@@ -1,0 +1,196 @@
+# Strong Hire local stack. Use scripts/dev.ps1 rather than calling this file directly.
+#   core:   postgres, redis, api, worker, web
+#   models: ollama (CPU), litellm proxy
+#   voice:  livekit-server (dev mode), voice agent, stt, tts (stt and tts are stubs until P1)
+# Host ports come from .env (see .env.example); the defaults below match it.
+name: strong-hire
+
+x-python-env: &python-env
+  DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-strong}:${POSTGRES_PASSWORD:-strong}@postgres:5432/${POSTGRES_DB:-strong}
+  REDIS_URL: redis://redis:6379/0
+  MODEL_PROFILE: ${MODEL_PROFILE:-fake}
+  MODEL_GATEWAY_URL: http://litellm:4000/v1
+  MODEL_GATEWAY_API_KEY: ${LITELLM_MASTER_KEY:-sk-local-dev-only}
+  LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-local-dev-only}
+  REPO_ROOT: /app
+
+x-healthcheck: &healthcheck
+  interval: 5s
+  timeout: 5s
+  retries: 20
+  start_period: 10s
+
+services:
+  # ---------------------------------------------------------------- core
+  postgres:
+    image: postgres:16-alpine
+    profiles: [core]
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-strong}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-strong}
+      POSTGRES_DB: ${POSTGRES_DB:-strong}
+    ports: ["${POSTGRES_PORT:-55432}:5432"]
+    volumes: [postgres-data:/var/lib/postgresql/data]
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+
+  redis:
+    image: redis:7-alpine
+    profiles: [core]
+    ports: ["${REDIS_PORT:-56379}:6379"]
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "redis-cli", "ping"]
+
+  api:
+    build:
+      context: ..
+      dockerfile: infra/docker/python.Dockerfile
+      args: { PACKAGE: strong-api, APP_DIR: apps/api }
+    profiles: [core]
+    environment: *python-env
+    command: >-
+      uvicorn strong_api.main:app --host 0.0.0.0 --port 8000
+      --reload --reload-dir /app/apps/api/src --reload-dir /app/packages/core/src
+    ports: ["${API_PORT:-8700}:8000"]
+    volumes:
+      - ../apps/api/src:/app/apps/api/src
+      - ../packages/core:/app/packages/core
+      - ../config:/app/config:ro
+      - ../prompts:/app/prompts:ro
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
+
+  worker:
+    build:
+      context: ..
+      dockerfile: infra/docker/python.Dockerfile
+      args: { PACKAGE: strong-worker, APP_DIR: apps/worker }
+    profiles: [core]
+    environment: *python-env
+    command: ["arq", "strong_worker.main.WorkerSettings"]
+    volumes:
+      - ../apps/worker/src:/app/apps/worker/src
+      - ../packages/core:/app/packages/core
+      - ../config:/app/config:ro
+      - ../prompts:/app/prompts:ro
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "arq", "--check", "strong_worker.main.WorkerSettings"]
+      interval: 15s
+      start_period: 20s
+
+  web:
+    build:
+      context: ..
+      dockerfile: infra/docker/web.Dockerfile
+    profiles: [core]
+    environment:
+      VITE_API_PROXY_TARGET: http://api:8000
+      VITE_USE_POLLING: "true"
+    ports: ["${WEB_PORT:-5180}:5180"]
+    volumes:
+      - ../apps/web/src:/app/src
+      - ../apps/web/index.html:/app/index.html
+    depends_on:
+      api: { condition: service_healthy }
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:5180/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+
+  # ---------------------------------------------------------------- models
+  ollama:
+    image: ollama/ollama:latest
+    profiles: [models]
+    ports: ["${OLLAMA_PORT:-11435}:11434"]
+    volumes: [ollama-models:/root/.ollama]
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "ollama", "list"]
+
+  litellm:
+    image: ghcr.io/berriai/litellm:main-stable
+    profiles: [models]
+    command: ["--config", "/app/litellm.yaml", "--port", "4000"]
+    environment:
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-local-dev-only}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      TOGETHER_API_KEY: ${TOGETHER_API_KEY:-}
+    ports: ["${LITELLM_PORT:-4000}:4000"]
+    volumes:
+      - ../config/litellm.${LITELLM_PROFILE:-local}.yaml:/app/litellm.yaml:ro
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:4000/health/liveliness', timeout=3)"]
+      start_period: 30s
+
+  # ---------------------------------------------------------------- voice
+  livekit:
+    image: livekit/livekit-server:latest
+    profiles: [voice]
+    command: ["--dev", "--bind", "0.0.0.0"]
+    ports:
+      - "${LIVEKIT_PORT:-7880}:7880"
+      - "${LIVEKIT_RTC_TCP_PORT:-7881}:7881"
+      - "${LIVEKIT_RTC_UDP_PORT:-7882}:7882/udp"
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:7880 || exit 1"]
+
+  voice:
+    build:
+      context: ..
+      dockerfile: infra/docker/python.Dockerfile
+      args: { PACKAGE: strong-voice, APP_DIR: apps/voice }
+    profiles: [voice]
+    environment:
+      <<: *python-env
+      LIVEKIT_URL: ws://livekit:7880
+      LIVEKIT_API_KEY: ${LIVEKIT_API_KEY:-devkey}
+      LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET:-secret}
+      VOICE_HEALTH_PORT: "8081"
+    command: ["python", "-m", "strong_voice"]
+    ports: ["${VOICE_HEALTH_PORT:-8081}:8081"]
+    volumes:
+      - ../apps/voice/src:/app/apps/voice/src
+      - ../packages/core:/app/packages/core
+      - ../config:/app/config:ro
+      - ../prompts:/app/prompts:ro
+    depends_on:
+      livekit: { condition: service_healthy }
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8081/health', timeout=3)"]
+
+  stt:
+    # Stub until P1 swaps in a faster-whisper server with an OpenAI-compatible API.
+    build: { context: .., dockerfile: infra/stub/Dockerfile }
+    profiles: [voice]
+    environment: { STUB_NAME: stt, PORT: "8000" }
+    ports: ["${STT_PORT:-8010}:8000"]
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
+
+  tts:
+    # Stub until P1 swaps in Kokoro (OpenAI-compatible /v1/audio/speech on port 8880).
+    build: { context: .., dockerfile: infra/stub/Dockerfile }
+    profiles: [voice]
+    environment: { STUB_NAME: tts, PORT: "8880" }
+    ports: ["${TTS_PORT:-8880}:8880"]
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8880/health', timeout=3)"]
+
+volumes:
+  postgres-data:
+  ollama-models:

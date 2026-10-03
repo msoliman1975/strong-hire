@@ -1,0 +1,7 @@
+# Placeholder for hosting (P12). TLS termination in front of web and api on Hetzner.
+# {$DOMAIN} {
+#     handle_path /api/* {
+#         reverse_proxy api:8000
+#     }
+#     reverse_proxy web:5180
+# }
