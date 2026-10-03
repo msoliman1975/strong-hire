@@ -1,0 +1,47 @@
+[tool.uv.workspace]
+members = ["packages/core", "apps/api", "apps/worker", "apps/voice"]
+
+[tool.uv.sources]
+strong-core = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "ruff>=0.6",
+    "mypy>=1.11",
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "types-PyYAML>=6.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["packages/core/migrations/versions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "RUF", "ASYNC"]
+ignore = ["RUF012"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["strong_core", "strong_api", "strong_worker", "strong_voice"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["B011"]
+
+[tool.mypy]
+python_version = "3.12"
+plugins = ["pydantic.mypy"]
+ignore_missing_imports = true
+explicit_package_bases = true
+mypy_path = ["packages/core/src", "apps/api/src", "apps/worker/src", "apps/voice/src"]
+files = ["packages/core/src", "apps/api/src", "apps/worker/src", "apps/voice/src"]
+
+[[tool.mypy.overrides]]
+module = ["strong_core", "strong_core.*"]
+strict = true
+
+[tool.pytest.ini_options]
+testpaths = ["packages/core/tests", "apps/api/tests", "apps/worker/tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "--import-mode=importlib"

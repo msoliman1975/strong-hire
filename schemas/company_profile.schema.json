@@ -1,0 +1,604 @@
+{
+  "$defs": {
+    "CaseStyle": {
+      "additionalProperties": false,
+      "description": "Relative emphasis, each from 0 to 1.",
+      "properties": {
+        "estimation": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Estimation",
+          "type": "number"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "product_sense": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Product Sense",
+          "type": "number"
+        },
+        "system_thinking": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "System Thinking",
+          "type": "number"
+        }
+      },
+      "required": [
+        "product_sense",
+        "estimation",
+        "system_thinking"
+      ],
+      "title": "CaseStyle",
+      "type": "object"
+    },
+    "Competency": {
+      "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.",
+      "enum": [
+        "ownership",
+        "impact",
+        "collaboration",
+        "conflict_handling",
+        "learning_from_failure",
+        "communication",
+        "role_fit",
+        "depth_of_experience",
+        "judgment",
+        "motivation",
+        "team_fit",
+        "scope_at_level",
+        "technical_depth",
+        "accuracy",
+        "reasoning",
+        "trade_offs",
+        "clarity_of_explanation",
+        "problem_framing",
+        "structure",
+        "user_and_business_sense",
+        "estimation_logic",
+        "prioritization",
+        "recommendation"
+      ],
+      "title": "Competency",
+      "type": "string"
+    },
+    "Confidence": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "title": "Confidence",
+      "type": "string"
+    },
+    "InterviewType": {
+      "description": "The four v1 interview types (IV-2).",
+      "enum": [
+        "behavioral",
+        "hiring_manager",
+        "technical_qa",
+        "case"
+      ],
+      "title": "InterviewType",
+      "type": "string"
+    },
+    "Level": {
+      "description": "Normalized seniority (IV-6). Company-specific labels such as L5 or E5 map to these.",
+      "enum": [
+        "new_grad",
+        "mid",
+        "senior",
+        "staff_principal"
+      ],
+      "title": "Level",
+      "type": "string"
+    },
+    "LevelBar": {
+      "additionalProperties": false,
+      "properties": {
+        "level_name": {
+          "description": "Company label, for example 'L5' or 'E5'.",
+          "minLength": 1,
+          "title": "Level Name",
+          "type": "string"
+        },
+        "normalized_level": {
+          "$ref": "#/$defs/Level"
+        },
+        "role_family": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RoleFamily"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "scope_expectation": {
+          "minLength": 1,
+          "title": "Scope Expectation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "level_name",
+        "normalized_level",
+        "scope_expectation"
+      ],
+      "title": "LevelBar",
+      "type": "object"
+    },
+    "LoopRound": {
+      "additionalProperties": false,
+      "properties": {
+        "duration_min": {
+          "anyOf": [
+            {
+              "maximum": 240,
+              "minimum": 5,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Duration Min"
+        },
+        "interview_type": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/InterviewType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "None for rounds v1 does not simulate, such as live coding."
+        },
+        "interviewer_role": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Interviewer Role"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "LoopRound",
+      "type": "object"
+    },
+    "LoopStructure": {
+      "additionalProperties": false,
+      "properties": {
+        "levels": {
+          "description": "Company level names covered.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Levels",
+          "type": "array"
+        },
+        "role_family": {
+          "$ref": "#/$defs/RoleFamily"
+        },
+        "rounds": {
+          "items": {
+            "$ref": "#/$defs/LoopRound"
+          },
+          "minItems": 1,
+          "title": "Rounds",
+          "type": "array"
+        }
+      },
+      "required": [
+        "role_family",
+        "rounds"
+      ],
+      "title": "LoopStructure",
+      "type": "object"
+    },
+    "PersonaNotes": {
+      "additionalProperties": false,
+      "properties": {
+        "closing_style": {
+          "minLength": 1,
+          "title": "Closing Style",
+          "type": "string"
+        },
+        "pace": {
+          "minLength": 1,
+          "title": "Pace",
+          "type": "string"
+        },
+        "pushback_style": {
+          "minLength": 1,
+          "title": "Pushback Style",
+          "type": "string"
+        },
+        "tone": {
+          "minLength": 1,
+          "title": "Tone",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tone",
+        "pace",
+        "pushback_style",
+        "closing_style"
+      ],
+      "title": "PersonaNotes",
+      "type": "object"
+    },
+    "Principle": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "evidence_signals": {
+          "description": "What evidence of this principle sounds like in an answer.",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Signals",
+          "type": "array"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "evidence_signals"
+      ],
+      "title": "Principle",
+      "type": "object"
+    },
+    "ProfileField": {
+      "description": "Top-level profile fields that carry sources and a confidence level.",
+      "enum": [
+        "values_framework",
+        "loop_structure",
+        "question_patterns",
+        "bar_by_level",
+        "persona",
+        "scoring_weights",
+        "case_style"
+      ],
+      "title": "ProfileField",
+      "type": "string"
+    },
+    "ProfileMeta": {
+      "additionalProperties": false,
+      "properties": {
+        "published_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Published At"
+        },
+        "researched_at": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Researched At"
+        },
+        "reviewed_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reviewed By"
+        },
+        "status": {
+          "$ref": "#/$defs/ProfileStatus",
+          "default": "draft"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "version"
+      ],
+      "title": "ProfileMeta",
+      "type": "object"
+    },
+    "ProfileStatus": {
+      "enum": [
+        "draft",
+        "in_review",
+        "published",
+        "archived"
+      ],
+      "title": "ProfileStatus",
+      "type": "string"
+    },
+    "QuestionPattern": {
+      "additionalProperties": false,
+      "description": "A recurring theme, phrased as a pattern. Never a leaked or NDA-protected question.",
+      "properties": {
+        "competencies": {
+          "items": {
+            "$ref": "#/$defs/Competency"
+          },
+          "title": "Competencies",
+          "type": "array"
+        },
+        "interview_type": {
+          "$ref": "#/$defs/InterviewType"
+        },
+        "pattern": {
+          "minLength": 1,
+          "title": "Pattern",
+          "type": "string"
+        },
+        "theme": {
+          "minLength": 1,
+          "title": "Theme",
+          "type": "string"
+        }
+      },
+      "required": [
+        "interview_type",
+        "theme",
+        "pattern"
+      ],
+      "title": "QuestionPattern",
+      "type": "object"
+    },
+    "RoleFamily": {
+      "enum": [
+        "swe",
+        "data_ml",
+        "pm",
+        "design",
+        "tpm",
+        "other"
+      ],
+      "title": "RoleFamily",
+      "type": "string"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "fields": {
+          "description": "Which profile fields this source supports.",
+          "items": {
+            "$ref": "#/$defs/ProfileField"
+          },
+          "minItems": 1,
+          "title": "Fields",
+          "type": "array"
+        },
+        "retrieved_at": {
+          "format": "date",
+          "title": "Retrieved At",
+          "type": "string"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title"
+        },
+        "url": {
+          "minLength": 1,
+          "title": "Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "url",
+        "retrieved_at",
+        "fields"
+      ],
+      "title": "Source",
+      "type": "object"
+    },
+    "ValuesFramework": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "description": "For example 'Leadership Principles'.",
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "principles": {
+          "items": {
+            "$ref": "#/$defs/Principle"
+          },
+          "minItems": 1,
+          "title": "Principles",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "principles"
+      ],
+      "title": "ValuesFramework",
+      "type": "object"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/company_profile.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "bar_by_level": {
+      "items": {
+        "$ref": "#/$defs/LevelBar"
+      },
+      "minItems": 1,
+      "title": "Bar By Level",
+      "type": "array"
+    },
+    "case_style": {
+      "$ref": "#/$defs/CaseStyle"
+    },
+    "company_name": {
+      "minLength": 1,
+      "title": "Company Name",
+      "type": "string"
+    },
+    "company_slug": {
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "title": "Company Slug",
+      "type": "string"
+    },
+    "field_confidence": {
+      "additionalProperties": {
+        "$ref": "#/$defs/Confidence"
+      },
+      "description": "Confidence per field. Every ProfileField must be present.",
+      "propertyNames": {
+        "$ref": "#/$defs/ProfileField"
+      },
+      "title": "Field Confidence",
+      "type": "object"
+    },
+    "loop_structure": {
+      "items": {
+        "$ref": "#/$defs/LoopStructure"
+      },
+      "minItems": 1,
+      "title": "Loop Structure",
+      "type": "array"
+    },
+    "low_confidence_notes": {
+      "description": "Fields or claims flagged for reviewer attention.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Low Confidence Notes",
+      "type": "array"
+    },
+    "meta": {
+      "$ref": "#/$defs/ProfileMeta"
+    },
+    "persona": {
+      "$ref": "#/$defs/PersonaNotes"
+    },
+    "question_patterns": {
+      "items": {
+        "$ref": "#/$defs/QuestionPattern"
+      },
+      "minItems": 1,
+      "title": "Question Patterns",
+      "type": "array"
+    },
+    "scoring_weights": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "description": "Relative weight of each competency in the hire signal. Missing means 1.0.",
+      "minProperties": 1,
+      "propertyNames": {
+        "$ref": "#/$defs/Competency"
+      },
+      "title": "Scoring Weights",
+      "type": "object"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/Source"
+      },
+      "minItems": 1,
+      "title": "Sources",
+      "type": "array"
+    },
+    "values_framework": {
+      "$ref": "#/$defs/ValuesFramework"
+    }
+  },
+  "required": [
+    "company_name",
+    "company_slug",
+    "meta",
+    "values_framework",
+    "loop_structure",
+    "question_patterns",
+    "bar_by_level",
+    "persona",
+    "scoring_weights",
+    "case_style",
+    "sources",
+    "field_confidence"
+  ],
+  "title": "CompanyProfile",
+  "type": "object"
+}

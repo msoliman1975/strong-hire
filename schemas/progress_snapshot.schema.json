@@ -1,0 +1,73 @@
+{
+  "$defs": {
+    "Competency": {
+      "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.",
+      "enum": [
+        "ownership",
+        "impact",
+        "collaboration",
+        "conflict_handling",
+        "learning_from_failure",
+        "communication",
+        "role_fit",
+        "depth_of_experience",
+        "judgment",
+        "motivation",
+        "team_fit",
+        "scope_at_level",
+        "technical_depth",
+        "accuracy",
+        "reasoning",
+        "trade_offs",
+        "clarity_of_explanation",
+        "problem_framing",
+        "structure",
+        "user_and_business_sense",
+        "estimation_logic",
+        "prioritization",
+        "recommendation"
+      ],
+      "title": "Competency",
+      "type": "string"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/progress_snapshot.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One competency score from one Realistic session, for trend charts (PR-1).",
+  "properties": {
+    "at": {
+      "format": "date-time",
+      "title": "At",
+      "type": "string"
+    },
+    "competency": {
+      "$ref": "#/$defs/Competency"
+    },
+    "job_target_id": {
+      "format": "uuid",
+      "title": "Job Target Id",
+      "type": "string"
+    },
+    "score": {
+      "maximum": 4,
+      "minimum": 1,
+      "title": "Score",
+      "type": "number"
+    },
+    "session_id": {
+      "format": "uuid",
+      "title": "Session Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "job_target_id",
+    "session_id",
+    "competency",
+    "score",
+    "at"
+  ],
+  "title": "ProgressSnapshot",
+  "type": "object"
+}

@@ -1,0 +1,46 @@
+{
+  "company_name": "Example Corp",
+  "company_slug": "example-corp",
+  "meta": {"version": 1, "status": "draft", "reviewed_by": null, "researched_at": "2026-10-03", "published_at": null},
+  "values_framework": {
+    "name": "Example Values",
+    "principles": [
+      {"name": "Customer first", "description": "Start from the customer problem.", "evidence_signals": ["Names a specific customer and their pain", "Shows how the outcome was measured for the customer"]},
+      {"name": "Own the outcome", "description": "Take responsibility end to end.", "evidence_signals": ["Uses 'I' for own decisions", "Follows through after launch"]}
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["E4", "E5"],
+      "rounds": [
+        {"name": "Recruiter screen", "interview_type": null, "duration_min": 30, "interviewer_role": "Recruiter", "notes": null},
+        {"name": "Values interview", "interview_type": "behavioral", "duration_min": 45, "interviewer_role": "Senior engineer", "notes": null},
+        {"name": "Hiring manager", "interview_type": "hiring_manager", "duration_min": 45, "interviewer_role": "Engineering manager", "notes": null}
+      ]
+    }
+  ],
+  "question_patterns": [
+    {"interview_type": "behavioral", "theme": "Ownership under ambiguity", "pattern": "A time the candidate drove a result without clear direction", "competencies": ["ownership", "impact"]}
+  ],
+  "bar_by_level": [
+    {"level_name": "E4", "normalized_level": "mid", "role_family": "swe", "scope_expectation": "Owns features within one team."},
+    {"level_name": "E5", "normalized_level": "senior", "role_family": "swe", "scope_expectation": "Owns systems and influences adjacent teams."}
+  ],
+  "persona": {"tone": "Friendly and curious", "pace": "Moderate", "pushback_style": "Asks 'what would you do differently?'", "closing_style": "Leaves 5 minutes for questions"},
+  "scoring_weights": {"ownership": 1.5, "impact": 1.2, "collaboration": 1.0},
+  "case_style": {"product_sense": 0.6, "estimation": 0.2, "system_thinking": 0.2, "notes": null},
+  "sources": [
+    {"url": "https://careers.example.com/values", "title": "Example Corp values", "retrieved_at": "2026-10-03", "fields": ["values_framework", "persona"]}
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "medium",
+    "scoring_weights": "low",
+    "case_style": "low"
+  },
+  "low_confidence_notes": ["Level names are from one public source only."]
+}

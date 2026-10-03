@@ -1,0 +1,279 @@
+{
+  "$defs": {
+    "BriefQuestion": {
+      "additionalProperties": false,
+      "properties": {
+        "competencies": {
+          "items": {
+            "$ref": "#/$defs/Competency"
+          },
+          "minItems": 1,
+          "title": "Competencies",
+          "type": "array"
+        },
+        "id": {
+          "description": "Stable id, used as Turn.question_ref.",
+          "pattern": "^[a-z0-9_-]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "priority": {
+          "description": "1 is asked first.",
+          "minimum": 1,
+          "title": "Priority",
+          "type": "integer"
+        },
+        "probe_hints": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Probe Hints",
+          "type": "array"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "text",
+        "competencies",
+        "priority"
+      ],
+      "title": "BriefQuestion",
+      "type": "object"
+    },
+    "Competency": {
+      "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.",
+      "enum": [
+        "ownership",
+        "impact",
+        "collaboration",
+        "conflict_handling",
+        "learning_from_failure",
+        "communication",
+        "role_fit",
+        "depth_of_experience",
+        "judgment",
+        "motivation",
+        "team_fit",
+        "scope_at_level",
+        "technical_depth",
+        "accuracy",
+        "reasoning",
+        "trade_offs",
+        "clarity_of_explanation",
+        "problem_framing",
+        "structure",
+        "user_and_business_sense",
+        "estimation_logic",
+        "prioritization",
+        "recommendation"
+      ],
+      "title": "Competency",
+      "type": "string"
+    },
+    "Difficulty": {
+      "description": "IV-4.",
+      "enum": [
+        "friendly",
+        "realistic",
+        "tough"
+      ],
+      "title": "Difficulty",
+      "type": "string"
+    },
+    "InterviewType": {
+      "description": "The four v1 interview types (IV-2).",
+      "enum": [
+        "behavioral",
+        "hiring_manager",
+        "technical_qa",
+        "case"
+      ],
+      "title": "InterviewType",
+      "type": "string"
+    },
+    "Level": {
+      "description": "Normalized seniority (IV-6). Company-specific labels such as L5 or E5 map to these.",
+      "enum": [
+        "new_grad",
+        "mid",
+        "senior",
+        "staff_principal"
+      ],
+      "title": "Level",
+      "type": "string"
+    },
+    "Mode": {
+      "description": "IV-8. Only Realistic sessions count toward progress trends (PR-1).",
+      "enum": [
+        "coach",
+        "realistic"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "PersonaBrief": {
+      "additionalProperties": false,
+      "properties": {
+        "closing_style": {
+          "minLength": 1,
+          "title": "Closing Style",
+          "type": "string"
+        },
+        "pushback_style": {
+          "minLength": 1,
+          "title": "Pushback Style",
+          "type": "string"
+        },
+        "tone": {
+          "minLength": 1,
+          "title": "Tone",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tone",
+        "pushback_style",
+        "closing_style"
+      ],
+      "title": "PersonaBrief",
+      "type": "object"
+    },
+    "SessionConfig": {
+      "additionalProperties": false,
+      "description": "What the candidate picks before a session (journey 2, step 1).",
+      "properties": {
+        "difficulty": {
+          "$ref": "#/$defs/Difficulty"
+        },
+        "duration_min": {
+          "enum": [
+            30,
+            45
+          ],
+          "title": "Duration Min",
+          "type": "integer"
+        },
+        "interview_type": {
+          "$ref": "#/$defs/InterviewType"
+        },
+        "level": {
+          "$ref": "#/$defs/Level"
+        },
+        "mode": {
+          "$ref": "#/$defs/Mode"
+        }
+      },
+      "required": [
+        "interview_type",
+        "difficulty",
+        "mode",
+        "duration_min",
+        "level"
+      ],
+      "title": "SessionConfig",
+      "type": "object"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/interviewer_brief.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Built by the planner before each session. The live interviewer reads only this.",
+  "properties": {
+    "company_name": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "None in generic mode.",
+      "title": "Company Name"
+    },
+    "curveball": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Tough difficulty only (IV-4).",
+      "title": "Curveball"
+    },
+    "generic_mode": {
+      "title": "Generic Mode",
+      "type": "boolean"
+    },
+    "max_probes_per_question": {
+      "description": "IV-3.",
+      "maximum": 3,
+      "minimum": 0,
+      "title": "Max Probes Per Question",
+      "type": "integer"
+    },
+    "persona": {
+      "$ref": "#/$defs/PersonaBrief"
+    },
+    "probe_areas": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Probe Areas",
+      "type": "array"
+    },
+    "profile_version": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Profile Version"
+    },
+    "questions": {
+      "items": {
+        "$ref": "#/$defs/BriefQuestion"
+      },
+      "maxItems": 10,
+      "minItems": 6,
+      "title": "Questions",
+      "type": "array"
+    },
+    "session": {
+      "$ref": "#/$defs/SessionConfig"
+    },
+    "target_competencies": {
+      "items": {
+        "$ref": "#/$defs/Competency"
+      },
+      "maxItems": 6,
+      "minItems": 4,
+      "title": "Target Competencies",
+      "type": "array"
+    }
+  },
+  "required": [
+    "session",
+    "generic_mode",
+    "target_competencies",
+    "questions",
+    "persona",
+    "max_probes_per_question"
+  ],
+  "title": "InterviewerBrief",
+  "type": "object"
+}

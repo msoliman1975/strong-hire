@@ -1,0 +1,80 @@
+{
+  "$defs": {
+    "Difficulty": {
+      "description": "IV-4.",
+      "enum": [
+        "friendly",
+        "realistic",
+        "tough"
+      ],
+      "title": "Difficulty",
+      "type": "string"
+    },
+    "InterviewType": {
+      "description": "The four v1 interview types (IV-2).",
+      "enum": [
+        "behavioral",
+        "hiring_manager",
+        "technical_qa",
+        "case"
+      ],
+      "title": "InterviewType",
+      "type": "string"
+    },
+    "Level": {
+      "description": "Normalized seniority (IV-6). Company-specific labels such as L5 or E5 map to these.",
+      "enum": [
+        "new_grad",
+        "mid",
+        "senior",
+        "staff_principal"
+      ],
+      "title": "Level",
+      "type": "string"
+    },
+    "Mode": {
+      "description": "IV-8. Only Realistic sessions count toward progress trends (PR-1).",
+      "enum": [
+        "coach",
+        "realistic"
+      ],
+      "title": "Mode",
+      "type": "string"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/session_config.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "What the candidate picks before a session (journey 2, step 1).",
+  "properties": {
+    "difficulty": {
+      "$ref": "#/$defs/Difficulty"
+    },
+    "duration_min": {
+      "enum": [
+        30,
+        45
+      ],
+      "title": "Duration Min",
+      "type": "integer"
+    },
+    "interview_type": {
+      "$ref": "#/$defs/InterviewType"
+    },
+    "level": {
+      "$ref": "#/$defs/Level"
+    },
+    "mode": {
+      "$ref": "#/$defs/Mode"
+    }
+  },
+  "required": [
+    "interview_type",
+    "difficulty",
+    "mode",
+    "duration_min",
+    "level"
+  ],
+  "title": "SessionConfig",
+  "type": "object"
+}

@@ -1,0 +1,74 @@
+{
+  "$defs": {
+    "Phase": {
+      "description": "Session state machine phases (IV-7). The session controller moves phases, not the LLM.",
+      "enum": [
+        "intro",
+        "small_talk",
+        "agenda",
+        "core",
+        "candidate_questions",
+        "wrap_up"
+      ],
+      "title": "Phase",
+      "type": "string"
+    },
+    "Speaker": {
+      "enum": [
+        "interviewer",
+        "candidate"
+      ],
+      "title": "Speaker",
+      "type": "string"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/turn.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One utterance in the transcript. Text only; audio is never stored.",
+  "properties": {
+    "end_ms": {
+      "minimum": 0,
+      "title": "End Ms",
+      "type": "integer"
+    },
+    "phase": {
+      "$ref": "#/$defs/Phase"
+    },
+    "question_ref": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "BriefQuestion.id, in CORE only.",
+      "title": "Question Ref"
+    },
+    "speaker": {
+      "$ref": "#/$defs/Speaker"
+    },
+    "start_ms": {
+      "description": "Offset from session start.",
+      "minimum": 0,
+      "title": "Start Ms",
+      "type": "integer"
+    },
+    "text": {
+      "title": "Text",
+      "type": "string"
+    }
+  },
+  "required": [
+    "speaker",
+    "phase",
+    "text",
+    "start_ms",
+    "end_ms"
+  ],
+  "title": "Turn",
+  "type": "object"
+}

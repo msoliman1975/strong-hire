@@ -1,0 +1,1 @@
+"""strong_worker."""

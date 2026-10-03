@@ -1,0 +1,297 @@
+{
+  "$defs": {
+    "Competency": {
+      "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.",
+      "enum": [
+        "ownership",
+        "impact",
+        "collaboration",
+        "conflict_handling",
+        "learning_from_failure",
+        "communication",
+        "role_fit",
+        "depth_of_experience",
+        "judgment",
+        "motivation",
+        "team_fit",
+        "scope_at_level",
+        "technical_depth",
+        "accuracy",
+        "reasoning",
+        "trade_offs",
+        "clarity_of_explanation",
+        "problem_framing",
+        "structure",
+        "user_and_business_sense",
+        "estimation_logic",
+        "prioritization",
+        "recommendation"
+      ],
+      "title": "Competency",
+      "type": "string"
+    },
+    "CompetencyMatch": {
+      "additionalProperties": false,
+      "properties": {
+        "competency": {
+          "$ref": "#/$defs/Competency"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "score": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Score",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "competency",
+        "score"
+      ],
+      "title": "CompetencyMatch",
+      "type": "object"
+    },
+    "Difficulty": {
+      "description": "IV-4.",
+      "enum": [
+        "friendly",
+        "realistic",
+        "tough"
+      ],
+      "title": "Difficulty",
+      "type": "string"
+    },
+    "Gap": {
+      "additionalProperties": false,
+      "properties": {
+        "related_requirement": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Related Requirement"
+        },
+        "severity": {
+          "$ref": "#/$defs/Severity"
+        },
+        "summary": {
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        }
+      },
+      "required": [
+        "summary",
+        "severity"
+      ],
+      "title": "Gap",
+      "type": "object"
+    },
+    "InterviewType": {
+      "description": "The four v1 interview types (IV-2).",
+      "enum": [
+        "behavioral",
+        "hiring_manager",
+        "technical_qa",
+        "case"
+      ],
+      "title": "InterviewType",
+      "type": "string"
+    },
+    "PlannedSession": {
+      "additionalProperties": false,
+      "description": "One recommended practice session (GA-3).",
+      "properties": {
+        "difficulty": {
+          "$ref": "#/$defs/Difficulty",
+          "default": "realistic"
+        },
+        "focus_topics": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Focus Topics",
+          "type": "array"
+        },
+        "interview_type": {
+          "$ref": "#/$defs/InterviewType"
+        },
+        "priority": {
+          "description": "1 is the first session to run.",
+          "minimum": 1,
+          "title": "Priority",
+          "type": "integer"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "priority",
+        "interview_type",
+        "focus_topics",
+        "reason"
+      ],
+      "title": "PlannedSession",
+      "type": "object"
+    },
+    "RequirementKind": {
+      "enum": [
+        "must_have",
+        "nice_to_have"
+      ],
+      "title": "RequirementKind",
+      "type": "string"
+    },
+    "RequirementMatch": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Resume text that supports the score.",
+          "title": "Evidence"
+        },
+        "kind": {
+          "$ref": "#/$defs/RequirementKind"
+        },
+        "requirement": {
+          "minLength": 1,
+          "title": "Requirement",
+          "type": "string"
+        },
+        "score": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Score",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "requirement",
+        "kind",
+        "score"
+      ],
+      "title": "RequirementMatch",
+      "type": "object"
+    },
+    "Severity": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "title": "Severity",
+      "type": "string"
+    },
+    "Strength": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "description": "Resume evidence (GA-2).",
+          "minLength": 1,
+          "title": "Evidence",
+          "type": "string"
+        },
+        "summary": {
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        }
+      },
+      "required": [
+        "summary",
+        "evidence"
+      ],
+      "title": "Strength",
+      "type": "object"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/gap_analysis.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "competency_breakdown": {
+      "items": {
+        "$ref": "#/$defs/CompetencyMatch"
+      },
+      "title": "Competency Breakdown",
+      "type": "array"
+    },
+    "gaps": {
+      "items": {
+        "$ref": "#/$defs/Gap"
+      },
+      "title": "Gaps",
+      "type": "array"
+    },
+    "match_score": {
+      "description": "GA-1.",
+      "maximum": 100,
+      "minimum": 0,
+      "title": "Match Score",
+      "type": "integer"
+    },
+    "probe_areas": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Probe Areas",
+      "type": "array"
+    },
+    "requirement_breakdown": {
+      "items": {
+        "$ref": "#/$defs/RequirementMatch"
+      },
+      "title": "Requirement Breakdown",
+      "type": "array"
+    },
+    "session_plan": {
+      "items": {
+        "$ref": "#/$defs/PlannedSession"
+      },
+      "minItems": 1,
+      "title": "Session Plan",
+      "type": "array"
+    },
+    "strengths": {
+      "items": {
+        "$ref": "#/$defs/Strength"
+      },
+      "title": "Strengths",
+      "type": "array"
+    }
+  },
+  "required": [
+    "match_score",
+    "session_plan"
+  ],
+  "title": "GapAnalysis",
+  "type": "object"
+}

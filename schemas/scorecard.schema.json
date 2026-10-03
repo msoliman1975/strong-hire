@@ -1,0 +1,177 @@
+{
+  "$defs": {
+    "Competency": {
+      "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.",
+      "enum": [
+        "ownership",
+        "impact",
+        "collaboration",
+        "conflict_handling",
+        "learning_from_failure",
+        "communication",
+        "role_fit",
+        "depth_of_experience",
+        "judgment",
+        "motivation",
+        "team_fit",
+        "scope_at_level",
+        "technical_depth",
+        "accuracy",
+        "reasoning",
+        "trade_offs",
+        "clarity_of_explanation",
+        "problem_framing",
+        "structure",
+        "user_and_business_sense",
+        "estimation_logic",
+        "prioritization",
+        "recommendation"
+      ],
+      "title": "Competency",
+      "type": "string"
+    },
+    "CompetencyScore": {
+      "additionalProperties": false,
+      "properties": {
+        "competency": {
+          "$ref": "#/$defs/Competency"
+        },
+        "justification": {
+          "minLength": 1,
+          "title": "Justification",
+          "type": "string"
+        },
+        "quotes": {
+          "description": "Transcript quotes backing the score.",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Quotes",
+          "type": "array"
+        },
+        "score": {
+          "maximum": 4,
+          "minimum": 1,
+          "title": "Score",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "competency",
+        "score",
+        "justification",
+        "quotes"
+      ],
+      "title": "CompetencyScore",
+      "type": "object"
+    },
+    "HireSignal": {
+      "description": "FB-1. Ordered from strongest to weakest.",
+      "enum": [
+        "Strong Hire",
+        "Hire",
+        "Lean Hire",
+        "Lean No Hire",
+        "No Hire"
+      ],
+      "title": "HireSignal",
+      "type": "string"
+    },
+    "QuestionScore": {
+      "additionalProperties": false,
+      "properties": {
+        "misses": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Misses",
+          "type": "array"
+        },
+        "question_ref": {
+          "minLength": 1,
+          "title": "Question Ref",
+          "type": "string"
+        },
+        "question_text": {
+          "minLength": 1,
+          "title": "Question Text",
+          "type": "string"
+        },
+        "scores": {
+          "items": {
+            "$ref": "#/$defs/CompetencyScore"
+          },
+          "minItems": 1,
+          "title": "Scores",
+          "type": "array"
+        },
+        "strengths": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Strengths",
+          "type": "array"
+        }
+      },
+      "required": [
+        "question_ref",
+        "question_text",
+        "scores"
+      ],
+      "title": "QuestionScore",
+      "type": "object"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/scorecard.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "competency_scores": {
+      "description": "Overall score per competency across the session.",
+      "items": {
+        "$ref": "#/$defs/CompetencyScore"
+      },
+      "minItems": 1,
+      "title": "Competency Scores",
+      "type": "array"
+    },
+    "hire_signal": {
+      "$ref": "#/$defs/HireSignal"
+    },
+    "per_question": {
+      "items": {
+        "$ref": "#/$defs/QuestionScore"
+      },
+      "title": "Per Question",
+      "type": "array"
+    },
+    "rationale": {
+      "description": "3 to 5 sentences, like a debrief summary.",
+      "minLength": 1,
+      "title": "Rationale",
+      "type": "string"
+    },
+    "rubric_version": {
+      "description": "Prompt ref, for example 'scorer/rubric.v1'.",
+      "minLength": 1,
+      "title": "Rubric Version",
+      "type": "string"
+    },
+    "scorer_model": {
+      "description": "Gateway model alias, never a vendor id.",
+      "minLength": 1,
+      "title": "Scorer Model",
+      "type": "string"
+    }
+  },
+  "required": [
+    "hire_signal",
+    "rationale",
+    "competency_scores",
+    "scorer_model",
+    "rubric_version"
+  ],
+  "title": "Scorecard",
+  "type": "object"
+}
