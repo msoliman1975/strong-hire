@@ -13,6 +13,7 @@ from redis.asyncio import Redis
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from strong_api.auth import install_auth
 from strong_api.inputs import router as inputs_router
 from strong_api.inputs.queue import ArqJobQueue, JobQueue
 from strong_core import __version__
@@ -59,6 +60,7 @@ def create_app(
     app.state.sessionmaker = sessionmaker or get_sessionmaker()
     app.state.queue = queue or ArqJobQueue(settings.redis_url)
     app.include_router(inputs_router)
+    install_auth(app)
 
     @app.get("/health")
     async def health(response: Response) -> dict[str, Any]:

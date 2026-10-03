@@ -10,6 +10,10 @@ dependencies = [
     "redis>=5.0",
     "arq>=0.26",
     "python-multipart>=0.0.9",
+    "authlib>=1.3",
+    "itsdangerous>=2.2",
+    "httpx>=0.27",
+    "email-validator>=2.2",
 ]
 
 [tool.uv.sources]
