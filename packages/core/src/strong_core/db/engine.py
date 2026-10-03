@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 
+from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -12,10 +13,15 @@ from sqlalchemy.ext.asyncio import (
 from strong_core.config import get_settings
 
 
+def async_database_url(url: str) -> str:
+    """DATABASE_URL uses psycopg (sync: Alembic, scripts). Async code uses asyncpg, which also
+    works on the default Windows event loop, unlike psycopg's async mode."""
+    return make_url(url).set(drivername="postgresql+asyncpg").render_as_string(hide_password=False)
+
+
 @lru_cache
 def get_engine() -> AsyncEngine:
-    """Async engine. DATABASE_URL uses the psycopg 3 driver, which works sync and async."""
-    return create_async_engine(get_settings().database_url, pool_pre_ping=True)
+    return create_async_engine(async_database_url(get_settings().database_url), pool_pre_ping=True)
 
 
 def get_sessionmaker() -> async_sessionmaker[AsyncSession]:

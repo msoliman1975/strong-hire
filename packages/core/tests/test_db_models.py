@@ -37,3 +37,10 @@ def test_training_consent_defaults_off() -> None:
     column = Base.metadata.tables["users"].columns["training_consent"]
     assert column.server_default is not None
     assert str(column.server_default.arg) == "false"
+
+
+def test_async_url_uses_asyncpg() -> None:
+    from strong_core.db.engine import async_database_url
+
+    url = async_database_url("postgresql+psycopg://u:p@db:5432/strong")
+    assert url == "postgresql+asyncpg://u:p@db:5432/strong"

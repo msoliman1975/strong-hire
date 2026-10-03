@@ -36,7 +36,7 @@ def create_app(checks: dict[str, Check] | None = None) -> FastAPI:
     app = FastAPI(title="Strong Hire API", version=__version__)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:5173"],
+        allow_origins=["http://localhost:5180"],
         allow_methods=["*"],
         allow_headers=["*"],
     )
