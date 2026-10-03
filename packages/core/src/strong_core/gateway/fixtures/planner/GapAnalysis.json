@@ -1,0 +1,23 @@
+{
+  "match_score": 72,
+  "requirement_breakdown": [
+    {"requirement": "Python", "kind": "must_have", "score": 95, "evidence": "7 years of Python in billing systems"},
+    {"requirement": "Distributed systems", "kind": "must_have", "score": 60, "evidence": "Partitioned invoice jobs across workers"},
+    {"requirement": "Payments domain", "kind": "nice_to_have", "score": 80, "evidence": "Refunds API at Shoply"}
+  ],
+  "competency_breakdown": [
+    {"competency": "technical_depth", "score": 75, "notes": null},
+    {"competency": "scope_at_level", "score": 55, "notes": "Little evidence of cross-team leadership"}
+  ],
+  "strengths": [
+    {"summary": "Strong PostgreSQL operations", "evidence": "Led migration of 30 services to PostgreSQL 15 with zero downtime"}
+  ],
+  "gaps": [
+    {"summary": "No clear technical leadership across teams", "severity": "high", "related_requirement": "Lead technical design reviews for the team"}
+  ],
+  "probe_areas": ["Design review leadership", "Failure handling in money movement"],
+  "session_plan": [
+    {"priority": 1, "interview_type": "behavioral", "difficulty": "realistic", "focus_topics": ["Leading without authority"], "reason": "Largest gap is scope at senior level"},
+    {"priority": 2, "interview_type": "technical_qa", "difficulty": "realistic", "focus_topics": ["Idempotency", "Exactly-once payments"], "reason": "Core to the role"}
+  ]
+}

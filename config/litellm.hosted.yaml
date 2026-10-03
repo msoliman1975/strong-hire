@@ -1,0 +1,39 @@
+# LiteLLM proxy config for MODEL_PROFILE=hosted. Placeholders until P1 picks providers that offer
+# zero data retention. API keys come from environment variables, never from this file.
+model_list:
+  - model_name: hosted-extractor
+    litellm_params:
+      model: groq/llama-3.1-8b-instant
+      api_key: os.environ/GROQ_API_KEY
+  - model_name: hosted-planner
+    litellm_params:
+      model: groq/llama-3.3-70b-versatile
+      api_key: os.environ/GROQ_API_KEY
+  - model_name: hosted-interviewer
+    litellm_params:
+      model: groq/llama-3.3-70b-versatile
+      api_key: os.environ/GROQ_API_KEY
+  - model_name: hosted-scorer
+    litellm_params:
+      model: together_ai/meta-llama/Llama-3.3-70B-Instruct-Turbo
+      api_key: os.environ/TOGETHER_API_KEY
+  - model_name: hosted-stt
+    litellm_params:
+      model: groq/whisper-large-v3-turbo
+      api_key: os.environ/GROQ_API_KEY
+    model_info:
+      mode: audio_transcription
+  - model_name: hosted-tts
+    litellm_params:
+      model: openai/kokoro
+      api_base: http://tts:8880/v1
+      api_key: not-needed
+    model_info:
+      mode: audio_speech
+
+litellm_settings:
+  drop_params: true
+  request_timeout: 60
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY

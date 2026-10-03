@@ -1,0 +1,16 @@
+{
+  "company_name": "Example Corp",
+  "title": "Senior Software Engineer, Payments",
+  "role_family": "swe",
+  "level": "senior",
+  "level_label": "Senior",
+  "team": "Payments Platform",
+  "location": "Remote, US",
+  "must_have_skills": ["Python", "Distributed systems", "PostgreSQL"],
+  "nice_to_have_skills": ["Kafka", "Payments domain"],
+  "responsibilities": [
+    "Design and run services that move money reliably",
+    "Lead technical design reviews for the team"
+  ],
+  "source_url": "https://jobs.example.com/123"
+}

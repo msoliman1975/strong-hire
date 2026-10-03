@@ -1,0 +1,21 @@
+{
+  "hire_signal": "Lean Hire",
+  "rationale": "The candidate showed clear ownership of the invoice migration and gave a measurable result. Collaboration examples were thin and mostly within one team. At senior level we expect cross-team influence, which was not shown. The signal is Lean Hire.",
+  "competency_scores": [
+    {"competency": "ownership", "score": 3, "justification": "Owned the migration plan and rollout.", "quotes": ["I wrote the plan and ran the cutover myself."]},
+    {"competency": "collaboration", "score": 2, "justification": "Examples stayed inside one team.", "quotes": ["My team handled all of it."]}
+  ],
+  "per_question": [
+    {
+      "question_ref": "q1",
+      "question_text": "Tell me about a project you owned end to end.",
+      "scores": [
+        {"competency": "ownership", "score": 3, "justification": "Clear personal role.", "quotes": ["I wrote the plan and ran the cutover myself."]}
+      ],
+      "strengths": ["Measurable result: runtime down from 4 hours to 25 minutes"],
+      "misses": ["Did not explain trade-offs considered"]
+    }
+  ],
+  "scorer_model": "fake-scorer",
+  "rubric_version": "scorer/rubric.v1"
+}

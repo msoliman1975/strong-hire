@@ -1,0 +1,48 @@
+# Role -> model alias for MODEL_PROFILE=hosted (hosted open-weight model APIs via LiteLLM).
+# Aliases are LiteLLM model_names defined in litellm.hosted.yaml.
+# Providers must offer zero data retention (spec, Privacy section). Picks are placeholders until P1.
+profile: hosted
+gateway:
+  base_url: http://litellm:4000/v1
+  api_key_env: LITELLM_MASTER_KEY
+  timeout_s: 60
+
+roles:
+  extractor: hosted-extractor
+  planner: hosted-planner
+  interviewer: hosted-interviewer
+  scorer: hosted-scorer
+  stt: hosted-stt
+  tts: hosted-tts
+
+models:
+  hosted-extractor:
+    kind: chat
+    supports_tools: true
+    json_mode: true
+    context_window: 131072
+  hosted-planner:
+    kind: chat
+    supports_tools: true
+    json_mode: true
+    context_window: 131072
+  hosted-interviewer:
+    kind: chat
+    supports_tools: true
+    json_mode: true
+    context_window: 131072
+  hosted-scorer:
+    kind: chat
+    supports_tools: true
+    json_mode: true
+    context_window: 131072
+  hosted-stt:
+    kind: stt
+    context_window: 512
+    options:
+      language: en
+  hosted-tts:
+    kind: tts
+    context_window: 512
+    options:
+      voice: af_heart

@@ -1,0 +1,29 @@
+{
+  "summary": "Backend engineer with 7 years building payment and billing systems.",
+  "roles": [
+    {
+      "title": "Software Engineer II",
+      "company": "Acme Billing",
+      "start": "2021-03",
+      "end": null,
+      "achievements": [
+        "Cut invoice job runtime from 4 hours to 25 minutes by partitioning work across workers",
+        "Led migration of 30 services to PostgreSQL 15 with zero downtime"
+      ],
+      "skills": ["Python", "PostgreSQL", "Kafka"]
+    },
+    {
+      "title": "Software Engineer",
+      "company": "Shoply",
+      "start": "2018-06",
+      "end": "2021-02",
+      "achievements": ["Built the refunds API used by 2,000 merchants"],
+      "skills": ["Python", "Django"]
+    }
+  ],
+  "skills": ["Python", "PostgreSQL", "Kafka", "AWS"],
+  "education": [
+    {"institution": "State University", "degree": "BSc", "field_of_study": "Computer Science", "end": "2018"}
+  ],
+  "certifications": []
+}

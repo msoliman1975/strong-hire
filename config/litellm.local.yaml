@@ -1,0 +1,37 @@
+# LiteLLM proxy config for MODEL_PROFILE=local. This file and litellm.hosted.yaml are the only
+# places where real model ids and providers appear.
+# Placeholders until the P1 model spike. Pull the Ollama models first:
+#   docker compose -f infra/compose.yaml exec ollama ollama pull qwen2.5:3b-instruct
+model_list:
+  - model_name: local-small
+    litellm_params:
+      model: ollama_chat/qwen2.5:3b-instruct
+      api_base: http://ollama:11434
+  - model_name: local-mid
+    litellm_params:
+      model: ollama_chat/qwen2.5:7b-instruct
+      api_base: http://ollama:11434
+  # To use LM Studio on the host instead, point a model at it:
+  #   model: openai/<model-id-in-lm-studio>
+  #   api_base: http://host.docker.internal:1234/v1
+  - model_name: local-stt
+    litellm_params:
+      model: openai/Systran/faster-whisper-small
+      api_base: http://stt:8000/v1
+      api_key: not-needed
+    model_info:
+      mode: audio_transcription
+  - model_name: local-tts
+    litellm_params:
+      model: openai/kokoro
+      api_base: http://tts:8880/v1
+      api_key: not-needed
+    model_info:
+      mode: audio_speech
+
+litellm_settings:
+  drop_params: true
+  request_timeout: 120
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY

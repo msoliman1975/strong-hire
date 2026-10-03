@@ -1,0 +1,19 @@
+{
+  "session": {"interview_type": "behavioral", "difficulty": "realistic", "mode": "realistic", "duration_min": 30, "level": "senior"},
+  "company_name": null,
+  "generic_mode": true,
+  "profile_version": null,
+  "target_competencies": ["ownership", "impact", "collaboration", "conflict_handling"],
+  "questions": [
+    {"id": "q1", "text": "Tell me about a project you owned end to end.", "competencies": ["ownership", "impact"], "priority": 1, "probe_hints": ["Ask for their own role", "Ask for a measurable result"]},
+    {"id": "q2", "text": "Describe a time you disagreed with a senior engineer.", "competencies": ["conflict_handling"], "priority": 2, "probe_hints": []},
+    {"id": "q3", "text": "Tell me about a time you helped another team ship.", "competencies": ["collaboration"], "priority": 3, "probe_hints": []},
+    {"id": "q4", "text": "Describe a production incident you led the response to.", "competencies": ["ownership"], "priority": 4, "probe_hints": []},
+    {"id": "q5", "text": "Tell me about a decision you would make differently now.", "competencies": ["impact"], "priority": 5, "probe_hints": []},
+    {"id": "q6", "text": "How did you raise the bar for code quality on your team?", "competencies": ["collaboration", "impact"], "priority": 6, "probe_hints": []}
+  ],
+  "probe_areas": ["Design review leadership"],
+  "persona": {"tone": "Warm but direct", "pushback_style": "Asks for specifics", "closing_style": "Thanks the candidate and explains next steps"},
+  "max_probes_per_question": 3,
+  "curveball": null
+}
