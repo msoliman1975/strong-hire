@@ -1,0 +1,35 @@
+# Planning material kept outside the repo (the spec is copied to docs/spec.md)
+Specs-Design-Prompts/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+apps/web/dist/
+*.tsbuildinfo
+
+# Env and secrets
+.env
+.env.*
+!.env.example
+
+# Extra CA certificates for corporate proxies (machine-specific)
+infra/certs/*
+!infra/certs/README.md
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
