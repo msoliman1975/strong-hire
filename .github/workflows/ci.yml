@@ -1,0 +1,114 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: Python (ruff, mypy, pytest, schemas)
+    runs-on: ubuntu-latest
+    env:
+      MODEL_PROFILE: fake
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv python install 3.12
+      - run: uv sync --all-packages --frozen
+      - name: ruff
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+      - name: mypy
+        run: uv run mypy
+      - name: pytest
+        run: uv run pytest
+      - name: JSON Schemas are fresh
+        run: uv run python -m strong_core.export_schemas --check
+
+  migrations:
+    name: Migrations on a fresh Postgres 16
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: strong
+          POSTGRES_PASSWORD: strong
+          POSTGRES_DB: strong
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U strong" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql+psycopg://strong:strong@localhost:5432/strong
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv python install 3.12
+      - run: uv sync --all-packages --frozen
+      - name: upgrade, check for model drift, downgrade, upgrade again
+        run: |
+          A="uv run alembic -c packages/core/alembic.ini"
+          $A upgrade head
+          $A check
+          $A downgrade base
+          $A upgrade head
+      - name: seed is repeatable
+        run: |
+          uv run python -m strong_core.db.seed
+          uv run python -m strong_core.db.seed
+
+  web:
+    name: Web (lint, typecheck, test, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: apps/web/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: apps/web/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+
+  compose:
+    name: Docker stack (core profile) starts and /health is OK through the web page
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: All profiles parse
+        run: docker compose -f infra/compose.yaml --env-file .env.example --profile core --profile models --profile voice config --quiet
+      - name: Start core profile
+        run: |
+          cp .env.example .env
+          docker compose -f infra/compose.yaml --env-file .env --profile core up -d --build --wait
+      - name: Migrate and seed
+        run: |
+          C="docker compose -f infra/compose.yaml --env-file .env --profile core"
+          $C exec -T api alembic -c packages/core/alembic.ini upgrade head
+          $C exec -T api python -m strong_core.db.seed
+      - name: Health through the web proxy
+        run: |
+          curl -sf http://localhost:5180/api/health | tee health.json
+          grep -q '"status":"ok"' health.json
+      - name: Logs on failure
+        if: failure()
+        run: docker compose -f infra/compose.yaml --env-file .env --profile core logs --tail 100
