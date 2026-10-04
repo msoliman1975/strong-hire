@@ -18,10 +18,20 @@ class CompetencyScore(Contract):
     quotes: list[str] = Field(min_length=1, description="Transcript quotes backing the score.")
 
 
+class ValueScore(Contract):
+    """Score for one company value (Principle.name), same 1 to 4 rubric as competencies."""
+
+    value: str = Field(min_length=1)
+    score: RubricScore
+    justification: str = Field(min_length=1)
+    quotes: list[str] = Field(min_length=1, description="Transcript quotes backing the score.")
+
+
 class QuestionScore(Contract):
     question_ref: str = Field(min_length=1)
     question_text: str = Field(min_length=1)
     scores: list[CompetencyScore] = Field(min_length=1)
+    value_scores: list[ValueScore] = Field(default_factory=list)
     strengths: list[str] = Field(default_factory=list)
     misses: list[str] = Field(default_factory=list)
 
@@ -31,6 +41,10 @@ class Scorecard(Contract):
     rationale: str = Field(min_length=1, description="3 to 5 sentences, like a debrief summary.")
     competency_scores: list[CompetencyScore] = Field(
         min_length=1, description="Overall score per competency across the session."
+    )
+    value_scores: list[ValueScore] = Field(
+        default_factory=list,
+        description="Overall score per company value. Empty in generic mode.",
     )
     per_question: list[QuestionScore] = Field(default_factory=list)
     scorer_model: str = Field(min_length=1, description="Gateway model alias, never a vendor id.")

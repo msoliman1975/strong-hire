@@ -32,6 +32,9 @@ class BriefQuestion(Contract):
     id: str = Field(pattern=r"^[a-z0-9_-]+$", description="Stable id, used as Turn.question_ref.")
     text: str = Field(min_length=1)
     competencies: list[Competency] = Field(min_length=1)
+    values: list[str] = Field(
+        default_factory=list, description="Company values this question probes (target_values)."
+    )
     priority: int = Field(ge=1, description="1 is asked first.")
     probe_hints: list[str] = Field(default_factory=list)
 
@@ -50,6 +53,11 @@ class InterviewerBrief(Contract):
     generic_mode: bool
     profile_version: int | None = Field(default=None, ge=1)
     target_competencies: list[Competency] = Field(min_length=4, max_length=6)
+    target_values: list[str] = Field(
+        default_factory=list,
+        max_length=4,
+        description="Company value names (Principle.name) to probe. Empty in generic mode.",
+    )
     questions: list[BriefQuestion] = Field(min_length=6, max_length=10)
     probe_areas: list[str] = Field(default_factory=list)
     persona: PersonaBrief
@@ -62,6 +70,11 @@ class InterviewerBrief(Contract):
             raise ValueError("generic_mode briefs must not have a profile_version")
         if not self.generic_mode and self.profile_version is None:
             raise ValueError("company briefs must record the profile_version used")
+        if self.generic_mode and self.target_values:
+            raise ValueError("generic_mode briefs must not have target_values")
+        stray = sorted({v for q in self.questions for v in q.values} - set(self.target_values))
+        if stray:
+            raise ValueError(f"questions use values not in target_values: {', '.join(stray)}")
         ids = [q.id for q in self.questions]
         if len(ids) != len(set(ids)):
             raise ValueError("question ids must be unique")

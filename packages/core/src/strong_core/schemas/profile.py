@@ -35,10 +35,16 @@ class ProfileField(StrEnum):
 
 
 class Principle(Contract):
+    """One company value, for example 'Customer Obsession'. The name is its id in briefs and
+    scorecards, so keep it stable across profile versions."""
+
     name: str = Field(min_length=1)
     description: str = Field(min_length=1)
     evidence_signals: list[str] = Field(
         min_length=1, description="What evidence of this principle sounds like in an answer."
+    )
+    weight: float = Field(
+        default=1.0, gt=0, description="Relative weight of this value inside the values share."
     )
 
 
@@ -70,6 +76,9 @@ class QuestionPattern(Contract):
     theme: str = Field(min_length=1)
     pattern: str = Field(min_length=1)
     competencies: list[Competency] = Field(default_factory=list)
+    values: list[str] = Field(
+        default_factory=list, description="Principle names from values_framework this probes."
+    )
 
 
 class LevelBar(Contract):
@@ -125,6 +134,15 @@ class CompanyProfile(Contract):
         min_length=1,
         description="Relative weight of each competency in the hire signal. Missing means 1.0.",
     )
+    values_share: float = Field(
+        default=0.25,
+        ge=0,
+        le=0.5,
+        description=(
+            "Share of the hire signal that comes from company value scores. The rest comes from "
+            "competency scores. P08 owns the hire-signal formula."
+        ),
+    )
     case_style: CaseStyle
     sources: list[Source] = Field(min_length=1)
     field_confidence: dict[ProfileField, Confidence] = Field(
@@ -143,4 +161,14 @@ class CompanyProfile(Contract):
         bad = [c.value for c, w in self.scoring_weights.items() if w <= 0]
         if bad:
             raise ValueError(f"scoring_weights must be positive: {', '.join(bad)}")
+        names = [p.name for p in self.values_framework.principles]
+        if len(names) != len(set(names)):
+            raise ValueError("values_framework principle names must be unique")
+        unknown = sorted({v for q in self.question_patterns for v in q.values} - set(names))
+        if unknown:
+            raise ValueError(f"question_patterns use unknown values: {', '.join(unknown)}")
         return self
+
+    @property
+    def value_names(self) -> list[str]:
+        return [p.name for p in self.values_framework.principles]

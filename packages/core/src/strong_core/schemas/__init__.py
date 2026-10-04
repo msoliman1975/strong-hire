@@ -52,6 +52,7 @@ from strong_core.schemas.scoring import (
     ProgressSnapshot,
     QuestionScore,
     Scorecard,
+    ValueScore,
 )
 from strong_core.schemas.session import (
     BriefQuestion,
@@ -126,5 +127,6 @@ __all__ = [
     "SubscriptionStatus",
     "Turn",
     "UsageComponent",
+    "ValueScore",
     "ValuesFramework",
 ]
