@@ -112,3 +112,47 @@ jobs:
       - name: Logs on failure
         if: failure()
         run: docker compose -f infra/compose.yaml --env-file .env --profile core logs --tail 100
+
+  models-voice:
+    name: Local models and voice (smoke test all roles, latency spike)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      MODEL_PROFILE: local
+      LITELLM_PROFILE: local
+    steps:
+      - name: Free disk space for model images and weights
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          df -h /
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv python install 3.12
+      - run: uv sync --all-packages --frozen
+      - run: cp .env.example .env
+      - name: Pull the local models named in config/
+        shell: pwsh
+        run: ./scripts/models.ps1 pull
+      - name: Smoke test all six roles (local), then hosted (skips without HOSTED_API_KEY)
+        shell: pwsh
+        env:
+          HOSTED_API_KEY: ${{ secrets.HOSTED_API_KEY }}
+        run: |
+          ./scripts/models.ps1 smoke -Profile local
+          ./scripts/models.ps1 smoke -Profile hosted
+      - name: Latency spike with a simulated candidate
+        shell: pwsh
+        env:
+          HOSTED_API_KEY: ${{ secrets.HOSTED_API_KEY }}
+        run: ./scripts/latency.ps1 -Sessions 3
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: latency
+          path: var/latency/
+          if-no-files-found: ignore
+      - name: Logs on failure
+        if: failure()
+        run: docker compose -f infra/compose.yaml --env-file .env --profile models --profile voice logs --tail 150

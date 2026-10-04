@@ -142,12 +142,14 @@ services:
   livekit:
     image: livekit/livekit-server:latest
     profiles: [voice]
-    # --node-ip 127.0.0.1 so browsers on the Windows host can reach the media ports.
+    # --node-ip 127.0.0.1 so the browser on the Windows host can reach the media ports. The voice
+    # agent shares this container's network (network_mode below), so 127.0.0.1 works for it too.
     command: ["--dev", "--bind", "0.0.0.0", "--node-ip", "127.0.0.1"]
     ports:
       - "${LIVEKIT_PORT:-7880}:7880"
       - "${LIVEKIT_RTC_TCP_PORT:-7881}:7881"
       - "${LIVEKIT_RTC_UDP_PORT:-7882}:7882/udp"
+      - "${VOICE_HEALTH_PORT:-8081}:8081"    # the voice agent's health and dev page
     healthcheck:
       <<: *healthcheck
       test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:7880 || exit 1"]
@@ -160,7 +162,7 @@ services:
     profiles: [voice]
     environment:
       <<: *python-env
-      LIVEKIT_URL: ws://livekit:7880
+      LIVEKIT_URL: ws://localhost:7880
       LIVEKIT_PUBLIC_URL: ws://localhost:${LIVEKIT_PORT:-7880}
       LIVEKIT_API_KEY: ${LIVEKIT_API_KEY:-devkey}
       LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET:-secret}
@@ -169,7 +171,9 @@ services:
       HF_HOME: /models/hf
     # download-files fetches the VAD and turn detector models once into the voice-models volume.
     command: ["sh", "-c", "python -m strong_voice download-files && exec python -m strong_voice"]
-    ports: ["${VOICE_HEALTH_PORT:-8081}:8081"]
+    # Same network namespace as livekit: WebRTC media to 127.0.0.1 reaches the server. Its port
+    # 8081 is published on the livekit service.
+    network_mode: "service:livekit"
     volumes:
       - ../apps/voice/src:/app/apps/voice/src
       - ../apps/voice/devpage:/app/apps/voice/devpage:ro
