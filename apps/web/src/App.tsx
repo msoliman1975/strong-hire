@@ -1,45 +1,67 @@
-import { useEffect, useState } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useState } from "react";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 
-import { fetchHealth, type Health } from "./api";
+import { ApiError } from "./api/client";
+import { AppLayout, PublicLayout } from "./components/Layout";
+import { AccountPage } from "./pages/AccountPage";
+import { DashboardPage } from "./pages/DashboardPage";
+import { DebriefPage } from "./pages/DebriefPage";
+import { GapAnalysisPage } from "./pages/GapAnalysisPage";
+import { ConfirmJobPage } from "./pages/onboarding/ConfirmJobPage";
+import { ContextPage } from "./pages/onboarding/ContextPage";
+import { NewJobPage } from "./pages/onboarding/NewJobPage";
+import { ResumePage } from "./pages/onboarding/ResumePage";
+import { PaywallPage } from "./pages/PaywallPage";
+import { SessionSetupPage } from "./pages/SessionSetupPage";
+import { SignInPage } from "./pages/SignInPage";
+import { SignupPage } from "./pages/SignupPage";
+import { LiveSessionPage } from "./session/LiveSessionPage";
 
-type State = { kind: "loading" } | { kind: "done"; health: Health } | { kind: "error"; message: string };
+export function createQueryClient(): QueryClient {
+  return new QueryClient({
+    defaultOptions: {
+      queries: {
+        // Do not retry client errors (404, 401, 402); they will not change on retry.
+        retry: (count, err) => !(err instanceof ApiError && err.status < 500) && count < 2,
+        refetchOnWindowFocus: false,
+      },
+    },
+  });
+}
+
+export function AppRoutes() {
+  return (
+    <Routes>
+      <Route element={<PublicLayout />}>
+        <Route path="/signin" element={<SignInPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+      </Route>
+      <Route element={<AppLayout />}>
+        <Route index element={<DashboardPage />} />
+        <Route path="/jobs/new" element={<NewJobPage />} />
+        <Route path="/jobs/:jobId/confirm" element={<ConfirmJobPage />} />
+        <Route path="/jobs/:jobId/resume" element={<ResumePage />} />
+        <Route path="/jobs/:jobId/context" element={<ContextPage />} />
+        <Route path="/jobs/:jobId/gap" element={<GapAnalysisPage />} />
+        <Route path="/jobs/:jobId/sessions/new" element={<SessionSetupPage />} />
+        <Route path="/sessions/:sessionId/live" element={<LiveSessionPage />} />
+        <Route path="/sessions/:sessionId/debrief" element={<DebriefPage />} />
+        <Route path="/account" element={<AccountPage />} />
+        <Route path="/upgrade" element={<PaywallPage />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
 
 export function App() {
-  const [state, setState] = useState<State>({ kind: "loading" });
-
-  useEffect(() => {
-    const ctrl = new AbortController();
-    fetchHealth(ctrl.signal)
-      .then((health) => setState({ kind: "done", health }))
-      .catch((err: unknown) => {
-        if (!ctrl.signal.aborted) {
-          setState({ kind: "error", message: err instanceof Error ? err.message : String(err) });
-        }
-      });
-    return () => ctrl.abort();
-  }, []);
-
+  const [queryClient] = useState(createQueryClient);
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", maxWidth: 640, margin: "48px auto", padding: "0 16px" }}>
-      <h1>Strong Hire</h1>
-      {state.kind === "loading" && <p>Checking the API...</p>}
-      {state.kind === "error" && <p role="alert">API unreachable: {state.message}</p>}
-      {state.kind === "done" && (
-        <section aria-label="API health">
-          <p>
-            API status: <strong data-testid="api-status">{state.health.status.toUpperCase()}</strong>
-          </p>
-          <ul>
-            {Object.entries(state.health.checks).map(([name, result]) => (
-              <li key={name}>
-                {name}: {result}
-              </li>
-            ))}
-            <li>model profile: {state.health.model_profile}</li>
-            <li>version: {state.health.version}</li>
-          </ul>
-        </section>
-      )}
-    </main>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }

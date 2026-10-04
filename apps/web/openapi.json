@@ -1,0 +1,2155 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Strong Hire API",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/auth/providers": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Providers",
+        "operationId": "providers_auth_providers_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthProviders"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Me",
+        "operationId": "me_auth_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthState"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Logout",
+        "operationId": "logout_auth_logout_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        }
+      }
+    },
+    "/auth/magic-link": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Send Magic Link",
+        "operationId": "send_magic_link_auth_magic_link_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MagicLinkRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MagicLinkSent"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/magic-link/callback": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Magic Link Callback",
+        "operationId": "magic_link_callback_auth_magic_link_callback_get",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/google/login": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Google Login",
+        "operationId": "google_login_auth_google_login_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/google/callback": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Google Callback",
+        "operationId": "google_callback_auth_google_callback_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/signup": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Signup",
+        "operationId": "signup_auth_signup_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/dev-login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Dev Login",
+        "description": "Local only (APP_ENV=local). Signs in any email with no check.",
+        "operationId": "dev_login_auth_dev_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DevLoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Health Health Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AuthProvider": {
+        "type": "string",
+        "enum": [
+          "google",
+          "email",
+          "dev"
+        ],
+        "title": "AuthProvider"
+      },
+      "AuthProviders": {
+        "properties": {
+          "google": {
+            "type": "boolean",
+            "title": "Google"
+          },
+          "email": {
+            "type": "boolean",
+            "title": "Email"
+          },
+          "dev": {
+            "type": "boolean",
+            "title": "Dev"
+          }
+        },
+        "type": "object",
+        "required": [
+          "google",
+          "email",
+          "dev"
+        ],
+        "title": "AuthProviders"
+      },
+      "AuthState": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "signed_out",
+              "needs_signup",
+              "signed_in"
+            ],
+            "title": "Status"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email",
+            "description": "Set for needs_signup and signed_in."
+          },
+          "user": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AuthUser"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "AuthState"
+      },
+      "AuthUser": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "org_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Org Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "auth_provider": {
+            "$ref": "#/components/schemas/AuthProvider"
+          },
+          "training_consent": {
+            "type": "boolean",
+            "title": "Training Consent"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "org_id",
+          "email",
+          "auth_provider",
+          "training_consent",
+          "created_at"
+        ],
+        "title": "AuthUser"
+      },
+      "BriefQuestion": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Stable id, used as Turn.question_ref.",
+            "pattern": "^[a-z0-9_-]+$",
+            "title": "Id",
+            "type": "string"
+          },
+          "text": {
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          },
+          "competencies": {
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "minItems": 1,
+            "title": "Competencies",
+            "type": "array"
+          },
+          "priority": {
+            "description": "1 is asked first.",
+            "minimum": 1,
+            "title": "Priority",
+            "type": "integer"
+          },
+          "probe_hints": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Probe Hints",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "competencies",
+          "priority"
+        ],
+        "title": "BriefQuestion",
+        "type": "object"
+      },
+      "CaseStyle": {
+        "additionalProperties": false,
+        "description": "Relative emphasis, each from 0 to 1.",
+        "properties": {
+          "product_sense": {
+            "maximum": 1,
+            "minimum": 0,
+            "title": "Product Sense",
+            "type": "number"
+          },
+          "estimation": {
+            "maximum": 1,
+            "minimum": 0,
+            "title": "Estimation",
+            "type": "number"
+          },
+          "system_thinking": {
+            "maximum": 1,
+            "minimum": 0,
+            "title": "System Thinking",
+            "type": "number"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Notes"
+          }
+        },
+        "required": [
+          "product_sense",
+          "estimation",
+          "system_thinking"
+        ],
+        "title": "CaseStyle",
+        "type": "object"
+      },
+      "CompanyProfile": {
+        "additionalProperties": false,
+        "properties": {
+          "company_name": {
+            "minLength": 1,
+            "title": "Company Name",
+            "type": "string"
+          },
+          "company_slug": {
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "title": "Company Slug",
+            "type": "string"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ProfileMeta"
+          },
+          "values_framework": {
+            "$ref": "#/components/schemas/ValuesFramework"
+          },
+          "loop_structure": {
+            "items": {
+              "$ref": "#/components/schemas/LoopStructure"
+            },
+            "minItems": 1,
+            "title": "Loop Structure",
+            "type": "array"
+          },
+          "question_patterns": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionPattern"
+            },
+            "minItems": 1,
+            "title": "Question Patterns",
+            "type": "array"
+          },
+          "bar_by_level": {
+            "items": {
+              "$ref": "#/components/schemas/LevelBar"
+            },
+            "minItems": 1,
+            "title": "Bar By Level",
+            "type": "array"
+          },
+          "persona": {
+            "$ref": "#/components/schemas/PersonaNotes"
+          },
+          "scoring_weights": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "description": "Relative weight of each competency in the hire signal. Missing means 1.0.",
+            "minProperties": 1,
+            "propertyNames": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "title": "Scoring Weights",
+            "type": "object"
+          },
+          "case_style": {
+            "$ref": "#/components/schemas/CaseStyle"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/Source"
+            },
+            "minItems": 1,
+            "title": "Sources",
+            "type": "array"
+          },
+          "field_confidence": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Confidence"
+            },
+            "description": "Confidence per field. Every ProfileField must be present.",
+            "propertyNames": {
+              "$ref": "#/components/schemas/ProfileField"
+            },
+            "title": "Field Confidence",
+            "type": "object"
+          },
+          "low_confidence_notes": {
+            "description": "Fields or claims flagged for reviewer attention.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Low Confidence Notes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "company_name",
+          "company_slug",
+          "meta",
+          "values_framework",
+          "loop_structure",
+          "question_patterns",
+          "bar_by_level",
+          "persona",
+          "scoring_weights",
+          "case_style",
+          "sources",
+          "field_confidence"
+        ],
+        "title": "CompanyProfile",
+        "type": "object"
+      },
+      "Competency": {
+        "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.",
+        "enum": [
+          "ownership",
+          "impact",
+          "collaboration",
+          "conflict_handling",
+          "learning_from_failure",
+          "communication",
+          "role_fit",
+          "depth_of_experience",
+          "judgment",
+          "motivation",
+          "team_fit",
+          "scope_at_level",
+          "technical_depth",
+          "accuracy",
+          "reasoning",
+          "trade_offs",
+          "clarity_of_explanation",
+          "problem_framing",
+          "structure",
+          "user_and_business_sense",
+          "estimation_logic",
+          "prioritization",
+          "recommendation"
+        ],
+        "title": "Competency",
+        "type": "string"
+      },
+      "CompetencyMatch": {
+        "additionalProperties": false,
+        "properties": {
+          "competency": {
+            "$ref": "#/components/schemas/Competency"
+          },
+          "score": {
+            "maximum": 100,
+            "minimum": 0,
+            "title": "Score",
+            "type": "integer"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Notes"
+          }
+        },
+        "required": [
+          "competency",
+          "score"
+        ],
+        "title": "CompetencyMatch",
+        "type": "object"
+      },
+      "CompetencyScore": {
+        "additionalProperties": false,
+        "properties": {
+          "competency": {
+            "$ref": "#/components/schemas/Competency"
+          },
+          "score": {
+            "maximum": 4,
+            "minimum": 1,
+            "title": "Score",
+            "type": "integer"
+          },
+          "justification": {
+            "minLength": 1,
+            "title": "Justification",
+            "type": "string"
+          },
+          "quotes": {
+            "description": "Transcript quotes backing the score.",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Quotes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "competency",
+          "score",
+          "justification",
+          "quotes"
+        ],
+        "title": "CompetencyScore",
+        "type": "object"
+      },
+      "Confidence": {
+        "enum": [
+          "low",
+          "medium",
+          "high"
+        ],
+        "title": "Confidence",
+        "type": "string"
+      },
+      "DevLoginRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 320,
+            "title": "Email",
+            "default": "dev@example.com"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "DevLoginRequest"
+      },
+      "Difficulty": {
+        "description": "IV-4.",
+        "enum": [
+          "friendly",
+          "realistic",
+          "tough"
+        ],
+        "title": "Difficulty",
+        "type": "string"
+      },
+      "Education": {
+        "additionalProperties": false,
+        "properties": {
+          "institution": {
+            "minLength": 1,
+            "title": "Institution",
+            "type": "string"
+          },
+          "degree": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Degree"
+          },
+          "field_of_study": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Field Of Study"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "examples": [
+                  "2023-04"
+                ],
+                "pattern": "^\\d{4}(-(0[1-9]|1[0-2]))?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "End"
+          }
+        },
+        "required": [
+          "institution"
+        ],
+        "title": "Education",
+        "type": "object"
+      },
+      "Gap": {
+        "additionalProperties": false,
+        "properties": {
+          "summary": {
+            "minLength": 1,
+            "title": "Summary",
+            "type": "string"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "related_requirement": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Related Requirement"
+          }
+        },
+        "required": [
+          "summary",
+          "severity"
+        ],
+        "title": "Gap",
+        "type": "object"
+      },
+      "GapAnalysis": {
+        "additionalProperties": false,
+        "properties": {
+          "match_score": {
+            "description": "GA-1.",
+            "maximum": 100,
+            "minimum": 0,
+            "title": "Match Score",
+            "type": "integer"
+          },
+          "requirement_breakdown": {
+            "items": {
+              "$ref": "#/components/schemas/RequirementMatch"
+            },
+            "title": "Requirement Breakdown",
+            "type": "array"
+          },
+          "competency_breakdown": {
+            "items": {
+              "$ref": "#/components/schemas/CompetencyMatch"
+            },
+            "title": "Competency Breakdown",
+            "type": "array"
+          },
+          "strengths": {
+            "items": {
+              "$ref": "#/components/schemas/Strength"
+            },
+            "title": "Strengths",
+            "type": "array"
+          },
+          "gaps": {
+            "items": {
+              "$ref": "#/components/schemas/Gap"
+            },
+            "title": "Gaps",
+            "type": "array"
+          },
+          "probe_areas": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Probe Areas",
+            "type": "array"
+          },
+          "session_plan": {
+            "items": {
+              "$ref": "#/components/schemas/PlannedSession"
+            },
+            "minItems": 1,
+            "title": "Session Plan",
+            "type": "array"
+          }
+        },
+        "required": [
+          "match_score",
+          "session_plan"
+        ],
+        "title": "GapAnalysis",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HireSignal": {
+        "description": "FB-1. Ordered from strongest to weakest.",
+        "enum": [
+          "Strong Hire",
+          "Hire",
+          "Lean Hire",
+          "Lean No Hire",
+          "No Hire"
+        ],
+        "title": "HireSignal",
+        "type": "string"
+      },
+      "InterviewType": {
+        "description": "The four v1 interview types (IV-2).",
+        "enum": [
+          "behavioral",
+          "hiring_manager",
+          "technical_qa",
+          "case"
+        ],
+        "title": "InterviewType",
+        "type": "string"
+      },
+      "InterviewerBrief": {
+        "additionalProperties": false,
+        "description": "Built by the planner before each session. The live interviewer reads only this.",
+        "properties": {
+          "session": {
+            "$ref": "#/components/schemas/SessionConfig"
+          },
+          "company_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "None in generic mode.",
+            "title": "Company Name"
+          },
+          "generic_mode": {
+            "title": "Generic Mode",
+            "type": "boolean"
+          },
+          "profile_version": {
+            "anyOf": [
+              {
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Profile Version"
+          },
+          "target_competencies": {
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "maxItems": 6,
+            "minItems": 4,
+            "title": "Target Competencies",
+            "type": "array"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/BriefQuestion"
+            },
+            "maxItems": 10,
+            "minItems": 6,
+            "title": "Questions",
+            "type": "array"
+          },
+          "probe_areas": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Probe Areas",
+            "type": "array"
+          },
+          "persona": {
+            "$ref": "#/components/schemas/PersonaBrief"
+          },
+          "max_probes_per_question": {
+            "description": "IV-3.",
+            "maximum": 3,
+            "minimum": 0,
+            "title": "Max Probes Per Question",
+            "type": "integer"
+          },
+          "curveball": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Tough difficulty only (IV-4).",
+            "title": "Curveball"
+          }
+        },
+        "required": [
+          "session",
+          "generic_mode",
+          "target_competencies",
+          "questions",
+          "persona",
+          "max_probes_per_question"
+        ],
+        "title": "InterviewerBrief",
+        "type": "object"
+      },
+      "JobPosting": {
+        "additionalProperties": false,
+        "description": "Structured data extracted from a job posting. The user confirms or edits it (IN-2).",
+        "properties": {
+          "company_name": {
+            "minLength": 1,
+            "title": "Company Name",
+            "type": "string"
+          },
+          "title": {
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          },
+          "role_family": {
+            "$ref": "#/components/schemas/RoleFamily",
+            "default": "other"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Level"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Normalized level, if it can be inferred."
+          },
+          "level_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Level as written in the posting, for example 'L5' or 'Senior'.",
+            "title": "Level Label"
+          },
+          "team": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Team"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Location"
+          },
+          "must_have_skills": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Must Have Skills",
+            "type": "array"
+          },
+          "nice_to_have_skills": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Nice To Have Skills",
+            "type": "array"
+          },
+          "responsibilities": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Responsibilities",
+            "type": "array"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Source Url"
+          }
+        },
+        "required": [
+          "company_name",
+          "title"
+        ],
+        "title": "JobPosting",
+        "type": "object"
+      },
+      "Level": {
+        "description": "Normalized seniority (IV-6). Company-specific labels such as L5 or E5 map to these.",
+        "enum": [
+          "new_grad",
+          "mid",
+          "senior",
+          "staff_principal"
+        ],
+        "title": "Level",
+        "type": "string"
+      },
+      "LevelBar": {
+        "additionalProperties": false,
+        "properties": {
+          "level_name": {
+            "description": "Company label, for example 'L5' or 'E5'.",
+            "minLength": 1,
+            "title": "Level Name",
+            "type": "string"
+          },
+          "normalized_level": {
+            "$ref": "#/components/schemas/Level"
+          },
+          "role_family": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RoleFamily"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "scope_expectation": {
+            "minLength": 1,
+            "title": "Scope Expectation",
+            "type": "string"
+          }
+        },
+        "required": [
+          "level_name",
+          "normalized_level",
+          "scope_expectation"
+        ],
+        "title": "LevelBar",
+        "type": "object"
+      },
+      "LoopRound": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "interview_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/InterviewType"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "None for rounds v1 does not simulate, such as live coding."
+          },
+          "duration_min": {
+            "anyOf": [
+              {
+                "maximum": 240,
+                "minimum": 5,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Duration Min"
+          },
+          "interviewer_role": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Interviewer Role"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Notes"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "LoopRound",
+        "type": "object"
+      },
+      "LoopStructure": {
+        "additionalProperties": false,
+        "properties": {
+          "role_family": {
+            "$ref": "#/components/schemas/RoleFamily"
+          },
+          "levels": {
+            "description": "Company level names covered.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Levels",
+            "type": "array"
+          },
+          "rounds": {
+            "items": {
+              "$ref": "#/components/schemas/LoopRound"
+            },
+            "minItems": 1,
+            "title": "Rounds",
+            "type": "array"
+          }
+        },
+        "required": [
+          "role_family",
+          "rounds"
+        ],
+        "title": "LoopStructure",
+        "type": "object"
+      },
+      "MagicLinkRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "MagicLinkRequest"
+      },
+      "MagicLinkSent": {
+        "properties": {
+          "sent": {
+            "type": "boolean",
+            "title": "Sent"
+          },
+          "dev_link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dev Link",
+            "description": "Only when APP_ENV=local, so no email server is needed."
+          }
+        },
+        "type": "object",
+        "required": [
+          "sent"
+        ],
+        "title": "MagicLinkSent"
+      },
+      "Mode": {
+        "description": "IV-8. Only Realistic sessions count toward progress trends (PR-1).",
+        "enum": [
+          "coach",
+          "realistic"
+        ],
+        "title": "Mode",
+        "type": "string"
+      },
+      "PersonaBrief": {
+        "additionalProperties": false,
+        "properties": {
+          "tone": {
+            "minLength": 1,
+            "title": "Tone",
+            "type": "string"
+          },
+          "pushback_style": {
+            "minLength": 1,
+            "title": "Pushback Style",
+            "type": "string"
+          },
+          "closing_style": {
+            "minLength": 1,
+            "title": "Closing Style",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tone",
+          "pushback_style",
+          "closing_style"
+        ],
+        "title": "PersonaBrief",
+        "type": "object"
+      },
+      "PersonaNotes": {
+        "additionalProperties": false,
+        "properties": {
+          "tone": {
+            "minLength": 1,
+            "title": "Tone",
+            "type": "string"
+          },
+          "pace": {
+            "minLength": 1,
+            "title": "Pace",
+            "type": "string"
+          },
+          "pushback_style": {
+            "minLength": 1,
+            "title": "Pushback Style",
+            "type": "string"
+          },
+          "closing_style": {
+            "minLength": 1,
+            "title": "Closing Style",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tone",
+          "pace",
+          "pushback_style",
+          "closing_style"
+        ],
+        "title": "PersonaNotes",
+        "type": "object"
+      },
+      "Phase": {
+        "description": "Session state machine phases (IV-7). The session controller moves phases, not the LLM.",
+        "enum": [
+          "intro",
+          "small_talk",
+          "agenda",
+          "core",
+          "candidate_questions",
+          "wrap_up"
+        ],
+        "title": "Phase",
+        "type": "string"
+      },
+      "PlannedSession": {
+        "additionalProperties": false,
+        "description": "One recommended practice session (GA-3).",
+        "properties": {
+          "priority": {
+            "description": "1 is the first session to run.",
+            "minimum": 1,
+            "title": "Priority",
+            "type": "integer"
+          },
+          "interview_type": {
+            "$ref": "#/components/schemas/InterviewType"
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/Difficulty",
+            "default": "realistic"
+          },
+          "focus_topics": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Focus Topics",
+            "type": "array"
+          },
+          "reason": {
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "priority",
+          "interview_type",
+          "focus_topics",
+          "reason"
+        ],
+        "title": "PlannedSession",
+        "type": "object"
+      },
+      "Principle": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "description": {
+            "minLength": 1,
+            "title": "Description",
+            "type": "string"
+          },
+          "evidence_signals": {
+            "description": "What evidence of this principle sounds like in an answer.",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Evidence Signals",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "evidence_signals"
+        ],
+        "title": "Principle",
+        "type": "object"
+      },
+      "ProfileField": {
+        "description": "Top-level profile fields that carry sources and a confidence level.",
+        "enum": [
+          "values_framework",
+          "loop_structure",
+          "question_patterns",
+          "bar_by_level",
+          "persona",
+          "scoring_weights",
+          "case_style"
+        ],
+        "title": "ProfileField",
+        "type": "string"
+      },
+      "ProfileMeta": {
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "minimum": 1,
+            "title": "Version",
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ProfileStatus",
+            "default": "draft"
+          },
+          "reviewed_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reviewed By"
+          },
+          "researched_at": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Researched At"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Published At"
+          }
+        },
+        "required": [
+          "version"
+        ],
+        "title": "ProfileMeta",
+        "type": "object"
+      },
+      "ProfileStatus": {
+        "enum": [
+          "draft",
+          "in_review",
+          "published",
+          "archived"
+        ],
+        "title": "ProfileStatus",
+        "type": "string"
+      },
+      "ProgressSnapshot": {
+        "additionalProperties": false,
+        "description": "One competency score from one Realistic session, for trend charts (PR-1).",
+        "properties": {
+          "job_target_id": {
+            "format": "uuid",
+            "title": "Job Target Id",
+            "type": "string"
+          },
+          "session_id": {
+            "format": "uuid",
+            "title": "Session Id",
+            "type": "string"
+          },
+          "competency": {
+            "$ref": "#/components/schemas/Competency"
+          },
+          "score": {
+            "maximum": 4,
+            "minimum": 1,
+            "title": "Score",
+            "type": "number"
+          },
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_target_id",
+          "session_id",
+          "competency",
+          "score",
+          "at"
+        ],
+        "title": "ProgressSnapshot",
+        "type": "object"
+      },
+      "QuestionPattern": {
+        "additionalProperties": false,
+        "description": "A recurring theme, phrased as a pattern. Never a leaked or NDA-protected question.",
+        "properties": {
+          "interview_type": {
+            "$ref": "#/components/schemas/InterviewType"
+          },
+          "theme": {
+            "minLength": 1,
+            "title": "Theme",
+            "type": "string"
+          },
+          "pattern": {
+            "minLength": 1,
+            "title": "Pattern",
+            "type": "string"
+          },
+          "competencies": {
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "title": "Competencies",
+            "type": "array"
+          }
+        },
+        "required": [
+          "interview_type",
+          "theme",
+          "pattern"
+        ],
+        "title": "QuestionPattern",
+        "type": "object"
+      },
+      "QuestionScore": {
+        "additionalProperties": false,
+        "properties": {
+          "question_ref": {
+            "minLength": 1,
+            "title": "Question Ref",
+            "type": "string"
+          },
+          "question_text": {
+            "minLength": 1,
+            "title": "Question Text",
+            "type": "string"
+          },
+          "scores": {
+            "items": {
+              "$ref": "#/components/schemas/CompetencyScore"
+            },
+            "minItems": 1,
+            "title": "Scores",
+            "type": "array"
+          },
+          "strengths": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Strengths",
+            "type": "array"
+          },
+          "misses": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Misses",
+            "type": "array"
+          }
+        },
+        "required": [
+          "question_ref",
+          "question_text",
+          "scores"
+        ],
+        "title": "QuestionScore",
+        "type": "object"
+      },
+      "RequirementKind": {
+        "enum": [
+          "must_have",
+          "nice_to_have"
+        ],
+        "title": "RequirementKind",
+        "type": "string"
+      },
+      "RequirementMatch": {
+        "additionalProperties": false,
+        "properties": {
+          "requirement": {
+            "minLength": 1,
+            "title": "Requirement",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/RequirementKind"
+          },
+          "score": {
+            "maximum": 100,
+            "minimum": 0,
+            "title": "Score",
+            "type": "integer"
+          },
+          "evidence": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Resume text that supports the score.",
+            "title": "Evidence"
+          }
+        },
+        "required": [
+          "requirement",
+          "kind",
+          "score"
+        ],
+        "title": "RequirementMatch",
+        "type": "object"
+      },
+      "Resume": {
+        "additionalProperties": false,
+        "description": "A parsed resume (IN-3). Contact details are deliberately not part of the contract.",
+        "properties": {
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Summary"
+          },
+          "roles": {
+            "items": {
+              "$ref": "#/components/schemas/ResumeRole"
+            },
+            "title": "Roles",
+            "type": "array"
+          },
+          "skills": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Skills",
+            "type": "array"
+          },
+          "education": {
+            "items": {
+              "$ref": "#/components/schemas/Education"
+            },
+            "title": "Education",
+            "type": "array"
+          },
+          "certifications": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Certifications",
+            "type": "array"
+          }
+        },
+        "title": "Resume",
+        "type": "object"
+      },
+      "ResumeRole": {
+        "additionalProperties": false,
+        "properties": {
+          "title": {
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          },
+          "company": {
+            "minLength": 1,
+            "title": "Company",
+            "type": "string"
+          },
+          "start": {
+            "anyOf": [
+              {
+                "examples": [
+                  "2023-04"
+                ],
+                "pattern": "^\\d{4}(-(0[1-9]|1[0-2]))?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Start"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "examples": [
+                  "2023-04"
+                ],
+                "pattern": "^\\d{4}(-(0[1-9]|1[0-2]))?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "None means current role.",
+            "title": "End"
+          },
+          "achievements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Achievements",
+            "type": "array"
+          },
+          "skills": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Skills",
+            "type": "array"
+          }
+        },
+        "required": [
+          "title",
+          "company"
+        ],
+        "title": "ResumeRole",
+        "type": "object"
+      },
+      "RoleFamily": {
+        "enum": [
+          "swe",
+          "data_ml",
+          "pm",
+          "design",
+          "tpm",
+          "other"
+        ],
+        "title": "RoleFamily",
+        "type": "string"
+      },
+      "Scorecard": {
+        "additionalProperties": false,
+        "properties": {
+          "hire_signal": {
+            "$ref": "#/components/schemas/HireSignal"
+          },
+          "rationale": {
+            "description": "3 to 5 sentences, like a debrief summary.",
+            "minLength": 1,
+            "title": "Rationale",
+            "type": "string"
+          },
+          "competency_scores": {
+            "description": "Overall score per competency across the session.",
+            "items": {
+              "$ref": "#/components/schemas/CompetencyScore"
+            },
+            "minItems": 1,
+            "title": "Competency Scores",
+            "type": "array"
+          },
+          "per_question": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionScore"
+            },
+            "title": "Per Question",
+            "type": "array"
+          },
+          "scorer_model": {
+            "description": "Gateway model alias, never a vendor id.",
+            "minLength": 1,
+            "title": "Scorer Model",
+            "type": "string"
+          },
+          "rubric_version": {
+            "description": "Prompt ref, for example 'scorer/rubric.v1'.",
+            "minLength": 1,
+            "title": "Rubric Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "hire_signal",
+          "rationale",
+          "competency_scores",
+          "scorer_model",
+          "rubric_version"
+        ],
+        "title": "Scorecard",
+        "type": "object"
+      },
+      "SessionConfig": {
+        "additionalProperties": false,
+        "description": "What the candidate picks before a session (journey 2, step 1).",
+        "properties": {
+          "interview_type": {
+            "$ref": "#/components/schemas/InterviewType"
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/Difficulty"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/Mode"
+          },
+          "duration_min": {
+            "enum": [
+              30,
+              45
+            ],
+            "title": "Duration Min",
+            "type": "integer"
+          },
+          "level": {
+            "$ref": "#/components/schemas/Level"
+          }
+        },
+        "required": [
+          "interview_type",
+          "difficulty",
+          "mode",
+          "duration_min",
+          "level"
+        ],
+        "title": "SessionConfig",
+        "type": "object"
+      },
+      "SessionStatus": {
+        "enum": [
+          "created",
+          "in_progress",
+          "interrupted",
+          "scoring",
+          "completed",
+          "failed"
+        ],
+        "title": "SessionStatus",
+        "type": "string"
+      },
+      "Severity": {
+        "enum": [
+          "low",
+          "medium",
+          "high"
+        ],
+        "title": "Severity",
+        "type": "string"
+      },
+      "SignupRequest": {
+        "properties": {
+          "age_confirmed": {
+            "type": "boolean",
+            "title": "Age Confirmed",
+            "description": "The user confirmed they are 18 or older."
+          },
+          "terms_accepted": {
+            "type": "boolean",
+            "title": "Terms Accepted"
+          },
+          "training_consent": {
+            "type": "boolean",
+            "title": "Training Consent",
+            "description": "AC-2: off unless the user opts in.",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "age_confirmed",
+          "terms_accepted"
+        ],
+        "title": "SignupRequest"
+      },
+      "Source": {
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "minLength": 1,
+            "title": "Url",
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Title"
+          },
+          "retrieved_at": {
+            "format": "date",
+            "title": "Retrieved At",
+            "type": "string"
+          },
+          "fields": {
+            "description": "Which profile fields this source supports.",
+            "items": {
+              "$ref": "#/components/schemas/ProfileField"
+            },
+            "minItems": 1,
+            "title": "Fields",
+            "type": "array"
+          }
+        },
+        "required": [
+          "url",
+          "retrieved_at",
+          "fields"
+        ],
+        "title": "Source",
+        "type": "object"
+      },
+      "Speaker": {
+        "enum": [
+          "interviewer",
+          "candidate"
+        ],
+        "title": "Speaker",
+        "type": "string"
+      },
+      "Strength": {
+        "additionalProperties": false,
+        "properties": {
+          "summary": {
+            "minLength": 1,
+            "title": "Summary",
+            "type": "string"
+          },
+          "evidence": {
+            "description": "Resume evidence (GA-2).",
+            "minLength": 1,
+            "title": "Evidence",
+            "type": "string"
+          }
+        },
+        "required": [
+          "summary",
+          "evidence"
+        ],
+        "title": "Strength",
+        "type": "object"
+      },
+      "SubscriptionStatus": {
+        "description": "Mirrors the Stripe subscription statuses we act on.",
+        "enum": [
+          "trialing",
+          "active",
+          "past_due",
+          "canceled",
+          "incomplete"
+        ],
+        "title": "SubscriptionStatus",
+        "type": "string"
+      },
+      "Turn": {
+        "additionalProperties": false,
+        "description": "One utterance in the transcript. Text only; audio is never stored.",
+        "properties": {
+          "speaker": {
+            "$ref": "#/components/schemas/Speaker"
+          },
+          "phase": {
+            "$ref": "#/components/schemas/Phase"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "start_ms": {
+            "description": "Offset from session start.",
+            "minimum": 0,
+            "title": "Start Ms",
+            "type": "integer"
+          },
+          "end_ms": {
+            "minimum": 0,
+            "title": "End Ms",
+            "type": "integer"
+          },
+          "question_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "BriefQuestion.id, in CORE only.",
+            "title": "Question Ref"
+          }
+        },
+        "required": [
+          "speaker",
+          "phase",
+          "text",
+          "start_ms",
+          "end_ms"
+        ],
+        "title": "Turn",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "ValuesFramework": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "description": "For example 'Leadership Principles'.",
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "principles": {
+            "items": {
+              "$ref": "#/components/schemas/Principle"
+            },
+            "minItems": 1,
+            "title": "Principles",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "principles"
+        ],
+        "title": "ValuesFramework",
+        "type": "object"
+      }
+    }
+  }
+}

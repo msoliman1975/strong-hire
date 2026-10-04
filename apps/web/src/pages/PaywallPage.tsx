@@ -1,0 +1,61 @@
+import { useMutation } from "@tanstack/react-query";
+import { useSearchParams } from "react-router";
+
+import { usePlan, useUsage } from "../api/hooks";
+import { billingApi } from "../api/planned";
+import { ErrorNotice, Loading, PageHead } from "../components/ui";
+
+const REASONS: Record<string, string> = {
+  upgrade_required: "You have used your free interview. Gap analyses stay free.",
+  minutes_exhausted: "You have used this month's interview minutes.",
+};
+
+/** BL-1 and BL-2: the monthly plan. Prices and caps come from the API. */
+export function PaywallPage() {
+  const [params] = useSearchParams();
+  const plan = usePlan();
+  const usage = useUsage();
+  const checkout = useMutation({
+    mutationFn: billingApi.checkout,
+    onSuccess: ({ url }) => window.location.assign(url),
+  });
+  const reason = params.get("reason");
+
+  return (
+    <div className="page--narrow">
+      <PageHead title="Keep practicing">
+        {reason && <p>{REASONS[reason] ?? REASONS.upgrade_required}</p>}
+      </PageHead>
+      {plan.isPending && <Loading />}
+      {plan.isError && <ErrorNotice error={plan.error} />}
+      {plan.data && (
+        <section className="panel" aria-labelledby="plan-heading">
+          <div className="plan">
+            <div>
+              <h2 id="plan-heading">{plan.data.name}</h2>
+              <ul>
+                <li>{plan.data.minutes_cap} interview minutes each month</li>
+                <li>All four interview types, Coach and Realistic modes</li>
+                <li>Unlimited gap analyses</li>
+                <li>Cancel at any time</li>
+              </ul>
+            </div>
+            <p className="plan__price">
+              ${plan.data.price_usd_month}
+              <small> per month</small>
+            </p>
+          </div>
+          {usage.data?.plan === "paid" ? (
+            <p className="notice notice--ok">Your plan is already active.</p>
+          ) : (
+            <button type="button" className="btn" onClick={() => checkout.mutate()} disabled={checkout.isPending}>
+              Subscribe
+            </button>
+          )}
+          {checkout.isError && <ErrorNotice error={checkout.error} />}
+          <p className="muted section">Payment is handled by Stripe. We do not see or store your card details.</p>
+        </section>
+      )}
+    </div>
+  );
+}
