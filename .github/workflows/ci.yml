@@ -153,6 +153,9 @@ jobs:
           name: latency
           path: var/latency/
           if-no-files-found: ignore
-      - name: Logs on failure
+      - name: Logs and memory on failure
         if: failure()
-        run: docker compose -f infra/compose.yaml --env-file .env --profile models --profile voice logs --tail 150
+        run: |
+          free -m
+          docker stats --no-stream
+          docker compose -f infra/compose.yaml --env-file .env --profile models --profile voice logs --tail 150

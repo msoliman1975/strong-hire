@@ -42,6 +42,13 @@ try {
         $services = @('litellm', 'stt', 'tts', 'livekit', 'voice')
         if ($p -eq 'local') { $services = @('ollama') + $services }
         Start-ModelServices -ModelProfile $p -Services $services
+        if ($p -eq 'local') {
+            # Unload models left in memory by other runs (for example the smoke test), so only the
+            # interviewer's model loads. CI runners have 16 GB of RAM.
+            Write-Step 'Restarting ollama to free memory'
+            Invoke-Compose @('restart', 'ollama')
+            Invoke-Compose (@('up', '-d', '--wait') + $services)
+        }
 
         $csv = Join-Path $latencyDir "$p.csv"
         Write-Step "Warm-up session for $p (not counted)"
