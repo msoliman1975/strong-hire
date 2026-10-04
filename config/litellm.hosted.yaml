@@ -1,29 +1,38 @@
-# LiteLLM proxy config for MODEL_PROFILE=hosted. Placeholders until P1 picks providers that offer
-# zero data retention. API keys come from environment variables, never from this file.
+# LiteLLM proxy config for MODEL_PROFILE=hosted. Real model ids and providers appear only here
+# and in litellm.local.yaml.
+#
+# Placeholder provider: Groq (low first-token latency, OpenAI-compatible, Whisper hosted).
+# HOSTED_API_KEY holds the Groq API key. Before real users, turn on zero data retention in the
+# Groq console (Settings > Data controls), as the spec's Privacy section requires.
+# To use another provider for a role, change that entry and add its key to .env and to
+# requires_env in models.hosted.yaml. Code does not change.
 model_list:
-  - model_name: hosted-extractor
+  - model_name: hosted-extractor          # mid-size, 1000 tokens/s
     litellm_params:
-      model: groq/llama-3.1-8b-instant
-      api_key: os.environ/GROQ_API_KEY
-  - model_name: hosted-planner
+      model: groq/openai/gpt-oss-20b
+      api_key: os.environ/HOSTED_API_KEY
+      reasoning_effort: low
+  - model_name: hosted-planner            # 120B open-weight
+    litellm_params:
+      model: groq/openai/gpt-oss-120b
+      api_key: os.environ/HOSTED_API_KEY
+      reasoning_effort: medium
+  - model_name: hosted-interviewer        # 70B class, no reasoning phase, so the first token is fast
     litellm_params:
       model: groq/llama-3.3-70b-versatile
-      api_key: os.environ/GROQ_API_KEY
-  - model_name: hosted-interviewer
+      api_key: os.environ/HOSTED_API_KEY
+  - model_name: hosted-scorer             # strongest open-weight model on this provider
     litellm_params:
-      model: groq/llama-3.3-70b-versatile
-      api_key: os.environ/GROQ_API_KEY
-  - model_name: hosted-scorer
-    litellm_params:
-      model: together_ai/meta-llama/Llama-3.3-70B-Instruct-Turbo
-      api_key: os.environ/TOGETHER_API_KEY
-  - model_name: hosted-stt
+      model: groq/openai/gpt-oss-120b
+      api_key: os.environ/HOSTED_API_KEY
+      reasoning_effort: high
+  - model_name: hosted-stt                # Whisper large-v3-turbo, hosted
     litellm_params:
       model: groq/whisper-large-v3-turbo
-      api_key: os.environ/GROQ_API_KEY
+      api_key: os.environ/HOSTED_API_KEY
     model_info:
       mode: audio_transcription
-  - model_name: hosted-tts
+  - model_name: hosted-tts                # Kokoro-82M stays self-hosted on CPU in both profiles
     litellm_params:
       model: openai/kokoro
       api_base: http://tts:8880/v1

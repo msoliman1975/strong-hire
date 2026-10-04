@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+from collections.abc import Mapping
 from enum import StrEnum
 from pathlib import Path
 
@@ -26,6 +28,12 @@ class ModelCapabilities(BaseModel):
     supports_tools: bool = False
     json_mode: bool = False
     context_window: int = Field(default=8192, ge=512)
+    streaming: bool = Field(
+        default=False, description="TTS only: the server streams audio chunks as it renders."
+    )
+    sample_rate: int | None = Field(
+        default=None, ge=8000, description="TTS only: sample rate of the raw PCM output, in Hz."
+    )
     options: dict[str, str] = Field(
         default_factory=dict, description="Per-model request options, such as a TTS voice."
     )
@@ -39,6 +47,15 @@ class GatewayEndpoint(BaseModel):
         default=None, description="Environment variable that holds the gateway API key."
     )
     timeout_s: float = Field(default=60.0, gt=0)
+    requires_env: tuple[str, ...] = Field(
+        default=(),
+        description="Environment variables the providers behind the gateway need, such as API "
+        "keys. Live smoke tests skip when one is missing.",
+    )
+
+    def missing_env(self, environ: Mapping[str, str] | None = None) -> list[str]:
+        env = os.environ if environ is None else environ
+        return [name for name in self.requires_env if not env.get(name)]
 
 
 class ModelsConfig(BaseModel):
@@ -78,11 +95,27 @@ class ModelsConfig(BaseModel):
         return self.models[self.roles[role]]
 
 
-def load_models_config(config_dir: Path, profile: str) -> ModelsConfig:
+ROLE_OVERRIDE_PREFIX = "MODEL_ROLE_"
+
+
+def load_models_config(
+    config_dir: Path, profile: str, environ: Mapping[str, str] | None = None
+) -> ModelsConfig:
+    """Read config/models.<profile>.yaml.
+
+    MODEL_ROLE_<ROLE>=<alias> points one role at another alias from the same file without editing
+    it, for example MODEL_ROLE_INTERVIEWER=local-lmstudio.
+    """
     path = config_dir / f"models.{profile}.yaml"
     if not path.exists():
         raise FileNotFoundError(f"No model config for MODEL_PROFILE={profile!r}: {path}")
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    env = os.environ if environ is None else environ
+    roles = data.setdefault("roles", {})
+    for role in Role:
+        override = env.get(f"{ROLE_OVERRIDE_PREFIX}{role.value.upper()}")
+        if override:
+            roles[role.value] = override
     return ModelsConfig.model_validate(data)
 
 
@@ -94,6 +127,8 @@ def fake_models_config() -> ModelsConfig:
             supports_tools=role in CHAT_ROLES,
             json_mode=role in CHAT_ROLES,
             context_window=32768,
+            streaming=role == Role.TTS,
+            sample_rate=16000 if role == Role.TTS else None,
         )
         for role in Role
     }

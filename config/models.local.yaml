@@ -1,6 +1,7 @@
 # Role -> model alias for MODEL_PROFILE=local (Docker on this machine, CPU only).
 # Aliases are LiteLLM model_names defined in litellm.local.yaml. Code never sees vendor ids.
-# Model picks are placeholders until the P1 model spike chooses them.
+# Override one role without editing this file: MODEL_ROLE_<ROLE>=<alias>, for example
+# MODEL_ROLE_INTERVIEWER=local-lmstudio.
 profile: local
 gateway:
   base_url: http://litellm:4000/v1     # overridden by MODEL_GATEWAY_URL when running outside Docker
@@ -16,17 +17,23 @@ roles:
   tts: local-tts
 
 # Capability registry. Code checks these flags, never model names.
+# context_window is the num_ctx set in litellm.local.yaml, not the model's maximum (32768).
 models:
   local-small:
     kind: chat
     supports_tools: true
     json_mode: true
-    context_window: 32768
+    context_window: 8192
   local-mid:
     kind: chat
     supports_tools: true
     json_mode: true
-    context_window: 32768
+    context_window: 8192
+  local-lmstudio:
+    kind: chat
+    supports_tools: false     # depends on the model loaded in LM Studio; prompted JSON is safe
+    json_mode: true
+    context_window: 8192
   local-stt:
     kind: stt
     context_window: 512
@@ -35,5 +42,7 @@ models:
   local-tts:
     kind: tts
     context_window: 512
+    streaming: true
+    sample_rate: 24000
     options:
       voice: af_heart

@@ -50,3 +50,20 @@ def test_only_gateway_imports_model_sdks() -> None:
         and MODEL_SDK.search(p.read_text(encoding="utf-8"))
     ]
     assert not offenders, "Only strong_core.gateway may import model SDKs:\n" + "\n".join(offenders)
+
+
+NON_CODE = ["scripts", "infra", "apps/voice/devpage"]
+NON_CODE_SUFFIXES = {".ps1", ".yaml", ".yml", ".html", ".js", ".py", ".txt", ".md", ""}
+
+
+def test_no_model_names_in_scripts_infra_or_env_example() -> None:
+    """Model and provider ids live in config/ only; scripts read them from there (PL-1)."""
+    files = [REPO / ".env.example"]
+    for d in NON_CODE:
+        files += [p for p in (REPO / d).rglob("*") if p.is_file() and p.suffix in NON_CODE_SUFFIXES]
+    offenders = [
+        f"{p.relative_to(REPO)}: {m.group(0)}"
+        for p in files
+        if (m := MODEL_NAME.search(p.read_text(encoding="utf-8", errors="ignore")))
+    ]
+    assert not offenders, "Model names belong in config/ only:\n" + "\n".join(offenders)

@@ -1,11 +1,13 @@
 # Role -> model alias for MODEL_PROFILE=hosted (hosted open-weight model APIs via LiteLLM).
 # Aliases are LiteLLM model_names defined in litellm.hosted.yaml.
-# Providers must offer zero data retention (spec, Privacy section). Picks are placeholders until P1.
+# Providers must offer zero data retention (spec, Privacy section).
+# Switching to this profile needs only the keys in requires_env (see .env.example).
 profile: hosted
 gateway:
   base_url: http://litellm:4000/v1
   api_key_env: LITELLM_MASTER_KEY
   timeout_s: 60
+  requires_env: [HOSTED_API_KEY]
 
 roles:
   extractor: hosted-extractor
@@ -15,6 +17,7 @@ roles:
   stt: hosted-stt
   tts: hosted-tts
 
+# Capability registry. Code checks these flags, never model names.
 models:
   hosted-extractor:
     kind: chat
@@ -44,5 +47,7 @@ models:
   hosted-tts:
     kind: tts
     context_window: 512
+    streaming: true
+    sample_rate: 24000
     options:
       voice: af_heart

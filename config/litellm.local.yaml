@@ -1,19 +1,34 @@
 # LiteLLM proxy config for MODEL_PROFILE=local. This file and litellm.hosted.yaml are the only
 # places where real model ids and providers appear.
-# Placeholders until the P1 model spike. Pull the Ollama models first:
-#   docker compose -f infra/compose.yaml exec ollama ollama pull qwen2.5:3b-instruct
+#
+# Ollama models: ./scripts/models.ps1 pull reads the ollama_chat entries below and pulls them.
+#   local-small  Qwen2.5 3B Instruct, Q4_K_M (about 1.9 GB)   extractor, interviewer
+#   local-mid    Qwen2.5 7B Instruct, Q4_K_M (about 4.7 GB)   planner, scorer
+# num_ctx caps the context so both models, faster-whisper and Kokoro fit in 32 GB of RAM on CPU.
 model_list:
   - model_name: local-small
     litellm_params:
       model: ollama_chat/qwen2.5:3b-instruct
       api_base: http://ollama:11434
+      num_ctx: 8192
+      keep_alive: 30m
   - model_name: local-mid
     litellm_params:
       model: ollama_chat/qwen2.5:7b-instruct
       api_base: http://ollama:11434
-  # To use LM Studio on the host instead, point a model at it:
-  #   model: openai/<model-id-in-lm-studio>
-  #   api_base: http://host.docker.internal:1234/v1
+      num_ctx: 8192
+      keep_alive: 30m
+
+  # LM Studio on the Windows host. Load a model in LM Studio, start its server on port 1234,
+  # and put the model identifier LM Studio shows after "openai/". Then point a role at it
+  # without editing models.local.yaml, for example: MODEL_ROLE_INTERVIEWER=local-lmstudio
+  - model_name: local-lmstudio
+    litellm_params:
+      model: openai/qwen2.5-3b-instruct
+      api_base: http://host.docker.internal:1234/v1
+      api_key: not-needed
+
+  # faster-whisper small, int8 on CPU (infra/stt). The server loads the model named here.
   - model_name: local-stt
     litellm_params:
       model: openai/Systran/faster-whisper-small
@@ -21,6 +36,8 @@ model_list:
       api_key: not-needed
     model_info:
       mode: audio_transcription
+
+  # Kokoro-82M on CPU (Kokoro-FastAPI image), streaming PCM at 24 kHz.
   - model_name: local-tts
     litellm_params:
       model: openai/kokoro

@@ -88,6 +88,12 @@ class FakeBackend:
             w.writeframes(b"\x00\x00" * frames)
         return buf.getvalue()
 
+    def synthesize_pcm(self, text: str, sample_rate: int) -> list[bytes]:
+        """Silent raw PCM, 10 ms per character (max 30 s), in 100 ms chunks."""
+        total = min(len(text), 3000) * sample_rate // 100
+        step = sample_rate // 10
+        return [b"\x00\x00" * min(step, total - i) for i in range(0, total, step)]
+
     @staticmethod
     def _first(*paths: Path) -> Path | None:
         return next((p for p in paths if p.exists()), None)
