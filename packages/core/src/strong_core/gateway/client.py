@@ -155,12 +155,50 @@ class ModelGateway:
         if self._fake is not None:
             return self._fake.synthesize(text)
         alias = self.config.alias_for(Role.TTS)
-        body = {"model": alias, "input": text, "response_format": "wav"}
+        # stream=False: a streamed WAV has no real length in its header.
+        body: dict[str, Any] = {
+            "model": alias,
+            "input": text,
+            "response_format": "wav",
+            "stream": False,
+        }
         body.update(self.capabilities(Role.TTS).options)
         async with self._http() as http:
             resp = await http.post("/audio/speech", json=body)
         _raise_for(resp, Role.TTS)
         return resp.content
+
+    async def synthesize_stream(self, text: str) -> AsyncIterator[bytes]:
+        """Text to speech as raw 16-bit mono PCM at `capabilities(Role.TTS).sample_rate`.
+
+        Chunks arrive as the server renders them when the TTS model has `streaming: true`, so
+        the voice loop can play the first chunk before the sentence is finished.
+        """
+        caps = self.capabilities(Role.TTS)
+        if caps.sample_rate is None:
+            raise GatewayError("tts model needs sample_rate in the capability registry")
+        if self._fake is not None:
+            for chunk in self._fake.synthesize_pcm(text, caps.sample_rate):
+                yield chunk
+            return
+        body: dict[str, Any] = {
+            "model": self.config.alias_for(Role.TTS),
+            "input": text,
+            "response_format": "pcm",
+            "stream": caps.streaming,
+        }
+        body.update(caps.options)
+        carry = b""
+        async with self._http() as http, http.stream("POST", "/audio/speech", json=body) as resp:
+            if resp.is_error:
+                await resp.aread()
+                _raise_for(resp, Role.TTS)
+            async for chunk in resp.aiter_bytes():
+                data = carry + chunk
+                cut = len(data) - len(data) % 2  # never split a 16-bit sample
+                carry = data[cut:]
+                if cut:
+                    yield data[:cut]
 
     # --- internals --------------------------------------------------------------------------
 

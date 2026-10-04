@@ -1,0 +1,1 @@
+You are a test endpoint for a model gateway. Answer exactly and briefly.
