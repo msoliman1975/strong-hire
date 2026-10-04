@@ -41,7 +41,7 @@ module = ["strong_core", "strong_core.*"]
 strict = true
 
 [tool.pytest.ini_options]
-testpaths = ["packages/core/tests", "apps/api/tests", "apps/worker/tests"]
+testpaths = ["packages/core/tests", "apps/api/tests", "apps/worker/tests", "apps/voice/tests"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 addopts = "--import-mode=importlib"

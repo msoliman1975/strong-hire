@@ -1,34 +1,66 @@
-"""Voice agent placeholder. P1 replaces this with the LiveKit Agents worker.
+"""Voice agent entry point.
 
-Until then it serves GET /health on VOICE_HEALTH_PORT (default 8081) so the compose stack and
-its healthchecks work.
+python -m strong_voice                  run the worker (joins every new LiveKit room)
+python -m strong_voice download-files   fetch the VAD and turn detector model files
 """
 
 from __future__ import annotations
 
-import json
-import os
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+import asyncio
+import logging
+import sys
+
+from livekit.agents import AgentServer
+from livekit.agents.plugin import Plugin
+
+from strong_core.gateway import get_gateway
+from strong_voice.agent import entrypoint, prewarm
+from strong_voice.devserver import start_devserver
+from strong_voice.settings import get_voice_settings
 
 
-class _Health(BaseHTTPRequestHandler):
-    def do_GET(self) -> None:
-        ok = self.path == "/health"
-        body = json.dumps({"status": "stub", "service": "voice"} if ok else {"error": "not found"})
-        self.send_response(200 if ok else 404)
-        self.send_header("Content-Type", "application/json")
-        self.end_headers()
-        self.wfile.write(body.encode())
+def download_files() -> int:
+    import livekit.plugins.silero
+    import livekit.plugins.turn_detector  # noqa: F401  (registers the plugin)
 
-    def log_message(self, format: str, *args: object) -> None:
-        return
+    for plugin in Plugin.registered_plugins:
+        print(f"downloading files for {plugin.package}", flush=True)
+        plugin.download_files()
+    return 0
 
 
-def main() -> None:
-    port = int(os.environ.get("VOICE_HEALTH_PORT", "8081"))
-    print(f"voice agent stub listening on :{port}", flush=True)
-    ThreadingHTTPServer(("0.0.0.0", port), _Health).serve_forever()
+def build_server() -> AgentServer:
+    settings = get_voice_settings()
+    server = AgentServer(
+        ws_url=settings.livekit_url,
+        api_key=settings.livekit_api_key,
+        api_secret=settings.livekit_api_secret,
+        port=settings.voice_worker_port,
+        setup_fnc=prewarm,
+        num_idle_processes=1,
+        initialize_process_timeout=60.0,
+    )
+    server.rtc_session(entrypoint)
+    return server
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = sys.argv[1:] if argv is None else argv
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
+    if args[:1] == ["download-files"]:
+        return download_files()
+    settings = get_voice_settings()
+    profile = get_gateway().profile
+    start_devserver(settings, profile)
+    logging.getLogger("strong_voice").info(
+        "voice agent: profile=%s livekit=%s health=:%d",
+        profile,
+        settings.livekit_url,
+        settings.voice_health_port,
+    )
+    asyncio.run(build_server().run(devmode=settings.env == "dev"))
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

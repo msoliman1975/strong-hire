@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Voice spike test page</title>
+  <!-- Bare test page for the P1 voice spike. Not the product web app (apps/web). -->
+  <script src="https://cdn.jsdelivr.net/npm/livekit-client@2/dist/livekit-client.umd.js"></script>
+  <style>
+    body { font: 16px/1.5 system-ui, sans-serif; max-width: 40rem; margin: 2rem auto; padding: 0 1rem; }
+    button { font-size: 1rem; padding: 0.5rem 1rem; margin-right: 0.5rem; }
+    #log { margin-top: 1rem; border-top: 1px solid #ccc; padding-top: 0.5rem; }
+    #log p { margin: 0.25rem 0; }
+    .agent { color: #0b5394; }
+    .you { color: #38761d; }
+    .sys { color: #666; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <h1>Voice spike</h1>
+  <p>Join, allow the microphone, and answer two questions. You can talk over the interviewer to interrupt.</p>
+  <button id="join">Join</button>
+  <button id="leave" disabled>Leave</button>
+  <span id="state" class="sys">Not connected</span>
+  <div id="log"></div>
+
+  <script>
+    const { Room, RoomEvent, Track } = LivekitClient;
+    const log = document.getElementById("log");
+    const state = document.getElementById("state");
+    const join = document.getElementById("join");
+    const leave = document.getElementById("leave");
+    let room = null;
+
+    function say(cls, text) {
+      const p = document.createElement("p");
+      p.className = cls;
+      p.textContent = text;
+      log.appendChild(p);
+      p.scrollIntoView();
+    }
+
+    join.onclick = async () => {
+      join.disabled = true;
+      try {
+        const name = "spike-" + Math.random().toString(36).slice(2, 8);
+        const resp = await fetch("/token?room=" + name);
+        if (!resp.ok) throw new Error("token request failed: " + resp.status);
+        const { url, token } = await resp.json();
+
+        room = new Room({ adaptiveStream: true, dynacast: true });
+        room.on(RoomEvent.TrackSubscribed, (track) => {
+          if (track.kind === Track.Kind.Audio) document.body.appendChild(track.attach());
+        });
+        room.on(RoomEvent.ParticipantConnected, (p) => say("sys", p.identity + " joined"));
+        room.on(RoomEvent.Disconnected, () => {
+          state.textContent = "Disconnected";
+          join.disabled = false;
+          leave.disabled = true;
+        });
+        room.registerTextStreamHandler("lk.transcription", async (reader, info) => {
+          const text = await reader.readAll();
+          if (text.trim()) {
+            const mine = info.identity === room.localParticipant.identity;
+            say(mine ? "you" : "agent", (mine ? "You: " : "Interviewer: ") + text);
+          }
+        });
+
+        await room.connect(url, token);
+        await room.localParticipant.setMicrophoneEnabled(true);
+        state.textContent = "Connected to " + name + ". Waiting for the interviewer.";
+        leave.disabled = false;
+      } catch (err) {
+        say("sys", String(err));
+        join.disabled = false;
+      }
+    };
+
+    leave.onclick = async () => {
+      if (room) await room.disconnect();
+    };
+  </script>
+</body>
+</html>
