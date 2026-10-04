@@ -120,9 +120,16 @@ jobs:
     env:
       MODEL_PROFILE: local
       LITELLM_PROFILE: local
+      OLLAMA_MAX_LOADED_MODELS: "1"
     steps:
       - name: Free disk space for model images and weights
         run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+      - name: Add 8 GB of swap (the runner has 7.9 GB of RAM)
+        run: |
+          sudo swapoff -a || true
+          sudo fallocate -l 8G /swapfile2 && sudo chmod 600 /swapfile2
+          sudo mkswap /swapfile2 && sudo swapon /swapfile2
+          free -m
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
         with:
@@ -151,9 +158,16 @@ jobs:
     env:
       MODEL_PROFILE: local
       LITELLM_PROFILE: local
+      OLLAMA_MAX_LOADED_MODELS: "1"
     steps:
       - name: Free disk space for model images and weights
         run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+      - name: Add 8 GB of swap (the runner has 7.9 GB of RAM)
+        run: |
+          sudo swapoff -a || true
+          sudo fallocate -l 8G /swapfile2 && sudo chmod 600 /swapfile2
+          sudo mkswap /swapfile2 && sudo swapon /swapfile2
+          free -m
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
         with:
