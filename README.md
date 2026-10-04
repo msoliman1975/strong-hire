@@ -17,9 +17,8 @@ A voice interview simulator for tech candidates. The product and technical spec 
 9. Install the local Python tools: `uv sync --all-packages`.
 10. Install the web tools: `pnpm --dir apps/web install`.
 11. Run the tests: `./scripts/dev.ps1 test`. Run the linters: `./scripts/dev.ps1 lint`.
-12. Optional, local models: `./scripts/dev.ps1 up -Profile models`, then pull a model with
-    `docker compose -f infra/compose.yaml exec ollama ollama pull qwen2.5:3b-instruct`
-    and set `MODEL_PROFILE=local` in `.env`.
+12. Optional, local models and voice: `./scripts/models.ps1 pull` (pulls the models named in
+    `config/`), then `./scripts/models.ps1 smoke` and see [apps/voice/README.md](apps/voice/README.md).
 13. Stop everything: `./scripts/dev.ps1 down`. Add `-Volumes` to delete the database too.
 
 Note: if your network inspects TLS traffic, `up` copies the CA file named in `SSL_CERT_FILE`
@@ -39,9 +38,9 @@ All ports are set in `.env` (see `.env.example`).
 | models | ollama (CPU) | 11435 | Not 11434, so it does not clash with Ollama on the host |
 | models | litellm proxy | 4000 | Loads `config/litellm.<LITELLM_PROFILE>.yaml` |
 | voice | livekit-server (dev mode) | 7880, 7881, 7882/udp | Keys: `devkey` / `secret` |
-| voice | voice agent | 8081 | Stub until P1 |
-| voice | stt (faster-whisper) | 8010 | Stub until P1 |
-| voice | tts (Kokoro) | 8880 | Stub until P1 |
+| voice | voice agent | 8081 | `/health`; dev test page at <http://localhost:8081> |
+| voice | stt (faster-whisper, CPU, int8) | 8010 | OpenAI-compatible `/v1/audio/transcriptions` |
+| voice | tts (Kokoro, CPU) | 8880 | OpenAI-compatible `/v1/audio/speech`, streaming PCM |
 
 ## Model profiles
 
@@ -49,7 +48,12 @@ All ports are set in `.env` (see `.env.example`).
 
 - `fake`: recorded fixtures, no model. The default, and the only profile tests use.
 - `local`: `config/models.local.yaml`, through LiteLLM to Ollama in Docker.
-- `hosted`: `config/models.hosted.yaml`, through LiteLLM to hosted APIs. Needs provider keys in `.env`.
+- `hosted`: `config/models.hosted.yaml`, through LiteLLM to hosted APIs. Needs `HOSTED_API_KEY` in `.env`.
+
+Set `LITELLM_PROFILE` to the same value, so the proxy loads the matching `config/litellm.*.yaml`.
+`./scripts/models.ps1` and `./scripts/latency.ps1` set both for you.
+To point one role at another alias, such as LM Studio on the host, set
+`MODEL_ROLE_<ROLE>=<alias>`, for example `MODEL_ROLE_INTERVIEWER=local-lmstudio`.
 
 ## Repository layout
 
@@ -65,5 +69,5 @@ schemas/        JSON Schemas generated from the contracts
 profiles/       Company profile JSON files
 evals/          Eval harness and fixtures
 infra/          Docker Compose, Dockerfiles, Caddy
-scripts/        dev.ps1
+scripts/        dev.ps1, models.ps1 (pull, smoke), latency.ps1
 ```
