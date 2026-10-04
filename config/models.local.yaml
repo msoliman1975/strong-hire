@@ -21,7 +21,7 @@ roles:
 models:
   local-small:
     kind: chat
-    supports_tools: true
+    supports_tools: false     # the 3B model breaks tool-call output; JSON-schema mode is reliable
     json_mode: true
     context_window: 8192
   local-mid:

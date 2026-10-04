@@ -155,7 +155,13 @@ class ModelGateway:
         if self._fake is not None:
             return self._fake.synthesize(text)
         alias = self.config.alias_for(Role.TTS)
-        body = {"model": alias, "input": text, "response_format": "wav"}
+        # stream=False: a streamed WAV has no real length in its header.
+        body: dict[str, Any] = {
+            "model": alias,
+            "input": text,
+            "response_format": "wav",
+            "stream": False,
+        }
         body.update(self.capabilities(Role.TTS).options)
         async with self._http() as http:
             resp = await http.post("/audio/speech", json=body)

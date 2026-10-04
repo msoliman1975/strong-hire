@@ -148,10 +148,11 @@ async def test_real_path_structured_output_with_one_retry() -> None:
         Message(role="assistant", content="ok"),
         Message(role="user", content="Parse this posting."),
     ]
-    done = await _gateway(FunctionModel(model)).complete(Role.EXTRACTOR, msgs, JobPosting)
+    # The planner's alias supports tool calls, so output arrives as a tool call.
+    done = await _gateway(FunctionModel(model)).complete(Role.PLANNER, msgs, JobPosting)
 
     assert isinstance(done.output, JobPosting)
-    assert done.model == "local-small"
+    assert done.model == "local-mid"
     assert len(calls) == 2  # one automatic retry after a validation error
     first = calls[0]
     assert isinstance(first[0], ModelRequest)
@@ -168,7 +169,7 @@ async def test_real_path_fails_loudly_after_retry() -> None:
         return ModelResponse(parts=[ToolCallPart(info.output_tools[0].name, {"bad": 1})])
 
     with pytest.raises(Exception, match=r"(?i)retr"):
-        await _gateway(FunctionModel(model)).complete(Role.EXTRACTOR, USER, JobPosting)
+        await _gateway(FunctionModel(model)).complete(Role.PLANNER, USER, JobPosting)
 
 
 async def test_real_path_text_and_stream() -> None:

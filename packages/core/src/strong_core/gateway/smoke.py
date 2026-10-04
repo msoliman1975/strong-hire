@@ -88,8 +88,11 @@ async def run_smoke(gw: ModelGateway) -> list[RoleResult]:
 
 
 def _wav_seconds(data: bytes) -> float:
+    """Duration from the byte count, not the header: a streamed WAV header has no real length."""
     with wave.open(io.BytesIO(data)) as w:
-        return float(w.getnframes()) / float(w.getframerate())
+        rate, width, channels = w.getframerate(), w.getsampwidth(), w.getnchannels()
+    pcm_bytes = len(data) - 44  # canonical WAV header size
+    return max(pcm_bytes, 0) / float(rate * width * channels)
 
 
 def _ms(start: float) -> float:

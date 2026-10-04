@@ -124,3 +124,14 @@ async def test_pl1_live_smoke(profile: str) -> None:
     results = await run_smoke(gw)
     failed = [r for r in results if not r.ok]
     assert not failed, failed
+
+
+def test_pl1_output_mode_follows_the_capability_registry() -> None:
+    from pydantic_ai import NativeOutput, ToolOutput
+
+    from strong_core.gateway import ModelGateway
+    from strong_core.gateway.smoke import SmokeAnswer
+
+    gw = ModelGateway(load_models_config(CONFIG, "local", environ={}))
+    assert isinstance(gw._output_spec(Role.EXTRACTOR, SmokeAnswer), NativeOutput)
+    assert isinstance(gw._output_spec(Role.PLANNER, SmokeAnswer), ToolOutput)
