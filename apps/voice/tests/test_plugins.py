@@ -90,3 +90,11 @@ async def test_warm_up_calls_interviewer_tts_and_stt(
     assert "warm-up tts" in text
     assert "warm-up stt" in text
     assert "failed" not in text
+
+
+async def test_stt_reports_each_transcription_time(fake: ModelGateway) -> None:
+    seen: list[float] = []
+    stt = GatewaySTT(fake, on_recognized=seen.append)
+    await stt.recognize(rtc.AudioFrame(bytes(3200), 16000, 1, 1600))
+    assert len(seen) == 1
+    assert seen[0] >= 0

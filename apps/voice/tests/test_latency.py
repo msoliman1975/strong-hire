@@ -114,3 +114,22 @@ def test_report_shows_a_miss() -> None:
     assert t is not None
     rec.turns.append(t)
     assert "MISS, 1400 ms" in rec.summary()
+
+
+def test_stt_time_comes_from_the_adapter_when_given(tmp_path: Path) -> None:
+    rec = LatencyRecorder(tmp_path / "x.csv", session="room", profile="local")
+    rec.on_message("user", {**USER, "transcription_delay": 0.0})
+    rec.on_stt(1.5)
+    rec.on_message("assistant", REPLY)
+    t = rec.turns[0]
+    assert t.stt_ms == 1500.0
+    assert t.turn_detection_ms == 450.0
+    assert t.other_ms == pytest.approx(900 - (450 + 1500 + 250 + 120))
+
+
+def test_warmup_recorder_writes_no_file(tmp_path: Path) -> None:
+    rec = LatencyRecorder(None, session="warmup-local-1", profile="local")
+    rec.on_message("user", USER)
+    rec.on_message("assistant", REPLY)
+    assert len(rec.turns) == 1
+    assert list(tmp_path.iterdir()) == []

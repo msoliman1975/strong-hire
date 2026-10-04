@@ -23,6 +23,7 @@ from array import array
 from livekit import rtc
 
 from strong_core.gateway import ModelGateway, Role, get_gateway
+from strong_voice.agent import WARMUP_ROOM_PREFIX
 from strong_voice.devserver import make_token
 from strong_voice.latency import percentile
 from strong_voice.settings import get_voice_settings
@@ -132,10 +133,15 @@ async def _render(gw: ModelGateway, text: str) -> bytes:
 
 
 async def run_session(
-    gw: ModelGateway, answers: list[bytes], rate: int, index: int, timeout_s: float
+    gw: ModelGateway,
+    answers: list[bytes],
+    rate: int,
+    index: int,
+    timeout_s: float,
+    prefix: str = "latency-",
 ) -> list[float]:
     settings = get_voice_settings()
-    room_name = f"latency-{gw.profile}-{index}-{uuid.uuid4().hex[:4]}"
+    room_name = f"{prefix}{gw.profile}-{index}-{uuid.uuid4().hex[:4]}"
     room = rtc.Room()
     ear = AgentEar(timeout_s)
 
@@ -174,14 +180,15 @@ async def run_session(
     return results
 
 
-async def run(sessions: int, timeout_s: float = DEFAULT_TIMEOUT_S) -> int:
+async def run(sessions: int, timeout_s: float = DEFAULT_TIMEOUT_S, warmup: bool = False) -> int:
     gw = get_gateway()
     rate = gw.capabilities(Role.TTS).sample_rate or 24000
     answers = [await _render(gw, text) for text in ANSWERS]
     print(f"caller: profile={gw.profile}, {sessions} sessions, {len(answers)} answers each")
     heard: list[float] = []
     for i in range(1, sessions + 1):
-        heard += await run_session(gw, answers, rate, i, timeout_s)
+        prefix = WARMUP_ROOM_PREFIX if warmup else "latency-"
+        heard += await run_session(gw, answers, rate, i, timeout_s, prefix)
         await asyncio.sleep(2.0)  # let the worker close the job and write its CSV rows
     if not heard:
         print("caller: no replies measured")
@@ -199,8 +206,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--timeout", type=float, default=DEFAULT_TIMEOUT_S, help="seconds to wait for each reply"
     )
+    parser.add_argument(
+        "--warmup", action="store_true", help="use warm-up rooms; the agent does not record them"
+    )
     args = parser.parse_args(argv)
-    return asyncio.run(run(args.sessions, args.timeout))
+    return asyncio.run(run(args.sessions, args.timeout, args.warmup))
 
 
 if __name__ == "__main__":

@@ -12,10 +12,11 @@ Columns in the CSV, all in milliseconds:
 
     total_ms           e2e_latency
     turn_detection_ms  end_of_turn_delay - transcription_delay (wait after the transcript)
-    stt_ms             transcription_delay
+    stt_ms             duration of the last transcription call before the reply, timed by
+                       GatewaySTT (LiveKit reports transcription_delay 0 for a non-streaming STT)
     llm_ttft_ms        llm_node_ttft
     tts_ttfb_ms        tts_node_ttfb
-    other_ms           total - (end_of_turn_delay + llm_ttft + tts_ttfb): queues, audio buffers
+    other_ms           total - (turn_detection + stt + llm_ttft + tts_ttfb): queues, buffers
 
 A step LiveKit did not report is left empty (NaN) and skipped in the percentiles. One answer can
 arrive as two user messages when the candidate pauses; their metrics are merged.
@@ -68,6 +69,7 @@ def build_turn(
     profile: str,
     turn: int,
     interrupted: bool = False,
+    stt_s: float | None = None,
 ) -> TurnLatency | None:
     """Combine a user turn's metrics with the reply's. None without the end-to-end latency."""
     total = _ms(assistant.get("e2e_latency"))
@@ -77,7 +79,9 @@ def build_turn(
     if math.isnan(total):
         return None
     eot = _ms(user.get("end_of_turn_delay"))
-    stt = _ms(user.get("transcription_delay"))
+    reported_stt = _ms(user.get("transcription_delay"))
+    stt = _ms(stt_s) if stt_s is not None else reported_stt
+    turn_detection = eot if math.isnan(reported_stt) else round(max(eot - reported_stt, 0.0), 1)
     ttft = _ms(assistant.get("llm_node_ttft"))
     ttfb = _ms(assistant.get("tts_node_ttfb"))
     return TurnLatency(
@@ -86,11 +90,11 @@ def build_turn(
         profile=profile,
         turn=turn,
         total_ms=total,
-        turn_detection_ms=round(max(eot - stt, 0.0), 1),
+        turn_detection_ms=turn_detection,
         stt_ms=stt,
         llm_ttft_ms=ttft,
         tts_ttfb_ms=ttfb,
-        other_ms=round(total - (eot + ttft + ttfb), 1),
+        other_ms=round(total - (turn_detection + stt + ttft + ttfb), 1),
         interrupted=interrupted,
     )
 
@@ -98,12 +102,18 @@ def build_turn(
 class LatencyRecorder:
     """Pairs each user turn with the agent reply that follows and appends a CSV row."""
 
-    def __init__(self, path: Path, *, session: str, profile: str) -> None:
+    def __init__(self, path: Path | None, *, session: str, profile: str) -> None:
+        """path=None keeps rows in memory only (used for warm-up rooms)."""
         self.path = path
         self.session = session
         self.profile = profile
         self.turns: list[TurnLatency] = []
         self._pending_user: Mapping[str, Any] | None = None
+        self._last_stt_s: float | None = None
+
+    def on_stt(self, seconds: float) -> None:
+        """Duration of one transcription call. The last one before the reply is the turn's STT."""
+        self._last_stt_s = seconds
 
     def on_message(self, role: str, metrics: Mapping[str, Any], interrupted: bool = False) -> None:
         if role == "user":
@@ -119,11 +129,14 @@ class LatencyRecorder:
             profile=self.profile,
             turn=len(self.turns) + 1,
             interrupted=interrupted,
+            stt_s=self._last_stt_s,
         )
         self._pending_user = None
+        self._last_stt_s = None
         if row is not None:
             self.turns.append(row)
-            append_rows(self.path, [row])
+            if self.path is not None:
+                append_rows(self.path, [row])
 
     def summary(self) -> str:
         return format_report({self.profile: self.turns})

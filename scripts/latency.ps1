@@ -57,9 +57,8 @@ try {
 
         $csv = Join-Path $latencyDir "$p.csv"
         Write-Step "Warm-up session for $p (not counted)"
-        Invoke-Compose @('exec', '-T', 'voice', 'python', '-m', 'strong_voice.caller', '--sessions', '1', '--timeout', "$ReplyTimeout")
-        Start-Sleep -Seconds 3
         Remove-Item $csv -ErrorAction SilentlyContinue
+        Invoke-Compose @('exec', '-T', 'voice', 'python', '-m', 'strong_voice.caller', '--sessions', '1', '--timeout', "$ReplyTimeout", '--warmup')
 
         Write-Step "Measuring $Sessions sessions for $p"
         Invoke-Compose @('exec', '-T', 'voice', 'python', '-m', 'strong_voice.caller', '--sessions', "$Sessions", '--timeout', "$ReplyTimeout")

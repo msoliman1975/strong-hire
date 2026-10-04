@@ -40,11 +40,14 @@ def prewarm(proc: JobProcess) -> None:
     proc.userdata["vad"] = silero.VAD.load(min_silence_duration=settings.vad_min_silence_s)
 
 
-def build_session(proc: JobProcess) -> AgentSession[None]:
+WARMUP_ROOM_PREFIX = "warmup-"
+
+
+def build_session(proc: JobProcess, recorder: LatencyRecorder) -> AgentSession[None]:
     settings = get_voice_settings()
     gateway = get_gateway()
     return AgentSession(
-        stt=GatewaySTT(gateway),
+        stt=GatewaySTT(gateway, on_recognized=recorder.on_stt),
         llm=GatewayLLM(gateway, Role.INTERVIEWER),
         tts=GatewayTTS(gateway),
         vad=proc.userdata["vad"],
@@ -70,10 +73,10 @@ async def entrypoint(ctx: JobContext) -> None:
     await ctx.connect()
 
     label = settings.latency_label or gateway.profile
-    recorder = LatencyRecorder(
-        settings.latency_dir / f"{label}.csv", session=ctx.room.name, profile=gateway.profile
-    )
-    session = build_session(ctx.proc)
+    warmup = ctx.room.name.startswith(WARMUP_ROOM_PREFIX)  # warm-up rooms are not counted
+    path = None if warmup else settings.latency_dir / f"{label}.csv"
+    recorder = LatencyRecorder(path, session=ctx.room.name, profile=gateway.profile)
+    session = build_session(ctx.proc, recorder)
 
     @session.on("conversation_item_added")
     def _on_item(ev: ConversationItemAddedEvent) -> None:

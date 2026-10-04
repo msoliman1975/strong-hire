@@ -13,6 +13,8 @@ role (stt, interviewer, tts), so MODEL_PROFILE alone decides which models answer
 
 from __future__ import annotations
 
+import time
+from collections.abc import Callable
 from typing import Any
 
 from livekit import rtc
@@ -36,9 +38,14 @@ PROVIDER = "strong-gateway"
 
 
 class GatewaySTT(stt.STT[None]):
-    def __init__(self, gateway: ModelGateway) -> None:
+    """on_recognized(seconds) reports each transcription's duration, for the latency CSV."""
+
+    def __init__(
+        self, gateway: ModelGateway, on_recognized: Callable[[float], None] | None = None
+    ) -> None:
         super().__init__(capabilities=stt.STTCapabilities(streaming=False, interim_results=False))
         self._gw = gateway
+        self._on_recognized = on_recognized
 
     @property
     def model(self) -> str:
@@ -56,7 +63,10 @@ class GatewaySTT(stt.STT[None]):
         conn_options: APIConnectOptions,
     ) -> stt.SpeechEvent:
         wav = rtc.combine_audio_frames(buffer).to_wav_bytes()
+        start = time.perf_counter()
         text = await self._gw.transcribe(wav)
+        if self._on_recognized is not None:
+            self._on_recognized(time.perf_counter() - start)
         lang = self._gw.capabilities(Role.STT).options.get("language", "en")
         return stt.SpeechEvent(
             type=stt.SpeechEventType.FINAL_TRANSCRIPT,
