@@ -18,7 +18,9 @@
 param(
     [int]$Sessions = 5,
     [ValidateSet('local', 'hosted')]
-    [string[]]$Profiles = @('local', 'hosted')
+    [string[]]$Profiles = @('local', 'hosted'),
+    # Seconds the simulated candidate waits for each reply. Raise it on slow CPUs.
+    [int]$ReplyTimeout = 60
 )
 
 $ErrorActionPreference = 'Stop'
@@ -44,20 +46,23 @@ try {
         Start-ModelServices -ModelProfile $p -Services $services
         if ($p -eq 'local') {
             # Unload models left in memory by other runs (for example the smoke test), so only the
-            # interviewer's model loads. CI runners have 16 GB of RAM.
+            # interviewer's model loads. Private-repo CI runners have 7.9 GB of RAM.
             Write-Step 'Restarting ollama to free memory'
             Invoke-Compose @('restart', 'ollama')
-            Invoke-Compose (@('up', '-d', '--wait') + $services)
         }
+        # The voice worker warms up its models at start; restart it so the warm-up is current.
+        Write-Step 'Restarting the voice worker (it warms up its models before taking rooms)'
+        Invoke-Compose @('restart', 'voice')
+        Invoke-Compose (@('up', '-d', '--wait') + $services)
 
         $csv = Join-Path $latencyDir "$p.csv"
         Write-Step "Warm-up session for $p (not counted)"
-        Invoke-Compose @('exec', '-T', 'voice', 'python', '-m', 'strong_voice.caller', '--sessions', '1')
+        Invoke-Compose @('exec', '-T', 'voice', 'python', '-m', 'strong_voice.caller', '--sessions', '1', '--timeout', "$ReplyTimeout")
         Start-Sleep -Seconds 3
         Remove-Item $csv -ErrorAction SilentlyContinue
 
         Write-Step "Measuring $Sessions sessions for $p"
-        Invoke-Compose @('exec', '-T', 'voice', 'python', '-m', 'strong_voice.caller', '--sessions', "$Sessions")
+        Invoke-Compose @('exec', '-T', 'voice', 'python', '-m', 'strong_voice.caller', '--sessions', "$Sessions", '--timeout', "$ReplyTimeout")
         Start-Sleep -Seconds 3
         $csvs += $csv
     }

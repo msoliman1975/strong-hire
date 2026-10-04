@@ -36,7 +36,7 @@ ANSWERS = (
 FRAME_MS = 10
 LOUD_RMS = 300.0
 QUIET_AFTER_S = 1.5
-REPLY_TIMEOUT_S = 30.0
+DEFAULT_TIMEOUT_S = 30.0
 
 
 def _rms(frame: rtc.AudioFrame) -> float:
@@ -49,7 +49,8 @@ def _rms(frame: rtc.AudioFrame) -> float:
 class AgentEar:
     """Tracks when the agent's audio is loud, from the subscribed audio track."""
 
-    def __init__(self) -> None:
+    def __init__(self, timeout_s: float = DEFAULT_TIMEOUT_S) -> None:
+        self.timeout_s = timeout_s
         self.last_loud = 0.0
         self.loud_times: list[float] = []
         self.tasks: list[asyncio.Task[None]] = []
@@ -69,7 +70,7 @@ class AgentEar:
 
     async def wait_reply(self, after: float) -> float | None:
         """Seconds from `after` to the first loud frame, then wait until the agent is quiet."""
-        deadline = after + REPLY_TIMEOUT_S
+        deadline = after + self.timeout_s
         first = None
         while time.perf_counter() < deadline:
             first = first or self.first_loud_after(after)
@@ -130,11 +131,13 @@ async def _render(gw: ModelGateway, text: str) -> bytes:
     return b"".join([chunk async for chunk in gw.synthesize_stream(text)])
 
 
-async def run_session(gw: ModelGateway, answers: list[bytes], rate: int, index: int) -> list[float]:
+async def run_session(
+    gw: ModelGateway, answers: list[bytes], rate: int, index: int, timeout_s: float
+) -> list[float]:
     settings = get_voice_settings()
     room_name = f"latency-{gw.profile}-{index}-{uuid.uuid4().hex[:4]}"
     room = rtc.Room()
-    ear = AgentEar()
+    ear = AgentEar(timeout_s)
 
     @room.on("track_subscribed")
     def _on_track(track: rtc.Track, *_: object) -> None:
@@ -153,7 +156,7 @@ async def run_session(gw: ModelGateway, answers: list[bytes], rate: int, index: 
     try:
         greeting = await ear.wait_reply(time.perf_counter())
         if greeting is None:
-            print(f"  session {index}: no greeting within {REPLY_TIMEOUT_S:.0f} s", flush=True)
+            print(f"  session {index}: no greeting within {timeout_s:.0f} s", flush=True)
             return results
         for n, pcm in enumerate(answers, start=1):
             ended = await mouth.say(pcm)
@@ -171,14 +174,14 @@ async def run_session(gw: ModelGateway, answers: list[bytes], rate: int, index: 
     return results
 
 
-async def run(sessions: int) -> int:
+async def run(sessions: int, timeout_s: float = DEFAULT_TIMEOUT_S) -> int:
     gw = get_gateway()
     rate = gw.capabilities(Role.TTS).sample_rate or 24000
     answers = [await _render(gw, text) for text in ANSWERS]
     print(f"caller: profile={gw.profile}, {sessions} sessions, {len(answers)} answers each")
     heard: list[float] = []
     for i in range(1, sessions + 1):
-        heard += await run_session(gw, answers, rate, i)
+        heard += await run_session(gw, answers, rate, i, timeout_s)
         await asyncio.sleep(2.0)  # let the worker close the job and write its CSV rows
     if not heard:
         print("caller: no replies measured")
@@ -193,8 +196,11 @@ async def run(sessions: int) -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--sessions", type=int, default=5)
+    parser.add_argument(
+        "--timeout", type=float, default=DEFAULT_TIMEOUT_S, help="seconds to wait for each reply"
+    )
     args = parser.parse_args(argv)
-    return asyncio.run(run(args.sessions))
+    return asyncio.run(run(args.sessions, args.timeout))
 
 
 if __name__ == "__main__":

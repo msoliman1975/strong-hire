@@ -178,7 +178,7 @@ jobs:
               docker stats --no-stream --format 'mem: {{.Name}} {{.MemUsage}}' 2>/dev/null
               sleep 15
             done ) &
-          pwsh ./scripts/latency.ps1 -Sessions 3
+          pwsh ./scripts/latency.ps1 -Sessions 3 -ReplyTimeout 120
       - uses: actions/upload-artifact@v4
         if: always()
         with:

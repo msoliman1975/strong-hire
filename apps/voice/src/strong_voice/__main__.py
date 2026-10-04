@@ -7,13 +7,18 @@ python -m strong_voice download-files   fetch the VAD and turn detector model fi
 from __future__ import annotations
 
 import asyncio
+import io
 import logging
 import sys
+import time
+import wave
+from collections.abc import AsyncIterator, Awaitable, Callable
 
 from livekit.agents import AgentServer
 from livekit.agents.plugin import Plugin
 
-from strong_core.gateway import get_gateway
+from strong_core.gateway import ModelGateway, Role, get_gateway
+from strong_core.prompts import load_prompt
 from strong_voice.agent import entrypoint, prewarm
 from strong_voice.devserver import start_devserver
 from strong_voice.settings import get_voice_settings
@@ -27,6 +32,44 @@ def download_files() -> int:
         print(f"downloading files for {plugin.package}", flush=True)
         plugin.download_files()
     return 0
+
+
+def _silence_wav(seconds: float = 0.5, rate: int = 16000) -> bytes:
+    buf = io.BytesIO()
+    with wave.open(buf, "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(rate)
+        w.writeframes(bytes(int(seconds * rate) * 2))
+    return buf.getvalue()
+
+
+async def warm_up(gw: ModelGateway) -> None:
+    """Load the interviewer, TTS and STT models before the first room, so turn 1 is not cold.
+
+    The interviewer call sends the spike's system prompt, which also fills the model server's
+    prompt cache for it. Failures are logged, not raised: the worker still starts.
+    """
+    log = logging.getLogger("strong_voice")
+    system = load_prompt(Role.INTERVIEWER, "spike").message("system")
+    user = load_prompt(Role.INTERVIEWER, "spike_continue").message("user")
+    steps: dict[str, Callable[[], Awaitable[object]]] = {
+        "interviewer": lambda: _drain(gw.stream(Role.INTERVIEWER, [system, user])),
+        "tts": lambda: _drain(gw.synthesize_stream("Hello.")),
+        "stt": lambda: gw.transcribe(_silence_wav()),
+    }
+    for name, step in steps.items():
+        start = time.perf_counter()
+        try:
+            await step()
+            log.info("warm-up %s: %.0f ms", name, (time.perf_counter() - start) * 1000)
+        except Exception as exc:
+            log.warning("warm-up %s failed: %s", name, exc)
+
+
+async def _drain(stream: AsyncIterator[object]) -> None:
+    async for _ in stream:
+        pass
 
 
 def build_server() -> AgentServer:
@@ -50,7 +93,10 @@ def main(argv: list[str] | None = None) -> int:
     if args[:1] == ["download-files"]:
         return download_files()
     settings = get_voice_settings()
-    profile = get_gateway().profile
+    gateway = get_gateway()
+    profile = gateway.profile
+    if not gateway.is_fake:
+        asyncio.run(warm_up(gateway))
     start_devserver(settings, profile)
     logging.getLogger("strong_voice").info(
         "voice agent: profile=%s livekit=%s health=:%d",

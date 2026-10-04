@@ -76,3 +76,17 @@ def test_spike_prompt_has_two_questions() -> None:
     assert agent.prompt_ref == "interviewer/spike.v1"
     assert "1. " in agent.instructions
     assert "2. " in agent.instructions
+
+
+async def test_warm_up_calls_interviewer_tts_and_stt(
+    fake: ModelGateway, caplog: pytest.LogCaptureFixture
+) -> None:
+    from strong_voice.__main__ import warm_up
+
+    with caplog.at_level("INFO", logger="strong_voice"):
+        await warm_up(fake)
+    text = caplog.text
+    assert "warm-up interviewer" in text
+    assert "warm-up tts" in text
+    assert "warm-up stt" in text
+    assert "failed" not in text
