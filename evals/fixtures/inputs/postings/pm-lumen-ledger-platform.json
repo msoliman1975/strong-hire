@@ -1,0 +1,26 @@
+{
+  "company_name": "Lumen Ledger",
+  "title": "Product Manager - Developer Platform",
+  "role_family": "pm",
+  "level": "mid",
+  "level_label": null,
+  "team": "Developer Platform",
+  "location": "New York, NY",
+  "must_have_skills": [
+    "Product management",
+    "APIs or developer tools",
+    "Reading code or API documentation",
+    "Prioritization and communication"
+  ],
+  "nice_to_have_skills": [
+    "Software engineering experience",
+    "Accounting or fintech"
+  ],
+  "responsibilities": [
+    "Turn developer feedback into a prioritized backlog",
+    "Write product requirement documents and API specs",
+    "Define success metrics for developer onboarding and API adoption",
+    "Plan launches with marketing and developer relations"
+  ],
+  "source_url": null
+}

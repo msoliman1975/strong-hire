@@ -1,0 +1,23 @@
+Technical Program Manager - Hardware/Software Integration
+Harbor Robotics
+Boston, MA (on-site)
+
+Harbor Robotics builds autonomous forklifts for warehouses. We are a team of 150 people.
+
+You will coordinate the release of new robot software to customer sites, working with firmware, autonomy, cloud and field operations teams.
+
+Responsibilities
+- Run the release train for robot software every two weeks
+- Track dependencies across hardware and software teams
+- Lead incident reviews after field issues
+- Report schedule and risk to the VP of Engineering
+
+Requirements
+- 3+ years as a technical program manager or engineering lead
+- Experience with hardware or embedded software projects
+- Comfort with Jira and release management
+- Strong communication with technical and non-technical people
+
+Nice to have
+- Robotics experience
+- Background in mechanical or electrical engineering

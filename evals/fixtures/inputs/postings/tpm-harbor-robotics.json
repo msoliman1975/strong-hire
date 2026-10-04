@@ -1,0 +1,26 @@
+{
+  "company_name": "Harbor Robotics",
+  "title": "Technical Program Manager - Hardware/Software Integration",
+  "role_family": "tpm",
+  "level": "mid",
+  "level_label": null,
+  "team": null,
+  "location": "Boston, MA (on-site)",
+  "must_have_skills": [
+    "Technical program management or engineering lead",
+    "Hardware or embedded software projects",
+    "Jira and release management",
+    "Communication with technical and non-technical people"
+  ],
+  "nice_to_have_skills": [
+    "Robotics",
+    "Mechanical or electrical engineering"
+  ],
+  "responsibilities": [
+    "Run the release train for robot software",
+    "Track dependencies across hardware and software teams",
+    "Lead incident reviews after field issues",
+    "Report schedule and risk to the VP of Engineering"
+  ],
+  "source_url": null
+}

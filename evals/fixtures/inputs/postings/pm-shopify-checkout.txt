@@ -1,0 +1,22 @@
+Senior Product Manager, Checkout
+Shopify | Remote - Americas
+
+Shopify is the commerce platform behind millions of merchants. The Checkout team owns the last step before a buyer pays, where every 0.1% of conversion matters.
+
+What you'll be doing
+- Own the strategy and roadmap for one-page checkout
+- Turn merchant and buyer research into clear problem statements and specs
+- Work with engineering, design and data leads to ship and measure improvements
+- Run experiments and decide what to scale based on conversion data
+- Communicate plans and results to directors and partner teams
+
+What you'll bring
+- 5+ years of product management experience on consumer or commerce products
+- Track record of shipping products that moved a business metric
+- Strong analytical skills and comfort with SQL or a BI tool
+- Experience working closely with engineering teams on technical products
+- Excellent written communication
+
+Bonus
+- Experience with payments, fraud or tax
+- Experience with A/B testing at scale

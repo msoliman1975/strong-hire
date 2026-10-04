@@ -1,0 +1,29 @@
+{
+  "company_name": "Stripe",
+  "title": "Backend Engineer, Payments Infrastructure",
+  "role_family": "swe",
+  "level": "senior",
+  "level_label": "L3",
+  "team": "Payments Infrastructure",
+  "location": "Seattle, WA or Remote in the US",
+  "must_have_skills": [
+    "Backend systems",
+    "Java, Ruby or Go",
+    "Distributed systems",
+    "API design",
+    "Operating production services with high availability"
+  ],
+  "nice_to_have_skills": [
+    "Payments or financial systems",
+    "Kafka",
+    "AWS"
+  ],
+  "responsibilities": [
+    "Design, build and operate services that process payments",
+    "Improve reliability and latency of the card authorization path",
+    "Lead technical design reviews and mentor engineers",
+    "Partner with product and risk teams to launch new payment methods",
+    "Participate in an on-call rotation"
+  ],
+  "source_url": null
+}

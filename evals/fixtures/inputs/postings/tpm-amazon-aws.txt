@@ -1,0 +1,24 @@
+Senior Technical Program Manager, AWS Networking
+Amazon Web Services (AWS)
+Job ID: 2876543 | Arlington, VA, USA
+
+Amazon Web Services is looking for a Senior Technical Program Manager to drive the launch of new networking features across AWS Regions.
+
+Key job responsibilities
+- Own the end-to-end delivery of multi-team networking programs
+- Write clear program plans, risk registers and status reports for senior leaders
+- Drive technical trade-off decisions with principal engineers
+- Build mechanisms that make launches across 30+ Regions repeatable
+
+Basic qualifications
+- 5+ years of technical program management experience
+- Experience working directly with engineering teams on distributed systems
+- Bachelor's degree in computer science, engineering or a related field
+- Experience with networking concepts such as TCP/IP, DNS and load balancing
+
+Preferred qualifications
+- Experience at a cloud provider
+- PMP or similar certification
+- Experience with data analysis in SQL
+
+This is an L6 role.

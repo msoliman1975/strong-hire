@@ -1,0 +1,5 @@
+Extract the job posting fields from the text in the following block.
+
+<untrusted_input>
+$posting
+</untrusted_input>

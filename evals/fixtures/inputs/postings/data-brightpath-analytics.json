@@ -1,0 +1,28 @@
+{
+  "company_name": "Brightpath Health",
+  "title": "Data Scientist, Product Analytics",
+  "role_family": "data_ml",
+  "level": "mid",
+  "level_label": null,
+  "team": "Product Analytics",
+  "location": "Remote (US time zones)",
+  "must_have_skills": [
+    "Product analytics or data science",
+    "SQL",
+    "Python or R",
+    "Experiment design and statistical inference",
+    "Written and spoken communication"
+  ],
+  "nice_to_have_skills": [
+    "dbt",
+    "Healthcare",
+    "Looker or Tableau"
+  ],
+  "responsibilities": [
+    "Define and track success metrics for the member app",
+    "Design and analyze A/B tests",
+    "Build dashboards for leaders",
+    "Present findings and recommendations to product and clinical leaders"
+  ],
+  "source_url": null
+}

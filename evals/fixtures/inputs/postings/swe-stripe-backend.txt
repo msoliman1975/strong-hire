@@ -1,0 +1,31 @@
+Backend Engineer, Payments Infrastructure
+Stripe
+Location: Seattle, WA or Remote in the US
+Team: Payments Infrastructure
+
+Who we are
+Stripe is a financial infrastructure platform for businesses. Millions of companies use Stripe to accept payments, grow their revenue, and accelerate new business opportunities.
+
+About the team
+The Payments Infrastructure team builds the systems that move money for every Stripe user. We own the services that authorize, capture and settle card payments, and we care deeply about correctness and availability.
+
+What you'll do
+- Design, build and operate services that process billions of dollars in payments each year
+- Improve the reliability and latency of the card authorization path
+- Lead technical design reviews and mentor engineers on the team
+- Partner with product and risk teams to launch new payment methods
+- Participate in an on-call rotation for the services you own
+
+Who you are
+Minimum requirements
+- 5+ years of experience building and operating backend systems
+- Strong experience with Java, Ruby or Go
+- Experience with distributed systems and API design
+- Experience operating services in production with high availability requirements
+
+Preferred qualifications
+- Experience with payments or financial systems
+- Familiarity with Kafka or other streaming systems
+- Experience with AWS
+
+This is a Senior level role (L3 at Stripe).

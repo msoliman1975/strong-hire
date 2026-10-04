@@ -1,0 +1,27 @@
+{
+  "company_name": "Airbnb",
+  "title": "Staff Product Designer, Guest Experience",
+  "role_family": "design",
+  "level": "staff_principal",
+  "level_label": "Staff",
+  "team": "Guest Experience",
+  "location": "United States - Remote Eligible",
+  "must_have_skills": [
+    "Product design including mobile apps",
+    "Interaction design and visual design",
+    "Figma and prototyping tools",
+    "Leading design for cross-functional projects"
+  ],
+  "nice_to_have_skills": [
+    "Motion design",
+    "Travel or marketplace products"
+  ],
+  "responsibilities": [
+    "Lead end-to-end design for complex features",
+    "Create prototypes to test ideas with guests",
+    "Partner with product managers and engineers to define scope",
+    "Present design work to senior leaders and give feedback",
+    "Contribute to the design system"
+  ],
+  "source_url": null
+}

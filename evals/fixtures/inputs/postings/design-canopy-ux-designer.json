@@ -1,0 +1,26 @@
+{
+  "company_name": "Canopy Studio",
+  "title": "UX Designer",
+  "role_family": "design",
+  "level": "mid",
+  "level_label": "Mid-level",
+  "team": null,
+  "location": "Austin, TX or Remote",
+  "must_have_skills": [
+    "UX or product design",
+    "Figma",
+    "Running usability tests",
+    "Web application portfolio"
+  ],
+  "nice_to_have_skills": [
+    "Accessibility standards (WCAG)",
+    "HTML and CSS"
+  ],
+  "responsibilities": [
+    "Design new features for the studio owner dashboard",
+    "Run usability tests with studio owners",
+    "Turn research into flows, wireframes and mockups",
+    "Work with engineering squads to ship designs"
+  ],
+  "source_url": null
+}

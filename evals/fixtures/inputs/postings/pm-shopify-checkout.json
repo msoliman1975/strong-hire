@@ -1,0 +1,28 @@
+{
+  "company_name": "Shopify",
+  "title": "Senior Product Manager, Checkout",
+  "role_family": "pm",
+  "level": "senior",
+  "level_label": "Senior",
+  "team": "Checkout",
+  "location": "Remote - Americas",
+  "must_have_skills": [
+    "Product management on consumer or commerce products",
+    "Shipping products that moved a business metric",
+    "Analytical skills with SQL or a BI tool",
+    "Working with engineering teams",
+    "Written communication"
+  ],
+  "nice_to_have_skills": [
+    "Payments, fraud or tax",
+    "A/B testing at scale"
+  ],
+  "responsibilities": [
+    "Own the strategy and roadmap for one-page checkout",
+    "Turn merchant and buyer research into problem statements and specs",
+    "Work with engineering, design and data leads to ship and measure improvements",
+    "Run experiments and decide what to scale",
+    "Communicate plans and results to directors and partner teams"
+  ],
+  "source_url": null
+}

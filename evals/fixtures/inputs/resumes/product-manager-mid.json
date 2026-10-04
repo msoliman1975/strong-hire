@@ -1,0 +1,45 @@
+{
+  "summary": "Product manager who has shipped checkout and onboarding features for consumer apps.",
+  "roles": [
+    {
+      "title": "Product Manager",
+      "company": "Hearthside Home Goods",
+      "start": "2022-04",
+      "end": null,
+      "achievements": [
+        "Owned the checkout roadmap; one-page checkout raised conversion by 4.2%",
+        "Ran 18 A/B tests in 2024 with the data science team",
+        "Wrote specs with 2 engineering squads and 1 designer"
+      ],
+      "skills": []
+    },
+    {
+      "title": "Associate Product Manager",
+      "company": "Brightline Fitness App",
+      "start": "2020-07",
+      "end": "2022-03",
+      "achievements": [
+        "Launched a new onboarding flow that lifted 7-day retention from 31% to 38%",
+        "Interviewed 40 users to define the workout plan feature"
+      ],
+      "skills": []
+    }
+  ],
+  "skills": [
+    "Product strategy",
+    "A/B testing",
+    "SQL",
+    "Amplitude",
+    "Figma",
+    "Jira"
+  ],
+  "education": [
+    {
+      "institution": "Meadowbrook College",
+      "degree": "B.A.",
+      "field_of_study": "Economics",
+      "end": "2020"
+    }
+  ],
+  "certifications": []
+}

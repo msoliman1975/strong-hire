@@ -1,0 +1,27 @@
+{
+  "company_name": "Amazon",
+  "title": "Senior Technical Program Manager, AWS Networking",
+  "role_family": "tpm",
+  "level": "senior",
+  "level_label": "L6",
+  "team": "AWS Networking",
+  "location": "Arlington, VA, USA",
+  "must_have_skills": [
+    "Technical program management",
+    "Working with engineering teams on distributed systems",
+    "Bachelor's degree in computer science or engineering",
+    "Networking concepts (TCP/IP, DNS, load balancing)"
+  ],
+  "nice_to_have_skills": [
+    "Cloud provider experience",
+    "PMP certification",
+    "SQL data analysis"
+  ],
+  "responsibilities": [
+    "Own end-to-end delivery of multi-team networking programs",
+    "Write program plans, risk registers and status reports",
+    "Drive technical trade-off decisions with principal engineers",
+    "Build mechanisms that make launches repeatable"
+  ],
+  "source_url": null
+}

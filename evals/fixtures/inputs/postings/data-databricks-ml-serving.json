@@ -1,0 +1,30 @@
+{
+  "company_name": "Databricks",
+  "title": "Staff Machine Learning Engineer - Model Serving",
+  "role_family": "data_ml",
+  "level": "staff_principal",
+  "level_label": "Staff (IC6)",
+  "team": "Model Serving",
+  "location": "San Francisco, California",
+  "must_have_skills": [
+    "Machine learning infrastructure",
+    "Python",
+    "C++, Scala or Rust",
+    "PyTorch",
+    "Model inference optimization",
+    "Distributed systems",
+    "Leading multi-team technical projects"
+  ],
+  "nice_to_have_skills": [
+    "Kubernetes",
+    "Open source ML contributions",
+    "GPU programming (CUDA)"
+  ],
+  "responsibilities": [
+    "Set the technical direction for low-latency model serving",
+    "Design autoscaling and batching systems",
+    "Drive cross-team projects with runtime, networking and product teams",
+    "Mentor senior engineers and raise the bar on design reviews"
+  ],
+  "source_url": null
+}

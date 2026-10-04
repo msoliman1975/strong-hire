@@ -1,0 +1,45 @@
+{
+  "summary": null,
+  "roles": [
+    {
+      "title": "Software Engineering Intern",
+      "company": "Pinecrest Maps",
+      "start": "2026-05",
+      "end": "2026-08",
+      "achievements": [
+        "Built a TypeScript tool that validates map tile uploads, used by 12 engineers",
+        "Added integration tests that cut release bugs in the tile service by 20%"
+      ],
+      "skills": [
+        "TypeScript"
+      ]
+    },
+    {
+      "title": "Teaching Assistant",
+      "company": "Lakeshore Institute of Technology",
+      "start": "2025-01",
+      "end": "2025-12",
+      "achievements": [
+        "Held weekly office hours for 60 students in Data Structures"
+      ],
+      "skills": []
+    }
+  ],
+  "skills": [
+    "Python",
+    "TypeScript",
+    "Java",
+    "SQL",
+    "React",
+    "Git"
+  ],
+  "education": [
+    {
+      "institution": "Lakeshore Institute of Technology",
+      "degree": "B.S.",
+      "field_of_study": "Computer Science",
+      "end": "2027-05"
+    }
+  ],
+  "certifications": []
+}

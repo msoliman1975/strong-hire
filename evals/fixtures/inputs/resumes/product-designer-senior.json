@@ -1,0 +1,45 @@
+{
+  "summary": "Senior product designer focused on mobile booking and marketplace flows.",
+  "roles": [
+    {
+      "title": "Senior Product Designer",
+      "company": "Wayfarer Trips",
+      "start": "2021-01",
+      "end": null,
+      "achievements": [
+        "Redesigned the mobile booking flow; completed bookings rose 12%",
+        "Built and maintain the company's Figma design system with 140 components",
+        "Lead weekly design critiques for 6 designers"
+      ],
+      "skills": []
+    },
+    {
+      "title": "Product Designer",
+      "company": "Neighborly Marketplace",
+      "start": "2017-08",
+      "end": "2020-12",
+      "achievements": [
+        "Designed seller onboarding for web and iOS",
+        "Ran 30+ usability sessions and turned findings into roadmap items"
+      ],
+      "skills": []
+    }
+  ],
+  "skills": [
+    "Figma",
+    "Protopie",
+    "User research",
+    "Prototyping",
+    "Interaction design",
+    "Visual design"
+  ],
+  "education": [
+    {
+      "institution": "Hudson School of Art",
+      "degree": "BFA",
+      "field_of_study": "Interaction Design",
+      "end": "2017"
+    }
+  ],
+  "certifications": []
+}

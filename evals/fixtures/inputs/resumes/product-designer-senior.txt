@@ -1,0 +1,21 @@
+JULES FARRANT (synthetic person)
+Product Designer | Brooklyn, NY | jules.farrant@example.com | portfolio: example.com/jules
+
+ABOUT
+Senior product designer focused on mobile booking and marketplace flows.
+
+EXPERIENCE
+Senior Product Designer — Wayfarer Trips, 01/2021 – present
+• Redesigned the mobile booking flow; completed bookings rose 12%
+• Built and maintain the company's Figma design system with 140 components
+• Lead weekly design critiques for 6 designers
+
+Product Designer — Neighborly Marketplace, 08/2017 – 12/2020
+• Designed seller onboarding for web and iOS
+• Ran 30+ usability sessions and turned findings into roadmap items
+
+EDUCATION
+BFA Interaction Design — Hudson School of Art, 2017
+
+TOOLS & SKILLS
+Figma, Protopie, user research, prototyping, interaction design, visual design
