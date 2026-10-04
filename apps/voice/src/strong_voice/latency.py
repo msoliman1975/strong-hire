@@ -17,6 +17,9 @@ Columns in the CSV, all in milliseconds:
     tts_ttfb_ms        tts_node_ttfb
     other_ms           total - (end_of_turn_delay + llm_ttft + tts_ttfb): queues, audio buffers
 
+A step LiveKit did not report is left empty (NaN) and skipped in the percentiles. One answer can
+arrive as two user messages when the candidate pauses; their metrics are merged.
+
 Report:
 
     uv run python -m strong_voice.latency report var/latency/local.csv var/latency/hosted.csv
@@ -53,8 +56,8 @@ class TurnLatency:
     interrupted: bool
 
 
-def _ms(seconds: Any) -> float | None:
-    return None if seconds is None else round(float(seconds) * 1000, 1)
+def _ms(seconds: Any) -> float:
+    return math.nan if seconds is None else round(float(seconds) * 1000, 1)
 
 
 def build_turn(
@@ -66,14 +69,17 @@ def build_turn(
     turn: int,
     interrupted: bool = False,
 ) -> TurnLatency | None:
-    """Combine one user message's metrics with the reply's metrics. None if data is missing."""
+    """Combine a user turn's metrics with the reply's. None without the end-to-end latency."""
     total = _ms(assistant.get("e2e_latency"))
+    if math.isnan(total) and "started_speaking_at" in assistant and "stopped_speaking_at" in user:
+        # Same formula LiveKit uses for e2e_latency.
+        total = _ms(float(assistant["started_speaking_at"]) - float(user["stopped_speaking_at"]))
+    if math.isnan(total):
+        return None
     eot = _ms(user.get("end_of_turn_delay"))
     stt = _ms(user.get("transcription_delay"))
     ttft = _ms(assistant.get("llm_node_ttft"))
     ttfb = _ms(assistant.get("tts_node_ttfb"))
-    if total is None or eot is None or stt is None or ttft is None or ttfb is None:
-        return None
     return TurnLatency(
         timestamp=round(time.time(), 3),
         session=session,
@@ -101,7 +107,8 @@ class LatencyRecorder:
 
     def on_message(self, role: str, metrics: Mapping[str, Any], interrupted: bool = False) -> None:
         if role == "user":
-            self._pending_user = dict(metrics)
+            # A pause can split one answer into two messages: keep keys from both, newest wins.
+            self._pending_user = {**(self._pending_user or {}), **metrics}
             return
         if role != "assistant" or self._pending_user is None:
             return  # the greeting has no user turn before it
@@ -131,7 +138,10 @@ def append_rows(path: Path, rows: Iterable[TurnLatency]) -> None:
         if new:
             writer.writeheader()
         for row in rows:
-            writer.writerow(asdict(row))
+            cells = asdict(row)
+            writer.writerow(
+                {k: "" if isinstance(v, float) and math.isnan(v) else v for k, v in cells.items()}
+            )
 
 
 def read_rows(path: Path) -> list[TurnLatency]:
@@ -145,7 +155,7 @@ def read_rows(path: Path) -> list[TurnLatency]:
                     profile=r["profile"],
                     turn=int(r["turn"]),
                     interrupted=r["interrupted"] == "True",
-                    **{m: float(r[m]) for m in METRICS},
+                    **{m: float(r[m] or "nan") for m in METRICS},
                 )
             )
         return out
@@ -171,7 +181,11 @@ def format_report(by_profile: Mapping[str, Sequence[TurnLatency]]) -> str:
     for metric in METRICS:
         cells = ""
         for n in names:
-            values = [float(getattr(t, metric)) for t in by_profile[n] if not t.interrupted]
+            values = [
+                v
+                for t in by_profile[n]
+                if not t.interrupted and not math.isnan(v := float(getattr(t, metric)))
+            ]
             cells += f"{percentile(values, 50):>14.0f}{percentile(values, 95):>14.0f}"
         lines.append(f"{metric:<18}{cells}")
     hosted = [t.total_ms for t in by_profile.get("hosted", []) if not t.interrupted]

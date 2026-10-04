@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from pathlib import Path
 
 import pytest
@@ -30,8 +31,43 @@ def test_build_turn_breaks_down_end_of_speech_to_first_audio() -> None:
     assert t.other_ms == pytest.approx(900 - (450 + 250 + 120))
 
 
-def test_build_turn_needs_every_metric() -> None:
-    assert build_turn(USER, {"e2e_latency": 1.0}, session="r", profile="x", turn=1) is None
+def test_build_turn_needs_only_the_end_to_end_latency() -> None:
+    assert build_turn(USER, {"llm_node_ttft": 0.2}, session="r", profile="x", turn=1) is None
+    t = build_turn({}, {"e2e_latency": 1.0}, session="r", profile="x", turn=1)
+    assert t is not None
+    assert t.total_ms == 1000.0
+    assert math.isnan(t.stt_ms)
+    assert math.isnan(t.llm_ttft_ms)
+    fallback = build_turn(
+        {"stopped_speaking_at": 10.0},
+        {"started_speaking_at": 11.25},
+        session="r",
+        profile="x",
+        turn=1,
+    )
+    assert fallback is not None
+    assert fallback.total_ms == 1250.0
+
+
+def test_partial_rows_round_trip_and_are_skipped_in_percentiles(tmp_path: Path) -> None:
+    rec = LatencyRecorder(tmp_path / "local.csv", session="room", profile="local")
+    rec.on_message("user", {})
+    rec.on_message("assistant", {"e2e_latency": 2.0})
+    rec.on_message("user", USER)
+    rec.on_message("assistant", REPLY)
+    rows = read_rows(tmp_path / "local.csv")
+    assert math.isnan(rows[0].stt_ms)
+    assert rows[1].stt_ms == 200.0
+    text = format_report({"local": rows})
+    assert "stt_ms" in text
+
+
+def test_split_answer_merges_user_metrics(tmp_path: Path) -> None:
+    rec = LatencyRecorder(tmp_path / "x.csv", session="room", profile="local")
+    rec.on_message("user", {"transcription_delay": 0.3, "end_of_turn_delay": 0.6})
+    rec.on_message("user", {"stopped_speaking_at": 12.0})  # second half of the same answer
+    rec.on_message("assistant", REPLY)
+    assert rec.turns[0].stt_ms == 300.0
 
 
 def test_recorder_pairs_user_and_reply_and_skips_greeting(tmp_path: Path) -> None:

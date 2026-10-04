@@ -80,6 +80,7 @@ async def entrypoint(ctx: JobContext) -> None:
         item = ev.item
         if isinstance(item, llm.ChatMessage):
             log.info("%s: %s", item.role, (item.text_content or "")[:120])
+            log.info("%s metrics: %s", item.role, sorted(item.metrics))
             before = len(recorder.turns)
             recorder.on_message(item.role, item.metrics, item.interrupted)
             if len(recorder.turns) > before:
