@@ -34,6 +34,14 @@
           "minLength": 1,
           "title": "Text",
           "type": "string"
+        },
+        "values": {
+          "description": "Company values this question probes (target_values).",
+          "items": {
+            "type": "string"
+          },
+          "title": "Values",
+          "type": "array"
         }
       },
       "required": [
@@ -263,6 +271,15 @@
       "maxItems": 6,
       "minItems": 4,
       "title": "Target Competencies",
+      "type": "array"
+    },
+    "target_values": {
+      "description": "Company value names (Principle.name) to probe. Empty in generic mode.",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 4,
+      "title": "Target Values",
       "type": "array"
     }
   },
