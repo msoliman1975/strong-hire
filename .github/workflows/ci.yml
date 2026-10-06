@@ -166,8 +166,32 @@ jobs:
         if: failure()
         run: docker compose -f infra/compose.yaml --env-file .env --profile models --profile voice logs --tail 150
 
+  changes:
+    name: Find voice changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      # Always "true" on push to main. On a PR, "true" only when a voice path changed.
+      voice: ${{ github.event_name != 'pull_request' || steps.filter.outputs.voice == 'true' }}
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: filter
+        if: github.event_name == 'pull_request'
+        with:
+          filters: |
+            voice:
+              - 'apps/voice/**'
+              - 'packages/core/src/strong_core/gateway/**'
+              - 'config/**'
+              - '.github/workflows/ci.yml'
+
   voice-latency:
     name: Voice latency spike (simulated candidate)
+    # About 15 minutes on CPU, so it runs only for voice changes and on every push to main.
+    needs: changes
+    if: needs.changes.outputs.voice == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:

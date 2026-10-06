@@ -17,7 +17,7 @@ from livekit.plugins.turn_detector.english import EnglishModel
 
 from strong_core.gateway import Role, get_gateway
 from strong_core.prompts import load_prompt
-from strong_voice.latency import LatencyRecorder
+from strong_voice.latency import WARMUP_ROOM_PREFIX, LatencyRecorder
 from strong_voice.plugins import GatewayLLM, GatewaySTT, GatewayTTS
 from strong_voice.settings import get_voice_settings
 
@@ -38,9 +38,6 @@ def prewarm(proc: JobProcess) -> None:
     """Runs once per worker process, before any job: load the VAD model."""
     settings = get_voice_settings()
     proc.userdata["vad"] = silero.VAD.load(min_silence_duration=settings.vad_min_silence_s)
-
-
-WARMUP_ROOM_PREFIX = "warmup-"
 
 
 def build_session(proc: JobProcess, recorder: LatencyRecorder) -> AgentSession[None]:

@@ -39,6 +39,8 @@ from pathlib import Path
 from typing import Any
 
 GATE_P50_MS = 1000.0
+# Rooms with this prefix are warm-up runs. The agent does not record their turns.
+WARMUP_ROOM_PREFIX = "warmup-"
 METRICS = ("total_ms", "turn_detection_ms", "stt_ms", "llm_ttft_ms", "tts_ttfb_ms", "other_ms")
 
 
