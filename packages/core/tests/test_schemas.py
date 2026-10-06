@@ -10,7 +10,7 @@ import pytest
 from pydantic import ValidationError
 
 from strong_core.config import find_repo_root
-from strong_core.gateway.fake import DEFAULT_FIXTURES_DIR
+from strong_core.gateway.fake import DEFAULT_FIXTURES_DIR, read_recording
 from strong_core.gateway.smoke import SmokeAnswer
 from strong_core.schemas import (
     COMPETENCIES_BY_TYPE,
@@ -242,9 +242,14 @@ def test_all_contracts_produce_json_schema() -> None:
 
 
 def test_fixtures_are_valid_contracts() -> None:
-    """Every <OutputType>.json fixture must validate against its contract."""
+    """Every <OutputType>.json fixture and every recorded output must validate."""
     by_name = {m.__name__: m for m in [*EXPORTED_SCHEMAS.values(), SmokeAnswer]}
     files = list(Path(DEFAULT_FIXTURES_DIR).rglob("*.json"))
     assert files
     for path in files:
+        recorded = read_recording(path)
+        if recorded is not None:
+            if recorded.output_type is not None:
+                by_name[recorded.output_type].model_validate(recorded.output)
+            continue
         by_name[path.stem].model_validate_json(path.read_text(encoding="utf-8"))

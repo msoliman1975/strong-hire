@@ -1,0 +1,5 @@
+Transcript so far:
+$transcript
+
+MOVE: $move
+QUESTION: $question

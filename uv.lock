@@ -6,6 +6,7 @@ requires-python = "==3.12.*"
 members = [
     "strong-api",
     "strong-core",
+    "strong-evals",
     "strong-voice",
     "strong-worker",
 ]
@@ -2049,6 +2050,21 @@ requires-dist = [
     { name = "pydantic-settings", specifier = ">=2.5" },
     { name = "pyyaml", specifier = ">=6.0" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.35" },
+]
+
+[[package]]
+name = "strong-evals"
+version = "0.1.0"
+source = { editable = "evals" }
+dependencies = [
+    { name = "pyyaml" },
+    { name = "strong-core" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "pyyaml", specifier = ">=6.0" },
+    { name = "strong-core", editable = "packages/core" },
 ]
 
 [[package]]

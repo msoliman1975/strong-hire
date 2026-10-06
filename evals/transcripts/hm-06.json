@@ -1,0 +1,280 @@
+{
+  "id": "hm-06",
+  "title": "Hiring manager, senior TPM, average answers",
+  "role_family": "tpm",
+  "candidate_name": "Felix Abara-Lindgren",
+  "quality": "average",
+  "brief": {
+    "session": {
+      "interview_type": "hiring_manager",
+      "difficulty": "realistic",
+      "mode": "realistic",
+      "duration_min": 30,
+      "level": "senior"
+    },
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": [
+      "role_fit",
+      "depth_of_experience",
+      "judgment",
+      "motivation",
+      "scope_at_level"
+    ],
+    "questions": [
+      {
+        "id": "q1",
+        "text": "Tell me about the most complex program you have run.",
+        "competencies": [
+          "scope_at_level",
+          "depth_of_experience"
+        ],
+        "priority": 1,
+        "probe_hints": [
+          "your role",
+          "result",
+          "a hard moment"
+        ]
+      },
+      {
+        "id": "q2",
+        "text": "How do you handle a project that is slipping?",
+        "competencies": [
+          "judgment",
+          "role_fit"
+        ],
+        "priority": 2,
+        "probe_hints": [
+          "a real case"
+        ]
+      },
+      {
+        "id": "q3",
+        "text": "Why this role?",
+        "competencies": [
+          "motivation",
+          "role_fit"
+        ],
+        "priority": 3,
+        "probe_hints": [
+          "what scale means"
+        ]
+      },
+      {
+        "id": "q4",
+        "text": "How do you work with engineering leads who do not report to you?",
+        "competencies": [
+          "team_fit"
+        ],
+        "priority": 4,
+        "probe_hints": [
+          "example"
+        ]
+      },
+      {
+        "id": "q5",
+        "text": "How do you decide what to escalate?",
+        "competencies": [
+          "judgment"
+        ],
+        "priority": 5,
+        "probe_hints": []
+      },
+      {
+        "id": "q6",
+        "text": "How have you helped other program managers grow?",
+        "competencies": [
+          "scope_at_level",
+          "team_fit"
+        ],
+        "priority": 6,
+        "probe_hints": []
+      }
+    ],
+    "probe_areas": [
+      "Scale of past programs",
+      "Real cases of recovery"
+    ],
+    "persona": {
+      "tone": "professional and measured",
+      "pushback_style": "asks for a specific example",
+      "closing_style": "thanks and next steps"
+    },
+    "max_probes_per_question": 2,
+    "curveball": null
+  },
+  "turns": [
+    {
+      "speaker": "interviewer",
+      "phase": "intro",
+      "text": "Hi Felix, thanks for joining. I'm Sunita, I manage the program management team. This is a thirty minute conversation about your background and the role.",
+      "start_ms": 0,
+      "end_ms": 10000
+    },
+    {
+      "speaker": "candidate",
+      "phase": "intro",
+      "text": "Hi Sunita, thank you for the time.",
+      "start_ms": 10750,
+      "end_ms": 13550
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "small_talk",
+      "text": "Did you travel for work this week?",
+      "start_ms": 14050,
+      "end_ms": 16850
+    },
+    {
+      "speaker": "candidate",
+      "phase": "small_talk",
+      "text": "Not this week. I was in the office, so a normal week for once.",
+      "start_ms": 17750,
+      "end_ms": 23350
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "agenda",
+      "text": "Good. I'll ask about a few programs and how you work with others, and we will leave time for your questions.",
+      "start_ms": 24000,
+      "end_ms": 32400
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about the most complex program you have run.",
+      "start_ms": 33200,
+      "end_ms": 37200,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "At Corvane Health I ran a program to move our claims systems to a new vendor. It touched six teams and went on for about a year. We had a plan with milestones and I ran the weekly status meeting. We ended up launching about a month late because of a data migration issue, but the vendor switch itself went fine.",
+      "start_ms": 37900,
+      "end_ms": 62300,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "What did you do about the data migration issue?",
+      "start_ms": 62900,
+      "end_ms": 66500,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "We found the issue in testing, and I pulled the data team and the vendor into daily calls. I made the call to delay the launch by a month instead of launching with bad records. Leadership was not happy but agreed. After that we added a data check to every milestone.",
+      "start_ms": 67250,
+      "end_ms": 87650,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "How do you handle a project that is slipping?",
+      "start_ms": 88150,
+      "end_ms": 91750,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I try to find the cause early and talk to the team about it. Usually it is a dependency or unclear scope. Then we adjust the plan and tell the stakeholders so there are no surprises. Communication is the key thing.",
+      "start_ms": 92650,
+      "end_ms": 109050,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Why this role?",
+      "start_ms": 109700,
+      "end_ms": 110900,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I have run programs for about nine years and I want to work at a larger scale. Your team supports several products, which would stretch me. I also like that the role is close to engineering.",
+      "start_ms": 111700,
+      "end_ms": 126100,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "What does a larger scale mean to you?",
+      "start_ms": 126800,
+      "end_ms": 130000,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "More teams and more risk. Right now I run programs with about six teams, and I would like to coordinate fifteen or more. I have not done that yet, so I know there is a gap, but I have mentored two junior program managers and I think I can grow into it.",
+      "start_ms": 130600,
+      "end_ms": 151400,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "How do you work with engineering leads who do not report to you?",
+      "start_ms": 152150,
+      "end_ms": 157350,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I try to understand what each lead cares about. For the claims program, one lead was worried about on-call load, so I offered to move two of our tasks to a quieter month. We built trust that way, and she became one of the main supporters. I also keep a shared tracker so nobody gets surprised.",
+      "start_ms": 157850,
+      "end_ms": 180250,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Thanks. What questions do you have for me?",
+      "start_ms": 181150,
+      "end_ms": 184350
+    },
+    {
+      "speaker": "candidate",
+      "phase": "candidate_questions",
+      "text": "How are programs handed off between TPMs when someone leaves?",
+      "start_ms": 185000,
+      "end_ms": 189000
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Each program has a written brief and a named backup. A handoff takes two weeks, and the new owner meets every lead in that time.",
+      "start_ms": 189800,
+      "end_ms": 199800
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "wrap_up",
+      "text": "That is all the time we have. Thanks Felix, the recruiter will contact you next week.",
+      "start_ms": 200500,
+      "end_ms": 206900
+    },
+    {
+      "speaker": "candidate",
+      "phase": "wrap_up",
+      "text": "Thank you, Sunita. I enjoyed it.",
+      "start_ms": 207500,
+      "end_ms": 209900
+    }
+  ],
+  "vague_answers": [
+    10,
+    12
+  ],
+  "notes": "Average for senior: scope looks mid level. The slipping-project answer is vague and the interviewer moves on without a probe."
+}

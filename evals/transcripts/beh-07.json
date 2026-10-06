@@ -1,0 +1,263 @@
+{
+  "id": "beh-07",
+  "title": "Behavioral, senior software engineer, average answers, coach mode",
+  "role_family": "swe",
+  "candidate_name": "Nikhil Barrowman",
+  "quality": "average",
+  "brief": {
+    "session": {
+      "interview_type": "behavioral",
+      "difficulty": "realistic",
+      "mode": "coach",
+      "duration_min": 30,
+      "level": "senior"
+    },
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": [
+      "ownership",
+      "impact",
+      "collaboration",
+      "learning_from_failure",
+      "communication"
+    ],
+    "questions": [
+      {
+        "id": "q1",
+        "text": "Tell me about a technical initiative you led across teams.",
+        "competencies": [
+          "ownership",
+          "impact"
+        ],
+        "priority": 1,
+        "probe_hints": [
+          "scope",
+          "result"
+        ]
+      },
+      {
+        "id": "q2",
+        "text": "Tell me about mentoring someone through a hard stretch.",
+        "competencies": [
+          "collaboration",
+          "communication"
+        ],
+        "priority": 2,
+        "probe_hints": [
+          "result"
+        ]
+      },
+      {
+        "id": "q3",
+        "text": "Tell me about a technical disagreement you resolved.",
+        "competencies": [
+          "conflict_handling",
+          "collaboration"
+        ],
+        "priority": 3,
+        "probe_hints": []
+      },
+      {
+        "id": "q4",
+        "text": "Tell me about a project that failed or was cancelled.",
+        "competencies": [
+          "learning_from_failure",
+          "ownership"
+        ],
+        "priority": 4,
+        "probe_hints": [
+          "your role",
+          "what changed"
+        ]
+      },
+      {
+        "id": "q5",
+        "text": "Tell me about explaining a trade-off to leadership.",
+        "competencies": [
+          "communication",
+          "impact"
+        ],
+        "priority": 5,
+        "probe_hints": []
+      },
+      {
+        "id": "q6",
+        "text": "Tell me about a measurable improvement you made.",
+        "competencies": [
+          "impact"
+        ],
+        "priority": 6,
+        "probe_hints": []
+      }
+    ],
+    "probe_areas": [
+      "Cross-team scope",
+      "Mentoring record"
+    ],
+    "persona": {
+      "tone": "supportive but thorough",
+      "pushback_style": "asks for scope and numbers",
+      "closing_style": "thanks with one coaching tip"
+    },
+    "max_probes_per_question": 3,
+    "curveball": null
+  },
+  "turns": [
+    {
+      "speaker": "interviewer",
+      "phase": "intro",
+      "text": "Hi Nikhil, welcome. I'm Elise, a staff engineer. This is a thirty minute behavioral practice session, and I will give you one tip at the end.",
+      "start_ms": 0,
+      "end_ms": 10400
+    },
+    {
+      "speaker": "candidate",
+      "phase": "intro",
+      "text": "Hi Elise, thanks. Happy to be here.",
+      "start_ms": 11240,
+      "end_ms": 14040
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "small_talk",
+      "text": "What are you working on these days?",
+      "start_ms": 14886,
+      "end_ms": 17686
+    },
+    {
+      "speaker": "candidate",
+      "phase": "small_talk",
+      "text": "Mostly platform reliability work, plus some mentoring of newer engineers.",
+      "start_ms": 18371,
+      "end_ms": 22371
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "agenda",
+      "text": "Good. I'll ask about three experiences and leave time for your questions.",
+      "start_ms": 22927,
+      "end_ms": 27727
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a technical initiative you led across teams.",
+      "start_ms": 28448,
+      "end_ms": 32448,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "We had a lot of services with different logging formats, so I led an effort to standardize logging. A few teams joined and we agreed on a common library. It made debugging easier and people were happy with it.",
+      "start_ms": 33173,
+      "end_ms": 48773,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "How many teams adopted it, and what did it change for them?",
+      "start_ms": 49337,
+      "end_ms": 54137,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Six teams adopted it over about four months. I wrote the library and a migration guide. Time to find the cause of an incident went from around 50 minutes to 30, based on our incident reports. Two teams pushed back on the extra dependency, so I made the library optional at first.",
+      "start_ms": 55015,
+      "end_ms": 75815,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about mentoring someone through a hard stretch.",
+      "start_ms": 76490,
+      "end_ms": 80090,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I mentored a mid-level engineer who struggled with code reviews and kept getting long comment threads. We met weekly for six months. I had him review my code first, and I showed him how to write short, specific comments. His reviews got faster, and he was promoted last year. The key was making him do the work instead of me giving answers.",
+      "start_ms": 80721,
+      "end_ms": 105521,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a project that failed or was cancelled.",
+      "start_ms": 106376,
+      "end_ms": 110376,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "We built a recommendation feature that was cancelled after a reorganization. It was disappointing because we put in a lot of work. The priorities changed and leadership moved the team. I learned to stay flexible.",
+      "start_ms": 110883,
+      "end_ms": 124883,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "What was your role, and what would you do differently?",
+      "start_ms": 125529,
+      "end_ms": 129529,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I was the tech lead. I spent five months building before we tested with real users. A small test in month one would have shown the feature had low usage. Now I run a two week prototype test first. It would have saved about 4 engineer months.",
+      "start_ms": 130178,
+      "end_ms": 148978,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Thanks. What questions do you have for me?",
+      "start_ms": 149651,
+      "end_ms": 152851
+    },
+    {
+      "speaker": "candidate",
+      "phase": "candidate_questions",
+      "text": "How are senior engineers expected to work across teams here?",
+      "start_ms": 153657,
+      "end_ms": 157657
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Seniors own one cross-team goal per year and report progress in a quarterly review.",
+      "start_ms": 158207,
+      "end_ms": 163807
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "wrap_up",
+      "text": "That's our time. One tip: start with the scope and a number, then the story. Thanks Nikhil.",
+      "start_ms": 164405,
+      "end_ms": 171205
+    },
+    {
+      "speaker": "candidate",
+      "phase": "wrap_up",
+      "text": "Thank you, Elise. That is useful.",
+      "start_ms": 171802,
+      "end_ms": 174202
+    }
+  ],
+  "vague_answers": [
+    6,
+    12
+  ],
+  "notes": "Average for senior: scope is small and results appear only after probes."
+}

@@ -6,6 +6,10 @@ Fixture lookup for complete() and stream(), first match wins:
     <fixtures>/<role>/<OutputType>.json            default for a structured output type
     <fixtures>/<role>/text.txt                     default text reply for the role
 
+An exact `<messages-hash>.json` is either the bare output, or a Recording written by
+strong_core.gateway.recorder against a real profile. A Recording keeps the request too, and
+replays its recorded token usage. It is used only when its output type matches the call.
+
 transcribe() looks for <fixtures>/stt/<audio-hash>.txt, then stt/text.txt.
 The error message prints the hash, so recording a new fixture is copy and paste.
 """
@@ -19,8 +23,9 @@ import re
 import wave
 from collections.abc import AsyncIterator, Sequence
 from pathlib import Path
+from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 
 from strong_core.gateway.types import Message, Role, TokenUsage
 
@@ -28,8 +33,47 @@ DEFAULT_FIXTURES_DIR = Path(__file__).parent / "fixtures"
 _SENTENCE = re.compile(r"(?<=[.!?])\s+")
 
 
+RECORDING_FORMAT = 1
+
+
 class FakeFixtureMissingError(LookupError):
     pass
+
+
+class RecordedUsage(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    input_tokens: int = Field(default=0, ge=0)
+    output_tokens: int = Field(default=0, ge=0)
+
+
+class Recording(BaseModel):
+    """One real gateway call, request and response, saved as <role>/<messages-hash>.json."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    recording: int = Field(default=RECORDING_FORMAT, description="Format version.")
+    role: Role
+    profile: str = Field(description="The MODEL_PROFILE it was recorded with, never fake.")
+    model: str = Field(description="Gateway alias from config, never a vendor id.")
+    output_type: str | None = Field(description="Contract class name, or None for text.")
+    messages: list[Message]
+    prompt_refs: list[str] = Field(default_factory=list)
+    output: Any = Field(description="The validated output as JSON, or the text reply.")
+    usage: RecordedUsage = Field(default_factory=RecordedUsage)
+    recorded_at: str
+
+    @property
+    def token_usage(self) -> TokenUsage:
+        return TokenUsage(self.usage.input_tokens, self.usage.output_tokens)
+
+
+def read_recording(path: Path) -> Recording | None:
+    """The Recording in `path`, or None when the file holds a bare output instead."""
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if isinstance(data, dict) and "recording" in data:
+        return Recording.model_validate(data)
+    return None
 
 
 def messages_hash(messages: Sequence[Message]) -> str:
@@ -50,13 +94,22 @@ class FakeBackend:
     ) -> tuple[object, TokenUsage]:
         key = messages_hash(messages)
         folder = self.fixtures_dir / role.value
+        recorded = self._recording(folder / f"{key}.json", output_type)
+        if recorded is not None:
+            if output_type is None:
+                return str(recorded.output), recorded.token_usage
+            return output_type.model_validate(recorded.output), recorded.token_usage
         if output_type is None:
             path = self._first(folder / f"{key}.txt", folder / "text.txt")
             if path is None:
                 raise self._missing(role, key, "text.txt")
             text = path.read_text(encoding="utf-8").strip()
             return text, _usage(messages, text)
-        path = self._first(folder / f"{key}.json", folder / f"{output_type.__name__}.json")
+        exact = folder / f"{key}.json"
+        candidates = [folder / f"{output_type.__name__}.json"]
+        if exact.exists() and read_recording(exact) is None:  # a bare output, not a Recording
+            candidates.insert(0, exact)
+        path = self._first(*candidates)
         if path is None:
             raise self._missing(role, key, f"{output_type.__name__}.json")
         raw = path.read_text(encoding="utf-8")
@@ -93,6 +146,16 @@ class FakeBackend:
         total = min(len(text), 3000) * sample_rate // 100
         step = sample_rate // 10
         return [b"\x00\x00" * min(step, total - i) for i in range(0, total, step)]
+
+    @staticmethod
+    def _recording(path: Path, output_type: type[BaseModel] | None) -> Recording | None:
+        if not path.exists():
+            return None
+        recorded = read_recording(path)
+        if recorded is None:
+            return None
+        wanted = None if output_type is None else output_type.__name__
+        return recorded if recorded.output_type == wanted else None
 
     @staticmethod
     def _first(*paths: Path) -> Path | None:

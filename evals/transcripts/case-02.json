@@ -1,0 +1,279 @@
+{
+  "id": "case-02",
+  "title": "Case, mid product manager, strong answers",
+  "role_family": "pm",
+  "candidate_name": "Anika Sorensen-Patel",
+  "quality": "strong",
+  "brief": {
+    "session": {
+      "interview_type": "case",
+      "difficulty": "realistic",
+      "mode": "realistic",
+      "duration_min": 45,
+      "level": "mid"
+    },
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": [
+      "problem_framing",
+      "structure",
+      "user_and_business_sense",
+      "estimation_logic",
+      "prioritization",
+      "recommendation"
+    ],
+    "questions": [
+      {
+        "id": "q1",
+        "text": "RideLoop is a city bike-share. Over three months, weekday rides fell 15 percent while weekend rides held steady. How would you approach this?",
+        "competencies": [
+          "problem_framing",
+          "user_and_business_sense"
+        ],
+        "priority": 1,
+        "probe_hints": [
+          "goal",
+          "hypotheses"
+        ]
+      },
+      {
+        "id": "q2",
+        "text": "Estimate how many bikes RideLoop needs for a city of 800,000 people.",
+        "competencies": [
+          "estimation_logic",
+          "structure"
+        ],
+        "priority": 2,
+        "probe_hints": [
+          "assumptions",
+          "cross-check"
+        ]
+      },
+      {
+        "id": "q3",
+        "text": "You have a small team and three options: add docks in the suburbs, launch a monthly pass, or improve bike rebalancing. What do you recommend?",
+        "competencies": [
+          "prioritization",
+          "recommendation"
+        ],
+        "priority": 3,
+        "probe_hints": [
+          "trade-offs"
+        ]
+      },
+      {
+        "id": "q4",
+        "text": "Leadership wants to add e-bikes. How do you decide?",
+        "competencies": [
+          "user_and_business_sense",
+          "prioritization"
+        ],
+        "priority": 4,
+        "probe_hints": [
+          "pilot"
+        ]
+      },
+      {
+        "id": "q5",
+        "text": "How would you choose a success metric for an app redesign?",
+        "competencies": [
+          "structure",
+          "recommendation"
+        ],
+        "priority": 5,
+        "probe_hints": []
+      },
+      {
+        "id": "q6",
+        "text": "The city council asks for lower prices for students. How do you respond?",
+        "competencies": [
+          "problem_framing",
+          "user_and_business_sense"
+        ],
+        "priority": 6,
+        "probe_hints": []
+      }
+    ],
+    "probe_areas": [
+      "Experience with marketplace metrics"
+    ],
+    "persona": {
+      "tone": "neutral and professional",
+      "pushback_style": "asks why not the simpler option",
+      "closing_style": "brief thanks and next steps"
+    },
+    "max_probes_per_question": 2,
+    "curveball": null
+  },
+  "turns": [
+    {
+      "speaker": "interviewer",
+      "phase": "intro",
+      "text": "Hi Anika, I'm Marcus, a group product manager. This is a forty five minute product case interview, spoken only.",
+      "start_ms": 0,
+      "end_ms": 7600
+    },
+    {
+      "speaker": "candidate",
+      "phase": "intro",
+      "text": "Hi Marcus, thanks for having me. I'm ready.",
+      "start_ms": 8400,
+      "end_ms": 11600
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "small_talk",
+      "text": "Are you joining from home today?",
+      "start_ms": 12300,
+      "end_ms": 14700
+    },
+    {
+      "speaker": "candidate",
+      "phase": "small_talk",
+      "text": "Yes, from home. It is a quiet week, so that helps.",
+      "start_ms": 15600,
+      "end_ms": 20000
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "agenda",
+      "text": "Good. I will give you three or four cases. Ask clarifying questions whenever you like, and I will leave time at the end for yours.",
+      "start_ms": 20500,
+      "end_ms": 30500
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "RideLoop is a city bike-share. Over three months, weekday rides fell 15 percent while weekend rides held steady. How would you approach this?",
+      "start_ms": 31100,
+      "end_ms": 40300,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "First I want to clarify the goal. Is it ridership, revenue, or pass renewals? I will assume ridership, since revenue follows. Then I would split the drop into three buckets: fewer riders, fewer rides per rider, and fewer bikes available. Weekday only points to commuters, so my first hypotheses are a new competitor on commuter routes, bikes missing at rush hour, or a price change. I would check bike availability at the top ten stations by hour first, because it is the fastest to confirm and to fix.",
+      "start_ms": 41100,
+      "end_ms": 76300,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Suppose availability looks fine. What next?",
+      "start_ms": 77000,
+      "end_ms": 79400,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Then I would look at the rider side. I would compare pass holders against casual riders. If pass holders are leaving, I would read exit survey notes and check whether a new bus lane or competitor opened near them. If casual riders dropped, it is more likely weather or pricing. Each answer leads to a different fix, so I would not build anything until the split is clear. I would ask for three days of analysis, then decide.",
+      "start_ms": 80300,
+      "end_ms": 111500,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Estimate how many bikes RideLoop needs for a city of 800,000 people.",
+      "start_ms": 112000,
+      "end_ms": 116800,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I will work from peak demand. Assume 3 percent of 800,000 people ride on a weekday, so 24,000 riders. Each rides twice, so 48,000 trips. Say 40 percent fall in two commute peaks, about 19,000 trips. A bike does about 1.5 trips per peak, so I need roughly 13,000 bikes. As a cross-check, comparable cities run about 10 bikes per 1,000 people, which gives 8,000. I would start near 8,000 and grow with data.",
+      "start_ms": 117400,
+      "end_ms": 147000,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "You have a small team and three options: add docks in the suburbs, launch a monthly pass, or improve bike rebalancing. What do you recommend?",
+      "start_ms": 147800,
+      "end_ms": 157800,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I would score the options on weekday impact, cost and time to learn. Rebalancing attacks the availability problem directly and needs mostly software and routing, about six weeks. The pass raises retention but only for people who already ride. Suburban docks are slow and expensive. So I recommend rebalancing first, with a target of 95 percent of top stations having a bike at 8 a.m. The pass is second, tested in one district. I would pause the docks.",
+      "start_ms": 158500,
+      "end_ms": 189700,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Why not launch the pass first? It is cheaper.",
+      "start_ms": 190600,
+      "end_ms": 194200,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "It is cheaper, and I would run it as a small test alongside. But if bikes are missing at rush hour, a pass buys loyalty to an unreliable service and could raise complaints. The risk is that we lock in unhappy members. If the data says availability is fine, I would flip the order and lead with the pass.",
+      "start_ms": 194700,
+      "end_ms": 218300,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Last one. Leadership wants to add e-bikes. How do you decide?",
+      "start_ms": 218900,
+      "end_ms": 223300,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I would ask what problem e-bikes solve. If it is longer commutes and hills, they could expand our reach. The trade-off is cost: an e-bike costs about three times more and needs charging. I would pilot 500 e-bikes in the two hilliest districts for eight weeks, compare rides per bike and revenue per ride, and expand only if revenue per bike beats standard bikes by at least two times. My recommendation is a limited pilot, not a full rollout.",
+      "start_ms": 224100,
+      "end_ms": 255700,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "That is the end of the cases. What questions do you have?",
+      "start_ms": 256400,
+      "end_ms": 261200
+    },
+    {
+      "speaker": "candidate",
+      "phase": "candidate_questions",
+      "text": "How do product managers here work with the operations team on the street?",
+      "start_ms": 262100,
+      "end_ms": 267300
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Each product manager spends one morning a month on a rebalancing van. It changes how they read the data.",
+      "start_ms": 267800,
+      "end_ms": 275400
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "wrap_up",
+      "text": "Thanks Anika, that is our time. The recruiter will contact you within a week.",
+      "start_ms": 276000,
+      "end_ms": 281600
+    },
+    {
+      "speaker": "candidate",
+      "phase": "wrap_up",
+      "text": "Thank you, Marcus. I enjoyed the cases.",
+      "start_ms": 282400,
+      "end_ms": 285200
+    }
+  ],
+  "vague_answers": [],
+  "notes": "Strong for mid: states the goal, uses stated assumptions in the estimate, weighs trade-offs and recommends."
+}

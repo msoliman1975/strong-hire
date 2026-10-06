@@ -1,0 +1,293 @@
+{
+  "id": "hm-03",
+  "title": "Hiring manager, mid designer, average answers, coach mode",
+  "role_family": "design",
+  "candidate_name": "Camille Oyelaran",
+  "quality": "average",
+  "brief": {
+    "session": {
+      "interview_type": "hiring_manager",
+      "difficulty": "realistic",
+      "mode": "coach",
+      "duration_min": 30,
+      "level": "mid"
+    },
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": [
+      "role_fit",
+      "depth_of_experience",
+      "judgment",
+      "motivation",
+      "team_fit"
+    ],
+    "questions": [
+      {
+        "id": "q1",
+        "text": "Walk me through a design project you are proud of and your role in it.",
+        "competencies": [
+          "depth_of_experience",
+          "role_fit"
+        ],
+        "priority": 1,
+        "probe_hints": [
+          "own role",
+          "how you knew it worked"
+        ]
+      },
+      {
+        "id": "q2",
+        "text": "Tell me about a time you disagreed with a stakeholder about a design direction.",
+        "competencies": [
+          "judgment",
+          "team_fit"
+        ],
+        "priority": 2,
+        "probe_hints": [
+          "outcome",
+          "what you gave up"
+        ]
+      },
+      {
+        "id": "q3",
+        "text": "What draws you to this team?",
+        "competencies": [
+          "motivation"
+        ],
+        "priority": 3,
+        "probe_hints": []
+      },
+      {
+        "id": "q4",
+        "text": "How do you decide what to design next when many requests compete?",
+        "competencies": [
+          "judgment",
+          "scope_at_level"
+        ],
+        "priority": 4,
+        "probe_hints": [
+          "a real case"
+        ]
+      },
+      {
+        "id": "q5",
+        "text": "How do you work with engineers during build?",
+        "competencies": [
+          "team_fit"
+        ],
+        "priority": 5,
+        "probe_hints": []
+      },
+      {
+        "id": "q6",
+        "text": "How do you handle critique of your work?",
+        "competencies": [
+          "team_fit",
+          "depth_of_experience"
+        ],
+        "priority": 6,
+        "probe_hints": []
+      }
+    ],
+    "probe_areas": [
+      "Evidence that the design worked",
+      "How priorities are chosen"
+    ],
+    "persona": {
+      "tone": "calm and practical",
+      "pushback_style": "asks for a real case",
+      "closing_style": "one coaching tip then thanks"
+    },
+    "max_probes_per_question": 2,
+    "curveball": null
+  },
+  "turns": [
+    {
+      "speaker": "interviewer",
+      "phase": "intro",
+      "text": "Hi Camille, thanks for joining. I'm Daniel, design manager for the mobile team. We have thirty minutes to talk about your work and how you think.",
+      "start_ms": 0,
+      "end_ms": 10400
+    },
+    {
+      "speaker": "candidate",
+      "phase": "intro",
+      "text": "Hi Daniel, nice to meet you. Thank you for having me.",
+      "start_ms": 11150,
+      "end_ms": 15550
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "small_talk",
+      "text": "How is your week going so far?",
+      "start_ms": 16050,
+      "end_ms": 18850
+    },
+    {
+      "speaker": "candidate",
+      "phase": "small_talk",
+      "text": "Pretty good. I just finished a round of user tests, so I'm tired but happy.",
+      "start_ms": 19750,
+      "end_ms": 25750
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "agenda",
+      "text": "This is a practice session, so I may add a short tip at the end. I'll ask about a few projects, and then you can ask me things.",
+      "start_ms": 26400,
+      "end_ms": 37600
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Walk me through a design project you are proud of and your role in it.",
+      "start_ms": 38400,
+      "end_ms": 44400,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I'm proud of the onboarding flow redesign for a budgeting app at Quillon Labs. We saw many people dropping off after sign up. I did the research with five users, then sketched new screens and tested them. We shortened the flow from seven steps to four, and sign up completion went up, I think by around 15 percent. Engineering built it over about a month.",
+      "start_ms": 45100,
+      "end_ms": 71100,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "What was your part compared to the rest of the team?",
+      "start_ms": 71700,
+      "end_ms": 76100,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I did the flows, the screens and the prototype. The product manager set the goal and one researcher helped me with the interviews, but I wrote the test plan. I also made the handoff files for the engineers.",
+      "start_ms": 76850,
+      "end_ms": 92050,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "How did you know the four step version was the right one?",
+      "start_ms": 92550,
+      "end_ms": 97350,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I ran a test with six users on both versions. Five of six finished the four step flow without help, and only two finished the old one. I did not test other lengths, so I am not sure four is the best number.",
+      "start_ms": 98250,
+      "end_ms": 115450,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a time you disagreed with a stakeholder about a design direction.",
+      "start_ms": 116100,
+      "end_ms": 121700,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "A product manager wanted a banner on the home screen for a new feature. I thought it would push down the main content. We talked a few times and I showed mockups of both. In the end we added a smaller card instead. It worked out.",
+      "start_ms": 122500,
+      "end_ms": 140900,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "How did the card perform?",
+      "start_ms": 141600,
+      "end_ms": 143600,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I think people clicked it enough, because the manager did not bring it up again. Later I asked analytics, and about 8 percent of users tapped the card. That was lower than the banner estimate, but it kept the main content visible. I would make the same trade again.",
+      "start_ms": 144200,
+      "end_ms": 163800,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "How do you decide what to design next when many requests compete?",
+      "start_ms": 164550,
+      "end_ms": 169350,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I usually ask the product manager what matters most. Then I look at which request affects the most users. I make a short list and share it with the team so everyone can see it. If two things conflict I ask for a decision.",
+      "start_ms": 169850,
+      "end_ms": 187450,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Can you give me a real case?",
+      "start_ms": 188350,
+      "end_ms": 191150,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Last quarter I had requests for a settings page, a new chart and a list of bug fixes. I ranked them by users affected and effort. The bug fixes went first because they touched about 60 percent of users.",
+      "start_ms": 191800,
+      "end_ms": 207400,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Thanks. What questions do you have for me?",
+      "start_ms": 208200,
+      "end_ms": 211400
+    },
+    {
+      "speaker": "candidate",
+      "phase": "candidate_questions",
+      "text": "How closely do designers work with engineers on your team?",
+      "start_ms": 212100,
+      "end_ms": 216100
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Each designer is paired with two engineers and sits in their standup. Designers also review the built screens before release.",
+      "start_ms": 216700,
+      "end_ms": 224700
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "wrap_up",
+      "text": "That is all the time we have. A tip from the practice session is to lead with the number in each story. Thanks Camille.",
+      "start_ms": 225450,
+      "end_ms": 235050
+    },
+    {
+      "speaker": "candidate",
+      "phase": "wrap_up",
+      "text": "That is helpful, thank you Daniel.",
+      "start_ms": 235550,
+      "end_ms": 237950
+    }
+  ],
+  "vague_answers": [
+    16
+  ],
+  "notes": "Average for mid: some numbers but hedged, and one generic answer that the interviewer probes."
+}

@@ -1,0 +1,277 @@
+{
+  "id": "hm-01",
+  "title": "Hiring manager, new grad software engineer, average answers",
+  "role_family": "swe",
+  "candidate_name": "Tomas Vidal",
+  "quality": "average",
+  "brief": {
+    "session": {
+      "interview_type": "hiring_manager",
+      "difficulty": "friendly",
+      "mode": "realistic",
+      "duration_min": 30,
+      "level": "new_grad"
+    },
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": [
+      "role_fit",
+      "depth_of_experience",
+      "judgment",
+      "motivation",
+      "team_fit"
+    ],
+    "questions": [
+      {
+        "id": "q1",
+        "text": "Walk me through a project from your internship or coursework that best shows what you can do for this role.",
+        "competencies": [
+          "role_fit",
+          "depth_of_experience"
+        ],
+        "priority": 1,
+        "probe_hints": [
+          "own role",
+          "result"
+        ]
+      },
+      {
+        "id": "q2",
+        "text": "Why this role and why this team?",
+        "competencies": [
+          "motivation",
+          "role_fit"
+        ],
+        "priority": 2,
+        "probe_hints": [
+          "what you know about the team"
+        ]
+      },
+      {
+        "id": "q3",
+        "text": "Tell me about a technical decision you made and how you chose between the options.",
+        "competencies": [
+          "judgment",
+          "depth_of_experience"
+        ],
+        "priority": 3,
+        "probe_hints": [
+          "options",
+          "why this one"
+        ]
+      },
+      {
+        "id": "q4",
+        "text": "How do you like to work with a team and a manager?",
+        "competencies": [
+          "team_fit"
+        ],
+        "priority": 4,
+        "probe_hints": []
+      },
+      {
+        "id": "q5",
+        "text": "What is the largest piece of work you have handled so far?",
+        "competencies": [
+          "scope_at_level"
+        ],
+        "priority": 5,
+        "probe_hints": []
+      },
+      {
+        "id": "q6",
+        "text": "What do you want to learn in your first year?",
+        "competencies": [
+          "motivation",
+          "scope_at_level"
+        ],
+        "priority": 6,
+        "probe_hints": []
+      }
+    ],
+    "probe_areas": [
+      "Credit split on internship work",
+      "Why this team"
+    ],
+    "persona": {
+      "tone": "warm and curious",
+      "pushback_style": "gentle clarifying questions",
+      "closing_style": "thanks and clear next steps"
+    },
+    "max_probes_per_question": 2,
+    "curveball": null
+  },
+  "turns": [
+    {
+      "speaker": "interviewer",
+      "phase": "intro",
+      "text": "Hi Tomas, thanks for joining. I'm Priya, an engineering manager on the services team. This is a thirty minute conversation about your experience and the role.",
+      "start_ms": 0,
+      "end_ms": 10400
+    },
+    {
+      "speaker": "candidate",
+      "phase": "intro",
+      "text": "Hi Priya, thanks for making time. I'm happy to be here.",
+      "start_ms": 11150,
+      "end_ms": 15550
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "small_talk",
+      "text": "Did you find the video link easily today?",
+      "start_ms": 16050,
+      "end_ms": 19250
+    },
+    {
+      "speaker": "candidate",
+      "phase": "small_talk",
+      "text": "Yes, no problem. I tested it this morning, and I'm in my apartment so it is quiet.",
+      "start_ms": 20150,
+      "end_ms": 26950
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "agenda",
+      "text": "Good. I'll ask about three or four things you have worked on, then leave time at the end for your questions.",
+      "start_ms": 27600,
+      "end_ms": 36000
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Walk me through a project from your internship or coursework that best shows what you can do for this role.",
+      "start_ms": 36800,
+      "end_ms": 44800,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "My best example is my internship at Brindle Logistics last summer. We built a dashboard for warehouse staff to see late shipments. I wrote the filter and search part in React, and we used an existing API. It went live before I left and the team said people used it daily.",
+      "start_ms": 45500,
+      "end_ms": 65900,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "What part did you build yourself, and what did your mentor handle?",
+      "start_ms": 66500,
+      "end_ms": 71300,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I wrote the search box and the date filters myself. I also fixed a bug where the page reloaded every time someone typed. I fixed it by waiting half a second before sending the request. My mentor handled the API and reviewed all my code.",
+      "start_ms": 72050,
+      "end_ms": 90050,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Why this role and why this team?",
+      "start_ms": 90550,
+      "end_ms": 93350,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I like the work your team does. It seems like a great place to learn and I want to grow as an engineer. I also like that the product is used by real people.",
+      "start_ms": 94250,
+      "end_ms": 107850,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "What did you see in the team's work that stood out to you?",
+      "start_ms": 108500,
+      "end_ms": 113700,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I read your engineering blog post about moving to smaller services. I did something similar in a class project, where I split one app into two parts. It was hard and I want to learn how a real team does it.",
+      "start_ms": 114500,
+      "end_ms": 130900,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a technical decision you made and how you chose between the options.",
+      "start_ms": 131600,
+      "end_ms": 137600,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "In my operating systems course, we had to pick between threads and processes for a small web server. I tried both in a quick test. Threads were faster to start, but a crash in one could take down the server. I picked processes for safety, and the server handled 200 requests per second in our test.",
+      "start_ms": 138200,
+      "end_ms": 160600,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Did you talk to your partner before you decided?",
+      "start_ms": 161350,
+      "end_ms": 164950,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Yes, we talked it over. My partner wanted threads because they were simpler, so I showed him my test results. He agreed in the end, and we kept a short note in our repo about why we chose processes.",
+      "start_ms": 165450,
+      "end_ms": 181050,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Thanks. What questions do you have for me?",
+      "start_ms": 181950,
+      "end_ms": 185150
+    },
+    {
+      "speaker": "candidate",
+      "phase": "candidate_questions",
+      "text": "What does a typical first month look like for a new engineer on your team?",
+      "start_ms": 185800,
+      "end_ms": 191800
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "New engineers get a small real project with a mentor in week one. Most ship something in the first six weeks, and they join the on-call rotation after three months.",
+      "start_ms": 192600,
+      "end_ms": 204600
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "wrap_up",
+      "text": "That's all the time we have. Thanks Tomas, the recruiter will follow up within a week.",
+      "start_ms": 205300,
+      "end_ms": 211700
+    },
+    {
+      "speaker": "candidate",
+      "phase": "wrap_up",
+      "text": "Thank you, Priya. I enjoyed the conversation.",
+      "start_ms": 212300,
+      "end_ms": 215100
+    }
+  ],
+  "vague_answers": [
+    10
+  ],
+  "notes": "Average for new grad: real examples but shared credit and few numbers. One vague motivation answer is probed."
+}

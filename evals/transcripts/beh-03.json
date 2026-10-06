@@ -1,0 +1,292 @@
+{
+  "id": "beh-03",
+  "title": "Behavioral, mid product manager, strong answers, Example Corp values",
+  "role_family": "pm",
+  "candidate_name": "Tomas Ibarra-Quill",
+  "quality": "strong",
+  "brief": {
+    "session": {
+      "interview_type": "behavioral",
+      "difficulty": "realistic",
+      "mode": "realistic",
+      "duration_min": 45,
+      "level": "mid"
+    },
+    "company_name": "Example Corp",
+    "generic_mode": false,
+    "profile_version": 1,
+    "target_competencies": [
+      "ownership",
+      "impact",
+      "collaboration",
+      "conflict_handling",
+      "learning_from_failure",
+      "communication"
+    ],
+    "target_values": [
+      "Customer first",
+      "Own the outcome"
+    ],
+    "questions": [
+      {
+        "id": "q1",
+        "text": "Tell me about a product you owned and a decision you would defend.",
+        "competencies": [
+          "ownership",
+          "impact"
+        ],
+        "values": [
+          "Customer first",
+          "Own the outcome"
+        ],
+        "priority": 1,
+        "probe_hints": [
+          "own role",
+          "result"
+        ]
+      },
+      {
+        "id": "q2",
+        "text": "Tell me about a disagreement with engineering or design over scope.",
+        "competencies": [
+          "conflict_handling",
+          "collaboration"
+        ],
+        "values": [
+          "Customer first"
+        ],
+        "priority": 2,
+        "probe_hints": [
+          "how it ended"
+        ]
+      },
+      {
+        "id": "q3",
+        "text": "Tell me about a launch that missed its goal.",
+        "competencies": [
+          "learning_from_failure",
+          "impact"
+        ],
+        "values": [
+          "Own the outcome"
+        ],
+        "priority": 3,
+        "probe_hints": [
+          "what changed after"
+        ]
+      },
+      {
+        "id": "q4",
+        "text": "Tell me about a time you explained a hard trade-off to executives.",
+        "competencies": [
+          "communication",
+          "ownership"
+        ],
+        "values": [
+          "Own the outcome"
+        ],
+        "priority": 4,
+        "probe_hints": []
+      },
+      {
+        "id": "q5",
+        "text": "Tell me about how you work with a team across several functions.",
+        "competencies": [
+          "collaboration"
+        ],
+        "priority": 5,
+        "probe_hints": []
+      },
+      {
+        "id": "q6",
+        "text": "Tell me about a metric you moved and how.",
+        "competencies": [
+          "impact"
+        ],
+        "priority": 6,
+        "probe_hints": []
+      }
+    ],
+    "probe_areas": [
+      "Scope of ownership at current employer",
+      "Size of teams worked with"
+    ],
+    "persona": {
+      "tone": "professional and direct",
+      "pushback_style": "asks for specifics and numbers",
+      "closing_style": "thanks and clear next steps"
+    },
+    "max_probes_per_question": 2,
+    "curveball": null
+  },
+  "turns": [
+    {
+      "speaker": "interviewer",
+      "phase": "intro",
+      "text": "Hi Tomas, thanks for joining. I'm Hannah, a group product manager here. This is a forty-five minute behavioral conversation.",
+      "start_ms": 0,
+      "end_ms": 7600
+    },
+    {
+      "speaker": "candidate",
+      "phase": "intro",
+      "text": "Hi Hannah, thanks for making the time.",
+      "start_ms": 8430,
+      "end_ms": 11230
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "small_talk",
+      "text": "How has your week been?",
+      "start_ms": 11991,
+      "end_ms": 13991
+    },
+    {
+      "speaker": "candidate",
+      "phase": "small_talk",
+      "text": "Good. We just closed a planning cycle, so it's a relief to have a quieter few days.",
+      "start_ms": 14498,
+      "end_ms": 21298
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "agenda",
+      "text": "I'll ask about four past experiences and probe where I'm curious. We'll keep time at the end for your questions.",
+      "start_ms": 22160,
+      "end_ms": 30160
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a product you owned and a decision you would defend.",
+      "start_ms": 31032,
+      "end_ms": 36232,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I owned the driver check-in flow at Brightwell Logistics for about two years. Drivers waited an average of 22 minutes at warehouse gates, so I led a redesign to a QR code check-in. I ran twelve driver interviews, wrote the spec, and decided to ship to three pilot sites first, even though sales wanted all forty at once. Gate wait dropped to 9 minutes in the pilot, and we rolled out to every site the next quarter.",
+      "start_ms": 36871,
+      "end_ms": 67671,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Why pilot first instead of launching everywhere?",
+      "start_ms": 68554,
+      "end_ms": 71354,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Two reasons. A bad check-in blocks trucks, so a bug was expensive, and I had no data on gates with poor mobile signal. The pilot showed that at two sites about 15 percent of drivers could not scan. I added a fallback code, which cost the engineers one extra week. That week was worth it. The full launch had a 98 percent success rate with scan or fallback.",
+      "start_ms": 72221,
+      "end_ms": 99421,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a disagreement with engineering or design over scope.",
+      "start_ms": 99924,
+      "end_ms": 104324,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "On that project, the lead engineer wanted to cut offline mode to hit the date. I thought offline was the core need because gates often have weak signal. I did not argue opinions. I pulled gate logs showing 31 percent of check-ins happened on weak signal, and I offered to cut the admin dashboard instead. He agreed, because the dashboard could use existing reports. We shipped on the original date with offline mode, and the dashboard followed six weeks later.",
+      "start_ms": 105164,
+      "end_ms": 137164,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a launch that missed its goal.",
+      "start_ms": 137829,
+      "end_ms": 141429,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I launched text reminders for delivery appointments with a goal of cutting missed appointments by 20 percent. After six weeks the drop was only 4 percent. I had assumed drivers forgot, but I had not checked. I owned the miss in our review and then called 15 drivers. Most missed because of traffic or gate delays, not forgetting.",
+      "start_ms": 141952,
+      "end_ms": 165152,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "What did you change after that?",
+      "start_ms": 165779,
+      "end_ms": 168179,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I changed the reminder to include a live arrival estimate and an easy reschedule link. I also set a rule for my team: no launch goal without five customer calls first. The next version cut missed appointments by 17 percent in two months, and the rule is now in our planning template.",
+      "start_ms": 168917,
+      "end_ms": 189717,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a time you explained a hard trade-off to executives.",
+      "start_ms": 190250,
+      "end_ms": 195050,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Last year the CFO asked me to cut the roadmap by a third. I built a one page view with each item's cost, expected revenue and risk, and I proposed dropping three low-return items to protect the gate project. I told them plainly that this delayed two sales requests by a quarter. I also walked the sales head through the reasons before the meeting, so she was not surprised. The CFO approved it in one meeting, and we kept 90 percent of the planned revenue impact.",
+      "start_ms": 195780,
+      "end_ms": 230180,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Thanks, that's helpful. What questions do you have for me?",
+      "start_ms": 230681,
+      "end_ms": 234681
+    },
+    {
+      "speaker": "candidate",
+      "phase": "candidate_questions",
+      "text": "How does your team decide what to say no to each quarter?",
+      "start_ms": 235458,
+      "end_ms": 240258
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "We rank by expected impact and cost, then review with engineering leads, and about a third of requests are declined with a written reason.",
+      "start_ms": 240954,
+      "end_ms": 250554
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "wrap_up",
+      "text": "That's our time. Thanks Tomas, the recruiter will follow up within a week.",
+      "start_ms": 251070,
+      "end_ms": 256270
+    },
+    {
+      "speaker": "candidate",
+      "phase": "wrap_up",
+      "text": "Thank you, Hannah. I enjoyed it.",
+      "start_ms": 256959,
+      "end_ms": 259359
+    }
+  ],
+  "vague_answers": [],
+  "notes": "Strong for mid: own role, numbers and trade-offs in every answer."
+}
