@@ -26,27 +26,22 @@ Webhook events handled: `checkout.session.completed`, `customer.subscription.cre
 Rules:
 
 - Free plan: `BILLING_FREE_INTERVIEWS` interviews (default 1) for the life of the account. A
-  session counts once it has started and did not fail. Gap analyses are free and rate limited
-  (`GAP_ANALYSIS_LIMIT` per `GAP_ANALYSIS_WINDOW_S`, default 10 per hour).
+  session counts once it has started and did not fail. Gap analyses are free. Their rate limit
+  is in `strong_api.gap` (P6, `GAP_RATE_LIMIT_PER_HOUR` and `GAP_RATE_LIMIT_PER_DAY`).
 - Paid plan (Stripe status `active` or `trialing`): `BILLING_MINUTES_CAP` minutes per period
   (default 300). A session can start while 1 or more minutes are left. `max_minutes` tells the
   session timer where to stop.
 - A new period start from Stripe sets `minutes_used` to 0.
 - A canceled subscription stays canceled, and events about an older period are ignored.
 
-### For the session and gap analysis routes (P6, P7, P10)
+### For the session routes (P7, P10)
 
 ```python
-from strong_api.billing import (
-    GapAnalysisRateLimit, ensure_can_start_session, record_session_minutes,
-)
-
-# POST /job-targets/{id}/gap-analysis
-@router.post("...", dependencies=[GapAnalysisRateLimit])   # HTTP 429 over the limit
+from strong_api.billing import ensure_can_start_session, record_session_minutes
 
 # POST /sessions
-ent = await ensure_can_start_session(db, user.org_id)       # HTTP 402, detail.code is
-max_minutes = ent.max_minutes(config.duration_min)          # upgrade_required or minutes_exhausted
+ent = await ensure_can_start_session(db, user.org_id)  # HTTP 402, detail.code is
+max_minutes = ent.max_minutes(config.duration_min)  # upgrade_required or minutes_exhausted
 
 # when a session ends (safe to call again; it bills only the difference)
 await record_session_minutes(db, session)
@@ -63,7 +58,6 @@ await db.commit()
 | `BILLING_PRICE_USD_MONTH` | `29` | Shown on the paywall. Keep it equal to the Stripe price. |
 | `BILLING_MINUTES_CAP` | `300` | Minutes per billing period. |
 | `BILLING_FREE_INTERVIEWS` | `1` | Free interviews per account. |
-| `GAP_ANALYSIS_LIMIT`, `GAP_ANALYSIS_WINDOW_S` | `10`, `3600` | Fair-use limit. |
 | `ACCOUNT_EXPORT_TTL_S`, `ACCOUNT_EXPORT_MAX_MB` | `86400`, `100` | Export download window and size limit. |
 
 With no Stripe keys, the app still runs: the paywall says payments are not set up, and checkout

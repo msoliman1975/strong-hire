@@ -1,6 +1,6 @@
 """Billing (P9). Requirement IDs: BL-1 (Stripe plan, minute cap, usage meter), BL-2 (free tier:
-one free interview; the gap analysis rate limit is tested in P6). Webhooks use Stripe-format fixtures with
-signatures computed in the test; no Stripe account is used."""
+one free interview; P6 tests the gap analysis rate limit). Webhooks use Stripe-format fixtures
+with signatures computed in the test; no Stripe account is used."""
 
 from __future__ import annotations
 
@@ -125,8 +125,8 @@ def test_bl1_settings_refuse_live_keys_and_treat_empty_as_unset() -> None:
     assert empty.stripe_webhook_secret is None
 
 
-async def test_usage_needs_sign_in(billing_app: FastAPI, client: httpx.AsyncClient) -> None:
-    assert (await client.get("/billing/usage")).status_code == 401
+async def test_usage_needs_sign_in(billing_app: FastAPI, anon_client: httpx.AsyncClient) -> None:
+    assert (await anon_client.get("/billing/usage")).status_code == 401
 
 
 async def test_bl2_new_user_has_one_free_interview(

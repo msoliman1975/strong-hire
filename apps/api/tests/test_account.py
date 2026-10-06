@@ -93,8 +93,10 @@ async def test_ac2_consent_toggle_is_saved_and_audited(
     assert all(str(e.org_id) == user["org_id"] for e in entries)
 
 
-async def test_ac2_consent_needs_sign_in(account_app: FastAPI, client: httpx.AsyncClient) -> None:
-    resp = await client.put("/account/consent", json={"training_consent": True})
+async def test_ac2_consent_needs_sign_in(
+    account_app: FastAPI, anon_client: httpx.AsyncClient
+) -> None:
+    resp = await anon_client.put("/account/consent", json={"training_consent": True})
     assert resp.status_code == 401
 
 

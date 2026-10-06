@@ -1,7 +1,7 @@
 """What a user may do under their plan (BL-1, BL-2), and minute metering.
 
 Rules (numbers come from BillingSettings):
-- Free plan: gap analyses are free (rate limited, see limits.py) plus `billing_free_interviews`
+- Free plan: gap analyses are free (rate limited in strong_api.gap) plus `billing_free_interviews`
   interviews in the life of the account. An interview counts once it has started and did not fail.
 - Paid plan (Stripe status active or trialing): interview minutes up to `billing_minutes_cap`
   per billing period. A session may start while at least one minute is left; `max_minutes`

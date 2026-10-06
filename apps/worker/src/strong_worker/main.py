@@ -2,8 +2,8 @@
 
 P0 registers one `ping` job to prove the queue works. P2 adds the job and resume input jobs
 (strong_worker.inputs.jobs). P6 adds the gap analysis and interviewer brief jobs
-(strong_worker.gap.jobs). P8 adds the scorer job (strong_worker.scoring.jobs). P9 adds the account export and
-file delete jobs (strong_worker.account.jobs).
+(strong_worker.gap.jobs). P8 adds the scorer job (strong_worker.scoring.jobs). P9 adds the
+account export and file delete jobs (strong_worker.account.jobs).
 """
 
 from __future__ import annotations
