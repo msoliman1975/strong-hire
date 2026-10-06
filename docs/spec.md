@@ -286,9 +286,10 @@ Postgres is the single source of truth, with an `org_id` on every user-owned tab
 | GapAnalysis | id, job_target_id, resume_id, match_score, breakdown_json, session_plan_json, model_version | Recomputed when resume or job changes |
 | Session | id, job_target_id, type, difficulty, mode, duration_min, profile_version, brief_json, status, started_at, ended_at, minutes_billed | Coach sessions excluded from trends |
 | Turn | id, session_id, speaker, phase, text, start_ms, end_ms, question_ref | Transcript only, no audio |
-| Scorecard | id, session_id, hire_signal, rationale, competency_scores_json, per_question_json, scorer_model, rubric_version | One per Realistic or Coach session |
+| Scorecard | id, session_id, hire_signal, rationale, competency_scores_json, value_scores_json, per_question_json, scorer_model, rubric_version | One per Realistic or Coach session. Value scores are empty in generic mode |
 | ProgressSnapshot | id, job_target_id, competency, score, session_id, at | Realistic sessions only |
 | UsageEvent | id, session_id, component (stt, llm, tts), units, cost_usd | Drives cost per session tracking |
+| CompanyRequest | id, org_id, user_id, job_target_id, company_name, normalized_name, matched_company_id, source_host, created_at | Every company name entered at job setup. Null matched_company_id means a request for a company outside the 20 |
 | AuditLog | id, actor, action, entity, at | Deletes, exports, consent changes, profile approvals |
 
 ## Privacy, security and compliance
