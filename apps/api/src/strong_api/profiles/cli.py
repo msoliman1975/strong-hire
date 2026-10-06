@@ -86,7 +86,8 @@ def summary_lines(profile: CompanyProfile) -> list[str]:
     return [
         f"Company: {profile.company_name} ({profile.company_slug})",
         f"Values framework: {profile.values_framework.name}, "
-        f"{len(profile.values_framework.principles)} principles",
+        f"{len(profile.values_framework.principles)} principles, values share "
+        f"{profile.values_share:g}",
         f"Loops: {len(profile.loop_structure)}, question patterns: "
         f"{len(profile.question_patterns)}, levels: {len(profile.bar_by_level)}",
         f"Scoring weights: {len(profile.scoring_weights)} competencies, sources: "

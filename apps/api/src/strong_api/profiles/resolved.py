@@ -1,7 +1,8 @@
 """The profile the interviewer and scorer work from: a published company profile, or generic mode.
 
-Generic mode (spec, 'Companies outside the 20'): a default tech-industry persona and equal
-competency weights. It has no version number, so sessions store NULL in profile_version.
+Generic mode (spec, 'Companies outside the 20'): a default tech-industry persona, equal
+competency weights, and no company values. It has no version number, so sessions store NULL
+in profile_version.
 """
 
 from __future__ import annotations
@@ -44,6 +45,18 @@ class ResolvedProfile:
     @property
     def values_framework(self) -> ValuesFramework | None:
         return self.profile.values_framework if self.profile else None
+
+    @property
+    def values_share(self) -> float:
+        """Share of the hire signal from company value scores. 0 in generic mode (no values)."""
+        return self.profile.values_share if self.profile else 0.0
+
+    @property
+    def value_weights(self) -> dict[str, float]:
+        """Principle name to its weight inside the values share. Empty in generic mode."""
+        if self.profile is None:
+            return {}
+        return {p.name: p.weight for p in self.profile.values_framework.principles}
 
     def weight(self, competency: Competency) -> float:
         """Weight in the hire signal. Competencies the profile leaves out weigh 1.0."""
