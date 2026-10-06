@@ -3,12 +3,12 @@
  * screen works today. Each block names the workstream that will build the real endpoint; that
  * workstream may change the shape, then updates this file and its mock.
  *
- * The payloads inside the envelopes (SessionConfig, Scorecard, ProgressSnapshot, PlannedSession)
- * are the shared contracts from packages/core. Job targets, resumes, their lists and the gap
- * analysis are real endpoints now: see inputs.ts and gap.ts.
+ * The payloads inside the envelopes (SessionConfig) are the shared contracts from packages/core.
+ * Job targets, resumes, their lists and the gap analysis are real endpoints now (inputs.ts,
+ * gap.ts), and so are the debrief and progress (scoring.ts).
  */
 import { request } from "./client";
-import type { PlannedSession, ProgressSnapshot, Scorecard, SessionConfig, SessionStatus } from "./types";
+import type { SessionConfig, SessionStatus } from "./types";
 
 // ---------------------------------------------------------------- P7/P10: sessions
 
@@ -33,30 +33,6 @@ export const sessionsApi = {
   get: (sessionId: string) => request<SessionRecord>("GET", `/sessions/${sessionId}`),
   end: (sessionId: string) => request<SessionRecord>("POST", `/sessions/${sessionId}/end`),
   listForJob: (jobId: string) => request<SessionRecord[]>("GET", `/job-targets/${jobId}/sessions`),
-};
-
-// ---------------------------------------------------------------- P8: debrief and progress
-
-export type DebriefStatus = "scoring" | "ready" | "failed";
-
-export interface Debrief {
-  session: SessionRecord;
-  status: DebriefStatus;
-  scorecard: Scorecard | null;
-  /** PR-2. */
-  next_session: PlannedSession | null;
-}
-
-export interface JobProgress {
-  job_target_id: string;
-  /** Realistic sessions only (PR-1). */
-  snapshots: ProgressSnapshot[];
-  next_session: PlannedSession | null;
-}
-
-export const debriefApi = {
-  get: (sessionId: string) => request<Debrief>("GET", `/sessions/${sessionId}/debrief`),
-  progress: (jobId: string) => request<JobProgress>("GET", `/job-targets/${jobId}/progress`),
 };
 
 // ---------------------------------------------------------------- P9: billing and account

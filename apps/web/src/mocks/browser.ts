@@ -11,7 +11,7 @@
 import { setupWorker } from "msw/browser";
 
 import { createStore } from "./db";
-import { authHandlers, inputHandlers, inputMirrorHandlers, plannedHandlers } from "./handlers";
+import { authHandlers, inputHandlers, inputMirrorHandlers, plannedHandlers, scoringHandlers } from "./handlers";
 
 export type MockMode = "planned" | "all" | "off";
 
@@ -25,8 +25,10 @@ export async function startMocks(mode: MockMode): Promise<void> {
   const store = createStore({ persist: true, delayMs: 800 });
   const handlers =
     mode === "all"
-      ? [...inputHandlers(store), ...plannedHandlers(store), ...authHandlers(store)]
-      : [...inputMirrorHandlers(store), ...plannedHandlers(store)];
+      ? [...inputHandlers(store), ...plannedHandlers(store), ...scoringHandlers(store), ...authHandlers(store)]
+      : // The debrief and progress endpoints are real (P8), but sessions are still mocked (P7).
+        // A mocked session is unknown to the API, so the scoring mocks stay on until P7 lands.
+        [...inputMirrorHandlers(store), ...plannedHandlers(store), ...scoringHandlers(store)];
   await setupWorker(...handlers).start({ onUnhandledFrame: "bypass", quiet: true });
   // A way to start over during a click-through: run `strongHireMocks.reset()` in the console.
   (globalThis as { strongHireMocks?: unknown }).strongHireMocks = { reset: () => store.reset(), mode };

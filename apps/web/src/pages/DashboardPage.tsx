@@ -127,7 +127,7 @@ function JobTrends({ jobId }: { jobId: string }) {
       {progress.data.snapshots.length === 0 ? (
         <p className="muted">Trends appear here after your first Realistic session.</p>
       ) : (
-        <CompetencyTrends snapshots={progress.data.snapshots} />
+        <CompetencyTrends snapshots={progress.data.snapshots} trends={progress.data.trends} />
       )}
     </section>
   );

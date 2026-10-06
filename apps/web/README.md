@@ -25,6 +25,10 @@ The job target and resume endpoints (P2), their lists, and the gap analysis endp
 real. `src/api/inputs.ts` and `src/api/gap.ts` call them with the typed client. Their mocks use the
 same paths and shapes, and a Vitest test checks the mock responses against `openapi.json`.
 
+The debrief and progress endpoints (P8) are real too. `src/api/scoring.ts` calls them with the
+typed client. Their mocks (`scoringHandlers`) stay on in every mode while sessions are mocked (P7),
+because the API does not know a mocked session.
+
 Set `VITE_API_MOCKS` before `pnpm dev`:
 
 | Value | What is mocked | Use it for |

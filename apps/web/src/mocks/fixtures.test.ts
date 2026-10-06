@@ -12,7 +12,8 @@ import { describe, expect, it } from "vitest";
 import { authApi } from "../api/auth";
 import { gapApi } from "../api/gap";
 import { jobTargetsApi, resumesApi } from "../api/inputs";
-import { debriefApi, sessionsApi } from "../api/planned";
+import { sessionsApi } from "../api/planned";
+import { debriefApi } from "../api/scoring";
 import { gapAnalysis, jobPosting, resume, scorecardFor, sessionPlan } from "./fixtures";
 
 const SCHEMAS_DIR = resolve(__dirname, "../../../../schemas");
@@ -57,6 +58,7 @@ describe("mock payloads match the packages/core schemas", () => {
   it("Scorecard for every interview type (FB-1, FB-2)", () => {
     for (const type of ["behavioral", "hiring_manager", "technical_qa", "case"] as const) {
       expectValid("scorecard", scorecardFor(type));
+      expectValid("scorecard", scorecardFor(type, true));
     }
   });
 
@@ -81,10 +83,13 @@ describe("mock payloads match the packages/core schemas", () => {
 
     const debrief = await debriefApi.get(session.id);
     expectValid("scorecard", debrief.scorecard);
+    expectApiShape("Debrief", debrief);
 
     const progress = await debriefApi.progress(job.id);
     expect(progress.snapshots.length).toBeGreaterThan(0);
     for (const snapshot of progress.snapshots) expectValid("progress_snapshot", snapshot);
+    expectApiShape("JobProgress", progress);
+    expect(progress.trends.length).toBeGreaterThan(0);
     expect(sessionPlan.length).toBeGreaterThan(0);
   });
 });

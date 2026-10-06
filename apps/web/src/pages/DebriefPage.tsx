@@ -1,12 +1,15 @@
 import { Link, useParams } from "react-router";
 
 import { useDebrief } from "../api/hooks";
-import type { Scorecard } from "../api/types";
+import type { Debrief, Scorecard, ValueScore } from "../api/types";
 import { ErrorNotice, HireSignalScale, Loading, PageHead, Rubric } from "../components/ui";
 import { competencyLabel, difficultyLabel, interviewTypeLabel, modeLabel } from "../labels";
 import { setupLink } from "./GapAnalysisPage";
 
-/** FB-1, FB-2, PR-2: hire signal and rationale, per-question rubric, next session. */
+/**
+ * FB-1, FB-2, PR-2: hire signal and rationale, per-question rubric, company values, next session.
+ * In generic mode there are no company values; the page says so instead of showing an empty table.
+ */
 export function DebriefPage() {
   const { sessionId = "" } = useParams();
   const debrief = useDebrief(sessionId);
@@ -27,7 +30,9 @@ export function DebriefPage() {
       </PageHead>
       {status === "scoring" && <Loading label="Scoring your interview. The debrief is usually ready within a minute." />}
       {status === "failed" && <ErrorNotice error="Scoring failed. Your minutes for this session are refunded." />}
-      {status === "ready" && scorecard && <ScorecardView scorecard={scorecard} coach={config.mode === "coach"} />}
+      {status === "ready" && scorecard && (
+        <ScorecardView scorecard={scorecard} coach={config.mode === "coach"} values={valuesInfo(debrief.data)} />
+      )}
       {status === "ready" && (
         <section className="section panel" aria-labelledby="next-heading">
           <h2 id="next-heading">Next session</h2>
@@ -54,7 +59,17 @@ export function DebriefPage() {
   );
 }
 
-function ScorecardView({ scorecard, coach }: { scorecard: Scorecard; coach: boolean }) {
+interface ValuesInfo {
+  generic: boolean;
+  company: string | null;
+  framework: string | null;
+}
+
+function valuesInfo(d: Debrief): ValuesInfo {
+  return { generic: d.generic_mode, company: d.company_name, framework: d.values_framework };
+}
+
+function ScorecardView({ scorecard, coach, values }: { scorecard: Scorecard; coach: boolean; values: ValuesInfo }) {
   return (
     <div className="stack">
       <section className="verdict" aria-labelledby="signal-heading">
@@ -97,6 +112,8 @@ function ScorecardView({ scorecard, coach }: { scorecard: Scorecard; coach: bool
         </table>
       </section>
 
+      <ValuesSection scores={scorecard.value_scores} info={values} />
+
       <section className="panel" aria-labelledby="questions-heading">
         <h2 id="questions-heading">Question by question</h2>
         {scorecard.per_question.map((q, i) => (
@@ -112,6 +129,17 @@ function ScorecardView({ scorecard, coach }: { scorecard: Scorecard; coach: bool
                     <Rubric score={s.score} />
                   </div>
                   <p className="muted">{s.justification}</p>
+                </li>
+              ))}
+              {q.value_scores.map((v) => (
+                <li key={`value-${v.value}`}>
+                  <div className="row">
+                    <span>
+                      {v.value} <span className="muted">(company value)</span>
+                    </span>
+                    <Rubric score={v.score} />
+                  </div>
+                  <p className="muted">{v.justification}</p>
                 </li>
               ))}
             </ul>
@@ -137,5 +165,57 @@ function ScorecardView({ scorecard, coach }: { scorecard: Scorecard; coach: bool
         ))}
       </section>
     </div>
+  );
+}
+
+/** Company values (IV-5). Generic mode has none, and the page says so in words. */
+function ValuesSection({ scores, info }: { scores: ValueScore[]; info: ValuesInfo }) {
+  const title = info.framework ?? "Company values";
+  if (info.generic || scores.length === 0) {
+    return (
+      <section className="panel" aria-labelledby="values-heading">
+        <h2 id="values-heading">Company values</h2>
+        <p className="muted" data-testid="values-generic">
+          {info.generic
+            ? "This interview used the general interview style, with no company profile. Company values are not scored."
+            : "No company value was scored in this interview."}
+        </p>
+      </section>
+    );
+  }
+  return (
+    <section className="panel" aria-labelledby="values-heading">
+      <h2 id="values-heading">{title}</h2>
+      <p className="muted">
+        How your answers showed the values {info.company ?? "the company"} hires for. They count toward the hire signal.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Value</th>
+            <th scope="col">Score</th>
+            <th scope="col">Why</th>
+          </tr>
+        </thead>
+        <tbody>
+          {scores.map((v) => (
+            <tr key={v.value}>
+              <td>{v.value}</td>
+              <td>
+                <Rubric score={v.score} />
+              </td>
+              <td>
+                {v.justification}
+                {v.quotes.map((q) => (
+                  <blockquote key={q} className="quote">
+                    “{q}”
+                  </blockquote>
+                ))}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
   );
 }

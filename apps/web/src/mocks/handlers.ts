@@ -7,6 +7,8 @@
  * - `inputMirrorHandlers` send those requests to the real API and copy the job targets, resumes
  *   and gap analyses into the mock store, so the planned endpoints below can use them.
  * - `plannedHandlers` stand in for endpoints that later workstreams build (src/api/planned.ts).
+ * - `scoringHandlers` stand in for the real debrief and progress endpoints (P8), with the shapes
+ *   in openapi.json. Sessions are still mocked (P7), so every mock mode uses them for now.
  * - `authHandlers` stand in for the real sign-in routes.
  *
  * Rules such as "one free interview" live here only to make the mock believable. The real rules
@@ -15,14 +17,17 @@
 import { bypass, delay } from "msw";
 import { http, HttpResponse } from "msw/http";
 
-import type { CreateSessionRequest, Debrief, JobProgress, SessionRecord } from "../api/planned";
+import type { CreateSessionRequest, SessionRecord } from "../api/planned";
 import type {
   AuthState,
+  CompetencyTrend,
+  Debrief,
   GapAnalysisOut,
   GapAnalysisStart,
   JobContext,
   JobOut,
   JobPosting,
+  JobProgress,
   JobTargetAccepted,
   JobTargetCreate,
   JobTargetOut,
@@ -478,21 +483,6 @@ export function plannedHandlers(store: MockStore) {
   const findJob = (id: unknown) => db().jobs.find((j) => j.id === id);
   const findSession = (id: unknown) => db().sessions.find((s) => s.id === id);
 
-  const progressFor = (jobId: string): ProgressSnapshot[] => {
-    const realistic = db().sessions.filter(
-      (s) => s.job_target_id === jobId && s.status === "completed" && s.config.mode === "realistic",
-    );
-    return realistic.flatMap((s, index) =>
-      scorecardFor(s.config.interview_type).competency_scores.map((c) => ({
-        job_target_id: jobId,
-        session_id: s.id,
-        competency: c.competency,
-        score: Math.min(4, Math.max(1, c.score - 0.5 + 0.25 * index)),
-        at: s.ended_at ?? new Date().toISOString(),
-      })),
-    );
-  };
-
   return [
     // ------------------------------------------------------------ sessions (P7, P9, P10)
     http.post(`${API}/sessions`, async ({ request }) => {
@@ -549,33 +539,6 @@ export function plannedHandlers(store: MockStore) {
       return HttpResponse.json(db().sessions.filter((s) => s.job_target_id === params.jobId));
     }),
 
-    // ------------------------------------------------------------ debrief and progress (P8)
-    http.get(`${API}/sessions/:sessionId/debrief`, ({ params }) => {
-      advanceAll();
-      const s = findSession(params.sessionId);
-      if (!s) return notFound("Session");
-      const ready = s.status === "completed";
-      const debrief: Debrief = {
-        session: s,
-        status: ready ? "ready" : "scoring",
-        scorecard: ready ? scorecardFor(s.config.interview_type) : null,
-        next_session: ready ? sessionPlan[1] : null,
-      };
-      return HttpResponse.json(debrief);
-    }),
-    http.get(`${API}/job-targets/:jobId/progress`, ({ params }) => {
-      advanceAll();
-      const jobId = String(params.jobId);
-      if (!findJob(jobId)) return notFound("Job target");
-      const snapshots = progressFor(jobId);
-      const progress: JobProgress = {
-        job_target_id: jobId,
-        snapshots,
-        next_session: db().gaps[jobId]?.analysis ? sessionPlan[snapshots.length ? 1 : 0] : null,
-      };
-      return HttpResponse.json(progress);
-    }),
-
     // ------------------------------------------------------------ billing and account (P9)
     http.get(`${API}/billing/usage`, () => HttpResponse.json(db().usage)),
     http.get(`${API}/billing/plan`, () =>
@@ -613,6 +576,91 @@ export function plannedHandlers(store: MockStore) {
       await pause();
       store.reset();
       return new HttpResponse(null, { status: 204 });
+    }),
+  ];
+}
+
+// ---------------------------------------------------------------------------- debrief and progress (P8)
+
+/** Mock-only trend math, so the dashboard has numbers to show. The real API computes them. */
+function trendsFor(snapshots: ProgressSnapshot[]): CompetencyTrend[] {
+  const by = new Map<string, ProgressSnapshot[]>();
+  for (const s of [...snapshots].sort((a, b) => a.at.localeCompare(b.at))) {
+    by.set(s.competency, [...(by.get(s.competency) ?? []), s]);
+  }
+  return [...by.values()]
+    .map((points) => {
+      const first = points[0].score;
+      const latest = points[points.length - 1].score;
+      const change = Math.round((latest - first) * 100) / 100;
+      const direction: CompetencyTrend["direction"] =
+        points.length === 1 ? "single" : Math.abs(change) < 0.25 ? "flat" : change > 0 ? "up" : "down";
+      return {
+        competency: points[0].competency,
+        sessions: points.length,
+        first,
+        latest,
+        change,
+        average: Math.round((points.reduce((n, p) => n + p.score, 0) / points.length) * 100) / 100,
+        direction,
+      };
+    })
+    .sort((a, b) => a.latest - b.latest);
+}
+
+export function scoringHandlers(store: MockStore) {
+  const db = () => store.db;
+  const advanceAll = () => advance(store);
+  const findJob = (id: unknown) => db().jobs.find((j) => j.id === id);
+  const findSession = (id: unknown) => db().sessions.find((s) => s.id === id);
+
+  const progressFor = (jobId: string): ProgressSnapshot[] => {
+    const realistic = db().sessions.filter(
+      (s) => s.job_target_id === jobId && s.status === "completed" && s.config.mode === "realistic",
+    );
+    return realistic.flatMap((s, index) =>
+      scorecardFor(s.config.interview_type).competency_scores.map((c) => ({
+        job_target_id: jobId,
+        session_id: s.id,
+        competency: c.competency,
+        score: Math.min(4, Math.max(1, c.score - 0.5 + 0.25 * index)),
+        at: s.ended_at ?? new Date().toISOString(),
+      })),
+    );
+  };
+
+  return [
+    http.get(`${API}/sessions/:sessionId/debrief`, ({ params }) => {
+      advanceAll();
+      const s = findSession(params.sessionId);
+      if (!s) return notFound("Session");
+      const job = findJob(s.job_target_id);
+      const generic = job?.generic_mode ?? true;
+      const ready = s.status === "completed";
+      const scorecard = ready ? scorecardFor(s.config.interview_type, generic) : null;
+      const debrief: Debrief = {
+        session: s,
+        status: ready ? "ready" : s.status === "failed" ? "failed" : "scoring",
+        scorecard,
+        next_session: ready ? sessionPlan[1] : null,
+        generic_mode: generic,
+        company_name: job?.posting?.company_name ?? null,
+        values_framework: generic ? null : "Company values",
+      };
+      return HttpResponse.json(debrief);
+    }),
+    http.get(`${API}/job-targets/:jobId/progress`, ({ params }) => {
+      advanceAll();
+      const jobId = String(params.jobId);
+      if (!findJob(jobId)) return notFound("Job target");
+      const snapshots = progressFor(jobId);
+      const progress: JobProgress = {
+        job_target_id: jobId,
+        snapshots,
+        trends: trendsFor(snapshots),
+        next_session: db().gaps[jobId]?.analysis ? sessionPlan[snapshots.length ? 1 : 0] : null,
+      };
+      return HttpResponse.json(progress);
     }),
   ];
 }
