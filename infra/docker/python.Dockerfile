@@ -38,3 +38,8 @@ COPY config config
 COPY prompts prompts
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev --package ${PACKAGE}
+
+# At run time, Python HTTP clients (httpx in huggingface_hub, requests) use the system CA store,
+# which includes infra/certs/*.crt. Set after the uv steps: uv rejects some corporate CA files.
+ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt \
+    REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
