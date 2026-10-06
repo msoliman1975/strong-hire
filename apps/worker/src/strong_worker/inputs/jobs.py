@@ -111,6 +111,7 @@ async def extract_job_target(
         match = await match_and_log(
             db,
             org_id=target.org_id,
+            user_id=target.user_id,
             job_target_id=target.id,
             company_name=posting.company_name,
             source_url=target.source_url,
@@ -138,6 +139,7 @@ async def match_job_target(ctx: dict[str, Any], job_target_id: str, org_id: str)
         match = await match_and_log(
             db,
             org_id=target.org_id,
+            user_id=target.user_id,
             job_target_id=target.id,
             company_name=posting.company_name,
             source_url=target.source_url,

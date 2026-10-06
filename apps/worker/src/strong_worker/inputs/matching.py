@@ -2,8 +2,8 @@
 
 Matching uses the company name first (after removing legal suffixes and applying known
 aliases), then the posting URL: the company's own career domains, or the board token on
-Greenhouse, Lever, Ashby and Workday. Unknown companies are logged so we can see which
-profiles users ask for.
+Greenhouse, Lever, Ashby and Workday. Every company name is logged as a company request
+(strong_core.companies), so we can see which profiles users ask for.
 """
 
 from __future__ import annotations
@@ -19,11 +19,10 @@ from urllib.parse import urlparse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from strong_core.db.models import AuditLog, Company
+from strong_core.companies import normalize_company_name, record_company_request
+from strong_core.db.models import Company
 
 log = logging.getLogger(__name__)
-
-UNKNOWN_COMPANY_ACTION = "company.unknown"
 
 # Career-site domains per company slug. A host matches when it equals a domain or ends with
 # "." + domain. LinkedIn lists only its careers site: linkedin.com/jobs hosts every company.
@@ -68,30 +67,6 @@ NAME_ALIASES: dict[str, str] = {
     "slack": "salesforce",
 }
 
-_SUFFIXES = {
-    "inc",
-    "incorporated",
-    "llc",
-    "ltd",
-    "limited",
-    "corp",
-    "corporation",
-    "co",
-    "company",
-    "plc",
-    "gmbh",
-    "ag",
-    "sa",
-    "technologies",
-    "technology",
-    "platforms",
-    "labs",
-    "group",
-    "holdings",
-    "the",
-}
-_PAREN = re.compile(r"\([^)]*\)")
-_NON_WORD = re.compile(r"[^a-z0-9]+")
 _WORKDAY_HOST = re.compile(r"^(?P<tenant>[a-z0-9-]+)\.wd\d+\.myworkdayjobs\.com$")
 _BOARD_HOSTS = {
     "boards.greenhouse.io",
@@ -126,15 +101,6 @@ class CompanyMatch:
             "method": self.method,
             "generic_mode": self.generic_mode,
         }
-
-
-def normalize_company_name(name: str) -> str:
-    words = _NON_WORD.sub(" ", _PAREN.sub(" ", name.lower())).split()
-    while words and words[-1] in _SUFFIXES:
-        words.pop()
-    while words and words[0] == "the":
-        words.pop(0)
-    return " ".join(words)
 
 
 def url_host(url: str | None) -> str | None:
@@ -197,21 +163,25 @@ async def match_and_log(
     db: AsyncSession,
     *,
     org_id: uuid.UUID,
+    user_id: uuid.UUID,
     job_target_id: uuid.UUID,
     company_name: str | None,
     source_url: str | None,
 ) -> CompanyMatch:
-    """Match against the active companies. An unknown company adds an audit log row."""
+    """Match against the active companies and log the name as a company request.
+    The caller commits."""
     found = match_company(await load_companies(db), company_name, source_url)
+    host = url_host(source_url)
     if found.generic_mode:
-        log.info("unknown company requested: %r (host %s)", company_name, url_host(source_url))
-        db.add(
-            AuditLog(
-                org_id=org_id,
-                actor="system:inputs",
-                action=UNKNOWN_COMPANY_ACTION,
-                entity=f"job_target:{job_target_id}",
-                details_json={"company_name": company_name, "host": url_host(source_url)},
-            )
+        log.info("unknown company requested: %r (host %s)", company_name, host)
+    if company_name and company_name.strip():
+        await record_company_request(
+            db,
+            org_id=org_id,
+            user_id=user_id,
+            job_target_id=job_target_id,
+            company_name=company_name,
+            matched_company_id=found.company.id if found.company else None,
+            source_host=host,
         )
     return found
