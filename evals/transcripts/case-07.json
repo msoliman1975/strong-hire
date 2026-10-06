@@ -1,0 +1,280 @@
+{
+  "id": "case-07",
+  "title": "Case, new grad technical program manager, weak answers",
+  "role_family": "tpm",
+  "candidate_name": "Bao Lindholm-Ferreira",
+  "quality": "weak",
+  "brief": {
+    "session": {
+      "interview_type": "case",
+      "difficulty": "realistic",
+      "mode": "realistic",
+      "duration_min": 30,
+      "level": "new_grad"
+    },
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": [
+      "problem_framing",
+      "structure",
+      "estimation_logic",
+      "prioritization",
+      "recommendation"
+    ],
+    "questions": [
+      {
+        "id": "q1",
+        "text": "RouteBuddy shows campus shuttle locations. Students say the shuttle times are wrong. How would you find out why?",
+        "competencies": [
+          "problem_framing",
+          "structure"
+        ],
+        "priority": 1,
+        "probe_hints": [
+          "parts of the system"
+        ]
+      },
+      {
+        "id": "q2",
+        "text": "Estimate how many students use the shuttle on a weekday at a campus of 15,000 students.",
+        "competencies": [
+          "estimation_logic",
+          "structure"
+        ],
+        "priority": 2,
+        "probe_hints": [
+          "assumptions"
+        ]
+      },
+      {
+        "id": "q3",
+        "text": "Launch is in two weeks. Engineers say the live map and arrival alerts need three weeks. What do you do?",
+        "competencies": [
+          "prioritization",
+          "recommendation"
+        ],
+        "priority": 3,
+        "probe_hints": [
+          "scope",
+          "communication"
+        ]
+      },
+      {
+        "id": "q4",
+        "text": "Who are the users of RouteBuddy and what do they need first?",
+        "competencies": [
+          "user_and_business_sense",
+          "problem_framing"
+        ],
+        "priority": 4,
+        "probe_hints": []
+      },
+      {
+        "id": "q5",
+        "text": "How would you know the launch worked?",
+        "competencies": [
+          "structure",
+          "recommendation"
+        ],
+        "priority": 5,
+        "probe_hints": []
+      },
+      {
+        "id": "q6",
+        "text": "Estimate how many phones open RouteBuddy at 8 a.m.",
+        "competencies": [
+          "estimation_logic"
+        ],
+        "priority": 6,
+        "probe_hints": []
+      }
+    ],
+    "probe_areas": [
+      "No program experience yet",
+      "Basic systems thinking"
+    ],
+    "persona": {
+      "tone": "neutral and professional",
+      "pushback_style": "asks follow-up questions",
+      "closing_style": "brief thanks and next steps"
+    },
+    "max_probes_per_question": 2,
+    "curveball": null
+  },
+  "turns": [
+    {
+      "speaker": "interviewer",
+      "phase": "intro",
+      "text": "Hi Bao, I'm Carla, a technical program manager. This is a thirty minute case conversation, spoken only.",
+      "start_ms": 0,
+      "end_ms": 6800
+    },
+    {
+      "speaker": "candidate",
+      "phase": "intro",
+      "text": "Hi Carla, thank you for meeting me.",
+      "start_ms": 7600,
+      "end_ms": 10400
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "small_talk",
+      "text": "Are you still in school, or have you graduated?",
+      "start_ms": 11100,
+      "end_ms": 14700
+    },
+    {
+      "speaker": "candidate",
+      "phase": "small_talk",
+      "text": "I graduated in May. I am looking for my first job.",
+      "start_ms": 15600,
+      "end_ms": 20000
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "agenda",
+      "text": "Okay. I will ask three cases about a campus shuttle app. Think out loud, and ask me anything you need.",
+      "start_ms": 20500,
+      "end_ms": 28500
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "RouteBuddy shows campus shuttle locations. Students say the shuttle times are wrong. How would you find out why?",
+      "start_ms": 29100,
+      "end_ms": 36300,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I would check the app and see if the times are wrong. Maybe the GPS is not good. Then I would tell the engineers to fix it.",
+      "start_ms": 37100,
+      "end_ms": 47900,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Where in the system could the wrong time come from?",
+      "start_ms": 48600,
+      "end_ms": 52600,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "The GPS device on the bus could be wrong, or the server, or the app on the phone. I would compare the real bus time to the app time for one route.",
+      "start_ms": 53500,
+      "end_ms": 66300,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Estimate how many students use the shuttle on a weekday at a campus of 15,000 students.",
+      "start_ms": 66800,
+      "end_ms": 73200,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Fifteen thousand students. Maybe half use the shuttle. So about seven thousand students every day.",
+      "start_ms": 73800,
+      "end_ms": 79800,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Do half of all students really ride every day? What would change that number?",
+      "start_ms": 80600,
+      "end_ms": 86200,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Maybe not. Some students live on campus and walk. I would say fewer, maybe a thousand. I am not sure how to check.",
+      "start_ms": 86900,
+      "end_ms": 96100,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Launch is in two weeks. Engineers say the live map and arrival alerts need three weeks. What do you do?",
+      "start_ms": 97000,
+      "end_ms": 105000,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I would tell the engineers to work faster and add more people. Then we can launch both features on time.",
+      "start_ms": 105500,
+      "end_ms": 113500,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Suppose you cannot add people. What would you do?",
+      "start_ms": 114100,
+      "end_ms": 117700,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I would launch the live map first because students need it most, and delay the alerts by a week. Then I would tell the team and the users about the date.",
+      "start_ms": 118500,
+      "end_ms": 130900,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Thanks. What questions do you have?",
+      "start_ms": 131600,
+      "end_ms": 134000
+    },
+    {
+      "speaker": "candidate",
+      "phase": "candidate_questions",
+      "text": "What does a new program manager do in the first month?",
+      "start_ms": 134900,
+      "end_ms": 139300
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "They shadow two projects, write one status report a week, and take one small project by week four.",
+      "start_ms": 139800,
+      "end_ms": 147000
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "wrap_up",
+      "text": "That is our time, Bao. The recruiter will follow up within a week.",
+      "start_ms": 147600,
+      "end_ms": 152800
+    },
+    {
+      "speaker": "candidate",
+      "phase": "wrap_up",
+      "text": "Thank you, Carla.",
+      "start_ms": 153600,
+      "end_ms": 154800
+    }
+  ],
+  "vague_answers": [
+    6,
+    10,
+    12,
+    14
+  ],
+  "notes": "Weak for new grad: short generic answers, no estimate reasoning, but a reasonable scope cut after a probe."
+}

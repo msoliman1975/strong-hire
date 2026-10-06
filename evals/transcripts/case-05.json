@@ -1,0 +1,280 @@
+{
+  "id": "case-05",
+  "title": "Case, senior data and ML, strong answers, tough",
+  "role_family": "data_ml",
+  "candidate_name": "Rohan Thackeray-Vance",
+  "quality": "strong",
+  "brief": {
+    "session": {
+      "interview_type": "case",
+      "difficulty": "tough",
+      "mode": "realistic",
+      "duration_min": 45,
+      "level": "senior"
+    },
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": [
+      "problem_framing",
+      "structure",
+      "user_and_business_sense",
+      "estimation_logic",
+      "prioritization",
+      "recommendation"
+    ],
+    "questions": [
+      {
+        "id": "q1",
+        "text": "Tunelane's new recommendation model raised click-through by 4 percent, but paid conversion is flat. What do you do?",
+        "competencies": [
+          "problem_framing",
+          "user_and_business_sense"
+        ],
+        "priority": 1,
+        "probe_hints": [
+          "goal",
+          "guardrails"
+        ]
+      },
+      {
+        "id": "q2",
+        "text": "Estimate the daily cost to generate personalised playlists for 20 million active users.",
+        "competencies": [
+          "estimation_logic",
+          "structure"
+        ],
+        "priority": 2,
+        "probe_hints": [
+          "assumptions"
+        ]
+      },
+      {
+        "id": "q3",
+        "text": "The ads team wants more promoted tracks in recommendations. The ML team wants to protect quality. How do you decide?",
+        "competencies": [
+          "prioritization",
+          "recommendation"
+        ],
+        "priority": 3,
+        "probe_hints": [
+          "cross-team",
+          "data"
+        ]
+      },
+      {
+        "id": "q4",
+        "text": "How would you define a discovery metric for Tunelane?",
+        "competencies": [
+          "structure",
+          "problem_framing"
+        ],
+        "priority": 4,
+        "probe_hints": [
+          "delay of signal"
+        ]
+      },
+      {
+        "id": "q5",
+        "text": "Should Tunelane build a podcast model or improve music first?",
+        "competencies": [
+          "user_and_business_sense",
+          "prioritization"
+        ],
+        "priority": 5,
+        "probe_hints": []
+      },
+      {
+        "id": "q6",
+        "text": "What would make you stop a model launch that looks good in tests?",
+        "competencies": [
+          "recommendation",
+          "problem_framing"
+        ],
+        "priority": 6,
+        "probe_hints": []
+      }
+    ],
+    "probe_areas": [
+      "Cross-team trade-offs",
+      "Ambiguity handling"
+    ],
+    "persona": {
+      "tone": "direct and curious",
+      "pushback_style": "asks why not the simpler option and adds new facts",
+      "closing_style": "short and neutral"
+    },
+    "max_probes_per_question": 3,
+    "curveball": "Tell the candidate legal says the model cannot use listening data from users under 18, about 12 percent of the user base."
+  },
+  "turns": [
+    {
+      "speaker": "interviewer",
+      "phase": "intro",
+      "text": "Hi Rohan, I'm Hana, a director of data science. This is a forty five minute case interview, spoken only. Expect follow-up questions.",
+      "start_ms": 0,
+      "end_ms": 8800
+    },
+    {
+      "speaker": "candidate",
+      "phase": "intro",
+      "text": "Hi Hana, thank you. I am ready.",
+      "start_ms": 9600,
+      "end_ms": 12400
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "small_talk",
+      "text": "How is your week going?",
+      "start_ms": 13100,
+      "end_ms": 15100
+    },
+    {
+      "speaker": "candidate",
+      "phase": "small_talk",
+      "text": "Busy, but in a good way. We just closed a quarter, so this is a change of pace.",
+      "start_ms": 16000,
+      "end_ms": 23200
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "agenda",
+      "text": "I will give you three or four cases. They are open on purpose. State your assumptions, and I will challenge some of them.",
+      "start_ms": 23700,
+      "end_ms": 32900
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tunelane's new recommendation model raised click-through by 4 percent, but paid conversion is flat. What do you do?",
+      "start_ms": 33500,
+      "end_ms": 40700,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I would first ask what we want conversion to do, because click-through is a means. My hypothesis is that the model optimizes for clicks on familiar music, which does not change a free user's decision to pay. I would segment free users who hit skip limits against casual listeners. Then I would check whether the extra clicks are new artists or repeats. If they are repeats, the lift is shallow. I would run a two week test with paid conversion as the primary metric and thirty day retention as a guardrail.",
+      "start_ms": 41500,
+      "end_ms": 77900,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Why not just ship the model? Click-through is up.",
+      "start_ms": 78600,
+      "end_ms": 82200,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Click-through is up, so shipping is tempting. The risk is that we pay for more compute and teach the model to chase clicks, which can hurt retention later. I would ship to 10 percent of free users while we learn, since that costs little and keeps the option open. If the test shows no conversion lift, I would retrain with a reward tied to saves and full listens instead of clicks.",
+      "start_ms": 83100,
+      "end_ms": 111500,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Estimate the daily cost to generate personalised playlists for 20 million active users.",
+      "start_ms": 112000,
+      "end_ms": 117200,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I would estimate per user and multiply. Assume 20 million users, and one refresh a day. Say 2,000 candidates scored per user, so 40 billion scores a day. At about 20,000 scores per second per GPU, that is 2 million GPU seconds, roughly 550 GPU hours. At 2 dollars an hour, that is about 1,100 dollars. Add three times for features and storage, so 3,000 to 4,000 dollars a day. Caching for inactive users could cut a third.",
+      "start_ms": 117800,
+      "end_ms": 149000,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "The ads team wants more promoted tracks in recommendations. The ML team wants to protect quality. How do you decide?",
+      "start_ms": 149800,
+      "end_ms": 157800,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I would reframe it as one budget: how many promoted slots can we add before quality losses cost more than the ads earn. I would ask both teams for numbers, ad revenue per promoted slot and the retention drop per extra slot. Then I would propose a cap, say one promoted track in ten, and test two caps. Ad revenue is real today, and retention is revenue next year. My recommendation is a cap of one in ten, with a guardrail that stops the test if skip rate rises by 5 percent.",
+      "start_ms": 158500,
+      "end_ms": 195300,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "New fact. Legal says we cannot use listening data from users under 18, about 12 percent of the user base. Does your plan change?",
+      "start_ms": 196200,
+      "end_ms": 205800,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Yes, in two ways. The model needs a fallback for those users, such as popularity within a genre, and I would check whether quality drops for that group. For the ads cap, I would exclude them from promoted tracks, which may need its own review. I would split test results by age group so we do not mix groups. The plan holds for the other 88 percent, and I would start the fallback now, since it is on the critical path.",
+      "start_ms": 206300,
+      "end_ms": 238700,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "How would you define a discovery metric for Tunelane?",
+      "start_ms": 239300,
+      "end_ms": 242900,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I would define discovery as a listener playing a new artist for at least thirty seconds and returning to that artist within 14 days. A play alone is not enough, since people skip. The numerator is users with at least one such artist per week, and the denominator is weekly active users. The trade-off is that 14 days delays the signal, so I would also track an early proxy, saves in the first session. I would use the 14 day number for decisions.",
+      "start_ms": 243700,
+      "end_ms": 276900,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Thanks. That is the end of the cases. What would you like to ask me?",
+      "start_ms": 277600,
+      "end_ms": 283600
+    },
+    {
+      "speaker": "candidate",
+      "phase": "candidate_questions",
+      "text": "How do the ads and ML teams settle disagreements today?",
+      "start_ms": 284500,
+      "end_ms": 288500
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Mostly with a shared test plan agreed before launch, and a monthly review where both teams see the same numbers.",
+      "start_ms": 289000,
+      "end_ms": 297000
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "wrap_up",
+      "text": "That is our time, Rohan. The recruiter will follow up within a week.",
+      "start_ms": 297600,
+      "end_ms": 302800
+    },
+    {
+      "speaker": "candidate",
+      "phase": "wrap_up",
+      "text": "Thank you, Hana. I enjoyed the discussion.",
+      "start_ms": 303600,
+      "end_ms": 306400
+    }
+  ],
+  "vague_answers": [],
+  "notes": "Strong for senior: reframes ambiguity, states assumptions, handles pushback and the curveball with specific changes."
+}

@@ -1,0 +1,297 @@
+{
+  "id": "beh-05",
+  "title": "Behavioral, mid software engineer, weak answers, tough",
+  "role_family": "swe",
+  "candidate_name": "Grant Vasquez-Holt",
+  "quality": "weak",
+  "brief": {
+    "session": {
+      "interview_type": "behavioral",
+      "difficulty": "tough",
+      "mode": "realistic",
+      "duration_min": 30,
+      "level": "mid"
+    },
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": [
+      "ownership",
+      "impact",
+      "collaboration",
+      "conflict_handling",
+      "learning_from_failure"
+    ],
+    "questions": [
+      {
+        "id": "q1",
+        "text": "Tell me about a project you owned from start to finish.",
+        "competencies": [
+          "ownership",
+          "impact"
+        ],
+        "priority": 1,
+        "probe_hints": [
+          "own role",
+          "result"
+        ]
+      },
+      {
+        "id": "q2",
+        "text": "Tell me about a conflict with a teammate over a technical decision.",
+        "competencies": [
+          "conflict_handling",
+          "collaboration"
+        ],
+        "priority": 2,
+        "probe_hints": [
+          "how it ended"
+        ]
+      },
+      {
+        "id": "q3",
+        "text": "Tell me about a time something you shipped failed.",
+        "competencies": [
+          "learning_from_failure",
+          "ownership"
+        ],
+        "priority": 3,
+        "probe_hints": [
+          "what changed after"
+        ]
+      },
+      {
+        "id": "q4",
+        "text": "Tell me about explaining a technical problem to non-engineers.",
+        "competencies": [
+          "communication"
+        ],
+        "priority": 4,
+        "probe_hints": []
+      },
+      {
+        "id": "q5",
+        "text": "Tell me about a time you improved how your team worked.",
+        "competencies": [
+          "impact",
+          "collaboration"
+        ],
+        "priority": 5,
+        "probe_hints": []
+      },
+      {
+        "id": "q6",
+        "text": "Tell me about a time you pushed back on a deadline.",
+        "competencies": [
+          "communication",
+          "ownership"
+        ],
+        "priority": 6,
+        "probe_hints": []
+      }
+    ],
+    "probe_areas": [
+      "Own contribution versus team contribution",
+      "Depth of technical decisions"
+    ],
+    "persona": {
+      "tone": "brisk and skeptical",
+      "pushback_style": "challenges choices and asks for the simpler option",
+      "closing_style": "brief and neutral"
+    },
+    "max_probes_per_question": 3,
+    "curveball": "Suppose your manager tells you to ship tomorrow with a known bug in the payment flow. What do you do?"
+  },
+  "turns": [
+    {
+      "speaker": "interviewer",
+      "phase": "intro",
+      "text": "Hi Grant. I'm Deborah, an engineering manager. This is a thirty minute behavioral interview, and I will push on details.",
+      "start_ms": 0,
+      "end_ms": 8000
+    },
+    {
+      "speaker": "candidate",
+      "phase": "intro",
+      "text": "Hi Deborah. Okay, sounds good.",
+      "start_ms": 8878,
+      "end_ms": 10878
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "small_talk",
+      "text": "How are you today?",
+      "start_ms": 11575,
+      "end_ms": 13175
+    },
+    {
+      "speaker": "candidate",
+      "phase": "small_talk",
+      "text": "Fine, thanks. A bit tired.",
+      "start_ms": 13815,
+      "end_ms": 15815
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "agenda",
+      "text": "I'll cover three experiences, then you can ask me questions.",
+      "start_ms": 16378,
+      "end_ms": 20378
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a project you owned from start to finish.",
+      "start_ms": 20963,
+      "end_ms": 25363,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I worked on a caching project for our API. We added Redis so pages loaded faster. It was a big team effort and it went well.",
+      "start_ms": 25981,
+      "end_ms": 36381,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "What was your own part in it?",
+      "start_ms": 37257,
+      "end_ms": 40057,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I did some of the backend code. Mostly the cache functions. The team lead did the design.",
+      "start_ms": 40933,
+      "end_ms": 47733,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Why Redis? Why not the simpler option, like a cache in memory or in the database?",
+      "start_ms": 48433,
+      "end_ms": 54833,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Redis was already in our stack. A simple in-memory cache would not share across servers. I set it up in two days and page time went from about 4 seconds to 2.",
+      "start_ms": 55470,
+      "end_ms": 68270,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a conflict with a teammate over a technical decision.",
+      "start_ms": 68814,
+      "end_ms": 73614,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "We sometimes disagreed about code style. I just talked to him and we figured it out. Conflict is normal in teams.",
+      "start_ms": 74271,
+      "end_ms": 82671,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Give me one specific disagreement and how it ended.",
+      "start_ms": 83244,
+      "end_ms": 86844,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "He wanted a custom linter config and I thought the default was fine. I showed him the default passed on all 40 files, and he dropped it.",
+      "start_ms": 87622,
+      "end_ms": 98422,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a time something you shipped failed.",
+      "start_ms": 99071,
+      "end_ms": 102671,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "A release once had a bug and we had to roll back. It was stressful. We fixed it and shipped again later.",
+      "start_ms": 103269,
+      "end_ms": 112069,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Suppose your manager tells you to ship tomorrow with a known bug in the payment flow. What do you do?",
+      "start_ms": 112856,
+      "end_ms": 120856,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I would probably ask the manager what to do. If they said ship, I would ship it, since they decide.",
+      "start_ms": 121371,
+      "end_ms": 129371,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Okay. Any questions for me?",
+      "start_ms": 130115,
+      "end_ms": 132115
+    },
+    {
+      "speaker": "candidate",
+      "phase": "candidate_questions",
+      "text": "What technologies does the team use?",
+      "start_ms": 132868,
+      "end_ms": 135268
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Mostly Go and Postgres, with some Python for tooling.",
+      "start_ms": 135934,
+      "end_ms": 139534
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "wrap_up",
+      "text": "That's the time. Thanks Grant. The recruiter will be in touch.",
+      "start_ms": 140290,
+      "end_ms": 144690
+    },
+    {
+      "speaker": "candidate",
+      "phase": "wrap_up",
+      "text": "Thanks, Deborah.",
+      "start_ms": 145539,
+      "end_ms": 146339
+    }
+  ],
+  "vague_answers": [
+    6,
+    8,
+    12,
+    16,
+    18
+  ],
+  "notes": "Weak for mid, tough session: pushback and curveball get thin answers. Last answer is not probed."
+}

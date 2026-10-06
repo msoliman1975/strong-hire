@@ -1,0 +1,52 @@
+{
+  "id": "tq-08",
+  "title": "Technical Q&A, senior software engineer, weak answers",
+  "role_family": "swe",
+  "candidate_name": "Bertrand Nakamura-Oyelaran",
+  "quality": "weak",
+  "brief": {
+    "session": {"interview_type": "technical_qa", "difficulty": "realistic", "mode": "realistic", "duration_min": 30, "level": "senior"},
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": ["reasoning", "technical_depth", "trade_offs", "accuracy", "clarity_of_explanation"],
+    "questions": [
+      {"id": "q1", "text": "How would you find the cause of a memory leak in a long running service?", "competencies": ["reasoning", "technical_depth"], "priority": 1, "probe_hints": ["tools", "own example"]},
+      {"id": "q2", "text": "How do you decide when to add a cache?", "competencies": ["trade_offs", "reasoning"], "priority": 2, "probe_hints": ["what can go wrong"]},
+      {"id": "q3", "text": "Explain how a database index works.", "competencies": ["technical_depth", "accuracy"], "priority": 3, "probe_hints": ["write cost"]},
+      {"id": "q4", "text": "How would you design a retry policy for calls between services?", "competencies": ["technical_depth", "trade_offs"], "priority": 4, "probe_hints": []},
+      {"id": "q5", "text": "Explain the CAP theorem in plain words.", "competencies": ["accuracy", "clarity_of_explanation"], "priority": 5, "probe_hints": []},
+      {"id": "q6", "text": "How would you roll out a risky schema change?", "competencies": ["reasoning", "trade_offs"], "priority": 6, "probe_hints": []}
+    ],
+    "probe_areas": ["Depth expected at senior level", "Own debugging experience"],
+    "persona": {"tone": "neutral and professional", "pushback_style": "asks for the tools and the specific case", "closing_style": "thanks and next steps"},
+    "max_probes_per_question": 2,
+    "curveball": null
+  },
+  "turns": [
+    {"speaker": "interviewer", "phase": "intro", "text": "Hi Bertrand, thanks for joining. I'm Fiona, an engineer on the platform team. This is a thirty minute technical conversation with spoken questions and no coding.", "start_ms": 0, "end_ms": 10400},
+    {"speaker": "candidate", "phase": "intro", "text": "Hi Fiona, thank you.", "start_ms": 11200, "end_ms": 12800},
+    {"speaker": "interviewer", "phase": "small_talk", "text": "What are you working on at the moment?", "start_ms": 13300, "end_ms": 16500},
+    {"speaker": "candidate", "phase": "small_talk", "text": "I am a senior developer on a web application. Mostly features and bug fixes.", "start_ms": 17400, "end_ms": 23000},
+    {"speaker": "interviewer", "phase": "agenda", "text": "Okay. I'll ask three or four questions about debugging and design, and then leave time for yours.", "start_ms": 23700, "end_ms": 30500},
+    {"speaker": "interviewer", "phase": "core", "text": "How would you find the cause of a memory leak in a long running service?", "start_ms": 31100, "end_ms": 37100, "question_ref": "q1"},
+    {"speaker": "candidate", "phase": "core", "text": "I would look at the logs and monitor the memory. Then I would restart the service if it gets too high. Maybe look at the code to see where the leak is.", "start_ms": 37900, "end_ms": 50700, "question_ref": "q1"},
+    {"speaker": "interviewer", "phase": "core", "text": "What tools would you use to see which objects are growing?", "start_ms": 51200, "end_ms": 55600, "question_ref": "q1"},
+    {"speaker": "candidate", "phase": "core", "text": "A profiler, I guess. There are profiler tools that show memory. I would use one of those and look for the problem.", "start_ms": 56500, "end_ms": 65300, "question_ref": "q1"},
+    {"speaker": "interviewer", "phase": "core", "text": "Walk me through what you did the last time you had a leak.", "start_ms": 66000, "end_ms": 71200, "question_ref": "q1"},
+    {"speaker": "candidate", "phase": "core", "text": "Last time we restarted it every night. It was a quick fix.", "start_ms": 71800, "end_ms": 76600, "question_ref": "q1"},
+    {"speaker": "interviewer", "phase": "core", "text": "How do you decide when to add a cache?", "start_ms": 77400, "end_ms": 81000, "question_ref": "q2"},
+    {"speaker": "candidate", "phase": "core", "text": "When the application is slow. Caching makes things faster, so you cache the data that is used a lot. Redis is good for that.", "start_ms": 81500, "end_ms": 91100, "question_ref": "q2"},
+    {"speaker": "interviewer", "phase": "core", "text": "Explain how a database index works.", "start_ms": 92000, "end_ms": 94400, "question_ref": "q3"},
+    {"speaker": "candidate", "phase": "core", "text": "An index is like a shortcut to the data. It makes queries and also writes faster, because the data is organized. You should index every column.", "start_ms": 95100, "end_ms": 105500, "question_ref": "q3"},
+    {"speaker": "interviewer", "phase": "core", "text": "What does an index cost? Think about writes and storage.", "start_ms": 106100, "end_ms": 110100, "question_ref": "q3"},
+    {"speaker": "candidate", "phase": "core", "text": "Storage a bit. I do not think writes are affected much. It is generally worth it.", "start_ms": 110900, "end_ms": 117300, "question_ref": "q3"},
+    {"speaker": "interviewer", "phase": "candidate_questions", "text": "Thanks. What questions do you have for me?", "start_ms": 117800, "end_ms": 121000},
+    {"speaker": "candidate", "phase": "candidate_questions", "text": "What does a senior engineer own on your team?", "start_ms": 121900, "end_ms": 125500},
+    {"speaker": "interviewer", "phase": "candidate_questions", "text": "A senior engineer owns a service end to end, mentors two engineers, and writes the design review for large changes.", "start_ms": 126200, "end_ms": 134200},
+    {"speaker": "interviewer", "phase": "wrap_up", "text": "That's our time. Thanks Bertrand, the recruiter will contact you within a week.", "start_ms": 134800, "end_ms": 140000},
+    {"speaker": "candidate", "phase": "wrap_up", "text": "Thank you, Fiona.", "start_ms": 140800, "end_ms": 142000}
+  ],
+  "vague_answers": [6, 8, 10, 12, 14, 16],
+  "notes": "Weak for senior: short generic answers, tool names without detail, one wrong claim about indexes, no numbers, no examples."
+}

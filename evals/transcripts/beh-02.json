@@ -1,0 +1,262 @@
+{
+  "id": "beh-02",
+  "title": "Behavioral, new grad product designer, weak answers",
+  "role_family": "design",
+  "candidate_name": "Dara Whitlock",
+  "quality": "weak",
+  "brief": {
+    "session": {
+      "interview_type": "behavioral",
+      "difficulty": "friendly",
+      "mode": "coach",
+      "duration_min": 30,
+      "level": "new_grad"
+    },
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": [
+      "ownership",
+      "impact",
+      "collaboration",
+      "learning_from_failure",
+      "communication"
+    ],
+    "questions": [
+      {
+        "id": "q1",
+        "text": "Tell me about a design project you are proud of.",
+        "competencies": [
+          "ownership",
+          "impact"
+        ],
+        "priority": 1,
+        "probe_hints": [
+          "own role",
+          "result"
+        ]
+      },
+      {
+        "id": "q2",
+        "text": "Tell me about a time a teammate disagreed with your design.",
+        "competencies": [
+          "conflict_handling",
+          "collaboration"
+        ],
+        "priority": 2,
+        "probe_hints": []
+      },
+      {
+        "id": "q3",
+        "text": "Tell me about feedback on your work that was hard to hear.",
+        "competencies": [
+          "learning_from_failure",
+          "communication"
+        ],
+        "priority": 3,
+        "probe_hints": [
+          "what changed"
+        ]
+      },
+      {
+        "id": "q4",
+        "text": "Tell me about a time you explained a design choice to someone outside design.",
+        "competencies": [
+          "communication"
+        ],
+        "priority": 4,
+        "probe_hints": [
+          "how they reacted"
+        ]
+      },
+      {
+        "id": "q5",
+        "text": "Tell me about something you made that did not work.",
+        "competencies": [
+          "learning_from_failure",
+          "ownership"
+        ],
+        "priority": 5,
+        "probe_hints": []
+      },
+      {
+        "id": "q6",
+        "text": "Tell me about design work that had a measurable effect on users.",
+        "competencies": [
+          "impact"
+        ],
+        "priority": 6,
+        "probe_hints": []
+      }
+    ],
+    "probe_areas": [
+      "No full-time design experience",
+      "Portfolio is mostly class projects"
+    ],
+    "persona": {
+      "tone": "warm and patient",
+      "pushback_style": "gentle clarifying questions",
+      "closing_style": "encouraging with one tip"
+    },
+    "max_probes_per_question": 2,
+    "curveball": null
+  },
+  "turns": [
+    {
+      "speaker": "interviewer",
+      "phase": "intro",
+      "text": "Hi Dara, welcome. I'm Mei, a product designer on the mobile team. This is a thirty minute behavioral conversation, and I will share a tip or two along the way.",
+      "start_ms": 0,
+      "end_ms": 12000
+    },
+    {
+      "speaker": "candidate",
+      "phase": "intro",
+      "text": "Hi Mei, thanks. I'm a bit nervous.",
+      "start_ms": 12896,
+      "end_ms": 15696
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "small_talk",
+      "text": "That's fine, take your time. Are you finishing school this term?",
+      "start_ms": 16470,
+      "end_ms": 20870
+    },
+    {
+      "speaker": "candidate",
+      "phase": "small_talk",
+      "text": "Yes, I graduate in May from Marrow Hill University.",
+      "start_ms": 21739,
+      "end_ms": 25339
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "agenda",
+      "text": "Great. I'll ask about three experiences and leave time for your questions at the end.",
+      "start_ms": 26006,
+      "end_ms": 32006
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a design project you are proud of.",
+      "start_ms": 32776,
+      "end_ms": 36776,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I made an app for a class. It was for finding study spaces. I made the screens and the colors. People liked it and my teacher said it was good.",
+      "start_ms": 37466,
+      "end_ms": 49466,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "What was your part in it, and what happened when you showed it to people?",
+      "start_ms": 50215,
+      "end_ms": 56215,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I made the screens and the colors myself. The map screen was hard, so I used a tutorial. Five classmates tested it and four finished the task.",
+      "start_ms": 56992,
+      "end_ms": 67792,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about feedback on your work that was hard to hear.",
+      "start_ms": 68651,
+      "end_ms": 73451,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Sometimes people say the layout is confusing. I try to listen and fix it. Feedback is important for designers.",
+      "start_ms": 74123,
+      "end_ms": 81723,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Can you give me one real example, and what you changed?",
+      "start_ms": 82374,
+      "end_ms": 86774,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "One student said my buttons were too small. I made them bigger. In the next test all five testers found the button.",
+      "start_ms": 87312,
+      "end_ms": 96112,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a time you explained a design choice to someone outside design.",
+      "start_ms": 96967,
+      "end_ms": 102567,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I explained my colors to my friend in computer science. He said okay. I said it was for readability.",
+      "start_ms": 103157,
+      "end_ms": 110757,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Thanks. What questions do you have for me?",
+      "start_ms": 111325,
+      "end_ms": 114525
+    },
+    {
+      "speaker": "candidate",
+      "phase": "candidate_questions",
+      "text": "What does a designer do in the first month here?",
+      "start_ms": 115218,
+      "end_ms": 119218
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "You pair with a senior designer and fix small issues in the live product, so you ship something in your first two weeks.",
+      "start_ms": 119841,
+      "end_ms": 129041
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "wrap_up",
+      "text": "That's all our time. Thanks Dara. One tip for next time: add a number to each story. The recruiter will write within a week.",
+      "start_ms": 129835,
+      "end_ms": 139435
+    },
+    {
+      "speaker": "candidate",
+      "phase": "wrap_up",
+      "text": "Okay, thank you. I will try that.",
+      "start_ms": 140322,
+      "end_ms": 143122
+    }
+  ],
+  "vague_answers": [
+    6,
+    10,
+    14
+  ],
+  "notes": "Weak for new grad: short generic first answers; probes bring out one small example each."
+}

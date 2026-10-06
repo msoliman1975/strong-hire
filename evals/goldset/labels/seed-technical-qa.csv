@@ -1,0 +1,62 @@
+transcript_id,rater,question_ref,competency,score,hire_signal,note
+tq-01,seed-author,q1,technical_depth,4,,Chaining and probing with measured lookup counts
+tq-01,seed-author,q1,accuracy,4,,Correct and precise on load factor and amortized cost
+tq-01,seed-author,q2,reasoning,4,,Measured first and cut load time from 4.2 to 1.1 seconds
+tq-01,seed-author,q2,technical_depth,3,,Good use of network tab and query count
+tq-01,seed-author,q3,trade_offs,4,,Named when to switch and the cost of switching
+tq-01,seed-author,q3,reasoning,3,,Own example of duplicated names
+tq-01,seed-author,overall,,,Strong Hire,Above the new grad bar with examples and numbers
+tq-02,seed-author,q1,technical_depth,3,,Right definition and a thesis example after the probe
+tq-02,seed-author,q1,accuracy,3,,Correct with numbers after the probe
+tq-02,seed-author,q2,reasoning,2,,Names the metrics but gives little reasoning
+tq-02,seed-author,q2,trade_offs,2,,Precision versus recall trade-off stays general
+tq-02,seed-author,q3,reasoning,2,,Reasonable list but no order until probed
+tq-02,seed-author,q3,technical_depth,3,,Internship null column example
+tq-02,seed-author,q4,clarity_of_explanation,3,,Clear with a tree depth example
+tq-02,seed-author,q4,accuracy,3,,Correct
+tq-02,seed-author,overall,,,Lean Hire,Correct basics for new grad but shallow reasoning on metrics
+tq-03,seed-author,q1,technical_depth,2,,Knows the idea of REST but hedges
+tq-03,seed-author,q1,clarity_of_explanation,2,,Short and unsure
+tq-03,seed-author,q2,accuracy,2,,Vague and no costs named
+tq-03,seed-author,q2,technical_depth,2,,No access or insert costs
+tq-03,seed-author,q3,trade_offs,1,,Said index everything and no write cost
+tq-03,seed-author,q3,accuracy,2,,Admitted not knowing the write effect
+tq-03,seed-author,overall,,,Lean No Hire,Some basics but a wrong claim and no examples
+tq-04,seed-author,q1,reasoning,4,,Clear steps and a 400 to 190 millisecond fix
+tq-04,seed-author,q1,technical_depth,3,,Good use of traces and flags
+tq-04,seed-author,q2,trade_offs,4,,Handled pushback and the cost change with numbers
+tq-04,seed-author,q2,reasoning,3,,Chose by failure tolerance
+tq-04,seed-author,q3,accuracy,3,,Correct on aborts and hot rows
+tq-04,seed-author,q3,technical_depth,3,,Aborts cut from 8 to under 1 percent
+tq-04,seed-author,overall,,,Hire,Meets the mid bar with strong trade-off reasoning
+tq-05,seed-author,q1,technical_depth,3,,Shared library and a null fill example
+tq-05,seed-author,q1,reasoning,2,,General until probed
+tq-05,seed-author,q2,reasoning,2,,Process steps but no criteria
+tq-05,seed-author,q2,trade_offs,2,,Cost versus gain left open
+tq-05,seed-author,q3,technical_depth,2,,Names KS and PSI without own use at first
+tq-05,seed-author,q3,accuracy,3,,Threshold example was concrete
+tq-05,seed-author,q4,trade_offs,3,,Used a churn model example
+tq-05,seed-author,overall,,,Lean No Hire,Below the mid bar on reasoning and trade-offs
+tq-06,seed-author,q1,technical_depth,4,,Time split and sliced NDCG with a 0.6 correlation
+tq-06,seed-author,q1,reasoning,4,,Found position bias in a disagreement
+tq-06,seed-author,q2,trade_offs,4,,Schedule plus trigger and 0.4 percent a week cost
+tq-06,seed-author,q2,reasoning,4,,Measured stale cost by replay
+tq-06,seed-author,q4,trade_offs,4,,Ranked options by savings per week of work
+tq-06,seed-author,q4,technical_depth,3,,Quantization and distillation numbers
+tq-06,seed-author,q5,clarity_of_explanation,4,,Clear story and a mentoring example
+tq-06,seed-author,q5,accuracy,3,,AUC 0.98 to 0.83 after removing leak
+tq-06,seed-author,overall,,,Strong Hire,Above the senior bar with measured claims and mentoring scope
+tq-07,seed-author,q1,reasoning,3,,Example with pool 10 to 50 after the probe
+tq-07,seed-author,q1,technical_depth,2,,Generic list at first
+tq-07,seed-author,q2,trade_offs,2,,Pushback answer improved but first answer was weak
+tq-07,seed-author,q2,reasoning,2,,Generic uptime answer and little depth
+tq-07,seed-author,q3,technical_depth,3,,Idempotency key with 24 hour retention
+tq-07,seed-author,q3,accuracy,3,,Correct with a number
+tq-07,seed-author,overall,,,Lean No Hire,Below the senior bar on depth and trade-offs
+tq-08,seed-author,q1,reasoning,2,,Restarting is not a diagnosis
+tq-08,seed-author,q1,technical_depth,1,,No tools or method named
+tq-08,seed-author,q2,trade_offs,1,,No costs or invalidation named
+tq-08,seed-author,q2,reasoning,2,,Only says when slow
+tq-08,seed-author,q3,technical_depth,1,,Wrong claim that indexes speed up writes
+tq-08,seed-author,q3,accuracy,1,,Index every column is incorrect
+tq-08,seed-author,overall,,,No Hire,Far below the senior bar with wrong claims and no examples

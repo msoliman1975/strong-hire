@@ -1,0 +1,53 @@
+transcript_id,rater,question_ref,competency,score,hire_signal,note
+hm-01,seed-author,q1,role_fit,3,,Clear example from internship but credit shared
+hm-01,seed-author,q1,depth_of_experience,3,,Named own pieces and a bug fix
+hm-01,seed-author,q2,motivation,2,,Generic at first then one specific blog post
+hm-01,seed-author,q2,role_fit,2,,Little link between skills and the role
+hm-01,seed-author,q3,judgment,3,,Tested both options and gave a reason
+hm-01,seed-author,q3,depth_of_experience,3,,200 requests per second from own test
+hm-01,seed-author,overall,,,Lean Hire,Meets the new grad bar on craft but motivation is thin
+hm-02,seed-author,q1,depth_of_experience,4,,Fixed label leak and set ship bar before training
+hm-02,seed-author,q1,role_fit,4,,Retention lift 3.1 points and 40 percent fewer emails
+hm-02,seed-author,q2,judgment,4,,Chose the simple model with a revisit rule
+hm-02,seed-author,q2,scope_at_level,4,,Used 40 thousand dollars a quarter to settle it
+hm-02,seed-author,q3,motivation,3,,Clear reasons but the move is about scope more than the team
+hm-02,seed-author,q3,role_fit,4,,Shipped ranking work twice
+hm-02,seed-author,q5,scope_at_level,4,,Aligned three teams and kept 11 of 14 features
+hm-02,seed-author,q5,team_fit,3,,Good alignment work but little on conflict
+hm-02,seed-author,overall,,,Strong Hire,Above the mid bar with numbers and trade-offs
+hm-03,seed-author,q1,depth_of_experience,3,,Own role stated and a six user test
+hm-03,seed-author,q1,role_fit,3,,Flows screens and prototype are core design work
+hm-03,seed-author,q2,judgment,3,,Compromise with mockups and later checked analytics
+hm-03,seed-author,q2,team_fit,3,,Worked through the disagreement calmly
+hm-03,seed-author,q4,judgment,2,,Opening answer was generic and a case came only after a probe
+hm-03,seed-author,q4,scope_at_level,3,,Ranked by users and effort with a 60 percent figure
+hm-03,seed-author,overall,,,Lean Hire,Solid craft stories but vague on prioritization at first
+hm-04,seed-author,q1,depth_of_experience,2,,No numbers and credit given to the team
+hm-04,seed-author,q1,scope_at_level,2,,Role described only as gathering requirements
+hm-04,seed-author,q2,judgment,2,,Generic answer then a reasonable cut under pressure
+hm-04,seed-author,q2,role_fit,2,,No real prioritization case given
+hm-04,seed-author,q3,motivation,2,,Generic reasons only
+hm-04,seed-author,q3,role_fit,1,,No knowledge of the product or the role
+hm-04,seed-author,overall,,,No Hire,No numbers and no knowledge of the role
+hm-05,seed-author,q1,scope_at_level,4,,Led four teams with 70 percent fewer incidents
+hm-05,seed-author,q1,depth_of_experience,3,,Strong design choice with a prototype
+hm-05,seed-author,q2,judgment,4,,Profiled first and chose a two week fix with an alert
+hm-05,seed-author,q2,depth_of_experience,3,,Used real latency numbers
+hm-05,seed-author,q4,team_fit,3,,Concrete mentoring story and promotion result
+hm-05,seed-author,q4,scope_at_level,3,,Good re-plan under the curveball but no org wide view
+hm-05,seed-author,overall,,,Hire,Meets or beats the senior bar with clear trade-offs
+hm-06,seed-author,q1,scope_at_level,2,,Six teams is below the senior bar and no result numbers
+hm-06,seed-author,q1,depth_of_experience,3,,Made the delay call and added data checks
+hm-06,seed-author,q2,judgment,2,,Generic process with no real case
+hm-06,seed-author,q2,role_fit,2,,No example of recovering a slipping project
+hm-06,seed-author,q3,motivation,3,,Honest about the gap after a probe
+hm-06,seed-author,q3,role_fit,3,,Nine years of program work fits the role
+hm-06,seed-author,q4,team_fit,3,,Traded two tasks to ease a lead's on-call load
+hm-06,seed-author,overall,,,Lean No Hire,Scope and judgment are below the senior bar
+hm-07,seed-author,q1,depth_of_experience,2,,Generic and could not recall the result
+hm-07,seed-author,q1,scope_at_level,1,,No evidence of senior ownership or scope
+hm-07,seed-author,q2,judgment,2,,Shipped on one comparison and missed false positives
+hm-07,seed-author,q2,depth_of_experience,2,,Fraud example is real but shallow
+hm-07,seed-author,q4,scope_at_level,2,,Mentoring limited to answering questions
+hm-07,seed-author,q4,team_fit,3,,One good coaching example after a probe
+hm-07,seed-author,overall,,,Lean No Hire,No senior scope shown and results not recalled

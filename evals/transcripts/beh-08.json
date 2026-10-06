@@ -1,0 +1,262 @@
+{
+  "id": "beh-08",
+  "title": "Behavioral, senior product manager, weak answers",
+  "role_family": "pm",
+  "candidate_name": "Oren Whitcombe-Diaz",
+  "quality": "weak",
+  "brief": {
+    "session": {
+      "interview_type": "behavioral",
+      "difficulty": "realistic",
+      "mode": "realistic",
+      "duration_min": 30,
+      "level": "senior"
+    },
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": [
+      "ownership",
+      "impact",
+      "collaboration",
+      "learning_from_failure",
+      "communication"
+    ],
+    "questions": [
+      {
+        "id": "q1",
+        "text": "Tell me about a product you owned and what it achieved.",
+        "competencies": [
+          "ownership",
+          "impact"
+        ],
+        "priority": 1,
+        "probe_hints": [
+          "own role",
+          "result"
+        ]
+      },
+      {
+        "id": "q2",
+        "text": "Tell me about a conflict with a stakeholder.",
+        "competencies": [
+          "conflict_handling",
+          "collaboration"
+        ],
+        "priority": 2,
+        "probe_hints": []
+      },
+      {
+        "id": "q3",
+        "text": "Tell me about a launch that missed its goals.",
+        "competencies": [
+          "learning_from_failure",
+          "impact"
+        ],
+        "priority": 3,
+        "probe_hints": [
+          "your part",
+          "what changed"
+        ]
+      },
+      {
+        "id": "q4",
+        "text": "Tell me about leading people who did not report to you.",
+        "competencies": [
+          "collaboration",
+          "communication"
+        ],
+        "priority": 4,
+        "probe_hints": []
+      },
+      {
+        "id": "q5",
+        "text": "Tell me about explaining a hard trade-off to executives.",
+        "competencies": [
+          "communication",
+          "ownership"
+        ],
+        "priority": 5,
+        "probe_hints": []
+      },
+      {
+        "id": "q6",
+        "text": "Tell me about a metric you moved.",
+        "competencies": [
+          "impact"
+        ],
+        "priority": 6,
+        "probe_hints": []
+      }
+    ],
+    "probe_areas": [
+      "Senior-level scope",
+      "Specific results"
+    ],
+    "persona": {
+      "tone": "neutral and professional",
+      "pushback_style": "asks for specifics",
+      "closing_style": "thanks and clear next steps"
+    },
+    "max_probes_per_question": 2,
+    "curveball": null
+  },
+  "turns": [
+    {
+      "speaker": "interviewer",
+      "phase": "intro",
+      "text": "Hi Oren, thanks for joining. I'm Sunita, a director of product. This is a thirty minute behavioral conversation.",
+      "start_ms": 0,
+      "end_ms": 7200
+    },
+    {
+      "speaker": "candidate",
+      "phase": "intro",
+      "text": "Hi Sunita, thank you.",
+      "start_ms": 8084,
+      "end_ms": 9684
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "small_talk",
+      "text": "How is your day going so far?",
+      "start_ms": 10330,
+      "end_ms": 13130
+    },
+    {
+      "speaker": "candidate",
+      "phase": "small_talk",
+      "text": "Good. Busy, but good.",
+      "start_ms": 13815,
+      "end_ms": 15415
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "agenda",
+      "text": "I'll ask about three experiences and leave time at the end for your questions.",
+      "start_ms": 16042,
+      "end_ms": 21642
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a product you owned and what it achieved.",
+      "start_ms": 22242,
+      "end_ms": 26642,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I managed a scheduling product. It had many users and the team was great. We shipped several features and customers liked them.",
+      "start_ms": 27516,
+      "end_ms": 36316,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "What did you personally decide, and what changed for customers?",
+      "start_ms": 37118,
+      "end_ms": 41118,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I decided to build calendar sync first. Customers asked for it most, so I put it ahead of reports. Support tickets about missing bookings dropped by about a third.",
+      "start_ms": 42016,
+      "end_ms": 53616,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a launch that missed its goals.",
+      "start_ms": 54190,
+      "end_ms": 57790,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "We launched a feature and adoption was low. It was a tough market. We learned we should have done more research.",
+      "start_ms": 58493,
+      "end_ms": 66893,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "What was your part in that, and what did you change afterward?",
+      "start_ms": 67426,
+      "end_ms": 72226,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I wrote the launch plan. I skipped customer calls because we were late. After that I added a research step to planning, and the next launch hit its target of 1000 users.",
+      "start_ms": 72933,
+      "end_ms": 85733,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about explaining a hard trade-off to executives.",
+      "start_ms": 86513,
+      "end_ms": 90113,
+      "question_ref": "q5"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I once told executives we needed more time. They understood. I just explained the situation clearly and they agreed.",
+      "start_ms": 90672,
+      "end_ms": 98272,
+      "question_ref": "q5"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Thanks. What questions do you have?",
+      "start_ms": 99018,
+      "end_ms": 101418
+    },
+    {
+      "speaker": "candidate",
+      "phase": "candidate_questions",
+      "text": "What is the team size for this role?",
+      "start_ms": 102043,
+      "end_ms": 105243
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "The product group has six product managers and about forty engineers.",
+      "start_ms": 106051,
+      "end_ms": 110451
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "wrap_up",
+      "text": "That's our time. Thanks Oren, the recruiter will follow up within a week.",
+      "start_ms": 110955,
+      "end_ms": 116155
+    },
+    {
+      "speaker": "candidate",
+      "phase": "wrap_up",
+      "text": "Thank you, Sunita.",
+      "start_ms": 116925,
+      "end_ms": 118125
+    }
+  ],
+  "vague_answers": [
+    6,
+    10,
+    14
+  ],
+  "notes": "Weak for senior: first answers generic and short; the last one is not probed."
+}

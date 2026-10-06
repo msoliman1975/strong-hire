@@ -1,0 +1,263 @@
+{
+  "id": "beh-04",
+  "title": "Behavioral, mid data scientist, average answers",
+  "role_family": "data_ml",
+  "candidate_name": "Wen Adeyemi-Lund",
+  "quality": "average",
+  "brief": {
+    "session": {
+      "interview_type": "behavioral",
+      "difficulty": "realistic",
+      "mode": "realistic",
+      "duration_min": 30,
+      "level": "mid"
+    },
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": [
+      "ownership",
+      "impact",
+      "collaboration",
+      "learning_from_failure",
+      "communication"
+    ],
+    "questions": [
+      {
+        "id": "q1",
+        "text": "Tell me about an analysis or model you owned from start to finish.",
+        "competencies": [
+          "ownership",
+          "impact"
+        ],
+        "priority": 1,
+        "probe_hints": [
+          "own role",
+          "result"
+        ]
+      },
+      {
+        "id": "q2",
+        "text": "Tell me about a stakeholder who doubted your results.",
+        "competencies": [
+          "conflict_handling",
+          "communication"
+        ],
+        "priority": 2,
+        "probe_hints": []
+      },
+      {
+        "id": "q3",
+        "text": "Tell me about a model or analysis that turned out to be wrong.",
+        "competencies": [
+          "learning_from_failure",
+          "ownership"
+        ],
+        "priority": 3,
+        "probe_hints": [
+          "your part",
+          "what changed"
+        ]
+      },
+      {
+        "id": "q4",
+        "text": "Tell me about working with engineers to put a model into production.",
+        "competencies": [
+          "collaboration",
+          "impact"
+        ],
+        "priority": 4,
+        "probe_hints": [
+          "trade-offs"
+        ]
+      },
+      {
+        "id": "q5",
+        "text": "Tell me about explaining results to a non-technical audience.",
+        "competencies": [
+          "communication"
+        ],
+        "priority": 5,
+        "probe_hints": []
+      },
+      {
+        "id": "q6",
+        "text": "Tell me about a time you changed how your team works.",
+        "competencies": [
+          "impact",
+          "collaboration"
+        ],
+        "priority": 6,
+        "probe_hints": []
+      }
+    ],
+    "probe_areas": [
+      "Mix of own work and team work",
+      "Production experience"
+    ],
+    "persona": {
+      "tone": "calm and curious",
+      "pushback_style": "asks what the candidate personally did",
+      "closing_style": "thanks and clear next steps"
+    },
+    "max_probes_per_question": 2,
+    "curveball": null
+  },
+  "turns": [
+    {
+      "speaker": "interviewer",
+      "phase": "intro",
+      "text": "Hi Wen, thanks for joining. I'm Rafael, a data science lead. This is a thirty minute behavioral conversation.",
+      "start_ms": 0,
+      "end_ms": 7200
+    },
+    {
+      "speaker": "candidate",
+      "phase": "intro",
+      "text": "Hi Rafael, nice to meet you.",
+      "start_ms": 7932,
+      "end_ms": 10332
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "small_talk",
+      "text": "Did you have far to travel, or are you remote today?",
+      "start_ms": 10990,
+      "end_ms": 15390
+    },
+    {
+      "speaker": "candidate",
+      "phase": "small_talk",
+      "text": "Remote. I'm at home, so no travel.",
+      "start_ms": 16258,
+      "end_ms": 19058
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "agenda",
+      "text": "Good. I'll ask about three or four past projects and leave a few minutes for your questions.",
+      "start_ms": 19564,
+      "end_ms": 26364
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about an analysis or model you owned from start to finish.",
+      "start_ms": 27169,
+      "end_ms": 32369,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "At my last job I built a churn model for our subscription product. I pulled the data, built the features and trained a gradient boosting model. It got an AUC of 0.81 on the holdout set. The retention team used the top decile list for a campaign, and churn in that group fell by about 5 percent. I chose boosting over logistic regression because it was a bit more accurate, though it was harder to explain.",
+      "start_ms": 33247,
+      "end_ms": 63647,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a model or analysis that turned out to be wrong.",
+      "start_ms": 64254,
+      "end_ms": 69454,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "We had a demand forecast that was off for a couple of months. The numbers did not match what sales saw. We looked into it and found some data issues, so we fixed the pipeline. It was a good lesson about checking data.",
+      "start_ms": 70192,
+      "end_ms": 87392,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "What was your part in finding it, and what did you change?",
+      "start_ms": 87892,
+      "end_ms": 92692,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I found it. A source table had started double counting returns after a vendor update. I wrote a check that compares row counts every night, and it has caught two more problems since. I should have set up that monitoring from the start.",
+      "start_ms": 93536,
+      "end_ms": 110736,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about working with engineers to put a model into production.",
+      "start_ms": 111378,
+      "end_ms": 116178,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "We worked with the platform team to deploy it. There were a lot of meetings about the API. Everyone was helpful and it went live in the end. I learned that communication matters.",
+      "start_ms": 116991,
+      "end_ms": 130191,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "What was the hardest part, and what did you decide?",
+      "start_ms": 130775,
+      "end_ms": 134775,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "The hard part was latency. The first version took 800 milliseconds and the product team wanted under 200. I proposed dropping two expensive features, which cost about 1 point of AUC. We hit 150 milliseconds and launched on time.",
+      "start_ms": 135285,
+      "end_ms": 150885,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Thanks. What questions do you have?",
+      "start_ms": 151494,
+      "end_ms": 153894
+    },
+    {
+      "speaker": "candidate",
+      "phase": "candidate_questions",
+      "text": "What does the team's model review process look like?",
+      "start_ms": 154492,
+      "end_ms": 158092
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Every model gets a written review with one reviewer outside the team, usually a week before launch.",
+      "start_ms": 158724,
+      "end_ms": 165524
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "wrap_up",
+      "text": "That's our time. Thanks Wen, you'll hear from the recruiter within a week.",
+      "start_ms": 166077,
+      "end_ms": 171277
+    },
+    {
+      "speaker": "candidate",
+      "phase": "wrap_up",
+      "text": "Thank you, Rafael.",
+      "start_ms": 171843,
+      "end_ms": 173043
+    }
+  ],
+  "vague_answers": [
+    8,
+    12
+  ],
+  "notes": "Average for mid: one good story, two answers start generic and improve after a probe."
+}

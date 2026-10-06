@@ -1,0 +1,293 @@
+{
+  "id": "beh-06",
+  "title": "Behavioral, senior technical program manager, strong answers, tough",
+  "role_family": "tpm",
+  "candidate_name": "Imani Kovalenko-Reyes",
+  "quality": "strong",
+  "brief": {
+    "session": {
+      "interview_type": "behavioral",
+      "difficulty": "tough",
+      "mode": "realistic",
+      "duration_min": 45,
+      "level": "senior"
+    },
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": [
+      "ownership",
+      "impact",
+      "collaboration",
+      "conflict_handling",
+      "learning_from_failure",
+      "communication"
+    ],
+    "questions": [
+      {
+        "id": "q1",
+        "text": "Tell me about a program you drove across several teams.",
+        "competencies": [
+          "ownership",
+          "impact"
+        ],
+        "priority": 1,
+        "probe_hints": [
+          "scope",
+          "result"
+        ]
+      },
+      {
+        "id": "q2",
+        "text": "Tell me about a time two teams disagreed on priorities and you had to resolve it.",
+        "competencies": [
+          "conflict_handling",
+          "collaboration"
+        ],
+        "priority": 2,
+        "probe_hints": [
+          "how it ended"
+        ]
+      },
+      {
+        "id": "q3",
+        "text": "Tell me about a program that slipped or failed.",
+        "competencies": [
+          "learning_from_failure",
+          "ownership"
+        ],
+        "priority": 3,
+        "probe_hints": [
+          "what changed after"
+        ]
+      },
+      {
+        "id": "q4",
+        "text": "Tell me about explaining a serious risk to executives.",
+        "competencies": [
+          "communication",
+          "impact"
+        ],
+        "priority": 4,
+        "probe_hints": []
+      },
+      {
+        "id": "q5",
+        "text": "Tell me about mentoring someone on your team.",
+        "competencies": [
+          "collaboration",
+          "communication"
+        ],
+        "priority": 5,
+        "probe_hints": []
+      },
+      {
+        "id": "q6",
+        "text": "Tell me about a process change that other teams adopted.",
+        "competencies": [
+          "impact",
+          "ownership"
+        ],
+        "priority": 6,
+        "probe_hints": []
+      }
+    ],
+    "probe_areas": [
+      "Scope and size of programs",
+      "Influence without authority"
+    ],
+    "persona": {
+      "tone": "formal and probing",
+      "pushback_style": "challenges choices with the simpler alternative",
+      "closing_style": "thanks and clear next steps"
+    },
+    "max_probes_per_question": 3,
+    "curveball": "Suppose your sponsor is out for two weeks and two teams refuse to move on a shared deadline. What do you do?"
+  },
+  "turns": [
+    {
+      "speaker": "interviewer",
+      "phase": "intro",
+      "text": "Hello Imani, thank you for joining. I'm Julian, a director of program management. This is a forty-five minute behavioral interview, and I will push on your choices.",
+      "start_ms": 0,
+      "end_ms": 10800
+    },
+    {
+      "speaker": "candidate",
+      "phase": "intro",
+      "text": "Hello Julian, thank you. I'm glad to be here.",
+      "start_ms": 11546,
+      "end_ms": 15146
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "small_talk",
+      "text": "Have you been in program management for a long time?",
+      "start_ms": 15948,
+      "end_ms": 19948
+    },
+    {
+      "speaker": "candidate",
+      "phase": "small_talk",
+      "text": "About nine years, the last five leading cross-team programs.",
+      "start_ms": 20626,
+      "end_ms": 24226
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "agenda",
+      "text": "Good. I'll cover four experiences, then there is time for your questions.",
+      "start_ms": 24883,
+      "end_ms": 29683
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a program you drove across several teams.",
+      "start_ms": 30406,
+      "end_ms": 34406,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I led our payment platform migration across nine teams and about 60 engineers over fourteen months. I built the dependency map, ran a weekly cross-team review, and set a rule that no team could cut over without a tested rollback. I was accountable for the schedule and the risk log. We moved all traffic with zero customer-facing outages and finished two weeks early. I handed the weekly review to a senior engineer in month ten, so the program did not depend on me.",
+      "start_ms": 34990,
+      "end_ms": 68190,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "How did you decide the order in which teams moved?",
+      "start_ms": 69034,
+      "end_ms": 73034,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I ranked teams by the risk of the service and how ready the team was. I moved low-risk, ready teams first so we could learn on small traffic. Billing, the riskiest, went last. Two teams wanted to go early for prestige, and I said no, using data from the first three cutovers: a rollback took 40 minutes the first time and 8 minutes by the third.",
+      "start_ms": 73852,
+      "end_ms": 100252,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a time two teams disagreed on priorities and you had to resolve it.",
+      "start_ms": 100993,
+      "end_ms": 107393,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "The fraud team and the checkout team both needed the same three engineers from the shared platform group in the same quarter. Each had a good case, and I did not pick a side. I asked each lead for the value at stake. Fraud's number was 2.1 million dollars in avoided losses against 1.4 million in checkout revenue. I split the work so checkout got one engineer plus a contractor. Both leads signed the plan, and both hit their dates.",
+      "start_ms": 108099,
+      "end_ms": 140099,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Why not just escalate to your director and let her decide? That is simpler.",
+      "start_ms": 140974,
+      "end_ms": 146574,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I considered it. Escalation is fast, but both leads would have lost trust in each other and in me, and I would have needed to ask her again next quarter. Using their own numbers took three days instead of one, and it gave them a way to settle it themselves. They did: the same two leads agreed on the next quarter's split without me.",
+      "start_ms": 147322,
+      "end_ms": 172922,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a program that slipped or failed.",
+      "start_ms": 173430,
+      "end_ms": 177030,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "An analytics data platform I ran slipped by three months. I had trusted one team's estimate without checking their dependencies, and an unplanned security review added eight weeks. I told my sponsor as soon as I saw it, with a recovery plan, and cut scope to the three reports customers used most. We landed with 80 percent of scope and kept the key customer. Since then I check dependencies on every estimate, and I put a security review into every plan at the start.",
+      "start_ms": 177913,
+      "end_ms": 211513,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Suppose your sponsor is out for two weeks and two teams refuse to move on a shared deadline. What do you do?",
+      "start_ms": 212252,
+      "end_ms": 221052,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "First I would find out why they refuse, because it is usually a real constraint. Then I would put the deadline and each team's cost on one page and bring it to their two managers instead of waiting for the sponsor. If it is a true conflict, I would ask for a delegate from the sponsor's staff. A similar case in my migration was settled in two days this way. I would also message the sponsor so there are no surprises.",
+      "start_ms": 221945,
+      "end_ms": 254345,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a process change that other teams adopted.",
+      "start_ms": 254951,
+      "end_ms": 258951,
+      "question_ref": "q6"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I introduced a one page launch readiness checklist. I tested it with two teams first and cut it from 30 items to 12 after they said it was too long. Then I showed that launches using it had 45 percent fewer rollbacks over two quarters. Eleven teams adopted it, mostly because their engineers asked for it, not because I required it.",
+      "start_ms": 259761,
+      "end_ms": 284161,
+      "question_ref": "q6"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Thank you. What questions do you have for me?",
+      "start_ms": 284769,
+      "end_ms": 288369
+    },
+    {
+      "speaker": "candidate",
+      "phase": "candidate_questions",
+      "text": "How do program managers here share what works across organizations?",
+      "start_ms": 288869,
+      "end_ms": 292869
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "We have a monthly review where two programs present lessons, and the notes go into a shared playbook.",
+      "start_ms": 293733,
+      "end_ms": 300933
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "wrap_up",
+      "text": "That's our time. Thanks Imani, the recruiter will follow up within a week.",
+      "start_ms": 301500,
+      "end_ms": 306700
+    },
+    {
+      "speaker": "candidate",
+      "phase": "wrap_up",
+      "text": "Thank you, Julian.",
+      "start_ms": 307303,
+      "end_ms": 308503
+    }
+  ],
+  "vague_answers": [],
+  "notes": "Strong for senior: cross-team scope, numbers, trade-offs. Handles pushback and the curveball well."
+}

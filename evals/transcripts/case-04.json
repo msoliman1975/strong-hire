@@ -1,0 +1,298 @@
+{
+  "id": "case-04",
+  "title": "Case, mid designer, weak answers, tough",
+  "role_family": "design",
+  "candidate_name": "Mira Calloway",
+  "quality": "weak",
+  "brief": {
+    "session": {
+      "interview_type": "case",
+      "difficulty": "tough",
+      "mode": "realistic",
+      "duration_min": 30,
+      "level": "mid"
+    },
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": [
+      "problem_framing",
+      "structure",
+      "user_and_business_sense",
+      "prioritization",
+      "recommendation"
+    ],
+    "questions": [
+      {
+        "id": "q1",
+        "text": "PanTrail is a meal-kit app. New users often stop before they finish setting up their first weekly box. How would you approach improving that?",
+        "competencies": [
+          "problem_framing",
+          "user_and_business_sense"
+        ],
+        "priority": 1,
+        "probe_hints": [
+          "where users stop",
+          "who they are"
+        ]
+      },
+      {
+        "id": "q2",
+        "text": "You have three ideas: a taste quiz, a recipe preview and one-tap reorder. Which first and why?",
+        "competencies": [
+          "prioritization",
+          "structure"
+        ],
+        "priority": 2,
+        "probe_hints": [
+          "trade-offs"
+        ]
+      },
+      {
+        "id": "q3",
+        "text": "PanTrail wants a feature for people who cook for one. What do you recommend?",
+        "competencies": [
+          "recommendation",
+          "user_and_business_sense"
+        ],
+        "priority": 3,
+        "probe_hints": [
+          "evidence"
+        ]
+      },
+      {
+        "id": "q4",
+        "text": "Estimate how many users start setup each day if PanTrail gets 1 million installs a year.",
+        "competencies": [
+          "estimation_logic",
+          "structure"
+        ],
+        "priority": 4,
+        "probe_hints": []
+      },
+      {
+        "id": "q5",
+        "text": "How would you decide whether to redesign the whole home screen?",
+        "competencies": [
+          "prioritization",
+          "recommendation"
+        ],
+        "priority": 5,
+        "probe_hints": []
+      },
+      {
+        "id": "q6",
+        "text": "How would you explain the value of a design change to a business owner?",
+        "competencies": [
+          "user_and_business_sense",
+          "structure"
+        ],
+        "priority": 6,
+        "probe_hints": []
+      }
+    ],
+    "probe_areas": [
+      "Design depth for mid level",
+      "Use of evidence"
+    ],
+    "persona": {
+      "tone": "direct and skeptical",
+      "pushback_style": "asks why not the simpler option",
+      "closing_style": "short and neutral"
+    },
+    "max_probes_per_question": 3,
+    "curveball": "Tell the candidate the design team just lost half its time this month and one of the three launch features must be cut."
+  },
+  "turns": [
+    {
+      "speaker": "interviewer",
+      "phase": "intro",
+      "text": "Hi Mira, I'm Victor, a design lead. This is a thirty minute product case. I will push on your answers, so do not take it personally.",
+      "start_ms": 0,
+      "end_ms": 10400
+    },
+    {
+      "speaker": "candidate",
+      "phase": "intro",
+      "text": "Hi Victor. Okay, that is fine.",
+      "start_ms": 11200,
+      "end_ms": 13600
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "small_talk",
+      "text": "Where are you joining from?",
+      "start_ms": 14300,
+      "end_ms": 16300
+    },
+    {
+      "speaker": "candidate",
+      "phase": "small_talk",
+      "text": "From my apartment. It is quiet.",
+      "start_ms": 17200,
+      "end_ms": 19600
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "agenda",
+      "text": "I will give you three cases. Talk through your thinking. We will leave a few minutes at the end for questions.",
+      "start_ms": 20100,
+      "end_ms": 28500
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "PanTrail is a meal-kit app. New users often stop before they finish setting up their first weekly box. How would you approach improving that?",
+      "start_ms": 29100,
+      "end_ms": 38700,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I would make the setup shorter. Fewer steps is better. Maybe add some nice pictures and a progress bar so people feel good.",
+      "start_ms": 39500,
+      "end_ms": 48700,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Which step do users leave at, and how would you find out?",
+      "start_ms": 49400,
+      "end_ms": 54200,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I think probably the payment step. People do not like paying. I would maybe ask users what they think.",
+      "start_ms": 55100,
+      "end_ms": 62700,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Who are these users, and what do they want from their first box?",
+      "start_ms": 63200,
+      "end_ms": 68400,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Busy people who want to cook at home. They want simple recipes. So I would show those first, and check how many finish setup after we change it.",
+      "start_ms": 69000,
+      "end_ms": 80200,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "You have three ideas: a taste quiz, a recipe preview and one-tap reorder. Which first and why?",
+      "start_ms": 81000,
+      "end_ms": 87800,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I would do the taste quiz first because it is more personal. Users like personal things. The others are also good but the quiz is the best.",
+      "start_ms": 88500,
+      "end_ms": 99300,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Why not one-tap reorder? It is the simpler option and costs less.",
+      "start_ms": 100200,
+      "end_ms": 105000,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Reorder only works for people who already ordered. New users have nothing to reorder, so the quiz helps more at the start. But reorder is cheaper, so maybe it is good later.",
+      "start_ms": 105500,
+      "end_ms": 118300,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "PanTrail wants a feature for people who cook for one. What do you recommend?",
+      "start_ms": 118900,
+      "end_ms": 124500,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I would add smaller portions. People who cook for one want less food. And maybe a lower price.",
+      "start_ms": 125300,
+      "end_ms": 132500,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "New fact. The design team just lost half its time this month, and one of your three launch features must be cut. What do you do?",
+      "start_ms": 133200,
+      "end_ms": 143600,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I would talk to the team and see what is possible. Maybe we cut something small. I am not sure which one.",
+      "start_ms": 144500,
+      "end_ms": 153300,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "That is the end of the cases. Do you have questions for me?",
+      "start_ms": 153800,
+      "end_ms": 159000
+    },
+    {
+      "speaker": "candidate",
+      "phase": "candidate_questions",
+      "text": "What does a typical week look like on your team?",
+      "start_ms": 159600,
+      "end_ms": 163600
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Two design reviews, one user test, and a lot of time with product managers and engineers.",
+      "start_ms": 164400,
+      "end_ms": 170800
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "wrap_up",
+      "text": "That is our time, Mira. The recruiter will follow up within a week.",
+      "start_ms": 171500,
+      "end_ms": 176700
+    },
+    {
+      "speaker": "candidate",
+      "phase": "wrap_up",
+      "text": "Thank you, Victor.",
+      "start_ms": 177600,
+      "end_ms": 178800
+    }
+  ],
+  "vague_answers": [
+    6,
+    8,
+    12,
+    16,
+    18
+  ],
+  "notes": "Weak for mid: generic answers, no numbers, no recommendation. Pushback and curveball included."
+}

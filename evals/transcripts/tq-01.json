@@ -1,0 +1,50 @@
+{
+  "id": "tq-01",
+  "title": "Technical Q&A, new grad software engineer, strong answers",
+  "role_family": "swe",
+  "candidate_name": "Dara Kellner",
+  "quality": "strong",
+  "brief": {
+    "session": {"interview_type": "technical_qa", "difficulty": "friendly", "mode": "realistic", "duration_min": 30, "level": "new_grad"},
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": ["technical_depth", "accuracy", "reasoning", "trade_offs", "clarity_of_explanation"],
+    "questions": [
+      {"id": "q1", "text": "Explain how a hash map works, and what happens when two keys collide.", "competencies": ["technical_depth", "accuracy"], "priority": 1, "probe_hints": ["resizing", "own example"]},
+      {"id": "q2", "text": "Say a web page you built loads slowly. How would you find out why?", "competencies": ["reasoning", "technical_depth"], "priority": 2, "probe_hints": ["measure first", "numbers"]},
+      {"id": "q3", "text": "For a small messaging app project, would you choose SQL or NoSQL, and why?", "competencies": ["trade_offs", "reasoning"], "priority": 3, "probe_hints": ["when to switch"]},
+      {"id": "q4", "text": "Explain the difference between a process and a thread.", "competencies": ["accuracy", "clarity_of_explanation"], "priority": 4, "probe_hints": []},
+      {"id": "q5", "text": "What happens when you type a URL into a browser?", "competencies": ["clarity_of_explanation", "technical_depth"], "priority": 5, "probe_hints": []},
+      {"id": "q6", "text": "When would you use a cache, and what can go wrong?", "competencies": ["trade_offs", "accuracy"], "priority": 6, "probe_hints": []}
+    ],
+    "probe_areas": ["No full-time experience yet", "Depth beyond course material"],
+    "persona": {"tone": "warm and encouraging", "pushback_style": "gentle follow-up questions", "closing_style": "thanks and clear next steps"},
+    "max_probes_per_question": 2,
+    "curveball": null
+  },
+  "turns": [
+    {"speaker": "interviewer", "phase": "intro", "text": "Hi Dara, welcome. I'm Jonas, a backend engineer. This is a thirty minute technical conversation, with spoken questions only and no coding.", "start_ms": 0, "end_ms": 8800},
+    {"speaker": "candidate", "phase": "intro", "text": "Hi Jonas, thanks. I'm happy to be here.", "start_ms": 9600, "end_ms": 12800},
+    {"speaker": "interviewer", "phase": "small_talk", "text": "What are you working on at school right now?", "start_ms": 13300, "end_ms": 16900},
+    {"speaker": "candidate", "phase": "small_talk", "text": "My senior project, a shared grocery list app, and I teach assistant for the data structures course.", "start_ms": 17800, "end_ms": 24600},
+    {"speaker": "interviewer", "phase": "agenda", "text": "Good. I'll ask three or four questions about concepts and trade-offs, and then leave time for yours.", "start_ms": 25300, "end_ms": 32100},
+    {"speaker": "interviewer", "phase": "core", "text": "Explain how a hash map works, and what happens when two keys collide.", "start_ms": 32700, "end_ms": 37900, "question_ref": "q1"},
+    {"speaker": "candidate", "phase": "core", "text": "A hash map runs the key through a hash function to get an index into an array of buckets. When two keys land in the same bucket, there are two common fixes: chaining, where each bucket holds a small list, and open addressing, where you probe for the next free slot. In my teaching assistant work I built a chained map in Java for a lab and measured it. At a load factor of 0.75, lookups averaged about 1.3 comparisons. At a load of 3.0 it was closer to 3.5, so the table has to resize.", "start_ms": 38700, "end_ms": 77100, "question_ref": "q1"},
+    {"speaker": "interviewer", "phase": "core", "text": "How does resizing work, and what does it cost?", "start_ms": 77600, "end_ms": 81200, "question_ref": "q1"},
+    {"speaker": "candidate", "phase": "core", "text": "When the load factor passes a limit, usually 0.75, I allocate an array twice as big and rehash every key, because the index depends on the array size. One resize costs O of n, but doubling keeps the average cost per insert at O of 1, which people call amortized. In my lab, inserting one million keys with doubling took about 180 milliseconds. With a fixed 1000 buckets it took over 40 seconds. The trade-off is memory, since the table can be half empty.", "start_ms": 82100, "end_ms": 115700, "question_ref": "q1"},
+    {"speaker": "interviewer", "phase": "core", "text": "Say a web page you built loads slowly. How would you find out why?", "start_ms": 116400, "end_ms": 122000, "question_ref": "q2"},
+    {"speaker": "candidate", "phase": "core", "text": "I would measure before changing anything. First I open the browser network tab and see whether the time goes to the server response, to large files, or to scripts. On my group project, the product page took 4.2 seconds. The waterfall showed one 2.8 megabyte image and a database query that ran 60 times, once per item. I compressed the image to 240 kilobytes and fetched all items with one query. Load time dropped to 1.1 seconds. I measured three times, because one run can mislead you.", "start_ms": 122600, "end_ms": 157400, "question_ref": "q2"},
+    {"speaker": "interviewer", "phase": "core", "text": "For a small messaging app project, would you choose SQL or NoSQL, and why?", "start_ms": 158200, "end_ms": 163800, "question_ref": "q3"},
+    {"speaker": "candidate", "phase": "core", "text": "For a small app I would pick SQL, specifically Postgres. Messages have clear relations between users, conversations and messages, and I want joins and transactions. In my senior project I first used a document store and had to copy the user name into every message. When a user changed their name, I had to update thousands of documents. In Postgres it became one row. I would reconsider if writes grew to many thousands of messages a second, since then sharding matters more.", "start_ms": 164300, "end_ms": 197100, "question_ref": "q3"},
+    {"speaker": "interviewer", "phase": "core", "text": "What would make you switch away from SQL?", "start_ms": 198000, "end_ms": 201200, "question_ref": "q3"},
+    {"speaker": "candidate", "phase": "core", "text": "Mainly scale and the shape of the data. If one machine could not handle the writes, even with read replicas and partitioning, I would look at a store built to spread data across machines, like a wide column store. I would also switch if messages had no fixed fields. But I would try partitioning by conversation id first, because moving data stores costs weeks, and I have no evidence yet that we need it.", "start_ms": 201900, "end_ms": 231500, "question_ref": "q3"},
+    {"speaker": "interviewer", "phase": "candidate_questions", "text": "Thanks. What questions do you have for me?", "start_ms": 232100, "end_ms": 235300},
+    {"speaker": "candidate", "phase": "candidate_questions", "text": "What does a new engineer's first month of code review look like on your team?", "start_ms": 236100, "end_ms": 242100},
+    {"speaker": "interviewer", "phase": "candidate_questions", "text": "Every change gets one reviewer in the first month, and a mentor walks through the feedback in a short weekly session.", "start_ms": 242600, "end_ms": 251000},
+    {"speaker": "interviewer", "phase": "wrap_up", "text": "That's our time. Thanks Dara, the recruiter will contact you within a week.", "start_ms": 251900, "end_ms": 257100},
+    {"speaker": "candidate", "phase": "wrap_up", "text": "Thank you, Jonas. I enjoyed it.", "start_ms": 257800, "end_ms": 260200}
+  ],
+  "vague_answers": [],
+  "notes": "Strong for new grad: precise, own examples from a lab and a project, numbers and trade-offs in each answer."
+}

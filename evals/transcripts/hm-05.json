@@ -1,0 +1,296 @@
+{
+  "id": "hm-05",
+  "title": "Hiring manager, senior software engineer, strong answers, tough",
+  "role_family": "swe",
+  "candidate_name": "Joaquin Ferreira-Stone",
+  "quality": "strong",
+  "brief": {
+    "session": {
+      "interview_type": "hiring_manager",
+      "difficulty": "tough",
+      "mode": "realistic",
+      "duration_min": 45,
+      "level": "senior"
+    },
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": [
+      "role_fit",
+      "depth_of_experience",
+      "judgment",
+      "motivation",
+      "team_fit",
+      "scope_at_level"
+    ],
+    "questions": [
+      {
+        "id": "q1",
+        "text": "Tell me about the largest cross-team system you led.",
+        "competencies": [
+          "scope_at_level",
+          "depth_of_experience"
+        ],
+        "priority": 1,
+        "probe_hints": [
+          "your role",
+          "result",
+          "disagreements"
+        ]
+      },
+      {
+        "id": "q2",
+        "text": "Tell me about a technical call where you went against the team's first instinct.",
+        "competencies": [
+          "judgment",
+          "depth_of_experience"
+        ],
+        "priority": 2,
+        "probe_hints": [
+          "trade-off",
+          "what you gave up"
+        ]
+      },
+      {
+        "id": "q3",
+        "text": "Why this role, and why leave the senior role you hold now?",
+        "competencies": [
+          "motivation",
+          "role_fit"
+        ],
+        "priority": 3,
+        "probe_hints": []
+      },
+      {
+        "id": "q4",
+        "text": "How do you grow other engineers?",
+        "competencies": [
+          "team_fit",
+          "scope_at_level"
+        ],
+        "priority": 4,
+        "probe_hints": [
+          "a named example",
+          "result"
+        ]
+      },
+      {
+        "id": "q5",
+        "text": "How do you handle an underperforming peer?",
+        "competencies": [
+          "team_fit",
+          "judgment"
+        ],
+        "priority": 5,
+        "probe_hints": []
+      },
+      {
+        "id": "q6",
+        "text": "What would you do in your first 90 days?",
+        "competencies": [
+          "role_fit",
+          "scope_at_level"
+        ],
+        "priority": 6,
+        "probe_hints": []
+      }
+    ],
+    "probe_areas": [
+      "Cross-team disagreements",
+      "How trade-offs are justified"
+    ],
+    "persona": {
+      "tone": "direct and challenging",
+      "pushback_style": "asks why not the simpler or the bigger option",
+      "closing_style": "short and professional"
+    },
+    "max_probes_per_question": 3,
+    "curveball": "Midway through, say a key dependency team will miss its date by six weeks and ask how the candidate would re-plan."
+  },
+  "turns": [
+    {
+      "speaker": "interviewer",
+      "phase": "intro",
+      "text": "Hi Joaquin, thanks for joining. I'm Marguerite, director of engineering for the platform group. We have forty five minutes, and I'll push on your answers a bit.",
+      "start_ms": 0,
+      "end_ms": 10800
+    },
+    {
+      "speaker": "candidate",
+      "phase": "intro",
+      "text": "Hi Marguerite, thank you. That is fine with me.",
+      "start_ms": 11550,
+      "end_ms": 15150
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "small_talk",
+      "text": "I saw you were at a conference last month. Was it useful?",
+      "start_ms": 15650,
+      "end_ms": 20450
+    },
+    {
+      "speaker": "candidate",
+      "phase": "small_talk",
+      "text": "Yes, one talk on event streaming was very good. I came back with a few ideas for my team.",
+      "start_ms": 21350,
+      "end_ms": 28950
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "agenda",
+      "text": "I'll ask about your largest projects and how you lead. I'll leave time at the end for your questions.",
+      "start_ms": 29600,
+      "end_ms": 37200
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about the largest cross-team system you led.",
+      "start_ms": 38000,
+      "end_ms": 41600,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "At Marrow Commerce I led the move of our order pipeline from a monolith to event streaming across four teams. I wrote the migration plan, chaired a weekly sync with the four tech leads, and took the on-call risk for the cutover. We moved in three phases over seven months with no customer-facing outage. Order latency at the 95th percentile dropped from 2.4 seconds to 600 milliseconds, and incident pages for that pipeline fell by about 70 percent.",
+      "start_ms": 42300,
+      "end_ms": 73500,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "What was the hardest disagreement between the four teams?",
+      "start_ms": 74100,
+      "end_ms": 77700,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "The billing team wanted exactly-once delivery, which would have added about three months. I argued for at-least-once with idempotent consumers. I built a small prototype in a week and showed it handled replays with no duplicate charges in 10 thousand test events. Billing agreed, and I wrote the idempotency rules into a shared guide that two other teams reused.",
+      "start_ms": 78450,
+      "end_ms": 102050,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a technical call where you went against the team's first instinct.",
+      "start_ms": 102550,
+      "end_ms": 108150,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Our team wanted to rewrite the search service in a new language to fix slow queries. I profiled it first and found 80 percent of the time was one badly indexed query and a cache that never warmed. I proposed a two week fix instead of a six month rewrite. I owned the fix, and median query time fell from 900 to 210 milliseconds. I did note that the rewrite might still pay off if traffic triples.",
+      "start_ms": 109050,
+      "end_ms": 139850,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Why not do the rewrite anyway while you had the momentum?",
+      "start_ms": 140500,
+      "end_ms": 144900,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Because a rewrite stops feature work for two quarters, and the team had committed to three launches. The fix gave us most of the benefit at about 5 percent of the cost. I also set an alert at twice the current traffic, so the question comes back with data, not opinion.",
+      "start_ms": 145700,
+      "end_ms": 166100,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "What did the team say when you changed the plan?",
+      "start_ms": 166800,
+      "end_ms": 170800,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Two engineers were disappointed, since they wanted the rewrite. I gave one of them the profiling work as a lead task and let her present the results. That turned a loss into ownership, and she later led the cache redesign.",
+      "start_ms": 171400,
+      "end_ms": 187400,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "How do you grow other engineers?",
+      "start_ms": 188150,
+      "end_ms": 190550,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I mentor three engineers at different levels. Last year I gave a mid-level engineer ownership of a service migration, and I reviewed her design docs weekly, not her code. I stepped back from the doc reviews after two months. She was promoted in the next cycle, and the migration finished two weeks early. For juniors, I pair on the first three tasks and then stop.",
+      "start_ms": 191050,
+      "end_ms": 217050,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Say a dependency team just told you they will miss their date by six weeks. How do you re-plan?",
+      "start_ms": 217950,
+      "end_ms": 225550,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "First I would find out what exactly is late and what we can build against a stub. Then I would split our plan into work that does not need it, which is usually 60 percent or more, and move that forward. I would tell product the new risk date today and offer two options, a smaller launch or a delay, with the cost of each. I would also offer the other team an engineer for a week if that gets them done sooner.",
+      "start_ms": 226200,
+      "end_ms": 259400,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Thank you. What questions do you have for me?",
+      "start_ms": 260200,
+      "end_ms": 263800
+    },
+    {
+      "speaker": "candidate",
+      "phase": "candidate_questions",
+      "text": "What is the biggest technical risk the team faces this year?",
+      "start_ms": 264500,
+      "end_ms": 268900
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Our oldest data store runs near capacity. Moving it without downtime is the main risk, and we want a tech lead to own the plan.",
+      "start_ms": 269500,
+      "end_ms": 279500
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "wrap_up",
+      "text": "That is all the time we have. Thanks Joaquin, we will be in touch within a week.",
+      "start_ms": 280250,
+      "end_ms": 287050
+    },
+    {
+      "speaker": "candidate",
+      "phase": "wrap_up",
+      "text": "Thank you, Marguerite. I enjoyed the conversation.",
+      "start_ms": 287550,
+      "end_ms": 290350
+    }
+  ],
+  "vague_answers": [],
+  "notes": "Strong for senior: cross-team scope, numbers, trade-offs and mentoring. Handles pushback and the curveball."
+}

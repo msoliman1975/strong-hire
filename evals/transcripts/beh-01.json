@@ -1,0 +1,54 @@
+{
+  "id": "beh-01",
+  "title": "Behavioral, new grad software engineer, strong answers",
+  "role_family": "swe",
+  "candidate_name": "Lena Okafor-Brandt",
+  "quality": "strong",
+  "brief": {
+    "session": {
+      "interview_type": "behavioral",
+      "difficulty": "friendly",
+      "mode": "realistic",
+      "duration_min": 30,
+      "level": "new_grad"
+    },
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": ["ownership", "impact", "collaboration", "learning_from_failure", "communication"],
+    "questions": [
+      {"id": "q1", "text": "Tell me about a project you owned from start to finish.", "competencies": ["ownership", "impact"], "priority": 1, "probe_hints": ["own role", "result"]},
+      {"id": "q2", "text": "Tell me about a time you worked closely with someone who had a different working style.", "competencies": ["collaboration", "communication"], "priority": 2, "probe_hints": ["what you changed"]},
+      {"id": "q3", "text": "Tell me about something that did not go to plan and what you learned.", "competencies": ["learning_from_failure", "ownership"], "priority": 3, "probe_hints": ["what changed after"]},
+      {"id": "q4", "text": "Tell me about a disagreement in a team project.", "competencies": ["conflict_handling", "collaboration"], "priority": 4, "probe_hints": []},
+      {"id": "q5", "text": "Tell me about a time you explained something technical to a non-technical person.", "competencies": ["communication"], "priority": 5, "probe_hints": []},
+      {"id": "q6", "text": "Tell me about work you did that had a measurable effect on users.", "competencies": ["impact"], "priority": 6, "probe_hints": []}
+    ],
+    "probe_areas": ["No full-time work experience yet", "Team size on internship projects"],
+    "persona": {"tone": "warm and encouraging", "pushback_style": "gentle clarifying questions", "closing_style": "thanks and clear next steps"},
+    "max_probes_per_question": 2,
+    "curveball": null
+  },
+  "turns": [
+    {"speaker": "interviewer", "phase": "intro", "text": "Hi Lena, thanks for joining. I'm Sam, an engineer on the platform team. This is a thirty minute behavioral conversation.", "start_ms": 0, "end_ms": 7000},
+    {"speaker": "candidate", "phase": "intro", "text": "Hi Sam, thanks for having me. I'm looking forward to it.", "start_ms": 7600, "end_ms": 10400},
+    {"speaker": "interviewer", "phase": "small_talk", "text": "How has your final semester been so far?", "start_ms": 11000, "end_ms": 13200},
+    {"speaker": "candidate", "phase": "small_talk", "text": "Busy but good. I'm finishing my capstone and teaching assistant work for the databases course.", "start_ms": 13800, "end_ms": 18800},
+    {"speaker": "interviewer", "phase": "agenda", "text": "Great. I'll ask about three or four past experiences, then leave time for your questions at the end.", "start_ms": 19400, "end_ms": 24800},
+    {"speaker": "interviewer", "phase": "core", "text": "Tell me about a project you owned from start to finish.", "start_ms": 25400, "end_ms": 28400, "question_ref": "q1"},
+    {"speaker": "candidate", "phase": "core", "text": "During my internship at Fernhill Payments I owned a tool that flagged duplicate refund requests. Support agents were catching duplicates by hand, about 40 a week. I wrote the design doc, got feedback from two senior engineers, built the matching job in Python, and added a review screen. I chose a simple rule on amount, card and a 48 hour window instead of a model, because we had no labeled data. After launch it caught 92 percent of duplicates in the first month and saved the support team about 6 hours a week.", "start_ms": 29000, "end_ms": 58000, "question_ref": "q1"},
+    {"speaker": "interviewer", "phase": "core", "text": "What would you change if you built it again?", "start_ms": 58600, "end_ms": 61000, "question_ref": "q1"},
+    {"speaker": "candidate", "phase": "core", "text": "I would talk to the agents earlier. I only met them in week three, and they told me partial refunds also counted as duplicates. That cost me a week of rework. Now I set up a user conversation in the first few days of any project.", "start_ms": 61600, "end_ms": 75000, "question_ref": "q1"},
+    {"speaker": "interviewer", "phase": "core", "text": "Tell me about a time you worked closely with someone who had a different working style.", "start_ms": 75600, "end_ms": 80600, "question_ref": "q2"},
+    {"speaker": "candidate", "phase": "core", "text": "In my capstone, my partner liked to plan everything up front and I like to prototype. Early on we argued about whether to write the full API spec first. I suggested we each try our way for one day on separate endpoints and compare. His spec caught two naming problems my prototype missed, and my prototype found a slow query his spec did not. We agreed on a short spec plus a spike for anything risky, and we shipped all six milestones on time.", "start_ms": 81200, "end_ms": 108000, "question_ref": "q2"},
+    {"speaker": "interviewer", "phase": "core", "text": "Tell me about something that did not go to plan and what you learned.", "start_ms": 108600, "end_ms": 112000, "question_ref": "q3"},
+    {"speaker": "candidate", "phase": "core", "text": "As a teaching assistant I wrote an autograder for a SQL assignment. I tested it only on my own solutions, and on the due date it failed 30 students whose queries were correct but ordered rows differently. I owned it in the course forum the same night, regraded everything by hand with one other assistant, and fixed the grader to compare sorted results. Since then I collect three or four real student answers before I trust any grader.", "start_ms": 112600, "end_ms": 138000, "question_ref": "q3"},
+    {"speaker": "interviewer", "phase": "candidate_questions", "text": "Thanks. What questions do you have for me?", "start_ms": 138600, "end_ms": 141000},
+    {"speaker": "candidate", "phase": "candidate_questions", "text": "How do new graduates get their first project on your team?", "start_ms": 141600, "end_ms": 144800},
+    {"speaker": "interviewer", "phase": "candidate_questions", "text": "Each new engineer gets a small, real project with a mentor in the first month, usually something that ships in four to six weeks.", "start_ms": 145400, "end_ms": 152000},
+    {"speaker": "interviewer", "phase": "wrap_up", "text": "That's all the time we have. Thanks Lena, the recruiter will follow up within a week.", "start_ms": 152600, "end_ms": 157000},
+    {"speaker": "candidate", "phase": "wrap_up", "text": "Thank you, Sam. This was a good conversation.", "start_ms": 157600, "end_ms": 160000}
+  ],
+  "vague_answers": [],
+  "notes": "Strong for new grad: own role, numbers and a trade-off in each answer."
+}

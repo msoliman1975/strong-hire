@@ -1,0 +1,300 @@
+{
+  "id": "case-06",
+  "title": "Case, senior product manager, weak answers",
+  "role_family": "pm",
+  "candidate_name": "Gwen Ostrander",
+  "quality": "weak",
+  "brief": {
+    "session": {
+      "interview_type": "case",
+      "difficulty": "realistic",
+      "mode": "realistic",
+      "duration_min": 30,
+      "level": "senior"
+    },
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": [
+      "problem_framing",
+      "structure",
+      "user_and_business_sense",
+      "estimation_logic",
+      "prioritization",
+      "recommendation"
+    ],
+    "questions": [
+      {
+        "id": "q1",
+        "text": "GatePass sells event tickets. Ticket volume grew 20 percent this year, but fee revenue is flat. Leadership wants a plan. How do you start?",
+        "competencies": [
+          "problem_framing",
+          "user_and_business_sense"
+        ],
+        "priority": 1,
+        "probe_hints": [
+          "what data",
+          "segments"
+        ]
+      },
+      {
+        "id": "q2",
+        "text": "Finance suggests raising fees, product suggests parking add-ons, and sales suggests more venues. You have one team this half. How do you choose?",
+        "competencies": [
+          "prioritization",
+          "structure"
+        ],
+        "priority": 2,
+        "probe_hints": [
+          "criteria",
+          "cross-team"
+        ]
+      },
+      {
+        "id": "q3",
+        "text": "Estimate the yearly fee revenue GatePass could earn from parking add-ons in one large city.",
+        "competencies": [
+          "estimation_logic",
+          "recommendation"
+        ],
+        "priority": 3,
+        "probe_hints": [
+          "assumptions"
+        ]
+      },
+      {
+        "id": "q4",
+        "text": "How would you measure whether a fee change hurt customer trust?",
+        "competencies": [
+          "user_and_business_sense",
+          "structure"
+        ],
+        "priority": 4,
+        "probe_hints": []
+      },
+      {
+        "id": "q5",
+        "text": "A large venue threatens to leave over fees. What do you do?",
+        "competencies": [
+          "prioritization",
+          "recommendation"
+        ],
+        "priority": 5,
+        "probe_hints": []
+      },
+      {
+        "id": "q6",
+        "text": "How would you set the goal for GatePass next year?",
+        "competencies": [
+          "problem_framing",
+          "prioritization"
+        ],
+        "priority": 6,
+        "probe_hints": []
+      }
+    ],
+    "probe_areas": [
+      "Senior scope",
+      "Business trade-offs"
+    ],
+    "persona": {
+      "tone": "neutral and professional",
+      "pushback_style": "asks for numbers",
+      "closing_style": "brief thanks and next steps"
+    },
+    "max_probes_per_question": 2,
+    "curveball": null
+  },
+  "turns": [
+    {
+      "speaker": "interviewer",
+      "phase": "intro",
+      "text": "Hi Gwen, I'm Peter, a director of product. This is a thirty minute case interview, spoken only.",
+      "start_ms": 0,
+      "end_ms": 6800
+    },
+    {
+      "speaker": "candidate",
+      "phase": "intro",
+      "text": "Hi Peter, thanks for having me.",
+      "start_ms": 7600,
+      "end_ms": 10000
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "small_talk",
+      "text": "How has your week been?",
+      "start_ms": 10700,
+      "end_ms": 12700
+    },
+    {
+      "speaker": "candidate",
+      "phase": "small_talk",
+      "text": "Fine, a bit tiring. I have had many meetings.",
+      "start_ms": 13600,
+      "end_ms": 17200
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "agenda",
+      "text": "I will ask three cases. They are open, so use your own judgment, and ask questions if you need more context.",
+      "start_ms": 17700,
+      "end_ms": 26100
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "GatePass sells event tickets. Ticket volume grew 20 percent this year, but fee revenue is flat. Leadership wants a plan. How do you start?",
+      "start_ms": 26700,
+      "end_ms": 36300,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I would look at the fees. Maybe the fees are too low. We could raise them a little and then revenue goes up.",
+      "start_ms": 37100,
+      "end_ms": 46300,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Volume grew 20 percent. What could explain flat revenue?",
+      "start_ms": 47000,
+      "end_ms": 50600,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Maybe people are buying cheaper tickets. Or there are more discounts. I am not sure. I would ask the data team.",
+      "start_ms": 51500,
+      "end_ms": 59900,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "What would you ask the data team for first?",
+      "start_ms": 60400,
+      "end_ms": 64000,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I would ask for revenue per ticket by price band and by event type. Then I can see whether cheap events are growing faster than big ones.",
+      "start_ms": 64600,
+      "end_ms": 75400,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Finance suggests raising fees, product suggests parking add-ons, and sales suggests more venues. You have one team this half. How do you choose?",
+      "start_ms": 76200,
+      "end_ms": 85400,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I think all three are good. Raising fees is fast. Add-ons are good for customers. More venues is also growth. I would try to do all of them over time.",
+      "start_ms": 86100,
+      "end_ms": 98100,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "You only have one team this half. Which one first?",
+      "start_ms": 99000,
+      "end_ms": 103000,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Add-ons first, because customers get something and not only a higher price. Fees can upset customers and make them leave. Venues take a long time.",
+      "start_ms": 103500,
+      "end_ms": 113500,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Estimate the yearly fee revenue GatePass could earn from parking add-ons in one large city.",
+      "start_ms": 114100,
+      "end_ms": 120100,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "A large city has many events. Many people drive, so many would buy parking. If parking costs some money, the revenue would be big.",
+      "start_ms": 120900,
+      "end_ms": 130500,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Can you put numbers on that?",
+      "start_ms": 131200,
+      "end_ms": 133600,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Maybe a million tickets. Maybe a lot buy parking. So the revenue is a few million dollars, I guess.",
+      "start_ms": 134500,
+      "end_ms": 142100,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Thanks. What questions do you have for me?",
+      "start_ms": 142600,
+      "end_ms": 145800
+    },
+    {
+      "speaker": "candidate",
+      "phase": "candidate_questions",
+      "text": "What are the main goals for the product team this year?",
+      "start_ms": 146400,
+      "end_ms": 150800
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Grow revenue per ticket and keep the customer trust score above its current level.",
+      "start_ms": 151600,
+      "end_ms": 157200
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "wrap_up",
+      "text": "That is our time, Gwen. The recruiter will follow up within a week.",
+      "start_ms": 157900,
+      "end_ms": 163100
+    },
+    {
+      "speaker": "candidate",
+      "phase": "wrap_up",
+      "text": "Thank you, Peter.",
+      "start_ms": 164000,
+      "end_ms": 165200
+    }
+  ],
+  "vague_answers": [
+    6,
+    8,
+    12,
+    16,
+    18
+  ],
+  "notes": "Weak for senior: generic answers, no structure, no numbers in the estimate, no ranked recommendation."
+}

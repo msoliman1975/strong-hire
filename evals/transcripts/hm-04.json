@@ -1,0 +1,298 @@
+{
+  "id": "hm-04",
+  "title": "Hiring manager, mid product manager, weak answers, tough",
+  "role_family": "pm",
+  "candidate_name": "Marcus Delgado-Reyes",
+  "quality": "weak",
+  "brief": {
+    "session": {
+      "interview_type": "hiring_manager",
+      "difficulty": "tough",
+      "mode": "realistic",
+      "duration_min": 30,
+      "level": "mid"
+    },
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": [
+      "role_fit",
+      "depth_of_experience",
+      "judgment",
+      "motivation",
+      "team_fit",
+      "scope_at_level"
+    ],
+    "questions": [
+      {
+        "id": "q1",
+        "text": "Walk me through a product you owned and the results.",
+        "competencies": [
+          "depth_of_experience",
+          "scope_at_level"
+        ],
+        "priority": 1,
+        "probe_hints": [
+          "own role",
+          "metrics",
+          "why those features"
+        ]
+      },
+      {
+        "id": "q2",
+        "text": "Tell me about a hard prioritization call you made.",
+        "competencies": [
+          "judgment",
+          "role_fit"
+        ],
+        "priority": 2,
+        "probe_hints": [
+          "real case",
+          "what you cut"
+        ]
+      },
+      {
+        "id": "q3",
+        "text": "Why do you want this role?",
+        "competencies": [
+          "motivation",
+          "role_fit"
+        ],
+        "priority": 3,
+        "probe_hints": [
+          "knowledge of the product"
+        ]
+      },
+      {
+        "id": "q4",
+        "text": "How do you work with engineering?",
+        "competencies": [
+          "team_fit"
+        ],
+        "priority": 4,
+        "probe_hints": []
+      },
+      {
+        "id": "q5",
+        "text": "Tell me about a product decision that turned out wrong.",
+        "competencies": [
+          "judgment"
+        ],
+        "priority": 5,
+        "probe_hints": []
+      },
+      {
+        "id": "q6",
+        "text": "What is the widest scope you have owned beyond one team?",
+        "competencies": [
+          "scope_at_level"
+        ],
+        "priority": 6,
+        "probe_hints": []
+      }
+    ],
+    "probe_areas": [
+      "No metrics given",
+      "Preparation for this role"
+    ],
+    "persona": {
+      "tone": "brisk and skeptical",
+      "pushback_style": "challenges choices and asks for the simpler option",
+      "closing_style": "short and neutral"
+    },
+    "max_probes_per_question": 3,
+    "curveball": "Midway through, say the budget was cut by 30 percent and ask which part of the earlier project the candidate would drop."
+  },
+  "turns": [
+    {
+      "speaker": "interviewer",
+      "phase": "intro",
+      "text": "Hello Marcus, thanks for coming. I'm Karen, VP of product for the business tools group. We have thirty minutes and I will ask direct questions.",
+      "start_ms": 0,
+      "end_ms": 10000
+    },
+    {
+      "speaker": "candidate",
+      "phase": "intro",
+      "text": "Hi Karen, thank you. Sounds good.",
+      "start_ms": 10750,
+      "end_ms": 13150
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "small_talk",
+      "text": "How was your trip in this morning?",
+      "start_ms": 13650,
+      "end_ms": 16450
+    },
+    {
+      "speaker": "candidate",
+      "phase": "small_talk",
+      "text": "It was fine. A bit of traffic but nothing bad.",
+      "start_ms": 17350,
+      "end_ms": 21350
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "agenda",
+      "text": "I'll cover two or three areas of your experience. Expect follow-up questions, and I will keep a few minutes for yours.",
+      "start_ms": 22000,
+      "end_ms": 30400
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Walk me through a product you owned and the results.",
+      "start_ms": 31200,
+      "end_ms": 35200,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I was the PM for the customer portal at my last company. We wanted to make it better for users, so we added some features and improved the design. It went pretty well and customers were happy.",
+      "start_ms": 35900,
+      "end_ms": 50700,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "What was your own role, and what did customers do differently afterward?",
+      "start_ms": 51300,
+      "end_ms": 56100,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I worked with the team to gather requirements and talked to stakeholders. Customers seemed to like it more. I don't have the exact numbers on hand.",
+      "start_ms": 56850,
+      "end_ms": 67250,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Why did you build new features instead of the simpler option, fixing the existing pages first?",
+      "start_ms": 67750,
+      "end_ms": 74150,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Honestly the portal pages were slow, and I should have fixed those first. I chose the features because my manager wanted visible work. That was my call and I would do it differently now.",
+      "start_ms": 75050,
+      "end_ms": 88650,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a hard prioritization call you made.",
+      "start_ms": 89300,
+      "end_ms": 92900,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I usually think about what is most important to users and the business. Then I talk to the team and we agree on the order. It depends on the situation.",
+      "start_ms": 93700,
+      "end_ms": 105700,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Say your budget was just cut by 30 percent. Which part of that portal project would you drop?",
+      "start_ms": 106400,
+      "end_ms": 113600,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I would drop the notifications, because only a few customers asked for them. I would keep the dashboard, since my manager needed it for a demo. I would tell the stakeholders myself.",
+      "start_ms": 114200,
+      "end_ms": 127000,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Why do you want this role?",
+      "start_ms": 127750,
+      "end_ms": 130150,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "It looks like a great opportunity and I want to grow my career. Your company seems like a good place to work.",
+      "start_ms": 130650,
+      "end_ms": 139450,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "What about this product area interests you?",
+      "start_ms": 140350,
+      "end_ms": 143150,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I like building products people use. I haven't looked into the details of your product yet, but I'm sure it is interesting.",
+      "start_ms": 143800,
+      "end_ms": 152600,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Do you have any questions for me?",
+      "start_ms": 153400,
+      "end_ms": 156200
+    },
+    {
+      "speaker": "candidate",
+      "phase": "candidate_questions",
+      "text": "What does the team look like?",
+      "start_ms": 156900,
+      "end_ms": 159300
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Six product managers, each paired with a design lead and an engineering lead, and each owning one product area.",
+      "start_ms": 159900,
+      "end_ms": 167500
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "wrap_up",
+      "text": "That is all the time we have. Thanks Marcus, the recruiter will follow up.",
+      "start_ms": 168250,
+      "end_ms": 173850
+    },
+    {
+      "speaker": "candidate",
+      "phase": "wrap_up",
+      "text": "Thank you, Karen.",
+      "start_ms": 174350,
+      "end_ms": 175550
+    }
+  ],
+  "vague_answers": [
+    6,
+    8,
+    12,
+    16,
+    18
+  ],
+  "notes": "Weak for mid: generic and no numbers. Pushback and the budget curveball each draw one concrete answer. The last answer is vague and not probed."
+}

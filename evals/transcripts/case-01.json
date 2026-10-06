@@ -1,0 +1,264 @@
+{
+  "id": "case-01",
+  "title": "Case, new grad product manager, average answers",
+  "role_family": "pm",
+  "candidate_name": "Tomas Reyes-Lindqvist",
+  "quality": "average",
+  "brief": {
+    "session": {
+      "interview_type": "case",
+      "difficulty": "friendly",
+      "mode": "realistic",
+      "duration_min": 30,
+      "level": "new_grad"
+    },
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": [
+      "problem_framing",
+      "structure",
+      "user_and_business_sense",
+      "estimation_logic",
+      "prioritization",
+      "recommendation"
+    ],
+    "questions": [
+      {
+        "id": "q1",
+        "text": "FreshCart is a grocery delivery app in one city. Fewer customers are ordering a second time. How would you think about that?",
+        "competencies": [
+          "problem_framing",
+          "user_and_business_sense"
+        ],
+        "priority": 1,
+        "probe_hints": [
+          "who leaves",
+          "what data"
+        ]
+      },
+      {
+        "id": "q2",
+        "text": "Estimate how many orders FreshCart handles in one day in a city of one million people.",
+        "competencies": [
+          "estimation_logic",
+          "structure"
+        ],
+        "priority": 2,
+        "probe_hints": [
+          "assumptions"
+        ]
+      },
+      {
+        "id": "q3",
+        "text": "You have three ideas: faster delivery slots, a loyalty program, and better substitutions when items are out. Which would you do first?",
+        "competencies": [
+          "prioritization",
+          "recommendation"
+        ],
+        "priority": 3,
+        "probe_hints": [
+          "why this one"
+        ]
+      },
+      {
+        "id": "q4",
+        "text": "Who is the main user of a school lunch ordering app?",
+        "competencies": [
+          "user_and_business_sense",
+          "problem_framing"
+        ],
+        "priority": 4,
+        "probe_hints": []
+      },
+      {
+        "id": "q5",
+        "text": "How would you decide whether to launch FreshCart in a second city?",
+        "competencies": [
+          "structure",
+          "recommendation"
+        ],
+        "priority": 5,
+        "probe_hints": []
+      },
+      {
+        "id": "q6",
+        "text": "Estimate how many delivery drivers FreshCart needs at the evening peak.",
+        "competencies": [
+          "estimation_logic"
+        ],
+        "priority": 6,
+        "probe_hints": []
+      }
+    ],
+    "probe_areas": [
+      "No work experience in product yet",
+      "Comfort with rough numbers"
+    ],
+    "persona": {
+      "tone": "warm and encouraging",
+      "pushback_style": "gentle clarifying questions",
+      "closing_style": "thanks and clear next steps"
+    },
+    "max_probes_per_question": 2,
+    "curveball": null
+  },
+  "turns": [
+    {
+      "speaker": "interviewer",
+      "phase": "intro",
+      "text": "Hi Tomas, I'm Dana, a product manager here. This is a thirty minute product case conversation, and we will talk out loud.",
+      "start_ms": 0,
+      "end_ms": 8800
+    },
+    {
+      "speaker": "candidate",
+      "phase": "intro",
+      "text": "Hi Dana, nice to meet you. Thanks for the time.",
+      "start_ms": 9600,
+      "end_ms": 13600
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "small_talk",
+      "text": "How is your week going?",
+      "start_ms": 14300,
+      "end_ms": 16300
+    },
+    {
+      "speaker": "candidate",
+      "phase": "small_talk",
+      "text": "Pretty good. I am finishing my last exams, so it is busy.",
+      "start_ms": 17200,
+      "end_ms": 22000
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "agenda",
+      "text": "Okay. I will give you two or three product questions. There is no single right answer, so think out loud and ask me anything.",
+      "start_ms": 22500,
+      "end_ms": 32100
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "FreshCart is a grocery delivery app in one city. Fewer customers are ordering a second time. How would you think about that?",
+      "start_ms": 32700,
+      "end_ms": 41500,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I think the main problem is probably delivery time or prices. So I would make delivery faster and add discounts for second orders. Maybe also send push notifications to remind people. I would also improve the app design so it feels nicer to use.",
+      "start_ms": 42300,
+      "end_ms": 59900,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Before ideas, what would you want to know about the people who do not come back?",
+      "start_ms": 60600,
+      "end_ms": 67000,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Okay. I would ask who they are, new customers or older ones, and when they stop. If most people leave after a late delivery, then speed matters. If they leave after missing items, then it is about stock. I would look at the data for the last three months first.",
+      "start_ms": 67900,
+      "end_ms": 87900,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Next, an estimate. How many orders does FreshCart handle in one day in a city of one million people?",
+      "start_ms": 88400,
+      "end_ms": 96000,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I think it is maybe fifty thousand orders a day. A big city has many people and they order groceries often. So it should be quite a lot, but I am not sure about the exact number.",
+      "start_ms": 96600,
+      "end_ms": 111400,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "How did you get to that number?",
+      "start_ms": 112200,
+      "end_ms": 115000,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Let me try again. One million people, about three per household, so around 330 thousand households. If one in ten uses the app, that is 33 thousand households. Maybe each orders once a week, so around 5 thousand orders a day.",
+      "start_ms": 115700,
+      "end_ms": 132100,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "You have three ideas: faster delivery slots, a loyalty program, and better substitutions when items are out. Which would you do first?",
+      "start_ms": 133000,
+      "end_ms": 141800,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I think the loyalty program is good because people like rewards. Customers come back when they get points. But faster slots are also important. I would probably start with loyalty and then do the others later.",
+      "start_ms": 142300,
+      "end_ms": 156700,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Thanks, that is the end of the cases. What questions do you have for me?",
+      "start_ms": 157300,
+      "end_ms": 163300
+    },
+    {
+      "speaker": "candidate",
+      "phase": "candidate_questions",
+      "text": "How do product managers on your team use data in a normal week?",
+      "start_ms": 164100,
+      "end_ms": 169300
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Most of us look at a dashboard every Monday, then pick one question to study more deeply that week.",
+      "start_ms": 170000,
+      "end_ms": 177600
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "wrap_up",
+      "text": "That's all the time we have. Thanks Tomas, the recruiter will follow up within a week.",
+      "start_ms": 178500,
+      "end_ms": 184900
+    },
+    {
+      "speaker": "candidate",
+      "phase": "wrap_up",
+      "text": "Thank you, Dana. I enjoyed it.",
+      "start_ms": 185400,
+      "end_ms": 187800
+    }
+  ],
+  "vague_answers": [
+    6,
+    10,
+    14
+  ],
+  "notes": "Average for new grad: some structure after a probe, rough numbers, weak recommendation."
+}

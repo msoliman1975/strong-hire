@@ -1,0 +1,296 @@
+{
+  "id": "hm-07",
+  "title": "Hiring manager, senior data and ML, weak answers",
+  "role_family": "data_ml",
+  "candidate_name": "Dmitri Kowalczuk-Hale",
+  "quality": "weak",
+  "brief": {
+    "session": {
+      "interview_type": "hiring_manager",
+      "difficulty": "realistic",
+      "mode": "realistic",
+      "duration_min": 30,
+      "level": "senior"
+    },
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": [
+      "role_fit",
+      "depth_of_experience",
+      "judgment",
+      "scope_at_level",
+      "team_fit"
+    ],
+    "questions": [
+      {
+        "id": "q1",
+        "text": "Tell me about the most impactful model you owned end to end.",
+        "competencies": [
+          "depth_of_experience",
+          "scope_at_level"
+        ],
+        "priority": 1,
+        "probe_hints": [
+          "own role",
+          "measured result"
+        ]
+      },
+      {
+        "id": "q2",
+        "text": "How do you decide when a model is ready to ship?",
+        "competencies": [
+          "judgment",
+          "depth_of_experience"
+        ],
+        "priority": 2,
+        "probe_hints": [
+          "a real case"
+        ]
+      },
+      {
+        "id": "q3",
+        "text": "Why this role and why now?",
+        "competencies": [
+          "motivation",
+          "role_fit"
+        ],
+        "priority": 3,
+        "probe_hints": []
+      },
+      {
+        "id": "q4",
+        "text": "How have you mentored other people?",
+        "competencies": [
+          "scope_at_level",
+          "team_fit"
+        ],
+        "priority": 4,
+        "probe_hints": [
+          "a named example"
+        ]
+      },
+      {
+        "id": "q5",
+        "text": "How do you work with product managers?",
+        "competencies": [
+          "team_fit"
+        ],
+        "priority": 5,
+        "probe_hints": []
+      },
+      {
+        "id": "q6",
+        "text": "Tell me about a time you pushed back on a project.",
+        "competencies": [
+          "judgment"
+        ],
+        "priority": 6,
+        "probe_hints": []
+      }
+    ],
+    "probe_areas": [
+      "Measured results",
+      "Senior scope"
+    ],
+    "persona": {
+      "tone": "neutral and patient",
+      "pushback_style": "repeats the question with a narrower ask",
+      "closing_style": "thanks and next steps"
+    },
+    "max_probes_per_question": 2,
+    "curveball": null
+  },
+  "turns": [
+    {
+      "speaker": "interviewer",
+      "phase": "intro",
+      "text": "Hello Dmitri, thanks for joining. I'm Alma, a data science manager. This is a thirty minute conversation about your experience.",
+      "start_ms": 0,
+      "end_ms": 8000
+    },
+    {
+      "speaker": "candidate",
+      "phase": "intro",
+      "text": "Hello Alma, thank you.",
+      "start_ms": 8750,
+      "end_ms": 10350
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "small_talk",
+      "text": "How has your week been?",
+      "start_ms": 10850,
+      "end_ms": 12850
+    },
+    {
+      "speaker": "candidate",
+      "phase": "small_talk",
+      "text": "Busy, but good. Thanks for asking.",
+      "start_ms": 13750,
+      "end_ms": 16150
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "agenda",
+      "text": "I'll ask about a few of your projects and how you work, then leave a few minutes for your questions.",
+      "start_ms": 16800,
+      "end_ms": 24800
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about the most impactful model you owned end to end.",
+      "start_ms": 25600,
+      "end_ms": 30400,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I built a recommendation model at my last job. We used a standard approach and it improved things for the business. I worked on the data and the training.",
+      "start_ms": 31100,
+      "end_ms": 42700,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "What was the measured improvement?",
+      "start_ms": 43300,
+      "end_ms": 45300,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I don't remember the exact figure. It was an improvement in the main metric, I believe. The product team tracked it.",
+      "start_ms": 46050,
+      "end_ms": 54450,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "What did you own, and what did the team own?",
+      "start_ms": 54950,
+      "end_ms": 58950,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Mostly the team did the deployment. I helped where I could. I was senior on the project, so I guided people on the approach.",
+      "start_ms": 59850,
+      "end_ms": 69450,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "How do you decide when a model is ready to ship?",
+      "start_ms": 70100,
+      "end_ms": 74500,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "You look at the accuracy and make sure it is good enough. Then you check with the team and ship it. Monitoring after that is also important.",
+      "start_ms": 75300,
+      "end_ms": 86100,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "How did you decide in a specific case?",
+      "start_ms": 86800,
+      "end_ms": 90000,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "On the fraud project we compared the model with the old rules on last month's data. The model caught more cases, so I chose to ship it. I did not look closely at false positives, and that caused complaints later.",
+      "start_ms": 90600,
+      "end_ms": 106600,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "How have you mentored other people?",
+      "start_ms": 107350,
+      "end_ms": 109750,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I help junior people when they have questions. I do code reviews and sometimes pair with them. I think a senior person should be available to the team.",
+      "start_ms": 110250,
+      "end_ms": 121450,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about one person you helped grow.",
+      "start_ms": 122350,
+      "end_ms": 125550,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "A new analyst joined and did not know experiments. I walked her through one of ours, then let her run the next one while I reviewed. I wanted her to learn by doing.",
+      "start_ms": 126200,
+      "end_ms": 139400,
+      "question_ref": "q4"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "What questions do you have for me?",
+      "start_ms": 140200,
+      "end_ms": 143000
+    },
+    {
+      "speaker": "candidate",
+      "phase": "candidate_questions",
+      "text": "What tools does the team use?",
+      "start_ms": 143700,
+      "end_ms": 146100
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Mostly Python, a shared feature store and an in-house experiment platform.",
+      "start_ms": 146700,
+      "end_ms": 151100
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "wrap_up",
+      "text": "That is all the time we have. Thanks Dmitri, the recruiter will follow up.",
+      "start_ms": 151850,
+      "end_ms": 157450
+    },
+    {
+      "speaker": "candidate",
+      "phase": "wrap_up",
+      "text": "Thank you, Alma.",
+      "start_ms": 157950,
+      "end_ms": 159150
+    }
+  ],
+  "vague_answers": [
+    6,
+    8,
+    10,
+    12,
+    16
+  ],
+  "notes": "Weak for senior: generic, no numbers, unclear own role. The last probe on the project role does not get a concrete answer and the interviewer moves on."
+}

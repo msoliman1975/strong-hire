@@ -1,0 +1,52 @@
+{
+  "id": "tq-06",
+  "title": "Technical Q&A, senior data scientist, strong answers",
+  "role_family": "data_ml",
+  "candidate_name": "Ingrid Tavares-Mbeki",
+  "quality": "strong",
+  "brief": {
+    "session": {"interview_type": "technical_qa", "difficulty": "realistic", "mode": "realistic", "duration_min": 45, "level": "senior"},
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": ["technical_depth", "reasoning", "trade_offs", "accuracy", "clarity_of_explanation"],
+    "questions": [
+      {"id": "q1", "text": "How would you design an offline and online evaluation strategy for a ranking model?", "competencies": ["technical_depth", "reasoning"], "priority": 1, "probe_hints": ["disagreement between offline and online"]},
+      {"id": "q2", "text": "How do you decide between retraining on a schedule and retraining on drift triggers?", "competencies": ["trade_offs", "reasoning"], "priority": 2, "probe_hints": ["cost of stale predictions"]},
+      {"id": "q3", "text": "Explain why a model with higher AUC can still hurt the product metric.", "competencies": ["accuracy", "clarity_of_explanation"], "priority": 3, "probe_hints": []},
+      {"id": "q4", "text": "How would you cut serving cost for a large model without losing much quality?", "competencies": ["trade_offs", "technical_depth"], "priority": 4, "probe_hints": ["order of steps"]},
+      {"id": "q5", "text": "How would you explain the risk of label leakage to a junior engineer?", "competencies": ["clarity_of_explanation", "accuracy"], "priority": 5, "probe_hints": ["own mentoring"]},
+      {"id": "q6", "text": "How do you design a feature store for multiple teams?", "competencies": ["technical_depth", "trade_offs"], "priority": 6, "probe_hints": []}
+    ],
+    "probe_areas": ["Cross-team scope", "Mentoring on technical work"],
+    "persona": {"tone": "collegial and rigorous", "pushback_style": "asks how a claim was measured", "closing_style": "thanks and next steps"},
+    "max_probes_per_question": 3,
+    "curveball": null
+  },
+  "turns": [
+    {"speaker": "interviewer", "phase": "intro", "text": "Hi Ingrid, thanks for joining. I'm Owen, a principal machine learning engineer. This is a forty five minute technical conversation, with spoken questions and no coding.", "start_ms": 0, "end_ms": 10400},
+    {"speaker": "candidate", "phase": "intro", "text": "Hi Owen, thanks. I'm glad to be here.", "start_ms": 11200, "end_ms": 14400},
+    {"speaker": "interviewer", "phase": "small_talk", "text": "What does your day to day look like at the moment?", "start_ms": 14900, "end_ms": 19300},
+    {"speaker": "candidate", "phase": "small_talk", "text": "I lead a ranking team of five across two product areas, and I mentor three engineers on evaluation work.", "start_ms": 20200, "end_ms": 27800},
+    {"speaker": "interviewer", "phase": "agenda", "text": "Good. I'll ask about four questions on evaluation, retraining and cost, then leave time for yours.", "start_ms": 28500, "end_ms": 34900},
+    {"speaker": "interviewer", "phase": "core", "text": "How would you design an offline and online evaluation strategy for a ranking model?", "start_ms": 35500, "end_ms": 41100, "question_ref": "q1"},
+    {"speaker": "candidate", "phase": "core", "text": "Offline, I fix a test set sampled by time so there is no leakage, and report NDCG at ten, sliced by query type and new versus returning users, because averages hide regressions. But offline metrics only predict online ones loosely. On my team the correlation between offline NDCG gain and online click gain was about 0.6. So a candidate that clears offline checks goes to a one week A/B test on 5 percent of traffic, with guardrails for latency and complaint rate. I treat offline as a filter and online as the decision.", "start_ms": 41900, "end_ms": 79100, "question_ref": "q1"},
+    {"speaker": "interviewer", "phase": "core", "text": "What do you do when offline and online results disagree?", "start_ms": 79600, "end_ms": 83600, "question_ref": "q1"},
+    {"speaker": "candidate", "phase": "core", "text": "I treat it as a finding, not noise. Last year a model gained 2 percent offline but lost 1 percent online. I looked at the logs, and our training labels came from clicks on a layout that no longer existed, so position bias had shifted. We added position as a feature in training and used inverse propensity weights, and the next version gained 1.5 percent online. I also wrote that check into the team's review template so others reuse it.", "start_ms": 84500, "end_ms": 116500, "question_ref": "q1"},
+    {"speaker": "interviewer", "phase": "core", "text": "How do you decide between retraining on a schedule and retraining on drift triggers?", "start_ms": 117200, "end_ms": 122800, "question_ref": "q2"},
+    {"speaker": "candidate", "phase": "core", "text": "I start with a schedule because it is predictable and easy to audit. We retrain weekly, at about 400 dollars of compute per run. Drift triggers help when the world changes faster than the schedule, like a sales event, but they add false alarms and are harder to debug. So I use a weekly schedule plus a trigger only for severe drift, such as a population stability index above 0.3 on key features. It is simplicity against reaction time, and I let the cost of stale predictions set the balance.", "start_ms": 123400, "end_ms": 159400, "question_ref": "q2"},
+    {"speaker": "interviewer", "phase": "core", "text": "How did you measure the cost of stale predictions?", "start_ms": 160200, "end_ms": 163800, "question_ref": "q2"},
+    {"speaker": "candidate", "phase": "core", "text": "We replayed three months of data and delayed each model by one, two and four weeks. Quality dropped 0.4 percent a week on average, but 3 percent in holiday weeks. That showed weekly retraining was enough except during sales, so we added a manual trigger for those events. I wrote the runbook so two other engineers could run it.", "start_ms": 164300, "end_ms": 187900, "question_ref": "q2"},
+    {"speaker": "interviewer", "phase": "core", "text": "How would you cut serving cost for a large model without losing much quality?", "start_ms": 188800, "end_ms": 194400, "question_ref": "q4"},
+    {"speaker": "candidate", "phase": "core", "text": "I start with the cheapest gains: caching repeated requests, batching, and quantization. For us, moving a ranker from 32 bit to 8 bit cut latency 40 percent and cost 35 percent, with 0.2 percent NDCG loss, which passed our guardrail. Next is distillation into a smaller student, which takes weeks but can cut cost by about 70 percent. I would also cascade, so a cheap model handles easy requests. Each step trades engineering time and a little quality for cost, so I rank them by savings per week of work.", "start_ms": 195100, "end_ms": 231100, "question_ref": "q4"},
+    {"speaker": "interviewer", "phase": "core", "text": "How would you explain label leakage to a junior engineer?", "start_ms": 231700, "end_ms": 235700, "question_ref": "q5"},
+    {"speaker": "candidate", "phase": "core", "text": "I use a story. Say we predict who will cancel, and one feature is days since the last support call about cancelling. The model looks great, but that information only exists after the decision. So I tell them to ask about every feature: would I know this at prediction time? I mentored an engineer last quarter whose AUC was 0.98. We found a feature built from a refund table. After removing it, AUC was 0.83, the real number. Then I asked her to add a time check to our pipeline tests.", "start_ms": 236500, "end_ms": 272900, "question_ref": "q5"},
+    {"speaker": "interviewer", "phase": "candidate_questions", "text": "Thanks. What questions do you have for me?", "start_ms": 273400, "end_ms": 276600},
+    {"speaker": "candidate", "phase": "candidate_questions", "text": "How are evaluation standards shared across ranking teams here?", "start_ms": 277500, "end_ms": 281100},
+    {"speaker": "interviewer", "phase": "candidate_questions", "text": "A small group of engineers owns a shared evaluation library, and each team sends one reviewer to a monthly meeting.", "start_ms": 281800, "end_ms": 289800},
+    {"speaker": "interviewer", "phase": "wrap_up", "text": "That's all the time we have. Thanks Ingrid, the recruiter will follow up within a week.", "start_ms": 290400, "end_ms": 296800},
+    {"speaker": "candidate", "phase": "wrap_up", "text": "Thank you, Owen. I enjoyed this.", "start_ms": 297600, "end_ms": 300000}
+  ],
+  "vague_answers": [],
+  "notes": "Strong for senior: measured claims, trade-off reasoning, cross-team and mentoring scope in the answers."
+}

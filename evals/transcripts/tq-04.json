@@ -1,0 +1,52 @@
+{
+  "id": "tq-04",
+  "title": "Technical Q&A, mid level software engineer, strong answers",
+  "role_family": "swe",
+  "candidate_name": "Imran Vasquez-Holt",
+  "quality": "strong",
+  "brief": {
+    "session": {"interview_type": "technical_qa", "difficulty": "tough", "mode": "realistic", "duration_min": 45, "level": "mid"},
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": ["reasoning", "technical_depth", "trade_offs", "accuracy", "clarity_of_explanation"],
+    "questions": [
+      {"id": "q1", "text": "Walk me through how you would debug a service whose p99 latency doubled after a deploy.", "competencies": ["reasoning", "technical_depth"], "priority": 1, "probe_hints": ["first step", "when rollback is not possible"]},
+      {"id": "q2", "text": "How do you choose between a message queue and direct synchronous calls between services?", "competencies": ["trade_offs", "reasoning"], "priority": 2, "probe_hints": ["simpler option", "failure cost"]},
+      {"id": "q3", "text": "Explain database isolation levels, and when you would not use serializable.", "competencies": ["accuracy", "technical_depth"], "priority": 3, "probe_hints": ["hot rows"]},
+      {"id": "q4", "text": "How does a load balancer decide where to send a request?", "competencies": ["technical_depth", "clarity_of_explanation"], "priority": 4, "probe_hints": []},
+      {"id": "q5", "text": "Explain eventual consistency to a product manager.", "competencies": ["clarity_of_explanation", "accuracy"], "priority": 5, "probe_hints": []},
+      {"id": "q6", "text": "How would you design rate limiting for a public API?", "competencies": ["trade_offs", "technical_depth"], "priority": 6, "probe_hints": []}
+    ],
+    "probe_areas": ["Production debugging", "Trade-offs under cost limits"],
+    "persona": {"tone": "direct and skeptical", "pushback_style": "asks why not the simpler option and tests the answer with a changed constraint", "closing_style": "brief and neutral"},
+    "max_probes_per_question": 3,
+    "curveball": "Finance says to cut infrastructure cost by forty percent next quarter. Does the candidate's design change?"
+  },
+  "turns": [
+    {"speaker": "interviewer", "phase": "intro", "text": "Hi Imran, thanks for joining. I'm Dana, a staff engineer on the infrastructure team. This is a forty five minute technical conversation. Questions are spoken, with no coding, and I will push on your answers.", "start_ms": 0, "end_ms": 14000},
+    {"speaker": "candidate", "phase": "intro", "text": "Sounds good, Dana. Thanks for having me.", "start_ms": 14800, "end_ms": 17600},
+    {"speaker": "interviewer", "phase": "small_talk", "text": "What does your team own right now?", "start_ms": 18100, "end_ms": 20900},
+    {"speaker": "candidate", "phase": "small_talk", "text": "I'm on a payments platform team of six. We own the ledger service and the retry pipeline behind it.", "start_ms": 21800, "end_ms": 29400},
+    {"speaker": "interviewer", "phase": "agenda", "text": "Good. I'll cover debugging, system design and data consistency, then leave time for your questions.", "start_ms": 30100, "end_ms": 36100},
+    {"speaker": "interviewer", "phase": "core", "text": "Walk me through how you would debug a service whose p99 latency doubled after a deploy.", "start_ms": 36700, "end_ms": 43100, "question_ref": "q1"},
+    {"speaker": "candidate", "phase": "core", "text": "First I confirm it is the deploy: I compare p99 before and after on the dashboard, and roll back if it is clearly tied to the release, because rollback is cheap. Then I split latency by endpoint and by dependency using traces. At my current job, p99 on the ledger service went from 180 to 400 milliseconds after a release. Traces showed a new database call inside a loop, 25 calls per request. I batched it into one query and p99 came back to 190.", "start_ms": 43900, "end_ms": 77900, "question_ref": "q1"},
+    {"speaker": "interviewer", "phase": "core", "text": "Say rollback is not possible because of a schema change. What now?", "start_ms": 78400, "end_ms": 83200, "question_ref": "q1"},
+    {"speaker": "candidate", "phase": "core", "text": "Then I use a feature flag to turn off the new code path if one exists. If not, I ship a forward fix and limit risk by sending only 5 percent of requests to it first, watching p99 and error rate for 15 minutes before going wider. I also tell the on call engineer and the team channel, so people stop making unrelated changes while we investigate.", "start_ms": 84100, "end_ms": 110900, "question_ref": "q1"},
+    {"speaker": "interviewer", "phase": "core", "text": "How do you choose between a message queue and direct synchronous calls between services?", "start_ms": 111600, "end_ms": 117200, "question_ref": "q2"},
+    {"speaker": "candidate", "phase": "core", "text": "I ask whether the caller needs the answer now. If the user is waiting on the result, a synchronous call is simpler. If the work can finish later, like sending a receipt or updating a report, I use a queue so a slow downstream service cannot slow the caller. We moved receipt sending to a queue last year, and checkout p99 fell from 900 to 350 milliseconds. The cost is more moving parts: retries, duplicate messages and harder tracing.", "start_ms": 117800, "end_ms": 149400, "question_ref": "q2"},
+    {"speaker": "interviewer", "phase": "core", "text": "Why not the simpler option? Direct calls with retries are easier to reason about.", "start_ms": 150200, "end_ms": 155800, "question_ref": "q2"},
+    {"speaker": "candidate", "phase": "core", "text": "For many cases I agree, and I still use direct calls on the checkout path itself. But retries on a direct call extend the user's wait. When the receipt service was down for 20 minutes, checkout errors reached 12 percent before we moved it. With a queue, the receipts waited and checkout stayed healthy. So I choose by how much failure I can tolerate in the user path.", "start_ms": 156300, "end_ms": 183500, "question_ref": "q2"},
+    {"speaker": "interviewer", "phase": "core", "text": "Suppose finance tells you to cut infrastructure cost by forty percent next quarter. Does your answer change?", "start_ms": 184400, "end_ms": 191200, "question_ref": "q2"},
+    {"speaker": "candidate", "phase": "core", "text": "The details change, not the principle. A managed queue is a running cost, so I would first check how many messages we send, and whether a database table with a worker, an outbox, could carry the low volume flows. For a flow under 50 messages a second, that is probably enough and costs nothing extra. I would keep the real queue only where volume or bursts justify it, and I would show finance the numbers.", "start_ms": 191900, "end_ms": 221900, "question_ref": "q2"},
+    {"speaker": "interviewer", "phase": "core", "text": "Switching topics. When would you not use the serializable isolation level?", "start_ms": 222500, "end_ms": 226900, "question_ref": "q3"},
+    {"speaker": "candidate", "phase": "core", "text": "Serializable gives the strongest guarantee, but it costs throughput and can abort transactions that must be retried. I avoid it for hot rows, like a counter or an account balance updated by many requests, because conflicts rise sharply. For those I use a row lock or a single atomic update. I use serializable for rare, complex rules across several rows where a bug costs money, and I accept the retry logic. On our ledger, moving one hot path to row locks cut aborts from about 8 percent to under 1.", "start_ms": 227700, "end_ms": 263700, "question_ref": "q3"},
+    {"speaker": "interviewer", "phase": "candidate_questions", "text": "Thanks. What questions do you have for me?", "start_ms": 264200, "end_ms": 267400},
+    {"speaker": "candidate", "phase": "candidate_questions", "text": "How does your team decide which latency targets to enforce?", "start_ms": 268300, "end_ms": 272300},
+    {"speaker": "interviewer", "phase": "candidate_questions", "text": "Each service owns a p99 target agreed with its main callers, and we review misses in a monthly meeting.", "start_ms": 273000, "end_ms": 280600},
+    {"speaker": "interviewer", "phase": "wrap_up", "text": "That's all we have time for. Thanks Imran, the recruiter will follow up within a week.", "start_ms": 281200, "end_ms": 287600},
+    {"speaker": "candidate", "phase": "wrap_up", "text": "Thank you, Dana. I enjoyed the questions.", "start_ms": 288400, "end_ms": 291200}
+  ],
+  "vague_answers": [],
+  "notes": "Strong for mid: own production examples with numbers. Handles the pushback and the cost curveball with trade-off reasoning."
+}

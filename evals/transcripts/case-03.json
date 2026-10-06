@@ -1,0 +1,263 @@
+{
+  "id": "case-03",
+  "title": "Case, mid technical program manager, average answers, coach mode",
+  "role_family": "tpm",
+  "candidate_name": "Joel Abernathy-Ruiz",
+  "quality": "average",
+  "brief": {
+    "session": {
+      "interview_type": "case",
+      "difficulty": "realistic",
+      "mode": "coach",
+      "duration_min": 30,
+      "level": "mid"
+    },
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": [
+      "problem_framing",
+      "structure",
+      "estimation_logic",
+      "prioritization",
+      "recommendation"
+    ],
+    "questions": [
+      {
+        "id": "q1",
+        "text": "Tablewise is a food-ordering app. Push notifications about order status arrive late for 5 percent of users. How would you investigate?",
+        "competencies": [
+          "problem_framing",
+          "structure"
+        ],
+        "priority": 1,
+        "probe_hints": [
+          "split the path"
+        ]
+      },
+      {
+        "id": "q2",
+        "text": "Estimate the peak number of notifications per second if Tablewise has 2 million daily active users.",
+        "competencies": [
+          "estimation_logic",
+          "structure"
+        ],
+        "priority": 2,
+        "probe_hints": [
+          "assumptions"
+        ]
+      },
+      {
+        "id": "q3",
+        "text": "You must move the notification service to a new platform in 12 weeks with two engineering teams. How do you plan it?",
+        "competencies": [
+          "prioritization",
+          "recommendation"
+        ],
+        "priority": 3,
+        "probe_hints": [
+          "risk",
+          "first step"
+        ]
+      },
+      {
+        "id": "q4",
+        "text": "Support wants a notification preferences screen and growth wants more marketing notifications. How do you decide?",
+        "competencies": [
+          "user_and_business_sense",
+          "prioritization"
+        ],
+        "priority": 4,
+        "probe_hints": []
+      },
+      {
+        "id": "q5",
+        "text": "Should Tablewise add text message fallback for failed push notifications?",
+        "competencies": [
+          "problem_framing",
+          "recommendation"
+        ],
+        "priority": 5,
+        "probe_hints": []
+      },
+      {
+        "id": "q6",
+        "text": "Estimate the monthly cost of a text message fallback.",
+        "competencies": [
+          "estimation_logic",
+          "prioritization"
+        ],
+        "priority": 6,
+        "probe_hints": []
+      }
+    ],
+    "probe_areas": [
+      "Systems knowledge",
+      "Planning under a deadline"
+    ],
+    "persona": {
+      "tone": "steady and supportive",
+      "pushback_style": "gives small hints",
+      "closing_style": "encouraging with one tip"
+    },
+    "max_probes_per_question": 2,
+    "curveball": null
+  },
+  "turns": [
+    {
+      "speaker": "interviewer",
+      "phase": "intro",
+      "text": "Hi Joel, I'm Elise, a technical program manager. This is a thirty minute case conversation, spoken only.",
+      "start_ms": 0,
+      "end_ms": 6800
+    },
+    {
+      "speaker": "candidate",
+      "phase": "intro",
+      "text": "Hi Elise, thanks for meeting me.",
+      "start_ms": 7600,
+      "end_ms": 10000
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "small_talk",
+      "text": "How has your day been?",
+      "start_ms": 10700,
+      "end_ms": 12700
+    },
+    {
+      "speaker": "candidate",
+      "phase": "small_talk",
+      "text": "Good so far. I had a planning meeting this morning, so I am warmed up.",
+      "start_ms": 13600,
+      "end_ms": 19600
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "agenda",
+      "text": "Since this is coach mode, I may give small hints along the way. I will ask about three systems questions, and you can ask me anything.",
+      "start_ms": 20100,
+      "end_ms": 30500
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tablewise is a food-ordering app. Push notifications about order status arrive late for 5 percent of users. How would you investigate?",
+      "start_ms": 31100,
+      "end_ms": 39500,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I would look at the logs to find where the delay is. Maybe the servers are slow, or the phone providers are slow. I would fix the slow part and then test again. I might also add more servers to be safe.",
+      "start_ms": 40300,
+      "end_ms": 57100,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Here is a hint. What parts could you split the delivery path into?",
+      "start_ms": 57800,
+      "end_ms": 63000,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Okay. The path has four parts: the order event, our notification service, the queue, and the phone push service. I would measure the time at each step for the late 5 percent. If the delay sits in the queue, it is capacity. If it is the provider, we can only retry or change the priority.",
+      "start_ms": 63900,
+      "end_ms": 86700,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Estimate the peak number of notifications per second if Tablewise has 2 million daily active users.",
+      "start_ms": 87200,
+      "end_ms": 93600,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Two million users. A lot of them order around dinner time. Each order sends maybe five notifications. So that is about ten million notifications, and over a few hours it is a few thousand per second. I would say peak is about five thousand per second.",
+      "start_ms": 94200,
+      "end_ms": 112600,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "You must move the notification service to a new platform in 12 weeks with two engineering teams. How do you plan it?",
+      "start_ms": 113400,
+      "end_ms": 122200,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I would make a plan with milestones. First we move a small part, then more. We should test a lot and keep communication open between the two teams. If something breaks we can go back.",
+      "start_ms": 122900,
+      "end_ms": 136900,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Hint: what would you move first, and how would you protect users?",
+      "start_ms": 137800,
+      "end_ms": 142600,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Maybe start with order status notifications for one percent of users, since they matter most. Run the old and new systems side by side and compare delivery times. If the new one is slower, switch that one percent back. Then raise it to ten percent and fifty percent every week.",
+      "start_ms": 143100,
+      "end_ms": 163100,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Thanks. What questions do you have for me?",
+      "start_ms": 163700,
+      "end_ms": 166900
+    },
+    {
+      "speaker": "candidate",
+      "phase": "candidate_questions",
+      "text": "What does a good plan document look like on your team?",
+      "start_ms": 167700,
+      "end_ms": 172100
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "One page: goal, dates, owners, the three biggest risks, and what we will cut if we run late.",
+      "start_ms": 172800,
+      "end_ms": 180000
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "wrap_up",
+      "text": "That is our time, Joel. One tip: say your assumptions before the numbers. The recruiter will follow up within a week.",
+      "start_ms": 180900,
+      "end_ms": 189300
+    },
+    {
+      "speaker": "candidate",
+      "phase": "wrap_up",
+      "text": "Thank you, Elise. I will remember that.",
+      "start_ms": 189800,
+      "end_ms": 192600
+    }
+  ],
+  "vague_answers": [
+    6,
+    12
+  ],
+  "notes": "Average for mid: needed hints to find structure, rough numbers without assumptions, no clear recommendation."
+}

@@ -1,0 +1,52 @@
+{
+  "id": "tq-03",
+  "title": "Technical Q&A, new grad software engineer, weak answers",
+  "role_family": "swe",
+  "candidate_name": "Kofi Lindqvist",
+  "quality": "weak",
+  "brief": {
+    "session": {"interview_type": "technical_qa", "difficulty": "realistic", "mode": "coach", "duration_min": 30, "level": "new_grad"},
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": ["technical_depth", "clarity_of_explanation", "accuracy", "trade_offs", "reasoning"],
+    "questions": [
+      {"id": "q1", "text": "Can you explain what an API is, and what REST means?", "competencies": ["technical_depth", "clarity_of_explanation"], "priority": 1, "probe_hints": ["example call"]},
+      {"id": "q2", "text": "What is the difference between an array and a linked list?", "competencies": ["accuracy", "technical_depth"], "priority": 2, "probe_hints": ["cost of access"]},
+      {"id": "q3", "text": "What are the pros and cons of adding an index to a database table?", "competencies": ["trade_offs", "accuracy"], "priority": 3, "probe_hints": ["write cost"]},
+      {"id": "q4", "text": "A function you wrote is slow. How do you figure out why?", "competencies": ["reasoning"], "priority": 4, "probe_hints": []},
+      {"id": "q5", "text": "Explain what a race condition is.", "competencies": ["technical_depth", "accuracy"], "priority": 5, "probe_hints": []},
+      {"id": "q6", "text": "How do you decide between recursion and a loop?", "competencies": ["trade_offs", "reasoning"], "priority": 6, "probe_hints": []}
+    ],
+    "probe_areas": ["Basic concepts", "Examples from own projects"],
+    "persona": {"tone": "supportive and patient", "pushback_style": "short follow-up questions that give the candidate room", "closing_style": "encouraging with one tip"},
+    "max_probes_per_question": 2,
+    "curveball": null
+  },
+  "turns": [
+    {"speaker": "interviewer", "phase": "intro", "text": "Hi Kofi, welcome. I'm Hannah, a software engineer. This is a thirty minute practice technical conversation. I'll ask spoken questions, and there is no coding.", "start_ms": 0, "end_ms": 10000},
+    {"speaker": "candidate", "phase": "intro", "text": "Hi Hannah, thanks. I'm a little nervous.", "start_ms": 10800, "end_ms": 13600},
+    {"speaker": "interviewer", "phase": "small_talk", "text": "That's fine. What have you been working on lately?", "start_ms": 14100, "end_ms": 17700},
+    {"speaker": "candidate", "phase": "small_talk", "text": "Some class projects, and I made a small website for my cousin's shop.", "start_ms": 18600, "end_ms": 23800},
+    {"speaker": "interviewer", "phase": "agenda", "text": "Okay. I'll ask three or four questions about basic concepts, and then leave time for yours.", "start_ms": 24500, "end_ms": 30900},
+    {"speaker": "interviewer", "phase": "core", "text": "Can you explain what an API is, and what REST means?", "start_ms": 31500, "end_ms": 35900, "question_ref": "q1"},
+    {"speaker": "candidate", "phase": "core", "text": "An API is a way for programs to talk to each other. REST is a type of API that uses HTTP and it is stateless, I think. It is used a lot in web apps.", "start_ms": 36700, "end_ms": 50700, "question_ref": "q1"},
+    {"speaker": "interviewer", "phase": "core", "text": "Can you give an example of a REST call and what it returns?", "start_ms": 51200, "end_ms": 56400, "question_ref": "q1"},
+    {"speaker": "candidate", "phase": "core", "text": "Like a GET request to get data. It returns JSON, with the data inside. I used one in my cousin's website, I think, for the products.", "start_ms": 57300, "end_ms": 67700, "question_ref": "q1"},
+    {"speaker": "interviewer", "phase": "core", "text": "What does stateless mean in that sentence?", "start_ms": 68400, "end_ms": 71200, "question_ref": "q1"},
+    {"speaker": "candidate", "phase": "core", "text": "It means the server does not remember me? Each request is separate, I think.", "start_ms": 71800, "end_ms": 77400, "question_ref": "q1"},
+    {"speaker": "interviewer", "phase": "core", "text": "What is the difference between an array and a linked list?", "start_ms": 78200, "end_ms": 82600, "question_ref": "q2"},
+    {"speaker": "candidate", "phase": "core", "text": "An array is a list of items and a linked list is also a list of items but linked. Arrays are faster, I think. Linked lists are more flexible.", "start_ms": 83100, "end_ms": 94700, "question_ref": "q2"},
+    {"speaker": "interviewer", "phase": "core", "text": "What are the pros and cons of adding an index to a database table?", "start_ms": 95600, "end_ms": 101200, "question_ref": "q3"},
+    {"speaker": "candidate", "phase": "core", "text": "An index makes the database faster. The con is it uses more space. You should add indexes on everything to be safe.", "start_ms": 101900, "end_ms": 110700, "question_ref": "q3"},
+    {"speaker": "interviewer", "phase": "core", "text": "Does an index change how fast inserts are?", "start_ms": 111300, "end_ms": 114500, "question_ref": "q3"},
+    {"speaker": "candidate", "phase": "core", "text": "I do not know. Maybe it makes it faster as well, because everything is organized.", "start_ms": 115300, "end_ms": 121300, "question_ref": "q3"},
+    {"speaker": "interviewer", "phase": "candidate_questions", "text": "Thanks. What questions do you have for me?", "start_ms": 121800, "end_ms": 125000},
+    {"speaker": "candidate", "phase": "candidate_questions", "text": "What is the best way to practice these kinds of questions?", "start_ms": 125900, "end_ms": 130300},
+    {"speaker": "interviewer", "phase": "candidate_questions", "text": "Explain a concept out loud, then add one example from your own project and one number. Do that for ten topics.", "start_ms": 131000, "end_ms": 139400},
+    {"speaker": "interviewer", "phase": "wrap_up", "text": "That's our time. Thanks Kofi, you will get your written feedback right after this session.", "start_ms": 140000, "end_ms": 146000},
+    {"speaker": "candidate", "phase": "wrap_up", "text": "Thank you, Hannah.", "start_ms": 146800, "end_ms": 148000}
+  ],
+  "vague_answers": [6, 8, 10, 12, 14, 16],
+  "notes": "Weak for new grad: short, hedged answers, one wrong claim (index on everything), no numbers, no examples."
+}

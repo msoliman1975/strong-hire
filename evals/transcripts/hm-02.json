@@ -1,0 +1,278 @@
+{
+  "id": "hm-02",
+  "title": "Hiring manager, mid data and ML, strong answers",
+  "role_family": "data_ml",
+  "candidate_name": "Ravi Deshmukh-Lowe",
+  "quality": "strong",
+  "brief": {
+    "session": {
+      "interview_type": "hiring_manager",
+      "difficulty": "realistic",
+      "mode": "realistic",
+      "duration_min": 45,
+      "level": "mid"
+    },
+    "company_name": null,
+    "generic_mode": true,
+    "profile_version": null,
+    "target_competencies": [
+      "role_fit",
+      "depth_of_experience",
+      "judgment",
+      "motivation",
+      "scope_at_level"
+    ],
+    "questions": [
+      {
+        "id": "q1",
+        "text": "Walk me through the most important model or analysis you shipped in the last two years.",
+        "competencies": [
+          "depth_of_experience",
+          "role_fit"
+        ],
+        "priority": 1,
+        "probe_hints": [
+          "own role",
+          "result",
+          "ship criteria"
+        ]
+      },
+      {
+        "id": "q2",
+        "text": "Tell me about a time you had to choose between a better model and faster delivery.",
+        "competencies": [
+          "judgment",
+          "scope_at_level"
+        ],
+        "priority": 2,
+        "probe_hints": [
+          "trade-off",
+          "who decided"
+        ]
+      },
+      {
+        "id": "q3",
+        "text": "Why are you looking to move now, and why this role?",
+        "competencies": [
+          "motivation",
+          "role_fit"
+        ],
+        "priority": 3,
+        "probe_hints": []
+      },
+      {
+        "id": "q4",
+        "text": "How do you work with engineers and product partners?",
+        "competencies": [
+          "team_fit"
+        ],
+        "priority": 4,
+        "probe_hints": []
+      },
+      {
+        "id": "q5",
+        "text": "Tell me about a project that crossed team lines.",
+        "competencies": [
+          "scope_at_level",
+          "team_fit"
+        ],
+        "priority": 5,
+        "probe_hints": [
+          "your role",
+          "how you aligned people"
+        ]
+      },
+      {
+        "id": "q6",
+        "text": "Where have you changed your mind about how to do data work?",
+        "competencies": [
+          "judgment",
+          "depth_of_experience"
+        ],
+        "priority": 6,
+        "probe_hints": []
+      }
+    ],
+    "probe_areas": [
+      "How ship decisions are made",
+      "Cross team scope"
+    ],
+    "persona": {
+      "tone": "direct and interested",
+      "pushback_style": "asks what would change the decision",
+      "closing_style": "brief thanks and timeline"
+    },
+    "max_probes_per_question": 2,
+    "curveball": null
+  },
+  "turns": [
+    {
+      "speaker": "interviewer",
+      "phase": "intro",
+      "text": "Hi Ravi, welcome. I'm Helen, I lead the data science group. We have forty five minutes, and I want to understand your experience and what you want next.",
+      "start_ms": 0,
+      "end_ms": 11200
+    },
+    {
+      "speaker": "candidate",
+      "phase": "intro",
+      "text": "Thanks Helen. I've been looking forward to this conversation.",
+      "start_ms": 11950,
+      "end_ms": 15550
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "small_talk",
+      "text": "Where are you joining from today?",
+      "start_ms": 16050,
+      "end_ms": 18450
+    },
+    {
+      "speaker": "candidate",
+      "phase": "small_talk",
+      "text": "From home in the north of the city. It has been a rainy week, so I'm glad to be inside.",
+      "start_ms": 19350,
+      "end_ms": 27350
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "agenda",
+      "text": "Good. I'll ask about three or four pieces of your work and your reasons for the move, and we will keep time at the end for you.",
+      "start_ms": 28000,
+      "end_ms": 38800
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Walk me through the most important model or analysis you shipped in the last two years.",
+      "start_ms": 39600,
+      "end_ms": 46000,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Last year I led the churn prediction model for the subscription product at Alder and Finch, a mid size retailer. Before that, retention emails went to everyone. I built a gradient boosted model on 14 months of usage data, and I spent two weeks on the label definition because my first one leaked future data. In a holdout test, targeted emails lifted retention by 3.1 points and cut email volume by 40 percent. I ran the test and presented it to finance.",
+      "start_ms": 46700,
+      "end_ms": 79500,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "How did you decide the model was good enough to ship?",
+      "start_ms": 80100,
+      "end_ms": 84500,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I set the bar before training. The retention team could only contact 10 percent of users, so I needed precision above 35 percent in the top decile. The model reached 41 percent. A logistic regression got 33, so I chose the boosted model despite the harder explanation, and I added feature importance reports so the team could trust it.",
+      "start_ms": 85250,
+      "end_ms": 108850,
+      "question_ref": "q1"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a time you had to choose between a better model and faster delivery.",
+      "start_ms": 109350,
+      "end_ms": 115750,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "On a demand forecasting project, a deep model beat our baseline by 6 percent in error, but it needed a new serving setup that would take eight weeks. I proposed shipping the simpler model in three weeks and keeping the deep one for later. I showed the planners that the gain was worth about 40 thousand dollars a quarter, which was not enough to wait. We shipped the simple one, and I wrote down what would make us revisit the choice. Two quarters later that threshold was met.",
+      "start_ms": 116650,
+      "end_ms": 151850,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "What if the planners had pushed for the better model?",
+      "start_ms": 152500,
+      "end_ms": 156500,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I would have asked what decision the extra accuracy changes. If they could show it changes an order size, I would have put the deep model first. In this case their own numbers said it did not, so we agreed.",
+      "start_ms": 157300,
+      "end_ms": 173300,
+      "question_ref": "q2"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Why are you looking to move now, and why this role?",
+      "start_ms": 174000,
+      "end_ms": 178400,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "I grew our forecasting work from one analyst to a team of four, and I mentored two of them. Now I want to work on problems where the model drives a product decision directly, not only a report. Your posting mentions ranking and personalization, which is the area I have shipped in twice. I also want a larger scope, with two or three projects running at once.",
+      "start_ms": 179000,
+      "end_ms": 205800,
+      "question_ref": "q3"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "core",
+      "text": "Tell me about a project that crossed team lines.",
+      "start_ms": 206550,
+      "end_ms": 210150,
+      "question_ref": "q5"
+    },
+    {
+      "speaker": "candidate",
+      "phase": "core",
+      "text": "Last spring I worked with the platform team, the pricing team and legal on a data retention change. Our features depended on logs that would be deleted after 90 days. I wrote a one page proposal with the cost of each option, and I ran two meetings to agree on a 180 day window for hashed data. It kept 11 of our 14 features running and passed legal review in three weeks.",
+      "start_ms": 210650,
+      "end_ms": 239450,
+      "question_ref": "q5"
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "Thank you. What questions do you have for me?",
+      "start_ms": 240350,
+      "end_ms": 243950
+    },
+    {
+      "speaker": "candidate",
+      "phase": "candidate_questions",
+      "text": "How does the team decide which models go to production, and who owns them after launch?",
+      "start_ms": 244600,
+      "end_ms": 251000
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "candidate_questions",
+      "text": "The model owner decides with a review from one peer and one engineer. The owner stays on call for the model for the first quarter, then it moves to a shared rotation.",
+      "start_ms": 251800,
+      "end_ms": 264600
+    },
+    {
+      "speaker": "interviewer",
+      "phase": "wrap_up",
+      "text": "That is all the time we have. Thanks Ravi, we will be in touch within a week.",
+      "start_ms": 265300,
+      "end_ms": 272100
+    },
+    {
+      "speaker": "candidate",
+      "phase": "wrap_up",
+      "text": "Thank you, Helen. I enjoyed it.",
+      "start_ms": 272700,
+      "end_ms": 275100
+    }
+  ],
+  "vague_answers": [],
+  "notes": "Strong for mid: own role, numbers and trade-offs in every answer."
+}
