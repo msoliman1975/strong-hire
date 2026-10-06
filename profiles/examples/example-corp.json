@@ -1,38 +1,208 @@
 {
   "company_name": "Example Corp",
   "company_slug": "example-corp",
-  "meta": {"version": 1, "status": "draft", "reviewed_by": null, "researched_at": "2026-10-03", "published_at": null},
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-03",
+    "published_at": null
+  },
   "values_framework": {
     "name": "Example Values",
     "principles": [
-      {"name": "Customer first", "description": "Start from the customer problem.", "evidence_signals": ["Names a specific customer and their pain", "Shows how the outcome was measured for the customer"]},
-      {"name": "Own the outcome", "description": "Take responsibility end to end.", "evidence_signals": ["Uses 'I' for own decisions", "Follows through after launch"], "weight": 1.5}
+      {
+        "name": "Customer first",
+        "description": "Start from the customer problem and measure the result for the customer.",
+        "evidence_signals": [
+          "Names a specific customer or user group and their pain",
+          "Shows how the outcome was measured for the customer"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Own the outcome",
+        "description": "Take responsibility end to end, including after launch.",
+        "evidence_signals": [
+          "Uses 'I' for own decisions and 'we' for team work",
+          "Follows through after launch and fixes what broke"
+        ],
+        "weight": 1.5
+      }
     ]
   },
   "loop_structure": [
     {
       "role_family": "swe",
-      "levels": ["E4", "E5"],
+      "levels": ["E3", "E4", "E5", "E6"],
       "rounds": [
-        {"name": "Recruiter screen", "interview_type": null, "duration_min": 30, "interviewer_role": "Recruiter", "notes": null},
-        {"name": "Values interview", "interview_type": "behavioral", "duration_min": 45, "interviewer_role": "Senior engineer", "notes": null},
-        {"name": "Hiring manager", "interview_type": "hiring_manager", "duration_min": 45, "interviewer_role": "Engineering manager", "notes": null}
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, motivation and logistics. Not simulated in v1."
+        },
+        {
+          "name": "Coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Live coding. Not simulated in v1."
+        },
+        {
+          "name": "Technical deep dive",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Senior engineer",
+          "notes": "Verbal questions about a past system the candidate built."
+        },
+        {
+          "name": "Values interview",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Senior engineer from another team",
+          "notes": null
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager",
+          "notes": "Scope, motivation and team fit."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": ["PM2", "Senior PM"],
+      "rounds": [
+        {
+          "name": "Product sense case",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Senior product manager",
+          "notes": null
+        },
+        {
+          "name": "Values interview",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Product leader",
+          "notes": null
+        }
       ]
     }
   ],
   "question_patterns": [
-    {"interview_type": "behavioral", "theme": "Ownership under ambiguity", "pattern": "A time the candidate drove a result without clear direction", "competencies": ["ownership", "impact"], "values": ["Own the outcome"]}
+    {
+      "interview_type": "behavioral",
+      "theme": "Ownership under ambiguity",
+      "pattern": "A time the candidate drove a result without clear direction or a clear owner",
+      "competencies": ["ownership", "impact"],
+      "values": ["Own the outcome"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Disagreement with a peer",
+      "pattern": "A time the candidate disagreed with a peer or manager and how it ended",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Largest project",
+      "pattern": "Walk through the largest project on the resume: the goal, own role, and result",
+      "competencies": ["depth_of_experience", "scope_at_level"],
+      "values": ["Own the outcome"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Design trade-offs",
+      "pattern": "Explain a design choice in a past system and the option that was rejected",
+      "competencies": ["trade_offs", "technical_depth"],
+      "values": []
+    },
+    {
+      "interview_type": "case",
+      "theme": "Improve an existing product",
+      "pattern": "Pick a user group of a product and propose one change, with a success metric",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Customer first"]
+    }
   ],
   "bar_by_level": [
-    {"level_name": "E4", "normalized_level": "mid", "role_family": "swe", "scope_expectation": "Owns features within one team."},
-    {"level_name": "E5", "normalized_level": "senior", "role_family": "swe", "scope_expectation": "Owns systems and influences adjacent teams."}
+    {
+      "level_name": "E3",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Delivers well-defined tasks with guidance from a senior engineer."
+    },
+    {
+      "level_name": "E4",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns features within one team from design to launch."
+    },
+    {
+      "level_name": "E5",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Owns systems and influences the plans of adjacent teams."
+    },
+    {
+      "level_name": "E6",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Sets technical direction for a group of teams."
+    },
+    {
+      "level_name": "Senior PM",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns a product area and its metrics."
+    }
   ],
-  "persona": {"tone": "Friendly and curious", "pace": "Moderate", "pushback_style": "Asks 'what would you do differently?'", "closing_style": "Leaves 5 minutes for questions"},
-  "scoring_weights": {"ownership": 1.5, "impact": 1.2, "collaboration": 1.0},
+  "persona": {
+    "tone": "Friendly and curious",
+    "pace": "Moderate, with short pauses for the candidate to think",
+    "pushback_style": "Asks 'what would you do differently?' and for numbers",
+    "closing_style": "Leaves 5 minutes for the candidate's questions"
+  },
+  "scoring_weights": {
+    "ownership": 1.5,
+    "impact": 1.2,
+    "collaboration": 1.0,
+    "conflict_handling": 1.0,
+    "trade_offs": 1.2,
+    "user_and_business_sense": 1.3
+  },
   "values_share": 0.25,
-  "case_style": {"product_sense": 0.6, "estimation": 0.2, "system_thinking": 0.2, "notes": null},
+  "case_style": {
+    "product_sense": 0.6,
+    "estimation": 0.2,
+    "system_thinking": 0.2,
+    "notes": "Cases start from a user problem. Estimation is a small part."
+  },
   "sources": [
-    {"url": "https://careers.example.com/values", "title": "Example Corp values", "retrieved_at": "2026-10-03", "fields": ["values_framework", "persona"]}
+    {
+      "url": "https://careers.example.com/values",
+      "title": "Example Corp values",
+      "retrieved_at": "2026-10-03",
+      "fields": ["values_framework", "persona"]
+    },
+    {
+      "url": "https://careers.example.com/how-we-hire",
+      "title": "How we hire at Example Corp",
+      "retrieved_at": "2026-10-03",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://engineering.example.com/career-ladder",
+      "title": "Example Corp engineering career ladder",
+      "retrieved_at": "2026-10-02",
+      "fields": ["bar_by_level", "scoring_weights"]
+    }
   ],
   "field_confidence": {
     "values_framework": "high",
@@ -43,5 +213,8 @@
     "scoring_weights": "low",
     "case_style": "low"
   },
-  "low_confidence_notes": ["Level names are from one public source only."]
+  "low_confidence_notes": [
+    "bar_by_level: level names come from one public source only.",
+    "scoring_weights: estimated from the values page; no public source gives weights."
+  ]
 }
