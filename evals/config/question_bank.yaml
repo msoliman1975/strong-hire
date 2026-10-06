@@ -1,0 +1,30 @@
+# Questions for the stub planner, per interview type (IV-2). The real planner (P6) replaces it.
+# Competencies come from the spec table "Competencies by interview type".
+behavioral:
+  - {id: own-project, text: "Tell me about a project you owned from start to finish.", competencies: [ownership, impact]}
+  - {id: disagreement, text: "Tell me about a time you disagreed with a teammate. What happened?", competencies: [conflict_handling, collaboration]}
+  - {id: failure, text: "Tell me about something that did not go to plan and what you learned.", competencies: [learning_from_failure, ownership]}
+  - {id: explain, text: "Tell me about a time you had to explain a complex idea to someone outside your field.", competencies: [communication]}
+  - {id: cross-team, text: "Tell me about work that needed help from another team.", competencies: [collaboration, communication]}
+  - {id: measurable, text: "What is the result you are most proud of, and how did you measure it?", competencies: [impact]}
+hiring_manager:
+  - {id: why-role, text: "Why this role, and why now?", competencies: [motivation, role_fit]}
+  - {id: deep-project, text: "Walk me through the most relevant project on your resume, in depth.", competencies: [depth_of_experience, scope_at_level]}
+  - {id: hard-call, text: "Tell me about a hard call you made with incomplete information.", competencies: [judgment]}
+  - {id: team-style, text: "Describe the team where you did your best work. What made it work?", competencies: [team_fit]}
+  - {id: first-90, text: "What would you focus on in your first ninety days here?", competencies: [role_fit, judgment]}
+  - {id: scope, text: "What is the largest scope you have owned, and how did you keep it on track?", competencies: [scope_at_level, depth_of_experience]}
+technical_qa:
+  - {id: design-choice, text: "Tell me about a technical design choice you made and the options you rejected.", competencies: [trade_offs, reasoning]}
+  - {id: debug, text: "Walk me through how you would debug a service whose latency doubled overnight.", competencies: [reasoning, technical_depth]}
+  - {id: concept, text: "Explain a core concept from your main area as if to a new teammate.", competencies: [clarity_of_explanation, accuracy]}
+  - {id: scale, text: "How would you change a system you built if traffic grew ten times?", competencies: [technical_depth, trade_offs]}
+  - {id: correctness, text: "How do you make sure your work is correct before it ships?", competencies: [accuracy]}
+  - {id: deep-dive, text: "Pick the hardest technical problem on your resume and explain how you solved it.", competencies: [technical_depth, clarity_of_explanation]}
+case:
+  - {id: frame, text: "Sign-ups for a grocery delivery app dropped 20 percent last month. How would you approach it?", competencies: [problem_framing, structure]}
+  - {id: estimate, text: "Estimate how many bikes a city bike-share needs for a city of one million people.", competencies: [estimation_logic, structure]}
+  - {id: users, text: "Who are the main users of a pet-care booking app, and what do they need most?", competencies: [user_and_business_sense]}
+  - {id: prioritize, text: "You have three features and capacity for one. How do you choose?", competencies: [prioritization, user_and_business_sense]}
+  - {id: recommend, text: "Given what we discussed, what would you recommend we do, and what would change your mind?", competencies: [recommendation]}
+  - {id: metric, text: "What single metric would you use to judge success, and why that one?", competencies: [problem_framing, prioritization]}

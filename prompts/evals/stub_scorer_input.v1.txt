@@ -1,0 +1,9 @@
+Interview type: $interview_type
+Candidate level: $level
+Target competencies: $competencies
+
+Questions that were asked (question_ref: text [competencies]):
+$questions
+
+Transcript:
+$transcript
