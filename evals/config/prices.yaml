@@ -1,0 +1,27 @@
+# USD prices per gateway alias, used to turn UsageEvent units into cost_usd.
+# Planning estimates from the spec cost model (Pricing and cost model), not quotes.
+# Check current provider prices before you trust the cost metric on the hosted profile.
+# The fake aliases use the hosted prices, so a fake run still exercises the cost math.
+
+llm_per_mtok:            # [input, output] USD per million tokens
+  hosted-extractor: [0.20, 0.20]
+  hosted-planner: [0.60, 0.80]
+  hosted-interviewer: [0.60, 0.80]
+  hosted-scorer: [0.90, 0.90]
+  fake-extractor: [0.20, 0.20]
+  fake-planner: [0.60, 0.80]
+  fake-interviewer: [0.60, 0.80]
+  fake-scorer: [0.90, 0.90]
+  local-small: [0, 0]      # runs on this machine
+  local-mid: [0, 0]
+  local-lmstudio: [0, 0]
+
+stt_per_minute:          # USD per minute of candidate speech
+  hosted-stt: 0.0007
+  fake-stt: 0.0007
+  local-stt: 0
+
+tts_per_mchar:           # USD per million characters; Kokoro is self-hosted on CPU
+  hosted-tts: 0
+  fake-tts: 0
+  local-tts: 0
