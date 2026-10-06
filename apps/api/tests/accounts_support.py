@@ -147,7 +147,8 @@ async def add_session(
     job = JobTarget(org_id=org_id, user_id=user_id, raw_text="Engineer")
     db.add(job)
     await db.flush()
-    start = datetime.now(UTC) - timedelta(minutes=minutes) if started else None
+    now = datetime.now(UTC)
+    start = now - timedelta(minutes=minutes) if started else None
     session = InterviewSession(
         org_id=org_id,
         job_target_id=job.id,
@@ -157,7 +158,7 @@ async def add_session(
         duration_min=45,
         status=status,
         started_at=start,
-        ended_at=datetime.now(UTC) if started else None,
+        ended_at=now if started else None,
     )
     db.add(session)
     await db.commit()
