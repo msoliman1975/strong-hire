@@ -1,0 +1,26 @@
+Morgan Tessaly (synthetic person)
+Seattle, WA | morgan.t@example.com
+
+Staff ML engineer with 11 years in software and 5 years running model inference at scale.
+
+WORK HISTORY
+
+Staff Machine Learning Engineer | Glacier AI | 2022 - present
+• Designed a GPU batching scheduler that raised inference throughput 3.1x
+• Led a 3-team effort to move 400 models to a shared serving platform
+• Set the design review process for the ML platform group
+Tech: Python, C++, PyTorch, Kubernetes, CUDA
+
+Senior Software Engineer | Cascade Search | 2016 - 2022
+• Built the ranking feature pipeline that processes 2 TB per day
+• Cut model training cost by 45% with spot instances and checkpointing
+Tech: Scala, Spark, Python
+
+Software Engineer | Rainier Telecom | 2013 - 2016
+• Wrote billing reconciliation jobs in Java
+
+EDUCATION
+M.S. Computer Science, Puget Sound University (2013)
+
+CERTIFICATIONS
+AWS Certified Machine Learning - Specialty

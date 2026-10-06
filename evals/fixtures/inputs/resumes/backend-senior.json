@@ -1,0 +1,56 @@
+{
+  "summary": "Backend engineer with 8 years of experience building payment and billing systems in Go and Python.",
+  "roles": [
+    {
+      "title": "Senior Software Engineer",
+      "company": "Fernhill Payments",
+      "start": "2021-03",
+      "end": null,
+      "achievements": [
+        "Led the redesign of the payout service, cutting failed payouts by 38%",
+        "Reduced p99 API latency from 900 ms to 180 ms by adding caching and query fixes",
+        "Mentored 4 engineers; two were promoted"
+      ],
+      "skills": [
+        "Go",
+        "PostgreSQL",
+        "Kafka",
+        "AWS"
+      ]
+    },
+    {
+      "title": "Software Engineer",
+      "company": "Tidewater Billing",
+      "start": "2017-06",
+      "end": "2021-02",
+      "achievements": [
+        "Built the invoicing API used by 3,000 business customers",
+        "Migrated 25 cron jobs to a queue-based worker system"
+      ],
+      "skills": [
+        "Python",
+        "Django",
+        "Redis"
+      ]
+    }
+  ],
+  "skills": [
+    "Go",
+    "Python",
+    "PostgreSQL",
+    "Kafka",
+    "AWS",
+    "Django",
+    "Redis",
+    "Docker"
+  ],
+  "education": [
+    {
+      "institution": "Oregon Coast University",
+      "degree": "B.S.",
+      "field_of_study": "Computer Science",
+      "end": "2017"
+    }
+  ],
+  "certifications": []
+}

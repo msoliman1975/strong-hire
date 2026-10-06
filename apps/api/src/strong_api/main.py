@@ -1,19 +1,23 @@
-"""Strong Hire API. P0 only exposes /health; product routes arrive in later workstreams."""
+"""Strong Hire API. P0 exposes /health; P2 adds the job target and resume input routes."""
 
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Awaitable, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable
+from contextlib import asynccontextmanager
 from typing import Any
 
 from fastapi import FastAPI, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from redis.asyncio import Redis
 from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from strong_api.inputs import router as inputs_router
+from strong_api.inputs.queue import ArqJobQueue, JobQueue
 from strong_core import __version__
 from strong_core.config import get_settings
-from strong_core.db import get_engine
+from strong_core.db import get_engine, get_sessionmaker
 
 Check = Callable[[], Awaitable[None]]
 
@@ -31,9 +35,20 @@ async def check_redis() -> None:
         await client.aclose()
 
 
-def create_app(checks: dict[str, Check] | None = None) -> FastAPI:
+def create_app(
+    checks: dict[str, Check] | None = None,
+    *,
+    sessionmaker: async_sessionmaker[AsyncSession] | None = None,
+    queue: JobQueue | None = None,
+) -> FastAPI:
     settings = get_settings()
-    app = FastAPI(title="Strong Hire API", version=__version__)
+
+    @asynccontextmanager
+    async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+        yield
+        await app.state.queue.close()
+
+    app = FastAPI(title="Strong Hire API", version=__version__, lifespan=lifespan)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["http://localhost:5180"],
@@ -41,6 +56,9 @@ def create_app(checks: dict[str, Check] | None = None) -> FastAPI:
         allow_headers=["*"],
     )
     app.state.checks = checks or {"database": check_database, "redis": check_redis}
+    app.state.sessionmaker = sessionmaker or get_sessionmaker()
+    app.state.queue = queue or ArqJobQueue(settings.redis_url)
+    app.include_router(inputs_router)
 
     @app.get("/health")
     async def health(response: Response) -> dict[str, Any]:

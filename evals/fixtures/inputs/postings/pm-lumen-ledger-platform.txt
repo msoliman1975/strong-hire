@@ -1,0 +1,25 @@
+Product Manager - Developer Platform
+Lumen Ledger
+New York, NY
+
+About Lumen Ledger
+Lumen Ledger provides accounting APIs for fintech startups. More than 600 companies build on our platform.
+
+The role
+We are hiring a Product Manager for our Developer Platform group. You will own our public REST API, SDKs and developer docs.
+
+Responsibilities:
+• Talk with developers every week and turn their feedback into a prioritized backlog
+• Write product requirement documents and API specs with engineers
+• Define success metrics for developer onboarding and API adoption
+• Plan launches with marketing and developer relations
+
+Qualifications:
+• 2-4 years of product management experience
+• Experience with APIs or developer tools
+• Ability to read code or API documentation
+• Strong prioritization and communication skills
+
+Preferred:
+• Prior software engineering experience
+• Familiarity with accounting or fintech

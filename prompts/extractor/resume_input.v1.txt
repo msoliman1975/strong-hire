@@ -1,0 +1,5 @@
+Extract the resume fields from the text in the following block.
+
+<untrusted_input>
+$resume
+</untrusted_input>

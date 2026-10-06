@@ -1,0 +1,27 @@
+Drew Halvorsen (synthetic person)
+Technical Program Manager
+drew.h@example.com | Denver, CO
+
+Summary: Former mechanical engineer, now a technical program manager for hardware and software launches.
+
+Professional Experience
+
+Technical Program Manager
+Summit Drones, Denver, CO — September 2021 to Present
+- Run a two-week release train for drone firmware and the ground control app
+- Cut the release slip rate from 40% to 10% by adding dependency reviews
+- Lead incident reviews after field failures with 5 engineering teams
+
+Mechanical Engineer
+Foothill Manufacturing, Golden, CO — June 2015 to August 2021
+- Designed enclosures for industrial sensors
+- Managed supplier schedules for 3 product launches
+
+Education
+B.S. Mechanical Engineering, Front Range State University, 2015
+
+Certifications
+PMP (Project Management Professional)
+
+Skills
+Release management, Jira, risk management, embedded systems, CAD

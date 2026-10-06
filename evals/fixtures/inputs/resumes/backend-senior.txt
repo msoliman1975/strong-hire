@@ -1,0 +1,25 @@
+Avery Quinlan (synthetic person)
+avery.quinlan@example.com | 555-0100 | Portland, OR
+
+SUMMARY
+Backend engineer with 8 years of experience building payment and billing systems in Go and Python.
+
+EXPERIENCE
+Senior Software Engineer, Fernhill Payments - Portland, OR
+March 2021 - Present
+- Led the redesign of the payout service, cutting failed payouts by 38%
+- Reduced p99 API latency from 900 ms to 180 ms by adding caching and query fixes
+- Mentored 4 engineers; two were promoted
+Skills: Go, PostgreSQL, Kafka, AWS
+
+Software Engineer, Tidewater Billing - Remote
+June 2017 - February 2021
+- Built the invoicing API used by 3,000 business customers
+- Migrated 25 cron jobs to a queue-based worker system
+Skills: Python, Django, Redis
+
+EDUCATION
+B.S. Computer Science, Oregon Coast University, 2017
+
+SKILLS
+Go, Python, PostgreSQL, Kafka, AWS, Django, Redis, Docker

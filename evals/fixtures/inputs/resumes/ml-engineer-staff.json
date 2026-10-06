@@ -1,0 +1,71 @@
+{
+  "summary": "Staff ML engineer with 11 years in software and 5 years running model inference at scale.",
+  "roles": [
+    {
+      "title": "Staff Machine Learning Engineer",
+      "company": "Glacier AI",
+      "start": "2022",
+      "end": null,
+      "achievements": [
+        "Designed a GPU batching scheduler that raised inference throughput 3.1x",
+        "Led a 3-team effort to move 400 models to a shared serving platform",
+        "Set the design review process for the ML platform group"
+      ],
+      "skills": [
+        "Python",
+        "C++",
+        "PyTorch",
+        "Kubernetes",
+        "CUDA"
+      ]
+    },
+    {
+      "title": "Senior Software Engineer",
+      "company": "Cascade Search",
+      "start": "2016",
+      "end": "2022",
+      "achievements": [
+        "Built the ranking feature pipeline that processes 2 TB per day",
+        "Cut model training cost by 45% with spot instances and checkpointing"
+      ],
+      "skills": [
+        "Scala",
+        "Spark",
+        "Python"
+      ]
+    },
+    {
+      "title": "Software Engineer",
+      "company": "Rainier Telecom",
+      "start": "2013",
+      "end": "2016",
+      "achievements": [
+        "Wrote billing reconciliation jobs in Java"
+      ],
+      "skills": [
+        "Java"
+      ]
+    }
+  ],
+  "skills": [
+    "Python",
+    "C++",
+    "PyTorch",
+    "Kubernetes",
+    "CUDA",
+    "Scala",
+    "Spark",
+    "Java"
+  ],
+  "education": [
+    {
+      "institution": "Puget Sound University",
+      "degree": "M.S.",
+      "field_of_study": "Computer Science",
+      "end": "2013"
+    }
+  ],
+  "certifications": [
+    "AWS Certified Machine Learning - Specialty"
+  ]
+}

@@ -1,0 +1,20 @@
+UX Designer (Mid-level)
+Canopy Studio - Austin, TX or Remote
+
+Canopy Studio makes scheduling software for independent gyms and yoga studios.
+
+What you'll do
+- Design new features for our studio owner dashboard
+- Run usability tests with studio owners every sprint
+- Turn research into flows, wireframes and high-fidelity mockups
+- Work with two engineering squads to ship your designs
+
+What we need
+- 3+ years of UX or product design experience
+- Skill with Figma
+- Experience running usability tests
+- A portfolio with web application work
+
+Extra credit
+- Experience with accessibility standards (WCAG)
+- Basic HTML and CSS

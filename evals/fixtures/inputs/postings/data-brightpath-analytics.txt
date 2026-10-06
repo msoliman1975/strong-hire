@@ -1,0 +1,23 @@
+Data Scientist, Product Analytics
+Brightpath Health
+Remote (US time zones)
+
+Brightpath Health runs a virtual care service for 2 million members. Our Product Analytics team helps product managers decide what to build next.
+
+In this role you will:
+1. Define and track success metrics for the member app
+2. Design and analyze A/B tests for new features
+3. Build dashboards that leaders use every week
+4. Present findings and recommendations to product and clinical leaders
+
+You have:
+- 3+ years of experience in product analytics or data science
+- Strong SQL skills
+- Experience with Python or R for statistical analysis
+- Knowledge of experiment design and statistical inference
+- Clear written and spoken communication
+
+It's a plus if you have:
+- Experience with dbt
+- Experience in healthcare
+- Experience with Looker or Tableau

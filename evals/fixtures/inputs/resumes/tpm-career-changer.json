@@ -1,0 +1,46 @@
+{
+  "summary": "Former mechanical engineer, now a technical program manager for hardware and software launches.",
+  "roles": [
+    {
+      "title": "Technical Program Manager",
+      "company": "Summit Drones",
+      "start": "2021-09",
+      "end": null,
+      "achievements": [
+        "Run a two-week release train for drone firmware and the ground control app",
+        "Cut the release slip rate from 40% to 10% by adding dependency reviews",
+        "Lead incident reviews after field failures with 5 engineering teams"
+      ],
+      "skills": []
+    },
+    {
+      "title": "Mechanical Engineer",
+      "company": "Foothill Manufacturing",
+      "start": "2015-06",
+      "end": "2021-08",
+      "achievements": [
+        "Designed enclosures for industrial sensors",
+        "Managed supplier schedules for 3 product launches"
+      ],
+      "skills": []
+    }
+  ],
+  "skills": [
+    "Release management",
+    "Jira",
+    "Risk management",
+    "Embedded systems",
+    "CAD"
+  ],
+  "education": [
+    {
+      "institution": "Front Range State University",
+      "degree": "B.S.",
+      "field_of_study": "Mechanical Engineering",
+      "end": "2015"
+    }
+  ],
+  "certifications": [
+    "PMP (Project Management Professional)"
+  ]
+}

@@ -1,0 +1,25 @@
+Staff Machine Learning Engineer - Model Serving
+Databricks
+San Francisco, California
+
+At Databricks, we are passionate about enabling data teams to solve the world's toughest problems. The Model Serving team runs real-time inference for thousands of customer models.
+
+The impact you will have:
+- Set the technical direction for low-latency model serving across GPU and CPU fleets
+- Design autoscaling and batching systems that keep p99 latency under 100 ms
+- Drive cross-team projects with the runtime, networking and product teams
+- Mentor senior engineers and raise the bar on design reviews
+
+What we look for:
+- 10+ years of software engineering experience, with 4+ years in machine learning infrastructure
+- Deep knowledge of Python and one of C++, Scala or Rust
+- Experience with PyTorch and model inference optimization
+- Experience building large-scale distributed systems
+- Proven record of leading multi-team technical projects
+
+Bonus points:
+- Experience with Kubernetes
+- Contributions to open source ML projects
+- Knowledge of GPU programming (CUDA)
+
+Level: Staff (IC6)

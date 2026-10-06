@@ -1,0 +1,19 @@
+Rowan Ellery (synthetic person)
+rowan.ellery@example.com
+
+Education
+Lakeshore Institute of Technology - B.S. in Computer Science, expected May 2027
+Relevant courses: Algorithms, Operating Systems, Databases
+
+Experience
+Software Engineering Intern, Pinecrest Maps (May 2026 - August 2026)
+- Built a TypeScript tool that validates map tile uploads, used by 12 engineers
+- Added integration tests that cut release bugs in the tile service by 20%
+
+Teaching Assistant, Lakeshore Institute of Technology (Jan 2025 - Dec 2025)
+- Held weekly office hours for 60 students in Data Structures
+
+Projects
+- Route Planner: a Python web app that plans bike routes with Dijkstra's algorithm
+
+Skills: Python, TypeScript, Java, SQL, React, Git

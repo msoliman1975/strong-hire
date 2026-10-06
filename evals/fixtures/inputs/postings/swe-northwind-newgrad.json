@@ -1,0 +1,27 @@
+{
+  "company_name": "Northwind Logistics",
+  "title": "Software Engineer I",
+  "role_family": "swe",
+  "level": "new_grad",
+  "level_label": "New Grad",
+  "team": "Routing",
+  "location": "Chicago, IL (Hybrid)",
+  "must_have_skills": [
+    "Bachelor's degree in Computer Science",
+    "Python or TypeScript",
+    "Data structures and algorithms",
+    "SQL"
+  ],
+  "nice_to_have_skills": [
+    "Internship experience",
+    "React",
+    "Logistics or optimization"
+  ],
+  "responsibilities": [
+    "Build features for the route planning web application",
+    "Write unit and integration tests",
+    "Fix production bugs with a senior engineer",
+    "Take part in code reviews and sprint planning"
+  ],
+  "source_url": null
+}
