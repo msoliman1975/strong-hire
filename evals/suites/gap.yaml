@@ -1,0 +1,14 @@
+name: gap
+description: Gap analysis over the P2 posting and resume fixtures. Each pair runs twice to measure the match score spread (GA-1); mismatched pairs check that a matching resume scores higher.
+gap:
+  - {id: gap-swe-senior, posting: swe-stripe-backend, resume: backend-senior, fit: match}
+  - {id: gap-swe-senior-company, posting: swe-stripe-backend, resume: backend-senior, fit: match, profile: examples/example-corp.json}
+  - {id: gap-ml-staff, posting: data-databricks-ml-serving, resume: ml-engineer-staff, fit: match}
+  - {id: gap-swe-new-grad, posting: swe-northwind-newgrad, resume: new-grad-swe, fit: match}
+  - {id: gap-design-senior, posting: design-airbnb-product-designer, resume: product-designer-senior, fit: match}
+  - {id: gap-pm-mid, posting: pm-shopify-checkout, resume: product-manager-mid, fit: match}
+  - {id: gap-tpm-changer, posting: tpm-harbor-robotics, resume: tpm-career-changer, fit: match}
+  - {id: gap-swe-vs-designer, posting: swe-stripe-backend, resume: product-designer-senior, fit: mismatch}
+  - {id: gap-design-vs-backend, posting: design-airbnb-product-designer, resume: backend-senior, fit: mismatch}
+  - {id: gap-pm-vs-new-grad, posting: pm-shopify-checkout, resume: new-grad-swe, fit: mismatch}
+  - {id: gap-ml-vs-pm, posting: data-databricks-ml-serving, resume: product-manager-mid, fit: mismatch}

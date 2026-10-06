@@ -18,3 +18,11 @@ competency_coverage:
 cost_per_session_usd:
   max: 0.80
   source: "Spec, Metrics: cost per session under $0.80"
+gap_score_spread:
+  max: 3
+  source: "P6 prompt: same inputs give match scores within 3 points across runs (GA-1)"
+gap_fit_order:
+  min: 1.0
+  source: "Harness default. A resume written for the job should score above one for another role"
+gap_cost_usd:
+  source: "Spec, Pricing: planner and gap analysis about $0.05 per session. Shown for information"

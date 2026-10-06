@@ -3,6 +3,8 @@
     result = await run_text_session(config, persona)
 
 P7 and P8 plug in here: pass `interviewer=` (P7) and score `result.turns` with their scorer (P8).
+The brief comes from the real planner (P6, strong_evals.gap.GapPlanner) unless `planner=` or
+`brief=` is passed.
 The controller owns the phases and the clock (spec, Conversation state machine); the interviewer
 only decides what to say and whether to probe. The probe cap is enforced here, in code (IV-3).
 """
@@ -17,8 +19,9 @@ from strong_core.db.models import UsageEvent
 from strong_core.gateway import ModelGateway, build_gateway
 from strong_core.schemas import InterviewerBrief, Phase, SessionConfig, Speaker, Turn
 from strong_evals.candidate import Persona, SimulatedCandidate
+from strong_evals.gap import GapPlanner
 from strong_evals.interfaces import Interviewer, InterviewState, Planner
-from strong_evals.stubs import StubInterviewer, StubPlanner
+from strong_evals.stubs import StubInterviewer
 from strong_evals.usage import MeteredGateway, load_prices
 
 MS_PER_WORD = 400  # about 150 spoken words per minute
@@ -78,7 +81,8 @@ async def run_text_session(
     sid = session_id or uuid.uuid4()
     base = gateway or build_gateway(Settings())
     metered = base if isinstance(base, MeteredGateway) else MeteredGateway(base, load_prices(), sid)
-    brief = brief or await (planner or StubPlanner()).brief(config, persona)
+    if brief is None:
+        brief = await (planner or GapPlanner(metered)).brief(config, persona)
     interviewer = interviewer or StubInterviewer(metered)
     candidate = SimulatedCandidate(
         persona, metered, level=config.level, interview_type=config.interview_type

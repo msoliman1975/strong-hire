@@ -14,6 +14,7 @@ The Python package is `strong_evals` (`evals/src`). All model calls go through
 ./scripts/eval.ps1 -Suite full                      # 30 transcripts and 12 simulated sessions
 ./scripts/models.ps1 pull                           # once, before the local profile
 ./scripts/eval.ps1 -Suite goldset -Profile local    # scorer calibration on local models
+./scripts/eval.ps1 -Suite gap -Profile local        # gap analysis over the P2 fixtures
 ./scripts/eval.ps1 -Suite full -Profile local -Record -Gate
 ```
 
@@ -28,10 +29,11 @@ Suites live in `suites/<name>.yaml`:
 
 | Suite | Contents |
 | --- | --- |
-| `smoke` | 4 scripted transcripts (one per interview type) and 2 short simulated sessions |
+| `smoke` | 4 scripted transcripts (one per interview type), 2 short simulated sessions and 2 gap analyses |
 | `goldset` | All 30 scripted transcripts, scored and compared with the gold-set labels |
 | `simulated` | 12 simulated sessions: 4 interview types times strong, average and weak answers |
-| `full` | `goldset` plus `simulated` |
+| `gap` | Gap analysis over the P2 posting and resume fixtures: 7 matched pairs (one in company mode) and 4 mismatched pairs, 2 runs each |
+| `full` | `goldset`, `simulated` and `gap` |
 
 ## Metrics and thresholds
 
@@ -46,6 +48,9 @@ Thresholds are in `config/thresholds.yaml`.
 | Follow-up rate on vague answers | Simulated sessions: vague answers that got a probe on the same question, while probes were left (IV-3) | 80% (harness default) |
 | Coverage of target competencies | Simulated sessions: target competencies touched by the asked questions | 80% (harness default) |
 | Cost per session | Simulated sessions: sum of `UsageEvent.cost_usd`, with STT and TTS estimated from the text | $0.80 or less (spec) |
+| Gap analysis score spread | Gap pairs: largest difference between the match scores of one pair across runs (GA-1) | 3 points or less (P6) |
+| Gap analysis fit order | Gap pairs: matched resumes score above mismatched resumes on the same posting | 100% (harness default) |
+| Gap analysis cost per run | Gap pairs: `UsageEvent.cost_usd` per run | Information only |
 
 Prices per gateway alias are planning estimates in `config/prices.yaml`. A vague answer is one
 that misses two or more of: own role, measurable result, concrete example, trade-off reasoning
@@ -66,8 +71,11 @@ that misses two or more of: own role, measurable result, concrete example, trade
 - `run_text_session(config, persona)` (`strong_evals.session`): a text-only interview with the
   session controller, an interviewer and the simulated candidate. P7 passes its interviewer with
   `interviewer=`; P8 scores the returned turns with its scorer.
-- Stubs (`strong_evals.stubs`) stand in for the planner, interviewer and scorer until P6 to P8
-  land. They sit behind the interfaces in `strong_evals.interfaces`.
+- Real planner (`strong_evals.gap.GapPlanner`, P6): runs the gap analysis for the persona's resume
+  and its matching posting fixture, then builds the interviewer brief with `strong_worker.gap`.
+  Simulated sessions use it by default.
+- Stubs (`strong_evals.stubs`) stand in for the interviewer and scorer until P7 and P8 land. They
+  sit behind the interfaces in `strong_evals.interfaces`. `StubPlanner` is kept for tests.
 - Fixture recorder (`strong_core.gateway.recorder`): `-Record` saves every model call of a run as
   a fixture that the fake model replays.
 

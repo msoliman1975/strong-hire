@@ -1,3 +1,3 @@
 name: full
-description: Everything. The gold-set calibration plus the twelve simulated sessions.
-include: [goldset, simulated]
+description: Everything. The gold-set calibration, the twelve simulated sessions and the gap analysis pairs.
+include: [goldset, simulated, gap]
