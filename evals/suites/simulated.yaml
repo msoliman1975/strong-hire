@@ -1,0 +1,63 @@
+name: simulated
+description: Twelve text-only sessions with the simulated candidate, four interview types times three answer qualities.
+simulated:
+  - id: sim-beh-strong
+    resume: backend-senior
+    quality: strong
+    candidate_name: Ada Venn
+    session: {interview_type: behavioral, difficulty: realistic, mode: realistic, duration_min: 30, level: senior}
+  - id: sim-hm-strong
+    resume: ml-engineer-staff
+    quality: strong
+    candidate_name: Tomas Ruel
+    session: {interview_type: hiring_manager, difficulty: realistic, mode: realistic, duration_min: 30, level: senior}
+  - id: sim-tq-strong
+    resume: new-grad-swe
+    quality: strong
+    candidate_name: Mira Ostrand
+    session: {interview_type: technical_qa, difficulty: realistic, mode: realistic, duration_min: 30, level: new_grad}
+  - id: sim-case-strong
+    resume: product-manager-mid
+    quality: strong
+    candidate_name: Kofi Lindqvist
+    session: {interview_type: case, difficulty: realistic, mode: realistic, duration_min: 30, level: mid}
+  - id: sim-beh-average
+    resume: backend-senior
+    quality: average
+    candidate_name: Ben Halloway
+    session: {interview_type: behavioral, difficulty: realistic, mode: realistic, duration_min: 30, level: senior}
+  - id: sim-hm-average
+    resume: ml-engineer-staff
+    quality: average
+    candidate_name: Ines Marrow
+    session: {interview_type: hiring_manager, difficulty: realistic, mode: realistic, duration_min: 30, level: senior}
+  - id: sim-tq-average
+    resume: new-grad-swe
+    quality: average
+    candidate_name: Joel Tamsin
+    session: {interview_type: technical_qa, difficulty: realistic, mode: realistic, duration_min: 30, level: new_grad}
+  - id: sim-case-average
+    resume: product-manager-mid
+    quality: average
+    candidate_name: Priya Calder
+    session: {interview_type: case, difficulty: realistic, mode: realistic, duration_min: 30, level: mid}
+  - id: sim-beh-weak
+    resume: backend-senior
+    quality: weak
+    candidate_name: Cal Dunmore
+    session: {interview_type: behavioral, difficulty: tough, mode: realistic, duration_min: 30, level: senior}
+  - id: sim-hm-weak
+    resume: ml-engineer-staff
+    quality: weak
+    candidate_name: Nadia Fenwick
+    session: {interview_type: hiring_manager, difficulty: tough, mode: realistic, duration_min: 30, level: senior}
+  - id: sim-tq-weak
+    resume: new-grad-swe
+    quality: weak
+    candidate_name: Owen Strand
+    session: {interview_type: technical_qa, difficulty: tough, mode: realistic, duration_min: 30, level: new_grad}
+  - id: sim-case-weak
+    resume: product-manager-mid
+    quality: weak
+    candidate_name: Lila Burrows
+    session: {interview_type: case, difficulty: tough, mode: realistic, duration_min: 30, level: mid}

@@ -1,0 +1,18 @@
+# Pass or fail lines for the eval report. "source" says where each number comes from.
+# Metrics without min or max are shown for information only.
+scorer_within_one_band:
+  min: 0.85
+  source: "Spec, Calibration and Metrics: within one band on 85% or more of the gold set"
+scorer_exact:
+  source: "No threshold in the spec. Shown for information"
+rubric_within_one_point:
+  source: "No threshold in the spec. Shown for information"
+follow_up_rate:
+  min: 0.80
+  source: "Harness default. IV-3 asks for follow-ups on vague answers but gives no number"
+competency_coverage:
+  min: 0.80
+  source: "Harness default. The brief lists 4 to 6 target competencies; the spec gives no number"
+cost_per_session_usd:
+  max: 0.80
+  source: "Spec, Metrics: cost per session under $0.80"

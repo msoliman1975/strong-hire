@@ -1,0 +1,16 @@
+name: smoke
+description: Fast end-to-end check. Four scripted transcripts (one per interview type) and two short simulated sessions.
+scripted: [beh-01, hm-04, tq-05, case-06]
+simulated:
+  - id: sim-smoke-beh-weak
+    resume: backend-senior
+    quality: weak
+    candidate_name: Sam Ortega
+    max_questions: 2
+    session: {interview_type: behavioral, difficulty: realistic, mode: realistic, duration_min: 30, level: senior}
+  - id: sim-smoke-case-strong
+    resume: product-manager-mid
+    quality: strong
+    candidate_name: Rina Calloway
+    max_questions: 2
+    session: {interview_type: case, difficulty: friendly, mode: realistic, duration_min: 30, level: mid}

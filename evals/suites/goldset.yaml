@@ -1,0 +1,3 @@
+name: goldset
+description: Scorer calibration. Scores every scripted transcript and compares with the human gold-set labels (spec, Calibration).
+scripted: all
