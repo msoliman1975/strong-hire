@@ -172,6 +172,9 @@ async def publish_profile(
     if previous is not None:
         previous.status = ProfileStatus.ARCHIVED
         previous.profile_json = _with_meta(previous.profile_json, status=ProfileStatus.ARCHIVED)
+        # Write the archive first. The database allows one Published row per company, and
+        # the flush order of two updates on one table is not fixed.
+        await db.flush()
     row.status = ProfileStatus.PUBLISHED
     row.published_at = now
     row.reviewed_by = reviewer

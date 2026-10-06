@@ -278,6 +278,27 @@ async def test_ad1_publish_switches_active_version_and_keeps_old_readable(
     assert summary["amazon"].version_count == 0
 
 
+async def test_ad1_publish_keeps_one_published_version_per_company(db: AsyncSession) -> None:
+    """Publish archives the old version before it publishes the new one, so the unique index on
+    Published rows never fails. Many switches cover both update orders of the two rows."""
+    google = as_google(example_data())
+    for n in range(1, 7):
+        data = copy.deepcopy(google)
+        data["persona"]["pace"] = f"Pace {n}"
+        await _import(db, data)
+    company = await repo.require_company(db, "google")
+
+    for version in [1, 2, 3, 4, 5, 6, 1, 6, 2, 5, 3, 4]:
+        await repo.publish_profile(db, "google", version, reviewer="mo")
+        await db.commit()
+        statuses = (
+            await db.scalars(select(ProfileRow.status).where(ProfileRow.company_id == company.id))
+        ).all()
+        assert statuses.count(ProfileStatus.PUBLISHED) == 1
+        published = await get_published_profile(db, company.id)
+        assert published is not None and published.version == version
+
+
 # --- strongctl ------------------------------------------------------------------------------
 
 

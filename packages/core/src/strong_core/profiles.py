@@ -7,6 +7,9 @@ A session works from a ResolvedProfile: the company's Published profile, or gene
 Generic mode (spec, 'Companies outside the 20'): a default tech-industry persona, equal
 competency weights, and no company values. It has no version number, so sessions store NULL
 in profile_version.
+
+The database allows at most one Published version per company (a partial unique index on
+company_profiles.company_id).
 """
 
 from __future__ import annotations
@@ -191,6 +194,7 @@ async def get_profile_version(
 
 
 async def get_published_row(db: AsyncSession, company_id: uuid.UUID) -> ProfileRow | None:
+    """The Published row. The database allows at most one per company."""
     return await db.scalar(
         select(ProfileRow)
         .where(

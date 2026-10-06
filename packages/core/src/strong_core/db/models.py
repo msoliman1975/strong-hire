@@ -28,6 +28,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
     func,
+    text,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -171,7 +172,17 @@ class Company(Base):
 
 class CompanyProfile(Base):
     __tablename__ = "company_profiles"
-    __table_args__ = (UniqueConstraint("company_id", "version"),)
+    __table_args__ = (
+        UniqueConstraint("company_id", "version"),
+        # At most one Published version per company (AD-1). Publish archives the old one first.
+        Index(
+            "uq_company_profiles_one_published",
+            "company_id",
+            unique=True,
+            postgresql_where=text("status = 'published'"),
+            sqlite_where=text("status = 'published'"),
+        ),
+    )
 
     id: Mapped[uuid.UUID] = _uuid_pk()
     company_id: Mapped[uuid.UUID] = mapped_column(

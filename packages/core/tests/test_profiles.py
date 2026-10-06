@@ -1,16 +1,23 @@
-"""Profile lookups and the generic default profile (IV-5, IN-5, AD-1). They run on SQLite."""
+"""Profile lookups and the generic default profile (IV-5, IN-5, AD-1), and the database rule that
+one company has at most one Published profile version (AD-1).
+
+The lookups run on SQLite. The one-Published rule also runs on Postgres 16 when
+STRONG_TEST_POSTGRES_URL points at a database migrated to head (CI: the migrations job).
+"""
 
 from __future__ import annotations
 
 import copy
 import json
+import os
 import uuid
 from collections.abc import AsyncIterator
 from typing import Any
 
 import pytest
-from sqlalchemy import select
+from sqlalchemy import create_engine, insert, select
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.pool import StaticPool
@@ -40,6 +47,7 @@ from strong_core.schemas import (
 )
 
 EXAMPLE = find_repo_root() / "profiles/examples/example-corp.json"
+POSTGRES_URL = os.environ.get("STRONG_TEST_POSTGRES_URL")
 
 
 @compiles(JSONB, "sqlite")
@@ -195,3 +203,91 @@ async def test_ad1_stored_profile_that_no_longer_validates_names_the_field(
     with pytest.raises(ProfileFileError):
         await get_published_profile(db, company.id)
     assert parse_profile(example_data()).company_slug == "google"
+
+
+# --- one Published version per company (AD-1) ------------------------------------------------
+
+
+async def test_ad1_second_published_version_for_a_company_fails(db: AsyncSession) -> None:
+    company = await _company(db)
+    await _add_version(db, company, 1, ProfileStatus.ARCHIVED)
+    await _add_version(db, company, 2, ProfileStatus.ARCHIVED)
+    await _add_version(db, company, 3, ProfileStatus.DRAFT)
+    await _add_version(db, company, 4, ProfileStatus.PUBLISHED)
+    other = await _company(db, "amazon")
+    await _add_version(db, other, 1, ProfileStatus.PUBLISHED)
+    await db.commit()
+
+    with pytest.raises(
+        IntegrityError, match=r"UNIQUE constraint failed: company_profiles\.company_id"
+    ):
+        await _add_version(db, company, 5, ProfileStatus.PUBLISHED)
+    await db.rollback()
+
+    company = await _company(db)
+    draft = await _add_version(db, company, 5, ProfileStatus.DRAFT)
+    await db.commit()
+    draft.status = ProfileStatus.PUBLISHED
+    with pytest.raises(IntegrityError):
+        await db.flush()
+    await db.rollback()
+
+
+def _profile_values(company_id: uuid.UUID, version: int, status: ProfileStatus) -> dict[str, Any]:
+    data = example_data()
+    return {
+        "id": uuid.uuid4(),
+        "company_id": company_id,
+        "version": version,
+        "status": status,
+        "profile_json": data,
+        "sources_json": data["sources"],
+    }
+
+
+@pytest.mark.skipif(POSTGRES_URL is None, reason="needs STRONG_TEST_POSTGRES_URL (migrated)")
+def test_ad1_postgres_migration_allows_one_published_version_per_company() -> None:
+    """Runs on the migrated Postgres schema, so it checks migration 0003, not create_all."""
+    assert POSTGRES_URL is not None
+    engine = create_engine(POSTGRES_URL)
+    rows = ProfileRow.__table__
+    try:
+        with engine.connect() as conn:
+            outer = conn.begin()
+            company_id = uuid.uuid4()
+            conn.execute(
+                insert(Company.__table__).values(
+                    id=company_id, slug=f"t-{company_id.hex[:12]}", name="Test", active=False
+                )
+            )
+            conn.execute(insert(rows).values(**_profile_values(company_id, 1, ProfileStatus.DRAFT)))
+            conn.execute(
+                insert(rows).values(**_profile_values(company_id, 2, ProfileStatus.PUBLISHED))
+            )
+            nested = conn.begin_nested()
+            with pytest.raises(IntegrityError, match="uq_company_profiles_one_published"):
+                conn.execute(
+                    insert(rows).values(**_profile_values(company_id, 3, ProfileStatus.PUBLISHED))
+                )
+            nested.rollback()
+
+            # Publish order: archive the old version, then publish the new one.
+            conn.execute(
+                rows.update()
+                .where(rows.c.company_id == company_id, rows.c.version == 2)
+                .values(status=ProfileStatus.ARCHIVED)
+            )
+            conn.execute(
+                rows.update()
+                .where(rows.c.company_id == company_id, rows.c.version == 1)
+                .values(status=ProfileStatus.PUBLISHED)
+            )
+            published = conn.execute(
+                rows.select().where(
+                    rows.c.company_id == company_id, rows.c.status == ProfileStatus.PUBLISHED
+                )
+            ).all()
+            assert [r.version for r in published] == [1]
+            outer.rollback()
+    finally:
+        engine.dispose()
