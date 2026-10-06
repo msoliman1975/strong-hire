@@ -3,97 +3,40 @@
  * screen works today. Each block names the workstream that will build the real endpoint; that
  * workstream may change the shape, then updates this file and its mock.
  *
- * The payloads inside the envelopes (JobPosting, Resume, GapAnalysis, SessionConfig, Scorecard,
- * ProgressSnapshot, PlannedSession) are the shared contracts from packages/core.
+ * The payloads inside the envelopes (GapAnalysis, SessionConfig, Scorecard, ProgressSnapshot,
+ * PlannedSession) are the shared contracts from packages/core. Job targets and resumes use the
+ * real API types (JobTargetOut, ResumeOut) from openapi.json.
  */
 import { request } from "./client";
 import type {
   GapAnalysis,
-  JobPosting,
-  Level,
+  JobTargetOut,
   PlannedSession,
   ProgressSnapshot,
-  Resume,
+  ResumeOut,
   Scorecard,
   SessionConfig,
   SessionStatus,
 } from "./types";
 
-// ---------------------------------------------------------------- P2: job and resume inputs
-
-export type JobStatus = "extracting" | "needs_confirmation" | "confirmed" | "failed";
-
-/** IN-4 optional context. */
-export interface JobContext {
-  stage: string | null;
-  interviewer: string | null;
-  recruiter_notes: string | null;
-  concerns: string | null;
-}
-
-export interface CompanyRef {
-  id: string;
-  name: string;
-  slug: string;
-}
-
-export interface JobTarget {
-  id: string;
-  status: JobStatus;
-  source_url: string | null;
-  /** Set once extraction finishes. The user confirms or edits it (IN-2). */
-  posting: JobPosting | null;
-  /** Null means generic mode (IN-5). */
-  company: CompanyRef | null;
-  level: Level | null;
-  context: JobContext | null;
-  resume_id: string | null;
-  /** Why extraction failed, for example a blocked job board. The user can paste text instead. */
-  error: string | null;
-  created_at: string;
-}
+// ---------------------------------------------------------------- job and resume lists
+// P2 built the job target and resume endpoints (see inputs.ts). These two lists are not in the
+// API yet. No workstream owns them yet; the dashboard (P8) and resume reuse need them.
 
 export interface JobTargetSummary {
-  job: JobTarget;
+  job_target: JobTargetOut;
+  /** From the latest gap analysis. Null until one is ready. */
   match_score: number | null;
   sessions_count: number;
   last_session_at: string | null;
 }
 
-export interface CreateJobRequest {
-  source_url?: string;
-  raw_text?: string;
-}
-
-export type ResumeStatus = "parsing" | "ready" | "failed";
-
-export interface ResumeRecord {
-  id: string;
-  status: ResumeStatus;
-  file_name: string | null;
-  parsed: Resume | null;
-  error: string | null;
-  uploaded_at: string;
-}
-
-export const jobsApi = {
-  list: () => request<JobTargetSummary[]>("GET", "/jobs"),
-  create: (body: CreateJobRequest) => request<JobTarget>("POST", "/jobs", body),
-  get: (jobId: string) => request<JobTarget>("GET", `/jobs/${jobId}`),
-  /** Saves the confirmed or edited posting (IN-2). */
-  confirm: (jobId: string, posting: JobPosting) =>
-    request<JobTarget>("PUT", `/jobs/${jobId}/posting`, posting),
-  setContext: (jobId: string, context: JobContext) =>
-    request<JobTarget>("PUT", `/jobs/${jobId}/context`, context),
-  setResume: (jobId: string, resumeId: string) =>
-    request<JobTarget>("PUT", `/jobs/${jobId}/resume`, { resume_id: resumeId }),
+export const jobListApi = {
+  list: () => request<JobTargetSummary[]>("GET", "/job-targets"),
 };
 
-export const resumesApi = {
-  list: () => request<ResumeRecord[]>("GET", "/resumes"),
-  get: (resumeId: string) => request<ResumeRecord>("GET", `/resumes/${resumeId}`),
-  /** Multipart: either a `file` (PDF or DOCX) or a `text` field. */
-  upload: (form: FormData) => request<ResumeRecord>("POST", "/resumes", form),
+export const resumeListApi = {
+  list: () => request<ResumeOut[]>("GET", "/resumes"),
 };
 
 // ---------------------------------------------------------------- P6: gap analysis
@@ -108,10 +51,16 @@ export interface GapAnalysisResult {
   error: string | null;
 }
 
+export interface StartGapAnalysisRequest {
+  /** The resume to compare with the job. A job target has no resume of its own. */
+  resume_id: string;
+}
+
 export const gapApi = {
   /** Starts or restarts the analysis. Free and rate limited (GA-4). */
-  start: (jobId: string) => request<GapAnalysisResult>("POST", `/jobs/${jobId}/gap-analysis`),
-  get: (jobId: string) => request<GapAnalysisResult>("GET", `/jobs/${jobId}/gap-analysis`),
+  start: (jobId: string, body: StartGapAnalysisRequest) =>
+    request<GapAnalysisResult>("POST", `/job-targets/${jobId}/gap-analysis`, body),
+  get: (jobId: string) => request<GapAnalysisResult>("GET", `/job-targets/${jobId}/gap-analysis`),
 };
 
 // ---------------------------------------------------------------- P7/P10: sessions
@@ -136,7 +85,7 @@ export const sessionsApi = {
   create: (body: CreateSessionRequest) => request<SessionRecord>("POST", "/sessions", body),
   get: (sessionId: string) => request<SessionRecord>("GET", `/sessions/${sessionId}`),
   end: (sessionId: string) => request<SessionRecord>("POST", `/sessions/${sessionId}/end`),
-  listForJob: (jobId: string) => request<SessionRecord[]>("GET", `/jobs/${jobId}/sessions`),
+  listForJob: (jobId: string) => request<SessionRecord[]>("GET", `/job-targets/${jobId}/sessions`),
 };
 
 // ---------------------------------------------------------------- P8: debrief and progress
@@ -160,7 +109,7 @@ export interface JobProgress {
 
 export const debriefApi = {
   get: (sessionId: string) => request<Debrief>("GET", `/sessions/${sessionId}/debrief`),
-  progress: (jobId: string) => request<JobProgress>("GET", `/jobs/${jobId}/progress`),
+  progress: (jobId: string) => request<JobProgress>("GET", `/job-targets/${jobId}/progress`),
 };
 
 // ---------------------------------------------------------------- P9: billing and account

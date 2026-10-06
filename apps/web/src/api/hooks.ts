@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { authApi } from "./auth";
-import { billingApi, debriefApi, gapApi, jobsApi, resumesApi, sessionsApi } from "./planned";
+import { jobRunning, jobTargetsApi, resumesApi } from "./inputs";
+import { billingApi, debriefApi, gapApi, jobListApi, resumeListApi, sessionsApi } from "./planned";
 
 /** How often to re-check work that runs in the background (extraction, analysis, scoring). */
 export const POLL_MS = 1000;
@@ -13,11 +14,13 @@ export const keys = {
   plan: ["billing", "plan"] as const,
   jobs: ["jobs"] as const,
   job: (id: string) => ["jobs", id] as const,
+  jobTask: (id: string, taskId: string) => ["jobs", id, "task", taskId] as const,
   jobSessions: (id: string) => ["jobs", id, "sessions"] as const,
   gap: (id: string) => ["jobs", id, "gap"] as const,
   progress: (id: string) => ["jobs", id, "progress"] as const,
   resumes: ["resumes"] as const,
   resume: (id: string) => ["resumes", id] as const,
+  resumeTask: (id: string, taskId: string) => ["resumes", id, "task", taskId] as const,
   session: (id: string) => ["sessions", id] as const,
   debrief: (id: string) => ["sessions", id, "debrief"] as const,
 };
@@ -32,23 +35,42 @@ export const useUsage = (enabled = true) =>
 
 export const usePlan = () => useQuery({ queryKey: keys.plan, queryFn: billingApi.plan });
 
-export const useJobs = () => useQuery({ queryKey: keys.jobs, queryFn: jobsApi.list });
+export const useJobs = () => useQuery({ queryKey: keys.jobs, queryFn: jobListApi.list });
 
-export const useJob = (jobId: string) =>
+/** A job target. Polls while the posting is still being read, unless `poll` is false. */
+export const useJob = (jobId: string, poll = true) =>
   useQuery({
     queryKey: keys.job(jobId),
-    queryFn: () => jobsApi.get(jobId),
-    refetchInterval: (q) => (q.state.data?.status === "extracting" ? POLL_MS : false),
+    queryFn: () => jobTargetsApi.get(jobId),
+    refetchInterval: (q) => (poll && q.state.data?.status === "pending" ? POLL_MS : false),
   });
 
-export const useResumes = () => useQuery({ queryKey: keys.resumes, queryFn: resumesApi.list });
+/** The background job that reads a posting. `taskId` comes from the create or update response. */
+export const useJobTask = (jobId: string, taskId: string | null) =>
+  useQuery({
+    queryKey: keys.jobTask(jobId, taskId ?? ""),
+    queryFn: () => jobTargetsApi.job(jobId, taskId ?? ""),
+    enabled: Boolean(taskId),
+    refetchInterval: (q) => (jobRunning(q.state.data) ? POLL_MS : false),
+  });
 
-export const useResume = (resumeId: string | null) =>
+export const useResumes = () => useQuery({ queryKey: keys.resumes, queryFn: resumeListApi.list });
+
+/** A resume. Polls while it is still being read, unless `poll` is false. */
+export const useResume = (resumeId: string | null, poll = true) =>
   useQuery({
     queryKey: keys.resume(resumeId ?? ""),
     queryFn: () => resumesApi.get(resumeId ?? ""),
     enabled: Boolean(resumeId),
-    refetchInterval: (q) => (q.state.data?.status === "parsing" ? POLL_MS : false),
+    refetchInterval: (q) => (poll && q.state.data?.status === "pending" ? POLL_MS : false),
+  });
+
+export const useResumeTask = (resumeId: string | null, taskId: string | null) =>
+  useQuery({
+    queryKey: keys.resumeTask(resumeId ?? "", taskId ?? ""),
+    queryFn: () => resumesApi.job(resumeId ?? "", taskId ?? ""),
+    enabled: Boolean(resumeId && taskId),
+    refetchInterval: (q) => (jobRunning(q.state.data) ? POLL_MS : false),
   });
 
 export const useGapAnalysis = (jobId: string) =>

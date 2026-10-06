@@ -9,11 +9,8 @@ import { setupLink } from "./GapAnalysisPage";
 
 /** Where an unfinished job setup continues. Display routing only. */
 function nextSetupStep(s: JobTargetSummary): string | null {
-  const { job } = s;
-  if (job.status === "extracting" || job.status === "needs_confirmation" || job.status === "failed") {
-    return `/jobs/${job.id}/confirm`;
-  }
-  if (!job.resume_id) return `/jobs/${job.id}/resume`;
+  const job = s.job_target;
+  if (job.status === "pending") return `/jobs/${job.id}/confirm`;
   if (s.match_score === null) return `/jobs/${job.id}/gap`;
   return null;
 }
@@ -54,7 +51,7 @@ export function DashboardPage() {
           </div>
           <ul className="plain-list section" aria-label="Jobs">
             {jobs.data.map((s) => (
-              <JobRow key={s.job.id} summary={s} />
+              <JobRow key={s.job_target.id} summary={s} />
             ))}
           </ul>
         </>
@@ -64,7 +61,7 @@ export function DashboardPage() {
 }
 
 function JobRow({ summary }: { summary: JobTargetSummary }) {
-  const { job } = summary;
+  const job = summary.job_target;
   const setup = nextSetupStep(summary);
   const title = job.posting ? job.posting.title : "Job posting";
   const company = job.posting?.company_name ?? job.source_url ?? "Reading the posting";
@@ -75,7 +72,7 @@ function JobRow({ summary }: { summary: JobTargetSummary }) {
         <h2>{title}</h2>
         <p className="muted">
           {company}
-          {job.company === null && job.posting ? ", general interview style" : ""}
+          {job.generic_mode ? ", general interview style" : ""}
         </p>
         <p>
           {summary.sessions_count} {summary.sessions_count === 1 ? "session" : "sessions"}

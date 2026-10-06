@@ -1,6 +1,7 @@
 /**
  * The main candidate journey in jsdom, against the MSW mock API. Requirement IDs: AC-2
- * (consent off by default), IN-1 (paste fallback), IN-4 (optional context can be skipped),
+ * (consent off by default), IN-1 (paste fallback), IN-2 (confirm the posting), IN-3 (resume),
+ * IN-4 (optional context can be skipped),
  * BL-2 (one free interview, then the paywall), BL-1 (usage meter).
  */
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -144,13 +145,41 @@ describe("main journey", () => {
     expect(await screen.findByRole("heading", { name: "Sign in" })).toBeInTheDocument();
   });
 
-  it("IN-1: a blocked job board falls back to pasting the text", async () => {
+  it("IN-1: LinkedIn cannot be read, so the user pastes the text and the link is kept", async () => {
+    const jobBodies: unknown[] = [];
+    server.events.on("request:start", async ({ request }) => {
+      if (request.method === "POST" && request.url.endsWith("/api/job-targets")) {
+        jobBodies.push(await request.clone().json());
+      }
+    });
     const user = renderApp("/signin");
     await signUp(user);
     await user.click(screen.getByRole("link", { name: "Add a job" }));
-    await user.type(screen.getByLabelText("Job posting link"), "https://www.linkedin.com/jobs/view/1");
+    const link = "https://www.linkedin.com/jobs/view/1";
+    await user.type(screen.getByLabelText("Job posting link"), link);
+    await user.click(screen.getByRole("button", { name: "Read job posting" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("This site does not allow automatic reading.");
+
+    await user.type(screen.getByLabelText("Or paste the job posting text"), "Senior engineer, payments. ".repeat(5));
+    await user.click(screen.getByRole("button", { name: "Read job posting" }));
+    expect(await screen.findByRole("heading", { name: "Check the job details" })).toBeInTheDocument();
+    expect(jobBodies).toEqual([
+      { url: link, text: null },
+      { url: link, text: "Senior engineer, payments. ".repeat(5).trim() },
+    ]);
+  });
+
+  it("IN-1: when the background job cannot read the page, the user pastes the text", async () => {
+    const user = renderApp("/signin");
+    await signUp(user);
+    await user.click(screen.getByRole("link", { name: "Add a job" }));
+    await user.type(screen.getByLabelText("Job posting link"), "https://jobs.blocked.example/42");
     await user.click(screen.getByRole("button", { name: "Read job posting" }));
     expect(await screen.findByRole("heading", { name: "Paste the job posting" })).toBeInTheDocument();
-    expect(screen.getByRole("alert")).toHaveTextContent("LinkedIn does not allow automatic reading.");
+    expect(screen.getByRole("alert")).toHaveTextContent("This job board blocks automatic reading.");
+
+    await user.type(screen.getByLabelText("Job posting text"), "Senior engineer, payments. ".repeat(5));
+    await user.click(screen.getByRole("button", { name: "Read job posting" }));
+    expect(await screen.findByRole("heading", { name: "Check the job details" })).toBeInTheDocument();
   });
 });

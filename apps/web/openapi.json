@@ -5,6 +5,382 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/job-targets": {
+      "post": {
+        "tags": [
+          "inputs"
+        ],
+        "summary": "Create Job Target",
+        "operationId": "create_job_target_job_targets_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobTargetCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobTargetAccepted"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/job-targets/{job_target_id}": {
+      "get": {
+        "tags": [
+          "inputs"
+        ],
+        "summary": "Get Job Target",
+        "operationId": "get_job_target_job_targets__job_target_id__get",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobTargetOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "inputs"
+        ],
+        "summary": "Update Job Target",
+        "description": "Confirm or edit the posting. A changed company name runs company matching again.",
+        "operationId": "update_job_target_job_targets__job_target_id__put",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobTargetUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobTargetAccepted"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/job-targets/{job_target_id}/jobs/{job_id}": {
+      "get": {
+        "tags": [
+          "inputs"
+        ],
+        "summary": "Get Job Target Job",
+        "operationId": "get_job_target_job_job_targets__job_target_id__jobs__job_id__get",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resumes": {
+      "post": {
+        "tags": [
+          "inputs"
+        ],
+        "summary": "Create Resume",
+        "description": "Upload a PDF or DOCX file, or send pasted text in the `text` form field (IN-3).",
+        "operationId": "create_resume_resumes_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_create_resume_resumes_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeAccepted"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resumes/{resume_id}": {
+      "get": {
+        "tags": [
+          "inputs"
+        ],
+        "summary": "Get Resume",
+        "operationId": "get_resume_resumes__resume_id__get",
+        "parameters": [
+          {
+            "name": "resume_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Resume Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "inputs"
+        ],
+        "summary": "Update Resume",
+        "description": "Confirm or edit the parsed resume.",
+        "operationId": "update_resume_resumes__resume_id__put",
+        "parameters": [
+          {
+            "name": "resume_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Resume Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResumeUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resumes/{resume_id}/jobs/{job_id}": {
+      "get": {
+        "tags": [
+          "inputs"
+        ],
+        "summary": "Get Resume Job",
+        "operationId": "get_resume_job_resumes__resume_id__jobs__job_id__get",
+        "parameters": [
+          {
+            "name": "resume_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Resume Id"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/providers": {
       "get": {
         "tags": [
@@ -398,6 +774,36 @@
         ],
         "title": "AuthUser"
       },
+      "Body_create_resume_resumes_post": {
+        "properties": {
+          "file": {
+            "anyOf": [
+              {
+                "type": "string",
+                "contentMediaType": "application/octet-stream"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          }
+        },
+        "type": "object",
+        "title": "Body_create_resume_resumes_post"
+      },
       "BriefQuestion": {
         "additionalProperties": false,
         "properties": {
@@ -723,12 +1129,11 @@
         "type": "string"
       },
       "Education": {
-        "additionalProperties": false,
         "properties": {
           "institution": {
+            "type": "string",
             "minLength": 1,
-            "title": "Institution",
-            "type": "string"
+            "title": "Institution"
           },
           "degree": {
             "anyOf": [
@@ -739,7 +1144,6 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Degree"
           },
           "field_of_study": {
@@ -751,31 +1155,30 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Field Of Study"
           },
           "end": {
             "anyOf": [
               {
+                "type": "string",
+                "pattern": "^\\d{4}(-(0[1-9]|1[0-2]))?$",
                 "examples": [
                   "2023-04"
-                ],
-                "pattern": "^\\d{4}(-(0[1-9]|1[0-2]))?$",
-                "type": "string"
+                ]
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "End"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "institution"
         ],
-        "title": "Education",
-        "type": "object"
+        "title": "Education"
       },
       "Gap": {
         "additionalProperties": false,
@@ -1002,19 +1405,121 @@
         "title": "InterviewerBrief",
         "type": "object"
       },
-      "JobPosting": {
+      "JobContext": {
+        "properties": {
+          "interviewer_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interviewer Name"
+          },
+          "interviewer_role": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interviewer Role"
+          },
+          "recruiter_notes": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recruiter Notes"
+          },
+          "concerns": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Concerns"
+          }
+        },
         "additionalProperties": false,
-        "description": "Structured data extracted from a job posting. The user confirms or edits it (IN-2).",
+        "type": "object",
+        "title": "JobContext",
+        "description": "Optional context the user adds about the interview (IN-4). Stage has its own column."
+      },
+      "JobOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "in_progress",
+              "complete",
+              "failed",
+              "not_found"
+            ],
+            "title": "Status"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status"
+        ],
+        "title": "JobOut"
+      },
+      "JobPosting": {
         "properties": {
           "company_name": {
+            "type": "string",
             "minLength": 1,
-            "title": "Company Name",
-            "type": "string"
+            "title": "Company Name"
           },
           "title": {
+            "type": "string",
             "minLength": 1,
-            "title": "Title",
-            "type": "string"
+            "title": "Title"
           },
           "role_family": {
             "$ref": "#/components/schemas/RoleFamily",
@@ -1029,7 +1534,6 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "description": "Normalized level, if it can be inferred."
           },
           "level_label": {
@@ -1041,9 +1545,8 @@
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "Level as written in the posting, for example 'L5' or 'Senior'.",
-            "title": "Level Label"
+            "title": "Level Label",
+            "description": "Level as written in the posting, for example 'L5' or 'Senior'."
           },
           "team": {
             "anyOf": [
@@ -1054,7 +1557,6 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Team"
           },
           "location": {
@@ -1066,29 +1568,28 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Location"
           },
           "must_have_skills": {
             "items": {
               "type": "string"
             },
-            "title": "Must Have Skills",
-            "type": "array"
+            "type": "array",
+            "title": "Must Have Skills"
           },
           "nice_to_have_skills": {
             "items": {
               "type": "string"
             },
-            "title": "Nice To Have Skills",
-            "type": "array"
+            "type": "array",
+            "title": "Nice To Have Skills"
           },
           "responsibilities": {
             "items": {
               "type": "string"
             },
-            "title": "Responsibilities",
-            "type": "array"
+            "type": "array",
+            "title": "Responsibilities"
           },
           "source_url": {
             "anyOf": [
@@ -1099,19 +1600,236 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Source Url"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "company_name",
           "title"
         ],
         "title": "JobPosting",
-        "type": "object"
+        "description": "Structured data extracted from a job posting. The user confirms or edits it (IN-2)."
+      },
+      "JobTargetAccepted": {
+        "properties": {
+          "job_target": {
+            "$ref": "#/components/schemas/JobTargetOut"
+          },
+          "job": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/JobOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "job_target",
+          "job"
+        ],
+        "title": "JobTargetAccepted"
+      },
+      "JobTargetCreate": {
+        "properties": {
+          "text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          },
+          "stage": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stage"
+          },
+          "context": {
+            "$ref": "#/components/schemas/JobContext"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "JobTargetCreate",
+        "description": "A posting as pasted text, a URL, or both (IN-1). With both, the text is used and the URL\nhelps company matching."
+      },
+      "JobTargetOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "extracted"
+            ],
+            "title": "Status"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "posting": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/JobPosting"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "level": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Level"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "company_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company Id"
+          },
+          "company_slug": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company Slug"
+          },
+          "generic_mode": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Generic Mode",
+            "description": "True when no curated company matched. None until extraction finishes."
+          },
+          "stage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stage"
+          },
+          "context": {
+            "$ref": "#/components/schemas/JobContext"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "source_url",
+          "posting",
+          "level",
+          "company_id",
+          "company_slug",
+          "generic_mode",
+          "stage",
+          "context",
+          "created_at"
+        ],
+        "title": "JobTargetOut"
+      },
+      "JobTargetUpdate": {
+        "properties": {
+          "posting": {
+            "$ref": "#/components/schemas/JobPosting"
+          },
+          "stage": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stage"
+          },
+          "context": {
+            "$ref": "#/components/schemas/JobContext"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "posting"
+        ],
+        "title": "JobTargetUpdate",
+        "description": "The user confirms or edits the extracted posting (IN-2) and the context (IN-4)."
       },
       "Level": {
-        "description": "Normalized seniority (IV-6). Company-specific labels such as L5 or E5 map to these.",
+        "type": "string",
         "enum": [
           "new_grad",
           "mid",
@@ -1119,7 +1837,7 @@
           "staff_principal"
         ],
         "title": "Level",
-        "type": "string"
+        "description": "Normalized seniority (IV-6). Company-specific labels such as L5 or E5 map to these."
       },
       "LevelBar": {
         "additionalProperties": false,
@@ -1691,8 +2409,6 @@
         "type": "object"
       },
       "Resume": {
-        "additionalProperties": false,
-        "description": "A parsed resume (IN-3). Contact details are deliberately not part of the contract.",
         "properties": {
           "summary": {
             "anyOf": [
@@ -1703,110 +2419,191 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Summary"
           },
           "roles": {
             "items": {
               "$ref": "#/components/schemas/ResumeRole"
             },
-            "title": "Roles",
-            "type": "array"
+            "type": "array",
+            "title": "Roles"
           },
           "skills": {
             "items": {
               "type": "string"
             },
-            "title": "Skills",
-            "type": "array"
+            "type": "array",
+            "title": "Skills"
           },
           "education": {
             "items": {
               "$ref": "#/components/schemas/Education"
             },
-            "title": "Education",
-            "type": "array"
+            "type": "array",
+            "title": "Education"
           },
           "certifications": {
             "items": {
               "type": "string"
             },
-            "title": "Certifications",
-            "type": "array"
+            "type": "array",
+            "title": "Certifications"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "title": "Resume",
-        "type": "object"
+        "description": "A parsed resume (IN-3). Contact details are deliberately not part of the contract."
+      },
+      "ResumeAccepted": {
+        "properties": {
+          "resume": {
+            "$ref": "#/components/schemas/ResumeOut"
+          },
+          "job": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/JobOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "resume",
+          "job"
+        ],
+        "title": "ResumeAccepted"
+      },
+      "ResumeOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "extracted"
+            ],
+            "title": "Status"
+          },
+          "has_file": {
+            "type": "boolean",
+            "title": "Has File"
+          },
+          "resume": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Resume"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "uploaded_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Uploaded At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "has_file",
+          "resume",
+          "uploaded_at"
+        ],
+        "title": "ResumeOut"
       },
       "ResumeRole": {
-        "additionalProperties": false,
         "properties": {
           "title": {
+            "type": "string",
             "minLength": 1,
-            "title": "Title",
-            "type": "string"
+            "title": "Title"
           },
           "company": {
+            "type": "string",
             "minLength": 1,
-            "title": "Company",
-            "type": "string"
+            "title": "Company"
           },
           "start": {
             "anyOf": [
               {
+                "type": "string",
+                "pattern": "^\\d{4}(-(0[1-9]|1[0-2]))?$",
                 "examples": [
                   "2023-04"
-                ],
-                "pattern": "^\\d{4}(-(0[1-9]|1[0-2]))?$",
-                "type": "string"
+                ]
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Start"
           },
           "end": {
             "anyOf": [
               {
+                "type": "string",
+                "pattern": "^\\d{4}(-(0[1-9]|1[0-2]))?$",
                 "examples": [
                   "2023-04"
-                ],
-                "pattern": "^\\d{4}(-(0[1-9]|1[0-2]))?$",
-                "type": "string"
+                ]
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "None means current role.",
-            "title": "End"
+            "title": "End",
+            "description": "None means current role."
           },
           "achievements": {
             "items": {
               "type": "string"
             },
-            "title": "Achievements",
-            "type": "array"
+            "type": "array",
+            "title": "Achievements"
           },
           "skills": {
             "items": {
               "type": "string"
             },
-            "title": "Skills",
-            "type": "array"
+            "type": "array",
+            "title": "Skills"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "title",
           "company"
         ],
-        "title": "ResumeRole",
-        "type": "object"
+        "title": "ResumeRole"
+      },
+      "ResumeUpdate": {
+        "properties": {
+          "resume": {
+            "$ref": "#/components/schemas/Resume"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "resume"
+        ],
+        "title": "ResumeUpdate"
       },
       "RoleFamily": {
+        "type": "string",
         "enum": [
           "swe",
           "data_ml",
@@ -1815,8 +2612,7 @@
           "tpm",
           "other"
         ],
-        "title": "RoleFamily",
-        "type": "string"
+        "title": "RoleFamily"
       },
       "Scorecard": {
         "additionalProperties": false,

@@ -22,6 +22,17 @@ export type AuthUser = S["AuthUser"];
 export type AuthProviders = S["AuthProviders"];
 export type MagicLinkSent = S["MagicLinkSent"];
 
+// Job and resume inputs (real endpoints in apps/api inputs, P2).
+export type JobTargetCreate = S["JobTargetCreate"];
+export type JobTargetUpdate = S["JobTargetUpdate"];
+export type JobContext = DeepRequired<S["JobContext"]>;
+export type JobTargetOut = DeepRequired<S["JobTargetOut"]>;
+export type JobTargetAccepted = DeepRequired<S["JobTargetAccepted"]>;
+export type ResumeOut = DeepRequired<S["ResumeOut"]>;
+export type ResumeAccepted = DeepRequired<S["ResumeAccepted"]>;
+/** A background job (Arq) that extracts a posting or parses a resume. */
+export type JobOut = DeepRequired<S["JobOut"]>;
+
 // Shared contracts from strong_core.schemas.
 export type JobPosting = DeepRequired<S["JobPosting"]>;
 export type Resume = DeepRequired<S["Resume"]>;

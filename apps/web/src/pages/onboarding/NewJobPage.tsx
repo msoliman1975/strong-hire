@@ -2,10 +2,17 @@ import { useMutation } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
 
-import { jobsApi, type CreateJobRequest } from "../../api/planned";
+import { ApiError } from "../../api/client";
+import { jobTargetsApi } from "../../api/inputs";
+import type { JobTargetCreate } from "../../api/types";
 import { ErrorNotice, ONBOARDING_STEPS, PageHead, Steps } from "../../components/ui";
 
 export const MIN_POSTING_CHARS = 100;
+
+/** Where the confirm page continues, with the background job to watch. */
+export function confirmPath(jobId: string, taskId: string | null | undefined): string {
+  return taskId ? `/jobs/${jobId}/confirm?task=${encodeURIComponent(taskId)}` : `/jobs/${jobId}/confirm`;
+}
 
 /** Form validation only: one of URL or text, a well-formed http(s) URL, enough text to read. */
 export function validateJobInput(url: string, text: string): string | null {
@@ -32,16 +39,19 @@ export function NewJobPage() {
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
   const create = useMutation({
-    mutationFn: (body: CreateJobRequest) => jobsApi.create(body),
-    onSuccess: (job) => navigate(`/jobs/${job.id}/confirm`),
+    mutationFn: (body: JobTargetCreate) => jobTargetsApi.create(body),
+    onSuccess: (accepted) => navigate(confirmPath(accepted.job_target.id, accepted.job?.id)),
   });
+  // IN-1: some sites (LinkedIn) cannot be read. The API says so; the user pastes the text.
+  const pasteRequired = create.error instanceof ApiError && create.error.code === "paste_required";
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    const problem = validateJobInput(url, text);
+    const problem = pasteRequired && !text.trim() ? "Paste the job posting text." : validateJobInput(url, text);
     setError(problem);
     if (problem) return;
-    create.mutate(url.trim() ? { source_url: url.trim() } : { raw_text: text.trim() });
+    // With both, the API reads the text and uses the link to match the company.
+    create.mutate({ url: url.trim() || null, text: text.trim() || null });
   };
 
   return (
@@ -75,7 +85,13 @@ export function NewJobPage() {
             {error}
           </p>
         )}
-        {create.isError && <ErrorNotice error={create.error} />}
+        {pasteRequired ? (
+          <div className="notice notice--error" role="alert">
+            <p>This site does not allow automatic reading. Paste the job posting text above. We keep the link.</p>
+          </div>
+        ) : (
+          create.isError && <ErrorNotice error={create.error} />
+        )}
         <div className="row section">
           <button type="submit" className="btn" disabled={create.isPending}>
             Read job posting

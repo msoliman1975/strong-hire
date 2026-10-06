@@ -1,13 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 
-import { keys, useJob } from "../../api/hooks";
-import { jobsApi, type JobTarget } from "../../api/planned";
-import type { JobPosting, Level, RoleFamily } from "../../api/types";
+import { keys, useJob, useJobTask } from "../../api/hooks";
+import { jobProblem, jobTargetsApi } from "../../api/inputs";
+import type { JobPosting, JobTargetOut, Level, RoleFamily } from "../../api/types";
 import { ErrorNotice, Loading, ONBOARDING_STEPS, PageHead, Steps } from "../../components/ui";
 import { levelLabel, roleFamilyLabel } from "../../labels";
-import { MIN_POSTING_CHARS } from "./NewJobPage";
+import { confirmPath, MIN_POSTING_CHARS } from "./NewJobPage";
 
 const lines = (value: string) =>
   value
@@ -17,41 +17,46 @@ const lines = (value: string) =>
 
 export function ConfirmJobPage() {
   const { jobId = "" } = useParams();
-  const job = useJob(jobId);
+  const [params] = useSearchParams();
+  const task = useJobTask(jobId, params.get("task"));
+  const problem = jobProblem(task.data);
+  const job = useJob(jobId, problem === null);
 
   return (
     <div className="page--narrow">
       <Steps current={0} steps={ONBOARDING_STEPS} />
       {job.isPending && <Loading label="Loading the job" />}
       {job.isError && <ErrorNotice error={job.error} />}
-      {job.data?.status === "extracting" && (
+      {task.isError && <ErrorNotice error={task.error} />}
+      {job.data && problem && <PasteInstead job={job.data} message={problem.message} />}
+      {job.data?.status === "pending" && !problem && (
         <>
           <PageHead title="Reading the job posting" />
           <Loading label="Reading the posting. This takes up to a minute." />
         </>
       )}
-      {job.data?.status === "failed" && <PasteInstead job={job.data} />}
-      {job.data?.posting && job.data.status !== "extracting" && (
+      {job.data?.status === "extracted" && job.data.posting && (
         <PostingForm key={job.data.id} job={job.data} posting={job.data.posting} />
       )}
     </div>
   );
 }
 
-/** IN-1: a blocked fetch falls back to pasting the text. */
-function PasteInstead({ job }: { job: JobTarget }) {
+/** IN-1: a link that cannot be read falls back to pasting the text. The link is kept. */
+function PasteInstead({ job, message }: { job: JobTargetOut; message: string }) {
   const navigate = useNavigate();
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
   const create = useMutation({
-    mutationFn: () => jobsApi.create({ raw_text: text.trim() }),
-    onSuccess: (created) => navigate(`/jobs/${created.id}/confirm`, { replace: true }),
+    mutationFn: () => jobTargetsApi.create({ url: job.source_url, text: text.trim() }),
+    onSuccess: (accepted) =>
+      navigate(confirmPath(accepted.job_target.id, accepted.job?.id), { replace: true }),
   });
   return (
     <>
       <PageHead title="Paste the job posting" />
       <div className="notice notice--error" role="alert">
-        <p>{job.error ?? "We could not read that link."}</p>
+        <p>{message}</p>
       </div>
       <form
         className="panel"
@@ -81,7 +86,7 @@ function PasteInstead({ job }: { job: JobTarget }) {
 }
 
 /** IN-2: the user confirms or edits what was extracted. */
-function PostingForm({ job, posting }: { job: JobTarget; posting: JobPosting }) {
+function PostingForm({ job, posting }: { job: JobTargetOut; posting: JobPosting }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [form, setForm] = useState({
@@ -98,9 +103,10 @@ function PostingForm({ job, posting }: { job: JobTarget; posting: JobPosting }) 
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const save = useMutation({
-    mutationFn: (p: JobPosting) => jobsApi.confirm(job.id, p),
+    // The stage and context are saved on the same call; keep what the job target has.
+    mutationFn: (p: JobPosting) => jobTargetsApi.update(job.id, { posting: p, stage: job.stage, context: job.context }),
     onSuccess: (saved) => {
-      queryClient.setQueryData(keys.job(job.id), saved);
+      queryClient.setQueryData(keys.job(job.id), saved.job_target);
       navigate(`/jobs/${job.id}/resume`);
     },
   });
@@ -164,14 +170,15 @@ function PostingForm({ job, posting }: { job: JobTarget; posting: JobPosting }) 
       <PageHead title="Check the job details">
         <p>We read these from the posting. Fix anything that is wrong. The interview is built from them.</p>
       </PageHead>
-      {job.company ? (
+      {job.generic_mode === false && (
         <div className="notice" role="status">
           <p>
-            We have an interview profile for <strong>{job.company.name}</strong>. Your interviewer follows its
+            We have an interview profile for <strong>{posting.company_name}</strong>. Your interviewer follows its
             interview style.
           </p>
         </div>
-      ) : (
+      )}
+      {job.generic_mode === true && (
         <div className="notice" role="status">
           <p>We do not have an interview profile for this company. Your interview uses a general style.</p>
         </div>

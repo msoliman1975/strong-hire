@@ -1,43 +1,43 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router";
 
-import { keys, useResume, useResumes } from "../../api/hooks";
-import { jobsApi, resumesApi, type ResumeRecord } from "../../api/planned";
+import { useResume, useResumes, useResumeTask } from "../../api/hooks";
+import { jobProblem, resumesApi } from "../../api/inputs";
+import type { ResumeAccepted, ResumeOut } from "../../api/types";
 import { ErrorNotice, Loading, ONBOARDING_STEPS, PageHead, Steps } from "../../components/ui";
 import { formatDate } from "../../labels";
 
-export const MAX_RESUME_BYTES = 10 * 1024 * 1024;
+/** The API accepts files up to 5 MB. */
+export const MAX_RESUME_BYTES = 5 * 1024 * 1024;
 const ACCEPTED = [".pdf", ".docx"];
 
-/** Form validation only: a PDF or DOCX under 10 MB, or pasted text. */
+/** Form validation only: a PDF or DOCX up to 5 MB, or pasted text. */
 export function validateResumeInput(file: File | null, text: string): string | null {
   if (!file && !text.trim()) return "Choose a PDF or DOCX file, or paste your resume text.";
   if (file) {
     const name = file.name.toLowerCase();
     if (!ACCEPTED.some((ext) => name.endsWith(ext))) return "The file must be a PDF or DOCX.";
-    if (file.size > MAX_RESUME_BYTES) return "The file is larger than 10 MB.";
+    if (file.size > MAX_RESUME_BYTES) return "The file is larger than 5 MB.";
   }
   return null;
 }
 
+/** The context step starts the gap analysis with the chosen resume. */
+const contextPath = (jobId: string, resumeId: string) =>
+  `/jobs/${jobId}/context?resume=${encodeURIComponent(resumeId)}`;
+
 export function ResumePage() {
   const { jobId = "" } = useParams();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const existing = useResumes();
-  const [uploadedId, setUploadedId] = useState<string | null>(null);
-  const uploaded = useResume(uploadedId);
+  const [upload, setUpload] = useState<{ id: string; task: string | null } | null>(null);
+  const task = useResumeTask(upload?.id ?? null, upload?.task ?? null);
+  const problem = jobProblem(task.data);
+  const uploaded = useResume(upload?.id ?? null, problem === null);
 
-  const chooseResume = useMutation({
-    mutationFn: (resumeId: string) => jobsApi.setResume(jobId, resumeId),
-    onSuccess: (job) => {
-      queryClient.setQueryData(keys.job(jobId), job);
-      navigate(`/jobs/${jobId}/context`);
-    },
-  });
-
-  const ready = (existing.data ?? []).filter((r) => r.status === "ready");
+  const ready = (existing.data ?? []).filter((r) => r.status === "extracted");
+  const choose = (resumeId: string) => navigate(contextPath(jobId, resumeId));
 
   return (
     <div className="page--narrow">
@@ -46,21 +46,17 @@ export function ResumePage() {
         <p>We compare your resume with the job to find your strengths and gaps.</p>
       </PageHead>
 
-      {ready.length > 0 && !uploadedId && (
+      {ready.length > 0 && !upload && (
         <section className="panel" aria-labelledby="existing-heading">
           <h2 id="existing-heading">Use a resume you added before</h2>
           <ul className="plain-list">
             {ready.map((r) => (
               <li key={r.id} className="row row--between">
                 <span>
-                  {r.file_name ?? "Pasted text"} <span className="muted">added {formatDate(r.uploaded_at)}</span>
+                  {r.has_file ? "Uploaded file" : "Pasted text"}{" "}
+                  <span className="muted">added {formatDate(r.uploaded_at)}</span>
                 </span>
-                <button
-                  type="button"
-                  className="btn btn--secondary"
-                  onClick={() => chooseResume.mutate(r.id)}
-                  disabled={chooseResume.isPending}
-                >
+                <button type="button" className="btn btn--secondary" onClick={() => choose(r.id)}>
                   Use this resume
                 </button>
               </li>
@@ -69,40 +65,38 @@ export function ResumePage() {
         </section>
       )}
 
-      {uploadedId ? (
+      {upload ? (
         <section className="panel" aria-labelledby="parsed-heading">
           <h2 id="parsed-heading">Your resume</h2>
           {uploaded.isError && <ErrorNotice error={uploaded.error} />}
-          {(uploaded.isPending || uploaded.data?.status === "parsing") && (
+          {task.isError && <ErrorNotice error={task.error} />}
+          {problem && <ErrorNotice error={`${problem.message} Try pasting the text instead.`} />}
+          {!problem && (uploaded.isPending || uploaded.data?.status === "pending") && (
             <Loading label="Reading your resume. This takes up to a minute." />
           )}
-          {uploaded.data?.status === "failed" && (
-            <ErrorNotice error={uploaded.data.error ?? "We could not read this resume. Try pasting the text."} />
-          )}
-          {uploaded.data?.status === "ready" && <ParsedResume record={uploaded.data} />}
+          {uploaded.data?.status === "extracted" && <ParsedResume record={uploaded.data} />}
           <div className="row section">
             <button
               type="button"
               className="btn"
-              disabled={uploaded.data?.status !== "ready" || chooseResume.isPending}
-              onClick={() => chooseResume.mutate(uploadedId)}
+              disabled={uploaded.data?.status !== "extracted"}
+              onClick={() => choose(upload.id)}
             >
               Continue
             </button>
-            <button type="button" className="btn btn--quiet" onClick={() => setUploadedId(null)}>
+            <button type="button" className="btn btn--quiet" onClick={() => setUpload(null)}>
               Upload a different resume
             </button>
           </div>
-          {chooseResume.isError && <ErrorNotice error={chooseResume.error} />}
         </section>
       ) : (
-        <UploadForm onUploaded={(r) => setUploadedId(r.id)} />
+        <UploadForm onUploaded={(r) => setUpload({ id: r.resume.id, task: r.job?.id ?? null })} />
       )}
     </div>
   );
 }
 
-function UploadForm({ onUploaded }: { onUploaded: (r: ResumeRecord) => void }) {
+function UploadForm({ onUploaded }: { onUploaded: (r: ResumeAccepted) => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -125,7 +119,7 @@ function UploadForm({ onUploaded }: { onUploaded: (r: ResumeRecord) => void }) {
       <div className="field">
         <label htmlFor="resume-file">Resume file</label>
         <p className="hint" id="resume-file-hint">
-          PDF or DOCX, up to 10 MB. We store the file encrypted, and you can delete it at any time.
+          PDF or DOCX, up to 5 MB. We store the file encrypted, and you can delete it at any time.
         </p>
         <input
           id="resume-file"
@@ -152,8 +146,8 @@ function UploadForm({ onUploaded }: { onUploaded: (r: ResumeRecord) => void }) {
   );
 }
 
-function ParsedResume({ record }: { record: ResumeRecord }) {
-  const parsed = record.parsed;
+function ParsedResume({ record }: { record: ResumeOut }) {
+  const parsed = record.resume;
   if (!parsed) return null;
   return (
     <div className="stack">

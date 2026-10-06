@@ -4,6 +4,119 @@
  */
 
 export interface paths {
+    "/job-targets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Job Target */
+        post: operations["create_job_target_job_targets_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/job-targets/{job_target_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Job Target */
+        get: operations["get_job_target_job_targets__job_target_id__get"];
+        /**
+         * Update Job Target
+         * @description Confirm or edit the posting. A changed company name runs company matching again.
+         */
+        put: operations["update_job_target_job_targets__job_target_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/job-targets/{job_target_id}/jobs/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Job Target Job */
+        get: operations["get_job_target_job_job_targets__job_target_id__jobs__job_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/resumes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Resume
+         * @description Upload a PDF or DOCX file, or send pasted text in the `text` form field (IN-3).
+         */
+        post: operations["create_resume_resumes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/resumes/{resume_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Resume */
+        get: operations["get_resume_resumes__resume_id__get"];
+        /**
+         * Update Resume
+         * @description Confirm or edit the parsed resume.
+         */
+        put: operations["update_resume_resumes__resume_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/resumes/{resume_id}/jobs/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Resume Job */
+        get: operations["get_resume_job_resumes__resume_id__jobs__job_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/providers": {
         parameters: {
             query?: never;
@@ -232,6 +345,13 @@ export interface components {
              */
             created_at: string;
         };
+        /** Body_create_resume_resumes_post */
+        Body_create_resume_resumes_post: {
+            /** File */
+            file?: string | null;
+            /** Text */
+            text?: string | null;
+        };
         /** BriefQuestion */
         BriefQuestion: {
             /**
@@ -359,21 +479,12 @@ export interface components {
         Education: {
             /** Institution */
             institution: string;
-            /**
-             * Degree
-             * @default null
-             */
-            degree: string | null;
-            /**
-             * Field Of Study
-             * @default null
-             */
-            field_of_study: string | null;
-            /**
-             * End
-             * @default null
-             */
-            end: string | null;
+            /** Degree */
+            degree?: string | null;
+            /** Field Of Study */
+            field_of_study?: string | null;
+            /** End */
+            end?: string | null;
         };
         /** Gap */
         Gap: {
@@ -462,6 +573,36 @@ export interface components {
             curveball: string | null;
         };
         /**
+         * JobContext
+         * @description Optional context the user adds about the interview (IN-4). Stage has its own column.
+         */
+        JobContext: {
+            /** Interviewer Name */
+            interviewer_name?: string | null;
+            /** Interviewer Role */
+            interviewer_role?: string | null;
+            /** Recruiter Notes */
+            recruiter_notes?: string | null;
+            /** Concerns */
+            concerns?: string | null;
+        };
+        /** JobOut */
+        JobOut: {
+            /** Id */
+            id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "queued" | "in_progress" | "complete" | "failed" | "not_found";
+            /** Result */
+            result?: {
+                [key: string]: unknown;
+            } | null;
+            /** Error */
+            error?: string | null;
+        };
+        /**
          * JobPosting
          * @description Structured data extracted from a job posting. The user confirms or edits it (IN-2).
          */
@@ -472,38 +613,88 @@ export interface components {
             title: string;
             /** @default other */
             role_family: components["schemas"]["RoleFamily"];
-            /**
-             * @description Normalized level, if it can be inferred.
-             * @default null
-             */
-            level: components["schemas"]["Level"] | null;
+            /** @description Normalized level, if it can be inferred. */
+            level?: components["schemas"]["Level"] | null;
             /**
              * Level Label
              * @description Level as written in the posting, for example 'L5' or 'Senior'.
-             * @default null
              */
-            level_label: string | null;
-            /**
-             * Team
-             * @default null
-             */
-            team: string | null;
-            /**
-             * Location
-             * @default null
-             */
-            location: string | null;
+            level_label?: string | null;
+            /** Team */
+            team?: string | null;
+            /** Location */
+            location?: string | null;
             /** Must Have Skills */
             must_have_skills?: string[];
             /** Nice To Have Skills */
             nice_to_have_skills?: string[];
             /** Responsibilities */
             responsibilities?: string[];
+            /** Source Url */
+            source_url?: string | null;
+        };
+        /** JobTargetAccepted */
+        JobTargetAccepted: {
+            job_target: components["schemas"]["JobTargetOut"];
+            job: components["schemas"]["JobOut"] | null;
+        };
+        /**
+         * JobTargetCreate
+         * @description A posting as pasted text, a URL, or both (IN-1). With both, the text is used and the URL
+         *     helps company matching.
+         */
+        JobTargetCreate: {
+            /** Text */
+            text?: string | null;
+            /** Url */
+            url?: string | null;
+            /** Stage */
+            stage?: string | null;
+            context?: components["schemas"]["JobContext"];
+        };
+        /** JobTargetOut */
+        JobTargetOut: {
             /**
-             * Source Url
-             * @default null
+             * Id
+             * Format: uuid
              */
+            id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "extracted";
+            /** Source Url */
             source_url: string | null;
+            posting: components["schemas"]["JobPosting"] | null;
+            level: components["schemas"]["Level"] | null;
+            /** Company Id */
+            company_id: string | null;
+            /** Company Slug */
+            company_slug: string | null;
+            /**
+             * Generic Mode
+             * @description True when no curated company matched. None until extraction finishes.
+             */
+            generic_mode: boolean | null;
+            /** Stage */
+            stage: string | null;
+            context: components["schemas"]["JobContext"];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * JobTargetUpdate
+         * @description The user confirms or edits the extracted posting (IN-2) and the context (IN-4).
+         */
+        JobTargetUpdate: {
+            posting: components["schemas"]["JobPosting"];
+            /** Stage */
+            stage?: string | null;
+            context?: components["schemas"]["JobContext"];
         };
         /**
          * Level
@@ -747,11 +938,8 @@ export interface components {
          * @description A parsed resume (IN-3). Contact details are deliberately not part of the contract.
          */
         Resume: {
-            /**
-             * Summary
-             * @default null
-             */
-            summary: string | null;
+            /** Summary */
+            summary?: string | null;
             /** Roles */
             roles?: components["schemas"]["ResumeRole"][];
             /** Skills */
@@ -761,27 +949,53 @@ export interface components {
             /** Certifications */
             certifications?: string[];
         };
+        /** ResumeAccepted */
+        ResumeAccepted: {
+            resume: components["schemas"]["ResumeOut"];
+            job: components["schemas"]["JobOut"] | null;
+        };
+        /** ResumeOut */
+        ResumeOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "extracted";
+            /** Has File */
+            has_file: boolean;
+            resume: components["schemas"]["Resume"] | null;
+            /**
+             * Uploaded At
+             * Format: date-time
+             */
+            uploaded_at: string;
+        };
         /** ResumeRole */
         ResumeRole: {
             /** Title */
             title: string;
             /** Company */
             company: string;
-            /**
-             * Start
-             * @default null
-             */
-            start: string | null;
+            /** Start */
+            start?: string | null;
             /**
              * End
              * @description None means current role.
-             * @default null
              */
-            end: string | null;
+            end?: string | null;
             /** Achievements */
             achievements?: string[];
             /** Skills */
             skills?: string[];
+        };
+        /** ResumeUpdate */
+        ResumeUpdate: {
+            resume: components["schemas"]["Resume"];
         };
         /**
          * RoleFamily
@@ -951,6 +1165,268 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    create_job_target_job_targets_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JobTargetCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobTargetAccepted"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_job_target_job_targets__job_target_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobTargetOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_job_target_job_targets__job_target_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JobTargetUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobTargetAccepted"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_job_target_job_job_targets__job_target_id__jobs__job_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_resume_resumes_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_create_resume_resumes_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumeAccepted"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_resume_resumes__resume_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                resume_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_resume_resumes__resume_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                resume_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResumeUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_resume_job_resumes__resume_id__jobs__job_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                resume_id: string;
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     providers_auth_providers_get: {
         parameters: {
             query?: never;

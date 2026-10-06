@@ -3,15 +3,17 @@
  * add shows on the dashboard, the free interview is used once, and so on. In the browser it is
  * saved to localStorage so a page reload keeps it. This file is mock-only and never ships.
  */
-import type { AuthUser } from "../api/types";
-import type {
-  ExportJob,
-  GapAnalysisResult,
-  JobTarget,
-  ResumeRecord,
-  SessionRecord,
-  Usage,
-} from "../api/planned";
+import type { AuthUser, JobOut, JobTargetOut, ResumeOut } from "../api/types";
+import type { ExportJob, GapAnalysisResult, SessionRecord, Usage } from "../api/planned";
+
+/** A mock background job (Arq in the real API): reads a posting or parses a resume. */
+export interface MockTask extends JobOut {
+  readyAt: number;
+  kind: "job_target" | "resume";
+  entityId: string;
+  /** What the job reports when it finishes. */
+  outcome: "extracted" | "needs_paste";
+}
 
 export interface MockAuth {
   status: "signed_out" | "needs_signup" | "signed_in";
@@ -22,11 +24,9 @@ export interface MockAuth {
 export interface MockDb {
   auth: MockAuth;
   users: Record<string, AuthUser>;
-  jobs: JobTarget[];
-  /** Job id -> time the extraction finishes. */
-  jobReadyAt: Record<string, number>;
-  resumes: ResumeRecord[];
-  resumeReadyAt: Record<string, number>;
+  jobs: JobTargetOut[];
+  resumes: ResumeOut[];
+  tasks: Record<string, MockTask>;
   gaps: Record<string, GapAnalysisResult & { readyAt: number }>;
   sessions: SessionRecord[];
   debriefReadyAt: Record<string, number>;
@@ -47,9 +47,8 @@ export function emptyDb(): MockDb {
     auth: { status: "signed_out", email: null, userEmail: null },
     users: {},
     jobs: [],
-    jobReadyAt: {},
     resumes: [],
-    resumeReadyAt: {},
+    tasks: {},
     gaps: {},
     sessions: [],
     debriefReadyAt: {},
@@ -58,7 +57,8 @@ export function emptyDb(): MockDb {
   };
 }
 
-const STORAGE_KEY = "strong-hire-mock-db";
+/** Version 2: job targets and resumes use the real P2 shapes. Older saved data is dropped. */
+const STORAGE_KEY = "strong-hire-mock-db-v2";
 
 export interface MockStore {
   db: MockDb;

@@ -32,7 +32,7 @@ describe("resume input", () => {
     expect(validateResumeInput(file("CV.DOCX"), "")).toBeNull();
     expect(validateResumeInput(file("cv.png"), "")).toMatch(/PDF or DOCX/);
   });
-  it("rejects files over 10 MB", () => {
-    expect(validateResumeInput(file("cv.pdf", MAX_RESUME_BYTES + 1), "")).toMatch(/10 MB/);
+  it("rejects files over 5 MB", () => {
+    expect(validateResumeInput(file("cv.pdf", MAX_RESUME_BYTES + 1), "")).toMatch(/5 MB/);
   });
 });

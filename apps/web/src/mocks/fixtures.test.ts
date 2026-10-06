@@ -9,14 +9,17 @@ import Ajv2020 from "ajv/dist/2020";
 import addFormats from "ajv-formats";
 import { describe, expect, it } from "vitest";
 
-import { debriefApi, jobsApi, resumesApi, sessionsApi, gapApi } from "../api/planned";
 import { authApi } from "../api/auth";
+import { jobTargetsApi, resumesApi } from "../api/inputs";
+import { debriefApi, gapApi, sessionsApi } from "../api/planned";
 import { gapAnalysis, jobPosting, resume, scorecardFor, sessionPlan } from "./fixtures";
 
 const SCHEMAS_DIR = resolve(__dirname, "../../../../schemas");
+const OPENAPI = JSON.parse(readFileSync(resolve(__dirname, "../../openapi.json"), "utf8")) as object;
 
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 addFormats(ajv);
+ajv.addSchema(OPENAPI, "openapi.json");
 
 const compiled = new Map<string, ReturnType<typeof ajv.compile>>();
 
@@ -29,6 +32,14 @@ function validator(name: string) {
     compiled.set(name, validate);
   }
   return validate;
+}
+
+/** Validates a payload against a response schema of the real API (components in openapi.json). */
+function expectApiShape(component: string, payload: unknown) {
+  const validate = ajv.compile({ $ref: `openapi.json#/components/schemas/${component}` });
+  const ok = validate(payload);
+  expect(validate.errors ?? [], `${component} mock does not match openapi.json`).toEqual([]);
+  expect(ok).toBe(true);
 }
 
 function expectValid(name: string, payload: unknown) {
@@ -56,10 +67,10 @@ describe("mock payloads match the packages/core schemas", () => {
   it("payloads the mock API builds at run time: SessionConfig, PlannedSession, ProgressSnapshot", async () => {
     await authApi.devLogin("schema@example.com");
     await authApi.signup({ age_confirmed: true, terms_accepted: true, training_consent: false });
-    const job = await jobsApi.create({ raw_text: "x".repeat(200) });
-    const resumeRecord = await resumesApi.upload(formWithText("Python engineer"));
-    await jobsApi.setResume(job.id, resumeRecord.id);
-    await gapApi.start(job.id);
+    const { job_target: job } = await jobTargetsApi.create({ text: "x".repeat(200) });
+    const { resume: resumeRecord } = await resumesApi.upload(formWithText("Python engineer"));
+    await resumesApi.get(resumeRecord.id);
+    await gapApi.start(job.id, { resume_id: resumeRecord.id });
     const session = await sessionsApi.create({
       job_target_id: job.id,
       config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min: 30, level: "senior" },
@@ -74,6 +85,51 @@ describe("mock payloads match the packages/core schemas", () => {
     expect(progress.snapshots.length).toBeGreaterThan(0);
     for (const snapshot of progress.snapshots) expectValid("progress_snapshot", snapshot);
     expect(sessionPlan.length).toBeGreaterThan(0);
+  });
+});
+
+describe("mocks of the real P2 endpoints match openapi.json", () => {
+  it("job targets: create (202), job status, get, update (IN-1, IN-2, IN-4)", async () => {
+    const accepted = await jobTargetsApi.create({ url: "https://example-board.test/jobs/1" });
+    expectApiShape("JobTargetAccepted", accepted);
+    expect(accepted.job_target.status).toBe("pending");
+    expect(accepted.job?.status).toBe("queued");
+
+    const job = await jobTargetsApi.job(accepted.job_target.id, accepted.job?.id ?? "");
+    expectApiShape("JobOut", job);
+    expect(job.result?.outcome).toBe("extracted");
+
+    const target = await jobTargetsApi.get(accepted.job_target.id);
+    expectApiShape("JobTargetOut", target);
+    expect(target.generic_mode).toBe(false);
+    expectValid("job_posting", target.posting);
+
+    const updated = await jobTargetsApi.update(target.id, {
+      posting: { ...jobPosting, company_name: "Tiny Startup" },
+      stage: "Phone screen",
+      context: { concerns: "System design" },
+    });
+    expectApiShape("JobTargetAccepted", updated);
+    expect(updated.job_target.generic_mode).toBe(true);
+    expect(updated.job_target.context.concerns).toBe("System design");
+  });
+
+  it("IN-1: LinkedIn needs pasted text, like the API (422 paste_required)", async () => {
+    await expect(jobTargetsApi.create({ url: "https://www.linkedin.com/jobs/view/1" })).rejects.toMatchObject({
+      status: 422,
+      code: "paste_required",
+    });
+  });
+
+  it("resumes: upload (202), job status, get, update (IN-3)", async () => {
+    const accepted = await resumesApi.upload(formWithText("Python engineer"));
+    expectApiShape("ResumeAccepted", accepted);
+    const job = await resumesApi.job(accepted.resume.id, accepted.job?.id ?? "");
+    expectApiShape("JobOut", job);
+    const record = await resumesApi.get(accepted.resume.id);
+    expectApiShape("ResumeOut", record);
+    expect(record.status).toBe("extracted");
+    expectApiShape("ResumeOut", await resumesApi.update(record.id, resume));
   });
 });
 

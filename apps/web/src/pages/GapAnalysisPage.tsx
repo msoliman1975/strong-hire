@@ -1,9 +1,7 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useParams } from "react-router";
 
 import { ApiError } from "../api/client";
-import { keys, useGapAnalysis, useJob } from "../api/hooks";
-import { gapApi } from "../api/planned";
+import { useGapAnalysis, useJob } from "../api/hooks";
 import type { GapAnalysis, PlannedSession } from "../api/types";
 import { Bar, ErrorNotice, Loading, PageHead } from "../components/ui";
 import { competencyLabel, difficultyLabel, interviewTypeLabel, severityLabel } from "../labels";
@@ -19,11 +17,6 @@ export function GapAnalysisPage() {
   const { jobId = "" } = useParams();
   const job = useJob(jobId);
   const gap = useGapAnalysis(jobId);
-  const queryClient = useQueryClient();
-  const start = useMutation({
-    mutationFn: () => gapApi.start(jobId),
-    onSuccess: (g) => queryClient.setQueryData(keys.gap(jobId), g),
-  });
 
   const posting = job.data?.posting;
   const title = posting ? `${posting.title} at ${posting.company_name}` : "Gap analysis";
@@ -39,11 +32,10 @@ export function GapAnalysisPage() {
       )}
       {notStarted && (
         <div className="panel">
-          <p>There is no gap analysis for this job yet. It is free.</p>
-          <button type="button" className="btn" onClick={() => start.mutate()} disabled={start.isPending}>
-            Run gap analysis
-          </button>
-          {start.isError && <ErrorNotice error={start.error} />}
+          <p>There is no gap analysis for this job yet. It is free. Choose a resume to start it.</p>
+          <Link className="btn" to={`/jobs/${jobId}/resume`}>
+            Choose a resume
+          </Link>
         </div>
       )}
       {gap.isError && !notStarted && <ErrorNotice error={gap.error} />}
