@@ -154,6 +154,14 @@ class Severity(StrEnum):
     HIGH = "high"
 
 
+class GapStatus(StrEnum):
+    """State of one gap analysis run (GA-1 to GA-4)."""
+
+    RUNNING = "running"
+    READY = "ready"
+    FAILED = "failed"
+
+
 class Confidence(StrEnum):
     LOW = "low"
     MEDIUM = "medium"

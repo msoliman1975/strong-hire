@@ -45,6 +45,13 @@ class PersonaBrief(Contract):
     closing_style: str = Field(min_length=1)
 
 
+class PhaseTime(Contract):
+    """Minutes planned for one phase of the session (IV-7)."""
+
+    phase: Phase
+    minutes: int = Field(ge=0, le=45)
+
+
 class InterviewerBrief(Contract):
     """Built by the planner before each session. The live interviewer reads only this."""
 
@@ -63,6 +70,19 @@ class InterviewerBrief(Contract):
     persona: PersonaBrief
     max_probes_per_question: int = Field(ge=0, le=3, description="IV-3.")
     curveball: str | None = Field(default=None, description="Tough difficulty only (IV-4).")
+    seniority_bar: str | None = Field(
+        default=None, description="Scope expected at session.level (IV-6). Level changes the bar."
+    )
+    pushback: bool = Field(
+        default=False, description="Tough difficulty only: challenge assumptions (IV-4)."
+    )
+    coach_help: bool = Field(
+        default=False, description="Coach mode only: pause, hint and redo are allowed (IV-8)."
+    )
+    time_plan: list[PhaseTime] = Field(
+        default_factory=list,
+        description="Minutes per phase. When set, the minutes add up to session.duration_min.",
+    )
 
     @model_validator(mode="after")
     def _check(self) -> InterviewerBrief:
@@ -80,7 +100,28 @@ class InterviewerBrief(Contract):
             raise ValueError("question ids must be unique")
         if self.curveball and self.session.difficulty != Difficulty.TOUGH:
             raise ValueError("curveball is only allowed in Tough difficulty")
+        if self.pushback and self.session.difficulty != Difficulty.TOUGH:
+            raise ValueError("pushback is only allowed in Tough difficulty")
+        if self.coach_help and self.session.mode != Mode.COACH:
+            raise ValueError("coach_help is only allowed in Coach mode")
+        if self.time_plan:
+            phases = [p.phase for p in self.time_plan]
+            if len(phases) != len(set(phases)):
+                raise ValueError("time_plan lists a phase more than once")
+            total = sum(p.minutes for p in self.time_plan)
+            if total != self.session.duration_min:
+                raise ValueError(
+                    f"time_plan adds up to {total} minutes, not {self.session.duration_min}"
+                )
         return self
+
+
+class BriefDraft(Contract):
+    """What the planner model returns for an interviewer brief. Code adds the rest: persona,
+    seniority bar, probe limits, time plan and the profile version."""
+
+    questions: list[BriefQuestion] = Field(min_length=6, max_length=12)
+    curveball: str | None = Field(default=None, description="Only asked for in Tough difficulty.")
 
 
 class Turn(Contract):

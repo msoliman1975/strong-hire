@@ -1,0 +1,15 @@
+{
+  "questions": [
+    {"id": "q1", "text": "Tell me about a project you owned from start to finish.", "competencies": ["ownership", "impact"], "priority": 1, "probe_hints": ["Ask for their own role", "Ask for a measurable result"]},
+    {"id": "q2", "text": "Describe a time you disagreed with a senior engineer about a design.", "competencies": ["conflict_handling", "trade_offs"], "priority": 2, "probe_hints": ["Ask how it was resolved"]},
+    {"id": "q3", "text": "Tell me about a time you helped another team ship something.", "competencies": ["collaboration"], "priority": 3, "probe_hints": ["Ask what they did themselves"]},
+    {"id": "q4", "text": "Walk me through a production incident you led the response to.", "competencies": ["ownership", "technical_depth"], "priority": 4, "probe_hints": ["Ask what they changed afterwards"]},
+    {"id": "q5", "text": "Tell me about a decision you would make differently now.", "competencies": ["learning_from_failure", "judgment"], "priority": 5, "probe_hints": ["Ask what they learned"]},
+    {"id": "q6", "text": "How did you raise the quality bar on your team?", "competencies": ["impact", "collaboration"], "priority": 6, "probe_hints": []},
+    {"id": "q7", "text": "Explain a trade-off you made between speed and reliability.", "competencies": ["trade_offs", "reasoning"], "priority": 7, "probe_hints": ["Ask why not the simpler option"]},
+    {"id": "q8", "text": "How would you explain your system's design to a new engineer?", "competencies": ["communication", "clarity_of_explanation"], "priority": 8, "probe_hints": []},
+    {"id": "q9", "text": "How would you size the demand for a new payment method?", "competencies": ["estimation_logic", "problem_framing"], "priority": 9, "probe_hints": ["Ask for the assumptions"]},
+    {"id": "q10", "text": "Why do you want this role, and what scope do you want next?", "competencies": ["motivation", "scope_at_level"], "priority": 10, "probe_hints": []}
+  ],
+  "curveball": "Halfway through, say the budget was cut in half and ask how the plan changes."
+}
