@@ -1,0 +1,36 @@
+{
+  "id": "evt_TEST_invoice_paid",
+  "object": "event",
+  "api_version": "2026-09-30.endive",
+  "created": 1792595600,
+  "data": {
+    "object": {
+      "id": "in_TEST456",
+      "object": "invoice",
+      "amount_paid": 2900,
+      "billing_reason": "subscription_cycle",
+      "currency": "usd",
+      "customer": "cus_TEST123",
+      "customer_email": "ana@example.com",
+      "livemode": false,
+      "parent": {
+        "type": "subscription_details",
+        "quote_details": null,
+        "subscription_details": {
+          "metadata": {},
+          "subscription": "sub_TEST123"
+        }
+      },
+      "period_start": 1790000000,
+      "period_end": 1792592000,
+      "status": "paid"
+    }
+  },
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "invoice.paid"
+}

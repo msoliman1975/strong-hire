@@ -4,8 +4,8 @@ P9 (BL-1, AC-1). Adds stripe_events (handled webhook event ids, for idempotency)
 (cancellation exit survey, user-owned), and two subscription columns: stripe_subscription_id
 and cancel_at_period_end.
 
-Revision ID: 0004
-Revises: 0003
+Revision ID: 0005
+Revises: 0004
 Create Date: 2026-10-06 02:03:24.272549
 """
 
@@ -14,8 +14,8 @@ from collections.abc import Sequence
 import sqlalchemy as sa
 from alembic import op
 
-revision: str = '0004'
-down_revision: str | None = '0003'
+revision: str = '0005'
+down_revision: str | None = '0004'
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

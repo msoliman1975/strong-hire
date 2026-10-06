@@ -14,6 +14,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import StaticPool
 
+from strong_api.account.exports import MemoryExportStore
 from strong_api.auth import get_db, install_auth
 from strong_api.auth.magic_links import MagicLinks, MemoryUsedTokenStore
 from strong_api.auth.settings import AppEnv, AuthSettings
@@ -24,6 +25,8 @@ from strong_core.db.models import Base, Company
 from strong_core.db.seed import LAUNCH_COMPANIES
 from strong_core.gateway import ModelGateway
 from strong_core.gateway.registry import fake_models_config
+from strong_worker.account import jobs as account_jobs
+from strong_worker.account.jobs import AccountContext
 from strong_worker.gap import jobs as gap_jobs
 from strong_worker.gap.jobs import GapContext
 from strong_worker.inputs import jobs
@@ -46,7 +49,9 @@ def _fake_profile(monkeypatch: pytest.MonkeyPatch) -> None:
     get_settings.cache_clear()
 
 
-WORKER_FUNCTIONS = {f.__name__: f for f in (*jobs.FUNCTIONS, *gap_jobs.FUNCTIONS)}
+WORKER_FUNCTIONS = {
+    f.__name__: f for f in (*jobs.FUNCTIONS, *gap_jobs.FUNCTIONS, *account_jobs.FUNCTIONS)
+}
 
 
 class InlineQueue:
@@ -93,18 +98,31 @@ async def sessionmaker() -> AsyncIterator[async_sessionmaker[AsyncSession]]:
 
 
 @pytest.fixture
+def export_store() -> MemoryExportStore:
+    """Shared by the API (download) and the inline worker jobs (export_account)."""
+    return MemoryExportStore()
+
+
+@pytest.fixture
 def ctx(
-    sessionmaker: async_sessionmaker[AsyncSession], fake_fixtures: Path, tmp_path: Path
+    sessionmaker: async_sessionmaker[AsyncSession],
+    fake_fixtures: Path,
+    tmp_path: Path,
+    export_store: MemoryExportStore,
 ) -> dict[str, Any]:
     gateway = ModelGateway(fake_models_config(), fake=RecordingBackend(fake_fixtures))
+    store = LocalEncryptedFileStore(tmp_path / "files", Fernet.generate_key())
     return {
         CTX_KEY: InputsContext(
             sessionmaker=sessionmaker,
             gateway=gateway,
-            store=LocalEncryptedFileStore(tmp_path / "files", Fernet.generate_key()),
+            store=store,
             fetcher=make_fetcher({}),
         ),
         gap_jobs.CTX_KEY: GapContext(sessionmaker=sessionmaker, gateway=gateway),
+        account_jobs.CTX_KEY: AccountContext(
+            sessionmaker=sessionmaker, store=store, exports=export_store
+        ),
     }
 
 
@@ -118,8 +136,14 @@ async def _ok() -> None:
 
 
 @pytest.fixture
-def app(sessionmaker: async_sessionmaker[AsyncSession], queue: InlineQueue) -> FastAPI:
-    return create_app({"database": _ok}, sessionmaker=sessionmaker, queue=queue)
+def app(
+    sessionmaker: async_sessionmaker[AsyncSession],
+    queue: InlineQueue,
+    export_store: MemoryExportStore,
+) -> FastAPI:
+    app = create_app({"database": _ok}, sessionmaker=sessionmaker, queue=queue)
+    app.state.export_store = export_store
+    return app
 
 
 async def sign_in(http: httpx.AsyncClient, email: str = "dev@example.com") -> dict[str, Any]:

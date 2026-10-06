@@ -1,0 +1,84 @@
+{
+  "id": "evt_TEST_sub_renewal",
+  "object": "event",
+  "api_version": "2026-09-30.endive",
+  "created": 1792592000,
+  "data": {
+    "object": {
+      "id": "sub_TEST123",
+      "object": "subscription",
+      "application": null,
+      "billing_cycle_anchor": 1790000000,
+      "cancel_at": null,
+      "cancel_at_period_end": false,
+      "canceled_at": null,
+      "cancellation_details": {
+        "comment": null,
+        "feedback": null,
+        "reason": null
+      },
+      "collection_method": "charge_automatically",
+      "created": 1790000000,
+      "currency": "usd",
+      "customer": "cus_TEST123",
+      "default_payment_method": "pm_TEST123",
+      "ended_at": null,
+      "items": {
+        "object": "list",
+        "data": [
+          {
+            "id": "si_TEST123",
+            "object": "subscription_item",
+            "created": 1790000000,
+            "current_period_start": 1792592000,
+            "current_period_end": 1795270400,
+            "price": {
+              "id": "price_TEST123",
+              "object": "price",
+              "active": true,
+              "currency": "usd",
+              "product": "prod_TEST123",
+              "recurring": {
+                "interval": "month",
+                "interval_count": 1,
+                "usage_type": "licensed"
+              },
+              "type": "recurring",
+              "unit_amount": 2900
+            },
+            "quantity": 1,
+            "subscription": "sub_TEST123"
+          }
+        ],
+        "has_more": false,
+        "total_count": 1,
+        "url": "/v1/subscription_items?subscription=sub_TEST123"
+      },
+      "latest_invoice": "in_TEST123",
+      "livemode": false,
+      "metadata": {
+        "user_id": "USER_ID"
+      },
+      "start_date": 1790000000,
+      "status": "active"
+    },
+    "previous_attributes": {
+      "items": {
+        "data": [
+          {
+            "current_period_start": 1790000000,
+            "current_period_end": 1792592000
+          }
+        ]
+      },
+      "latest_invoice": "in_TEST000"
+    }
+  },
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "customer.subscription.updated"
+}

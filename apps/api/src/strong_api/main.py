@@ -1,5 +1,6 @@
 """Strong Hire API. P0 exposes /health; P2 adds the job target and resume input routes; P6 adds
-the gap analysis routes; P8 adds the debrief and progress routes."""
+the gap analysis routes; P8 adds the debrief and progress routes; P9 adds billing (/billing) and
+account self-service (/account)."""
 
 from __future__ import annotations
 
@@ -14,7 +15,9 @@ from redis.asyncio import Redis
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from strong_api.account import install_account
 from strong_api.auth import install_auth
+from strong_api.billing import install_billing
 from strong_api.gap.router import router as gap_router
 from strong_api.inputs import router as inputs_router
 from strong_api.inputs.queue import ArqJobQueue, JobQueue
@@ -66,6 +69,8 @@ def create_app(
     app.include_router(gap_router)
     app.include_router(scoring_router)
     install_auth(app)
+    install_billing(app)
+    install_account(app)
 
     @app.get("/health")
     async def health(response: Response) -> dict[str, Any]:
