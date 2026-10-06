@@ -136,8 +136,8 @@ def test_briefs_differ_by_difficulty() -> None:
     )
     tough, _ = assemble(draft(), config(difficulty="tough"), POSTING, generic_profile(), None)
 
-    assert friendly.max_probes_per_question < realistic.max_probes_per_question <= 3
-    assert tough.max_probes_per_question == 3
+    probes = [b.max_probes_per_question for b in (friendly, realistic, tough)]
+    assert probes == [1, 2, 3]  # IV-3: at most 3, fewer in Friendly; matches P07
     assert (friendly.pushback, realistic.pushback, tough.pushback) == (False, False, True)
     assert friendly.curveball is None and realistic.curveball is None
     assert tough.curveball == draft().curveball

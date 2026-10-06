@@ -61,8 +61,8 @@ MAX_PATTERNS = 5
 QUESTIONS_BY_DURATION = {30: 8, 45: 10}
 COMPETENCIES_BY_DURATION = {30: 5, 45: 6}
 
-PROBES_BY_DIFFICULTY = {Difficulty.FRIENDLY: 1, Difficulty.REALISTIC: 3, Difficulty.TOUGH: 3}
-"""IV-3: up to 3 probes per question, fewer in Friendly."""
+PROBES_BY_DIFFICULTY = {Difficulty.FRIENDLY: 1, Difficulty.REALISTIC: 2, Difficulty.TOUGH: 3}
+"""IV-3: up to 3 probes per question, fewer in Friendly. Same values as the P07 interviewer."""
 
 TONE_BY_DIFFICULTY = {
     Difficulty.FRIENDLY: "Warm and encouraging. Gives the candidate time and helps them settle.",
