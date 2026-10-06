@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from strong_api.inputs.queue import JobState
-from strong_core.schemas import JobPosting, Level, Resume
+from strong_core.schemas import GapStatus, JobPosting, Level, Resume
 
 MAX_POSTING_CHARS = 60_000
 MAX_RESUME_TEXT_CHARS = 60_000
@@ -110,3 +110,15 @@ class JobTargetAccepted(BaseModel):
 class ResumeAccepted(BaseModel):
     resume: ResumeOut
     job: JobOut | None
+
+
+class JobTargetSummary(BaseModel):
+    """One row of the dashboard list (GET /job-targets)."""
+
+    job_target: JobTargetOut
+    match_score: int | None = Field(description="From the latest ready gap analysis, else None.")
+    gap_status: GapStatus | None = Field(
+        description="Status of the latest gap analysis. None when none was started."
+    )
+    sessions_count: int = Field(ge=0, description="Interview sessions for this job.")
+    last_session_at: datetime | None = Field(description="Start of the latest session.")

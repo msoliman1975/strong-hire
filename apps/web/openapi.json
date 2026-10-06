@@ -6,6 +6,30 @@
   },
   "paths": {
     "/job-targets": {
+      "get": {
+        "tags": [
+          "inputs"
+        ],
+        "summary": "List Job Targets",
+        "description": "The signed-in user's job targets, newest first, with dashboard numbers (PR-1).\n\nmatch_score comes from the latest ready gap analysis. sessions_count and last_session_at\ncount rows in the sessions table; they stay 0 and null until sessions exist (P7, P10).",
+        "operationId": "list_job_targets_job_targets_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/JobTargetSummary"
+                  },
+                  "type": "array",
+                  "title": "Response List Job Targets Job Targets Get"
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "tags": [
           "inputs"
@@ -93,7 +117,7 @@
           "inputs"
         ],
         "summary": "Update Job Target",
-        "description": "Confirm or edit the posting. A changed company name runs company matching again.",
+        "description": "Confirm or edit the posting. A changed company name runs company matching again.\n\nIf the job has a gap analysis and the edit changes its inputs, a new analysis starts.",
         "operationId": "update_job_target_job_targets__job_target_id__put",
         "parameters": [
           {
@@ -194,6 +218,30 @@
       }
     },
     "/resumes": {
+      "get": {
+        "tags": [
+          "inputs"
+        ],
+        "summary": "List Resumes",
+        "description": "The signed-in user's resumes, newest first. Used to reuse a resume for a new job.",
+        "operationId": "list_resumes_resumes_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ResumeOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Resumes Resumes Get"
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "tags": [
           "inputs"
@@ -281,7 +329,7 @@
           "inputs"
         ],
         "summary": "Update Resume",
-        "description": "Confirm or edit the parsed resume.",
+        "description": "Confirm or edit the parsed resume. Gap analyses that used it start again.",
         "operationId": "update_resume_resumes__resume_id__put",
         "parameters": [
           {
@@ -367,6 +415,120 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/job-targets/{job_target_id}/gap-analysis": {
+      "post": {
+        "tags": [
+          "gap analysis"
+        ],
+        "summary": "Start Gap Analysis",
+        "description": "Start the gap analysis for a job and a resume. Free; rate limited per user (GA-4).",
+        "operationId": "start_gap_analysis_job_targets__job_target_id__gap_analysis_post",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GapAnalysisStart"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GapAnalysisOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The job target, the resume or the analysis does not exist."
+          },
+          "409": {
+            "description": "The job posting or the resume is still being read."
+          },
+          "429": {
+            "description": "Rate limited. detail.code is 'rate_limited'; see Retry-After."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "gap analysis"
+        ],
+        "summary": "Get Gap Analysis",
+        "description": "The latest gap analysis for the job (GA-1 to GA-3). 404 when none was started.",
+        "operationId": "get_gap_analysis_job_targets__job_target_id__gap_analysis_get",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GapAnalysisOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The job target, the resume or the analysis does not exist."
+          },
+          "409": {
+            "description": "The job posting or the resume is still being read."
+          },
+          "429": {
+            "description": "Rate limited. detail.code is 'rate_limited'; see Retry-After."
           },
           "422": {
             "description": "Validation Error",
@@ -804,6 +966,39 @@
         "type": "object",
         "title": "Body_create_resume_resumes_post"
       },
+      "BriefDraft": {
+        "additionalProperties": false,
+        "description": "What the planner model returns for an interviewer brief. Code adds the rest: persona,\nseniority bar, probe limits, time plan and the profile version.",
+        "properties": {
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/BriefQuestion"
+            },
+            "maxItems": 12,
+            "minItems": 6,
+            "title": "Questions",
+            "type": "array"
+          },
+          "curveball": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Only asked for in Tough difficulty.",
+            "title": "Curveball"
+          }
+        },
+        "required": [
+          "questions"
+        ],
+        "title": "BriefDraft",
+        "type": "object"
+      },
       "BriefQuestion": {
         "additionalProperties": false,
         "properties": {
@@ -1015,7 +1210,7 @@
         "type": "object"
       },
       "Competency": {
-        "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.",
+        "type": "string",
         "enum": [
           "ownership",
           "impact",
@@ -1042,18 +1237,49 @@
           "recommendation"
         ],
         "title": "Competency",
-        "type": "string"
+        "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE."
       },
       "CompetencyMatch": {
-        "additionalProperties": false,
         "properties": {
           "competency": {
             "$ref": "#/components/schemas/Competency"
           },
           "score": {
-            "maximum": 100,
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Score"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "competency",
+          "score"
+        ],
+        "title": "CompetencyMatch"
+      },
+      "CompetencyRating": {
+        "additionalProperties": false,
+        "properties": {
+          "competency": {
+            "$ref": "#/components/schemas/Competency"
+          },
+          "rating": {
+            "maximum": 3,
             "minimum": 0,
-            "title": "Score",
+            "title": "Rating",
             "type": "integer"
           },
           "notes": {
@@ -1071,9 +1297,9 @@
         },
         "required": [
           "competency",
-          "score"
+          "rating"
         ],
-        "title": "CompetencyMatch",
+        "title": "CompetencyRating",
         "type": "object"
       },
       "CompetencyScore": {
@@ -1135,14 +1361,14 @@
         "title": "DevLoginRequest"
       },
       "Difficulty": {
-        "description": "IV-4.",
+        "type": "string",
         "enum": [
           "friendly",
           "realistic",
           "tough"
         ],
         "title": "Difficulty",
-        "type": "string"
+        "description": "IV-4."
       },
       "Education": {
         "properties": {
@@ -1197,12 +1423,11 @@
         "title": "Education"
       },
       "Gap": {
-        "additionalProperties": false,
         "properties": {
           "summary": {
+            "type": "string",
             "minLength": 1,
-            "title": "Summary",
-            "type": "string"
+            "title": "Summary"
           },
           "severity": {
             "$ref": "#/components/schemas/Severity"
@@ -1216,39 +1441,220 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Related Requirement"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "summary",
           "severity"
         ],
-        "title": "Gap",
-        "type": "object"
+        "title": "Gap"
       },
       "GapAnalysis": {
-        "additionalProperties": false,
         "properties": {
           "match_score": {
-            "description": "GA-1.",
-            "maximum": 100,
-            "minimum": 0,
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 0.0,
             "title": "Match Score",
-            "type": "integer"
+            "description": "GA-1."
           },
           "requirement_breakdown": {
             "items": {
               "$ref": "#/components/schemas/RequirementMatch"
             },
-            "title": "Requirement Breakdown",
-            "type": "array"
+            "type": "array",
+            "title": "Requirement Breakdown"
           },
           "competency_breakdown": {
             "items": {
               "$ref": "#/components/schemas/CompetencyMatch"
             },
-            "title": "Competency Breakdown",
+            "type": "array",
+            "title": "Competency Breakdown"
+          },
+          "strengths": {
+            "items": {
+              "$ref": "#/components/schemas/Strength"
+            },
+            "type": "array",
+            "title": "Strengths"
+          },
+          "gaps": {
+            "items": {
+              "$ref": "#/components/schemas/Gap"
+            },
+            "type": "array",
+            "title": "Gaps"
+          },
+          "probe_areas": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Probe Areas"
+          },
+          "session_plan": {
+            "items": {
+              "$ref": "#/components/schemas/PlannedSession"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Session Plan"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "match_score",
+          "session_plan"
+        ],
+        "title": "GapAnalysis"
+      },
+      "GapAnalysisOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "job_target_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Job Target Id"
+          },
+          "resume_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Resume Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/GapStatus"
+          },
+          "analysis": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GapAnalysis"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Set when status is ready."
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error",
+            "description": "A plain reason when status is failed."
+          },
+          "generic_mode": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Generic Mode",
+            "description": "True when no company profile was used. None until ready."
+          },
+          "profile_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile Version"
+          },
+          "stale": {
+            "type": "boolean",
+            "title": "Stale",
+            "description": "The job, the resume or the company profile changed after this analysis. Start it again to update it."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "job_target_id",
+          "resume_id",
+          "status",
+          "analysis",
+          "error",
+          "generic_mode",
+          "profile_version",
+          "stale",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "GapAnalysisOut",
+        "description": "The latest gap analysis of a job target. Poll while status is \"running\"."
+      },
+      "GapAnalysisStart": {
+        "properties": {
+          "resume_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resume Id",
+            "description": "The resume to compare with the job. Leave it out to run again with the resume of the latest analysis."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "GapAnalysisStart"
+      },
+      "GapAssessment": {
+        "additionalProperties": false,
+        "description": "What the planner model returns for a gap analysis. Code builds the GapAnalysis from it.",
+        "properties": {
+          "requirements": {
+            "items": {
+              "$ref": "#/components/schemas/RequirementRating"
+            },
+            "title": "Requirements",
+            "type": "array"
+          },
+          "competencies": {
+            "items": {
+              "$ref": "#/components/schemas/CompetencyRating"
+            },
+            "title": "Competencies",
             "type": "array"
           },
           "strengths": {
@@ -1282,11 +1688,20 @@
           }
         },
         "required": [
-          "match_score",
           "session_plan"
         ],
-        "title": "GapAnalysis",
+        "title": "GapAssessment",
         "type": "object"
+      },
+      "GapStatus": {
+        "type": "string",
+        "enum": [
+          "running",
+          "ready",
+          "failed"
+        ],
+        "title": "GapStatus",
+        "description": "State of one gap analysis run (GA-1 to GA-4)."
       },
       "HTTPValidationError": {
         "properties": {
@@ -1314,7 +1729,7 @@
         "type": "string"
       },
       "InterviewType": {
-        "description": "The four v1 interview types (IV-2).",
+        "type": "string",
         "enum": [
           "behavioral",
           "hiring_manager",
@@ -1322,7 +1737,7 @@
           "case"
         ],
         "title": "InterviewType",
-        "type": "string"
+        "description": "The four v1 interview types (IV-2)."
       },
       "InterviewerBrief": {
         "additionalProperties": false,
@@ -1417,6 +1832,39 @@
             "default": null,
             "description": "Tough difficulty only (IV-4).",
             "title": "Curveball"
+          },
+          "seniority_bar": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Scope expected at session.level (IV-6). Level changes the bar.",
+            "title": "Seniority Bar"
+          },
+          "pushback": {
+            "default": false,
+            "description": "Tough difficulty only: challenge assumptions (IV-4).",
+            "title": "Pushback",
+            "type": "boolean"
+          },
+          "coach_help": {
+            "default": false,
+            "description": "Coach mode only: pause, hint and redo are allowed (IV-8).",
+            "title": "Coach Help",
+            "type": "boolean"
+          },
+          "time_plan": {
+            "description": "Minutes per phase. When set, the minutes add up to session.duration_min.",
+            "items": {
+              "$ref": "#/components/schemas/PhaseTime"
+            },
+            "title": "Time Plan",
+            "type": "array"
           }
         },
         "required": [
@@ -1824,6 +2272,65 @@
         ],
         "title": "JobTargetOut"
       },
+      "JobTargetSummary": {
+        "properties": {
+          "job_target": {
+            "$ref": "#/components/schemas/JobTargetOut"
+          },
+          "match_score": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Match Score",
+            "description": "From the latest ready gap analysis, else None."
+          },
+          "gap_status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GapStatus"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Status of the latest gap analysis. None when none was started."
+          },
+          "sessions_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Sessions Count",
+            "description": "Interview sessions for this job."
+          },
+          "last_session_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Session At",
+            "description": "Start of the latest session."
+          }
+        },
+        "type": "object",
+        "required": [
+          "job_target",
+          "match_score",
+          "gap_status",
+          "sessions_count",
+          "last_session_at"
+        ],
+        "title": "JobTargetSummary",
+        "description": "One row of the dashboard list (GET /job-targets)."
+      },
       "JobTargetUpdate": {
         "properties": {
           "posting": {
@@ -2118,15 +2625,34 @@
         "title": "Phase",
         "type": "string"
       },
-      "PlannedSession": {
+      "PhaseTime": {
         "additionalProperties": false,
-        "description": "One recommended practice session (GA-3).",
+        "description": "Minutes planned for one phase of the session (IV-7).",
+        "properties": {
+          "phase": {
+            "$ref": "#/components/schemas/Phase"
+          },
+          "minutes": {
+            "maximum": 45,
+            "minimum": 0,
+            "title": "Minutes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "phase",
+          "minutes"
+        ],
+        "title": "PhaseTime",
+        "type": "object"
+      },
+      "PlannedSession": {
         "properties": {
           "priority": {
-            "description": "1 is the first session to run.",
-            "minimum": 1,
+            "type": "integer",
+            "minimum": 1.0,
             "title": "Priority",
-            "type": "integer"
+            "description": "1 is the first session to run."
           },
           "interview_type": {
             "$ref": "#/components/schemas/InterviewType"
@@ -2139,16 +2665,18 @@
             "items": {
               "type": "string"
             },
+            "type": "array",
             "minItems": 1,
-            "title": "Focus Topics",
-            "type": "array"
+            "title": "Focus Topics"
           },
           "reason": {
+            "type": "string",
             "minLength": 1,
-            "title": "Reason",
-            "type": "string"
+            "title": "Reason"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "priority",
           "interview_type",
@@ -2156,7 +2684,7 @@
           "reason"
         ],
         "title": "PlannedSession",
-        "type": "object"
+        "description": "One recommended practice session (GA-3)."
       },
       "Principle": {
         "additionalProperties": false,
@@ -2410,28 +2938,64 @@
         "type": "object"
       },
       "RequirementKind": {
+        "type": "string",
         "enum": [
           "must_have",
           "nice_to_have"
         ],
-        "title": "RequirementKind",
-        "type": "string"
+        "title": "RequirementKind"
       },
       "RequirementMatch": {
-        "additionalProperties": false,
         "properties": {
           "requirement": {
+            "type": "string",
             "minLength": 1,
-            "title": "Requirement",
-            "type": "string"
+            "title": "Requirement"
           },
           "kind": {
             "$ref": "#/components/schemas/RequirementKind"
           },
           "score": {
-            "maximum": 100,
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Score"
+          },
+          "evidence": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence",
+            "description": "Resume text that supports the score."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "requirement",
+          "kind",
+          "score"
+        ],
+        "title": "RequirementMatch"
+      },
+      "RequirementRating": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "The requirement id from the input, e.g. 'r3'.",
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "rating": {
+            "maximum": 3,
             "minimum": 0,
-            "title": "Score",
+            "title": "Rating",
             "type": "integer"
           },
           "evidence": {
@@ -2444,16 +3008,15 @@
               }
             ],
             "default": null,
-            "description": "Resume text that supports the score.",
+            "description": "A short quote from the resume that supports the rating.",
             "title": "Evidence"
           }
         },
         "required": [
-          "requirement",
-          "kind",
-          "score"
+          "id",
+          "rating"
         ],
-        "title": "RequirementMatch",
+        "title": "RequirementRating",
         "type": "object"
       },
       "Resume": {
@@ -2769,13 +3332,13 @@
         "type": "string"
       },
       "Severity": {
+        "type": "string",
         "enum": [
           "low",
           "medium",
           "high"
         ],
-        "title": "Severity",
-        "type": "string"
+        "title": "Severity"
       },
       "SignupRequest": {
         "properties": {
@@ -2855,26 +3418,26 @@
         "type": "string"
       },
       "Strength": {
-        "additionalProperties": false,
         "properties": {
           "summary": {
+            "type": "string",
             "minLength": 1,
-            "title": "Summary",
-            "type": "string"
+            "title": "Summary"
           },
           "evidence": {
-            "description": "Resume evidence (GA-2).",
+            "type": "string",
             "minLength": 1,
             "title": "Evidence",
-            "type": "string"
+            "description": "Resume evidence (GA-2)."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "summary",
           "evidence"
         ],
-        "title": "Strength",
-        "type": "object"
+        "title": "Strength"
       },
       "SubscriptionStatus": {
         "description": "Mirrors the Stripe subscription statuses we act on.",

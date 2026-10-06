@@ -1,4 +1,4 @@
-"""Job queue used by the input endpoints. Production uses Arq; tests swap in a fake."""
+"""Job queue used by the input and gap analysis endpoints. Production uses Arq; tests use a fake."""
 
 from __future__ import annotations
 
@@ -13,6 +13,9 @@ from arq.jobs import Job, JobStatus
 EXTRACT_JOB_TARGET = "extract_job_target"
 MATCH_JOB_TARGET = "match_job_target"
 PARSE_RESUME = "parse_resume"
+# Names of the Arq functions in strong_worker.gap.jobs (P6).
+RUN_GAP_ANALYSIS = "run_gap_analysis_job"
+BUILD_INTERVIEWER_BRIEF = "build_interviewer_brief"
 
 
 JobState = Literal["queued", "in_progress", "complete", "failed", "not_found"]

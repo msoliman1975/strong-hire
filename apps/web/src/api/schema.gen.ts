@@ -11,7 +11,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * List Job Targets
+         * @description The signed-in user's job targets, newest first, with dashboard numbers (PR-1).
+         *
+         *     match_score comes from the latest ready gap analysis. sessions_count and last_session_at
+         *     count rows in the sessions table; they stay 0 and null until sessions exist (P7, P10).
+         */
+        get: operations["list_job_targets_job_targets_get"];
         put?: never;
         /** Create Job Target */
         post: operations["create_job_target_job_targets_post"];
@@ -33,6 +40,8 @@ export interface paths {
         /**
          * Update Job Target
          * @description Confirm or edit the posting. A changed company name runs company matching again.
+         *
+         *     If the job has a gap analysis and the edit changes its inputs, a new analysis starts.
          */
         put: operations["update_job_target_job_targets__job_target_id__put"];
         post?: never;
@@ -66,7 +75,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * List Resumes
+         * @description The signed-in user's resumes, newest first. Used to reuse a resume for a new job.
+         */
+        get: operations["list_resumes_resumes_get"];
         put?: never;
         /**
          * Create Resume
@@ -90,7 +103,7 @@ export interface paths {
         get: operations["get_resume_resumes__resume_id__get"];
         /**
          * Update Resume
-         * @description Confirm or edit the parsed resume.
+         * @description Confirm or edit the parsed resume. Gap analyses that used it start again.
          */
         put: operations["update_resume_resumes__resume_id__put"];
         post?: never;
@@ -111,6 +124,30 @@ export interface paths {
         get: operations["get_resume_job_resumes__resume_id__jobs__job_id__get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/job-targets/{job_target_id}/gap-analysis": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Gap Analysis
+         * @description The latest gap analysis for the job (GA-1 to GA-3). 404 when none was started.
+         */
+        get: operations["get_gap_analysis_job_targets__job_target_id__gap_analysis_get"];
+        put?: never;
+        /**
+         * Start Gap Analysis
+         * @description Start the gap analysis for a job and a resume. Free; rate limited per user (GA-4).
+         */
+        post: operations["start_gap_analysis_job_targets__job_target_id__gap_analysis_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -352,6 +389,21 @@ export interface components {
             /** Text */
             text?: string | null;
         };
+        /**
+         * BriefDraft
+         * @description What the planner model returns for an interviewer brief. Code adds the rest: persona,
+         *     seniority bar, probe limits, time plan and the profile version.
+         */
+        BriefDraft: {
+            /** Questions */
+            questions: components["schemas"]["BriefQuestion"][];
+            /**
+             * Curveball
+             * @description Only asked for in Tough difficulty.
+             * @default null
+             */
+            curveball: string | null;
+        };
         /** BriefQuestion */
         BriefQuestion: {
             /**
@@ -448,6 +500,14 @@ export interface components {
             competency: components["schemas"]["Competency"];
             /** Score */
             score: number;
+            /** Notes */
+            notes?: string | null;
+        };
+        /** CompetencyRating */
+        CompetencyRating: {
+            competency: components["schemas"]["Competency"];
+            /** Rating */
+            rating: number;
             /**
              * Notes
              * @default null
@@ -502,11 +562,8 @@ export interface components {
             /** Summary */
             summary: string;
             severity: components["schemas"]["Severity"];
-            /**
-             * Related Requirement
-             * @default null
-             */
-            related_requirement: string | null;
+            /** Related Requirement */
+            related_requirement?: string | null;
         };
         /** GapAnalysis */
         GapAnalysis: {
@@ -528,6 +585,86 @@ export interface components {
             /** Session Plan */
             session_plan: components["schemas"]["PlannedSession"][];
         };
+        /**
+         * GapAnalysisOut
+         * @description The latest gap analysis of a job target. Poll while status is "running".
+         */
+        GapAnalysisOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Job Target Id
+             * Format: uuid
+             */
+            job_target_id: string;
+            /**
+             * Resume Id
+             * Format: uuid
+             */
+            resume_id: string;
+            status: components["schemas"]["GapStatus"];
+            /** @description Set when status is ready. */
+            analysis: components["schemas"]["GapAnalysis"] | null;
+            /**
+             * Error
+             * @description A plain reason when status is failed.
+             */
+            error: string | null;
+            /**
+             * Generic Mode
+             * @description True when no company profile was used. None until ready.
+             */
+            generic_mode: boolean | null;
+            /** Profile Version */
+            profile_version: number | null;
+            /**
+             * Stale
+             * @description The job, the resume or the company profile changed after this analysis. Start it again to update it.
+             */
+            stale: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Updated At */
+            updated_at: string | null;
+        };
+        /** GapAnalysisStart */
+        GapAnalysisStart: {
+            /**
+             * Resume Id
+             * @description The resume to compare with the job. Leave it out to run again with the resume of the latest analysis.
+             */
+            resume_id?: string | null;
+        };
+        /**
+         * GapAssessment
+         * @description What the planner model returns for a gap analysis. Code builds the GapAnalysis from it.
+         */
+        GapAssessment: {
+            /** Requirements */
+            requirements?: components["schemas"]["RequirementRating"][];
+            /** Competencies */
+            competencies?: components["schemas"]["CompetencyRating"][];
+            /** Strengths */
+            strengths?: components["schemas"]["Strength"][];
+            /** Gaps */
+            gaps?: components["schemas"]["Gap"][];
+            /** Probe Areas */
+            probe_areas?: string[];
+            /** Session Plan */
+            session_plan: components["schemas"]["PlannedSession"][];
+        };
+        /**
+         * GapStatus
+         * @description State of one gap analysis run (GA-1 to GA-4).
+         * @enum {string}
+         */
+        GapStatus: "running" | "ready" | "failed";
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -587,6 +724,29 @@ export interface components {
              * @default null
              */
             curveball: string | null;
+            /**
+             * Seniority Bar
+             * @description Scope expected at session.level (IV-6). Level changes the bar.
+             * @default null
+             */
+            seniority_bar: string | null;
+            /**
+             * Pushback
+             * @description Tough difficulty only: challenge assumptions (IV-4).
+             * @default false
+             */
+            pushback: boolean;
+            /**
+             * Coach Help
+             * @description Coach mode only: pause, hint and redo are allowed (IV-8).
+             * @default false
+             */
+            coach_help: boolean;
+            /**
+             * Time Plan
+             * @description Minutes per phase. When set, the minutes add up to session.duration_min.
+             */
+            time_plan?: components["schemas"]["PhaseTime"][];
         };
         /**
          * JobContext
@@ -703,6 +863,30 @@ export interface components {
             created_at: string;
         };
         /**
+         * JobTargetSummary
+         * @description One row of the dashboard list (GET /job-targets).
+         */
+        JobTargetSummary: {
+            job_target: components["schemas"]["JobTargetOut"];
+            /**
+             * Match Score
+             * @description From the latest ready gap analysis, else None.
+             */
+            match_score: number | null;
+            /** @description Status of the latest gap analysis. None when none was started. */
+            gap_status: components["schemas"]["GapStatus"] | null;
+            /**
+             * Sessions Count
+             * @description Interview sessions for this job.
+             */
+            sessions_count: number;
+            /**
+             * Last Session At
+             * @description Start of the latest session.
+             */
+            last_session_at: string | null;
+        };
+        /**
          * JobTargetUpdate
          * @description The user confirms or edits the extracted posting (IN-2) and the context (IN-4).
          */
@@ -817,6 +1001,15 @@ export interface components {
          * @enum {string}
          */
         Phase: "intro" | "small_talk" | "agenda" | "core" | "candidate_questions" | "wrap_up";
+        /**
+         * PhaseTime
+         * @description Minutes planned for one phase of the session (IV-7).
+         */
+        PhaseTime: {
+            phase: components["schemas"]["Phase"];
+            /** Minutes */
+            minutes: number;
+        };
         /**
          * PlannedSession
          * @description One recommended practice session (GA-3).
@@ -962,6 +1155,21 @@ export interface components {
             /**
              * Evidence
              * @description Resume text that supports the score.
+             */
+            evidence?: string | null;
+        };
+        /** RequirementRating */
+        RequirementRating: {
+            /**
+             * Id
+             * @description The requirement id from the input, e.g. 'r3'.
+             */
+            id: string;
+            /** Rating */
+            rating: number;
+            /**
+             * Evidence
+             * @description A short quote from the resume that supports the rating.
              * @default null
              */
             evidence: string | null;
@@ -1220,6 +1428,26 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    list_job_targets_job_targets_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobTargetSummary"][];
+                };
+            };
+        };
+    };
     create_job_target_job_targets_post: {
         parameters: {
             query?: never;
@@ -1347,6 +1575,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_resumes_resumes_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumeOut"][];
                 };
             };
         };
@@ -1479,6 +1727,114 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
+            };
+        };
+    };
+    get_gap_analysis_job_targets__job_target_id__gap_analysis_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GapAnalysisOut"];
+                };
+            };
+            /** @description The job target, the resume or the analysis does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The job posting or the resume is still being read. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Rate limited. detail.code is 'rate_limited'; see Retry-After. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    start_gap_analysis_job_targets__job_target_id__gap_analysis_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GapAnalysisStart"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GapAnalysisOut"];
+                };
+            };
+            /** @description The job target, the resume or the analysis does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The job posting or the resume is still being read. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Rate limited. detail.code is 'rate_limited'; see Retry-After. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
