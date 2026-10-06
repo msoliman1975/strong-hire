@@ -1,0 +1,17 @@
+Interview type: $interview_type
+Candidate level: $level
+Company: $company
+
+Level expectations (what a 3 means at this level):
+$level_expectations
+
+Competencies to score: $competencies
+
+Company values:
+$values
+
+Questions that were asked (question_ref: text [competencies] {values}):
+$questions
+
+Transcript:
+$transcript

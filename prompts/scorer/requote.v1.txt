@@ -1,0 +1,6 @@
+Some quotes in your scorecard are not in the transcript as the candidate said them:
+$problems
+
+Return the full scorecard again. For each of these scores, copy one to three quotes word for
+word from the candidate's answers, or change the score if no answer supports it. Keep the other
+scores as they were.

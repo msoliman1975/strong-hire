@@ -1,0 +1,17 @@
+Hire signal: $hire_signal
+Interview type: $interview_type
+Candidate level: $level
+Weighted average score: $average of 4
+Rules that changed the signal: $rules
+
+Competency scores (1 to 4, with the profile weight):
+$competencies
+
+Company value scores:
+$values
+
+Strengths noted:
+$strengths
+
+Misses noted:
+$misses
