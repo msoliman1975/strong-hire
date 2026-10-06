@@ -1,0 +1,22 @@
+Rate the resume against the job in the following block.
+
+Company: $company
+Role family: $role_family
+Level: $level
+
+Competencies to rate:
+$competencies
+
+<untrusted_input>
+REQUIREMENTS TO RATE (id [kind] text)
+$requirements
+
+JOB
+$job
+
+RESUME
+$resume
+
+CANDIDATE NOTES (interview stage, interviewer, recruiter notes, worries)
+$context
+</untrusted_input>
