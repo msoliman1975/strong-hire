@@ -47,6 +47,15 @@ export type DebriefSession = DeepRequired<S["DebriefSession"]>;
 export type JobProgress = DeepRequired<S["JobProgress"]>;
 export type CompetencyTrend = DeepRequired<S["CompetencyTrend"]>;
 
+// Billing and account (real endpoints in apps/api billing and account, P9).
+export type Usage = DeepRequired<S["UsageOut"]>;
+export type PlanOffer = S["PlanOut"];
+export type ExportJob = DeepRequired<S["ExportOut"]>;
+export type ExportStatus = S["ExportOut"]["status"];
+export type ExitSurveyIn = S["ExitSurveyIn"];
+export type ExitReason = S["ExitSurveyIn"]["reason"];
+export type GotJob = S["ExitSurveyIn"]["got_job"];
+
 // Shared contracts from strong_core.schemas.
 export type JobPosting = DeepRequired<S["JobPosting"]>;
 export type Resume = DeepRequired<S["Resume"]>;

@@ -933,6 +933,423 @@
         }
       }
     },
+    "/billing/plan": {
+      "get": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Plan",
+        "operationId": "plan_billing_plan_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/usage": {
+      "get": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Usage",
+        "operationId": "usage_billing_usage_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/checkout": {
+      "post": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Checkout",
+        "description": "Start Stripe Checkout for the plan. The webhook turns the plan on after payment.",
+        "operationId": "checkout_billing_checkout_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedirectOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/portal": {
+      "post": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Portal",
+        "description": "Open the Stripe Customer Portal to change the card, see invoices or cancel.",
+        "operationId": "portal_billing_portal_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/PortalRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedirectOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/exit-survey": {
+      "post": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Exit Survey",
+        "description": "The cancellation exit survey: why the user leaves, and did they get the job.",
+        "operationId": "exit_survey_billing_exit_survey_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExitSurveyIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExitSurveyOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/webhook": {
+      "post": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Webhook",
+        "description": "Stripe calls this. The Stripe-Signature header must match STRIPE_WEBHOOK_SECRET.",
+        "operationId": "webhook_billing_webhook_post",
+        "parameters": [
+          {
+            "name": "stripe-signature",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Stripe-Signature"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/dev/usage": {
+      "post": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Dev Usage",
+        "description": "Local only (APP_ENV=local). Uses plan minutes as if a session had ended, so the\nsubscribe, use, cancel flow can be checked before voice sessions exist.",
+        "operationId": "dev_usage_billing_dev_usage_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DevUsageIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/consent": {
+      "put": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Set Consent",
+        "description": "AC-2: training-data consent, off by default, changeable at any time.",
+        "operationId": "set_consent_account_consent_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsentIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/export": {
+      "post": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Start Export",
+        "description": "AC-1: prepare a zip of all the user's data and original resume files.",
+        "operationId": "start_export_account_export_post",
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExportOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/export/{export_id}": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Get Export",
+        "operationId": "get_export_account_export__export_id__get",
+        "parameters": [
+          {
+            "name": "export_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Export Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExportOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/export/{export_id}/download": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Download Export",
+        "description": "The export bundle. The first download deletes it from the server.",
+        "operationId": "download_export_account_export__export_id__download_get",
+        "parameters": [
+          {
+            "name": "export_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Export Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/zip": {}
+            }
+          },
+          "410": {
+            "description": "Gone"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account": {
+      "delete": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Delete Account",
+        "description": "AC-1: delete the account and all its data. Rows go now, files within 24 hours.",
+        "operationId": "delete_account_account_delete",
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountDeletedOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -956,6 +1373,41 @@
   },
   "components": {
     "schemas": {
+      "AccountDeletedOut": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "deleted",
+            "title": "Status"
+          },
+          "rows_deleted": {
+            "type": "integer",
+            "title": "Rows Deleted"
+          },
+          "files_pending": {
+            "type": "integer",
+            "title": "Files Pending"
+          },
+          "files_deleted_within_hours": {
+            "type": "integer",
+            "title": "Files Deleted Within Hours"
+          },
+          "backups_expire_within_days": {
+            "type": "integer",
+            "title": "Backups Expire Within Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "rows_deleted",
+          "files_pending",
+          "files_deleted_within_hours",
+          "backups_expire_within_days"
+        ],
+        "title": "AccountDeletedOut",
+        "description": "AC-1 account delete. Rows are gone now; resume files go within the deadline."
+      },
       "AuthProvider": {
         "type": "string",
         "enum": [
@@ -1537,6 +1989,33 @@
         "title": "Confidence",
         "type": "string"
       },
+      "ConsentIn": {
+        "properties": {
+          "training_consent": {
+            "type": "boolean",
+            "title": "Training Consent"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "training_consent"
+        ],
+        "title": "ConsentIn"
+      },
+      "ConsentOut": {
+        "properties": {
+          "training_consent": {
+            "type": "boolean",
+            "title": "Training Consent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "training_consent"
+        ],
+        "title": "ConsentOut"
+      },
       "Debrief": {
         "properties": {
           "session": {
@@ -1688,6 +2167,22 @@
         "type": "object",
         "title": "DevLoginRequest"
       },
+      "DevUsageIn": {
+        "properties": {
+          "minutes": {
+            "type": "integer",
+            "maximum": 600.0,
+            "minimum": 1.0,
+            "title": "Minutes"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "minutes"
+        ],
+        "title": "DevUsageIn"
+      },
       "Difficulty": {
         "type": "string",
         "enum": [
@@ -1749,6 +2244,130 @@
           "institution"
         ],
         "title": "Education"
+      },
+      "ExitSurveyIn": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "enum": [
+              "got_the_job",
+              "interview_over",
+              "too_expensive",
+              "not_helpful",
+              "technical_problems",
+              "missing_feature",
+              "other"
+            ],
+            "title": "Reason",
+            "description": "Why are you leaving?"
+          },
+          "reason_detail": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason Detail"
+          },
+          "got_job": {
+            "type": "string",
+            "enum": [
+              "yes",
+              "no",
+              "still_interviewing",
+              "prefer_not_to_say"
+            ],
+            "title": "Got Job",
+            "description": "Did you get the job?"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reason",
+          "got_job"
+        ],
+        "title": "ExitSurveyIn",
+        "description": "The cancellation exit survey: two questions. Both are required, the detail is not."
+      },
+      "ExitSurveyOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "created_at"
+        ],
+        "title": "ExitSurveyOut"
+      },
+      "ExportOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "preparing",
+              "ready",
+              "downloaded",
+              "expired",
+              "failed"
+            ],
+            "title": "Status"
+          },
+          "requested_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Requested At"
+          },
+          "download_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Download Url",
+            "description": "Set while status is ready. Works once."
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "requested_at",
+          "download_url"
+        ],
+        "title": "ExportOut",
+        "description": "AC-1 data export. The bundle is a zip: data.json plus the original resume files."
       },
       "Gap": {
         "properties": {
@@ -3019,6 +3638,43 @@
         "title": "PhaseTime",
         "type": "object"
       },
+      "PlanOut": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "price_usd_month": {
+            "type": "number",
+            "title": "Price Usd Month"
+          },
+          "minutes_cap": {
+            "type": "integer",
+            "title": "Minutes Cap",
+            "description": "Interview minutes per billing period."
+          },
+          "free_interviews": {
+            "type": "integer",
+            "title": "Free Interviews",
+            "description": "BL-2: interviews on the free plan."
+          },
+          "billing_enabled": {
+            "type": "boolean",
+            "title": "Billing Enabled",
+            "description": "False until Stripe keys are set."
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "price_usd_month",
+          "minutes_cap",
+          "free_interviews",
+          "billing_enabled"
+        ],
+        "title": "PlanOut",
+        "description": "The one paid plan. Every number comes from the API config."
+      },
       "PlannedSession": {
         "properties": {
           "priority": {
@@ -3058,6 +3714,23 @@
         ],
         "title": "PlannedSession",
         "description": "One recommended practice session (GA-3)."
+      },
+      "PortalRequest": {
+        "properties": {
+          "flow": {
+            "type": "string",
+            "enum": [
+              "manage",
+              "cancel"
+            ],
+            "title": "Flow",
+            "description": "cancel opens the portal at the cancellation step.",
+            "default": "manage"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "PortalRequest"
       },
       "Principle": {
         "additionalProperties": false,
@@ -3309,6 +3982,19 @@
           "scores"
         ],
         "title": "QuestionScore"
+      },
+      "RedirectOut": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "title": "Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "title": "RedirectOut"
       },
       "RequirementKind": {
         "type": "string",
@@ -3837,7 +4523,7 @@
         "title": "Strength"
       },
       "SubscriptionStatus": {
-        "description": "Mirrors the Stripe subscription statuses we act on.",
+        "type": "string",
         "enum": [
           "trialing",
           "active",
@@ -3846,7 +4532,7 @@
           "incomplete"
         ],
         "title": "SubscriptionStatus",
-        "type": "string"
+        "description": "Mirrors the Stripe subscription statuses we act on."
       },
       "Turn": {
         "additionalProperties": false,
@@ -3896,6 +4582,121 @@
         ],
         "title": "Turn",
         "type": "object"
+      },
+      "UsageOut": {
+        "properties": {
+          "plan": {
+            "type": "string",
+            "enum": [
+              "free",
+              "paid"
+            ],
+            "title": "Plan"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SubscriptionStatus"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Stripe status; null if never paid."
+          },
+          "minutes_used": {
+            "type": "integer",
+            "title": "Minutes Used"
+          },
+          "minutes_cap": {
+            "type": "integer",
+            "title": "Minutes Cap",
+            "description": "0 on the free plan."
+          },
+          "minutes_left": {
+            "type": "integer",
+            "title": "Minutes Left"
+          },
+          "period_start": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period Start"
+          },
+          "period_end": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period End"
+          },
+          "cancel_at_period_end": {
+            "type": "boolean",
+            "title": "Cancel At Period End"
+          },
+          "free_interviews_total": {
+            "type": "integer",
+            "title": "Free Interviews Total"
+          },
+          "free_interviews_left": {
+            "type": "integer",
+            "title": "Free Interviews Left"
+          },
+          "can_start_session": {
+            "type": "boolean",
+            "title": "Can Start Session"
+          },
+          "block_code": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "upgrade_required",
+                  "minutes_exhausted"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Block Code",
+            "description": "Why a new session is blocked. Null when it is allowed."
+          },
+          "has_billing_account": {
+            "type": "boolean",
+            "title": "Has Billing Account",
+            "description": "True when the Customer Portal can open."
+          }
+        },
+        "type": "object",
+        "required": [
+          "plan",
+          "status",
+          "minutes_used",
+          "minutes_cap",
+          "minutes_left",
+          "period_start",
+          "period_end",
+          "cancel_at_period_end",
+          "free_interviews_total",
+          "free_interviews_left",
+          "can_start_session",
+          "block_code",
+          "has_billing_account"
+        ],
+        "title": "UsageOut",
+        "description": "BL-1 usage meter and BL-2 free interview, as the API counts them."
       },
       "ValidationError": {
         "properties": {
@@ -4000,6 +4801,24 @@
         ],
         "title": "ValuesFramework",
         "type": "object"
+      },
+      "WebhookOut": {
+        "properties": {
+          "received": {
+            "type": "boolean",
+            "title": "Received"
+          },
+          "duplicate": {
+            "type": "boolean",
+            "title": "Duplicate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "received",
+          "duplicate"
+        ],
+        "title": "WebhookOut"
       }
     }
   }

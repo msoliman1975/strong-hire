@@ -3,8 +3,17 @@
  * add shows on the dashboard, the free interview is used once, and so on. In the browser it is
  * saved to localStorage so a page reload keeps it. This file is mock-only and never ships.
  */
-import type { AuthUser, GapAnalysisOut, JobOut, JobTargetOut, ResumeOut } from "../api/types";
-import type { ExportJob, SessionRecord, Usage } from "../api/planned";
+import type { SessionRecord } from "../api/planned";
+import type {
+  AuthUser,
+  ExitSurveyIn,
+  ExportJob,
+  GapAnalysisOut,
+  JobOut,
+  JobTargetOut,
+  ResumeOut,
+  Usage,
+} from "../api/types";
 
 /** A mock background job (Arq in the real API): reads a posting or parses a resume. */
 export interface MockTask extends JobOut {
@@ -33,14 +42,24 @@ export interface MockDb {
   debriefReadyAt: Record<string, number>;
   usage: Usage;
   exports: Record<string, ExportJob & { readyAt: number }>;
+  exitSurveys: ExitSurveyIn[];
 }
 
+/** The real API's answer for a new user (GET /billing/usage). */
 export const FREE_USAGE: Usage = {
   plan: "free",
+  status: null,
   minutes_used: 0,
   minutes_cap: 0,
+  minutes_left: 0,
+  period_start: null,
   period_end: null,
-  free_interview_available: true,
+  cancel_at_period_end: false,
+  free_interviews_total: 1,
+  free_interviews_left: 1,
+  can_start_session: true,
+  block_code: null,
+  has_billing_account: false,
 };
 
 export function emptyDb(): MockDb {
@@ -55,11 +74,12 @@ export function emptyDb(): MockDb {
     debriefReadyAt: {},
     usage: { ...FREE_USAGE },
     exports: {},
+    exitSurveys: [],
   };
 }
 
-/** Version 3: gap analyses use the real P6 shape. Older saved data is dropped. */
-const STORAGE_KEY = "strong-hire-mock-db-v3";
+/** Version 4: gap analyses (P6), usage and exports (P9) use the real shapes. Older data is dropped. */
+const STORAGE_KEY = "strong-hire-mock-db-v4";
 
 export interface MockStore {
   db: MockDb;

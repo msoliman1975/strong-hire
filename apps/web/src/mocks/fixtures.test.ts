@@ -9,7 +9,9 @@ import Ajv2020 from "ajv/dist/2020";
 import addFormats from "ajv-formats";
 import { describe, expect, it } from "vitest";
 
+import { accountApi } from "../api/account";
 import { authApi } from "../api/auth";
+import { billingApi } from "../api/billing";
 import { gapApi } from "../api/gap";
 import { jobTargetsApi, resumesApi } from "../api/inputs";
 import { sessionsApi } from "../api/planned";
@@ -170,6 +172,40 @@ describe("mocks of the real P6 endpoints match openapi.json", () => {
     const resumes = await resumesApi.list();
     expect(resumes.length).toBeGreaterThan(0);
     for (const row of resumes) expectApiShape("ResumeOut", row);
+  });
+});
+
+describe("mocks of the real P9 endpoints match openapi.json", () => {
+  it("billing: plan, usage, checkout, portal, exit survey (BL-1, BL-2)", async () => {
+    await authApi.devLogin("billing@example.com");
+    await authApi.signup({ age_confirmed: true, terms_accepted: true, training_consent: false });
+    expectApiShape("PlanOut", await billingApi.plan());
+    const free = await billingApi.usage();
+    expectApiShape("UsageOut", free);
+    expect(free.plan).toBe("free");
+    await expect(billingApi.portal("manage")).rejects.toMatchObject({ status: 404 });
+
+    expectApiShape("RedirectOut", await billingApi.checkout());
+    const paid = await billingApi.usage();
+    expectApiShape("UsageOut", paid);
+    expect(paid.plan).toBe("paid");
+    await expect(billingApi.checkout()).rejects.toMatchObject({ status: 409, code: "already_subscribed" });
+
+    expectApiShape("ExitSurveyOut", await billingApi.exitSurvey({ reason: "got_the_job", got_job: "yes" }));
+    expectApiShape("RedirectOut", await billingApi.portal("cancel"));
+    expect((await billingApi.usage()).cancel_at_period_end).toBe(true);
+  });
+
+  it("account: consent, export, delete (AC-1, AC-2)", async () => {
+    await authApi.devLogin("account@example.com");
+    await authApi.signup({ age_confirmed: true, terms_accepted: true, training_consent: false });
+    expectApiShape("ConsentOut", await accountApi.setConsent(true));
+    const started = await accountApi.startExport();
+    expectApiShape("ExportOut", started);
+    const ready = await accountApi.getExport(started.id);
+    expectApiShape("ExportOut", ready);
+    expect(ready.status).toBe("ready");
+    expectApiShape("AccountDeletedOut", await accountApi.deleteAccount());
   });
 });
 
