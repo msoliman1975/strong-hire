@@ -2003,6 +2003,7 @@ dependencies = [
     { name = "python-multipart" },
     { name = "redis" },
     { name = "strong-core" },
+    { name = "typer" },
     { name = "uvicorn", extra = ["standard"] },
 ]
 
@@ -2017,6 +2018,7 @@ requires-dist = [
     { name = "python-multipart", specifier = ">=0.0.9" },
     { name = "redis", specifier = ">=5.0" },
     { name = "strong-core", editable = "packages/core" },
+    { name = "typer", specifier = ">=0.12" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.30" },
 ]
 
