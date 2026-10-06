@@ -13,12 +13,15 @@ from __future__ import annotations
 import argparse
 import asyncio
 import contextlib
+import logging
 import math
+import os
 import statistics
 import sys
 import time
 import uuid
 from array import array
+from typing import NoReturn
 
 from livekit import rtc
 
@@ -232,5 +235,21 @@ def main(argv: list[str] | None = None) -> int:
     return asyncio.run(run(args.sessions, args.timeout, args.warmup))
 
 
+def exit_now(code: int) -> NoReturn:
+    """Flush output, then end the process without Python's shutdown steps.
+
+    The livekit rtc native library calls back into Python from its own tokio threads. In
+    Python 3.12, a thread that asks for the GIL after shutdown has started is ended with
+    pthread_exit. That unwinds through Rust code that cannot unwind, so the process aborts with
+    "panic in a function that cannot unwind" (exit code 134). In CI this happened after all
+    turns were measured. run_session closes every room, track, source and stream first, so
+    nothing is left for the shutdown steps to do. The caller's own exit code is kept.
+    """
+    logging.shutdown()
+    sys.stdout.flush()
+    sys.stderr.flush()
+    os._exit(code)
+
+
 if __name__ == "__main__":
-    sys.exit(main())
+    exit_now(main())

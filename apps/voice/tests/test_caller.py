@@ -76,3 +76,11 @@ def test_caller_does_not_load_the_agent_stack() -> None:
     code = "import sys, strong_voice.caller; print('livekit.agents' in sys.modules)"
     out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=True)
     assert out.stdout.strip() == "False"
+
+
+def test_exit_now_keeps_the_exit_code_and_flushes_output() -> None:
+    """The caller ends with os._exit, so the livekit native runtime cannot abort the shutdown."""
+    code = "from strong_voice.caller import exit_now; print('measured', end=''); exit_now(3)"
+    out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
+    assert out.returncode == 3
+    assert out.stdout == "measured"
