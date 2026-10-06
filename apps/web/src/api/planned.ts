@@ -3,65 +3,12 @@
  * screen works today. Each block names the workstream that will build the real endpoint; that
  * workstream may change the shape, then updates this file and its mock.
  *
- * The payloads inside the envelopes (GapAnalysis, SessionConfig, Scorecard, ProgressSnapshot,
- * PlannedSession) are the shared contracts from packages/core. Job targets and resumes use the
- * real API types (JobTargetOut, ResumeOut) from openapi.json.
+ * The payloads inside the envelopes (SessionConfig, Scorecard, ProgressSnapshot, PlannedSession)
+ * are the shared contracts from packages/core. Job targets, resumes, their lists and the gap
+ * analysis are real endpoints now: see inputs.ts and gap.ts.
  */
 import { request } from "./client";
-import type {
-  GapAnalysis,
-  JobTargetOut,
-  PlannedSession,
-  ProgressSnapshot,
-  ResumeOut,
-  Scorecard,
-  SessionConfig,
-  SessionStatus,
-} from "./types";
-
-// ---------------------------------------------------------------- job and resume lists
-// P2 built the job target and resume endpoints (see inputs.ts). These two lists are not in the
-// API yet. No workstream owns them yet; the dashboard (P8) and resume reuse need them.
-
-export interface JobTargetSummary {
-  job_target: JobTargetOut;
-  /** From the latest gap analysis. Null until one is ready. */
-  match_score: number | null;
-  sessions_count: number;
-  last_session_at: string | null;
-}
-
-export const jobListApi = {
-  list: () => request<JobTargetSummary[]>("GET", "/job-targets"),
-};
-
-export const resumeListApi = {
-  list: () => request<ResumeOut[]>("GET", "/resumes"),
-};
-
-// ---------------------------------------------------------------- P6: gap analysis
-
-export type GapStatus = "running" | "ready" | "failed";
-
-export interface GapAnalysisResult {
-  job_target_id: string;
-  resume_id: string;
-  status: GapStatus;
-  analysis: GapAnalysis | null;
-  error: string | null;
-}
-
-export interface StartGapAnalysisRequest {
-  /** The resume to compare with the job. A job target has no resume of its own. */
-  resume_id: string;
-}
-
-export const gapApi = {
-  /** Starts or restarts the analysis. Free and rate limited (GA-4). */
-  start: (jobId: string, body: StartGapAnalysisRequest) =>
-    request<GapAnalysisResult>("POST", `/job-targets/${jobId}/gap-analysis`, body),
-  get: (jobId: string) => request<GapAnalysisResult>("GET", `/job-targets/${jobId}/gap-analysis`),
-};
+import type { PlannedSession, ProgressSnapshot, Scorecard, SessionConfig, SessionStatus } from "./types";
 
 // ---------------------------------------------------------------- P7/P10: sessions
 

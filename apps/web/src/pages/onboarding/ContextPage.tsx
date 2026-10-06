@@ -4,7 +4,7 @@ import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 
 import { keys, useJob } from "../../api/hooks";
 import { jobTargetsApi } from "../../api/inputs";
-import { gapApi } from "../../api/planned";
+import { gapApi } from "../../api/gap";
 import type { JobContext } from "../../api/types";
 import { ErrorNotice, Loading, ONBOARDING_STEPS, PageHead, Steps } from "../../components/ui";
 

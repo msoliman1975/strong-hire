@@ -1,0 +1,37 @@
+{
+  "requirements": [
+    {"id": "r1", "rating": 3, "evidence": "Built the invoicing API used by 3,000 business customers"},
+    {"id": "r2", "rating": 2, "evidence": "Go"},
+    {"id": "r3", "rating": 1, "evidence": "Migrated 25 cron jobs to a queue-based worker system"},
+    {"id": "r4", "rating": 2, "evidence": "Reduced p99 API latency from 900 ms to 180 ms"},
+    {"id": "r5", "rating": 1, "evidence": null},
+    {"id": "r6", "rating": 3, "evidence": "Led the redesign of the payout service, cutting failed payouts by 38%"},
+    {"id": "r7", "rating": 2, "evidence": "Kafka"},
+    {"id": "r8", "rating": 2, "evidence": "AWS"}
+  ],
+  "competencies": [
+    {"competency": "ownership", "rating": 3, "notes": "Led the payout service redesign end to end."},
+    {"competency": "impact", "rating": 3, "notes": "Results come with numbers."},
+    {"competency": "collaboration", "rating": 2, "notes": "Mentored 4 engineers."},
+    {"competency": "communication", "rating": 1, "notes": "Little direct evidence on a resume."},
+    {"competency": "depth_of_experience", "rating": 2, "notes": "8 years in payments and billing."},
+    {"competency": "scope_at_level", "rating": 1, "notes": "Little evidence of cross-team leadership."},
+    {"competency": "technical_depth", "rating": 2, "notes": "Latency and reliability work."},
+    {"competency": "trade_offs", "rating": 1, "notes": "Design trade-offs are not described."}
+  ],
+  "strengths": [
+    {"summary": "Payments domain experience", "evidence": "Led the redesign of the payout service, cutting failed payouts by 38%"},
+    {"summary": "Performance work with measured results", "evidence": "Reduced p99 API latency from 900 ms to 180 ms by adding caching and query fixes"},
+    {"summary": "Mentoring", "evidence": "Mentored 4 engineers; two were promoted"}
+  ],
+  "gaps": [
+    {"summary": "No clear technical leadership across teams", "severity": "high", "related_requirement": "Lead technical design reviews and mentor engineers"},
+    {"summary": "Distributed systems depth is not shown", "severity": "medium", "related_requirement": "Distributed systems"}
+  ],
+  "probe_areas": ["Design review leadership", "Failure handling in money movement", "On-call and incident response"],
+  "session_plan": [
+    {"priority": 1, "interview_type": "behavioral", "difficulty": "realistic", "focus_topics": ["Leading without authority"], "reason": "The largest gap is scope at the senior level."},
+    {"priority": 2, "interview_type": "technical_qa", "difficulty": "realistic", "focus_topics": ["Idempotency", "Distributed systems"], "reason": "Core to the role and not shown on the resume."},
+    {"priority": 3, "interview_type": "hiring_manager", "difficulty": "tough", "focus_topics": ["Payout service redesign"], "reason": "Expect a deep dive on the strongest project."}
+  ]
+}

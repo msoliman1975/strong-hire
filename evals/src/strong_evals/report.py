@@ -185,6 +185,41 @@ def render_html(r: RunReport) -> str:
             lines = "".join(_turn_html(t) for t in m.turns)
             parts.append(f"<details><summary>Transcript {e(m.spec.id)}</summary>{lines}</details>")
 
+    if r.gap:
+        parts.append("<h2>Gap analysis</h2>")
+        rows = [
+            [
+                e(g.spec.id),
+                e(g.spec.posting),
+                e(g.spec.resume),
+                e(g.spec.fit),
+                "generic" if g.generic_mode else "company",
+                e(", ".join(str(s) for s in g.scores)),
+                "" if g.spread is None else str(g.spread),
+                e(", ".join(f"{s:.1f}" for s in g.seconds)),
+                f"${g.cost_usd:.4f}",
+                e(g.error or ""),
+            ]
+            for g in r.gap
+        ]
+        parts.append(
+            _table(
+                [
+                    "Id",
+                    "Posting",
+                    "Resume",
+                    "Fit",
+                    "Mode",
+                    "Match scores",
+                    "Spread",
+                    "Seconds",
+                    "Cost",
+                    "Error",
+                ],
+                rows,
+            )
+        )
+
     parts.append("<h2>Run details</h2>")
     parts.append(
         _table(
@@ -254,6 +289,21 @@ def report_data(r: RunReport) -> dict[str, Any]:
                 "error": m.error,
             }
             for m in r.simulated
+        ],
+        "gap": [
+            {
+                "id": g.spec.id,
+                "posting": g.spec.posting,
+                "resume": g.spec.resume,
+                "fit": g.spec.fit,
+                "generic_mode": g.generic_mode,
+                "scores": g.scores,
+                "spread": g.spread,
+                "seconds": g.seconds,
+                "cost_usd": str(g.cost_usd),
+                "error": g.error,
+            }
+            for g in r.gap
         ],
     }
 

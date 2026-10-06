@@ -37,6 +37,7 @@ from strong_core.schemas.enums import (
     AuthProvider,
     Competency,
     Difficulty,
+    GapStatus,
     HireSignal,
     InterviewType,
     Level,
@@ -228,11 +229,24 @@ class GapAnalysis(Base):
     resume_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("resumes.id", ondelete="CASCADE"), index=True
     )
-    match_score: Mapped[int] = mapped_column(Integer)
-    breakdown_json: Mapped[dict[str, Any]] = mapped_column(comment="schemas.GapAnalysis")
-    session_plan_json: Mapped[list[Any]] = mapped_column(comment="schemas.PlannedSession list")
-    model_version: Mapped[str] = mapped_column(String(200), comment="Gateway alias + prompt ref")
+    status: Mapped[GapStatus] = mapped_column(
+        str_enum(GapStatus, "gap_status"), default=GapStatus.READY, server_default="ready"
+    )
+    error: Mapped[str | None] = mapped_column(Text, comment="Plain reason when status is failed")
+    input_hash: Mapped[str | None] = mapped_column(
+        String(64), comment="Hash of the posting, resume and profile version it was built from"
+    )
+    profile_version: Mapped[int | None] = mapped_column(Integer, comment="NULL in generic mode")
+    match_score: Mapped[int | None] = mapped_column(Integer, comment="NULL until ready")
+    breakdown_json: Mapped[dict[str, Any] | None] = mapped_column(comment="schemas.GapAnalysis")
+    session_plan_json: Mapped[list[Any] | None] = mapped_column(
+        comment="schemas.PlannedSession list"
+    )
+    model_version: Mapped[str | None] = mapped_column(
+        String(200), comment="Gateway alias + prompt ref"
+    )
     created_at: Mapped[datetime] = _created_at()
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class InterviewSession(Base):

@@ -1,5 +1,7 @@
 """Endpoints for job targets (IN-1, IN-2, IN-4, IN-5) and resumes (IN-3).
 
+All routes act for the signed-in user (P3 sign-in) and only see rows of the user's org.
+
 Create endpoints save the row and enqueue an Arq job, then return 202 with the job id. The
 client polls the job endpoint until the status is "complete", then reads the job result:
 outcome "extracted" (with field-level confidence and the company match), "needs_paste" (the
@@ -14,9 +16,11 @@ from pathlib import PurePath
 from typing import Annotated
 from urllib.parse import urlparse
 
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile, status
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from sqlalchemy import func, select
 
+from strong_api.gap import service as gap_service
+from strong_api.gap.settings import GapSettings, get_gap_settings
 from strong_api.inputs.deps import Db, Me, Queue
 from strong_api.inputs.queue import (
     EXTRACT_JOB_TARGET,
@@ -31,16 +35,20 @@ from strong_api.inputs.schemas import (
     JobTargetAccepted,
     JobTargetCreate,
     JobTargetOut,
+    JobTargetSummary,
     JobTargetUpdate,
     ResumeAccepted,
     ResumeOut,
     ResumeUpdate,
 )
-from strong_core.db.models import Company, JobTarget
+from strong_core.db.models import Company, InterviewSession, JobTarget
+from strong_core.db.models import GapAnalysis as GapRow
 from strong_core.db.models import Resume as ResumeRow
-from strong_core.schemas import JobPosting, Resume
+from strong_core.schemas import GapStatus, JobPosting, Resume
 
 router = APIRouter(tags=["inputs"])
+
+GapLimits = Annotated[GapSettings, Depends(get_gap_settings)]
 
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 RESUME_EXTENSIONS = {".pdf", ".docx", ".txt", ".md"}
@@ -153,6 +161,55 @@ async def create_job_target(
     )
 
 
+@router.get("/job-targets")
+async def list_job_targets(db: Db, me: Me) -> list[JobTargetSummary]:
+    """The signed-in user's job targets, newest first, with dashboard numbers (PR-1).
+
+    match_score comes from the latest ready gap analysis. sessions_count and last_session_at
+    count rows in the sessions table; they stay 0 and null until sessions exist (P7, P10).
+    """
+    targets = (
+        await db.scalars(
+            select(JobTarget)
+            .where(JobTarget.org_id == me.org_id, JobTarget.user_id == me.user_id)
+            .order_by(JobTarget.created_at.desc())
+        )
+    ).all()
+    ids = [t.id for t in targets]
+    sessions: dict[uuid.UUID, tuple[int, object]] = {}
+    gaps: dict[uuid.UUID, list[GapRow]] = {}
+    if ids:
+        rows = await db.execute(
+            select(
+                InterviewSession.job_target_id,
+                func.count(InterviewSession.id),
+                func.max(InterviewSession.started_at),
+            )
+            .where(InterviewSession.job_target_id.in_(ids))
+            .group_by(InterviewSession.job_target_id)
+        )
+        sessions = {jt: (n, last) for jt, n, last in rows}
+        for gap in await db.scalars(
+            select(GapRow).where(GapRow.job_target_id.in_(ids)).order_by(GapRow.created_at.desc())
+        ):
+            gaps.setdefault(gap.job_target_id, []).append(gap)
+    out = []
+    for target in targets:
+        history = gaps.get(target.id, [])
+        ready = next((g for g in history if g.status == GapStatus.READY), None)
+        count, last = sessions.get(target.id, (0, None))
+        out.append(
+            JobTargetSummary(
+                job_target=await _job_target_out(db, target),
+                match_score=ready.match_score if ready else None,
+                gap_status=history[0].status if history else None,
+                sessions_count=count,
+                last_session_at=last,
+            )
+        )
+    return out
+
+
 @router.get("/job-targets/{job_target_id}")
 async def get_job_target(job_target_id: uuid.UUID, db: Db, me: Me) -> JobTargetOut:
     return await _job_target_out(db, await _owned_job_target(db, me, job_target_id))
@@ -160,9 +217,17 @@ async def get_job_target(job_target_id: uuid.UUID, db: Db, me: Me) -> JobTargetO
 
 @router.put("/job-targets/{job_target_id}")
 async def update_job_target(
-    job_target_id: uuid.UUID, body: JobTargetUpdate, db: Db, me: Me, queue: Queue
+    job_target_id: uuid.UUID,
+    body: JobTargetUpdate,
+    db: Db,
+    me: Me,
+    queue: Queue,
+    limits: GapLimits,
 ) -> JobTargetAccepted:
-    """Confirm or edit the posting. A changed company name runs company matching again."""
+    """Confirm or edit the posting. A changed company name runs company matching again.
+
+    If the job has a gap analysis and the edit changes its inputs, a new analysis starts.
+    """
     target = await _owned_job_target(db, me, job_target_id)
     old_company = (target.parsed_json or {}).get("company_name")
     posting = body.posting.model_copy(update={"source_url": target.source_url})
@@ -179,6 +244,10 @@ async def update_job_target(
             MATCH_JOB_TARGET, job_id, job_target_id=str(target.id), org_id=str(me.org_id)
         )
         job = _job_out(await queue.info(job_id))
+    await db.refresh(target)
+    await gap_service.recompute(
+        db, queue, org_id=me.org_id, user_id=me.user_id, settings=limits, job_target_id=target.id
+    )
     await db.refresh(target)
     return JobTargetAccepted(job_target=await _job_target_out(db, target), job=job)
 
@@ -242,17 +311,33 @@ async def create_resume(
     return ResumeAccepted(resume=_resume_out(row), job=_job_out(await queue.info(job_id)))
 
 
+@router.get("/resumes")
+async def list_resumes(db: Db, me: Me) -> list[ResumeOut]:
+    """The signed-in user's resumes, newest first. Used to reuse a resume for a new job."""
+    rows = await db.scalars(
+        select(ResumeRow)
+        .where(ResumeRow.org_id == me.org_id, ResumeRow.user_id == me.user_id)
+        .order_by(ResumeRow.uploaded_at.desc())
+    )
+    return [_resume_out(row) for row in rows]
+
+
 @router.get("/resumes/{resume_id}")
 async def get_resume(resume_id: uuid.UUID, db: Db, me: Me) -> ResumeOut:
     return _resume_out(await _owned_resume(db, me, resume_id))
 
 
 @router.put("/resumes/{resume_id}")
-async def update_resume(resume_id: uuid.UUID, body: ResumeUpdate, db: Db, me: Me) -> ResumeOut:
-    """Confirm or edit the parsed resume."""
+async def update_resume(
+    resume_id: uuid.UUID, body: ResumeUpdate, db: Db, me: Me, queue: Queue, limits: GapLimits
+) -> ResumeOut:
+    """Confirm or edit the parsed resume. Gap analyses that used it start again."""
     row = await _owned_resume(db, me, resume_id)
     row.parsed_json = body.resume.model_dump(mode="json")
     await db.commit()
+    await gap_service.recompute(
+        db, queue, org_id=me.org_id, user_id=me.user_id, settings=limits, resume_id=row.id
+    )
     await db.refresh(row)
     return _resume_out(row)
 

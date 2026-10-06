@@ -1,0 +1,120 @@
+{
+  "$defs": {
+    "BriefQuestion": {
+      "additionalProperties": false,
+      "properties": {
+        "competencies": {
+          "items": {
+            "$ref": "#/$defs/Competency"
+          },
+          "minItems": 1,
+          "title": "Competencies",
+          "type": "array"
+        },
+        "id": {
+          "description": "Stable id, used as Turn.question_ref.",
+          "pattern": "^[a-z0-9_-]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "priority": {
+          "description": "1 is asked first.",
+          "minimum": 1,
+          "title": "Priority",
+          "type": "integer"
+        },
+        "probe_hints": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Probe Hints",
+          "type": "array"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "values": {
+          "description": "Company values this question probes (target_values).",
+          "items": {
+            "type": "string"
+          },
+          "title": "Values",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "text",
+        "competencies",
+        "priority"
+      ],
+      "title": "BriefQuestion",
+      "type": "object"
+    },
+    "Competency": {
+      "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.",
+      "enum": [
+        "ownership",
+        "impact",
+        "collaboration",
+        "conflict_handling",
+        "learning_from_failure",
+        "communication",
+        "role_fit",
+        "depth_of_experience",
+        "judgment",
+        "motivation",
+        "team_fit",
+        "scope_at_level",
+        "technical_depth",
+        "accuracy",
+        "reasoning",
+        "trade_offs",
+        "clarity_of_explanation",
+        "problem_framing",
+        "structure",
+        "user_and_business_sense",
+        "estimation_logic",
+        "prioritization",
+        "recommendation"
+      ],
+      "title": "Competency",
+      "type": "string"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/brief_draft.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "What the planner model returns for an interviewer brief. Code adds the rest: persona,\nseniority bar, probe limits, time plan and the profile version.",
+  "properties": {
+    "curveball": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Only asked for in Tough difficulty.",
+      "title": "Curveball"
+    },
+    "questions": {
+      "items": {
+        "$ref": "#/$defs/BriefQuestion"
+      },
+      "maxItems": 12,
+      "minItems": 6,
+      "title": "Questions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "questions"
+  ],
+  "title": "BriefDraft",
+  "type": "object"
+}

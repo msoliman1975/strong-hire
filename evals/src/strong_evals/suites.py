@@ -4,6 +4,13 @@ name: smoke
 description: A fast check that the harness runs end to end.
 include: [other-suite]         # optional: add the items of other suites
 scripted: [beh-01, hm-02]      # transcript ids, or "all"
+gap:                           # optional: gap analysis runs (P6)
+  - id: gap-swe-match
+    posting: swe-stripe-backend  # evals/fixtures/inputs/postings/<posting>.json
+    resume: backend-senior
+    fit: match                 # match or mismatch: matched pairs should score higher
+    runs: 2                    # runs per pair, for the score spread (GA-1: 3 points or less)
+    profile: examples/example-corp.json   # optional company profile under profiles/
 simulated:
   - id: sim-beh-weak
     resume: backend-senior     # evals/fixtures/inputs/resumes/<resume>.json
@@ -38,12 +45,24 @@ class SimulatedSpec(Contract):
     max_questions: int | None = Field(default=None, ge=1)
 
 
+class GapSpec(Contract):
+    """One gap analysis to run: a posting fixture and a resume fixture (P2 fixtures)."""
+
+    id: str = Field(pattern=r"^[a-z0-9-]+$")
+    posting: str
+    resume: str
+    fit: Literal["match", "mismatch"] = "match"
+    runs: int = Field(default=2, ge=1, le=10)
+    profile: str | None = Field(default=None, description="Profile file under profiles/.")
+
+
 class Suite(Contract):
     name: str
     description: str
     include: list[str] = Field(default_factory=list)
     scripted: list[str] | Literal["all"] = Field(default_factory=list)
     simulated: list[SimulatedSpec] = Field(default_factory=list)
+    gap: list[GapSpec] = Field(default_factory=list)
 
 
 def suite_names(folder: Path = SUITES_DIR) -> list[str]:
@@ -65,4 +84,6 @@ def load_suite(name: str, folder: Path = SUITES_DIR) -> Suite:
             suite.scripted = list(dict.fromkeys([*suite.scripted, *sub.scripted]))
         known = {s.id for s in suite.simulated}
         suite.simulated += [s for s in sub.simulated if s.id not in known]
+        known_gap = {g.id for g in suite.gap}
+        suite.gap += [g for g in sub.gap if g.id not in known_gap]
     return suite

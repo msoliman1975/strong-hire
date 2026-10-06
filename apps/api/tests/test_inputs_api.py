@@ -13,9 +13,9 @@ from fastapi import FastAPI
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from strong_api.inputs import queue as queue_names
-from strong_api.inputs.deps import CurrentUser, dev_user
+from strong_api.inputs.deps import CurrentUser, current_user
 from strong_core.config import get_settings
-from strong_core.db.models import Org, User
+from strong_core.db.models import JobTarget, Org, User
 from strong_core.schemas import AuthProvider
 from strong_worker.inputs import jobs
 from strong_worker.inputs.jobs import CTX_KEY
@@ -317,17 +317,28 @@ async def test_other_orgs_cannot_read_or_edit(
         await db.commit()
         other = CurrentUser(user_id=user.id, org_id=org.id)
 
-    app.dependency_overrides[dev_user] = lambda: other
+    app.dependency_overrides[current_user] = lambda: other
     assert (await client.get(f"/job-targets/{target['id']}")).status_code == 404
     assert (await client.get(f"/resumes/{resume['id']}")).status_code == 404
     put = await client.put(f"/job-targets/{target['id']}", json={"posting": target["posting"]})
     assert put.status_code == 404
 
 
-async def test_dev_user_is_refused_in_prod(
-    client: httpx.AsyncClient, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    monkeypatch.setenv("ENV", "prod")
-    get_settings.cache_clear()
-    resp = await client.get(f"/job-targets/{uuid.uuid4()}")
+async def test_input_routes_need_sign_in(anon_client: httpx.AsyncClient) -> None:
+    """The input routes act for the signed-in user only (P3 sign-in), not a shared dev user."""
+    for path in ("/job-targets", "/resumes", f"/job-targets/{uuid.uuid4()}"):
+        assert (await anon_client.get(path)).status_code == 401
+    resp = await anon_client.post("/job-targets", json={"text": "x" * 200})
     assert resp.status_code == 401
+
+
+async def test_rows_belong_to_the_signed_in_user(
+    client: httpx.AsyncClient, sessionmaker: async_sessionmaker[AsyncSession]
+) -> None:
+    text, _ = fixture("postings", "swe-stripe-backend")
+    target = (await create_posting(client, text=text))["job_target"]
+    me = (await client.get("/auth/me")).json()["user"]
+    async with sessionmaker() as db:
+        row = await db.get(JobTarget, uuid.UUID(target["id"]))
+        user = await db.get(User, row.user_id) if row else None
+    assert user is not None and user.email == me["email"] == "dev@example.com"

@@ -1,7 +1,9 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useParams } from "react-router";
 
 import { ApiError } from "../api/client";
-import { useGapAnalysis, useJob } from "../api/hooks";
+import { gapApi } from "../api/gap";
+import { keys, useGapAnalysis, useJob } from "../api/hooks";
 import type { GapAnalysis, PlannedSession } from "../api/types";
 import { Bar, ErrorNotice, Loading, PageHead } from "../components/ui";
 import { competencyLabel, difficultyLabel, interviewTypeLabel, severityLabel } from "../labels";
@@ -17,17 +19,32 @@ export function GapAnalysisPage() {
   const { jobId = "" } = useParams();
   const job = useJob(jobId);
   const gap = useGapAnalysis(jobId);
+  const queryClient = useQueryClient();
+  const again = useMutation({
+    /** GA-4: free, but the API limits how many runs a user starts (HTTP 429, rate_limited). */
+    mutationFn: () => gapApi.start(jobId),
+    onSuccess: (result) => {
+      queryClient.setQueryData(keys.gap(jobId), result);
+      void queryClient.invalidateQueries({ queryKey: keys.jobs });
+    },
+  });
 
   const posting = job.data?.posting;
   const title = posting ? `${posting.title} at ${posting.company_name}` : "Gap analysis";
   const notStarted = gap.error instanceof ApiError && gap.error.status === 404;
+  const data = gap.data;
+  const runAgain = (
+    <button type="button" className="btn btn--secondary" disabled={again.isPending} onClick={() => again.mutate()}>
+      Run the analysis again
+    </button>
+  );
 
   return (
     <>
       <PageHead title="Gap analysis">
         <p>{title}</p>
       </PageHead>
-      {(gap.isPending || gap.data?.status === "running") && (
+      {(gap.isPending || data?.status === "running") && (
         <Loading label="Comparing your resume with the job. This takes about a minute." />
       )}
       {notStarted && (
@@ -39,10 +56,26 @@ export function GapAnalysisPage() {
         </div>
       )}
       {gap.isError && !notStarted && <ErrorNotice error={gap.error} />}
-      {gap.data?.status === "failed" && <ErrorNotice error={gap.data.error ?? "The gap analysis failed."} />}
-      {gap.data?.status === "ready" && gap.data.analysis && (
-        <AnalysisView jobId={jobId} analysis={gap.data.analysis} />
+      {again.isError && <ErrorNotice error={again.error} title="The analysis did not start" />}
+      {data?.status === "failed" && (
+        <div className="stack">
+          <ErrorNotice error={data.error ?? "The gap analysis failed."} />
+          <div className="row">{runAgain}</div>
+        </div>
       )}
+      {data?.status === "ready" && data.stale && (
+        <div className="notice" role="status">
+          <p>The job, your resume or the company profile changed after this analysis. Run it again to update it.</p>
+          <div className="row">{runAgain}</div>
+        </div>
+      )}
+      {data?.status === "ready" && data.generic_mode && (
+        <p className="muted">
+          This company has no curated profile yet, so the analysis uses a general tech interview style and equal
+          weights for each competency.
+        </p>
+      )}
+      {data?.status === "ready" && data.analysis && <AnalysisView jobId={jobId} analysis={data.analysis} />}
     </>
   );
 }
@@ -56,6 +89,14 @@ function AnalysisView({ jobId, analysis }: { jobId: string; analysis: GapAnalysi
           <div>
             <h2 id="match-heading">Match score</h2>
             <p className="muted">How well your resume shows what this job asks for.</p>
+            <details>
+              <summary>How we compute the score</summary>
+              <p className="muted">
+                Each requirement and competency gets 0, 35, 70 or 100 points. A score of 70 or more needs a quote from
+                your resume. Must-have requirements count twice as much as nice-to-have ones. The match score is 70%
+                requirements and 30% competencies.
+              </p>
+            </details>
           </div>
           <p className="score-big" data-testid="match-score">
             {analysis.match_score}

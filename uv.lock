@@ -2059,12 +2059,14 @@ source = { editable = "evals" }
 dependencies = [
     { name = "pyyaml" },
     { name = "strong-core" },
+    { name = "strong-worker" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "pyyaml", specifier = ">=6.0" },
     { name = "strong-core", editable = "packages/core" },
+    { name = "strong-worker", editable = "apps/worker" },
 ]
 
 [[package]]

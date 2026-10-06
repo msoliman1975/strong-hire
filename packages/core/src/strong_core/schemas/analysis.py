@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
+from typing import Annotated
 
 from pydantic import Field
 
@@ -53,6 +54,40 @@ class GapAnalysis(Contract):
     match_score: int = Field(ge=0, le=100, description="GA-1.")
     requirement_breakdown: list[RequirementMatch] = Field(default_factory=list)
     competency_breakdown: list[CompetencyMatch] = Field(default_factory=list)
+    strengths: list[Strength] = Field(default_factory=list)
+    gaps: list[Gap] = Field(default_factory=list)
+    probe_areas: list[str] = Field(default_factory=list)
+    session_plan: list[PlannedSession] = Field(min_length=1)
+
+
+# --- planner output ------------------------------------------------------------------------
+# The planner model does not return the match score. It rates each requirement and competency
+# on a 0 to 3 scale, and code turns the ratings into scores (GA-1). This keeps the number
+# explainable and stable across runs.
+
+Rating = Annotated[int, Field(ge=0, le=3)]
+"""0 = no evidence, 1 = partial or adjacent evidence, 2 = meets it, 3 = clearly exceeds it."""
+
+
+class RequirementRating(Contract):
+    id: str = Field(min_length=1, description="The requirement id from the input, e.g. 'r3'.")
+    rating: Rating
+    evidence: str | None = Field(
+        default=None, description="A short quote from the resume that supports the rating."
+    )
+
+
+class CompetencyRating(Contract):
+    competency: Competency
+    rating: Rating
+    notes: str | None = None
+
+
+class GapAssessment(Contract):
+    """What the planner model returns for a gap analysis. Code builds the GapAnalysis from it."""
+
+    requirements: list[RequirementRating] = Field(default_factory=list)
+    competencies: list[CompetencyRating] = Field(default_factory=list)
     strengths: list[Strength] = Field(default_factory=list)
     gaps: list[Gap] = Field(default_factory=list)
     probe_areas: list[str] = Field(default_factory=list)

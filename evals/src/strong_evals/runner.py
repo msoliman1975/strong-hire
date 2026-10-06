@@ -31,6 +31,7 @@ from strong_core.gateway.recorder import RecordingGateway
 from strong_core.schemas import HireSignal, Scorecard
 from strong_evals import EVALS_DIR
 from strong_evals.candidate import Persona
+from strong_evals.gap import GapResult, fit_order, run_gap_item
 from strong_evals.goldset import GoldLabel, load_goldset
 from strong_evals.metrics import (
     Agreement,
@@ -47,7 +48,7 @@ from strong_evals.metrics import (
 )
 from strong_evals.session import run_text_session
 from strong_evals.stubs import GatewayScorer
-from strong_evals.suites import SimulatedSpec, Suite, load_suite, suite_names
+from strong_evals.suites import GapSpec, SimulatedSpec, Suite, load_suite, suite_names
 from strong_evals.transcripts import ScriptedTranscript, load_transcripts
 from strong_evals.usage import MeteredGateway, Prices, load_prices
 
@@ -105,12 +106,17 @@ class RunReport:
     prompt_refs: list[str]
     scripted: list[ScriptedResult] = field(default_factory=list)
     simulated: list[SimulatedResult] = field(default_factory=list)
+    gap: list[GapResult] = field(default_factory=list)
     metrics: list[MetricResult] = field(default_factory=list)
     recorded: int = 0
 
     @property
     def errors(self) -> int:
-        items: list[ScriptedResult | SimulatedResult] = [*self.scripted, *self.simulated]
+        items: list[ScriptedResult | SimulatedResult | GapResult] = [
+            *self.scripted,
+            *self.simulated,
+            *self.gap,
+        ]
         return sum(r.error is not None for r in items)
 
     @property
@@ -209,6 +215,17 @@ async def run_simulated(
         scorer=signal,
         error=error,
     )
+
+
+async def run_gap(
+    spec: GapSpec, base: ModelGateway, prices: Prices, suite: str, refs: dict[str, None]
+) -> GapResult:
+    sid = _session_id(suite, spec.id)
+    gw = MeteredGateway(base, prices, sid)
+    result = await run_gap_item(spec, gw)
+    result.cost_usd = _cost(gw.events, sid)
+    refs.update(gw.prompt_refs)
+    return result
 
 
 def _check(value: float, rule: dict[str, Any]) -> tuple[str, bool | None]:
@@ -310,6 +327,34 @@ def compute_metrics(report: RunReport, thresholds: dict[str, dict[str, Any]]) ->
         f"mean over {len(costs)} sessions from UsageEvent records; "
         f"max ${max(costs, default=0):.4f}",
     )
+
+    gaps = [r for r in report.gap if r.error is None]
+    spreads = [r.spread for r in gaps if r.spread is not None]
+    if report.gap:
+        worst = max(spreads, default=None)
+        add(
+            "gap_score_spread",
+            "Gap analysis: match score spread across runs, points (worst pair)",
+            float(worst) if worst is not None else None,
+            str(worst),
+            f"{len(spreads)} pairs run more than once; {len(report.gap) - len(gaps)} errors",
+        )
+        passed, checked = fit_order(gaps)
+        add(
+            "gap_fit_order",
+            "Gap analysis: matched resumes score above mismatched ones",
+            passed / checked if checked else None,
+            f"{passed / checked:.0%}" if checked else "",
+            f"{passed} of {checked} matched and mismatched pairs on the same posting",
+        )
+        costs = [float(r.cost_usd) / len(r.scores) for r in gaps if r.scores]
+        add(
+            "gap_cost_usd",
+            "Gap analysis: cost per run, USD",
+            mean(costs) if costs else None,
+            f"${mean(costs):.4f}" if costs else "",
+            f"mean over {len(costs)} pairs",
+        )
 
     # Reference numbers from the human-written transcripts (not the system under test).
     s_probed = sum(r.follow_ups.probed for r in report.scripted)
@@ -422,6 +467,10 @@ async def run_suite(
         report.simulated.append(await run_simulated(spec, base, prices, suite.name, refs))
         r = report.simulated[-1]
         print(f"  simulated {spec.id}: {len(r.turns)} turns {r.error or ''}")
+    for gap_spec in suite.gap:
+        report.gap.append(await run_gap(gap_spec, base, prices, suite.name, refs))
+        g = report.gap[-1]
+        print(f"  gap {gap_spec.id}: scores {g.scores} {g.error or ''}")
     report.prompt_refs = sorted(refs)
     report.recorded = len(recorder.saved) if recorder else 0
     thresholds = yaml.safe_load(THRESHOLDS_FILE.read_text(encoding="utf-8"))

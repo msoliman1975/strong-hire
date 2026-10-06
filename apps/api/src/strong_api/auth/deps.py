@@ -16,8 +16,11 @@ SESSION_USER_KEY = "uid"
 SESSION_PENDING_KEY = "pending_signup"
 
 
-async def get_db() -> AsyncIterator[AsyncSession]:
-    async with get_sessionmaker()() as session:
+async def get_db(request: Request) -> AsyncIterator[AsyncSession]:
+    """One database session per request. Uses the app's sessionmaker when create_app set one
+    (tests pass their own), else the default engine."""
+    maker = getattr(request.app.state, "sessionmaker", None) or get_sessionmaker()
+    async with maker() as session:
         yield session
 
 

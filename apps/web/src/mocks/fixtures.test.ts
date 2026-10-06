@@ -10,8 +10,9 @@ import addFormats from "ajv-formats";
 import { describe, expect, it } from "vitest";
 
 import { authApi } from "../api/auth";
+import { gapApi } from "../api/gap";
 import { jobTargetsApi, resumesApi } from "../api/inputs";
-import { debriefApi, gapApi, sessionsApi } from "../api/planned";
+import { debriefApi, sessionsApi } from "../api/planned";
 import { gapAnalysis, jobPosting, resume, scorecardFor, sessionPlan } from "./fixtures";
 
 const SCHEMAS_DIR = resolve(__dirname, "../../../../schemas");
@@ -130,6 +131,40 @@ describe("mocks of the real P2 endpoints match openapi.json", () => {
     expectApiShape("ResumeOut", record);
     expect(record.status).toBe("extracted");
     expectApiShape("ResumeOut", await resumesApi.update(record.id, resume));
+  });
+});
+
+describe("mocks of the real P6 endpoints match openapi.json", () => {
+  it("gap analysis: start (202), get, run again (GA-1 to GA-3)", async () => {
+    const { job_target: job } = await jobTargetsApi.create({ text: "y".repeat(200) });
+    const { resume: record } = await resumesApi.upload(formWithText("Go engineer"));
+    await jobTargetsApi.get(job.id);
+    await resumesApi.get(record.id);
+
+    await expect(gapApi.get(job.id)).rejects.toMatchObject({ status: 404 });
+    await expect(gapApi.start(job.id)).rejects.toMatchObject({ status: 422 });
+
+    const started = await gapApi.start(job.id, { resume_id: record.id });
+    expectApiShape("GapAnalysisOut", started);
+    const ready = await gapApi.get(job.id);
+    expectApiShape("GapAnalysisOut", ready);
+    expect(ready.status).toBe("ready");
+    expectValid("gap_analysis", ready.analysis);
+
+    const again = await gapApi.start(job.id);
+    expect(again.resume_id).toBe(record.id);
+    expect(again.id).not.toBe(started.id);
+  });
+
+  it("lists: job targets with dashboard numbers, and resumes", async () => {
+    await jobTargetsApi.create({ text: "z".repeat(200) });
+    await resumesApi.upload(formWithText("Data engineer"));
+    const jobs = await jobTargetsApi.list();
+    expect(jobs.length).toBeGreaterThan(0);
+    for (const row of jobs) expectApiShape("JobTargetSummary", row);
+    const resumes = await resumesApi.list();
+    expect(resumes.length).toBeGreaterThan(0);
+    for (const row of resumes) expectApiShape("ResumeOut", row);
   });
 });
 

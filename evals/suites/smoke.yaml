@@ -1,5 +1,5 @@
 name: smoke
-description: Fast end-to-end check. Four scripted transcripts (one per interview type) and two short simulated sessions.
+description: Fast end-to-end check. Four scripted transcripts (one per interview type), two short simulated sessions and two gap analyses.
 scripted: [beh-01, hm-04, tq-05, case-06]
 simulated:
   - id: sim-smoke-beh-weak
@@ -14,3 +14,6 @@ simulated:
     candidate_name: Rina Calloway
     max_questions: 2
     session: {interview_type: case, difficulty: friendly, mode: realistic, duration_min: 30, level: mid}
+gap:
+  - {id: gap-smoke-match, posting: swe-stripe-backend, resume: backend-senior, fit: match, runs: 2}
+  - {id: gap-smoke-mismatch, posting: swe-stripe-backend, resume: product-designer-senior, fit: mismatch, runs: 1}

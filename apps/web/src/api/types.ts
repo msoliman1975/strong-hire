@@ -32,6 +32,13 @@ export type ResumeOut = DeepRequired<S["ResumeOut"]>;
 export type ResumeAccepted = DeepRequired<S["ResumeAccepted"]>;
 /** A background job (Arq) that extracts a posting or parses a resume. */
 export type JobOut = DeepRequired<S["JobOut"]>;
+/** One row of the dashboard list (GET /job-targets). */
+export type JobTargetSummary = DeepRequired<S["JobTargetSummary"]>;
+
+// Gap analysis (real endpoints in apps/api gap, P6).
+export type GapAnalysisStart = S["GapAnalysisStart"];
+export type GapAnalysisOut = DeepRequired<S["GapAnalysisOut"]>;
+export type GapStatus = S["GapStatus"];
 
 // Shared contracts from strong_core.schemas.
 export type JobPosting = DeepRequired<S["JobPosting"]>;

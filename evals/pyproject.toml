@@ -5,11 +5,13 @@ description = "Strong Hire eval harness: scripted transcripts, simulated candida
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "strong-core",
+    "strong-worker",
     "pyyaml>=6.0",
 ]
 
 [tool.uv.sources]
 strong-core = { workspace = true }
+strong-worker = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]

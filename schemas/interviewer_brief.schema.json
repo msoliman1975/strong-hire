@@ -151,6 +151,40 @@
       "title": "PersonaBrief",
       "type": "object"
     },
+    "Phase": {
+      "description": "Session state machine phases (IV-7). The session controller moves phases, not the LLM.",
+      "enum": [
+        "intro",
+        "small_talk",
+        "agenda",
+        "core",
+        "candidate_questions",
+        "wrap_up"
+      ],
+      "title": "Phase",
+      "type": "string"
+    },
+    "PhaseTime": {
+      "additionalProperties": false,
+      "description": "Minutes planned for one phase of the session (IV-7).",
+      "properties": {
+        "minutes": {
+          "maximum": 45,
+          "minimum": 0,
+          "title": "Minutes",
+          "type": "integer"
+        },
+        "phase": {
+          "$ref": "#/$defs/Phase"
+        }
+      },
+      "required": [
+        "phase",
+        "minutes"
+      ],
+      "title": "PhaseTime",
+      "type": "object"
+    },
     "SessionConfig": {
       "additionalProperties": false,
       "description": "What the candidate picks before a session (journey 2, step 1).",
@@ -192,6 +226,12 @@
   "additionalProperties": false,
   "description": "Built by the planner before each session. The live interviewer reads only this.",
   "properties": {
+    "coach_help": {
+      "default": false,
+      "description": "Coach mode only: pause, hint and redo are allowed (IV-8).",
+      "title": "Coach Help",
+      "type": "boolean"
+    },
     "company_name": {
       "anyOf": [
         {
@@ -252,6 +292,12 @@
       "default": null,
       "title": "Profile Version"
     },
+    "pushback": {
+      "default": false,
+      "description": "Tough difficulty only: challenge assumptions (IV-4).",
+      "title": "Pushback",
+      "type": "boolean"
+    },
     "questions": {
       "items": {
         "$ref": "#/$defs/BriefQuestion"
@@ -260,6 +306,19 @@
       "minItems": 6,
       "title": "Questions",
       "type": "array"
+    },
+    "seniority_bar": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Scope expected at session.level (IV-6). Level changes the bar.",
+      "title": "Seniority Bar"
     },
     "session": {
       "$ref": "#/$defs/SessionConfig"
@@ -280,6 +339,14 @@
       },
       "maxItems": 4,
       "title": "Target Values",
+      "type": "array"
+    },
+    "time_plan": {
+      "description": "Minutes per phase. When set, the minutes add up to session.duration_min.",
+      "items": {
+        "$ref": "#/$defs/PhaseTime"
+      },
+      "title": "Time Plan",
       "type": "array"
     }
   },

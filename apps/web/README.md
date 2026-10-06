@@ -21,15 +21,15 @@ Some screens need endpoints that later workstreams build. `src/api/planned.ts` l
 the owner of each. MSW mocks them in development so every screen works today. Production builds
 contain no mocks: `main.tsx` loads them only when `import.meta.env.DEV` is true.
 
-The job target and resume endpoints (P2) are real. `src/api/inputs.ts` calls them with the typed
-client. Their mocks use the same paths and shapes, and a Vitest test checks the mock responses
-against `openapi.json`.
+The job target and resume endpoints (P2), their lists, and the gap analysis endpoints (P6) are
+real. `src/api/inputs.ts` and `src/api/gap.ts` call them with the typed client. Their mocks use the
+same paths and shapes, and a Vitest test checks the mock responses against `openapi.json`.
 
 Set `VITE_API_MOCKS` before `pnpm dev`:
 
 | Value | What is mocked | Use it for |
 | --- | --- | --- |
-| `planned` (default) | Only endpoints the API does not have yet. Sign-in, job targets and resumes use the real API; the mock keeps a copy of each job target and resume for the planned endpoints. | The Docker stack |
+| `planned` (default) | Only endpoints the API does not have yet. Sign-in, job targets, resumes and gap analysis use the real API; the mock keeps a copy of each job target, resume and gap analysis for the planned endpoints. | The Docker stack |
 | `all` | Everything, including sign-in. No API needed. | Front-end work without Docker; Playwright |
 | `off` | Nothing. | When every endpoint exists |
 
