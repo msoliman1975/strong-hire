@@ -543,6 +543,138 @@
         }
       }
     },
+    "/sessions/{session_id}/debrief": {
+      "get": {
+        "tags": [
+          "scoring"
+        ],
+        "summary": "Get Debrief",
+        "description": "FB-1, FB-2, PR-2. Poll while status is \"scoring\" (FB-3: ready within 60 seconds).",
+        "operationId": "get_debrief_sessions__session_id__debrief_get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Debrief"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/job-targets/{job_target_id}/progress": {
+      "get": {
+        "tags": [
+          "scoring"
+        ],
+        "summary": "Get Progress",
+        "description": "PR-1 (Realistic sessions only) and PR-2.",
+        "operationId": "get_progress_job_targets__job_target_id__progress_get",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobProgress"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessions/{session_id}/scoring": {
+      "post": {
+        "tags": [
+          "scoring"
+        ],
+        "summary": "Score Session",
+        "description": "Start scoring an ended session, or retry after a failure.",
+        "operationId": "score_session_sessions__session_id__scoring_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoringAccepted"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/providers": {
       "get": {
         "tags": [
@@ -1303,40 +1435,98 @@
         "type": "object"
       },
       "CompetencyScore": {
-        "additionalProperties": false,
         "properties": {
           "competency": {
             "$ref": "#/components/schemas/Competency"
           },
           "score": {
-            "maximum": 4,
-            "minimum": 1,
-            "title": "Score",
-            "type": "integer"
+            "type": "integer",
+            "maximum": 4.0,
+            "minimum": 1.0,
+            "title": "Score"
           },
           "justification": {
+            "type": "string",
             "minLength": 1,
-            "title": "Justification",
-            "type": "string"
+            "title": "Justification"
           },
           "quotes": {
-            "description": "Transcript quotes backing the score.",
             "items": {
               "type": "string"
             },
+            "type": "array",
             "minItems": 1,
             "title": "Quotes",
-            "type": "array"
+            "description": "Transcript quotes backing the score."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "competency",
           "score",
           "justification",
           "quotes"
         ],
-        "title": "CompetencyScore",
-        "type": "object"
+        "title": "CompetencyScore"
+      },
+      "CompetencyTrend": {
+        "properties": {
+          "competency": {
+            "$ref": "#/components/schemas/Competency"
+          },
+          "sessions": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Sessions"
+          },
+          "first": {
+            "type": "number",
+            "maximum": 4.0,
+            "minimum": 1.0,
+            "title": "First"
+          },
+          "latest": {
+            "type": "number",
+            "maximum": 4.0,
+            "minimum": 1.0,
+            "title": "Latest"
+          },
+          "change": {
+            "type": "number",
+            "title": "Change",
+            "description": "latest minus first"
+          },
+          "average": {
+            "type": "number",
+            "maximum": 4.0,
+            "minimum": 1.0,
+            "title": "Average"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "up",
+              "down",
+              "flat",
+              "single"
+            ],
+            "title": "Direction"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "competency",
+          "sessions",
+          "first",
+          "latest",
+          "change",
+          "average",
+          "direction"
+        ],
+        "title": "CompetencyTrend",
+        "description": "PR-1: one competency over the Realistic sessions of a job target."
       },
       "Confidence": {
         "enum": [
@@ -1346,6 +1536,144 @@
         ],
         "title": "Confidence",
         "type": "string"
+      },
+      "Debrief": {
+        "properties": {
+          "session": {
+            "$ref": "#/components/schemas/DebriefSession"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "scoring",
+              "ready",
+              "failed"
+            ],
+            "title": "Status"
+          },
+          "scorecard": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Scorecard"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "next_session": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlannedSession"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "PR-2. Null until the debrief is ready."
+          },
+          "generic_mode": {
+            "type": "boolean",
+            "title": "Generic Mode",
+            "description": "True when no company profile was used: no values."
+          },
+          "company_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company Name"
+          },
+          "values_framework": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Values Framework",
+            "description": "Name of the company's values framework, for example 'Leadership Principles'."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "session",
+          "status",
+          "scorecard",
+          "next_session",
+          "generic_mode",
+          "company_name",
+          "values_framework"
+        ],
+        "title": "Debrief"
+      },
+      "DebriefSession": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "job_target_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Job Target Id"
+          },
+          "config": {
+            "$ref": "#/components/schemas/SessionConfig"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SessionStatus"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "ended_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ended At"
+          },
+          "minutes_billed": {
+            "type": "integer",
+            "title": "Minutes Billed"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "job_target_id",
+          "config",
+          "status",
+          "started_at",
+          "ended_at",
+          "minutes_billed"
+        ],
+        "title": "DebriefSession",
+        "description": "The session a debrief belongs to. Same shape as the web app's SessionRecord."
       },
       "DevLoginRequest": {
         "properties": {
@@ -1717,7 +2045,7 @@
         "title": "HTTPValidationError"
       },
       "HireSignal": {
-        "description": "FB-1. Ordered from strongest to weakest.",
+        "type": "string",
         "enum": [
           "Strong Hire",
           "Hire",
@@ -1726,7 +2054,7 @@
           "No Hire"
         ],
         "title": "HireSignal",
-        "type": "string"
+        "description": "FB-1. Ordered from strongest to weakest."
       },
       "InterviewType": {
         "type": "string",
@@ -2084,6 +2412,51 @@
         ],
         "title": "JobPosting",
         "description": "Structured data extracted from a job posting. The user confirms or edits it (IN-2)."
+      },
+      "JobProgress": {
+        "properties": {
+          "job_target_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Job Target Id"
+          },
+          "snapshots": {
+            "items": {
+              "$ref": "#/components/schemas/ProgressSnapshot"
+            },
+            "type": "array",
+            "title": "Snapshots",
+            "description": "Realistic sessions only (PR-1)."
+          },
+          "trends": {
+            "items": {
+              "$ref": "#/components/schemas/CompetencyTrend"
+            },
+            "type": "array",
+            "title": "Trends",
+            "description": "Weakest latest score first."
+          },
+          "next_session": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlannedSession"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "PR-2."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "job_target_id",
+          "snapshots",
+          "trends",
+          "next_session"
+        ],
+        "title": "JobProgress"
       },
       "JobTargetAccepted": {
         "properties": {
@@ -2544,13 +2917,13 @@
         "title": "MagicLinkSent"
       },
       "Mode": {
-        "description": "IV-8. Only Realistic sessions count toward progress trends (PR-1).",
+        "type": "string",
         "enum": [
           "coach",
           "realistic"
         ],
         "title": "Mode",
-        "type": "string"
+        "description": "IV-8. Only Realistic sessions count toward progress trends (PR-1)."
       },
       "PersonaBrief": {
         "additionalProperties": false,
@@ -2807,34 +3180,34 @@
         "type": "string"
       },
       "ProgressSnapshot": {
-        "additionalProperties": false,
-        "description": "One competency score from one Realistic session, for trend charts (PR-1).",
         "properties": {
           "job_target_id": {
+            "type": "string",
             "format": "uuid",
-            "title": "Job Target Id",
-            "type": "string"
+            "title": "Job Target Id"
           },
           "session_id": {
+            "type": "string",
             "format": "uuid",
-            "title": "Session Id",
-            "type": "string"
+            "title": "Session Id"
           },
           "competency": {
             "$ref": "#/components/schemas/Competency"
           },
           "score": {
-            "maximum": 4,
-            "minimum": 1,
-            "title": "Score",
-            "type": "number"
+            "type": "number",
+            "maximum": 4.0,
+            "minimum": 1.0,
+            "title": "Score"
           },
           "at": {
+            "type": "string",
             "format": "date-time",
-            "title": "At",
-            "type": "string"
+            "title": "At"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "job_target_id",
           "session_id",
@@ -2843,7 +3216,7 @@
           "at"
         ],
         "title": "ProgressSnapshot",
-        "type": "object"
+        "description": "One competency score from one Realistic session, for trend charts (PR-1)."
       },
       "QuestionPattern": {
         "additionalProperties": false,
@@ -2887,55 +3260,55 @@
         "type": "object"
       },
       "QuestionScore": {
-        "additionalProperties": false,
         "properties": {
           "question_ref": {
+            "type": "string",
             "minLength": 1,
-            "title": "Question Ref",
-            "type": "string"
+            "title": "Question Ref"
           },
           "question_text": {
+            "type": "string",
             "minLength": 1,
-            "title": "Question Text",
-            "type": "string"
+            "title": "Question Text"
           },
           "scores": {
             "items": {
               "$ref": "#/components/schemas/CompetencyScore"
             },
+            "type": "array",
             "minItems": 1,
-            "title": "Scores",
-            "type": "array"
+            "title": "Scores"
           },
           "value_scores": {
             "items": {
               "$ref": "#/components/schemas/ValueScore"
             },
-            "title": "Value Scores",
-            "type": "array"
+            "type": "array",
+            "title": "Value Scores"
           },
           "strengths": {
             "items": {
               "type": "string"
             },
-            "title": "Strengths",
-            "type": "array"
+            "type": "array",
+            "title": "Strengths"
           },
           "misses": {
             "items": {
               "type": "string"
             },
-            "title": "Misses",
-            "type": "array"
+            "type": "array",
+            "title": "Misses"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "question_ref",
           "question_text",
           "scores"
         ],
-        "title": "QuestionScore",
-        "type": "object"
+        "title": "QuestionScore"
       },
       "RequirementKind": {
         "type": "string",
@@ -3226,54 +3599,55 @@
         "title": "RoleFamily"
       },
       "Scorecard": {
-        "additionalProperties": false,
         "properties": {
           "hire_signal": {
             "$ref": "#/components/schemas/HireSignal"
           },
           "rationale": {
-            "description": "3 to 5 sentences, like a debrief summary.",
+            "type": "string",
             "minLength": 1,
             "title": "Rationale",
-            "type": "string"
+            "description": "3 to 5 sentences, like a debrief summary."
           },
           "competency_scores": {
-            "description": "Overall score per competency across the session.",
             "items": {
               "$ref": "#/components/schemas/CompetencyScore"
             },
+            "type": "array",
             "minItems": 1,
             "title": "Competency Scores",
-            "type": "array"
+            "description": "Overall score per competency across the session."
           },
           "value_scores": {
-            "description": "Overall score per company value. Empty in generic mode.",
             "items": {
               "$ref": "#/components/schemas/ValueScore"
             },
+            "type": "array",
             "title": "Value Scores",
-            "type": "array"
+            "description": "Overall score per company value. Empty in generic mode."
           },
           "per_question": {
             "items": {
               "$ref": "#/components/schemas/QuestionScore"
             },
-            "title": "Per Question",
-            "type": "array"
+            "type": "array",
+            "title": "Per Question"
           },
           "scorer_model": {
-            "description": "Gateway model alias, never a vendor id.",
+            "type": "string",
             "minLength": 1,
             "title": "Scorer Model",
-            "type": "string"
+            "description": "Gateway model alias, never a vendor id."
           },
           "rubric_version": {
-            "description": "Prompt ref, for example 'scorer/rubric.v1'.",
+            "type": "string",
             "minLength": 1,
             "title": "Rubric Version",
-            "type": "string"
+            "description": "Prompt ref, for example 'scorer/rubric.v1'."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "hire_signal",
           "rationale",
@@ -3281,12 +3655,33 @@
           "scorer_model",
           "rubric_version"
         ],
-        "title": "Scorecard",
-        "type": "object"
+        "title": "Scorecard"
+      },
+      "ScoringAccepted": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Id"
+          },
+          "job_id": {
+            "type": "string",
+            "title": "Job Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SessionStatus"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "session_id",
+          "job_id",
+          "status"
+        ],
+        "title": "ScoringAccepted"
       },
       "SessionConfig": {
-        "additionalProperties": false,
-        "description": "What the candidate picks before a session (journey 2, step 1).",
         "properties": {
           "interview_type": {
             "$ref": "#/components/schemas/InterviewType"
@@ -3298,17 +3693,19 @@
             "$ref": "#/components/schemas/Mode"
           },
           "duration_min": {
+            "type": "integer",
             "enum": [
               30,
               45
             ],
-            "title": "Duration Min",
-            "type": "integer"
+            "title": "Duration Min"
           },
           "level": {
             "$ref": "#/components/schemas/Level"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "interview_type",
           "difficulty",
@@ -3317,9 +3714,10 @@
           "level"
         ],
         "title": "SessionConfig",
-        "type": "object"
+        "description": "What the candidate picks before a session (journey 2, step 1)."
       },
       "SessionStatus": {
+        "type": "string",
         "enum": [
           "created",
           "in_progress",
@@ -3328,8 +3726,7 @@
           "completed",
           "failed"
         ],
-        "title": "SessionStatus",
-        "type": "string"
+        "title": "SessionStatus"
       },
       "Severity": {
         "type": "string",
@@ -3541,35 +3938,35 @@
         "title": "ValidationError"
       },
       "ValueScore": {
-        "additionalProperties": false,
-        "description": "Score for one company value (Principle.name), same 1 to 4 rubric as competencies.",
         "properties": {
           "value": {
+            "type": "string",
             "minLength": 1,
-            "title": "Value",
-            "type": "string"
+            "title": "Value"
           },
           "score": {
-            "maximum": 4,
-            "minimum": 1,
-            "title": "Score",
-            "type": "integer"
+            "type": "integer",
+            "maximum": 4.0,
+            "minimum": 1.0,
+            "title": "Score"
           },
           "justification": {
+            "type": "string",
             "minLength": 1,
-            "title": "Justification",
-            "type": "string"
+            "title": "Justification"
           },
           "quotes": {
-            "description": "Transcript quotes backing the score.",
             "items": {
               "type": "string"
             },
+            "type": "array",
             "minItems": 1,
             "title": "Quotes",
-            "type": "array"
+            "description": "Transcript quotes backing the score."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "value",
           "score",
@@ -3577,7 +3974,7 @@
           "quotes"
         ],
         "title": "ValueScore",
-        "type": "object"
+        "description": "Score for one company value (Principle.name), same 1 to 4 rubric as competencies."
       },
       "ValuesFramework": {
         "additionalProperties": false,
