@@ -78,12 +78,12 @@ async def test_record_a_run_then_replay_it_on_fake(tmp_path: Path) -> None:
     config = load_models_config(REPO / "config", "local")
     real = ModelGateway(config, model_factory=lambda alias, cfg: FunctionModel(_model))
     suite = Suite(name="tiny", description="one transcript", scripted=["beh-01"])
-    live = await run_suite(suite, "local", gateway=real, record_dir=tmp_path)
+    live = await run_suite(suite, "local", gateway=real, record_dir=tmp_path, scorer="stub")
     assert live.recorded == 1
     assert live.profile == "local"
     assert live.errors == 0
 
     fake = build_gateway(Settings(model_profile="fake", fake_fixtures_dir=tmp_path))
-    replay = await run_suite(suite, "fake", gateway=fake)
+    replay = await run_suite(suite, "fake", gateway=fake, scorer="stub")
     assert replay.errors == 0
     assert replay.scripted[0].scorer == live.scripted[0].scorer

@@ -1,4 +1,4 @@
-import type { Competency, ProgressSnapshot } from "../api/types";
+import type { Competency, CompetencyTrend, ProgressSnapshot } from "../api/types";
 import { competencyLabel, formatDate } from "../labels";
 
 const W = 220;
@@ -6,7 +6,23 @@ const H = 110;
 const PAD = { top: 10, right: 12, bottom: 18, left: 22 };
 
 /** One competency's Realistic-session scores (1 to 4) over time. Single series: no legend. */
-function TrendSmall({ competency, points }: { competency: Competency; points: ProgressSnapshot[] }) {
+/** "Up 1.0 since your first session". Display only: the API computes the change. */
+export function trendText(t: CompetencyTrend | undefined): string | null {
+  if (!t || t.direction === "single") return null;
+  if (t.direction === "flat") return "No change since your first session";
+  const word = t.direction === "up" ? "Up" : "Down";
+  return `${word} ${Math.abs(t.change).toFixed(1)} since your first session`;
+}
+
+function TrendSmall({
+  competency,
+  points,
+  trend,
+}: {
+  competency: Competency;
+  points: ProgressSnapshot[];
+  trend?: CompetencyTrend;
+}) {
   const innerW = W - PAD.left - PAD.right;
   const innerH = H - PAD.top - PAD.bottom;
   const x = (i: number) => PAD.left + (points.length === 1 ? innerW / 2 : (i / (points.length - 1)) * innerW);
@@ -21,6 +37,7 @@ function TrendSmall({ competency, points }: { competency: Competency; points: Pr
         <span className="label">{name}</span>
         {last && <span className="muted">{last.score.toFixed(1)} of 4</span>}
       </figcaption>
+      {trendText(trend) && <p className="muted">{trendText(trend)}</p>}
       <svg
         viewBox={`0 0 ${W} ${H}`}
         width={W}
@@ -62,7 +79,7 @@ function TrendSmall({ competency, points }: { competency: Competency; points: Pr
 }
 
 /** PR-1: competency trends from Realistic sessions, as small multiples with a table view. */
-export function CompetencyTrends({ snapshots }: { snapshots: ProgressSnapshot[] }) {
+export function CompetencyTrends({ snapshots, trends = [] }: { snapshots: ProgressSnapshot[]; trends?: CompetencyTrend[] }) {
   const byCompetency = new Map<Competency, ProgressSnapshot[]>();
   for (const s of [...snapshots].sort((a, b) => a.at.localeCompare(b.at))) {
     const list = byCompetency.get(s.competency) ?? [];
@@ -75,7 +92,12 @@ export function CompetencyTrends({ snapshots }: { snapshots: ProgressSnapshot[] 
     <div>
       <div className="row" style={{ alignItems: "flex-start", gap: "var(--space-5)" }}>
         {entries.map(([competency, points]) => (
-          <TrendSmall key={competency} competency={competency} points={points} />
+          <TrendSmall
+            key={competency}
+            competency={competency}
+            points={points}
+            trend={trends.find((t) => t.competency === competency)}
+          />
         ))}
       </div>
       <details>

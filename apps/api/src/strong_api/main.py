@@ -1,5 +1,5 @@
 """Strong Hire API. P0 exposes /health; P2 adds the job target and resume input routes; P6 adds
-the gap analysis routes."""
+the gap analysis routes; P8 adds the debrief and progress routes."""
 
 from __future__ import annotations
 
@@ -18,6 +18,7 @@ from strong_api.auth import install_auth
 from strong_api.gap.router import router as gap_router
 from strong_api.inputs import router as inputs_router
 from strong_api.inputs.queue import ArqJobQueue, JobQueue
+from strong_api.scoring import router as scoring_router
 from strong_core import __version__
 from strong_core.config import get_settings
 from strong_core.db import get_engine, get_sessionmaker
@@ -63,6 +64,7 @@ def create_app(
     app.state.queue = queue or ArqJobQueue(settings.redis_url)
     app.include_router(inputs_router)
     app.include_router(gap_router)
+    app.include_router(scoring_router)
     install_auth(app)
 
     @app.get("/health")

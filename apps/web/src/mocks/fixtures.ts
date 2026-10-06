@@ -185,6 +185,13 @@ const technicalScorecard: Scorecard = {
   rubric_version: "scorer/rubric.v1",
 };
 
-export function scorecardFor(type: InterviewType): Scorecard {
-  return type === "technical_qa" ? technicalScorecard : behavioralScorecard;
+/** In generic mode (no company profile) a scorecard has no company value scores. */
+export function scorecardFor(type: InterviewType, generic = false): Scorecard {
+  const card = type === "technical_qa" ? technicalScorecard : behavioralScorecard;
+  if (!generic) return card;
+  return {
+    ...card,
+    value_scores: [],
+    per_question: card.per_question.map((q) => ({ ...q, value_scores: [] })),
+  };
 }

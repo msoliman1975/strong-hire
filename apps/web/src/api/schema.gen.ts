@@ -154,6 +154,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/sessions/{session_id}/debrief": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Debrief
+         * @description FB-1, FB-2, PR-2. Poll while status is "scoring" (FB-3: ready within 60 seconds).
+         */
+        get: operations["get_debrief_sessions__session_id__debrief_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/job-targets/{job_target_id}/progress": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Progress
+         * @description PR-1 (Realistic sessions only) and PR-2.
+         */
+        get: operations["get_progress_job_targets__job_target_id__progress_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions/{session_id}/scoring": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Score Session
+         * @description Start scoring an ended session, or retry after a failure.
+         */
+        post: operations["score_session_sessions__session_id__scoring_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/providers": {
         parameters: {
             query?: never;
@@ -528,10 +588,83 @@ export interface components {
             quotes: string[];
         };
         /**
+         * CompetencyTrend
+         * @description PR-1: one competency over the Realistic sessions of a job target.
+         */
+        CompetencyTrend: {
+            competency: components["schemas"]["Competency"];
+            /** Sessions */
+            sessions: number;
+            /** First */
+            first: number;
+            /** Latest */
+            latest: number;
+            /**
+             * Change
+             * @description latest minus first
+             */
+            change: number;
+            /** Average */
+            average: number;
+            /**
+             * Direction
+             * @enum {string}
+             */
+            direction: "up" | "down" | "flat" | "single";
+        };
+        /**
          * Confidence
          * @enum {string}
          */
         Confidence: "low" | "medium" | "high";
+        /** Debrief */
+        Debrief: {
+            session: components["schemas"]["DebriefSession"];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "scoring" | "ready" | "failed";
+            scorecard: components["schemas"]["Scorecard"] | null;
+            /** @description PR-2. Null until the debrief is ready. */
+            next_session: components["schemas"]["PlannedSession"] | null;
+            /**
+             * Generic Mode
+             * @description True when no company profile was used: no values.
+             */
+            generic_mode: boolean;
+            /** Company Name */
+            company_name: string | null;
+            /**
+             * Values Framework
+             * @description Name of the company's values framework, for example 'Leadership Principles'.
+             */
+            values_framework: string | null;
+        };
+        /**
+         * DebriefSession
+         * @description The session a debrief belongs to. Same shape as the web app's SessionRecord.
+         */
+        DebriefSession: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Job Target Id
+             * Format: uuid
+             */
+            job_target_id: string;
+            config: components["schemas"]["SessionConfig"];
+            status: components["schemas"]["SessionStatus"];
+            /** Started At */
+            started_at: string | null;
+            /** Ended At */
+            ended_at: string | null;
+            /** Minutes Billed */
+            minutes_billed: number;
+        };
         /** DevLoginRequest */
         DevLoginRequest: {
             /**
@@ -808,6 +941,26 @@ export interface components {
             responsibilities?: string[];
             /** Source Url */
             source_url?: string | null;
+        };
+        /** JobProgress */
+        JobProgress: {
+            /**
+             * Job Target Id
+             * Format: uuid
+             */
+            job_target_id: string;
+            /**
+             * Snapshots
+             * @description Realistic sessions only (PR-1).
+             */
+            snapshots: components["schemas"]["ProgressSnapshot"][];
+            /**
+             * Trends
+             * @description Weakest latest score first.
+             */
+            trends: components["schemas"]["CompetencyTrend"][];
+            /** @description PR-2. */
+            next_session: components["schemas"]["PlannedSession"] | null;
         };
         /** JobTargetAccepted */
         JobTargetAccepted: {
@@ -1273,6 +1426,17 @@ export interface components {
              * @description Prompt ref, for example 'scorer/rubric.v1'.
              */
             rubric_version: string;
+        };
+        /** ScoringAccepted */
+        ScoringAccepted: {
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            /** Job Id */
+            job_id: string;
+            status: components["schemas"]["SessionStatus"];
         };
         /**
          * SessionConfig
@@ -1835,6 +1999,99 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    get_debrief_sessions__session_id__debrief_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Debrief"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_progress_job_targets__job_target_id__progress_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobProgress"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    score_session_sessions__session_id__scoring_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoringAccepted"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
             };
         };
     };

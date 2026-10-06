@@ -84,7 +84,7 @@ def render_html(r: RunReport) -> str:
             "quality. Run with the local or hosted profile to judge the interviewer and scorer."
             "</div>"
         )
-    parts.append(f"<p><strong>{e(verdict)}</strong> Errors: {r.errors}.</p>")
+    parts.append(f"<p><strong>{e(verdict)}</strong> Errors: {r.errors}. Scorer: {e(r.scorer)}.</p>")
     parts.append("<h2>Metrics</h2>")
     parts.append(
         _table(
@@ -249,6 +249,7 @@ def report_data(r: RunReport) -> dict[str, Any]:
         "prompt_refs": r.prompt_refs,
         "errors": r.errors,
         "recorded": r.recorded,
+        "scorer": r.scorer,
         "metrics": [
             {
                 "key": m.key,
@@ -272,6 +273,7 @@ def report_data(r: RunReport) -> dict[str, Any]:
                 "vague_eligible": s.follow_ups.eligible,
                 "coverage": s.coverage,
                 "cost_usd": str(s.cost_usd),
+                "scorer_s": s.scorer_s,
                 "error": s.error,
             }
             for s in r.scripted

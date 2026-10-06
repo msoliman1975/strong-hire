@@ -40,6 +40,13 @@ export type GapAnalysisStart = S["GapAnalysisStart"];
 export type GapAnalysisOut = DeepRequired<S["GapAnalysisOut"]>;
 export type GapStatus = S["GapStatus"];
 
+// Debrief and progress (real endpoints in apps/api scoring, P8).
+export type Debrief = DeepRequired<S["Debrief"]>;
+export type DebriefStatus = Debrief["status"];
+export type DebriefSession = DeepRequired<S["DebriefSession"]>;
+export type JobProgress = DeepRequired<S["JobProgress"]>;
+export type CompetencyTrend = DeepRequired<S["CompetencyTrend"]>;
+
 // Shared contracts from strong_core.schemas.
 export type JobPosting = DeepRequired<S["JobPosting"]>;
 export type Resume = DeepRequired<S["Resume"]>;
@@ -49,6 +56,7 @@ export type SessionConfig = DeepRequired<S["SessionConfig"]>;
 export type Scorecard = DeepRequired<S["Scorecard"]>;
 export type CompetencyScore = DeepRequired<S["CompetencyScore"]>;
 export type QuestionScore = DeepRequired<S["QuestionScore"]>;
+export type ValueScore = DeepRequired<S["ValueScore"]>;
 export type ProgressSnapshot = DeepRequired<S["ProgressSnapshot"]>;
 export type Turn = DeepRequired<S["Turn"]>;
 export type Phase = S["Phase"];
