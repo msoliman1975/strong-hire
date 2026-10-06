@@ -25,6 +25,10 @@ numbers only show that the harness works; the fake scorer gives the same scoreca
 
 Without PowerShell: `uv run python -m strong_evals run --suite smoke --profile fake`.
 
+The scorer is the real P8 scorer (`strong_worker.scoring`) on the local and hosted profiles. On the
+fake profile the harness uses the stub scorer, because the one fixed fake scorecard quotes no
+transcript and the P8 quote check rejects it. Choose with `--scorer p8|stub|auto` (default `auto`).
+
 Suites live in `suites/<name>.yaml`:
 
 | Suite | Contents |
@@ -47,6 +51,7 @@ Thresholds are in `config/thresholds.yaml`.
 | Company value scores within one point | Per question and company value, in company-mode transcripts (IV-5) | Information only |
 | Follow-up rate on vague answers | Simulated sessions: vague answers that got a probe on the same question, while probes were left (IV-3) | 80% (harness default) |
 | Coverage of target competencies | Simulated sessions: target competencies touched by the asked questions | 80% (harness default) |
+| Scorer time per transcript | Slowest scorer run over the scripted transcripts (FB-3) | 60 seconds or less (spec) |
 | Cost per session | Simulated sessions: sum of `UsageEvent.cost_usd`, with STT and TTS estimated from the text | $0.80 or less (spec) |
 | Gap analysis score spread | Gap pairs: largest difference between the match scores of one pair across runs (GA-1) | 3 points or less (P6) |
 | Gap analysis fit order | Gap pairs: matched resumes score above mismatched resumes on the same posting | 100% (harness default) |
