@@ -6,6 +6,12 @@
 The scripted part scores each gold-set transcript with the scorer and compares it with the human
 labels. The simulated part runs text sessions with the simulated candidate. Every model call is
 metered into UsageEvent records for the cost metric.
+
+Scorers (--scorer):
+- p8: the real scorer (strong_worker.scoring): quote checks, hire signal in code, rationale.
+- stub: GatewayScorer, which returns the scorer role's Scorecard as is.
+- auto (default): p8, except on the fake profile. There the fake model returns one fixed
+  scorecard whose quotes are in no transcript, so the p8 scorer would reject every one of them.
 """
 
 from __future__ import annotations
@@ -33,6 +39,7 @@ from strong_evals import EVALS_DIR
 from strong_evals.candidate import Persona
 from strong_evals.gap import GapResult, fit_order, run_gap_item
 from strong_evals.goldset import GoldLabel, load_goldset
+from strong_evals.interfaces import Scorer
 from strong_evals.metrics import (
     Agreement,
     FollowUpCount,
@@ -51,9 +58,23 @@ from strong_evals.stubs import GatewayScorer
 from strong_evals.suites import GapSpec, SimulatedSpec, Suite, load_suite, suite_names
 from strong_evals.transcripts import ScriptedTranscript, load_transcripts
 from strong_evals.usage import MeteredGateway, Prices, load_prices
+from strong_worker.scoring.harness import HarnessScorer
 
 REPORTS_DIR = EVALS_DIR / "reports"
 THRESHOLDS_FILE = EVALS_DIR / "config" / "thresholds.yaml"
+SCORERS = ("auto", "p8", "stub")
+
+
+def resolve_scorer(name: str, profile: str) -> str:
+    if name not in SCORERS:
+        raise ValueError(f"scorer must be one of {', '.join(SCORERS)}")
+    if name == "auto":
+        return "stub" if profile == "fake" else "p8"
+    return name
+
+
+def make_scorer(name: str, gateway: ModelGateway) -> Scorer:
+    return HarnessScorer(gateway) if name == "p8" else GatewayScorer(gateway)
 
 
 @dataclass
@@ -69,6 +90,7 @@ class ScriptedResult:
     error: str | None = None
     detector_hits: int = 0  # vague answers the heuristic found that are labeled vague
     detector_extra: int = 0  # answers the heuristic calls vague that are not labeled vague
+    scorer_s: float | None = None  # wall time of the scorer, for the FB-3 60 second budget
 
 
 @dataclass
@@ -109,6 +131,7 @@ class RunReport:
     gap: list[GapResult] = field(default_factory=list)
     metrics: list[MetricResult] = field(default_factory=list)
     recorded: int = 0
+    scorer: str = "stub"
 
     @property
     def errors(self) -> int:
@@ -139,6 +162,7 @@ async def run_scripted(
     prices: Prices,
     suite: str,
     refs: dict[str, None],
+    scorer: str = "stub",
 ) -> ScriptedResult:
     sid = _session_id(suite, t.id)
     gw = MeteredGateway(base, prices, sid)
@@ -146,10 +170,12 @@ async def run_scripted(
     coverage = competency_coverage(t.brief, t.turns)
     card: Scorecard | None = None
     error = None
+    clock = time.perf_counter()
     try:
-        card = await GatewayScorer(gw).score(t.brief, t.turns)
+        card = await make_scorer(scorer, gw).score(t.brief, t.turns)
     except Exception as e:  # a model that fails validation counts as a miss, not a crash
         error = f"{type(e).__name__}: {e}"[:300]
+    scorer_s = round(time.perf_counter() - clock, 3)
     refs.update(gw.prompt_refs)
     found, labeled = set(vague_answer_indexes(t.turns)), set(t.vague_answers)
     rubric = values = Agreement(0, 0, 0)
@@ -168,11 +194,17 @@ async def run_scripted(
         error=error,
         detector_hits=len(found & labeled),
         detector_extra=len(found - labeled),
+        scorer_s=scorer_s,
     )
 
 
 async def run_simulated(
-    spec: SimulatedSpec, base: ModelGateway, prices: Prices, suite: str, refs: dict[str, None]
+    spec: SimulatedSpec,
+    base: ModelGateway,
+    prices: Prices,
+    suite: str,
+    refs: dict[str, None],
+    scorer: str = "stub",
 ) -> SimulatedResult:
     sid = _session_id(suite, spec.id)
     gw = MeteredGateway(base, prices, sid)
@@ -200,7 +232,7 @@ async def run_simulated(
     signal: HireSignal | None = None
     error = None
     try:
-        signal = (await GatewayScorer(gw).score(session.brief, turns)).hire_signal
+        signal = (await make_scorer(scorer, gw).score(session.brief, turns)).hire_signal
     except Exception as e:
         error = f"scorer: {type(e).__name__}: {e}"[:300]
     refs.update(gw.prompt_refs)
@@ -299,6 +331,17 @@ def compute_metrics(report: RunReport, thresholds: dict[str, dict[str, Any]]) ->
             )
     else:
         add("scorer_within_one_band", "Scorer agreement, within one band", None, "")
+
+    timed = [r.scorer_s for r in report.scripted if r.scorer_s is not None and r.error is None]
+    if timed:
+        add(
+            "debrief_ready_s",
+            "Scorer time per transcript, seconds (FB-3)",
+            max(timed),
+            f"{max(timed):.1f} s",
+            f"slowest of {len(timed)} transcripts; mean {mean(timed):.1f} s; "
+            f"scorer {report.scorer}",
+        )
 
     sims = [r for r in report.simulated if r.error is None or r.turns]
     probed = sum(r.follow_ups.probed for r in sims)
@@ -438,6 +481,7 @@ async def run_suite(
     gateway: ModelGateway | None = None,
     record_dir: Path | None = None,
     goldset: dict[str, GoldLabel] | None = None,
+    scorer: str = "auto",
 ) -> RunReport:
     started = time.perf_counter()
     base = gateway or build_gateway(Settings(model_profile=profile))
@@ -457,14 +501,17 @@ async def run_suite(
         git_sha=_git_sha(),
         models={r.value: base.config.alias_for(r) for r in Role},
         prompt_refs=[],
+        scorer=resolve_scorer(scorer, base.profile),
     )
     for t in transcripts:
         report.scripted.append(
-            await run_scripted(t, gold.get(t.id), base, prices, suite.name, refs)
+            await run_scripted(t, gold.get(t.id), base, prices, suite.name, refs, report.scorer)
         )
         print(f"  scripted {t.id}: {report.scripted[-1].scorer or report.scripted[-1].error}")
     for spec in suite.simulated:
-        report.simulated.append(await run_simulated(spec, base, prices, suite.name, refs))
+        report.simulated.append(
+            await run_simulated(spec, base, prices, suite.name, refs, report.scorer)
+        )
         r = report.simulated[-1]
         print(f"  simulated {spec.id}: {len(r.turns)} turns {r.error or ''}")
     for gap_spec in suite.gap:
@@ -486,8 +533,9 @@ def cmd_run(args: argparse.Namespace) -> int:
     record_dir = None
     if args.record:
         record_dir = Path(args.record_dir) if args.record_dir else DEFAULT_FIXTURES_DIR
-    print(f"Running suite {suite.name} on profile {args.profile}")
-    report = asyncio.run(run_suite(suite, args.profile, record_dir=record_dir))
+    scorer = resolve_scorer(args.scorer, args.profile)
+    print(f"Running suite {suite.name} on profile {args.profile} with the {scorer} scorer")
+    report = asyncio.run(run_suite(suite, args.profile, record_dir=record_dir, scorer=scorer))
     html_path, json_path = write_report(report, Path(args.out))
     for m in report.metrics:
         verdict = {True: "PASS", False: "FAIL", None: "info"}[m.passed]
@@ -512,4 +560,10 @@ def add_run_parser(sub: Any) -> None:
     p.add_argument("--record", action="store_true", help="save every model call as a fixture")
     p.add_argument("--record-dir", help="fixture folder (default: the fake model's fixtures)")
     p.add_argument("--gate", action="store_true", help="exit 1 when a metric fails")
+    p.add_argument(
+        "--scorer",
+        default="auto",
+        choices=SCORERS,
+        help="p8 (real scorer), stub, or auto: p8 except on the fake profile",
+    )
     p.set_defaults(func=cmd_run)

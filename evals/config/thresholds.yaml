@@ -26,3 +26,6 @@ gap_fit_order:
   source: "Harness default. A resume written for the job should score above one for another role"
 gap_cost_usd:
   source: "Spec, Pricing: planner and gap analysis about $0.05 per session. Shown for information"
+debrief_ready_s:
+  max: 60
+  source: "Spec FB-3: debrief ready within 60 seconds of session end. Measured as the slowest scorer run"
