@@ -93,7 +93,7 @@ Invalid profile file: profiles/acme.json
 
 A company without a published profile runs in generic mode: a default tech-industry persona
 and equal competency weights (spec, "Companies outside the 20"). Code gets it from
-`strong_api.profiles.resolve_profile(db, company_id)`. The result has `version = None` and
+`strong_core.profiles.resolve_profile(db, company_id)`. The result has `version = None` and
 `generic = True`.
 
 ## Full example (fictional company)

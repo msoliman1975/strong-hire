@@ -27,6 +27,7 @@ from strong_api.profiles.diff import format_diff
 from strong_api.profiles.validation import ProfileFileError, load_profile_file
 from strong_core.config import get_settings
 from strong_core.db.engine import async_database_url
+from strong_core.profiles import ProfileError, get_profile_version, get_published_row
 from strong_core.schemas import CompanyProfile, Confidence
 
 app = typer.Typer(help="Strong Hire admin commands.", no_args_is_help=True)
@@ -131,7 +132,7 @@ def import_cmd(
             ),
             commit=True,
         )
-    except repo.ProfileError as exc:
+    except ProfileError as exc:
         raise fail(str(exc)) from exc
 
     slug = result.company.slug
@@ -170,7 +171,7 @@ def publish_cmd(
         result = run_db(
             lambda db: repo.publish_profile(db, company, version, reviewer=who), commit=True
         )
-    except (repo.ProfileError, ProfileFileError) as exc:
+    except (ProfileError, ProfileFileError) as exc:
         raise fail(str(exc)) from exc
     if result.already_published:
         typer.echo(f"{company} version {version} is already the published version.")
@@ -217,17 +218,17 @@ def show_cmd(
             for r in rows
         ]
         if version is not None:
-            row = await repo.get_profile_version(db, found.id, version)
+            row = await get_profile_version(db, found.id, version)
             if row is None:
-                raise repo.ProfileError(f"'{company}' has no version {version}.")
+                raise ProfileError(f"'{company}' has no version {version}.")
         else:
-            row = await repo.get_published_row(db, found.id)
+            row = await get_published_row(db, found.id)
         label = f"version {row.version} ({row.status.value})" if row else "no published version"
         return lines, (row.profile_json if row else None), label
 
     try:
         lines, data, label = run_db(_load)
-    except repo.ProfileError as exc:
+    except ProfileError as exc:
         raise fail(str(exc)) from exc
     if as_json:
         if data is None:

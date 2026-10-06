@@ -1,8 +1,11 @@
-"""Company profile storage (AD-1) and lookups for the interviewer and scorer (IV-5, FB-1).
+"""Company profile storage (AD-1): import, publish and the company list for strongctl.
+
+The read-side lookups (published profile, generic fallback, the profile of a session) are in
+strong_core.profiles, so the voice agent and the worker can use them without this app.
 
 Versions: each import stores the next version number for the company as a Draft. Publishing a
 version archives the version that was published before, so one version per company is active.
-Old versions stay in the table and remain readable with get_profile_version().
+Old versions stay in the table and remain readable with strong_core.profiles.get_profile_version().
 """
 
 from __future__ import annotations
@@ -17,15 +20,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from strong_api.profiles.diff import FieldChange, diff_profiles
-from strong_api.profiles.resolved import ResolvedProfile, generic_profile
-from strong_api.profiles.validation import parse_profile
-from strong_core.db.models import AuditLog, Company, InterviewSession, JobTarget
+from strong_core.db.models import AuditLog, Company
 from strong_core.db.models import CompanyProfile as ProfileRow
+from strong_core.profiles import ProfileError, get_profile_version, get_published_row, row_profile
 from strong_core.schemas import CompanyProfile, ProfileStatus
-
-
-class ProfileError(Exception):
-    """A profile action cannot run. The message says why and what to do."""
 
 
 @dataclass(frozen=True)
@@ -65,11 +63,6 @@ def _now() -> datetime:
     return datetime.now(UTC)
 
 
-def row_profile(row: ProfileRow) -> CompanyProfile:
-    """The stored profile as the contract. Raises ProfileFileError if it no longer validates."""
-    return parse_profile(row.profile_json)
-
-
 async def get_company(db: AsyncSession, slug: str) -> Company | None:
     return await db.scalar(select(Company).where(Company.slug == slug))
 
@@ -89,77 +82,6 @@ async def list_versions(db: AsyncSession, company_id: uuid.UUID) -> Sequence[Pro
         select(ProfileRow).where(ProfileRow.company_id == company_id).order_by(ProfileRow.version)
     )
     return rows.all()
-
-
-async def get_profile_version(
-    db: AsyncSession, company_id: uuid.UUID, version: int
-) -> ProfileRow | None:
-    """Any version, in any status. Used to explain old sessions after a refresh."""
-    return await db.scalar(
-        select(ProfileRow).where(ProfileRow.company_id == company_id, ProfileRow.version == version)
-    )
-
-
-async def get_published_row(db: AsyncSession, company_id: uuid.UUID) -> ProfileRow | None:
-    return await db.scalar(
-        select(ProfileRow)
-        .where(
-            ProfileRow.company_id == company_id,
-            ProfileRow.status == ProfileStatus.PUBLISHED,
-        )
-        .order_by(ProfileRow.version.desc())
-        .limit(1)
-    )
-
-
-async def get_published_profile(db: AsyncSession, company_id: uuid.UUID) -> ResolvedProfile | None:
-    """The active (Published) profile with its version number, or None if there is none."""
-    row = await get_published_row(db, company_id)
-    if row is None:
-        return None
-    return ResolvedProfile.from_profile(
-        row_profile(row), company_id=company_id, version=row.version
-    )
-
-
-async def resolve_profile(db: AsyncSession, company_id: uuid.UUID | None) -> ResolvedProfile:
-    """The published profile for the company, else the generic default profile (IN-5)."""
-    if company_id is None:
-        return generic_profile()
-    published = await get_published_profile(db, company_id)
-    if published is not None:
-        return published
-    company = await db.get(Company, company_id)
-    return generic_profile(company_id, company.name if company else None)
-
-
-async def use_profile_for_session(db: AsyncSession, session: InterviewSession) -> ResolvedProfile:
-    """Pick the profile for a new session and record its version on the session.
-
-    Generic mode stores NULL. The caller commits.
-    """
-    target = await db.get(JobTarget, session.job_target_id)
-    resolved = await resolve_profile(db, target.company_id if target else None)
-    session.profile_version = resolved.version
-    return resolved
-
-
-async def profile_for_session(db: AsyncSession, session: InterviewSession) -> ResolvedProfile:
-    """The exact profile a session used, even if a newer version is published now."""
-    target = await db.get(JobTarget, session.job_target_id)
-    if session.profile_version is None or target is None or target.company_id is None:
-        company_id = target.company_id if target else None
-        company = await db.get(Company, company_id) if company_id else None
-        return generic_profile(company_id, company.name if company else None)
-    row = await get_profile_version(db, target.company_id, session.profile_version)
-    if row is None:
-        raise ProfileError(
-            f"Session {session.id} used profile version {session.profile_version}, "
-            "which is not in the database."
-        )
-    return ResolvedProfile.from_profile(
-        row_profile(row), company_id=target.company_id, version=row.version
-    )
 
 
 async def import_profile(
@@ -250,6 +172,9 @@ async def publish_profile(
     if previous is not None:
         previous.status = ProfileStatus.ARCHIVED
         previous.profile_json = _with_meta(previous.profile_json, status=ProfileStatus.ARCHIVED)
+        # Write the archive first. The database allows one Published row per company, and
+        # the flush order of two updates on one table is not fixed.
+        await db.flush()
     row.status = ProfileStatus.PUBLISHED
     row.published_at = now
     row.reviewed_by = reviewer

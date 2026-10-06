@@ -1,4 +1,8 @@
-"""Company profile validation, import, diff, publish and generic fallback (AD-1, IV-5, IN-5)."""
+"""Company profile validation, import, diff and publish (AD-1).
+
+The lookup and generic fallback tests (IV-5, IN-5) moved to packages/core/tests/test_profiles.py
+with the code.
+"""
 
 from __future__ import annotations
 
@@ -23,20 +27,18 @@ from typer.testing import CliRunner
 from strong_api.profiles import cli
 from strong_api.profiles import repository as repo
 from strong_api.profiles.diff import ChangeKind, diff_profiles, flatten, format_diff
-from strong_api.profiles.resolved import GENERIC_PERSONA, generic_profile
 from strong_api.profiles.validation import ProfileFileError, load_profile_file, parse_profile
 from strong_core.config import get_settings
-from strong_core.db.models import AuditLog, Base, Company, InterviewSession, JobTarget, Org, User
+from strong_core.db.models import AuditLog, Base, Company
 from strong_core.db.models import CompanyProfile as ProfileRow
 from strong_core.db.seed import LAUNCH_COMPANIES
-from strong_core.schemas import (
-    AuthProvider,
-    Competency,
-    Difficulty,
-    InterviewType,
-    Mode,
-    ProfileStatus,
+from strong_core.profiles import (
+    ProfileError,
+    get_profile_version,
+    get_published_profile,
+    row_profile,
 )
+from strong_core.schemas import ProfileStatus
 
 REPO = get_settings().repo_root
 EXAMPLE = REPO / "profiles/examples/example-corp.json"
@@ -198,7 +200,7 @@ async def test_ad1_import_stores_draft_versions_and_diffs_against_published(
     assert first.row.sources_json == google["sources"]
     assert first.row.imported_at is not None
 
-    with pytest.raises(repo.ProfileError, match="same content as version 1"):
+    with pytest.raises(ProfileError, match="same content as version 1"):
         await repo.import_profile(db, parse_profile(google), actor="tester")
     await db.rollback()
 
@@ -221,7 +223,7 @@ async def test_ad1_import_stores_draft_versions_and_diffs_against_published(
 
 
 async def test_ad1_import_unknown_company_needs_create_company(db: AsyncSession) -> None:
-    with pytest.raises(repo.ProfileError, match="'example-corp' is not in the companies table"):
+    with pytest.raises(ProfileError, match="'example-corp' is not in the companies table"):
         await repo.import_profile(db, parse_profile(example_data()), actor="tester")
     await db.rollback()
 
@@ -241,12 +243,12 @@ async def test_ad1_publish_switches_active_version_and_keeps_old_readable(
     await _import(db, v2)
     company = await repo.require_company(db, "google")
 
-    assert await repo.get_published_profile(db, company.id) is None
+    assert await get_published_profile(db, company.id) is None
 
     first = await repo.publish_profile(db, "google", 1, reviewer="mo")
     await db.commit()
     assert first.previous_version is None
-    published = await repo.get_published_profile(db, company.id)
+    published = await get_published_profile(db, company.id)
     assert published is not None and published.version == 1
     assert published.persona.tone == "Friendly and curious"
     assert published.profile is not None
@@ -256,18 +258,18 @@ async def test_ad1_publish_switches_active_version_and_keeps_old_readable(
     second = await repo.publish_profile(db, "google", 2, reviewer="mo")
     await db.commit()
     assert second.previous_version == 1
-    published = await repo.get_published_profile(db, company.id)
+    published = await get_published_profile(db, company.id)
     assert published is not None and published.version == 2
     assert published.persona.tone == "Direct and fast"
 
-    old = await repo.get_profile_version(db, company.id, 1)
+    old = await get_profile_version(db, company.id, 1)
     assert old is not None and old.status is ProfileStatus.ARCHIVED
-    assert repo.row_profile(old).persona.tone == "Friendly and curious"
+    assert row_profile(old).persona.tone == "Friendly and curious"
 
     again = await repo.publish_profile(db, "google", 2, reviewer="mo")
     assert again.already_published
 
-    with pytest.raises(repo.ProfileError, match=r"no version 9. Stored versions: 1, 2"):
+    with pytest.raises(ProfileError, match=r"no version 9. Stored versions: 1, 2"):
         await repo.publish_profile(db, "google", 9, reviewer="mo")
 
     summary = {c.slug: c for c in await repo.list_companies(db)}
@@ -276,81 +278,25 @@ async def test_ad1_publish_switches_active_version_and_keeps_old_readable(
     assert summary["amazon"].version_count == 0
 
 
-async def test_iv5_generic_fallback_and_weights(db: AsyncSession) -> None:
-    generic = await repo.resolve_profile(db, None)
-    assert generic.generic and generic.version is None
-    assert generic.persona == GENERIC_PERSONA
-    assert {generic.weight(c) for c in Competency} == {1.0}
-
-    company = await repo.require_company(db, "google")
-    no_profile = await repo.resolve_profile(db, company.id)
-    assert no_profile.generic and no_profile.company_name == "Google"
-
-    await _import(db, as_google(example_data()))
-    draft_only = await repo.resolve_profile(db, company.id)
-    assert draft_only.generic, "a Draft is never used"
-
-    await repo.publish_profile(db, "google", 1, reviewer="mo")
-    await db.commit()
-    resolved = await repo.resolve_profile(db, company.id)
-    assert not resolved.generic and resolved.version == 1
-    assert resolved.weight(Competency.OWNERSHIP) == 1.5
-    assert resolved.weight(Competency.JUDGMENT) == 1.0
-    assert resolved.values_framework is not None
-    assert resolved.values_share == 0.25
-    assert resolved.value_weights == {"Customer first": 1.0, "Own the outcome": 1.5}
-    assert generic_profile().values_framework is None
-    assert generic.values_share == 0.0 and generic.value_weights == {}
-
-
-async def _session_for(db: AsyncSession, company_id: uuid.UUID | None) -> InterviewSession:
-    org = Org(name="o")
-    db.add(org)
-    await db.flush()
-    user = User(org_id=org.id, email=f"{uuid.uuid4()}@x.test", auth_provider=AuthProvider.DEV)
-    db.add(user)
-    await db.flush()
-    target = JobTarget(org_id=org.id, user_id=user.id, company_id=company_id)
-    db.add(target)
-    await db.flush()
-    session = InterviewSession(
-        org_id=org.id,
-        job_target_id=target.id,
-        type=InterviewType.BEHAVIORAL,
-        difficulty=Difficulty.REALISTIC,
-        mode=Mode.REALISTIC,
-        duration_min=30,
-    )
-    db.add(session)
-    await db.flush()
-    return session
-
-
-async def test_ad1_session_records_profile_version_and_keeps_it(db: AsyncSession) -> None:
+async def test_ad1_publish_keeps_one_published_version_per_company(db: AsyncSession) -> None:
+    """Publish archives the old version before it publishes the new one, so the unique index on
+    Published rows never fails. Many switches cover both update orders of the two rows."""
     google = as_google(example_data())
-    await _import(db, google)
-    await repo.publish_profile(db, "google", 1, reviewer="mo")
+    for n in range(1, 7):
+        data = copy.deepcopy(google)
+        data["persona"]["pace"] = f"Pace {n}"
+        await _import(db, data)
     company = await repo.require_company(db, "google")
 
-    session = await _session_for(db, company.id)
-    used = await repo.use_profile_for_session(db, session)
-    await db.commit()
-    assert used.version == 1 and session.profile_version == 1
-
-    v2 = copy.deepcopy(google)
-    v2["persona"]["tone"] = "Blunt"
-    await _import(db, v2)
-    await repo.publish_profile(db, "google", 2, reviewer="mo")
-    await db.commit()
-
-    later = await repo.profile_for_session(db, session)
-    assert later.version == 1
-    assert later.persona.tone == "Friendly and curious"
-
-    generic_session = await _session_for(db, None)
-    used = await repo.use_profile_for_session(db, generic_session)
-    assert used.generic and generic_session.profile_version is None
-    assert (await repo.profile_for_session(db, generic_session)).generic
+    for version in [1, 2, 3, 4, 5, 6, 1, 6, 2, 5, 3, 4]:
+        await repo.publish_profile(db, "google", version, reviewer="mo")
+        await db.commit()
+        statuses = (
+            await db.scalars(select(ProfileRow.status).where(ProfileRow.company_id == company.id))
+        ).all()
+        assert statuses.count(ProfileStatus.PUBLISHED) == 1
+        published = await get_published_profile(db, company.id)
+        assert published is not None and published.version == version
 
 
 # --- strongctl ------------------------------------------------------------------------------
