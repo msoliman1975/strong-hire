@@ -826,6 +826,14 @@
             "title": "Competencies",
             "type": "array"
           },
+          "values": {
+            "description": "Company values this question probes (target_values).",
+            "items": {
+              "type": "string"
+            },
+            "title": "Values",
+            "type": "array"
+          },
           "priority": {
             "description": "1 is asked first.",
             "minimum": 1,
@@ -949,6 +957,14 @@
             },
             "title": "Scoring Weights",
             "type": "object"
+          },
+          "values_share": {
+            "default": 0.25,
+            "description": "Share of the hire signal that comes from company value scores. The rest comes from competency scores. P08 owns the hire-signal formula.",
+            "maximum": 0.5,
+            "minimum": 0,
+            "title": "Values Share",
+            "type": "number"
           },
           "case_style": {
             "$ref": "#/components/schemas/CaseStyle"
@@ -1352,6 +1368,15 @@
             "maxItems": 6,
             "minItems": 4,
             "title": "Target Competencies",
+            "type": "array"
+          },
+          "target_values": {
+            "description": "Company value names (Principle.name) to probe. Empty in generic mode.",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 4,
+            "title": "Target Values",
             "type": "array"
           },
           "questions": {
@@ -2135,6 +2160,7 @@
       },
       "Principle": {
         "additionalProperties": false,
+        "description": "One company value, for example 'Customer Obsession'. The name is its id in briefs and\nscorecards, so keep it stable across profile versions.",
         "properties": {
           "name": {
             "minLength": 1,
@@ -2154,6 +2180,13 @@
             "minItems": 1,
             "title": "Evidence Signals",
             "type": "array"
+          },
+          "weight": {
+            "default": 1.0,
+            "description": "Relative weight of this value inside the values share.",
+            "exclusiveMinimum": 0,
+            "title": "Weight",
+            "type": "number"
           }
         },
         "required": [
@@ -2307,6 +2340,14 @@
             },
             "title": "Competencies",
             "type": "array"
+          },
+          "values": {
+            "description": "Principle names from values_framework this probes.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Values",
+            "type": "array"
           }
         },
         "required": [
@@ -2336,6 +2377,13 @@
             },
             "minItems": 1,
             "title": "Scores",
+            "type": "array"
+          },
+          "value_scores": {
+            "items": {
+              "$ref": "#/components/schemas/ValueScore"
+            },
+            "title": "Value Scores",
             "type": "array"
           },
           "strengths": {
@@ -2635,6 +2683,14 @@
             "title": "Competency Scores",
             "type": "array"
           },
+          "value_scores": {
+            "description": "Overall score per company value. Empty in generic mode.",
+            "items": {
+              "$ref": "#/components/schemas/ValueScore"
+            },
+            "title": "Value Scores",
+            "type": "array"
+          },
           "per_question": {
             "items": {
               "$ref": "#/components/schemas/QuestionScore"
@@ -2920,6 +2976,45 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "ValueScore": {
+        "additionalProperties": false,
+        "description": "Score for one company value (Principle.name), same 1 to 4 rubric as competencies.",
+        "properties": {
+          "value": {
+            "minLength": 1,
+            "title": "Value",
+            "type": "string"
+          },
+          "score": {
+            "maximum": 4,
+            "minimum": 1,
+            "title": "Score",
+            "type": "integer"
+          },
+          "justification": {
+            "minLength": 1,
+            "title": "Justification",
+            "type": "string"
+          },
+          "quotes": {
+            "description": "Transcript quotes backing the score.",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Quotes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "value",
+          "score",
+          "justification",
+          "quotes"
+        ],
+        "title": "ValueScore",
+        "type": "object"
       },
       "ValuesFramework": {
         "additionalProperties": false,

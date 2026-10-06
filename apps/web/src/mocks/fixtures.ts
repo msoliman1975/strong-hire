@@ -123,6 +123,11 @@ const behavioralScorecard: Scorecard = {
     { competency: "collaboration", score: 2, justification: "Examples stayed inside one team.", quotes: ["My team handled all of it."] },
     { competency: "communication", score: 3, justification: "Clear structure in most answers.", quotes: ["There were three parts to the problem."] },
   ],
+  // Synthetic company values, as a matched company profile would define them.
+  value_scores: [
+    { value: "Users first", score: 3, justification: "Tied the migration to merchant impact.", quotes: ["Merchants were waiting four hours for invoices."] },
+    { value: "Raise the bar", score: 2, justification: "Did not describe review of others' work.", quotes: ["My team handled all of it."] },
+  ],
   per_question: [
     {
       question_ref: "q1",
@@ -130,6 +135,9 @@ const behavioralScorecard: Scorecard = {
       scores: [
         { competency: "ownership", score: 3, justification: "Clear personal role.", quotes: ["I wrote the plan and ran the cutover myself."] },
         { competency: "impact", score: 3, justification: "Quantified result.", quotes: ["Runtime went from four hours to twenty-five minutes."] },
+      ],
+      value_scores: [
+        { value: "Users first", score: 3, justification: "Named the merchant problem first.", quotes: ["Merchants were waiting four hours for invoices."] },
       ],
       strengths: ["Measurable result: runtime down from 4 hours to 25 minutes"],
       misses: ["Did not explain the trade-offs considered"],
@@ -139,6 +147,9 @@ const behavioralScorecard: Scorecard = {
       question_text: "Tell me about a time you disagreed with another team.",
       scores: [
         { competency: "collaboration", score: 2, justification: "No other team was involved in the example.", quotes: ["My team handled all of it."] },
+      ],
+      value_scores: [
+        { value: "Raise the bar", score: 2, justification: "No example of raising the bar for others.", quotes: ["My team handled all of it."] },
       ],
       strengths: ["Stayed calm and specific"],
       misses: ["The example did not involve another team", "No outcome for the relationship"],
@@ -157,6 +168,7 @@ const technicalScorecard: Scorecard = {
     { competency: "trade_offs", score: 3, justification: "Named storage cost of keys.", quotes: ["We keep keys for a day, which costs storage."] },
     { competency: "reasoning", score: 4, justification: "Built the answer step by step.", quotes: ["First I would ask what failure we are protecting against."] },
   ],
+  value_scores: [],
   per_question: [
     {
       question_ref: "t1",
@@ -164,6 +176,7 @@ const technicalScorecard: Scorecard = {
       scores: [
         { competency: "technical_depth", score: 3, justification: "Correct approach.", quotes: ["The key is stored with the result, so a retry returns the same answer."] },
       ],
+      value_scores: [],
       strengths: ["Correct use of idempotency keys"],
       misses: ["Did not mention key expiry until asked"],
     },

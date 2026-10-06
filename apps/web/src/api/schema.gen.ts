@@ -364,6 +364,11 @@ export interface components {
             /** Competencies */
             competencies: components["schemas"]["Competency"][];
             /**
+             * Values
+             * @description Company values this question probes (target_values).
+             */
+            values?: string[];
+            /**
              * Priority
              * @description 1 is asked first.
              */
@@ -410,6 +415,12 @@ export interface components {
             scoring_weights: {
                 [key: string]: number;
             };
+            /**
+             * Values Share
+             * @description Share of the hire signal that comes from company value scores. The rest comes from competency scores. P08 owns the hire-signal formula.
+             * @default 0.25
+             */
+            values_share: number;
             case_style: components["schemas"]["CaseStyle"];
             /** Sources */
             sources: components["schemas"]["Source"][];
@@ -555,6 +566,11 @@ export interface components {
             profile_version: number | null;
             /** Target Competencies */
             target_competencies: components["schemas"]["Competency"][];
+            /**
+             * Target Values
+             * @description Company value names (Principle.name) to probe. Empty in generic mode.
+             */
+            target_values?: string[];
             /** Questions */
             questions: components["schemas"]["BriefQuestion"][];
             /** Probe Areas */
@@ -819,7 +835,11 @@ export interface components {
             /** Reason */
             reason: string;
         };
-        /** Principle */
+        /**
+         * Principle
+         * @description One company value, for example 'Customer Obsession'. The name is its id in briefs and
+         *     scorecards, so keep it stable across profile versions.
+         */
         Principle: {
             /** Name */
             name: string;
@@ -830,6 +850,12 @@ export interface components {
              * @description What evidence of this principle sounds like in an answer.
              */
             evidence_signals: string[];
+            /**
+             * Weight
+             * @description Relative weight of this value inside the values share.
+             * @default 1
+             */
+            weight: number;
         };
         /**
          * ProfileField
@@ -900,6 +926,11 @@ export interface components {
             pattern: string;
             /** Competencies */
             competencies?: components["schemas"]["Competency"][];
+            /**
+             * Values
+             * @description Principle names from values_framework this probes.
+             */
+            values?: string[];
         };
         /** QuestionScore */
         QuestionScore: {
@@ -909,6 +940,8 @@ export interface components {
             question_text: string;
             /** Scores */
             scores: components["schemas"]["CompetencyScore"][];
+            /** Value Scores */
+            value_scores?: components["schemas"]["ValueScore"][];
             /** Strengths */
             strengths?: string[];
             /** Misses */
@@ -1015,6 +1048,11 @@ export interface components {
              * @description Overall score per competency across the session.
              */
             competency_scores: components["schemas"]["CompetencyScore"][];
+            /**
+             * Value Scores
+             * @description Overall score per company value. Empty in generic mode.
+             */
+            value_scores?: components["schemas"]["ValueScore"][];
             /** Per Question */
             per_question?: components["schemas"]["QuestionScore"][];
             /**
@@ -1145,6 +1183,23 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /**
+         * ValueScore
+         * @description Score for one company value (Principle.name), same 1 to 4 rubric as competencies.
+         */
+        ValueScore: {
+            /** Value */
+            value: string;
+            /** Score */
+            score: number;
+            /** Justification */
+            justification: string;
+            /**
+             * Quotes
+             * @description Transcript quotes backing the score.
+             */
+            quotes: string[];
         };
         /** ValuesFramework */
         ValuesFramework: {
