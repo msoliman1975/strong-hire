@@ -12,7 +12,7 @@ spec is `docs/spec.md`. Read the sections that touch your task before you change
 | `apps/worker` | Arq background jobs (`strong_worker`) | Worker workstreams |
 | `apps/voice` | LiveKit Agents voice agent (`strong_voice`), stub until P1 | P1, P7 |
 | `apps/web` | React + Vite + TypeScript front end | P3 and UI workstreams |
-| `prompts/<role>/` | LLM prompt templates, `<name>.v<N>.txt` | The workstream that owns the role |
+| `prompts/<role>/` | LLM prompt templates, `<name>.v<N>.txt` or `<name>.<tier>.v<N>.txt` | The workstream that owns the role |
 | `config/` | `models.<profile>.yaml` (role to model alias, capabilities), `litellm.<profile>.yaml` (real model ids) | P1 |
 | `schemas/` | JSON Schemas generated from `strong_core.schemas`. Never edit by hand. | Generated |
 | `profiles/` | Company profile JSON files | R1 research, P4 import |
@@ -53,10 +53,12 @@ Note: on networks with TLS inspection, `uv` can fail to load the CA file in `SSL
 - Never write a model name or provider in code. Real model ids appear only in
   `config/litellm.*.yaml`. A test scans the code for model names.
 - To change behavior by model, check `gateway.capabilities(role)` (`supports_tools`,
-  `json_mode`, `context_window`). Never check a model name.
+  `json_mode`, `context_window`, `tier`). Never check a model name.
 - Structured output: `await gateway.complete(role, messages, output_type=SomeContract)`.
   Pydantic AI validates it and retries once.
 - Prompts come from `strong_core.prompts.load_prompt(role, name)`, never inline strings.
+  The loader picks the variant for the model's tier (`small`, `medium`, `large`) when a file for
+  it exists, else the default variant (PL-5). See `prompts/README.md`.
   `PromptTemplate.message(...)` sets `prompt_ref`, and `Completion.prompt_refs` reports it.
   Store the prompt ref with the output, for example `Scorecard.rubric_version`.
 

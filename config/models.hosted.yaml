@@ -18,27 +18,32 @@ roles:
   tts: hosted-tts
 
 # Capability registry. Code checks these flags, never model names.
+# tier (small, medium, large) picks prompt variants: prompts/<role>/<name>.<tier>.v<N>.txt.
 models:
   hosted-extractor:
     kind: chat
     supports_tools: true
     json_mode: true
     context_window: 131072
+    tier: large
   hosted-planner:
     kind: chat
     supports_tools: true
     json_mode: true
     context_window: 131072
+    tier: large
   hosted-interviewer:
     kind: chat
     supports_tools: true
     json_mode: true
     context_window: 131072
+    tier: large
   hosted-scorer:
     kind: chat
     supports_tools: true
     json_mode: true
     context_window: 131072
+    tier: large
   hosted-stt:
     kind: stt
     context_window: 512

@@ -17,6 +17,7 @@ roles:
   tts: local-tts
 
 # Capability registry. Code checks these flags, never model names.
+# tier (small, medium, large) picks prompt variants: prompts/<role>/<name>.<tier>.v<N>.txt.
 # context_window is the num_ctx set in litellm.local.yaml, not the model's maximum (32768).
 models:
   local-small:
@@ -24,16 +25,19 @@ models:
     supports_tools: false     # the 3B model breaks tool-call output; JSON-schema mode is reliable
     json_mode: true
     context_window: 8192
+    tier: small
   local-mid:
     kind: chat
     supports_tools: true
     json_mode: true
     context_window: 8192
+    tier: medium
   local-lmstudio:
     kind: chat
     supports_tools: false     # depends on the model loaded in LM Studio; prompted JSON is safe
     json_mode: true
     context_window: 8192
+    tier: small               # unknown model, so assume the small tier
   local-stt:
     kind: stt
     context_window: 512

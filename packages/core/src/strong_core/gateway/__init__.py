@@ -2,10 +2,16 @@
 
 from strong_core.gateway.client import GatewayError, ModelGateway, build_gateway, get_gateway
 from strong_core.gateway.fake import FakeBackend, FakeFixtureMissingError
-from strong_core.gateway.registry import ModelCapabilities, ModelsConfig, load_models_config
+from strong_core.gateway.registry import (
+    CapabilityTier,
+    ModelCapabilities,
+    ModelsConfig,
+    load_models_config,
+)
 from strong_core.gateway.types import Completion, Message, Role, TokenUsage
 
 __all__ = [
+    "CapabilityTier",
     "Completion",
     "FakeBackend",
     "FakeFixtureMissingError",

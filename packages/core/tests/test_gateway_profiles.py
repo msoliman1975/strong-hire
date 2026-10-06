@@ -135,3 +135,23 @@ def test_pl1_output_mode_follows_the_capability_registry() -> None:
     gw = ModelGateway(load_models_config(CONFIG, "local", environ={}))
     assert isinstance(gw._output_spec(Role.EXTRACTOR, SmokeAnswer), NativeOutput)
     assert isinstance(gw._output_spec(Role.PLANNER, SmokeAnswer), ToolOutput)
+
+
+@pytest.mark.parametrize("profile", PROFILES)
+def test_pl5_every_chat_model_has_a_capability_tier(profile: str) -> None:
+    cfg = load_models_config(CONFIG, profile, environ={})
+    for alias, caps in cfg.models.items():
+        if caps.kind == ModelKind.CHAT:
+            assert caps.tier is not None, alias
+        else:
+            assert caps.tier is None, alias
+
+
+def test_pl5_tier_is_for_chat_models_only() -> None:
+    from pydantic import ValidationError
+
+    from strong_core.gateway import CapabilityTier, ModelCapabilities
+
+    assert ModelCapabilities(tier=CapabilityTier.SMALL).tier == CapabilityTier.SMALL
+    with pytest.raises(ValidationError):
+        ModelCapabilities(kind=ModelKind.STT, tier=CapabilityTier.SMALL)

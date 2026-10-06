@@ -19,6 +19,14 @@ class ModelKind(StrEnum):
     TTS = "tts"
 
 
+class CapabilityTier(StrEnum):
+    """How strong a chat model is. The prompt loader picks prompt variants by tier (PL-5)."""
+
+    SMALL = "small"
+    MEDIUM = "medium"
+    LARGE = "large"
+
+
 class ModelCapabilities(BaseModel):
     """What a model can do. Code checks these, never model names."""
 
@@ -28,6 +36,11 @@ class ModelCapabilities(BaseModel):
     supports_tools: bool = False
     json_mode: bool = False
     context_window: int = Field(default=8192, ge=512)
+    tier: CapabilityTier | None = Field(
+        default=None,
+        description="Chat only: capability tier. Prompts with a variant for this tier use it; "
+        "no tier means the default prompt variant.",
+    )
     streaming: bool = Field(
         default=False, description="TTS only: the server streams audio chunks as it renders."
     )
@@ -37,6 +50,12 @@ class ModelCapabilities(BaseModel):
     options: dict[str, str] = Field(
         default_factory=dict, description="Per-model request options, such as a TTS voice."
     )
+
+    @model_validator(mode="after")
+    def _tier_only_for_chat(self) -> ModelCapabilities:
+        if self.tier is not None and self.kind != ModelKind.CHAT:
+            raise ValueError(f"tier is for chat models only, not {self.kind.value}")
+        return self
 
 
 class GatewayEndpoint(BaseModel):
