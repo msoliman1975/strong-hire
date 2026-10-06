@@ -15,6 +15,17 @@ function Initialize-EnvFile {
         Copy-Item (Join-Path $Root '.env.example') $EnvFile
         Write-Step 'Created .env from .env.example'
     }
+    Initialize-ExtraCerts
+}
+
+function Initialize-ExtraCerts {
+    # Networks with TLS inspection need their root CA in the images and in ollama (infra/certs/README.md).
+    $certDir = Join-Path $Root 'infra/certs'
+    $haveCrt = @(Get-ChildItem -Path $certDir -Filter '*.crt' -ErrorAction SilentlyContinue).Count -gt 0
+    if (-not $haveCrt -and $env:SSL_CERT_FILE -and (Test-Path $env:SSL_CERT_FILE)) {
+        Copy-Item $env:SSL_CERT_FILE (Join-Path $certDir 'extra-ca.crt')
+        Write-Step 'Copied SSL_CERT_FILE into infra/certs/extra-ca.crt'
+    }
 }
 
 function Import-EnvFile {

@@ -116,8 +116,12 @@ services:
       OLLAMA_KEEP_ALIVE: 30m
       OLLAMA_MAX_LOADED_MODELS: ${OLLAMA_MAX_LOADED_MODELS:-2}   # CI uses 1 (7.9 GB of RAM)
       OLLAMA_NUM_PARALLEL: "1"
+      # Also trust infra/certs/*.crt when pulling models (networks with TLS inspection).
+      SSL_CERT_DIR: /etc/ssl/certs:/extra-certs
     ports: ["${OLLAMA_PORT:-11435}:11434"]
-    volumes: [ollama-models:/root/.ollama]
+    volumes:
+      - ollama-models:/root/.ollama
+      - ./certs:/extra-certs:ro
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "ollama", "list"]
