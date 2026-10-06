@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { authApi } from "./auth";
+import { gapApi } from "./gap";
 import { jobRunning, jobTargetsApi, resumesApi } from "./inputs";
-import { billingApi, debriefApi, gapApi, jobListApi, resumeListApi, sessionsApi } from "./planned";
+import { billingApi, debriefApi, sessionsApi } from "./planned";
 
 /** How often to re-check work that runs in the background (extraction, analysis, scoring). */
 export const POLL_MS = 1000;
@@ -35,7 +36,7 @@ export const useUsage = (enabled = true) =>
 
 export const usePlan = () => useQuery({ queryKey: keys.plan, queryFn: billingApi.plan });
 
-export const useJobs = () => useQuery({ queryKey: keys.jobs, queryFn: jobListApi.list });
+export const useJobs = () => useQuery({ queryKey: keys.jobs, queryFn: jobTargetsApi.list });
 
 /** A job target. Polls while the posting is still being read, unless `poll` is false. */
 export const useJob = (jobId: string, poll = true) =>
@@ -54,7 +55,7 @@ export const useJobTask = (jobId: string, taskId: string | null) =>
     refetchInterval: (q) => (jobRunning(q.state.data) ? POLL_MS : false),
   });
 
-export const useResumes = () => useQuery({ queryKey: keys.resumes, queryFn: resumeListApi.list });
+export const useResumes = () => useQuery({ queryKey: keys.resumes, queryFn: resumesApi.list });
 
 /** A resume. Polls while it is still being read, unless `poll` is false. */
 export const useResume = (resumeId: string | null, poll = true) =>

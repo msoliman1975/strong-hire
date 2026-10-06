@@ -11,6 +11,7 @@ import type {
   JobTargetAccepted,
   JobTargetCreate,
   JobTargetOut,
+  JobTargetSummary,
   JobTargetUpdate,
   Resume,
   ResumeAccepted,
@@ -18,6 +19,8 @@ import type {
 } from "./types";
 
 export const jobTargetsApi = {
+  /** The signed-in user's jobs, newest first, with the dashboard numbers. */
+  list: async () => unwrap(await apiClient.GET("/job-targets")) as JobTargetSummary[],
   /** IN-1. HTTP 422 with detail.code "paste_required" when the site cannot be read (LinkedIn). */
   create: async (body: JobTargetCreate) =>
     unwrap(await apiClient.POST("/job-targets", { body })) as JobTargetAccepted,
@@ -44,6 +47,8 @@ export const jobTargetsApi = {
 };
 
 export const resumesApi = {
+  /** The signed-in user's resumes, newest first. */
+  list: async () => unwrap(await apiClient.GET("/resumes")) as ResumeOut[],
   /** IN-3. Multipart form: either a `file` (PDF or DOCX) or a `text` field. */
   upload: async (form: FormData) =>
     unwrap(

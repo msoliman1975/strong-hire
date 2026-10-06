@@ -3,8 +3,8 @@
  * add shows on the dashboard, the free interview is used once, and so on. In the browser it is
  * saved to localStorage so a page reload keeps it. This file is mock-only and never ships.
  */
-import type { AuthUser, JobOut, JobTargetOut, ResumeOut } from "../api/types";
-import type { ExportJob, GapAnalysisResult, SessionRecord, Usage } from "../api/planned";
+import type { AuthUser, GapAnalysisOut, JobOut, JobTargetOut, ResumeOut } from "../api/types";
+import type { ExportJob, SessionRecord, Usage } from "../api/planned";
 
 /** A mock background job (Arq in the real API): reads a posting or parses a resume. */
 export interface MockTask extends JobOut {
@@ -27,7 +27,8 @@ export interface MockDb {
   jobs: JobTargetOut[];
   resumes: ResumeOut[];
   tasks: Record<string, MockTask>;
-  gaps: Record<string, GapAnalysisResult & { readyAt: number }>;
+  /** The latest gap analysis per job target id. */
+  gaps: Record<string, GapAnalysisOut & { readyAt: number }>;
   sessions: SessionRecord[];
   debriefReadyAt: Record<string, number>;
   usage: Usage;
@@ -57,8 +58,8 @@ export function emptyDb(): MockDb {
   };
 }
 
-/** Version 2: job targets and resumes use the real P2 shapes. Older saved data is dropped. */
-const STORAGE_KEY = "strong-hire-mock-db-v2";
+/** Version 3: gap analyses use the real P6 shape. Older saved data is dropped. */
+const STORAGE_KEY = "strong-hire-mock-db-v3";
 
 export interface MockStore {
   db: MockDb;

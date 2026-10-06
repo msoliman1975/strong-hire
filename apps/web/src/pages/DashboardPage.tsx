@@ -1,7 +1,7 @@
 import { Link, useSearchParams } from "react-router";
 
 import { useJobs, useProgress } from "../api/hooks";
-import type { JobTargetSummary } from "../api/planned";
+import type { JobTargetSummary } from "../api/types";
 import { CompetencyTrends } from "../components/TrendChart";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
 import { formatDate, interviewTypeLabel } from "../labels";

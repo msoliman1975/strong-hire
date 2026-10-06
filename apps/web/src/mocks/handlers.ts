@@ -1,10 +1,11 @@
 /**
  * MSW request handlers.
  *
- * - `inputHandlers` stand in for the real job target and resume endpoints (P2), with the same
- *   paths, status codes and bodies as openapi.json. Tests and `VITE_API_MOCKS=all` use them.
- * - `inputMirrorHandlers` send those requests to the real API and copy the job targets and
- *   resumes into the mock store, so the planned endpoints below can use them.
+ * - `inputHandlers` stand in for the real job target, resume and gap analysis endpoints (P2, P6),
+ *   with the same paths, status codes and bodies as openapi.json. Tests and
+ *   `VITE_API_MOCKS=all` use them.
+ * - `inputMirrorHandlers` send those requests to the real API and copy the job targets, resumes
+ *   and gap analyses into the mock store, so the planned endpoints below can use them.
  * - `plannedHandlers` stand in for endpoints that later workstreams build (src/api/planned.ts).
  * - `authHandlers` stand in for the real sign-in routes.
  *
@@ -14,22 +15,18 @@
 import { bypass, delay } from "msw";
 import { http, HttpResponse } from "msw/http";
 
-import type {
-  CreateSessionRequest,
-  Debrief,
-  JobProgress,
-  JobTargetSummary,
-  SessionRecord,
-  StartGapAnalysisRequest,
-} from "../api/planned";
+import type { CreateSessionRequest, Debrief, JobProgress, SessionRecord } from "../api/planned";
 import type {
   AuthState,
+  GapAnalysisOut,
+  GapAnalysisStart,
   JobContext,
   JobOut,
   JobPosting,
   JobTargetAccepted,
   JobTargetCreate,
   JobTargetOut,
+  JobTargetSummary,
   JobTargetUpdate,
   ProgressSnapshot,
   Resume,
@@ -194,8 +191,12 @@ function advance(store: MockStore) {
   }
   for (const gap of Object.values(d.gaps)) {
     if (gap.status === "running" && now >= gap.readyAt) {
+      const generic = d.jobs.find((j) => j.id === gap.job_target_id)?.company_id == null;
       gap.status = "ready";
       gap.analysis = gapAnalysis;
+      gap.generic_mode = generic;
+      gap.profile_version = generic ? null : 1;
+      gap.updated_at = new Date(now).toISOString();
     }
   }
   for (const s of d.sessions) {
@@ -354,12 +355,71 @@ export function inputHandlers(store: MockStore) {
     http.get(`${API}/resumes/:resumeId/jobs/:jobId`, ({ params }) =>
       getTask("resume", String(params.resumeId), String(params.jobId)),
     ),
+
+    // ------------------------------------------------------------ lists (P6)
+    http.get(`${API}/job-targets`, () => {
+      advance(store);
+      const summaries: JobTargetSummary[] = [...db().jobs].reverse().map((target) => {
+        const sessions = db().sessions.filter((x) => x.job_target_id === target.id);
+        const gap = db().gaps[target.id];
+        return {
+          job_target: target,
+          match_score: gap?.analysis?.match_score ?? null,
+          gap_status: gap?.status ?? null,
+          sessions_count: sessions.length,
+          last_session_at: sessions.at(-1)?.started_at ?? null,
+        };
+      });
+      return HttpResponse.json(summaries);
+    }),
+    http.get(`${API}/resumes`, () => {
+      advance(store);
+      return HttpResponse.json([...db().resumes].reverse());
+    }),
+
+    // ------------------------------------------------------------ gap analysis (P6)
+    http.post(`${API}/job-targets/:jobId/gap-analysis`, async ({ params, request }) => {
+      const job = findJob(params.jobId);
+      if (!job) return notFound("Job target");
+      const body = (await request.json()) as GapAnalysisStart;
+      const resumeId = body.resume_id ?? db().gaps[job.id]?.resume_id;
+      if (!resumeId) return HttpResponse.json({ detail: "Choose a resume first." }, { status: 422 });
+      const r = findResume(resumeId);
+      if (!r) return notFound("Resume");
+      if (job.status !== "extracted" || r.status !== "extracted") {
+        return HttpResponse.json({ detail: "The job posting or the resume is still being read." }, { status: 409 });
+      }
+      const gap: GapAnalysisOut & { readyAt: number } = {
+        id: newId(),
+        job_target_id: job.id,
+        resume_id: r.id,
+        status: "running",
+        analysis: null,
+        error: null,
+        generic_mode: null,
+        profile_version: null,
+        stale: false,
+        created_at: new Date().toISOString(),
+        updated_at: null,
+        readyAt: Date.now() + store.delayMs * 1.5,
+      };
+      db().gaps[job.id] = gap;
+      store.save();
+      return HttpResponse.json(publicView(gap), { status: 202 });
+    }),
+    http.get(`${API}/job-targets/:jobId/gap-analysis`, ({ params }) => {
+      advance(store);
+      const gap = db().gaps[String(params.jobId)];
+      if (!gap) return notFound("Gap analysis");
+      return HttpResponse.json(publicView(gap));
+    }),
   ];
 }
 
 /**
- * For `VITE_API_MOCKS=planned`: the real API answers the P2 endpoints, and the mock keeps a copy
- * of each job target and resume it sees, for the planned endpoints (lists, gap analysis, sessions).
+ * For `VITE_API_MOCKS=planned`: the real API answers the P2 and P6 endpoints, and the mock keeps a
+ * copy of each job target, resume and gap analysis it sees, for the planned endpoints (sessions,
+ * debrief, progress).
  */
 export function inputMirrorHandlers(store: MockStore) {
   const upsert = <T extends { id: string }>(list: T[], item: T) => {
@@ -387,7 +447,17 @@ export function inputMirrorHandlers(store: MockStore) {
     const r = ("job" in data ? data.resume : data) as ResumeOut;
     if (r.id) upsert(store.db.resumes, r);
   };
+  const saveTargets = (data: unknown) => {
+    for (const row of data as JobTargetSummary[]) upsert(store.db.jobs, row.job_target);
+  };
+  const saveGap = (data: Record<string, unknown>) => {
+    const gap = data as unknown as GapAnalysisOut;
+    if (gap.job_target_id) store.db.gaps[gap.job_target_id] = { ...gap, readyAt: 0 };
+  };
   return [
+    http.get(`${API}/job-targets`, ({ request }) => mirror(request, saveTargets)),
+    http.post(`${API}/job-targets/:jobId/gap-analysis`, ({ request }) => mirror(request, saveGap)),
+    http.get(`${API}/job-targets/:jobId/gap-analysis`, ({ request }) => mirror(request, saveGap)),
     http.post(`${API}/job-targets`, ({ request }) => mirror(request, saveTarget)),
     http.get(`${API}/job-targets/:jobTargetId`, ({ request }) => mirror(request, saveTarget)),
     http.put(`${API}/job-targets/:jobTargetId`, ({ request }) => mirror(request, saveTarget)),
@@ -424,52 +494,6 @@ export function plannedHandlers(store: MockStore) {
   };
 
   return [
-    // ------------------------------------------------------------ job and resume lists (no owner yet)
-    http.get(`${API}/job-targets`, () => {
-      advanceAll();
-      const summaries: JobTargetSummary[] = db().jobs.map((target) => {
-        const sessions = db().sessions.filter((s) => s.job_target_id === target.id);
-        const gap = db().gaps[target.id];
-        return {
-          job_target: target,
-          match_score: gap?.analysis?.match_score ?? null,
-          sessions_count: sessions.length,
-          last_session_at: sessions.at(-1)?.started_at ?? null,
-        };
-      });
-      return HttpResponse.json(summaries);
-    }),
-    http.get(`${API}/resumes`, () => {
-      advanceAll();
-      return HttpResponse.json(db().resumes);
-    }),
-
-    // ------------------------------------------------------------ gap analysis (P6)
-    http.post(`${API}/job-targets/:jobId/gap-analysis`, async ({ params, request }) => {
-      const job = findJob(params.jobId);
-      if (!job) return notFound("Job target");
-      const body = (await request.json()) as Partial<StartGapAnalysisRequest>;
-      if (!body.resume_id || !db().resumes.some((r) => r.id === body.resume_id)) {
-        return HttpResponse.json({ detail: "Choose a resume first" }, { status: 422 });
-      }
-      db().gaps[job.id] = {
-        job_target_id: job.id,
-        resume_id: body.resume_id,
-        status: "running",
-        analysis: null,
-        error: null,
-        readyAt: later(1.5),
-      };
-      store.save();
-      return HttpResponse.json(publicView(db().gaps[job.id]), { status: 202 });
-    }),
-    http.get(`${API}/job-targets/:jobId/gap-analysis`, ({ params }) => {
-      advanceAll();
-      const gap = db().gaps[String(params.jobId)];
-      if (!gap) return notFound("Gap analysis");
-      return HttpResponse.json(publicView(gap));
-    }),
-
     // ------------------------------------------------------------ sessions (P7, P9, P10)
     http.post(`${API}/sessions`, async ({ request }) => {
       await pause();
