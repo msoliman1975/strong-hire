@@ -10,6 +10,8 @@
  * - `scoringHandlers` stand in for the real debrief and progress endpoints (P8), with the shapes
  *   in openapi.json. Sessions are still mocked (P7), so every mock mode uses them for now.
  * - `authHandlers` stand in for the real sign-in routes.
+ * - `accountHandlers` stand in for the real billing and account routes (P9), with the same
+ *   paths, status codes and bodies as openapi.json.
  *
  * Rules such as "one free interview" live here only to make the mock believable. The real rules
  * belong to the API; the web app only shows what the API returns.
@@ -20,6 +22,8 @@ import { http, HttpResponse } from "msw/http";
 import type { CreateSessionRequest, SessionRecord } from "../api/planned";
 import type {
   AuthState,
+  ExitSurveyIn,
+  ExportJob,
   CompetencyTrend,
   Debrief,
   GapAnalysisOut,
@@ -37,6 +41,7 @@ import type {
   Resume,
   ResumeAccepted,
   ResumeOut,
+  Usage,
 } from "../api/types";
 import { newId, type MockStore, type MockTask } from "./db";
 import { gapAnalysis, jobPosting, resume, scorecardFor, sessionPlan } from "./fixtures";
@@ -490,19 +495,17 @@ export function plannedHandlers(store: MockStore) {
       const body = (await request.json()) as CreateSessionRequest;
       if (!findJob(body.job_target_id)) return notFound("Job target");
       const usage = db().usage;
-      if (usage.plan === "free" && !usage.free_interview_available) {
-        return HttpResponse.json(
-          { detail: { code: "upgrade_required", message: "You have used your free interview." } },
-          { status: 402 },
-        );
+      if (!usage.can_start_session) {
+        // Same answer as strong_api.billing.ensure_can_start_session.
+        const code = usage.block_code ?? "upgrade_required";
+        const message =
+          code === "minutes_exhausted"
+            ? "You have used this period's interview minutes."
+            : "You have used your free interview. Subscribe to keep practicing.";
+        return HttpResponse.json({ detail: { code, message, upgrade_url: "/upgrade" } }, { status: 402 });
       }
-      if (usage.plan === "paid" && usage.minutes_used + body.config.duration_min > usage.minutes_cap) {
-        return HttpResponse.json(
-          { detail: { code: "minutes_exhausted", message: "Not enough minutes left this month." } },
-          { status: 402 },
-        );
-      }
-      if (usage.plan === "free") usage.free_interview_available = false;
+      if (usage.plan === "free") usage.free_interviews_left = Math.max(0, usage.free_interviews_left - 1);
+      refreshUsage(usage);
       const session: SessionRecord = {
         id: newId(),
         job_target_id: body.job_target_id,
@@ -529,6 +532,7 @@ export function plannedHandlers(store: MockStore) {
         s.ended_at = new Date().toISOString();
         s.minutes_billed = s.config.duration_min;
         if (db().usage.plan === "paid") db().usage.minutes_used += s.minutes_billed;
+        refreshUsage(db().usage);
         db().debriefReadyAt[s.id] = later(2);
       }
       store.save();
@@ -537,45 +541,6 @@ export function plannedHandlers(store: MockStore) {
     http.get(`${API}/job-targets/:jobId/sessions`, ({ params }) => {
       advanceAll();
       return HttpResponse.json(db().sessions.filter((s) => s.job_target_id === params.jobId));
-    }),
-
-    // ------------------------------------------------------------ billing and account (P9)
-    http.get(`${API}/billing/usage`, () => HttpResponse.json(db().usage)),
-    http.get(`${API}/billing/plan`, () =>
-      HttpResponse.json({ name: "Strong Hire monthly", price_usd_month: 29, minutes_cap: 300 }),
-    ),
-    http.post(`${API}/billing/checkout`, async () => {
-      await pause();
-      // The real endpoint returns a Stripe Checkout URL. The mock upgrades at once.
-      const end = new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString();
-      db().usage = { ...db().usage, plan: "paid", minutes_cap: 300, period_end: end };
-      store.save();
-      return HttpResponse.json({ url: "/?upgraded=1" });
-    }),
-    http.put(`${API}/account/consent`, async ({ request }) => {
-      const body = (await request.json()) as { training_consent: boolean };
-      const email = db().auth.userEmail;
-      if (email && db().users[email]) db().users[email].training_consent = body.training_consent;
-      store.save();
-      return HttpResponse.json({ training_consent: body.training_consent });
-    }),
-    http.post(`${API}/account/export`, async () => {
-      await pause();
-      const id = newId();
-      db().exports[id] = { id, status: "preparing", download_url: null, readyAt: later() };
-      store.save();
-      return HttpResponse.json(publicView(db().exports[id]), { status: 202 });
-    }),
-    http.get(`${API}/account/export/:exportId`, ({ params }) => {
-      advanceAll();
-      const e = db().exports[String(params.exportId)];
-      if (!e) return notFound("Export");
-      return HttpResponse.json(publicView(e));
-    }),
-    http.delete(`${API}/account`, async () => {
-      await pause();
-      store.reset();
-      return new HttpResponse(null, { status: 204 });
     }),
   ];
 }
@@ -661,6 +626,140 @@ export function scoringHandlers(store: MockStore) {
         next_session: db().gaps[jobId]?.analysis ? sessionPlan[snapshots.length ? 1 : 0] : null,
       };
       return HttpResponse.json(progress);
+    }),
+  ];
+}
+
+// ---------------------------------------------------------------------------- P9 billing and account
+
+/** The API's rules for what a user may start (strong_api.billing.entitlements), for the mock. */
+export function refreshUsage(usage: Usage): Usage {
+  usage.minutes_left = usage.plan === "paid" ? Math.max(0, usage.minutes_cap - usage.minutes_used) : 0;
+  if (usage.plan === "paid") {
+    usage.block_code = usage.minutes_left > 0 ? null : "minutes_exhausted";
+  } else {
+    usage.block_code = usage.free_interviews_left > 0 ? null : "upgrade_required";
+  }
+  usage.can_start_session = usage.block_code === null;
+  return usage;
+}
+
+/** Mock plan. The real numbers come from the API config (BILLING_* settings). */
+export const MOCK_PLAN = {
+  name: "Strong Hire monthly",
+  price_usd_month: 29,
+  minutes_cap: 300,
+  free_interviews: 1,
+  billing_enabled: true,
+};
+
+const EXIT_REASONS = new Set([
+  "got_the_job",
+  "interview_over",
+  "too_expensive",
+  "not_helpful",
+  "technical_problems",
+  "missing_feature",
+  "other",
+]);
+const GOT_JOB = new Set(["yes", "no", "still_interviewing", "prefer_not_to_say"]);
+
+/** Mocks of the real P9 endpoints. Paths, status codes and bodies follow openapi.json. */
+export function accountHandlers(store: MockStore) {
+  const db = () => store.db;
+
+  return [
+    http.get(`${API}/billing/usage`, () => HttpResponse.json(refreshUsage(db().usage))),
+    http.get(`${API}/billing/plan`, () => HttpResponse.json(MOCK_PLAN)),
+    http.post(`${API}/billing/checkout`, async () => {
+      await pauseFor(store);
+      if (db().usage.plan === "paid") {
+        return HttpResponse.json(
+          { detail: { code: "already_subscribed", message: "Your plan is already active." } },
+          { status: 409 },
+        );
+      }
+      // The real endpoint returns a Stripe Checkout URL, and a webhook turns the plan on.
+      // The mock turns it on at once.
+      const now = Date.now();
+      db().usage = refreshUsage({
+        ...db().usage,
+        plan: "paid",
+        status: "active",
+        minutes_used: 0,
+        minutes_cap: MOCK_PLAN.minutes_cap,
+        period_start: new Date(now).toISOString(),
+        period_end: new Date(now + 30 * 24 * 3600 * 1000).toISOString(),
+        cancel_at_period_end: false,
+        has_billing_account: true,
+      });
+      store.save();
+      return HttpResponse.json({ url: "/?upgraded=1" });
+    }),
+    http.post(`${API}/billing/portal`, async ({ request }) => {
+      const body = (await request.json().catch(() => null)) as { flow?: string } | null;
+      if (!db().usage.has_billing_account) {
+        return HttpResponse.json(
+          { detail: { code: "no_billing_account", message: "You have no plan to manage." } },
+          { status: 404 },
+        );
+      }
+      // The real endpoint returns a Stripe Customer Portal URL. The mock cancels at once.
+      if (body?.flow === "cancel") db().usage.cancel_at_period_end = true;
+      store.save();
+      return HttpResponse.json({ url: "/account" });
+    }),
+    http.post(`${API}/billing/exit-survey`, async ({ request }) => {
+      const body = (await request.json()) as Partial<ExitSurveyIn>;
+      if (!body.reason || !EXIT_REASONS.has(body.reason) || !body.got_job || !GOT_JOB.has(body.got_job)) {
+        return HttpResponse.json({ detail: [{ msg: "Answer both questions" }] }, { status: 422 });
+      }
+      store.db.exitSurveys.push(body as ExitSurveyIn);
+      store.save();
+      return HttpResponse.json({ id: newId(), created_at: new Date().toISOString() }, { status: 201 });
+    }),
+    http.put(`${API}/account/consent`, async ({ request }) => {
+      const body = (await request.json()) as { training_consent: boolean };
+      const email = db().auth.userEmail;
+      if (email && db().users[email]) db().users[email].training_consent = body.training_consent;
+      store.save();
+      return HttpResponse.json({ training_consent: body.training_consent });
+    }),
+    http.post(`${API}/account/export`, async () => {
+      await pauseFor(store);
+      const id = newId();
+      db().exports[id] = {
+        id,
+        status: "preparing",
+        requested_at: new Date().toISOString(),
+        download_url: null,
+        error: null,
+        readyAt: Date.now() + store.delayMs,
+      };
+      store.save();
+      const view: ExportJob = publicView(db().exports[id]);
+      return HttpResponse.json(view, { status: 202 });
+    }),
+    http.get(`${API}/account/export/:exportId`, ({ params }) => {
+      advance(store);
+      const e = db().exports[String(params.exportId)];
+      if (!e) return notFound("Export");
+      const view: ExportJob = publicView(e);
+      return HttpResponse.json(view);
+    }),
+    http.delete(`${API}/account`, async () => {
+      await pauseFor(store);
+      store.reset();
+      return HttpResponse.json(
+        {
+          status: "deleted",
+          rows_deleted: 12,
+          files_pending: 0,
+          files_deleted_within_hours: 24,
+          backups_expire_within_days: 30,
+        },
+        { status: 202 },
+      );
     }),
   ];
 }

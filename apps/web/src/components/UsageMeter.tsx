@@ -1,16 +1,18 @@
 import { Link } from "react-router";
 
-import type { Usage } from "../api/planned";
+import type { Usage } from "../api/types";
 
-/** BL-1: minutes used of the monthly cap. The numbers come from the API as they are. */
+function freeText(left: number): string {
+  if (left <= 0) return "Free plan: free interview used";
+  return `Free plan: ${left} free ${left === 1 ? "interview" : "interviews"} left`;
+}
+
+/** BL-1: minutes used of the monthly cap. BL-2: free interviews left. Numbers come from the API. */
 export function UsageMeter({ usage }: { usage: Usage }) {
   if (usage.plan === "free") {
-    const text = usage.free_interview_available
-      ? "Free plan: 1 free interview left"
-      : "Free plan: free interview used";
     return (
       <Link className="usage" to="/upgrade" data-testid="usage-meter">
-        <span>{text}</span>
+        <span>{freeText(usage.free_interviews_left)}</span>
         <span className="muted">Upgrade for more interviews</span>
       </Link>
     );

@@ -29,11 +29,15 @@ The debrief and progress endpoints (P8) are real too. `src/api/scoring.ts` calls
 typed client. Their mocks (`scoringHandlers`) stay on in every mode while sessions are mocked (P7),
 because the API does not know a mocked session.
 
+The billing and account endpoints (P9) are real. `src/api/billing.ts` and `src/api/account.ts`
+call them with the typed client. Their mocks (`accountHandlers`) run in `all` mode and in Vitest,
+and a Vitest test checks them against `openapi.json`.
+
 Set `VITE_API_MOCKS` before `pnpm dev`:
 
 | Value | What is mocked | Use it for |
 | --- | --- | --- |
-| `planned` (default) | Only endpoints the API does not have yet. Sign-in, job targets, resumes and gap analysis use the real API; the mock keeps a copy of each job target, resume and gap analysis for the planned endpoints. | The Docker stack |
+| `planned` (default) | Only endpoints the API does not have yet. Sign-in, job targets, resumes, gap analysis, billing and account use the real API; the mock keeps a copy of each job target, resume and gap analysis for the planned endpoints. | The Docker stack |
 | `all` | Everything, including sign-in. No API needed. | Front-end work without Docker; Playwright |
 | `off` | Nothing. | When every endpoint exists |
 
@@ -59,6 +63,7 @@ Another Vitest test validates every mock payload against the JSON Schemas in `/s
 ## Rules
 
 - No business logic in the web app. It shows what the API returns and validates forms. Rules such
-  as the free interview limit live in the API (and, until then, in the mock only).
+  as the free interview limit, the plan price and the minute cap live in the API config
+  (`GET /billing/plan`, `GET /billing/usage`). The mocks copy them only to stay believable.
 - Accessibility: every page sets its title and moves focus to its heading. Every input has a label.
   Errors use `role="alert"`. Charts have a table view.

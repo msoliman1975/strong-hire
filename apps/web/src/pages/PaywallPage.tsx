@@ -1,8 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { useSearchParams } from "react-router";
 
+import { billingApi } from "../api/billing";
 import { usePlan, useUsage } from "../api/hooks";
-import { billingApi } from "../api/planned";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
 
 const REASONS: Record<string, string> = {
@@ -47,10 +47,14 @@ export function PaywallPage() {
           </div>
           {usage.data?.plan === "paid" ? (
             <p className="notice notice--ok">Your plan is already active.</p>
-          ) : (
+          ) : plan.data.billing_enabled ? (
             <button type="button" className="btn" onClick={() => checkout.mutate()} disabled={checkout.isPending}>
               Subscribe
             </button>
+          ) : (
+            <p className="notice" role="status">
+              Payments are not set up yet. Try again later.
+            </p>
           )}
           {checkout.isError && <ErrorNotice error={checkout.error} />}
           <p className="muted section">Payment is handled by Stripe. We do not see or store your card details.</p>

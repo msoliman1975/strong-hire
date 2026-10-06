@@ -1,0 +1,38 @@
+{
+  "id": "evt_TEST_checkout",
+  "object": "event",
+  "api_version": "2026-09-30.endive",
+  "created": 1790000000,
+  "data": {
+    "object": {
+      "id": "cs_test_TEST123",
+      "object": "checkout.session",
+      "amount_subtotal": 2900,
+      "amount_total": 2900,
+      "cancel_url": "http://localhost:5180/upgrade",
+      "client_reference_id": "USER_ID",
+      "created": 1789999940,
+      "currency": "usd",
+      "customer": "cus_TEST123",
+      "customer_details": {
+        "email": "ana@example.com",
+        "name": null
+      },
+      "livemode": false,
+      "metadata": {},
+      "mode": "subscription",
+      "payment_status": "paid",
+      "status": "complete",
+      "subscription": "sub_TEST123",
+      "success_url": "http://localhost:5180/?upgraded=1",
+      "url": null
+    }
+  },
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "checkout.session.completed"
+}

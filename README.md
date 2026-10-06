@@ -55,6 +55,12 @@ Set `LITELLM_PROFILE` to the same value, so the proxy loads the matching `config
 To point one role at another alias, such as LM Studio on the host, set
 `MODEL_ROLE_<ROLE>=<alias>`, for example `MODEL_ROLE_INTERVIEWER=local-lmstudio`.
 
+## Billing (Stripe, test mode)
+
+The app runs without Stripe keys: the paywall then says payments are not set up. To check the
+subscribe, use and cancel flow with the Stripe CLI, follow
+`apps/api/src/strong_api/billing/README.md`. It lists the `STRIPE_*` and `BILLING_*` variables.
+
 ## Repository layout
 
 ```

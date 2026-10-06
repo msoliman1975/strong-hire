@@ -370,6 +370,238 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/billing/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Plan */
+        get: operations["plan_billing_plan_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Usage */
+        get: operations["usage_billing_usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing/checkout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Checkout
+         * @description Start Stripe Checkout for the plan. The webhook turns the plan on after payment.
+         */
+        post: operations["checkout_billing_checkout_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing/portal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Portal
+         * @description Open the Stripe Customer Portal to change the card, see invoices or cancel.
+         */
+        post: operations["portal_billing_portal_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing/exit-survey": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Exit Survey
+         * @description The cancellation exit survey: why the user leaves, and did they get the job.
+         */
+        post: operations["exit_survey_billing_exit_survey_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing/webhook": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Webhook
+         * @description Stripe calls this. The Stripe-Signature header must match STRIPE_WEBHOOK_SECRET.
+         */
+        post: operations["webhook_billing_webhook_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing/dev/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Dev Usage
+         * @description Local only (APP_ENV=local). Uses plan minutes as if a session had ended, so the
+         *     subscribe, use, cancel flow can be checked before voice sessions exist.
+         */
+        post: operations["dev_usage_billing_dev_usage_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account/consent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Consent
+         * @description AC-2: training-data consent, off by default, changeable at any time.
+         */
+        put: operations["set_consent_account_consent_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start Export
+         * @description AC-1: prepare a zip of all the user's data and original resume files.
+         */
+        post: operations["start_export_account_export_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account/export/{export_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Export */
+        get: operations["get_export_account_export__export_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account/export/{export_id}/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download Export
+         * @description The export bundle. The first download deletes it from the server.
+         */
+        get: operations["download_export_account_export__export_id__download_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Account
+         * @description AC-1: delete the account and all its data. Rows go now, files within 24 hours.
+         */
+        delete: operations["delete_account_account_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -391,6 +623,25 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * AccountDeletedOut
+         * @description AC-1 account delete. Rows are gone now; resume files go within the deadline.
+         */
+        AccountDeletedOut: {
+            /**
+             * Status
+             * @constant
+             */
+            status: "deleted";
+            /** Rows Deleted */
+            rows_deleted: number;
+            /** Files Pending */
+            files_pending: number;
+            /** Files Deleted Within Hours */
+            files_deleted_within_hours: number;
+            /** Backups Expire Within Days */
+            backups_expire_within_days: number;
+        };
         /**
          * AuthProvider
          * @enum {string}
@@ -617,6 +868,16 @@ export interface components {
          * @enum {string}
          */
         Confidence: "low" | "medium" | "high";
+        /** ConsentIn */
+        ConsentIn: {
+            /** Training Consent */
+            training_consent: boolean;
+        };
+        /** ConsentOut */
+        ConsentOut: {
+            /** Training Consent */
+            training_consent: boolean;
+        };
         /** Debrief */
         Debrief: {
             session: components["schemas"]["DebriefSession"];
@@ -673,6 +934,11 @@ export interface components {
              */
             email: string;
         };
+        /** DevUsageIn */
+        DevUsageIn: {
+            /** Minutes */
+            minutes: number;
+        };
         /**
          * Difficulty
          * @description IV-4.
@@ -689,6 +955,61 @@ export interface components {
             field_of_study?: string | null;
             /** End */
             end?: string | null;
+        };
+        /**
+         * ExitSurveyIn
+         * @description The cancellation exit survey: two questions. Both are required, the detail is not.
+         */
+        ExitSurveyIn: {
+            /**
+             * Reason
+             * @description Why are you leaving?
+             * @enum {string}
+             */
+            reason: "got_the_job" | "interview_over" | "too_expensive" | "not_helpful" | "technical_problems" | "missing_feature" | "other";
+            /** Reason Detail */
+            reason_detail?: string | null;
+            /**
+             * Got Job
+             * @description Did you get the job?
+             * @enum {string}
+             */
+            got_job: "yes" | "no" | "still_interviewing" | "prefer_not_to_say";
+        };
+        /** ExitSurveyOut */
+        ExitSurveyOut: {
+            /** Id */
+            id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * ExportOut
+         * @description AC-1 data export. The bundle is a zip: data.json plus the original resume files.
+         */
+        ExportOut: {
+            /** Id */
+            id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "preparing" | "ready" | "downloaded" | "expired" | "failed";
+            /**
+             * Requested At
+             * Format: date-time
+             */
+            requested_at: string;
+            /**
+             * Download Url
+             * @description Set while status is ready. Works once.
+             */
+            download_url: string | null;
+            /** Error */
+            error?: string | null;
         };
         /** Gap */
         Gap: {
@@ -1164,6 +1485,31 @@ export interface components {
             minutes: number;
         };
         /**
+         * PlanOut
+         * @description The one paid plan. Every number comes from the API config.
+         */
+        PlanOut: {
+            /** Name */
+            name: string;
+            /** Price Usd Month */
+            price_usd_month: number;
+            /**
+             * Minutes Cap
+             * @description Interview minutes per billing period.
+             */
+            minutes_cap: number;
+            /**
+             * Free Interviews
+             * @description BL-2: interviews on the free plan.
+             */
+            free_interviews: number;
+            /**
+             * Billing Enabled
+             * @description False until Stripe keys are set.
+             */
+            billing_enabled: boolean;
+        };
+        /**
          * PlannedSession
          * @description One recommended practice session (GA-3).
          */
@@ -1180,6 +1526,16 @@ export interface components {
             focus_topics: string[];
             /** Reason */
             reason: string;
+        };
+        /** PortalRequest */
+        PortalRequest: {
+            /**
+             * Flow
+             * @description cancel opens the portal at the cancellation step.
+             * @default manage
+             * @enum {string}
+             */
+            flow: "manage" | "cancel";
         };
         /**
          * Principle
@@ -1292,6 +1648,11 @@ export interface components {
             strengths?: string[];
             /** Misses */
             misses?: string[];
+        };
+        /** RedirectOut */
+        RedirectOut: {
+            /** Url */
+            url: string;
         };
         /**
          * RequirementKind
@@ -1543,6 +1904,50 @@ export interface components {
              */
             question_ref: string | null;
         };
+        /**
+         * UsageOut
+         * @description BL-1 usage meter and BL-2 free interview, as the API counts them.
+         */
+        UsageOut: {
+            /**
+             * Plan
+             * @enum {string}
+             */
+            plan: "free" | "paid";
+            /** @description Stripe status; null if never paid. */
+            status: components["schemas"]["SubscriptionStatus"] | null;
+            /** Minutes Used */
+            minutes_used: number;
+            /**
+             * Minutes Cap
+             * @description 0 on the free plan.
+             */
+            minutes_cap: number;
+            /** Minutes Left */
+            minutes_left: number;
+            /** Period Start */
+            period_start: string | null;
+            /** Period End */
+            period_end: string | null;
+            /** Cancel At Period End */
+            cancel_at_period_end: boolean;
+            /** Free Interviews Total */
+            free_interviews_total: number;
+            /** Free Interviews Left */
+            free_interviews_left: number;
+            /** Can Start Session */
+            can_start_session: boolean;
+            /**
+             * Block Code
+             * @description Why a new session is blocked. Null when it is allowed.
+             */
+            block_code: ("upgrade_required" | "minutes_exhausted") | null;
+            /**
+             * Has Billing Account
+             * @description True when the Customer Portal can open.
+             */
+            has_billing_account: boolean;
+        };
         /** ValidationError */
         ValidationError: {
             /** Location */
@@ -1582,6 +1987,13 @@ export interface components {
             name: string;
             /** Principles */
             principles: components["schemas"]["Principle"][];
+        };
+        /** WebhookOut */
+        WebhookOut: {
+            /** Received */
+            received: boolean;
+            /** Duplicate */
+            duplicate: boolean;
         };
     };
     responses: never;
@@ -2319,6 +2731,338 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    plan_billing_plan_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanOut"];
+                };
+            };
+        };
+    };
+    usage_billing_usage_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsageOut"];
+                };
+            };
+        };
+    };
+    checkout_billing_checkout_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RedirectOut"];
+                };
+            };
+        };
+    };
+    portal_billing_portal_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PortalRequest"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RedirectOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    exit_survey_billing_exit_survey_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExitSurveyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExitSurveyOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    webhook_billing_webhook_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "stripe-signature"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WebhookOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dev_usage_billing_dev_usage_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DevUsageIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsageOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_consent_account_consent_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConsentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    start_export_account_export_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExportOut"];
+                };
+            };
+        };
+    };
+    get_export_account_export__export_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                export_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExportOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    download_export_account_export__export_id__download_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                export_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/zip": unknown;
+                };
+            };
+            /** @description Gone */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_account_account_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountDeletedOut"];
                 };
             };
         };

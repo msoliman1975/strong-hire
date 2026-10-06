@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { authApi } from "./auth";
+import { billingApi } from "./billing";
 import { gapApi } from "./gap";
 import { jobRunning, jobTargetsApi, resumesApi } from "./inputs";
-import { billingApi, sessionsApi } from "./planned";
+import { sessionsApi } from "./planned";
 import { debriefApi } from "./scoring";
 
 /** How often to re-check work that runs in the background (extraction, analysis, scoring). */

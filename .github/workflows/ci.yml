@@ -62,11 +62,11 @@ jobs:
           $A check
           $A downgrade base
           $A upgrade head
-      - name: Database rules on the migrated schema (one Published profile per company)
+      - name: Database rules on the migrated schema (one Published profile per company; AC-1 delete)
         env:
           MODEL_PROFILE: fake
           STRONG_TEST_POSTGRES_URL: postgresql+psycopg://strong:strong@localhost:5432/strong
-        run: uv run pytest packages/core/tests/test_profiles.py -k postgres -rs
+        run: uv run pytest packages/core/tests/test_profiles.py apps/api/tests/test_account.py -k postgres -rs
       - name: seed is repeatable
         run: |
           uv run python -m strong_core.db.seed

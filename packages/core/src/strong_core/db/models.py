@@ -102,6 +102,7 @@ USER_OWNED_TABLES = (
     "progress_snapshots",
     "usage_events",
     "company_requests",
+    "exit_surveys",
 )
 
 
@@ -137,6 +138,9 @@ class Subscription(Base):
         ForeignKey("users.id", ondelete="CASCADE"), index=True
     )
     stripe_customer_id: Mapped[str | None] = mapped_column(String(100), unique=True)
+    stripe_subscription_id: Mapped[str | None] = mapped_column(
+        String(100), comment="The current Stripe subscription. A new one replaces a canceled one."
+    )
     status: Mapped[SubscriptionStatus] = mapped_column(
         str_enum(SubscriptionStatus, "subscription_status")
     )
@@ -144,6 +148,38 @@ class Subscription(Base):
     period_end: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     minutes_cap: Mapped[int] = mapped_column(Integer, default=0)
     minutes_used: Mapped[int] = mapped_column(Integer, default=0)
+    cancel_at_period_end: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default="false", comment="Canceled; ends at period_end"
+    )
+    created_at: Mapped[datetime] = _created_at()
+
+
+class StripeEvent(Base):
+    """Stripe webhook events already handled (BL-1). The primary key makes handling idempotent.
+
+    Only the id and type are kept: the payload holds personal data such as the email.
+    """
+
+    __tablename__ = "stripe_events"
+
+    id: Mapped[str] = mapped_column(String(100), primary_key=True, comment="Stripe event id")
+    type: Mapped[str] = mapped_column(String(100))
+    received_at: Mapped[datetime] = _created_at()
+
+
+class ExitSurvey(Base):
+    """Answers to the cancellation exit survey: why the user leaves, and did they get the job."""
+
+    __tablename__ = "exit_surveys"
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    org_id: Mapped[uuid.UUID] = _org_fk()
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    reason: Mapped[str] = mapped_column(String(50))
+    reason_detail: Mapped[str | None] = mapped_column(Text)
+    got_job: Mapped[str] = mapped_column(String(30))
     created_at: Mapped[datetime] = _created_at()
 
 
