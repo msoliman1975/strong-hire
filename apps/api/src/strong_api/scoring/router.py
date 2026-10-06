@@ -142,18 +142,19 @@ async def _owned_target(db: Db, me: Me, job_target_id: uuid.UUID) -> JobTarget:
 
 
 async def _plan(db: AsyncSession, job_target_id: uuid.UUID) -> list[PlannedSession]:
+    """The session plan of the newest ready gap analysis (P6), or [] when there is none."""
     row = await db.scalar(
         select(GapRow)
-        .where(GapRow.job_target_id == job_target_id)
+        .where(GapRow.job_target_id == job_target_id, GapRow.breakdown_json.is_not(None))
         .order_by(GapRow.created_at.desc())
         .limit(1)
     )
-    if row is None:
+    if row is None or row.breakdown_json is None:
         return []
     try:
         return GapAnalysis.model_validate(row.breakdown_json).session_plan
     except ValidationError:
-        return [PlannedSession.model_validate(p) for p in row.session_plan_json]
+        return [PlannedSession.model_validate(p) for p in row.session_plan_json or []]
 
 
 async def _practiced(db: AsyncSession, job_target_id: uuid.UUID) -> list[InterviewType]:

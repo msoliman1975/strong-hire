@@ -14,7 +14,6 @@ from fastapi import FastAPI
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from strong_api.inputs.deps import DEV_USER_EMAIL
 from strong_api.inputs.queue import JobInfo
 from strong_api.main import create_app
 from strong_api.scoring import SCORE_SESSION
@@ -40,7 +39,10 @@ from strong_core.schemas import (
 from strong_worker.scoring import jobs
 from strong_worker.scoring.testing import RATIONALE, ScriptedBackend, load_scripted, scorecard_reply
 
+from .conftest import sign_in
+
 C = Competency
+DEV_USER_EMAIL = "dev@example.com"  # the user sign_in() creates
 EXAMPLE_PROFILE = find_repo_root() / "profiles" / "examples" / "example-corp.json"
 GAP_FIXTURE = (
     find_repo_root() / "packages/core/src/strong_core/gateway/fixtures/planner/GapAnalysis.json"
@@ -86,6 +88,7 @@ async def sclient(
     app: FastAPI = create_app({"database": ok}, sessionmaker=sessionmaker, queue=squeue)
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as http:
+        await sign_in(http, DEV_USER_EMAIL)
         yield http
 
 
