@@ -112,6 +112,13 @@
           },
           "title": "Strengths",
           "type": "array"
+        },
+        "value_scores": {
+          "items": {
+            "$ref": "#/$defs/ValueScore"
+          },
+          "title": "Value Scores",
+          "type": "array"
         }
       },
       "required": [
@@ -120,6 +127,45 @@
         "scores"
       ],
       "title": "QuestionScore",
+      "type": "object"
+    },
+    "ValueScore": {
+      "additionalProperties": false,
+      "description": "Score for one company value (Principle.name), same 1 to 4 rubric as competencies.",
+      "properties": {
+        "justification": {
+          "minLength": 1,
+          "title": "Justification",
+          "type": "string"
+        },
+        "quotes": {
+          "description": "Transcript quotes backing the score.",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Quotes",
+          "type": "array"
+        },
+        "score": {
+          "maximum": 4,
+          "minimum": 1,
+          "title": "Score",
+          "type": "integer"
+        },
+        "value": {
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value",
+        "score",
+        "justification",
+        "quotes"
+      ],
+      "title": "ValueScore",
       "type": "object"
     }
   },
@@ -163,6 +209,14 @@
       "minLength": 1,
       "title": "Scorer Model",
       "type": "string"
+    },
+    "value_scores": {
+      "description": "Overall score per company value. Empty in generic mode.",
+      "items": {
+        "$ref": "#/$defs/ValueScore"
+      },
+      "title": "Value Scores",
+      "type": "array"
     }
   },
   "required": [

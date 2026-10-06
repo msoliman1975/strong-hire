@@ -99,6 +99,7 @@ USER_OWNED_TABLES = (
     "scorecards",
     "progress_snapshots",
     "usage_events",
+    "company_requests",
 )
 
 
@@ -272,6 +273,9 @@ class Scorecard(Base):
     hire_signal: Mapped[HireSignal] = mapped_column(str_enum(HireSignal, "hire_signal"))
     rationale: Mapped[str] = mapped_column(Text)
     competency_scores_json: Mapped[list[Any]] = mapped_column(comment="schemas.CompetencyScore")
+    value_scores_json: Mapped[list[Any]] = mapped_column(
+        server_default="[]", comment="schemas.ValueScore list; empty in generic mode"
+    )
     per_question_json: Mapped[list[Any]] = mapped_column(comment="schemas.QuestionScore list")
     scorer_model: Mapped[str] = mapped_column(String(200))
     rubric_version: Mapped[str] = mapped_column(String(200))
@@ -306,6 +310,36 @@ class UsageEvent(Base):
     component: Mapped[UsageComponent] = mapped_column(str_enum(UsageComponent, "usage_component"))
     units: Mapped[Decimal] = mapped_column(Numeric(14, 4), comment="Tokens, seconds or characters")
     cost_usd: Mapped[Decimal] = mapped_column(Numeric(12, 6))
+    created_at: Mapped[datetime] = _created_at()
+
+
+class CompanyRequest(Base):
+    """Every company name a user enters at job setup (IN-5), matched or not.
+
+    Rows with matched_company_id NULL are requests for companies outside the curated list. Count
+    them by normalized_name to choose the next profiles to research.
+    """
+
+    __tablename__ = "company_requests"
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    org_id: Mapped[uuid.UUID] = _org_fk()
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    job_target_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("job_targets.id", ondelete="SET NULL")
+    )
+    company_name: Mapped[str] = mapped_column(
+        String(200), comment="As the user or posting wrote it"
+    )
+    normalized_name: Mapped[str] = mapped_column(String(200), index=True)
+    matched_company_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("companies.id", ondelete="SET NULL"), comment="NULL means not curated"
+    )
+    source_host: Mapped[str | None] = mapped_column(
+        String(200), comment="Host of the posting URL, without www."
+    )
     created_at: Mapped[datetime] = _created_at()
 
 

@@ -271,6 +271,7 @@
     },
     "Principle": {
       "additionalProperties": false,
+      "description": "One company value, for example 'Customer Obsession'. The name is its id in briefs and\nscorecards, so keep it stable across profile versions.",
       "properties": {
         "description": {
           "minLength": 1,
@@ -290,6 +291,13 @@
           "minLength": 1,
           "title": "Name",
           "type": "string"
+        },
+        "weight": {
+          "default": 1.0,
+          "description": "Relative weight of this value inside the values share.",
+          "exclusiveMinimum": 0,
+          "title": "Weight",
+          "type": "number"
         }
       },
       "required": [
@@ -404,6 +412,14 @@
           "minLength": 1,
           "title": "Theme",
           "type": "string"
+        },
+        "values": {
+          "description": "Principle names from values_framework this probes.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Values",
+          "type": "array"
         }
       },
       "required": [
@@ -583,6 +599,14 @@
     },
     "values_framework": {
       "$ref": "#/$defs/ValuesFramework"
+    },
+    "values_share": {
+      "default": 0.25,
+      "description": "Share of the hire signal that comes from company value scores. The rest comes from competency scores. P08 owns the hire-signal formula.",
+      "maximum": 0.5,
+      "minimum": 0,
+      "title": "Values Share",
+      "type": "number"
     }
   },
   "required": [

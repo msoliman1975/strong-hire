@@ -17,6 +17,7 @@ SPEC_TABLES = {
     "progress_snapshots",
     "usage_events",
     "audit_logs",
+    "company_requests",  # spec: Companies outside the 20, request this company
 }
 
 

@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from strong_core.schemas.base import Contract, RubricScore
 from strong_core.schemas.enums import Competency, HireSignal
@@ -18,10 +18,20 @@ class CompetencyScore(Contract):
     quotes: list[str] = Field(min_length=1, description="Transcript quotes backing the score.")
 
 
+class ValueScore(Contract):
+    """Score for one company value (Principle.name), same 1 to 4 rubric as competencies."""
+
+    value: str = Field(min_length=1)
+    score: RubricScore
+    justification: str = Field(min_length=1)
+    quotes: list[str] = Field(min_length=1, description="Transcript quotes backing the score.")
+
+
 class QuestionScore(Contract):
     question_ref: str = Field(min_length=1)
     question_text: str = Field(min_length=1)
     scores: list[CompetencyScore] = Field(min_length=1)
+    value_scores: list[ValueScore] = Field(default_factory=list)
     strengths: list[str] = Field(default_factory=list)
     misses: list[str] = Field(default_factory=list)
 
@@ -32,11 +42,22 @@ class Scorecard(Contract):
     competency_scores: list[CompetencyScore] = Field(
         min_length=1, description="Overall score per competency across the session."
     )
+    value_scores: list[ValueScore] = Field(
+        default_factory=list,
+        description="Overall score per company value. Empty in generic mode.",
+    )
     per_question: list[QuestionScore] = Field(default_factory=list)
     scorer_model: str = Field(min_length=1, description="Gateway model alias, never a vendor id.")
     rubric_version: str = Field(
         min_length=1, description="Prompt ref, for example 'scorer/rubric.v1'."
     )
+
+    @model_validator(mode="after")
+    def _one_score_per_value(self) -> Scorecard:
+        names = [v.value for v in self.value_scores]
+        if len(names) != len(set(names)):
+            raise ValueError("value_scores must have one entry per value")
+        return self
 
 
 class ProgressSnapshot(Contract):

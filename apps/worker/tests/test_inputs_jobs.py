@@ -12,7 +12,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from strong_core.config import get_settings
-from strong_core.db.models import AuditLog, Company, JobTarget
+from strong_core.db.models import Company, CompanyRequest, JobTarget
 from strong_core.db.models import Resume as ResumeRow
 from strong_worker.inputs import jobs
 from strong_worker.inputs.jobs import CTX_KEY
@@ -91,9 +91,13 @@ async def test_in5_unknown_company_runs_generic_mode_and_is_logged(
     assert result["company"]["generic_mode"] is True
     assert (await reload(sessionmaker, target.id)).company_id is None
     async with sessionmaker() as db:
-        log = await db.scalar(select(AuditLog))
-    assert log is not None and log.details_json is not None
-    assert log.details_json["company_name"] == "Harbor Robotics"
+        request = await db.scalar(select(CompanyRequest))
+    assert request is not None
+    assert request.company_name == "Harbor Robotics"
+    assert request.normalized_name == "harbor robotics"
+    assert request.matched_company_id is None
+    assert request.job_target_id == target.id
+    assert (request.org_id, request.user_id) == account
 
 
 async def test_in1_fetches_a_url_then_extracts(

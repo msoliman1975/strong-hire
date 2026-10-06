@@ -6,7 +6,7 @@
     "name": "Example Values",
     "principles": [
       {"name": "Customer first", "description": "Start from the customer problem.", "evidence_signals": ["Names a specific customer and their pain", "Shows how the outcome was measured for the customer"]},
-      {"name": "Own the outcome", "description": "Take responsibility end to end.", "evidence_signals": ["Uses 'I' for own decisions", "Follows through after launch"]}
+      {"name": "Own the outcome", "description": "Take responsibility end to end.", "evidence_signals": ["Uses 'I' for own decisions", "Follows through after launch"], "weight": 1.5}
     ]
   },
   "loop_structure": [
@@ -21,7 +21,7 @@
     }
   ],
   "question_patterns": [
-    {"interview_type": "behavioral", "theme": "Ownership under ambiguity", "pattern": "A time the candidate drove a result without clear direction", "competencies": ["ownership", "impact"]}
+    {"interview_type": "behavioral", "theme": "Ownership under ambiguity", "pattern": "A time the candidate drove a result without clear direction", "competencies": ["ownership", "impact"], "values": ["Own the outcome"]}
   ],
   "bar_by_level": [
     {"level_name": "E4", "normalized_level": "mid", "role_family": "swe", "scope_expectation": "Owns features within one team."},
@@ -29,6 +29,7 @@
   ],
   "persona": {"tone": "Friendly and curious", "pace": "Moderate", "pushback_style": "Asks 'what would you do differently?'", "closing_style": "Leaves 5 minutes for questions"},
   "scoring_weights": {"ownership": 1.5, "impact": 1.2, "collaboration": 1.0},
+  "values_share": 0.25,
   "case_style": {"product_sense": 0.6, "estimation": 0.2, "system_thinking": 0.2, "notes": null},
   "sources": [
     {"url": "https://careers.example.com/values", "title": "Example Corp values", "retrieved_at": "2026-10-03", "fields": ["values_framework", "persona"]}

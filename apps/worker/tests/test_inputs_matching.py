@@ -8,15 +8,14 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from strong_core.db.models import AuditLog
+from strong_core.companies import most_requested_uncurated, normalize_company_name
+from strong_core.db.models import CompanyRequest
 from strong_core.db.seed import LAUNCH_COMPANIES
 from strong_worker.inputs.matching import (
-    UNKNOWN_COMPANY_ACTION,
     CompanyRef,
     board_token,
     match_and_log,
     match_company,
-    normalize_company_name,
 )
 
 COMPANIES = [CompanyRef(uuid.uuid4(), slug, name) for slug, name in LAUNCH_COMPANIES]
@@ -99,31 +98,41 @@ def test_helpers() -> None:
     assert board_token("https://example.org/jobs") is None
 
 
-async def test_in5_unknown_company_requests_are_logged(
+async def test_in5_company_requests_are_logged(
     sessionmaker: async_sessionmaker[AsyncSession], account: tuple[uuid.UUID, uuid.UUID]
 ) -> None:
-    org_id, _ = account
+    """Every company name is logged; unknown ones have no matched company (spec: request
+    this company)."""
+    org_id, user_id = account
     job_target_id = uuid.uuid4()
     async with sessionmaker() as db:
         known = await match_and_log(
-            db, org_id=org_id, job_target_id=job_target_id, company_name="Uber", source_url=None
+            db,
+            org_id=org_id,
+            user_id=user_id,
+            job_target_id=job_target_id,
+            company_name="Uber",
+            source_url=None,
         )
         unknown = await match_and_log(
             db,
             org_id=org_id,
+            user_id=user_id,
             job_target_id=job_target_id,
-            company_name="Harbor Robotics",
+            company_name="Harbor Robotics, Inc.",
             source_url="https://www.harborrobotics.example/careers/9",
         )
         await db.commit()
-        logs = list(await db.scalars(select(AuditLog)))
+        rows = {r.company_name: r for r in await db.scalars(select(CompanyRequest))}
+        report = await most_requested_uncurated(db)
 
     assert known.company is not None and known.company.slug == "uber"
     assert unknown.generic_mode
-    assert len(logs) == 1
-    assert logs[0].action == UNKNOWN_COMPANY_ACTION
-    assert logs[0].org_id == org_id
-    assert logs[0].details_json == {
-        "company_name": "Harbor Robotics",
-        "host": "harborrobotics.example",
-    }
+    assert set(rows) == {"Uber", "Harbor Robotics, Inc."}
+    assert rows["Uber"].matched_company_id == known.company.id
+    harbor = rows["Harbor Robotics, Inc."]
+    assert harbor.matched_company_id is None
+    assert harbor.normalized_name == "harbor robotics"
+    assert harbor.source_host == "harborrobotics.example"
+    assert (harbor.org_id, harbor.user_id) == (org_id, user_id)
+    assert report == [("harbor robotics", 1)]

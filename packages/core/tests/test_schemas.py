@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 import pytest
 from pydantic import ValidationError
@@ -19,8 +20,10 @@ from strong_core.schemas import (
     HireSignal,
     InterviewerBrief,
     InterviewType,
+    Scorecard,
     SessionConfig,
     Turn,
+    ValueScore,
 )
 
 REPO = find_repo_root()
@@ -121,6 +124,116 @@ def test_profile_requires_confidence_for_every_field() -> None:
     del data["field_confidence"]["persona"]
     with pytest.raises(ValidationError, match="persona"):
         CompanyProfile.model_validate(data)
+
+
+def _profile() -> dict[str, Any]:
+    path = REPO / "profiles" / "examples" / "example-corp.json"
+    data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+    return data
+
+
+def test_iv5_profile_question_patterns_name_known_values() -> None:
+    """IV-5: question patterns point at values from the profile's values framework."""
+    profile = CompanyProfile.model_validate(_profile())
+    assert profile.value_names == ["Customer first", "Own the outcome"]
+    assert profile.question_patterns[0].values == ["Own the outcome"]
+
+    data = _profile()
+    data["question_patterns"][0]["values"] = ["Move fast"]
+    with pytest.raises(ValidationError, match="unknown values: Move fast"):
+        CompanyProfile.model_validate(data)
+
+
+def test_iv5_profile_value_names_are_unique() -> None:
+    data = _profile()
+    principles = data["values_framework"]["principles"]
+    principles.append(dict(principles[0]))
+    with pytest.raises(ValidationError, match="unique"):
+        CompanyProfile.model_validate(data)
+
+
+@pytest.mark.parametrize(("field", "value"), [("values_share", 0.6), ("values_share", -0.1)])
+def test_profile_values_share_is_0_to_half(field: str, value: float) -> None:
+    with pytest.raises(ValidationError, match=field):
+        CompanyProfile.model_validate(_profile() | {field: value})
+
+
+def test_profile_value_weight_is_positive() -> None:
+    data = _profile()
+    data["values_framework"]["principles"][0]["weight"] = 0
+    with pytest.raises(ValidationError, match="weight"):
+        CompanyProfile.model_validate(data)
+
+
+def test_profile_value_defaults() -> None:
+    """Older profile files without the value fields still validate."""
+    data = _profile()
+    del data["values_share"]
+    for principle in data["values_framework"]["principles"]:
+        principle.pop("weight", None)
+    for pattern in data["question_patterns"]:
+        pattern.pop("values", None)
+    profile = CompanyProfile.model_validate(data)
+    assert profile.values_share == 0.25
+    assert all(p.weight == 1.0 for p in profile.values_framework.principles)
+
+
+def _company_brief(target_values: list[str], question_values: list[str]) -> dict[str, Any]:
+    data: dict[str, Any] = _brief() | {
+        "generic_mode": False,
+        "company_name": "Example Corp",
+        "profile_version": 1,
+        "target_values": target_values,
+    }
+    data["questions"] = [dict(q) for q in data["questions"]]
+    data["questions"][0]["values"] = question_values
+    return data
+
+
+def test_iv5_company_brief_targets_values() -> None:
+    """IV-5: a company brief lists the values to probe, and each question names its values."""
+    brief = InterviewerBrief.model_validate(
+        _company_brief(["Own the outcome", "Customer first"], ["Own the outcome"])
+    )
+    assert brief.target_values == ["Own the outcome", "Customer first"]
+    assert brief.questions[0].values == ["Own the outcome"]
+
+
+def test_iv5_brief_questions_use_only_target_values() -> None:
+    with pytest.raises(ValidationError, match="not in target_values: Customer first"):
+        InterviewerBrief.model_validate(_company_brief(["Own the outcome"], ["Customer first"]))
+
+
+def test_brief_at_most_4_target_values() -> None:
+    with pytest.raises(ValidationError, match="target_values"):
+        InterviewerBrief.model_validate(_company_brief(["a", "b", "c", "d", "e"], []))
+
+
+def test_generic_brief_has_no_values() -> None:
+    """IN-5 generic mode: no company values to probe."""
+    assert InterviewerBrief.model_validate(_brief()).target_values == []
+    with pytest.raises(ValidationError, match="target_values"):
+        InterviewerBrief.model_validate(_brief() | {"target_values": ["Own the outcome"]})
+
+
+def _scorecard() -> dict[str, Any]:
+    path = DEFAULT_FIXTURES_DIR / "scorer" / "Scorecard.json"
+    data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+    return data
+
+
+def test_fb2_scorecard_value_scores() -> None:
+    """FB-2: value scores use the same 1 to 4 rubric, with quotes. Empty in generic mode."""
+    assert Scorecard.model_validate(_scorecard()).value_scores == []
+    score = {"value": "Own the outcome", "score": 3, "justification": "x", "quotes": ["y"]}
+    card = Scorecard.model_validate(_scorecard() | {"value_scores": [score]})
+    assert card.value_scores == [ValueScore.model_validate(score)]
+    with pytest.raises(ValidationError, match="one entry per value"):
+        Scorecard.model_validate(_scorecard() | {"value_scores": [score, score]})
+    with pytest.raises(ValidationError):
+        ValueScore.model_validate(score | {"quotes": []})
+    with pytest.raises(ValidationError):
+        ValueScore.model_validate(score | {"score": 5})
 
 
 def test_all_contracts_produce_json_schema() -> None:
