@@ -185,6 +185,9 @@ jobs:
               - 'apps/voice/**'
               - 'packages/core/src/strong_core/gateway/**'
               - 'config/**'
+              - 'scripts/latency.ps1'
+              - 'scripts/lib/stack.ps1'
+              - 'infra/**'
               - '.github/workflows/ci.yml'
 
   voice-latency:
