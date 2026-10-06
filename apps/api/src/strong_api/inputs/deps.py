@@ -3,20 +3,17 @@
 from __future__ import annotations
 
 import uuid
-from collections.abc import AsyncIterator
 from dataclasses import dataclass
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, Request, status
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+from fastapi import Depends, Request
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from strong_api.auth.deps import get_db, require_user
 from strong_api.inputs.queue import JobQueue
-from strong_core.config import get_settings
-from strong_core.db.models import Org, User
-from strong_core.schemas import AuthProvider, OrgType
+from strong_core.db.models import User
 
-DEV_USER_EMAIL = "dev@stronghire.local"
+__all__ = ["CurrentUser", "Db", "Me", "Queue", "current_user", "get_db", "get_queue"]
 
 
 @dataclass(frozen=True)
@@ -25,35 +22,19 @@ class CurrentUser:
     org_id: uuid.UUID
 
 
-async def get_db(request: Request) -> AsyncIterator[AsyncSession]:
-    maker: async_sessionmaker[AsyncSession] = request.app.state.sessionmaker
-    async with maker() as session:
-        yield session
-
-
 def get_queue(request: Request) -> JobQueue:
     queue: JobQueue = request.app.state.queue
     return queue
 
 
-Db = Annotated[AsyncSession, Depends(get_db)]
-Queue = Annotated[JobQueue, Depends(get_queue)]
+async def current_user(user: Annotated[User, Depends(require_user)]) -> CurrentUser:
+    """The signed-in user (P3 sign-in). Returns 401 when nobody is signed in.
 
-
-async def dev_user(db: Db) -> CurrentUser:
-    """Accounts arrive with P9. Until then every request acts as one dev user, outside prod only.
-    Replace this dependency (app.dependency_overrides) when real sign-in exists."""
-    if get_settings().env == "prod":
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Sign-in is required")
-    user = await db.scalar(select(User).where(User.email == DEV_USER_EMAIL))
-    if user is None:
-        org = Org(name="Dev org", type=OrgType.PERSONAL)
-        db.add(org)
-        await db.flush()
-        user = User(org_id=org.id, email=DEV_USER_EMAIL, auth_provider=AuthProvider.DEV)
-        db.add(user)
-        await db.commit()
+    Local development signs in with POST /auth/dev-login (APP_ENV=local only).
+    """
     return CurrentUser(user_id=user.id, org_id=user.org_id)
 
 
-Me = Annotated[CurrentUser, Depends(dev_user)]
+Db = Annotated[AsyncSession, Depends(get_db)]
+Queue = Annotated[JobQueue, Depends(get_queue)]
+Me = Annotated[CurrentUser, Depends(current_user)]
