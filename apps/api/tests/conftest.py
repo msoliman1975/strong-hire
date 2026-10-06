@@ -1,6 +1,8 @@
+"""Test helpers. API tests run on in-memory SQLite, so they need no Docker and no Postgres."""
+
 from __future__ import annotations
 
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Iterator
 from pathlib import Path
 from typing import Any
 
@@ -8,9 +10,13 @@ import httpx
 import pytest
 from cryptography.fernet import Fernet
 from fastapi import FastAPI
+from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import StaticPool
 
+from strong_api.auth import get_db, install_auth
+from strong_api.auth.magic_links import MagicLinks, MemoryUsedTokenStore
+from strong_api.auth.settings import AppEnv, AuthSettings
 from strong_api.inputs.queue import JobInfo
 from strong_api.main import create_app
 from strong_core.config import get_settings
@@ -115,3 +121,73 @@ async def client(app: FastAPI) -> AsyncIterator[httpx.AsyncClient]:
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as http:
         yield http
+
+
+# Sign-in (P3)
+
+
+class RecordingEmailSender:
+    def __init__(self) -> None:
+        self.sent: list[tuple[str, str]] = []
+
+    async def send_magic_link(self, to: str, link: str) -> None:
+        self.sent.append((to, link))
+
+
+class AuthHarness:
+    def __init__(self, app: FastAPI, client: TestClient, sessionmaker: Any, email: Any) -> None:
+        self.app = app
+        self.client = client
+        self.sessionmaker: async_sessionmaker[AsyncSession] = sessionmaker
+        self.email: RecordingEmailSender = email
+
+    def query(self, fn: Any) -> Any:
+        """Run `await fn(db_session)` on the test database and return the result."""
+
+        async def _run() -> Any:
+            async with self.sessionmaker() as db:
+                return await fn(db)
+
+        return self.client.portal.call(_run)  # type: ignore[union-attr]
+
+
+def build_harness(app_env: AppEnv = AppEnv.LOCAL, google: Any = None) -> Iterator[AuthHarness]:
+    engine = create_async_engine(
+        "sqlite+aiosqlite://", poolclass=StaticPool, connect_args={"check_same_thread": False}
+    )
+    sessionmaker = async_sessionmaker(engine, expire_on_commit=False)
+
+    async def _db() -> AsyncIterator[AsyncSession]:
+        async with sessionmaker() as session:
+            yield session
+
+    settings = AuthSettings(
+        app_env=app_env,
+        session_secret="x" * 40,
+        web_base_url="http://web.test",
+        api_public_url="http://web.test/api",
+    )
+    email = RecordingEmailSender()
+    app = FastAPI()
+    install_auth(
+        app,
+        settings,
+        magic_links=MagicLinks(settings.session_secret, 900, MemoryUsedTokenStore()),
+        email_sender=email,
+        google=google,
+    )
+    app.dependency_overrides[get_db] = _db
+    with TestClient(app, base_url="http://web.test") as client:
+        client.portal.call(_create_all, engine)  # type: ignore[union-attr]
+        yield AuthHarness(app, client, sessionmaker, email)
+        client.portal.call(engine.dispose)  # type: ignore[union-attr]
+
+
+async def _create_all(engine: Any) -> None:
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+
+@pytest.fixture
+def auth() -> Iterator[AuthHarness]:
+    yield from build_harness()
