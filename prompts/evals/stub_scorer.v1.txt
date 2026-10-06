@@ -12,5 +12,8 @@ Start from the average of the competency scores, then apply the hard rules:
 
 Fill per_question with one entry per question that was asked, using its question_ref.
 Fill competency_scores with one overall score per competency across the session.
+Company values: when the input lists company values, score each value a question probes in that
+question's value_scores, and give one overall score per value in value_scores. Use the same 1 to 4
+rubric, a justification and a quote. With no company values (generic mode), leave value_scores empty.
 Set scorer_model and rubric_version to "stub"; the harness replaces them.
 The rationale states the deciding evidence in 3 to 5 sentences, like a debrief summary.

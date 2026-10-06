@@ -42,6 +42,7 @@ Thresholds are in `config/thresholds.yaml`.
 | Scorer agreement, within one band | Scorer hire signal versus the human gold-set signal | 85% or more (spec) |
 | Scorer agreement, exact band | Same pairs, exact match | Information only |
 | Rubric scores within one point | Per question and competency, scorer versus human | Information only |
+| Company value scores within one point | Per question and company value, in company-mode transcripts (IV-5) | Information only |
 | Follow-up rate on vague answers | Simulated sessions: vague answers that got a probe on the same question, while probes were left (IV-3) | 80% (harness default) |
 | Coverage of target competencies | Simulated sessions: target competencies touched by the asked questions | 80% (harness default) |
 | Cost per session | Simulated sessions: sum of `UsageEvent.cost_usd`, with STT and TTS estimated from the text | $0.80 or less (spec) |
@@ -55,6 +56,8 @@ that misses two or more of: own role, measurable result, concrete example, trade
 - `transcripts/<id>.json`: 30 scripted interviews (`ScriptedTranscript`): the `InterviewerBrief`,
   the `Turn` list, and the indexes of vague candidate answers. 8 behavioral, 7 hiring manager,
   8 technical Q&A, 7 case; new grad, mid and senior; 10 strong, 10 average and 10 weak.
+  28 run in generic mode. 2 (`beh-03`, `hm-05`) run in company mode against the example profile
+  `profiles/examples/example-corp.json`, with target values and value scores.
   The people and companies are made up.
 - `goldset/labels/*.csv`: human scores, see below.
 - Simulated candidate (`strong_evals.candidate`): plays a `Persona` built from a resume in
@@ -76,7 +79,7 @@ interviewers add their own files next to them. The spec asks for 60 to 100 score
 1. Make your sheets: `uv run python -m strong_evals goldset sheet --rater <your-initials>`.
    This writes one readable `<id>.txt` per transcript and a `<your-initials>.csv` to fill, in
    `var/goldset-sheets/`.
-2. In the CSV, give each asked question and competency a score from 1 to 4
+2. In the CSV, give each asked question and competency (or company value) a score from 1 to 4
    (1 = no evidence, 2 = weak, 3 = meets the bar for this level, 4 = above the bar).
    On the `overall` row, set `hire_signal` to Strong Hire, Hire, Lean Hire, Lean No Hire or
    No Hire. The `note` column is optional.

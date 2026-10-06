@@ -152,6 +152,12 @@ def rubric_pairs(
     return [(scorer[k], v) for k, v in sorted(human.items()) if k in scorer]
 
 
+def value_pairs(card: Scorecard, human: dict[tuple[str, str], int]) -> list[tuple[int, int]]:
+    """(scorer, human) pairs for each question and company value both of them scored."""
+    scorer = {(q.question_ref, v.value): v.score for q in card.per_question for v in q.value_scores}
+    return [(scorer[k], v) for k, v in sorted(human.items()) if k in scorer]
+
+
 def score_agreement(pairs: Iterable[tuple[int, int]]) -> Agreement:
     n = exact = within = 0
     for a, b in pairs:

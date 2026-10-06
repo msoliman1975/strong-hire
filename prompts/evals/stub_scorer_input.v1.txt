@@ -1,8 +1,9 @@
 Interview type: $interview_type
 Candidate level: $level
 Target competencies: $competencies
+Company values: $values
 
-Questions that were asked (question_ref: text [competencies]):
+Questions that were asked (question_ref: text [competencies] {values}):
 $questions
 
 Transcript:

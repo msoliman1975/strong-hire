@@ -1,54 +1,54 @@
-transcript_id,rater,question_ref,competency,score,hire_signal,note
-case-01,seed-author,q1,problem_framing,3,,Asked for who leaves and when after the probe
-case-01,seed-author,q1,user_and_business_sense,3,,Linked late delivery and missing items to causes
-case-01,seed-author,q2,estimation_logic,3,,Second try had clear steps and a usable result
-case-01,seed-author,q2,structure,3,,Steps stated only after the probe
-case-01,seed-author,q3,prioritization,2,,Picked loyalty with no reason beyond rewards
-case-01,seed-author,q3,recommendation,2,,Weak pick and no next step
-case-01,seed-author,overall,,,Lean Hire,Meets the new grad bar after probes but weak on recommending
-case-02,seed-author,q1,problem_framing,4,,Clarified the goal and split the drop into buckets
-case-02,seed-author,q1,user_and_business_sense,3,,Separated commuters from casual riders
-case-02,seed-author,q2,estimation_logic,4,,Stated assumptions and cross-checked
-case-02,seed-author,q2,structure,4,,Clear demand to bikes chain
-case-02,seed-author,q3,prioritization,4,,Scored options and defended the order
-case-02,seed-author,q3,recommendation,4,,Clear pick with a target
-case-02,seed-author,q4,user_and_business_sense,3,,Linked e-bikes to a user problem and cost
-case-02,seed-author,q4,prioritization,4,,Pilot with a stop rule
-case-02,seed-author,overall,,,Strong Hire,Above the mid bar with clear structure and numbers
-case-03,seed-author,q1,problem_framing,3,,Found the right split after a hint
-case-03,seed-author,q1,structure,2,,Started unstructured and needed the hint
-case-03,seed-author,q2,estimation_logic,2,,Numbers given but assumptions not stated
-case-03,seed-author,q2,structure,2,,Steps only partly stated
-case-03,seed-author,q3,prioritization,2,,Good first step only after a hint
-case-03,seed-author,q3,recommendation,2,,No dates or clear final plan
-case-03,seed-author,overall,,,Lean No Hire,Below the mid bar and needed two hints
-case-04,seed-author,q1,problem_framing,2,,Started with solutions and found the user only after two probes
-case-04,seed-author,q1,user_and_business_sense,2,,Named users but no evidence
-case-04,seed-author,q2,prioritization,2,,Reasoned about new users only after pushback
-case-04,seed-author,q2,structure,1,,No criteria or order
-case-04,seed-author,q3,recommendation,2,,Small portions idea with no reasoning
-case-04,seed-author,q3,user_and_business_sense,2,,Did not use user needs
-case-04,seed-author,overall,,,Lean No Hire,Below the mid bar and one score of 1
-case-05,seed-author,q1,problem_framing,4,,Questioned the goal and set a test with a guardrail
-case-05,seed-author,q1,user_and_business_sense,3,,Segmented free users and weighed retention
-case-05,seed-author,q2,estimation_logic,4,,Stated assumptions and gave a cost range
-case-05,seed-author,q2,structure,4,,Per user build up then multiply
-case-05,seed-author,q3,prioritization,3,,Framed one budget but did not weigh the legal impact in numbers
-case-05,seed-author,q3,recommendation,4,,Clear cap and a stop rule
-case-05,seed-author,q4,structure,3,,Clear definition with numerator and denominator
-case-05,seed-author,q4,problem_framing,3,,Named the signal delay trade-off
-case-05,seed-author,overall,,,Hire,Meets or exceeds the senior bar on every competency
-case-06,seed-author,q1,problem_framing,2,,Jumped to raising fees and found a data question only after probes
-case-06,seed-author,q1,user_and_business_sense,2,,Little on customer or business drivers
-case-06,seed-author,q2,prioritization,2,,Chose add-ons only after being pushed
-case-06,seed-author,q2,structure,2,,No criteria
-case-06,seed-author,q3,estimation_logic,1,,No assumptions and a guess
-case-06,seed-author,q3,recommendation,1,,No recommendation
-case-06,seed-author,overall,,,No Hire,Far below the senior bar and two scores of 1
-case-07,seed-author,q1,problem_framing,2,,Listed three parts only after the probe
-case-07,seed-author,q1,structure,2,,Little structure
-case-07,seed-author,q2,estimation_logic,2,,Guess with no reasoning then a second guess
-case-07,seed-author,q2,structure,2,,No steps
-case-07,seed-author,q3,prioritization,3,,Chose the live map first with a reason
-case-07,seed-author,q3,recommendation,2,,Plan was short and had no dates
-case-07,seed-author,overall,,,Lean No Hire,Below the new grad bar but showed some judgment on scope
+transcript_id,rater,question_ref,competency,value,score,hire_signal,note
+case-01,seed-author,q1,problem_framing,,3,,Asked for who leaves and when after the probe
+case-01,seed-author,q1,user_and_business_sense,,3,,Linked late delivery and missing items to causes
+case-01,seed-author,q2,estimation_logic,,3,,Second try had clear steps and a usable result
+case-01,seed-author,q2,structure,,3,,Steps stated only after the probe
+case-01,seed-author,q3,prioritization,,2,,Picked loyalty with no reason beyond rewards
+case-01,seed-author,q3,recommendation,,2,,Weak pick and no next step
+case-01,seed-author,overall,,,,Lean Hire,Meets the new grad bar after probes but weak on recommending
+case-02,seed-author,q1,problem_framing,,4,,Clarified the goal and split the drop into buckets
+case-02,seed-author,q1,user_and_business_sense,,3,,Separated commuters from casual riders
+case-02,seed-author,q2,estimation_logic,,4,,Stated assumptions and cross-checked
+case-02,seed-author,q2,structure,,4,,Clear demand to bikes chain
+case-02,seed-author,q3,prioritization,,4,,Scored options and defended the order
+case-02,seed-author,q3,recommendation,,4,,Clear pick with a target
+case-02,seed-author,q4,user_and_business_sense,,3,,Linked e-bikes to a user problem and cost
+case-02,seed-author,q4,prioritization,,4,,Pilot with a stop rule
+case-02,seed-author,overall,,,,Strong Hire,Above the mid bar with clear structure and numbers
+case-03,seed-author,q1,problem_framing,,3,,Found the right split after a hint
+case-03,seed-author,q1,structure,,2,,Started unstructured and needed the hint
+case-03,seed-author,q2,estimation_logic,,2,,Numbers given but assumptions not stated
+case-03,seed-author,q2,structure,,2,,Steps only partly stated
+case-03,seed-author,q3,prioritization,,2,,Good first step only after a hint
+case-03,seed-author,q3,recommendation,,2,,No dates or clear final plan
+case-03,seed-author,overall,,,,Lean No Hire,Below the mid bar and needed two hints
+case-04,seed-author,q1,problem_framing,,2,,Started with solutions and found the user only after two probes
+case-04,seed-author,q1,user_and_business_sense,,2,,Named users but no evidence
+case-04,seed-author,q2,prioritization,,2,,Reasoned about new users only after pushback
+case-04,seed-author,q2,structure,,1,,No criteria or order
+case-04,seed-author,q3,recommendation,,2,,Small portions idea with no reasoning
+case-04,seed-author,q3,user_and_business_sense,,2,,Did not use user needs
+case-04,seed-author,overall,,,,Lean No Hire,Below the mid bar and one score of 1
+case-05,seed-author,q1,problem_framing,,4,,Questioned the goal and set a test with a guardrail
+case-05,seed-author,q1,user_and_business_sense,,3,,Segmented free users and weighed retention
+case-05,seed-author,q2,estimation_logic,,4,,Stated assumptions and gave a cost range
+case-05,seed-author,q2,structure,,4,,Per user build up then multiply
+case-05,seed-author,q3,prioritization,,3,,Framed one budget but did not weigh the legal impact in numbers
+case-05,seed-author,q3,recommendation,,4,,Clear cap and a stop rule
+case-05,seed-author,q4,structure,,3,,Clear definition with numerator and denominator
+case-05,seed-author,q4,problem_framing,,3,,Named the signal delay trade-off
+case-05,seed-author,overall,,,,Hire,Meets or exceeds the senior bar on every competency
+case-06,seed-author,q1,problem_framing,,2,,Jumped to raising fees and found a data question only after probes
+case-06,seed-author,q1,user_and_business_sense,,2,,Little on customer or business drivers
+case-06,seed-author,q2,prioritization,,2,,Chose add-ons only after being pushed
+case-06,seed-author,q2,structure,,2,,No criteria
+case-06,seed-author,q3,estimation_logic,,1,,No assumptions and a guess
+case-06,seed-author,q3,recommendation,,1,,No recommendation
+case-06,seed-author,overall,,,,No Hire,Far below the senior bar and two scores of 1
+case-07,seed-author,q1,problem_framing,,2,,Listed three parts only after the probe
+case-07,seed-author,q1,structure,,2,,Little structure
+case-07,seed-author,q2,estimation_logic,,2,,Guess with no reasoning then a second guess
+case-07,seed-author,q2,structure,,2,,No steps
+case-07,seed-author,q3,prioritization,,3,,Chose the live map first with a reason
+case-07,seed-author,q3,recommendation,,2,,Plan was short and had no dates
+case-07,seed-author,overall,,,,Lean No Hire,Below the new grad bar but showed some judgment on scope

@@ -5,6 +5,7 @@
     {"competency": "ownership", "score": 3, "justification": "Owned the migration plan and rollout.", "quotes": ["I wrote the plan and ran the cutover myself."]},
     {"competency": "collaboration", "score": 2, "justification": "Examples stayed inside one team.", "quotes": ["My team handled all of it."]}
   ],
+  "value_scores": [],
   "per_question": [
     {
       "question_ref": "q1",
@@ -12,6 +13,7 @@
       "scores": [
         {"competency": "ownership", "score": 3, "justification": "Clear personal role.", "quotes": ["I wrote the plan and ran the cutover myself."]}
       ],
+      "value_scores": [],
       "strengths": ["Measurable result: runtime down from 4 hours to 25 minutes"],
       "misses": ["Did not explain trade-offs considered"]
     }

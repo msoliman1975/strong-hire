@@ -43,6 +43,7 @@ from strong_evals.metrics import (
     score_agreement,
     signal_agreement,
     vague_answer_indexes,
+    value_pairs,
 )
 from strong_evals.session import run_text_session
 from strong_evals.stubs import GatewayScorer
@@ -60,6 +61,7 @@ class ScriptedResult:
     human: HireSignal | None
     scorer: HireSignal | None
     rubric: Agreement
+    values: Agreement
     follow_ups: FollowUpCount
     coverage: float
     cost_usd: Decimal
@@ -144,14 +146,16 @@ async def run_scripted(
         error = f"{type(e).__name__}: {e}"[:300]
     refs.update(gw.prompt_refs)
     found, labeled = set(vague_answer_indexes(t.turns)), set(t.vague_answers)
-    rubric = (
-        score_agreement(rubric_pairs(card, gold.scores)) if card and gold else Agreement(0, 0, 0)
-    )
+    rubric = values = Agreement(0, 0, 0)
+    if card and gold:
+        rubric = score_agreement(rubric_pairs(card, gold.scores))
+        values = score_agreement(value_pairs(card, gold.value_scores))
     return ScriptedResult(
         transcript=t,
         human=gold.hire_signal if gold else None,
         scorer=card.hire_signal if card else None,
         rubric=rubric,
+        values=values,
         follow_ups=follow,
         coverage=coverage,
         cost_usd=_cost(gw.events, sid),
@@ -261,6 +265,21 @@ def compute_metrics(report: RunReport, thresholds: dict[str, dict[str, Any]]) ->
             f"{rub.within_one_rate:.0%}",
             f"{rub.within_one} of {rub.n} question and competency scores; exact {rub.exact}",
         )
+        val = Agreement(
+            sum(r.values.n for r in labeled),
+            sum(r.values.exact for r in labeled),
+            sum(r.values.within_one for r in labeled),
+        )
+        labeled_values = sum(len(r.transcript.brief.target_values) > 0 for r in labeled)
+        if labeled_values:
+            add(
+                "value_within_one_point",
+                "Company value scores within one point",
+                val.within_one_rate if val.n else None,
+                f"{val.within_one_rate:.0%}",
+                f"{val.within_one} of {val.n} question and value scores; exact {val.exact}; "
+                f"{labeled_values} company-mode transcripts",
+            )
     else:
         add("scorer_within_one_band", "Scorer agreement, within one band", None, "")
 

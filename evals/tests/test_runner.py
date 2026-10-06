@@ -59,6 +59,14 @@ def test_gate_fails_when_a_metric_fails(tmp_path: Path) -> None:
     assert main(args) == 1
 
 
+async def test_goldset_report_lists_company_value_agreement() -> None:
+    """IV-5: company-mode transcripts add a value score agreement row to the report."""
+    report = await run_suite(load_suite("goldset"), "fake")
+    keys = {m.key: m for m in report.metrics}
+    assert "value_within_one_point" in keys
+    assert "2 company-mode transcripts" in keys["value_within_one_point"].detail
+
+
 def _model(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
     if info.output_tools:
         return ModelResponse(parts=[ToolCallPart(info.output_tools[0].name, SCORECARD)])

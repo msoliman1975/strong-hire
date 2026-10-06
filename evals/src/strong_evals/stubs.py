@@ -137,8 +137,11 @@ class GatewayScorer:
             interview_type=brief.session.interview_type.value,
             level=brief.session.level.value,
             competencies=", ".join(c.value for c in brief.target_competencies),
+            values=", ".join(brief.target_values) or "none (generic mode)",
             questions="\n".join(
-                f"{q.id}: {q.text} [{', '.join(c.value for c in q.competencies)}]" for q in asked
+                f"{q.id}: {q.text} [{', '.join(c.value for c in q.competencies)}] "
+                f"{{{', '.join(q.values)}}}"
+                for q in asked
             ),
             transcript=render_transcript(turns),
         )

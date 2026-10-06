@@ -1,60 +1,65 @@
-transcript_id,rater,question_ref,competency,score,hire_signal,note
-beh-01,seed-author,q1,ownership,4,,Wrote the design and owned launch
-beh-01,seed-author,q1,impact,4,,92 percent caught and 6 hours a week saved
-beh-01,seed-author,q2,collaboration,4,,Found a shared approach and shipped on time
-beh-01,seed-author,q2,communication,3,,Clear but short on how the talk went
-beh-01,seed-author,q3,learning_from_failure,4,,Owned the mistake and changed practice
-beh-01,seed-author,q3,ownership,4,,Fixed it the same night
-beh-01,seed-author,overall,,,Strong Hire,Above the new grad bar on every competency
-beh-02,seed-author,q1,ownership,2,,Said I made screens but little on decisions
-beh-02,seed-author,q1,impact,2,,Four of five testers finished only after probing
-beh-02,seed-author,q3,learning_from_failure,2,,Generic first then one small fix
-beh-02,seed-author,q3,communication,2,,Short and plain but few details
-beh-02,seed-author,q4,communication,1,,No evidence of adapting to the listener
-beh-02,seed-author,overall,,,Lean No Hire,Answers stay generic and need probing; one competency has no evidence
-beh-03,seed-author,q1,ownership,4,,Clear own role and a defended decision
-beh-03,seed-author,q1,impact,3,,Gate wait 22 to 9 minutes
-beh-03,seed-author,q2,conflict_handling,3,,Used data and offered a trade
-beh-03,seed-author,q2,collaboration,4,,Engineer agreed and both goals met
-beh-03,seed-author,q3,learning_from_failure,4,,Owned the miss and set a team rule
-beh-03,seed-author,q3,impact,3,,Second version cut misses 17 percent
-beh-03,seed-author,q4,communication,3,,One page view and pre-brief
-beh-03,seed-author,q4,ownership,3,,Made the call and told the cost
-beh-03,seed-author,overall,,,Hire,Meets the mid bar on all eight scores and beats it on three
-beh-04,seed-author,q1,ownership,3,,Did the work end to end
-beh-04,seed-author,q1,impact,3,,AUC 0.81 and churn down 5 percent
-beh-04,seed-author,q3,learning_from_failure,3,,Added nightly monitoring after the miss
-beh-04,seed-author,q3,ownership,2,,Started with we and needed a probe
-beh-04,seed-author,q4,collaboration,2,,Generic until probed
-beh-04,seed-author,q4,impact,3,,Latency 800 to 150 milliseconds
-beh-04,seed-author,overall,,,Lean Hire,Solid first story; two answers needed probing to show own role
-beh-05,seed-author,q1,ownership,2,,Unclear own role until pushed
-beh-05,seed-author,q1,impact,2,,Page time 4 to 2 seconds only after pushback
-beh-05,seed-author,q2,conflict_handling,2,,Trivial example
-beh-05,seed-author,q2,collaboration,2,,Resolved but low stakes
-beh-05,seed-author,q3,learning_from_failure,1,,No lesson or change given
-beh-05,seed-author,q3,ownership,1,,Defers all decisions and no accountability
-beh-05,seed-author,overall,,,No Hire,Generic answers and no evidence of learning from failure
-beh-06,seed-author,q1,ownership,4,,Accountable for schedule and risk and handed off cleanly
-beh-06,seed-author,q1,impact,4,,Zero outages and two weeks early
-beh-06,seed-author,q2,conflict_handling,4,,Used both teams numbers and defended it against escalation
-beh-06,seed-author,q2,collaboration,4,,Leads later settled a split on their own
-beh-06,seed-author,q3,learning_from_failure,4,,Named own error and two process changes
-beh-06,seed-author,q3,ownership,3,,Told sponsor early and cut scope
-beh-06,seed-author,q6,impact,4,,45 percent fewer rollbacks across 11 teams
-beh-06,seed-author,q6,ownership,3,,Tested and shortened the checklist
-beh-06,seed-author,overall,,,Strong Hire,Average 3.75 with no score below 3; strong senior scope and trade-offs
-beh-07,seed-author,q1,ownership,3,,Led and built the library
-beh-07,seed-author,q1,impact,2,,Small scope for senior and numbers only after a probe
-beh-07,seed-author,q2,collaboration,3,,Weekly mentoring and a promotion
-beh-07,seed-author,q2,communication,3,,Taught specific review habits
-beh-07,seed-author,q4,learning_from_failure,2,,Lesson came only after a probe
-beh-07,seed-author,q4,ownership,2,,Started with we and impersonal causes
-beh-07,seed-author,overall,,,Lean No Hire,Average 2.5; scope and results are below the senior bar
-beh-08,seed-author,q1,ownership,2,,Role unclear until probed
-beh-08,seed-author,q1,impact,2,,Tickets down a third but no scale
-beh-08,seed-author,q3,learning_from_failure,2,,Named a change but thin for senior
-beh-08,seed-author,q3,impact,2,,Target hit on next launch
-beh-08,seed-author,q5,communication,2,,Generic with no content
-beh-08,seed-author,q5,ownership,1,,No evidence of owning the trade-off
-beh-08,seed-author,overall,,,No Hire,Below the senior bar on every competency; one answer has no evidence
+transcript_id,rater,question_ref,competency,value,score,hire_signal,note
+beh-01,seed-author,q1,ownership,,4,,Wrote the design and owned launch
+beh-01,seed-author,q1,impact,,4,,92 percent caught and 6 hours a week saved
+beh-01,seed-author,q2,collaboration,,4,,Found a shared approach and shipped on time
+beh-01,seed-author,q2,communication,,3,,Clear but short on how the talk went
+beh-01,seed-author,q3,learning_from_failure,,4,,Owned the mistake and changed practice
+beh-01,seed-author,q3,ownership,,4,,Fixed it the same night
+beh-01,seed-author,overall,,,,Strong Hire,Above the new grad bar on every competency
+beh-02,seed-author,q1,ownership,,2,,Said I made screens but little on decisions
+beh-02,seed-author,q1,impact,,2,,Four of five testers finished only after probing
+beh-02,seed-author,q3,learning_from_failure,,2,,Generic first then one small fix
+beh-02,seed-author,q3,communication,,2,,Short and plain but few details
+beh-02,seed-author,q4,communication,,1,,No evidence of adapting to the listener
+beh-02,seed-author,overall,,,,Lean No Hire,Answers stay generic and need probing; one competency has no evidence
+beh-03,seed-author,q1,ownership,,4,,Clear own role and a defended decision
+beh-03,seed-author,q1,impact,,3,,Gate wait 22 to 9 minutes
+beh-03,seed-author,q2,conflict_handling,,3,,Used data and offered a trade
+beh-03,seed-author,q2,collaboration,,4,,Engineer agreed and both goals met
+beh-03,seed-author,q3,learning_from_failure,,4,,Owned the miss and set a team rule
+beh-03,seed-author,q3,impact,,3,,Second version cut misses 17 percent
+beh-03,seed-author,q4,communication,,3,,One page view and pre-brief
+beh-03,seed-author,q4,ownership,,3,,Made the call and told the cost
+beh-03,seed-author,q1,,Customer first,4,,Ran twelve driver interviews before the spec
+beh-03,seed-author,q1,,Own the outcome,4,,Owned the pilot call and its cost
+beh-03,seed-author,q2,,Customer first,3,,Used gate logs to protect the driver need
+beh-03,seed-author,q3,,Own the outcome,4,,Owned the missed goal in review
+beh-03,seed-author,q4,,Own the outcome,3,,Told executives the cost plainly
+beh-03,seed-author,overall,,,,Hire,Meets the mid bar on all eight scores and beats it on three
+beh-04,seed-author,q1,ownership,,3,,Did the work end to end
+beh-04,seed-author,q1,impact,,3,,AUC 0.81 and churn down 5 percent
+beh-04,seed-author,q3,learning_from_failure,,3,,Added nightly monitoring after the miss
+beh-04,seed-author,q3,ownership,,2,,Started with we and needed a probe
+beh-04,seed-author,q4,collaboration,,2,,Generic until probed
+beh-04,seed-author,q4,impact,,3,,Latency 800 to 150 milliseconds
+beh-04,seed-author,overall,,,,Lean Hire,Solid first story; two answers needed probing to show own role
+beh-05,seed-author,q1,ownership,,2,,Unclear own role until pushed
+beh-05,seed-author,q1,impact,,2,,Page time 4 to 2 seconds only after pushback
+beh-05,seed-author,q2,conflict_handling,,2,,Trivial example
+beh-05,seed-author,q2,collaboration,,2,,Resolved but low stakes
+beh-05,seed-author,q3,learning_from_failure,,1,,No lesson or change given
+beh-05,seed-author,q3,ownership,,1,,Defers all decisions and no accountability
+beh-05,seed-author,overall,,,,No Hire,Generic answers and no evidence of learning from failure
+beh-06,seed-author,q1,ownership,,4,,Accountable for schedule and risk and handed off cleanly
+beh-06,seed-author,q1,impact,,4,,Zero outages and two weeks early
+beh-06,seed-author,q2,conflict_handling,,4,,Used both teams numbers and defended it against escalation
+beh-06,seed-author,q2,collaboration,,4,,Leads later settled a split on their own
+beh-06,seed-author,q3,learning_from_failure,,4,,Named own error and two process changes
+beh-06,seed-author,q3,ownership,,3,,Told sponsor early and cut scope
+beh-06,seed-author,q6,impact,,4,,45 percent fewer rollbacks across 11 teams
+beh-06,seed-author,q6,ownership,,3,,Tested and shortened the checklist
+beh-06,seed-author,overall,,,,Strong Hire,Average 3.75 with no score below 3; strong senior scope and trade-offs
+beh-07,seed-author,q1,ownership,,3,,Led and built the library
+beh-07,seed-author,q1,impact,,2,,Small scope for senior and numbers only after a probe
+beh-07,seed-author,q2,collaboration,,3,,Weekly mentoring and a promotion
+beh-07,seed-author,q2,communication,,3,,Taught specific review habits
+beh-07,seed-author,q4,learning_from_failure,,2,,Lesson came only after a probe
+beh-07,seed-author,q4,ownership,,2,,Started with we and impersonal causes
+beh-07,seed-author,overall,,,,Lean No Hire,Average 2.5; scope and results are below the senior bar
+beh-08,seed-author,q1,ownership,,2,,Role unclear until probed
+beh-08,seed-author,q1,impact,,2,,Tickets down a third but no scale
+beh-08,seed-author,q3,learning_from_failure,,2,,Named a change but thin for senior
+beh-08,seed-author,q3,impact,,2,,Target hit on next launch
+beh-08,seed-author,q5,communication,,2,,Generic with no content
+beh-08,seed-author,q5,ownership,,1,,No evidence of owning the trade-off
+beh-08,seed-author,overall,,,,No Hire,Below the senior bar on every competency; one answer has no evidence

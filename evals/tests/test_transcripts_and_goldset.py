@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+import csv
 import re
 from collections import Counter
 from pathlib import Path
 
 import pytest
 
-from strong_core.schemas import HireSignal, InterviewType, Level
+from strong_core.schemas import Competency, HireSignal, InterviewType, Level
 from strong_evals.goldset import (
     COLUMNS,
     GoldSetError,
@@ -83,40 +84,71 @@ def _csv(tmp_path: Path, rows: list[str]) -> Path:
 
 def test_label_file_errors_are_clear(tmp_path: Path) -> None:
     with pytest.raises(GoldSetError, match="no overall row"):
-        read_label_file(_csv(tmp_path, ["beh-01,ana,q1,ownership,3,,"]))
+        read_label_file(_csv(tmp_path, ["beh-01,ana,q1,ownership,,3,,"]))
     with pytest.raises(GoldSetError, match="score must be 1 to 4"):
         read_label_file(
-            _csv(tmp_path, ["beh-01,ana,q1,ownership,5,,", "beh-01,ana,overall,,,Hire,"])
+            _csv(tmp_path, ["beh-01,ana,q1,ownership,,5,,", "beh-01,ana,overall,,,,Hire,"])
         )
     with pytest.raises(GoldSetError, match="bad hire_signal"):
-        read_label_file(_csv(tmp_path, ["beh-01,ana,overall,,,Maybe,"]))
+        read_label_file(_csv(tmp_path, ["beh-01,ana,overall,,,,Maybe,"]))
+    with pytest.raises(GoldSetError, match="not both"):
+        read_label_file(_csv(tmp_path, ["beh-03,ana,q1,ownership,Customer first,3,,"]))
 
 
 def test_consensus_takes_the_cautious_median(tmp_path: Path) -> None:
     rows = [
-        "beh-01,ana,q1,ownership,4,,",
-        "beh-01,ana,overall,,,Strong Hire,",
-        "beh-01,ben,q1,ownership,3,,",
-        "beh-01,ben,overall,,,Hire,",
+        "beh-01,ana,q1,ownership,,4,,",
+        "beh-01,ana,overall,,,,Strong Hire,",
+        "beh-01,ben,q1,ownership,,3,,",
+        "beh-01,ben,overall,,,,Hire,",
     ]
     gold = consensus(read_label_file(_csv(tmp_path, rows)))["beh-01"]
     assert gold.raters == ["ana", "ben"]
     assert gold.hire_signal == HireSignal.HIRE
-    assert gold.scores[("q1", "ownership")] == 3  # type: ignore[index]
+    assert gold.scores[("q1", Competency.OWNERSHIP)] == 3
+
+
+def test_iv5_company_mode_transcripts_have_value_labels() -> None:
+    """IV-5: company-mode transcripts carry target values, and the gold set scores them."""
+    transcripts = {t.id: t for t in load_transcripts()}
+    company = sorted(tid for tid, t in transcripts.items() if not t.brief.generic_mode)
+    assert company == ["beh-03", "hm-05"]
+    gold = consensus(read_labels())
+    for tid in company:
+        assert transcripts[tid].brief.company_name == "Example Corp"
+        assert gold[tid].value_scores, tid
+        assert {v for _, v in gold[tid].value_scores} <= set(transcripts[tid].brief.target_values)
+    assert all(not gold[tid].value_scores for tid in set(transcripts) - set(company))
+
+
+def test_value_label_must_be_probed_by_the_question(tmp_path: Path) -> None:
+    transcripts = {t.id: t for t in load_transcripts(["beh-03"])}
+    rows = ["beh-03,ana,q2,,Own the outcome,3,,", "beh-03,ana,overall,,,,Hire,"]
+    with pytest.raises(GoldSetError, match="not probed on q2"):
+        check_against(read_label_file(_csv(tmp_path, rows)), transcripts)
 
 
 def test_rater_sheet_round_trips(tmp_path: Path) -> None:
     """A human rater gets the transcript as text and a CSV with the rows to fill."""
-    [t] = load_transcripts(["beh-01"])
+    [t] = load_transcripts(["beh-03"])
     written = write_sheet([t], "ana", tmp_path)
-    assert (tmp_path / "beh-01.txt").read_text(encoding="utf-8").startswith("Transcript beh-01")
+    text = (tmp_path / "beh-03.txt").read_text(encoding="utf-8")
+    assert text.startswith("Transcript beh-03")
+    assert "Company values: Customer first, Own the outcome" in text
     csv_path = written[-1]
-    filled = csv_path.read_text(encoding="utf-8").splitlines()
-    filled = [filled[0]] + [
-        line.replace(",,,", ",,,Hire,") if ",overall," in line else line.replace(",,", ",3,", 1)
-        for line in filled[1:]
-    ]
-    csv_path.write_text("\n".join(filled) + "\n", encoding="utf-8")
+    with csv_path.open(encoding="utf-8", newline="") as f:
+        rows = list(csv.DictReader(f))
+    assert any(r["value"] == "Customer first" for r in rows)
+    for r in rows:
+        if r["question_ref"] == "overall":
+            r["hire_signal"] = "Hire"
+        else:
+            r["score"] = "3"
+    with csv_path.open("w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=COLUMNS)
+        writer.writeheader()
+        writer.writerows(rows)
     [labels] = read_label_file(csv_path)
     check_against([labels], {t.id: t})
     assert labels.hire_signal == HireSignal.HIRE
+    assert labels.value_scores[("q1", "Own the outcome")] == 3

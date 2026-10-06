@@ -2,11 +2,13 @@
 
 Raters fill CSV files in evals/goldset/labels/. Each rater can use their own file. Columns:
 
-    transcript_id, rater, question_ref, competency, score, hire_signal, note
+    transcript_id, rater, question_ref, competency, value, score, hire_signal, note
 
 - One row per asked question and competency: question_ref, competency and score (1 to 4).
+- In company mode, one row per asked question and company value it probes: question_ref, value
+  (a Principle.name from the profile) and score. competency stays empty.
 - One row per transcript with question_ref = "overall" and the hire_signal
-  (Strong Hire, Hire, Lean Hire, Lean No Hire, No Hire). competency and score stay empty.
+  (Strong Hire, Hire, Lean Hire, Lean No Hire, No Hire). competency, value and score stay empty.
 
 `python -m strong_evals goldset sheet <transcript_id> --rater <name>` writes a readable transcript
 and a CSV with the rows to fill. `python -m strong_evals validate` checks every label file.
@@ -28,7 +30,16 @@ from strong_evals.transcripts import ScriptedTranscript
 GOLDSET_DIR = EVALS_DIR / "goldset"
 LABELS_DIR = GOLDSET_DIR / "labels"
 OVERALL = "overall"
-COLUMNS = ["transcript_id", "rater", "question_ref", "competency", "score", "hire_signal", "note"]
+COLUMNS = [
+    "transcript_id",
+    "rater",
+    "question_ref",
+    "competency",
+    "value",
+    "score",
+    "hire_signal",
+    "note",
+]
 
 
 class GoldSetError(ValueError):
@@ -43,6 +54,7 @@ class RaterLabels:
     rater: str
     hire_signal: HireSignal | None = None
     scores: dict[tuple[str, Competency], int] = field(default_factory=dict)
+    value_scores: dict[tuple[str, str], int] = field(default_factory=dict)
 
 
 @dataclass
@@ -53,6 +65,7 @@ class GoldLabel:
     raters: list[str]
     hire_signal: HireSignal
     scores: dict[tuple[str, Competency], int]
+    value_scores: dict[tuple[str, str], int] = field(default_factory=dict)
 
 
 def read_label_file(path: Path) -> list[RaterLabels]:
@@ -76,13 +89,24 @@ def read_label_file(path: Path) -> list[RaterLabels]:
                 except ValueError as e:
                     raise GoldSetError(f"{where}: bad hire_signal {row['hire_signal']!r}") from e
                 continue
+            value = row["value"].strip()
             try:
-                competency = Competency(row["competency"].strip())
                 score = int(row["score"])
             except ValueError as e:
-                raise GoldSetError(f"{where}: bad competency or score") from e
+                raise GoldSetError(f"{where}: bad score {row['score']!r}") from e
             if not 1 <= score <= 4:
                 raise GoldSetError(f"{where}: score must be 1 to 4")
+            if value:
+                if row["competency"].strip():
+                    raise GoldSetError(f"{where}: set competency or value, not both")
+                if (ref, value) in labels.value_scores:
+                    raise GoldSetError(f"{where}: duplicate row for {ref}/{value}")
+                labels.value_scores[(ref, value)] = score
+                continue
+            try:
+                competency = Competency(row["competency"].strip())
+            except ValueError as e:
+                raise GoldSetError(f"{where}: bad competency {row['competency']!r}") from e
             if (ref, competency) in labels.scores:
                 raise GoldSetError(f"{where}: duplicate row for {ref}/{competency.value}")
             labels.scores[(ref, competency)] = score
@@ -110,7 +134,7 @@ def read_labels(folder: Path = LABELS_DIR) -> list[RaterLabels]:
 def check_against(
     labels: Iterable[RaterLabels], transcripts: dict[str, ScriptedTranscript]
 ) -> None:
-    """Every label must point at an asked question and one of that question's competencies."""
+    """Every label must point at an asked question and a competency or value it targets."""
     for lab in labels:
         t = transcripts.get(lab.transcript_id)
         if t is None:
@@ -122,6 +146,13 @@ def check_against(
             if competency not in t.question(ref).competencies:
                 raise GoldSetError(
                     f"{lab.transcript_id}/{lab.rater}: {competency.value} is not scored on {ref}"
+                )
+        for ref, value in lab.value_scores:
+            if ref not in asked:
+                raise GoldSetError(f"{lab.transcript_id}/{lab.rater}: {ref} was not asked")
+            if value not in t.question(ref).values:
+                raise GoldSetError(
+                    f"{lab.transcript_id}/{lab.rater}: {value} is not probed on {ref}"
                 )
 
 
@@ -139,7 +170,14 @@ def consensus(labels: Iterable[RaterLabels]) -> dict[str, GoldLabel]:
             k: statistics.median_low([lab.scores[k] for lab in group if k in lab.scores])
             for k in keys
         }
-        out[tid] = GoldLabel(tid, sorted(lab.rater for lab in group), signal, scores)
+        value_keys = {k for lab in group for k in lab.value_scores}
+        values = {
+            k: statistics.median_low(
+                [lab.value_scores[k] for lab in group if k in lab.value_scores]
+            )
+            for k in value_keys
+        }
+        out[tid] = GoldLabel(tid, sorted(lab.rater for lab in group), signal, scores, values)
     return out
 
 
@@ -158,6 +196,7 @@ def render_transcript_text(t: ScriptedTranscript) -> str:
         f"Interview type: {s.interview_type.value}. Level: {s.level.value}. "
         f"Difficulty: {s.difficulty.value}. Mode: {s.mode.value}.",
         "Target competencies: " + ", ".join(c.value for c in t.brief.target_competencies),
+        "Company values: " + (", ".join(t.brief.target_values) or "none (generic mode)"),
         "",
     ]
     phase: Phase | None = None
@@ -171,7 +210,8 @@ def render_transcript_text(t: ScriptedTranscript) -> str:
     lines += ["", "Questions to score:"]
     for ref in t.asked_question_refs():
         q = t.question(ref)
-        lines.append(f"  {ref}: {q.text} ({', '.join(c.value for c in q.competencies)})")
+        targets = [c.value for c in q.competencies] + [f"value: {v}" for v in q.values]
+        lines.append(f"  {ref}: {q.text} ({', '.join(targets)})")
     lines += [
         "",
         "Rubric: 1 = no evidence, 2 = weak, 3 = meets the bar for this level, 4 = above the bar.",
@@ -192,6 +232,11 @@ def blank_rows(t: ScriptedTranscript, rater: str) -> list[dict[str, str]]:
                     "question_ref": ref,
                     "competency": c.value,
                 }
+            )
+        for v in t.question(ref).values:
+            rows.append(
+                dict.fromkeys(COLUMNS, "")
+                | {"transcript_id": t.id, "rater": rater, "question_ref": ref, "value": v}
             )
     rows.append(
         dict.fromkeys(COLUMNS, "")

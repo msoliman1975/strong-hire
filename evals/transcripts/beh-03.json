@@ -1,6 +1,6 @@
 {
   "id": "beh-03",
-  "title": "Behavioral, mid product manager, strong answers",
+  "title": "Behavioral, mid product manager, strong answers, Example Corp values",
   "role_family": "pm",
   "candidate_name": "Tomas Ibarra-Quill",
   "quality": "strong",
@@ -12,9 +12,9 @@
       "duration_min": 45,
       "level": "mid"
     },
-    "company_name": null,
-    "generic_mode": true,
-    "profile_version": null,
+    "company_name": "Example Corp",
+    "generic_mode": false,
+    "profile_version": 1,
     "target_competencies": [
       "ownership",
       "impact",
@@ -23,6 +23,10 @@
       "learning_from_failure",
       "communication"
     ],
+    "target_values": [
+      "Customer first",
+      "Own the outcome"
+    ],
     "questions": [
       {
         "id": "q1",
@@ -30,6 +34,10 @@
         "competencies": [
           "ownership",
           "impact"
+        ],
+        "values": [
+          "Customer first",
+          "Own the outcome"
         ],
         "priority": 1,
         "probe_hints": [
@@ -44,6 +52,9 @@
           "conflict_handling",
           "collaboration"
         ],
+        "values": [
+          "Customer first"
+        ],
         "priority": 2,
         "probe_hints": [
           "how it ended"
@@ -56,6 +67,9 @@
           "learning_from_failure",
           "impact"
         ],
+        "values": [
+          "Own the outcome"
+        ],
         "priority": 3,
         "probe_hints": [
           "what changed after"
@@ -67,6 +81,9 @@
         "competencies": [
           "communication",
           "ownership"
+        ],
+        "values": [
+          "Own the outcome"
         ],
         "priority": 4,
         "probe_hints": []
