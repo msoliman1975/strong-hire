@@ -23,9 +23,8 @@ from array import array
 from livekit import rtc
 
 from strong_core.gateway import ModelGateway, Role, get_gateway
-from strong_voice.agent import WARMUP_ROOM_PREFIX
 from strong_voice.devserver import make_token
-from strong_voice.latency import percentile
+from strong_voice.latency import WARMUP_ROOM_PREFIX, percentile
 from strong_voice.settings import get_voice_settings
 
 ANSWERS = (
@@ -55,16 +54,29 @@ class AgentEar:
         self.last_loud = 0.0
         self.loud_times: list[float] = []
         self.tasks: list[asyncio.Task[None]] = []
+        self.streams: list[rtc.AudioStream] = []
 
     def listen(self, track: rtc.Track) -> None:
-        self.tasks.append(asyncio.create_task(self._read(track)))
+        stream = rtc.AudioStream(track)
+        self.streams.append(stream)
+        self.tasks.append(asyncio.create_task(self._read(stream)))
 
-    async def _read(self, track: rtc.Track) -> None:
-        async for ev in rtc.AudioStream(track):
+    async def _read(self, stream: rtc.AudioStream) -> None:
+        async for ev in stream:
             if _rms(ev.frame) > LOUD_RMS:
                 now = time.perf_counter()
                 self.last_loud = now
                 self.loud_times.append(now)
+
+    async def aclose(self) -> None:
+        """Stop the readers and close each native audio stream before the room disconnects."""
+        for task in self.tasks:
+            task.cancel()
+        await asyncio.gather(*self.tasks, return_exceptions=True)
+        for stream in self.streams:
+            await stream.aclose()
+        self.tasks.clear()
+        self.streams.clear()
 
     def first_loud_after(self, t: float) -> float | None:
         return next((x for x in self.loud_times if x > t), None)
@@ -122,10 +134,13 @@ class Mouth:
         return self.spoke_until
 
     async def stop(self) -> None:
+        """Stop sending frames, then close the native audio source."""
         if self._task:
             self._task.cancel()
             with contextlib.suppress(asyncio.CancelledError):
                 await self._task
+            self._task = None
+        await self.source.aclose()
 
 
 async def _render(gw: ModelGateway, text: str) -> bytes:
@@ -155,7 +170,7 @@ async def run_session(
     mouth = Mouth(rate)
     track = rtc.LocalAudioTrack.create_audio_track("mic", mouth.source)
     opts = rtc.TrackPublishOptions(source=rtc.TrackSource.SOURCE_MICROPHONE)
-    await room.local_participant.publish_track(track, opts)
+    publication = await room.local_participant.publish_track(track, opts)
     mouth.start()
 
     results: list[float] = []
@@ -173,9 +188,13 @@ async def run_session(
             results.append(took * 1000)
             print(f"  session {index} turn {n}: first reply audio after {took * 1000:.0f} ms")
     finally:
+        # Close every native object (track, source, streams) before the room disconnects. Objects
+        # left open stay alive in the livekit FFI runtime until the process exits, and the runtime
+        # can then abort with "panic in a function that cannot unwind" (exit code 134).
+        if room.isconnected():
+            await room.local_participant.unpublish_track(publication.sid)
         await mouth.stop()
-        for t in ear.tasks:
-            t.cancel()
+        await ear.aclose()
         await room.disconnect()
     return results
 
