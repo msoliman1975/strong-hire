@@ -512,3 +512,19 @@ async def test_exit_survey_stores_both_answers(
     assert bad.status_code == 422
     missing = await client.post("/billing/exit-survey", json={"reason": "other"})
     assert missing.status_code == 422
+
+
+async def test_webhook_answers_503_without_a_secret(
+    billing_app: FastAPI, client: httpx.AsyncClient
+) -> None:
+    billing_app.state.billing_settings = billing_settings(stripe_webhook_secret=None)
+    resp = await post_event(client, load_event("customer_subscription_created"))
+    assert resp.status_code == 503
+
+
+def test_stripe_gateway_is_built_only_with_keys() -> None:
+    from strong_api.billing.stripe_gateway import StripeSdkGateway, build_stripe_gateway
+
+    assert build_stripe_gateway(BillingSettings(stripe_secret_key=None)) is None
+    gateway = build_stripe_gateway(billing_settings())
+    assert isinstance(gateway, StripeSdkGateway)  # no network call at build time
