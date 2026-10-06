@@ -18,6 +18,8 @@ SPEC_TABLES = {
     "usage_events",
     "audit_logs",
     "company_requests",  # spec: Companies outside the 20, request this company
+    "stripe_events",  # BL-1: webhook events already handled (idempotency)
+    "exit_surveys",  # P9: cancellation exit survey
 }
 
 
