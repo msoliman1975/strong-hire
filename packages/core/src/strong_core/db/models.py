@@ -45,6 +45,7 @@ from strong_core.schemas.enums import (
     OrgType,
     Phase,
     ProfileStatus,
+    SessionChannel,
     SessionStatus,
     Speaker,
     SubscriptionStatus,
@@ -297,8 +298,23 @@ class InterviewSession(Base):
     difficulty: Mapped[Difficulty] = mapped_column(str_enum(Difficulty, "difficulty"))
     mode: Mapped[Mode] = mapped_column(str_enum(Mode, "mode"))
     duration_min: Mapped[int] = mapped_column(Integer)
+    channel: Mapped[SessionChannel] = mapped_column(
+        str_enum(SessionChannel, "session_channel"),
+        default=SessionChannel.VOICE,
+        server_default="voice",
+        comment="PL-7: voice, or text behind a dev flag",
+    )
     profile_version: Mapped[int | None] = mapped_column(Integer, comment="NULL in generic mode")
     brief_json: Mapped[dict[str, Any] | None] = mapped_column(comment="schemas.InterviewerBrief")
+    model_profile: Mapped[str | None] = mapped_column(
+        String(20), comment="PL-6: MODEL_PROFILE the session ran on"
+    )
+    interviewer_model_id: Mapped[str | None] = mapped_column(
+        String(200), comment="PL-6: gateway alias that served the interviewer role"
+    )
+    prompt_version: Mapped[str | None] = mapped_column(
+        String(200), comment="PL-6: interviewer prompt refs, comma separated"
+    )
     status: Mapped[SessionStatus] = mapped_column(
         str_enum(SessionStatus, "session_status"), default=SessionStatus.CREATED
     )
