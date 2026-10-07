@@ -225,16 +225,22 @@ jobs:
       - name: Pull the local models named in config/
         shell: pwsh
         run: ./scripts/models.ps1 pull
-      - name: Latency spike, with memory use printed every 15 s
-        env:
-          HOSTED_API_KEY: ${{ secrets.HOSTED_API_KEY }}
+      - name: Latency spike (local), with memory use printed every 15 s
         run: |
           ( while true; do
               echo "mem: $(free -m | awk 'NR==2 {print $3 " MB used of " $2}')"
               docker stats --no-stream --format 'mem: {{.Name}} {{.MemUsage}}' 2>/dev/null
               sleep 15
             done ) &
-          pwsh ./scripts/latency.ps1 -Sessions 3 -ReplyTimeout 120
+          pwsh ./scripts/latency.ps1 -Sessions 3 -ReplyTimeout 120 -Profiles local
+      # Hosted runs only on push to main, and never fails the job: the hosted provider's free-plan
+      # quota (200k tokens per day, #36) runs out, and PRs should not fail because of it.
+      - name: Latency spike (hosted, push to main only, does not fail the job)
+        if: github.event_name == 'push'
+        continue-on-error: true
+        env:
+          HOSTED_API_KEY: ${{ secrets.HOSTED_API_KEY }}
+        run: pwsh ./scripts/latency.ps1 -Sessions 3 -ReplyTimeout 120 -Profiles hosted
       - uses: actions/upload-artifact@v4
         if: always()
         with:
