@@ -28,7 +28,9 @@ models:
     tier: large
   hosted-planner:
     kind: chat
-    supports_tools: true
+    # false: the gateway asks for JSON that matches the schema (NativeOutput), not a tool call.
+    # With tool calls, Groq rejected the gap analysis (HTTP 400, tool_use_failed).
+    supports_tools: false
     json_mode: true
     context_window: 131072
     tier: large
@@ -40,7 +42,9 @@ models:
     tier: large
   hosted-scorer:
     kind: chat
-    supports_tools: true
+    # false: the gateway asks for JSON that matches the schema (NativeOutput), not a tool call.
+    # With tool calls, Groq rejected the gap analysis (HTTP 400, tool_use_failed).
+    supports_tools: false
     json_mode: true
     context_window: 131072
     tier: large
