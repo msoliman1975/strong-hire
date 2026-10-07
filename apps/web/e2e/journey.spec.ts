@@ -67,6 +67,10 @@ async function runSession(page: Page) {
   await page.getByRole("button", { name: "Start interview" }).click();
 
   await expect(page.getByRole("heading", { name: "Interview in progress" })).toBeVisible();
+  await page.getByRole("button", { name: "Check my microphone" }).click();
+  await page.getByRole("button", { name: "Join the interview" }).click();
+  // The browser mocks use a scripted interviewer (src/session/mockVoice.ts).
+  await expect(page.getByTestId("captions")).toContainText("led a project without formal authority");
   await shot(page, "09-live");
   await page.getByRole("button", { name: "End interview" }).click();
   await page.getByRole("dialog").getByRole("button", { name: "End interview" }).click();

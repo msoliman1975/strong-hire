@@ -4,7 +4,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router";
 
 import { ApiError } from "../api/client";
 import { keys, useJob } from "../api/hooks";
-import { sessionsApi } from "../api/planned";
+import { sessionsApi } from "../api/sessions";
 import type { Difficulty, InterviewType, Level, Mode, SessionConfig } from "../api/types";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
 import {
@@ -73,7 +73,7 @@ export function SessionSetupPage() {
   const [level, setLevel] = useState<Level | "">("");
 
   const start = useMutation({
-    mutationFn: (config: SessionConfig) => sessionsApi.create({ job_target_id: jobId, config }),
+    mutationFn: (config: SessionConfig) => sessionsApi.create({ job_target_id: jobId, config, channel: "voice" }),
     onSuccess: (session) => {
       void queryClient.invalidateQueries({ queryKey: keys.usage });
       navigate(`/sessions/${session.id}/live`);

@@ -3,46 +3,39 @@
  * import.meta.env.DEV is true, so production builds contain no mocks.
  *
  * VITE_API_MOCKS:
- *   planned (default)  mock only endpoints the API does not have yet; sign-in, job targets,
- *                      resumes, billing and account use the real API
- *   all                mock everything, including sign-in (no API needed; used by Playwright)
- *   off                no mocks
+ *   off (default)  no mocks: the web app uses the real API (the Docker stack)
+ *   all            mock everything, including sign-in and the voice room (no API needed; used by
+ *                  Playwright)
+ * The old value "planned" now means off: every endpoint the web app uses exists in the API.
  */
 import { setupWorker } from "msw/browser";
 
 import { createStore } from "./db";
-import {
-  accountHandlers,
-  authHandlers,
-  inputHandlers,
-  inputMirrorHandlers,
-  plannedHandlers,
-  scoringHandlers,
-} from "./handlers";
+import { accountHandlers, authHandlers, inputHandlers, scoringHandlers, sessionHandlers } from "./handlers";
 
-export type MockMode = "planned" | "all" | "off";
+export type MockMode = "all" | "off";
 
 export function mockMode(): MockMode {
-  const value = import.meta.env.VITE_API_MOCKS;
-  return value === "all" || value === "off" ? value : "planned";
+  return import.meta.env.VITE_API_MOCKS === "all" ? "all" : "off";
 }
 
 export async function startMocks(mode: MockMode): Promise<void> {
   if (mode === "off") return;
   const store = createStore({ persist: true, delayMs: 800 });
-  const handlers =
-    mode === "all"
-      ? [
-          ...inputHandlers(store),
-          ...plannedHandlers(store),
-          ...scoringHandlers(store),
-          ...authHandlers(store),
-          ...accountHandlers(store),
-        ]
-      : // The debrief and progress endpoints are real (P8), but sessions are still mocked (P7).
-        // A mocked session is unknown to the API, so the scoring mocks stay on until P7 lands.
-        [...inputMirrorHandlers(store), ...plannedHandlers(store), ...scoringHandlers(store)];
-  await setupWorker(...handlers).start({ onUnhandledFrame: "bypass", quiet: true });
+  const handlers = [
+    ...inputHandlers(store),
+    ...sessionHandlers(store),
+    ...scoringHandlers(store),
+    ...authHandlers(store),
+    ...accountHandlers(store),
+  ];
+  await setupWorker(...handlers).start({
+    onUnhandledFrame: "bypass",
+    quiet: true,
+  });
   // A way to start over during a click-through: run `strongHireMocks.reset()` in the console.
-  (globalThis as { strongHireMocks?: unknown }).strongHireMocks = { reset: () => store.reset(), mode };
+  (globalThis as { strongHireMocks?: unknown }).strongHireMocks = {
+    reset: () => store.reset(),
+    mode,
+  };
 }

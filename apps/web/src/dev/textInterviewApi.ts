@@ -1,9 +1,8 @@
 /**
  * Dev only: the real sessions API (P7) for the text-interview page.
  *
- * The browser mocks (MSW, "planned" mode) still answer POST /sessions and GET /sessions/{id} for
- * the mocked voice flow (#24). This client sends its requests past them with msw's `bypass`, so
- * they reach the API. In tests (Vitest), the test's own MSW handlers must answer instead.
+ * With VITE_API_MOCKS=all, the browser mocks answer POST /sessions and GET /sessions/{id}. This
+ * client sends its requests past them with msw's `bypass`, so they always reach the API. In tests (Vitest), the test's own MSW handlers must answer instead.
  * This module is imported only by the dev page, which production builds do not include.
  */
 import { bypass } from "msw";

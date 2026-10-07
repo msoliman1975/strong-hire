@@ -46,7 +46,7 @@ The `all-in-one` profile starts every service above, for the `tiny` model profil
 
 ## Text interview (dev only)
 
-Until the voice interview works (P7 part 3, P10), dev builds have a page at
+Dev builds also have a page that runs the interview as text, at
 <http://localhost:5180/dev/interview> ("Text interview (dev)" in the top bar). You pick a job and the
 interview settings, type your answers, and see the real debrief at the end. It uses the text channel of
 the sessions API with the active model profile, for example `claude`.
