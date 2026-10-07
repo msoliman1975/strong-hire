@@ -348,6 +348,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/sessions/{session_id}/voice/join": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Join Voice Session
+         * @description Start the voice session (first join) and return a LiveKit token for its room.
+         *
+         *     Call it again after a dropped connection: the room stays the same, so the voice agent goes
+         *     on at the same phase and question when the candidate is back within 2 minutes (IV-9).
+         */
+        post: operations["join_voice_session_sessions__session_id__voice_join_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/dev/model-usage": {
         parameters: {
             query?: never;
@@ -2259,6 +2282,20 @@ export interface components {
             /** Principles */
             principles: components["schemas"]["Principle"][];
         };
+        /**
+         * VoiceJoin
+         * @description What the browser needs to join the interview room (P7, P10).
+         */
+        VoiceJoin: {
+            /** Livekit Url */
+            livekit_url: string;
+            /** Room */
+            room: string;
+            /** Token */
+            token: string;
+            /** Identity */
+            identity: string;
+        };
         /** WebhookOut */
         WebhookOut: {
             /** Received */
@@ -2992,6 +3029,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TextTurns"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    join_voice_session_sessions__session_id__voice_join_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VoiceJoin"];
                 };
             };
             /** @description Validation Error */

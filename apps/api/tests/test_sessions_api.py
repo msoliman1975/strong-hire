@@ -215,3 +215,65 @@ async def test_job_must_be_read_first(client: httpx.AsyncClient, queue: Any) -> 
 def test_session_status_values_are_known() -> None:
     assert {s.value for s in sessions_router.OPEN} == {"created", "in_progress", "interrupted"}
     assert SessionStatus.SCORING not in sessions_router.OPEN
+
+
+async def test_voice_join_starts_the_session_and_returns_a_room_token(
+    client: httpx.AsyncClient, fake_fixtures: Path
+) -> None:
+    """The first join starts the session; a second join (reconnect) keeps the same room."""
+    from livekit import api as livekit_api
+
+    job = await ready_job(client, fake_fixtures)
+    sid = (await create(client, job["id"])).json()["id"]
+    resp = await client.post(f"/sessions/{sid}/voice/join")
+    assert resp.status_code == 200, resp.text
+    join = resp.json()
+    assert join["room"] == f"session-{sid}" and join["identity"].startswith("candidate-")
+    claims = livekit_api.TokenVerifier("devkey", "secret").verify(join["token"])
+    assert claims.video is not None and claims.video.room == join["room"]
+    assert claims.video.room_join and claims.video.can_publish_data
+    record = (await client.get(f"/sessions/{sid}")).json()
+    assert record["status"] == "in_progress" and record["started_at"] is not None
+    again = (await client.post(f"/sessions/{sid}/voice/join")).json()
+    assert again["room"] == join["room"]
+    started = (await client.get(f"/sessions/{sid}")).json()["started_at"]
+    assert started == record["started_at"]
+
+
+async def test_voice_join_rules(
+    client: httpx.AsyncClient, fake_fixtures: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(sessions_router, "_text_allowed", lambda: True)
+    job = await ready_job(client, fake_fixtures)
+    text = (await create(client, job["id"], channel="text")).json()["id"]
+    assert (await client.post(f"/sessions/{text}/voice/join")).status_code == 409
+    voice = (await create(client, job["id"])).json()["id"]
+    await client.post(f"/sessions/{voice}/end")
+    assert (await client.post(f"/sessions/{voice}/voice/join")).status_code == 409
+
+
+async def test_internal_end_needs_the_shared_token(
+    client: httpx.AsyncClient, fake_fixtures: Path, queue: Any
+) -> None:
+    """The voice agent ends a started session: it is billed and scored. Others get 403."""
+    job = await ready_job(client, fake_fixtures)
+    sid = (await create(client, job["id"])).json()["id"]
+    await client.post(f"/sessions/{sid}/voice/join")
+    url = f"/internal/sessions/{sid}/end"
+    assert (await client.post(url, json={})).status_code == 403
+    wrong = {"X-Internal-Token": "guess"}
+    assert (await client.post(url, json={}, headers=wrong)).status_code == 403
+    queue.run_jobs = False
+    token = {"X-Internal-Token": "dev-internal-token"}
+    resp = await client.post(url, json={"interrupted": True}, headers=token)
+    assert resp.status_code == 200, resp.text
+    assert resp.json()["status"] == "scoring"
+    assert [name for name, _, _ in queue.enqueued][-1] == "score_session"
+    missing = await client.post(
+        f"/internal/sessions/{__import__('uuid').uuid4()}/end", json={}, headers=token
+    )
+    assert missing.status_code == 404
+    assert (
+        "/internal/sessions/{session_id}/end"
+        not in (await client.get("/openapi.json")).json()["paths"]
+    )

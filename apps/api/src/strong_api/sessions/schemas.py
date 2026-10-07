@@ -52,3 +52,18 @@ class TextTurns(BaseModel):
     turns: list[Turn]
     ended: bool
     phase: str
+
+
+class VoiceJoin(BaseModel):
+    """What the browser needs to join the interview room (P7, P10)."""
+
+    livekit_url: str
+    room: str
+    token: str
+    identity: str
+
+
+class InternalEndRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    interrupted: bool = Field(default=False, description="True when the candidate did not return.")

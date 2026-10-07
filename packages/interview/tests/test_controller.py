@@ -204,3 +204,18 @@ def test_brief_time_plan_sets_the_core_budget(clock: FakeClock) -> None:
     )
     ctl = SessionController(brief, clock)
     assert ctl.deadline_ms(Phase.CORE) == 27 * 60 * 1000
+
+
+def test_iv9_hold_stops_the_clock_in_any_mode(clock: FakeClock) -> None:
+    """IV-9: while the candidate is disconnected, session time does not run (Realistic too)."""
+    ctl = SessionController(make_brief(mode=Mode.REALISTIC), clock)
+    ctl.start()
+    clock.advance(minutes=2)
+    ctl.hold()
+    clock.advance(minutes=1.5)
+    assert ctl.elapsed_ms == 120_000
+    ctl.release()
+    clock.advance(minutes=1)
+    assert ctl.elapsed_ms == 180_000
+    ctl.release()  # safe to call twice
+    assert ctl.elapsed_ms == 180_000
