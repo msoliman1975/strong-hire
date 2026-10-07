@@ -270,6 +270,19 @@ class SessionController:
         self.question = None
         return Move(MoveKind.WRAP_UP, Phase.WRAP_UP)
 
+    # ------------------------------------------------------------------ dropped connection (IV-9)
+
+    def hold(self) -> None:
+        """Stop the clock while the candidate is disconnected. Allowed in every mode."""
+        if self._clock.started is not None and self._clock.paused_at is None:
+            self._clock.paused_at = self.clock()
+
+    def release(self) -> None:
+        """Restart the clock after a reconnect."""
+        if self._clock.paused_at is not None:
+            self._clock.paused_total += self.clock() - self._clock.paused_at
+            self._clock.paused_at = None
+
     # ------------------------------------------------------------------ Coach mode (IV-8)
 
     def _coach(self) -> None:

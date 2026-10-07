@@ -84,6 +84,8 @@ class Interviewer:
         self.window = SMALL_WINDOW if self.small else WINDOW
         self.prompt_refs: set[str] = set()
         self.model: str | None = None
+        self.input_tokens = 0
+        self.output_tokens = 0
 
     # ------------------------------------------------------------------ prompts
 
@@ -122,6 +124,8 @@ class Interviewer:
     def _note(self, done: Completion[object]) -> None:
         self.prompt_refs.update(done.prompt_refs)
         self.model = done.model
+        self.input_tokens += done.usage.input_tokens
+        self.output_tokens += done.usage.output_tokens
 
     # ------------------------------------------------------------------ calls
 
