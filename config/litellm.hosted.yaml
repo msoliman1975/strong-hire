@@ -17,10 +17,11 @@ model_list:
       model: groq/openai/gpt-oss-120b
       api_key: os.environ/HOSTED_API_KEY
       reasoning_effort: medium
-  - model_name: hosted-interviewer        # 70B class, no reasoning phase, so the first token is fast
+  - model_name: hosted-interviewer        # reasoning off, so the first token is fast (82 to 111 ms)
     litellm_params:
-      model: groq/llama-3.3-70b-versatile
+      model: groq/qwen/qwen3.8-27b
       api_key: os.environ/HOSTED_API_KEY
+      reasoning_effort: none
   - model_name: hosted-scorer             # strongest open-weight model on this provider
     litellm_params:
       model: groq/openai/gpt-oss-120b

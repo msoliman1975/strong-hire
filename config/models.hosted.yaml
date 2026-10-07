@@ -36,7 +36,9 @@ models:
     tier: large
   hosted-interviewer:
     kind: chat
-    supports_tools: true
+    # false: the gateway asks for JSON that matches the schema (NativeOutput), not a tool call,
+    # as for the planner and scorer.
+    supports_tools: false
     json_mode: true
     context_window: 131072
     tier: large
