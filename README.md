@@ -44,6 +44,20 @@ All ports are set in `.env` (see `.env.example`).
 
 The `all-in-one` profile starts every service above, for the `tiny` model profile.
 
+## Run the CI checks locally
+
+When GitHub Actions cannot run (for example, no Actions minutes left), run the same checks here and
+paste the summary into the pull request:
+
+```powershell
+./scripts/check.ps1 -Report var/check.md   # python, migrations, web (with Playwright e2e)
+./scripts/check.ps1 -SkipE2E               # without the Playwright browser tests
+./scripts/check.ps1 -Docker                # also the Docker stack check
+```
+
+The tests do not read your `.env`, as in CI. Migrations run on a new Postgres 16 container that is
+removed afterwards. The local-models and voice jobs are not included. About 6 minutes on a laptop.
+
 ## Model profiles
 
 `MODEL_PROFILE` picks how the model gateway works:
