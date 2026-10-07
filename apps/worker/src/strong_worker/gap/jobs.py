@@ -2,7 +2,9 @@
 
 The API creates a gap_analyses row with status "running" and enqueues `run_gap_analysis`. The
 job fills in the result and sets status "ready", or "failed" with a plain reason. The API reads
-the row; it does not need the Arq job result.
+the row; it does not need the Arq job result. If the job stops in any other way (the Arq job
+timeout cancels it, or an unexpected error), the row is still marked "failed", so the page never
+waits forever.
 
 `build_interviewer_brief` builds the brief for a session row and stores it in brief_json. The
 sessions workstream enqueues it when a session is created.
@@ -12,6 +14,7 @@ Neither job records usage minutes: gap analysis is free (GA-4).
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import uuid
@@ -19,7 +22,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from strong_core.db import get_sessionmaker
@@ -82,6 +85,34 @@ async def run_gap_analysis_job(
 ) -> dict[str, Any]:
     """Compute one gap analysis row (GA-1 to GA-3)."""
     gap = _gap(ctx)
+    try:
+        return await _run_gap_analysis(gap, gap_analysis_id, org_id)
+    except BaseException:
+        # The Arq job timeout cancels the task (asyncio.CancelledError), or something failed that
+        # run_gap_analysis does not turn into GapAnalysisError. Without this, the row would stay
+        # "running" and the page would wait forever. Shielded, so the cancel cannot stop it.
+        await asyncio.shield(_mark_failed_if_running(gap, gap_analysis_id, org_id))
+        raise
+
+
+async def _mark_failed_if_running(gap: GapContext, gap_analysis_id: str, org_id: str) -> None:
+    try:
+        async with gap.sessionmaker() as db:
+            await db.execute(
+                update(GapRow)
+                .where(
+                    GapRow.id == uuid.UUID(gap_analysis_id),
+                    GapRow.org_id == uuid.UUID(org_id),
+                    GapRow.status == GapStatus.RUNNING,
+                )
+                .values(status=GapStatus.FAILED, error=FAILED_REASON, updated_at=datetime.now(UTC))
+            )
+            await db.commit()
+    except Exception:
+        log.exception("could not mark gap analysis %s as failed", gap_analysis_id)
+
+
+async def _run_gap_analysis(gap: GapContext, gap_analysis_id: str, org_id: str) -> dict[str, Any]:
     async with gap.sessionmaker() as db:
         row = await db.scalar(
             select(GapRow).where(

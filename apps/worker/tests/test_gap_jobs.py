@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import uuid
 from pathlib import Path
 from typing import Any
 
+import pytest
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -159,6 +161,49 @@ async def test_gap_job_failure_is_saved_with_a_reason(
         row = await db.get(GapRow, gap_id)
         assert row is not None and row.status == GapStatus.FAILED
         assert row.error == jobs.FAILED_REASON and row.match_score is None
+
+
+async def _hang(*_: object, **__: object) -> Any:
+    await asyncio.Event().wait()
+
+
+async def test_gap_job_timeout_marks_the_row_failed(
+    sessionmaker: async_sessionmaker[AsyncSession],
+    account: tuple[uuid.UUID, uuid.UUID],
+    gateway: ModelGateway,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """GA-1: when the Arq job timeout cancels the job, the row is "failed", not "running"."""
+    org_id, _ = account
+    _, _, gap_id = await _setup(sessionmaker, account)
+    monkeypatch.setattr(jobs, "run_gap_analysis", _hang)
+    job = jobs.run_gap_analysis_job(_ctx(sessionmaker, gateway), str(gap_id), str(org_id))
+    with pytest.raises(TimeoutError):
+        await asyncio.wait_for(job, timeout=0.2)  # what arq does at its job timeout
+    async with sessionmaker() as db:
+        row = await db.get(GapRow, gap_id)
+        assert row is not None and row.status == GapStatus.FAILED
+        assert row.error == jobs.FAILED_REASON
+
+
+async def test_gap_job_unexpected_error_marks_the_row_failed(
+    sessionmaker: async_sessionmaker[AsyncSession],
+    account: tuple[uuid.UUID, uuid.UUID],
+    gateway: ModelGateway,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    org_id, _ = account
+    _, _, gap_id = await _setup(sessionmaker, account)
+
+    async def boom(*_: object, **__: object) -> Any:
+        raise RuntimeError("provider down")
+
+    monkeypatch.setattr(jobs, "run_gap_analysis", boom)
+    with pytest.raises(RuntimeError):
+        await jobs.run_gap_analysis_job(_ctx(sessionmaker, gateway), str(gap_id), str(org_id))
+    async with sessionmaker() as db:
+        row = await db.get(GapRow, gap_id)
+        assert row is not None and row.status == GapStatus.FAILED
 
 
 async def test_gap_job_checks_the_org(
