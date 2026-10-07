@@ -44,6 +44,13 @@ All ports are set in `.env` (see `.env.example`).
 
 The `all-in-one` profile starts every service above, for the `tiny` model profile.
 
+## Text interview (dev only)
+
+Until the voice interview works (P7 part 3, P10), dev builds have a page at
+<http://localhost:5180/dev/interview> ("Text interview (dev)" in the top bar). You pick a job and the
+interview settings, type your answers, and see the real debrief at the end. It uses the text channel of
+the sessions API with the active model profile, for example `claude`.
+
 ## Run the CI checks locally
 
 When GitHub Actions cannot run (for example, no Actions minutes left), run the same checks here and
