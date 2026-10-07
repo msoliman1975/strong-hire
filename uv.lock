@@ -2019,6 +2019,7 @@ dependencies = [
     { name = "redis" },
     { name = "stripe" },
     { name = "strong-core" },
+    { name = "strong-interview" },
     { name = "typer" },
     { name = "uvicorn", extra = ["standard"] },
 ]
@@ -2035,6 +2036,7 @@ requires-dist = [
     { name = "redis", specifier = ">=5.0" },
     { name = "stripe", specifier = ">=12" },
     { name = "strong-core", editable = "packages/core" },
+    { name = "strong-interview", editable = "packages/interview" },
     { name = "typer", specifier = ">=0.12" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.30" },
 ]

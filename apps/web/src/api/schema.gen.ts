@@ -214,6 +214,140 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Session
+         * @description Create a session and queue its interviewer brief (IV-2, IV-4, IV-6, IV-8).
+         */
+        post: operations["create_session_sessions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions/{session_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Session */
+        get: operations["get_session_sessions__session_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/job-targets/{job_target_id}/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Sessions */
+        get: operations["list_sessions_job_targets__job_target_id__sessions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions/{session_id}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * End Session
+         * @description End the session. Started sessions are billed and scored (FB-3); safe to call twice.
+         */
+        post: operations["end_session_sessions__session_id__end_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions/{session_id}/text/open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Open Text Session
+         * @description Start the text session: the interviewer greets the candidate.
+         */
+        post: operations["open_text_session_sessions__session_id__text_open_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions/{session_id}/text/turn": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Text Turn
+         * @description The candidate's turn. Returns the interviewer's reply; the session ends on its own.
+         */
+        post: operations["text_turn_sessions__session_id__text_turn_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions/{session_id}/coach": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Coach
+         * @description Coach mode only (IV-8): pause and resume the clock, ask for a hint, redo the answer.
+         */
+        post: operations["coach_sessions__session_id__coach_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/providers": {
         parameters: {
             query?: never;
@@ -756,6 +890,14 @@ export interface components {
              */
             notes: string | null;
         };
+        /** CoachRequest */
+        CoachRequest: {
+            /**
+             * Command
+             * @enum {string}
+             */
+            command: "pause" | "resume" | "hint" | "redo";
+        };
         /** CompanyProfile */
         CompanyProfile: {
             /** Company Name */
@@ -877,6 +1019,20 @@ export interface components {
         ConsentOut: {
             /** Training Consent */
             training_consent: boolean;
+        };
+        /** CreateSessionRequest */
+        CreateSessionRequest: {
+            /**
+             * Job Target Id
+             * Format: uuid
+             */
+            job_target_id: string;
+            config: components["schemas"]["SessionConfig"];
+            /**
+             * @description text runs the same interviewer with typed input; dev and test only (PL-7)
+             * @default voice
+             */
+            channel: components["schemas"]["SessionChannel"];
         };
         /** Debrief */
         Debrief: {
@@ -1825,6 +1981,13 @@ export interface components {
             status: components["schemas"]["SessionStatus"];
         };
         /**
+         * SessionChannel
+         * @description PL-7. How the candidate and the interviewer talk. Text runs the same controller and
+         *     interviewer logic with typed input. It is a dev flag; the simulated-candidate tests use it.
+         * @enum {string}
+         */
+        SessionChannel: "voice" | "text";
+        /**
          * SessionConfig
          * @description What the candidate picks before a session (journey 2, step 1).
          */
@@ -1838,6 +2001,33 @@ export interface components {
              */
             duration_min: 30 | 45;
             level: components["schemas"]["Level"];
+        };
+        /** SessionRecord */
+        SessionRecord: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Job Target Id
+             * Format: uuid
+             */
+            job_target_id: string;
+            config: components["schemas"]["SessionConfig"];
+            channel: components["schemas"]["SessionChannel"];
+            status: components["schemas"]["SessionStatus"];
+            /**
+             * Brief Ready
+             * @description True when the interviewer brief is built.
+             */
+            brief_ready: boolean;
+            /** Started At */
+            started_at: string | null;
+            /** Ended At */
+            ended_at: string | null;
+            /** Minutes Billed */
+            minutes_billed: number;
         };
         /**
          * SessionStatus
@@ -1906,6 +2096,23 @@ export interface components {
          * @enum {string}
          */
         SubscriptionStatus: "trialing" | "active" | "past_due" | "canceled" | "incomplete";
+        /** TextTurnRequest */
+        TextTurnRequest: {
+            /** Text */
+            text: string;
+        };
+        /**
+         * TextTurns
+         * @description The interviewer's new turns, and whether the session has ended.
+         */
+        TextTurns: {
+            /** Turns */
+            turns: components["schemas"]["Turn"][];
+            /** Ended */
+            ended: boolean;
+            /** Phase */
+            phase: string;
+        };
         /**
          * Turn
          * @description One utterance in the transcript. Text only; audio is never stored.
@@ -1925,9 +2132,8 @@ export interface components {
             /**
              * Question Ref
              * @description BriefQuestion.id, in CORE only.
-             * @default null
              */
-            question_ref: string | null;
+            question_ref?: string | null;
         };
         /**
          * UsageOut
@@ -2519,6 +2725,233 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ScoringAccepted"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_session_sessions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateSessionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionRecord"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_session_sessions__session_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionRecord"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_sessions_job_targets__job_target_id__sessions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionRecord"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    end_session_sessions__session_id__end_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionRecord"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    open_text_session_sessions__session_id__text_open_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TextTurns"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    text_turn_sessions__session_id__text_turn_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TextTurnRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TextTurns"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    coach_sessions__session_id__coach_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CoachRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TextTurns"];
                 };
             };
             /** @description Validation Error */
