@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch: # run by hand, for example the voice job on a branch
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -130,6 +131,9 @@ jobs:
 
   models-voice:
     name: Local models (smoke test all six roles)
+    # About 9 minutes. On a PR, only when model config, the gateway or the stack changes.
+    needs: changes
+    if: needs.changes.outputs.models == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
@@ -167,34 +171,34 @@ jobs:
         run: docker compose -f infra/compose.yaml --env-file .env --profile models --profile voice logs --tail 150
 
   changes:
-    name: Find voice changes
+    name: Find model changes
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: read
     outputs:
-      # Always "true" on push to main. On a PR, "true" only when a voice path changed.
-      voice: ${{ github.event_name != 'pull_request' || steps.filter.outputs.voice == 'true' }}
+      # Always "true" on push to main or a manual run. On a PR, only when a model path changed.
+      models: ${{ github.event_name != 'pull_request' || steps.filter.outputs.models == 'true' }}
     steps:
       - uses: dorny/paths-filter@v3
         id: filter
         if: github.event_name == 'pull_request'
         with:
           filters: |
-            voice:
-              - 'apps/voice/**'
-              - 'packages/core/src/strong_core/gateway/**'
+            models:
               - 'config/**'
-              - 'scripts/latency.ps1'
+              - 'packages/core/src/strong_core/gateway/**'
+              - 'scripts/models.ps1'
               - 'scripts/lib/stack.ps1'
-              - 'infra/**'
+              - 'infra/compose.yaml'
+              - 'infra/docker/**'
               - '.github/workflows/ci.yml'
 
   voice-latency:
     name: Voice latency spike (simulated candidate)
-    # About 15 minutes on CPU, so it runs only for voice changes and on every push to main.
-    needs: changes
-    if: needs.changes.outputs.voice == 'true'
+    # 15 to 30 minutes, so it runs only on push to main and by hand (Actions > CI > Run workflow),
+    # never on a PR. It used about half of all CI minutes when it ran on PRs.
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
@@ -225,16 +229,22 @@ jobs:
       - name: Pull the local models named in config/
         shell: pwsh
         run: ./scripts/models.ps1 pull
-      - name: Latency spike, with memory use printed every 15 s
-        env:
-          HOSTED_API_KEY: ${{ secrets.HOSTED_API_KEY }}
+      - name: Latency spike (local), with memory use printed every 15 s
         run: |
           ( while true; do
               echo "mem: $(free -m | awk 'NR==2 {print $3 " MB used of " $2}')"
               docker stats --no-stream --format 'mem: {{.Name}} {{.MemUsage}}' 2>/dev/null
               sleep 15
             done ) &
-          pwsh ./scripts/latency.ps1 -Sessions 3 -ReplyTimeout 120
+          pwsh ./scripts/latency.ps1 -Sessions 3 -ReplyTimeout 120 -Profiles local
+      # Hosted runs only on push to main, and never fails the job: the hosted provider's free-plan
+      # quota (200k tokens per day, #36) runs out, and PRs should not fail because of it.
+      - name: Latency spike (hosted, push to main only, does not fail the job)
+        if: github.event_name == 'push'
+        continue-on-error: true
+        env:
+          HOSTED_API_KEY: ${{ secrets.HOSTED_API_KEY }}
+        run: pwsh ./scripts/latency.ps1 -Sessions 3 -ReplyTimeout 120 -Profiles hosted
       - uses: actions/upload-artifact@v4
         if: always()
         with:
