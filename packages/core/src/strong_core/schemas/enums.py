@@ -196,6 +196,14 @@ class SubscriptionStatus(StrEnum):
     INCOMPLETE = "incomplete"
 
 
+class SessionChannel(StrEnum):
+    """PL-7. How the candidate and the interviewer talk. Text runs the same controller and
+    interviewer logic with typed input. It is a dev flag; the simulated-candidate tests use it."""
+
+    VOICE = "voice"
+    TEXT = "text"
+
+
 class SessionStatus(StrEnum):
     CREATED = "created"
     IN_PROGRESS = "in_progress"
