@@ -14,6 +14,7 @@ class ModelProfile(StrEnum):
     """Which config/models.<profile>.yaml the gateway uses. `fake` needs no model at all."""
 
     FAKE = "fake"
+    TINY = "tiny"
     LOCAL = "local"
     HOSTED = "hosted"
 

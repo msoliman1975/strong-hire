@@ -1,0 +1,38 @@
+# LiteLLM proxy config for MODEL_PROFILE=tiny (PL-2). Real model ids and providers appear only in
+# the config/litellm.*.yaml files.
+#
+# Ollama model: ./scripts/models.ps1 pull -Profile tiny reads the ollama_chat entry below and pulls it.
+#   tiny-chat  Qwen2.5 3B Instruct, Q4_K_M (about 1.9 GB)   all four text roles
+# The same model is local-small in litellm.local.yaml, so it is pulled only once.
+model_list:
+  - model_name: tiny-chat
+    litellm_params:
+      model: ollama_chat/qwen2.5:3b-instruct
+      api_base: http://ollama:11434
+      num_ctx: 8192
+      keep_alive: 30m
+
+  # faster-whisper base, int8 on CPU (infra/stt). The server loads the model named here.
+  - model_name: tiny-stt
+    litellm_params:
+      model: openai/Systran/faster-whisper-base
+      api_base: http://stt:8000/v1
+      api_key: not-needed
+    model_info:
+      mode: audio_transcription
+
+  # Kokoro-82M on CPU (Kokoro-FastAPI image), streaming PCM at 24 kHz.
+  - model_name: tiny-tts
+    litellm_params:
+      model: openai/kokoro
+      api_base: http://tts:8880/v1
+      api_key: not-needed
+    model_info:
+      mode: audio_speech
+
+litellm_settings:
+  drop_params: true
+  request_timeout: 120
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY

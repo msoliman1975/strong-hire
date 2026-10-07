@@ -1,0 +1,40 @@
+# Role -> model alias for MODEL_PROFILE=tiny (PL-2): the smallest setup, a laptop with no GPU.
+# One small model serves all four text roles. Use it with the Docker Compose "all-in-one" profile.
+# Aliases are LiteLLM model_names defined in litellm.tiny.yaml. Code never sees vendor ids.
+# Results from this profile are development data (PL-6). Expect weak interviewing; use the
+# text-only session mode (PL-7) for day-to-day work.
+profile: tiny
+gateway:
+  base_url: http://litellm:4000/v1     # overridden by MODEL_GATEWAY_URL when running outside Docker
+  api_key_env: LITELLM_MASTER_KEY
+  timeout_s: 120
+
+roles:
+  extractor: tiny-chat
+  planner: tiny-chat
+  interviewer: tiny-chat
+  scorer: tiny-chat
+  stt: tiny-stt
+  tts: tiny-tts
+
+# Capability registry. Code checks these flags, never model names.
+# context_window is the num_ctx set in litellm.tiny.yaml, not the model's maximum (32768).
+models:
+  tiny-chat:
+    kind: chat
+    supports_tools: false     # 3B models break tool-call output; JSON-schema mode is reliable
+    json_mode: true
+    context_window: 8192
+    tier: small
+  tiny-stt:
+    kind: stt
+    context_window: 512
+    options:
+      language: en
+  tiny-tts:
+    kind: tts
+    context_window: 512
+    streaming: true
+    sample_rate: 24000
+    options:
+      voice: af_heart

@@ -5,6 +5,7 @@
 .EXAMPLE
   ./scripts/dev.ps1 up                  # core profile: postgres, redis, api, worker, web
   ./scripts/dev.ps1 up -Profile all     # core + models + voice
+  ./scripts/dev.ps1 up -Profile all-in-one   # every service, for MODEL_PROFILE=tiny (PL-2)
   ./scripts/dev.ps1 logs -Service api
   ./scripts/dev.ps1 test
   ./scripts/dev.ps1 down -Volumes       # also delete the database and model volumes
@@ -16,7 +17,7 @@ param(
     [string]$Command = 'help',
 
     [Alias('Profile')]
-    [ValidateSet('core', 'models', 'voice', 'all')]
+    [ValidateSet('core', 'models', 'voice', 'all', 'all-in-one')]
     [string]$StackProfile = 'core',
 
     [string]$Service = '',
@@ -102,14 +103,14 @@ try {
             Initialize-ExtraCerts
             Write-Step "Starting profile '$StackProfile' (first build takes a few minutes)"
             Invoke-Compose ((Get-ProfileArgs $StackProfile) + @('up', '-d', '--build', '--wait'))
-            if ($StackProfile -in @('core', 'all')) {
+            if ($StackProfile -in @('core', 'all', 'all-in-one')) {
                 Invoke-Migrate
                 Write-Host ''
                 Write-Host 'Web:    http://localhost:5180  (shows API health)'
                 Write-Host 'API:    http://localhost:8700/health'
             }
-            if ($StackProfile -in @('models', 'all')) { Write-Host 'LiteLLM: http://localhost:4000' }
-            if ($StackProfile -in @('voice', 'all')) { Write-Host 'LiveKit: ws://localhost:7880' }
+            if ($StackProfile -in @('models', 'all', 'all-in-one')) { Write-Host 'LiteLLM: http://localhost:4000' }
+            if ($StackProfile -in @('voice', 'all', 'all-in-one')) { Write-Host 'LiveKit: ws://localhost:7880' }
         }
         'down' {
             $downArgs = @('down', '--remove-orphans')
