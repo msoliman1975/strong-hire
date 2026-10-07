@@ -55,6 +55,27 @@ The `all-in-one` profile starts every service above, for the `tiny` model profil
   Results are development data (PL-6), and interviewing is weak.
 - `local`: `config/models.local.yaml`, through LiteLLM to Ollama in Docker.
 - `hosted`: `config/models.hosted.yaml`, through LiteLLM to hosted APIs. Needs `HOSTED_API_KEY` in `.env`.
+- `claude`: `config/models.claude.yaml`. Claude Haiku 4.5 (extractor, interviewer) and Claude Sonnet 5.5
+  (planner, scorer); speech-to-text and text-to-speech stay local. Needs `ANTHROPIC_API_KEY` as an
+  environment variable (a Windows user variable is fine); it is never written to a file.
+
+### Switch profiles
+
+```powershell
+./scripts/profile.ps1 status     # current profile; for claude, spend today against the budget
+./scripts/profile.ps1 claude     # or: hosted, local, tiny, fake
+./scripts/profile.ps1 claude -Voice   # also start the voice services
+```
+
+The script edits `MODEL_PROFILE` and `LITELLM_PROFILE` in `.env` and restarts LiteLLM, the API, the
+worker and the web app. It works in Windows PowerShell 5.1.
+
+**Cost limits for `claude`.** The app calls LiteLLM with its own key, created by the script, with a
+daily budget (`CLAUDE_DAILY_BUDGET_USD`, default 5) and a request limit (`CLAUDE_RPM_LIMIT`, default
+60 per minute) from `.env`. Once the budget is used, model calls fail until the next day (UTC).
+LiteLLM counts cost with the prices in `config/litellm.claude.yaml`, in its own `litellm` database
+(`infra/compose.claude.yaml`). Set a monthly spend limit in the Anthropic Console as well: it is
+the hard limit, and it also covers anything outside this app.
 
 Set `LITELLM_PROFILE` to the same value, so the proxy loads the matching `config/litellm.*.yaml`.
 `./scripts/models.ps1` and `./scripts/latency.ps1` set both for you.

@@ -348,6 +348,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/dev/model-usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Model Usage
+         * @description Spend today and this month for the app key (claude profile). Dev and test only.
+         */
+        get: operations["model_usage_dev_model_usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/providers": {
         parameters: {
             query?: never;
@@ -872,6 +892,15 @@ export interface components {
             priority: number;
             /** Probe Hints */
             probe_hints?: string[];
+        };
+        /** Budget */
+        Budget: {
+            /** Spend Usd */
+            spend_usd: number;
+            /** Budget Usd */
+            budget_usd: number | null;
+            /** Resets At */
+            resets_at: string | null;
         };
         /**
          * CaseStyle
@@ -1605,6 +1634,17 @@ export interface components {
          * @enum {string}
          */
         Mode: "coach" | "realistic";
+        /** ModelUsage */
+        ModelUsage: {
+            /** Profile */
+            profile: string;
+            /** Tracked */
+            tracked: boolean;
+            today?: components["schemas"]["Budget"] | null;
+            month?: components["schemas"]["Budget"] | null;
+            /** Rpm Limit */
+            rpm_limit?: number | null;
+        };
         /** PersonaBrief */
         PersonaBrief: {
             /** Tone */
@@ -2961,6 +3001,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    model_usage_dev_model_usage_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModelUsage"];
                 };
             };
         };

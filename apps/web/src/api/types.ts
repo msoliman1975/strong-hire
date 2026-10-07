@@ -49,6 +49,7 @@ export type CompetencyTrend = DeepRequired<S["CompetencyTrend"]>;
 
 // Billing and account (real endpoints in apps/api billing and account, P9).
 export type Usage = DeepRequired<S["UsageOut"]>;
+export type ModelUsage = S["ModelUsage"];
 export type PlanOffer = S["PlanOut"];
 export type ExportJob = DeepRequired<S["ExportOut"]>;
 export type ExportStatus = S["ExportOut"]["status"];

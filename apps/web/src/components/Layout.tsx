@@ -2,7 +2,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from "react-router";
 
 import { authApi } from "../api/auth";
-import { useAuth, useUsage } from "../api/hooks";
+import { useAuth, useModelUsage, useUsage } from "../api/hooks";
+import { ModelUsageBadge } from "./ModelUsageBadge";
 import { ErrorNotice, Loading } from "./ui";
 import { UsageMeter } from "./UsageMeter";
 
@@ -12,6 +13,7 @@ export function AppLayout() {
   const location = useLocation();
   const signedIn = auth.data?.status === "signed_in";
   const usage = useUsage(signedIn);
+  const modelUsage = useModelUsage(signedIn);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const logout = useMutation({
@@ -61,6 +63,7 @@ export function AppLayout() {
             </ul>
           </nav>
           <div className="app-header__end">
+            <ModelUsageBadge usage={modelUsage.data} />
             {usage.data && <UsageMeter usage={usage.data} />}
             <button
               type="button"

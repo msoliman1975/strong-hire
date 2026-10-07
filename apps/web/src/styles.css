@@ -204,6 +204,25 @@ h1:focus {
   background: var(--signal-negative);
 }
 
+/* Dev builds only: model spend against the LiteLLM budgets (testing and validation). */
+.model-usage {
+  padding: 2px 8px;
+  border: 1px dashed var(--line);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.model-usage__label {
+  font-weight: 600;
+}
+
+.model-usage[data-level="high"] {
+  border-color: var(--signal-negative);
+  color: var(--signal-negative);
+}
+
 /* ------------------------------------------------------------ page layout */
 
 .page {

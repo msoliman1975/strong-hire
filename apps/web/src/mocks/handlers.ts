@@ -670,6 +670,10 @@ export function accountHandlers(store: MockStore) {
 
   return [
     http.get(`${API}/billing/usage`, () => HttpResponse.json(refreshUsage(db().usage))),
+    // Dev-only spend indicator: the mocks track no model spend, so the indicator stays hidden.
+    http.get(`${API}/dev/model-usage`, () =>
+      HttpResponse.json({ profile: "fake", tracked: false, today: null, month: null, rpm_limit: null }),
+    ),
     http.get(`${API}/billing/plan`, () => HttpResponse.json(MOCK_PLAN)),
     http.post(`${API}/billing/checkout`, async () => {
       await pauseFor(store);

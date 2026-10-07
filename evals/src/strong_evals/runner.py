@@ -590,7 +590,9 @@ def cmd_run(args: argparse.Namespace) -> int:
 def add_run_parser(sub: Any) -> None:
     p: argparse.ArgumentParser = sub.add_parser("run", help="run a suite and write a report")
     p.add_argument("--suite", default="smoke", help=f"one of: {', '.join(suite_names())}")
-    p.add_argument("--profile", default="fake", choices=["fake", "tiny", "local", "hosted"])
+    p.add_argument(
+        "--profile", default="fake", choices=["fake", "tiny", "local", "hosted", "claude"]
+    )
     p.add_argument("--out", default=str(REPORTS_DIR), help="report folder")
     p.add_argument("--record", action="store_true", help="save every model call as a fixture")
     p.add_argument("--record-dir", help="fixture folder (default: the fake model's fixtures)")

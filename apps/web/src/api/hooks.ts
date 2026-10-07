@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { authApi } from "./auth";
 import { billingApi } from "./billing";
+import { devApi } from "./dev";
 import { gapApi } from "./gap";
 import { jobRunning, jobTargetsApi, resumesApi } from "./inputs";
 import { sessionsApi } from "./planned";
@@ -15,6 +16,7 @@ export const keys = {
   providers: ["auth", "providers"] as const,
   usage: ["billing", "usage"] as const,
   plan: ["billing", "plan"] as const,
+  modelUsage: ["dev", "model-usage"] as const,
   jobs: ["jobs"] as const,
   job: (id: string) => ["jobs", id] as const,
   jobTask: (id: string, taskId: string) => ["jobs", id, "task", taskId] as const,
@@ -35,6 +37,16 @@ export const useProviders = () =>
 
 export const useUsage = (enabled = true) =>
   useQuery({ queryKey: keys.usage, queryFn: billingApi.usage, enabled });
+
+/** Dev builds only: Claude spend against the LiteLLM budgets, refreshed every 30 seconds. */
+export const useModelUsage = (enabled = true) =>
+  useQuery({
+    queryKey: keys.modelUsage,
+    queryFn: devApi.modelUsage,
+    enabled: enabled && import.meta.env.DEV,
+    refetchInterval: 30_000,
+    retry: false,
+  });
 
 export const usePlan = () => useQuery({ queryKey: keys.plan, queryFn: billingApi.plan });
 

@@ -1,0 +1,45 @@
+# Role -> model alias for MODEL_PROFILE=claude: Anthropic models for the 4 text roles, local
+# speech-to-text and text-to-speech. Aliases are LiteLLM model_names in litellm.claude.yaml.
+# Switch with ./scripts/profile.ps1 claude. It reads ANTHROPIC_API_KEY from your environment and
+# creates a LiteLLM key with a daily cost limit for the app (CLAUDE_DAILY_BUDGET_USD in .env).
+profile: claude
+gateway:
+  base_url: http://litellm:4000/v1     # overridden by MODEL_GATEWAY_URL when running outside Docker
+  api_key_env: LITELLM_MASTER_KEY
+  timeout_s: 120
+  requires_env: [ANTHROPIC_API_KEY]
+
+roles:
+  extractor: claude-fast
+  planner: claude-strong
+  interviewer: claude-fast
+  scorer: claude-strong
+  stt: claude-stt
+  tts: claude-tts
+
+# Capability registry. Code checks these flags, never model names.
+models:
+  claude-fast:
+    kind: chat
+    supports_tools: false     # schema JSON (NativeOutput), as for the hosted planner (PR #15)
+    json_mode: true
+    context_window: 200000
+    tier: large
+  claude-strong:
+    kind: chat
+    supports_tools: false
+    json_mode: true
+    context_window: 200000
+    tier: large
+  claude-stt:
+    kind: stt
+    context_window: 512
+    options:
+      language: en
+  claude-tts:
+    kind: tts
+    context_window: 512
+    streaming: true
+    sample_rate: 24000
+    options:
+      voice: af_heart

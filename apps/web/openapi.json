@@ -1003,6 +1003,28 @@
         }
       }
     },
+    "/dev/model-usage": {
+      "get": {
+        "tags": [
+          "dev"
+        ],
+        "summary": "Model Usage",
+        "description": "Spend today and this month for the app key (claude profile). Dev and test only.",
+        "operationId": "model_usage_dev_model_usage_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelUsage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/providers": {
       "get": {
         "tags": [
@@ -1963,6 +1985,44 @@
         ],
         "title": "BriefQuestion",
         "type": "object"
+      },
+      "Budget": {
+        "properties": {
+          "spend_usd": {
+            "type": "number",
+            "title": "Spend Usd"
+          },
+          "budget_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Budget Usd"
+          },
+          "resets_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resets At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "spend_usd",
+          "budget_usd",
+          "resets_at"
+        ],
+        "title": "Budget"
       },
       "CaseStyle": {
         "additionalProperties": false,
@@ -3915,6 +3975,55 @@
         ],
         "title": "Mode",
         "description": "IV-8. Only Realistic sessions count toward progress trends (PR-1)."
+      },
+      "ModelUsage": {
+        "properties": {
+          "profile": {
+            "type": "string",
+            "title": "Profile"
+          },
+          "tracked": {
+            "type": "boolean",
+            "title": "Tracked"
+          },
+          "today": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Budget"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "month": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Budget"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rpm_limit": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rpm Limit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "profile",
+          "tracked"
+        ],
+        "title": "ModelUsage"
       },
       "PersonaBrief": {
         "additionalProperties": false,

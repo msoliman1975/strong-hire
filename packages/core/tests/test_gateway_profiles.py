@@ -22,7 +22,7 @@ from strong_core.gateway.smoke import run_smoke
 
 REPO = find_repo_root()
 CONFIG = REPO / "config"
-PROFILES = ["tiny", "local", "hosted"]
+PROFILES = ["tiny", "local", "hosted", "claude"]
 
 
 def _litellm_aliases(profile: str) -> set[str]:
