@@ -7,6 +7,7 @@ members = [
     "strong-api",
     "strong-core",
     "strong-evals",
+    "strong-interview",
     "strong-voice",
     "strong-worker",
 ]
@@ -2074,6 +2075,7 @@ source = { editable = "evals" }
 dependencies = [
     { name = "pyyaml" },
     { name = "strong-core" },
+    { name = "strong-interview" },
     { name = "strong-worker" },
 ]
 
@@ -2081,8 +2083,20 @@ dependencies = [
 requires-dist = [
     { name = "pyyaml", specifier = ">=6.0" },
     { name = "strong-core", editable = "packages/core" },
+    { name = "strong-interview", editable = "packages/interview" },
     { name = "strong-worker", editable = "apps/worker" },
 ]
+
+[[package]]
+name = "strong-interview"
+version = "0.1.0"
+source = { editable = "packages/interview" }
+dependencies = [
+    { name = "strong-core" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "strong-core", editable = "packages/core" }]
 
 [[package]]
 name = "strong-voice"

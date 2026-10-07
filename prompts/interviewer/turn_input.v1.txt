@@ -1,0 +1,9 @@
+Transcript so far:
+$transcript
+
+Move: $move
+Question: $question
+What the last answer lacks: $missing
+Pushback: $pushback
+
+Write only what you say next, as the interviewer.

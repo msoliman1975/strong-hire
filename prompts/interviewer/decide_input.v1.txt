@@ -1,0 +1,10 @@
+Interview type: $interview_type. Level: $level.
+
+Question: $question
+What a strong answer covers: $probe_hints
+
+Recent transcript:
+$transcript
+
+The answer to judge:
+$answer
