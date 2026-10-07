@@ -139,13 +139,23 @@ services:
   litellm:
     image: ghcr.io/berriai/litellm:main-stable
     profiles: [models]
+    # Also trust infra/certs/*.crt (networks with TLS inspection): the entrypoint adds them to the
+    # system CA bundle, and SSL_CERT_FILE points the HTTP clients at the result. Same image.
+    entrypoint:
+      - sh
+      - -c
+      - cat /etc/ssl/certs/ca-certificates.crt /extra-certs/*.crt > /tmp/ca-bundle.pem 2>/dev/null; exec docker/prod_entrypoint.sh "$$@"
+      - --
     command: ["--config", "/app/litellm.yaml", "--port", "4000"]
     environment:
       LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-local-dev-only}
       HOSTED_API_KEY: ${HOSTED_API_KEY:-}
+      SSL_CERT_FILE: /tmp/ca-bundle.pem
+      REQUESTS_CA_BUNDLE: /tmp/ca-bundle.pem
     ports: ["${LITELLM_PORT:-4000}:4000"]
     volumes:
       - ../config/litellm.${LITELLM_PROFILE:-local}.yaml:/app/litellm.yaml:ro
+      - ./certs:/extra-certs:ro
     extra_hosts: ["host.docker.internal:host-gateway"]
     healthcheck:
       <<: *healthcheck
