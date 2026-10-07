@@ -17,6 +17,7 @@ from livekit.plugins.turn_detector.english import EnglishModel
 
 from strong_core.gateway import Role, get_gateway
 from strong_core.prompts import load_prompt
+from strong_voice.interview_agent import run_session
 from strong_voice.latency import WARMUP_ROOM_PREFIX, LatencyRecorder
 from strong_voice.plugins import GatewayLLM, GatewaySTT, GatewayTTS
 from strong_voice.settings import get_voice_settings
@@ -68,6 +69,14 @@ async def entrypoint(ctx: JobContext) -> None:
     settings = get_voice_settings()
     gateway = get_gateway()
     await ctx.connect()
+
+    # A room named session-<uuid> is a real interview (P7). Other rooms are latency spike rooms.
+    def session_for_interview() -> AgentSession[None]:
+        recorder = LatencyRecorder(None, session=ctx.room.name, profile=gateway.profile)
+        return build_session(ctx.proc, recorder)
+
+    if await run_session(ctx, session_for_interview):
+        return
 
     label = settings.latency_label or gateway.profile
     warmup = ctx.room.name.startswith(WARMUP_ROOM_PREFIX)  # warm-up rooms are not counted

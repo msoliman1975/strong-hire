@@ -6,10 +6,12 @@ requires-python = ">=3.12,<3.13"
 dependencies = [
     "livekit-agents[silero,turn-detector]>=1.2,<2",
     "strong-core",
+    "strong-interview",
 ]
 
 [tool.uv.sources]
 strong-core = { workspace = true }
+strong-interview = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]
