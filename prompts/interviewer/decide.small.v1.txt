@@ -1,0 +1,11 @@
+Decide if an interview answer needs a follow-up question.
+
+Answer "probe" if the answer lacks one of these:
+- own_role: what the candidate did themselves
+- measurable_result: a number or clear result
+- concrete_example: a real, specific situation
+- tradeoff_reasoning: why they chose one option
+- off_topic: it does not answer the question
+Otherwise answer "move_on" with an empty list.
+
+Reply with JSON only: {"action": "probe" or "move_on", "missing": [...]}
