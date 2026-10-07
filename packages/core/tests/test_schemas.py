@@ -253,3 +253,19 @@ def test_fixtures_are_valid_contracts() -> None:
                 by_name[recorded.output_type].model_validate(recorded.output)
             continue
         by_name[path.stem].model_validate_json(path.read_text(encoding="utf-8"))
+
+
+def test_iv3_probe_decision_is_a_constrained_choice() -> None:
+    """IV-3: the probe decision allows only probe or move_on, with known triggers."""
+    from strong_core.schemas import ProbeDecision, ProbeTrigger
+
+    ok = ProbeDecision.model_validate({"action": "probe", "missing": ["own_role"]})
+    assert ok.missing == [ProbeTrigger.OWN_ROLE]
+    assert ProbeDecision.model_validate({"action": "move_on"}).missing == []
+    for bad in (
+        {"action": "ask_again"},
+        {"action": "probe", "missing": ["vibes"]},
+        {"action": "probe", "reason": "extra field"},
+    ):
+        with pytest.raises(ValidationError):
+            ProbeDecision.model_validate(bad)

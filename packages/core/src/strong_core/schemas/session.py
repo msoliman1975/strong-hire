@@ -14,6 +14,7 @@ from strong_core.schemas.enums import (
     Level,
     Mode,
     Phase,
+    ProbeTrigger,
     Speaker,
 )
 
@@ -139,3 +140,16 @@ class Turn(Contract):
         if self.end_ms < self.start_ms:
             raise ValueError("end_ms must be >= start_ms")
         return self
+
+
+class ProbeDecision(Contract):
+    """What the interviewer model decides after an answer in CORE (IV-3).
+
+    A constrained choice, so a weak model cannot derail the session. The session controller
+    enforces the probe limit per question and moves on once it is reached, whatever this says.
+    """
+
+    action: Literal["probe", "move_on"]
+    missing: list[ProbeTrigger] = Field(
+        default_factory=list, max_length=5, description="What the answer lacks; empty to move on."
+    )
