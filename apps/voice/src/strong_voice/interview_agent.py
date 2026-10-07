@@ -5,7 +5,10 @@ strong_interview through VoiceInterview, and speaks what it returns. LiveKit's o
 skipped (StopResponse): the interviewer and the controller decide what is said.
 
 From the browser, on the data channel (topic "coach"): {"command": "hint" | "redo" | "pause" |
-"resume"}. To the browser (topic "session"): {"type": "ended"} when the session is over.
+"resume" | "end"}. "end" means the candidate clicked End interview.
+To the browser (topic "session"):
+  {"type": "state", "phase", "paused", "elapsed_ms", "said": [lines]}  after each interviewer turn
+  {"type": "ended"}                                                     when the session is over
 """
 
 from __future__ import annotations
@@ -44,13 +47,29 @@ SESSION_TOPIC = "session"
 COACH_COMMANDS = {"hint", "redo", "pause", "resume"}
 
 
+def state_message(interview: VoiceInterview, said: list[str]) -> bytes:
+    """What the browser shows: the phase, the clock and the interviewer's words (captions)."""
+    controller = interview.runner.controller
+    return json.dumps(
+        {
+            "type": "state",
+            "phase": controller.phase.value,
+            "paused": controller.paused,
+            "elapsed_ms": controller.elapsed_ms,
+            "said": said,
+        }
+    ).encode()
+
+
 class InterviewAgent(Agent):
-    def __init__(self, interview: VoiceInterview, on_ended: Any) -> None:
+    def __init__(self, interview: VoiceInterview, on_ended: Any, notify: Any) -> None:
         super().__init__(instructions="Unused: strong_interview decides what is said.")
         self.interview = interview
         self._on_ended = on_ended
+        self._notify = notify
 
     async def speak(self, lines: list[str]) -> None:
+        await self._notify(lines)
         handle = None
         for line in lines:
             handle = self.session.say(line)
@@ -104,7 +123,15 @@ async def run_session(ctx: JobContext, build_session: Any) -> bool:
         await ctx.room.local_participant.publish_data(payload, reliable=True, topic=SESSION_TOPIC)
         ctx.shutdown("interview ended")
 
-    agent = InterviewAgent(interview, ended)
+    async def notify(lines: list[str]) -> None:
+        try:
+            await ctx.room.local_participant.publish_data(
+                state_message(interview, lines), reliable=True, topic=SESSION_TOPIC
+            )
+        except Exception:
+            log.warning("could not send the session state to the browser", exc_info=True)
+
+    agent = InterviewAgent(interview, ended, notify)
     tasks: set[asyncio.Task[None]] = set()
 
     def background(coro: Any) -> None:
@@ -121,7 +148,9 @@ async def run_session(ctx: JobContext, build_session: Any) -> bool:
             command = json.loads(packet.data.decode()).get("command")
         except ValueError:
             return
-        if command in COACH_COMMANDS:
+        if command == "end":
+            background(ended())
+        elif command in COACH_COMMANDS:
             background(_coach(command))
 
     async def _coach(command: Any) -> None:
