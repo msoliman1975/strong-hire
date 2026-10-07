@@ -50,6 +50,12 @@ services:
   worker:
     environment:
       APP_ENV: staging
+      ENV: staging
+      # Encrypted resume files, kept in a volume so they survive restarts.
+      INPUTS_STORAGE_DIR: /data/uploads
+      INPUTS_STORAGE_KEY: ${INPUTS_STORAGE_KEY:?set INPUTS_STORAGE_KEY in .env}
+    volumes:
+      - uploads-data:/data/uploads
     restart: unless-stopped
 
   # Caddy serves the built web app, so the Vite dev server is not needed.
@@ -93,5 +99,6 @@ services:
     restart: unless-stopped
 
 volumes:
+  uploads-data:
   caddy-data:
   caddy-config:
