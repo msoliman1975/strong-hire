@@ -14,7 +14,8 @@
 
 .NOTES
   The script edits MODEL_PROFILE and LITELLM_PROFILE in .env, then recreates api, worker, web and
-  litellm so they read the new values. Works in Windows PowerShell 5.1 and PowerShell 7.
+  litellm so they read the new values, and applies database migrations. Works in Windows
+  PowerShell 5.1 and PowerShell 7.
 
   claude profile: the Anthropic key is read from your environment (process, user or machine
   variable) and passed to LiteLLM only; it is never written to a file. The app gets a LiteLLM key
@@ -245,6 +246,9 @@ try {
         catch { Start-Sleep -Seconds 2 }
     }
     if ($null -eq $health) { throw "The API did not answer on port $port within 3 minutes." }
+    # New code can bring new database migrations; apply them, as ./scripts/dev.ps1 up does.
+    Write-Step 'Applying database migrations'
+    Invoke-Docker ($compose + @('exec', '-T', 'api', 'alembic', '-c', 'packages/core/alembic.ini', 'upgrade', 'head'))
     Write-Step "API is up with model_profile=$($health.model_profile)"
     if ($Name -eq 'claude') { Show-Spend (Get-EnvValues) }
     if ($Name -in @('tiny', 'local')) {
