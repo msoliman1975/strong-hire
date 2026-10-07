@@ -18,9 +18,12 @@
 
   claude profile: the Anthropic key is read from your environment (process, user or machine
   variable) and passed to LiteLLM only; it is never written to a file. The app gets a LiteLLM key
-  with a daily budget (CLAUDE_DAILY_BUDGET_USD) and a requests-per-minute limit
-  (CLAUDE_RPM_LIMIT) from .env. Once the budget is used, model calls fail until the next day.
-  Set a monthly limit in the Anthropic Console as well: it is the hard limit.
+  in the LiteLLM team "strong-hire". Limits, from .env:
+    CLAUDE_DAILY_BUDGET_USD    the key's budget per day (resets 00:00 UTC)
+    CLAUDE_MONTHLY_BUDGET_USD  the team's budget per month (resets on the 1st, UTC)
+    CLAUDE_RPM_LIMIT           requests per minute
+  Once a budget is used, model calls fail until it resets. Set a monthly limit in the Anthropic
+  Console as well: it is the hard limit.
 #>
 [CmdletBinding()]
 param(
@@ -34,6 +37,7 @@ $ErrorActionPreference = 'Stop'
 $Root = Split-Path -Parent $PSScriptRoot
 $EnvFile = Join-Path $Root '.env'
 $AppKeyAlias = 'strong-hire-app'
+$TeamAlias = 'strong-hire'
 
 function Write-Step([string]$Message) { Write-Host "==> $Message" -ForegroundColor Cyan }
 
@@ -106,21 +110,45 @@ function Invoke-LiteLLM([string]$Method, [string]$Path, $Body, [hashtable]$Env) 
     return Invoke-RestMethod @params
 }
 
-function Set-AppKey([hashtable]$Env) {
+function Set-Team([hashtable]$Env) {
+    $monthly = if ($Env['CLAUDE_MONTHLY_BUDGET_USD']) { [double]$Env['CLAUDE_MONTHLY_BUDGET_USD'] } else { 30.0 }
+    $limits = @{ max_budget = $monthly; budget_duration = '30d' }
+    $team = $Env['LITELLM_TEAM_ID']
+    if ($team) {
+        try {
+            $null = Invoke-LiteLLM 'GET' "/team/info?team_id=$team" $null $Env
+            $null = Invoke-LiteLLM 'POST' '/team/update' (@{ team_id = $team } + $limits) $Env
+            Write-Step "Team budget updated: `$$monthly per month"
+            return $team
+        }
+        catch { Write-Host 'The saved team is unknown to LiteLLM; creating a new one.' }
+    }
+    $created = Invoke-LiteLLM 'POST' '/team/new' (@{ team_alias = $TeamAlias } + $limits) $Env
+    Set-EnvValue 'LITELLM_TEAM_ID' $created.team_id
+    Write-Step "Team created: `$$monthly per month"
+    return $created.team_id
+}
+
+function Set-AppKey([hashtable]$Env, [string]$Team) {
     $budget = if ($Env['CLAUDE_DAILY_BUDGET_USD']) { [double]$Env['CLAUDE_DAILY_BUDGET_USD'] } else { 5.0 }
     $rpm = if ($Env['CLAUDE_RPM_LIMIT']) { [int]$Env['CLAUDE_RPM_LIMIT'] } else { 60 }
     $limits = @{ max_budget = $budget; budget_duration = '1d'; rpm_limit = $rpm }
     $key = $Env['LITELLM_APP_KEY']
     if ($key) {
         try {
-            $null = Invoke-LiteLLM 'GET' "/key/info?key=$key" $null $Env
-            $null = Invoke-LiteLLM 'POST' '/key/update' (@{ key = $key } + $limits) $Env
-            Write-Step "App key updated: `$$budget per day, $rpm requests per minute"
-            return $key
+            $info = (Invoke-LiteLLM 'GET' "/key/info?key=$key" $null $Env).info
+            if ($info.team_id -eq $Team) {
+                $null = Invoke-LiteLLM 'POST' '/key/update' (@{ key = $key } + $limits) $Env
+                Write-Step "App key updated: `$$budget per day, $rpm requests per minute"
+                return $key
+            }
+            # A key from before the team existed: replace it, so the monthly budget applies.
+            $null = Invoke-LiteLLM 'POST' '/key/delete' @{ keys = @($key) } $Env
         }
         catch { Write-Host 'The saved app key is unknown to LiteLLM; creating a new one.' }
     }
-    $created = Invoke-LiteLLM 'POST' '/key/generate' (@{ key_alias = $AppKeyAlias } + $limits) $Env
+    $body = @{ key_alias = $AppKeyAlias; team_id = $Team } + $limits
+    $created = Invoke-LiteLLM 'POST' '/key/generate' $body $Env
     Set-EnvValue 'LITELLM_APP_KEY' $created.key
     Write-Step "App key created: `$$budget per day, $rpm requests per minute"
     return $created.key
@@ -134,6 +162,11 @@ function Show-Spend([hashtable]$Env) {
         $spend = [math]::Round([double]$info.spend, 4)
         Write-Host ("Claude spend today: `${0} of `${1} (resets {2}); limit {3} requests per minute" -f `
                 $spend, $info.max_budget, $info.budget_reset_at, $info.rpm_limit)
+        if ($info.team_id) {
+            $team = (Invoke-LiteLLM 'GET' "/team/info?team_id=$($info.team_id)" $null $Env).team_info
+            Write-Host ("Claude spend this month: `${0} of `${1} (resets {2})" -f `
+                    [math]::Round([double]$team.spend, 4), $team.max_budget, $team.budget_reset_at)
+        }
     }
     catch { Write-Host 'LiteLLM is not running, or it does not know the app key.' }
 }
@@ -195,7 +228,8 @@ try {
         Invoke-Docker ($compose + @('up', '-d', '--wait', '--force-recreate') + $services)
     }
     if ($Name -eq 'claude') {
-        $null = Set-AppKey (Get-EnvValues)
+        $team = Set-Team (Get-EnvValues)
+        $null = Set-AppKey (Get-EnvValues) $team
     }
 
     $app = @('api', 'worker', 'web')
