@@ -883,7 +883,7 @@ th.num {
   height: auto;
 }
 
-/* ------------------------------------------------------------ live session placeholder */
+/* ------------------------------------------------------------ live session */
 
 .live {
   background: var(--ink);
@@ -894,6 +894,26 @@ th.num {
 
 .live .muted {
   color: #b8c0cc;
+}
+
+/* What the interviewer said: light text on a slightly lighter dark box, easy to read. */
+.live__captions {
+  background: #2c3746;
+  color: #f2f4f7;
+  border-radius: var(--radius);
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-4);
+  min-height: 5.5rem;
+  font-size: 1.15rem;
+  line-height: 1.5;
+}
+
+.live__captions p {
+  margin: 0;
+}
+
+.live__captions p + p {
+  margin-top: var(--space-2);
 }
 
 .live__timer {

@@ -156,7 +156,9 @@ describe("live session page", () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const { user } = renderLive(session());
     await joinRoom(user);
-    act(() => vi.advanceTimersByTime(AGENT_WAIT_MS + 100));
+    act(() => vi.advanceTimersByTime(10_100));
+    expect(screen.getByText("The interviewer is starting. This can take up to a minute.")).toBeInTheDocument();
+    act(() => vi.advanceTimersByTime(AGENT_WAIT_MS));
     expect(await screen.findByRole("alert")).toHaveTextContent("The interviewer did not join.");
     expect(screen.getByRole("button", { name: "Try again" })).toBeInTheDocument();
   });

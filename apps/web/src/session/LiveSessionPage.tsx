@@ -27,8 +27,13 @@ import {
 } from "./voice";
 
 const PHASES = Object.keys(phaseLabel) as Phase[];
-/** How long the page waits for the voice agent to join the room. */
-export const AGENT_WAIT_MS = 20_000;
+/**
+ * How long the page waits for the voice agent to join the room. On a local stack with CPU models,
+ * starting the agent's process can take 40 seconds.
+ */
+export const AGENT_WAIT_MS = 60_000;
+/** After this long, the page says that the wait is normal. */
+const SLOW_AGENT_MS = 10_000;
 /** The voice agent keeps the session this long after a drop (IV-9). */
 const RECONNECT_MIN = 2;
 
@@ -78,6 +83,7 @@ function LiveView({ session }: { session: SessionRecord }) {
   const [failure, setFailure] = useState<string | null>(null);
   const [link, setLink] = useState<"connected" | "reconnecting" | "disconnected">("connected");
   const [agent, setAgent] = useState<AgentState | null>(null);
+  const [slowAgent, setSlowAgent] = useState(false);
   const now = useNow();
   const { config } = session;
   const sessionId = session.id;
@@ -122,11 +128,16 @@ function LiveView({ session }: { session: SessionRecord }) {
   // The voice agent should join within seconds. If it does not, say so and offer a retry.
   useEffect(() => {
     if (stage !== "waiting") return;
+    const slow = setTimeout(() => setSlowAgent(true), SLOW_AGENT_MS);
     const t = setTimeout(() => {
       setStage("failed");
       setFailure("The interviewer did not join. The voice service may be down. Try again in a minute.");
     }, AGENT_WAIT_MS);
-    return () => clearTimeout(t);
+    return () => {
+      clearTimeout(slow);
+      clearTimeout(t);
+      setSlowAgent(false);
+    };
   }, [stage]);
 
   useEffect(() => () => void connection.current?.disconnect(), []);
@@ -195,7 +206,13 @@ function LiveView({ session }: { session: SessionRecord }) {
               </p>
             </div>
             <p className="muted" role="status">
-              {stage === "waiting" ? "Waiting for the interviewer to join" : paused ? "Paused" : "Connected"}
+              {stage === "waiting"
+                ? slowAgent
+                  ? "The interviewer is starting. This can take up to a minute."
+                  : "Waiting for the interviewer to join"
+                : paused
+                  ? "Paused"
+                  : "Connected"}
             </p>
           </div>
           <ol className="phases" aria-label="Interview phases">
@@ -205,7 +222,12 @@ function LiveView({ session }: { session: SessionRecord }) {
               </li>
             ))}
           </ol>
-          <div className="panel" aria-live="polite" aria-label="What the interviewer said" data-testid="captions">
+          <div
+            className="live__captions"
+            aria-live="polite"
+            aria-label="What the interviewer said"
+            data-testid="captions"
+          >
             {agent?.said.length ? (
               agent.said.map((line, i) => <p key={i}>{line}</p>)
             ) : (
