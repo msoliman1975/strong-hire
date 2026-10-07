@@ -172,7 +172,9 @@ class ModelGateway:
         """Text to speech as raw 16-bit mono PCM at `capabilities(Role.TTS).sample_rate`.
 
         Chunks arrive as the server renders them when the TTS model has `streaming: true`, so
-        the voice loop can play the first chunk before the sentence is finished.
+        the voice loop can play the first chunk before the sentence is finished. A provider that
+        only returns WAV can set `response_format: wav` in the model's options: the WAV header
+        is removed here, and its sample rate must match the capability registry.
         """
         caps = self.capabilities(Role.TTS)
         if caps.sample_rate is None:
@@ -189,12 +191,13 @@ class ModelGateway:
         }
         body.update(caps.options)
         carry = b""
+        wav = _WavHeader(caps.sample_rate)
         async with self._http() as http, http.stream("POST", "/audio/speech", json=body) as resp:
             if resp.is_error:
                 await resp.aread()
                 _raise_for(resp, Role.TTS)
             async for chunk in resp.aiter_bytes():
-                data = carry + chunk
+                data = carry + wav.strip(chunk)
                 cut = len(data) - len(data) % 2  # never split a 16-bit sample
                 carry = data[cut:]
                 if cut:
@@ -273,3 +276,50 @@ def get_gateway() -> ModelGateway:
     if _gateway is None:
         _gateway = build_gateway(get_settings())
     return _gateway
+
+
+class _WavHeader:
+    """Removes a WAV header from the start of a byte stream; other streams pass through.
+
+    Buffers only until the "data" chunk starts. Raises GatewayError when the WAV is not 16-bit
+    mono PCM at the expected sample rate, because the voice loop would play it wrong.
+    """
+
+    def __init__(self, sample_rate: int) -> None:
+        self.sample_rate = sample_rate
+        self._head = b""
+        self._done = False
+
+    def strip(self, chunk: bytes) -> bytes:
+        if self._done:
+            return chunk
+        self._head += chunk
+        if len(self._head) < 12:
+            return b""
+        if self._head[:4] != b"RIFF" or self._head[8:12] != b"WAVE":
+            self._done = True
+            return self._head
+        pos = 12
+        while pos + 8 <= len(self._head):
+            chunk_id = self._head[pos : pos + 4]
+            size = int.from_bytes(self._head[pos + 4 : pos + 8], "little")
+            if chunk_id == b"data":
+                self._done = True
+                return self._head[pos + 8 :]
+            if chunk_id == b"fmt ":
+                if pos + 24 > len(self._head):
+                    return b""  # wait for the whole fmt chunk
+                self._check_format(self._head[pos + 8 : pos + 24])
+            pos += 8 + size + (size % 2)
+        return b""
+
+    def _check_format(self, fmt: bytes) -> None:
+        audio_format = int.from_bytes(fmt[0:2], "little")
+        channels = int.from_bytes(fmt[2:4], "little")
+        rate = int.from_bytes(fmt[4:8], "little")
+        bits = int.from_bytes(fmt[14:16], "little")
+        if (audio_format, channels, rate, bits) != (1, 1, self.sample_rate, 16):
+            raise GatewayError(
+                f"tts returned WAV with format {audio_format}, {channels} channel(s), {rate} Hz, "
+                f"{bits} bit; expected 16-bit mono PCM at {self.sample_rate} Hz"
+            )
