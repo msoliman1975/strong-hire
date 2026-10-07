@@ -1560,6 +1560,31 @@ export interface components {
             weight: number;
         };
         /**
+         * ProbeDecision
+         * @description What the interviewer model decides after an answer in CORE (IV-3).
+         *
+         *     A constrained choice, so a weak model cannot derail the session. The session controller
+         *     enforces the probe limit per question and moves on once it is reached, whatever this says.
+         */
+        ProbeDecision: {
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "probe" | "move_on";
+            /**
+             * Missing
+             * @description What the answer lacks; empty to move on.
+             */
+            missing?: components["schemas"]["ProbeTrigger"][];
+        };
+        /**
+         * ProbeTrigger
+         * @description IV-3 follow-up rules: what an answer lacks, so the interviewer probes.
+         * @enum {string}
+         */
+        ProbeTrigger: "own_role" | "measurable_result" | "concrete_example" | "tradeoff_reasoning" | "off_topic";
+        /**
          * ProfileField
          * @description Top-level profile fields that carry sources and a confidence level.
          * @enum {string}

@@ -29,6 +29,7 @@ from strong_core.schemas.enums import (
     Mode,
     OrgType,
     Phase,
+    ProbeTrigger,
     ProfileStatus,
     RoleFamily,
     SessionChannel,
@@ -66,6 +67,7 @@ from strong_core.schemas.session import (
     InterviewerBrief,
     PersonaBrief,
     PhaseTime,
+    ProbeDecision,
     SessionConfig,
     Turn,
 )
@@ -81,6 +83,7 @@ EXPORTED_SCHEMAS: dict[str, type[BaseModel]] = {
     "session_config": SessionConfig,
     "interviewer_brief": InterviewerBrief,
     "turn": Turn,
+    "probe_decision": ProbeDecision,
     "scorecard": Scorecard,
     "progress_snapshot": ProgressSnapshot,
 }
@@ -121,6 +124,8 @@ __all__ = [
     "PhaseTime",
     "PlannedSession",
     "Principle",
+    "ProbeDecision",
+    "ProbeTrigger",
     "ProfileField",
     "ProfileMeta",
     "ProfileStatus",

@@ -196,6 +196,16 @@ class SubscriptionStatus(StrEnum):
     INCOMPLETE = "incomplete"
 
 
+class ProbeTrigger(StrEnum):
+    """IV-3 follow-up rules: what an answer lacks, so the interviewer probes."""
+
+    OWN_ROLE = "own_role"
+    MEASURABLE_RESULT = "measurable_result"
+    CONCRETE_EXAMPLE = "concrete_example"
+    TRADEOFF_REASONING = "tradeoff_reasoning"
+    OFF_TOPIC = "off_topic"
+
+
 class SessionChannel(StrEnum):
     """PL-7. How the candidate and the interviewer talk. Text runs the same controller and
     interviewer logic with typed input. It is a dev flag; the simulated-candidate tests use it."""
