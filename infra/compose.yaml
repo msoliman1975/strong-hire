@@ -2,6 +2,8 @@
 #   core:   postgres, redis, api, worker, web
 #   models: ollama (CPU), litellm proxy
 #   voice:  livekit-server (dev mode), voice agent, stt (faster-whisper), tts (Kokoro)
+#   all-in-one: every service above, for the smallest machine; set MODEL_PROFILE=tiny and
+#               LITELLM_PROFILE=tiny in .env (PL-2)
 # Which models answer each role is set only in config/ (MODEL_PROFILE, LITELLM_PROFILE).
 # Host ports come from .env (see .env.example); the defaults below match it.
 name: strong-hire
@@ -25,7 +27,7 @@ services:
   # ---------------------------------------------------------------- core
   postgres:
     image: postgres:16-alpine
-    profiles: [core]
+    profiles: [core, all-in-one]
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-strong}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-strong}
@@ -38,7 +40,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    profiles: [core]
+    profiles: [core, all-in-one]
     ports: ["${REDIS_PORT:-56379}:6379"]
     healthcheck:
       <<: *healthcheck
@@ -49,7 +51,7 @@ services:
       context: ..
       dockerfile: infra/docker/python.Dockerfile
       args: { PACKAGE: strong-api, APP_DIR: apps/api }
-    profiles: [core]
+    profiles: [core, all-in-one]
     environment:
       <<: *python-env
       # P9 billing (BL-1, BL-2). Empty Stripe keys: checkout and the portal answer 503.
@@ -82,7 +84,7 @@ services:
       context: ..
       dockerfile: infra/docker/python.Dockerfile
       args: { PACKAGE: strong-worker, APP_DIR: apps/worker }
-    profiles: [core]
+    profiles: [core, all-in-one]
     environment: *python-env
     command: ["arq", "strong_worker.main.WorkerSettings"]
     volumes:
@@ -103,7 +105,7 @@ services:
     build:
       context: ..
       dockerfile: infra/docker/web.Dockerfile
-    profiles: [core]
+    profiles: [core, all-in-one]
     environment:
       VITE_API_PROXY_TARGET: http://api:8000
       VITE_USE_POLLING: "true"
@@ -121,7 +123,7 @@ services:
   ollama:
     # CPU inference. Pull the models in config/litellm.local.yaml with ./scripts/models.ps1 pull
     image: ollama/ollama:latest
-    profiles: [models]
+    profiles: [models, all-in-one]
     environment:
       OLLAMA_KEEP_ALIVE: 30m
       OLLAMA_MAX_LOADED_MODELS: ${OLLAMA_MAX_LOADED_MODELS:-2}   # CI uses 1 (7.9 GB of RAM)
@@ -138,7 +140,7 @@ services:
 
   litellm:
     image: ghcr.io/berriai/litellm:main-stable
-    profiles: [models]
+    profiles: [models, all-in-one]
     # Also trust infra/certs/*.crt (networks with TLS inspection): the entrypoint adds them to the
     # system CA bundle, and SSL_CERT_FILE points the HTTP clients at the result. Same image.
     entrypoint:
@@ -165,7 +167,7 @@ services:
   # ---------------------------------------------------------------- voice
   livekit:
     image: livekit/livekit-server:latest
-    profiles: [voice]
+    profiles: [voice, all-in-one]
     # --node-ip 127.0.0.1 so the browser on the Windows host can reach the media ports. The voice
     # agent shares this container's network (network_mode below), so 127.0.0.1 works for it too.
     command: ["--dev", "--bind", "0.0.0.0", "--node-ip", "127.0.0.1"]
@@ -183,7 +185,7 @@ services:
       context: ..
       dockerfile: infra/docker/python.Dockerfile
       args: { PACKAGE: strong-voice, APP_DIR: apps/voice }
-    profiles: [voice]
+    profiles: [voice, all-in-one]
     environment:
       <<: *python-env
       LIVEKIT_URL: ws://localhost:7880
@@ -219,7 +221,7 @@ services:
     # faster-whisper on CPU, OpenAI-compatible /v1/audio/transcriptions (infra/stt/server.py).
     # The model to load comes from the request, which LiteLLM fills from config/.
     build: { context: .., dockerfile: infra/stt/Dockerfile }
-    profiles: [voice]
+    profiles: [voice, all-in-one]
     environment:
       STT_DEVICE: cpu
       STT_COMPUTE_TYPE: int8
@@ -233,7 +235,7 @@ services:
   tts:
     # Kokoro-82M on CPU, OpenAI-compatible /v1/audio/speech with streaming PCM (24 kHz).
     image: ghcr.io/remsky/kokoro-fastapi-cpu:latest
-    profiles: [voice]
+    profiles: [voice, all-in-one]
     ports: ["${TTS_PORT:-8880}:8880"]
     healthcheck:
       <<: *healthcheck

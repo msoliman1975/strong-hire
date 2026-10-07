@@ -4,6 +4,7 @@
 
 .EXAMPLE
   ./scripts/models.ps1 pull                    # pull the Ollama models named in config/litellm.local.yaml
+  ./scripts/models.ps1 pull -Profile tiny      # pull the one small model of the tiny profile
   ./scripts/models.ps1 smoke                   # all six roles with MODEL_PROFILE=local
   ./scripts/models.ps1 smoke -Profile hosted   # same test on hosted APIs; skips when keys are missing
 
@@ -19,7 +20,7 @@ param(
     [string]$Command = 'help',
 
     [Alias('Profile')]
-    [ValidateSet('local', 'hosted')]
+    [ValidateSet('tiny', 'local', 'hosted')]
     [string]$ModelProfile = 'local'
 )
 
@@ -28,8 +29,8 @@ $Root = Split-Path -Parent $PSScriptRoot
 . (Join-Path $PSScriptRoot 'lib/stack.ps1')
 
 function Get-OllamaModels {
-    # Entries in litellm.local.yaml whose api_base is the ollama service; the tag follows "<provider>/".
-    $lines = Get-Content (Join-Path $Root 'config/litellm.local.yaml')
+    # Entries in litellm.<profile>.yaml whose api_base is the ollama service; the tag follows "<provider>/".
+    $lines = Get-Content (Join-Path $Root "config/litellm.$ModelProfile.yaml")
     $tags = @()
     for ($i = 0; $i -lt $lines.Count; $i++) {
         if ($lines[$i] -match '^\s*model:\s*[^/\s]+/(\S+)\s*$') {
@@ -47,6 +48,7 @@ try {
         'pull' {
             Assert-Docker
             Initialize-EnvFile
+            if ($ModelProfile -eq 'hosted') { throw 'The hosted profile has no local models to pull.' }
             Invoke-Compose @('--profile', 'models', 'up', '-d', '--wait', 'ollama')
             foreach ($tag in Get-OllamaModels) {
                 Write-Step "Pulling $tag"
@@ -58,7 +60,7 @@ try {
             Initialize-EnvFile
             Import-EnvFile
             $services = @('litellm', 'stt', 'tts')
-            if ($ModelProfile -eq 'local') { $services = @('ollama') + $services }
+            if ($ModelProfile -ne 'hosted') { $services = @('ollama') + $services }
             Start-ModelServices -ModelProfile $ModelProfile -Services $services
             $exit = Invoke-HostPython -ModelProfile $ModelProfile -PythonArgs @('-m', 'strong_core.gateway.smoke', '--profile', $ModelProfile)
             if ($exit -eq 2) { Write-Host "Skipped profile $ModelProfile (see the message above)."; exit 0 }

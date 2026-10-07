@@ -42,11 +42,17 @@ All ports are set in `.env` (see `.env.example`).
 | voice | stt (faster-whisper, CPU, int8) | 8010 | OpenAI-compatible `/v1/audio/transcriptions` |
 | voice | tts (Kokoro, CPU) | 8880 | OpenAI-compatible `/v1/audio/speech`, streaming PCM |
 
+The `all-in-one` profile starts every service above, for the `tiny` model profile.
+
 ## Model profiles
 
 `MODEL_PROFILE` picks how the model gateway works:
 
 - `fake`: recorded fixtures, no model. The default, and the only profile tests use.
+- `tiny`: `config/models.tiny.yaml`. One small model (Qwen 2.5 3B) serves all four text roles, on CPU.
+  For the smallest machine: set `MODEL_PROFILE=tiny` and `LITELLM_PROFILE=tiny` in `.env`, run
+  `./scripts/models.ps1 pull -Profile tiny`, then start the `all-in-one` Docker profile.
+  Results are development data (PL-6), and interviewing is weak.
 - `local`: `config/models.local.yaml`, through LiteLLM to Ollama in Docker.
 - `hosted`: `config/models.hosted.yaml`, through LiteLLM to hosted APIs. Needs `HOSTED_API_KEY` in `.env`.
 

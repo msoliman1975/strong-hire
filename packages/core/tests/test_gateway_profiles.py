@@ -1,4 +1,4 @@
-"""PL-1: local and hosted profiles switch by config only; all six roles pass a smoke test.
+"""PL-1, PL-2: tiny, local and hosted profiles switch by config only; six roles pass a smoke test.
 
 The live tests call real models and are skipped unless SMOKE_LIVE=1. Run them with
 ./scripts/models.ps1 smoke [-Profile hosted]. The hosted test also skips when the provider key
@@ -22,7 +22,7 @@ from strong_core.gateway.smoke import run_smoke
 
 REPO = find_repo_root()
 CONFIG = REPO / "config"
-PROFILES = ["local", "hosted"]
+PROFILES = ["tiny", "local", "hosted"]
 
 
 def _litellm_aliases(profile: str) -> set[str]:
@@ -52,10 +52,20 @@ def test_pl1_capability_registry_is_filled(profile: str) -> None:
 
 
 def test_pl1_profiles_cover_the_same_roles_with_the_same_code() -> None:
-    local = load_models_config(CONFIG, "local", environ={})
-    hosted = load_models_config(CONFIG, "hosted", environ={})
-    assert set(local.roles) == set(hosted.roles) == set(Role)
-    assert local.gateway.base_url == hosted.gateway.base_url  # only the proxy config differs
+    configs = [load_models_config(CONFIG, p, environ={}) for p in PROFILES]
+    for cfg in configs:
+        assert set(cfg.roles) == set(Role), cfg.profile
+    # only the proxy config differs between profiles
+    assert len({cfg.gateway.base_url for cfg in configs}) == 1
+
+
+def test_pl2_tiny_uses_one_small_model_for_all_text_roles() -> None:
+    """PL-2: the tiny profile serves the four text roles with one small-tier model."""
+    tiny = load_models_config(CONFIG, "tiny", environ={})
+    text_roles = [Role.EXTRACTOR, Role.PLANNER, Role.INTERVIEWER, Role.SCORER]
+    aliases = {tiny.alias_for(role) for role in text_roles}
+    assert len(aliases) == 1
+    assert tiny.models[aliases.pop()].tier == "small"
 
 
 def test_pl1_hosted_needs_only_keys_from_env() -> None:
