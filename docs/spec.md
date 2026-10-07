@@ -1,6 +1,6 @@
 # Strong Hire: Product & Technical Spec v1
 
-Oct 3, 2026 · Mo Soliman
+Updated Oct 5, 2026 · Mo Soliman
 
 ## Overview
 
@@ -19,6 +19,11 @@ Strong Hire is a voice-first web app where tech candidates rehearse a real inter
 
 **North star metric (first 6 months):** paying subscribers.
 
+**Design principles.**
+
+- **Model-agnostic.** No feature depends on a specific model or provider. Code asks for a role, such as interviewer or scorer, and configuration decides which model serves it. Adding or swapping a model is a config change plus a passing conformance suite.
+- **Runs anywhere.** The same container images run on a laptop with one small model, on a single cloud VM, or on a larger cloud setup. Moving between them changes configuration only, never code or images.
+
 ## Scope
 
 v1 is deliberately narrow: tech roles, 20 curated companies plus a generic mode, English only, voice on desktop web.
@@ -30,7 +35,7 @@ v1 is deliberately narrow: tech roles, 20 curated companies plus a generic mode,
 | Roles | Tech only: SWE, data/ML, PM, design, TPM | Adjacent corporate roles | Non-tech roles |
 | Companies | 20 curated profiles researched offline and imported, generic mode for others | Auto-profiles for other companies at job setup, more curated profiles, community interview reports | |
 | Interview types | Behavioral, hiring manager deep dive, verbal technical Q&A, case (product sense, estimation, system thinking) | Recruiter screen, panel with multiple personas | Live coding, whiteboard, written system design |
-| Feedback | Hire signal with rationale, per-question rubric, progress tracking | Transcript view, model answers, delivery metrics (pace, fillers) | Audio playback (audio is deleted after scoring) |
+| Feedback | Hire signal with rationale, per-question rubric, progress tracking | Transcript view, model answers, delivery metrics (pace, fillers), story bank: the candidate's strongest answers saved as reusable stories, tagged by competency (e.g. conflict management, leadership) | Audio playback (audio is deleted after scoring) |
 | Modes | Coach and Realistic, chosen at session start | | |
 | Business | B2C, one paid plan with monthly cap | Org accounts and seats (B2B) | |
 | Markets | US and Canada, English | Other languages (Arabic is a candidate) | |
@@ -108,6 +113,13 @@ IDs are referenced by the build plan and acceptance tests. Priority: P0 must shi
 | AD-1 | Profile import command: validate a profile JSON file against the schema, store it as a new version with sources and import date, and publish it after confirmation. | P0 |
 | AD-2 | Admin dashboard: users, sessions, cost per session, failed sessions. | P1 |
 | PL-1 | Every model call is routed by role through the model gateway, so local and hosted models switch by config (see Architecture). | P0 |
+| PL-2 | Runtime profiles chosen by config only: `tiny` (one small model for all text roles, CPU), `local` (two local models), `hosted` (API providers), `gpu` (self-hosted inference). Switching needs no code change. | P0 |
+| PL-3 | Works with weak models: without JSON mode or tool calls, the gateway falls back to grammar-constrained output plus repair and retry; with a small context window, the scorer works one question at a time. | P0 |
+| PL-4 | Model conformance suite: a model is onboarded by config and by passing a standard test suite for each role it serves. CI runs it on at least two model families per role. | P0 |
+| PL-5 | Prompt variants by capability tier, never by model name. Small models get simpler prompts; code picks the variant from the model's tier. | P0 |
+| PL-6 | Provenance on every AI output: profile, model ID and prompt version. Outputs from `tiny` or `local` are marked as development data and excluded from real progress trends. | P0 |
+| PL-7 | Text-only session mode behind a dev flag, so the interviewer runs as text when local voice is too slow; the simulated-candidate tests reuse it. | P0 |
+| PL-8 | Cloud-portable deployment: only Postgres, Redis and S3-compatible storage (MinIO locally). Hetzner is the default target; only provisioning scripts are provider-specific. | P0 |
 
 ## Interviewer and scoring design
 
@@ -176,7 +188,7 @@ Python on the server end to end, a small TypeScript front end (browser audio nee
 ```mermaid
 flowchart TB
     browser["Candidate browser<br/>App UI, session screen, WebRTC audio"]
-    subgraph hetzner["Hetzner US region (same stack runs in local Docker)"]
+    subgraph hetzner["Deployment target: laptop, single VM or cloud (default Hetzner US)"]
         api["API service (FastAPI)<br/>Auth, jobs, resumes, sessions, dashboards,<br/>billing webhooks, admin pages"]
         voice["Voice agent (LiveKit Agents)<br/>LiveKit server, VAD, turn detection,<br/>session controller, interviewer loop"]
         workers["Background workers (Arq)<br/>Scraping, parsing, gap analysis,<br/>planner and scorer (Pydantic AI)"]
@@ -184,10 +196,10 @@ flowchart TB
         gateway["Model gateway<br/>LiteLLM proxy, models by role"]
         pg[("Postgres<br/>Source of truth")]
         redis[("Redis<br/>Job queue, live session state")]
-        storage[("Object storage<br/>Encrypted resume files")]
+        storage[("S3-compatible storage<br/>MinIO locally, encrypted resumes")]
     end
     stripe["Stripe<br/>Subscriptions and monthly minute cap"]
-    models["Hosted model APIs (or local Ollama)<br/>Speech-to-text and LLM, zero retention"]
+    models["Any model backend by profile<br/>tiny/local: Ollama or LM Studio<br/>hosted: zero-retention APIs, gpu: self-hosted"]
 
     browser -- HTTPS --> api
     browser -- WebRTC audio --> voice
@@ -241,34 +253,59 @@ The interviewer streams its reply sentence by sentence into TTS, so audio starts
 
 **Fine-tuning path.** v1 ships on prompted base models. Once 500 or more consenting, PII-scrubbed sessions exist, fine-tune the scorer first (LoRA on the chosen open-weight model) against human-reviewed scorecards, then the interviewer's follow-up behavior. Every fine-tuned model must beat the base model on the gold set before release.
 
-**Model-agnostic design.** No code outside the gateway module knows which model or provider it is talking to. Code asks for a role; config decides the model.
+**Model-agnostic design.** No code outside the gateway knows which model or provider it is talking to. Code asks for a role; the active runtime profile decides the model. The OpenAI-compatible protocol is the only wire format, and no vendor SDK is imported outside the gateway.
 
-| Role | Used by | Local profile (Docker, CPU) | Hosted profile |
-| --- | --- | --- | --- |
-| extractor | Job and resume parsing, company matching | Small instruct model, 3B to 4B, quantized | Mid-size open-weight model |
-| planner | Gap analysis, interviewer brief | 7B to 8B, quantized | 70B-class open-weight model |
-| interviewer | Live voice loop | 3B to 4B, for speed | Fast 70B-class model on a low-latency provider |
-| scorer | Debrief and hire signal | 7B to 8B, quantized | Strongest open-weight model available |
-| stt | Voice input | faster-whisper small, int8 on CPU | Whisper large-v3-turbo, hosted |
-| tts | Voice output | Kokoro on CPU | Kokoro on Hetzner CPU |
+| Role | Used by | tiny (laptop, CPU) | local (Docker, CPU) | hosted |
+| --- | --- | --- | --- | --- |
+| extractor | Job and resume parsing, company matching | One 3B to 4B quantized instruct model shared by all four text roles | 3B to 4B, quantized | Mid-size open-weight |
+| planner | Gap analysis, interviewer brief | (same model) | 7B to 8B, quantized | 70B-class open-weight |
+| interviewer | Live voice loop | (same model) | 3B to 4B, for speed | Fast 70B-class, low-latency provider |
+| scorer | Debrief and hire signal | (same model) | 7B to 8B, quantized | Strongest open-weight available |
+| stt | Voice input | faster-whisper tiny or base | faster-whisper small, int8 | Whisper large-v3-turbo |
+| tts | Voice output | Kokoro on CPU | Kokoro on CPU | Kokoro on cloud CPU |
+
+A fourth profile, `gpu`, points the same roles at self-hosted inference (for example vLLM) when hosted API spend justifies a GPU server.
 
 Rules that keep it agnostic:
 
-- Role-to-model mapping lives in `config/models.local.yaml` and `config/models.hosted.yaml`, picked by a `MODEL_PROFILE` environment variable.
-- A capability registry records per model whether it supports tool calls, JSON mode, and its context window. Code checks capabilities, never model names.
-- All structured output goes through Pydantic AI with schema validation and one automatic retry, so weak local models fail loudly instead of silently.
-- Prompts are plain text templates with no vendor-specific syntax.
+- Role mapping lives in `config/models.<profile>.yaml`, selected by `MODEL_PROFILE`.
+- A capability registry records per model: tool calls, JSON mode, grammar support, context window and a capability tier (small, medium, large). Code checks capabilities and tiers, never model names.
+- Prompts live in `prompts/<role>/<name>.<tier>.v<N>.txt`. Small-tier prompts are shorter and ask for one thing at a time.
+- Structured output goes through Pydantic AI with validation. When a model lacks JSON mode, the gateway uses grammar-constrained decoding where the backend supports it, then a repair-and-retry step, then fails loudly.
 - A deterministic fake model (recorded fixtures) lets tests and CI run with no model at all.
 
-**Local development environment.** Windows with Docker Desktop on WSL2, helper scripts in PowerShell. The machine has an integrated Intel Arc GPU and no CUDA, so local inference runs on CPU; 32 GB of RAM fits one small and one mid-size quantized model plus faster-whisper and Kokoro, though not all under heavy load at once. LM Studio on the host is an option (the gateway reaches it at `host.docker.internal:1234`) if it runs faster there.
+**Inference contracts.** Each role is an internal API with a fixed contract. The browser never calls these directly; the product API wraps them.
 
-Docker Compose profiles keep startup light:
+| Role | Input | Output | Minimum capability | Fallback on a small model | Latency target (hosted) |
+| --- | --- | --- | --- | --- | --- |
+| extractor | Raw posting or resume text | JobPosting or Resume with field confidence | 4k context, structured output | Extract sections in separate calls | Under 10 s |
+| planner | Job, resume, profile, session config | GapAnalysis ratings, InterviewerBrief | 8k context, structured output | Rate requirements in batches; score computed in code | Under 20 s |
+| interviewer | Brief, recent turns, controller state | Streamed reply plus a small probe-or-move-on decision | 4k context, streaming | Shorter turn window; decision via constrained choice | First token under 300 ms |
+| scorer | Transcript, brief, rubric, profile weights | Per-question and per-competency scores with quotes; rationale | 16k context, structured output | Score one question per call; hire signal always computed in code | Under 45 s for the whole session |
+| stt | Audio segment | Text with timings | Streaming or segment mode | Smaller Whisper model | Under 250 ms per final segment |
+| tts | Text sentence | Audio stream | Streaming | None needed | First chunk under 150 ms |
 
-- `core`: Postgres, Redis, API, worker, web
+**Deployment targets.**
+
+| Target | How it runs | Model profile | What changes |
+| --- | --- | --- | --- |
+| Laptop, minimal | Docker Compose `all-in-one` profile, no GPU, about 8 to 10 GB RAM free | `tiny` | Nothing but the `.env` file |
+| Laptop, full | Docker Compose `core` + `models` + `voice` | `local` or `hosted` | `.env` and API keys |
+| Single cloud VM (beta) | The same Compose files with production overrides; Caddy for TLS | `hosted` | `.env`, secrets, domain names |
+| Scaled cloud (later) | The same images on a container platform or Kubernetes, managed Postgres and S3 | `hosted` or `gpu` | Deployment manifests only |
+
+Nothing in the app depends on a specific cloud. Storage goes through the S3 API (MinIO locally), and only the provisioning scripts know about Hetzner.
+
+**Local development environment.** Windows with Docker Desktop on WSL2, helper scripts in PowerShell, CPU-only inference (Intel Arc, no CUDA, 32 GB RAM). LM Studio on the host can stand in for Ollama (the gateway reaches it at `host.docker.internal:1234`).
+
+Docker Compose profiles:
+
+- `all-in-one`: everything on the `tiny` profile, for the smallest machine
+- `core`: Postgres, Redis, MinIO, API, worker, web
 - `models`: Ollama and the LiteLLM gateway
 - `voice`: LiveKit server, voice agent, faster-whisper, Kokoro
 
-Expect local voice turns of 2 to 4 seconds and weak interviewing from small models. That is fine for building and testing flows. The phase 1 latency gate is measured with the app still running locally but the `hosted` model profile pointed at real APIs.
+Expect slow voice turns and weak interviewing on `tiny`; use the text-only session mode (PL-7) for day-to-day work. The phase 1 latency gate is measured with the app still running locally but the `hosted` model profile pointed at real APIs.
 
 ## Data model
 
@@ -283,14 +320,16 @@ Postgres is the single source of truth, with an `org_id` on every user-owned tab
 | JobTarget | id, user_id, company_id (nullable), source_url, raw_text, parsed_json, level, stage, context_notes | Null company_id means generic mode |
 | Company | id, name, slug, active | The 20 launch companies |
 | CompanyProfile | id, company_id, version, status, profile_json, sources_json, reviewed_by, published_at | Only Published versions are used |
-| GapAnalysis | id, job_target_id, resume_id, match_score, breakdown_json, session_plan_json, model_version | Recomputed when resume or job changes |
-| Session | id, job_target_id, type, difficulty, mode, duration_min, profile_version, brief_json, status, started_at, ended_at, minutes_billed | Coach sessions excluded from trends |
+| GapAnalysis | id, job_target_id, resume_id, match_score, breakdown_json, session_plan_json, model_profile, model_id, prompt_version | Recomputed when resume or job changes |
+| Session | id, job_target_id, type, difficulty, mode, channel (voice or text), duration_min, profile_version, brief_json, model_profile, interviewer_model_id, prompt_version, status, started_at, ended_at, minutes_billed | Coach and dev-profile sessions excluded from trends |
 | Turn | id, session_id, speaker, phase, text, start_ms, end_ms, question_ref | Transcript only, no audio |
-| Scorecard | id, session_id, hire_signal, rationale, competency_scores_json, value_scores_json, per_question_json, scorer_model, rubric_version | One per Realistic or Coach session. Value scores are empty in generic mode |
+| Scorecard | id, session_id, hire_signal, rationale, competency_scores_json, value_scores_json, per_question_json, model_profile, model_id, prompt_version, rubric_version | One per Realistic or Coach session. Value scores are empty in generic mode |
 | ProgressSnapshot | id, job_target_id, competency, score, session_id, at | Realistic sessions only |
 | UsageEvent | id, session_id, component (stt, llm, tts), units, cost_usd | Drives cost per session tracking |
 | CompanyRequest | id, org_id, user_id, job_target_id, company_name, normalized_name, matched_company_id, source_host, created_at | Every company name entered at job setup. Null matched_company_id means a request for a company outside the 20 |
 | AuditLog | id, actor, action, entity, at | Deletes, exports, consent changes, profile approvals |
+
+The model registry and runtime profiles live in config files, not the database. Provenance fields (PL-6) are written on every AI output so results from different models are never mixed silently.
 
 ## Privacy, security and compliance
 
@@ -374,11 +413,11 @@ Ten weeks, five two-week phases, built entirely with Claude Code on your persona
 
 | Dates | Phase | Scope | Gate at the end |
 | --- | --- | --- | --- |
-| Oct 5 to 18 | 1. Foundations and voice spike | Repo, CI, contracts, local Docker stack, model gateway, Postgres, auth; voice loop prototype on local models, latency measured with hosted model APIs | p50 voice latency under 1 second |
+| Oct 5 to 18 | 1. Foundations and voice spike | Repo, CI, contracts, local Docker stack with `tiny` and `all-in-one` profiles, model gateway with conformance suite, Postgres, MinIO, auth; voice loop prototype on local models, latency measured with hosted model APIs | Whole stack runs on `tiny` with no GPU, and p50 voice latency under 1 second on `hosted` |
 | Oct 19 to Nov 1 | 2. Inputs and gap analysis | Job scraping and parsing, resume parsing, company matching, generic mode; match score and session plan; profile import, first 5 profiles | |
 | Nov 2 to 15 | 3. The interviewer | Brief planner, state machine, four interview types, follow-up rules; difficulty levels, Coach and Realistic modes, persona, seniority, reconnect | |
 | Nov 16 to 29 | 4. Scoring, debrief and accounts | Scorer, hire signal, per-question rubric, progress dashboard, next-session plan; billing with minute cap, export and delete, consent, audit log, gold set calibration | Scorer within one band of human scores on 85% of the gold set |
-| Nov 30 to Dec 13 | 5. Private beta and hardening | Invite 30 to 50 beta users, fix top issues, publish the remaining 15 profiles; deploy to Hetzner US, load test 10 concurrent sessions, legal review, price test | |
+| Nov 30 to Dec 13 | 5. Private beta and hardening | Invite 30 to 50 beta users, fix top issues, publish the remaining 15 profiles; deploy the same images that ran locally to Hetzner US, load test 10 concurrent sessions, legal review, price test | |
 | Dec 14 | Public launch | | |
 
 If a gate fails, the next phase does not start; the fallback is to swap models through the gateway or tighten prompts, not to cut the gate.
@@ -388,7 +427,7 @@ If a gate fails, the next phase does not start; the fallback is to swap models t
 - [ ] Check your eBay employment agreement and outside-activity policy
 - [ ] Shortlist 2 to 3 open-weight models per role and 2 hosted providers that offer zero data retention
 - [ ] Start business entity setup for a Stripe live account
-- [ ] Book a privacy lawyer for the policy, terms, Quebec Law 25 assessment and use of company names
+- [ ] Book a privacy lawyer for the policy, terms, Quebec Law 25 assessment and use of company names (see Appendix A)
 - [ ] Line up 3 to 4 experienced interviewers to help score the gold set in November
 
 **How to run the build with Claude Code.**
@@ -415,6 +454,8 @@ The biggest risk is not the tech: it's whether the hire signal feels credible en
 | Ten-week timeline | Late or rough launch | Strict P0 list, invite-only beta first, cut P1 items before cutting quality of scoring |
 | Job board scraping blocked | Broken onboarding | Paste fallback always available; scraping is a convenience |
 | Hetzner GPU availability | Delayed self-hosting | Hosted APIs are the default, so no launch dependency on GPUs |
+| Small local models break structured output | Failed parses, stalled sessions in dev | Grammar-constrained decoding, repair and retry, one-question-per-call scoring, hire signal computed in code |
+| Scores shift silently when a model changes | Progress trends become meaningless | Pinned model versions, provenance on every score, gold-set recalibration before any scorer change |
 | Running a side business while employed | Conflict of interest or IP questions | Review your employment agreement and outside-activity policy before launch |
 
 **Blockers found in review (and how the spec now handles them).**
@@ -438,3 +479,44 @@ The biggest risk is not the tech: it's whether the hire signal feels credible en
 - [ ] Domain and trademark availability for "Strong Hire"
 - [ ] Invite-only beta size and recruitment channel (e.g. your network, tech communities)
 - [ ] Whether v1 needs 30-minute sessions only, to keep cost and fatigue down
+
+## Appendix A: Quebec Law 25
+
+Quebec's Law 25 (formerly Bill 64) modernized Quebec's private-sector privacy act and is the strictest privacy law Strong Hire faces at launch. It applies to any business that collects personal information from people in Quebec, wherever the business is based. This summary is for planning only and is not legal advice; the privacy lawyer confirms each point before launch.
+
+| Date | What came into force |
+| --- | --- |
+| Sep 22, 2022 | Person in charge of privacy (privacy officer) and mandatory reporting of confidentiality incidents |
+| Sep 22, 2023 | Most obligations: consent rules, privacy policies, privacy impact assessments, privacy by default, transfers outside Quebec, automated decision notices, penalties |
+| Sep 22, 2024 | Right to data portability |
+
+The regulator is the Commission d'accès à l'information du Québec (CAI).
+
+| Requirement | What the law asks | Strong Hire action |
+| --- | --- | --- |
+| Privacy officer | A named person responsible for personal information; by default the person with the highest authority in the business; title and contact published on the website. | Founder acts as privacy officer at launch; contact listed on the privacy page. |
+| PIA for transfers outside Quebec | Before personal information leaves Quebec, assess its sensitivity, the purpose, the protection measures and the legal framework in the destination, then sign a written agreement with the recipient. | One assessment and agreement each for the hosting provider, every hosted model provider, Stripe, and analytics. |
+| PIA for new systems | An assessment for any project to acquire or build an information system that handles personal information. | A PIA for Strong Hire itself before beta, covering resumes, transcripts, scorecards and audio handling. |
+| Consent | Clear, informed, specific to each purpose, requested separately; express consent for sensitive information. | Separate, unticked consent for training-data use; session start states that answers will be scored. |
+| Privacy by default | Privacy settings start at the highest level of confidentiality. | Training-data sharing off, no public profiles, no optional tracking until turned on. |
+| Profiling and identification | People must be told before technology is used to identify, locate or profile them, and such functions are off by default. Profiling includes assessing work performance or behaviour. | Interview scoring likely counts as profiling; the user starts it explicitly by beginning a session, and onboarding explains what is assessed. |
+| Automated decisions | When a decision about a person is made only by automated processing, tell them and, on request, give the information used, the main reasons and factors, and a way to correct data. | The hire signal is practice feedback, but disclose it anyway: label scores as AI-generated and show the rubric and quoted evidence. |
+| Transparency | A privacy policy in clear, simple language on the website. | Plain-language privacy page plus short notices at sign-up, resume upload and session start. |
+| Retention and destruction | A governance policy on keeping and destroying personal information; destroy or anonymize once the purpose is fulfilled. | Audio dropped after scoring; documented retention periods; 30-day backup expiry. |
+| Data portability | Provide information the person supplied in a structured, commonly used format on request. | Covered by the JSON export (AC-1). |
+| Erasure and de-indexing | Stop dissemination or delete information when no longer needed or handled unlawfully. | Covered by self-service delete (AC-1) within 24 hours. |
+| Confidentiality incidents | Promptly notify the CAI and affected people of incidents presenting a risk of serious injury; keep a register of all incidents. | Incident runbook and register in `docs/runbook.md` (P12); providers notify Strong Hire of breaches by contract. |
+| Minors | Consent for a minor under 14 comes from a parent or guardian. | Not applicable: users must be 18 or older. |
+
+**Penalties.** Administrative monetary penalties of up to $10 million or 2% of worldwide turnover, whichever is greater. Penal fines of up to $25 million or 4% of worldwide turnover, whichever is greater. Individuals can also claim punitive damages.
+
+**Before beta.**
+
+- [ ] Name the privacy officer and publish the contact
+- [ ] Write the PIA for the Strong Hire system
+- [ ] Write a transfer assessment and sign a written agreement with each provider outside Quebec
+- [ ] Publish the plain-language privacy policy and retention schedule
+- [ ] Set up the incident register and notification steps
+- [ ] Have the privacy lawyer review all of the above
+
+Sources: [LaBarge Weinstein, overview of Law 25 changes](https://www.lwlaw.com/quebecs-law-25-formerly-bill-64-an-overview-of-key-changes-for-2023-to-quebecs-privacy-regime/); [Usercentrics, Quebec Law 25 guide](https://usercentrics.com/knowledge-hub/quebec-law-25/). Checked Oct 5, 2026.
