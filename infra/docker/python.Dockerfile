@@ -26,6 +26,7 @@ WORKDIR /app
 # Dependencies first, for layer caching. Every workspace member's pyproject is needed to resolve.
 COPY pyproject.toml uv.lock .python-version ./
 COPY packages/core/pyproject.toml packages/core/
+COPY packages/interview/pyproject.toml packages/interview/
 COPY apps/api/pyproject.toml apps/api/
 COPY apps/worker/pyproject.toml apps/worker/
 COPY apps/voice/pyproject.toml apps/voice/
@@ -33,6 +34,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev --package ${PACKAGE} --no-install-workspace
 
 COPY packages/core packages/core
+COPY packages/interview packages/interview
 COPY ${APP_DIR} ${APP_DIR}
 COPY config config
 COPY prompts prompts

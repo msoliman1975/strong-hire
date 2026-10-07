@@ -675,6 +675,334 @@
         }
       }
     },
+    "/sessions": {
+      "post": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Create Session",
+        "description": "Create a session and queue its interviewer brief (IV-2, IV-4, IV-6, IV-8).",
+        "operationId": "create_session_sessions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionRecord"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessions/{session_id}": {
+      "get": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Get Session",
+        "operationId": "get_session_sessions__session_id__get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionRecord"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/job-targets/{job_target_id}/sessions": {
+      "get": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "List Sessions",
+        "operationId": "list_sessions_job_targets__job_target_id__sessions_get",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SessionRecord"
+                  },
+                  "title": "Response List Sessions Job Targets  Job Target Id  Sessions Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessions/{session_id}/end": {
+      "post": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "End Session",
+        "description": "End the session. Started sessions are billed and scored (FB-3); safe to call twice.",
+        "operationId": "end_session_sessions__session_id__end_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionRecord"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessions/{session_id}/text/open": {
+      "post": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Open Text Session",
+        "description": "Start the text session: the interviewer greets the candidate.",
+        "operationId": "open_text_session_sessions__session_id__text_open_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TextTurns"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessions/{session_id}/text/turn": {
+      "post": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Text Turn",
+        "description": "The candidate's turn. Returns the interviewer's reply; the session ends on its own.",
+        "operationId": "text_turn_sessions__session_id__text_turn_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TextTurnRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TextTurns"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessions/{session_id}/coach": {
+      "post": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Coach",
+        "description": "Coach mode only (IV-8): pause and resume the clock, ask for a hint, redo the answer.",
+        "operationId": "coach_sessions__session_id__coach_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoachRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TextTurns"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/providers": {
       "get": {
         "tags": [
@@ -1679,6 +2007,26 @@
         "title": "CaseStyle",
         "type": "object"
       },
+      "CoachRequest": {
+        "properties": {
+          "command": {
+            "type": "string",
+            "enum": [
+              "pause",
+              "resume",
+              "hint",
+              "redo"
+            ],
+            "title": "Command"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "command"
+        ],
+        "title": "CoachRequest"
+      },
       "CompanyProfile": {
         "additionalProperties": false,
         "properties": {
@@ -2015,6 +2363,30 @@
           "training_consent"
         ],
         "title": "ConsentOut"
+      },
+      "CreateSessionRequest": {
+        "properties": {
+          "job_target_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Job Target Id"
+          },
+          "config": {
+            "$ref": "#/components/schemas/SessionConfig"
+          },
+          "channel": {
+            "$ref": "#/components/schemas/SessionChannel",
+            "description": "text runs the same interviewer with typed input; dev and test only (PL-7)",
+            "default": "voice"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "job_target_id",
+          "config"
+        ],
+        "title": "CreateSessionRequest"
       },
       "Debrief": {
         "properties": {
@@ -3605,7 +3977,7 @@
         "type": "object"
       },
       "Phase": {
-        "description": "Session state machine phases (IV-7). The session controller moves phases, not the LLM.",
+        "type": "string",
         "enum": [
           "intro",
           "small_talk",
@@ -3615,7 +3987,7 @@
           "wrap_up"
         ],
         "title": "Phase",
-        "type": "string"
+        "description": "Session state machine phases (IV-7). The session controller moves phases, not the LLM."
       },
       "PhaseTime": {
         "additionalProperties": false,
@@ -4407,6 +4779,15 @@
         ],
         "title": "ScoringAccepted"
       },
+      "SessionChannel": {
+        "type": "string",
+        "enum": [
+          "voice",
+          "text"
+        ],
+        "title": "SessionChannel",
+        "description": "PL-7. How the candidate and the interviewer talk. Text runs the same controller and\ninterviewer logic with typed input. It is a dev flag; the simulated-candidate tests use it."
+      },
       "SessionConfig": {
         "properties": {
           "interview_type": {
@@ -4441,6 +4822,75 @@
         ],
         "title": "SessionConfig",
         "description": "What the candidate picks before a session (journey 2, step 1)."
+      },
+      "SessionRecord": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "job_target_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Job Target Id"
+          },
+          "config": {
+            "$ref": "#/components/schemas/SessionConfig"
+          },
+          "channel": {
+            "$ref": "#/components/schemas/SessionChannel"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SessionStatus"
+          },
+          "brief_ready": {
+            "type": "boolean",
+            "title": "Brief Ready",
+            "description": "True when the interviewer brief is built."
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "ended_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ended At"
+          },
+          "minutes_billed": {
+            "type": "integer",
+            "title": "Minutes Billed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "job_target_id",
+          "config",
+          "channel",
+          "status",
+          "brief_ready",
+          "started_at",
+          "ended_at",
+          "minutes_billed"
+        ],
+        "title": "SessionRecord"
       },
       "SessionStatus": {
         "type": "string",
@@ -4533,12 +4983,12 @@
         "type": "object"
       },
       "Speaker": {
+        "type": "string",
         "enum": [
           "interviewer",
           "candidate"
         ],
-        "title": "Speaker",
-        "type": "string"
+        "title": "Speaker"
       },
       "Strength": {
         "properties": {
@@ -4574,9 +5024,50 @@
         "title": "SubscriptionStatus",
         "description": "Mirrors the Stripe subscription statuses we act on."
       },
-      "Turn": {
+      "TextTurnRequest": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Text"
+          }
+        },
         "additionalProperties": false,
-        "description": "One utterance in the transcript. Text only; audio is never stored.",
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "TextTurnRequest"
+      },
+      "TextTurns": {
+        "properties": {
+          "turns": {
+            "items": {
+              "$ref": "#/components/schemas/Turn"
+            },
+            "type": "array",
+            "title": "Turns"
+          },
+          "ended": {
+            "type": "boolean",
+            "title": "Ended"
+          },
+          "phase": {
+            "type": "string",
+            "title": "Phase"
+          }
+        },
+        "type": "object",
+        "required": [
+          "turns",
+          "ended",
+          "phase"
+        ],
+        "title": "TextTurns",
+        "description": "The interviewer's new turns, and whether the session has ended."
+      },
+      "Turn": {
         "properties": {
           "speaker": {
             "$ref": "#/components/schemas/Speaker"
@@ -4585,19 +5076,19 @@
             "$ref": "#/components/schemas/Phase"
           },
           "text": {
-            "title": "Text",
-            "type": "string"
+            "type": "string",
+            "title": "Text"
           },
           "start_ms": {
-            "description": "Offset from session start.",
-            "minimum": 0,
+            "type": "integer",
+            "minimum": 0.0,
             "title": "Start Ms",
-            "type": "integer"
+            "description": "Offset from session start."
           },
           "end_ms": {
-            "minimum": 0,
-            "title": "End Ms",
-            "type": "integer"
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "End Ms"
           },
           "question_ref": {
             "anyOf": [
@@ -4608,11 +5099,12 @@
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "BriefQuestion.id, in CORE only.",
-            "title": "Question Ref"
+            "title": "Question Ref",
+            "description": "BriefQuestion.id, in CORE only."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "speaker",
           "phase",
@@ -4621,7 +5113,7 @@
           "end_ms"
         ],
         "title": "Turn",
-        "type": "object"
+        "description": "One utterance in the transcript. Text only; audio is never stored."
       },
       "UsageOut": {
         "properties": {

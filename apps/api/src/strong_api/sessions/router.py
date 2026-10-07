@@ -1,0 +1,277 @@
+"""Interview sessions (P7).
+
+    POST /sessions                         create a session (402 when the plan does not allow it)
+    GET  /sessions/{id}                    one session
+    GET  /job-targets/{id}/sessions        a job's sessions, newest first
+    POST /sessions/{id}/end                end it: bill minutes, start scoring
+    POST /sessions/{id}/text/open          text channel: the interviewer greets (PL-7)
+    POST /sessions/{id}/text/turn          text channel: a candidate turn and the reply
+    POST /sessions/{id}/coach              pause, resume, hint, redo (Coach mode only, IV-8)
+
+Creating a session queues the interviewer brief job (P6). The text channel runs the same
+controller and interviewer as the voice agent (strong_interview), with typed input. It exists
+only when APP_ENV is local or test, and its runners live in this API process: if the API
+restarts, an open text session must be ended.
+"""
+
+from __future__ import annotations
+
+import uuid
+from datetime import UTC, datetime
+
+from fastapi import APIRouter, HTTPException, Request, status
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from strong_api.auth.settings import AppEnv, get_auth_settings
+from strong_api.billing.entitlements import ensure_can_start_session, record_session_minutes
+from strong_api.inputs.deps import Db, Me, Queue
+from strong_api.inputs.queue import BUILD_INTERVIEWER_BRIEF, JobQueue
+from strong_api.scoring.router import _brief, _config, _owned_session, _owned_target, start_scoring
+from strong_api.sessions.schemas import (
+    CoachRequest,
+    CreateSessionRequest,
+    SessionRecord,
+    TextTurnRequest,
+    TextTurns,
+)
+from strong_core.db.models import InterviewSession, JobTarget
+from strong_core.db.models import Turn as TurnRow
+from strong_core.gateway import Role, get_gateway
+from strong_core.schemas import JobPosting, SessionChannel, SessionStatus, Turn
+from strong_interview import (
+    CoachNotAllowedError,
+    Interviewer,
+    InterviewRunner,
+    SessionController,
+    SessionFacts,
+)
+
+OPEN = {SessionStatus.CREATED, SessionStatus.IN_PROGRESS, SessionStatus.INTERRUPTED}
+
+router = APIRouter(tags=["sessions"])
+
+
+def _record(session: InterviewSession, target: JobTarget | None) -> SessionRecord:
+    return SessionRecord(
+        id=session.id,
+        job_target_id=session.job_target_id,
+        config=_config(session, target),
+        channel=session.channel,
+        status=session.status,
+        brief_ready=_brief(session) is not None,
+        started_at=session.started_at,
+        ended_at=session.ended_at,
+        minutes_billed=session.minutes_billed or 0,
+    )
+
+
+def _text_allowed() -> bool:
+    return get_auth_settings().app_env in (AppEnv.LOCAL, AppEnv.TEST)
+
+
+def _runners(request: Request) -> dict[uuid.UUID, InterviewRunner]:
+    runners: dict[uuid.UUID, InterviewRunner] | None = getattr(
+        request.app.state, "text_runners", None
+    )
+    if runners is None:
+        runners = {}
+        request.app.state.text_runners = runners
+    return runners
+
+
+@router.post("/sessions", status_code=status.HTTP_201_CREATED)
+async def create_session(body: CreateSessionRequest, db: Db, me: Me, queue: Queue) -> SessionRecord:
+    """Create a session and queue its interviewer brief (IV-2, IV-4, IV-6, IV-8)."""
+    target = await _owned_target(db, me, body.job_target_id)
+    if target.parsed_json is None:
+        raise HTTPException(status.HTTP_409_CONFLICT, "The job posting is still being read.")
+    if body.channel == SessionChannel.TEXT and not _text_allowed():
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Text sessions are a dev feature.")
+    await ensure_can_start_session(db, me.org_id)
+    config = body.config
+    target.level = config.level  # the level confirmed at setup sets the bar (IV-6)
+    session = InterviewSession(
+        org_id=me.org_id,
+        job_target_id=target.id,
+        type=config.interview_type,
+        difficulty=config.difficulty,
+        mode=config.mode,
+        duration_min=config.duration_min,
+        channel=body.channel,
+        model_profile=get_gateway().profile,
+    )
+    db.add(session)
+    await db.commit()
+    await queue.enqueue(
+        BUILD_INTERVIEWER_BRIEF,
+        f"brief:{session.id}:{uuid.uuid4().hex[:8]}",
+        session_id=str(session.id),
+        org_id=str(session.org_id),
+    )
+    await db.refresh(session)
+    return _record(session, target)
+
+
+@router.get("/sessions/{session_id}")
+async def get_session(session_id: uuid.UUID, db: Db, me: Me) -> SessionRecord:
+    session = await _owned_session(db, me, session_id)
+    return _record(session, await db.get(JobTarget, session.job_target_id))
+
+
+@router.get("/job-targets/{job_target_id}/sessions")
+async def list_sessions(job_target_id: uuid.UUID, db: Db, me: Me) -> list[SessionRecord]:
+    target = await _owned_target(db, me, job_target_id)
+    rows = await db.scalars(
+        select(InterviewSession)
+        .where(InterviewSession.job_target_id == target.id, InterviewSession.org_id == me.org_id)
+        .order_by(InterviewSession.created_at.desc(), InterviewSession.id.desc())
+    )
+    return [_record(s, target) for s in rows]
+
+
+async def _end(
+    db: AsyncSession, queue: JobQueue, session: InterviewSession, runner: InterviewRunner | None
+) -> None:
+    if session.status not in OPEN:
+        return
+    if runner is not None:
+        session.prompt_version = ",".join(sorted(runner.interviewer.prompt_refs))[:200] or None
+    if session.started_at is None:
+        # Never started: no minutes, no scoring, and the free interview is not used.
+        session.ended_at = datetime.now(UTC)
+        session.status = SessionStatus.FAILED
+        await db.commit()
+        return
+    session.ended_at = datetime.now(UTC)
+    await record_session_minutes(db, session)
+    await start_scoring(db, queue, session)  # commits; sets status scoring
+
+
+@router.post("/sessions/{session_id}/end")
+async def end_session(
+    session_id: uuid.UUID, request: Request, db: Db, me: Me, queue: Queue
+) -> SessionRecord:
+    """End the session. Started sessions are billed and scored (FB-3); safe to call twice."""
+    session = await _owned_session(db, me, session_id)
+    runner = _runners(request).pop(session.id, None)
+    await _end(db, queue, session, runner)
+    await db.refresh(session)
+    return _record(session, await db.get(JobTarget, session.job_target_id))
+
+
+# ---------------------------------------------------------------- text channel (PL-7)
+
+
+async def _text_session(db: Db, me: Me, session_id: uuid.UUID) -> InterviewSession:
+    if not _text_allowed():
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found")
+    session = await _owned_session(db, me, session_id)
+    if session.channel != SessionChannel.TEXT:
+        raise HTTPException(status.HTTP_409_CONFLICT, "This is not a text session.")
+    if session.status not in OPEN:
+        raise HTTPException(status.HTTP_409_CONFLICT, "The session has ended.")
+    return session
+
+
+def _turn_saver(request: Request, session: InterviewSession):  # type: ignore[no-untyped-def]
+    maker = request.app.state.sessionmaker
+
+    async def save(turn: Turn) -> None:
+        async with maker() as db:
+            db.add(
+                TurnRow(
+                    org_id=session.org_id,
+                    session_id=session.id,
+                    speaker=turn.speaker,
+                    phase=turn.phase,
+                    text=turn.text,
+                    start_ms=turn.start_ms,
+                    end_ms=turn.end_ms,
+                    question_ref=turn.question_ref,
+                )
+            )
+            await db.commit()
+
+    return save
+
+
+def _facts(target: JobTarget | None, company: str | None) -> SessionFacts:
+    if target is None or target.parsed_json is None:
+        return SessionFacts(company_name=company)
+    posting = JobPosting.model_validate(target.parsed_json)
+    return SessionFacts(
+        company_name=company or posting.company_name,
+        job_title=posting.title,
+        team=posting.team,
+        notes=tuple(posting.responsibilities[:5]),
+    )
+
+
+@router.post("/sessions/{session_id}/text/open")
+async def open_text_session(session_id: uuid.UUID, request: Request, db: Db, me: Me) -> TextTurns:
+    """Start the text session: the interviewer greets the candidate."""
+    session = await _text_session(db, me, session_id)
+    runners = _runners(request)
+    if session.id in runners:
+        raise HTTPException(status.HTTP_409_CONFLICT, "The session is already open.")
+    if session.started_at is not None:
+        raise HTTPException(status.HTTP_409_CONFLICT, "The text session was lost; end it.")
+    brief = _brief(session)
+    if brief is None:
+        raise HTTPException(status.HTTP_409_CONFLICT, "The interview plan is not ready yet.")
+    gateway = get_gateway()
+    target = await db.get(JobTarget, session.job_target_id)
+    interviewer = Interviewer(gateway, brief, facts=_facts(target, brief.company_name))
+    runner = InterviewRunner(
+        SessionController(brief), interviewer, on_turn=_turn_saver(request, session)
+    )
+    session.status = SessionStatus.IN_PROGRESS
+    session.started_at = datetime.now(UTC)
+    session.model_profile = gateway.profile
+    session.interviewer_model_id = gateway.config.alias_for(Role.INTERVIEWER)
+    await db.commit()
+    runners[session.id] = runner
+    turns = await runner.open()
+    return TextTurns(turns=turns, ended=runner.ended, phase=runner.controller.phase.value)
+
+
+def _runner(request: Request, session: InterviewSession) -> InterviewRunner:
+    runner = _runners(request).get(session.id)
+    if runner is None:
+        raise HTTPException(status.HTTP_409_CONFLICT, "The text session is not open.")
+    return runner
+
+
+@router.post("/sessions/{session_id}/text/turn")
+async def text_turn(
+    session_id: uuid.UUID, body: TextTurnRequest, request: Request, db: Db, me: Me, queue: Queue
+) -> TextTurns:
+    """The candidate's turn. Returns the interviewer's reply; the session ends on its own."""
+    session = await _text_session(db, me, session_id)
+    runner = _runner(request, session)
+    turns = await runner.respond(body.text)
+    if runner.ended:
+        _runners(request).pop(session.id, None)
+        await _end(db, queue, session, runner)
+    return TextTurns(turns=turns, ended=runner.ended, phase=runner.controller.phase.value)
+
+
+@router.post("/sessions/{session_id}/coach")
+async def coach(
+    session_id: uuid.UUID, body: CoachRequest, request: Request, db: Db, me: Me
+) -> TextTurns:
+    """Coach mode only (IV-8): pause and resume the clock, ask for a hint, redo the answer."""
+    session = await _text_session(db, me, session_id)
+    runner = _runner(request, session)
+    turns: list[Turn] = []
+    try:
+        if body.command == "pause":
+            runner.pause()
+        elif body.command == "resume":
+            runner.resume()
+        else:
+            turns = await runner.coach(body.command)
+    except CoachNotAllowedError as exc:
+        raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc
+    return TextTurns(turns=turns, ended=runner.ended, phase=runner.controller.phase.value)
