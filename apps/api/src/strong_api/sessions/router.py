@@ -7,6 +7,8 @@
     POST /sessions/{id}/text/open          text channel: the interviewer greets (PL-7)
     POST /sessions/{id}/text/turn          text channel: a candidate turn and the reply
     POST /sessions/{id}/coach              pause, resume, hint, redo (Coach mode only, IV-8)
+    POST /sessions/{id}/voice/join         voice channel: start, and a LiveKit token for the room
+    POST /internal/sessions/{id}/end       the voice agent ends a session (shared token)
 
 Creating a session queues the interviewer brief job (P6). The text channel runs the same
 controller and interviewer as the voice agent (strong_interview), with typed input. It exists
@@ -16,10 +18,13 @@ restarts, an open text session must be ended.
 
 from __future__ import annotations
 
+import hmac
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
+from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Request, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
+from livekit import api as livekit_api
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -31,10 +36,13 @@ from strong_api.scoring.router import _brief, _config, _owned_session, _owned_ta
 from strong_api.sessions.schemas import (
     CoachRequest,
     CreateSessionRequest,
+    InternalEndRequest,
     SessionRecord,
     TextTurnRequest,
     TextTurns,
+    VoiceJoin,
 )
+from strong_api.sessions.settings import VoiceSessionSettings, get_voice_session_settings
 from strong_core.db.models import InterviewSession, JobTarget
 from strong_core.db.models import Turn as TurnRow
 from strong_core.gateway import Role, get_gateway
@@ -48,6 +56,8 @@ from strong_interview import (
 )
 
 OPEN = {SessionStatus.CREATED, SessionStatus.IN_PROGRESS, SessionStatus.INTERRUPTED}
+SESSION_ROOM_PREFIX = "session-"  # the voice agent runs the interview in rooms named like this
+VoiceSettings = Annotated[VoiceSessionSettings, Depends(get_voice_session_settings)]
 
 router = APIRouter(tags=["sessions"])
 
@@ -275,3 +285,70 @@ async def coach(
     except CoachNotAllowedError as exc:
         raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc
     return TextTurns(turns=turns, ended=runner.ended, phase=runner.controller.phase.value)
+
+
+# ---------------------------------------------------------------- voice channel (IV-1, IV-9)
+
+
+@router.post("/sessions/{session_id}/voice/join")
+async def join_voice_session(
+    session_id: uuid.UUID, db: Db, me: Me, settings: VoiceSettings
+) -> VoiceJoin:
+    """Start the voice session (first join) and return a LiveKit token for its room.
+
+    Call it again after a dropped connection: the room stays the same, so the voice agent goes
+    on at the same phase and question when the candidate is back within 2 minutes (IV-9).
+    """
+    session = await _owned_session(db, me, session_id)
+    if session.channel != SessionChannel.VOICE:
+        raise HTTPException(status.HTTP_409_CONFLICT, "This is not a voice session.")
+    if session.status not in OPEN:
+        raise HTTPException(status.HTTP_409_CONFLICT, "The session has ended.")
+    if _brief(session) is None:
+        raise HTTPException(status.HTTP_409_CONFLICT, "The interview plan is not ready yet.")
+    if session.started_at is None:
+        gateway = get_gateway()
+        session.status = SessionStatus.IN_PROGRESS
+        session.started_at = datetime.now(UTC)
+        session.model_profile = gateway.profile
+        session.interviewer_model_id = gateway.config.alias_for(Role.INTERVIEWER)
+        await db.commit()
+    room = f"{SESSION_ROOM_PREFIX}{session.id}"
+    identity = f"candidate-{me.user_id}"
+    grants = livekit_api.VideoGrants(
+        room_join=True, room=room, can_publish=True, can_subscribe=True, can_publish_data=True
+    )
+    token = (
+        livekit_api.AccessToken(
+            settings.livekit_api_key, settings.livekit_api_secret.get_secret_value()
+        )
+        .with_identity(identity)
+        .with_name("Candidate")
+        .with_grants(grants)
+        .with_ttl(timedelta(minutes=settings.token_ttl_minutes))
+        .to_jwt()
+    )
+    return VoiceJoin(
+        livekit_url=settings.livekit_public_url, room=room, token=token, identity=identity
+    )
+
+
+@router.post("/internal/sessions/{session_id}/end", include_in_schema=False)
+async def internal_end_session(
+    session_id: uuid.UUID,
+    body: InternalEndRequest,
+    db: Db,
+    queue: Queue,
+    settings: VoiceSettings,
+    x_internal_token: Annotated[str | None, Header()] = None,
+) -> dict[str, str]:
+    """The voice agent ends a session: bill the minutes and start scoring. Not for browsers."""
+    expected = settings.strong_internal_token.get_secret_value()
+    if not x_internal_token or not hmac.compare_digest(x_internal_token, expected):
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Forbidden")
+    session = await db.get(InterviewSession, session_id)
+    if session is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Session not found")
+    await _end(db, queue, session, None)
+    await db.refresh(session)
+    return {"status": session.status.value, "interrupted": str(body.interrupted).lower()}

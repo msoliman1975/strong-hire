@@ -2015,6 +2015,7 @@ dependencies = [
     { name = "fastapi" },
     { name = "httpx" },
     { name = "itsdangerous" },
+    { name = "livekit-api" },
     { name = "python-multipart" },
     { name = "redis" },
     { name = "stripe" },
@@ -2032,6 +2033,7 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.115" },
     { name = "httpx", specifier = ">=0.27" },
     { name = "itsdangerous", specifier = ">=2.2" },
+    { name = "livekit-api", specifier = ">=1.0" },
     { name = "python-multipart", specifier = ">=0.0.9" },
     { name = "redis", specifier = ">=5.0" },
     { name = "stripe", specifier = ">=12" },
@@ -2107,12 +2109,14 @@ source = { editable = "apps/voice" }
 dependencies = [
     { name = "livekit-agents", extra = ["silero", "turn-detector"] },
     { name = "strong-core" },
+    { name = "strong-interview" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "livekit-agents", extras = ["silero", "turn-detector"], specifier = ">=1.2,<2" },
     { name = "strong-core", editable = "packages/core" },
+    { name = "strong-interview", editable = "packages/interview" },
 ]
 
 [[package]]

@@ -1003,6 +1003,50 @@
         }
       }
     },
+    "/sessions/{session_id}/voice/join": {
+      "post": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Join Voice Session",
+        "description": "Start the voice session (first join) and return a LiveKit token for its room.\n\nCall it again after a dropped connection: the room stays the same, so the voice agent goes\non at the same phase and question when the candidate is back within 2 minutes (IV-9).",
+        "operationId": "join_voice_session_sessions__session_id__voice_join_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoiceJoin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/dev/model-usage": {
       "get": {
         "tags": [
@@ -5442,6 +5486,35 @@
         ],
         "title": "ValuesFramework",
         "type": "object"
+      },
+      "VoiceJoin": {
+        "properties": {
+          "livekit_url": {
+            "type": "string",
+            "title": "Livekit Url"
+          },
+          "room": {
+            "type": "string",
+            "title": "Room"
+          },
+          "token": {
+            "type": "string",
+            "title": "Token"
+          },
+          "identity": {
+            "type": "string",
+            "title": "Identity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "livekit_url",
+          "room",
+          "token",
+          "identity"
+        ],
+        "title": "VoiceJoin",
+        "description": "What the browser needs to join the interview room (P7, P10)."
       },
       "WebhookOut": {
         "properties": {
