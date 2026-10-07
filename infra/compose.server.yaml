@@ -13,7 +13,6 @@ services:
     profiles: [core, all-in-one]
     environment:
       DOMAIN: ${DOMAIN:?set DOMAIN in .env}
-      ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL in .env}
     ports: ["80:80", "443:443", "443:443/udp"]
     volumes:
       - caddy-data:/data
