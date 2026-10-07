@@ -12,6 +12,11 @@ Scorers (--scorer):
 - stub: GatewayScorer, which returns the scorer role's Scorecard as is.
 - auto (default): p8, except on the fake profile. There the fake model returns one fixed
   scorecard whose quotes are in no transcript, so the p8 scorer would reject every one of them.
+
+Interviewers (--interviewer) for the simulated sessions:
+- p7 (default): the real interviewer (strong_interview): its prompts, its probe-or-move-on
+  decision and its probe limit per difficulty.
+- stub: StubInterviewer, which probes on a word-list check of vague answers.
 """
 
 from __future__ import annotations
@@ -39,7 +44,7 @@ from strong_evals import EVALS_DIR
 from strong_evals.candidate import Persona
 from strong_evals.gap import GapResult, fit_order, run_gap_item
 from strong_evals.goldset import GoldLabel, load_goldset
-from strong_evals.interfaces import Scorer
+from strong_evals.interfaces import Interviewer, Scorer
 from strong_evals.metrics import (
     Agreement,
     FollowUpCount,
@@ -54,15 +59,17 @@ from strong_evals.metrics import (
     value_pairs,
 )
 from strong_evals.session import run_text_session
-from strong_evals.stubs import GatewayScorer
+from strong_evals.stubs import GatewayScorer, StubInterviewer
 from strong_evals.suites import GapSpec, SimulatedSpec, Suite, load_suite, suite_names
 from strong_evals.transcripts import ScriptedTranscript, load_transcripts
 from strong_evals.usage import MeteredGateway, Prices, load_prices
+from strong_interview.harness import HarnessInterviewer
 from strong_worker.scoring.harness import HarnessScorer
 
 REPORTS_DIR = EVALS_DIR / "reports"
 THRESHOLDS_FILE = EVALS_DIR / "config" / "thresholds.yaml"
 SCORERS = ("auto", "p8", "stub")
+INTERVIEWERS = ("p7", "stub")
 
 
 def resolve_scorer(name: str, profile: str) -> str:
@@ -71,6 +78,12 @@ def resolve_scorer(name: str, profile: str) -> str:
     if name == "auto":
         return "stub" if profile == "fake" else "p8"
     return name
+
+
+def make_interviewer(name: str, gateway: ModelGateway) -> Interviewer:
+    if name not in INTERVIEWERS:
+        raise ValueError(f"interviewer must be one of {', '.join(INTERVIEWERS)}")
+    return HarnessInterviewer(gateway) if name == "p7" else StubInterviewer(gateway)
 
 
 def make_scorer(name: str, gateway: ModelGateway) -> Scorer:
@@ -132,6 +145,7 @@ class RunReport:
     metrics: list[MetricResult] = field(default_factory=list)
     recorded: int = 0
     scorer: str = "stub"
+    interviewer: str = "p7"
 
     @property
     def errors(self) -> int:
@@ -205,13 +219,19 @@ async def run_simulated(
     suite: str,
     refs: dict[str, None],
     scorer: str = "stub",
+    interviewer: str = "p7",
 ) -> SimulatedResult:
     sid = _session_id(suite, spec.id)
     gw = MeteredGateway(base, prices, sid)
     persona = Persona.from_resume_fixture(spec.resume, spec.quality, spec.candidate_name)
     try:
         session = await run_text_session(
-            spec.session, persona, gateway=gw, max_questions=spec.max_questions, session_id=sid
+            spec.session,
+            persona,
+            gateway=gw,
+            interviewer=make_interviewer(interviewer, gw),
+            max_questions=spec.max_questions,
+            session_id=sid,
         )
     except Exception as e:
         refs.update(gw.prompt_refs)
@@ -482,6 +502,7 @@ async def run_suite(
     record_dir: Path | None = None,
     goldset: dict[str, GoldLabel] | None = None,
     scorer: str = "auto",
+    interviewer: str = "p7",
 ) -> RunReport:
     started = time.perf_counter()
     base = gateway or build_gateway(Settings(model_profile=profile))
@@ -502,6 +523,7 @@ async def run_suite(
         models={r.value: base.config.alias_for(r) for r in Role},
         prompt_refs=[],
         scorer=resolve_scorer(scorer, base.profile),
+        interviewer=interviewer,
     )
     for t in transcripts:
         report.scripted.append(
@@ -510,7 +532,9 @@ async def run_suite(
         print(f"  scripted {t.id}: {report.scripted[-1].scorer or report.scripted[-1].error}")
     for spec in suite.simulated:
         report.simulated.append(
-            await run_simulated(spec, base, prices, suite.name, refs, report.scorer)
+            await run_simulated(
+                spec, base, prices, suite.name, refs, report.scorer, report.interviewer
+            )
         )
         r = report.simulated[-1]
         print(f"  simulated {spec.id}: {len(r.turns)} turns {r.error or ''}")
@@ -534,8 +558,19 @@ def cmd_run(args: argparse.Namespace) -> int:
     if args.record:
         record_dir = Path(args.record_dir) if args.record_dir else DEFAULT_FIXTURES_DIR
     scorer = resolve_scorer(args.scorer, args.profile)
-    print(f"Running suite {suite.name} on profile {args.profile} with the {scorer} scorer")
-    report = asyncio.run(run_suite(suite, args.profile, record_dir=record_dir, scorer=scorer))
+    print(
+        f"Running suite {suite.name} on profile {args.profile} with the {scorer} scorer"
+        f" and the {args.interviewer} interviewer"
+    )
+    report = asyncio.run(
+        run_suite(
+            suite,
+            args.profile,
+            record_dir=record_dir,
+            scorer=scorer,
+            interviewer=args.interviewer,
+        )
+    )
     html_path, json_path = write_report(report, Path(args.out))
     for m in report.metrics:
         verdict = {True: "PASS", False: "FAIL", None: "info"}[m.passed]
@@ -555,7 +590,7 @@ def cmd_run(args: argparse.Namespace) -> int:
 def add_run_parser(sub: Any) -> None:
     p: argparse.ArgumentParser = sub.add_parser("run", help="run a suite and write a report")
     p.add_argument("--suite", default="smoke", help=f"one of: {', '.join(suite_names())}")
-    p.add_argument("--profile", default="fake", choices=["fake", "local", "hosted"])
+    p.add_argument("--profile", default="fake", choices=["fake", "tiny", "local", "hosted"])
     p.add_argument("--out", default=str(REPORTS_DIR), help="report folder")
     p.add_argument("--record", action="store_true", help="save every model call as a fixture")
     p.add_argument("--record-dir", help="fixture folder (default: the fake model's fixtures)")
@@ -565,5 +600,11 @@ def add_run_parser(sub: Any) -> None:
         default="auto",
         choices=SCORERS,
         help="p8 (real scorer), stub, or auto: p8 except on the fake profile",
+    )
+    p.add_argument(
+        "--interviewer",
+        default="p7",
+        choices=INTERVIEWERS,
+        help="p7 (real interviewer) or stub, for the simulated sessions",
     )
     p.set_defaults(func=cmd_run)
