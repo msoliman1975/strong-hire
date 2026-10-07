@@ -13,7 +13,8 @@ x-python-env: &python-env
   REDIS_URL: redis://redis:6379/0
   MODEL_PROFILE: ${MODEL_PROFILE:-fake}
   MODEL_GATEWAY_URL: http://litellm:4000/v1
-  MODEL_GATEWAY_API_KEY: ${LITELLM_MASTER_KEY:-sk-local-dev-only}
+  # The app key from ./scripts/profile.ps1 claude (budget and rate limit), else the master key.
+  MODEL_GATEWAY_API_KEY: ${LITELLM_APP_KEY:-${LITELLM_MASTER_KEY:-sk-local-dev-only}}
   LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-local-dev-only}
   REPO_ROOT: /app
 

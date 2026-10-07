@@ -1,0 +1,12 @@
+# Override for MODEL_PROFILE=claude. ./scripts/profile.ps1 adds it with -f; do not use it alone.
+#   - LiteLLM gets ANTHROPIC_API_KEY from your environment (never from a file).
+#   - LiteLLM gets its own database ("litellm" in the same Postgres), which it needs to count
+#     spend and to enforce the app key's daily budget and rate limit.
+services:
+  litellm:
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?set ANTHROPIC_API_KEY in your environment}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-strong}:${POSTGRES_PASSWORD:-strong}@postgres:5432/litellm
+      STORE_MODEL_IN_DB: "False"
+    depends_on:
+      postgres: { condition: service_healthy }

@@ -1,0 +1,52 @@
+# LiteLLM proxy config for MODEL_PROFILE=claude. Real model ids and providers appear only in the
+# config/litellm.*.yaml files.
+#
+#   claude-fast    Claude Haiku 4.5     extractor, interviewer (fast replies)
+#   claude-strong  Claude Sonnet 5.5    planner, scorer
+#   claude-stt     faster-whisper small, local (infra/stt)
+#   claude-tts     Kokoro, local
+#
+# Cost control: the prices below let LiteLLM count dollars (Anthropic list prices per token,
+# Sep 2026; cached-input discounts are not counted, so the count is on the high side). The app
+# uses a LiteLLM key with a daily budget and a request-per-minute limit, created by
+# ./scripts/profile.ps1 claude. Spend tracking needs the database in infra/compose.claude.yaml.
+model_list:
+  - model_name: claude-fast
+    litellm_params:
+      model: anthropic/claude-haiku-4-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+    model_info:
+      input_cost_per_token: 0.000001    # $1 per million input tokens
+      output_cost_per_token: 0.000005   # $5 per million output tokens
+  - model_name: claude-strong
+    litellm_params:
+      model: anthropic/claude-sonnet-5-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+    model_info:
+      input_cost_per_token: 0.000002    # $2 per million input tokens
+      output_cost_per_token: 0.00001    # $10 per million output tokens
+
+  # faster-whisper small, int8 on CPU (infra/stt). The server loads the model named here.
+  - model_name: claude-stt
+    litellm_params:
+      model: openai/Systran/faster-whisper-small
+      api_base: http://stt:8000/v1
+      api_key: not-needed
+    model_info:
+      mode: audio_transcription
+
+  # Kokoro-82M on CPU (Kokoro-FastAPI image), streaming PCM at 24 kHz.
+  - model_name: claude-tts
+    litellm_params:
+      model: openai/kokoro
+      api_base: http://tts:8880/v1
+      api_key: not-needed
+    model_info:
+      mode: audio_speech
+
+litellm_settings:
+  drop_params: true
+  request_timeout: 120
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
