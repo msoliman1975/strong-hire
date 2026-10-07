@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 
 import { ApiError } from "./api/client";
@@ -17,6 +17,11 @@ import { SessionSetupPage } from "./pages/SessionSetupPage";
 import { SignInPage } from "./pages/SignInPage";
 import { SignupPage } from "./pages/SignupPage";
 import { LiveSessionPage } from "./session/LiveSessionPage";
+
+// Dev builds only: a text interview against the real API (P7). Production builds drop it.
+const DevTextInterviewPage = import.meta.env.DEV
+  ? lazy(() => import("./dev/DevTextInterviewPage").then((m) => ({ default: m.DevTextInterviewPage })))
+  : null;
 
 export function createQueryClient(): QueryClient {
   return new QueryClient({
@@ -49,6 +54,16 @@ export function AppRoutes() {
         <Route path="/sessions/:sessionId/debrief" element={<DebriefPage />} />
         <Route path="/account" element={<AccountPage />} />
         <Route path="/upgrade" element={<PaywallPage />} />
+        {DevTextInterviewPage && (
+          <Route
+            path="/dev/interview"
+            element={
+              <Suspense fallback={null}>
+                <DevTextInterviewPage />
+              </Suspense>
+            }
+          />
+        )}
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

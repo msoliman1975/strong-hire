@@ -223,6 +223,55 @@ h1:focus {
   color: var(--signal-negative);
 }
 
+/* Dev builds only: the text-interview page. */
+.dev-interview__setup {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 420px;
+}
+
+.dev-interview__setup label {
+  display: grid;
+  gap: 4px;
+}
+
+.dev-interview__turns {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.dev-turn {
+  display: grid;
+  gap: 2px;
+  padding: var(--space-3);
+  border-radius: 6px;
+  background: var(--surface, #f6f6f6);
+  max-width: 80ch;
+}
+
+.dev-turn--candidate {
+  margin-left: auto;
+  border: 1px solid var(--line);
+}
+
+.dev-turn__who {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.dev-interview__answer {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.dev-interview__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
 /* ------------------------------------------------------------ page layout */
 
 .page {
