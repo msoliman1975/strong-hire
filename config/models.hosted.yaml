@@ -61,4 +61,5 @@ models:
     streaming: true
     sample_rate: 24000
     options:
-      voice: af_heart
+      voice: troy
+      response_format: wav    # the provider sends WAV only; the gateway removes the header
