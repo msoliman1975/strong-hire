@@ -1,0 +1,98 @@
+# Override for the test server (Hetzner). ./scripts/profile.ps1 adds it with -f when .env has
+# STACK_TARGET=server; do not use it alone. See docs/hosting.md.
+#   - Caddy is the only public entry: https://$DOMAIN (web and /api) and https://rtc.$DOMAIN
+#     (LiveKit signaling). LiveKit media also uses 7881/tcp and 7882/udp.
+#   - Other services publish no host ports, except the API and LiteLLM on 127.0.0.1 for
+#     ./scripts/profile.ps1 (health check, LiteLLM app key).
+#   - The API runs without --reload, in staging mode (no dev login, real session secret).
+services:
+  caddy:
+    build:
+      context: ..
+      dockerfile: infra/docker/caddy.Dockerfile
+    profiles: [core, all-in-one]
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN in .env}
+      ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL in .env}
+    ports: ["80:80", "443:443", "443:443/udp"]
+    volumes:
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      api: { condition: service_healthy }
+    restart: unless-stopped
+
+  postgres:
+    ports: !reset []
+    restart: unless-stopped
+  redis:
+    ports: !reset []
+    restart: unless-stopped
+
+  api:
+    ports: !override ["127.0.0.1:${API_PORT:-8700}:8000"]
+    command: ["uvicorn", "strong_api.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--forwarded-allow-ips", "*"]
+    environment:
+      APP_ENV: staging
+      SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET in .env}
+      WEB_BASE_URL: https://${DOMAIN}
+      API_PUBLIC_URL: https://${DOMAIN}/api
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      LIVEKIT_PUBLIC_URL: wss://rtc.${DOMAIN}
+      STRONG_INTERNAL_TOKEN: ${STRONG_INTERNAL_TOKEN:?set STRONG_INTERNAL_TOKEN in .env}
+    restart: unless-stopped
+
+  worker:
+    environment:
+      APP_ENV: staging
+    restart: unless-stopped
+
+  # Caddy serves the built web app, so the Vite dev server is not needed.
+  web:
+    ports: !reset []
+    profiles: [dev-only]
+
+  ollama:
+    ports: !reset []
+
+  litellm:
+    ports: !override ["127.0.0.1:${LITELLM_PORT:-4000}:4000"]
+    restart: unless-stopped
+
+  livekit:
+    # Production mode: keys from LIVEKIT_KEYS, media announced on the server's public IP.
+    command: ["--config", "/etc/livekit.yaml", "--node-ip", "${SERVER_IP:?set SERVER_IP in .env}"]
+    environment:
+      LIVEKIT_KEYS: "${LIVEKIT_API_KEY:?set LIVEKIT_API_KEY in .env}: ${LIVEKIT_API_SECRET:?set LIVEKIT_API_SECRET in .env}"
+    ports: !override
+      - "7881:7881"
+      - "7882:7882/udp"
+    volumes:
+      - ./livekit/livekit.server.yaml:/etc/livekit.yaml:ro
+    restart: unless-stopped
+
+  voice:
+    environment:
+      LIVEKIT_PUBLIC_URL: wss://rtc.${DOMAIN}
+      STRONG_INTERNAL_TOKEN: ${STRONG_INTERNAL_TOKEN}
+    restart: unless-stopped
+
+  stt:
+    ports: !reset []
+    environment:
+      STT_CPU_THREADS: "4"
+    restart: unless-stopped
+
+  tts:
+    ports: !reset []
+    restart: unless-stopped
+
+volumes:
+  caddy-data:
+  caddy-config:
