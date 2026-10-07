@@ -17,6 +17,7 @@ class ModelProfile(StrEnum):
     TINY = "tiny"
     LOCAL = "local"
     HOSTED = "hosted"
+    CLAUDE = "claude"  # Anthropic models for the text roles, local speech (PL-2)
 
 
 def find_repo_root(start: Path | None = None) -> Path:
