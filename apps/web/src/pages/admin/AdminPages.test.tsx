@@ -45,6 +45,7 @@ function seed({ consent = false, signedInAs = "admin@example.com" } = {}) {
     started_at: "2026-10-07T09:00:00Z",
     ended_at: "2026-10-07T09:09:30Z",
     minutes_billed: 10,
+    failure_reason: null,
   };
   mockStore.db.sessions.push(session);
   mockStore.db.auth = { status: "signed_in", email: signedInAs, userEmail: signedInAs };

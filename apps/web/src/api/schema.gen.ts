@@ -336,7 +336,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get Session */
+        /**
+         * Get Session
+         * @description One session. A session whose brief never came (the worker job was lost) is marked failed
+         *     here, so a page that polls it stops waiting.
+         */
         get: operations["get_session_sessions__session_id__get"];
         put?: never;
         post?: never;
@@ -1513,7 +1517,7 @@ export interface components {
              * Status
              * @enum {string}
              */
-            status: "not_ended" | "scoring" | "ready" | "failed";
+            status: "not_ended" | "not_started" | "scoring" | "ready" | "failed";
             scorecard: components["schemas"]["Scorecard"] | null;
             /** @description PR-2. Null until the debrief is ready. */
             next_session: components["schemas"]["PlannedSession"] | null;
@@ -1553,6 +1557,11 @@ export interface components {
             ended_at: string | null;
             /** Minutes Billed */
             minutes_billed: number;
+            /**
+             * Failure Reason
+             * @description Plain reason when the session failed before it started.
+             */
+            failure_reason?: string | null;
         };
         /** DevLoginRequest */
         DevLoginRequest: {
@@ -2672,6 +2681,11 @@ export interface components {
             ended_at: string | null;
             /** Minutes Billed */
             minutes_billed: number;
+            /**
+             * Failure Reason
+             * @description Plain reason when the session failed before it started (status failed, never started), for example when the interview plan could not be built. Such a session is not billed and does not use a free interview. Null otherwise.
+             */
+            failure_reason?: string | null;
         };
         /**
          * SessionStatus

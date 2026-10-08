@@ -68,6 +68,7 @@ async function seed() {
     started_at: "2026-10-03T10:00:00Z",
     ended_at: "2026-10-03T10:10:00Z",
     minutes_billed: 10,
+    failure_reason: null,
   });
   return { job, resume, gap };
 }

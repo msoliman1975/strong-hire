@@ -1,6 +1,7 @@
 """Debrief and progress endpoints (FB-1 to FB-3, PR-1, PR-2), and the scoring trigger.
 
-- GET  /sessions/{id}/debrief      status "not_ended", "scoring", "ready" or "failed";
+- GET  /sessions/{id}/debrief      status "not_ended", "not_started", "scoring", "ready" or
+                                   "failed";
                                    the scorecard when ready
 - GET  /job-targets/{id}/progress  Realistic-session snapshots, trends and the next session
 
@@ -36,6 +37,7 @@ from strong_api.scoring.schemas import (
     JobProgress,
     ScoringAccepted,
 )
+from strong_api.sessions.failure import failed_before_start, failure_reason
 from strong_core.db.models import GapAnalysis as GapRow
 from strong_core.db.models import InterviewSession, JobTarget
 from strong_core.db.models import ProgressSnapshot as SnapshotRow
@@ -212,6 +214,8 @@ async def get_debrief(session_id: uuid.UUID, db: Db, me: Me) -> Debrief:
     state: DebriefStatus
     if card is not None:
         state = "ready"
+    elif failed_before_start(session):
+        state = "not_started"
     elif session.status == SessionStatus.FAILED:
         state = "failed"
     elif session.status in NOT_ENDED:
@@ -244,6 +248,7 @@ async def get_debrief(session_id: uuid.UUID, db: Db, me: Me) -> Debrief:
             started_at=session.started_at,
             ended_at=session.ended_at,
             minutes_billed=session.minutes_billed,
+            failure_reason=failure_reason(session),
         ),
         status=state,
         scorecard=card,
@@ -275,5 +280,7 @@ async def score_session(session_id: uuid.UUID, db: Db, me: Me, queue: Queue) -> 
         raise HTTPException(status.HTTP_409_CONFLICT, "This session is already scored")
     if session.status not in ENDED and session.ended_at is None:
         raise HTTPException(status.HTTP_409_CONFLICT, "End the session before scoring it")
+    if failed_before_start(session):
+        raise HTTPException(status.HTTP_409_CONFLICT, "This interview never started")
     job_id = await start_scoring(db, queue, session)
     return ScoringAccepted(session_id=session.id, job_id=job_id, status=session.status)

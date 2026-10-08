@@ -144,7 +144,8 @@ class AppClient:
         async def brief_ready() -> dict[str, Any] | None:
             row: dict[str, Any] = await self._call("GET", f"/sessions/{sid}")
             if row["status"] == "failed":
-                raise ApiError("the session failed before it started")
+                reason = row.get("failure_reason") or "no reason given"
+                raise ApiError(f"the session failed before it started: {reason}")
             return row if row["brief_ready"] else None
 
         ready: dict[str, Any] = await self._wait("the interview plan", brief_ready)
@@ -177,7 +178,8 @@ class AppClient:
 
         async def done() -> dict[str, Any] | None:
             row: dict[str, Any] = await self._call("GET", f"/sessions/{sid}/debrief")
-            return row if row["status"] in ("ready", "failed", "not_ended") else None
+            finished = ("ready", "failed", "not_ended", "not_started")
+            return row if row["status"] in finished else None
 
         result: dict[str, Any] = await self._wait("the debrief", done)
         return result
