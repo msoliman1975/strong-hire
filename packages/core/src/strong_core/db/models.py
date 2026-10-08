@@ -210,6 +210,10 @@ class Resume(Base):
         DateTime(timezone=True),
         comment="R1: soft delete. Content is cleared; gap reports that used it stay",
     )
+    confirmed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        comment="When the user checked and saved the extracted CV. NULL: not confirmed",
+    )
     uploaded_at: Mapped[datetime] = _created_at()
 
 
