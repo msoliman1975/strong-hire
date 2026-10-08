@@ -34,7 +34,7 @@ class FakeStore:
         self.turns.append(turn)
 
     async def save_usage(
-        self, session_id: uuid.UUID, component: UsageComponent, units: float
+        self, session_id: uuid.UUID, component: UsageComponent, units: float, cost_usd: float = 0.0
     ) -> None:
         self.usage[component] = units
 

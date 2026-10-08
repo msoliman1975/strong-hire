@@ -5,7 +5,7 @@ import { Navigate, useNavigate } from "react-router";
 import { authApi } from "../api/auth";
 import { keys, useAuth } from "../api/hooks";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
-import { ConsentSwitch } from "../components/ConsentSwitch";
+import { ConsentCheckbox } from "../components/ConsentSwitch";
 
 /** Sign-up: 18+ confirmation, terms, and the training-data consent (AC-2, off by default). */
 export function SignupPage() {
@@ -85,7 +85,7 @@ export function SignupPage() {
         </div>
 
         <div className="section">
-          <ConsentSwitch checked={consent} onChange={setConsent} />
+          <ConsentCheckbox checked={consent} onChange={setConsent} />
         </div>
 
         {signup.isError && <ErrorNotice error={signup.error} />}

@@ -11,6 +11,7 @@ from urllib.parse import urlparse
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from strong_api.inputs.queue import JobState
+from strong_core.library import NAME_MAX_CHARS, clean_name
 from strong_core.schemas import GapStatus, JobPosting, Level, Resume
 
 MAX_POSTING_CHARS = 60_000
@@ -71,6 +72,35 @@ class ResumeUpdate(_Body):
     resume: Resume
 
 
+class LibraryRename(_Body):
+    """R1: a new name for a saved job or CV. Trimmed; 1 to 120 characters."""
+
+    name: str = Field(max_length=NAME_MAX_CHARS * 2)
+
+    @field_validator("name")
+    @classmethod
+    def _clean(cls, value: str) -> str:
+        if len(value.strip()) > NAME_MAX_CHARS:
+            raise ValueError(f"Use at most {NAME_MAX_CHARS} characters.")
+        cleaned = clean_name(value)
+        if not cleaned:
+            raise ValueError("The name cannot be empty.")
+        return cleaned
+
+
+class JobTargetMatchIn(_Body):
+    """R1: a posting the user is about to add. Same fields as JobTargetCreate."""
+
+    text: str | None = Field(default=None, max_length=MAX_POSTING_CHARS)
+    url: str | None = Field(default=None, max_length=2000)
+
+
+class ResumeMatchIn(_Body):
+    """R1: the SHA-256 of a CV file (or of the pasted text as UTF-8) before it is uploaded."""
+
+    sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
 class JobOut(BaseModel):
     id: str
     status: JobState
@@ -80,6 +110,12 @@ class JobOut(BaseModel):
 
 class JobTargetOut(BaseModel):
     id: uuid.UUID
+    name: str | None = Field(
+        description="R1: the name in the job library. None when the job description is deleted."
+    )
+    deleted: bool = Field(
+        description="R1: the job description was deleted. Its reports and sessions stay."
+    )
     status: Literal["pending", "extracted"]
     source_url: str | None
     posting: JobPosting | None
@@ -96,6 +132,10 @@ class JobTargetOut(BaseModel):
 
 class ResumeOut(BaseModel):
     id: uuid.UUID
+    name: str | None = Field(
+        description="R1: the name in the CV library. None when the CV is deleted."
+    )
+    deleted: bool = Field(description="R1: the CV was deleted. Its gap reports stay.")
     status: Literal["pending", "extracted"]
     has_file: bool
     resume: Resume | None
@@ -122,3 +162,15 @@ class JobTargetSummary(BaseModel):
     )
     sessions_count: int = Field(ge=0, description="Interview sessions for this job.")
     last_session_at: datetime | None = Field(description="Start of the latest session.")
+
+
+class JobTargetMatch(BaseModel):
+    """R1: the saved job with the same text or link, or None."""
+
+    job_target: JobTargetOut | None
+
+
+class ResumeMatch(BaseModel):
+    """R1: the saved CV with the same file content, or None."""
+
+    resume: ResumeOut | None

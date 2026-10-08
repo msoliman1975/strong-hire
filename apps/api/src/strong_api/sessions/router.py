@@ -20,8 +20,10 @@ restarts, an open text session must be ended.
 from __future__ import annotations
 
 import hmac
+import logging
 import uuid
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
@@ -45,10 +47,10 @@ from strong_api.sessions.schemas import (
     VoiceJoin,
 )
 from strong_api.sessions.settings import VoiceSessionSettings, get_voice_session_settings
-from strong_core.db.models import InterviewSession, JobTarget
+from strong_core.db.models import InterviewSession, JobTarget, UsageEvent
 from strong_core.db.models import Turn as TurnRow
 from strong_core.gateway import Role, get_gateway
-from strong_core.schemas import JobPosting, SessionChannel, SessionStatus, Turn
+from strong_core.schemas import JobPosting, SessionChannel, SessionStatus, Turn, UsageComponent
 from strong_interview import (
     CoachNotAllowedError,
     Interviewer,
@@ -56,6 +58,9 @@ from strong_interview import (
     SessionController,
     SessionFacts,
 )
+from strong_interview.trace_store import SqlTraceSink
+
+log = logging.getLogger(__name__)
 
 OPEN = {SessionStatus.CREATED, SessionStatus.IN_PROGRESS, SessionStatus.INTERRUPTED}
 SESSION_ROOM_PREFIX = "session-"  # the voice agent runs the interview in rooms named like this
@@ -99,6 +104,8 @@ def _runners(request: Request) -> dict[uuid.UUID, InterviewRunner]:
 async def create_session(body: CreateSessionRequest, db: Db, me: Me, queue: Queue) -> SessionRecord:
     """Create a session and queue its interviewer brief (IV-2, IV-4, IV-6, IV-8)."""
     target = await _owned_target(db, me, body.job_target_id)
+    if target.deleted_at is not None:  # R1: a deleted job cannot get new sessions
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Job target not found")
     if target.parsed_json is None:
         raise HTTPException(status.HTTP_409_CONFLICT, "The job posting is still being read.")
     if body.channel == SessionChannel.TEXT and not await _text_allowed(db, me):
@@ -153,6 +160,19 @@ async def _end(
         return
     if runner is not None:
         session.prompt_version = ",".join(sorted(runner.interviewer.prompt_refs))[:200] or None
+        await _flush_traces(runner)
+        interviewer = runner.interviewer
+        if session.started_at is not None:
+            # The text channel's interviewer tokens and cost, like the voice agent saves them.
+            db.add(
+                UsageEvent(
+                    org_id=session.org_id,
+                    session_id=session.id,
+                    component=UsageComponent.LLM,
+                    units=Decimal(interviewer.input_tokens + interviewer.output_tokens),
+                    cost_usd=Decimal(f"{interviewer.cost_usd:.6f}"),
+                )
+            )
     if session.started_at is None:
         # Never started: no minutes, no scoring, and the free interview is not used.
         session.ended_at = datetime.now(UTC)
@@ -162,6 +182,15 @@ async def _end(
     session.ended_at = datetime.now(UTC)
     await record_session_minutes(db, session)
     await start_scoring(db, queue, session)  # commits; sets status scoring
+
+
+async def _flush_traces(runner: InterviewRunner) -> None:
+    """Wait for trace rows still being written (R2). Never raises."""
+    if isinstance(runner.trace, SqlTraceSink):
+        try:
+            await runner.trace.flush()
+        except Exception:
+            log.warning("could not flush the interviewer traces", exc_info=True)
 
 
 @router.post("/sessions/{session_id}/end")
@@ -240,7 +269,10 @@ async def open_text_session(session_id: uuid.UUID, request: Request, db: Db, me:
     target = await db.get(JobTarget, session.job_target_id)
     interviewer = Interviewer(gateway, brief, facts=_facts(target, brief.company_name))
     runner = InterviewRunner(
-        SessionController(brief), interviewer, on_turn=_turn_saver(request, session)
+        SessionController(brief),
+        interviewer,
+        on_turn=_turn_saver(request, session),
+        trace=SqlTraceSink(request.app.state.sessionmaker, session.org_id, session.id),
     )
     session.status = SessionStatus.IN_PROGRESS
     session.started_at = datetime.now(UTC)

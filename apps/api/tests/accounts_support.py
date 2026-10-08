@@ -22,6 +22,7 @@ from strong_core.db.models import (
     CompanyRequest,
     ExitSurvey,
     GapAnalysis,
+    InterviewerTrace,
     InterviewSession,
     JobTarget,
     ProgressSnapshot,
@@ -251,6 +252,23 @@ async def fill_every_user_table(
                 minutes_used=30,
             ),
             ExitSurvey(org_id=org_id, user_id=user_id, reason="got_the_job", got_job="yes"),
+            InterviewerTrace(
+                org_id=org_id,
+                session_id=session.id,
+                seq=1,
+                turn_index=0,
+                call="say",
+                move="greet",
+                reason_json={"why": ["start"]},
+                phase=Phase.INTRO,
+                elapsed_ms=0,
+                phase_deadline_ms=60_000,
+                messages_json=[{"role": "user", "content": "Greet the candidate."}],
+                raw_reply="Hi, I am Alex.",
+                spoken_text="Hi, I am Alex.",
+                input_tokens=100,
+                output_tokens=10,
+            ),
             AuditLog(org_id=org_id, actor="test", action="test.row", entity="test"),
         ]
     )
@@ -268,6 +286,7 @@ async def fill_every_user_table(
         "usage_events",
         "company_requests",
         "exit_surveys",
+        "interviewer_traces",
     }
 
 

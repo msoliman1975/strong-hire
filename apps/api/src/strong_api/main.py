@@ -1,6 +1,7 @@
 """Strong Hire API. P0 exposes /health; P2 adds the job target and resume input routes; P6 adds
 the gap analysis routes; P8 adds the debrief and progress routes; P9 adds billing (/billing) and
-account self-service (/account)."""
+account self-service (/account). R1 adds the saved job and CV library and /reports. R2 adds
+the admin area (/admin)."""
 
 from __future__ import annotations
 
@@ -16,12 +17,14 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from strong_api.account import install_account
+from strong_api.admin import install_admin
 from strong_api.auth import install_auth
 from strong_api.billing import install_billing
 from strong_api.devtools import router as dev_router
 from strong_api.gap.router import router as gap_router
 from strong_api.inputs import router as inputs_router
 from strong_api.inputs.queue import ArqJobQueue, JobQueue
+from strong_api.reports import router as reports_router
 from strong_api.scoring import router as scoring_router
 from strong_api.sessions.router import router as sessions_router
 from strong_core import __version__
@@ -71,10 +74,12 @@ def create_app(
     app.include_router(gap_router)
     app.include_router(scoring_router)
     app.include_router(sessions_router)
+    app.include_router(reports_router)
     app.include_router(dev_router)
     install_auth(app)
     install_billing(app)
     install_account(app)
+    install_admin(app)
 
     @app.get("/health")
     async def health(response: Response) -> dict[str, Any]:

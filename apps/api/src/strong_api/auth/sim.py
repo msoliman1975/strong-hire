@@ -15,6 +15,7 @@ import logging
 import time
 import uuid
 from collections import defaultdict, deque
+from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Header, HTTPException, Request, status
@@ -97,6 +98,8 @@ def build_sim_router(settings: AuthSettings, limiter: FailureLimiter | None = No
                 terms_accepted=True,
                 training_consent=False,
             )
+        user.last_sign_in_at = datetime.now(UTC)
+        await db.commit()
         request.session.clear()
         request.session[SESSION_USER_KEY] = str(user.id)
         log.info("sim-login ok from %s", client)

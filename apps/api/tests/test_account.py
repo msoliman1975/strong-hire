@@ -426,3 +426,98 @@ async def test_ac1_delete_on_postgres_leaves_no_rows() -> None:
             await db.commit()
     finally:
         await engine.dispose()
+
+
+async def test_r1_export_and_delete_cover_deleted_library_items(
+    client: httpx.AsyncClient,
+    user: dict[str, Any],
+    sessionmaker: Maker,
+    fake_fixtures: Any,
+    ctx: dict[str, Any],
+) -> None:
+    """R1: a deleted CV stays in the export as a row with deleted_at and no content or file;
+    account delete still removes every row, saved or deleted."""
+    kept_id = await _upload_resume(client, fake_fixtures)
+    deleted_id = (await client.post("/resumes", data={"text": "Old CV text. " * 10})).json()[
+        "resume"
+    ]["id"]
+    await client.patch(f"/resumes/{kept_id}", json={"name": "Main CV"})
+    assert (await client.delete(f"/resumes/{deleted_id}")).status_code == 204
+
+    export = (await client.post("/account/export")).json()
+    resp = await client.get(f"/account/export/{export['id']}/download")
+    bundle = zipfile.ZipFile(io.BytesIO(resp.content))
+    data = json.loads(bundle.read("data.json"))
+    rows = {r["id"]: r for r in data["tables"]["resumes"]}
+    assert rows[kept_id]["name"] == "Main CV" and rows[kept_id]["deleted_at"] is None
+    assert rows[kept_id]["content_hash"]
+    assert rows[deleted_id]["deleted_at"] is not None
+    assert rows[deleted_id]["parsed_json"] is None and rows[deleted_id]["name"] is None
+    assert [f["resume_id"] for f in data["files"]] == [kept_id]
+
+    assert (await client.delete("/account")).status_code == 202
+    async with sessionmaker() as db:
+        assert await db.scalar(select(func.count(Resume.id))) == 0
+
+
+@pytest.mark.skipif(POSTGRES_URL is None, reason="needs STRONG_TEST_POSTGRES_URL (migrated)")
+async def test_r1_postgres_job_targets_and_resumes_no_longer_cascade() -> None:
+    """R1, migration 0007: reports hang on job targets and resumes without a cascade. A hard
+    delete of a job with reports fails; a soft delete keeps them; account delete still works."""
+    from sqlalchemy.exc import IntegrityError
+
+    from strong_core.db.models import GapAnalysis, InterviewSession, JobTarget
+
+    assert POSTGRES_URL is not None
+    engine = create_async_engine(async_database_url(POSTGRES_URL))
+    maker = async_sessionmaker(engine, expire_on_commit=False)
+    try:
+        async with maker() as db:
+            org = Org(name="pg-r1-test")
+            db.add(org)
+            await db.flush()
+            user = User(
+                org_id=org.id, email=f"pg-{uuid.uuid4().hex}@example.com", auth_provider="dev"
+            )
+            db.add(user)
+            await db.commit()
+            org_id = org.id
+            await fill_every_user_table(db, org_id, user.id, file_ref=None)
+            job = await db.scalar(select(JobTarget).where(JobTarget.org_id == org_id))
+            assert job is not None
+            job_id = job.id
+            with pytest.raises(IntegrityError):
+                await db.execute(text("DELETE FROM job_targets WHERE id = :i"), {"i": job_id})
+            await db.rollback()
+
+            await db.execute(
+                text(
+                    "UPDATE job_targets SET deleted_at = now(), raw_text = NULL, "
+                    "parsed_json = NULL, name = NULL WHERE id = :i"
+                ),
+                {"i": job_id},
+            )
+            await db.commit()
+            gaps = await db.scalar(
+                select(func.count(GapAnalysis.id)).where(GapAnalysis.job_target_id == job_id)
+            )
+            sessions = await db.scalar(
+                select(func.count(InterviewSession.id)).where(
+                    InterviewSession.job_target_id == job_id
+                )
+            )
+            assert gaps == 1 and sessions == 1
+
+            await delete_org_rows(db, org_id)
+            await db.commit()
+            for table in Base.metadata.sorted_tables:
+                if table.name in USER_OWNED_TABLES:
+                    count = await db.scalar(
+                        text(f"SELECT count(*) FROM {table.name} WHERE org_id = :o"),
+                        {"o": org_id},
+                    )
+                    assert count == 0, table.name
+            await db.execute(text("DELETE FROM audit_logs WHERE org_id = :o"), {"o": org_id})
+            await db.commit()
+    finally:
+        await engine.dispose()

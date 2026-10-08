@@ -10,11 +10,14 @@ import type {
   JobOut,
   JobTargetAccepted,
   JobTargetCreate,
+  JobTargetMatch,
+  JobTargetMatchIn,
   JobTargetOut,
   JobTargetSummary,
   JobTargetUpdate,
   Resume,
   ResumeAccepted,
+  ResumeMatch,
   ResumeOut,
 } from "./types";
 
@@ -44,6 +47,26 @@ export const jobTargetsApi = {
         params: { path: { job_target_id: jobTargetId, job_id: jobId } },
       }),
     ) as JobOut,
+  /** R1: the saved job with the same posting text or link, so it is not read again. */
+  match: async (body: JobTargetMatchIn) =>
+    unwrap(await apiClient.POST("/job-targets/match", { body })) as JobTargetMatch,
+  /** R1: rename a saved job. HTTP 422 when the name is empty or longer than 120 characters. */
+  rename: async (jobTargetId: string, name: string) =>
+    unwrap(
+      await apiClient.PATCH("/job-targets/{job_target_id}", {
+        params: { path: { job_target_id: jobTargetId } },
+        body: { name },
+      }),
+    ) as JobTargetOut,
+  /** R1: delete a saved job description. Its reports stay. */
+  remove: async (jobTargetId: string) => {
+    unwrap(
+      await apiClient.DELETE("/job-targets/{job_target_id}", {
+        params: { path: { job_target_id: jobTargetId } },
+        parseAs: "text",
+      }),
+    );
+  },
 };
 
 export const resumesApi = {
@@ -75,7 +98,33 @@ export const resumesApi = {
         params: { path: { resume_id: resumeId, job_id: jobId } },
       }),
     ) as JobOut,
+  /** R1: the saved CV with the same content. `sha256` is the hash of the file or the pasted text. */
+  match: async (sha256: string) =>
+    unwrap(await apiClient.POST("/resumes/match", { body: { sha256 } })) as ResumeMatch,
+  rename: async (resumeId: string, name: string) =>
+    unwrap(
+      await apiClient.PATCH("/resumes/{resume_id}", {
+        params: { path: { resume_id: resumeId } },
+        body: { name },
+      }),
+    ) as ResumeOut,
+  /** R1: delete a saved CV and its stored file. Its gap reports stay. */
+  remove: async (resumeId: string) => {
+    unwrap(
+      await apiClient.DELETE("/resumes/{resume_id}", {
+        params: { path: { resume_id: resumeId } },
+        parseAs: "text",
+      }),
+    );
+  },
 };
+
+/** SHA-256 as hex, the same hash the API keeps for a CV (R1). */
+export async function sha256Hex(data: ArrayBuffer | string): Promise<string> {
+  const bytes = typeof data === "string" ? new TextEncoder().encode(data) : new Uint8Array(data);
+  const digest = await globalThis.crypto.subtle.digest("SHA-256", bytes);
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
 
 /** True while a background job still runs. */
 export const jobRunning = (job: JobOut | undefined) =>

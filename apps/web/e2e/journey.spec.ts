@@ -7,6 +7,9 @@ import { expect, test, type Page } from "@playwright/test";
  */
 
 const SHOTS = process.env.E2E_SCREENSHOTS;
+// The consent text (src/components/ConsentSwitch.tsx, AC-2).
+const CONSENT_LABEL =
+  "Let the Strong Hire team read my interview transcripts and the interviewer's reasoning to improve the product.";
 
 async function shot(page: Page, name: string) {
   if (SHOTS) await page.screenshot({ path: `${SHOTS}/${name}.png`, fullPage: true });
@@ -19,14 +22,11 @@ async function signUp(page: Page, email: string, consent = false) {
   await page.getByLabel("Email for dev login").fill(email);
   await page.getByRole("button", { name: "Sign in as dev user" }).click();
   await expect(page.getByRole("heading", { name: "Create your account" })).toBeVisible();
-  await expect(page.getByRole("switch", { name: "Use my transcripts to improve Strong Hire" })).toHaveAttribute(
-    "aria-checked",
-    "false",
-  );
+  await expect(page.getByRole("checkbox", { name: CONSENT_LABEL })).not.toBeChecked();
   await shot(page, "02-signup");
   await page.getByLabel("I am 18 or older.").check();
   await page.getByLabel("I accept the terms of service and the privacy policy.").check();
-  if (consent) await page.getByRole("switch", { name: "Use my transcripts to improve Strong Hire" }).click();
+  if (consent) await page.getByRole("checkbox", { name: CONSENT_LABEL }).check();
   await page.getByRole("button", { name: "Create account" }).click();
   await expect(page.getByRole("heading", { name: "Your interviews" })).toBeVisible();
 }
@@ -122,7 +122,7 @@ test("main journey from sign-up to paywall", async ({ page }) => {
 test("account page: consent, export and delete", async ({ page }) => {
   await signUp(page, "bo@example.com");
   await page.getByRole("link", { name: "Account" }).click();
-  const consent = page.getByRole("switch", { name: "Use my transcripts to improve Strong Hire" });
+  const consent = page.getByRole("switch", { name: CONSENT_LABEL });
   await expect(consent).toHaveAttribute("aria-checked", "false");
   await consent.click();
   await expect(consent).toHaveAttribute("aria-checked", "true");

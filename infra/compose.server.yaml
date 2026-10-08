@@ -45,6 +45,8 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       # Emails that see the model spend meter (strong_api.devtools). Testers do not.
       MODEL_SPEND_VIEWERS: ${MODEL_SPEND_VIEWERS:-}
+      # Emails that may open the admin area (/admin). Everyone else gets 404.
+      ADMIN_EMAILS: ${ADMIN_EMAILS:-}
       LIVEKIT_PUBLIC_URL: wss://rtc.${DOMAIN}
       STRONG_INTERNAL_TOKEN: ${STRONG_INTERNAL_TOKEN:?set STRONG_INTERNAL_TOKEN in .env}
       # The AI candidate (P13, docs/sim-candidate.md). Off unless SIM_ENABLED=true in .env.

@@ -11,7 +11,7 @@
           "inputs"
         ],
         "summary": "List Job Targets",
-        "description": "The signed-in user's job targets, newest first, with dashboard numbers (PR-1).\n\nmatch_score comes from the latest ready gap analysis. sessions_count and last_session_at\ncount rows in the sessions table; they stay 0 and null until sessions exist (P7, P10).",
+        "description": "The signed-in user's saved job targets, newest first, with dashboard numbers (PR-1).\n\nDeleted job descriptions are left out (R1); their reports are on GET /reports.\n\nmatch_score comes from the latest ready gap analysis. sessions_count and last_session_at\ncount rows in the sessions table; they stay 0 and null until sessions exist (P7, P10).",
         "operationId": "list_job_targets_job_targets_get",
         "responses": {
           "200": {
@@ -70,12 +70,55 @@
         }
       }
     },
+    "/job-targets/match": {
+      "post": {
+        "tags": [
+          "inputs"
+        ],
+        "summary": "Match Job Target",
+        "description": "R1: the saved job with the same posting text (formatting ignored) or the same link.\n\nLets the app offer the saved job instead of reading the posting again. Deleted jobs and\njobs of other users never match.",
+        "operationId": "match_job_target_job_targets_match_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobTargetMatchIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobTargetMatch"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/job-targets/{job_target_id}": {
       "get": {
         "tags": [
           "inputs"
         ],
         "summary": "Get Job Target",
+        "description": "One job target. A deleted one still answers, with deleted true and no content (R1).",
         "operationId": "get_job_target_job_targets__job_target_id__get",
         "parameters": [
           {
@@ -99,6 +142,93 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "inputs"
+        ],
+        "summary": "Rename Job Target",
+        "description": "R1: rename a saved job.",
+        "operationId": "rename_job_target_job_targets__job_target_id__patch",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryRename"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobTargetOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "inputs"
+        ],
+        "summary": "Delete Job Target",
+        "description": "R1: delete a saved job description. Its text, link, parsed data and context go.\n\nGap reports, interview sessions, transcripts, debriefs and progress stay; they show the\njob as deleted. Safe to call twice.",
+        "operationId": "delete_job_target_job_targets__job_target_id__delete",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
           },
           "422": {
             "description": "Validation Error",
@@ -223,7 +353,7 @@
           "inputs"
         ],
         "summary": "List Resumes",
-        "description": "The signed-in user's resumes, newest first. Used to reuse a resume for a new job.",
+        "description": "The signed-in user's saved resumes, newest first. Used to reuse a resume for a new job.\n\nDeleted resumes are left out (R1).",
         "operationId": "list_resumes_resumes_get",
         "responses": {
           "200": {
@@ -282,12 +412,55 @@
         }
       }
     },
+    "/resumes/match": {
+      "post": {
+        "tags": [
+          "inputs"
+        ],
+        "summary": "Match Resume",
+        "description": "R1: the saved CV with the same file content (SHA-256 of the file, or of the pasted text\nas UTF-8). Lets the app offer the saved CV instead of reading the file again.",
+        "operationId": "match_resume_resumes_match_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResumeMatchIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeMatch"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/resumes/{resume_id}": {
       "get": {
         "tags": [
           "inputs"
         ],
         "summary": "Get Resume",
+        "description": "One resume. A deleted one still answers, with deleted true and no content (R1).",
         "operationId": "get_resume_resumes__resume_id__get",
         "parameters": [
           {
@@ -311,6 +484,93 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "inputs"
+        ],
+        "summary": "Rename Resume",
+        "description": "R1: rename a saved CV.",
+        "operationId": "rename_resume_resumes__resume_id__patch",
+        "parameters": [
+          {
+            "name": "resume_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Resume Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryRename"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "inputs"
+        ],
+        "summary": "Delete Resume",
+        "description": "R1: delete a saved CV: its parsed data now, its encrypted file by a worker job.\n\nGap reports that used it stay and show the CV as deleted. Safe to call twice.",
+        "operationId": "delete_resume_resumes__resume_id__delete",
+        "parameters": [
+          {
+            "name": "resume_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Resume Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
           },
           "422": {
             "description": "Validation Error",
@@ -529,6 +789,53 @@
           },
           "429": {
             "description": "Rate limited. detail.code is 'rate_limited'; see Retry-After."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gap-analyses/{gap_analysis_id}": {
+      "get": {
+        "tags": [
+          "gap analysis"
+        ],
+        "summary": "Get Gap Analysis By Id",
+        "description": "One gap analysis run of the signed-in user (R1 Reports page), also for a deleted job.",
+        "operationId": "get_gap_analysis_by_id_gap_analyses__gap_analysis_id__get",
+        "parameters": [
+          {
+            "name": "gap_analysis_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Gap Analysis Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GapAnalysisOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The job target, the resume or the analysis does not exist."
           },
           "422": {
             "description": "Validation Error",
@@ -1030,6 +1337,81 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/VoiceJoin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reports": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "List Reports",
+        "description": "All gap reports and interview debriefs of the signed-in user, newest first (R1).",
+        "operationId": "list_reports_reports_get",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Job Target Id"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "gap_report",
+                    "interview_debrief"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Type"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReportItem"
+                  },
+                  "title": "Response List Reports Reports Get"
                 }
               }
             }
@@ -1744,6 +2126,232 @@
         }
       }
     },
+    "/admin/users": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List Users",
+        "operationId": "list_users_admin_users_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AdminUser"
+                  },
+                  "type": "array",
+                  "title": "Response List Users Admin Users Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/sessions": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List Sessions",
+        "description": "Interviews of all users, newest first, with the interviewer's model cost.",
+        "operationId": "list_sessions_admin_sessions_get",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "day_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "First day (UTC), inclusive.",
+              "title": "Day From"
+            },
+            "description": "First day (UTC), inclusive."
+          },
+          {
+            "name": "day_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Last day (UTC), inclusive.",
+              "title": "Day To"
+            },
+            "description": "Last day (UTC), inclusive."
+          },
+          {
+            "name": "interview_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/InterviewType"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Interview Type"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSessionList"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/sessions/{session_id}": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Session",
+        "description": "One interview. Transcript and traces only when the user's consent is on now.",
+        "operationId": "get_session_admin_sessions__session_id__get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSessionDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/audit": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List Audit",
+        "description": "Newest first. `admin` shows the admin views only; `all` shows every entry.",
+        "operationId": "list_audit_admin_audit_get",
+        "parameters": [
+          {
+            "name": "scope",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "admin",
+                "all"
+              ],
+              "type": "string",
+              "default": "admin",
+              "title": "Scope"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminAuditEntry"
+                  },
+                  "title": "Response List Audit Admin Audit Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -1801,6 +2409,671 @@
         ],
         "title": "AccountDeletedOut",
         "description": "AC-1 account delete. Rows are gone now; resume files go within the deadline."
+      },
+      "AdminAuditEntry": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At"
+          },
+          "actor": {
+            "type": "string",
+            "title": "Actor"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "entity": {
+            "type": "string",
+            "title": "Entity"
+          },
+          "org_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Org Id"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Details"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "at",
+          "actor",
+          "action",
+          "entity",
+          "org_id",
+          "details"
+        ],
+        "title": "AdminAuditEntry"
+      },
+      "AdminMessage": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          },
+          "prompt_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt Ref"
+          }
+        },
+        "type": "object",
+        "required": [
+          "role",
+          "content"
+        ],
+        "title": "AdminMessage"
+      },
+      "AdminScore": {
+        "properties": {
+          "competency": {
+            "$ref": "#/components/schemas/Competency"
+          },
+          "score": {
+            "type": "integer",
+            "title": "Score"
+          }
+        },
+        "type": "object",
+        "required": [
+          "competency",
+          "score"
+        ],
+        "title": "AdminScore"
+      },
+      "AdminSession": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id"
+          },
+          "user_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Email"
+          },
+          "training_consent": {
+            "type": "boolean",
+            "title": "Training Consent"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "ended_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ended At"
+          },
+          "interview_type": {
+            "$ref": "#/components/schemas/InterviewType"
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/Difficulty"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/Mode"
+          },
+          "duration_min": {
+            "type": "integer",
+            "title": "Duration Min"
+          },
+          "duration_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration S",
+            "description": "From start to end. None until it ends."
+          },
+          "channel": {
+            "$ref": "#/components/schemas/SessionChannel"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SessionStatus"
+          },
+          "minutes_billed": {
+            "type": "integer",
+            "title": "Minutes Billed"
+          },
+          "hire_signal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HireSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scores": {
+            "items": {
+              "$ref": "#/components/schemas/AdminScore"
+            },
+            "type": "array",
+            "title": "Scores"
+          },
+          "model_profile": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Profile"
+          },
+          "interviewer_model_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interviewer Model Id"
+          },
+          "prompt_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt Version"
+          },
+          "cost_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Usd",
+            "description": "Interviewer model cost. From usage events, else from the traces."
+          },
+          "cost_source": {
+            "type": "string",
+            "enum": [
+              "usage_events",
+              "traces",
+              "none"
+            ],
+            "title": "Cost Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "user_email",
+          "training_consent",
+          "created_at",
+          "started_at",
+          "ended_at",
+          "interview_type",
+          "difficulty",
+          "mode",
+          "duration_min",
+          "duration_s",
+          "channel",
+          "status",
+          "minutes_billed",
+          "hire_signal",
+          "scores",
+          "model_profile",
+          "interviewer_model_id",
+          "prompt_version",
+          "cost_usd",
+          "cost_source"
+        ],
+        "title": "AdminSession",
+        "description": "Metadata of one interview. Always shown, with or without consent."
+      },
+      "AdminSessionDetail": {
+        "properties": {
+          "session": {
+            "$ref": "#/components/schemas/AdminSession"
+          },
+          "content_visible": {
+            "type": "boolean",
+            "title": "Content Visible",
+            "description": "True when the user has training consent on now. Else only metadata."
+          },
+          "transcript": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Turn"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transcript"
+          },
+          "traces": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/AdminTrace"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Traces"
+          },
+          "trace_retention_days": {
+            "type": "integer",
+            "title": "Trace Retention Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session",
+          "content_visible",
+          "transcript",
+          "traces",
+          "trace_retention_days"
+        ],
+        "title": "AdminSessionDetail"
+      },
+      "AdminSessionList": {
+        "properties": {
+          "sessions": {
+            "items": {
+              "$ref": "#/components/schemas/AdminSession"
+            },
+            "type": "array",
+            "title": "Sessions"
+          },
+          "daily": {
+            "items": {
+              "$ref": "#/components/schemas/DailyCost"
+            },
+            "type": "array",
+            "title": "Daily",
+            "description": "Cost per day (UTC) of the sessions listed."
+          },
+          "total_cost_usd": {
+            "type": "number",
+            "title": "Total Cost Usd"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sessions",
+          "daily",
+          "total_cost_usd",
+          "limit"
+        ],
+        "title": "AdminSessionList"
+      },
+      "AdminTrace": {
+        "properties": {
+          "seq": {
+            "type": "integer",
+            "title": "Seq"
+          },
+          "turn_index": {
+            "type": "integer",
+            "title": "Turn Index"
+          },
+          "call": {
+            "type": "string",
+            "title": "Call"
+          },
+          "move": {
+            "type": "string",
+            "title": "Move"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "phase": {
+            "$ref": "#/components/schemas/Phase"
+          },
+          "elapsed_ms": {
+            "type": "integer",
+            "title": "Elapsed Ms"
+          },
+          "phase_deadline_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phase Deadline Ms"
+          },
+          "question_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Ref"
+          },
+          "messages": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/AdminMessage"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Messages"
+          },
+          "raw_reply": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Raw Reply"
+          },
+          "spoken_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Spoken Text"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "prompt_refs": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt Refs"
+          },
+          "input_tokens": {
+            "type": "integer",
+            "title": "Input Tokens"
+          },
+          "output_tokens": {
+            "type": "integer",
+            "title": "Output Tokens"
+          },
+          "cost_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Usd"
+          },
+          "latency_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latency Ms"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "seq",
+          "turn_index",
+          "call",
+          "move",
+          "reason",
+          "phase",
+          "elapsed_ms",
+          "phase_deadline_ms",
+          "question_ref",
+          "messages",
+          "raw_reply",
+          "spoken_text",
+          "model",
+          "prompt_refs",
+          "input_tokens",
+          "output_tokens",
+          "cost_usd",
+          "latency_ms",
+          "error",
+          "created_at"
+        ],
+        "title": "AdminTrace"
+      },
+      "AdminUser": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "last_sign_in_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Sign In At"
+          },
+          "plan": {
+            "type": "string",
+            "enum": [
+              "free",
+              "paid"
+            ],
+            "title": "Plan"
+          },
+          "subscription_status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SubscriptionStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "minutes_used": {
+            "type": "integer",
+            "title": "Minutes Used"
+          },
+          "minutes_cap": {
+            "type": "integer",
+            "title": "Minutes Cap"
+          },
+          "training_consent": {
+            "type": "boolean",
+            "title": "Training Consent"
+          },
+          "interviews": {
+            "type": "integer",
+            "title": "Interviews"
+          },
+          "is_admin": {
+            "type": "boolean",
+            "title": "Is Admin"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "created_at",
+          "last_sign_in_at",
+          "plan",
+          "subscription_status",
+          "minutes_used",
+          "minutes_cap",
+          "training_consent",
+          "interviews",
+          "is_admin"
+        ],
+        "title": "AdminUser"
       },
       "AuthProvider": {
         "type": "string",
@@ -1901,6 +3174,12 @@
             "type": "string",
             "format": "date-time",
             "title": "Created At"
+          },
+          "is_admin": {
+            "type": "boolean",
+            "title": "Is Admin",
+            "description": "True for ADMIN_EMAILS users: the web app shows Admin.",
+            "default": false
           }
         },
         "type": "object",
@@ -2492,6 +3771,30 @@
         ],
         "title": "CreateSessionRequest"
       },
+      "DailyCost": {
+        "properties": {
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day"
+          },
+          "sessions": {
+            "type": "integer",
+            "title": "Sessions"
+          },
+          "cost_usd": {
+            "type": "number",
+            "title": "Cost Usd"
+          }
+        },
+        "type": "object",
+        "required": [
+          "day",
+          "sessions",
+          "cost_usd"
+        ],
+        "title": "DailyCost"
+      },
       "Debrief": {
         "properties": {
           "session": {
@@ -2954,6 +4257,28 @@
             "format": "uuid",
             "title": "Resume Id"
           },
+          "resume_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resume Name",
+            "description": "R1: the CV's library name. None when deleted."
+          },
+          "resume_deleted": {
+            "type": "boolean",
+            "title": "Resume Deleted",
+            "description": "R1: the CV used for this analysis was deleted."
+          },
+          "job_deleted": {
+            "type": "boolean",
+            "title": "Job Deleted",
+            "description": "R1: the job description was deleted."
+          },
           "status": {
             "$ref": "#/components/schemas/GapStatus"
           },
@@ -3006,7 +4331,7 @@
           "stale": {
             "type": "boolean",
             "title": "Stale",
-            "description": "The job, the resume or the company profile changed after this analysis. Start it again to update it."
+            "description": "The job, the resume or the company profile changed after this analysis. Start it again to update it. Always false when the job or the resume was deleted."
           },
           "created_at": {
             "type": "string",
@@ -3031,6 +4356,9 @@
           "id",
           "job_target_id",
           "resume_id",
+          "resume_name",
+          "resume_deleted",
+          "job_deleted",
           "status",
           "analysis",
           "error",
@@ -3057,6 +4385,12 @@
             ],
             "title": "Resume Id",
             "description": "The resume to compare with the job. Leave it out to run again with the resume of the latest analysis."
+          },
+          "reuse_ready": {
+            "type": "boolean",
+            "title": "Reuse Ready",
+            "description": "R1: return the latest ready analysis instead of a new run when the job, the resume and the company profile did not change since it was made. The app sets it when the user picks a saved job and a saved CV again.",
+            "default": false
           }
         },
         "additionalProperties": false,
@@ -3626,12 +4960,81 @@
         "title": "JobTargetCreate",
         "description": "A posting as pasted text, a URL, or both (IN-1). With both, the text is used and the URL\nhelps company matching."
       },
+      "JobTargetMatch": {
+        "properties": {
+          "job_target": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/JobTargetOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "job_target"
+        ],
+        "title": "JobTargetMatch",
+        "description": "R1: the saved job with the same text or link, or None."
+      },
+      "JobTargetMatchIn": {
+        "properties": {
+          "text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "JobTargetMatchIn",
+        "description": "R1: a posting the user is about to add. Same fields as JobTargetCreate."
+      },
       "JobTargetOut": {
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid",
             "title": "Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name",
+            "description": "R1: the name in the job library. None when the job description is deleted."
+          },
+          "deleted": {
+            "type": "boolean",
+            "title": "Deleted",
+            "description": "R1: the job description was deleted. Its reports and sessions stay."
           },
           "status": {
             "type": "string",
@@ -3730,6 +5133,8 @@
         "type": "object",
         "required": [
           "id",
+          "name",
+          "deleted",
           "status",
           "source_url",
           "posting",
@@ -3878,6 +5283,22 @@
         ],
         "title": "LevelBar",
         "type": "object"
+      },
+      "LibraryRename": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 240,
+            "title": "Name"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "LibraryRename",
+        "description": "R1: a new name for a saved job or CV. Trimmed; 1 to 120 characters."
       },
       "LoopRound": {
         "additionalProperties": false,
@@ -4564,6 +5985,169 @@
         ],
         "title": "RedirectOut"
       },
+      "ReportItem": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "gap_report",
+              "interview_debrief"
+            ],
+            "title": "Type"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id",
+            "description": "The gap analysis id, or the session id of a debrief."
+          },
+          "job_target_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Job Target Id"
+          },
+          "job_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Name",
+            "description": "None when the job description was deleted."
+          },
+          "job_deleted": {
+            "type": "boolean",
+            "title": "Job Deleted"
+          },
+          "resume_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resume Id",
+            "description": "Gap reports only."
+          },
+          "resume_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resume Name",
+            "description": "Gap reports only. None when the CV was deleted."
+          },
+          "resume_deleted": {
+            "type": "boolean",
+            "title": "Resume Deleted",
+            "description": "Gap reports only: the CV was deleted."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "scoring",
+              "failed"
+            ],
+            "title": "Status",
+            "description": "Gap reports are always ready. A debrief is scoring, ready or failed."
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At",
+            "description": "When the report was made; the list is newest first."
+          },
+          "match_score": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Match Score",
+            "description": "Gap reports only."
+          },
+          "hire_signal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HireSignal"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Debriefs only, when ready."
+          },
+          "interview_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/InterviewType"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Debriefs only."
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Mode"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Debriefs only."
+          },
+          "duration_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Min",
+            "description": "Debriefs only."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "type",
+          "id",
+          "job_target_id",
+          "job_name",
+          "job_deleted",
+          "resume_id",
+          "resume_name",
+          "resume_deleted",
+          "status",
+          "at",
+          "match_score",
+          "hire_signal",
+          "interview_type",
+          "mode",
+          "duration_min"
+        ],
+        "title": "ReportItem",
+        "description": "One row of the Reports page. Open a gap report with GET /gap-analyses/{id} and a debrief\nwith GET /sessions/{id}/debrief."
+      },
       "RequirementKind": {
         "type": "string",
         "enum": [
@@ -4716,12 +6300,65 @@
         ],
         "title": "ResumeAccepted"
       },
+      "ResumeMatch": {
+        "properties": {
+          "resume": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ResumeOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "resume"
+        ],
+        "title": "ResumeMatch",
+        "description": "R1: the saved CV with the same file content, or None."
+      },
+      "ResumeMatchIn": {
+        "properties": {
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Sha256"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "sha256"
+        ],
+        "title": "ResumeMatchIn",
+        "description": "R1: the SHA-256 of a CV file (or of the pasted text as UTF-8) before it is uploaded."
+      },
       "ResumeOut": {
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid",
             "title": "Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name",
+            "description": "R1: the name in the CV library. None when the CV is deleted."
+          },
+          "deleted": {
+            "type": "boolean",
+            "title": "Deleted",
+            "description": "R1: the CV was deleted. Its gap reports stay."
           },
           "status": {
             "type": "string",
@@ -4754,6 +6391,8 @@
         "type": "object",
         "required": [
           "id",
+          "name",
+          "deleted",
           "status",
           "has_file",
           "resume",

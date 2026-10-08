@@ -11,6 +11,7 @@ import { MemoryRouter } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 
 import { AppRoutes, createQueryClient } from "./App";
+import { CONSENT_LABEL } from "./components/ConsentSwitch";
 import { server } from "./mocks/node";
 import { MOCK_QUESTION } from "./session/mockVoice";
 
@@ -50,10 +51,7 @@ async function startSignup(user: User) {
 
 async function signUp(user: User) {
   await startSignup(user);
-  expect(screen.getByRole("switch", { name: "Use my transcripts to improve Strong Hire" })).toHaveAttribute(
-    "aria-checked",
-    "false",
-  );
+  expect(screen.getByRole("checkbox", { name: CONSENT_LABEL })).not.toBeChecked();
   await user.click(screen.getByLabelText("I am 18 or older."));
   await user.click(screen.getByLabelText("I accept the terms of service and the privacy policy."));
   await user.click(screen.getByRole("button", { name: "Create account" }));
@@ -148,7 +146,7 @@ describe("main journey", () => {
     await startSignup(user);
     await user.click(screen.getByLabelText("I am 18 or older."));
     await user.click(screen.getByLabelText("I accept the terms of service and the privacy policy."));
-    await user.click(screen.getByRole("switch", { name: "Use my transcripts to improve Strong Hire" }));
+    await user.click(screen.getByRole("checkbox", { name: CONSENT_LABEL }));
     await user.click(screen.getByRole("button", { name: "Create account" }));
     await screen.findByRole("heading", { name: "Your interviews" });
     expect(signupBodies).toEqual([{ age_confirmed: true, terms_accepted: true, training_consent: true }]);

@@ -104,6 +104,7 @@ USER_OWNED_TABLES = (
     "usage_events",
     "company_requests",
     "exit_surveys",
+    "interviewer_traces",
 )
 
 
@@ -128,6 +129,9 @@ class User(Base):
         Boolean, default=False, server_default="false", comment="AC-2: off by default"
     )
     created_at: Mapped[datetime] = _created_at()
+    last_sign_in_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), comment="Set at each sign-in (admin users page)"
+    )
 
 
 class Subscription(Base):
@@ -196,6 +200,16 @@ class Resume(Base):
     file_ref: Mapped[str | None] = mapped_column(
         String(500), comment="Object storage key of the encrypted original file"
     )
+    name: Mapped[str | None] = mapped_column(
+        String(120), comment="R1: name in the CV library. NULL after delete"
+    )
+    content_hash: Mapped[str | None] = mapped_column(
+        String(64), index=True, comment="R1: SHA-256 of the uploaded file or pasted text"
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        comment="R1: soft delete. Content is cleared; gap reports that used it stay",
+    )
     uploaded_at: Mapped[datetime] = _created_at()
 
 
@@ -252,6 +266,16 @@ class JobTarget(Base):
     level: Mapped[Level | None] = mapped_column(str_enum(Level, "level"))
     stage: Mapped[str | None] = mapped_column(String(100))
     context_notes: Mapped[str | None] = mapped_column(Text, comment="IN-4 optional context")
+    name: Mapped[str | None] = mapped_column(
+        String(120), comment="R1: name in the job library. NULL means the default name"
+    )
+    text_hash: Mapped[str | None] = mapped_column(
+        String(64), index=True, comment="R1: SHA-256 of the normalized posting text"
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        comment="R1: soft delete. Content is cleared; reports, sessions and progress stay",
+    )
     created_at: Mapped[datetime] = _created_at()
 
 
@@ -260,12 +284,9 @@ class GapAnalysis(Base):
 
     id: Mapped[uuid.UUID] = _uuid_pk()
     org_id: Mapped[uuid.UUID] = _org_fk()
-    job_target_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("job_targets.id", ondelete="CASCADE"), index=True
-    )
-    resume_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("resumes.id", ondelete="CASCADE"), index=True
-    )
+    # R1: job targets and resumes are soft deleted, so these keys do not cascade.
+    job_target_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("job_targets.id"), index=True)
+    resume_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("resumes.id"), index=True)
     status: Mapped[GapStatus] = mapped_column(
         str_enum(GapStatus, "gap_status"), default=GapStatus.READY, server_default="ready"
     )
@@ -291,9 +312,7 @@ class InterviewSession(Base):
 
     id: Mapped[uuid.UUID] = _uuid_pk()
     org_id: Mapped[uuid.UUID] = _org_fk()
-    job_target_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("job_targets.id", ondelete="CASCADE"), index=True
-    )
+    job_target_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("job_targets.id"), index=True)
     type: Mapped[InterviewType] = mapped_column(str_enum(InterviewType, "interview_type"))
     difficulty: Mapped[Difficulty] = mapped_column(str_enum(Difficulty, "difficulty"))
     mode: Mapped[Mode] = mapped_column(str_enum(Mode, "mode"))
@@ -339,6 +358,50 @@ class Turn(Base):
     question_ref: Mapped[str | None] = mapped_column(String(100))
 
 
+TRACE_RETENTION_DAYS = 90  # a worker cron job deletes older interviewer traces (R2)
+
+
+class InterviewerTrace(Base):
+    """One interviewer model call (or fixed line) in a session, with the controller's reason.
+
+    For the admin review of test interviews. Shown only when the user has training_consent on.
+    A worker cron job deletes rows older than 90 days; the turns stay.
+    """
+
+    __tablename__ = "interviewer_traces"
+    __table_args__ = (Index("ix_interviewer_traces_session_seq", "session_id", "seq"),)
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    org_id: Mapped[uuid.UUID] = _org_fk()
+    session_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("sessions.id", ondelete="CASCADE"))
+    seq: Mapped[int] = mapped_column(Integer, comment="Order of the call in the session")
+    turn_index: Mapped[int] = mapped_column(Integer, comment="Transcript length at the call")
+    call: Mapped[str] = mapped_column(String(20), comment="say, decide, line or rollback")
+    move: Mapped[str] = mapped_column(String(40), comment="Controller move or fixed line name")
+    reason_json: Mapped[dict[str, Any] | None] = mapped_column(
+        comment="Why: the ProbeDecision and the controller's reason"
+    )
+    phase: Mapped[Phase] = mapped_column(str_enum(Phase, "phase"))
+    elapsed_ms: Mapped[int] = mapped_column(Integer)
+    phase_deadline_ms: Mapped[int | None] = mapped_column(Integer)
+    question_ref: Mapped[str | None] = mapped_column(String(100))
+    messages_json: Mapped[list[Any] | None] = mapped_column(comment="Prompt messages sent")
+    raw_reply: Mapped[str | None] = mapped_column(Text)
+    spoken_text: Mapped[str | None] = mapped_column(Text)
+    model: Mapped[str | None] = mapped_column(String(200), comment="Gateway alias")
+    prompt_refs: Mapped[str | None] = mapped_column(String(500))
+    input_tokens: Mapped[int] = mapped_column(Integer, default=0)
+    output_tokens: Mapped[int] = mapped_column(Integer, default=0)
+    cost_usd: Mapped[Decimal | None] = mapped_column(
+        Numeric(12, 6), comment="From the LiteLLM config prices; NULL when unknown"
+    )
+    latency_ms: Mapped[int | None] = mapped_column(Integer)
+    error: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False, index=True
+    )
+
+
 class Scorecard(Base):
     __tablename__ = "scorecards"
 
@@ -365,9 +428,7 @@ class ProgressSnapshot(Base):
 
     id: Mapped[uuid.UUID] = _uuid_pk()
     org_id: Mapped[uuid.UUID] = _org_fk()
-    job_target_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("job_targets.id", ondelete="CASCADE")
-    )
+    job_target_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("job_targets.id"))
     competency: Mapped[Competency] = mapped_column(str_enum(Competency, "competency"))
     score: Mapped[Decimal] = mapped_column(Numeric(3, 2))
     session_id: Mapped[uuid.UUID] = mapped_column(

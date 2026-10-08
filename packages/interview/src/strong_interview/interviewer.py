@@ -10,15 +10,18 @@ from __future__ import annotations
 
 import logging
 import re
+import time
 from collections.abc import AsyncIterator, Sequence
 from dataclasses import dataclass
 
 from strong_core.gateway import ModelGateway, Role
+from strong_core.gateway.prices import cost_usd
 from strong_core.gateway.registry import CapabilityTier
 from strong_core.gateway.types import Completion, Message
 from strong_core.prompts import load_prompt
 from strong_core.schemas import BriefQuestion, InterviewerBrief, ProbeDecision, Speaker, Turn
 from strong_interview.controller import Move
+from strong_interview.trace import ModelCall
 
 log = logging.getLogger(__name__)
 
@@ -86,6 +89,8 @@ class Interviewer:
         self.model: str | None = None
         self.input_tokens = 0
         self.output_tokens = 0
+        self.cost_usd = 0.0  # interviewer calls with a known price (R2)
+        self.last_call: ModelCall | None = None  # the latest say or decide call, for traces
 
     # ------------------------------------------------------------------ prompts
 
@@ -121,17 +126,38 @@ class Interviewer:
         )
         return [self._system(), user]
 
-    def _note(self, done: Completion[object]) -> None:
+    def _note(
+        self, done: Completion[object], messages: list[Message], raw: str, started: float
+    ) -> None:
         self.prompt_refs.update(done.prompt_refs)
         self.model = done.model
         self.input_tokens += done.usage.input_tokens
         self.output_tokens += done.usage.output_tokens
+        try:
+            cost = cost_usd(done.profile, done.model, done.usage)
+        except Exception:
+            log.warning("could not price the interviewer call", exc_info=True)
+            cost = None
+        self.cost_usd += cost or 0.0
+        self.last_call = ModelCall(
+            messages=tuple(messages),
+            raw_reply=raw,
+            model=done.model,
+            prompt_refs=done.prompt_refs,
+            input_tokens=done.usage.input_tokens,
+            output_tokens=done.usage.output_tokens,
+            cost_usd=cost,
+            latency_ms=_ms_since(started),
+        )
 
     # ------------------------------------------------------------------ calls
 
     async def say(self, move: Move, turns: Sequence[Turn]) -> str:
-        done = await self.gateway.complete(Role.INTERVIEWER, self.turn_messages(move, turns))
-        self._note(done)
+        messages = self.turn_messages(move, turns)
+        started = time.perf_counter()
+        self.last_call = None
+        done = await self.gateway.complete(Role.INTERVIEWER, messages)
+        self._note(done, messages, str(done.output), started)
         return clean_reply(str(done.output)) or "Let's continue."
 
     async def say_stream(self, move: Move, turns: Sequence[Turn]) -> AsyncIterator[str]:
@@ -158,12 +184,26 @@ class Interviewer:
                 transcript=render_transcript(turns, self.window),
             ),
         ]
+        started = time.perf_counter()
+        self.last_call = None
         try:
             done = await self.gateway.complete(
                 Role.INTERVIEWER, messages, output_type=ProbeDecision
             )
-        except Exception:
+        except Exception as exc:
             log.warning("probe decision failed; moving on", exc_info=True)
+            self.last_call = ModelCall(
+                messages=tuple(messages),
+                raw_reply=None,
+                model=self.gateway.config.alias_for(Role.INTERVIEWER),
+                prompt_refs=tuple(m.prompt_ref for m in messages if m.prompt_ref),
+                latency_ms=_ms_since(started),
+                error=f"{type(exc).__name__}: {exc}"[:2000],
+            )
             return ProbeDecision(action="move_on")
-        self._note(done)
+        self._note(done, messages, done.output.model_dump_json(), started)
         return done.output
+
+
+def _ms_since(started: float) -> int:
+    return max(0, int((time.perf_counter() - started) * 1000))
