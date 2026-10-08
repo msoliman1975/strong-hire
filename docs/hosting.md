@@ -29,7 +29,7 @@ adds `infra/compose.server.yaml`, which:
 - publishes no ports except Caddy and LiveKit media. The API (8700) and LiteLLM (4000) listen on
   127.0.0.1 only, for the script's health check and LiteLLM key setup.
 
-Sign-in uses email links, so the server needs SMTP settings (a Gmail app password works).
+Sign-in uses email links. The server sends them through Brevo SMTP (`smtp-relay.brevo.com`, port 587). The domain is authenticated in Brevo with DKIM records in GoDaddy DNS. The SMTP key is in `/etc/stronghire/smtp.key` and in `.env`.
 
 ## First setup
 
