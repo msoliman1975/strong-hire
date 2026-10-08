@@ -9,12 +9,22 @@ import { apiClient, unwrap } from "./client";
 import type { GapAnalysisOut, GapAnalysisStart } from "./types";
 
 export const gapApi = {
-  /** Start or restart. Leave `resume_id` out to run again with the resume of the last run. */
-  start: async (jobTargetId: string, body: GapAnalysisStart = {}) =>
+  /**
+   * Start or restart. Leave `resume_id` out to run again with the resume of the last run.
+   * With `reuse_ready` (R1), a ready analysis of the same saved job and CV comes back instead.
+   */
+  start: async (jobTargetId: string, body: Partial<GapAnalysisStart> = {}) =>
     unwrap(
       await apiClient.POST("/job-targets/{job_target_id}/gap-analysis", {
         params: { path: { job_target_id: jobTargetId } },
-        body,
+        body: { reuse_ready: false, ...body },
+      }),
+    ) as GapAnalysisOut,
+  /** One run by id, for the Reports page (R1). Works for a deleted job too. */
+  getById: async (gapAnalysisId: string) =>
+    unwrap(
+      await apiClient.GET("/gap-analyses/{gap_analysis_id}", {
+        params: { path: { gap_analysis_id: gapAnalysisId } },
       }),
     ) as GapAnalysisOut,
   /** The latest run. HTTP 404 when none was started. */

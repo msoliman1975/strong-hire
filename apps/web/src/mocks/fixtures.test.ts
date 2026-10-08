@@ -13,7 +13,8 @@ import { accountApi } from "../api/account";
 import { authApi } from "../api/auth";
 import { billingApi } from "../api/billing";
 import { gapApi } from "../api/gap";
-import { jobTargetsApi, resumesApi } from "../api/inputs";
+import { jobTargetsApi, resumesApi, sha256Hex } from "../api/inputs";
+import { reportsApi } from "../api/reports";
 import { sessionsApi } from "../api/sessions";
 import { debriefApi } from "../api/scoring";
 import { gapAnalysis, jobPosting, resume, scorecardFor, sessionPlan } from "./fixtures";
@@ -183,6 +184,49 @@ describe("mocks of the real P6 endpoints match openapi.json", () => {
     const resumes = await resumesApi.list();
     expect(resumes.length).toBeGreaterThan(0);
     for (const row of resumes) expectApiShape("ResumeOut", row);
+  });
+});
+
+describe("mocks of the R1 library and reports endpoints match openapi.json", () => {
+  it("match, rename, delete, gap report by id, reports list", async () => {
+    const text = "w".repeat(200);
+    const { job_target: job } = await jobTargetsApi.create({ text });
+    const { resume: record } = await resumesApi.upload(formWithText("Rust engineer"));
+    await jobTargetsApi.get(job.id);
+    await resumesApi.get(record.id);
+    const started = await gapApi.start(job.id, { resume_id: record.id });
+    await gapApi.get(job.id);
+
+    const matched = await jobTargetsApi.match({ text, url: null });
+    expectApiShape("JobTargetMatch", matched);
+    expect(matched.job_target?.id).toBe(job.id);
+    expectApiShape("JobTargetMatch", await jobTargetsApi.match({ text: "other", url: null }));
+    const hash = await sha256Hex("Rust engineer");
+    const cv = await resumesApi.match(hash);
+    expectApiShape("ResumeMatch", cv);
+    expect(cv.resume?.id).toBe(record.id);
+
+    expectApiShape("JobTargetOut", await jobTargetsApi.rename(job.id, "My job"));
+    expectApiShape("ResumeOut", await resumesApi.rename(record.id, "My CV"));
+    await expect(resumesApi.rename(record.id, " ")).rejects.toMatchObject({ status: 422 });
+
+    const report = await gapApi.getById(started.id);
+    expectApiShape("GapAnalysisOut", report);
+    expect(report.resume_name).toBe("My CV");
+    for (const row of await reportsApi.list()) expectApiShape("ReportItem", row);
+
+    await resumesApi.remove(record.id);
+    await jobTargetsApi.remove(job.id);
+    const deleted = await jobTargetsApi.get(job.id);
+    expectApiShape("JobTargetOut", deleted);
+    expect(deleted.deleted).toBe(true);
+    const gone = await gapApi.getById(started.id);
+    expectApiShape("GapAnalysisOut", gone);
+    expect(gone.job_deleted && gone.resume_deleted).toBe(true);
+    const [row] = await reportsApi.list({ type: "gap_report" });
+    expectApiShape("ReportItem", row);
+    expect(row.job_deleted).toBe(true);
+    await expect(gapApi.start(job.id, { resume_id: record.id })).rejects.toMatchObject({ status: 404 });
   });
 });
 

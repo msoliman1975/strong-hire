@@ -19,6 +19,8 @@ import { SessionSetupPage } from "./SessionSetupPage";
 
 const JOB: JobTargetOut = {
   id: "j1",
+  name: "Software Engineer at Acme",
+  deleted: false,
   status: "extracted",
   source_url: null,
   posting: jobPosting,

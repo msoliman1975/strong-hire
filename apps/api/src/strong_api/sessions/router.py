@@ -99,6 +99,8 @@ def _runners(request: Request) -> dict[uuid.UUID, InterviewRunner]:
 async def create_session(body: CreateSessionRequest, db: Db, me: Me, queue: Queue) -> SessionRecord:
     """Create a session and queue its interviewer brief (IV-2, IV-4, IV-6, IV-8)."""
     target = await _owned_target(db, me, body.job_target_id)
+    if target.deleted_at is not None:  # R1: a deleted job cannot get new sessions
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Job target not found")
     if target.parsed_json is None:
         raise HTTPException(status.HTTP_409_CONFLICT, "The job posting is still being read.")
     if body.channel == SessionChannel.TEXT and not await _text_allowed(db, me):

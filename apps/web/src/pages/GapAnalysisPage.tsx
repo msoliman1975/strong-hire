@@ -1,12 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link, useParams } from "react-router";
+import { Link, useParams, useSearchParams } from "react-router";
 
 import { ApiError } from "../api/client";
 import { gapApi } from "../api/gap";
-import { keys, useGapAnalysis, useJob } from "../api/hooks";
-import type { GapAnalysis, PlannedSession } from "../api/types";
+import { keys, useGapAnalysis, useGapReport, useJob, useReports } from "../api/hooks";
+import type { GapAnalysis, GapAnalysisOut, PlannedSession } from "../api/types";
+import { CV_DELETED, JD_DELETED, ReportList } from "../components/ReportList";
 import { Bar, ErrorNotice, Loading, PageHead } from "../components/ui";
-import { competencyLabel, difficultyLabel, interviewTypeLabel, severityLabel } from "../labels";
+import { competencyLabel, difficultyLabel, formatDate, interviewTypeLabel, severityLabel } from "../labels";
 
 export function setupLink(jobId: string, plan?: PlannedSession | null): string {
   if (!plan) return `/jobs/${jobId}/sessions/new`;
@@ -14,11 +15,19 @@ export function setupLink(jobId: string, plan?: PlannedSession | null): string {
   return `/jobs/${jobId}/sessions/new?${q.toString()}`;
 }
 
-/** GA-1 to GA-3: match score, breakdown, strengths, gaps, probe areas and the session plan. */
+/**
+ * GA-1 to GA-3: match score, breakdown, strengths, gaps, probe areas and the session plan.
+ * `?report=<id>` shows one earlier run from the Reports page (R1); otherwise the latest run.
+ */
 export function GapAnalysisPage() {
   const { jobId = "" } = useParams();
+  const [params] = useSearchParams();
+  const reportId = params.get("report");
   const job = useJob(jobId);
-  const gap = useGapAnalysis(jobId);
+  const latest = useGapAnalysis(jobId);
+  const report = useGapReport(reportId);
+  const gap = reportId ? report : latest;
+  const jobReports = useReports({ jobTargetId: jobId });
   const queryClient = useQueryClient();
   const again = useMutation({
     /** GA-4: free, but the API limits how many runs a user starts (HTTP 429, rate_limited). */
@@ -30,9 +39,14 @@ export function GapAnalysisPage() {
   });
 
   const posting = job.data?.posting;
-  const title = posting ? `${posting.title} at ${posting.company_name}` : "Gap analysis";
-  const notStarted = gap.error instanceof ApiError && gap.error.status === 404;
-  const data = gap.data;
+  const jobDeleted = job.data?.deleted ?? false;
+  const title = jobDeleted
+    ? JD_DELETED
+    : (job.data?.name ?? (posting ? `${posting.title} at ${posting.company_name}` : "Gap analysis"));
+  const notStarted = !reportId && gap.error instanceof ApiError && gap.error.status === 404;
+  const data: GapAnalysisOut | undefined = gap.data;
+  // A deleted job description or CV cannot be analysed again (R1).
+  const canRun = !jobDeleted && !data?.resume_deleted;
   const runAgain = (
     <button type="button" className="btn btn--secondary" disabled={again.isPending} onClick={() => again.mutate()}>
       Run the analysis again
@@ -43,11 +57,22 @@ export function GapAnalysisPage() {
     <>
       <PageHead title="Gap analysis">
         <p>{title}</p>
+        {data && (
+          <p className="muted">
+            CV: {data.resume_deleted ? CV_DELETED : (data.resume_name ?? "CV")}
+            {reportId && data.created_at && <>. Report from {formatDate(data.created_at)}</>}
+          </p>
+        )}
       </PageHead>
+      {reportId && latest.data && latest.data.id !== reportId && (
+        <p className="notice" role="status">
+          This is an earlier report. <Link to={`/jobs/${jobId}/gap`}>See the latest gap analysis</Link>.
+        </p>
+      )}
       {(gap.isPending || data?.status === "running") && (
         <Loading label="Comparing your resume with the job. This takes about a minute." />
       )}
-      {notStarted && (
+      {notStarted && canRun && (
         <div className="panel">
           <p>There is no gap analysis for this job yet. It is free. Choose a resume to start it.</p>
           <Link className="btn" to={`/jobs/${jobId}/resume`}>
@@ -60,10 +85,10 @@ export function GapAnalysisPage() {
       {data?.status === "failed" && (
         <div className="stack">
           <ErrorNotice error={data.error ?? "The gap analysis failed."} />
-          <div className="row">{runAgain}</div>
+          {canRun && <div className="row">{runAgain}</div>}
         </div>
       )}
-      {data?.status === "ready" && data.stale && (
+      {data?.status === "ready" && data.stale && !reportId && (
         <div className="notice" role="status">
           <p>The job, your resume or the company profile changed after this analysis. Run it again to update it.</p>
           <div className="row">{runAgain}</div>
@@ -75,12 +100,27 @@ export function GapAnalysisPage() {
           weights for each competency.
         </p>
       )}
-      {data?.status === "ready" && data.analysis && <AnalysisView jobId={jobId} analysis={data.analysis} />}
+      {data?.status === "ready" && data.analysis && (
+        <AnalysisView jobId={jobId} analysis={data.analysis} canPractice={!jobDeleted} />
+      )}
+      <section className="panel section" aria-labelledby="job-reports-heading">
+        <h2 id="job-reports-heading">Reports for this job</h2>
+        {jobReports.isError && <ErrorNotice error={jobReports.error} />}
+        {jobReports.data && <ReportList reports={jobReports.data} showJob={false} />}
+      </section>
     </>
   );
 }
 
-function AnalysisView({ jobId, analysis }: { jobId: string; analysis: GapAnalysis }) {
+function AnalysisView({
+  jobId,
+  analysis,
+  canPractice,
+}: {
+  jobId: string;
+  analysis: GapAnalysis;
+  canPractice: boolean;
+}) {
   const first = [...analysis.session_plan].sort((a, b) => a.priority - b.priority)[0];
   return (
     <div className="stack">
@@ -103,7 +143,7 @@ function AnalysisView({ jobId, analysis }: { jobId: string; analysis: GapAnalysi
             <span className="visually-hidden"> out of 100</span>
           </p>
         </div>
-        {first && (
+        {first && canPractice && (
           <div className="row">
             <Link className="btn" to={setupLink(jobId, first)}>
               Start the recommended session
@@ -209,9 +249,11 @@ function AnalysisView({ jobId, analysis }: { jobId: string; analysis: GapAnalysi
                     {p.focus_topics.join(", ")}. {p.reason}
                   </p>
                 </div>
-                <Link className="btn btn--secondary" to={setupLink(jobId, p)}>
-                  Set up this session
-                </Link>
+                {canPractice && (
+                  <Link className="btn btn--secondary" to={setupLink(jobId, p)}>
+                    Set up this session
+                  </Link>
+                )}
               </li>
             ))}
         </ol>

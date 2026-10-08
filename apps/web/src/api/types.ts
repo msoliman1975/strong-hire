@@ -35,6 +35,14 @@ export type JobOut = DeepRequired<S["JobOut"]>;
 /** One row of the dashboard list (GET /job-targets). */
 export type JobTargetSummary = DeepRequired<S["JobTargetSummary"]>;
 
+// Library of saved job descriptions and CVs, and the Reports page (R1).
+export type LibraryRename = S["LibraryRename"];
+export type JobTargetMatchIn = S["JobTargetMatchIn"];
+export type JobTargetMatch = DeepRequired<S["JobTargetMatch"]>;
+export type ResumeMatch = DeepRequired<S["ResumeMatch"]>;
+export type ReportItem = DeepRequired<S["ReportItem"]>;
+export type ReportType = ReportItem["type"];
+
 // Gap analysis (real endpoints in apps/api gap, P6).
 export type GapAnalysisStart = S["GapAnalysisStart"];
 export type GapAnalysisOut = DeepRequired<S["GapAnalysisOut"]>;
