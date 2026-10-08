@@ -92,6 +92,23 @@ _FEEDBACK = re.compile(
     | \bI\s+(really\s+)?(like|love)\s+(that|how|your)\b
     | \bI\s+(really\s+)?appreciate\s+(the|your|how)\s+(detail|clarity|honesty|candou?r|example
         |examples|answer|answers|thoroughness|openness|insight|depth)\b
+    # "You covered reconciliation well", "Your answer lays out the options clearly"
+    | \b(you|your\s+(answer|response|explanation|example|story))\s+(\w+\s+)?
+        (cover|covers|covered|describe|describes|described|explain|explains|explained
+        |lay|lays|laid|walk|walks|walked|handle|handles|handled|address|addresses|addressed
+        |frame|frames|framed|structure|structures|structured|articulate|articulates|articulated
+        |answer|answers|answered|outline|outlines|outlined|break|breaks|broke)\b
+        [^.?!]{{0,90}}?\b(well|clearly|nicely|thoroughly|effectively|convincingly|concisely)\b
+    # "That beta approach sounds sensible", "That seems reasonable"
+    | \b(sounds|seems|looks)\s+(like\s+)?(a\s+)?(very\s+|really\s+|quite\s+)?
+        (good|great|sensible|reasonable|solid|smart|fair|strong|valid|nice|right|wise|logical)\b
+    # "Kafka is a good tool for that"
+    | \b(is|was)\s+a\s+(good|great|solid|sensible|reasonable|fine|strong|smart|nice)\s+
+        (tool|choice|option|fit|call|idea|approach|pick|move|decision)\s+for\s+(that|this|it)\b
+    # "Thanks for that candid answer"
+    | \b(thanks|thank\s+you)\s+for\s+(that|this|the|your)\s+(very\s+|really\s+)?
+        (candid|honest|thoughtful|detailed|clear|great|good|helpful|thorough|insightful|open
+        |frank|complete|full)\b
     """,
     re.IGNORECASE | re.VERBOSE,
 )
