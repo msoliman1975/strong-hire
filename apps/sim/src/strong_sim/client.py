@@ -7,6 +7,7 @@ run creates the job, the resume and the gap analysis only once per fixture.
 from __future__ import annotations
 
 import asyncio
+import logging
 import time
 from typing import Any
 
@@ -17,6 +18,8 @@ from strong_sim.scenarios import Scenario
 from strong_sim.settings import SimSettings
 
 STAGE_PREFIX = "sim:"
+log = logging.getLogger("strong_sim")
+
 POLL_S = 2.0
 BUSY_RETRIES = 30
 
@@ -160,6 +163,8 @@ class AppClient:
         """Send one candidate turn. A 409 means the last reply is still being made: wait, retry."""
         path = f"/sessions/{sid}/text/turn"
         for _ in range(BUSY_RETRIES):
+            # The send time, so a turn that never gets an answer can be found in the server logs.
+            log.info("text/turn sent: session %s, %d characters", sid, len(text))
             resp = await self.http.post(path, json={"text": text[:4000]})
             if resp.status_code != 409:
                 break
