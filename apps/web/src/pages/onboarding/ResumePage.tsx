@@ -27,6 +27,10 @@ export function validateResumeInput(file: File | null, text: string): string | n
 const contextPath = (jobId: string, resumeId: string) =>
   `/jobs/${jobId}/context?resume=${encodeURIComponent(resumeId)}`;
 
+/** "Check your CV": the user checks and fixes the extracted CV before the gap analysis. */
+const checkPath = (jobId: string, resumeId: string) =>
+  `/jobs/${jobId}/resume/${encodeURIComponent(resumeId)}/check`;
+
 export function ResumePage() {
   const { jobId = "" } = useParams();
   const navigate = useNavigate();
@@ -37,7 +41,9 @@ export function ResumePage() {
   const uploaded = useResume(upload?.id ?? null, problem === null);
 
   const ready = (existing.data ?? []).filter((r) => r.status === "extracted");
-  const choose = (resumeId: string) => navigate(contextPath(jobId, resumeId));
+  // A CV the user has not checked yet goes to "Check your CV" first; a confirmed one goes on.
+  const choose = (saved: ResumeOut) =>
+    navigate(saved.confirmed_at ? contextPath(jobId, saved.id) : checkPath(jobId, saved.id));
 
   return (
     <div className="page--narrow">
@@ -57,7 +63,7 @@ export function ResumePage() {
                   {r.name ?? (r.has_file ? "Uploaded file" : "Pasted text")}{" "}
                   <span className="muted">added {formatDate(r.uploaded_at)}</span>
                 </span>
-                <button type="button" className="btn btn--secondary" onClick={() => choose(r.id)}>
+                <button type="button" className="btn btn--secondary" onClick={() => choose(r)}>
                   Use this resume
                 </button>
               </li>
@@ -81,9 +87,9 @@ export function ResumePage() {
               type="button"
               className="btn"
               disabled={uploaded.data?.status !== "extracted"}
-              onClick={() => choose(upload.id)}
+              onClick={() => navigate(checkPath(jobId, upload.id))}
             >
-              Continue
+              Check and continue
             </button>
             <button type="button" className="btn btn--quiet" onClick={() => setUpload(null)}>
               Upload a different resume
@@ -105,7 +111,7 @@ function UploadForm({
   onUseSaved,
 }: {
   onUploaded: (r: ResumeAccepted) => void;
-  onUseSaved: (resumeId: string) => void;
+  onUseSaved: (saved: ResumeOut) => void;
 }) {
   const [file, setFile] = useState<File | null>(null);
   const [text, setText] = useState("");
@@ -169,7 +175,7 @@ function UploadForm({
         <div className="notice" role="status">
           <p>You saved this CV before as {offer.saved.name ?? "a saved CV"}. Use it?</p>
           <div className="row">
-            <button type="button" className="btn" onClick={() => onUseSaved(offer.saved.id)}>
+            <button type="button" className="btn" onClick={() => onUseSaved(offer.saved)}>
               Use the saved CV
             </button>
             <button

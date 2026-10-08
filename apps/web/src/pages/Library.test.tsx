@@ -131,9 +131,21 @@ describe("R1 library in the Add a job flow", () => {
     await user.click(screen.getByRole("button", { name: "Upload resume" }));
     expect(await screen.findByText("You saved this CV before as Ana CV. Use it?")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Use the saved CV" }));
-    expect(await screen.findByRole("heading", { name: "Add context (optional)" })).toBeInTheDocument();
+    // The saved CV was never confirmed, so the user checks it first.
+    expect(await screen.findByRole("heading", { name: "Check your CV" })).toBeInTheDocument();
     expect(mockStore.db.resumes).toHaveLength(1);
     expect(mockStore.db.resumes[0].id).toBe(resume.id);
+  });
+
+  it("a saved CV that the user confirmed before goes straight to the context step", async () => {
+    const { job, resume } = await seed();
+    const parsed = (await resumesApi.get(resume.id)).resume;
+    if (!parsed) throw new Error("the seeded CV is not extracted");
+    await resumesApi.update(resume.id, parsed);
+    const user = renderAt(`/jobs/${job.id}/resume`);
+    const saved = await screen.findByRole("region", { name: "Use a resume you saved" });
+    await user.click(within(saved).getByRole("button", { name: "Use this resume" }));
+    expect(await screen.findByRole("heading", { name: "Add context (optional)" })).toBeInTheDocument();
   });
 
   it("picking the same job and CV again reuses the ready gap report", async () => {

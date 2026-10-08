@@ -16,6 +16,7 @@ import { GapAnalysisPage } from "./pages/GapAnalysisPage";
 import { ConfirmJobPage } from "./pages/onboarding/ConfirmJobPage";
 import { ContextPage } from "./pages/onboarding/ContextPage";
 import { NewJobPage } from "./pages/onboarding/NewJobPage";
+import { CheckResumePage } from "./pages/onboarding/CheckResumePage";
 import { ResumePage } from "./pages/onboarding/ResumePage";
 import { PaywallPage } from "./pages/PaywallPage";
 import { ReportsPage } from "./pages/ReportsPage";
@@ -53,6 +54,7 @@ export function AppRoutes() {
         <Route path="/jobs/new" element={<NewJobPage />} />
         <Route path="/jobs/:jobId/confirm" element={<ConfirmJobPage />} />
         <Route path="/jobs/:jobId/resume" element={<ResumePage />} />
+        <Route path="/jobs/:jobId/resume/:resumeId/check" element={<CheckResumePage />} />
         <Route path="/jobs/:jobId/context" element={<ContextPage />} />
         <Route path="/jobs/:jobId/gap" element={<GapAnalysisPage />} />
         <Route path="/jobs/:jobId/sessions/new" element={<SessionSetupPage />} />
