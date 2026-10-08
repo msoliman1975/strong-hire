@@ -63,7 +63,7 @@ export function DashboardPage() {
 function JobRow({ summary }: { summary: JobTargetSummary }) {
   const job = summary.job_target;
   const setup = nextSetupStep(summary);
-  const title = job.posting ? job.posting.title : "Job posting";
+  const title = job.name ?? (job.posting ? job.posting.title : "Job posting");
   const company = job.posting?.company_name ?? job.source_url ?? "Reading the posting";
 
   return (
@@ -91,6 +91,9 @@ function JobRow({ summary }: { summary: JobTargetSummary }) {
               View gap analysis
             </Link>
           )}
+          <Link className="btn btn--quiet" to={`/reports?job=${encodeURIComponent(job.id)}`}>
+            Reports
+          </Link>
         </div>
       </div>
       <div className="job__score">

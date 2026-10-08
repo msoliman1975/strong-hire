@@ -13,6 +13,7 @@ import { ContextPage } from "./pages/onboarding/ContextPage";
 import { NewJobPage } from "./pages/onboarding/NewJobPage";
 import { ResumePage } from "./pages/onboarding/ResumePage";
 import { PaywallPage } from "./pages/PaywallPage";
+import { ReportsPage } from "./pages/ReportsPage";
 import { SessionSetupPage } from "./pages/SessionSetupPage";
 import { SignInPage } from "./pages/SignInPage";
 import { SignupPage } from "./pages/SignupPage";
@@ -52,6 +53,7 @@ export function AppRoutes() {
         <Route path="/jobs/:jobId/sessions/new" element={<SessionSetupPage />} />
         <Route path="/sessions/:sessionId/live" element={<LiveSessionPage />} />
         <Route path="/sessions/:sessionId/debrief" element={<DebriefPage />} />
+        <Route path="/reports" element={<ReportsPage />} />
         <Route path="/account" element={<AccountPage />} />
         <Route path="/upgrade" element={<PaywallPage />} />
         {DevTextInterviewPage && (

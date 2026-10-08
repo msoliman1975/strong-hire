@@ -196,6 +196,16 @@ class Resume(Base):
     file_ref: Mapped[str | None] = mapped_column(
         String(500), comment="Object storage key of the encrypted original file"
     )
+    name: Mapped[str | None] = mapped_column(
+        String(120), comment="R1: name in the CV library. NULL after delete"
+    )
+    content_hash: Mapped[str | None] = mapped_column(
+        String(64), index=True, comment="R1: SHA-256 of the uploaded file or pasted text"
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        comment="R1: soft delete. Content is cleared; gap reports that used it stay",
+    )
     uploaded_at: Mapped[datetime] = _created_at()
 
 
@@ -252,6 +262,16 @@ class JobTarget(Base):
     level: Mapped[Level | None] = mapped_column(str_enum(Level, "level"))
     stage: Mapped[str | None] = mapped_column(String(100))
     context_notes: Mapped[str | None] = mapped_column(Text, comment="IN-4 optional context")
+    name: Mapped[str | None] = mapped_column(
+        String(120), comment="R1: name in the job library. NULL means the default name"
+    )
+    text_hash: Mapped[str | None] = mapped_column(
+        String(64), index=True, comment="R1: SHA-256 of the normalized posting text"
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        comment="R1: soft delete. Content is cleared; reports, sessions and progress stay",
+    )
     created_at: Mapped[datetime] = _created_at()
 
 
@@ -260,12 +280,9 @@ class GapAnalysis(Base):
 
     id: Mapped[uuid.UUID] = _uuid_pk()
     org_id: Mapped[uuid.UUID] = _org_fk()
-    job_target_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("job_targets.id", ondelete="CASCADE"), index=True
-    )
-    resume_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("resumes.id", ondelete="CASCADE"), index=True
-    )
+    # R1: job targets and resumes are soft deleted, so these keys do not cascade.
+    job_target_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("job_targets.id"), index=True)
+    resume_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("resumes.id"), index=True)
     status: Mapped[GapStatus] = mapped_column(
         str_enum(GapStatus, "gap_status"), default=GapStatus.READY, server_default="ready"
     )
@@ -291,9 +308,7 @@ class InterviewSession(Base):
 
     id: Mapped[uuid.UUID] = _uuid_pk()
     org_id: Mapped[uuid.UUID] = _org_fk()
-    job_target_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("job_targets.id", ondelete="CASCADE"), index=True
-    )
+    job_target_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("job_targets.id"), index=True)
     type: Mapped[InterviewType] = mapped_column(str_enum(InterviewType, "interview_type"))
     difficulty: Mapped[Difficulty] = mapped_column(str_enum(Difficulty, "difficulty"))
     mode: Mapped[Mode] = mapped_column(str_enum(Mode, "mode"))
@@ -365,9 +380,7 @@ class ProgressSnapshot(Base):
 
     id: Mapped[uuid.UUID] = _uuid_pk()
     org_id: Mapped[uuid.UUID] = _org_fk()
-    job_target_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("job_targets.id", ondelete="CASCADE")
-    )
+    job_target_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("job_targets.id"))
     competency: Mapped[Competency] = mapped_column(str_enum(Competency, "competency"))
     score: Mapped[Decimal] = mapped_column(Numeric(3, 2))
     session_id: Mapped[uuid.UUID] = mapped_column(

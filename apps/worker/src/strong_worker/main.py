@@ -3,7 +3,8 @@
 P0 registers one `ping` job to prove the queue works. P2 adds the job and resume input jobs
 (strong_worker.inputs.jobs). P6 adds the gap analysis and interviewer brief jobs
 (strong_worker.gap.jobs). P8 adds the scorer job (strong_worker.scoring.jobs). P9 adds the
-account export and file delete jobs (strong_worker.account.jobs).
+account export and file delete jobs (strong_worker.account.jobs). R1 adds the file delete for
+one saved CV (delete_resume_file).
 """
 
 from __future__ import annotations
@@ -41,6 +42,13 @@ class WorkerSettings:
         *(
             func(f, keep_result=inputs_jobs.RESULT_TTL_S, timeout=600)
             for f in inputs_jobs.FUNCTIONS
+            if f is not inputs_jobs.delete_resume_file
+        ),
+        func(
+            inputs_jobs.delete_resume_file,
+            keep_result=inputs_jobs.RESULT_TTL_S,
+            timeout=600,
+            max_tries=inputs_jobs.DELETE_FILE_MAX_TRIES,
         ),
         *(func(f, keep_result=gap_jobs.RESULT_TTL_S, timeout=600) for f in gap_jobs.FUNCTIONS),
         *(

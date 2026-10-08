@@ -36,7 +36,8 @@ export function ContextPage() {
         const saved = await jobTargetsApi.update(jobId, { posting, ...input });
         queryClient.setQueryData(keys.job(jobId), saved.job_target);
       }
-      return gapApi.start(jobId, { resume_id: resumeId });
+      // R1: a saved job and CV picked again reuse the ready analysis when nothing changed.
+      return gapApi.start(jobId, { resume_id: resumeId, reuse_ready: true });
     },
     onSuccess: (gap) => {
       queryClient.setQueryData(keys.gap(jobId), gap);

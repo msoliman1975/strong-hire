@@ -29,6 +29,7 @@ from strong_api.inputs.queue import RUN_GAP_ANALYSIS, JobQueue
 from strong_core.db.models import GapAnalysis as GapRow
 from strong_core.db.models import JobTarget
 from strong_core.db.models import Resume as ResumeRow
+from strong_core.library import default_resume_name
 from strong_core.profiles import resolve_profile
 from strong_core.schemas import GapAnalysis, GapStatus
 
@@ -56,6 +57,10 @@ def input_hash(target: JobTarget, resume: ResumeRow) -> str:
     }
     raw = json.dumps(data, sort_keys=True, separators=(",", ":"), default=str)
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
+def resume_label(resume: ResumeRow) -> str:
+    return resume.name or default_resume_name(None, resume.uploaded_at)
 
 
 async def latest(db: AsyncSession, job_target_id: uuid.UUID) -> GapRow | None:
@@ -109,8 +114,13 @@ async def start(
     target: JobTarget,
     resume: ResumeRow,
     settings: GapSettings,
+    reuse_ready: bool = False,
 ) -> GapRow:
-    """Start a run, or return the one already running for the same inputs."""
+    """Start a run, or return the one already running for the same inputs.
+
+    With reuse_ready (R1), a ready run for the same inputs and company profile is returned too,
+    so picking a saved job and a saved CV again does not build the same analysis twice.
+    """
     digest = input_hash(target, resume)
     current = await latest(db, target.id)
     if (
@@ -119,6 +129,14 @@ async def start(
         and current.resume_id == resume.id
         and current.input_hash == digest
         and not timed_out(current, settings)
+    ):
+        return current
+    if (
+        reuse_ready
+        and current is not None
+        and current.status == GapStatus.READY
+        and current.resume_id == resume.id
+        and not await is_stale(db, current, target, resume)
     ):
         return current
     await check_rate_limit(db, user_id, settings)
@@ -165,7 +183,7 @@ async def recompute(
     resume. Runs over the rate limit are skipped; those analyses stay stale until the user
     starts them again. Returns the number of runs started.
     """
-    query = select(JobTarget).where(JobTarget.org_id == org_id)
+    query = select(JobTarget).where(JobTarget.org_id == org_id, JobTarget.deleted_at.is_(None))
     if job_target_id is not None:
         query = query.where(JobTarget.id == job_target_id)
     started = 0
@@ -176,7 +194,7 @@ async def recompute(
         if target.parsed_json is None:
             continue
         resume = await db.get(ResumeRow, row.resume_id)
-        if resume is None or resume.parsed_json is None:
+        if resume is None or resume.parsed_json is None or resume.deleted_at is not None:
             continue
         if not await is_stale(db, row, target, resume):
             continue
@@ -200,7 +218,12 @@ async def to_out(
     db: AsyncSession, row: GapRow, target: JobTarget, settings: GapSettings
 ) -> GapAnalysisOut:
     resume = await db.get(ResumeRow, row.resume_id)
-    stale = resume is None or await is_stale(db, row, target, resume)
+    job_deleted = target.deleted_at is not None
+    resume_deleted = resume is None or resume.deleted_at is not None
+    # R1: a deleted job or CV cannot be analysed again, so the report is never "stale".
+    stale = False
+    if not job_deleted and resume is not None and resume.deleted_at is None:
+        stale = await is_stale(db, row, target, resume)
     status, error = row.status, row.error
     if timed_out(row, settings):
         status, error = GapStatus.FAILED, TIMED_OUT
@@ -209,6 +232,9 @@ async def to_out(
         id=row.id,
         job_target_id=row.job_target_id,
         resume_id=row.resume_id,
+        resume_name=resume_label(resume) if resume is not None and not resume_deleted else None,
+        resume_deleted=resume_deleted,
+        job_deleted=job_deleted,
         status=status,
         analysis=GapAnalysis.model_validate(row.breakdown_json) if ready else None,
         error=error,
