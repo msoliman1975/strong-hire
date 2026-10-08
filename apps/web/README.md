@@ -1,7 +1,7 @@
 # Strong Hire web app
 
 React + Vite + TypeScript. The candidate-facing app: sign-in, onboarding, gap analysis, session
-setup, live session (placeholder until P10), debrief, progress dashboard, account and paywall.
+setup, live session, debrief, progress dashboard, account and paywall.
 
 ## Commands
 
@@ -17,35 +17,38 @@ pnpm gen:api      # regenerate src/api/schema.gen.ts from openapi.json
 
 ## Mocks (MSW)
 
-Some screens need endpoints that later workstreams build. `src/api/planned.ts` lists them, with
-the owner of each. MSW mocks them in development so every screen works today. Production builds
-contain no mocks: `main.tsx` loads them only when `import.meta.env.DEV` is true.
+Every endpoint the web app uses exists in the API now, and the web app calls each one with the
+typed client (`src/api/*.ts`). MSW mocks remain for front-end work without Docker, for Playwright,
+and for Vitest. Production builds contain no mocks: `main.tsx` loads them only when
+`import.meta.env.DEV` is true. Vitest tests check the mock responses against `openapi.json`.
 
-The job target and resume endpoints (P2), their lists, and the gap analysis endpoints (P6) are
-real. `src/api/inputs.ts` and `src/api/gap.ts` call them with the typed client. Their mocks use the
-same paths and shapes, and a Vitest test checks the mock responses against `openapi.json`.
-
-The debrief and progress endpoints (P8) are real too. `src/api/scoring.ts` calls them with the
-typed client. Their mocks (`scoringHandlers`) stay on in every mode while sessions are mocked (P7),
-because the API does not know a mocked session.
-
-The billing and account endpoints (P9) are real. `src/api/billing.ts` and `src/api/account.ts`
-call them with the typed client. Their mocks (`accountHandlers`) run in `all` mode and in Vitest,
-and a Vitest test checks them against `openapi.json`.
+The mocked voice join returns the URL `mock://voice`. For that URL, the live session page uses a
+scripted interviewer (`src/session/mockVoice.ts`) instead of LiveKit.
 
 Set `VITE_API_MOCKS` before `pnpm dev`:
 
 | Value | What is mocked | Use it for |
 | --- | --- | --- |
-| `planned` (default) | Only endpoints the API does not have yet. Sign-in, job targets, resumes, gap analysis, billing and account use the real API; the mock keeps a copy of each job target, resume and gap analysis for the planned endpoints. | The Docker stack |
-| `all` | Everything, including sign-in. No API needed. | Front-end work without Docker; Playwright |
-| `off` | Nothing. | When every endpoint exists |
+| `off` (default) | Nothing. The old value `planned` also means `off`. | The Docker stack |
+| `all` | Everything, including sign-in and the voice room. No API needed. | Front-end work without Docker; Playwright |
 
 The mock keeps its data in `localStorage`. To start over, run `strongHireMocks.reset()` in the
 browser console.
 
-When a workstream builds a planned endpoint, it moves the caller from `request()` to the typed
-`apiClient`, regenerates the types, and deletes the matching mock handler.
+## Live session (P10)
+
+`src/session/LiveSessionPage.tsx` runs the voice interview:
+
+1. The candidate checks the microphone. A blocked or missing microphone shows a message, and the
+   session does not start.
+2. The page waits until the interviewer brief is ready (`brief_ready`).
+3. `POST /sessions/{id}/voice/join` starts the session and returns a LiveKit token. The page joins
+   the room `session-<id>`, where the voice agent (apps/voice) runs the interview.
+4. The agent sends the phase, its clock and its words on the data topic `session`. The page shows
+   them as the phase list, the timer and captions. Coach commands go to the agent on topic `coach`.
+5. If the connection drops, a banner offers Rejoin. The agent keeps the session for 2 minutes.
+6. When the agent ends the session, or the candidate clicks End interview, the page opens the
+   debrief, which waits for the score.
 
 ## Typed API client
 

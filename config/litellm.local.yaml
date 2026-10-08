@@ -41,7 +41,7 @@ model_list:
   - model_name: local-tts
     litellm_params:
       model: openai/kokoro
-      api_base: http://tts:8880/v1
+      api_base: os.environ/TTS_API_BASE   # http://tts:8880/v1 unless .env sets it
       api_key: not-needed
     model_info:
       mode: audio_speech

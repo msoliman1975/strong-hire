@@ -6,13 +6,16 @@ role (stt, interviewer, tts), so MODEL_PROFILE alone decides which models answer
 - GatewaySTT is non-streaming. AgentSession wraps it in a StreamAdapter, so Silero VAD cuts the
   audio and only the final speech segment goes to the gateway.
 - GatewayLLM streams the interviewer role's text deltas.
-- GatewayTTS is non-streaming per call. AgentSession wraps it in a StreamAdapter that splits the
-  reply into sentences, so the first sentence is spoken while the rest is still generated.
-  Each sentence streams raw PCM from the gateway as it is rendered.
+- GatewayTTS streams. It splits the text into phrases as it arrives (split_phrases) and renders
+  them one after another, so the first phrase plays while the next ones render. The first phrase
+  may end at a comma, so the candidate hears the interviewer sooner; later phrases end at
+  sentences, which sound more natural. Each phrase streams raw PCM from the gateway.
 """
 
 from __future__ import annotations
 
+import asyncio
+import re
 import time
 from collections.abc import Callable
 from typing import Any
@@ -35,6 +38,39 @@ from strong_core.gateway import Message, ModelGateway, Role
 from strong_core.prompts import load_prompt
 
 PROVIDER = "strong-gateway"
+
+# A phrase ends after . ! ? (a sentence) or , ; : (a clause), followed by a space.
+_SENTENCE_END = re.compile(r"[.!?]+[\"')\]]*\s")
+_CLAUSE_END = re.compile(r"[,;:]\s")
+# The first phrase may end at a clause once it has this many characters, to start audio sooner.
+FIRST_PHRASE_MIN_CHARS = 12
+# A later phrase ends at a clause only when no sentence end comes within this many characters.
+LONG_PHRASE_CHARS = 140
+
+
+def split_phrases(buffer: str, *, first: bool) -> tuple[list[str], str]:
+    """Complete phrases at the start of `buffer`, and the rest (not complete yet).
+
+    `first` is True until the first phrase of the reply is out.
+    """
+    phrases: list[str] = []
+    rest = buffer
+    while True:
+        cut = None
+        sentence = _SENTENCE_END.search(rest)
+        if first or (sentence is None and len(rest) > LONG_PHRASE_CHARS):
+            for clause in _CLAUSE_END.finditer(rest):
+                if clause.end() >= FIRST_PHRASE_MIN_CHARS:
+                    cut = clause.end()
+                    break
+        if sentence is not None and (cut is None or sentence.end() < cut):
+            cut = sentence.end()
+        if cut is None:
+            return phrases, rest
+        phrase, rest = rest[:cut].strip(), rest[cut:]
+        if phrase:
+            phrases.append(phrase)
+            first = False
 
 
 class GatewaySTT(stt.STT[None]):
@@ -139,7 +175,7 @@ class GatewayTTS(tts.TTS[None]):
         if rate is None:
             raise ValueError("the tts model needs sample_rate in the capability registry")
         super().__init__(
-            capabilities=tts.TTSCapabilities(streaming=False), sample_rate=rate, num_channels=1
+            capabilities=tts.TTSCapabilities(streaming=True), sample_rate=rate, num_channels=1
         )
         self._gw = gateway
 
@@ -156,6 +192,11 @@ class GatewayTTS(tts.TTS[None]):
     ) -> tts.ChunkedStream:
         return _GatewayChunkedStream(tts=self, input_text=text, conn_options=conn_options)
 
+    def stream(
+        self, *, conn_options: APIConnectOptions = DEFAULT_API_CONNECT_OPTIONS
+    ) -> tts.SynthesizeStream:
+        return _GatewaySynthesizeStream(tts=self, conn_options=conn_options)
+
 
 class _GatewayChunkedStream(tts.ChunkedStream):
     async def _run(self, output_emitter: tts.AudioEmitter) -> None:
@@ -170,3 +211,52 @@ class _GatewayChunkedStream(tts.ChunkedStream):
         async for chunk in self._tts._gw.synthesize_stream(self._input_text):
             output_emitter.push(chunk)
         output_emitter.flush()
+
+
+class _GatewaySynthesizeStream(tts.SynthesizeStream):
+    """Text in (in pieces), audio out by phrase. Phrases render in order, one at a time."""
+
+    async def _run(self, output_emitter: tts.AudioEmitter) -> None:
+        assert isinstance(self._tts, GatewayTTS)
+        gateway = self._tts._gw
+        output_emitter.initialize(
+            request_id=utils.shortuuid("gw_"),
+            sample_rate=self._tts.sample_rate,
+            num_channels=1,
+            mime_type="audio/pcm",
+            frame_size_ms=50,
+            stream=True,
+        )
+        output_emitter.start_segment(segment_id=utils.shortuuid())
+        phrases: asyncio.Queue[str | None] = asyncio.Queue()
+
+        async def read_text() -> None:
+            buffer, first = "", True
+            async for data in self._input_ch:
+                if isinstance(data, self._FlushSentinel):
+                    ready, buffer = split_phrases(buffer + " ", first=first)
+                    ready += [buffer.strip()] if buffer.strip() else []
+                    buffer = ""
+                else:
+                    ready, buffer = split_phrases(buffer + data, first=first)
+                for phrase in ready:
+                    first = False
+                    phrases.put_nowait(phrase)
+            ready, rest = split_phrases(buffer + " ", first=first)
+            for phrase in [*ready, rest.strip()]:
+                if phrase:
+                    phrases.put_nowait(phrase)
+            phrases.put_nowait(None)
+
+        async def render() -> None:
+            while (phrase := await phrases.get()) is not None:
+                self._mark_started()
+                async for chunk in gateway.synthesize_stream(phrase):
+                    output_emitter.push(chunk)
+                output_emitter.flush()
+
+        tasks = [asyncio.create_task(read_text()), asyncio.create_task(render())]
+        try:
+            await asyncio.gather(*tasks)
+        finally:
+            await utils.aio.cancel_and_wait(*tasks)

@@ -9,7 +9,13 @@ from livekit.agents import AgentSession, llm
 from strong_core.config import Settings
 from strong_core.gateway import ModelGateway, Role, build_gateway
 from strong_voice.agent import SpikeInterviewer
-from strong_voice.plugins import GatewayLLM, GatewaySTT, GatewayTTS, to_gateway_messages
+from strong_voice.plugins import (
+    GatewayLLM,
+    GatewaySTT,
+    GatewayTTS,
+    split_phrases,
+    to_gateway_messages,
+)
 
 
 @pytest.fixture
@@ -98,3 +104,50 @@ async def test_stt_reports_each_transcription_time(fake: ModelGateway) -> None:
     await stt.recognize(rtc.AudioFrame(bytes(3200), 16000, 1, 1600))
     assert len(seen) == 1
     assert seen[0] >= 0
+
+
+def test_split_phrases_starts_early_then_keeps_sentences() -> None:
+    text = (
+        "Hi, I'm Alex, and I'll run the interview today. "
+        "Thanks for joining, it is good to meet you. "
+    )
+    phrases, rest = split_phrases(text, first=True)
+    assert phrases == [
+        "Hi, I'm Alex,",  # the first phrase may end at a comma (12 characters or more)
+        "and I'll run the interview today.",
+        "Thanks for joining, it is good to meet you.",  # later phrases end at sentences
+    ]
+    assert rest == ""
+    assert split_phrases("Tell me about a time. What did", first=False) == (
+        ["Tell me about a time."],
+        "What did",
+    )
+    assert split_phrases("Hi, there", first=True) == ([], "Hi, there")  # not complete yet
+    long = "word, " * 30
+    assert split_phrases(long, first=False)[0]  # a very long sentence ends at a comma
+
+
+async def test_tts_stream_renders_phrase_by_phrase(
+    fake: ModelGateway, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    rendered: list[str] = []
+    original = fake.synthesize_stream
+
+    async def spy(text: str):  # type: ignore[no-untyped-def]
+        rendered.append(text)
+        async for chunk in original(text):
+            yield chunk
+
+    monkeypatch.setattr(fake, "synthesize_stream", spy)
+    tts = GatewayTTS(fake)
+    assert tts.capabilities.streaming is True
+    samples = 0
+    async with tts.stream() as stream:
+        for piece in ("Hi, I'm Al", "ex, and I'll run ", "the interview. Ready", "?"):
+            stream.push_text(piece)
+        stream.end_input()
+        async for ev in stream:
+            samples += ev.frame.samples_per_channel
+    assert rendered == ["Hi, I'm Alex,", "and I'll run the interview.", "Ready?"]
+    expected = sum(len(p) for p in rendered) * tts.sample_rate // 100
+    assert expected <= samples <= expected + 3 * tts.sample_rate // 20
