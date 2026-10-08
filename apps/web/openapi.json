@@ -2301,6 +2301,87 @@
         }
       }
     },
+    "/admin/sessions/{session_id}/transcript.txt": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Download Transcript",
+        "description": "The transcript as a text file. 404 when the user's consent is off now.",
+        "operationId": "download_transcript_admin_sessions__session_id__transcript_txt_get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/sessions/{session_id}/audio": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Download Audio",
+        "description": "The recording of an AI candidate voice interview, as stereo Ogg Opus.\n\nThe left channel is what the candidate heard, the right channel what it said. 404 for every\nother session.",
+        "operationId": "download_audio_admin_sessions__session_id__audio_get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/audit": {
       "get": {
         "tags": [
@@ -2757,6 +2838,12 @@
           "trace_retention_days": {
             "type": "integer",
             "title": "Trace Retention Days"
+          },
+          "audio_available": {
+            "type": "boolean",
+            "title": "Audio Available",
+            "description": "True when a recording can be downloaded (AI candidate voice interviews).",
+            "default": false
           }
         },
         "type": "object",

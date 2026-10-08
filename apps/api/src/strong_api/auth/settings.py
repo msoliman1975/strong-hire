@@ -62,6 +62,11 @@ class AuthSettings(BaseSettings):
     sim_daily_budget_usd: float = Field(
         default=5.0, description="Used when the sim LiteLLM key does not report its own limit."
     )
+    sim_results_dir: str = Field(
+        default="/sim-results",
+        description="Saved sim runs (/srv/stronghire/sim on the server, mounted read-only). The "
+        "admin area serves sim voice audio from here.",
+    )
 
     @property
     def is_local(self) -> bool:

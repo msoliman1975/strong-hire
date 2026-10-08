@@ -5,11 +5,14 @@
                                      model cost and a cost total per day
     GET /admin/sessions/{id}         one interview: metadata always; transcript and traces only
                                      when the user's training consent is on now
+    GET /admin/sessions/{id}/transcript.txt   the transcript as a text file (same consent rule)
+    GET /admin/sessions/{id}/audio   the recording of an AI candidate (P13) voice interview, from
+                                     the saved sim runs (same consent rule)
     GET /admin/audit                 the audit log (admin views by default)
 
 Only ADMIN_EMAILS users may call these routes. Everyone else, signed in or not, gets 404.
 Consent is read at view time, so turning it off hides old transcripts and traces too. Each view
-of a transcript or of traces writes an audit_logs row.
+or download of a transcript, traces or audio writes an audit_logs row.
 
 Cost: per-session cost is the interviewer's model cost. Sessions save it as an LLM usage event
 when they end (tokens times the prices in config/litellm.<profile>.yaml); for a session without
@@ -19,13 +22,16 @@ counted here.
 
 from __future__ import annotations
 
+import asyncio
 import uuid
 from collections import defaultdict
 from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal
+from pathlib import Path
 from typing import Annotated, Any, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi.responses import FileResponse, PlainTextResponse
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -43,6 +49,7 @@ from strong_api.admin.schemas import (
 )
 from strong_api.auth.deps import DbSession, optional_user
 from strong_api.auth.settings import AuthSettings
+from strong_api.auth.sim import is_sim_user
 from strong_api.billing.entitlements import as_utc, get_entitlement
 from strong_core.db.models import (
     TRACE_RETENTION_DAYS,
@@ -304,9 +311,9 @@ def _audit(admin: User, action: str, row: InterviewSession, details: dict[str, A
     )
 
 
-@router.get("/sessions/{session_id}")
-async def get_session(session_id: uuid.UUID, db: DbSession, admin: Admin) -> AdminSessionDetail:
-    """One interview. Transcript and traces only when the user's consent is on now."""
+async def _find(
+    db: AsyncSession, session_id: uuid.UUID
+) -> tuple[InterviewSession, User | None, Scorecard | None]:
     found = (
         await db.execute(
             select(InterviewSession, User, Scorecard)
@@ -318,20 +325,21 @@ async def get_session(session_id: uuid.UUID, db: DbSession, admin: Admin) -> Adm
     if found is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Session not found")
     row, user, card = found.tuple()
-    cost = (await _costs(db, [row.id]))[row.id]
-    meta = _session_out(row, user, card, cost)
+    return row, user, card
+
+
+def _content_user(user: User | None) -> User:
+    """The session's user when consent is on now; 404 otherwise, as for a missing file."""
     if user is None or not user.training_consent:
-        return AdminSessionDetail(
-            session=meta,
-            content_visible=False,
-            transcript=None,
-            traces=None,
-            trace_retention_days=TRACE_RETENTION_DAYS,
-        )
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No consent for this interview")
+    return user
+
+
+async def _transcript(db: AsyncSession, row: InterviewSession) -> list[Turn]:
     turn_rows = await db.scalars(
         select(TurnRow).where(TurnRow.session_id == row.id).order_by(*TURN_ORDER)
     )
-    transcript = [
+    return [
         Turn(
             speaker=t.speaker,
             phase=t.phase,
@@ -342,6 +350,74 @@ async def get_session(session_id: uuid.UUID, db: DbSession, admin: Admin) -> Adm
         )
         for t in turn_rows
     ]
+
+
+def _find_recording(results_dir: str, session_id: uuid.UUID) -> tuple[Path, int] | None:
+    """The newest <run>/<session id>/audio.ogg under the results folder, with its size.
+
+    The path is built from the session id only (a UUID), and it must resolve inside the folder.
+    """
+    root = Path(results_dir).resolve()
+    if not root.is_dir():
+        return None
+    found = []
+    for path in root.glob(f"*/{session_id}/audio.ogg"):
+        resolved = path.resolve()
+        if resolved.is_relative_to(root) and resolved.is_file():
+            stat = resolved.stat()
+            found.append((stat.st_mtime, resolved, stat.st_size))
+    if not found:
+        return None
+    _, newest, size = max(found)
+    return newest, size
+
+
+async def _sim_audio(
+    db: AsyncSession, user: User, row: InterviewSession, settings: AuthSettings
+) -> tuple[Path, int] | None:
+    """The saved recording of a sim voice interview and its size, or None.
+
+    Only the sim user's sessions have recordings; real users' audio is never stored.
+    """
+    if not await is_sim_user(db, user.id):
+        return None
+    return await asyncio.to_thread(_find_recording, settings.sim_results_dir, row.id)
+
+
+def _transcript_text(row: InterviewSession, user: User, transcript: list[Turn]) -> str:
+    lines = [
+        f"Interview {row.id}",
+        f"User: {user.email}",
+        f"Setup: {row.type}, {row.difficulty}, {row.mode}, {row.channel}, "
+        f"{row.duration_min} minutes planned",
+        f"Created: {as_utc(row.created_at)}",
+        "",
+    ]
+    for turn in transcript:
+        seconds = (turn.start_ms or 0) // 1000
+        who = "Interviewer" if turn.speaker == "interviewer" else "Candidate"
+        lines.append(f"[{seconds // 60:02d}:{seconds % 60:02d}] {who} [{turn.phase}]: {turn.text}")
+        lines.append("")
+    return "\n".join(lines)
+
+
+@router.get("/sessions/{session_id}")
+async def get_session(
+    session_id: uuid.UUID, db: DbSession, admin: Admin, request: Request
+) -> AdminSessionDetail:
+    """One interview. Transcript and traces only when the user's consent is on now."""
+    row, user, card = await _find(db, session_id)
+    cost = (await _costs(db, [row.id]))[row.id]
+    meta = _session_out(row, user, card, cost)
+    if user is None or not user.training_consent:
+        return AdminSessionDetail(
+            session=meta,
+            content_visible=False,
+            transcript=None,
+            traces=None,
+            trace_retention_days=TRACE_RETENTION_DAYS,
+        )
+    transcript = await _transcript(db, row)
     trace_rows = await db.scalars(
         select(InterviewerTrace)
         .where(InterviewerTrace.session_id == row.id)
@@ -352,13 +428,53 @@ async def get_session(session_id: uuid.UUID, db: DbSession, admin: Admin) -> Adm
     db.add(_audit(admin, "admin.transcript_viewed", row, {**who, "turns": len(transcript)}))
     db.add(_audit(admin, "admin.traces_viewed", row, {**who, "traces": len(traces)}))
     await db.commit()
+    audio = await _sim_audio(db, user, row, admin_settings(request))
     return AdminSessionDetail(
         session=meta,
         content_visible=True,
         transcript=transcript,
         traces=traces,
         trace_retention_days=TRACE_RETENTION_DAYS,
+        audio_available=audio is not None,
     )
+
+
+@router.get("/sessions/{session_id}/transcript.txt", response_class=PlainTextResponse)
+async def download_transcript(
+    session_id: uuid.UUID, db: DbSession, admin: Admin
+) -> PlainTextResponse:
+    """The transcript as a text file. 404 when the user's consent is off now."""
+    row, found_user, _ = await _find(db, session_id)
+    user = _content_user(found_user)
+    transcript = await _transcript(db, row)
+    details = {"user_id": str(user.id), "turns": len(transcript)}
+    db.add(_audit(admin, "admin.transcript_downloaded", row, details))
+    await db.commit()
+    return PlainTextResponse(
+        _transcript_text(row, user, transcript),
+        headers={"Content-Disposition": f'attachment; filename="interview-{row.id}.txt"'},
+    )
+
+
+@router.get("/sessions/{session_id}/audio", response_class=FileResponse)
+async def download_audio(
+    session_id: uuid.UUID, db: DbSession, admin: Admin, request: Request
+) -> FileResponse:
+    """The recording of an AI candidate voice interview, as stereo Ogg Opus.
+
+    The left channel is what the candidate heard, the right channel what it said. 404 for every
+    other session.
+    """
+    row, found_user, _ = await _find(db, session_id)
+    user = _content_user(found_user)
+    audio = await _sim_audio(db, user, row, admin_settings(request))
+    if audio is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No recording for this interview")
+    path, size = audio
+    details = {"user_id": str(user.id), "bytes": size}
+    db.add(_audit(admin, "admin.audio_downloaded", row, details))
+    await db.commit()
+    return FileResponse(path, media_type="audio/ogg", filename=f"interview-{row.id}.ogg")
 
 
 @router.get("/audit")

@@ -33,7 +33,7 @@ from strong_api.auth.deps import SESSION_USER_KEY, DbSession, require_user
 from strong_api.auth.settings import AuthSettings, get_auth_settings
 from strong_api.auth.users import create_user, find_user, normalize_email
 from strong_core.config import get_settings
-from strong_core.db.models import User
+from strong_core.db.models import AuditLog, User
 from strong_core.gateway import get_gateway
 from strong_core.schemas import AuthProvider
 from strong_core.sim import sim_key_budget
@@ -185,7 +185,19 @@ def build_sim_router(settings: AuthSettings, limiter: FailureLimiter | None = No
                 provider=AuthProvider.DEV,
                 age_confirmed=True,
                 terms_accepted=True,
-                training_consent=False,
+                training_consent=True,
+            )
+        if not user.training_consent:
+            # Our own test user: its transcripts are always open to the admin area.
+            user.training_consent = True
+            db.add(
+                AuditLog(
+                    org_id=user.org_id,
+                    actor="sim-login",
+                    action="account.consent_changed",
+                    entity=f"user:{user.id}",
+                    details_json={"training_consent_from": False, "training_consent_to": True},
+                )
             )
         user.last_sign_in_at = datetime.now(UTC)
         await db.commit()
