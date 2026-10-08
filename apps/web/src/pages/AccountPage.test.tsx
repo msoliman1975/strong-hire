@@ -55,7 +55,7 @@ describe("account page", () => {
     signedIn();
     mockStore.db.usage = refreshUsage({ ...mockStore.db.usage, free_interviews_total: 2, free_interviews_left: 2 });
     renderAccount();
-    expect(await screen.findByText(/Free plan\. 2 of 2 free interviews left\./)).toBeInTheDocument();
+    expect(await screen.findByText(/Free plan\. 2 of 2 free mini interviews left\./)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "See the monthly plan" })).toHaveAttribute("href", "/upgrade");
     expect(screen.queryByRole("button", { name: "Cancel plan" })).not.toBeInTheDocument();
   });

@@ -193,7 +193,9 @@
           "$ref": "#/$defs/Difficulty"
         },
         "duration_min": {
+          "description": "10 is a mini interview.",
           "enum": [
+            10,
             30,
             45
           ],
@@ -299,11 +301,12 @@
       "type": "boolean"
     },
     "questions": {
+      "description": "6 to 10; a mini interview has 3.",
       "items": {
         "$ref": "#/$defs/BriefQuestion"
       },
       "maxItems": 10,
-      "minItems": 6,
+      "minItems": 3,
       "title": "Questions",
       "type": "array"
     },
@@ -324,11 +327,12 @@
       "$ref": "#/$defs/SessionConfig"
     },
     "target_competencies": {
+      "description": "4 to 6; a mini interview has 2.",
       "items": {
         "$ref": "#/$defs/Competency"
       },
       "maxItems": 6,
-      "minItems": 4,
+      "minItems": 2,
       "title": "Target Competencies",
       "type": "array"
     },

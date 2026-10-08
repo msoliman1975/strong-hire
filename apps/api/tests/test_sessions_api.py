@@ -35,11 +35,12 @@ async def ready_job(client: httpx.AsyncClient, fake_fixtures: Path) -> dict[str,
 
 
 def config(**changes: Any) -> dict[str, Any]:
+    # 10 minutes: the test accounts are on the free plan, which allows mini interviews only.
     base = {
         "interview_type": "behavioral",
         "difficulty": "realistic",
         "mode": "realistic",
-        "duration_min": 30,
+        "duration_min": 10,
         "level": "staff_principal",
     }
     return {**base, **changes}
@@ -175,20 +176,68 @@ async def test_bl2_ending_an_unstarted_session_uses_no_free_interview(
     assert (await create(client, job["id"])).status_code == 201
 
 
-async def test_bl2_free_plan_allows_one_started_interview(
+async def test_bl2_free_plan_allows_two_started_mini_interviews(
     client: httpx.AsyncClient,
     fake_fixtures: Path,
     sessionmaker: async_sessionmaker[AsyncSession],
 ) -> None:
     job = await ready_job(client, fake_fixtures)
-    record = (await create(client, job["id"], channel="text")).json()
-    await client.post(f"/sessions/{record['id']}/text/open")  # started: the free interview
+    for _ in range(2):
+        record = (await create(client, job["id"], channel="text")).json()
+        await client.post(f"/sessions/{record['id']}/text/open")  # started: a free interview
     blocked = await create(client, job["id"])
     assert blocked.status_code == 402
     assert blocked.json()["detail"]["code"] == "upgrade_required"
     async with sessionmaker() as db:
         count = await db.scalar(select(func.count()).select_from(InterviewSession))
-    assert count == 1
+    assert count == 2
+
+
+@pytest.mark.parametrize("minutes", [30, 45])
+async def test_bl2_free_plan_cannot_create_a_full_interview(
+    client: httpx.AsyncClient,
+    fake_fixtures: Path,
+    sessionmaker: async_sessionmaker[AsyncSession],
+    minutes: int,
+) -> None:
+    job = await ready_job(client, fake_fixtures)
+    blocked = await create(client, job["id"], duration_min=minutes)
+    assert blocked.status_code == 402
+    detail = blocked.json()["detail"]
+    assert detail["code"] == "full_interview_requires_plan"
+    assert "mini interviews" in detail["message"]
+    async with sessionmaker() as db:
+        assert await db.scalar(select(func.count()).select_from(InterviewSession)) == 0
+    assert (await create(client, job["id"], duration_min=10)).status_code == 201
+
+
+async def test_a_paid_30_minute_text_session_has_candidate_questions(
+    client: httpx.AsyncClient, fake_fixtures: Path, queue: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A full session still runs small talk and candidate questions; a mini skips both."""
+
+    async def allow(*_: Any, **__: Any) -> None:
+        return None
+
+    monkeypatch.setattr(sessions_router, "ensure_can_start_session", allow)  # as a paid plan
+    job = await ready_job(client, fake_fixtures)
+    seen: dict[int, set[str]] = {}
+    for minutes in (30, 10):
+        record = (await create(client, job["id"], channel="text", duration_min=minutes)).json()
+        assert record["config"]["duration_min"] == minutes
+        sid = record["id"]
+        await client.post(f"/sessions/{sid}/text/open")
+        queue.run_jobs = False  # the scorer job is not run here
+        phases: set[str] = set()
+        for _ in range(80):
+            out = (await client.post(f"/sessions/{sid}/text/turn", json={"text": "No."})).json()
+            phases.update(t["phase"] for t in out["turns"])
+            if out["ended"]:
+                break
+        seen[minutes] = phases
+        queue.run_jobs = True  # the next session's brief job runs inline
+    assert {"small_talk", "candidate_questions"} <= seen[30]
+    assert not {"small_talk", "candidate_questions"} & seen[10]
 
 
 async def test_text_channel_rules(

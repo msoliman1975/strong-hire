@@ -279,6 +279,39 @@ async def test_brief_job_stores_the_brief_and_profile_version(
         assert brief.probe_areas  # from the gap analysis
 
 
+async def test_brief_job_keeps_a_10_minute_session_as_a_mini(
+    sessionmaker: async_sessionmaker[AsyncSession],
+    account: tuple[uuid.UUID, uuid.UUID],
+    gateway: ModelGateway,
+) -> None:
+    """A 10-minute session gets a mini brief; before, any length other than 45 became 30."""
+    org_id, _ = account
+    target_id, _, gap_id = await _setup(sessionmaker, account)
+    ctx = _ctx(sessionmaker, gateway)
+    await jobs.run_gap_analysis_job(ctx, str(gap_id), str(org_id))
+    async with sessionmaker() as db:
+        session = InterviewSession(
+            org_id=org_id,
+            job_target_id=target_id,
+            type=InterviewType.CASE,
+            difficulty=Difficulty.TOUGH,
+            mode=Mode.REALISTIC,
+            duration_min=10,
+        )
+        db.add(session)
+        await db.commit()
+        session_id = session.id
+    result = await jobs.build_interviewer_brief(ctx, str(session_id), str(org_id))
+    assert result["outcome"] == "ready"
+    async with sessionmaker() as db:
+        stored = await db.get(InterviewSession, session_id)
+        assert stored is not None and stored.brief_json is not None
+        brief = InterviewerBrief.model_validate(stored.brief_json)
+        assert brief.session.duration_min == 10
+        assert len(brief.questions) == 3
+        assert brief.curveball is None and brief.max_probes_per_question == 1
+
+
 def test_context_notes_are_plain_lines() -> None:
     target = JobTarget(stage="Phone screen", context_notes=json.dumps({"interviewer_name": "Ana"}))
     assert context_notes(target) == "stage: Phone screen\ninterviewer name: Ana"

@@ -22,7 +22,7 @@ export function DashboardPage() {
   return (
     <>
       <PageHead title="Your interviews">
-        <p>Each job keeps its own gap analysis and history. Trends count Realistic sessions only.</p>
+        <p>Each job keeps its own gap analysis and history. Trends count full Realistic sessions only, not mini interviews.</p>
       </PageHead>
       {params.get("upgraded") === "1" && (
         <div className="notice notice--ok" role="status">
@@ -125,7 +125,7 @@ function JobTrends({ jobId }: { jobId: string }) {
   return (
     <section className="job__trends" aria-label="Competency trends">
       {progress.data.snapshots.length === 0 ? (
-        <p className="muted">Trends appear here after your first Realistic session.</p>
+        <p className="muted">Trends appear here after your first full Realistic session (30 or 45 minutes).</p>
       ) : (
         <CompetencyTrends snapshots={progress.data.snapshots} trends={progress.data.trends} />
       )}

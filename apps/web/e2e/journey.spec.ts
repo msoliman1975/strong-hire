@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 /**
  * Smoke test of the main journey with every API call mocked:
  * sign in, sign up, job posting, resume, context, gap analysis, session setup, live session,
- * debrief, dashboard trend, paywall after the free interview (BL-2), subscribe, account.
+ * debrief, dashboard, paywall after the two free mini interviews (BL-2), subscribe, account.
  */
 
 const SHOTS = process.env.E2E_SCREENSHOTS;
@@ -60,10 +60,13 @@ async function addJob(page: Page) {
   await shot(page, "07-gap");
 }
 
-async function runSession(page: Page) {
+async function runSession(page: Page, screenshots = true) {
   await expect(page.getByRole("heading", { name: "Set up your interview" })).toBeVisible();
   await expect(page.getByLabel("Level")).toHaveValue("senior");
-  await shot(page, "08-setup");
+  // A free account gets the 10-minute mini interview; full interviews need a plan.
+  await expect(page.getByRole("radio", { name: /^10 minutes \(mini\)/ })).toBeChecked();
+  await expect(page.getByRole("radio", { name: /^30 minutes/ })).toBeDisabled();
+  if (screenshots) await shot(page, "08-setup");
   await page.getByRole("button", { name: "Start interview" }).click();
 
   await expect(page.getByRole("heading", { name: "Interview in progress" })).toBeVisible();
@@ -71,17 +74,18 @@ async function runSession(page: Page) {
   await page.getByRole("button", { name: "Join the interview" }).click();
   // The browser mocks use a scripted interviewer (src/session/mockVoice.ts).
   await expect(page.getByTestId("captions")).toContainText("led a project without formal authority");
-  await shot(page, "09-live");
+  if (screenshots) await shot(page, "09-live");
   await page.getByRole("button", { name: "End interview" }).click();
   await page.getByRole("dialog").getByRole("button", { name: "End interview" }).click();
 
   await expect(page.getByTestId("hire-signal")).toBeVisible({ timeout: 15_000 });
-  await shot(page, "10-debrief");
+  await expect(page.getByTestId("mini-note")).toContainText("Practice signal only.");
+  if (screenshots) await shot(page, "10-debrief");
 }
 
 test("main journey from sign-up to paywall", async ({ page }) => {
   await signUp(page, "ana@example.com");
-  await expect(page.getByTestId("usage-meter")).toContainText("1 free interview left");
+  await expect(page.getByTestId("usage-meter")).toContainText("2 free mini interviews left");
   await shot(page, "02b-dashboard-empty");
   await addJob(page);
 
@@ -92,15 +96,22 @@ test("main journey from sign-up to paywall", async ({ page }) => {
 
   await page.getByRole("link", { name: "Dashboard" }).click();
   await expect(page.getByText(/^1 session, last on/)).toBeVisible();
-  await expect(page.getByRole("img", { name: /^Ownership:/ })).toBeVisible();
-  await expect(page.getByTestId("usage-meter")).toContainText("free interview used");
+  // A mini interview is not in the trends.
+  await expect(page.getByText(/Trends appear here after your first full Realistic session/)).toBeVisible();
+  await expect(page.getByTestId("usage-meter")).toContainText("1 free mini interview left");
   await shot(page, "11-dashboard");
 
-  // BL-2: the second interview needs a plan.
+  // The second free mini interview.
+  await page.getByRole("link", { name: /Start next/ }).click();
+  await runSession(page, false);
+  await page.getByRole("link", { name: "Dashboard" }).click();
+  await expect(page.getByTestId("usage-meter")).toContainText("free mini interviews used");
+
+  // BL-2: the third interview needs a plan.
   await page.getByRole("link", { name: /Start next/ }).click();
   await page.getByRole("button", { name: "Start interview" }).click();
   await expect(page.getByRole("heading", { name: "Keep practicing" })).toBeVisible();
-  await expect(page.getByText("You have used your free interview.")).toBeVisible();
+  await expect(page.getByText("You have used your free mini interviews.")).toBeVisible();
   await shot(page, "12-paywall");
   await page.getByRole("button", { name: "Subscribe" }).click();
 

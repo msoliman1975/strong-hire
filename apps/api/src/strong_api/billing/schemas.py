@@ -20,7 +20,9 @@ class PlanOut(BaseModel):
     name: str
     price_usd_month: float
     minutes_cap: int = Field(description="Interview minutes per billing period.")
-    free_interviews: int = Field(description="BL-2: interviews on the free plan.")
+    free_interviews: int = Field(
+        description="BL-2: interviews on the free plan. They are 10-minute mini interviews."
+    )
     billing_enabled: bool = Field(description="False until Stripe keys are set.")
 
 
@@ -35,9 +37,13 @@ class UsageOut(BaseModel):
     period_start: datetime | None
     period_end: datetime | None
     cancel_at_period_end: bool
-    free_interviews_total: int
+    free_interviews_total: int = Field(description="Free mini interviews for the account.")
     free_interviews_left: int
     can_start_session: bool
+    full_interviews_allowed: bool = Field(
+        description="True when 30 and 45 minute sessions may start (paid plan). "
+        "Free accounts may start 10-minute mini interviews only."
+    )
     block_code: Literal["upgrade_required", "minutes_exhausted"] | None = Field(
         description="Why a new session is blocked. Null when it is allowed."
     )

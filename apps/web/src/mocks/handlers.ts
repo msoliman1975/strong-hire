@@ -444,14 +444,22 @@ export function sessionHandlers(store: MockStore) {
       const body = (await request.json()) as CreateSessionRequest;
       if (!findJob(body.job_target_id)) return notFound("Job target");
       const usage = db().usage;
-      if (!usage.can_start_session) {
-        // Same answer as strong_api.billing.ensure_can_start_session.
-        const code = usage.block_code ?? "upgrade_required";
-        const message =
-          code === "minutes_exhausted"
-            ? "You have used this period's interview minutes."
-            : "You have used your free interview. Subscribe to keep practicing.";
-        return HttpResponse.json({ detail: { code, message, upgrade_url: "/upgrade" } }, { status: 402 });
+      // Same answer as strong_api.billing.ensure_can_start_session.
+      const code: string | null = !usage.can_start_session
+        ? (usage.block_code ?? "upgrade_required")
+        : body.config.duration_min !== 10 && !usage.full_interviews_allowed
+          ? "full_interview_requires_plan"
+          : null;
+      if (code) {
+        const messages: Record<string, string> = {
+          minutes_exhausted: "You have used this period's interview minutes.",
+          upgrade_required: "You have used your free mini interviews. Subscribe to keep practicing.",
+          full_interview_requires_plan: `Full interviews are part of the subscription. Free accounts get ${usage.free_interviews_total} mini interviews.`,
+        };
+        return HttpResponse.json(
+          { detail: { code, message: messages[code], upgrade_url: "/upgrade" } },
+          { status: 402 },
+        );
       }
       const session: SessionRecord = {
         id: newId(),
@@ -552,8 +560,13 @@ export function scoringHandlers(store: MockStore) {
   const findSession = (id: unknown) => db().sessions.find((s) => s.id === id);
 
   const progressFor = (jobId: string): ProgressSnapshot[] => {
+    // Like the API: Realistic sessions only, and never a 10-minute mini interview.
     const realistic = db().sessions.filter(
-      (s) => s.job_target_id === jobId && s.status === "completed" && s.config.mode === "realistic",
+      (s) =>
+        s.job_target_id === jobId &&
+        s.status === "completed" &&
+        s.config.mode === "realistic" &&
+        s.config.duration_min !== 10,
     );
     return realistic.flatMap((s, index) =>
       scorecardFor(s.config.interview_type).competency_scores.map((c) => ({
@@ -622,6 +635,7 @@ export function refreshUsage(usage: Usage): Usage {
     usage.block_code = usage.free_interviews_left > 0 ? null : "upgrade_required";
   }
   usage.can_start_session = usage.block_code === null;
+  usage.full_interviews_allowed = usage.plan === "paid";
   return usage;
 }
 
@@ -630,7 +644,7 @@ export const MOCK_PLAN = {
   name: "Strong Hire monthly",
   price_usd_month: 29,
   minutes_cap: 300,
-  free_interviews: 1,
+  free_interviews: 2,
   billing_enabled: true,
 };
 

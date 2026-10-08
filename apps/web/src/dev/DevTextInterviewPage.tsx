@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { useJobs } from "../api/hooks";
-import type { Difficulty, InterviewType, Level, Mode, Turn } from "../api/types";
+import type { Difficulty, InterviewType, Level, Mode, SessionConfig, Turn } from "../api/types";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
 import { difficultyLabel, interviewTypeLabel, levelLabel, modeLabel, phaseLabel } from "../labels";
 import type { CoachCommand, Debrief, SessionRecord } from "./textInterviewApi";
@@ -24,7 +24,8 @@ export function DevTextInterviewPage() {
   const [type, setType] = useState<InterviewType>("behavioral");
   const [difficulty, setDifficulty] = useState<Difficulty>("realistic");
   const [mode, setMode] = useState<Mode>("realistic");
-  const [duration, setDuration] = useState<30 | 45>(30);
+  // 10 by default: a free account may start mini interviews only.
+  const [duration, setDuration] = useState<SessionConfig["duration_min"]>(10);
   const [pickedLevel, setLevel] = useState<Level | null>(null);
 
   const [stage, setStage] = useState<Stage>("setup");
@@ -195,7 +196,11 @@ export function DevTextInterviewPage() {
           </label>
           <label>
             Duration
-            <select value={duration} onChange={(e) => setDuration(Number(e.target.value) as 30 | 45)}>
+            <select
+              value={duration}
+              onChange={(e) => setDuration(Number(e.target.value) as SessionConfig["duration_min"])}
+            >
+              <option value={10}>10 minutes (mini)</option>
               <option value={30}>30 minutes</option>
               <option value={45}>45 minutes</option>
             </select>

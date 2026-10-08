@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Final, Literal
 
 from pydantic import Field, model_validator
 
@@ -18,6 +18,23 @@ from strong_core.schemas.enums import (
     Speaker,
 )
 
+DurationMin = Literal[10, 30, 45]
+MINI_DURATION_MIN: Final = 10
+"""A mini interview: 3 questions, no candidate questions, no curveball, at most 1 probe."""
+
+MINI_MAX_PROBES: Final = 1
+FULL_MIN_QUESTIONS: Final = 6
+FULL_MIN_COMPETENCIES: Final = 4
+
+
+def session_duration(minutes: int) -> DurationMin:
+    """A stored session length as a SessionConfig duration. Unknown values become 30."""
+    if minutes == 10:
+        return 10
+    if minutes == 45:
+        return 45
+    return 30
+
 
 class SessionConfig(Contract):
     """What the candidate picks before a session (journey 2, step 1)."""
@@ -25,8 +42,12 @@ class SessionConfig(Contract):
     interview_type: InterviewType
     difficulty: Difficulty
     mode: Mode
-    duration_min: Literal[30, 45]
+    duration_min: DurationMin = Field(description="10 is a mini interview.")
     level: Level
+
+    @property
+    def is_mini(self) -> bool:
+        return self.duration_min == MINI_DURATION_MIN
 
 
 class BriefQuestion(Contract):
@@ -60,13 +81,17 @@ class InterviewerBrief(Contract):
     company_name: str | None = Field(default=None, description="None in generic mode.")
     generic_mode: bool
     profile_version: int | None = Field(default=None, ge=1)
-    target_competencies: list[Competency] = Field(min_length=4, max_length=6)
+    target_competencies: list[Competency] = Field(
+        min_length=2, max_length=6, description="4 to 6; a mini interview has 2."
+    )
     target_values: list[str] = Field(
         default_factory=list,
         max_length=4,
         description="Company value names (Principle.name) to probe. Empty in generic mode.",
     )
-    questions: list[BriefQuestion] = Field(min_length=6, max_length=10)
+    questions: list[BriefQuestion] = Field(
+        min_length=3, max_length=10, description="6 to 10; a mini interview has 3."
+    )
     probe_areas: list[str] = Field(default_factory=list)
     persona: PersonaBrief
     max_probes_per_question: int = Field(ge=0, le=3, description="IV-3.")
@@ -105,6 +130,18 @@ class InterviewerBrief(Contract):
             raise ValueError("pushback is only allowed in Tough difficulty")
         if self.coach_help and self.session.mode != Mode.COACH:
             raise ValueError("coach_help is only allowed in Coach mode")
+        if self.session.is_mini:
+            if self.curveball:
+                raise ValueError("a mini interview has no curveball")
+            if self.max_probes_per_question > MINI_MAX_PROBES:
+                raise ValueError(f"a mini interview allows at most {MINI_MAX_PROBES} probe")
+        else:
+            if len(self.questions) < FULL_MIN_QUESTIONS:
+                raise ValueError(f"a full interview needs at least {FULL_MIN_QUESTIONS} questions")
+            if len(self.target_competencies) < FULL_MIN_COMPETENCIES:
+                raise ValueError(
+                    f"a full interview needs at least {FULL_MIN_COMPETENCIES} target competencies"
+                )
         if self.time_plan:
             phases = [p.phase for p in self.time_plan]
             if len(phases) != len(set(phases)):

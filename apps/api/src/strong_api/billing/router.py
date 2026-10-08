@@ -92,6 +92,7 @@ def build_router(auth_settings: AuthSettings) -> APIRouter:
             free_interviews_total=ent.free_interviews_total,
             free_interviews_left=ent.free_interviews_left,
             can_start_session=ent.can_start_session,
+            full_interviews_allowed=ent.full_interviews_allowed,
             block_code=ent.block_code,
             has_billing_account=bool(sub and sub.stripe_customer_id),
         )

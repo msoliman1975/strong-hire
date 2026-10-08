@@ -1363,14 +1363,20 @@ export interface components {
              * @default null
              */
             profile_version: number | null;
-            /** Target Competencies */
+            /**
+             * Target Competencies
+             * @description 4 to 6; a mini interview has 2.
+             */
             target_competencies: components["schemas"]["Competency"][];
             /**
              * Target Values
              * @description Company value names (Principle.name) to probe. Empty in generic mode.
              */
             target_values?: string[];
-            /** Questions */
+            /**
+             * Questions
+             * @description 6 to 10; a mini interview has 3.
+             */
             questions: components["schemas"]["BriefQuestion"][];
             /** Probe Areas */
             probe_areas?: string[];
@@ -1719,7 +1725,7 @@ export interface components {
             minutes_cap: number;
             /**
              * Free Interviews
-             * @description BL-2: interviews on the free plan.
+             * @description BL-2: interviews on the free plan. They are 10-minute mini interviews.
              */
             free_interviews: number;
             /**
@@ -2060,9 +2066,10 @@ export interface components {
             mode: components["schemas"]["Mode"];
             /**
              * Duration Min
+             * @description 10 is a mini interview.
              * @enum {integer}
              */
-            duration_min: 30 | 45;
+            duration_min: 10 | 30 | 45;
             level: components["schemas"]["Level"];
         };
         /** SessionRecord */
@@ -2225,12 +2232,20 @@ export interface components {
             period_end: string | null;
             /** Cancel At Period End */
             cancel_at_period_end: boolean;
-            /** Free Interviews Total */
+            /**
+             * Free Interviews Total
+             * @description Free mini interviews for the account.
+             */
             free_interviews_total: number;
             /** Free Interviews Left */
             free_interviews_left: number;
             /** Can Start Session */
             can_start_session: boolean;
+            /**
+             * Full Interviews Allowed
+             * @description True when 30 and 45 minute sessions may start (paid plan). Free accounts may start 10-minute mini interviews only.
+             */
+            full_interviews_allowed: boolean;
             /**
              * Block Code
              * @description Why a new session is blocked. Null when it is allowed.

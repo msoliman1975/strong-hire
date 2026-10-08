@@ -1,5 +1,5 @@
 /** BL-1: the usage meter shows minutes used of the cap, exactly as the API reports them.
- * BL-2: on the free plan it shows the free interviews left, as a number from the API. */
+ * BL-2: on the free plan it shows the free mini interviews left, as a number from the API. */
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
@@ -31,31 +31,40 @@ describe("UsageMeter", () => {
     expect(screen.getByRole("meter")).toHaveAttribute("aria-valuenow", "300");
   });
 
-  it("shows the free interview on the free plan, with a link to upgrade", () => {
+  it("shows the free mini interviews on the free plan, with a link to upgrade", () => {
     render(
       <MemoryRouter>
         <UsageMeter usage={FREE_USAGE} />
       </MemoryRouter>,
     );
     expect(screen.getByRole("link")).toHaveAttribute("href", "/upgrade");
-    expect(screen.getByText("Free plan: 1 free interview left")).toBeInTheDocument();
+    expect(screen.getByText("Free plan: 2 free mini interviews left")).toBeInTheDocument();
+  });
+
+  it("uses the singular for one free mini interview", () => {
+    render(
+      <MemoryRouter>
+        <UsageMeter usage={{ ...FREE_USAGE, free_interviews_left: 1 }} />
+      </MemoryRouter>,
+    );
+    expect(screen.getByText("Free plan: 1 free mini interview left")).toBeInTheDocument();
   });
 
   it("uses the number of free interviews from the API", () => {
     render(
       <MemoryRouter>
-        <UsageMeter usage={{ ...FREE_USAGE, free_interviews_total: 3, free_interviews_left: 2 }} />
+        <UsageMeter usage={{ ...FREE_USAGE, free_interviews_total: 5, free_interviews_left: 4 }} />
       </MemoryRouter>,
     );
-    expect(screen.getByText("Free plan: 2 free interviews left")).toBeInTheDocument();
+    expect(screen.getByText("Free plan: 4 free mini interviews left")).toBeInTheDocument();
   });
 
-  it("says when the free interview is used", () => {
+  it("says when the free mini interviews are used", () => {
     render(
       <MemoryRouter>
         <UsageMeter usage={{ ...FREE_USAGE, free_interviews_left: 0, can_start_session: false }} />
       </MemoryRouter>,
     );
-    expect(screen.getByText("Free plan: free interview used")).toBeInTheDocument();
+    expect(screen.getByText("Free plan: free mini interviews used")).toBeInTheDocument();
   });
 });
