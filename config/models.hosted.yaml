@@ -16,6 +16,8 @@ roles:
   scorer: hosted-scorer
   stt: hosted-stt
   tts: hosted-tts
+  candidate: hosted-interviewer   # P13 AI candidate; the sim profile overrides it
+  judge: hosted-scorer
 
 # Capability registry. Code checks these flags, never model names.
 # tier (small, medium, large) picks prompt variants: prompts/<role>/<name>.<tier>.v<N>.txt.

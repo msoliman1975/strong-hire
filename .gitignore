@@ -34,3 +34,7 @@ infra/certs/*
 .DS_Store
 Thumbs.db
 /var/
+
+# AI candidate (P13)
+infra/sim/.env
+sim-runs/

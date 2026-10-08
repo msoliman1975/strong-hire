@@ -18,6 +18,7 @@ class ModelProfile(StrEnum):
     LOCAL = "local"
     HOSTED = "hosted"
     CLAUDE = "claude"  # Anthropic models for the text roles, local speech (PL-2)
+    SIM = "sim"  # the AI candidate's own server (P13): candidate, judge and candidate speech
 
 
 def find_repo_root(start: Path | None = None) -> Path:

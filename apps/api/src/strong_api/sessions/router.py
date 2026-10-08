@@ -30,8 +30,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from strong_api.auth.settings import AppEnv, get_auth_settings
+from strong_api.auth.sim import is_sim_user
 from strong_api.billing.entitlements import ensure_can_start_session, record_session_minutes
-from strong_api.inputs.deps import Db, Me, Queue
+from strong_api.inputs.deps import CurrentUser, Db, Me, Queue
 from strong_api.inputs.queue import BUILD_INTERVIEWER_BRIEF, JobQueue
 from strong_api.scoring.router import _brief, _config, _owned_session, _owned_target, start_scoring
 from strong_api.sessions.schemas import (
@@ -77,8 +78,11 @@ def _record(session: InterviewSession, target: JobTarget | None) -> SessionRecor
     )
 
 
-def _text_allowed() -> bool:
-    return get_auth_settings().app_env in (AppEnv.LOCAL, AppEnv.TEST)
+async def _text_allowed(db: AsyncSession, me: CurrentUser) -> bool:
+    """Text sessions are a dev feature (PL-7), and the AI candidate's way in (P13)."""
+    if get_auth_settings().app_env in (AppEnv.LOCAL, AppEnv.TEST):
+        return True
+    return await is_sim_user(db, me.user_id)
 
 
 def _runners(request: Request) -> dict[uuid.UUID, InterviewRunner]:
@@ -97,10 +101,11 @@ async def create_session(body: CreateSessionRequest, db: Db, me: Me, queue: Queu
     target = await _owned_target(db, me, body.job_target_id)
     if target.parsed_json is None:
         raise HTTPException(status.HTTP_409_CONFLICT, "The job posting is still being read.")
-    if body.channel == SessionChannel.TEXT and not _text_allowed():
+    if body.channel == SessionChannel.TEXT and not await _text_allowed(db, me):
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Text sessions are a dev feature.")
     config = body.config
-    await ensure_can_start_session(db, me.org_id, config.duration_min)
+    if not await is_sim_user(db, me.user_id):  # the AI candidate has no plan (P13)
+        await ensure_can_start_session(db, me.org_id, config.duration_min)
     target.level = config.level  # the level confirmed at setup sets the bar (IV-6)
     session = InterviewSession(
         org_id=me.org_id,
@@ -175,7 +180,7 @@ async def end_session(
 
 
 async def _text_session(db: Db, me: Me, session_id: uuid.UUID) -> InterviewSession:
-    if not _text_allowed():
+    if not await _text_allowed(db, me):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found")
     session = await _owned_session(db, me, session_id)
     if session.channel != SessionChannel.TEXT:

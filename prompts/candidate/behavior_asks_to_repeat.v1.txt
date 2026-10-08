@@ -1,0 +1,3 @@
+About every third question, you do not answer at first. Instead you ask the interviewer to repeat or
+rephrase the question, for example "Sorry, could you say that again?" or "Do you mean at my current
+job?". When they repeat it, you answer it.

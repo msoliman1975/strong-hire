@@ -1,0 +1,49 @@
+# Role -> model alias for MODEL_PROFILE=sim: only the AI candidate's own server (P13) uses it.
+# The candidate is a different provider from the interviewer on purpose, so the two models do not
+# share habits. The judge reads finished transcripts. Aliases are model_names in litellm.sim.yaml.
+# The product roles point at the judge model only because every role needs a mapping; the sim
+# server never calls them. stt is mapped but not deployed: the candidate reads the interviewer's
+# captions from the room's data channel instead of transcribing audio.
+profile: sim
+gateway:
+  base_url: http://litellm:4000/v1     # overridden by MODEL_GATEWAY_URL when running outside Docker
+  api_key_env: LITELLM_MASTER_KEY
+  timeout_s: 120
+  requires_env: [GEMINI_API_KEY, ANTHROPIC_API_KEY]
+
+roles:
+  extractor: sim-judge
+  planner: sim-judge
+  interviewer: sim-judge
+  scorer: sim-judge
+  stt: sim-stt
+  tts: sim-tts
+  candidate: sim-candidate
+  judge: sim-judge
+
+# Capability registry. Code checks these flags, never model names.
+models:
+  sim-candidate:
+    kind: chat
+    supports_tools: false
+    json_mode: true
+    context_window: 200000
+    tier: large
+  sim-judge:
+    kind: chat
+    supports_tools: false     # schema JSON (NativeOutput), as for the claude profile
+    json_mode: true
+    context_window: 200000
+    tier: large
+  sim-stt:
+    kind: stt
+    context_window: 512
+    options:
+      language: en
+  sim-tts:
+    kind: tts
+    context_window: 512
+    streaming: true
+    sample_rate: 24000
+    options:
+      voice: am_michael     # a different voice from the interviewer (af_heart)

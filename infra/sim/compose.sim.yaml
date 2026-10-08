@@ -1,0 +1,55 @@
+# The AI candidate's own stack (P13), on the short-lived sim server only.
+#   docker compose -f infra/sim/compose.sim.yaml run --rm sim run --suite text-smoke --yes
+# Secrets come from infra/sim/.env, which sim-run.ps1 writes on the sim server; never commit it.
+name: strong-sim
+
+x-healthcheck: &healthcheck
+  interval: 5s
+  timeout: 5s
+  retries: 30
+
+services:
+  litellm:
+    image: ghcr.io/berriai/litellm:main-stable
+    command: ["--config", "/app/litellm.yaml", "--port", "4000"]
+    environment:
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:?set LITELLM_MASTER_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?set ANTHROPIC_API_KEY}
+    volumes:
+      - ../../config/litellm.sim.yaml:/app/litellm.yaml:ro
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:4000/health/liveliness', timeout=3)"]
+      start_period: 30s
+
+  tts:
+    # Kokoro-82M on CPU: the candidate's voice in voice sessions.
+    image: ghcr.io/remsky/kokoro-fastapi-cpu:latest
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8880/health', timeout=3)"]
+      start_period: 120s
+
+  sim:
+    build:
+      context: ../..
+      dockerfile: infra/sim/sim.Dockerfile
+    image: strong-sim:latest
+    depends_on:
+      litellm: { condition: service_healthy }
+      tts: { condition: service_healthy }
+    environment:
+      MODEL_PROFILE: sim
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      SIM_BASE_URL: ${SIM_BASE_URL:-https://getstronghire.com/api}
+      SIM_TOKEN: ${SIM_TOKEN:?set SIM_TOKEN}
+      SIM_OUT_DIR: /runs
+      SIM_UPLOAD_TARGET: ${SIM_UPLOAD_TARGET:-}
+      SIM_UPLOAD_KEY: /keys/upload_key
+      SIM_COST_LIMIT_USD: ${SIM_COST_LIMIT_USD:-5}
+    volumes:
+      - ${SIM_RUNS_DIR:-/opt/sim/runs}:/runs
+      - ${SIM_KEYS_DIR:-/opt/sim/keys}:/keys:ro

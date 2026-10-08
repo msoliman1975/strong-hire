@@ -1,0 +1,13 @@
+name: text-behaviors
+description: Interviewer robustness in text. Pairwise over type, difficulty, mode, length and behavior.
+pairwise:
+  prefix: tb
+  seed: 7
+  fixed: {channel: text, quality: average}
+  dimensions:
+    interview_type: [behavioral, hiring_manager, technical_qa, case]
+    difficulty: [friendly, realistic, tough]
+    mode: [coach, realistic]
+    duration_min: [10, 30, 45]
+    behavior: [normal, long_answers, one_line_answers, off_topic, asks_to_repeat, silent, argues,
+               many_questions_back, prompt_injection]

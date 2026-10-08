@@ -1,0 +1,45 @@
+# LiteLLM proxy config for MODEL_PROFILE=sim, on the AI candidate's own server (P13).
+#
+#   sim-candidate  Gemini 3.5 Flash, thinking off   the candidate (about 1 s per reply)
+#   sim-judge      Claude Sonnet 5.5                 the judge
+#   sim-tts        Kokoro, local                     the candidate's voice
+#   sim-stt        not deployed (see models.sim.yaml)
+#
+# Prices are list prices per token (Oct 2026), so LiteLLM and the sim report count dollars.
+model_list:
+  - model_name: sim-candidate
+    litellm_params:
+      model: gemini/gemini-3.5-flash
+      api_key: os.environ/GEMINI_API_KEY
+      thinking: {type: enabled, budget_tokens: 0}
+    model_info:
+      input_cost_per_token: 0.0000015   # $1.50 per million input tokens
+      output_cost_per_token: 0.000009   # $9 per million output tokens
+  - model_name: sim-judge
+    litellm_params:
+      model: anthropic/claude-sonnet-5-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+    model_info:
+      input_cost_per_token: 0.000002    # $2 per million input tokens
+      output_cost_per_token: 0.00001    # $10 per million output tokens
+  - model_name: sim-stt
+    litellm_params:
+      model: openai/Systran/faster-whisper-small
+      api_base: http://stt:8000/v1
+      api_key: not-needed
+    model_info:
+      mode: audio_transcription
+  - model_name: sim-tts
+    litellm_params:
+      model: openai/kokoro
+      api_base: http://tts:8880/v1
+      api_key: not-needed
+    model_info:
+      mode: audio_speech
+
+litellm_settings:
+  drop_params: true
+  request_timeout: 120
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY

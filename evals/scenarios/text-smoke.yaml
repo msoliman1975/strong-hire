@@ -1,0 +1,9 @@
+name: text-smoke
+description: Six text sessions. Two interview types times three answer qualities, all else equal.
+scenarios:
+  - {id: beh-strong, interview_type: behavioral, quality: strong}
+  - {id: beh-average, interview_type: behavioral, quality: average}
+  - {id: beh-weak, interview_type: behavioral, quality: weak}
+  - {id: tq-strong, interview_type: technical_qa, quality: strong}
+  - {id: tq-average, interview_type: technical_qa, quality: average}
+  - {id: tq-weak, interview_type: technical_qa, quality: weak}

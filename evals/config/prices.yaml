@@ -15,6 +15,8 @@ llm_per_mtok:            # [input, output] USD per million tokens
   local-small: [0, 0]      # runs on this machine
   local-mid: [0, 0]
   local-lmstudio: [0, 0]
+  sim-candidate: [1.50, 9.00]   # Gemini 3.5 Flash (P13)
+  sim-judge: [2.00, 10.00]      # Sonnet 5.5
 
 stt_per_minute:          # USD per minute of candidate speech
   hosted-stt: 0.0007

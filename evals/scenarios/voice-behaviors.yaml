@@ -1,0 +1,9 @@
+name: voice-behaviors
+description: Voice-only behaviors and turn taking, 10-minute sessions in real time (about 80 minutes).
+scenarios:
+  - {id: v-interrupts, channel: voice, duration_min: 10, behavior: interrupts}
+  - {id: v-drop, channel: voice, duration_min: 10, behavior: drops_connection}
+  - {id: v-silent, channel: voice, duration_min: 10, behavior: silent}
+  - {id: v-long, channel: voice, duration_min: 10, behavior: long_answers}
+  - {id: v-repeat, channel: voice, duration_min: 10, behavior: asks_to_repeat}
+  - {id: v-inject, channel: voice, duration_min: 10, behavior: prompt_injection, difficulty: tough}

@@ -47,6 +47,10 @@ services:
       MODEL_SPEND_VIEWERS: ${MODEL_SPEND_VIEWERS:-}
       LIVEKIT_PUBLIC_URL: wss://rtc.${DOMAIN}
       STRONG_INTERNAL_TOKEN: ${STRONG_INTERNAL_TOKEN:?set STRONG_INTERNAL_TOKEN in .env}
+      # The AI candidate (P13, docs/sim-candidate.md). Off unless SIM_ENABLED=true in .env.
+      SIM_ENABLED: ${SIM_ENABLED:-false}
+      SIM_TOKEN: ${SIM_TOKEN:-}
+      SIM_EMAIL: ${SIM_EMAIL:-sim@getstronghire.com}
     restart: unless-stopped
 
   worker:

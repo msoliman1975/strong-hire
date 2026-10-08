@@ -15,6 +15,8 @@ roles:
   scorer: local-mid
   stt: local-stt
   tts: local-tts
+  candidate: local-small   # P13 AI candidate; the sim profile overrides it
+  judge: local-mid
 
 # Capability registry. Code checks these flags, never model names.
 # tier (small, medium, large) picks prompt variants: prompts/<role>/<name>.<tier>.v<N>.txt.

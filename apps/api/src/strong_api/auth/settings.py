@@ -5,7 +5,7 @@ from __future__ import annotations
 from enum import StrEnum
 from functools import lru_cache
 
-from pydantic import Field, model_validator
+from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 DEV_SESSION_SECRET = "local-dev-only-session-secret-change-me"  # local default only
@@ -49,6 +49,13 @@ class AuthSettings(BaseSettings):
     # Staging only: comma-separated emails that see the model spend meter (strong_api.devtools).
     model_spend_viewers: str = ""
 
+    # The AI candidate (P13). POST /auth/sim-login exists only when sim_enabled is true, and it
+    # signs in only sim_email, in that user's own org. Sim sessions skip the plan check and may
+    # use the text channel.
+    sim_enabled: bool = False
+    sim_token: SecretStr | None = None
+    sim_email: str = "sim@getstronghire.com"
+
     @property
     def is_local(self) -> bool:
         return self.app_env == AppEnv.LOCAL
@@ -56,6 +63,12 @@ class AuthSettings(BaseSettings):
     @property
     def spend_viewers(self) -> set[str]:
         return {e.strip().lower() for e in self.model_spend_viewers.split(",") if e.strip()}
+
+    @property
+    def sim_active(self) -> bool:
+        """True only when the flag is on and a real token is set."""
+        token = self.sim_token.get_secret_value() if self.sim_token else ""
+        return self.sim_enabled and len(token) >= 32
 
     @property
     def google_enabled(self) -> bool:

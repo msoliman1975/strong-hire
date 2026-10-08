@@ -249,7 +249,11 @@ async def test_text_channel_rules(
     text = (await create(client, job["id"], channel="text")).json()["id"]
     turn = await client.post(f"/sessions/{text}/text/turn", json={"text": "Hi"})
     assert turn.status_code == 409  # not open yet
-    monkeypatch.setattr(sessions_router, "_text_allowed", lambda: False)
+
+    async def never(*_: Any) -> bool:
+        return False
+
+    monkeypatch.setattr(sessions_router, "_text_allowed", never)
     assert (await create(client, job["id"], channel="text")).status_code == 403
     assert (await client.post(f"/sessions/{text}/text/open")).status_code == 404
 
@@ -292,7 +296,10 @@ async def test_voice_join_starts_the_session_and_returns_a_room_token(
 async def test_voice_join_rules(
     client: httpx.AsyncClient, fake_fixtures: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setattr(sessions_router, "_text_allowed", lambda: True)
+    async def always(*_: Any) -> bool:
+        return True
+
+    monkeypatch.setattr(sessions_router, "_text_allowed", always)
     job = await ready_job(client, fake_fixtures)
     text = (await create(client, job["id"], channel="text")).json()["id"]
     assert (await client.post(f"/sessions/{text}/voice/join")).status_code == 409

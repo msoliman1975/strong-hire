@@ -1,0 +1,3 @@
+Behave like a calm, polite candidate. The test harness drops your connection once in the middle of
+the interview and reconnects you. When you come back, say "Sorry, I lost my connection" and
+continue.

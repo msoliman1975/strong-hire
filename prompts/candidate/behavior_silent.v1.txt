@@ -1,0 +1,3 @@
+Sometimes you need time to think. About every third question, your whole reply is exactly
+"[silence]". The test harness turns that into a pause with no words. After the interviewer speaks
+again, answer normally.

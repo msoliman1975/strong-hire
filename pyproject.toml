@@ -1,5 +1,5 @@
 [tool.uv.workspace]
-members = ["packages/core", "packages/interview", "apps/api", "apps/worker", "apps/voice", "evals"]
+members = ["packages/core", "packages/interview", "apps/api", "apps/worker", "apps/voice", "apps/sim", "evals"]
 
 [tool.uv.sources]
 strong-core = { workspace = true }
@@ -24,7 +24,7 @@ select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "RUF", "ASYNC"]
 ignore = ["RUF012"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["strong_core", "strong_interview", "strong_api", "strong_worker", "strong_voice", "strong_evals"]
+known-first-party = ["strong_core", "strong_interview", "strong_api", "strong_worker", "strong_voice", "strong_evals", "strong_sim"]
 
 [tool.ruff.lint.per-file-ignores]
 "**/tests/**" = ["B011"]
@@ -34,15 +34,15 @@ python_version = "3.12"
 plugins = ["pydantic.mypy"]
 ignore_missing_imports = true
 explicit_package_bases = true
-mypy_path = ["packages/core/src", "packages/interview/src", "apps/api/src", "apps/worker/src", "apps/voice/src", "evals/src"]
-files = ["packages/core/src", "packages/interview/src", "apps/api/src", "apps/worker/src", "apps/voice/src", "evals/src"]
+mypy_path = ["packages/core/src", "packages/interview/src", "apps/api/src", "apps/worker/src", "apps/voice/src", "apps/sim/src", "evals/src"]
+files = ["packages/core/src", "packages/interview/src", "apps/api/src", "apps/worker/src", "apps/voice/src", "apps/sim/src", "evals/src"]
 
 [[tool.mypy.overrides]]
 module = ["strong_core", "strong_core.*"]
 strict = true
 
 [tool.pytest.ini_options]
-testpaths = ["packages/core/tests", "packages/interview/tests", "apps/api/tests", "apps/worker/tests", "apps/voice/tests", "evals/tests"]
+testpaths = ["packages/core/tests", "packages/interview/tests", "apps/api/tests", "apps/worker/tests", "apps/voice/tests", "apps/sim/tests", "evals/tests"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 addopts = "--import-mode=importlib"

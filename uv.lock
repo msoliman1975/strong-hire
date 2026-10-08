@@ -8,6 +8,7 @@ members = [
     "strong-core",
     "strong-evals",
     "strong-interview",
+    "strong-sim",
     "strong-voice",
     "strong-worker",
 ]
@@ -2101,6 +2102,27 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [{ name = "strong-core", editable = "packages/core" }]
+
+[[package]]
+name = "strong-sim"
+version = "0.1.0"
+source = { editable = "apps/sim" }
+dependencies = [
+    { name = "httpx" },
+    { name = "livekit" },
+    { name = "pyyaml" },
+    { name = "strong-core" },
+    { name = "strong-interview" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "httpx", specifier = ">=0.27" },
+    { name = "livekit", specifier = ">=1.0" },
+    { name = "pyyaml", specifier = ">=6.0" },
+    { name = "strong-core", editable = "packages/core" },
+    { name = "strong-interview", editable = "packages/interview" },
+]
 
 [[package]]
 name = "strong-voice"
