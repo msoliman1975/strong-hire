@@ -29,6 +29,12 @@ models:
     json_mode: true
     context_window: 200000
     tier: large
+  sim-candidate-alt:
+    kind: chat
+    supports_tools: false
+    json_mode: true
+    context_window: 200000
+    tier: large
   sim-judge:
     kind: chat
     supports_tools: false     # schema JSON (NativeOutput), as for the claude profile

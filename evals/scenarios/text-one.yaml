@@ -1,0 +1,4 @@
+name: text-one
+description: One 10-minute text session. Checks the whole pipeline at the lowest cost.
+scenarios:
+  - {id: one-beh-average, interview_type: behavioral, duration_min: 10, quality: average}

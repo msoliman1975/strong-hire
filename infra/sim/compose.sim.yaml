@@ -41,6 +41,7 @@ services:
       tts: { condition: service_healthy }
     environment:
       MODEL_PROFILE: sim
+      MODEL_ROLE_CANDIDATE: ${MODEL_ROLE_CANDIDATE:-sim-candidate}
       LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}

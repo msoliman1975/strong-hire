@@ -1,6 +1,7 @@
 # LiteLLM proxy config for MODEL_PROFILE=sim, on the AI candidate's own server (P13).
 #
 #   sim-candidate  Gemini 3.5 Flash, thinking off   the candidate (about 1 s per reply)
+#   sim-candidate-alt  Gemini 3.8 Flash             another candidate (about 4 s per reply)
 #   sim-judge      Claude Sonnet 5.5                 the judge
 #   sim-tts        Kokoro, local                     the candidate's voice
 #   sim-stt        not deployed (see models.sim.yaml)
@@ -15,6 +16,16 @@ model_list:
     model_info:
       input_cost_per_token: 0.0000015   # $1.50 per million input tokens
       output_cost_per_token: 0.000009   # $9 per million output tokens
+  # A second candidate, chosen with MODEL_ROLE_CANDIDATE=sim-candidate-alt. On the Gemini free
+  # tier each model has its own 20 requests per day, so this one can run when the first is used up.
+  - model_name: sim-candidate-alt
+    litellm_params:
+      model: gemini/gemini-3.8-flash
+      api_key: os.environ/GEMINI_API_KEY
+      thinking: {type: enabled, budget_tokens: 0}
+    model_info:
+      input_cost_per_token: 0.00000075  # $0.75 per million input tokens (until Dec 31, 2026)
+      output_cost_per_token: 0.00000375 # $3.75 per million output tokens
   - model_name: sim-judge
     litellm_params:
       model: anthropic/claude-sonnet-5-5
