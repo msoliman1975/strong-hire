@@ -46,9 +46,16 @@ class AuthSettings(BaseSettings):
     smtp_password: str | None = None
     smtp_from: str = "Strong Hire <no-reply@stronghire.local>"
 
+    # Staging only: comma-separated emails that see the model spend meter (strong_api.devtools).
+    model_spend_viewers: str = ""
+
     @property
     def is_local(self) -> bool:
         return self.app_env == AppEnv.LOCAL
+
+    @property
+    def spend_viewers(self) -> set[str]:
+        return {e.strip().lower() for e in self.model_spend_viewers.split(",") if e.strip()}
 
     @property
     def google_enabled(self) -> bool:

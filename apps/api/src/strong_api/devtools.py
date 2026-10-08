@@ -2,7 +2,9 @@
 
     GET /dev/model-usage   today's and this month's spend against the LiteLLM budgets
 
-It exists only when APP_ENV is local or test, like the dev login. It reads the app key's spend
+It exists when APP_ENV is local or test, like the dev login. On a hosted test server (staging) it
+answers only the users whose email is in MODEL_SPEND_VIEWERS, so testers do not see the budget.
+It reads the app key's spend
 and its team's spend from LiteLLM with the master key. With no app key (every profile except
 claude), nothing is tracked and the web app hides the indicator.
 """
@@ -19,8 +21,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
 from strong_api.auth.settings import AppEnv, get_auth_settings
-from strong_api.inputs.deps import Me
+from strong_api.inputs.deps import Db, Me
 from strong_core.config import get_settings
+from strong_core.db.models import User
 
 router = APIRouter(tags=["dev"])
 
@@ -60,10 +63,23 @@ def _budget(data: dict[str, Any]) -> Budget:
     )
 
 
+async def _may_see_spend(db: Db, me: Me) -> bool:
+    auth = get_auth_settings()
+    if auth.app_env in (AppEnv.LOCAL, AppEnv.TEST):
+        return True
+    if auth.app_env != AppEnv.STAGING or not auth.spend_viewers:
+        return False
+    user = await db.get(User, me.user_id)
+    return user is not None and user.email.strip().lower() in auth.spend_viewers
+
+
 @router.get("/dev/model-usage")
-async def model_usage(_: Me, http: LiteLLM) -> ModelUsage:
-    """Spend today and this month for the app key (claude profile). Dev and test only."""
-    if get_auth_settings().app_env not in (AppEnv.LOCAL, AppEnv.TEST):
+async def model_usage(db: Db, me: Me, http: LiteLLM) -> ModelUsage:
+    """Spend today and this month for the app key (claude profile).
+
+    Dev and test, and in staging for the MODEL_SPEND_VIEWERS emails. Others get 404.
+    """
+    if not await _may_see_spend(db, me):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found")
     settings = get_settings()
     profile = str(settings.model_profile.value)
