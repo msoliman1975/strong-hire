@@ -781,6 +781,83 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Users */
+        get: operations["list_users_admin_users_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Sessions
+         * @description Interviews of all users, newest first, with the interviewer's model cost.
+         */
+        get: operations["list_sessions_admin_sessions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/sessions/{session_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Session
+         * @description One interview. Transcript and traces only when the user's consent is on now.
+         */
+        get: operations["get_session_admin_sessions__session_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Audit
+         * @description Newest first. `admin` shows the admin views only; `all` shows every entry.
+         */
+        get: operations["list_audit_admin_audit_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -820,6 +897,214 @@ export interface components {
             files_deleted_within_hours: number;
             /** Backups Expire Within Days */
             backups_expire_within_days: number;
+        };
+        /** AdminAuditEntry */
+        AdminAuditEntry: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Actor */
+            actor: string;
+            /** Action */
+            action: string;
+            /** Entity */
+            entity: string;
+            /** Org Id */
+            org_id: string | null;
+            /** Details */
+            details: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /** AdminMessage */
+        AdminMessage: {
+            /** Role */
+            role: string;
+            /** Content */
+            content: string;
+            /** Prompt Ref */
+            prompt_ref?: string | null;
+        };
+        /** AdminScore */
+        AdminScore: {
+            competency: components["schemas"]["Competency"];
+            /** Score */
+            score: number;
+        };
+        /**
+         * AdminSession
+         * @description Metadata of one interview. Always shown, with or without consent.
+         */
+        AdminSession: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** User Id */
+            user_id: string | null;
+            /** User Email */
+            user_email: string | null;
+            /** Training Consent */
+            training_consent: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Started At */
+            started_at: string | null;
+            /** Ended At */
+            ended_at: string | null;
+            interview_type: components["schemas"]["InterviewType"];
+            difficulty: components["schemas"]["Difficulty"];
+            mode: components["schemas"]["Mode"];
+            /** Duration Min */
+            duration_min: number;
+            /**
+             * Duration S
+             * @description From start to end. None until it ends.
+             */
+            duration_s: number | null;
+            channel: components["schemas"]["SessionChannel"];
+            status: components["schemas"]["SessionStatus"];
+            /** Minutes Billed */
+            minutes_billed: number;
+            hire_signal: components["schemas"]["HireSignal"] | null;
+            /** Scores */
+            scores: components["schemas"]["AdminScore"][];
+            /** Model Profile */
+            model_profile: string | null;
+            /** Interviewer Model Id */
+            interviewer_model_id: string | null;
+            /** Prompt Version */
+            prompt_version: string | null;
+            /**
+             * Cost Usd
+             * @description Interviewer model cost. From usage events, else from the traces.
+             */
+            cost_usd: number | null;
+            /**
+             * Cost Source
+             * @enum {string}
+             */
+            cost_source: "usage_events" | "traces" | "none";
+        };
+        /** AdminSessionDetail */
+        AdminSessionDetail: {
+            session: components["schemas"]["AdminSession"];
+            /**
+             * Content Visible
+             * @description True when the user has training consent on now. Else only metadata.
+             */
+            content_visible: boolean;
+            /** Transcript */
+            transcript: components["schemas"]["Turn"][] | null;
+            /** Traces */
+            traces: components["schemas"]["AdminTrace"][] | null;
+            /** Trace Retention Days */
+            trace_retention_days: number;
+        };
+        /** AdminSessionList */
+        AdminSessionList: {
+            /** Sessions */
+            sessions: components["schemas"]["AdminSession"][];
+            /**
+             * Daily
+             * @description Cost per day (UTC) of the sessions listed.
+             */
+            daily: components["schemas"]["DailyCost"][];
+            /** Total Cost Usd */
+            total_cost_usd: number;
+            /** Limit */
+            limit: number;
+        };
+        /** AdminTrace */
+        AdminTrace: {
+            /** Seq */
+            seq: number;
+            /** Turn Index */
+            turn_index: number;
+            /** Call */
+            call: string;
+            /** Move */
+            move: string;
+            /** Reason */
+            reason: {
+                [key: string]: unknown;
+            } | null;
+            phase: components["schemas"]["Phase"];
+            /** Elapsed Ms */
+            elapsed_ms: number;
+            /** Phase Deadline Ms */
+            phase_deadline_ms: number | null;
+            /** Question Ref */
+            question_ref: string | null;
+            /** Messages */
+            messages: components["schemas"]["AdminMessage"][] | null;
+            /** Raw Reply */
+            raw_reply: string | null;
+            /** Spoken Text */
+            spoken_text: string | null;
+            /** Model */
+            model: string | null;
+            /** Prompt Refs */
+            prompt_refs: string | null;
+            /** Input Tokens */
+            input_tokens: number;
+            /** Output Tokens */
+            output_tokens: number;
+            /** Cost Usd */
+            cost_usd: number | null;
+            /** Latency Ms */
+            latency_ms: number | null;
+            /** Error */
+            error: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** AdminUser */
+        AdminUser: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Email */
+            email: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Last Sign In At */
+            last_sign_in_at: string | null;
+            /**
+             * Plan
+             * @enum {string}
+             */
+            plan: "free" | "paid";
+            subscription_status: components["schemas"]["SubscriptionStatus"] | null;
+            /** Minutes Used */
+            minutes_used: number;
+            /** Minutes Cap */
+            minutes_cap: number;
+            /** Training Consent */
+            training_consent: boolean;
+            /** Interviews */
+            interviews: number;
+            /** Is Admin */
+            is_admin: boolean;
         };
         /**
          * AuthProvider
@@ -871,6 +1156,12 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Is Admin
+             * @description True for ADMIN_EMAILS users: the web app shows Admin.
+             * @default false
+             */
+            is_admin: boolean;
         };
         /** Body_create_resume_resumes_post */
         Body_create_resume_resumes_post: {
@@ -1087,6 +1378,18 @@ export interface components {
              * @default voice
              */
             channel: components["schemas"]["SessionChannel"];
+        };
+        /** DailyCost */
+        DailyCost: {
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** Sessions */
+            sessions: number;
+            /** Cost Usd */
+            cost_usd: number;
         };
         /** Debrief */
         Debrief: {
@@ -3666,6 +3969,124 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AccountDeletedOut"];
+                };
+            };
+        };
+    };
+    list_users_admin_users_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUser"][];
+                };
+            };
+        };
+    };
+    list_sessions_admin_sessions_get: {
+        parameters: {
+            query?: {
+                user_id?: string | null;
+                /** @description First day (UTC), inclusive. */
+                day_from?: string | null;
+                /** @description Last day (UTC), inclusive. */
+                day_to?: string | null;
+                interview_type?: components["schemas"]["InterviewType"] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminSessionList"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_session_admin_sessions__session_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminSessionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_audit_admin_audit_get: {
+        parameters: {
+            query?: {
+                scope?: "admin" | "all";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAuditEntry"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

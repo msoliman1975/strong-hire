@@ -10,6 +10,7 @@ import addFormats from "ajv-formats";
 import { describe, expect, it } from "vitest";
 
 import { accountApi } from "../api/account";
+import { adminApi } from "../api/admin";
 import { authApi } from "../api/auth";
 import { billingApi } from "../api/billing";
 import { gapApi } from "../api/gap";
@@ -17,6 +18,7 @@ import { jobTargetsApi, resumesApi } from "../api/inputs";
 import { sessionsApi } from "../api/sessions";
 import { debriefApi } from "../api/scoring";
 import { gapAnalysis, jobPosting, resume, scorecardFor, sessionPlan } from "./fixtures";
+import { mockStore } from "./node";
 
 const SCHEMAS_DIR = resolve(__dirname, "../../../../schemas");
 const OPENAPI = JSON.parse(readFileSync(resolve(__dirname, "../../openapi.json"), "utf8")) as object;
@@ -219,6 +221,33 @@ describe("mocks of the real P9 endpoints match openapi.json", () => {
     expectApiShape("ExportOut", ready);
     expect(ready.status).toBe("ready");
     expectApiShape("AccountDeletedOut", await accountApi.deleteAccount());
+  });
+
+  it("admin: users, interviews, detail with traces, audit (R2)", async () => {
+    await authApi.devLogin("ana@example.com");
+    await authApi.signup({ age_confirmed: true, terms_accepted: true, training_consent: true });
+    await authApi.logout();
+    await authApi.devLogin("admin@example.com");
+    const me = await authApi.signup({ age_confirmed: true, terms_accepted: true, training_consent: false });
+    expectApiShape("AuthState", me);
+    expect(me.user?.is_admin).toBe(true);
+    mockStore.db.sessions.push({
+      id: "00000000-0000-4000-8000-0000000000c1",
+      job_target_id: "00000000-0000-4000-8000-0000000000d1",
+      config: { interview_type: "case", difficulty: "tough", mode: "coach", duration_min: 30, level: "mid" },
+      channel: "text",
+      brief_ready: true,
+      status: "completed",
+      started_at: "2026-10-07T09:00:00Z",
+      ended_at: "2026-10-07T09:30:00Z",
+      minutes_billed: 30,
+    });
+    for (const user of await adminApi.users()) expectApiShape("AdminUser", user);
+    expectApiShape("AdminSessionList", await adminApi.sessions({ interview_type: "case" }));
+    const detail = await adminApi.session("00000000-0000-4000-8000-0000000000c1");
+    expectApiShape("AdminSessionDetail", detail);
+    expect(detail.traces?.length).toBeGreaterThan(0);
+    for (const entry of await adminApi.audit("all")) expectApiShape("AdminAuditEntry", entry);
   });
 });
 
