@@ -45,6 +45,20 @@ function renderDebrief(body: Debrief) {
 }
 
 describe("debrief page", () => {
+  it("a session that has not ended links back to the interview instead of waiting for a score", async () => {
+    const body = debrief(true);
+    renderDebrief({
+      ...body,
+      session: { ...body.session, status: "created", started_at: null, ended_at: null, minutes_billed: 0 },
+      status: "not_ended",
+      scorecard: null,
+      next_session: null,
+    });
+    expect(await screen.findByTestId("not-ended")).toHaveTextContent("This interview has not finished");
+    expect(screen.getByRole("link", { name: "Go to the interview" })).toHaveAttribute("href", "/sessions/s1/live");
+    expect(screen.queryByText(/Scoring your interview/)).not.toBeInTheDocument();
+  });
+
   it("shows the hire signal, rationale, per-question rubric and next session (FB-1, FB-2, PR-2)", async () => {
     renderDebrief(debrief(true));
     expect(await screen.findByTestId("hire-signal")).toHaveTextContent("Lean Hire");
