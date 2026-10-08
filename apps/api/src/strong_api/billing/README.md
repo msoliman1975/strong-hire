@@ -8,7 +8,7 @@ The API refuses live keys (`sk_live_`) unless `STRIPE_ALLOW_LIVE=true`.
 | Endpoint | What it does |
 | --- | --- |
 | `GET /billing/plan` | Plan name, price, minute cap, free interviews. All from env (`BILLING_*`). |
-| `GET /billing/usage` | Usage meter: plan, minutes used and left, period end, free interviews left, and why a new session is blocked. |
+| `GET /billing/usage` | Usage meter: plan, minutes used and left, period end, free mini interviews left, why a new session is blocked, and `full_interviews_allowed` (false on the free plan). |
 | `POST /billing/checkout` | Creates the Stripe customer (once) and returns a Checkout URL. |
 | `POST /billing/portal` | Returns a Customer Portal URL. `{"flow": "cancel"}` opens the cancel step. |
 | `POST /billing/exit-survey` | Saves the 2 cancellation questions: why leaving, did you get the job. |
@@ -25,12 +25,16 @@ Webhook events handled: `checkout.session.completed`, `customer.subscription.cre
 
 Rules:
 
-- Free plan: `BILLING_FREE_INTERVIEWS` interviews (default 1) for the life of the account. A
-  session counts once it has started and did not fail. Gap analyses are free. Their rate limit
-  is in `strong_api.gap` (P6, `GAP_RATE_LIMIT_PER_HOUR` and `GAP_RATE_LIMIT_PER_DAY`).
-- Paid plan (Stripe status `active` or `trialing`): `BILLING_MINUTES_CAP` minutes per period
-  (default 300). A session can start while 1 or more minutes are left. `max_minutes` tells the
+- Free plan: `BILLING_FREE_INTERVIEWS` interviews (default 2) for the life of the account. Free
+  interviews are 10-minute mini interviews only. A free account that asks for a 30 or 45 minute
+  session gets HTTP 402 with code `full_interview_requires_plan`. A session counts once it has
+  started and did not fail. Gap analyses are free. Their rate limit is in `strong_api.gap` (P6,
+  `GAP_RATE_LIMIT_PER_HOUR` and `GAP_RATE_LIMIT_PER_DAY`).
+- Paid plan (Stripe status `active` or `trialing`): any length (10, 30 or 45 minutes) and
+  `BILLING_MINUTES_CAP` minutes per period (default 300). Minutes are counted the same way for
+  every length. A session can start while 1 or more minutes are left. `max_minutes` tells the
   session timer where to stop.
+- A mini interview gets a debrief, but it is not added to the progress trends.
 - A new period start from Stripe sets `minutes_used` to 0.
 - A canceled subscription stays canceled, and events about an older period are ignored.
 
@@ -39,9 +43,12 @@ Rules:
 ```python
 from strong_api.billing import ensure_can_start_session, record_session_minutes
 
-# POST /sessions
-ent = await ensure_can_start_session(db, user.org_id)  # HTTP 402, detail.code is
-max_minutes = ent.max_minutes(config.duration_min)  # upgrade_required or minutes_exhausted
+# POST /sessions. HTTP 402 when blocked; detail.code is one of:
+#   upgrade_required              free plan, the free mini interviews are used
+#   minutes_exhausted             paid plan, no minutes left this period
+#   full_interview_requires_plan  free plan, asked for 30 or 45 minutes
+ent = await ensure_can_start_session(db, user.org_id, config.duration_min)
+max_minutes = ent.max_minutes(config.duration_min)
 
 # when a session ends (safe to call again; it bills only the difference)
 await record_session_minutes(db, session)
@@ -57,7 +64,7 @@ await db.commit()
 | `STRIPE_PRICE_ID` | `price_...` | The monthly price of the plan. |
 | `BILLING_PRICE_USD_MONTH` | `29` | Shown on the paywall. Keep it equal to the Stripe price. |
 | `BILLING_MINUTES_CAP` | `300` | Minutes per billing period. |
-| `BILLING_FREE_INTERVIEWS` | `1` | Free interviews per account. |
+| `BILLING_FREE_INTERVIEWS` | `2` | Free mini interviews (10 minutes) per account. |
 | `ACCOUNT_EXPORT_TTL_S`, `ACCOUNT_EXPORT_MAX_MB` | `86400`, `100` | Export download window and size limit. |
 
 With no Stripe keys, the app still runs: the paywall says payments are not set up, and checkout
@@ -106,7 +113,8 @@ Copy the `whsec_...` it prints into `.env` as `STRIPE_WEBHOOK_SECRET`. Then star
 ### 3. Subscribe
 
 1. Open http://localhost:5180, use the dev login, and finish sign-up.
-2. The usage meter says "Free plan: 1 free interview left".
+2. The usage meter says "Free plan: 2 free mini interviews left". On the setup page, only
+   "10 minutes (mini)" can be picked.
 3. Open http://localhost:5180/upgrade and select Subscribe. Stripe Checkout opens.
 4. Pay with card `4242 4242 4242 4242`, any future date, any CVC, any postal code.
 5. You return to the dashboard. The meter says "0 of 300 minutes used".

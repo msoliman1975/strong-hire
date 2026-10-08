@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 
 import { ApiError } from "../api/client";
-import { keys, useJob } from "../api/hooks";
+import { keys, useJob, useUsage } from "../api/hooks";
 import { sessionsApi } from "../api/sessions";
 import type { Difficulty, InterviewType, Level, Mode, SessionConfig } from "../api/types";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
@@ -21,7 +21,18 @@ const TYPES = Object.keys(interviewTypeLabel) as InterviewType[];
 const DIFFICULTIES = Object.keys(difficultyLabel) as Difficulty[];
 const MODES = Object.keys(modeLabel) as Mode[];
 const LEVELS = Object.keys(levelLabel) as Level[];
-const DURATIONS: SessionConfig["duration_min"][] = [30, 45];
+type Duration = SessionConfig["duration_min"];
+const DURATIONS: Duration[] = [10, 30, 45];
+const MINI: Duration = 10;
+
+function durationLabel(minutes: Duration): string {
+  return minutes === MINI ? "10 minutes (mini)" : `${minutes} minutes`;
+}
+
+function durationHint(minutes: Duration, fullAllowed: boolean): string {
+  if (minutes === MINI) return "3 questions, no candidate questions. A short practice round.";
+  return fullAllowed ? "A full interview." : "Needs a subscription.";
+}
 
 function pick<T extends string>(value: string | null, options: T[], fallback: T): T {
   return options.includes(value as T) ? (value as T) : fallback;
@@ -35,9 +46,11 @@ function Choices<T extends string>(props: {
   onChange: (v: T) => void;
   label: (v: T) => string;
   hint?: (v: T) => string;
+  disabled?: (v: T) => boolean;
+  describedBy?: string;
 }) {
   return (
-    <fieldset>
+    <fieldset aria-describedby={props.describedBy}>
       <legend className="label">{props.legend}</legend>
       <div className="choices">
         {props.options.map((o) => (
@@ -47,6 +60,7 @@ function Choices<T extends string>(props: {
               name={props.name}
               value={o}
               checked={props.value === o}
+              disabled={props.disabled?.(o)}
               onChange={() => props.onChange(o)}
             />
             <span className="choice__name">{props.label(o)}</span>
@@ -63,12 +77,13 @@ export function SessionSetupPage() {
   const { jobId = "" } = useParams();
   const [params] = useSearchParams();
   const job = useJob(jobId);
+  const usage = useUsage();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const [type, setType] = useState<InterviewType>(pick(params.get("type"), TYPES, "behavioral"));
   const [difficulty, setDifficulty] = useState<Difficulty>(pick(params.get("difficulty"), DIFFICULTIES, "realistic"));
-  const [duration, setDuration] = useState<SessionConfig["duration_min"]>(30);
+  const [duration, setDuration] = useState<Duration | null>(null);
   const [mode, setMode] = useState<Mode>("realistic");
   const [level, setLevel] = useState<Level | "">("");
 
@@ -91,11 +106,14 @@ export function SessionSetupPage() {
 
   const chosenLevel: Level | "" = level || job.data.level || "";
   const posting = job.data.posting;
+  // Free accounts get mini interviews only (BL-2). Until the usage is known, assume the free plan.
+  const fullAllowed = usage.data?.full_interviews_allowed ?? false;
+  const chosenDuration: Duration = fullAllowed ? (duration ?? 30) : MINI;
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!chosenLevel) return;
-    start.mutate({ interview_type: type, difficulty, mode, duration_min: duration, level: chosenLevel });
+    start.mutate({ interview_type: type, difficulty, mode, duration_min: chosenDuration, level: chosenLevel });
   };
 
   return (
@@ -138,11 +156,21 @@ export function SessionSetupPage() {
         <Choices
           legend="Duration"
           name="duration"
-          options={DURATIONS.map(String) as ("30" | "45")[]}
-          value={String(duration) as "30" | "45"}
-          onChange={(v) => setDuration(Number(v) as SessionConfig["duration_min"])}
-          label={(v) => `${v} minutes`}
+          options={DURATIONS.map(String) as `${Duration}`[]}
+          value={String(chosenDuration) as `${Duration}`}
+          onChange={(v) => setDuration(Number(v) as Duration)}
+          label={(v) => durationLabel(Number(v) as Duration)}
+          hint={(v) => durationHint(Number(v) as Duration, fullAllowed)}
+          disabled={(v) => !fullAllowed && Number(v) !== MINI}
+          describedBy={fullAllowed ? undefined : "duration-hint"}
         />
+        {!fullAllowed && (
+          <p className="hint" id="duration-hint">
+            Full interviews (30 and 45 minutes) need a subscription. Free accounts get{" "}
+            {usage.data ? `${usage.data.free_interviews_total} ` : ""}mini interviews.{" "}
+            <Link to="/upgrade">See the monthly plan</Link>
+          </p>
+        )}
         <div className="field">
           <label htmlFor="level">Level</label>
           <p className="hint" id="level-hint">

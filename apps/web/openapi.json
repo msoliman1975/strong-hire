@@ -3201,11 +3201,12 @@
             "title": "Profile Version"
           },
           "target_competencies": {
+            "description": "4 to 6; a mini interview has 2.",
             "items": {
               "$ref": "#/components/schemas/Competency"
             },
             "maxItems": 6,
-            "minItems": 4,
+            "minItems": 2,
             "title": "Target Competencies",
             "type": "array"
           },
@@ -3219,11 +3220,12 @@
             "type": "array"
           },
           "questions": {
+            "description": "6 to 10; a mini interview has 3.",
             "items": {
               "$ref": "#/components/schemas/BriefQuestion"
             },
             "maxItems": 10,
-            "minItems": 6,
+            "minItems": 3,
             "title": "Questions",
             "type": "array"
           },
@@ -4182,7 +4184,7 @@
           "free_interviews": {
             "type": "integer",
             "title": "Free Interviews",
-            "description": "BL-2: interviews on the free plan."
+            "description": "BL-2: interviews on the free plan. They are 10-minute mini interviews."
           },
           "billing_enabled": {
             "type": "boolean",
@@ -4956,10 +4958,12 @@
           "duration_min": {
             "type": "integer",
             "enum": [
+              10,
               30,
               45
             ],
-            "title": "Duration Min"
+            "title": "Duration Min",
+            "description": "10 is a mini interview."
           },
           "level": {
             "$ref": "#/components/schemas/Level"
@@ -5333,7 +5337,8 @@
           },
           "free_interviews_total": {
             "type": "integer",
-            "title": "Free Interviews Total"
+            "title": "Free Interviews Total",
+            "description": "Free mini interviews for the account."
           },
           "free_interviews_left": {
             "type": "integer",
@@ -5342,6 +5347,11 @@
           "can_start_session": {
             "type": "boolean",
             "title": "Can Start Session"
+          },
+          "full_interviews_allowed": {
+            "type": "boolean",
+            "title": "Full Interviews Allowed",
+            "description": "True when 30 and 45 minute sessions may start (paid plan). Free accounts may start 10-minute mini interviews only."
           },
           "block_code": {
             "anyOf": [
@@ -5378,6 +5388,7 @@
           "free_interviews_total",
           "free_interviews_left",
           "can_start_session",
+          "full_interviews_allowed",
           "block_code",
           "has_billing_account"
         ],

@@ -219,3 +219,79 @@ def test_iv9_hold_stops_the_clock_in_any_mode(clock: FakeClock) -> None:
     assert ctl.elapsed_ms == 180_000
     ctl.release()  # safe to call twice
     assert ctl.elapsed_ms == 180_000
+
+
+# --- mini interview (10 minutes) --------------------------------------------------------------
+
+
+def test_iv7_mini_default_plan_adds_up_to_10_minutes() -> None:
+    """IV-7: minute 1 greeting and agenda, 8 minutes CORE, no candidate questions, 1 wrap-up."""
+    from strong_interview.controller import DEFAULT_PLAN
+
+    plan = DEFAULT_PLAN[10]
+    assert sum(plan.values()) == 10
+    assert plan[Phase.CORE] == 8
+    assert plan[Phase.CANDIDATE_QUESTIONS] == 0
+    assert plan[Phase.SMALL_TALK] == 0
+    assert plan[Phase.WRAP_UP] == 1
+
+
+def test_iv7_mini_skips_small_talk_and_candidate_questions(clock: FakeClock) -> None:
+    """A mini goes greet, agenda with the first question, 3 questions, then wrap-up."""
+    ctl = SessionController(make_brief(duration=10, questions=3), clock)
+    assert ctl.mini
+    assert ctl.deadline_ms(Phase.CORE) == 9 * 60 * 1000
+    assert ctl.start().kind == MoveKind.GREET
+    moves = ctl.after_answer()
+    assert kinds(moves) == [MoveKind.AGENDA, MoveKind.ASK]
+    assert moves[0].expects_answer is False
+    seen = [MoveKind.GREET, *kinds(moves)]
+    clock.advance(minutes=2)
+    seen += kinds(ctl.after_answer(MOVE_ON))
+    clock.advance(minutes=2)
+    seen += kinds(ctl.after_answer(MOVE_ON))
+    clock.advance(minutes=2)
+    moves = ctl.after_answer(MOVE_ON)
+    seen += kinds(moves)
+    assert kinds(moves) == [MoveKind.WRAP_UP]
+    assert ctl.asked == ["q1", "q2", "q3"]
+    assert MoveKind.SMALL_TALK not in seen
+    assert MoveKind.INVITE_QUESTIONS not in seen
+    assert ctl.after_answer() == []
+    assert ctl.ended
+
+
+def test_iv7_mini_wraps_up_when_core_time_runs_out(clock: FakeClock) -> None:
+    """With less than 2 minutes of CORE left, the mini drops the rest and wraps up."""
+    ctl = SessionController(make_brief(duration=10, questions=3), clock)
+    ctl.start()
+    ctl.after_answer()
+    clock.advance(minutes=7.5)
+    assert kinds(ctl.after_answer(MOVE_ON)) == [MoveKind.WRAP_UP]
+    assert ctl.dropped == ["q2", "q3"]
+
+
+@pytest.mark.parametrize("difficulty", list(Difficulty))
+def test_iv3_mini_allows_one_probe_per_question(difficulty: Difficulty, clock: FakeClock) -> None:
+    """IV-3 in a mini: at most 1 follow-up per question, whatever the difficulty."""
+    brief = make_brief(duration=10, questions=3, difficulty=difficulty)
+    # Even a brief that asks for more (built without validation) gets 1.
+    ctl = SessionController(brief.model_copy(update={"max_probes_per_question": 3}), clock)
+    assert ctl.probe_limit == 1
+    ctl.start()
+    ctl.after_answer()
+    assert kinds(ctl.after_answer(PROBE)) == [MoveKind.PROBE]
+    assert kinds(ctl.after_answer(PROBE)) == [MoveKind.ASK]
+
+
+def test_iv4_mini_has_no_curveball(clock: FakeClock) -> None:
+    """IV-4: no curveball in a mini, even if the brief carries one."""
+    brief = make_brief(duration=10, questions=3, difficulty=Difficulty.TOUGH)
+    assert brief.curveball is None
+    brief = brief.model_copy(update={"curveball": "The budget is cut in half."})
+    ctl = SessionController(brief, clock)
+    ctl.start()
+    ctl.after_answer()
+    moves = ctl.after_answer(MOVE_ON)
+    assert kinds(moves) == [MoveKind.ASK]
+    assert CURVEBALL_REF not in ctl.asked

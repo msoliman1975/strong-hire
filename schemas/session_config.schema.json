@@ -51,7 +51,9 @@
       "$ref": "#/$defs/Difficulty"
     },
     "duration_min": {
+      "description": "10 is a mini interview.",
       "enum": [
+        10,
         30,
         45
       ],

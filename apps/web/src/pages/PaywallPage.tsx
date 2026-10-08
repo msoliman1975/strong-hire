@@ -6,8 +6,10 @@ import { usePlan, useUsage } from "../api/hooks";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
 
 const REASONS: Record<string, string> = {
-  upgrade_required: "You have used your free interview. Gap analyses stay free.",
+  upgrade_required: "You have used your free mini interviews. Gap analyses stay free.",
   minutes_exhausted: "You have used this month's interview minutes.",
+  full_interview_requires_plan:
+    "Full interviews (30 and 45 minutes) are part of the subscription. Free accounts get mini interviews.",
 };
 
 /** BL-1 and BL-2: the monthly plan. Prices and caps come from the API. */
@@ -35,6 +37,7 @@ export function PaywallPage() {
               <h2 id="plan-heading">{plan.data.name}</h2>
               <ul>
                 <li>{plan.data.minutes_cap} interview minutes each month</li>
+                <li>Full 30 and 45 minute interviews, and 10 minute mini interviews</li>
                 <li>All four interview types, Coach and Realistic modes</li>
                 <li>Unlimited gap analyses</li>
                 <li>Cancel at any time</li>

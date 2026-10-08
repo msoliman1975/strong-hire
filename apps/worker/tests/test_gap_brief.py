@@ -100,7 +100,7 @@ async def test_brief_has_the_required_parts(gateway: ModelGateway, gap: GapAnaly
 def test_brief_stays_under_the_token_limit() -> None:
     """Keep the brief under 1,500 tokens so the live loop stays fast, for every setup."""
     for itype, diff, level, minutes, mode in itertools.product(
-        InterviewType, Difficulty, Level, (30, 45), Mode
+        InterviewType, Difficulty, Level, (10, 30, 45), Mode
     ):
         cfg = config(
             interview_type=itype, difficulty=diff, level=level, duration_min=minutes, mode=mode
@@ -221,6 +221,44 @@ def test_duration_sets_the_time_plan_and_question_count() -> None:
     assert sum(p.minutes for p in long.time_plan) == 45
     assert len(short.questions) == 8 and len(long.questions) == 10
     assert len(long.target_competencies) >= len(short.target_competencies)
+
+
+@pytest.mark.parametrize("itype", list(InterviewType))
+@pytest.mark.parametrize("difficulty", list(Difficulty))
+def test_mini_brief_for_every_type(itype: InterviewType, difficulty: Difficulty) -> None:
+    """IV-7 mini: 10 minutes, 3 questions, 2 competencies, 1 probe at most, no curveball,
+    no small talk and no candidate questions in the time plan."""
+    cfg = config(interview_type=itype, difficulty=difficulty, duration_min=10)
+    for profile in (generic_profile(), company()):
+        brief, _ = assemble(draft(), cfg, POSTING, profile, None)
+        assert brief.session.duration_min == 10
+        assert len(brief.questions) == 3
+        assert len(brief.target_competencies) == 2
+        covered = {c for q in brief.questions for c in q.competencies}
+        assert set(brief.target_competencies) <= covered
+        assert brief.max_probes_per_question <= 1
+        assert brief.curveball is None
+        assert brief.pushback is (difficulty == Difficulty.TOUGH)
+        minutes = {p.phase: p.minutes for p in brief.time_plan}
+        assert sum(minutes.values()) == 10
+        assert minutes[Phase.CORE] == 8 and minutes[Phase.WRAP_UP] == 1
+        assert minutes[Phase.SMALL_TALK] == 0 and minutes[Phase.CANDIDATE_QUESTIONS] == 0
+
+
+def test_mini_asks_the_planner_for_3_questions_and_no_curveball() -> None:
+    cfg = config(difficulty="tough", duration_min=10)
+    messages = build_messages(cfg, POSTING, RESUME, generic_profile(), None)
+    assert "curveball to null" in messages[1].content
+    assert "Write one curveball." not in messages[1].content
+    # BriefDraft needs 6 questions; the brief keeps the best 3.
+    assert messages[1].content.startswith("Write 6 questions")
+    assert "Length: 10 minutes" in messages[1].content
+
+
+def test_mini_needs_only_3_usable_questions() -> None:
+    data = draft().model_copy(update={"questions": draft().questions[:6]})
+    brief, _ = assemble(data, config(duration_min=10), POSTING, generic_profile(), None)
+    assert [q.priority for q in brief.questions] == [1, 2, 3]
 
 
 def test_company_mode_uses_the_profile() -> None:

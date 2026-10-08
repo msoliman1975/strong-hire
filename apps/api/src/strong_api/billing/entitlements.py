@@ -3,6 +3,8 @@
 Rules (numbers come from BillingSettings):
 - Free plan: gap analyses are free (rate limited in strong_api.gap) plus `billing_free_interviews`
   interviews in the life of the account. An interview counts once it has started and did not fail.
+  Free interviews are 10-minute mini interviews only. A free account asking for a 30 or 45 minute
+  session gets `full_interview_requires_plan`.
 - Paid plan (Stripe status active or trialing): interview minutes up to `billing_minutes_cap`
   per billing period. A session may start while at least one minute is left; `max_minutes`
   tells the session timer where to stop.
@@ -26,16 +28,20 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from strong_api.billing.settings import BillingSettings, get_billing_settings
 from strong_core.db.models import InterviewSession, Subscription
-from strong_core.schemas import SessionStatus, SubscriptionStatus
+from strong_core.schemas import MINI_DURATION_MIN, SessionStatus, SubscriptionStatus
 
 PAID_STATUSES = frozenset({SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING})
 UPGRADE_PATH = "/upgrade"
 
 BlockCode = Literal["upgrade_required", "minutes_exhausted"]
+StartBlockCode = Literal["upgrade_required", "minutes_exhausted", "full_interview_requires_plan"]
 
 BLOCK_MESSAGES: dict[str, str] = {
-    "upgrade_required": "You have used your free interview. Subscribe to keep practicing.",
+    "upgrade_required": "You have used your free mini interviews. Subscribe to keep practicing.",
     "minutes_exhausted": "You have used this period's interview minutes.",
+    "full_interview_requires_plan": (
+        "Full interviews are part of the subscription. Free accounts get {free} mini interviews."
+    ),
 }
 
 
@@ -70,6 +76,19 @@ class Entitlement:
     @property
     def can_start_session(self) -> bool:
         return self.block_code is None
+
+    @property
+    def full_interviews_allowed(self) -> bool:
+        """30 and 45 minute sessions need the paid plan. Free accounts get mini interviews."""
+        return self.plan == "paid"
+
+    def start_block(self, duration_min: int) -> StartBlockCode | None:
+        """Why a session of `duration_min` minutes may not start now, or None."""
+        if self.block_code is not None:
+            return self.block_code
+        if duration_min != MINI_DURATION_MIN and not self.full_interviews_allowed:
+            return "full_interview_requires_plan"
+        return None
 
     def max_minutes(self, duration_min: int) -> int:
         """How long a new session may run before the plan runs out."""
@@ -137,19 +156,25 @@ async def get_entitlement(
 
 
 async def ensure_can_start_session(
-    db: AsyncSession, org_id: uuid.UUID, settings: BillingSettings | None = None
+    db: AsyncSession,
+    org_id: uuid.UUID,
+    duration_min: int,
+    settings: BillingSettings | None = None,
 ) -> Entitlement:
-    """Raise HTTP 402 when the plan does not allow a new session (BL-1, BL-2).
+    """Raise HTTP 402 when the plan does not allow a new session of this length (BL-1, BL-2).
 
     The detail is {"code", "message", "upgrade_url"}. The web app sends the user to the paywall.
+    Codes: upgrade_required (free mini interviews used), minutes_exhausted (paid plan),
+    full_interview_requires_plan (a free account asked for 30 or 45 minutes).
     """
     ent = await get_entitlement(db, org_id, settings)
-    if ent.block_code is not None:
+    code = ent.start_block(duration_min)
+    if code is not None:
         raise HTTPException(
             status.HTTP_402_PAYMENT_REQUIRED,
             {
-                "code": ent.block_code,
-                "message": BLOCK_MESSAGES[ent.block_code],
+                "code": code,
+                "message": BLOCK_MESSAGES[code].format(free=ent.free_interviews_total),
                 "upgrade_url": UPGRADE_PATH,
             },
         )

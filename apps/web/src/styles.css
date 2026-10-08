@@ -521,6 +521,17 @@ legend {
   outline-offset: 2px;
 }
 
+.choice:has(input:disabled) {
+  cursor: not-allowed;
+  border-style: dashed;
+  color: var(--muted);
+  background: transparent;
+}
+
+.choice:has(input:disabled) input {
+  cursor: not-allowed;
+}
+
 .switch {
   display: flex;
   align-items: flex-start;

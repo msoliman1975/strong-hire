@@ -9,6 +9,8 @@ import { setupLink } from "./GapAnalysisPage";
 /**
  * FB-1, FB-2, PR-2: hire signal and rationale, per-question rubric, company values, next session.
  * In generic mode there are no company values; the page says so instead of showing an empty table.
+ * A 10-minute mini interview says how many questions the signal rests on, and that it is not
+ * counted in the progress trends.
  */
 export function DebriefPage() {
   const { sessionId = "" } = useParams();
@@ -39,7 +41,12 @@ export function DebriefPage() {
       {status === "scoring" && <Loading label="Scoring your interview. The debrief is usually ready within a minute." />}
       {status === "failed" && <ErrorNotice error="Scoring failed. Your minutes for this session are refunded." />}
       {status === "ready" && scorecard && (
-        <ScorecardView scorecard={scorecard} coach={config.mode === "coach"} values={valuesInfo(debrief.data)} />
+        <ScorecardView
+          scorecard={scorecard}
+          coach={config.mode === "coach"}
+          mini={config.duration_min === 10}
+          values={valuesInfo(debrief.data)}
+        />
       )}
       {status === "ready" && (
         <section className="section panel" aria-labelledby="next-heading">
@@ -77,7 +84,18 @@ function valuesInfo(d: Debrief): ValuesInfo {
   return { generic: d.generic_mode, company: d.company_name, framework: d.values_framework };
 }
 
-function ScorecardView({ scorecard, coach, values }: { scorecard: Scorecard; coach: boolean; values: ValuesInfo }) {
+function ScorecardView({
+  scorecard,
+  coach,
+  mini,
+  values,
+}: {
+  scorecard: Scorecard;
+  coach: boolean;
+  mini: boolean;
+  values: ValuesInfo;
+}) {
+  const questions = scorecard.per_question.length;
   return (
     <div className="stack">
       <section className="verdict" aria-labelledby="signal-heading">
@@ -86,6 +104,12 @@ function ScorecardView({ scorecard, coach, values }: { scorecard: Scorecard; coa
         </h2>
         <HireSignalScale signal={scorecard.hire_signal} />
         <p>{scorecard.rationale}</p>
+        {mini && (
+          <p className="notice" data-testid="mini-note">
+            Mini interview. Based on {questions} {questions === 1 ? "question" : "questions"}. Practice signal only.
+            It is not counted in your progress trends.
+          </p>
+        )}
         {coach && <p className="muted">Coach sessions are not counted in your progress trends.</p>}
       </section>
 
