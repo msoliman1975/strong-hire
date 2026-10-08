@@ -244,7 +244,7 @@ async def test_candidate_retries_after_a_rate_limit(
     from strong_sim.candidate import Candidate, Pacer
     from strong_sim.transcript import Line
 
-    class RateLimited(Exception):
+    class RateLimitedError(Exception):
         status_code = 429
 
     calls = {"n": 0}
@@ -253,7 +253,7 @@ async def test_candidate_retries_after_a_rate_limit(
     async def flaky(*args: Any, **kwargs: Any) -> Any:
         calls["n"] += 1
         if calls["n"] == 1:
-            raise RateLimited("429")
+            raise RateLimitedError("429")
         return await real(*args, **kwargs)
 
     monkeypatch.setattr(candidate_module, "RATE_LIMIT_WAIT_S", 0.0)
