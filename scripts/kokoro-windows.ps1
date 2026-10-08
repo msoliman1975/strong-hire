@@ -67,9 +67,10 @@ $env:VOICES_DIR = 'src/voices/v1_0'
 $env:WEB_PLAYER_PATH = "$InstallDir/web"
 $env:UV_NATIVE_TLS = '1'   # trust the Windows certificate store (networks with TLS inspection)
 
-if (-not (Test-Path '.venv')) {
-    Write-Host '==> Installing Python packages (first run only)'
-    Invoke-Native 'uv' @('venv', '--python', '3.12')
+# Check for an installed package, not the folder: a stopped install leaves an empty .venv behind.
+if (-not (Test-Path '.venv\Lib\site-packages	orch')) {
+    Write-Host '==> Installing Python packages (first run, or the last install did not finish)'
+    if (-not (Test-Path '.venv')) { Invoke-Native 'uv' @('venv', '--python', '3.12') }
     Invoke-Native 'uv' @('pip', 'install', '-e', '.[cpu]')
 }
 
