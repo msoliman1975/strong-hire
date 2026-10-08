@@ -101,6 +101,26 @@ def test_meta_sentences_are_removed(reply: str, kept: str) -> None:
          "Why not the simpler option?"),
         (MoveKind.ANSWER_QUESTION, "That's a great question. The team is based in Dublin.",
          "The team is based in Dublin."),
+        # From P13 run 20261008-164133-text-smoke-cf15 (Realistic mode).
+        (MoveKind.PROBE, "You covered reconciliation well. How did you test the edge cases?",
+         "How did you test the edge cases?"),
+        (MoveKind.PROBE, "Your answer lays out the options clearly. Which one would you pick, and "
+                         "why?",
+         "Which one would you pick, and why?"),
+        (MoveKind.PROBE, "You describe the Redis TTL and invalidation approach well. What happens "
+                         "on a cache stampede?",
+         "What happens on a cache stampede?"),
+        (MoveKind.PROBE, "Kafka is a good tool for that, but I'm still not hearing your reasoning. "
+                         "Why Kafka over a simple queue?",
+         "I'm still not hearing your reasoning. Why Kafka over a simple queue?"),
+        (MoveKind.PROBE, "Ease of setup is a fair point. What would change at ten times the load?",
+         "What would change at ten times the load?"),
+        (MoveKind.PROBE, "That beta approach sounds sensible. How did you decide who got access "
+                         "first?",
+         "How did you decide who got access first?"),
+        (MoveKind.ASK, "Thanks for that candid answer. Let's move to a different topic. Tell me "
+                       "about a time you disagreed with your manager.",
+         "Let's move to a different topic. Tell me about a time you disagreed with your manager."),
     ],
 )  # fmt: skip
 def test_feedback_is_removed(move: MoveKind, reply: str, kept: str) -> None:
@@ -136,6 +156,14 @@ def test_feedback_is_removed(move: MoveKind, reply: str, kept: str) -> None:
         (MoveKind.AGENDA, "We'll spend about twenty minutes on your experience, then you can "
                           "ask me anything."),
         (MoveKind.HINT, "Good start; think about who else the change affected."),
+        # Near misses for the wider feedback rule: these must stay as they are.
+        (MoveKind.PROBE, "You said you work well under pressure. What happened next?"),
+        (MoveKind.PROBE, "How well did that design scale when traffic doubled?"),
+        (MoveKind.ASK, "Tell me about a good tool you chose and why you chose it."),
+        (MoveKind.ANSWER_QUESTION, "The team uses Kafka, which is a good fit for their event "
+                                   "volume."),
+        (MoveKind.PROBE, "I'm still not sure what your own part was. What did you personally do?"),
+        (MoveKind.ASK, "Walk me through how you explained the trade-offs to your director."),
     ],
 )  # fmt: skip
 def test_good_replies_pass_unchanged(move: MoveKind, reply: str) -> None:
