@@ -13,8 +13,8 @@ function part(label: string, budget: Budget | null | undefined): { text: string;
 }
 
 /**
- * Dev builds only (testing and validation): Claude spend against the daily and monthly budgets
- * of the app's LiteLLM key. Hidden when the profile does not track spend.
+ * Testing and validation: Claude spend against the daily and monthly budgets of the app's LiteLLM
+ * key. Hidden when the profile does not track spend or the API does not answer (useModelUsage).
  */
 export function ModelUsageBadge({ usage }: { usage: ModelUsage | undefined }) {
   if (!usage?.tracked) return null;

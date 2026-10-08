@@ -380,7 +380,9 @@ export interface paths {
         };
         /**
          * Model Usage
-         * @description Spend today and this month for the app key (claude profile). Dev and test only.
+         * @description Spend today and this month for the app key (claude profile).
+         *
+         *     Dev and test, and in staging for the MODEL_SPEND_VIEWERS emails. Others get 404.
          */
         get: operations["model_usage_dev_model_usage_get"];
         put?: never;
