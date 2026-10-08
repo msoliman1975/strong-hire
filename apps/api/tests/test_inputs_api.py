@@ -266,16 +266,52 @@ async def test_in3_pasted_resume_text_and_edit(
     resp = await client.post("/resumes", data={"text": text})
     assert resp.status_code == 202, resp.text
     resume = resp.json()["resume"]
+    assert resume["confirmed_at"] is None
 
     edited = {**resume["resume"], "skills": ["Python", "Go"]}
     put = await client.put(f"/resumes/{resume['id']}", json={"resume": edited})
     assert put.status_code == 200
+    assert put.json()["confirmed_at"] is not None
     assert (await client.get(f"/resumes/{resume['id']}")).json()["resume"]["skills"] == [
         "Python",
         "Go",
     ]
     bad = await client.put(f"/resumes/{resume['id']}", json={"resume": {"roles": "x"}})
     assert bad.status_code == 422
+
+
+async def test_in3_check_your_cv_moves_an_achievement_and_confirms(
+    client: httpx.AsyncClient, fake_fixtures: Path
+) -> None:
+    """IN-3 "Check your CV": the user moves an achievement to another role, removes a role and
+    confirms. The confirmed version is stored and validated against the Resume contract."""
+    text, expected = fixture("resumes", "backend-senior")
+    set_extractor_output(fake_fixtures, "Resume", expected)
+    resume = (await client.post("/resumes", data={"text": text})).json()["resume"]
+    parsed = resume["resume"]
+    first, second = parsed["roles"][0], parsed["roles"][1]
+    moved = second["achievements"][0]
+    fixed = {
+        **parsed,
+        "roles": [
+            {**first, "achievements": [*first["achievements"], moved]},
+            {**second, "achievements": second["achievements"][1:]},
+        ],
+    }
+    put = await client.put(f"/resumes/{resume['id']}", json={"resume": fixed})
+    assert put.status_code == 200, put.text
+    saved = (await client.get(f"/resumes/{resume['id']}")).json()
+    assert moved in saved["resume"]["roles"][0]["achievements"]
+    assert moved not in saved["resume"]["roles"][1]["achievements"]
+    assert saved["confirmed_at"] is not None
+
+    one_role = {**fixed, "roles": fixed["roles"][:1]}
+    assert (await client.put(f"/resumes/{resume['id']}", json={"resume": one_role})).is_success
+    empty_company = {**fixed, "roles": [{**first, "company": ""}]}
+    bad = await client.put(f"/resumes/{resume['id']}", json={"resume": empty_company})
+    assert bad.status_code == 422
+    unknown = await client.put(f"/resumes/{resume['id']}", json={"resume": {"name": "x"}})
+    assert unknown.status_code == 422
 
 
 async def test_in3_injection_in_a_resume_is_flagged(client: httpx.AsyncClient) -> None:
@@ -321,6 +357,8 @@ async def test_other_orgs_cannot_read_or_edit(
     assert (await client.get(f"/job-targets/{target['id']}")).status_code == 404
     assert (await client.get(f"/resumes/{resume['id']}")).status_code == 404
     put = await client.put(f"/job-targets/{target['id']}", json={"posting": target["posting"]})
+    assert put.status_code == 404
+    put = await client.put(f"/resumes/{resume['id']}", json={"resume": {"skills": ["Go"]}})
     assert put.status_code == 404
 
 

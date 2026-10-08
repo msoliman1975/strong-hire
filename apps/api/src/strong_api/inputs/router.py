@@ -142,6 +142,7 @@ def _resume_out(row: ResumeRow) -> ResumeOut:
         status="extracted" if extracted else "pending",
         has_file=row.file_ref is not None,
         resume=Resume.model_validate(row.parsed_json) if extracted else None,
+        confirmed_at=row.confirmed_at,
         uploaded_at=row.uploaded_at,
     )
 
@@ -503,6 +504,7 @@ async def delete_resume(resume_id: uuid.UUID, db: Db, me: Me, queue: Queue) -> R
         row.parsed_json = None
         row.file_ref = None
         row.content_hash = None
+        row.confirmed_at = None
         db.add(_audit(me, "library.resume_deleted", f"resume:{row.id}"))
         await db.commit()
         if ref:
@@ -520,9 +522,19 @@ async def delete_resume(resume_id: uuid.UUID, db: Db, me: Me, queue: Queue) -> R
 async def update_resume(
     resume_id: uuid.UUID, body: ResumeUpdate, db: Db, me: Me, queue: Queue, limits: GapLimits
 ) -> ResumeOut:
-    """Confirm or edit the parsed resume. Gap analyses that used it start again."""
+    """Confirm or edit the parsed resume ("Check your CV"). Gap analyses that used it start again.
+
+    The body is validated against the Resume contract. Saving marks the CV as confirmed
+    (confirmed_at), so a later re-read of the stored file does not overwrite the user's version
+    without asking. Confirming is optional: a gap analysis also runs on an unconfirmed CV.
+    """
     row = await _owned_resume(db, me, resume_id, live=True)
+    if row.parsed_json is None:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "The resume is still being read. Try again in a minute."
+        )
     row.parsed_json = body.resume.model_dump(mode="json")
+    row.confirmed_at = datetime.now(UTC)
     await db.commit()
     await gap_service.recompute(
         db, queue, org_id=me.org_id, user_id=me.user_id, settings=limits, resume_id=row.id

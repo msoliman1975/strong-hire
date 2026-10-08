@@ -101,7 +101,9 @@ describe("main journey", () => {
     await user.type(screen.getByLabelText("Or paste your resume text"), "Backend engineer");
     await user.click(screen.getByRole("button", { name: "Upload resume" }));
     expect(await screen.findByRole("heading", { name: "Roles" })).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Continue" }));
+    await user.click(screen.getByRole("button", { name: "Check and continue" }));
+    expect(await screen.findByRole("heading", { name: "Check your CV" })).toBeInTheDocument();
+    await user.click(await screen.findByRole("button", { name: "Confirm and continue" }));
 
     expect(await screen.findByRole("heading", { name: "Add context (optional)" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Skip this step" }));

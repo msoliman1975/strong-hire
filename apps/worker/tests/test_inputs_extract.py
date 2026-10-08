@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 from strong_core.config import get_settings
-from strong_core.gateway import ModelGateway
+from strong_core.gateway import ModelGateway, Role
 from strong_core.prompts import load_prompt
 from strong_core.schemas import Confidence
 from strong_worker.inputs.extract import ExtractionError, extract_job_posting, extract_resume
@@ -132,6 +132,33 @@ async def test_in3_resume_with_end_before_start_is_rejected(
     set_extractor_output(fake_fixtures, "Resume", expected)
     with pytest.raises(ExtractionError, match="ends before it starts"):
         await extract_resume(gateway, text)
+
+
+async def test_in3_misfiled_achievements_are_flagged_not_rejected(
+    gateway: ModelGateway, fake_fixtures: Path
+) -> None:
+    """A dated role with no achievements above a role with many is kept, with a flag."""
+    text, expected = fixture("resumes", "backend-senior")
+    roles = expected["roles"]
+    assert isinstance(roles, list)
+    moved = roles[0]["achievements"] + roles[1]["achievements"]
+    roles[0] = {**roles[0], "achievements": []}
+    roles[1] = {**roles[1], "achievements": moved}
+    set_extractor_output(fake_fixtures, "Resume", expected)
+    result = await extract_resume(gateway, text)
+    assert result.output.roles[0].achievements == []
+    assert any(f.startswith("attribution_suspect:") for f in result.flags)
+
+    fine = fixture("resumes", "backend-senior")[1]
+    set_extractor_output(fake_fixtures, "Resume", fine)
+    result = await extract_resume(gateway, text)
+    assert not any(f.startswith("attribution_suspect:") for f in result.flags)
+
+
+def test_in3_resume_prompt_v2_files_achievements_by_role() -> None:
+    prompt = load_prompt(Role.EXTRACTOR, "resume")
+    assert prompt.ref == "extractor/resume.v2"
+    assert "nearest role heading above it" in prompt.text
 
 
 # --- prompt injection -----------------------------------------------------------------------

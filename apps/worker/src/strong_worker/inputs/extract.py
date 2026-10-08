@@ -12,6 +12,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from itertools import pairwise
 
 from strong_core.gateway import Message, ModelGateway, Role
 from strong_core.prompts import load_prompt
@@ -114,6 +115,10 @@ async def extract_resume(gateway: ModelGateway, text: str) -> Extraction[Resume]
         summary = None
     flags += [f"dropped_from_output: {d[:120]}" for d in dropped]
     resume = resume.model_copy(update={"skills": skills, "roles": roles, "summary": summary})
+    suspect = attribution_flags(resume)
+    if suspect:
+        log.warning("resume extraction looks misfiled: %s", "; ".join(suspect))
+    flags += suspect
     return Extraction(resume, resume_confidence(resume, clean.text), flags, model, refs, attempts)
 
 
@@ -155,3 +160,25 @@ def _resume_problems(resume: Resume) -> list[str]:
         if role.start and role.end and role.end < role.start:
             found.append(f"role '{role.title}' ends before it starts")
     return found
+
+
+SUSPECT_MIN_NEIGHBOR = 3  # achievements the next role must have before an empty role looks odd
+
+
+def attribution_flags(resume: Resume) -> list[str]:
+    """Confidence flags for achievements that may sit under the wrong role. Never a failure.
+
+    A role with dates but no achievements, right above a role with several, often means the
+    reader or the model moved the first role's lines into the next one (a PDF read out of
+    order). The flag tells the user to check the CV; the extraction is kept as it is.
+    """
+    flags = []
+    roles = resume.roles
+    for role, below in pairwise(roles):
+        dated = role.start is not None or role.end is not None
+        if dated and not role.achievements and len(below.achievements) >= SUSPECT_MIN_NEIGHBOR:
+            flags.append(
+                f"attribution_suspect: '{role.title}' at '{role.company}' has no achievements "
+                f"and the next role has {len(below.achievements)}"
+            )
+    return flags

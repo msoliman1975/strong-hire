@@ -1,0 +1,48 @@
+{
+  "summary": "Data engineer who builds batch and streaming pipelines for finance teams.",
+  "roles": [
+    {
+      "title": "Senior Data Engineer",
+      "company": "Cobaltline Insurance",
+      "start": "2022-01",
+      "end": null,
+      "achievements": [
+        "Moved 140 nightly ETL jobs from cron to Airflow with retries, alerts and an on-call runbook for the finance data team",
+        "Cut the monthly warehouse bill from $61,000 to $38,000 by clustering tables",
+        "Built a claims fraud feature store that 4 model teams read for training and for real-time scoring of new claims"
+      ],
+      "skills": []
+    },
+    {
+      "title": "Data Engineer",
+      "company": "Pebblestone Credit Union",
+      "start": "2018-06",
+      "end": "2021-12",
+      "achievements": [
+        "Wrote the change-data-capture pipeline for 30 core banking tables",
+        "Added data quality checks on every load that caught 95% of bad loads before the morning regulatory reports ran"
+      ],
+      "skills": []
+    }
+  ],
+  "skills": [
+    "SQL",
+    "Python",
+    "Airflow",
+    "Snowflake",
+    "dbt",
+    "Kafka",
+    "Terraform"
+  ],
+  "education": [
+    {
+      "institution": "Hill Country State University",
+      "degree": "B.S.",
+      "field_of_study": "Statistics",
+      "end": "2018"
+    }
+  ],
+  "certifications": [
+    "SnowPro Core Certification"
+  ]
+}
