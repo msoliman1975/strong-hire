@@ -1033,7 +1033,7 @@ def main() -> None:
     for item, ext, build in CASES:
         (OUT / f"{item.name}.{ext}").write_bytes(build(item))
         expected = json.dumps(item.expected(), indent=2, ensure_ascii=False) + "\n"
-        (OUT / f"{item.name}.json").write_text(expected, encoding="utf-8")
+        (OUT / f"{item.name}.json").write_bytes(expected.encode("utf-8"))
         print(f"wrote {item.name}.{ext}")
 
 
