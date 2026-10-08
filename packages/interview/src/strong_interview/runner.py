@@ -11,6 +11,7 @@ state. A sink error is logged and ignored, so tracing never breaks the interview
 
 from __future__ import annotations
 
+import asyncio
 import dataclasses
 import inspect
 import logging
@@ -63,6 +64,7 @@ class InterviewRunner:
         self.trace = trace
         self.turns: list[Turn] = []
         self._seq = 0
+        self._lock = asyncio.Lock()
 
     @property
     def ended(self) -> bool:
@@ -152,22 +154,32 @@ class InterviewRunner:
             **self._timer(move.phase),
         }
         turn_index = len(self.turns)
-        self.interviewer.last_call = None
+        interviewer = self.interviewer
+        interviewer.last_call = None
+        interviewer.last_calls = []
         text: str | None = None
         try:
-            text = await self.interviewer.say(move, self.turns)
+            text = await interviewer.say(move, self.turns)
         finally:
-            self._emit(
-                "say",
-                move.kind.value,
-                reason,
-                phase=move.phase,
-                elapsed_ms=before,
-                question_ref=move.question_ref,
-                model_call=self.interviewer.last_call,
-                spoken=text,
-                turn_index=turn_index,
-            )
+            # One record per model call. The output guard's result goes into the reason; only
+            # the last record carries the spoken text (R2).
+            calls: list[ModelCall | None] = [*interviewer.last_calls] or [interviewer.last_call]
+            for i, call in enumerate(calls):
+                last = i == len(calls) - 1
+                why = dict(reason)
+                if call is not None and call.guard is not None:
+                    why["guard"] = call.guard
+                self._emit(
+                    "say",
+                    move.kind.value,
+                    why,
+                    phase=move.phase,
+                    elapsed_ms=before,
+                    question_ref=move.question_ref,
+                    model_call=call,
+                    spoken=text if last else None,
+                    turn_index=turn_index,
+                )
         assert text is not None
         start = self.controller.elapsed_ms
         end = start + max(1, len(text.split())) * MS_PER_WORD
@@ -185,13 +197,26 @@ class InterviewRunner:
         """Start the session: the interviewer greets the candidate."""
         return [await self._say(self.controller.start())]
 
+    @property
+    def busy(self) -> bool:
+        """True while a candidate turn is being answered."""
+        return self._lock.locked()
+
     async def respond(
         self, text: str, *, start_ms: int | None = None, end_ms: int | None = None
     ) -> list[Turn]:
         """Record the candidate's turn and return the interviewer's next turns.
 
-        Returns an empty list once the session has ended.
+        Returns an empty list once the session has ended. Turns are answered one at a time: two
+        calls that overlap would each add a candidate turn and each get a reply, so the second
+        waits for the first.
         """
+        async with self._lock:
+            return await self._respond(text, start_ms=start_ms, end_ms=end_ms)
+
+    async def _respond(
+        self, text: str, *, start_ms: int | None = None, end_ms: int | None = None
+    ) -> list[Turn]:
         ctl = self.controller
         if ctl.ended:
             return []
@@ -299,8 +324,9 @@ class InterviewRunner:
 
     async def coach(self, command: Literal["hint", "redo"]) -> list[Turn]:
         """Coach mode only (IV-8). Raises CoachNotAllowedError in Realistic mode."""
-        move = self.controller.hint() if command == "hint" else self.controller.redo()
-        return [] if move is None else [await self._say(move)]
+        async with self._lock:
+            move = self.controller.hint() if command == "hint" else self.controller.redo()
+            return [] if move is None else [await self._say(move)]
 
     def pause(self) -> None:
         self.controller.pause()

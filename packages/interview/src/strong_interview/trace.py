@@ -34,6 +34,9 @@ class ModelCall:
     cost_usd: float | None = None
     latency_ms: int = 0
     error: str | None = None
+    # Output guard result for a say call: attempt, action (none, fixed, retry, fallback),
+    # rules and hits (strong_interview.guard). The runner adds it to the trace reason.
+    guard: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)
