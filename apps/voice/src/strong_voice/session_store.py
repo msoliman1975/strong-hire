@@ -19,6 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from strong_core.db.models import InterviewSession, JobTarget, UsageEvent
 from strong_core.db.models import Turn as TurnRow
+from strong_core.db.turns import next_turn_seq
 from strong_core.schemas import InterviewerBrief, JobPosting, Turn, UsageComponent
 from strong_interview import SessionFacts
 
@@ -93,6 +94,7 @@ class SqlSessionStore:
                     start_ms=turn.start_ms,
                     end_ms=turn.end_ms,
                     question_ref=turn.question_ref,
+                    seq=await next_turn_seq(db, session_id),
                 )
             )
             await db.commit()

@@ -341,6 +341,9 @@ class Turn(Base):
     start_ms: Mapped[int] = mapped_column(Integer)
     end_ms: Mapped[int] = mapped_column(Integer)
     question_ref: Mapped[str | None] = mapped_column(String(100))
+    seq: Mapped[int | None] = mapped_column(
+        Integer, comment="Order of the turn in its session, from 1 (strong_core.db.turns)"
+    )
 
 
 TRACE_RETENTION_DAYS = 90  # a worker cron job deletes older interviewer traces (R2)

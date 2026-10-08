@@ -54,6 +54,7 @@ from strong_core.db.models import (
     User,
 )
 from strong_core.db.models import Turn as TurnRow
+from strong_core.db.turns import TURN_ORDER
 from strong_core.schemas import InterviewType, Turn, UsageComponent
 
 SESSION_LIMIT = 500
@@ -328,9 +329,7 @@ async def get_session(session_id: uuid.UUID, db: DbSession, admin: Admin) -> Adm
             trace_retention_days=TRACE_RETENTION_DAYS,
         )
     turn_rows = await db.scalars(
-        select(TurnRow)
-        .where(TurnRow.session_id == row.id)
-        .order_by(TurnRow.start_ms, TurnRow.end_ms, TurnRow.id)
+        select(TurnRow).where(TurnRow.session_id == row.id).order_by(*TURN_ORDER)
     )
     transcript = [
         Turn(
