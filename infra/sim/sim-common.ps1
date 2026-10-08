@@ -1,7 +1,10 @@
 # Shared helpers for the sim scripts (P13). Dot-source it: . "$PSScriptRoot/sim-common.ps1"
 # Works in Windows PowerShell 5.1 and PowerShell 7.
 
-$ErrorActionPreference = 'Stop'
+# 'Continue', not 'Stop': in Windows PowerShell 5.1 a native command (ssh, scp, git) that writes to
+# stderr would otherwise stop the script. Native failures are checked with $LASTEXITCODE, and
+# every cmdlet that must stop the script uses -ErrorAction Stop.
+$ErrorActionPreference = 'Continue'
 
 $script:SimMainHost = if ($env:STRONGHIRE_MAIN_HOST) { $env:STRONGHIRE_MAIN_HOST } else { '188.245.31.58' }
 $script:SimServerType = 'cx33'          # 4 shared cores, 8 GB, nbg1 list price $0.016 per hour
@@ -29,9 +32,9 @@ function Invoke-Hcloud([string]$Method, [string]$Path, $Body = $null) {
     $uri = "https://api.hetzner.cloud/v1$Path"
     if ($null -ne $Body) {
         $json = $Body | ConvertTo-Json -Depth 10 -Compress
-        return Invoke-RestMethod -Method $Method -Uri $uri -Headers $headers -ContentType 'application/json' -Body $json
+        return Invoke-RestMethod -ErrorAction Stop -Method $Method -Uri $uri -Headers $headers -ContentType 'application/json' -Body $json
     }
-    return Invoke-RestMethod -Method $Method -Uri $uri -Headers $headers
+    return Invoke-RestMethod -ErrorAction Stop -Method $Method -Uri $uri -Headers $headers
 }
 
 function Wait-HcloudAction($Action, [int]$TimeoutS = 900) {
