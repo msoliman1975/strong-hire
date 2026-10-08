@@ -12,6 +12,7 @@ dropped. Coach mode can pause the clock.
 
 from __future__ import annotations
 
+import copy
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -147,6 +148,30 @@ class SessionController:
         if self.brief.time_plan:
             return {p.phase: p.minutes for p in self.brief.time_plan}
         return DEFAULT_PLAN[self.brief.session.duration_min]
+
+    # ------------------------------------------------------------------ take back
+
+    # Everything a turn can change, without the clock. Voice uses this to take back a reply that
+    # was not spoken because the candidate went on talking.
+    _STATE = (
+        "phase",
+        "question",
+        "probes_used",
+        "hints_used",
+        "ended",
+        "asked",
+        "dropped",
+        "curveball_used",
+        "candidate_questions",
+        "_queue",
+    )
+
+    def snapshot(self) -> dict[str, object]:
+        return {name: copy.copy(getattr(self, name)) for name in self._STATE}
+
+    def restore(self, state: dict[str, object]) -> None:
+        for name, value in state.items():
+            setattr(self, name, copy.copy(value))
 
     # ------------------------------------------------------------------ clock
 

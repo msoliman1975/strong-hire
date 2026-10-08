@@ -10,6 +10,7 @@ from __future__ import annotations
 import inspect
 import re
 from collections.abc import Awaitable, Callable
+from dataclasses import dataclass
 from typing import Literal
 
 from strong_core.schemas import Phase, Speaker, Turn
@@ -23,6 +24,14 @@ _NO_QUESTION = re.compile(
 )
 
 TurnHook = Callable[[Turn], Awaitable[None] | None]
+
+
+@dataclass(frozen=True)
+class Checkpoint:
+    """The transcript length and controller state before a turn (see InterviewRunner.rollback)."""
+
+    turns: int
+    controller: dict[str, object]
 
 
 def wants_to_ask(text: str) -> bool:
@@ -101,6 +110,54 @@ class InterviewRunner:
             decision = await self.interviewer.decide(ctl.question, text, self.turns)
         moves = ctl.after_answer(decision, has_question=wants_to_ask(text))
         return [await self._say(move) for move in moves]
+
+    def checkpoint(self) -> Checkpoint:
+        return Checkpoint(len(self.turns), self.controller.snapshot())
+
+    def rollback(self, checkpoint: Checkpoint) -> None:
+        """Take back the turns since `checkpoint`, as if they never happened.
+
+        Only for callers without `on_turn`: the hook has already seen the turns.
+        """
+        assert self.on_turn is None, "rollback cannot undo on_turn calls"
+        del self.turns[checkpoint.turns :]
+        self.controller.restore(checkpoint.controller)
+
+    async def note(
+        self, text: str, *, start_ms: int | None = None, end_ms: int | None = None
+    ) -> Turn:
+        """Record a candidate turn that is not an answer (for example "give me a moment").
+
+        The controller does not move on, so the question stays open.
+        """
+        ctl = self.controller
+        now = ctl.elapsed_ms
+        start = now if start_ms is None else start_ms
+        return await self._add(
+            Turn(
+                speaker=Speaker.CANDIDATE,
+                phase=ctl.phase,
+                text=text.strip() or "...",
+                start_ms=start,
+                end_ms=max(start, now if end_ms is None else end_ms),
+                question_ref=ctl.question.id if ctl.phase == Phase.CORE and ctl.question else None,
+            )
+        )
+
+    async def line(self, text: str) -> Turn:
+        """Record a fixed interviewer line, said without a model call. The controller stays."""
+        ctl = self.controller
+        start = ctl.elapsed_ms
+        return await self._add(
+            Turn(
+                speaker=Speaker.INTERVIEWER,
+                phase=ctl.phase,
+                text=text,
+                start_ms=start,
+                end_ms=start + max(1, len(text.split())) * MS_PER_WORD,
+                question_ref=ctl.question.id if ctl.phase == Phase.CORE and ctl.question else None,
+            )
+        )
 
     async def coach(self, command: Literal["hint", "redo"]) -> list[Turn]:
         """Coach mode only (IV-8). Raises CoachNotAllowedError in Realistic mode."""

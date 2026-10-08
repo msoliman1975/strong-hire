@@ -52,6 +52,7 @@ def build_session(proc: JobProcess, recorder: LatencyRecorder) -> AgentSession[N
         turn_handling={
             "turn_detection": EnglishModel(),
             "endpointing": {
+                "mode": settings.endpointing_mode,
                 "min_delay": settings.endpointing_min_delay_s,
                 "max_delay": settings.endpointing_max_delay_s,
             },
@@ -59,6 +60,8 @@ def build_session(proc: JobProcess, recorder: LatencyRecorder) -> AgentSession[N
                 "enabled": True,
                 "mode": "vad",
                 "min_duration": settings.interruption_min_duration_s,
+                "resume_false_interruption": True,
+                "false_interruption_timeout": settings.false_interruption_timeout_s,
             },
             "preemptive_generation": {"enabled": False},
         },
