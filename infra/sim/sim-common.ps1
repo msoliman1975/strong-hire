@@ -14,6 +14,10 @@ $script:SimFirewall = 'stronghire-sim-fw'
 $script:SimLabel = 'stronghire-sim'
 $script:SimRemoteDir = '/opt/sim'
 $script:SshOpts = @('-o', 'BatchMode=yes', '-o', 'StrictHostKeyChecking=accept-new', '-o', 'ConnectTimeout=15')
+# Sim servers are new machines on reused Hetzner IPs, each with new host keys. Trust each one on
+# first use, in a known-hosts file that lives only as long as this script.
+$script:SimKnownHosts = Join-Path ([IO.Path]::GetTempPath()) "strong-sim-known-hosts-$PID"
+$script:SimSshOpts = @('-o', 'BatchMode=yes', '-o', 'StrictHostKeyChecking=accept-new', '-o', 'ConnectTimeout=15', '-o', "UserKnownHostsFile=$script:SimKnownHosts")
 
 function Get-UserSecret([string]$Name, [string]$Hint) {
     $value = [Environment]::GetEnvironmentVariable($Name, 'Process')
@@ -91,7 +95,7 @@ function Remove-SimServer($Server) {
 function Wait-Ssh([string]$Ip, [int]$TimeoutS = 300) {
     $deadline = (Get-Date).AddSeconds($TimeoutS)
     while ((Get-Date) -lt $deadline) {
-        & ssh @script:SshOpts "root@$Ip" 'true' 2>$null
+        & ssh @script:SimSshOpts "root@$Ip" 'true' 2>$null
         if ($LASTEXITCODE -eq 0) { return }
         Start-Sleep -Seconds 5
     }
@@ -99,7 +103,7 @@ function Wait-Ssh([string]$Ip, [int]$TimeoutS = 300) {
 }
 
 function Invoke-Remote([string]$Ip, [string]$Command) {
-    & ssh @script:SshOpts "root@$Ip" $Command
+    & ssh @script:SimSshOpts "root@$Ip" $Command
     if ($LASTEXITCODE -ne 0) { throw "Remote command failed ($LASTEXITCODE): $Command" }
 }
 
@@ -109,7 +113,7 @@ function Send-RepoArchive([string]$Ip, [string]$RepoRoot) {
     try {
         & git -C $RepoRoot archive --format=tar -o $tar HEAD
         if ($LASTEXITCODE -ne 0) { throw 'git archive failed' }
-        & scp @script:SshOpts $tar "root@${Ip}:$script:SimRemoteDir/code.tar"
+        & scp @script:SimSshOpts $tar "root@${Ip}:$script:SimRemoteDir/code.tar"
         if ($LASTEXITCODE -ne 0) { throw 'scp of the code archive failed' }
     } finally {
         Remove-Item -Force -ErrorAction SilentlyContinue $tar

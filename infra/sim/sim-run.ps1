@@ -76,8 +76,8 @@ try {
         "SIM_COST_LIMIT_USD=$LimitUsd"
     ) | Set-Content -Encoding ascii $envFile
     try {
-        & scp @script:SshOpts $envFile "root@${ip}:$script:SimRemoteDir/strong-hire/infra/sim/.env"
-        & scp @script:SshOpts $uploadKey "root@${ip}:$script:SimRemoteDir/keys/upload_key"
+        & scp @script:SimSshOpts $envFile "root@${ip}:$script:SimRemoteDir/strong-hire/infra/sim/.env"
+        & scp @script:SimSshOpts $uploadKey "root@${ip}:$script:SimRemoteDir/keys/upload_key"
         if ($LASTEXITCODE -ne 0) { throw 'copying secrets failed' }
     } finally { Remove-Item -Force $envFile }
     Invoke-Remote $ip "chmod 600 $script:SimRemoteDir/keys/upload_key $script:SimRemoteDir/strong-hire/infra/sim/.env"
@@ -87,11 +87,11 @@ try {
     Invoke-Remote $ip "$compose build -q sim"
     Write-Host "Running suite $Suite as run $runId..."
     $runArgs = @('run', '--suite', $Suite, '--yes', '--limit-usd', $LimitUsd, '--run-id', $runId) + $scenarioArgs
-    & ssh @script:SshOpts "root@$ip" "$compose run --rm -T sim $($runArgs -join ' ')"
+    & ssh @script:SimSshOpts "root@$ip" "$compose run --rm -T sim $($runArgs -join ' ')"
     $runExit = $LASTEXITCODE
 
     New-Item -ItemType Directory -Force $OutDir | Out-Null
-    & scp @script:SshOpts -r "root@${ip}:$script:SimRemoteDir/runs/$runId" $OutDir
+    & scp @script:SimSshOpts -r "root@${ip}:$script:SimRemoteDir/runs/$runId" $OutDir
     if ($LASTEXITCODE -eq 0) { Write-Host "Copied the run to $(Join-Path $OutDir $runId)." }
     if ($runExit -ne 0) { Write-Warning "The run ended with exit code $runExit." }
 } finally {
