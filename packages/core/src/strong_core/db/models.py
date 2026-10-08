@@ -104,6 +104,7 @@ USER_OWNED_TABLES = (
     "usage_events",
     "company_requests",
     "exit_surveys",
+    "interviewer_traces",
 )
 
 
@@ -128,6 +129,9 @@ class User(Base):
         Boolean, default=False, server_default="false", comment="AC-2: off by default"
     )
     created_at: Mapped[datetime] = _created_at()
+    last_sign_in_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), comment="Set at each sign-in (admin users page)"
+    )
 
 
 class Subscription(Base):
@@ -337,6 +341,50 @@ class Turn(Base):
     start_ms: Mapped[int] = mapped_column(Integer)
     end_ms: Mapped[int] = mapped_column(Integer)
     question_ref: Mapped[str | None] = mapped_column(String(100))
+
+
+TRACE_RETENTION_DAYS = 90  # a worker cron job deletes older interviewer traces (R2)
+
+
+class InterviewerTrace(Base):
+    """One interviewer model call (or fixed line) in a session, with the controller's reason.
+
+    For the admin review of test interviews. Shown only when the user has training_consent on.
+    A worker cron job deletes rows older than 90 days; the turns stay.
+    """
+
+    __tablename__ = "interviewer_traces"
+    __table_args__ = (Index("ix_interviewer_traces_session_seq", "session_id", "seq"),)
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    org_id: Mapped[uuid.UUID] = _org_fk()
+    session_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("sessions.id", ondelete="CASCADE"))
+    seq: Mapped[int] = mapped_column(Integer, comment="Order of the call in the session")
+    turn_index: Mapped[int] = mapped_column(Integer, comment="Transcript length at the call")
+    call: Mapped[str] = mapped_column(String(20), comment="say, decide, line or rollback")
+    move: Mapped[str] = mapped_column(String(40), comment="Controller move or fixed line name")
+    reason_json: Mapped[dict[str, Any] | None] = mapped_column(
+        comment="Why: the ProbeDecision and the controller's reason"
+    )
+    phase: Mapped[Phase] = mapped_column(str_enum(Phase, "phase"))
+    elapsed_ms: Mapped[int] = mapped_column(Integer)
+    phase_deadline_ms: Mapped[int | None] = mapped_column(Integer)
+    question_ref: Mapped[str | None] = mapped_column(String(100))
+    messages_json: Mapped[list[Any] | None] = mapped_column(comment="Prompt messages sent")
+    raw_reply: Mapped[str | None] = mapped_column(Text)
+    spoken_text: Mapped[str | None] = mapped_column(Text)
+    model: Mapped[str | None] = mapped_column(String(200), comment="Gateway alias")
+    prompt_refs: Mapped[str | None] = mapped_column(String(500))
+    input_tokens: Mapped[int] = mapped_column(Integer, default=0)
+    output_tokens: Mapped[int] = mapped_column(Integer, default=0)
+    cost_usd: Mapped[Decimal | None] = mapped_column(
+        Numeric(12, 6), comment="From the LiteLLM config prices; NULL when unknown"
+    )
+    latency_ms: Mapped[int | None] = mapped_column(Integer)
+    error: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False, index=True
+    )
 
 
 class Scorecard(Base):

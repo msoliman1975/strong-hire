@@ -31,6 +31,7 @@ from strong_interview import (
     InterviewRunner,
     SessionController,
 )
+from strong_interview.trace_store import SqlTraceSink
 from strong_voice.interview import VoiceInterview
 from strong_voice.session_store import (
     AgentApiSettings,
@@ -116,7 +117,9 @@ async def run_session(ctx: JobContext, build_session: Any) -> bool:
 
     gateway = get_gateway()
     runner = InterviewRunner(
-        SessionController(loaded.brief), Interviewer(gateway, loaded.brief, facts=loaded.facts)
+        SessionController(loaded.brief),
+        Interviewer(gateway, loaded.brief, facts=loaded.facts),
+        trace=SqlTraceSink(maker, loaded.org_id, session_id),  # admin traces (R2), background
     )
     interview = VoiceInterview(
         session_id=session_id,

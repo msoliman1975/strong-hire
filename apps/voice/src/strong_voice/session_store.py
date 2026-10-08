@@ -98,9 +98,10 @@ class SqlSessionStore:
             await db.commit()
 
     async def save_usage(
-        self, session_id: uuid.UUID, component: UsageComponent, units: float
+        self, session_id: uuid.UUID, component: UsageComponent, units: float, cost_usd: float = 0.0
     ) -> None:
-        # Units only (tokens, seconds, characters). LiteLLM counts the money for hosted models.
+        # Units (tokens, seconds, characters). For LLM, cost_usd is the interviewer's cost from
+        # the LiteLLM config prices (0 when unknown); speech has no cost here.
         async with self.maker() as db:
             db.add(
                 UsageEvent(
@@ -108,7 +109,7 @@ class SqlSessionStore:
                     session_id=session_id,
                     component=component,
                     units=Decimal(str(units)),
-                    cost_usd=Decimal("0"),
+                    cost_usd=Decimal(f"{cost_usd:.6f}"),
                 )
             )
             await db.commit()
