@@ -27,6 +27,10 @@ class SimSettings(BaseSettings):
     http_timeout_s: float = 60.0
     wait_timeout_s: float = Field(default=600.0, description="Longest wait for a job or debrief.")
     max_turns: int = Field(default=120, description="Safety stop for one text session.")
+    candidate_min_interval_s: float = Field(
+        default=0.0,
+        description="Least time between candidate calls. 13 keeps a 5-per-minute free tier.",
+    )
     voice_silence_s: float = Field(
         default=6.0, description="How long a '[silence]' turn stays quiet in a voice session."
     )

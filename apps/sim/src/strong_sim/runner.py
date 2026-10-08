@@ -12,7 +12,7 @@ from typing import Any
 import yaml
 
 from strong_core.gateway import ModelGateway, Role
-from strong_sim.candidate import Candidate
+from strong_sim.candidate import Candidate, Pacer
 from strong_sim.client import AppClient
 from strong_sim.cost import CostLimitError, CostMeter
 from strong_sim.judge import judge
@@ -36,6 +36,7 @@ async def run_scenario(
     settings: SimSettings,
     meter: CostMeter,
     run_dir: Path,
+    pacer: Pacer | None = None,
 ) -> SessionRow:
     row = SessionRow(
         scenario_id=scenario.id,
@@ -60,7 +61,7 @@ async def run_scenario(
         folder = run_dir / sid
         folder.mkdir(parents=True, exist_ok=True)
         log.info("%s: session %s (%s)", scenario.id, sid, scenario.channel)
-        candidate = Candidate(scenario, gateway, meter)
+        candidate = Candidate(scenario, gateway, meter, pacer or Pacer())
         if scenario.channel == "voice":
             conv = await run_voice(
                 scenario, client, candidate, sid, settings, gateway, folder / "audio.ogg"
@@ -107,6 +108,11 @@ async def run_scenario(
     except Exception as exc:  # one broken session must not stop the run
         log.exception("%s failed", scenario.id)
         row.status, row.error = "error", f"{type(exc).__name__}: {exc}"[:500]
+        if row.session_id:  # do not leave the session open on the server
+            try:
+                await client.end(row.session_id)
+            except Exception:
+                log.warning("could not end session %s", row.session_id)
         row.session_s = time.perf_counter() - started
         row.sim_cost_usd = meter.total_usd - before
         if folder is not None:
@@ -153,11 +159,12 @@ async def run_suite(
         "judge_model": gateway.config.alias_for(Role.JUDGE),
     }
     rows: list[SessionRow] = []
+    pacer = Pacer(min_interval_s=settings.candidate_min_interval_s)
     try:
         me = await client.sign_in()
         meta["sim_user"] = (me.get("user") or {}).get("email")
         for scenario in suite.scenarios:
-            row = await run_scenario(scenario, client, gateway, settings, meter, run_dir)
+            row = await run_scenario(scenario, client, gateway, settings, meter, run_dir, pacer)
             rows.append(row)
             log.info(
                 "%s: %s, failed rules %s, signal %s, $%.3f",

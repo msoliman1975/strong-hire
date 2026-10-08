@@ -50,6 +50,7 @@ services:
       SIM_UPLOAD_TARGET: ${SIM_UPLOAD_TARGET:-}
       SIM_UPLOAD_KEY: /keys/upload_key
       SIM_COST_LIMIT_USD: ${SIM_COST_LIMIT_USD:-5}
+      SIM_CANDIDATE_MIN_INTERVAL_S: ${SIM_CANDIDATE_MIN_INTERVAL_S:-0}
     volumes:
       - ${SIM_RUNS_DIR:-/opt/sim/runs}:/runs
       - ${SIM_KEYS_DIR:-/opt/sim/keys}:/keys:ro

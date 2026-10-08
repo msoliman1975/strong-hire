@@ -7,9 +7,12 @@ says. "[silence]" is a reply with no words: text sends "...", voice stays quiet.
 
 from __future__ import annotations
 
+import asyncio
+import logging
 import re
+import time
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from strong_core.gateway import Message, ModelGateway, Role
 from strong_core.prompts import load_prompt
@@ -17,7 +20,10 @@ from strong_sim.cost import CostMeter
 from strong_sim.scenarios import FIXTURES_DIR, Scenario
 from strong_sim.transcript import Line
 
+log = logging.getLogger("strong_sim")
+
 SILENCE = "[silence]"
+RATE_LIMIT_WAIT_S = 20.0
 _STAGE = re.compile(r"^\s*[\[(*][^\])*]{0,40}[\])*]\s*")  # a leading "(smiles)" or "*pauses*"
 
 
@@ -36,11 +42,37 @@ def clean(text: str) -> str:
     return " ".join(text.split())
 
 
+def _rate_limited(exc: BaseException) -> bool:
+    return getattr(exc, "status_code", None) == 429 or "RateLimitError" in str(exc)[:300]
+
+
+@dataclass
+class Pacer:
+    """Spaces candidate calls (min_interval_s) and retries on HTTP 429.
+
+    A provider's free tier allows only a few requests per minute (Gemini: 5 per model). One pacer
+    is shared by all sessions of a run.
+    """
+
+    min_interval_s: float = 0.0
+    retries: int = 6
+    _last: float = 0.0
+    _lock: asyncio.Lock = field(default_factory=asyncio.Lock)
+
+    async def wait_turn(self) -> None:
+        async with self._lock:
+            delay = self._last + self.min_interval_s - time.monotonic()
+            if delay > 0:
+                await asyncio.sleep(delay)
+            self._last = time.monotonic()
+
+
 @dataclass
 class Candidate:
     scenario: Scenario
     gateway: ModelGateway
     meter: CostMeter
+    pacer: Pacer = field(default_factory=Pacer)
 
     def __post_init__(self) -> None:
         s = self.scenario
@@ -76,6 +108,15 @@ class Candidate:
                 messages.append(Message(role=role, content=text))
         if messages[-1].role != "user":
             messages.append(Message(role="user", content="(The interviewer waits for you.)"))
-        done = await self.gateway.complete(Role.CANDIDATE, messages)
+        for attempt in range(self.pacer.retries + 1):
+            await self.pacer.wait_turn()
+            try:
+                done = await self.gateway.complete(Role.CANDIDATE, messages)
+                break
+            except Exception as exc:
+                if not _rate_limited(exc) or attempt == self.pacer.retries:
+                    raise
+                log.warning("candidate model rate limited; waiting %.0f s", RATE_LIMIT_WAIT_S)
+                await asyncio.sleep(RATE_LIMIT_WAIT_S)
         self.meter.add(done)
         return clean(str(done.output)) or SILENCE

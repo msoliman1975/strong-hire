@@ -21,6 +21,9 @@ param(
     [Parameter(Mandatory = $true)][string]$Suite,
     [string[]]$Scenario,
     [double]$LimitUsd = 5,
+    # Least seconds between candidate model calls. 13 stays under a 5-per-minute free tier;
+    # use 0 on a paid plan.
+    [double]$CandidateIntervalS = 13,
     [switch]$Yes,
     [switch]$KeepServer,
     [string]$TokenFile,
@@ -73,7 +76,8 @@ try {
         "ANTHROPIC_API_KEY=$anthropic",
         "SIM_TOKEN=$simToken",
         "SIM_UPLOAD_TARGET=simup@${script:SimMainHost}:",
-        "SIM_COST_LIMIT_USD=$LimitUsd"
+        "SIM_COST_LIMIT_USD=$LimitUsd",
+        "SIM_CANDIDATE_MIN_INTERVAL_S=$CandidateIntervalS"
     ) | Set-Content -Encoding ascii $envFile
     try {
         & scp @script:SimSshOpts $envFile "root@${ip}:$script:SimRemoteDir/strong-hire/infra/sim/.env"
