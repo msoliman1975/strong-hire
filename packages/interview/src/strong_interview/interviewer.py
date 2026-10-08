@@ -24,8 +24,8 @@ log = logging.getLogger(__name__)
 
 SMALL_WINDOW = 6  # turns shown to small-tier models
 WINDOW = 16
-SMALL_MAX_WORDS = 40
-MAX_WORDS = 60
+SMALL_MAX_WORDS = 30
+MAX_WORDS = 35  # about 14 seconds of speech; two short sentences
 _LABEL = re.compile(r"^\s*(interviewer|[a-z]+)\s*:\s*", re.IGNORECASE)
 
 
