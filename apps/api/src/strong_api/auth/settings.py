@@ -59,6 +59,9 @@ class AuthSettings(BaseSettings):
     sim_enabled: bool = False
     sim_token: SecretStr | None = None
     sim_email: str = "sim@getstronghire.com"
+    sim_daily_budget_usd: float = Field(
+        default=5.0, description="Used when the sim LiteLLM key does not report its own limit."
+    )
 
     @property
     def is_local(self) -> bool:

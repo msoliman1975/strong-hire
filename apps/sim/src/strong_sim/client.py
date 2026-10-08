@@ -54,6 +54,21 @@ class AppClient:
         me: dict[str, Any] = await self._call("GET", "/auth/me")
         return me
 
+    async def budget(self) -> dict[str, Any] | None:
+        """The AI-to-AI daily budget, or None when the server has no budget route."""
+        resp = await self.http.get("/auth/sim-budget")
+        if resp.status_code == 404:
+            return None
+        if resp.status_code >= 400:
+            raise ApiError(f"GET /auth/sim-budget -> {resp.status_code}: {resp.text[:300]}")
+        data: dict[str, Any] = resp.json()
+        return data
+
+    async def report_spend(self, usd: float) -> None:
+        """Add the candidate and judge cost to the shared daily budget."""
+        if usd > 0:
+            await self._call("POST", "/auth/sim-spend", json={"usd": round(usd, 6)})
+
     async def _wait(self, what: str, check: Any) -> Any:
         deadline = time.monotonic() + self.settings.wait_timeout_s
         while True:

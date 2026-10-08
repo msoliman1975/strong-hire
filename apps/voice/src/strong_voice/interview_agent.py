@@ -25,6 +25,7 @@ from livekit.agents.voice.room_io import RoomOptions
 
 from strong_core.db import get_sessionmaker
 from strong_core.gateway import get_gateway
+from strong_core.sim import gateway_for_org
 from strong_interview import (
     CoachNotAllowedError,
     Interviewer,
@@ -115,7 +116,8 @@ async def run_session(ctx: JobContext, build_session: Any) -> bool:
         ctx.shutdown("session not ready")
         return True
 
-    gateway = get_gateway()
+    async with maker() as db:  # the sim user's sessions use the sim budget (P13)
+        gateway = await gateway_for_org(db, loaded.org_id, get_gateway())
     runner = InterviewRunner(
         SessionController(loaded.brief),
         Interviewer(gateway, loaded.brief, facts=loaded.facts),

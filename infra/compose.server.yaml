@@ -53,6 +53,8 @@ services:
       SIM_ENABLED: ${SIM_ENABLED:-false}
       SIM_TOKEN: ${SIM_TOKEN:-}
       SIM_EMAIL: ${SIM_EMAIL:-sim@getstronghire.com}
+      # The sim's own LiteLLM key with a $5 daily budget, so AI-to-AI tests never use the app's.
+      SIM_LITELLM_KEY: ${SIM_LITELLM_KEY:-}
     restart: unless-stopped
 
   worker:
@@ -62,6 +64,10 @@ services:
       # Encrypted resume files, kept in a volume so they survive restarts.
       INPUTS_STORAGE_DIR: /data/uploads
       INPUTS_STORAGE_KEY: ${INPUTS_STORAGE_KEY:?set INPUTS_STORAGE_KEY in .env}
+      # The sim org's jobs (extraction, gap, brief, scoring) use the sim key (P13).
+      SIM_ENABLED: ${SIM_ENABLED:-false}
+      SIM_EMAIL: ${SIM_EMAIL:-sim@getstronghire.com}
+      SIM_LITELLM_KEY: ${SIM_LITELLM_KEY:-}
     volumes:
       - uploads-data:/data/uploads
     restart: unless-stopped
@@ -94,6 +100,10 @@ services:
     environment:
       LIVEKIT_PUBLIC_URL: wss://rtc.${DOMAIN}
       STRONG_INTERNAL_TOKEN: ${STRONG_INTERNAL_TOKEN}
+      # The sim org's voice interviews use the sim key (P13).
+      SIM_ENABLED: ${SIM_ENABLED:-false}
+      SIM_EMAIL: ${SIM_EMAIL:-sim@getstronghire.com}
+      SIM_LITELLM_KEY: ${SIM_LITELLM_KEY:-}
     restart: unless-stopped
 
   stt:

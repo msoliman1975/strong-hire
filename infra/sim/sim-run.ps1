@@ -21,9 +21,9 @@ param(
     [Parameter(Mandatory = $true)][string]$Suite,
     [string[]]$Scenario,
     [double]$LimitUsd = 5,
-    # Least seconds between candidate model calls. 13 stays under a 5-per-minute free tier;
-    # use 0 on a paid plan.
-    [double]$CandidateIntervalS = 13,
+    # Least seconds between candidate model calls. 0 on the paid Gemini plan; 13 stays under a
+    # 5-per-minute free tier.
+    [double]$CandidateIntervalS = 0,
     # The candidate model alias in config/litellm.sim.yaml: sim-candidate or sim-candidate-alt.
     [string]$CandidateAlias = 'sim-candidate',
     [switch]$Yes,

@@ -68,6 +68,16 @@ class ModelGateway:
         self._fake = fake
         self._model_factory = model_factory
 
+    def with_api_key(self, api_key: str) -> ModelGateway:
+        """The same models through another LiteLLM key, for example one with its own budget."""
+        return ModelGateway(
+            self.config,
+            base_url=self.base_url,
+            api_key=api_key,
+            fake=self._fake,
+            model_factory=self._model_factory,
+        )
+
     @property
     def profile(self) -> str:
         return self.config.profile

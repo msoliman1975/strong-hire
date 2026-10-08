@@ -25,6 +25,7 @@ from strong_core.db.models import Resume as ResumeRow
 from strong_core.gateway import ModelGateway, get_gateway
 from strong_core.library import default_job_name, posting_text_hash
 from strong_core.schemas import JobPosting
+from strong_core.sim import gateway_for_org
 from strong_worker.inputs.documents import KIND_EXTENSIONS, DocumentError, document_text
 from strong_worker.inputs.extract import ExtractionError, extract_job_posting, extract_resume
 from strong_worker.inputs.fetch import PostingFetcher, playwright_render
@@ -104,8 +105,9 @@ async def extract_job_target(
 
         assert target.raw_text is not None
         try:
+            gateway = await gateway_for_org(db, target.org_id, inputs.gateway)  # P13
             extraction = await extract_job_posting(
-                inputs.gateway, target.raw_text, source_url=target.source_url
+                gateway, target.raw_text, source_url=target.source_url
             )
         except ExtractionError as exc:
             return _failed(str(exc))
@@ -188,7 +190,8 @@ async def parse_resume(
             return _failed("resume deleted")
 
         try:
-            extraction = await extract_resume(inputs.gateway, text)
+            gateway = await gateway_for_org(db, row.org_id, inputs.gateway)  # P13
+            extraction = await extract_resume(gateway, text)
         except ExtractionError as exc:
             return _failed(str(exc))
         await db.refresh(row)

@@ -14,7 +14,7 @@ import yaml
 from strong_core.gateway import ModelGateway, Role
 from strong_sim.candidate import Candidate, Pacer
 from strong_sim.client import AppClient
-from strong_sim.cost import CostLimitError, CostMeter
+from strong_sim.cost import CostLimitError, CostMeter, estimate, load_prices
 from strong_sim.judge import judge
 from strong_sim.report import SessionRow, percentile, render_html, summary
 from strong_sim.scenarios import Scenario, Suite
@@ -104,6 +104,11 @@ async def run_scenario(
             },
         )
     except CostLimitError:
+        if row.session_id:  # end the session on the server before the run stops
+            try:
+                await client.end(row.session_id)
+            except Exception:
+                log.warning("could not end session %s", row.session_id)
         raise
     except Exception as exc:  # one broken session must not stop the run
         log.exception("%s failed", scenario.id)
@@ -159,12 +164,34 @@ async def run_suite(
         "judge_model": gateway.config.alias_for(Role.JUDGE),
     }
     rows: list[SessionRow] = []
+    reported = 0.0  # sim-side cost already added to the shared daily budget
     pacer = Pacer(min_interval_s=settings.candidate_min_interval_s)
     try:
         me = await client.sign_in()
         meta["sim_user"] = (me.get("user") or {}).get("email")
+        prices = load_prices()
+        meta["budget_at_start"] = await client.budget()
+        run_limit = meter.limit_usd
         for scenario in suite.scenarios:
+            budget = await client.budget()
+            if budget is not None:
+                left = float(budget["remaining_usd"])
+                need = estimate([scenario.duration_min], prices)["total_usd"]
+                if left < need:
+                    meta["stopped"] = (
+                        f"daily AI-to-AI budget: ${left:.2f} left of ${budget['limit_usd']:.2f}, "
+                        f"the next session needs about ${need:.2f}"
+                    )
+                    log.error("%s; stopping the run", meta["stopped"])
+                    break
+                # The sim side may spend what is left today, and never more than the run limit.
+                meter.limit_usd = min(run_limit, meter.total_usd + left)
             row = await run_scenario(scenario, client, gateway, settings, meter, run_dir, pacer)
+            try:
+                await client.report_spend(meter.total_usd - reported)
+                reported = meter.total_usd
+            except Exception:
+                log.warning("could not report the sim-side cost of %s", scenario.id)
             rows.append(row)
             log.info(
                 "%s: %s, failed rules %s, signal %s, $%.3f",
@@ -178,6 +205,11 @@ async def run_suite(
         log.error("%s; stopping the run", exc)
         meta["stopped"] = str(exc)
     finally:
+        if meter.total_usd > reported:
+            try:
+                await client.report_spend(meter.total_usd - reported)
+            except Exception:
+                log.warning("could not report the last sim-side cost")
         meta["finished_at"] = datetime.now(UTC).isoformat(timespec="seconds")
         info = write_report(run_dir, rows, meta)
         uploader.push(run_dir)

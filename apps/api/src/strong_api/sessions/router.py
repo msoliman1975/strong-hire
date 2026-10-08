@@ -53,6 +53,7 @@ from strong_core.db.models import Turn as TurnRow
 from strong_core.db.turns import next_turn_seq
 from strong_core.gateway import Role, get_gateway
 from strong_core.schemas import JobPosting, SessionChannel, SessionStatus, Turn, UsageComponent
+from strong_core.sim import gateway_for_org
 from strong_interview import (
     CoachNotAllowedError,
     Interviewer,
@@ -271,7 +272,7 @@ async def open_text_session(session_id: uuid.UUID, request: Request, db: Db, me:
     brief = _brief(session)
     if brief is None:
         raise HTTPException(status.HTTP_409_CONFLICT, "The interview plan is not ready yet.")
-    gateway = get_gateway()
+    gateway = await gateway_for_org(db, session.org_id, get_gateway())  # sim budget (P13)
     target = await db.get(JobTarget, session.job_target_id)
     interviewer = Interviewer(gateway, brief, facts=_facts(target, brief.company_name))
     sink = SqlTraceSink(request.app.state.sessionmaker, session.org_id, session.id)

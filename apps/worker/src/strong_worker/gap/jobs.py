@@ -40,6 +40,7 @@ from strong_core.schemas import (
     SessionConfig,
     session_duration,
 )
+from strong_core.sim import gateway_for_org
 from strong_worker.gap.analysis import GapAnalysisError, run_gap_analysis
 from strong_worker.gap.brief import BriefError, build_brief
 
@@ -136,8 +137,9 @@ async def _run_gap_analysis(gap: GapContext, gap_analysis_id: str, org_id: str) 
         resume = Resume.model_validate(resume_row.parsed_json)
         profile = await resolve_profile(db, target.company_id)
         try:
+            gateway = await gateway_for_org(db, row.org_id, gap.gateway)  # sim budget (P13)
             result = await run_gap_analysis(
-                gap.gateway, posting, resume, profile, context_notes=context_notes(target)
+                gateway, posting, resume, profile, context_notes=context_notes(target)
             )
         except GapAnalysisError as exc:
             log.warning("gap analysis %s failed: %s", row.id, exc)
@@ -218,7 +220,8 @@ async def build_interviewer_brief(
             level=target.level or posting.level or Level.MID,
         )
         try:
-            built = await build_brief(gap.gateway, config, posting, resume, profile, gap=analysis)
+            gateway = await gateway_for_org(db, session.org_id, gap.gateway)
+            built = await build_brief(gateway, config, posting, resume, profile, gap=analysis)
         except BriefError as exc:
             log.warning("brief for session %s failed: %s", session.id, exc)
             return {"outcome": "failed", "reason": "The interview plan did not finish."}

@@ -17,6 +17,7 @@ from strong_api.auth.sim import FailureLimiter
 from strong_api.main import create_app
 from strong_core.db.models import User
 
+from .conftest import sign_in
 from .test_sessions_api import create, ready_job
 
 TOKEN = "s" * 40
@@ -120,3 +121,57 @@ async def test_sim_user_gets_text_sessions_and_skips_the_plan_check_outside_loca
         assert record.status_code == 201, record.text
         opened = await http.post(f"/sessions/{record.json()['id']}/text/open")
         assert opened.status_code == 200, opened.text
+
+
+async def test_sim_budget_routes_are_only_for_the_sim_user_and_add_up(
+    monkeypatch: pytest.MonkeyPatch, sessionmaker: Any, queue: Any
+) -> None:
+    """P13: the AI-to-AI budget is $5 per day, and the sim reports its own model cost."""
+    from strong_api.auth.sim import MemorySpendStore
+
+    _env(monkeypatch, SIM_ENABLED="true", SIM_TOKEN=TOKEN, SIM_EMAIL="sim@example.com")
+    app = _app(sessionmaker, queue)
+    app.state.sim_spend_store = MemorySpendStore()
+    async for http in _client(app):
+        assert (await http.get("/auth/sim-budget")).status_code == 401  # nobody signed in
+        await sign_in(http, "real@example.com")
+        assert (await http.get("/auth/sim-budget")).status_code == 404  # a real user
+        assert (await http.post("/auth/sim-spend", json={"usd": 1})).status_code == 404
+    async for http in _client(app):
+        assert (await _login(http)).status_code == 204
+        first = (await http.get("/auth/sim-budget")).json()
+        assert first["limit_usd"] == 5.0 and first["remaining_usd"] == 5.0
+        assert first["server_usd"] is None  # no sim LiteLLM key in tests
+        assert (await http.post("/auth/sim-spend", json={"usd": 1.25})).status_code == 204
+        after = (await http.get("/auth/sim-budget")).json()
+        assert after["sim_usd"] == 1.25 and after["remaining_usd"] == 3.75
+
+
+async def test_the_sim_org_gets_its_own_litellm_key(
+    monkeypatch: pytest.MonkeyPatch, sessionmaker: async_sessionmaker[AsyncSession], queue: Any
+) -> None:
+    """P13: model calls for the sim org use SIM_LITELLM_KEY; every other org keeps the app key."""
+    from strong_core import sim as core_sim
+    from strong_core.config import get_settings
+    from strong_core.gateway import ModelGateway
+    from strong_core.gateway.registry import fake_models_config
+
+    _env(monkeypatch, SIM_ENABLED="true", SIM_TOKEN=TOKEN, SIM_EMAIL="sim@example.com")
+    monkeypatch.setenv("SIM_LITELLM_KEY", "sk-sim-budget")
+    get_settings.cache_clear()
+    monkeypatch.setattr(core_sim, "_sim_orgs", {})
+    app = _app(sessionmaker, queue)
+    async for http in _client(app):
+        assert (await _login(http)).status_code == 204
+        sim_org = (await http.get("/auth/me")).json()["user"]["org_id"]
+    async for http in _client(app):
+        real_org = (await sign_in(http, "real@example.com"))["user"]["org_id"]
+    base = ModelGateway(fake_models_config(), api_key="sk-app")
+    import uuid as _uuid
+
+    async with sessionmaker() as db:
+        sim_gw = await core_sim.gateway_for_org(db, _uuid.UUID(sim_org), base)
+        real_gw = await core_sim.gateway_for_org(db, _uuid.UUID(real_org), base)
+    assert sim_gw._api_key == "sk-sim-budget"
+    assert real_gw is base
+    get_settings.cache_clear()

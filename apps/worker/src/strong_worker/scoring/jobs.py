@@ -34,6 +34,7 @@ from strong_core.db.turns import TURN_ORDER
 from strong_core.gateway import ModelGateway, get_gateway
 from strong_core.profiles import ProfileError, profile_for_session
 from strong_core.schemas import MINI_DURATION_MIN, InterviewerBrief, Mode, SessionStatus, Turn
+from strong_core.sim import gateway_for_org
 from strong_worker.scoring.scorer import ScoringError, ScoringOutcome, SessionScorer
 
 log = logging.getLogger(__name__)
@@ -99,7 +100,8 @@ async def score_session(ctx: dict[str, Any], session_id: str, org_id: str) -> di
             return {"outcome": "exists", "scorecard_id": str(existing)}
 
         try:
-            outcome = await _score(db, scoring.gateway, session)
+            gateway = await gateway_for_org(db, session.org_id, scoring.gateway)  # P13
+            outcome = await _score(db, gateway, session)
         except (ScoringError, ProfileError) as exc:
             return await _fail(db, session, str(exc))
         except Exception as exc:  # a model or gateway failure: the user sees a failed debrief

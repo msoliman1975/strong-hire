@@ -26,8 +26,9 @@ Runs are on demand only. Nothing runs on a schedule or in CI.
   characters. A wrong token also gets 404. After 5 wrong tokens from one address in 10 minutes,
   that address gets 404 for 10 minutes.
 - The sim user (`SIM_EMAIL`, default `sim@getstronghire.com`) has its own org. Its sessions skip
-  the plan check, may use the text channel on the server, and never mix with real users' data.
-  Its minutes and progress snapshots stay in that org.
+  the plan check, may use the text channel on the server, use their own model budget (see
+  Budget), and never mix with real users' data. Its minutes and progress snapshots stay in that
+  org.
 - The candidate model is a different provider from the interviewer on purpose
   (`config/models.sim.yaml`, `config/litellm.sim.yaml`). To switch provider, change
   `sim-candidate` in `litellm.sim.yaml` and pass the new key; no code changes.
@@ -71,15 +72,30 @@ uv run --package strong-sim strong-sim plan --suite text-quality   # scenarios a
 Suites are in `evals/scenarios/` (see its README). Text sessions finish in about 2 to 4 minutes
 each. Voice sessions run in real time.
 
-Model cost per session (estimates, check the report for real numbers): candidate about $0.17 for
-30 minutes, judge about $0.04, interviewer and scorer on the main server about $0.08. The main
-server's LiteLLM key has a daily budget (`CLAUDE_DAILY_BUDGET_USD`); a large suite can use it up
-and then real testers' sessions fail for the rest of the day.
+## Budget
+
+AI-to-AI tests have their own budget: **$5 per day** for everything, separate from the app's
+daily budget for real users.
+
+- On the main server, the sim org's model calls (job and resume reading, gap analysis, interview
+  plan, interviewer, scorer) use their own LiteLLM key, `SIM_LITELLM_KEY`, created with
+  `max_budget` 5 and `budget_duration` 1d. LiteLLM refuses calls past the limit, so sim runs can
+  never use the app key's budget. `strong_core.sim.gateway_for_org()` picks the key.
+- The sim server's own calls (candidate on Gemini, judge on Sonnet) are counted by the sim and
+  reported to `POST /auth/sim-spend` after each session.
+- `GET /auth/sim-budget` adds both parts. Before each session the sim checks what is left; it
+  does not start a session that would not fit, and it stops a session when the sim side passes
+  what is left. `-LimitUsd` on `sim-run.ps1` is a lower limit for one run.
+
+Rough model cost per 30-minute text session: candidate $0.17, judge $0.04, main server $0.08.
+Check the report for the real numbers.
 
 ## Setup (once)
 
 1. Main server `.env`: `SIM_ENABLED=true`, `SIM_TOKEN=<openssl rand -hex 32>`,
-   `SIM_EMAIL=sim@getstronghire.com`. `infra/compose.server.yaml` passes them to the API.
+   `SIM_EMAIL=sim@getstronghire.com`, and `SIM_LITELLM_KEY` (a LiteLLM key made with the master
+   key: `POST /key/generate` with `key_alias` "sim", `max_budget` 5, `budget_duration` "1d").
+   `infra/compose.server.yaml` passes them to the api, worker and voice services.
 2. Upload user on the main server:
    `bash infra/sim/server-setup.sh "<contents of ~/.ssh/stronghire_simup.pub>"`.
 3. Your machine, user environment variables: `HCLOUD_TOKEN`, `GEMINI_KEY`, `ANTHROPIC_API_KEY`,

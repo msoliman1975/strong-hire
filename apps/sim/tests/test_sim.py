@@ -112,6 +112,8 @@ class FakeApi:
         self.sessions: dict[str, dict[str, Any]] = {}
         self.targets: list[dict[str, Any]] = []
         self.candidate_texts: list[str] = []
+        self.remaining_usd = 5.0
+        self.reported_usd: list[float] = []
 
     def __call__(self, request: httpx.Request) -> httpx.Response:
         path, method = request.url.path.removeprefix("/api"), request.method
@@ -121,6 +123,12 @@ class FakeApi:
             return httpx.Response(204 if ok else 404)
         if not self.signed_in:
             return httpx.Response(401)
+        if path == "/auth/sim-budget":
+            left = self.remaining_usd
+            return httpx.Response(200, json={"limit_usd": 5.0, "remaining_usd": left})
+        if path == "/auth/sim-spend":
+            self.reported_usd.append(json.loads(request.content)["usd"])
+            return httpx.Response(204)
         if path == "/auth/me":
             return httpx.Response(200, json={"status": "signed_in", "user": {"email": "sim@x"}})
         if path == "/job-targets" and method == "GET":
@@ -292,3 +300,19 @@ async def test_a_failed_session_keeps_its_transcript(
     lines = json.loads((run_dir / sid / "transcript.json").read_text("utf-8"))
     assert [x["speaker"] for x in lines] == ["interviewer", "candidate"] * 2 + ["interviewer"]
     assert api.sessions[sid]["status"] == "scoring"  # ended by the harness
+
+
+async def test_run_stops_when_the_daily_budget_is_used_up(
+    tmp_path: Path, fake_gateway: ModelGateway
+) -> None:
+    """P13: the AI-to-AI budget is checked before each session; nothing starts without money."""
+    token = "t" * 40
+    api = FakeApi(token)
+    api.remaining_usd = 0.01
+    settings = SimSettings(base_url="https://sim.test/api", token=token, out_dir=tmp_path)
+    http = httpx.AsyncClient(base_url=settings.base_url, transport=httpx.MockTransport(api))
+    suite = Suite(name="t", scenarios=[Scenario(id="a", candidate_name="Ada Venn")])
+    _, info = await run_suite(suite, settings, fake_gateway, CostMeter(load_prices()), "r",
+                              AppClient(settings, http))  # fmt: skip
+    assert api.sessions == {}
+    assert "daily AI-to-AI budget" in info["stopped"]
