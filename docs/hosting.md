@@ -53,6 +53,19 @@ Sign-in uses email links. The server sends them through Brevo SMTP (`smtp-relay.
 cd /opt/stronghire/strong-hire && ./scripts/server-deploy.sh
 ```
 
+## Test plans
+
+Stripe is not set up. `infra/server/grant-test-plans.sh` gives a test subscription (status active,
+`TEST_PLAN_MINUTES` minutes, one year) to `TEST_PLAN_OWNER` and to the first `TEST_PLAN_SLOTS`
+other people who sign up. Cron runs it every 5 minutes:
+
+```bash
+echo '*/5 * * * * root /opt/stronghire/strong-hire/infra/server/grant-test-plans.sh >> /var/log/stronghire-test-plans.log 2>&1' > /etc/cron.d/stronghire-test-plans
+```
+
+The rows have `stripe_customer_id` `test-plan:<user id>`. To remove them:
+`delete from subscriptions where stripe_customer_id like 'test-plan:%';`
+
 ## Costs
 
 - `pwsh scripts/profile.ps1 status` shows Claude spend today and this month.
