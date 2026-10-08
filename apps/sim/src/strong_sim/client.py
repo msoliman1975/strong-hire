@@ -22,6 +22,7 @@ log = logging.getLogger("strong_sim")
 
 POLL_S = 2.0
 BUSY_RETRIES = 30
+FAILED_RETRIES = 2
 
 
 class ApiError(RuntimeError):
@@ -160,13 +161,22 @@ class AppClient:
         return out
 
     async def text_turn(self, sid: str, text: str) -> dict[str, Any]:
-        """Send one candidate turn. A 409 means the last reply is still being made: wait, retry."""
+        """Send one candidate turn, and retry when the server says so.
+
+        409: the last reply is still being made. 503 (the turn save failed) and 504 (the reply
+        passed the server's time limit): the turn was rolled back, so the same text is sent again,
+        at most FAILED_RETRIES times.
+        """
         path = f"/sessions/{sid}/text/turn"
+        failed = 0
         for _ in range(BUSY_RETRIES):
             # The send time, so a turn that never gets an answer can be found in the server logs.
             log.info("text/turn sent: session %s, %d characters", sid, len(text))
             resp = await self.http.post(path, json={"text": text[:4000]})
-            if resp.status_code != 409:
+            if resp.status_code in (503, 504) and failed < FAILED_RETRIES:
+                failed += 1
+                log.warning("text/turn %s: %d, retry %d", sid, resp.status_code, failed)
+            elif resp.status_code != 409:
                 break
             await asyncio.sleep(POLL_S)
         if resp.status_code >= 400:
