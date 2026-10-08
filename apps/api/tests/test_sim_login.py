@@ -159,7 +159,7 @@ async def test_the_sim_org_gets_its_own_litellm_key(
     _env(monkeypatch, SIM_ENABLED="true", SIM_TOKEN=TOKEN, SIM_EMAIL="sim@example.com")
     monkeypatch.setenv("SIM_LITELLM_KEY", "sk-sim-budget")
     get_settings.cache_clear()
-    monkeypatch.setattr(core_sim, "_sim_orgs", {})
+    monkeypatch.setattr(core_sim, "_sim_orgs", set())
     app = _app(sessionmaker, queue)
     async for http in _client(app):
         assert (await _login(http)).status_code == 204

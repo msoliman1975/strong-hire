@@ -24,21 +24,27 @@ from strong_core.gateway import ModelGateway
 
 log = logging.getLogger("strong_core.sim")
 
-_sim_orgs: dict[uuid.UUID, bool] = {}
+_sim_orgs: set[uuid.UUID] = set()
 
 
 async def is_sim_org(db: AsyncSession, org_id: uuid.UUID) -> bool:
-    """True when sim is on and the org belongs to the sim user. Cached per org id."""
+    """True when sim is on and the org belongs to the sim user.
+
+    Only a yes is cached: a no costs one indexed lookup each time, so an org whose sim user is
+    created later is still found.
+    """
     settings = get_settings()
     if not settings.sim_enabled:
         return False
-    if org_id not in _sim_orgs:
-        email = settings.sim_email.strip().lower()
-        found = await db.scalar(
-            select(User.id).where(User.org_id == org_id, func.lower(User.email) == email)
-        )
-        _sim_orgs[org_id] = found is not None
-    return _sim_orgs[org_id]
+    if org_id in _sim_orgs:
+        return True
+    email = settings.sim_email.strip().lower()
+    found = await db.scalar(
+        select(User.id).where(User.org_id == org_id, func.lower(User.email) == email)
+    )
+    if found is not None:
+        _sim_orgs.add(org_id)
+    return found is not None
 
 
 async def gateway_for_org(db: AsyncSession, org_id: uuid.UUID, base: ModelGateway) -> ModelGateway:
