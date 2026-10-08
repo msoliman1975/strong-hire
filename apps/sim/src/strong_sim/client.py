@@ -18,6 +18,7 @@ from strong_sim.settings import SimSettings
 
 STAGE_PREFIX = "sim:"
 POLL_S = 2.0
+BUSY_RETRIES = 30
 
 
 class ApiError(RuntimeError):
@@ -144,7 +145,8 @@ class AppClient:
         async def brief_ready() -> dict[str, Any] | None:
             row: dict[str, Any] = await self._call("GET", f"/sessions/{sid}")
             if row["status"] == "failed":
-                raise ApiError("the session failed before it started")
+                reason = row.get("failure_reason") or "no reason given"
+                raise ApiError(f"the session failed before it started: {reason}")
             return row if row["brief_ready"] else None
 
         ready: dict[str, Any] = await self._wait("the interview plan", brief_ready)
@@ -155,9 +157,16 @@ class AppClient:
         return out
 
     async def text_turn(self, sid: str, text: str) -> dict[str, Any]:
-        out: dict[str, Any] = await self._call(
-            "POST", f"/sessions/{sid}/text/turn", json={"text": text[:4000]}
-        )
+        """Send one candidate turn. A 409 means the last reply is still being made: wait, retry."""
+        path = f"/sessions/{sid}/text/turn"
+        for _ in range(BUSY_RETRIES):
+            resp = await self.http.post(path, json={"text": text[:4000]})
+            if resp.status_code != 409:
+                break
+            await asyncio.sleep(POLL_S)
+        if resp.status_code >= 400:
+            raise ApiError(f"POST {path} -> {resp.status_code}: {resp.text[:300]}")
+        out: dict[str, Any] = resp.json()
         return out
 
     async def voice_join(self, sid: str) -> dict[str, Any]:
@@ -177,7 +186,7 @@ class AppClient:
 
         async def done() -> dict[str, Any] | None:
             row: dict[str, Any] = await self._call("GET", f"/sessions/{sid}/debrief")
-            return row if row["status"] in ("ready", "failed", "not_ended") else None
+            return row if row["status"] in ("ready", "failed", "not_ended", "not_started") else None
 
         result: dict[str, Any] = await self._wait("the debrief", done)
         return result
