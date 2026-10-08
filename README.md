@@ -44,6 +44,21 @@ All ports are set in `.env` (see `.env.example`).
 
 The `all-in-one` profile starts every service above, for the `tiny` model profile.
 
+## Faster voice on a laptop (Kokoro on Windows)
+
+Kokoro text-to-speech in Docker can be 5 times slower than real time on a laptop. Then the
+interviewer's voice comes too late, and the candidate's next words cancel it. To run Kokoro on
+Windows instead:
+
+1. Install eSpeak NG (needs administrator rights):
+   <https://github.com/espeak-ng/espeak-ng/releases/download/1.52.0/espeak-ng.msi>
+2. Start Kokoro and keep the window open: `./scripts/kokoro-windows.ps1`. The first run takes a
+   few minutes (Python packages and the model).
+3. Add `TTS_API_BASE=http://host.rancher-desktop.internal:8881/v1` to `.env`, then run
+   `./scripts/profile.ps1 claude -Voice`.
+
+To go back to Kokoro in Docker, remove the line and run the profile again.
+
 ## Text interview (dev only)
 
 Dev builds also have a page that runs the interview as text, at
