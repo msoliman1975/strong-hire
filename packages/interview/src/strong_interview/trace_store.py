@@ -57,7 +57,9 @@ class SqlTraceSink:
         self._maker = maker
         self._org_id = org_id
         self._session_id = session_id
-        self._lock = asyncio.Lock()
+        # Other writers of the same session may share this lock (the text channel's turn saver),
+        # so their transactions never interleave with a trace insert.
+        self.lock = asyncio.Lock()
         self._tasks: set[asyncio.Task[None]] = set()
 
     def write(self, record: TraceRecord) -> None:
@@ -74,7 +76,7 @@ class SqlTraceSink:
 
     async def _insert(self, record: TraceRecord) -> None:
         try:
-            async with self._lock, self._maker() as db:
+            async with self.lock, self._maker() as db:
                 db.add(trace_row(self._org_id, self._session_id, record))
                 await db.commit()
         except Exception:

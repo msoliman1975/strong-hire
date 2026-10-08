@@ -30,6 +30,7 @@ from strong_core.db.models import InterviewSession
 from strong_core.db.models import ProgressSnapshot as SnapshotRow
 from strong_core.db.models import Scorecard as ScorecardRow
 from strong_core.db.models import Turn as TurnRow
+from strong_core.db.turns import TURN_ORDER
 from strong_core.gateway import ModelGateway, get_gateway
 from strong_core.profiles import ProfileError, profile_for_session
 from strong_core.schemas import MINI_DURATION_MIN, InterviewerBrief, Mode, SessionStatus, Turn
@@ -65,7 +66,7 @@ def _aware(at: datetime) -> datetime:
 
 async def load_turns(db: AsyncSession, session_id: uuid.UUID) -> list[Turn]:
     rows = await db.scalars(
-        select(TurnRow).where(TurnRow.session_id == session_id).order_by(TurnRow.start_ms)
+        select(TurnRow).where(TurnRow.session_id == session_id).order_by(*TURN_ORDER)
     )
     return [
         Turn(

@@ -19,6 +19,7 @@ restarts, an open text session must be ended.
 
 from __future__ import annotations
 
+import asyncio
 import hmac
 import logging
 import uuid
@@ -49,6 +50,7 @@ from strong_api.sessions.schemas import (
 from strong_api.sessions.settings import VoiceSessionSettings, get_voice_session_settings
 from strong_core.db.models import InterviewSession, JobTarget, UsageEvent
 from strong_core.db.models import Turn as TurnRow
+from strong_core.db.turns import next_turn_seq
 from strong_core.gateway import Role, get_gateway
 from strong_core.schemas import JobPosting, SessionChannel, SessionStatus, Turn, UsageComponent
 from strong_interview import (
@@ -219,11 +221,14 @@ async def _text_session(db: Db, me: Me, session_id: uuid.UUID) -> InterviewSessi
     return session
 
 
-def _turn_saver(request: Request, session: InterviewSession):  # type: ignore[no-untyped-def]
+def _turn_saver(request: Request, session: InterviewSession, lock: asyncio.Lock):  # type: ignore[no-untyped-def]
+    """Saves each turn. `lock` is the trace sink's lock: a turn save and a trace insert of the
+    same session take turns, so one never ends the other's open transaction (tests share one
+    SQLite connection)."""
     maker = request.app.state.sessionmaker
 
     async def save(turn: Turn) -> None:
-        async with maker() as db:
+        async with lock, maker() as db:
             db.add(
                 TurnRow(
                     org_id=session.org_id,
@@ -234,6 +239,7 @@ def _turn_saver(request: Request, session: InterviewSession):  # type: ignore[no
                     start_ms=turn.start_ms,
                     end_ms=turn.end_ms,
                     question_ref=turn.question_ref,
+                    seq=await next_turn_seq(db, session.id),
                 )
             )
             await db.commit()
@@ -268,11 +274,12 @@ async def open_text_session(session_id: uuid.UUID, request: Request, db: Db, me:
     gateway = get_gateway()
     target = await db.get(JobTarget, session.job_target_id)
     interviewer = Interviewer(gateway, brief, facts=_facts(target, brief.company_name))
+    sink = SqlTraceSink(request.app.state.sessionmaker, session.org_id, session.id)
     runner = InterviewRunner(
         SessionController(brief),
         interviewer,
-        on_turn=_turn_saver(request, session),
-        trace=SqlTraceSink(request.app.state.sessionmaker, session.org_id, session.id),
+        on_turn=_turn_saver(request, session, sink.lock),
+        trace=sink,
     )
     session.status = SessionStatus.IN_PROGRESS
     session.started_at = datetime.now(UTC)
@@ -281,6 +288,7 @@ async def open_text_session(session_id: uuid.UUID, request: Request, db: Db, me:
     await db.commit()
     runners[session.id] = runner
     turns = await runner.open()
+    await _flush_traces(runner)  # the text channel answers after its traces are saved
     return TextTurns(turns=turns, ended=runner.ended, phase=runner.controller.phase.value)
 
 
@@ -299,6 +307,7 @@ async def text_turn(
     session = await _text_session(db, me, session_id)
     runner = _runner(request, session)
     turns = await runner.respond(body.text)
+    await _flush_traces(runner)  # the text channel answers after its traces are saved
     if runner.ended:
         _runners(request).pop(session.id, None)
         await _end(db, queue, session, runner)
@@ -320,6 +329,7 @@ async def coach(
             runner.resume()
         else:
             turns = await runner.coach(body.command)
+            await _flush_traces(runner)  # the text channel answers after its traces are saved
     except CoachNotAllowedError as exc:
         raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc
     return TextTurns(turns=turns, ended=runner.ended, phase=runner.controller.phase.value)
