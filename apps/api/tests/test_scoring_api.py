@@ -255,6 +255,15 @@ async def test_scoring_needs_an_ended_session(
     target = await make_target(sessionmaker)
     sid = await make_session(sessionmaker, target, status=SessionStatus.IN_PROGRESS)
     assert (await sclient.post(f"/sessions/{sid}/scoring")).status_code == 409
+    # Not ended yet, so the debrief says so instead of "scoring" (the web app stops polling).
+    for open_status in (
+        SessionStatus.CREATED,
+        SessionStatus.IN_PROGRESS,
+        SessionStatus.INTERRUPTED,
+    ):
+        open_sid = await make_session(sessionmaker, target, status=open_status)
+        debrief = (await sclient.get(f"/sessions/{open_sid}/debrief")).json()
+        assert debrief["status"] == "not_ended" and debrief["scorecard"] is None
     assert (await sclient.get(f"/sessions/{uuid.uuid4()}/debrief")).status_code == 404
     assert (await sclient.get(f"/job-targets/{uuid.uuid4()}/progress")).status_code == 404
 

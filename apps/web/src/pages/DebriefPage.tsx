@@ -28,6 +28,14 @@ export function DebriefPage() {
           {modeLabel[config.mode]} mode, {session.minutes_billed} minutes
         </p>
       </PageHead>
+      {status === "not_ended" && (
+        <section className="section panel" data-testid="not-ended">
+          <p>This interview has not finished, so there is nothing to score yet.</p>
+          <Link className="btn" to={`/sessions/${session.id}/live`}>
+            Go to the interview
+          </Link>
+        </section>
+      )}
       {status === "scoring" && <Loading label="Scoring your interview. The debrief is usually ready within a minute." />}
       {status === "failed" && <ErrorNotice error="Scoring failed. Your minutes for this session are refunded." />}
       {status === "ready" && scorecard && (
