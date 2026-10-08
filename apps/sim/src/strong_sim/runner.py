@@ -63,11 +63,11 @@ async def run_scenario(
         log.info("%s: session %s (%s)", scenario.id, sid, scenario.channel)
         candidate = Candidate(scenario, gateway, meter, pacer or Pacer())
         if scenario.channel == "voice":
-            conv = await run_voice(
-                scenario, client, candidate, sid, settings, gateway, folder / "audio.ogg"
+            await run_voice(
+                scenario, client, candidate, sid, settings, gateway, folder / "audio.ogg", conv
             )
         else:
-            conv = await run_text(scenario, client, candidate, sid, settings)
+            await run_text(scenario, client, candidate, sid, settings, conv)
         row.session_s = time.perf_counter() - started
         row.ended_by_server, row.stopped_early = conv.ended_by_server, conv.stopped_early
         row.candidate_turns = sum(1 for line in conv.lines if line.speaker == "candidate")

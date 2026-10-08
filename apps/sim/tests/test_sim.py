@@ -263,3 +263,32 @@ async def test_candidate_retries_after_a_rate_limit(
     line = Line(speaker="interviewer", text="Hi", start_ms=0, end_ms=0)
     assert await cand.reply([line]) == "I led the billing rebuild."
     assert calls["n"] == 2
+
+
+async def test_a_failed_session_keeps_its_transcript(
+    tmp_path: Path, fake_gateway: ModelGateway, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A candidate model failure mid-session keeps the lines so far and ends the session."""
+    token = "t" * 40
+    api = FakeApi(token, turns_per_session=5)
+    settings = SimSettings(base_url="https://sim.test/api", token=token, out_dir=tmp_path)
+    http = httpx.AsyncClient(base_url=settings.base_url, transport=httpx.MockTransport(api))
+    calls = {"n": 0}
+    real = fake_gateway.complete
+
+    async def breaks_on_third(role: Any, *args: Any, **kwargs: Any) -> Any:
+        if str(role) == "candidate":
+            calls["n"] += 1
+            if calls["n"] == 3:
+                raise RuntimeError("provider down")
+        return await real(role, *args, **kwargs)
+
+    monkeypatch.setattr(fake_gateway, "complete", breaks_on_third)
+    suite = Suite(name="t", scenarios=[Scenario(id="a", candidate_name="Ada Venn")])
+    run_dir, info = await run_suite(suite, settings, fake_gateway, CostMeter(load_prices()), "r",
+                                    AppClient(settings, http))  # fmt: skip
+    assert info["sessions_error"] == 1
+    (sid,) = api.sessions
+    lines = json.loads((run_dir / sid / "transcript.json").read_text("utf-8"))
+    assert [x["speaker"] for x in lines] == ["interviewer", "candidate"] * 2 + ["interviewer"]
+    assert api.sessions[sid]["status"] == "scoring"  # ended by the harness

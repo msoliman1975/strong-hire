@@ -64,9 +64,15 @@ def _interviewer_lines(conv: Conversation, clock: _Clock, turns: list[dict[str, 
 
 
 async def run_text(
-    scenario: Scenario, client: AppClient, candidate: Candidate, sid: str, settings: SimSettings
+    scenario: Scenario,
+    client: AppClient,
+    candidate: Candidate,
+    sid: str,
+    settings: SimSettings,
+    conv: Conversation | None = None,
 ) -> Conversation:
-    conv, clock = Conversation(), _Clock()
+    """Fills `conv` as it goes, so the caller keeps the lines when a turn fails."""
+    conv, clock = conv if conv is not None else Conversation(), _Clock()
     out = await client.text_open(sid)
     _interviewer_lines(conv, clock, out["turns"])
     turns = 0
@@ -157,8 +163,9 @@ async def run_voice(
     settings: SimSettings,
     gateway: ModelGateway,
     audio_path: Path,
+    conv: Conversation | None = None,
 ) -> Conversation:
-    conv, clock = Conversation(), _Clock()
+    conv, clock = conv if conv is not None else Conversation(), _Clock()
     recorder = Recorder()
     said: asyncio.Queue[list[str] | None] = asyncio.Queue()
     join = await client.voice_join(sid)
