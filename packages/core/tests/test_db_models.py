@@ -20,6 +20,7 @@ SPEC_TABLES = {
     "company_requests",  # spec: Companies outside the 20, request this company
     "stripe_events",  # BL-1: webhook events already handled (idempotency)
     "exit_surveys",  # P9: cancellation exit survey
+    "interviewer_traces",  # R2: admin review of interviewer calls, deleted after 90 days
 }
 
 

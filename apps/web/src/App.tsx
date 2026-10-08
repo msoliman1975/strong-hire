@@ -5,6 +5,11 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { ApiError } from "./api/client";
 import { AppLayout, PublicLayout } from "./components/Layout";
 import { AccountPage } from "./pages/AccountPage";
+import { AdminAuditPage } from "./pages/admin/AdminAuditPage";
+import { AdminLayout } from "./pages/admin/AdminLayout";
+import { AdminSessionPage } from "./pages/admin/AdminSessionPage";
+import { AdminSessionsPage } from "./pages/admin/AdminSessionsPage";
+import { AdminUsersPage } from "./pages/admin/AdminUsersPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { DebriefPage } from "./pages/DebriefPage";
 import { GapAnalysisPage } from "./pages/GapAnalysisPage";
@@ -56,6 +61,13 @@ export function AppRoutes() {
         <Route path="/reports" element={<ReportsPage />} />
         <Route path="/account" element={<AccountPage />} />
         <Route path="/upgrade" element={<PaywallPage />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Navigate to="interviews" replace />} />
+          <Route path="interviews" element={<AdminSessionsPage />} />
+          <Route path="interviews/:sessionId" element={<AdminSessionPage />} />
+          <Route path="users" element={<AdminUsersPage />} />
+          <Route path="audit" element={<AdminAuditPage />} />
+        </Route>
         {DevTextInterviewPage && (
           <Route
             path="/dev/interview"

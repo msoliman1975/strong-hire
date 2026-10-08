@@ -45,6 +45,7 @@ import type {
   ResumeOut,
   Usage,
 } from "../api/types";
+import { isMockAdmin } from "./adminHandlers";
 import { newId, type MockGap, type MockStore, type MockTask } from "./db";
 import { gapAnalysis, jobPosting, resume, scorecardFor, sessionPlan } from "./fixtures";
 
@@ -115,6 +116,7 @@ export function authHandlers(store: MockStore) {
         auth_provider: "dev",
         training_consent: body.training_consent ?? false,
         created_at: new Date().toISOString(),
+        is_admin: isMockAdmin(auth.email),
       };
       store.db.auth = { status: "signed_in", email: auth.email, userEmail: auth.email };
       store.save();

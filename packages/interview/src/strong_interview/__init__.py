@@ -16,17 +16,23 @@ from strong_interview.controller import (
     Move,
     MoveKind,
     SessionController,
+    Why,
 )
 from strong_interview.interviewer import Interviewer, SessionFacts
 from strong_interview.runner import InterviewRunner
+from strong_interview.trace import ListTraceSink, TraceRecord, TraceSink
 
 __all__ = [
     "PROBE_LIMIT",
     "CoachNotAllowedError",
     "InterviewRunner",
     "Interviewer",
+    "ListTraceSink",
     "Move",
     "MoveKind",
     "SessionController",
     "SessionFacts",
+    "TraceRecord",
+    "TraceSink",
+    "Why",
 ]

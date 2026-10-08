@@ -63,6 +63,11 @@ export function AppLayout() {
               <li>
                 <NavLink to="/account">Account</NavLink>
               </li>
+              {auth.data.user?.is_admin && (
+                <li>
+                  <NavLink to="/admin">Admin</NavLink>
+                </li>
+              )}
               {import.meta.env.DEV && (
                 <li>
                   <NavLink to="/dev/interview">Text interview (dev)</NavLink>

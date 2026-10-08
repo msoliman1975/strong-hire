@@ -49,6 +49,10 @@ class AuthSettings(BaseSettings):
     # Staging only: comma-separated emails that see the model spend meter (strong_api.devtools).
     model_spend_viewers: str = ""
 
+    # Comma-separated emails that may open the admin area (strong_api.admin, R2). Case does not
+    # matter. Everyone else gets 404 from the admin routes.
+    admin_emails: str = ""
+
     # The AI candidate (P13). POST /auth/sim-login exists only when sim_enabled is true, and it
     # signs in only sim_email, in that user's own org. Sim sessions skip the plan check and may
     # use the text channel.
@@ -63,6 +67,13 @@ class AuthSettings(BaseSettings):
     @property
     def spend_viewers(self) -> set[str]:
         return {e.strip().lower() for e in self.model_spend_viewers.split(",") if e.strip()}
+
+    @property
+    def admins(self) -> set[str]:
+        return {e.strip().lower() for e in self.admin_emails.split(",") if e.strip()}
+
+    def is_admin(self, email: str | None) -> bool:
+        return bool(email) and str(email).strip().lower() in self.admins
 
     @property
     def sim_active(self) -> bool:
