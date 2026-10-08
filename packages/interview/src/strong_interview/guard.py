@@ -318,8 +318,14 @@ def fallback_line(
     duration_min: int,
     mini: bool,
     question: str | None,
+    closing: bool = False,
+    open_question: bool = False,
 ) -> str:
-    """A fixed, safe line for the move, used when the model gave nothing usable twice."""
+    """A fixed, safe line for the move, used when the model gave nothing usable twice.
+
+    `closing`: the last answer before the wrap-up, so it does not invite more questions.
+    `open_question`: the wrap-up after a question there was no time to answer.
+    """
     if move == MoveKind.GREET:
         return f"Hello, I'm {name}, and I'll be your interviewer today. Thanks for your time."
     if move == MoveKind.SMALL_TALK:
@@ -346,7 +352,14 @@ def fallback_line(
     if move == MoveKind.INVITE_QUESTIONS:
         return "That covers my questions. What questions do you have for me?"
     if move == MoveKind.ANSWER_QUESTION:
+        if closing:
+            return "I'm afraid I don't know that detail."
         return "I'm afraid I don't know that detail. Is there anything else you'd like to ask?"
+    if move == MoveKind.WRAP_UP and open_question:
+        return (
+            "Thanks for your question; the recruiter can follow up on it. Thank you for your "
+            "time today. The team will be in touch about next steps. Goodbye."
+        )
     if move == MoveKind.WRAP_UP:
         return "Thank you for your time today. The team will be in touch about next steps. Goodbye."
     return "Let's continue."

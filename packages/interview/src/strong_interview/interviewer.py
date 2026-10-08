@@ -165,6 +165,14 @@ class Interviewer:
             facts=self.facts.render(),
         )
 
+    def _move_note(self, move: Move) -> str:
+        """An extra instruction for a closing move (from prompts/interviewer/note_*)."""
+        if move.closing:
+            return load_prompt(Role.INTERVIEWER, "note_last_question").render().strip()
+        if move.open_question:
+            return load_prompt(Role.INTERVIEWER, "note_open_question").render().strip()
+        return "none"
+
     def turn_messages(self, move: Move, turns: Sequence[Turn]) -> list[Message]:
         user = load_prompt(Role.INTERVIEWER, "turn_input").message(
             "user",
@@ -175,6 +183,7 @@ class Interviewer:
             pushback="on" if move.pushback else "off",
             duration_min=str(self.duration_min),
             plan=self.plan_text(),
+            note=self._move_note(move),
         )
         return [self._system(), user]
 
@@ -288,6 +297,8 @@ class Interviewer:
             duration_min=self.duration_min,
             mini=self.brief.session.is_mini,
             question=move.question.text if move.question else None,
+            closing=move.closing,
+            open_question=move.open_question,
         )
 
     async def say_stream(self, move: Move, turns: Sequence[Turn]) -> AsyncIterator[str]:

@@ -2,8 +2,12 @@
 
 from __future__ import annotations
 
+import asyncio
+import uuid
 from pathlib import Path
 from typing import Any
+
+import pytest
 
 from strong_core.gateway import ModelGateway, TokenUsage
 from strong_core.gateway.prices import cost_usd, load_token_prices
@@ -17,6 +21,7 @@ from strong_interview import (
     TraceRecord,
 )
 from strong_interview.testing import FakeClock, make_brief
+from strong_interview.trace_store import SqlTraceSink
 
 ANSWER = "We built a new billing service and it went well."
 
@@ -200,3 +205,48 @@ def test_r2_prices_come_from_the_litellm_config(tmp_path: Path) -> None:
     assert cost_usd("p", "fast", usage, tmp_path) == 0.0014
     assert cost_usd("p", "stt", usage, tmp_path) is None
     assert cost_usd("missing", "fast", usage, tmp_path) is None
+
+
+async def test_r2_moving_on_after_the_same_gap_says_why(
+    gateway: ModelGateway, clock: FakeClock
+) -> None:
+    """The fake model probes for the same gap every time: the second time the controller moves
+    on, and the trace says why (same_gap_not_filled)."""
+    sink = ListTraceSink()
+    runner = make_runner(gateway, clock, sink)  # Realistic: 2 probes allowed
+    await runner.open()
+    for _ in range(5):
+        clock.advance(ms=20_000)
+        await runner.respond(ANSWER)
+    says = [r for r in sink.records if r.call == "say"]
+    asks = [r for r in says if r.move == "ask"]
+    assert any("same_gap_not_filled" in r.reason["why"] for r in asks)
+
+
+async def test_r2_a_stuck_trace_insert_gives_up_and_frees_the_lock(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """A trace insert that cannot get the lock (or the database) in time is logged and dropped,
+    and `flush` with a limit returns instead of waiting forever."""
+
+    def no_database() -> Any:
+        raise AssertionError("the insert must not reach the database while the lock is held")
+
+    sink = SqlTraceSink(no_database, uuid.uuid4(), uuid.uuid4(), timeout_s=0.05)  # type: ignore[arg-type]
+    record = TraceRecord(
+        seq=1,
+        turn_index=0,
+        call="line",
+        move="x",
+        reason={},
+        phase=Phase.INTRO,
+        elapsed_ms=0,
+        phase_deadline_ms=0,
+    )
+    async with sink.lock:  # someone else holds the lock and never lets go in time
+        sink.write(record)
+        assert await sink.flush(timeout_s=0.01) is False
+        await asyncio.sleep(0.1)
+        assert await sink.flush(timeout_s=1) is True
+    assert not sink.lock.locked()
+    assert "trace 1 of session" in caplog.text and "not saved" in caplog.text

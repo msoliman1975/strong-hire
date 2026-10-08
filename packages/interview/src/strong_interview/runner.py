@@ -7,6 +7,12 @@ session time and, in CORE, the question it belongs to.
 With a TraceSink (R2), each interviewer model call (say and decide), each fixed line and each
 take-back is written as a TraceRecord with the controller's move, the reason and the timer
 state. A sink error is logged and ignored, so tracing never breaks the interview.
+
+A candidate turn that fails or is cancelled part way (a model error, a save error, a time limit
+in the text API) leaves the runner usable: the runner lock is released, a turn the `on_turn`
+hook could not save is taken back out of the transcript, and the controller goes back to its
+state before the turn unless an interviewer turn was already said. So the candidate can send
+the same answer again.
 """
 
 from __future__ import annotations
@@ -32,8 +38,21 @@ _NO_QUESTION = re.compile(
     r"^\s*(no|nope|not really|nothing|none|i'?m good|i am good|that'?s (all|it)|no more)\b",
     re.IGNORECASE,
 )
+# A question without a question mark: "Yes, how big is the team", "I'd love to know what ...".
+_ASKS = re.compile(
+    r"^\s*(?:(?:yes|yeah|yep|sure|ok(?:ay)?|well|actually|also|and|so|one more thing)\b[\s,.!-]*)*"
+    r"(?:what|how|why|when|where|who|whom|which|is|are|was|were|do|does|did|can|could|would"
+    r"|will|should)\b"
+    r"|\b(?:i'?d|i would)(?: also)? (?:love|like) to (?:know|hear|ask|understand|learn)\b"
+    r"|\bi (?:want|wanted) to (?:know|ask)\b"
+    r"|\b(?:i'?m|i am|i was) (?:curious|wondering)\b"
+    r"|\b(?:can|could|would) you (?:tell|share|walk|describe|explain|say|give)\b"
+    r"|\btell me (?:more |a bit |a little )*(?:about|what|how|why|who)\b",
+    re.IGNORECASE,
+)
 
 TurnHook = Callable[[Turn], Awaitable[None] | None]
+StageHook = Callable[[str], None]
 
 
 @dataclass(frozen=True)
@@ -45,8 +64,17 @@ class Checkpoint:
 
 
 def wants_to_ask(text: str) -> bool:
-    """In the candidate questions phase: did the candidate ask something?"""
-    return "?" in text or not _NO_QUESTION.search(text)
+    """In the candidate questions phase: did the candidate ask something?
+
+    A question mark, or a question in words ("I'd love to know what ..."). A thank-you, a
+    goodbye or "no, that's all" is not a question, so the interviewer closes instead of asking
+    "anything else?" again.
+    """
+    if "?" in text:
+        return True
+    if _NO_QUESTION.search(text):
+        return False
+    return bool(_ASKS.search(text))
 
 
 class InterviewRunner:
@@ -65,6 +93,8 @@ class InterviewRunner:
         self.turns: list[Turn] = []
         self._seq = 0
         self._lock = asyncio.Lock()
+        # What a candidate turn is doing now, for logs when it is slow (text API).
+        self.stage = "idle"
 
     @property
     def ended(self) -> bool:
@@ -139,9 +169,16 @@ class InterviewRunner:
     async def _add(self, turn: Turn) -> Turn:
         self.turns.append(turn)
         if self.on_turn is not None:
-            result = self.on_turn(turn)
-            if inspect.isawaitable(result):
-                await result
+            try:
+                result = self.on_turn(turn)
+                if inspect.isawaitable(result):
+                    await result
+            except BaseException:
+                # Not saved (an error, a time limit): take it back, so a retry does not leave
+                # the same turn twice in the transcript.
+                if self.turns and self.turns[-1] is turn:
+                    self.turns.pop()
+                raise
         return turn
 
     async def _say(self, move: Move, decision: ProbeDecision | None = None) -> Turn:
@@ -203,23 +240,65 @@ class InterviewRunner:
         return self._lock.locked()
 
     async def respond(
-        self, text: str, *, start_ms: int | None = None, end_ms: int | None = None
+        self,
+        text: str,
+        *,
+        start_ms: int | None = None,
+        end_ms: int | None = None,
+        on_stage: StageHook | None = None,
     ) -> list[Turn]:
         """Record the candidate's turn and return the interviewer's next turns.
 
         Returns an empty list once the session has ended. Turns are answered one at a time: two
         calls that overlap would each add a candidate turn and each get a reply, so the second
-        waits for the first.
+        waits for the first. `on_stage` is called with the name of each step when it is done
+        (for logs). If the turn fails or is cancelled, the runner is left usable (see above).
         """
         async with self._lock:
-            return await self._respond(text, start_ms=start_ms, end_ms=end_ms)
+            self._stage("runner_lock_acquired", on_stage)
+            checkpoint = self.checkpoint()
+            try:
+                turns = await self._respond(
+                    text, start_ms=start_ms, end_ms=end_ms, on_stage=on_stage
+                )
+            except BaseException:
+                self._recover(checkpoint)  # self.stage keeps the step that did not finish
+                raise
+            self.stage = "idle"
+            return turns
+
+    def _stage(self, name: str, on_stage: StageHook | None) -> None:
+        self.stage = name
+        if on_stage is not None:
+            try:
+                on_stage(name)
+            except Exception:
+                log.warning("stage hook failed", exc_info=True)
+
+    def _recover(self, checkpoint: Checkpoint) -> None:
+        """After a failed or cancelled turn: if the interviewer said nothing yet, the controller
+        goes back to its state before the turn, so the question stays open for a retry."""
+        said = any(t.speaker == Speaker.INTERVIEWER for t in self.turns[checkpoint.turns :])
+        if not said:
+            self.controller.restore(checkpoint.controller)
+        log.warning(
+            "candidate turn stopped at stage %s; controller %s",
+            self.stage,
+            "kept" if said else "restored",
+        )
 
     async def _respond(
-        self, text: str, *, start_ms: int | None = None, end_ms: int | None = None
+        self,
+        text: str,
+        *,
+        start_ms: int | None = None,
+        end_ms: int | None = None,
+        on_stage: StageHook | None = None,
     ) -> list[Turn]:
         ctl = self.controller
         if ctl.ended:
             return []
+        self.stage = "saving_candidate_turn"
         now = ctl.elapsed_ms
         start = now if start_ms is None else start_ms
         ref = ctl.question.id if ctl.phase == Phase.CORE and ctl.question else None
@@ -233,8 +312,10 @@ class InterviewRunner:
                 question_ref=ref,
             )
         )
+        self._stage("candidate_turn_saved", on_stage)
         decision = None
         if ctl.needs_decision and ctl.question is not None:
+            self.stage = "deciding"
             before = ctl.elapsed_ms
             timer = self._timer(Phase.CORE)
             self.interviewer.last_call = None
@@ -248,8 +329,14 @@ class InterviewRunner:
                 question_ref=ctl.question.id,
                 model_call=self.interviewer.last_call,
             )
+            self._stage("decide_done", on_stage)
         moves = ctl.after_answer(decision, has_question=wants_to_ask(text))
-        return [await self._say(move, decision) for move in moves]
+        turns = []
+        for move in moves:
+            self.stage = f"saying_{move.kind.value}"
+            turns.append(await self._say(move, decision))
+            self._stage(f"say_done_{move.kind.value}", on_stage)
+        return turns
 
     def checkpoint(self) -> Checkpoint:
         return Checkpoint(len(self.turns), self.controller.snapshot())

@@ -6,6 +6,7 @@ the admin area (/admin)."""
 from __future__ import annotations
 
 import asyncio
+import logging
 from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from typing import Any
@@ -32,6 +33,24 @@ from strong_core.config import get_settings
 from strong_core.db import get_engine, get_sessionmaker
 
 Check = Callable[[], Awaitable[None]]
+LOG_FORMAT = "%(asctime)s %(levelname)s %(name)s: %(message)s"
+
+
+def configure_logging() -> None:
+    """Show INFO logs of the app's own packages (uvicorn sets up only its own loggers).
+
+    Adds a handler to the root logger only when it has none, so a host that set up logging
+    (or pytest) keeps its own. Other libraries stay at WARNING.
+    """
+    root = logging.getLogger()
+    if not root.handlers:
+        handler = logging.StreamHandler()
+        handler.setFormatter(logging.Formatter(LOG_FORMAT))
+        root.addHandler(handler)
+    for name in ("strong_api", "strong_interview"):
+        logger = logging.getLogger(name)
+        if logger.level == logging.NOTSET:
+            logger.setLevel(logging.INFO)
 
 
 async def check_database() -> None:
@@ -103,4 +122,5 @@ def create_app(
     return app
 
 
+configure_logging()
 app = create_app()

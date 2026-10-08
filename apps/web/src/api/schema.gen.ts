@@ -423,6 +423,9 @@ export interface paths {
         /**
          * Text Turn
          * @description The candidate's turn. Returns the interviewer's reply; the session ends on its own.
+         *
+         *     504 when the reply takes longer than TEXT_TURN_TIMEOUT_S, 503 when the turn could not be
+         *     saved. In both cases the turn is taken back, and the candidate can send it again.
          */
         post: operations["text_turn_sessions__session_id__text_turn_post"];
         delete?: never;
