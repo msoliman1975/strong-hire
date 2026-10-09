@@ -33,7 +33,7 @@ function debrief(generic: boolean): Debrief {
 
 function renderDebrief(body: Debrief) {
   server.use(http.get("*/api/sessions/:sessionId/debrief", () => HttpResponse.json(body)));
-  render(
+  return render(
     <QueryClientProvider client={createQueryClient()}>
       <MemoryRouter initialEntries={["/sessions/s1/debrief"]}>
         <Routes>
@@ -64,7 +64,20 @@ describe("debrief page", () => {
     expect(await screen.findByTestId("hire-signal")).toHaveTextContent("Lean Hire");
     expect(screen.getByText(/clear ownership of the invoice migration/)).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Question by question" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Next session" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Next rehearsal" })).toBeInTheDocument();
+  });
+
+  it("FB-1: an earned verdict (Hire) shows the green check; Lean Hire does not", async () => {
+    const body = debrief(true);
+    const hire = { ...body, scorecard: { ...body.scorecard!, hire_signal: "Hire" as const } };
+    const { unmount } = renderDebrief(hire);
+    expect(await screen.findByTestId("hire-signal")).toHaveTextContent("Hire");
+    expect(document.querySelector(".verdict .check-badge")).not.toBeNull();
+    unmount();
+
+    renderDebrief(debrief(true));
+    expect(await screen.findByTestId("hire-signal")).toHaveTextContent("Lean Hire");
+    expect(document.querySelector(".verdict .check-badge")).toBeNull();
   });
 
   it("company mode shows the company values with scores and quotes", async () => {

@@ -95,3 +95,10 @@ export function formatDate(iso: string | null): string {
   if (!iso) return "";
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
+
+/**
+ * The product slogan next to the logo. Not agreed yet: while this is the placeholder,
+ * the header does not show a slogan.
+ */
+export const SLOGAN = "{{SLOGAN}}";
+export const hasSlogan = (s: string) => s.trim() !== "" && !s.startsWith("{{");
