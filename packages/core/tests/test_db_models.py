@@ -43,6 +43,30 @@ def test_training_consent_defaults_off() -> None:
     assert str(column.server_default.arg) == "false"
 
 
+def test_profile_fields_are_optional_until_completed() -> None:
+    """AC-3: existing users have no profile yet, so the app asks them once."""
+    users = Base.metadata.tables["users"].columns
+    for name in (
+        "full_name",
+        "current_title",
+        "years_experience",
+        "target_level",
+        "country",
+        "time_zone",
+        "linkedin_url",
+        "profile_completed_at",
+    ):
+        assert users[name].nullable, name
+
+
+def test_job_archive_and_session_resume_columns() -> None:
+    """LB-2 (archived_at) and PR-3 (the CV used for a session)."""
+    assert Base.metadata.tables["job_targets"].columns["archived_at"].nullable
+    resume_id = Base.metadata.tables["sessions"].columns["resume_id"]
+    assert resume_id.nullable
+    assert {fk.column.table.name for fk in resume_id.foreign_keys} == {"resumes"}
+
+
 def test_async_url_uses_asyncpg() -> None:
     from strong_core.db.engine import async_database_url
 
