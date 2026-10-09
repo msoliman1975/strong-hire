@@ -15,7 +15,8 @@ from strong_evals.transcripts import Quality
 
 def test_gap_suite_covers_the_p2_fixtures() -> None:
     suite = load_suite("gap")
-    resumes = {p.stem for p in (INPUTS_DIR / "resumes").glob("*.json")}
+    # The pasted-text CVs. The PDF and DOCX CVs test the file reader and the extractor only.
+    resumes = {p.stem for p in (INPUTS_DIR / "resumes").glob("*.txt")}
     assert {g.resume for g in suite.gap} == resumes
     assert {g.fit for g in suite.gap} == {"match", "mismatch"}
     assert set(POSTING_FOR_RESUME) == resumes

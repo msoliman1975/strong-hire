@@ -168,7 +168,11 @@ export interface paths {
         get: operations["get_resume_resumes__resume_id__get"];
         /**
          * Update Resume
-         * @description Confirm or edit the parsed resume. Gap analyses that used it start again.
+         * @description Confirm or edit the parsed resume ("Check your CV"). Gap analyses that used it start again.
+         *
+         *     The body is validated against the Resume contract. Saving marks the CV as confirmed
+         *     (confirmed_at), so a later re-read of the stored file does not overwrite the user's version
+         *     without asking. Confirming is optional: a gap analysis also runs on an unconfirmed CV.
          */
         put: operations["update_resume_resumes__resume_id__put"];
         post?: never;
@@ -2557,6 +2561,11 @@ export interface components {
             /** Has File */
             has_file: boolean;
             resume: components["schemas"]["Resume"] | null;
+            /**
+             * Confirmed At
+             * @description When the user checked and saved the extracted CV (PUT /resumes/{id}). None: not confirmed yet. A gap analysis does not wait for it.
+             */
+            confirmed_at?: string | null;
             /**
              * Uploaded At
              * Format: date-time

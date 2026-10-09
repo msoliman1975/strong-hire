@@ -139,6 +139,13 @@ class ResumeOut(BaseModel):
     status: Literal["pending", "extracted"]
     has_file: bool
     resume: Resume | None
+    confirmed_at: datetime | None = Field(
+        default=None,
+        description=(
+            "When the user checked and saved the extracted CV (PUT /resumes/{id}). None: not "
+            "confirmed yet. A gap analysis does not wait for it."
+        ),
+    )
     uploaded_at: datetime
 
 

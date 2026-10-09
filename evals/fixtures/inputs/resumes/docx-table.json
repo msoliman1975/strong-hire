@@ -1,0 +1,44 @@
+{
+  "summary": "Product designer with 7 years in health and fintech apps.",
+  "roles": [
+    {
+      "title": "Senior Product Designer",
+      "company": "Saguaro Health",
+      "start": "2022-10",
+      "end": null,
+      "achievements": [
+        "Own the design of the patient app and its design system.",
+        "Redesigned appointment booking; completed bookings rose by 27%",
+        "Built a design system of 80 components used by 4 squads"
+      ],
+      "skills": []
+    },
+    {
+      "title": "Product Designer",
+      "company": "Copperleaf Bank",
+      "start": "2018-03",
+      "end": "2022-09",
+      "achievements": [
+        "Designed the mobile onboarding flow that cut drop-off by 18%",
+        "Ran 40 usability sessions a year with customers"
+      ],
+      "skills": []
+    }
+  ],
+  "skills": [
+    "Figma",
+    "Prototyping",
+    "User research",
+    "Design systems",
+    "Accessibility"
+  ],
+  "education": [
+    {
+      "institution": "Sonoran School of Design",
+      "degree": "B.F.A.",
+      "field_of_study": "Interaction Design",
+      "end": "2018"
+    }
+  ],
+  "certifications": []
+}

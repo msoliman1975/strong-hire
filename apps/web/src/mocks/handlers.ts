@@ -438,6 +438,7 @@ export function inputHandlers(store: MockStore) {
         status: "pending",
         has_file: false,
         resume: null,
+        confirmed_at: null,
         uploaded_at: new Date().toISOString(),
       };
       db().resumes.push(record);
@@ -471,7 +472,7 @@ export function inputHandlers(store: MockStore) {
     http.delete(`${API}/resumes/:resumeId`, ({ params }) => {
       const r = findResume(params.resumeId);
       if (!r) return notFound("Resume");
-      Object.assign(r, { deleted: true, name: null, resume: null, has_file: false });
+      Object.assign(r, { deleted: true, name: null, resume: null, has_file: false, confirmed_at: null });
       delete db().resumeHashes[r.id];
       store.save();
       return new HttpResponse(null, { status: 204 });
@@ -479,8 +480,11 @@ export function inputHandlers(store: MockStore) {
     http.put(`${API}/resumes/:resumeId`, async ({ params, request }) => {
       const r = findResume(params.resumeId);
       if (!r || r.deleted) return notFound("Resume");
+      if (r.status !== "extracted") {
+        return HttpResponse.json({ detail: "The resume is still being read. Try again in a minute." }, { status: 409 });
+      }
       r.resume = ((await request.json()) as { resume: Resume }).resume;
-      r.status = "extracted";
+      r.confirmed_at = new Date().toISOString();
       store.save();
       return HttpResponse.json(r);
     }),

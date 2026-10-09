@@ -1,0 +1,59 @@
+{
+  "summary": "Engineering lead with 12 years in search, knowledge graphs and developer tools.",
+  "roles": [
+    {
+      "title": "Principal Engineer, AI Platform",
+      "company": "Lumenfield Commerce",
+      "start": "2025-09",
+      "end": null,
+      "achievements": [
+        "Lead a group of 9 engineers that builds the AI platform for the marketplace search and seller tools.",
+        "Knowledge Graphs & Catalog Search: Designed a product knowledge graph of 40 million items that raised search conversion by 3.1%.",
+        "AI Coding & Workflow Agent: Led the prototype of an agentic platform that drafts code changes; 120 engineers used it in the first month.",
+        "Evaluation Harness: Built an offline evaluation suite of 2,400 queries that gates every ranking model release.",
+        "Hiring: Interviewed 60 candidates and hired 5 senior engineers."
+      ],
+      "skills": []
+    },
+    {
+      "title": "Senior Software Engineer",
+      "company": "Graniteview Cloud Works",
+      "start": "2017",
+      "end": "2025",
+      "achievements": [
+        "Owned the indexing service behind the developer documentation search.",
+        "Indexing Pipeline: Rebuilt the nightly index as a streaming job, cutting freshness lag from 24 hours to 15 minutes.",
+        "Reliability: Reduced paging incidents from 14 to 3 per quarter."
+      ],
+      "skills": []
+    },
+    {
+      "title": "Software Engineer",
+      "company": "Bramblewood Labs",
+      "start": "2013",
+      "end": "2017",
+      "achievements": [
+        "Built data tools for a 20-person research team.",
+        "Query Builder: Shipped a visual query builder used by 300 analysts."
+      ],
+      "skills": []
+    }
+  ],
+  "skills": [
+    "Python",
+    "Java",
+    "Elasticsearch",
+    "Graph databases",
+    "Kubernetes",
+    "PyTorch"
+  ],
+  "education": [
+    {
+      "institution": "Puget Ridge University",
+      "degree": "M.S.",
+      "field_of_study": "Computer Science",
+      "end": "2013"
+    }
+  ],
+  "certifications": []
+}
