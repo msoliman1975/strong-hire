@@ -73,3 +73,31 @@ The rows have `stripe_customer_id` `test-plan:<user id>`. To remove them:
   Also set a monthly limit in the Anthropic Console. It is the hard limit.
 - To pay nothing between test rounds, take a snapshot of the server in the Hetzner console, then
   delete the server. Hetzner bills a server that is powered off.
+
+## Re-read stored CVs
+
+After a change to the CV file reader (`apps/worker/src/strong_worker/inputs/documents.py`) or
+to the resume prompt (`prompts/extractor/resume.v*.txt`), stored CVs keep the old parsed data
+until they are read again. The command `strong_worker.inputs.reread` reads every stored CV file
+again and runs the extractor:
+
+- It skips deleted CVs (R1 `deleted_at`) and CVs without a stored file.
+- It skips CVs the user confirmed on the "Check your CV" screen (`resumes.confirmed_at`). The
+  user's version wins. `--include-confirmed` overwrites them too and clears `confirmed_at`, so
+  those users see the screen again. Ask the users before you use it.
+- Each update writes `resumes.parsed_json` and adds an `audit_logs` row with the action
+  `resume.reread` (old and new role count, prompt version, flags).
+- Gap reports made before the run keep their numbers. The next gap analysis uses the new data.
+
+Each CV costs one extractor call (Claude Haiku), also with `--dry-run`. Run it in the worker
+container. First a dry run on a few CVs, then the full run:
+
+```bash
+cd /opt/stronghire/strong-hire
+docker exec -it "$(docker ps -qf name=worker)" python -m strong_worker.inputs.reread --dry-run --limit 5 --verbose
+docker exec -it "$(docker ps -qf name=worker)" python -m strong_worker.inputs.reread
+```
+
+Other options: `--org <id>` and `--resume <id>` limit the run to one org or one CV. The command
+prints the number of CVs per outcome: `updated`, `unchanged`, `skipped_confirmed`,
+`unreadable`, `extraction_failed`, `error`.

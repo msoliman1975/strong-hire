@@ -589,7 +589,7 @@
           "inputs"
         ],
         "summary": "Update Resume",
-        "description": "Confirm or edit the parsed resume. Gap analyses that used it start again.",
+        "description": "Confirm or edit the parsed resume (\"Check your CV\"). Gap analyses that used it start again.\n\nThe body is validated against the Resume contract. Saving marks the CV as confirmed\n(confirmed_at), so a later re-read of the stored file does not overwrite the user's version\nwithout asking. Confirming is optional: a gap analysis also runs on an unconfirmed CV.",
         "operationId": "update_resume_resumes__resume_id__put",
         "parameters": [
           {
@@ -6381,6 +6381,19 @@
                 "type": "null"
               }
             ]
+          },
+          "confirmed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmed At",
+            "description": "When the user checked and saved the extracted CV (PUT /resumes/{id}). None: not confirmed yet. A gap analysis does not wait for it."
           },
           "uploaded_at": {
             "type": "string",

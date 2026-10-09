@@ -1,0 +1,53 @@
+{
+  "summary": "Machine learning engineer who ships ranking and forecasting models.",
+  "roles": [
+    {
+      "title": "Staff ML Engineer",
+      "company": "Northgate Freight",
+      "start": "2023-06",
+      "end": null,
+      "achievements": [
+        "Led the demand forecasting model that cut empty truck miles by 9%",
+        "Set the model review process for 3 ML teams"
+      ],
+      "skills": []
+    },
+    {
+      "title": "Senior ML Engineer",
+      "company": "Northgate Freight",
+      "start": "2020-01",
+      "end": "2023-05",
+      "achievements": [
+        "Built the load matching ranker; accepted matches rose by 14%",
+        "Moved training from notebooks to a scheduled pipeline on Kubeflow"
+      ],
+      "skills": []
+    },
+    {
+      "title": "Data Scientist",
+      "company": "Willowbend Analytics",
+      "start": "2016-09",
+      "end": "2019-12",
+      "achievements": [
+        "Built churn models for 12 retail clients"
+      ],
+      "skills": []
+    }
+  ],
+  "skills": [
+    "Python",
+    "PyTorch",
+    "XGBoost",
+    "Kubeflow",
+    "SQL"
+  ],
+  "education": [
+    {
+      "institution": "Cascadia Polytechnic",
+      "degree": "M.S.",
+      "field_of_study": "Statistics",
+      "end": "2016"
+    }
+  ],
+  "certifications": []
+}
