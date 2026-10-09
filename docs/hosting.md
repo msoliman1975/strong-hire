@@ -53,6 +53,16 @@ Sign-in uses email links. The server sends them through Brevo SMTP (`smtp-relay.
 cd /opt/stronghire/strong-hire && ./scripts/server-deploy.sh
 ```
 
+### Deploy from the owner's PC
+
+The deploy key (`infra/server/deploy-key.pub`) can start a deploy and nothing else. Its private
+half is `~/.ssh/stronghire_deploy` on the owner's PC. To add it on the server, run once:
+`bash infra/server/add-deploy-key.sh`. It writes the key into root's `authorized_keys` with
+`command="…/scripts/server-deploy.sh",restrict`, so the server ignores any other command.
+
+To deploy: `ssh -i ~/.ssh/stronghire_deploy root@getstronghire.com`. Claude Code has an allow
+rule for this exact command. To change the key, replace `deploy-key.pub` and run the script again.
+
 ## Test plans
 
 Stripe is not set up. `infra/server/grant-test-plans.sh` gives a test subscription (status active,
