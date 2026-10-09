@@ -106,10 +106,14 @@ IDs are referenced by the build plan and acceptance tests. Priority: P0 must shi
 | FB-3 | Debrief ready within 60 seconds of session end. | P0 |
 | PR-1 | Progress dashboard per target job: competency trends from Realistic sessions only. | P0 |
 | PR-2 | Recommended next session based on remaining gaps. | P0 |
+| PR-3 | Interview rehearsals: the user picks a job description and a CV, or adds one. For that pair, the app shows the earlier gap reports, debriefs and hire signals. | P0 |
 | BL-1 | Stripe subscription, one plan, monthly minute cap, usage meter visible in the app. | P0 |
 | BL-2 | Free tier: unlimited gap analyses (rate limited) plus one free interview. | P0 |
 | AC-1 | Self-service export and full delete of account and all data. | P0 |
 | AC-2 | Training-data consent toggle, off by default, changeable any time. | P0 |
+| AC-3 | At the first sign-in, ask for a short profile: full name, years of experience and target level, plus optional current title, country, time zone and LinkedIn URL. No payment details. The user edits it under Account, Profile. | P0 |
+| LB-1 | A top-level Resumes page lists saved CVs. The user can add, rename and delete a CV there. | P0 |
+| LB-2 | A top-level Job descriptions page lists saved job postings. A job description with no gap report and no session can be deleted. One that has reports can be archived and restored; a "Show archived" switch shows archived ones. | P0 |
 | AD-1 | Profile import command: validate a profile JSON file against the schema, store it as a new version with sources and import date, and publish it after confirmation. | P0 |
 | AD-2 | Admin dashboard: users, sessions, cost per session, failed sessions. | P1 |
 | PL-1 | Every model call is routed by role through the model gateway, so local and hosted models switch by config (see Architecture). | P0 |

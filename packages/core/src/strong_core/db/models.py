@@ -132,6 +132,19 @@ class User(Base):
     last_sign_in_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), comment="Set at each sign-in (admin users page)"
     )
+    # AC-3: profile asked for at the first sign-in. No payment details here.
+    full_name: Mapped[str | None] = mapped_column(String(120), comment="AC-3")
+    current_title: Mapped[str | None] = mapped_column(String(120), comment="AC-3: optional")
+    years_experience: Mapped[int | None] = mapped_column(Integer, comment="AC-3: 0 to 50")
+    target_level: Mapped[Level | None] = mapped_column(
+        str_enum(Level, "target_level"), comment="AC-3: default level for new sessions"
+    )
+    country: Mapped[str | None] = mapped_column(String(100), comment="AC-3: optional")
+    time_zone: Mapped[str | None] = mapped_column(String(64), comment="AC-3: IANA name, optional")
+    linkedin_url: Mapped[str | None] = mapped_column(String(300), comment="AC-3: optional")
+    profile_completed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), comment="AC-3: NULL until the user saves the profile once"
+    )
 
 
 class Subscription(Base):
@@ -280,6 +293,10 @@ class JobTarget(Base):
         DateTime(timezone=True),
         comment="R1: soft delete. Content is cleared; reports, sessions and progress stay",
     )
+    archived_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        comment="LB-2: hidden from pickers but kept, for a job that has reports. NULL: active",
+    )
     created_at: Mapped[datetime] = _created_at()
 
 
@@ -317,6 +334,11 @@ class InterviewSession(Base):
     id: Mapped[uuid.UUID] = _uuid_pk()
     org_id: Mapped[uuid.UUID] = _org_fk()
     job_target_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("job_targets.id"), index=True)
+    resume_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("resumes.id"),
+        index=True,
+        comment="PR-3: the CV of the job's latest gap analysis when the session was created",
+    )
     type: Mapped[InterviewType] = mapped_column(str_enum(InterviewType, "interview_type"))
     difficulty: Mapped[Difficulty] = mapped_column(str_enum(Difficulty, "difficulty"))
     mode: Mapped[Mode] = mapped_column(str_enum(Mode, "mode"))
