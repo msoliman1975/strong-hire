@@ -112,7 +112,7 @@ function JobCard({ summary }: { summary: JobTargetSummary }) {
         )}
       </div>
       <p className="job-card__meta">
-        {setup && <span className="chip chip--setup">Setup not finished</span>}
+        {setup && <span className="chip chip--setup">Not ready to rehearse</span>}
         <span>
           {summary.sessions_count} {summary.sessions_count === 1 ? "session" : "sessions"}
           {summary.last_session_at && `, last on ${formatDate(summary.last_session_at)}`}
@@ -121,7 +121,7 @@ function JobCard({ summary }: { summary: JobTargetSummary }) {
       <div className="job-card__actions">
         {setup ? (
           <Link className="btn btn--secondary" to={setup}>
-            Continue setup
+            Get ready to rehearse
           </Link>
         ) : (
           <RehearseButton jobId={job.id} />
