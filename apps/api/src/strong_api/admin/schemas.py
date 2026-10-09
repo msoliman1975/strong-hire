@@ -122,6 +122,10 @@ class AdminSessionDetail(BaseModel):
     transcript: list[Turn] | None
     traces: list[AdminTrace] | None
     trace_retention_days: int
+    audio_available: bool = Field(
+        default=False,
+        description="True when a recording can be downloaded (AI candidate voice interviews).",
+    )
 
 
 class AdminAuditEntry(BaseModel):

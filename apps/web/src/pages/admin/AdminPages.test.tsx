@@ -92,6 +92,7 @@ describe("admin area (R2)", () => {
     expect(await screen.findByText("This user has not given consent. You can see the details above only.")).toBeInTheDocument();
     expect(screen.getByText("Lean Hire")).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Transcript" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Download transcript" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Interviewer reasoning" })).not.toBeInTheDocument();
     await user.click(screen.getByRole("link", { name: "Audit log" }));
     expect(await screen.findByText("No entries yet.")).toBeInTheDocument();
@@ -102,6 +103,11 @@ describe("admin area (R2)", () => {
     const user = renderAt(`/admin/interviews/${SESSION_ID}`);
     expect(await screen.findByRole("heading", { name: "Transcript" })).toBeInTheDocument();
     expect(screen.getByText("Happy to be here.")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Download transcript" })).toHaveAttribute(
+      "href",
+      expect.stringMatching(new RegExp(`/api/admin/sessions/${SESSION_ID}/transcript\\.txt$`)),
+    );
+    expect(screen.queryByRole("link", { name: "Download audio" })).not.toBeInTheDocument();
     const traces = screen.getByRole("heading", { name: "Interviewer reasoning" }).closest("section") as HTMLElement;
     expect(within(traces).getByRole("heading", { name: "4. probe (say)" })).toBeInTheDocument();
     expect(within(traces).getByText("model chose probe; model said probe (missing: measurable result)")).toBeInTheDocument();

@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import json
+import logging
+import os
+import time
 import uuid
 from datetime import UTC, datetime
 from pathlib import Path
@@ -10,16 +13,20 @@ from typing import Any
 
 import httpx
 import pytest
-from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+from sqlalchemy import func, select, text
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from strong_api.billing.entitlements import count_free_interviews_used
 from strong_api.sessions import router as sessions_router  # the module
 from strong_api.sessions.failure import BRIEF_STALE_AFTER
+from strong_api.sessions.settings import TextSessionSettings, get_text_session_settings
 from strong_core.config import get_settings
-from strong_core.db.models import InterviewSession, JobTarget
+from strong_core.db.engine import async_database_url
+from strong_core.db.models import InterviewerTrace, InterviewSession, JobTarget, Org, User
 from strong_core.db.models import Turn as TurnRow
-from strong_core.schemas import Phase, SessionStatus, Speaker
+from strong_core.schemas import Difficulty, InterviewType, Mode, Phase, SessionStatus, Speaker
+from strong_interview.trace import TraceRecord
+from strong_interview.trace_store import SqlTraceSink
 from strong_worker.gap import jobs as gap_jobs
 from strong_worker.gap.brief import BriefError
 from strong_worker.inputs.testing import set_extractor_output
@@ -427,3 +434,172 @@ async def test_text_turn_while_the_interviewer_is_replying_is_refused(
     assert busy.json()["detail"] == "The interviewer is still replying."
     ok = await client.post(f"/sessions/{sid}/text/turn", json={"text": "Hello"})
     assert ok.status_code == 200
+
+
+# ---------------------------------------------------------------- stuck text turns (d40440ac)
+
+
+def limits(app: Any, turn_s: float = 45.0, db_s: float = 10.0) -> None:
+    app.dependency_overrides[get_text_session_settings] = lambda: TextSessionSettings(
+        text_turn_timeout_s=turn_s, text_db_timeout_s=db_s
+    )
+
+
+async def candidate_texts(sessionmaker: async_sessionmaker[AsyncSession], sid: str) -> list[str]:
+    async with sessionmaker() as db:
+        rows = await db.scalars(
+            select(TurnRow)
+            .where(TurnRow.session_id == uuid.UUID(sid), TurnRow.speaker == Speaker.CANDIDATE)
+            .order_by(TurnRow.seq)
+        )
+        return [row.text for row in rows]
+
+
+async def test_a_stuck_text_turn_answers_504_and_the_session_goes_on(
+    client: httpx.AsyncClient,
+    fake_fixtures: Path,
+    app: Any,
+    sessionmaker: async_sessionmaker[AsyncSession],
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Session d40440ac: a text turn hung with no answer. Now the turn has a time limit: the
+    API answers 504 and logs the stage; the runner and the trace lock are free again, nothing
+    half-saved is left, and the same answer can be sent again."""
+    limits(app, turn_s=0.2)
+    job = await ready_job(client, fake_fixtures)
+    sid = (await create(client, job["id"], channel="text")).json()["id"]
+    assert (await client.post(f"/sessions/{sid}/text/open")).status_code == 200
+    runner = app.state.text_runners[uuid.UUID(sid)]
+    caplog.set_level(logging.INFO, logger="strong_api")
+    async with runner.trace.lock:  # the turn save cannot start
+        stuck = await client.post(f"/sessions/{sid}/text/turn", json={"text": "Hello"})
+    assert stuck.status_code == 504
+    assert stuck.json()["detail"] == (
+        "The interviewer took too long to reply. Send your answer again."
+    )
+    assert "stopped at stage saving_candidate_turn" in caplog.text
+    assert not runner.busy and not runner.trace.lock.locked()
+    assert await candidate_texts(sessionmaker, sid) == []
+    ok = await client.post(f"/sessions/{sid}/text/turn", json={"text": "Hello"})
+    assert ok.status_code == 200 and ok.json()["turns"]
+    assert await candidate_texts(sessionmaker, sid) == ["Hello"]
+    steps = [
+        "received, 5 characters",
+        "runner_lock_acquired",
+        "candidate_turn_saved",
+        "say_done_agenda",  # a 10-minute session has no small talk
+        "say_done_ask",
+        "traces_flushed",
+        "response_sent",
+    ]
+    for step in steps:
+        assert f"text/turn {sid}: {step}" in caplog.text, step
+
+
+async def test_a_turn_that_cannot_be_saved_in_time_answers_503(
+    client: httpx.AsyncClient,
+    fake_fixtures: Path,
+    app: Any,
+    sessionmaker: async_sessionmaker[AsyncSession],
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """The turn save has its own, shorter database limit, so it fails with a logged error."""
+    limits(app, turn_s=5.0, db_s=0.1)
+    job = await ready_job(client, fake_fixtures)
+    sid = (await create(client, job["id"], channel="text")).json()["id"]
+    await client.post(f"/sessions/{sid}/text/open")
+    runner = app.state.text_runners[uuid.UUID(sid)]
+    async with runner.trace.lock:
+        failed = await client.post(f"/sessions/{sid}/text/turn", json={"text": "Hello"})
+    assert failed.status_code == 503
+    assert "candidate turn not saved" in caplog.text
+    assert not runner.busy
+    ok = await client.post(f"/sessions/{sid}/text/turn", json={"text": "Hello"})
+    assert ok.status_code == 200
+    assert await candidate_texts(sessionmaker, sid) == ["Hello"]
+
+
+async def test_text_open_logs_its_steps(
+    client: httpx.AsyncClient, fake_fixtures: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    caplog.set_level(logging.INFO, logger="strong_api")
+    job = await ready_job(client, fake_fixtures)
+    sid = (await create(client, job["id"], channel="text")).json()["id"]
+    assert (await client.post(f"/sessions/{sid}/text/open")).status_code == 200
+    for step in ("received", "session_started", "say_done_greet", "response_sent"):
+        assert f"text/open {sid}: {step}" in caplog.text, step
+
+
+POSTGRES_URL = os.environ.get("STRONG_TEST_POSTGRES_URL")
+
+
+@pytest.mark.skipif(POSTGRES_URL is None, reason="needs STRONG_TEST_POSTGRES_URL (migrated)")
+async def test_postgres_a_row_lock_stops_a_trace_insert_quickly(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """On Postgres, an insert that waits on a row lock (here: the session row is locked FOR
+    UPDATE by another transaction, which blocks the foreign key check) fails after lock_timeout
+    with a logged error that names the lock, instead of waiting forever."""
+    assert POSTGRES_URL is not None
+    engine = create_async_engine(async_database_url(POSTGRES_URL))
+    maker = async_sessionmaker(engine, expire_on_commit=False)
+    try:
+        async with maker() as db:
+            org = Org(name="pg-lock-test")
+            db.add(org)
+            await db.flush()
+            user = User(
+                org_id=org.id, email=f"pg-{uuid.uuid4().hex}@example.com", auth_provider="dev"
+            )
+            db.add(user)
+            await db.flush()
+            job = JobTarget(org_id=org.id, user_id=user.id, raw_text="Senior engineer")
+            db.add(job)
+            await db.flush()
+            session = InterviewSession(
+                org_id=org.id,
+                job_target_id=job.id,
+                type=InterviewType.BEHAVIORAL,
+                difficulty=Difficulty.REALISTIC,
+                mode=Mode.REALISTIC,
+                duration_min=30,
+            )
+            db.add(session)
+            await db.commit()
+            org_id, session_id = org.id, session.id
+        sink = SqlTraceSink(maker, org_id, session_id, timeout_s=1.0)
+        record = TraceRecord(
+            seq=1,
+            turn_index=0,
+            call="line",
+            move="x",
+            reason={},
+            phase=Phase.INTRO,
+            elapsed_ms=0,
+            phase_deadline_ms=0,
+        )
+        async with maker() as holder:
+            await holder.execute(
+                text("SELECT id FROM sessions WHERE id = :s FOR UPDATE"), {"s": session_id}
+            )
+            started = time.perf_counter()
+            sink.write(record)
+            assert await sink.flush(timeout_s=10) is True
+            assert time.perf_counter() - started < 5
+            await holder.rollback()
+        assert "could not save trace 1 of session" in caplog.text
+        assert "lock timeout" in caplog.text  # Postgres: canceling statement due to lock timeout
+        async with maker() as db:
+            count = await db.scalar(
+                select(func.count(InterviewerTrace.id)).where(
+                    InterviewerTrace.session_id == session_id
+                )
+            )
+            assert count == 0
+            await db.execute(text("DELETE FROM sessions WHERE id = :s"), {"s": session_id})
+            await db.execute(text("DELETE FROM job_targets WHERE org_id = :o"), {"o": org_id})
+            await db.execute(text("DELETE FROM users WHERE org_id = :o"), {"o": org_id})
+            await db.execute(text("DELETE FROM orgs WHERE id = :o"), {"o": org_id})
+            await db.commit()
+    finally:
+        await engine.dispose()

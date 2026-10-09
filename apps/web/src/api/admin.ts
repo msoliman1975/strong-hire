@@ -5,7 +5,7 @@
  */
 import { useQuery } from "@tanstack/react-query";
 
-import { apiClient, unwrap } from "./client";
+import { API_BASE, apiClient, unwrap } from "./client";
 import type { components } from "./schema.gen";
 
 type S = components["schemas"];
@@ -36,6 +36,12 @@ export const adminApi = {
     ),
   audit: async (scope: AuditScope = "admin") =>
     unwrap(await apiClient.GET("/admin/audit", { params: { query: { scope } } })),
+};
+
+/** Plain links: the browser downloads the files with the session cookie. Each one is audited. */
+export const adminDownloads = {
+  transcript: (sessionId: string) => `${API_BASE}/admin/sessions/${sessionId}/transcript.txt`,
+  audio: (sessionId: string) => `${API_BASE}/admin/sessions/${sessionId}/audio`,
 };
 
 export const adminKeys = {

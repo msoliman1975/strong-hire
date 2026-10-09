@@ -5,6 +5,17 @@ WRAP_UP. The controller decides every phase change and when the session ends; th
 does. The interviewer model only chooses what to say, and in CORE whether to probe. The
 controller caps probes per question by difficulty, so a weak model cannot loop.
 
+A follow-up must aim at something new. Each probe records what the answer lacked (the decision's
+`missing`). When the next decision asks to probe only for gaps already probed on this question,
+the candidate did not fill them after being asked once, so the controller moves on
+(`same_gap_not_filled`) instead of asking the same thing in new words. A probe on a gap not yet
+asked about is still allowed, within the probe limit.
+
+Candidate questions: a question is answered while time and the limit allow. When the controller
+must close anyway (limit reached, phase time up), a pending question still gets a short last
+answer before the wrap-up. When the session time is fully used, the wrap-up line acknowledges the
+question and says the recruiter can follow up.
+
 Time: each phase gets minutes from the brief's time_plan (or a default plan). CORE stops
 starting new questions when less than MIN_QUESTION_MS is left; lower-priority questions are
 dropped. Coach mode can pause the clock.
@@ -101,6 +112,9 @@ class Why(StrEnum):
     CANDIDATE_HAD_NO_QUESTION = "candidate_had_no_question"
     CANDIDATE_QUESTIONS_TIME_UP = "candidate_questions_time_up"
     CANDIDATE_QUESTIONS_LIMIT = "candidate_questions_limit"
+    SAME_GAP_NOT_FILLED = "same_gap_not_filled"
+    ANSWER_BEFORE_CLOSE = "answer_before_close"
+    CANDIDATE_QUESTION_LEFT_OPEN = "candidate_question_left_open"
     ENDED_EARLY = "ended_early"
     COACH_REQUEST = "coach_request"
     UNEXPECTED_PHASE = "unexpected_phase"
@@ -131,6 +145,10 @@ class Move:
     pushback: bool = False
     expects_answer: bool = True
     reason: tuple[Why, ...] = ()
+    # ANSWER_QUESTION: the last answer before the close; do not invite more questions.
+    closing: bool = False
+    # WRAP_UP: the candidate asked a question there is no time left to answer.
+    open_question: bool = False
 
     @property
     def question_ref(self) -> str | None:
@@ -173,6 +191,8 @@ class SessionController:
     dropped: list[str] = field(default_factory=list)
     curveball_used: bool = False
     candidate_questions: int = 0
+    # The gaps (ProbeDecision.missing) already probed on the current question.
+    probed_missing: list[ProbeTrigger] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         self._clock = _Clock(self.clock)
@@ -205,6 +225,7 @@ class SessionController:
         "dropped",
         "curveball_used",
         "candidate_questions",
+        "probed_missing",
         "_queue",
     )
 
@@ -279,6 +300,13 @@ class SessionController:
             self.ended = True
             return []
         if self.elapsed_ms >= self.total_ms:
+            if self.phase == Phase.CANDIDATE_QUESTIONS and has_question:
+                # No time to answer: the closing line acknowledges the question.
+                return [
+                    self._wrap_up(
+                        Why.SESSION_TIME_UP, Why.CANDIDATE_QUESTION_LEFT_OPEN, open_question=True
+                    )
+                ]
             return [self._wrap_up(Why.SESSION_TIME_UP)]
         if self.phase == Phase.INTRO and not self._skipped(Phase.SMALL_TALK):
             self.phase = Phase.SMALL_TALK
@@ -291,13 +319,22 @@ class SessionController:
             return [agenda, *self._next_core(Why.NEXT_PHASE)]
         if self.phase == Phase.CORE:
             if decision is not None and decision.action == "probe" and self.needs_decision:
+                missing = tuple(dict.fromkeys(decision.missing))  # in order, no duplicates
+                if self.probes_used > 0:
+                    # A later follow-up must aim at a gap not asked about yet. If the answer
+                    # still lacks only what was already probed, asking again in new words does
+                    # not help: move on.
+                    missing = tuple(m for m in missing if m not in self.probed_missing)
+                    if not missing:
+                        return self._next_core(Why.SAME_GAP_NOT_FILLED)
                 self.probes_used += 1
+                self.probed_missing.extend(missing)
                 return [
                     Move(
                         MoveKind.PROBE,
                         Phase.CORE,
                         self.question,
-                        tuple(decision.missing),
+                        missing,
                         pushback=self.brief.pushback,
                         reason=(Why.MODEL_CHOSE_PROBE,),
                     )
@@ -315,12 +352,19 @@ class SessionController:
                     )
                 ]
             if not has_question:
-                why = Why.CANDIDATE_HAD_NO_QUESTION
-            elif not in_time:
-                why = Why.CANDIDATE_QUESTIONS_TIME_UP
-            else:
-                why = Why.CANDIDATE_QUESTIONS_LIMIT
-            return [self._wrap_up(why)]
+                return [self._wrap_up(Why.CANDIDATE_HAD_NO_QUESTION)]
+            why = Why.CANDIDATE_QUESTIONS_TIME_UP if not in_time else Why.CANDIDATE_QUESTIONS_LIMIT
+            # The session still has time: answer this last question briefly, then close. The
+            # wrap-up comes right after, so the answer does not invite more questions.
+            self.candidate_questions += 1
+            last_answer = Move(
+                MoveKind.ANSWER_QUESTION,
+                Phase.CANDIDATE_QUESTIONS,
+                expects_answer=False,
+                reason=(why, Why.ANSWER_BEFORE_CLOSE),
+                closing=True,
+            )
+            return [last_answer, self._wrap_up(why)]
         return [self._wrap_up(Why.UNEXPECTED_PHASE)]  # AGENDA has no answer; recover by closing
 
     def _moved_on_because(self, decision: ProbeDecision | None) -> Why:
@@ -343,6 +387,7 @@ class SessionController:
     def _next_core(self, why: Why) -> list[Move]:
         self.phase = Phase.CORE
         self.probes_used = 0
+        self.probed_missing = []
         self.hints_used = 0
         enough_time = self._core_left_ms() >= MIN_QUESTION_MS
         curveball_due = (
@@ -376,13 +421,13 @@ class SessionController:
         self.phase = Phase.CANDIDATE_QUESTIONS
         return [Move(MoveKind.INVITE_QUESTIONS, Phase.CANDIDATE_QUESTIONS, reason=(why, stop))]
 
-    def _wrap_up(self, *why: Why) -> Move:
+    def _wrap_up(self, *why: Why, open_question: bool = False) -> Move:
         if self.phase == Phase.CORE:
             self.dropped.extend(q.id for q in self._queue)
             self._queue = []
         self.phase = Phase.WRAP_UP
         self.question = None
-        return Move(MoveKind.WRAP_UP, Phase.WRAP_UP, reason=why)
+        return Move(MoveKind.WRAP_UP, Phase.WRAP_UP, reason=why, open_question=open_question)
 
     # ------------------------------------------------------------------ dropped connection (IV-9)
 
@@ -430,4 +475,5 @@ class SessionController:
         if self.phase != Phase.CORE or self.question is None:
             return None
         self.probes_used = 0
+        self.probed_missing = []
         return Move(MoveKind.REDO, Phase.CORE, self.question, reason=(Why.COACH_REQUEST,))

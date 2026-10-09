@@ -142,7 +142,7 @@ try {
                     Invoke-Native 'uv' ($a + @('upgrade', 'head'))
                 }
                 Invoke-Check 'migrations' 'Postgres-only tests' {
-                    Invoke-Native 'uv' @('run', 'pytest', 'packages/core/tests/test_profiles.py', 'apps/api/tests/test_account.py', '-k', 'postgres', '-rs', '-q')
+                    Invoke-Native 'uv' @('run', 'pytest', 'packages/core/tests/test_profiles.py', 'apps/api/tests/test_account.py', 'apps/api/tests/test_sessions_api.py', '-k', 'postgres', '-rs', '-q')
                 }
                 Invoke-Check 'migrations' 'seed is repeatable' {
                     Invoke-Native 'uv' @('run', 'python', '-m', 'strong_core.db.seed')

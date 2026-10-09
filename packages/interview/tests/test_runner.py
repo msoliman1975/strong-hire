@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from typing import Any
 
 import pytest
@@ -16,6 +17,8 @@ from strong_interview import (
     SessionController,
     SessionFacts,
 )
+from strong_interview.controller import Move, MoveKind
+from strong_interview.guard import fallback_line
 from strong_interview.interviewer import clean_reply, render_transcript
 from strong_interview.runner import wants_to_ask
 from strong_interview.testing import FakeClock, make_brief
@@ -58,7 +61,8 @@ async def test_iv7_text_session_runs_to_the_end(gateway: ModelGateway, clock: Fa
 async def test_iv3_follow_ups_stop_at_the_limit(
     gateway: ModelGateway, clock: FakeClock, difficulty: Difficulty
 ) -> None:
-    """IV-3: the fake model always says "probe"; the controller stops at the limit."""
+    """IV-3: the fake model always says "probe" for the same gap; the controller never goes
+    past the limit, and does not ask about the same gap twice."""
     runner = await run_session(gateway, clock, difficulty=difficulty, questions=6)
     by_question: dict[str, int] = {}
     for turn in runner.turns:
@@ -67,8 +71,9 @@ async def test_iv3_follow_ups_stop_at_the_limit(
     assert by_question
     for ref, count in by_question.items():
         assert count - 1 <= PROBE_LIMIT[difficulty], ref  # 1 question + probes
-    # The fake model always says "probe", so the first question uses the whole limit.
-    assert by_question["q1"] - 1 == PROBE_LIMIT[difficulty]
+    # The fake model always says "probe" for the same gap (measurable result): the first
+    # question gets one follow-up, then the controller moves on (same_gap_not_filled).
+    assert by_question["q1"] - 1 == 1
 
 
 async def test_transcript_is_text_only_with_timings(
@@ -146,6 +151,13 @@ def test_wants_to_ask() -> None:
     assert not wants_to_ask("No questions, thanks.")
     assert not wants_to_ask("I'm good, thank you")
     assert not wants_to_ask("That's all from me")
+    # From the P13 run 1fd4: questions without a question mark, and goodbyes that are not.
+    assert wants_to_ask("Yes, I would love to know what the biggest technical challenge is")
+    assert wants_to_ask("I'd like to know how the team plans its work")
+    assert wants_to_ask("No worries at all. Could you tell me what a typical day looks like?")
+    assert not wants_to_ask("Thank you so much for your time today, Alex, it was great.")
+    assert not wants_to_ask("Thank you very much for sharing more about the team's focus.")
+    assert not wants_to_ask("No, I think we covered everything today, thank you again.")
 
 
 def test_clean_reply_and_window() -> None:
@@ -209,3 +221,119 @@ async def test_note_and_line_keep_the_question_open(
     assert (note.speaker, line.speaker) == (Speaker.CANDIDATE, Speaker.INTERVIEWER)
     assert note.question_ref == line.question_ref == (question.id if question else None)
     assert runner.controller.snapshot() == state
+
+
+# ---------------------------------------------------------------- closing questions (P13 run 1fd4)
+
+
+async def to_candidate_questions(gateway: ModelGateway, clock: FakeClock) -> InterviewRunner:
+    brief = make_brief()
+    runner = InterviewRunner(SessionController(brief, clock), Interviewer(gateway, brief))
+    await runner.open()
+    for _ in range(80):
+        if runner.controller.phase == Phase.CANDIDATE_QUESTIONS:
+            return runner
+        clock.advance(ms=20_000)
+        await runner.respond(ANSWER)
+    raise AssertionError("never reached the candidate questions")
+
+
+async def test_a_thank_you_after_an_answer_closes_without_asking_again(
+    gateway: ModelGateway, clock: FakeClock
+) -> None:
+    """The interviewer does not ask "anything else?" twice: a non-question closes."""
+    runner = await to_candidate_questions(gateway, clock)
+    asked = await runner.respond("Yes, I would love to know what the team works on next.")
+    assert [t.phase for t in asked] == [Phase.CANDIDATE_QUESTIONS]
+    closing = await runner.respond("Thank you so much for your time today, Alex.")
+    assert [t.phase for t in closing] == [Phase.WRAP_UP]
+
+
+async def test_a_question_at_the_limit_is_answered_before_the_wrap_up(
+    gateway: ModelGateway, clock: FakeClock
+) -> None:
+    """P13 run 1fd4 (behavioral): the 4th question was closed without an answer."""
+    runner = await to_candidate_questions(gateway, clock)
+    for _ in range(3):
+        await runner.respond("What does the team work on?")
+    turns = await runner.respond("Could you tell me what a typical day looks like?")
+    assert [t.phase for t in turns] == [Phase.CANDIDATE_QUESTIONS, Phase.WRAP_UP]
+    assert all(t.speaker == Speaker.INTERVIEWER for t in turns)
+
+
+def test_closing_moves_carry_their_extra_instruction(gateway: ModelGateway) -> None:
+    brief = make_brief()
+    interviewer = Interviewer(gateway, brief)
+    plain = Move(MoveKind.ANSWER_QUESTION, Phase.CANDIDATE_QUESTIONS)
+    last = Move(MoveKind.ANSWER_QUESTION, Phase.CANDIDATE_QUESTIONS, closing=True)
+    left_open = Move(MoveKind.WRAP_UP, Phase.WRAP_UP, open_question=True)
+
+    def user_text(move: Move) -> str:
+        return interviewer.turn_messages(move, [])[-1].content
+
+    assert "Extra instruction for this move: none" in user_text(plain)
+    assert "Do not ask whether they have other questions" in user_text(last)
+    assert "recruiter can follow up" in user_text(left_open)
+    assert interviewer.turn_messages(last, [])[-1].prompt_ref == "interviewer/turn_input.v3"
+    common = {"name": "Alex", "duration_min": 30, "mini": False, "question": None}
+    assert "anything else" not in fallback_line(MoveKind.ANSWER_QUESTION, closing=True, **common)
+    assert "recruiter" in fallback_line(MoveKind.WRAP_UP, open_question=True, **common)
+
+
+# ---------------------------------------------------------------- failed or stuck turns
+
+
+async def test_a_turn_stuck_on_saving_can_be_cancelled_and_retried(
+    gateway: ModelGateway, clock: FakeClock
+) -> None:
+    """Text API hang (session d40440ac): a turn stuck in the save hook is cancelled by a time
+    limit. The runner lock is free, the unsaved turn is taken back, the controller is as before,
+    and the same answer can be sent again."""
+    saved: list[Turn] = []
+    gate = asyncio.Event()
+    stuck = True
+
+    async def save(turn: Turn) -> None:
+        if stuck and turn.speaker == Speaker.CANDIDATE:
+            await gate.wait()  # never set: the save hangs
+        saved.append(turn)
+
+    brief = make_brief()
+    runner = InterviewRunner(SessionController(brief, clock), Interviewer(gateway, brief))
+    runner.on_turn = save
+    await runner.open()
+    clock.advance(ms=20_000)
+    before = (len(runner.turns), runner.controller.snapshot())
+    stages: list[str] = []
+    with pytest.raises(TimeoutError):
+        async with asyncio.timeout(0.05):
+            await runner.respond(ANSWER, on_stage=stages.append)
+    assert stages == ["runner_lock_acquired"]
+    assert runner.stage == "saving_candidate_turn"
+    assert not runner.busy
+    assert (len(runner.turns), runner.controller.snapshot()) == before
+    stuck = False
+    turns = await runner.respond(ANSWER, on_stage=stages.append)
+    assert [t.phase for t in turns] == [Phase.SMALL_TALK]
+    assert [t.text for t in saved if t.speaker == Speaker.CANDIDATE] == [ANSWER]
+    assert "candidate_turn_saved" in stages and "say_done_small_talk" in stages
+    assert runner.stage == "idle"
+
+
+async def test_a_failed_save_takes_the_turn_back(gateway: ModelGateway, clock: FakeClock) -> None:
+    brief = make_brief()
+    runner = InterviewRunner(SessionController(brief, clock), Interviewer(gateway, brief))
+    fail = True
+
+    def save(turn: Turn) -> None:
+        if fail and turn.speaker == Speaker.CANDIDATE:
+            raise RuntimeError("database is down")
+
+    runner.on_turn = save
+    await runner.open()
+    with pytest.raises(RuntimeError):
+        await runner.respond(ANSWER)
+    assert [t.speaker for t in runner.turns] == [Speaker.INTERVIEWER]
+    assert runner.controller.phase == Phase.INTRO
+    fail = False
+    assert [t.phase for t in await runner.respond(ANSWER)] == [Phase.SMALL_TALK]

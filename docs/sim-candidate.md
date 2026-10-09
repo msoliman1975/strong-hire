@@ -52,6 +52,11 @@ Each run is saved on the main server in `/srv/stronghire/sim/<run-id>/`:
 | `<session-id>/debrief.json` | The app's debrief, with the scorecard |
 | `<session-id>/meta.json` | Scenario, models, prompt versions, notes, latency, cost |
 
+The admin area shows sim interviews like any other: the sim user has training consent on (sim-login
+turns it on). On an interview page, the admin can download the transcript as a text file and, for
+sim voice interviews, the recording. The api reads the recordings from this folder, mounted
+read-only at `/sim-results`. Each download writes an audit log row.
+
 Files are uploaded after each session, so a run that stops early keeps the sessions it finished.
 A cron job keeps the folder under 10 GB (`SIM_KEEP_GB`) and deletes the oldest runs first. It
 never deletes the newest run.

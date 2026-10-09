@@ -311,6 +311,7 @@ export function adminHandlers(store: MockStore) {
         transcript: visible ? mockTranscript : null,
         traces,
         trace_retention_days: 90,
+        audio_available: false,
       };
       return HttpResponse.json(body);
     }),

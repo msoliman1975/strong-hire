@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router";
 
-import { type AdminSession, type AdminTrace, useAdminSession } from "../../api/admin";
+import { type AdminSession, type AdminTrace, adminDownloads, useAdminSession } from "../../api/admin";
 import { ErrorNotice, Loading, PageHead } from "../../components/ui";
 import { difficultyLabel, interviewTypeLabel, modeLabel, phaseLabel } from "../../labels";
 import { clock, money, utc, words } from "./format";
@@ -142,7 +142,7 @@ export function AdminSessionPage() {
 
   if (detail.isPending) return <Loading label="Loading the interview" />;
   if (detail.isError) return <ErrorNotice error={detail.error} title="The interview could not be loaded." />;
-  const { session, content_visible, transcript, traces, trace_retention_days } = detail.data;
+  const { session, content_visible, transcript, traces, trace_retention_days, audio_available } = detail.data;
 
   return (
     <>
@@ -163,6 +163,20 @@ export function AdminSessionPage() {
         <>
           <section className="section" aria-labelledby="transcript">
             <h2 id="transcript">Transcript</h2>
+            <p className="actions">
+              <a href={adminDownloads.transcript(session.id)} download>
+                Download transcript
+              </a>
+              {audio_available && (
+                <>
+                  {" "}
+                  <a href={adminDownloads.audio(session.id)} download>
+                    Download audio
+                  </a>{" "}
+                  <span className="muted">(left channel: what the AI candidate heard; right: what it said)</span>
+                </>
+              )}
+            </p>
             {transcript && transcript.length > 0 ? (
               <ol className="transcript panel">
                 {transcript.map((turn, i) => (

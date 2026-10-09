@@ -1,4 +1,4 @@
-"""Settings for voice sessions (P7), read from environment variables."""
+"""Settings for voice and text sessions (P7), read from environment variables."""
 
 from __future__ import annotations
 
@@ -26,3 +26,21 @@ class VoiceSessionSettings(BaseSettings):
 @lru_cache
 def get_voice_session_settings() -> VoiceSessionSettings:
     return VoiceSessionSettings()
+
+
+class TextSessionSettings(BaseSettings):
+    """Time limits for the text channel (PL-7)."""
+
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    text_turn_timeout_s: float = Field(
+        default=45.0, gt=0, description="The most one text turn (or the greeting) may take."
+    )
+    text_db_timeout_s: float = Field(
+        default=10.0, gt=0, description="The most one turn save or trace insert may wait."
+    )
+
+
+@lru_cache
+def get_text_session_settings() -> TextSessionSettings:
+    return TextSessionSettings()
