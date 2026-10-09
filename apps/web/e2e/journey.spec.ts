@@ -90,7 +90,7 @@ test("main journey from sign-up to paywall", async ({ page }) => {
   await expect(page.getByTestId("hire-signal")).toHaveText("Lean Hire");
   await expect(page.getByRole("heading", { name: "Question by question" })).toBeVisible();
 
-  await page.getByRole("link", { name: "Dashboard" }).click();
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Your interviews" }).click();
   await expect(page.getByText(/^1 session, last on/)).toBeVisible();
   await expect(page.getByRole("img", { name: /^Ownership:/ })).toBeVisible();
   await expect(page.getByTestId("usage-meter")).toContainText("free interview used");

@@ -2,6 +2,7 @@ import { useEffect, useRef, type ReactNode } from "react";
 
 import type { HireSignal } from "../api/types";
 import { hireSignalTone, rubricLabel } from "../labels";
+import { CheckBadge } from "./BrandMark";
 
 const HIRE_SIGNALS: HireSignal[] = ["Strong Hire", "Hire", "Lean Hire", "Lean No Hire", "No Hire"];
 
@@ -70,9 +71,12 @@ export function Bar({ value, label }: { value: number; label: string }) {
 export function HireSignalScale({ signal }: { signal: HireSignal }) {
   return (
     <>
-      <p className="verdict__title" data-tone={hireSignalTone[signal]} data-testid="hire-signal">
-        {signal}
-      </p>
+      <div className="verdict__head">
+        {(signal === "Hire" || signal === "Strong Hire") && <CheckBadge size={46} />}
+        <p className="verdict__title" data-tone={hireSignalTone[signal]} data-testid="hire-signal">
+          {signal}
+        </p>
+      </div>
       <ol className="ladder" aria-label="Hire signal scale, strongest first">
         {HIRE_SIGNALS.map((s) => (
           <li key={s} aria-current={s === signal ? "true" : undefined}>

@@ -114,7 +114,7 @@ describe("main journey", () => {
     expect(screen.getByRole("heading", { name: "Question by question" })).toBeInTheDocument();
 
     // Dashboard shows the job, its match score and a trend.
-    await user.click(screen.getByRole("link", { name: "Dashboard" }));
+    await user.click(within(screen.getByRole("navigation", { name: "Main" })).getByRole("link", { name: "Your interviews" }));
     expect(await screen.findByText(/^1 session, last on/)).toBeInTheDocument();
     expect(await screen.findByRole("img", { name: /^Ownership:/ })).toBeInTheDocument();
     expect(screen.getByTestId("usage-meter")).toHaveTextContent("free interview used");

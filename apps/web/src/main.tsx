@@ -1,5 +1,8 @@
 import "@fontsource/atkinson-hyperlegible/400.css";
 import "@fontsource/atkinson-hyperlegible/700.css";
+import "@fontsource-variable/archivo/wdth.css";
+import "@fontsource/jetbrains-mono/400.css";
+import "@fontsource/jetbrains-mono/600.css";
 import "./styles.css";
 
 import { StrictMode } from "react";
