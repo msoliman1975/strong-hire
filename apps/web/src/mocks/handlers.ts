@@ -4,11 +4,10 @@
  * - `inputHandlers` stand in for the real job target, resume and gap analysis endpoints (P2, P6),
  *   with the same paths, status codes and bodies as openapi.json. Tests and
  *   `VITE_API_MOCKS=all` use them.
- * - `inputMirrorHandlers` send those requests to the real API and copy the job targets, resumes
- *   and gap analyses into the mock store, so the planned endpoints below can use them.
- * - `plannedHandlers` stand in for endpoints that later workstreams build (src/api/planned.ts).
+ * - `sessionHandlers` stand in for the real session endpoints (P7) and the voice join (P10). The
+ *   join returns a "mock:" URL, so the live page uses a scripted interviewer (src/session/mockVoice).
  * - `scoringHandlers` stand in for the real debrief and progress endpoints (P8), with the shapes
- *   in openapi.json. Sessions are still mocked (P7), so every mock mode uses them for now.
+ *   in openapi.json.
  * - `authHandlers` stand in for the real sign-in routes.
  * - `accountHandlers` stand in for the real billing and account routes (P9), with the same
  *   paths, status codes and bodies as openapi.json.
@@ -16,10 +15,11 @@
  * Rules such as "one free interview" live here only to make the mock believable. The real rules
  * belong to the API; the web app only shows what the API returns.
  */
-import { bypass, delay } from "msw";
+import { delay } from "msw";
 import { http, HttpResponse } from "msw/http";
 
-import type { CreateSessionRequest, SessionRecord } from "../api/planned";
+import type { CreateSessionRequest, SessionRecord, VoiceJoin } from "../api/sessions";
+import { MOCK_VOICE_URL } from "../session/voice";
 import type {
   AuthState,
   ExitSurveyIn,
@@ -426,60 +426,9 @@ export function inputHandlers(store: MockStore) {
   ];
 }
 
-/**
- * For `VITE_API_MOCKS=planned`: the real API answers the P2 and P6 endpoints, and the mock keeps a
- * copy of each job target, resume and gap analysis it sees, for the planned endpoints (sessions,
- * debrief, progress).
- */
-export function inputMirrorHandlers(store: MockStore) {
-  const upsert = <T extends { id: string }>(list: T[], item: T) => {
-    const i = list.findIndex((x) => x.id === item.id);
-    if (i >= 0) list[i] = item;
-    else list.push(item);
-  };
-  const mirror = async (request: Request, save: (data: Record<string, unknown>) => void) => {
-    const response = await fetch(bypass(request));
-    if (response.ok) {
-      try {
-        save((await response.clone().json()) as Record<string, unknown>);
-        store.save();
-      } catch {
-        // Not JSON: nothing to copy.
-      }
-    }
-    return response;
-  };
-  const saveTarget = (data: Record<string, unknown>) => {
-    const target = (data.job_target ?? data) as JobTargetOut;
-    if (target.id) upsert(store.db.jobs, target);
-  };
-  const saveResume = (data: Record<string, unknown>) => {
-    const r = ("job" in data ? data.resume : data) as ResumeOut;
-    if (r.id) upsert(store.db.resumes, r);
-  };
-  const saveTargets = (data: unknown) => {
-    for (const row of data as JobTargetSummary[]) upsert(store.db.jobs, row.job_target);
-  };
-  const saveGap = (data: Record<string, unknown>) => {
-    const gap = data as unknown as GapAnalysisOut;
-    if (gap.job_target_id) store.db.gaps[gap.job_target_id] = { ...gap, readyAt: 0 };
-  };
-  return [
-    http.get(`${API}/job-targets`, ({ request }) => mirror(request, saveTargets)),
-    http.post(`${API}/job-targets/:jobId/gap-analysis`, ({ request }) => mirror(request, saveGap)),
-    http.get(`${API}/job-targets/:jobId/gap-analysis`, ({ request }) => mirror(request, saveGap)),
-    http.post(`${API}/job-targets`, ({ request }) => mirror(request, saveTarget)),
-    http.get(`${API}/job-targets/:jobTargetId`, ({ request }) => mirror(request, saveTarget)),
-    http.put(`${API}/job-targets/:jobTargetId`, ({ request }) => mirror(request, saveTarget)),
-    http.post(`${API}/resumes`, ({ request }) => mirror(request, saveResume)),
-    http.get(`${API}/resumes/:resumeId`, ({ request }) => mirror(request, saveResume)),
-    http.put(`${API}/resumes/:resumeId`, ({ request }) => mirror(request, saveResume)),
-  ];
-}
+// ---------------------------------------------------------------------------- sessions
 
-// ---------------------------------------------------------------------------- planned endpoints
-
-export function plannedHandlers(store: MockStore) {
+export function sessionHandlers(store: MockStore) {
   const later = (factor = 1) => Date.now() + store.delayMs * factor;
   const db = () => store.db;
   const pause = () => pauseFor(store);
@@ -504,14 +453,14 @@ export function plannedHandlers(store: MockStore) {
             : "You have used your free interview. Subscribe to keep practicing.";
         return HttpResponse.json({ detail: { code, message, upgrade_url: "/upgrade" } }, { status: 402 });
       }
-      if (usage.plan === "free") usage.free_interviews_left = Math.max(0, usage.free_interviews_left - 1);
-      refreshUsage(usage);
       const session: SessionRecord = {
         id: newId(),
         job_target_id: body.job_target_id,
         config: body.config,
-        status: "in_progress",
-        started_at: new Date().toISOString(),
+        channel: body.channel ?? "voice",
+        brief_ready: true,
+        status: "created",
+        started_at: null,
         ended_at: null,
         minutes_billed: 0,
       };
@@ -524,9 +473,32 @@ export function plannedHandlers(store: MockStore) {
       const s = findSession(params.sessionId);
       return s ? HttpResponse.json(s) : notFound("Session");
     }),
+    // The voice room is mocked too: the live page sees the "mock:" URL and uses src/session/mockVoice.
+    http.post(`${API}/sessions/:sessionId/voice/join`, ({ params }) => {
+      const s = findSession(params.sessionId);
+      if (!s) return notFound("Session");
+      if (s.status !== "created" && s.status !== "in_progress")
+        return HttpResponse.json({ detail: "The session has ended." }, { status: 409 });
+      if (s.status === "created") {
+        // Like the API: the first join starts the session, and only a started one uses the free one.
+        s.status = "in_progress";
+        s.started_at = new Date().toISOString();
+        const usage = db().usage;
+        if (usage.plan === "free") usage.free_interviews_left = Math.max(0, usage.free_interviews_left - 1);
+        refreshUsage(usage);
+        store.save();
+      }
+      const join: VoiceJoin = { livekit_url: MOCK_VOICE_URL, room: `session-${s.id}`, token: "mock", identity: "candidate" };
+      return HttpResponse.json(join);
+    }),
     http.post(`${API}/sessions/:sessionId/end`, ({ params }) => {
       const s = findSession(params.sessionId);
       if (!s) return notFound("Session");
+      if (s.status === "created") {
+        // Same as the API: a session that never started is not billed or scored (BL-2).
+        s.status = "failed";
+        s.ended_at = new Date().toISOString();
+      }
       if (s.status === "in_progress") {
         s.status = "scoring";
         s.ended_at = new Date().toISOString();
@@ -604,7 +576,16 @@ export function scoringHandlers(store: MockStore) {
       const ready = s.status === "completed";
       const scorecard = ready ? scorecardFor(s.config.interview_type, generic) : null;
       const debrief: Debrief = {
-        session: s,
+        // The debrief's session has no channel or brief_ready (DebriefSession in openapi.json).
+        session: {
+          id: s.id,
+          job_target_id: s.job_target_id,
+          config: s.config,
+          status: s.status,
+          started_at: s.started_at,
+          ended_at: s.ended_at,
+          minutes_billed: s.minutes_billed,
+        },
         status: ready ? "ready" : s.status === "failed" ? "failed" : "scoring",
         scorecard,
         next_session: ready ? sessionPlan[1] : null,

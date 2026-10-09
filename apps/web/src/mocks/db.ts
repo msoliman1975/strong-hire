@@ -3,7 +3,7 @@
  * add shows on the dashboard, the free interview is used once, and so on. In the browser it is
  * saved to localStorage so a page reload keeps it. This file is mock-only and never ships.
  */
-import type { SessionRecord } from "../api/planned";
+import type { SessionRecord } from "../api/sessions";
 import type {
   AuthUser,
   ExitSurveyIn,

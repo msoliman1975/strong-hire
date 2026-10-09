@@ -8,10 +8,17 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { AppRoutes, createQueryClient } from "./App";
 import { server } from "./mocks/node";
+import { MOCK_QUESTION } from "./session/mockVoice";
+
+// jsdom has no microphone. The live page's mic check gets a working one.
+vi.mock("./session/microphone", async (original) => ({
+  ...(await original<typeof import("./session/microphone")>()),
+  openMicrophone: async () => ({ level: () => 0.5, stop: () => undefined }),
+}));
 
 type User = ReturnType<typeof userEvent.setup>;
 
@@ -92,8 +99,11 @@ describe("main journey", () => {
     expect(screen.getByRole("radio", { name: /^Behavioral/ })).toBeChecked();
     await user.click(screen.getByRole("button", { name: "Start interview" }));
 
-    // Live session placeholder, then end it.
+    // Live session: mic check, join, the mocked interviewer asks a question, then end it.
     expect(await screen.findByRole("heading", { name: "Interview in progress" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Check my microphone" }));
+    await user.click(await screen.findByRole("button", { name: "Join the interview" }));
+    expect(await screen.findByText(MOCK_QUESTION, {}, { timeout: 3000 })).toBeInTheDocument();
     expect(screen.getByTestId("timer")).toHaveTextContent(/^(30:00|29:5\d)$/);
     await user.click(screen.getByRole("button", { name: "End interview" }));
     const dialog = screen.getByRole("dialog", { name: "End the interview?" });

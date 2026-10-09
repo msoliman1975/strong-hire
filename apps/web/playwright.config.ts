@@ -14,6 +14,10 @@ export default defineConfig({
     baseURL: `http://localhost:${PORT}`,
     trace: "retain-on-failure",
     viewport: { width: 1280, height: 860 },
+    // A fake microphone with permission granted, for the live session's mic check. Headless
+    // Chromium does not run audio here, so the level meter stays at zero; the test does not need it.
+    permissions: ["microphone"],
+    launchOptions: { args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"] },
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 860 } } }],
   webServer: {

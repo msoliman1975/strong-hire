@@ -159,6 +159,9 @@ services:
     environment:
       LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-local-dev-only}
       HOSTED_API_KEY: ${HOSTED_API_KEY:-}
+      # Kokoro TTS. scripts/kokoro-windows.ps1 runs it outside Docker; then .env sets
+      # TTS_API_BASE=http://host.rancher-desktop.internal:8881/v1
+      TTS_API_BASE: ${TTS_API_BASE:-http://tts:8880/v1}
       SSL_CERT_FILE: /tmp/ca-bundle.pem
       REQUESTS_CA_BUNDLE: /tmp/ca-bundle.pem
     ports: ["${LITELLM_PORT:-4000}:4000"]

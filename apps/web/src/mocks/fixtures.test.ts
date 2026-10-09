@@ -14,7 +14,7 @@ import { authApi } from "../api/auth";
 import { billingApi } from "../api/billing";
 import { gapApi } from "../api/gap";
 import { jobTargetsApi, resumesApi } from "../api/inputs";
-import { sessionsApi } from "../api/planned";
+import { sessionsApi } from "../api/sessions";
 import { debriefApi } from "../api/scoring";
 import { gapAnalysis, jobPosting, resume, scorecardFor, sessionPlan } from "./fixtures";
 
@@ -79,7 +79,9 @@ describe("mock payloads match the packages/core schemas", () => {
     const session = await sessionsApi.create({
       job_target_id: job.id,
       config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min: 30, level: "senior" },
+      channel: "voice",
     });
+    await sessionsApi.joinVoice(session.id);
     await sessionsApi.end(session.id);
     expectValid("session_config", session.config);
 

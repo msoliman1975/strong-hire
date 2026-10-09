@@ -5,7 +5,7 @@ import { billingApi } from "./billing";
 import { devApi } from "./dev";
 import { gapApi } from "./gap";
 import { jobRunning, jobTargetsApi, resumesApi } from "./inputs";
-import { sessionsApi } from "./planned";
+import { sessionsApi } from "./sessions";
 import { debriefApi } from "./scoring";
 
 /** How often to re-check work that runs in the background (extraction, analysis, scoring). */
@@ -103,7 +103,12 @@ export const useProgress = (jobId: string) =>
   useQuery({ queryKey: keys.progress(jobId), queryFn: () => debriefApi.progress(jobId) });
 
 export const useSession = (sessionId: string) =>
-  useQuery({ queryKey: keys.session(sessionId), queryFn: () => sessionsApi.get(sessionId) });
+  useQuery({
+    queryKey: keys.session(sessionId),
+    queryFn: () => sessionsApi.get(sessionId),
+    // A new session waits for its interviewer brief (built by the worker) before it can start.
+    refetchInterval: (q) => (q.state.data?.status === "created" && !q.state.data.brief_ready ? POLL_MS : false),
+  });
 
 export const useDebrief = (sessionId: string) =>
   useQuery({

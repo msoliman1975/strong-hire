@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 import uuid
 from dataclasses import dataclass, field
@@ -187,3 +188,19 @@ def test_session_room_names() -> None:
     assert session_id_from_room(f"session-{sid}") == sid
     assert session_id_from_room("latency-local-1-abcd") is None
     assert session_id_from_room("session-not-a-uuid") is None
+
+
+async def test_state_message_for_the_browser() -> None:
+    from strong_voice.interview_agent import state_message
+
+    rig = make_rig(mode=Mode.COACH)
+    lines = await rig.voice.opening()
+    await rig.voice.coach("pause")
+    message = json.loads(state_message(rig.voice, lines))
+    assert message == {
+        "type": "state",
+        "phase": "intro",
+        "paused": True,
+        "elapsed_ms": rig.voice.runner.controller.elapsed_ms,
+        "said": lines,
+    }
