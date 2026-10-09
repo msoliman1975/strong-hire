@@ -48,7 +48,10 @@ async function addJob(page: Page) {
   await page.getByRole("button", { name: "Upload resume" }).click();
   await expect(page.getByRole("heading", { name: "Roles" })).toBeVisible({ timeout: 10_000 });
   await shot(page, "05-resume");
-  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("button", { name: "Check and continue" }).click();
+
+  await expect(page.getByRole("heading", { name: "Check your CV" })).toBeVisible({ timeout: 10_000 });
+  await page.getByRole("button", { name: "Confirm and continue" }).click();
 
   await expect(page.getByRole("heading", { name: "Add context (optional)" })).toBeVisible();
   await page.getByLabel("Interview stage").selectOption("Onsite or final loop");
