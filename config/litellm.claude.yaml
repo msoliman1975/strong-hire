@@ -1,7 +1,7 @@
 # LiteLLM proxy config for MODEL_PROFILE=claude. Real model ids and providers appear only in the
 # config/litellm.*.yaml files.
 #
-#   claude-fast    Claude Haiku 4.5     extractor, interviewer (fast replies)
+#   claude-fast    Claude Haiku 5.5     extractor, interviewer (fast replies)
 #   claude-strong  Claude Sonnet 5.5    planner, scorer
 #   claude-stt     faster-whisper small, local (infra/stt)
 #   claude-tts     Kokoro, local
@@ -13,11 +13,12 @@
 model_list:
   - model_name: claude-fast
     litellm_params:
-      model: anthropic/claude-haiku-4-5
+      model: anthropic/claude-haiku-5-5
       api_key: os.environ/ANTHROPIC_API_KEY
     model_info:
-      input_cost_per_token: 0.000001    # $1 per million input tokens
-      output_cost_per_token: 0.000005   # $5 per million output tokens
+      # Prices for prompts up to 100K tokens; longer prompts cost 5 times more.
+      input_cost_per_token: 0.0000001    # $0.10 per million input tokens
+      output_cost_per_token: 0.0000005   # $0.50 per million output tokens
   - model_name: claude-strong
     litellm_params:
       model: anthropic/claude-sonnet-5-5

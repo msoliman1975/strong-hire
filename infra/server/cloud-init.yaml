@@ -1,0 +1,13 @@
+#cloud-config
+# First boot of the test server (docs/hosting.md): Docker, PowerShell 7, git, swap.
+package_update: true
+packages: [git, curl, ca-certificates, unattended-upgrades]
+swap:
+  filename: /swapfile
+  size: 4G
+runcmd:
+  - curl -fsSL https://get.docker.com | sh
+  - . /etc/os-release && curl -fsSL -o /tmp/ms.deb "https://packages.microsoft.com/config/ubuntu/${VERSION_ID}/packages-microsoft-prod.deb"
+  - dpkg -i /tmp/ms.deb && apt-get update && apt-get install -y powershell
+  - mkdir -p /opt/stronghire /etc/stronghire && chmod 700 /etc/stronghire
+  - sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config && systemctl restart ssh

@@ -84,10 +84,14 @@ function Invoke-Docker([string[]]$Arguments) {
 function Get-ComposeArgs([string]$ModelProfile, [bool]$WithVoice) {
     $files = @('compose', '-f', (Join-Path $Root 'infra/compose.yaml'))
     if ($ModelProfile -eq 'claude') { $files += @('-f', (Join-Path $Root 'infra/compose.claude.yaml')) }
+    if (Test-Server) { $files += @('-f', (Join-Path $Root 'infra/compose.server.yaml')) }
     $files += @('--env-file', $EnvFile, '--profile', 'core', '--profile', 'models')
     if ($WithVoice) { $files += @('--profile', 'voice') }
     return $files
 }
+
+# The test server (docs/hosting.md) sets STACK_TARGET=server in .env.
+function Test-Server { return (Get-EnvValues)['STACK_TARGET'] -eq 'server' }
 
 function Test-VoiceRunning {
     $names = & docker ps --format '{{.Names}}' 2>$null
@@ -233,7 +237,8 @@ try {
         $null = Set-AppKey (Get-EnvValues) $team
     }
 
-    $app = @('api', 'worker', 'web')
+    # On the test server Caddy serves the built web app in place of the Vite dev server.
+    $app = @('api', 'worker', $(if (Test-Server) { 'caddy' } else { 'web' }))
     if ($withVoice) { $app += @('livekit', 'stt', 'tts', 'voice') }
     Write-Step "Rebuilding if needed and restarting $($app -join ', ')"
     # No --wait: the worker's health check can be slower than its limit (#17). Poll /health instead.

@@ -1,7 +1,18 @@
-# Placeholder for hosting (P12). TLS termination in front of web and api on Hetzner.
-# {$DOMAIN} {
-#     handle_path /api/* {
-#         reverse_proxy api:8000
-#     }
-#     reverse_proxy web:5180
-# }
+# Test server (infra/compose.server.yaml). Caddy gets TLS certificates from Let's Encrypt.
+
+{$DOMAIN} {
+	encode gzip
+	handle_path /api/* {
+		reverse_proxy api:8000
+	}
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+}
+
+# LiveKit signaling (WebSocket). Media goes direct to 7881/tcp and 7882/udp.
+rtc.{$DOMAIN} {
+	reverse_proxy livekit:7880
+}
