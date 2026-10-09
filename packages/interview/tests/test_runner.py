@@ -166,3 +166,46 @@ def test_facts_render_only_what_is_known() -> None:
     assert SessionFacts().render() == "No facts are available."
     text = SessionFacts(company_name="Stripe", job_title="Engineer", notes=("Remote",)).render()
     assert text.splitlines() == ["Company: Stripe", "Job: Engineer", "- Remote"]
+
+
+async def test_rollback_takes_back_a_turn_and_its_reply(
+    gateway: ModelGateway, clock: FakeClock
+) -> None:
+    """Voice turn taking: a reply that was not spoken can be taken back completely."""
+    brief = make_brief(questions=6)
+    runner = InterviewRunner(SessionController(brief, clock), Interviewer(gateway, brief))
+    await runner.open()
+    for _ in range(4):  # into CORE, with a question open
+        clock.advance(ms=60_000)
+        await runner.respond(ANSWER)
+    assert runner.controller.phase == Phase.CORE
+    before_turns = list(runner.turns)
+    before_state = runner.controller.snapshot()
+
+    checkpoint = runner.checkpoint()
+    await runner.respond(ANSWER)
+    assert len(runner.turns) > len(before_turns)
+    runner.rollback(checkpoint)
+
+    assert runner.turns == before_turns
+    assert runner.controller.snapshot() == before_state
+
+
+async def test_note_and_line_keep_the_question_open(
+    gateway: ModelGateway, clock: FakeClock
+) -> None:
+    brief = make_brief(questions=6)
+    runner = InterviewRunner(SessionController(brief, clock), Interviewer(gateway, brief))
+    await runner.open()
+    for _ in range(4):
+        clock.advance(ms=60_000)
+        await runner.respond(ANSWER)
+    state = runner.controller.snapshot()
+    question = runner.controller.question
+
+    note = await runner.note("Give me a moment.")
+    line = await runner.line("Sure, take your time.")
+
+    assert (note.speaker, line.speaker) == (Speaker.CANDIDATE, Speaker.INTERVIEWER)
+    assert note.question_ref == line.question_ref == (question.id if question else None)
+    assert runner.controller.snapshot() == state

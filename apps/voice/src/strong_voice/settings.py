@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -32,11 +33,20 @@ class VoiceSettings(BaseSettings):
         default="", description="Name of the CSV in latency_dir. Defaults to MODEL_PROFILE."
     )
 
-    # Turn taking. Lower values answer sooner but cut in on slow speakers.
-    vad_min_silence_s: float = 0.35
-    endpointing_min_delay_s: float = 0.2
-    endpointing_max_delay_s: float = 2.5
-    interruption_min_duration_s: float = 0.4
+    # Turn taking. Lower values answer sooner but cut in on slow speakers and on people who
+    # pause to think. "dynamic" endpointing learns each candidate's pauses, between the minimum
+    # and the maximum delay. When the turn detector is sure the sentence is finished, the agent
+    # answers after the minimum delay.
+    vad_min_silence_s: float = 0.6
+    endpointing_mode: Literal["fixed", "dynamic"] = "dynamic"
+    endpointing_min_delay_s: float = 0.8
+    endpointing_max_delay_s: float = 6.0
+    interruption_min_duration_s: float = 0.6
+    # Speech this short that stops the interviewer, followed by this much silence, is a false
+    # interruption (a cough, "mm-hm"); the interviewer then goes on.
+    false_interruption_timeout_s: float = 2.0
+    # After "give me a moment": wait this long in silence, then check in once.
+    thinking_wait_s: float = 60.0
 
 
 @lru_cache
