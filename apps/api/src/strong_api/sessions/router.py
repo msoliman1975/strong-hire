@@ -1,6 +1,7 @@
 """Interview sessions (P7).
 
-    POST /sessions                         create a session (402 when the plan does not allow it)
+    POST /sessions                         create a session (402 when the plan does not allow it;
+                                           free accounts may start 10-minute minis only)
     GET  /sessions/{id}                    one session
     GET  /job-targets/{id}/sessions        a job's sessions, newest first
     POST /sessions/{id}/end                end it: bill minutes, start scoring
@@ -14,13 +15,22 @@ Creating a session queues the interviewer brief job (P6). The text channel runs 
 controller and interviewer as the voice agent (strong_interview), with typed input. It exists
 only when APP_ENV is local or test, and its runners live in this API process: if the API
 restarts, an open text session must be ended.
+
+Text turns are logged at INFO with the time of each step, and have a time limit
+(TEXT_TURN_TIMEOUT_S, default 45 s): past it the API answers 504, and the session stays usable
+(the runner takes the turn back; the candidate sends it again). Each turn save and trace insert
+has a shorter database limit (TEXT_DB_TIMEOUT_S, default 10 s).
 """
 
 from __future__ import annotations
 
+import asyncio
 import hmac
+import logging
+import time
 import uuid
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
@@ -29,10 +39,12 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from strong_api.auth.settings import AppEnv, get_auth_settings
+from strong_api.auth.sim import is_sim_user
 from strong_api.billing.entitlements import ensure_can_start_session, record_session_minutes
-from strong_api.inputs.deps import Db, Me, Queue
+from strong_api.inputs.deps import CurrentUser, Db, Me, Queue
 from strong_api.inputs.queue import BUILD_INTERVIEWER_BRIEF, JobQueue
 from strong_api.scoring.router import _brief, _config, _owned_session, _owned_target, start_scoring
+from strong_api.sessions.failure import brief_is_stale, failure_reason
 from strong_api.sessions.schemas import (
     CoachRequest,
     CreateSessionRequest,
@@ -42,11 +54,18 @@ from strong_api.sessions.schemas import (
     TextTurns,
     VoiceJoin,
 )
-from strong_api.sessions.settings import VoiceSessionSettings, get_voice_session_settings
-from strong_core.db.models import InterviewSession, JobTarget
+from strong_api.sessions.settings import (
+    TextSessionSettings,
+    VoiceSessionSettings,
+    get_text_session_settings,
+    get_voice_session_settings,
+)
+from strong_core.db.models import InterviewSession, JobTarget, UsageEvent
 from strong_core.db.models import Turn as TurnRow
+from strong_core.db.turns import next_turn_seq
 from strong_core.gateway import Role, get_gateway
-from strong_core.schemas import JobPosting, SessionChannel, SessionStatus, Turn
+from strong_core.schemas import JobPosting, SessionChannel, SessionStatus, Turn, UsageComponent
+from strong_core.sim import gateway_for_org
 from strong_interview import (
     CoachNotAllowedError,
     Interviewer,
@@ -54,10 +73,15 @@ from strong_interview import (
     SessionController,
     SessionFacts,
 )
+from strong_interview.trace_store import SqlTraceSink, limit_lock_waits
+
+log = logging.getLogger(__name__)
 
 OPEN = {SessionStatus.CREATED, SessionStatus.IN_PROGRESS, SessionStatus.INTERRUPTED}
 SESSION_ROOM_PREFIX = "session-"  # the voice agent runs the interview in rooms named like this
 VoiceSettings = Annotated[VoiceSessionSettings, Depends(get_voice_session_settings)]
+TextSettings = Annotated[TextSessionSettings, Depends(get_text_session_settings)]
+FLUSH_TIMEOUT_S = 30.0  # the most a request waits for trace rows still being saved
 
 router = APIRouter(tags=["sessions"])
 
@@ -73,11 +97,15 @@ def _record(session: InterviewSession, target: JobTarget | None) -> SessionRecor
         started_at=session.started_at,
         ended_at=session.ended_at,
         minutes_billed=session.minutes_billed or 0,
+        failure_reason=failure_reason(session),
     )
 
 
-def _text_allowed() -> bool:
-    return get_auth_settings().app_env in (AppEnv.LOCAL, AppEnv.TEST)
+async def _text_allowed(db: AsyncSession, me: CurrentUser) -> bool:
+    """Text sessions are a dev feature (PL-7), and the AI candidate's way in (P13)."""
+    if get_auth_settings().app_env in (AppEnv.LOCAL, AppEnv.TEST):
+        return True
+    return await is_sim_user(db, me.user_id)
 
 
 def _runners(request: Request) -> dict[uuid.UUID, InterviewRunner]:
@@ -94,12 +122,15 @@ def _runners(request: Request) -> dict[uuid.UUID, InterviewRunner]:
 async def create_session(body: CreateSessionRequest, db: Db, me: Me, queue: Queue) -> SessionRecord:
     """Create a session and queue its interviewer brief (IV-2, IV-4, IV-6, IV-8)."""
     target = await _owned_target(db, me, body.job_target_id)
+    if target.deleted_at is not None:  # R1: a deleted job cannot get new sessions
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Job target not found")
     if target.parsed_json is None:
         raise HTTPException(status.HTTP_409_CONFLICT, "The job posting is still being read.")
-    if body.channel == SessionChannel.TEXT and not _text_allowed():
+    if body.channel == SessionChannel.TEXT and not await _text_allowed(db, me):
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Text sessions are a dev feature.")
-    await ensure_can_start_session(db, me.org_id)
     config = body.config
+    if not await is_sim_user(db, me.user_id):  # the AI candidate has no plan (P13)
+        await ensure_can_start_session(db, me.org_id, config.duration_min)
     target.level = config.level  # the level confirmed at setup sets the bar (IV-6)
     session = InterviewSession(
         org_id=me.org_id,
@@ -125,7 +156,14 @@ async def create_session(body: CreateSessionRequest, db: Db, me: Me, queue: Queu
 
 @router.get("/sessions/{session_id}")
 async def get_session(session_id: uuid.UUID, db: Db, me: Me) -> SessionRecord:
+    """One session. A session whose brief never came (the worker job was lost) is marked failed
+    here, so a page that polls it stops waiting."""
     session = await _owned_session(db, me, session_id)
+    if brief_is_stale(session):
+        log.warning("session %s has waited too long for its brief; marking it failed", session.id)
+        session.status = SessionStatus.FAILED
+        await db.commit()
+        await db.refresh(session)
     return _record(session, await db.get(JobTarget, session.job_target_id))
 
 
@@ -147,6 +185,19 @@ async def _end(
         return
     if runner is not None:
         session.prompt_version = ",".join(sorted(runner.interviewer.prompt_refs))[:200] or None
+        await _flush_traces(runner)
+        interviewer = runner.interviewer
+        if session.started_at is not None:
+            # The text channel's interviewer tokens and cost, like the voice agent saves them.
+            db.add(
+                UsageEvent(
+                    org_id=session.org_id,
+                    session_id=session.id,
+                    component=UsageComponent.LLM,
+                    units=Decimal(interviewer.input_tokens + interviewer.output_tokens),
+                    cost_usd=Decimal(f"{interviewer.cost_usd:.6f}"),
+                )
+            )
     if session.started_at is None:
         # Never started: no minutes, no scoring, and the free interview is not used.
         session.ended_at = datetime.now(UTC)
@@ -158,6 +209,38 @@ async def _end(
     await start_scoring(db, queue, session)  # commits; sets status scoring
 
 
+async def _flush_traces(runner: InterviewRunner, timeout_s: float = FLUSH_TIMEOUT_S) -> None:
+    """Wait for trace rows still being written (R2), at most `timeout_s`. Never raises; rows
+    not saved by then go on being saved in the background."""
+    if isinstance(runner.trace, SqlTraceSink):
+        try:
+            if not await runner.trace.flush(timeout_s):
+                log.warning("interviewer traces still being saved after %.0f s", timeout_s)
+        except Exception:
+            log.warning("could not flush the interviewer traces", exc_info=True)
+
+
+class TurnSaveError(RuntimeError):
+    """A text turn could not be saved in time."""
+
+
+class _StepLog:
+    """INFO logs for one text request: each step with the ms since the request arrived."""
+
+    def __init__(self, what: str, session_id: uuid.UUID) -> None:
+        self.what = what
+        self.session_id = session_id
+        self.started = time.perf_counter()
+        self.last = "received"
+
+    def ms(self) -> int:
+        return int((time.perf_counter() - self.started) * 1000)
+
+    def step(self, name: str) -> None:
+        self.last = name
+        log.info("%s %s: %s at %d ms", self.what, self.session_id, name, self.ms())
+
+
 @router.post("/sessions/{session_id}/end")
 async def end_session(
     session_id: uuid.UUID, request: Request, db: Db, me: Me, queue: Queue
@@ -165,6 +248,10 @@ async def end_session(
     """End the session. Started sessions are billed and scored (FB-3); safe to call twice."""
     session = await _owned_session(db, me, session_id)
     runner = _runners(request).pop(session.id, None)
+    if runner is not None:
+        log.info(
+            "end %s: text runner found, busy=%s, stage=%s", session.id, runner.busy, runner.stage
+        )
     await _end(db, queue, session, runner)
     await db.refresh(session)
     return _record(session, await db.get(JobTarget, session.job_target_id))
@@ -174,7 +261,7 @@ async def end_session(
 
 
 async def _text_session(db: Db, me: Me, session_id: uuid.UUID) -> InterviewSession:
-    if not _text_allowed():
+    if not await _text_allowed(db, me):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found")
     session = await _owned_session(db, me, session_id)
     if session.channel != SessionChannel.TEXT:
@@ -184,24 +271,55 @@ async def _text_session(db: Db, me: Me, session_id: uuid.UUID) -> InterviewSessi
     return session
 
 
-def _turn_saver(request: Request, session: InterviewSession):  # type: ignore[no-untyped-def]
+def _turn_saver(  # type: ignore[no-untyped-def]
+    request: Request, session: InterviewSession, lock: asyncio.Lock, timeout_s: float
+):
+    """Saves each turn. `lock` is the trace sink's lock: a turn save and a trace insert of the
+    same session take turns, so one never ends the other's open transaction (tests share one
+    SQLite connection).
+
+    The lock, the connection and the insert together have a time limit (`timeout_s`), and on
+    Postgres a lock wait fails after it too. A save that fails is logged and raises
+    TurnSaveError; the lock and the connection are always released."""
     maker = request.app.state.sessionmaker
 
     async def save(turn: Turn) -> None:
-        async with maker() as db:
-            db.add(
-                TurnRow(
-                    org_id=session.org_id,
-                    session_id=session.id,
-                    speaker=turn.speaker,
-                    phase=turn.phase,
-                    text=turn.text,
-                    start_ms=turn.start_ms,
-                    end_ms=turn.end_ms,
-                    question_ref=turn.question_ref,
+        started = time.perf_counter()
+        try:
+            async with asyncio.timeout(timeout_s), lock, maker() as db:
+                await limit_lock_waits(db, timeout_s)
+                seq = await next_turn_seq(db, session.id)
+                db.add(
+                    TurnRow(
+                        org_id=session.org_id,
+                        session_id=session.id,
+                        speaker=turn.speaker,
+                        phase=turn.phase,
+                        text=turn.text,
+                        start_ms=turn.start_ms,
+                        end_ms=turn.end_ms,
+                        question_ref=turn.question_ref,
+                        seq=seq,
+                    )
                 )
+                await db.commit()
+        except TimeoutError as exc:
+            log.error(
+                "session %s: %s turn not saved; the database wait was over %.0f s",
+                session.id,
+                turn.speaker.value,
+                timeout_s,
             )
-            await db.commit()
+            raise TurnSaveError("the turn could not be saved in time") from exc
+        except Exception as exc:
+            log.error(
+                "session %s: %s turn not saved after %d ms",
+                session.id,
+                turn.speaker.value,
+                int((time.perf_counter() - started) * 1000),
+                exc_info=True,
+            )
+            raise TurnSaveError("the turn could not be saved") from exc
 
     return save
 
@@ -219,9 +337,13 @@ def _facts(target: JobTarget | None, company: str | None) -> SessionFacts:
 
 
 @router.post("/sessions/{session_id}/text/open")
-async def open_text_session(session_id: uuid.UUID, request: Request, db: Db, me: Me) -> TextTurns:
+async def open_text_session(
+    session_id: uuid.UUID, request: Request, db: Db, me: Me, settings: TextSettings
+) -> TextTurns:
     """Start the text session: the interviewer greets the candidate."""
     session = await _text_session(db, me, session_id)
+    steps = _StepLog("text/open", session.id)
+    log.info("text/open %s: received", session.id)
     runners = _runners(request)
     if session.id in runners:
         raise HTTPException(status.HTTP_409_CONFLICT, "The session is already open.")
@@ -230,11 +352,18 @@ async def open_text_session(session_id: uuid.UUID, request: Request, db: Db, me:
     brief = _brief(session)
     if brief is None:
         raise HTTPException(status.HTTP_409_CONFLICT, "The interview plan is not ready yet.")
-    gateway = get_gateway()
+    gateway = await gateway_for_org(db, session.org_id, get_gateway())  # sim budget (P13)
     target = await db.get(JobTarget, session.job_target_id)
     interviewer = Interviewer(gateway, brief, facts=_facts(target, brief.company_name))
+    db_timeout = settings.text_db_timeout_s
+    sink = SqlTraceSink(
+        request.app.state.sessionmaker, session.org_id, session.id, timeout_s=db_timeout
+    )
     runner = InterviewRunner(
-        SessionController(brief), interviewer, on_turn=_turn_saver(request, session)
+        SessionController(brief),
+        interviewer,
+        on_turn=_turn_saver(request, session, sink.lock, db_timeout),
+        trace=sink,
     )
     session.status = SessionStatus.IN_PROGRESS
     session.started_at = datetime.now(UTC)
@@ -242,8 +371,33 @@ async def open_text_session(session_id: uuid.UUID, request: Request, db: Db, me:
     session.interviewer_model_id = gateway.config.alias_for(Role.INTERVIEWER)
     await db.commit()
     runners[session.id] = runner
-    turns = await runner.open()
-    return TextTurns(turns=turns, ended=runner.ended, phase=runner.controller.phase.value)
+    steps.step("session_started")
+    try:
+        async with asyncio.timeout(settings.text_turn_timeout_s):
+            turns = await runner.open()
+    except TimeoutError:
+        log.error(
+            "text/open %s: no greeting after %d ms (limit %.0f s); stopped after step %s",
+            session.id,
+            steps.ms(),
+            settings.text_turn_timeout_s,
+            steps.last,
+        )
+        raise HTTPException(
+            status.HTTP_504_GATEWAY_TIMEOUT,
+            "The interviewer took too long to answer. Send a message to go on, or end the session.",
+        ) from None
+    except TurnSaveError as exc:
+        raise HTTPException(
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            "The greeting could not be saved. Send a message to go on, or end the session.",
+        ) from exc
+    steps.step("say_done_greet")
+    await _flush_traces(runner)  # the text channel answers after its traces are saved
+    steps.step("traces_flushed")
+    out = TextTurns(turns=turns, ended=runner.ended, phase=runner.controller.phase.value)
+    steps.step("response_sent")
+    return out
 
 
 def _runner(request: Request, session: InterviewSession) -> InterviewRunner:
@@ -255,16 +409,58 @@ def _runner(request: Request, session: InterviewSession) -> InterviewRunner:
 
 @router.post("/sessions/{session_id}/text/turn")
 async def text_turn(
-    session_id: uuid.UUID, body: TextTurnRequest, request: Request, db: Db, me: Me, queue: Queue
+    session_id: uuid.UUID,
+    body: TextTurnRequest,
+    request: Request,
+    db: Db,
+    me: Me,
+    queue: Queue,
+    settings: TextSettings,
 ) -> TextTurns:
-    """The candidate's turn. Returns the interviewer's reply; the session ends on its own."""
+    """The candidate's turn. Returns the interviewer's reply; the session ends on its own.
+
+    504 when the reply takes longer than TEXT_TURN_TIMEOUT_S, 503 when the turn could not be
+    saved. In both cases the turn is taken back, and the candidate can send it again.
+    """
     session = await _text_session(db, me, session_id)
+    steps = _StepLog("text/turn", session.id)
+    log.info("text/turn %s: received, %d characters", session.id, len(body.text))
     runner = _runner(request, session)
-    turns = await runner.respond(body.text)
+    if runner.busy:
+        # A second turn while the first is still answered (a double submit or a client retry)
+        # would get its own reply, so the interviewer would speak twice for one answer.
+        log.warning("text/turn %s: refused, still replying (stage %s)", session.id, runner.stage)
+        raise HTTPException(status.HTTP_409_CONFLICT, "The interviewer is still replying.")
+    try:
+        async with asyncio.timeout(settings.text_turn_timeout_s):
+            turns = await runner.respond(body.text, on_stage=steps.step)
+    except TimeoutError:
+        stage = runner.stage if steps.last != "received" else "waiting_for_runner_lock"
+        log.error(
+            "text/turn %s: no reply after %d ms (limit %.0f s); stopped at stage %s",
+            session.id,
+            steps.ms(),
+            settings.text_turn_timeout_s,
+            stage,
+        )
+        raise HTTPException(
+            status.HTTP_504_GATEWAY_TIMEOUT,
+            "The interviewer took too long to reply. Send your answer again.",
+        ) from None
+    except TurnSaveError as exc:
+        raise HTTPException(
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            "Your answer could not be saved. Send it again.",
+        ) from exc
+    await _flush_traces(runner)  # the text channel answers after its traces are saved
+    steps.step("traces_flushed")
     if runner.ended:
         _runners(request).pop(session.id, None)
         await _end(db, queue, session, runner)
-    return TextTurns(turns=turns, ended=runner.ended, phase=runner.controller.phase.value)
+        steps.step("session_ended")
+    out = TextTurns(turns=turns, ended=runner.ended, phase=runner.controller.phase.value)
+    steps.step("response_sent")
+    return out
 
 
 @router.post("/sessions/{session_id}/coach")
@@ -282,6 +478,7 @@ async def coach(
             runner.resume()
         else:
             turns = await runner.coach(body.command)
+            await _flush_traces(runner)  # the text channel answers after its traces are saved
     except CoachNotAllowedError as exc:
         raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc
     return TextTurns(turns=turns, ended=runner.ended, phase=runner.controller.phase.value)

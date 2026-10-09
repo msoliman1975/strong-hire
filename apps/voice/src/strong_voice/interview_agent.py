@@ -25,12 +25,14 @@ from livekit.agents.voice.room_io import RoomOptions
 
 from strong_core.db import get_sessionmaker
 from strong_core.gateway import get_gateway
+from strong_core.sim import gateway_for_org
 from strong_interview import (
     CoachNotAllowedError,
     Interviewer,
     InterviewRunner,
     SessionController,
 )
+from strong_interview.trace_store import SqlTraceSink
 from strong_voice.interview import VoiceInterview
 from strong_voice.session_store import (
     AgentApiSettings,
@@ -39,6 +41,8 @@ from strong_voice.session_store import (
     load_session,
     session_id_from_room,
 )
+from strong_voice.settings import get_voice_settings
+from strong_voice.turns import CandidateTurns
 
 log = logging.getLogger("strong_voice.interview")
 
@@ -67,6 +71,14 @@ class InterviewAgent(Agent):
         self.interview = interview
         self._on_ended = on_ended
         self._notify = notify
+        settings = get_voice_settings()
+        self.turns = CandidateTurns(
+            interview,
+            self.speak,
+            thinking_wait_s=settings.thinking_wait_s,
+            # Longer than the longest end-of-turn wait, so a real next turn comes first.
+            resume_wait_s=settings.endpointing_max_delay_s + 1.0,
+        )
 
     async def speak(self, lines: list[str]) -> None:
         await self._notify(lines)
@@ -88,7 +100,7 @@ class InterviewAgent(Agent):
         metrics: Any = getattr(new_message, "metrics", None) or {}
         start, stop = metrics.get("started_speaking_at"), metrics.get("stopped_speaking_at")
         spoken_s = stop - start if isinstance(start, float) and isinstance(stop, float) else None
-        await self.speak(await self.interview.on_candidate(text, spoken_s))
+        await self.turns.on_turn(text, spoken_s)
         raise StopResponse()
 
 
@@ -104,9 +116,12 @@ async def run_session(ctx: JobContext, build_session: Any) -> bool:
         ctx.shutdown("session not ready")
         return True
 
-    gateway = get_gateway()
+    async with maker() as db:  # the sim user's sessions use the sim budget (P13)
+        gateway = await gateway_for_org(db, loaded.org_id, get_gateway())
     runner = InterviewRunner(
-        SessionController(loaded.brief), Interviewer(gateway, loaded.brief, facts=loaded.facts)
+        SessionController(loaded.brief),
+        Interviewer(gateway, loaded.brief, facts=loaded.facts),
+        trace=SqlTraceSink(maker, loaded.org_id, session_id),  # admin traces (R2), background
     )
     interview = VoiceInterview(
         session_id=session_id,
@@ -118,6 +133,7 @@ async def run_session(ctx: JobContext, build_session: Any) -> bool:
     agent_session: AgentSession[None] = build_session()
 
     async def ended() -> None:
+        agent.turns.close()
         await interview.finish(interrupted=False)
         payload = json.dumps({"type": "ended"}).encode()
         await ctx.room.local_participant.publish_data(payload, reliable=True, topic=SESSION_TOPIC)
@@ -132,6 +148,11 @@ async def run_session(ctx: JobContext, build_session: Any) -> bool:
             log.warning("could not send the session state to the browser", exc_info=True)
 
     agent = InterviewAgent(interview, ended, notify)
+
+    @agent_session.on("user_state_changed")
+    def _on_user_state(event: Any) -> None:
+        agent.turns.on_user_state(event.new_state)
+
     tasks: set[asyncio.Task[None]] = set()
 
     def background(coro: Any) -> None:

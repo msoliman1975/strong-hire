@@ -1,0 +1,26 @@
+[project]
+name = "strong-sim"
+version = "0.1.0"
+description = "Strong Hire AI candidate (P13): interviews the deployed app, judges, reports."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "strong-core",
+    "strong-interview",
+    "httpx>=0.27",
+    "livekit>=1.0",
+    "pyyaml>=6.0",
+]
+
+[project.scripts]
+strong-sim = "strong_sim.cli:main"
+
+[tool.uv.sources]
+strong-core = { workspace = true }
+strong-interview = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/strong_sim"]

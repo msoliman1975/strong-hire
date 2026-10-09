@@ -1,0 +1,28 @@
+name: text-quality
+description: Scorer check. Four interview types times three qualities, on two resumes (24 sessions).
+pairwise: null
+scenarios:
+  - {id: be-beh-strong, resume: backend-senior, interview_type: behavioral, quality: strong}
+  - {id: be-beh-average, resume: backend-senior, interview_type: behavioral, quality: average}
+  - {id: be-beh-weak, resume: backend-senior, interview_type: behavioral, quality: weak}
+  - {id: be-hm-strong, resume: backend-senior, interview_type: hiring_manager, quality: strong}
+  - {id: be-hm-average, resume: backend-senior, interview_type: hiring_manager, quality: average}
+  - {id: be-hm-weak, resume: backend-senior, interview_type: hiring_manager, quality: weak}
+  - {id: be-tq-strong, resume: backend-senior, interview_type: technical_qa, quality: strong}
+  - {id: be-tq-average, resume: backend-senior, interview_type: technical_qa, quality: average}
+  - {id: be-tq-weak, resume: backend-senior, interview_type: technical_qa, quality: weak}
+  - {id: be-case-strong, resume: backend-senior, interview_type: case, quality: strong}
+  - {id: be-case-average, resume: backend-senior, interview_type: case, quality: average}
+  - {id: be-case-weak, resume: backend-senior, interview_type: case, quality: weak}
+  - {id: pm-beh-strong, resume: product-manager-mid, interview_type: behavioral, quality: strong}
+  - {id: pm-beh-average, resume: product-manager-mid, interview_type: behavioral, quality: average}
+  - {id: pm-beh-weak, resume: product-manager-mid, interview_type: behavioral, quality: weak}
+  - {id: pm-hm-strong, resume: product-manager-mid, interview_type: hiring_manager, quality: strong}
+  - {id: pm-hm-average, resume: product-manager-mid, interview_type: hiring_manager, quality: average}
+  - {id: pm-hm-weak, resume: product-manager-mid, interview_type: hiring_manager, quality: weak}
+  - {id: pm-tq-strong, resume: product-manager-mid, interview_type: technical_qa, quality: strong}
+  - {id: pm-tq-average, resume: product-manager-mid, interview_type: technical_qa, quality: average}
+  - {id: pm-tq-weak, resume: product-manager-mid, interview_type: technical_qa, quality: weak}
+  - {id: pm-case-strong, resume: product-manager-mid, interview_type: case, quality: strong}
+  - {id: pm-case-average, resume: product-manager-mid, interview_type: case, quality: average}
+  - {id: pm-case-weak, resume: product-manager-mid, interview_type: case, quality: weak}

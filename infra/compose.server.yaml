@@ -45,8 +45,20 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       # Emails that see the model spend meter (strong_api.devtools). Testers do not.
       MODEL_SPEND_VIEWERS: ${MODEL_SPEND_VIEWERS:-}
+      # Emails that may open the admin area (/admin). Everyone else gets 404.
+      ADMIN_EMAILS: ${ADMIN_EMAILS:-}
       LIVEKIT_PUBLIC_URL: wss://rtc.${DOMAIN}
       STRONG_INTERNAL_TOKEN: ${STRONG_INTERNAL_TOKEN:?set STRONG_INTERNAL_TOKEN in .env}
+      # The AI candidate (P13, docs/sim-candidate.md). Off unless SIM_ENABLED=true in .env.
+      SIM_ENABLED: ${SIM_ENABLED:-false}
+      SIM_TOKEN: ${SIM_TOKEN:-}
+      SIM_EMAIL: ${SIM_EMAIL:-sim@getstronghire.com}
+      # The sim's own LiteLLM key with a $5 daily budget, so AI-to-AI tests never use the app's.
+      SIM_LITELLM_KEY: ${SIM_LITELLM_KEY:-}
+      SIM_RESULTS_DIR: /sim-results
+    volumes:
+      # Saved sim runs, read-only, so the admin area can serve sim voice recordings (P13).
+      - /srv/stronghire/sim:/sim-results:ro
     restart: unless-stopped
 
   worker:
@@ -56,6 +68,10 @@ services:
       # Encrypted resume files, kept in a volume so they survive restarts.
       INPUTS_STORAGE_DIR: /data/uploads
       INPUTS_STORAGE_KEY: ${INPUTS_STORAGE_KEY:?set INPUTS_STORAGE_KEY in .env}
+      # The sim org's jobs (extraction, gap, brief, scoring) use the sim key (P13).
+      SIM_ENABLED: ${SIM_ENABLED:-false}
+      SIM_EMAIL: ${SIM_EMAIL:-sim@getstronghire.com}
+      SIM_LITELLM_KEY: ${SIM_LITELLM_KEY:-}
     volumes:
       - uploads-data:/data/uploads
     restart: unless-stopped
@@ -88,6 +104,10 @@ services:
     environment:
       LIVEKIT_PUBLIC_URL: wss://rtc.${DOMAIN}
       STRONG_INTERNAL_TOKEN: ${STRONG_INTERNAL_TOKEN}
+      # The sim org's voice interviews use the sim key (P13).
+      SIM_ENABLED: ${SIM_ENABLED:-false}
+      SIM_EMAIL: ${SIM_EMAIL:-sim@getstronghire.com}
+      SIM_LITELLM_KEY: ${SIM_LITELLM_KEY:-}
     restart: unless-stopped
 
   stt:

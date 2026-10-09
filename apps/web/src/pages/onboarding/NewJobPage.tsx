@@ -3,9 +3,11 @@ import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
 
 import { ApiError } from "../../api/client";
+import { useJobs } from "../../api/hooks";
 import { jobTargetsApi } from "../../api/inputs";
-import type { JobTargetCreate } from "../../api/types";
+import type { JobTargetCreate, JobTargetOut } from "../../api/types";
 import { ErrorNotice, ONBOARDING_STEPS, PageHead, Steps } from "../../components/ui";
+import { formatDate } from "../../labels";
 
 export const MIN_POSTING_CHARS = 100;
 
@@ -33,15 +35,33 @@ export function validateJobInput(url: string, text: string): string | null {
   return null;
 }
 
+/** R1: a saved job is not read again. A read one goes on to the resume step. */
+export function savedJobPath(job: JobTargetOut): string {
+  return job.status === "extracted" ? `/jobs/${job.id}/resume` : `/jobs/${job.id}/confirm`;
+}
+
 export function NewJobPage() {
   const navigate = useNavigate();
+  const saved = useJobs();
   const [url, setUrl] = useState("");
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [offer, setOffer] = useState<{ job: JobTargetOut; body: JobTargetCreate } | null>(null);
   const create = useMutation({
     mutationFn: (body: JobTargetCreate) => jobTargetsApi.create(body),
     onSuccess: (accepted) => navigate(confirmPath(accepted.job_target.id, accepted.job?.id)),
   });
+  // R1: before reading a posting, ask the API whether the user saved the same one before.
+  const check = useMutation({
+    mutationFn: (body: JobTargetCreate) => jobTargetsApi.match({ text: body.text, url: body.url }),
+    onSuccess: (found, body) => {
+      if (found.job_target) setOffer({ job: found.job_target, body });
+      else create.mutate(body);
+    },
+    // The check only saves work. If it fails, read the posting as before.
+    onError: (_err, body) => create.mutate(body),
+  });
+  const savedJobs = saved.data ?? [];
   // IN-1: some sites (LinkedIn) cannot be read. The API says so; the user pastes the text.
   const pasteRequired = create.error instanceof ApiError && create.error.code === "paste_required";
 
@@ -51,7 +71,8 @@ export function NewJobPage() {
     setError(problem);
     if (problem) return;
     // With both, the API reads the text and uses the link to match the company.
-    create.mutate({ url: url.trim() || null, text: text.trim() || null });
+    setOffer(null);
+    check.mutate({ url: url.trim() || null, text: text.trim() || null });
   };
 
   return (
@@ -60,7 +81,26 @@ export function NewJobPage() {
       <PageHead title="Add a job posting">
         <p>Use the posting for the real job you are interviewing for. We read the company, title, level and requirements.</p>
       </PageHead>
-      <form className="panel" onSubmit={onSubmit} noValidate>
+      {savedJobs.length > 0 && (
+        <section className="panel" aria-labelledby="saved-jobs-heading">
+          <h2 id="saved-jobs-heading">Use a job you saved</h2>
+          <p className="muted">We do not read a saved job again.</p>
+          <ul className="plain-list">
+            {savedJobs.map(({ job_target: job }) => (
+              <li key={job.id} className="row row--between">
+                <span>
+                  {job.name ?? "Job"} <span className="muted">added {formatDate(job.created_at)}</span>
+                </span>
+                <button type="button" className="btn btn--secondary" onClick={() => navigate(savedJobPath(job))}>
+                  Use this job
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      <form className="panel" onSubmit={onSubmit} noValidate aria-labelledby="new-job-heading">
+        <h2 id="new-job-heading">Add a new job</h2>
         <div className="field">
           <label htmlFor="job-url">Job posting link</label>
           <p className="hint" id="job-url-hint">
@@ -85,6 +125,27 @@ export function NewJobPage() {
             {error}
           </p>
         )}
+        {offer && (
+          <div className="notice" role="status">
+            <p>You saved this job before as {offer.job.name ?? "a saved job"}. Use it?</p>
+            <div className="row">
+              <button type="button" className="btn" onClick={() => navigate(savedJobPath(offer.job))}>
+                Use the saved job
+              </button>
+              <button
+                type="button"
+                className="btn btn--quiet"
+                disabled={create.isPending}
+                onClick={() => {
+                  create.mutate(offer.body);
+                  setOffer(null);
+                }}
+              >
+                Read it again as a new job
+              </button>
+            </div>
+          </div>
+        )}
         {pasteRequired ? (
           <div className="notice notice--error" role="alert">
             <p>This site does not allow automatic reading. Paste the job posting text above. We keep the link.</p>
@@ -93,7 +154,7 @@ export function NewJobPage() {
           create.isError && <ErrorNotice error={create.error} />
         )}
         <div className="row section">
-          <button type="submit" className="btn" disabled={create.isPending}>
+          <button type="submit" className="btn" disabled={create.isPending || check.isPending}>
             Read job posting
           </button>
         </div>

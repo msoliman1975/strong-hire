@@ -6,7 +6,7 @@ from enum import StrEnum
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import Field
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -18,6 +18,7 @@ class ModelProfile(StrEnum):
     LOCAL = "local"
     HOSTED = "hosted"
     CLAUDE = "claude"  # Anthropic models for the text roles, local speech (PL-2)
+    SIM = "sim"  # the AI candidate's own server (P13): candidate, judge and candidate speech
 
 
 def find_repo_root(start: Path | None = None) -> Path:
@@ -41,6 +42,11 @@ class Settings(BaseSettings):
         default=None, description="Overrides gateway.base_url from the models config file."
     )
     model_gateway_api_key: str | None = None
+
+    # The AI candidate (P13): its sessions use their own LiteLLM key and daily budget.
+    sim_enabled: bool = False
+    sim_email: str = "sim@getstronghire.com"
+    sim_litellm_key: SecretStr | None = None
 
     repo_root: Path = Field(default_factory=find_repo_root)
     config_dir: Path | None = None

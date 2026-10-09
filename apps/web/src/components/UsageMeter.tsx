@@ -3,17 +3,17 @@ import { Link } from "react-router";
 import type { Usage } from "../api/types";
 
 function freeText(left: number): string {
-  if (left <= 0) return "Free plan: free interview used";
-  return `Free plan: ${left} free ${left === 1 ? "interview" : "interviews"} left`;
+  if (left <= 0) return "Free plan: free mini interviews used";
+  return `Free plan: ${left} free mini ${left === 1 ? "interview" : "interviews"} left`;
 }
 
-/** BL-1: minutes used of the monthly cap. BL-2: free interviews left. Numbers come from the API. */
+/** BL-1: minutes used of the monthly cap. BL-2: free mini interviews left. Numbers come from the API. */
 export function UsageMeter({ usage }: { usage: Usage }) {
   if (usage.plan === "free") {
     return (
       <Link className="usage" to="/upgrade" data-testid="usage-meter">
         <span className="usage__value">{freeText(usage.free_interviews_left)}</span>
-        <span>Upgrade for more interviews</span>
+        <span>Upgrade for full interviews</span>
       </Link>
     );
   }

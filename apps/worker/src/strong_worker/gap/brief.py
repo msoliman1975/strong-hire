@@ -6,13 +6,16 @@
 The planner model writes the questions (BriefDraft). Code decides everything else, so the
 brief follows the rules even with a weak model:
 
-- target competencies (4 to 6): the interview type's competencies, ranked by company weight,
-  then by the weakest gap analysis score
+- target competencies (4 to 6, 2 in a mini): the interview type's competencies, ranked by
+  company weight, then by the weakest gap analysis score
 - target values: the highest-weighted company values (none in generic mode)
 - persona: the profile persona (or the generic one), adjusted for difficulty
 - seniority bar: the profile's bar for the level, else a generic bar (IV-6)
 - probe limit, pushback and curveball by difficulty (IV-3, IV-4); coach help by mode (IV-8)
 - time plan per phase (IV-7), and a size limit so the live loop stays fast
+
+A 10-minute mini interview gets 3 questions, 2 competencies, no curveball, at most 1 probe per
+question, and a time plan with no small talk and no candidate questions.
 """
 
 from __future__ import annotations
@@ -26,6 +29,7 @@ from strong_core.profiles import ResolvedProfile
 from strong_core.prompts import load_prompt
 from strong_core.schemas import (
     COMPETENCIES_BY_TYPE,
+    MINI_MAX_PROBES,
     BriefDraft,
     BriefQuestion,
     Competency,
@@ -58,8 +62,12 @@ MAX_TEXT = 240
 MAX_HINT = 120
 MAX_PATTERNS = 5
 
-QUESTIONS_BY_DURATION = {30: 8, 45: 10}
-COMPETENCIES_BY_DURATION = {30: 5, 45: 6}
+QUESTIONS_BY_DURATION = {10: 3, 30: 8, 45: 10}
+COMPETENCIES_BY_DURATION = {10: 2, 30: 5, 45: 6}
+MIN_QUESTIONS_BY_DURATION = {10: 3, 30: 6, 45: 6}
+# What the planner is asked to write. BriefDraft needs at least 6, so a mini asks for 6 and
+# keeps the 3 with the best priority.
+DRAFT_QUESTIONS_BY_DURATION = {10: 6, 30: 8, 45: 10}
 
 PROBES_BY_DIFFICULTY = {Difficulty.FRIENDLY: 1, Difficulty.REALISTIC: 2, Difficulty.TOUGH: 3}
 """IV-3: up to 3 probes per question, fewer in Friendly. Same values as the P07 interviewer."""
@@ -97,6 +105,14 @@ GENERIC_BARS = {
 
 # Minutes per phase (IV-7). Each plan adds up to the session length.
 TIME_PLANS: dict[int, tuple[tuple[Phase, int], ...]] = {
+    10: (
+        (Phase.INTRO, 1),  # greeting (one small-talk line at most) and a one-sentence agenda
+        (Phase.SMALL_TALK, 0),
+        (Phase.AGENDA, 0),
+        (Phase.CORE, 8),
+        (Phase.CANDIDATE_QUESTIONS, 0),  # 0 minutes: the controller skips this phase
+        (Phase.WRAP_UP, 1),
+    ),
     30: (
         (Phase.INTRO, 1),
         (Phase.SMALL_TALK, 2),
@@ -141,7 +157,7 @@ def time_plan(duration_min: int) -> list[PhaseTime]:
 def target_competencies(
     config: SessionConfig, profile: ResolvedProfile, gap: GapAnalysis | None
 ) -> list[Competency]:
-    """4 to 6 competencies: by company weight, then the weakest in the gap analysis."""
+    """4 to 6 competencies (2 in a mini): by company weight, then the weakest gap scores."""
     pool = list(COMPETENCIES_BY_TYPE[config.interview_type])
     scores = {c.competency: c.score for c in gap.competency_breakdown} if gap else {}
     ranked = sorted(pool, key=lambda c: (-profile.weight(c), scores.get(c, 50), pool.index(c)))
@@ -225,7 +241,7 @@ def build_messages(
             if q.interview_type == config.interview_type
         ][:MAX_PATTERNS]
     gaps = [f"[{g.severity.value}] {g.summary}" for g in (gap.gaps if gap else [])][:6]
-    tough = config.difficulty == Difficulty.TOUGH
+    curveball = config.difficulty == Difficulty.TOUGH and not config.is_mini
     return [
         load_prompt(Role.PLANNER, PROMPT).message("system"),
         load_prompt(Role.PLANNER, PROMPT_INPUT).message(
@@ -236,12 +252,12 @@ def build_messages(
             difficulty=config.difficulty.value,
             mode=config.mode.value,
             duration=config.duration_min,
-            question_count=QUESTIONS_BY_DURATION[config.duration_min],
+            question_count=DRAFT_QUESTIONS_BY_DURATION[config.duration_min],
             company=profile.company_name if not profile.generic else "generic mode (no profile)",
             competencies=", ".join(c.value for c in comps),
             values="\n".join(signals) or "(none: generic mode, leave values empty)",
             patterns="\n".join(patterns) or "(none)",
-            curveball="Write one curveball." if tough else "Set curveball to null.",
+            curveball="Write one curveball." if curveball else "Set curveball to null.",
             probe_areas="\n".join(probe_areas(gap)) or "(none)",
             gaps="\n".join(gaps) or "(none)",
             job=posting_text(posting),
@@ -263,15 +279,19 @@ def assemble(
     values = target_values(config, profile)
     questions = _clean_questions(draft.questions, comps, values, flags)
     questions = questions[: QUESTIONS_BY_DURATION[config.duration_min]]
-    if len(questions) < 6:
-        raise BriefError(f"the draft has {len(questions)} usable questions; 6 are needed")
+    needed = MIN_QUESTIONS_BY_DURATION[config.duration_min]
+    if len(questions) < needed:
+        raise BriefError(f"the draft has {len(questions)} usable questions; {needed} are needed")
     _cover(questions, comps)
     questions = [q.model_copy(update={"priority": i}) for i, q in enumerate(questions, start=1)]
 
     tough = config.difficulty == Difficulty.TOUGH
     curveball = None
-    if tough:
+    if tough and not config.is_mini:
         curveball = (draft.curveball or "").strip()[:MAX_TEXT] or DEFAULT_CURVEBALL
+    probes = PROBES_BY_DIFFICULTY[config.difficulty]
+    if config.is_mini:
+        probes = min(probes, MINI_MAX_PROBES)
     brief = InterviewerBrief(
         session=config,
         company_name=None if profile.generic else profile.company_name,
@@ -282,7 +302,7 @@ def assemble(
         questions=questions,
         probe_areas=probe_areas(gap),
         persona=persona(config, profile),
-        max_probes_per_question=PROBES_BY_DIFFICULTY[config.difficulty],
+        max_probes_per_question=probes,
         curveball=curveball,
         seniority_bar=seniority_bar(config, posting, profile),
         pushback=tough,
@@ -383,7 +403,7 @@ def _fit(brief: InterviewerBrief, flags: list[str]) -> InterviewerBrief:
         if len(longest.probe_hints) > 1:
             trimmed = [q.model_copy(update={"probe_hints": q.probe_hints[:1]}) for q in questions]
             flags.append("trimmed_probe_hints")
-        elif len(questions) > 6:
+        elif len(questions) > MIN_QUESTIONS_BY_DURATION[brief.session.duration_min]:
             trimmed = questions[:-1]
             _cover(trimmed, brief.target_competencies)
             flags.append("dropped_question")

@@ -7,7 +7,8 @@ timeout cancels it, or an unexpected error), the row is still marked "failed", s
 waits forever.
 
 `build_interviewer_brief` builds the brief for a session row and stores it in brief_json. The
-sessions workstream enqueues it when a session is created.
+sessions workstream enqueues it when a session is created. When the brief fails for good, the
+session is marked "failed" before it started, so nobody waits for it forever.
 
 Neither job records usage minutes: gap analysis is free (GA-4).
 """
@@ -22,6 +23,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any
 
+from arq import Retry
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -38,7 +40,10 @@ from strong_core.schemas import (
     Level,
     Resume,
     SessionConfig,
+    SessionStatus,
+    session_duration,
 )
+from strong_core.sim import gateway_for_org
 from strong_worker.gap.analysis import GapAnalysisError, run_gap_analysis
 from strong_worker.gap.brief import BriefError, build_brief
 
@@ -47,6 +52,11 @@ log = logging.getLogger(__name__)
 CTX_KEY = "gap"
 RESULT_TTL_S = 24 * 3600
 FAILED_REASON = "The analysis did not finish. Try again in a minute."
+# The brief job: tries in all (Arq max_tries), and the wait before the second try. The planner
+# already makes 2 calls per try, so a short provider error gets 4 calls over about 20 seconds.
+BRIEF_MAX_TRIES = 2
+BRIEF_RETRY_DEFER_S = 15
+BRIEF_FAILED_REASON = "The interview plan did not finish."
 
 
 @dataclass
@@ -135,8 +145,9 @@ async def _run_gap_analysis(gap: GapContext, gap_analysis_id: str, org_id: str) 
         resume = Resume.model_validate(resume_row.parsed_json)
         profile = await resolve_profile(db, target.company_id)
         try:
+            gateway = await gateway_for_org(db, row.org_id, gap.gateway)  # sim budget (P13)
             result = await run_gap_analysis(
-                gap.gateway, posting, resume, profile, context_notes=context_notes(target)
+                gateway, posting, resume, profile, context_notes=context_notes(target)
             )
         except GapAnalysisError as exc:
             log.warning("gap analysis %s failed: %s", row.id, exc)
@@ -185,8 +196,48 @@ async def build_interviewer_brief(
 
     Uses the job's latest ready gap analysis and its resume. Records the profile version on the
     session (generic mode stores NULL).
+
+    If the planner fails (for example the model provider returns an error), Arq runs the job
+    once more after BRIEF_RETRY_DEFER_S. When it fails for good, or stops in any other way, the
+    session is marked "failed" before it started, so the web app and the AI candidate stop
+    waiting. Such a session is never billed and does not use a free interview.
     """
     gap = _gap(ctx)
+    try:
+        return await _build_interviewer_brief(gap, session_id, org_id, ctx.get("job_try", 1))
+    except Retry:
+        raise
+    except BaseException:
+        # The Arq job timeout cancels the task, or something failed that build_brief does not
+        # turn into BriefError. Shielded, so the cancel cannot stop it.
+        log.exception("brief job for session %s stopped", session_id)
+        await asyncio.shield(_mark_session_failed(gap, session_id, org_id))
+        raise
+
+
+async def _mark_session_failed(gap: GapContext, session_id: str, org_id: str) -> None:
+    """Mark a session that never started and has no brief as failed. Never raises."""
+    try:
+        async with gap.sessionmaker() as db:
+            await db.execute(
+                update(InterviewSession)
+                .where(
+                    InterviewSession.id == uuid.UUID(session_id),
+                    InterviewSession.org_id == uuid.UUID(org_id),
+                    InterviewSession.status == SessionStatus.CREATED,
+                    InterviewSession.started_at.is_(None),
+                    InterviewSession.brief_json.is_(None),
+                )
+                .values(status=SessionStatus.FAILED)
+            )
+            await db.commit()
+    except Exception:
+        log.exception("could not mark session %s as failed", session_id)
+
+
+async def _build_interviewer_brief(
+    gap: GapContext, session_id: str, org_id: str, job_try: int
+) -> dict[str, Any]:
     async with gap.sessionmaker() as db:
         session = await db.scalar(
             select(InterviewSession).where(
@@ -196,8 +247,13 @@ async def build_interviewer_brief(
         )
         if session is None:
             return {"outcome": "failed", "reason": "session not found"}
+        if session.status != SessionStatus.CREATED or session.brief_json is not None:
+            # Ended, failed or already built (for example a retry after a worker restart).
+            return {"outcome": "skipped", "reason": f"session is {session.status.value}"}
         target = await db.get(JobTarget, session.job_target_id)
         if target is None or target.parsed_json is None:
+            session.status = SessionStatus.FAILED
+            await db.commit()
             return {"outcome": "failed", "reason": "The job posting is not ready yet."}
         posting = JobPosting.model_validate(target.parsed_json)
         gap_row = await latest_ready_gap(db, target.id)
@@ -213,14 +269,26 @@ async def build_interviewer_brief(
             interview_type=session.type,
             difficulty=session.difficulty,
             mode=session.mode,
-            duration_min=45 if session.duration_min == 45 else 30,
+            duration_min=session_duration(session.duration_min),
             level=target.level or posting.level or Level.MID,
         )
         try:
-            built = await build_brief(gap.gateway, config, posting, resume, profile, gap=analysis)
+            gateway = await gateway_for_org(db, session.org_id, gap.gateway)
+            built = await build_brief(gateway, config, posting, resume, profile, gap=analysis)
         except BriefError as exc:
-            log.warning("brief for session %s failed: %s", session.id, exc)
-            return {"outcome": "failed", "reason": "The interview plan did not finish."}
+            if job_try < BRIEF_MAX_TRIES:
+                log.warning(
+                    "brief for session %s failed on try %d; retrying in %ds: %s",
+                    session.id,
+                    job_try,
+                    BRIEF_RETRY_DEFER_S,
+                    exc,
+                )
+                raise Retry(defer=BRIEF_RETRY_DEFER_S) from exc
+            log.warning("brief for session %s failed for good: %s", session.id, exc)
+            session.status = SessionStatus.FAILED
+            await db.commit()
+            return {"outcome": "failed", "reason": BRIEF_FAILED_REASON, "error": str(exc)[:500]}
         session.brief_json = built.brief.model_dump(mode="json")
         await db.commit()
         return {

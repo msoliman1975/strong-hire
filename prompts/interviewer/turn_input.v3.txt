@@ -1,0 +1,11 @@
+Transcript so far:
+$transcript
+
+Session length: $duration_min minutes. $plan
+Move: $move
+Question: $question
+What the last answer lacks: $missing
+Pushback: $pushback
+Extra instruction for this move: $note
+
+Write only the words you say next to the candidate, as the interviewer. No reasoning, no notes, no feedback on the answers.

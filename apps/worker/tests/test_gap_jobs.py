@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from arq import Retry
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -33,9 +34,11 @@ from strong_core.schemas import (
     InterviewType,
     Mode,
     ProfileStatus,
+    SessionStatus,
     SubscriptionStatus,
 )
 from strong_worker.gap import jobs
+from strong_worker.gap.brief import BriefError
 from strong_worker.gap.jobs import CTX_KEY, GapContext, context_notes
 from strong_worker.inputs.testing import RecordingBackend
 
@@ -277,6 +280,137 @@ async def test_brief_job_stores_the_brief_and_profile_version(
         assert brief.profile_version == 2 and brief.curveball and brief.coach_help
         assert brief.session.duration_min == 45
         assert brief.probe_areas  # from the gap analysis
+
+
+async def test_brief_job_keeps_a_10_minute_session_as_a_mini(
+    sessionmaker: async_sessionmaker[AsyncSession],
+    account: tuple[uuid.UUID, uuid.UUID],
+    gateway: ModelGateway,
+) -> None:
+    """A 10-minute session gets a mini brief; before, any length other than 45 became 30."""
+    org_id, _ = account
+    target_id, _, gap_id = await _setup(sessionmaker, account)
+    ctx = _ctx(sessionmaker, gateway)
+    await jobs.run_gap_analysis_job(ctx, str(gap_id), str(org_id))
+    async with sessionmaker() as db:
+        session = InterviewSession(
+            org_id=org_id,
+            job_target_id=target_id,
+            type=InterviewType.CASE,
+            difficulty=Difficulty.TOUGH,
+            mode=Mode.REALISTIC,
+            duration_min=10,
+        )
+        db.add(session)
+        await db.commit()
+        session_id = session.id
+    result = await jobs.build_interviewer_brief(ctx, str(session_id), str(org_id))
+    assert result["outcome"] == "ready"
+    async with sessionmaker() as db:
+        stored = await db.get(InterviewSession, session_id)
+        assert stored is not None and stored.brief_json is not None
+        brief = InterviewerBrief.model_validate(stored.brief_json)
+        assert brief.session.duration_min == 10
+        assert len(brief.questions) == 3
+        assert brief.curveball is None and brief.max_probes_per_question == 1
+
+
+async def _new_session(
+    maker: async_sessionmaker[AsyncSession], org_id: uuid.UUID, target_id: uuid.UUID
+) -> uuid.UUID:
+    async with maker() as db:
+        session = InterviewSession(
+            org_id=org_id,
+            job_target_id=target_id,
+            type=InterviewType.BEHAVIORAL,
+            difficulty=Difficulty.REALISTIC,
+            mode=Mode.REALISTIC,
+            duration_min=30,
+        )
+        db.add(session)
+        await db.commit()
+        return session.id
+
+
+async def test_brief_failure_retries_once_then_marks_the_session_failed(
+    sessionmaker: async_sessionmaker[AsyncSession],
+    account: tuple[uuid.UUID, uuid.UUID],
+    gateway: ModelGateway,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The model provider fails: Arq tries again after a short wait, then the session fails
+    before it started, so the live page and the AI candidate stop waiting."""
+    org_id, _ = account
+    target_id, _, _ = await _setup(sessionmaker, account)
+    session_id = await _new_session(sessionmaker, org_id, target_id)
+
+    async def fails(*_: object, **__: object) -> Any:
+        raise BriefError("Brief failed after 2 attempts: credit balance too low")
+
+    monkeypatch.setattr(jobs, "build_brief", fails)
+    ctx = _ctx(sessionmaker, gateway)
+    with pytest.raises(Retry):
+        await jobs.build_interviewer_brief({**ctx, "job_try": 1}, str(session_id), str(org_id))
+    async with sessionmaker() as db:
+        stored = await db.get(InterviewSession, session_id)
+        assert stored is not None and stored.status == SessionStatus.CREATED
+
+    result = await jobs.build_interviewer_brief(
+        {**ctx, "job_try": jobs.BRIEF_MAX_TRIES}, str(session_id), str(org_id)
+    )
+    assert result["outcome"] == "failed"
+    async with sessionmaker() as db:
+        stored = await db.get(InterviewSession, session_id)
+        assert stored is not None
+        assert stored.status == SessionStatus.FAILED
+        assert stored.started_at is None and stored.ended_at is None
+        assert stored.brief_json is None and stored.minutes_billed == 0
+
+
+async def test_brief_unexpected_error_marks_the_session_failed(
+    sessionmaker: async_sessionmaker[AsyncSession],
+    account: tuple[uuid.UUID, uuid.UUID],
+    gateway: ModelGateway,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    org_id, _ = account
+    target_id, _, _ = await _setup(sessionmaker, account)
+    session_id = await _new_session(sessionmaker, org_id, target_id)
+
+    async def boom(*_: object, **__: object) -> Any:
+        raise RuntimeError("database went away")
+
+    monkeypatch.setattr(jobs, "build_brief", boom)
+    with pytest.raises(RuntimeError):
+        await jobs.build_interviewer_brief(
+            _ctx(sessionmaker, gateway), str(session_id), str(org_id)
+        )
+    async with sessionmaker() as db:
+        stored = await db.get(InterviewSession, session_id)
+        assert stored is not None and stored.status == SessionStatus.FAILED
+
+
+async def test_brief_job_skips_a_session_that_is_no_longer_waiting(
+    sessionmaker: async_sessionmaker[AsyncSession],
+    account: tuple[uuid.UUID, uuid.UUID],
+    gateway: ModelGateway,
+) -> None:
+    """A late retry must not bring a failed session back."""
+    org_id, _ = account
+    target_id, _, _ = await _setup(sessionmaker, account)
+    session_id = await _new_session(sessionmaker, org_id, target_id)
+    async with sessionmaker() as db:
+        stored = await db.get(InterviewSession, session_id)
+        assert stored is not None
+        stored.status = SessionStatus.FAILED
+        await db.commit()
+    result = await jobs.build_interviewer_brief(
+        _ctx(sessionmaker, gateway), str(session_id), str(org_id)
+    )
+    assert result["outcome"] == "skipped"
+    async with sessionmaker() as db:
+        stored = await db.get(InterviewSession, session_id)
+        assert stored is not None and stored.brief_json is None
 
 
 def test_context_notes_are_plain_lines() -> None:

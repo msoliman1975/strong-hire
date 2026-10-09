@@ -1,0 +1,45 @@
+{
+  "summary": "Product manager for B2B analytics products.",
+  "roles": [
+    {
+      "title": "Senior Product Manager",
+      "company": "Beacon Hill Analytics",
+      "start": "2022-04",
+      "end": null,
+      "achievements": [
+        "Own the dashboards product line with $14M in annual revenue.",
+        "Self-serve Dashboards: Launched a template gallery that doubled weekly active creators to 5,200.",
+        "Pricing: Moved 600 accounts to usage-based pricing with 2% churn.",
+        "Discovery: Ran 45 customer interviews that set the 2024 roadmap."
+      ],
+      "skills": []
+    },
+    {
+      "title": "Product Manager",
+      "company": "Harborlight Software",
+      "start": "2018-07",
+      "end": "2022-03",
+      "achievements": [
+        "Data Connectors: Shipped 12 new data connectors in one year.",
+        "Onboarding: Cut time to first report from 3 days to 4 hours."
+      ],
+      "skills": []
+    }
+  ],
+  "skills": [
+    "Product discovery",
+    "SQL",
+    "Amplitude",
+    "Roadmapping",
+    "A/B testing"
+  ],
+  "education": [
+    {
+      "institution": "Charles River College",
+      "degree": "B.A.",
+      "field_of_study": "Economics",
+      "end": "2018"
+    }
+  ],
+  "certifications": []
+}

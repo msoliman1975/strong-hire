@@ -57,6 +57,7 @@ function session(changes: Partial<SessionRecord> = {}): SessionRecord {
     started_at: null,
     ended_at: null,
     minutes_billed: 0,
+    failure_reason: null,
     ...changes,
   };
 }
@@ -103,6 +104,24 @@ describe("live session page", () => {
     await user.click(await screen.findByRole("button", { name: "Check my microphone" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("Your browser blocked the microphone.");
     expect(joins).toEqual([]); // the session did not start, so no minute is billed
+  });
+
+  it("stops waiting when the plan could not be built, and offers to try again", async () => {
+    const reason = "We could not prepare your interviewer. Nothing was counted or billed. Start a new interview to try again.";
+    const created: unknown[] = [];
+    const { user } = renderLive(session({ status: "failed", brief_ready: false, failure_reason: reason }));
+    server.use(
+      http.post("*/api/sessions", async ({ request }) => {
+        created.push(await request.json());
+        return HttpResponse.json(session({ id: "s2" }), { status: 201 });
+      }),
+      http.get("*/api/sessions/s2", () => HttpResponse.json(session({ id: "s2" }))),
+    );
+    expect(await screen.findByTestId("not-started")).toHaveTextContent(reason);
+    expect(screen.queryByText(/Preparing your interviewer/)).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Try again" }));
+    expect(await screen.findByRole("button", { name: "Check my microphone" })).toBeInTheDocument();
+    expect(created).toEqual([{ job_target_id: "j1", config: session().config, channel: "voice" }]);
   });
 
   it("waits for the interview plan before the candidate can join", async () => {

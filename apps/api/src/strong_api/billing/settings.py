@@ -34,7 +34,9 @@ class BillingSettings(BaseSettings):
     billing_plan_name: str = "Strong Hire monthly"
     billing_price_usd_month: Decimal = Decimal("29")
     billing_minutes_cap: int = Field(default=300, ge=1, description="Interview minutes per period.")
-    billing_free_interviews: int = Field(default=1, ge=0, description="BL-2: free interviews.")
+    billing_free_interviews: int = Field(
+        default=2, ge=0, description="BL-2: free interviews (10-minute mini interviews)."
+    )
 
     @field_validator("stripe_secret_key", "stripe_webhook_secret", "stripe_price_id", mode="before")
     @classmethod

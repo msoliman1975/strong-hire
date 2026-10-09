@@ -16,9 +16,14 @@ class Role(StrEnum):
     SCORER = "scorer"
     STT = "stt"
     TTS = "tts"
+    # Test-only roles for the AI candidate (P13). The product never calls them.
+    CANDIDATE = "candidate"
+    JUDGE = "judge"
 
 
-CHAT_ROLES = frozenset({Role.EXTRACTOR, Role.PLANNER, Role.INTERVIEWER, Role.SCORER})
+CHAT_ROLES = frozenset(
+    {Role.EXTRACTOR, Role.PLANNER, Role.INTERVIEWER, Role.SCORER, Role.CANDIDATE, Role.JUDGE}
+)
 
 
 class Message(BaseModel):

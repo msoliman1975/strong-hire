@@ -16,6 +16,8 @@ roles:
   scorer: tiny-chat
   stt: tiny-stt
   tts: tiny-tts
+  candidate: tiny-chat   # P13 AI candidate; the sim profile overrides it
+  judge: tiny-chat
 
 # Capability registry. Code checks these flags, never model names.
 # context_window is the num_ctx set in litellm.tiny.yaml, not the model's maximum (32768).

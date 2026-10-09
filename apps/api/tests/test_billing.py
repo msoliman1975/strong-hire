@@ -47,7 +47,7 @@ def billing_settings(**overrides: Any) -> BillingSettings:
         "stripe_price_id": "price_TEST123",
         "billing_price_usd_month": "29",
         "billing_minutes_cap": 300,
-        "billing_free_interviews": 1,
+        "billing_free_interviews": 2,
     }
     values.update(overrides)
     return BillingSettings(**values)
@@ -92,14 +92,14 @@ async def test_bl1_plan_numbers_come_from_config(
     billing_app: FastAPI, client: httpx.AsyncClient
 ) -> None:
     billing_app.state.billing_settings = billing_settings(
-        billing_price_usd_month="39", billing_minutes_cap=240, billing_free_interviews=2
+        billing_price_usd_month="39", billing_minutes_cap=240, billing_free_interviews=3
     )
     plan = (await client.get("/billing/plan")).json()
     assert plan == {
         "name": "Strong Hire monthly",
         "price_usd_month": 39.0,
         "minutes_cap": 240,
-        "free_interviews": 2,
+        "free_interviews": 3,
         "billing_enabled": True,
     }
 
@@ -129,28 +129,38 @@ async def test_usage_needs_sign_in(billing_app: FastAPI, anon_client: httpx.Asyn
     assert (await anon_client.get("/billing/usage")).status_code == 401
 
 
-async def test_bl2_new_user_has_one_free_interview(
+def test_bl2_default_is_two_free_interviews() -> None:
+    assert BillingSettings().billing_free_interviews == 2
+
+
+async def test_bl2_new_user_has_two_free_mini_interviews(
     client: httpx.AsyncClient, user: dict[str, Any]
 ) -> None:
     usage = (await client.get("/billing/usage")).json()
     assert usage["plan"] == "free"
-    assert usage["free_interviews_total"] == 1
-    assert usage["free_interviews_left"] == 1
+    assert usage["free_interviews_total"] == 2
+    assert usage["free_interviews_left"] == 2
     assert usage["can_start_session"] is True
+    assert usage["full_interviews_allowed"] is False
     assert usage["minutes_cap"] == 0
     assert usage["block_code"] is None
 
 
-async def test_bl2_free_interview_is_used_once_then_upgrade_required(
+async def test_bl2_free_interviews_are_used_then_upgrade_required(
     client: httpx.AsyncClient, user: dict[str, Any], sessionmaker: Maker
 ) -> None:
     org_id, user_id = uuid.UUID(user["org_id"]), uuid.UUID(user["id"])
+    settings = billing_settings()
     async with sessionmaker() as db:
-        # A session that never started and a failed one do not use the free interview.
+        # A session that never started and a failed one do not use a free interview.
         await add_session(db, org_id, user_id, started=False, status=SessionStatus.CREATED)
         await add_session(db, org_id, user_id, status=SessionStatus.FAILED)
-        assert (await ensure_can_start_session(db, org_id)).free_interviews_left == 1
-        await add_session(db, org_id, user_id, status=SessionStatus.COMPLETED)
+        ent = await ensure_can_start_session(db, org_id, 10, settings)
+        assert ent.free_interviews_left == 2
+        await add_session(db, org_id, user_id, status=SessionStatus.COMPLETED, duration=10)
+        ent = await ensure_can_start_session(db, org_id, 10, settings)
+        assert ent.free_interviews_left == 1
+        await add_session(db, org_id, user_id, status=SessionStatus.COMPLETED, duration=10)
 
     usage = (await client.get("/billing/usage")).json()
     assert usage["free_interviews_left"] == 0
@@ -159,11 +169,44 @@ async def test_bl2_free_interview_is_used_once_then_upgrade_required(
 
     async with sessionmaker() as db:
         with pytest.raises(Exception) as caught:
-            await ensure_can_start_session(db, org_id)
+            await ensure_can_start_session(db, org_id, 10, settings)
     exc: Any = caught.value
     assert exc.status_code == 402
     assert exc.detail["code"] == "upgrade_required"
+    assert "free mini interviews" in exc.detail["message"]
     assert exc.detail["upgrade_url"] == "/upgrade"
+
+
+@pytest.mark.parametrize("minutes", [30, 45])
+async def test_bl2_free_account_cannot_start_a_full_interview(
+    client: httpx.AsyncClient, user: dict[str, Any], sessionmaker: Maker, minutes: int
+) -> None:
+    """Free accounts get mini interviews only. 30 and 45 minutes need the subscription."""
+    org_id = uuid.UUID(user["org_id"])
+    async with sessionmaker() as db:
+        assert (await ensure_can_start_session(db, org_id, 10, billing_settings())).plan == "free"
+        with pytest.raises(Exception) as caught:
+            await ensure_can_start_session(db, org_id, minutes, billing_settings())
+    exc: Any = caught.value
+    assert exc.status_code == 402
+    assert exc.detail["code"] == "full_interview_requires_plan"
+    assert exc.detail["message"] == (
+        "Full interviews are part of the subscription. Free accounts get 2 mini interviews."
+    )
+    assert exc.detail["upgrade_url"] == "/upgrade"
+
+
+@pytest.mark.parametrize("minutes", [10, 30, 45])
+async def test_bl1_paid_plan_starts_any_length(
+    client: httpx.AsyncClient, user: dict[str, Any], sessionmaker: Maker, minutes: int
+) -> None:
+    await subscribe(client, user)
+    async with sessionmaker() as db:
+        ent = await ensure_can_start_session(
+            db, uuid.UUID(user["org_id"]), minutes, billing_settings()
+        )
+    assert ent.plan == "paid" and ent.full_interviews_allowed
+    assert (await client.get("/billing/usage")).json()["full_interviews_allowed"] is True
 
 
 # ---------------------------------------------------------------- checkout and portal
@@ -405,7 +448,7 @@ async def test_bl1_minutes_at_the_cap_block_a_new_session(
         assert row is not None
         row.minutes_used = 299
         await db.commit()
-        ent = await ensure_can_start_session(db, org_id)
+        ent = await ensure_can_start_session(db, org_id, 45)
         assert ent.minutes_left == 1
         assert ent.max_minutes(45) == 1  # the session timer stops at the cap
 
@@ -415,7 +458,7 @@ async def test_bl1_minutes_at_the_cap_block_a_new_session(
         assert ent.can_start_session is False
         assert ent.block_code == "minutes_exhausted"
         with pytest.raises(Exception) as caught:
-            await ensure_can_start_session(db, org_id)
+            await ensure_can_start_session(db, org_id, 10)
     exc: Any = caught.value
     assert exc.status_code == 402
     assert exc.detail["code"] == "minutes_exhausted"

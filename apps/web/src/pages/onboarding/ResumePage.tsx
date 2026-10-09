@@ -3,7 +3,7 @@ import { useState, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router";
 
 import { useResume, useResumes, useResumeTask } from "../../api/hooks";
-import { jobProblem, resumesApi } from "../../api/inputs";
+import { jobProblem, resumesApi, sha256Hex } from "../../api/inputs";
 import type { ResumeAccepted, ResumeOut } from "../../api/types";
 import { ErrorNotice, Loading, ONBOARDING_STEPS, PageHead, Steps } from "../../components/ui";
 import { formatDate } from "../../labels";
@@ -27,6 +27,10 @@ export function validateResumeInput(file: File | null, text: string): string | n
 const contextPath = (jobId: string, resumeId: string) =>
   `/jobs/${jobId}/context?resume=${encodeURIComponent(resumeId)}`;
 
+/** "Check your CV": the user checks and fixes the extracted CV before the gap analysis. */
+const checkPath = (jobId: string, resumeId: string) =>
+  `/jobs/${jobId}/resume/${encodeURIComponent(resumeId)}/check`;
+
 export function ResumePage() {
   const { jobId = "" } = useParams();
   const navigate = useNavigate();
@@ -37,7 +41,9 @@ export function ResumePage() {
   const uploaded = useResume(upload?.id ?? null, problem === null);
 
   const ready = (existing.data ?? []).filter((r) => r.status === "extracted");
-  const choose = (resumeId: string) => navigate(contextPath(jobId, resumeId));
+  // A CV the user has not checked yet goes to "Check your CV" first; a confirmed one goes on.
+  const choose = (saved: ResumeOut) =>
+    navigate(saved.confirmed_at ? contextPath(jobId, saved.id) : checkPath(jobId, saved.id));
 
   return (
     <div className="page--narrow">
@@ -48,15 +54,16 @@ export function ResumePage() {
 
       {ready.length > 0 && !upload && (
         <section className="panel" aria-labelledby="existing-heading">
-          <h2 id="existing-heading">Use a resume you added before</h2>
+          <h2 id="existing-heading">Use a resume you saved</h2>
+          <p className="muted">We do not read a saved resume again.</p>
           <ul className="plain-list">
             {ready.map((r) => (
               <li key={r.id} className="row row--between">
                 <span>
-                  {r.has_file ? "Uploaded file" : "Pasted text"}{" "}
+                  {r.name ?? (r.has_file ? "Uploaded file" : "Pasted text")}{" "}
                   <span className="muted">added {formatDate(r.uploaded_at)}</span>
                 </span>
-                <button type="button" className="btn btn--secondary" onClick={() => choose(r.id)}>
+                <button type="button" className="btn btn--secondary" onClick={() => choose(r)}>
                   Use this resume
                 </button>
               </li>
@@ -80,9 +87,9 @@ export function ResumePage() {
               type="button"
               className="btn"
               disabled={uploaded.data?.status !== "extracted"}
-              onClick={() => choose(upload.id)}
+              onClick={() => navigate(checkPath(jobId, upload.id))}
             >
-              Continue
+              Check and continue
             </button>
             <button type="button" className="btn btn--quiet" onClick={() => setUpload(null)}>
               Upload a different resume
@@ -90,17 +97,41 @@ export function ResumePage() {
           </div>
         </section>
       ) : (
-        <UploadForm onUploaded={(r) => setUpload({ id: r.resume.id, task: r.job?.id ?? null })} />
+        <UploadForm
+          onUploaded={(r) => setUpload({ id: r.resume.id, task: r.job?.id ?? null })}
+          onUseSaved={choose}
+        />
       )}
     </div>
   );
 }
 
-function UploadForm({ onUploaded }: { onUploaded: (r: ResumeAccepted) => void }) {
+function UploadForm({
+  onUploaded,
+  onUseSaved,
+}: {
+  onUploaded: (r: ResumeAccepted) => void;
+  onUseSaved: (saved: ResumeOut) => void;
+}) {
   const [file, setFile] = useState<File | null>(null);
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [offer, setOffer] = useState<{ saved: ResumeOut; form: FormData } | null>(null);
   const upload = useMutation({ mutationFn: resumesApi.upload, onSuccess: onUploaded });
+  // R1: the same file (or text) saved before is offered instead of reading it again.
+  const check = useMutation({
+    mutationFn: async (form: FormData) => {
+      const sent = form.get("file");
+      const hash = await sha256Hex(sent instanceof File ? await sent.arrayBuffer() : String(form.get("text") ?? ""));
+      return (await resumesApi.match(hash)).resume;
+    },
+    onSuccess: (saved, form) => {
+      if (saved) setOffer({ saved, form });
+      else upload.mutate(form);
+    },
+    // The check only saves work. If it fails, upload as before.
+    onError: (_err, form) => upload.mutate(form),
+  });
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -110,7 +141,8 @@ function UploadForm({ onUploaded }: { onUploaded: (r: ResumeAccepted) => void })
     const form = new FormData();
     if (file) form.append("file", file);
     else form.append("text", text.trim());
-    upload.mutate(form);
+    setOffer(null);
+    check.mutate(form);
   };
 
   return (
@@ -139,7 +171,28 @@ function UploadForm({ onUploaded }: { onUploaded: (r: ResumeAccepted) => void })
         </p>
       )}
       {upload.isError && <ErrorNotice error={upload.error} />}
-      <button type="submit" className="btn" disabled={upload.isPending}>
+      {offer && (
+        <div className="notice" role="status">
+          <p>You saved this CV before as {offer.saved.name ?? "a saved CV"}. Use it?</p>
+          <div className="row">
+            <button type="button" className="btn" onClick={() => onUseSaved(offer.saved)}>
+              Use the saved CV
+            </button>
+            <button
+              type="button"
+              className="btn btn--quiet"
+              disabled={upload.isPending}
+              onClick={() => {
+                upload.mutate(offer.form);
+                setOffer(null);
+              }}
+            >
+              Upload it again
+            </button>
+          </div>
+        </div>
+      )}
+      <button type="submit" className="btn" disabled={upload.isPending || check.isPending}>
         Upload resume
       </button>
     </form>

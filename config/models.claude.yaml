@@ -16,6 +16,8 @@ roles:
   scorer: claude-strong
   stt: claude-stt
   tts: claude-tts
+  candidate: claude-fast   # P13 AI candidate; the sim profile overrides it
+  judge: claude-strong
 
 # Capability registry. Code checks these flags, never model names.
 models:

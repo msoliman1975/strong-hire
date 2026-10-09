@@ -16,7 +16,7 @@ from strong_core.schemas import Difficulty, Mode, Phase, Speaker, Turn, UsageCom
 from strong_interview import CoachNotAllowedError, Interviewer, InterviewRunner, SessionController
 from strong_interview.testing import FakeClock, make_brief
 from strong_voice import interview as interview_module
-from strong_voice.interview import RECONNECT_S, WELCOME_BACK, VoiceInterview
+from strong_voice.interview import RECONNECT_S, TAKE_YOUR_TIME, WELCOME_BACK, VoiceInterview
 from strong_voice.session_store import session_id_from_room
 
 SID = uuid.uuid4()
@@ -34,7 +34,7 @@ class FakeStore:
         self.turns.append(turn)
 
     async def save_usage(
-        self, session_id: uuid.UUID, component: UsageComponent, units: float
+        self, session_id: uuid.UUID, component: UsageComponent, units: float, cost_usd: float = 0.0
     ) -> None:
         self.usage[component] = units
 
@@ -204,3 +204,27 @@ async def test_state_message_for_the_browser() -> None:
         "elapsed_ms": rig.voice.runner.controller.elapsed_ms,
         "said": lines,
     }
+
+
+async def test_voice_interview_takes_back_and_keeps_the_question_open() -> None:
+    """With the real runner (fake model): a taken-back reply leaves no trace, and a request for
+    time saves both lines without moving on."""
+    rig = make_rig()
+    await rig.voice.opening()
+    for _ in range(4):
+        rig.clock.advance(ms=60_000)
+        await rig.voice.on_candidate("We built a billing service and I led it.", 5.0)
+    controller = rig.voice.runner.controller
+    assert controller.phase == Phase.CORE
+    saved = len(rig.store.turns)
+    state = controller.snapshot()
+
+    assert (
+        await rig.voice.on_candidate("Yeah, great question.", 2.0, superseded=lambda: True) is None
+    )
+    assert len(rig.store.turns) == saved and controller.snapshot() == state
+
+    lines = await rig.voice.on_thinking("Give me a moment.", 1.0)
+    assert lines == [TAKE_YOUR_TIME]
+    assert [t.speaker for t in rig.store.turns[saved:]] == [Speaker.CANDIDATE, Speaker.INTERVIEWER]
+    assert controller.snapshot() == state

@@ -6,6 +6,7 @@ import { devApi } from "./dev";
 import { gapApi } from "./gap";
 import { jobRunning, jobTargetsApi, resumesApi } from "./inputs";
 import { sessionsApi } from "./sessions";
+import { reportsApi, type ReportFilter } from "./reports";
 import { debriefApi } from "./scoring";
 
 /** How often to re-check work that runs in the background (extraction, analysis, scoring). */
@@ -22,6 +23,9 @@ export const keys = {
   jobTask: (id: string, taskId: string) => ["jobs", id, "task", taskId] as const,
   jobSessions: (id: string) => ["jobs", id, "sessions"] as const,
   gap: (id: string) => ["jobs", id, "gap"] as const,
+  gapReport: (id: string) => ["gap-analyses", id] as const,
+  reports: ["reports"] as const,
+  reportList: (filter: ReportFilter) => ["reports", filter.jobTargetId ?? "", filter.type ?? ""] as const,
   progress: (id: string) => ["jobs", id, "progress"] as const,
   resumes: ["resumes"] as const,
   resume: (id: string) => ["resumes", id] as const,
@@ -38,13 +42,17 @@ export const useProviders = () =>
 export const useUsage = (enabled = true) =>
   useQuery({ queryKey: keys.usage, queryFn: billingApi.usage, enabled });
 
-/** Dev builds only: Claude spend against the LiteLLM budgets, refreshed every 30 seconds. */
+/**
+ * Claude spend against the LiteLLM budgets, refreshed every 30 seconds. The API answers in dev and,
+ * on the hosted test server, only for the owner (MODEL_SPEND_VIEWERS). Anyone else gets 404: the
+ * meter stays hidden and the page stops asking.
+ */
 export const useModelUsage = (enabled = true) =>
   useQuery({
     queryKey: keys.modelUsage,
     queryFn: devApi.modelUsage,
-    enabled: enabled && import.meta.env.DEV,
-    refetchInterval: 30_000,
+    enabled,
+    refetchInterval: (q) => (q.state.status === "error" ? false : 30_000),
     retry: false,
   });
 
@@ -95,6 +103,19 @@ export const useGapAnalysis = (jobId: string) =>
     retry: false,
     refetchInterval: (q) => (q.state.data?.status === "running" ? POLL_MS : false),
   });
+
+/** One gap analysis run by id (R1 Reports page). */
+export const useGapReport = (gapAnalysisId: string | null) =>
+  useQuery({
+    queryKey: keys.gapReport(gapAnalysisId ?? ""),
+    queryFn: () => gapApi.getById(gapAnalysisId ?? ""),
+    enabled: Boolean(gapAnalysisId),
+    retry: false,
+  });
+
+/** R1: gap reports and debriefs, newest first. */
+export const useReports = (filter: ReportFilter = {}) =>
+  useQuery({ queryKey: keys.reportList(filter), queryFn: () => reportsApi.list(filter) });
 
 export const useJobSessions = (jobId: string) =>
   useQuery({ queryKey: keys.jobSessions(jobId), queryFn: () => sessionsApi.listForJob(jobId) });

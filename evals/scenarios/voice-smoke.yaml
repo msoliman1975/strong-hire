@@ -1,0 +1,5 @@
+name: voice-smoke
+description: Two short voice sessions, real time (about 25 minutes).
+scenarios:
+  - {id: v-beh-strong, channel: voice, interview_type: behavioral, duration_min: 10, quality: strong}
+  - {id: v-tq-weak, channel: voice, interview_type: technical_qa, duration_min: 10, quality: weak}

@@ -1,0 +1,53 @@
+{
+  "summary": "Mobile engineer focused on payments and app performance.",
+  "roles": [
+    {
+      "title": "Staff iOS Engineer",
+      "company": "Harborview Wallet",
+      "start": "2021-03",
+      "end": null,
+      "achievements": [
+        "Rebuilt the card checkout flow; failed payments fell by 22%",
+        "Added Apple Pay for 1.2 million users in 6 weeks",
+        "Cut cold start time from 3.4 s to 1.1 s",
+        "Set up crash triage that took the crash-free rate to 99.8%",
+        "Mentored 6 engineers and ran the iOS guild"
+      ],
+      "skills": [
+        "Swift",
+        "SwiftUI"
+      ]
+    },
+    {
+      "title": "iOS Engineer",
+      "company": "Gristmill Recipes",
+      "start": "2017-08",
+      "end": "2021-02",
+      "achievements": [
+        "Built offline recipe sync used by 400,000 monthly users",
+        "Launched the shopping list widget"
+      ],
+      "skills": [
+        "Objective-C",
+        "Swift"
+      ]
+    }
+  ],
+  "skills": [
+    "Swift",
+    "SwiftUI",
+    "Objective-C",
+    "Core Data",
+    "XCTest",
+    "Fastlane"
+  ],
+  "education": [
+    {
+      "institution": "Lakeview College",
+      "degree": "B.A.",
+      "field_of_study": "Mathematics",
+      "end": "2017"
+    }
+  ],
+  "certifications": []
+}

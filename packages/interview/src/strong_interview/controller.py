@@ -5,19 +5,38 @@ WRAP_UP. The controller decides every phase change and when the session ends; th
 does. The interviewer model only chooses what to say, and in CORE whether to probe. The
 controller caps probes per question by difficulty, so a weak model cannot loop.
 
+A follow-up must aim at something new. Each probe records what the answer lacked (the decision's
+`missing`). When the next decision asks to probe only for gaps already probed on this question,
+the candidate did not fill them after being asked once, so the controller moves on
+(`same_gap_not_filled`) instead of asking the same thing in new words. A probe on a gap not yet
+asked about is still allowed, within the probe limit.
+
+Candidate questions: a question is answered while time and the limit allow. When the controller
+must close anyway (limit reached, phase time up), a pending question still gets a short last
+answer before the wrap-up. When the session time is fully used, the wrap-up line acknowledges the
+question and says the recruiter can follow up.
+
 Time: each phase gets minutes from the brief's time_plan (or a default plan). CORE stops
 starting new questions when less than MIN_QUESTION_MS is left; lower-priority questions are
 dropped. Coach mode can pause the clock.
+
+A phase with 0 planned minutes is skipped: no SMALL_TALK turn (the greeting may hold one short
+small-talk line) and no CANDIDATE_QUESTIONS turn (CORE goes straight to WRAP_UP). The agenda is
+always said, in one short turn. The 10-minute mini interview uses this: minute 1 is the greeting
+and the agenda, 8 minutes of CORE, 1 minute of WRAP_UP. A mini also has no curveball and at
+most MINI_MAX_PROBES follow-ups per question, whatever the difficulty.
 """
 
 from __future__ import annotations
 
+import copy
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import StrEnum
 
 from strong_core.schemas import (
+    MINI_MAX_PROBES,
     BriefQuestion,
     Difficulty,
     InterviewerBrief,
@@ -34,6 +53,14 @@ PROBE_LIMIT: dict[Difficulty, int] = {
 }
 # Minutes per phase when the brief has no time_plan (IV-7). Each plan adds up to the duration.
 DEFAULT_PLAN: dict[int, dict[Phase, int]] = {
+    10: {
+        Phase.INTRO: 1,  # greeting and the agenda
+        Phase.SMALL_TALK: 0,
+        Phase.AGENDA: 0,
+        Phase.CORE: 8,
+        Phase.CANDIDATE_QUESTIONS: 0,
+        Phase.WRAP_UP: 1,
+    },
     30: {
         Phase.INTRO: 1,
         Phase.SMALL_TALK: 2,
@@ -65,6 +92,34 @@ MAX_CANDIDATE_QUESTIONS = 3
 CURVEBALL_REF = "curveball"
 
 
+class Why(StrEnum):
+    """Why the controller made a move. Kept in the admin traces (R2), never shown to users."""
+
+    START = "start"
+    NEXT_PHASE = "next_phase"
+    SESSION_TIME_UP = "session_time_up"
+    MODEL_CHOSE_PROBE = "model_chose_probe"
+    MODEL_CHOSE_MOVE_ON = "model_chose_move_on"
+    NO_DECISION = "no_decision"
+    PROBE_LIMIT_REACHED = "probe_limit_reached"
+    CORE_TIME_UP = "core_time_up"
+    CURVEBALL_DUE = "curveball_due"
+    NEXT_QUESTION = "next_question"
+    CORE_TIME_LEFT_UNDER_MIN = "core_time_left_under_2_min"
+    NO_QUESTIONS_LEFT = "no_questions_left"
+    NO_CANDIDATE_QUESTIONS_PHASE = "no_candidate_questions_phase"
+    CANDIDATE_ASKED = "candidate_asked"
+    CANDIDATE_HAD_NO_QUESTION = "candidate_had_no_question"
+    CANDIDATE_QUESTIONS_TIME_UP = "candidate_questions_time_up"
+    CANDIDATE_QUESTIONS_LIMIT = "candidate_questions_limit"
+    SAME_GAP_NOT_FILLED = "same_gap_not_filled"
+    ANSWER_BEFORE_CLOSE = "answer_before_close"
+    CANDIDATE_QUESTION_LEFT_OPEN = "candidate_question_left_open"
+    ENDED_EARLY = "ended_early"
+    COACH_REQUEST = "coach_request"
+    UNEXPECTED_PHASE = "unexpected_phase"
+
+
 class MoveKind(StrEnum):
     """What the interviewer does next. The interviewer prompt explains each one."""
 
@@ -89,6 +144,11 @@ class Move:
     missing: tuple[ProbeTrigger, ...] = ()
     pushback: bool = False
     expects_answer: bool = True
+    reason: tuple[Why, ...] = ()
+    # ANSWER_QUESTION: the last answer before the close; do not invite more questions.
+    closing: bool = False
+    # WRAP_UP: the candidate asked a question there is no time left to answer.
+    open_question: bool = False
 
     @property
     def question_ref(self) -> str | None:
@@ -131,11 +191,14 @@ class SessionController:
     dropped: list[str] = field(default_factory=list)
     curveball_used: bool = False
     candidate_questions: int = 0
+    # The gaps (ProbeDecision.missing) already probed on the current question.
+    probed_missing: list[ProbeTrigger] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         self._clock = _Clock(self.clock)
         self._queue = sorted(self.brief.questions, key=lambda q: q.priority)
         minutes = self._plan()
+        self._minutes = minutes
         self._deadline: dict[Phase, int] = {}
         total = 0
         for phase in ORDER:
@@ -147,6 +210,31 @@ class SessionController:
         if self.brief.time_plan:
             return {p.phase: p.minutes for p in self.brief.time_plan}
         return DEFAULT_PLAN[self.brief.session.duration_min]
+
+    # ------------------------------------------------------------------ take back
+
+    # Everything a turn can change, without the clock. Voice uses this to take back a reply that
+    # was not spoken because the candidate went on talking.
+    _STATE = (
+        "phase",
+        "question",
+        "probes_used",
+        "hints_used",
+        "ended",
+        "asked",
+        "dropped",
+        "curveball_used",
+        "candidate_questions",
+        "probed_missing",
+        "_queue",
+    )
+
+    def snapshot(self) -> dict[str, object]:
+        return {name: copy.copy(getattr(self, name)) for name in self._STATE}
+
+    def restore(self, state: dict[str, object]) -> None:
+        for name, value in state.items():
+            setattr(self, name, copy.copy(value))
 
     # ------------------------------------------------------------------ clock
 
@@ -164,8 +252,19 @@ class SessionController:
         return self._deadline[phase]
 
     @property
+    def mini(self) -> bool:
+        """A 10-minute mini interview."""
+        return self.brief.session.is_mini
+
+    def _skipped(self, phase: Phase) -> bool:
+        """True when the plan gives the phase 0 minutes, so it gets no turn of its own.
+        A phase the plan does not list keeps its turn, as before."""
+        return self._minutes.get(phase) == 0
+
+    @property
     def probe_limit(self) -> int:
-        return min(self.brief.max_probes_per_question, PROBE_LIMIT[self.brief.session.difficulty])
+        limit = min(self.brief.max_probes_per_question, PROBE_LIMIT[self.brief.session.difficulty])
+        return min(limit, MINI_MAX_PROBES) if self.mini else limit
 
     @property
     def needs_decision(self) -> bool:
@@ -184,7 +283,7 @@ class SessionController:
         """Start the clock. The interviewer greets the candidate."""
         if self._clock.started is None:
             self._clock.started = self.clock()
-        return Move(MoveKind.GREET, Phase.INTRO)
+        return Move(MoveKind.GREET, Phase.INTRO, reason=(Why.START,))
 
     def after_answer(
         self, decision: ProbeDecision | None = None, *, has_question: bool = True
@@ -201,47 +300,102 @@ class SessionController:
             self.ended = True
             return []
         if self.elapsed_ms >= self.total_ms:
-            return [self._wrap_up()]
-        if self.phase == Phase.INTRO:
+            if self.phase == Phase.CANDIDATE_QUESTIONS and has_question:
+                # No time to answer: the closing line acknowledges the question.
+                return [
+                    self._wrap_up(
+                        Why.SESSION_TIME_UP, Why.CANDIDATE_QUESTION_LEFT_OPEN, open_question=True
+                    )
+                ]
+            return [self._wrap_up(Why.SESSION_TIME_UP)]
+        if self.phase == Phase.INTRO and not self._skipped(Phase.SMALL_TALK):
             self.phase = Phase.SMALL_TALK
-            return [Move(MoveKind.SMALL_TALK, Phase.SMALL_TALK)]
-        if self.phase == Phase.SMALL_TALK:
+            return [Move(MoveKind.SMALL_TALK, Phase.SMALL_TALK, reason=(Why.NEXT_PHASE,))]
+        if self.phase in (Phase.INTRO, Phase.SMALL_TALK):
             self.phase = Phase.AGENDA
-            return [Move(MoveKind.AGENDA, Phase.AGENDA, expects_answer=False), *self._next_core()]
+            agenda = Move(
+                MoveKind.AGENDA, Phase.AGENDA, expects_answer=False, reason=(Why.NEXT_PHASE,)
+            )
+            return [agenda, *self._next_core(Why.NEXT_PHASE)]
         if self.phase == Phase.CORE:
             if decision is not None and decision.action == "probe" and self.needs_decision:
+                missing = tuple(dict.fromkeys(decision.missing))  # in order, no duplicates
+                if self.probes_used > 0:
+                    # A later follow-up must aim at a gap not asked about yet. If the answer
+                    # still lacks only what was already probed, asking again in new words does
+                    # not help: move on.
+                    missing = tuple(m for m in missing if m not in self.probed_missing)
+                    if not missing:
+                        return self._next_core(Why.SAME_GAP_NOT_FILLED)
                 self.probes_used += 1
+                self.probed_missing.extend(missing)
                 return [
                     Move(
                         MoveKind.PROBE,
                         Phase.CORE,
                         self.question,
-                        tuple(decision.missing),
+                        missing,
                         pushback=self.brief.pushback,
+                        reason=(Why.MODEL_CHOSE_PROBE,),
                     )
                 ]
-            return self._next_core()
+            return self._next_core(self._moved_on_because(decision))
         if self.phase == Phase.CANDIDATE_QUESTIONS:
             in_time = self.elapsed_ms < self._deadline[Phase.CANDIDATE_QUESTIONS]
             if has_question and in_time and self.candidate_questions < MAX_CANDIDATE_QUESTIONS:
                 self.candidate_questions += 1
-                return [Move(MoveKind.ANSWER_QUESTION, Phase.CANDIDATE_QUESTIONS)]
-            return [self._wrap_up()]
-        return [self._wrap_up()]  # AGENDA has no answer; recover by closing
+                return [
+                    Move(
+                        MoveKind.ANSWER_QUESTION,
+                        Phase.CANDIDATE_QUESTIONS,
+                        reason=(Why.CANDIDATE_ASKED,),
+                    )
+                ]
+            if not has_question:
+                return [self._wrap_up(Why.CANDIDATE_HAD_NO_QUESTION)]
+            why = Why.CANDIDATE_QUESTIONS_TIME_UP if not in_time else Why.CANDIDATE_QUESTIONS_LIMIT
+            # The session still has time: answer this last question briefly, then close. The
+            # wrap-up comes right after, so the answer does not invite more questions.
+            self.candidate_questions += 1
+            last_answer = Move(
+                MoveKind.ANSWER_QUESTION,
+                Phase.CANDIDATE_QUESTIONS,
+                expects_answer=False,
+                reason=(why, Why.ANSWER_BEFORE_CLOSE),
+                closing=True,
+            )
+            return [last_answer, self._wrap_up(why)]
+        return [self._wrap_up(Why.UNEXPECTED_PHASE)]  # AGENDA has no answer; recover by closing
+
+    def _moved_on_because(self, decision: ProbeDecision | None) -> Why:
+        """Why CORE left the current question (for the admin traces)."""
+        if self.question is not None and self.probes_used >= self.probe_limit:
+            return Why.PROBE_LIMIT_REACHED
+        if self.elapsed_ms >= self._deadline[Phase.CORE]:
+            return Why.CORE_TIME_UP
+        if decision is None:
+            return Why.NO_DECISION
+        return Why.MODEL_CHOSE_MOVE_ON
 
     def end_now(self) -> Move:
         """Close the session early, for example when the candidate wants to stop."""
-        return self._wrap_up()
+        return self._wrap_up(Why.ENDED_EARLY)
 
     def _core_left_ms(self) -> int:
         return self._deadline[Phase.CORE] - self.elapsed_ms
 
-    def _next_core(self) -> list[Move]:
+    def _next_core(self, why: Why) -> list[Move]:
         self.phase = Phase.CORE
         self.probes_used = 0
+        self.probed_missing = []
         self.hints_used = 0
         enough_time = self._core_left_ms() >= MIN_QUESTION_MS
-        curveball_due = self.brief.curveball and not self.curveball_used and len(self.asked) == 1
+        curveball_due = (
+            self.brief.curveball
+            and not self.mini
+            and not self.curveball_used
+            and len(self.asked) == 1
+        )
         if curveball_due and enough_time and self.brief.curveball:
             self.curveball_used = True
             self.question = BriefQuestion(
@@ -251,24 +405,29 @@ class SessionController:
                 priority=99,
             )
             self.asked.append(CURVEBALL_REF)
-            return [Move(MoveKind.CURVEBALL, Phase.CORE, self.question)]
+            return [
+                Move(MoveKind.CURVEBALL, Phase.CORE, self.question, reason=(why, Why.CURVEBALL_DUE))
+            ]
         if self._queue and enough_time:
             self.question = self._queue.pop(0)
             self.asked.append(self.question.id)
-            return [Move(MoveKind.ASK, Phase.CORE, self.question)]
+            return [Move(MoveKind.ASK, Phase.CORE, self.question, reason=(why, Why.NEXT_QUESTION))]
+        stop = Why.NO_QUESTIONS_LEFT if not self._queue else Why.CORE_TIME_LEFT_UNDER_MIN
         self.dropped.extend(q.id for q in self._queue)
         self._queue = []
         self.question = None
+        if self._skipped(Phase.CANDIDATE_QUESTIONS):
+            return [self._wrap_up(why, stop, Why.NO_CANDIDATE_QUESTIONS_PHASE)]
         self.phase = Phase.CANDIDATE_QUESTIONS
-        return [Move(MoveKind.INVITE_QUESTIONS, Phase.CANDIDATE_QUESTIONS)]
+        return [Move(MoveKind.INVITE_QUESTIONS, Phase.CANDIDATE_QUESTIONS, reason=(why, stop))]
 
-    def _wrap_up(self) -> Move:
+    def _wrap_up(self, *why: Why, open_question: bool = False) -> Move:
         if self.phase == Phase.CORE:
             self.dropped.extend(q.id for q in self._queue)
             self._queue = []
         self.phase = Phase.WRAP_UP
         self.question = None
-        return Move(MoveKind.WRAP_UP, Phase.WRAP_UP)
+        return Move(MoveKind.WRAP_UP, Phase.WRAP_UP, reason=why, open_question=open_question)
 
     # ------------------------------------------------------------------ dropped connection (IV-9)
 
@@ -308,7 +467,7 @@ class SessionController:
         if self.hints_used >= MAX_HINTS_PER_QUESTION:
             return None
         self.hints_used += 1
-        return Move(MoveKind.HINT, Phase.CORE, self.question)
+        return Move(MoveKind.HINT, Phase.CORE, self.question, reason=(Why.COACH_REQUEST,))
 
     def redo(self) -> Move | None:
         """Ask the current question again, so the candidate can give a new answer."""
@@ -316,4 +475,5 @@ class SessionController:
         if self.phase != Phase.CORE or self.question is None:
             return None
         self.probes_used = 0
-        return Move(MoveKind.REDO, Phase.CORE, self.question)
+        self.probed_missing = []
+        return Move(MoveKind.REDO, Phase.CORE, self.question, reason=(Why.COACH_REQUEST,))

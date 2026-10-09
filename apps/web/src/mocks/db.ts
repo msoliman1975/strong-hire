@@ -24,6 +24,11 @@ export interface MockTask extends JobOut {
   outcome: "extracted" | "needs_paste";
 }
 
+/** A gap analysis as the mock keeps it. The R1 name fields are filled in when it is sent. */
+export type MockGap = Omit<GapAnalysisOut, "resume_name" | "resume_deleted" | "job_deleted"> & {
+  readyAt: number;
+};
+
 export interface MockAuth {
   status: "signed_out" | "needs_signup" | "signed_in";
   email: string | null;
@@ -37,7 +42,11 @@ export interface MockDb {
   resumes: ResumeOut[];
   tasks: Record<string, MockTask>;
   /** The latest gap analysis per job target id. */
-  gaps: Record<string, GapAnalysisOut & { readyAt: number }>;
+  gaps: Record<string, MockGap>;
+  /** R1: normalized posting text per job target id, for the "saved before" match. */
+  jobTexts: Record<string, string>;
+  /** R1: SHA-256 of each resume's file or pasted text, by resume id. */
+  resumeHashes: Record<string, string>;
   sessions: SessionRecord[];
   debriefReadyAt: Record<string, number>;
   usage: Usage;
@@ -55,9 +64,10 @@ export const FREE_USAGE: Usage = {
   period_start: null,
   period_end: null,
   cancel_at_period_end: false,
-  free_interviews_total: 1,
-  free_interviews_left: 1,
+  free_interviews_total: 2,
+  free_interviews_left: 2,
   can_start_session: true,
+  full_interviews_allowed: false,
   block_code: null,
   has_billing_account: false,
 };
@@ -70,6 +80,8 @@ export function emptyDb(): MockDb {
     resumes: [],
     tasks: {},
     gaps: {},
+    jobTexts: {},
+    resumeHashes: {},
     sessions: [],
     debriefReadyAt: {},
     usage: { ...FREE_USAGE },
@@ -78,8 +90,8 @@ export function emptyDb(): MockDb {
   };
 }
 
-/** Version 4: gap analyses (P6), usage and exports (P9) use the real shapes. Older data is dropped. */
-const STORAGE_KEY = "strong-hire-mock-db-v4";
+/** Version 5: saved job and CV names and soft delete (R1). Older data is dropped. */
+const STORAGE_KEY = "strong-hire-mock-db-v5";
 
 export interface MockStore {
   db: MockDb;

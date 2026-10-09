@@ -10,13 +10,16 @@ import addFormats from "ajv-formats";
 import { describe, expect, it } from "vitest";
 
 import { accountApi } from "../api/account";
+import { adminApi } from "../api/admin";
 import { authApi } from "../api/auth";
 import { billingApi } from "../api/billing";
 import { gapApi } from "../api/gap";
-import { jobTargetsApi, resumesApi } from "../api/inputs";
+import { jobTargetsApi, resumesApi, sha256Hex } from "../api/inputs";
+import { reportsApi } from "../api/reports";
 import { sessionsApi } from "../api/sessions";
 import { debriefApi } from "../api/scoring";
 import { gapAnalysis, jobPosting, resume, scorecardFor, sessionPlan } from "./fixtures";
+import { mockStore } from "./node";
 
 const SCHEMAS_DIR = resolve(__dirname, "../../../../schemas");
 const OPENAPI = JSON.parse(readFileSync(resolve(__dirname, "../../openapi.json"), "utf8")) as object;
@@ -76,6 +79,15 @@ describe("mock payloads match the packages/core schemas", () => {
     const { resume: resumeRecord } = await resumesApi.upload(formWithText("Python engineer"));
     await resumesApi.get(resumeRecord.id);
     await gapApi.start(job.id, { resume_id: resumeRecord.id });
+    // A free account may start mini interviews only, and minis are not in the trends.
+    await expect(
+      sessionsApi.create({
+        job_target_id: job.id,
+        config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min: 30, level: "senior" },
+        channel: "voice",
+      }),
+    ).rejects.toMatchObject({ status: 402, code: "full_interview_requires_plan" });
+    await billingApi.checkout(); // the mock turns the plan on at once
     const session = await sessionsApi.create({
       job_target_id: job.id,
       config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min: 30, level: "senior" },
@@ -177,6 +189,49 @@ describe("mocks of the real P6 endpoints match openapi.json", () => {
   });
 });
 
+describe("mocks of the R1 library and reports endpoints match openapi.json", () => {
+  it("match, rename, delete, gap report by id, reports list", async () => {
+    const text = "w".repeat(200);
+    const { job_target: job } = await jobTargetsApi.create({ text });
+    const { resume: record } = await resumesApi.upload(formWithText("Rust engineer"));
+    await jobTargetsApi.get(job.id);
+    await resumesApi.get(record.id);
+    const started = await gapApi.start(job.id, { resume_id: record.id });
+    await gapApi.get(job.id);
+
+    const matched = await jobTargetsApi.match({ text, url: null });
+    expectApiShape("JobTargetMatch", matched);
+    expect(matched.job_target?.id).toBe(job.id);
+    expectApiShape("JobTargetMatch", await jobTargetsApi.match({ text: "other", url: null }));
+    const hash = await sha256Hex("Rust engineer");
+    const cv = await resumesApi.match(hash);
+    expectApiShape("ResumeMatch", cv);
+    expect(cv.resume?.id).toBe(record.id);
+
+    expectApiShape("JobTargetOut", await jobTargetsApi.rename(job.id, "My job"));
+    expectApiShape("ResumeOut", await resumesApi.rename(record.id, "My CV"));
+    await expect(resumesApi.rename(record.id, " ")).rejects.toMatchObject({ status: 422 });
+
+    const report = await gapApi.getById(started.id);
+    expectApiShape("GapAnalysisOut", report);
+    expect(report.resume_name).toBe("My CV");
+    for (const row of await reportsApi.list()) expectApiShape("ReportItem", row);
+
+    await resumesApi.remove(record.id);
+    await jobTargetsApi.remove(job.id);
+    const deleted = await jobTargetsApi.get(job.id);
+    expectApiShape("JobTargetOut", deleted);
+    expect(deleted.deleted).toBe(true);
+    const gone = await gapApi.getById(started.id);
+    expectApiShape("GapAnalysisOut", gone);
+    expect(gone.job_deleted && gone.resume_deleted).toBe(true);
+    const [row] = await reportsApi.list({ type: "gap_report" });
+    expectApiShape("ReportItem", row);
+    expect(row.job_deleted).toBe(true);
+    await expect(gapApi.start(job.id, { resume_id: record.id })).rejects.toMatchObject({ status: 404 });
+  });
+});
+
 describe("mocks of the real P9 endpoints match openapi.json", () => {
   it("billing: plan, usage, checkout, portal, exit survey (BL-1, BL-2)", async () => {
     await authApi.devLogin("billing@example.com");
@@ -185,12 +240,14 @@ describe("mocks of the real P9 endpoints match openapi.json", () => {
     const free = await billingApi.usage();
     expectApiShape("UsageOut", free);
     expect(free.plan).toBe("free");
+    expect(free.full_interviews_allowed).toBe(false);
     await expect(billingApi.portal("manage")).rejects.toMatchObject({ status: 404 });
 
     expectApiShape("RedirectOut", await billingApi.checkout());
     const paid = await billingApi.usage();
     expectApiShape("UsageOut", paid);
     expect(paid.plan).toBe("paid");
+    expect(paid.full_interviews_allowed).toBe(true);
     await expect(billingApi.checkout()).rejects.toMatchObject({ status: 409, code: "already_subscribed" });
 
     expectApiShape("ExitSurveyOut", await billingApi.exitSurvey({ reason: "got_the_job", got_job: "yes" }));
@@ -208,6 +265,34 @@ describe("mocks of the real P9 endpoints match openapi.json", () => {
     expectApiShape("ExportOut", ready);
     expect(ready.status).toBe("ready");
     expectApiShape("AccountDeletedOut", await accountApi.deleteAccount());
+  });
+
+  it("admin: users, interviews, detail with traces, audit (R2)", async () => {
+    await authApi.devLogin("ana@example.com");
+    await authApi.signup({ age_confirmed: true, terms_accepted: true, training_consent: true });
+    await authApi.logout();
+    await authApi.devLogin("admin@example.com");
+    const me = await authApi.signup({ age_confirmed: true, terms_accepted: true, training_consent: false });
+    expectApiShape("AuthState", me);
+    expect(me.user?.is_admin).toBe(true);
+    mockStore.db.sessions.push({
+      id: "00000000-0000-4000-8000-0000000000c1",
+      job_target_id: "00000000-0000-4000-8000-0000000000d1",
+      config: { interview_type: "case", difficulty: "tough", mode: "coach", duration_min: 30, level: "mid" },
+      channel: "text",
+      brief_ready: true,
+      status: "completed",
+      started_at: "2026-10-07T09:00:00Z",
+      ended_at: "2026-10-07T09:30:00Z",
+      minutes_billed: 30,
+      failure_reason: null,
+    });
+    for (const user of await adminApi.users()) expectApiShape("AdminUser", user);
+    expectApiShape("AdminSessionList", await adminApi.sessions({ interview_type: "case" }));
+    const detail = await adminApi.session("00000000-0000-4000-8000-0000000000c1");
+    expectApiShape("AdminSessionDetail", detail);
+    expect(detail.traces?.length).toBeGreaterThan(0);
+    for (const entry of await adminApi.audit("all")) expectApiShape("AdminAuditEntry", entry);
   });
 });
 

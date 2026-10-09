@@ -14,6 +14,7 @@ from strong_api.auth.google import AuthlibGoogleClient, GoogleClient
 from strong_api.auth.magic_links import MagicLinks, RedisUsedTokenStore
 from strong_api.auth.router import build_router
 from strong_api.auth.settings import AppEnv, AuthSettings, get_auth_settings
+from strong_api.auth.sim import build_sim_router
 from strong_core.config import get_settings
 
 SESSION_COOKIE = "sh_session"
@@ -47,6 +48,7 @@ def install_auth(
     app.include_router(
         build_router(settings, magic_links, email_sender or make_email_sender(settings), google)
     )
+    app.include_router(build_sim_router(settings))  # 404 unless SIM_ENABLED (P13)
 
 
 __all__ = [

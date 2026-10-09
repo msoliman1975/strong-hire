@@ -1,0 +1,55 @@
+{
+  "summary": null,
+  "roles": [
+    {
+      "title": "Technical Program Manager",
+      "company": "Quarry Point Health",
+      "start": "2023-04",
+      "end": null,
+      "achievements": [
+        "Ran the move of 3 clinics to the new scheduling system with zero downtime",
+        "Cut the release cycle from 6 weeks to 2 weeks across 5 teams"
+      ],
+      "skills": []
+    },
+    {
+      "title": "Program Manager",
+      "company": "Fenwick Logistics",
+      "start": "2019-02",
+      "end": "2023-03",
+      "achievements": [
+        "Delivered the warehouse scanner rollout to 41 sites on budget",
+        "Set up a risk review that closed 80% of audit findings in one quarter"
+      ],
+      "skills": []
+    },
+    {
+      "title": "Business Analyst",
+      "company": "Tarheel Software Group",
+      "start": "2016-07",
+      "end": "2019-01",
+      "achievements": [
+        "Wrote requirements for a billing portal used by 9,000 customers"
+      ],
+      "skills": []
+    }
+  ],
+  "skills": [
+    "Jira",
+    "SQL",
+    "Risk management",
+    "Agile",
+    "Confluence"
+  ],
+  "education": [
+    {
+      "institution": "Piedmont University",
+      "degree": "B.S.",
+      "field_of_study": "Industrial Engineering",
+      "end": "2016"
+    }
+  ],
+  "certifications": [
+    "PMP"
+  ]
+}

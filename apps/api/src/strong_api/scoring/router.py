@@ -1,8 +1,12 @@
 """Debrief and progress endpoints (FB-1 to FB-3, PR-1, PR-2), and the scoring trigger.
 
-- GET  /sessions/{id}/debrief      status "not_ended", "scoring", "ready" or "failed";
+- GET  /sessions/{id}/debrief      status "not_ended", "not_started", "scoring", "ready" or
+                                   "failed";
                                    the scorecard when ready
 - GET  /job-targets/{id}/progress  Realistic-session snapshots, trends and the next session
+
+A 10-minute mini interview gets its own debrief, but it is left out of the progress snapshots,
+the trends and the "practiced" list used for the next-session advice.
 - POST /sessions/{id}/scoring      start (or restart) scoring for an ended session
 
 When a session ends, the session code (P7) calls `start_scoring`. The worker job
@@ -33,12 +37,14 @@ from strong_api.scoring.schemas import (
     JobProgress,
     ScoringAccepted,
 )
+from strong_api.sessions.failure import failed_before_start, failure_reason
 from strong_core.db.models import GapAnalysis as GapRow
 from strong_core.db.models import InterviewSession, JobTarget
 from strong_core.db.models import ProgressSnapshot as SnapshotRow
 from strong_core.db.models import Scorecard as ScorecardRow
 from strong_core.profiles import ProfileError, profile_for_session
 from strong_core.schemas import (
+    MINI_DURATION_MIN,
     Competency,
     GapAnalysis,
     InterviewerBrief,
@@ -50,6 +56,7 @@ from strong_core.schemas import (
     Scorecard,
     SessionConfig,
     SessionStatus,
+    session_duration,
 )
 
 # Name of the Arq function in strong_worker.scoring.jobs. A test checks they stay in sync.
@@ -120,7 +127,7 @@ def _config(session: InterviewSession, target: JobTarget | None) -> SessionConfi
         interview_type=session.type,
         difficulty=session.difficulty,
         mode=session.mode,
-        duration_min=45 if session.duration_min == 45 else 30,
+        duration_min=session_duration(session.duration_min),
         level=(target.level if target and target.level else Level.MID),
     )
 
@@ -166,6 +173,7 @@ async def _practiced(db: AsyncSession, job_target_id: uuid.UUID) -> list[Intervi
         select(InterviewSession.type).where(
             InterviewSession.job_target_id == job_target_id,
             InterviewSession.status == SessionStatus.COMPLETED,
+            InterviewSession.duration_min != MINI_DURATION_MIN,
         )
     )
     return list(rows)
@@ -174,7 +182,11 @@ async def _practiced(db: AsyncSession, job_target_id: uuid.UUID) -> list[Intervi
 async def _snapshots(db: AsyncSession, job_target_id: uuid.UUID) -> list[ProgressSnapshot]:
     rows = await db.scalars(
         select(SnapshotRow)
-        .where(SnapshotRow.job_target_id == job_target_id)
+        .join(InterviewSession, InterviewSession.id == SnapshotRow.session_id)
+        .where(
+            SnapshotRow.job_target_id == job_target_id,
+            InterviewSession.duration_min != MINI_DURATION_MIN,  # minis never count (PR-1)
+        )
         .order_by(SnapshotRow.at, SnapshotRow.competency)
     )
     return [snapshot_contract(r) for r in rows]
@@ -202,6 +214,8 @@ async def get_debrief(session_id: uuid.UUID, db: Db, me: Me) -> Debrief:
     state: DebriefStatus
     if card is not None:
         state = "ready"
+    elif failed_before_start(session):
+        state = "not_started"
     elif session.status == SessionStatus.FAILED:
         state = "failed"
     elif session.status in NOT_ENDED:
@@ -218,11 +232,11 @@ async def get_debrief(session_id: uuid.UUID, db: Db, me: Me) -> Debrief:
 
     next_session = None
     if card is not None:
-        # Realistic sessions already have snapshots with exact averages. Coach sessions do not.
+        # Realistic sessions already have snapshots with exact averages. Coach sessions and
+        # mini interviews do not.
+        no_snapshots = session.mode == Mode.COACH or session.duration_min == MINI_DURATION_MIN
         own = (
-            {c.competency: float(c.score) for c in card.competency_scores}
-            if session.mode == Mode.COACH
-            else None
+            {c.competency: float(c.score) for c in card.competency_scores} if no_snapshots else None
         )
         next_session = await next_session_for(db, session.job_target_id, own)
     return Debrief(
@@ -234,6 +248,7 @@ async def get_debrief(session_id: uuid.UUID, db: Db, me: Me) -> Debrief:
             started_at=session.started_at,
             ended_at=session.ended_at,
             minutes_billed=session.minutes_billed,
+            failure_reason=failure_reason(session),
         ),
         status=state,
         scorecard=card,
@@ -265,5 +280,7 @@ async def score_session(session_id: uuid.UUID, db: Db, me: Me, queue: Queue) -> 
         raise HTTPException(status.HTTP_409_CONFLICT, "This session is already scored")
     if session.status not in ENDED and session.ended_at is None:
         raise HTTPException(status.HTTP_409_CONFLICT, "End the session before scoring it")
+    if failed_before_start(session):
+        raise HTTPException(status.HTTP_409_CONFLICT, "This interview never started")
     job_id = await start_scoring(db, queue, session)
     return ScoringAccepted(session_id=session.id, job_id=job_id, status=session.status)

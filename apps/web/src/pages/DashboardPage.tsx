@@ -16,7 +16,8 @@ function nextSetupStep(s: JobTargetSummary): string | null {
 }
 
 function jobTitle(s: JobTargetSummary): string {
-  return s.job_target.posting ? s.job_target.posting.title : "Job posting";
+  const job = s.job_target;
+  return job.name ?? (job.posting ? job.posting.title : "Job posting");
 }
 
 function jobCompany(s: JobTargetSummary): string {
@@ -40,7 +41,7 @@ export function DashboardPage() {
     <>
       <PageHead title="Your interviews">
         <div className="page-head__row">
-          <p>Each job keeps its own gap analysis and history. Trends count Realistic sessions only.</p>
+          <p>Each job keeps its own gap analysis and history. Trends count full Realistic sessions only, not mini interviews.</p>
           {jobs.data && jobs.data.length > 0 && (
             <Link className="btn btn--secondary" to="/jobs/new">
               Add another job
@@ -126,6 +127,9 @@ function JobCard({ summary }: { summary: JobTargetSummary }) {
             View gap analysis
           </Link>
         )}
+        <Link className="text-link" to={`/reports?job=${encodeURIComponent(job.id)}`}>
+          Reports
+        </Link>
       </div>
     </li>
   );
@@ -157,7 +161,7 @@ function TrendSide({ summary }: { summary: JobTargetSummary }) {
           {jobTitle(summary)}, {jobCompany(summary)}. Realistic sessions.
         </p>
         {progress.data.snapshots.length === 0 ? (
-          <p className="muted small">Trends appear here after your first Realistic session.</p>
+          <p className="muted small">Trends appear here after your first full Realistic session (30 or 45 minutes).</p>
         ) : (
           <CompetencySparklines snapshots={progress.data.snapshots} />
         )}

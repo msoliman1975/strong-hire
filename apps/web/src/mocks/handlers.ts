@@ -34,16 +34,19 @@ import type {
   JobProgress,
   JobTargetAccepted,
   JobTargetCreate,
+  JobTargetMatchIn,
   JobTargetOut,
   JobTargetSummary,
   JobTargetUpdate,
   ProgressSnapshot,
+  ReportItem,
   Resume,
   ResumeAccepted,
   ResumeOut,
   Usage,
 } from "../api/types";
-import { newId, type MockStore, type MockTask } from "./db";
+import { isMockAdmin } from "./adminHandlers";
+import { newId, type MockGap, type MockStore, type MockTask } from "./db";
 import { gapAnalysis, jobPosting, resume, scorecardFor, sessionPlan } from "./fixtures";
 
 const API = "*/api";
@@ -113,6 +116,7 @@ export function authHandlers(store: MockStore) {
         auth_provider: "dev",
         training_consent: body.training_consent ?? false,
         created_at: new Date().toISOString(),
+        is_admin: isMockAdmin(auth.email),
       };
       store.db.auth = { status: "signed_in", email: auth.email, userEmail: auth.email };
       store.save();
@@ -160,6 +164,58 @@ function safeHost(url: string): string {
 const isPasteOnly = (url: string) =>
   ["linkedin.com", "lnkd.in"].some((h) => safeHost(url) === h || safeHost(url).endsWith(`.${h}`));
 
+/** Same rules as strong_core.library (R1), for the mock. */
+const today = () => new Date().toISOString().slice(0, 10);
+const normalizeText = (text: string) => text.replace(/\s+/g, " ").trim().toLowerCase();
+function normalizeUrl(url: string | null | undefined): string | null {
+  if (!url?.trim()) return null;
+  try {
+    const u = new URL(url.trim());
+    const host = u.host.toLowerCase().replace(/^www\./, "");
+    return `${u.protocol.toLowerCase()}//${host}${u.pathname.replace(/\/+$/, "")}${u.search}`;
+  } catch {
+    return null;
+  }
+}
+function defaultJobName(target: JobTargetOut): string {
+  const p = target.posting;
+  if (p?.title && p.company_name) return `${p.title} at ${p.company_name}`.slice(0, 120);
+  const host = target.source_url ? safeHost(target.source_url).replace(/^www\./, "") : "";
+  return host || `Job description ${today()}`;
+}
+function defaultResumeName(file: File | null): string {
+  const stem = file ? file.name.replace(/\.[^.]*$/, "").trim() : "";
+  return stem ? stem.slice(0, 120) : `CV ${today()}`;
+}
+async function sha256Of(data: ArrayBuffer | string): Promise<string> {
+  const bytes = typeof data === "string" ? new TextEncoder().encode(data) : new Uint8Array(data);
+  const digest = await globalThis.crypto.subtle.digest("SHA-256", bytes);
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+/** Same check as the API's LibraryRename: trimmed, 1 to 120 characters. */
+function renameProblem(name: unknown): string | null {
+  const value = typeof name === "string" ? name.replace(/\s+/g, " ").trim() : "";
+  if (!value) return "The name cannot be empty.";
+  if (value.length > 120) return "Use at most 120 characters.";
+  return null;
+}
+const invalid = (msg: string) => HttpResponse.json({ detail: [{ msg: `Value error, ${msg}` }] }, { status: 422 });
+
+/** A gap analysis as the API sends it, with the R1 name fields. */
+function gapView(store: MockStore, gap: MockGap): GapAnalysisOut {
+  const resumeRecord = store.db.resumes.find((r) => r.id === gap.resume_id);
+  const job = store.db.jobs.find((j) => j.id === gap.job_target_id);
+  const resumeDeleted = !resumeRecord || resumeRecord.deleted;
+  const jobDeleted = job?.deleted ?? true;
+  return {
+    ...publicView(gap),
+    resume_name: resumeDeleted ? null : resumeRecord.name,
+    resume_deleted: resumeDeleted,
+    job_deleted: jobDeleted,
+    stale: jobDeleted || resumeDeleted ? false : gap.stale,
+  };
+}
+
 /** Mock only: links to this host act like a job board that blocks reading (outcome needs_paste). */
 const isBlockedBoard = (url: string) => safeHost(url).endsWith("blocked.example");
 
@@ -186,14 +242,16 @@ function advance(store: MockStore) {
         task.result = { outcome: "needs_paste", reason: "blocked", detail: "This job board blocks automatic reading." };
         continue;
       }
+      if (target.deleted) continue;
       const posting: JobPosting = { ...jobPosting, source_url: target.source_url };
       target.status = "extracted";
       target.posting = posting;
       target.level = posting.level;
+      target.name = defaultJobName(target);
       task.result = { outcome: "extracted", board: null, company: matchCompany(target, posting) };
     } else {
       const r = d.resumes.find((x) => x.id === task.entityId);
-      if (!r) continue;
+      if (!r || r.deleted) continue;
       r.status = "extracted";
       r.resume = resume;
       task.result = { outcome: "extracted", kind: r.has_file ? "pdf" : "text" };
@@ -272,6 +330,8 @@ export function inputHandlers(store: MockStore) {
       }
       const target: JobTargetOut = {
         id: newId(),
+        name: null,
+        deleted: false,
         status: "pending",
         source_url: url,
         posting: null,
@@ -283,7 +343,9 @@ export function inputHandlers(store: MockStore) {
         context: { ...EMPTY_CONTEXT, ...body.context },
         created_at: new Date().toISOString(),
       };
+      target.name = defaultJobName(target);
       db().jobs.push(target);
+      if (text) db().jobTexts[target.id] = normalizeText(text);
       const blocked = url !== null && !text && isBlockedBoard(url);
       const task = enqueue("job_target", target.id, blocked ? "needs_paste" : "extracted");
       store.save();
@@ -295,9 +357,42 @@ export function inputHandlers(store: MockStore) {
       const target = findJob(params.jobTargetId);
       return target ? HttpResponse.json(target) : notFound("Job target");
     }),
-    http.put(`${API}/job-targets/:jobTargetId`, async ({ params, request }) => {
+    http.post(`${API}/job-targets/match`, async ({ request }) => {
+      advance(store);
+      const body = (await request.json()) as JobTargetMatchIn;
+      const text = body.text?.trim() ? normalizeText(body.text) : null;
+      const url = normalizeUrl(body.url);
+      const match = [...db().jobs]
+        .reverse()
+        .find(
+          (j) =>
+            !j.deleted &&
+            ((text !== null && db().jobTexts[j.id] === text) || (url !== null && normalizeUrl(j.source_url) === url)),
+        );
+      return HttpResponse.json({ job_target: match ?? null });
+    }),
+    http.patch(`${API}/job-targets/:jobTargetId`, async ({ params, request }) => {
+      const target = findJob(params.jobTargetId);
+      if (!target || target.deleted) return notFound("Job target");
+      const body = (await request.json()) as { name?: unknown };
+      const problem = renameProblem(body.name);
+      if (problem) return invalid(problem);
+      target.name = String(body.name).replace(/\s+/g, " ").trim();
+      store.save();
+      return HttpResponse.json(target);
+    }),
+    http.delete(`${API}/job-targets/:jobTargetId`, ({ params }) => {
       const target = findJob(params.jobTargetId);
       if (!target) return notFound("Job target");
+      // Like the API: the content goes; reports and sessions stay.
+      Object.assign(target, { deleted: true, name: null, posting: null, source_url: null, context: { ...EMPTY_CONTEXT } });
+      delete db().jobTexts[target.id];
+      store.save();
+      return new HttpResponse(null, { status: 204 });
+    }),
+    http.put(`${API}/job-targets/:jobTargetId`, async ({ params, request }) => {
+      const target = findJob(params.jobTargetId);
+      if (!target || target.deleted) return notFound("Job target");
       const body = (await request.json()) as JobTargetUpdate;
       const oldCompany = target.posting?.company_name;
       const posting = { ...(body.posting as JobPosting), source_url: target.source_url };
@@ -338,12 +433,16 @@ export function inputHandlers(store: MockStore) {
       // The worker stores the file when it runs, so has_file starts false, as in the API.
       const record: ResumeOut = {
         id: newId(),
+        name: defaultResumeName(hasFile ? file : null),
+        deleted: false,
         status: "pending",
         has_file: false,
         resume: null,
+        confirmed_at: null,
         uploaded_at: new Date().toISOString(),
       };
       db().resumes.push(record);
+      db().resumeHashes[record.id] = await sha256Of(hasFile ? await file.arrayBuffer() : String(text));
       const task = enqueue("resume", record.id, "extracted");
       store.save();
       const accepted: ResumeAccepted = { resume: record, job: taskView(task) };
@@ -354,11 +453,38 @@ export function inputHandlers(store: MockStore) {
       const r = findResume(params.resumeId);
       return r ? HttpResponse.json(r) : notFound("Resume");
     }),
-    http.put(`${API}/resumes/:resumeId`, async ({ params, request }) => {
+    http.post(`${API}/resumes/match`, async ({ request }) => {
+      const body = (await request.json()) as { sha256?: string };
+      if (!body.sha256 || !/^[0-9a-f]{64}$/.test(body.sha256)) return invalid("sha256 must be 64 hex characters");
+      const match = [...db().resumes].reverse().find((r) => !r.deleted && db().resumeHashes[r.id] === body.sha256);
+      return HttpResponse.json({ resume: match ?? null });
+    }),
+    http.patch(`${API}/resumes/:resumeId`, async ({ params, request }) => {
+      const r = findResume(params.resumeId);
+      if (!r || r.deleted) return notFound("Resume");
+      const body = (await request.json()) as { name?: unknown };
+      const problem = renameProblem(body.name);
+      if (problem) return invalid(problem);
+      r.name = String(body.name).replace(/\s+/g, " ").trim();
+      store.save();
+      return HttpResponse.json(r);
+    }),
+    http.delete(`${API}/resumes/:resumeId`, ({ params }) => {
       const r = findResume(params.resumeId);
       if (!r) return notFound("Resume");
+      Object.assign(r, { deleted: true, name: null, resume: null, has_file: false, confirmed_at: null });
+      delete db().resumeHashes[r.id];
+      store.save();
+      return new HttpResponse(null, { status: 204 });
+    }),
+    http.put(`${API}/resumes/:resumeId`, async ({ params, request }) => {
+      const r = findResume(params.resumeId);
+      if (!r || r.deleted) return notFound("Resume");
+      if (r.status !== "extracted") {
+        return HttpResponse.json({ detail: "The resume is still being read. Try again in a minute." }, { status: 409 });
+      }
       r.resume = ((await request.json()) as { resume: Resume }).resume;
-      r.status = "extracted";
+      r.confirmed_at = new Date().toISOString();
       store.save();
       return HttpResponse.json(r);
     }),
@@ -369,7 +495,8 @@ export function inputHandlers(store: MockStore) {
     // ------------------------------------------------------------ lists (P6)
     http.get(`${API}/job-targets`, () => {
       advance(store);
-      const summaries: JobTargetSummary[] = [...db().jobs].reverse().map((target) => {
+      const live = db().jobs.filter((j) => !j.deleted);
+      const summaries: JobTargetSummary[] = [...live].reverse().map((target) => {
         const sessions = db().sessions.filter((x) => x.job_target_id === target.id);
         const gap = db().gaps[target.id];
         return {
@@ -384,22 +511,27 @@ export function inputHandlers(store: MockStore) {
     }),
     http.get(`${API}/resumes`, () => {
       advance(store);
-      return HttpResponse.json([...db().resumes].reverse());
+      return HttpResponse.json([...db().resumes].filter((r) => !r.deleted).reverse());
     }),
 
     // ------------------------------------------------------------ gap analysis (P6)
     http.post(`${API}/job-targets/:jobId/gap-analysis`, async ({ params, request }) => {
       const job = findJob(params.jobId);
-      if (!job) return notFound("Job target");
+      if (!job || job.deleted) return notFound("Job target");
       const body = (await request.json()) as GapAnalysisStart;
       const resumeId = body.resume_id ?? db().gaps[job.id]?.resume_id;
       if (!resumeId) return HttpResponse.json({ detail: "Choose a resume first." }, { status: 422 });
       const r = findResume(resumeId);
-      if (!r) return notFound("Resume");
+      if (!r || r.deleted) return notFound("Resume");
+      const current = db().gaps[job.id];
+      // R1: the same saved job and CV picked again get the ready analysis back.
+      if (body.reuse_ready && current?.status === "ready" && current.resume_id === r.id && !current.stale) {
+        return HttpResponse.json(gapView(store, current), { status: 202 });
+      }
       if (job.status !== "extracted" || r.status !== "extracted") {
         return HttpResponse.json({ detail: "The job posting or the resume is still being read." }, { status: 409 });
       }
-      const gap: GapAnalysisOut & { readyAt: number } = {
+      const gap: MockGap = {
         id: newId(),
         job_target_id: job.id,
         resume_id: r.id,
@@ -415,13 +547,81 @@ export function inputHandlers(store: MockStore) {
       };
       db().gaps[job.id] = gap;
       store.save();
-      return HttpResponse.json(publicView(gap), { status: 202 });
+      return HttpResponse.json(gapView(store, gap), { status: 202 });
     }),
     http.get(`${API}/job-targets/:jobId/gap-analysis`, ({ params }) => {
       advance(store);
       const gap = db().gaps[String(params.jobId)];
       if (!gap) return notFound("Gap analysis");
-      return HttpResponse.json(publicView(gap));
+      return HttpResponse.json(gapView(store, gap));
+    }),
+    http.get(`${API}/gap-analyses/:gapId`, ({ params }) => {
+      advance(store);
+      const gap = Object.values(db().gaps).find((g) => g.id === params.gapId);
+      return gap ? HttpResponse.json(gapView(store, gap)) : notFound("Gap analysis");
+    }),
+
+    // ------------------------------------------------------------ reports (R1)
+    http.get(`${API}/reports`, ({ request }) => {
+      advance(store);
+      const query = new URL(request.url).searchParams;
+      const jobFilter = query.get("job_target_id");
+      const typeFilter = query.get("type");
+      if (typeFilter && typeFilter !== "gap_report" && typeFilter !== "interview_debrief") {
+        return invalid("type must be gap_report or interview_debrief");
+      }
+      const jobInfo = (jobId: string) => {
+        const job = findJob(jobId);
+        return { job_name: job && !job.deleted ? job.name : null, job_deleted: job?.deleted ?? true };
+      };
+      const items: ReportItem[] = [];
+      if (typeFilter !== "interview_debrief") {
+        for (const gap of Object.values(db().gaps)) {
+          if (gap.status !== "ready" || (jobFilter && gap.job_target_id !== jobFilter)) continue;
+          const view = gapView(store, gap);
+          items.push({
+            type: "gap_report",
+            id: gap.id,
+            job_target_id: gap.job_target_id,
+            ...jobInfo(gap.job_target_id),
+            resume_id: gap.resume_id,
+            resume_name: view.resume_name,
+            resume_deleted: view.resume_deleted,
+            status: "ready",
+            at: gap.updated_at ?? gap.created_at,
+            match_score: gap.analysis?.match_score ?? null,
+            hire_signal: null,
+            interview_type: null,
+            mode: null,
+            duration_min: null,
+          });
+        }
+      }
+      if (typeFilter !== "gap_report") {
+        for (const s of db().sessions) {
+          if (!s.started_at || !["scoring", "completed", "failed"].includes(s.status)) continue;
+          if (jobFilter && s.job_target_id !== jobFilter) continue;
+          const generic = findJob(s.job_target_id)?.generic_mode ?? true;
+          items.push({
+            type: "interview_debrief",
+            id: s.id,
+            job_target_id: s.job_target_id,
+            ...jobInfo(s.job_target_id),
+            resume_id: null,
+            resume_name: null,
+            resume_deleted: false,
+            status: s.status === "completed" ? "ready" : s.status === "failed" ? "failed" : "scoring",
+            at: s.ended_at ?? s.started_at,
+            match_score: null,
+            hire_signal: s.status === "completed" ? scorecardFor(s.config.interview_type, generic).hire_signal : null,
+            interview_type: s.config.interview_type,
+            mode: s.config.mode,
+            duration_min: s.config.duration_min,
+          });
+        }
+      }
+      items.sort((a, b) => b.at.localeCompare(a.at));
+      return HttpResponse.json(items);
     }),
   ];
 }
@@ -442,16 +642,25 @@ export function sessionHandlers(store: MockStore) {
     http.post(`${API}/sessions`, async ({ request }) => {
       await pause();
       const body = (await request.json()) as CreateSessionRequest;
-      if (!findJob(body.job_target_id)) return notFound("Job target");
+      const target = findJob(body.job_target_id);
+      if (!target || target.deleted) return notFound("Job target");
       const usage = db().usage;
-      if (!usage.can_start_session) {
-        // Same answer as strong_api.billing.ensure_can_start_session.
-        const code = usage.block_code ?? "upgrade_required";
-        const message =
-          code === "minutes_exhausted"
-            ? "You have used this period's interview minutes."
-            : "You have used your free interview. Subscribe to keep practicing.";
-        return HttpResponse.json({ detail: { code, message, upgrade_url: "/upgrade" } }, { status: 402 });
+      // Same answer as strong_api.billing.ensure_can_start_session.
+      const code: string | null = !usage.can_start_session
+        ? (usage.block_code ?? "upgrade_required")
+        : body.config.duration_min !== 10 && !usage.full_interviews_allowed
+          ? "full_interview_requires_plan"
+          : null;
+      if (code) {
+        const messages: Record<string, string> = {
+          minutes_exhausted: "You have used this period's interview minutes.",
+          upgrade_required: "You have used your free mini interviews. Subscribe to keep practicing.",
+          full_interview_requires_plan: `Full interviews are part of the subscription. Free accounts get ${usage.free_interviews_total} mini interviews.`,
+        };
+        return HttpResponse.json(
+          { detail: { code, message: messages[code], upgrade_url: "/upgrade" } },
+          { status: 402 },
+        );
       }
       const session: SessionRecord = {
         id: newId(),
@@ -463,6 +672,7 @@ export function sessionHandlers(store: MockStore) {
         started_at: null,
         ended_at: null,
         minutes_billed: 0,
+        failure_reason: null,
       };
       db().sessions.push(session);
       store.save();
@@ -552,8 +762,13 @@ export function scoringHandlers(store: MockStore) {
   const findSession = (id: unknown) => db().sessions.find((s) => s.id === id);
 
   const progressFor = (jobId: string): ProgressSnapshot[] => {
+    // Like the API: Realistic sessions only, and never a 10-minute mini interview.
     const realistic = db().sessions.filter(
-      (s) => s.job_target_id === jobId && s.status === "completed" && s.config.mode === "realistic",
+      (s) =>
+        s.job_target_id === jobId &&
+        s.status === "completed" &&
+        s.config.mode === "realistic" &&
+        s.config.duration_min !== 10,
     );
     return realistic.flatMap((s, index) =>
       scorecardFor(s.config.interview_type).competency_scores.map((c) => ({
@@ -585,8 +800,15 @@ export function scoringHandlers(store: MockStore) {
           started_at: s.started_at,
           ended_at: s.ended_at,
           minutes_billed: s.minutes_billed,
+          failure_reason: s.failure_reason ?? null,
         },
-        status: ready ? "ready" : s.status === "failed" ? "failed" : "scoring",
+        status: ready
+          ? "ready"
+          : s.status === "failed"
+            ? s.started_at === null
+              ? "not_started"
+              : "failed"
+            : "scoring",
         scorecard,
         next_session: ready ? sessionPlan[1] : null,
         generic_mode: generic,
@@ -622,6 +844,7 @@ export function refreshUsage(usage: Usage): Usage {
     usage.block_code = usage.free_interviews_left > 0 ? null : "upgrade_required";
   }
   usage.can_start_session = usage.block_code === null;
+  usage.full_interviews_allowed = usage.plan === "paid";
   return usage;
 }
 
@@ -630,7 +853,7 @@ export const MOCK_PLAN = {
   name: "Strong Hire monthly",
   price_usd_month: 29,
   minutes_cap: 300,
-  free_interviews: 1,
+  free_interviews: 2,
   billing_enabled: true,
 };
 

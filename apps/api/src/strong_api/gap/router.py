@@ -2,6 +2,9 @@
 
     POST /job-targets/{job_target_id}/gap-analysis   start or restart (202), body {resume_id}
     GET  /job-targets/{job_target_id}/gap-analysis   the latest run; poll while "running"
+    GET  /gap-analyses/{gap_analysis_id}             one run, for the Reports page (R1)
+
+A deleted job description or CV (R1) cannot start a run; its old reports can still be read.
 
 Gap analysis is free and does not use plan minutes (GA-4). Each user may start a limited number
 of runs per hour and per day; over the limit the API answers 429 with code "rate_limited" and a
@@ -21,6 +24,7 @@ from strong_api.gap import service
 from strong_api.gap.schemas import GapAnalysisOut, GapAnalysisStart
 from strong_api.gap.settings import GapSettings, get_gap_settings
 from strong_api.inputs.deps import Db, Me, Queue
+from strong_core.db.models import GapAnalysis as GapRow
 from strong_core.db.models import JobTarget
 from strong_core.db.models import Resume as ResumeRow
 
@@ -35,11 +39,15 @@ _RESPONSES: dict[int | str, dict[str, object]] = {
 }
 
 
-async def _target(db: Db, me: Me, job_target_id: uuid.UUID) -> JobTarget:
+async def _target(db: Db, me: Me, job_target_id: uuid.UUID, *, live: bool = False) -> JobTarget:
     target = await db.scalar(
-        select(JobTarget).where(JobTarget.id == job_target_id, JobTarget.org_id == me.org_id)
+        select(JobTarget).where(
+            JobTarget.id == job_target_id,
+            JobTarget.org_id == me.org_id,
+            JobTarget.user_id == me.user_id,
+        )
     )
-    if target is None:
+    if target is None or (live and target.deleted_at is not None):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Job target not found")
     return target
 
@@ -58,7 +66,7 @@ async def start_gap_analysis(
     settings: Settings,
 ) -> GapAnalysisOut:
     """Start the gap analysis for a job and a resume. Free; rate limited per user (GA-4)."""
-    target = await _target(db, me, job_target_id)
+    target = await _target(db, me, job_target_id, live=True)
     resume_id = body.resume_id
     if resume_id is None:
         previous = await service.latest(db, target.id)
@@ -66,7 +74,12 @@ async def start_gap_analysis(
             raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Choose a resume first.")
         resume_id = previous.resume_id
     resume = await db.scalar(
-        select(ResumeRow).where(ResumeRow.id == resume_id, ResumeRow.org_id == me.org_id)
+        select(ResumeRow).where(
+            ResumeRow.id == resume_id,
+            ResumeRow.org_id == me.org_id,
+            ResumeRow.user_id == me.user_id,
+            ResumeRow.deleted_at.is_(None),
+        )
     )
     if resume is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Resume not found")
@@ -83,6 +96,7 @@ async def start_gap_analysis(
             target=target,
             resume=resume,
             settings=settings,
+            reuse_ready=body.reuse_ready,
         )
     except service.RateLimitedError as exc:
         minutes = max(1, round(exc.retry_after_s / 60))
@@ -109,4 +123,24 @@ async def get_gap_analysis(
     row = await service.latest(db, target.id)
     if row is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Gap analysis not found")
+    return await service.to_out(db, row, target, settings)
+
+
+@router.get("/gap-analyses/{gap_analysis_id}", responses={404: _RESPONSES[404]})
+async def get_gap_analysis_by_id(
+    gap_analysis_id: uuid.UUID, db: Db, me: Me, settings: Settings
+) -> GapAnalysisOut:
+    """One gap analysis run of the signed-in user (R1 Reports page), also for a deleted job."""
+    row = await db.scalar(
+        select(GapRow)
+        .join(JobTarget, JobTarget.id == GapRow.job_target_id)
+        .where(
+            GapRow.id == gap_analysis_id,
+            GapRow.org_id == me.org_id,
+            JobTarget.user_id == me.user_id,
+        )
+    )
+    if row is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Gap analysis not found")
+    target = await _target(db, me, row.job_target_id)
     return await service.to_out(db, row, target, settings)

@@ -11,16 +11,17 @@ import { scorecardFor, sessionPlan } from "../mocks/fixtures";
 import { server } from "../mocks/node";
 import { DebriefPage } from "./DebriefPage";
 
-function debrief(generic: boolean): Debrief {
+function debrief(generic: boolean, duration_min: 10 | 30 | 45 = 30): Debrief {
   return {
     session: {
       id: "s1",
       job_target_id: "j1",
-      config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min: 30, level: "senior" },
+      config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min, level: "senior" },
       status: "completed",
       started_at: "2026-10-01T10:00:00Z",
       ended_at: "2026-10-01T10:30:00Z",
       minutes_billed: 30,
+      failure_reason: null,
     },
     status: "ready",
     scorecard: scorecardFor("behavioral", generic),
@@ -57,6 +58,36 @@ describe("debrief page", () => {
     expect(await screen.findByTestId("not-ended")).toHaveTextContent("This interview has not finished");
     expect(screen.getByRole("link", { name: "Go to the interview" })).toHaveAttribute("href", "/sessions/s1/live");
     expect(screen.queryByText(/Scoring your interview/)).not.toBeInTheDocument();
+  });
+
+  it("a session that never started says so instead of 'Scoring failed'", async () => {
+    const body = debrief(true);
+    const reason = "We could not prepare your interviewer. Nothing was counted or billed. Start a new interview to try again.";
+    renderDebrief({
+      ...body,
+      session: { ...body.session, status: "failed", started_at: null, ended_at: null, minutes_billed: 0, failure_reason: reason },
+      status: "not_started",
+      scorecard: null,
+      next_session: null,
+    });
+    expect(await screen.findByTestId("not-started")).toHaveTextContent(reason);
+    expect(screen.getByRole("link", { name: "Set up another session" })).toBeInTheDocument();
+    expect(screen.queryByText(/Scoring failed/)).not.toBeInTheDocument();
+  });
+
+  it("a mini interview says how many questions the signal is based on", async () => {
+    const body = debrief(true, 10);
+    renderDebrief(body);
+    const note = await screen.findByTestId("mini-note");
+    const count = body.scorecard?.per_question.length ?? 0;
+    expect(note).toHaveTextContent(`Based on ${count} questions. Practice signal only.`);
+    expect(note).toHaveTextContent("not counted in your progress trends");
+  });
+
+  it("a full interview has no mini note", async () => {
+    renderDebrief(debrief(true, 30));
+    expect(await screen.findByTestId("hire-signal")).toBeInTheDocument();
+    expect(screen.queryByTestId("mini-note")).not.toBeInTheDocument();
   });
 
   it("shows the hire signal, rationale, per-question rubric and next session (FB-1, FB-2, PR-2)", async () => {

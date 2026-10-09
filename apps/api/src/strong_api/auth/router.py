@@ -8,7 +8,7 @@ training-data consent (AC-2, default off) before POST /auth/signup creates the u
 from __future__ import annotations
 
 import re
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Annotated, Literal
 from urllib.parse import quote, urlencode
 from uuid import UUID
@@ -47,9 +47,12 @@ class AuthUser(BaseModel):
     auth_provider: AuthProvider
     training_consent: bool
     created_at: datetime
+    is_admin: bool = Field(
+        default=False, description="True for ADMIN_EMAILS users: the web app shows Admin."
+    )
 
     @classmethod
-    def of(cls, user: User) -> AuthUser:
+    def of(cls, user: User, *, is_admin: bool = False) -> AuthUser:
         return cls(
             id=user.id,
             org_id=user.org_id,
@@ -57,6 +60,7 @@ class AuthUser(BaseModel):
             auth_provider=user.auth_provider,
             training_consent=user.training_consent,
             created_at=user.created_at,
+            is_admin=is_admin,
         )
 
 
@@ -93,9 +97,10 @@ class SignupRequest(_Body):
     training_consent: bool = Field(default=False, description="AC-2: off unless the user opts in.")
 
 
-def _state(request: Request, user: User | None) -> AuthState:
+def _state(request: Request, user: User | None, settings: AuthSettings) -> AuthState:
     if user is not None:
-        return AuthState(status="signed_in", email=user.email, user=AuthUser.of(user))
+        user_out = AuthUser.of(user, is_admin=settings.is_admin(user.email))
+        return AuthState(status="signed_in", email=user.email, user=user_out)
     pending = request.session.get(SESSION_PENDING_KEY)
     if isinstance(pending, dict) and isinstance(pending.get("email"), str):
         return AuthState(status="needs_signup", email=pending["email"])
@@ -103,7 +108,7 @@ def _state(request: Request, user: User | None) -> AuthState:
 
 
 async def _finish_sign_in(
-    request: Request, db: DbSession, email: str, provider: AuthProvider
+    request: Request, db: DbSession, email: str, provider: AuthProvider, settings: AuthSettings
 ) -> AuthState:
     email = normalize_email(email)
     user = await find_user(db, email)
@@ -111,9 +116,11 @@ async def _finish_sign_in(
     request.session.clear()
     if user is not None:
         request.session[SESSION_USER_KEY] = str(user.id)
+        user.last_sign_in_at = datetime.now(UTC)
+        await db.commit()
     else:
         request.session[SESSION_PENDING_KEY] = {"email": email, "provider": provider.value}
-    return _state(request, user)
+    return _state(request, user, settings)
 
 
 def build_router(
@@ -139,7 +146,7 @@ def build_router(
 
     @router.get("/me")
     async def me(request: Request, user: OptionalUser) -> AuthState:
-        return _state(request, user)
+        return _state(request, user, settings)
 
     @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
     async def logout(request: Request) -> Response:
@@ -163,7 +170,9 @@ def build_router(
             email = await magic_links.redeem(token)
         except InvalidMagicLinkError as exc:
             return web_redirect("/signin", error=f"link_{exc}")
-        return after_sign_in(await _finish_sign_in(request, db, email, AuthProvider.EMAIL))
+        return after_sign_in(
+            await _finish_sign_in(request, db, email, AuthProvider.EMAIL, settings)
+        )
 
     @router.get("/google/login")
     async def google_login(request: Request) -> Response:
@@ -181,7 +190,7 @@ def build_router(
         except GoogleSignInError:
             return web_redirect("/signin", error="google")
         return after_sign_in(
-            await _finish_sign_in(request, db, identity.email, AuthProvider.GOOGLE)
+            await _finish_sign_in(request, db, identity.email, AuthProvider.GOOGLE, settings)
         )
 
     @router.post("/signup")
@@ -205,9 +214,11 @@ def build_router(
                 terms_accepted=body.terms_accepted,
                 training_consent=body.training_consent,
             )
+        user.last_sign_in_at = datetime.now(UTC)
+        await db.commit()
         request.session.clear()
         request.session[SESSION_USER_KEY] = str(user.id)
-        return _state(request, user)
+        return _state(request, user, settings)
 
     if settings.is_local:
 
@@ -216,6 +227,6 @@ def build_router(
             """Local only (APP_ENV=local). Signs in any email with no check."""
             if not _DEV_EMAIL.match(body.email):
                 raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Not an email address")
-            return await _finish_sign_in(request, db, body.email, AuthProvider.DEV)
+            return await _finish_sign_in(request, db, body.email, AuthProvider.DEV, settings)
 
     return router

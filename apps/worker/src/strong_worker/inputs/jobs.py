@@ -15,6 +15,7 @@ from dataclasses import dataclass
 from typing import Any
 
 import httpx
+from arq import Retry
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -22,7 +23,9 @@ from strong_core.db import get_sessionmaker
 from strong_core.db.models import JobTarget
 from strong_core.db.models import Resume as ResumeRow
 from strong_core.gateway import ModelGateway, get_gateway
+from strong_core.library import default_job_name, posting_text_hash
 from strong_core.schemas import JobPosting
+from strong_core.sim import gateway_for_org
 from strong_worker.inputs.documents import KIND_EXTENSIONS, DocumentError, document_text
 from strong_worker.inputs.extract import ExtractionError, extract_job_posting, extract_resume
 from strong_worker.inputs.fetch import PostingFetcher, playwright_render
@@ -81,7 +84,7 @@ async def extract_job_target(
     inputs = _inputs(ctx)
     async with inputs.sessionmaker() as db:
         target = await _job_target(db, job_target_id, org_id)
-        if target is None:
+        if target is None or target.deleted_at is not None:
             return _failed("job target not found")
 
         board = None
@@ -96,13 +99,15 @@ async def extract_job_target(
                     "detail": fetched.detail,
                 }
             target.raw_text = fetched.text
+            target.text_hash = posting_text_hash(fetched.text)
             board = fetched.board
             await db.commit()
 
         assert target.raw_text is not None
         try:
+            gateway = await gateway_for_org(db, target.org_id, inputs.gateway)  # P13
             extraction = await extract_job_posting(
-                inputs.gateway, target.raw_text, source_url=target.source_url
+                gateway, target.raw_text, source_url=target.source_url
             )
         except ExtractionError as exc:
             return _failed(str(exc))
@@ -119,6 +124,8 @@ async def extract_job_target(
         target.parsed_json = posting.model_dump(mode="json")
         target.level = posting.level
         target.company_id = match.company.id if match.company else None
+        if target.name is None:  # R1: the default library name; a rename is kept
+            target.name = default_job_name(target.parsed_json, target.source_url, target.created_at)
         await db.commit()
         return {
             "outcome": "extracted",
@@ -133,7 +140,7 @@ async def match_job_target(ctx: dict[str, Any], job_target_id: str, org_id: str)
     inputs = _inputs(ctx)
     async with inputs.sessionmaker() as db:
         target = await _job_target(db, job_target_id, org_id)
-        if target is None or target.parsed_json is None:
+        if target is None or target.parsed_json is None or target.deleted_at is not None:
             return _failed("job target not found or not extracted")
         posting = JobPosting.model_validate(target.parsed_json)
         match = await match_and_log(
@@ -164,7 +171,7 @@ async def parse_resume(
                 ResumeRow.id == uuid.UUID(resume_id), ResumeRow.org_id == uuid.UUID(org_id)
             )
         )
-        if row is None:
+        if row is None or row.deleted_at is not None:
             return _failed("resume not found")
         try:
             kind, text = document_text(data, filename)
@@ -172,16 +179,47 @@ async def parse_resume(
             return _failed(str(exc))
 
         key = f"resumes/{row.org_id}/{row.id}.{KIND_EXTENSIONS[kind]}"
-        row.file_ref = await inputs.store.put(key, data)
+        ref = await inputs.store.put(key, data)
+        row.file_ref = ref
         await db.commit()
+        await db.refresh(row)
+        if row.deleted_at is not None:  # R1: deleted before the file was saved; keep nothing
+            await inputs.store.delete(ref)
+            row.file_ref = None
+            await db.commit()
+            return _failed("resume deleted")
 
         try:
-            extraction = await extract_resume(inputs.gateway, text)
+            gateway = await gateway_for_org(db, row.org_id, inputs.gateway)  # P13
+            extraction = await extract_resume(gateway, text)
         except ExtractionError as exc:
             return _failed(str(exc))
+        await db.refresh(row)
+        if row.deleted_at is not None:  # deleted while it was read; the API removes the file
+            return _failed("resume deleted")
         row.parsed_json = extraction.output.model_dump(mode="json")
         await db.commit()
         return {"outcome": "extracted", "kind": kind, **extraction.summary()}
+
+
+DELETE_FILE_MAX_TRIES = 10
+DELETE_RETRY_DELAY_S = 600
+
+
+async def delete_resume_file(
+    ctx: dict[str, Any], org_id: str, resume_id: str, ref: str
+) -> dict[str, Any]:
+    """R1: delete the encrypted original file of a deleted CV. Retried on storage errors."""
+    inputs = _inputs(ctx)
+    try:
+        await inputs.store.delete(ref)  # a missing file is not an error
+    except Exception as exc:
+        job_try = int(ctx.get("job_try", 1))
+        log.warning("file delete for resume %s failed (try %d): %s", resume_id, job_try, exc)
+        if job_try < DELETE_FILE_MAX_TRIES:
+            raise Retry(defer=DELETE_RETRY_DELAY_S * job_try) from exc
+        raise
+    return {"outcome": "deleted", "resume_id": resume_id, "org_id": org_id}
 
 
 async def _job_target(db: AsyncSession, job_target_id: str, org_id: str) -> JobTarget | None:
@@ -192,4 +230,4 @@ async def _job_target(db: AsyncSession, job_target_id: str, org_id: str) -> JobT
     )
 
 
-FUNCTIONS = (extract_job_target, match_job_target, parse_resume)
+FUNCTIONS = (extract_job_target, match_job_target, parse_resume, delete_resume_file)

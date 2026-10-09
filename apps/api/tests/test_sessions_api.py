@@ -3,19 +3,32 @@
 from __future__ import annotations
 
 import json
+import logging
+import os
+import time
+import uuid
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 import httpx
 import pytest
-from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+from sqlalchemy import func, select, text
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
+from strong_api.billing.entitlements import count_free_interviews_used
 from strong_api.sessions import router as sessions_router  # the module
+from strong_api.sessions.failure import BRIEF_STALE_AFTER
+from strong_api.sessions.settings import TextSessionSettings, get_text_session_settings
 from strong_core.config import get_settings
-from strong_core.db.models import InterviewSession, JobTarget
+from strong_core.db.engine import async_database_url
+from strong_core.db.models import InterviewerTrace, InterviewSession, JobTarget, Org, User
 from strong_core.db.models import Turn as TurnRow
-from strong_core.schemas import Phase, SessionStatus, Speaker
+from strong_core.schemas import Difficulty, InterviewType, Mode, Phase, SessionStatus, Speaker
+from strong_interview.trace import TraceRecord
+from strong_interview.trace_store import SqlTraceSink
+from strong_worker.gap import jobs as gap_jobs
+from strong_worker.gap.brief import BriefError
 from strong_worker.inputs.testing import set_extractor_output
 
 from .conftest import sign_in
@@ -35,11 +48,12 @@ async def ready_job(client: httpx.AsyncClient, fake_fixtures: Path) -> dict[str,
 
 
 def config(**changes: Any) -> dict[str, Any]:
+    # 10 minutes: the test accounts are on the free plan, which allows mini interviews only.
     base = {
         "interview_type": "behavioral",
         "difficulty": "realistic",
         "mode": "realistic",
-        "duration_min": 30,
+        "duration_min": 10,
         "level": "staff_principal",
     }
     return {**base, **changes}
@@ -175,20 +189,68 @@ async def test_bl2_ending_an_unstarted_session_uses_no_free_interview(
     assert (await create(client, job["id"])).status_code == 201
 
 
-async def test_bl2_free_plan_allows_one_started_interview(
+async def test_bl2_free_plan_allows_two_started_mini_interviews(
     client: httpx.AsyncClient,
     fake_fixtures: Path,
     sessionmaker: async_sessionmaker[AsyncSession],
 ) -> None:
     job = await ready_job(client, fake_fixtures)
-    record = (await create(client, job["id"], channel="text")).json()
-    await client.post(f"/sessions/{record['id']}/text/open")  # started: the free interview
+    for _ in range(2):
+        record = (await create(client, job["id"], channel="text")).json()
+        await client.post(f"/sessions/{record['id']}/text/open")  # started: a free interview
     blocked = await create(client, job["id"])
     assert blocked.status_code == 402
     assert blocked.json()["detail"]["code"] == "upgrade_required"
     async with sessionmaker() as db:
         count = await db.scalar(select(func.count()).select_from(InterviewSession))
-    assert count == 1
+    assert count == 2
+
+
+@pytest.mark.parametrize("minutes", [30, 45])
+async def test_bl2_free_plan_cannot_create_a_full_interview(
+    client: httpx.AsyncClient,
+    fake_fixtures: Path,
+    sessionmaker: async_sessionmaker[AsyncSession],
+    minutes: int,
+) -> None:
+    job = await ready_job(client, fake_fixtures)
+    blocked = await create(client, job["id"], duration_min=minutes)
+    assert blocked.status_code == 402
+    detail = blocked.json()["detail"]
+    assert detail["code"] == "full_interview_requires_plan"
+    assert "mini interviews" in detail["message"]
+    async with sessionmaker() as db:
+        assert await db.scalar(select(func.count()).select_from(InterviewSession)) == 0
+    assert (await create(client, job["id"], duration_min=10)).status_code == 201
+
+
+async def test_a_paid_30_minute_text_session_has_candidate_questions(
+    client: httpx.AsyncClient, fake_fixtures: Path, queue: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A full session still runs small talk and candidate questions; a mini skips both."""
+
+    async def allow(*_: Any, **__: Any) -> None:
+        return None
+
+    monkeypatch.setattr(sessions_router, "ensure_can_start_session", allow)  # as a paid plan
+    job = await ready_job(client, fake_fixtures)
+    seen: dict[int, set[str]] = {}
+    for minutes in (30, 10):
+        record = (await create(client, job["id"], channel="text", duration_min=minutes)).json()
+        assert record["config"]["duration_min"] == minutes
+        sid = record["id"]
+        await client.post(f"/sessions/{sid}/text/open")
+        queue.run_jobs = False  # the scorer job is not run here
+        phases: set[str] = set()
+        for _ in range(80):
+            out = (await client.post(f"/sessions/{sid}/text/turn", json={"text": "No."})).json()
+            phases.update(t["phase"] for t in out["turns"])
+            if out["ended"]:
+                break
+        seen[minutes] = phases
+        queue.run_jobs = True  # the next session's brief job runs inline
+    assert {"small_talk", "candidate_questions"} <= seen[30]
+    assert not {"small_talk", "candidate_questions"} & seen[10]
 
 
 async def test_text_channel_rules(
@@ -200,7 +262,11 @@ async def test_text_channel_rules(
     text = (await create(client, job["id"], channel="text")).json()["id"]
     turn = await client.post(f"/sessions/{text}/text/turn", json={"text": "Hi"})
     assert turn.status_code == 409  # not open yet
-    monkeypatch.setattr(sessions_router, "_text_allowed", lambda: False)
+
+    async def never(*_: Any) -> bool:
+        return False
+
+    monkeypatch.setattr(sessions_router, "_text_allowed", never)
     assert (await create(client, job["id"], channel="text")).status_code == 403
     assert (await client.post(f"/sessions/{text}/text/open")).status_code == 404
 
@@ -243,7 +309,10 @@ async def test_voice_join_starts_the_session_and_returns_a_room_token(
 async def test_voice_join_rules(
     client: httpx.AsyncClient, fake_fixtures: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setattr(sessions_router, "_text_allowed", lambda: True)
+    async def always(*_: Any) -> bool:
+        return True
+
+    monkeypatch.setattr(sessions_router, "_text_allowed", always)
     job = await ready_job(client, fake_fixtures)
     text = (await create(client, job["id"], channel="text")).json()["id"]
     assert (await client.post(f"/sessions/{text}/voice/join")).status_code == 409
@@ -277,3 +346,260 @@ async def test_internal_end_needs_the_shared_token(
         "/internal/sessions/{session_id}/end"
         not in (await client.get("/openapi.json")).json()["paths"]
     )
+
+
+async def test_brief_failure_fails_the_session_with_a_plain_reason(
+    client: httpx.AsyncClient,
+    fake_fixtures: Path,
+    queue: Any,
+    monkeypatch: pytest.MonkeyPatch,
+    sessionmaker: async_sessionmaker[AsyncSession],
+) -> None:
+    """The brief job fails for good: the session is failed before it started, with a reason,
+    the debrief says it did not start, and no free interview or minutes are used (BL-2)."""
+
+    async def fails(*_: object, **__: object) -> Any:
+        raise BriefError("Brief failed after 2 attempts: credit balance too low")
+
+    monkeypatch.setattr(gap_jobs, "build_brief", fails)
+    queue.ctx["job_try"] = gap_jobs.BRIEF_MAX_TRIES  # the last try
+    job = await ready_job(client, fake_fixtures)
+    record = (await create(client, job["id"])).json()
+    assert record["status"] == "failed" and record["brief_ready"] is False
+    assert record["started_at"] is None and record["minutes_billed"] == 0
+    assert "could not prepare your interviewer" in record["failure_reason"]
+    fetched = (await client.get(f"/sessions/{record['id']}")).json()
+    assert fetched["failure_reason"] == record["failure_reason"]
+
+    debrief = (await client.get(f"/sessions/{record['id']}/debrief")).json()
+    assert debrief["status"] == "not_started"
+    assert debrief["session"]["failure_reason"] == record["failure_reason"]
+    scoring = await client.post(f"/sessions/{record['id']}/scoring")
+    assert scoring.status_code == 409
+    assert (await client.post(f"/sessions/{record['id']}/voice/join")).status_code == 409
+
+    async with sessionmaker() as db:
+        row = await db.get(InterviewSession, uuid.UUID(record["id"]))
+        assert row is not None
+        assert await count_free_interviews_used(db, row.org_id) == 0
+    del queue.ctx["job_try"]
+    monkeypatch.undo()
+    assert (await create(client, job["id"])).status_code == 201  # "Try again" works
+
+
+async def test_ended_before_start_has_its_own_reason(
+    client: httpx.AsyncClient, fake_fixtures: Path
+) -> None:
+    job = await ready_job(client, fake_fixtures)
+    sid = (await create(client, job["id"])).json()["id"]
+    ended = (await client.post(f"/sessions/{sid}/end")).json()
+    assert ended["failure_reason"].startswith("This interview was ended before it started")
+    debrief = (await client.get(f"/sessions/{sid}/debrief")).json()
+    assert debrief["status"] == "not_started"
+
+
+async def test_a_lost_brief_job_fails_the_session_after_a_while(
+    client: httpx.AsyncClient,
+    fake_fixtures: Path,
+    queue: Any,
+    sessionmaker: async_sessionmaker[AsyncSession],
+) -> None:
+    """If the worker job is lost, the page polling GET /sessions/{id} still stops waiting."""
+    job = await ready_job(client, fake_fixtures)
+    queue.run_jobs = False  # the brief job never runs
+    sid = (await create(client, job["id"])).json()["id"]
+    waiting = (await client.get(f"/sessions/{sid}")).json()
+    assert waiting["status"] == "created" and waiting["failure_reason"] is None
+    async with sessionmaker() as db:
+        row = await db.get(InterviewSession, uuid.UUID(sid))
+        assert row is not None
+        row.created_at = datetime.now(UTC) - BRIEF_STALE_AFTER * 2
+        await db.commit()
+    failed = (await client.get(f"/sessions/{sid}")).json()
+    assert failed["status"] == "failed"
+    assert "could not prepare your interviewer" in failed["failure_reason"]
+
+
+async def test_text_turn_while_the_interviewer_is_replying_is_refused(
+    client: httpx.AsyncClient, fake_fixtures: Path, app: Any
+) -> None:
+    """Bug 4: a second turn for the same answer must not get a second reply."""
+    job = await ready_job(client, fake_fixtures)
+    sid = (await create(client, job["id"], channel="text")).json()["id"]
+    await client.post(f"/sessions/{sid}/text/open")
+    runner = app.state.text_runners[uuid.UUID(sid)]
+    async with runner._lock:  # a reply is being prepared
+        busy = await client.post(f"/sessions/{sid}/text/turn", json={"text": "Hello"})
+    assert busy.status_code == 409
+    assert busy.json()["detail"] == "The interviewer is still replying."
+    ok = await client.post(f"/sessions/{sid}/text/turn", json={"text": "Hello"})
+    assert ok.status_code == 200
+
+
+# ---------------------------------------------------------------- stuck text turns (d40440ac)
+
+
+def limits(app: Any, turn_s: float = 45.0, db_s: float = 10.0) -> None:
+    app.dependency_overrides[get_text_session_settings] = lambda: TextSessionSettings(
+        text_turn_timeout_s=turn_s, text_db_timeout_s=db_s
+    )
+
+
+async def candidate_texts(sessionmaker: async_sessionmaker[AsyncSession], sid: str) -> list[str]:
+    async with sessionmaker() as db:
+        rows = await db.scalars(
+            select(TurnRow)
+            .where(TurnRow.session_id == uuid.UUID(sid), TurnRow.speaker == Speaker.CANDIDATE)
+            .order_by(TurnRow.seq)
+        )
+        return [row.text for row in rows]
+
+
+async def test_a_stuck_text_turn_answers_504_and_the_session_goes_on(
+    client: httpx.AsyncClient,
+    fake_fixtures: Path,
+    app: Any,
+    sessionmaker: async_sessionmaker[AsyncSession],
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Session d40440ac: a text turn hung with no answer. Now the turn has a time limit: the
+    API answers 504 and logs the stage; the runner and the trace lock are free again, nothing
+    half-saved is left, and the same answer can be sent again."""
+    limits(app, turn_s=0.2)
+    job = await ready_job(client, fake_fixtures)
+    sid = (await create(client, job["id"], channel="text")).json()["id"]
+    assert (await client.post(f"/sessions/{sid}/text/open")).status_code == 200
+    runner = app.state.text_runners[uuid.UUID(sid)]
+    caplog.set_level(logging.INFO, logger="strong_api")
+    async with runner.trace.lock:  # the turn save cannot start
+        stuck = await client.post(f"/sessions/{sid}/text/turn", json={"text": "Hello"})
+    assert stuck.status_code == 504
+    assert stuck.json()["detail"] == (
+        "The interviewer took too long to reply. Send your answer again."
+    )
+    assert "stopped at stage saving_candidate_turn" in caplog.text
+    assert not runner.busy and not runner.trace.lock.locked()
+    assert await candidate_texts(sessionmaker, sid) == []
+    ok = await client.post(f"/sessions/{sid}/text/turn", json={"text": "Hello"})
+    assert ok.status_code == 200 and ok.json()["turns"]
+    assert await candidate_texts(sessionmaker, sid) == ["Hello"]
+    steps = [
+        "received, 5 characters",
+        "runner_lock_acquired",
+        "candidate_turn_saved",
+        "say_done_agenda",  # a 10-minute session has no small talk
+        "say_done_ask",
+        "traces_flushed",
+        "response_sent",
+    ]
+    for step in steps:
+        assert f"text/turn {sid}: {step}" in caplog.text, step
+
+
+async def test_a_turn_that_cannot_be_saved_in_time_answers_503(
+    client: httpx.AsyncClient,
+    fake_fixtures: Path,
+    app: Any,
+    sessionmaker: async_sessionmaker[AsyncSession],
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """The turn save has its own, shorter database limit, so it fails with a logged error."""
+    limits(app, turn_s=5.0, db_s=0.1)
+    job = await ready_job(client, fake_fixtures)
+    sid = (await create(client, job["id"], channel="text")).json()["id"]
+    await client.post(f"/sessions/{sid}/text/open")
+    runner = app.state.text_runners[uuid.UUID(sid)]
+    async with runner.trace.lock:
+        failed = await client.post(f"/sessions/{sid}/text/turn", json={"text": "Hello"})
+    assert failed.status_code == 503
+    assert "candidate turn not saved" in caplog.text
+    assert not runner.busy
+    ok = await client.post(f"/sessions/{sid}/text/turn", json={"text": "Hello"})
+    assert ok.status_code == 200
+    assert await candidate_texts(sessionmaker, sid) == ["Hello"]
+
+
+async def test_text_open_logs_its_steps(
+    client: httpx.AsyncClient, fake_fixtures: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    caplog.set_level(logging.INFO, logger="strong_api")
+    job = await ready_job(client, fake_fixtures)
+    sid = (await create(client, job["id"], channel="text")).json()["id"]
+    assert (await client.post(f"/sessions/{sid}/text/open")).status_code == 200
+    for step in ("received", "session_started", "say_done_greet", "response_sent"):
+        assert f"text/open {sid}: {step}" in caplog.text, step
+
+
+POSTGRES_URL = os.environ.get("STRONG_TEST_POSTGRES_URL")
+
+
+@pytest.mark.skipif(POSTGRES_URL is None, reason="needs STRONG_TEST_POSTGRES_URL (migrated)")
+async def test_postgres_a_row_lock_stops_a_trace_insert_quickly(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """On Postgres, an insert that waits on a row lock (here: the session row is locked FOR
+    UPDATE by another transaction, which blocks the foreign key check) fails after lock_timeout
+    with a logged error that names the lock, instead of waiting forever."""
+    assert POSTGRES_URL is not None
+    engine = create_async_engine(async_database_url(POSTGRES_URL))
+    maker = async_sessionmaker(engine, expire_on_commit=False)
+    try:
+        async with maker() as db:
+            org = Org(name="pg-lock-test")
+            db.add(org)
+            await db.flush()
+            user = User(
+                org_id=org.id, email=f"pg-{uuid.uuid4().hex}@example.com", auth_provider="dev"
+            )
+            db.add(user)
+            await db.flush()
+            job = JobTarget(org_id=org.id, user_id=user.id, raw_text="Senior engineer")
+            db.add(job)
+            await db.flush()
+            session = InterviewSession(
+                org_id=org.id,
+                job_target_id=job.id,
+                type=InterviewType.BEHAVIORAL,
+                difficulty=Difficulty.REALISTIC,
+                mode=Mode.REALISTIC,
+                duration_min=30,
+            )
+            db.add(session)
+            await db.commit()
+            org_id, session_id = org.id, session.id
+        sink = SqlTraceSink(maker, org_id, session_id, timeout_s=1.0)
+        record = TraceRecord(
+            seq=1,
+            turn_index=0,
+            call="line",
+            move="x",
+            reason={},
+            phase=Phase.INTRO,
+            elapsed_ms=0,
+            phase_deadline_ms=0,
+        )
+        async with maker() as holder:
+            await holder.execute(
+                text("SELECT id FROM sessions WHERE id = :s FOR UPDATE"), {"s": session_id}
+            )
+            started = time.perf_counter()
+            sink.write(record)
+            assert await sink.flush(timeout_s=10) is True
+            assert time.perf_counter() - started < 5
+            await holder.rollback()
+        assert "could not save trace 1 of session" in caplog.text
+        assert "lock timeout" in caplog.text  # Postgres: canceling statement due to lock timeout
+        async with maker() as db:
+            count = await db.scalar(
+                select(func.count(InterviewerTrace.id)).where(
+                    InterviewerTrace.session_id == session_id
+                )
+            )
+            assert count == 0
+            await db.execute(text("DELETE FROM sessions WHERE id = :s"), {"s": session_id})
+            await db.execute(text("DELETE FROM job_targets WHERE org_id = :o"), {"o": org_id})
+            await db.execute(text("DELETE FROM users WHERE org_id = :o"), {"o": org_id})
+            await db.execute(text("DELETE FROM orgs WHERE id = :o"), {"o": org_id})
+            await db.commit()
+    finally:
+        await engine.dispose()

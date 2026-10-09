@@ -9,6 +9,7 @@ import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
 import { AppRoutes, createQueryClient } from "../App";
+import { CONSENT_LABEL } from "../components/ConsentSwitch";
 import { refreshUsage } from "../mocks/handlers";
 import { mockStore, server } from "../mocks/node";
 
@@ -20,6 +21,7 @@ function signedIn(email = "ana@example.com") {
     auth_provider: "dev",
     training_consent: false,
     created_at: "2026-10-01T10:00:00Z",
+    is_admin: false,
   };
   mockStore.db.auth = { status: "signed_in", email, userEmail: email };
 }
@@ -55,7 +57,7 @@ describe("account page", () => {
     signedIn();
     mockStore.db.usage = refreshUsage({ ...mockStore.db.usage, free_interviews_total: 2, free_interviews_left: 2 });
     renderAccount();
-    expect(await screen.findByText(/Free plan\. 2 of 2 free interviews left\./)).toBeInTheDocument();
+    expect(await screen.findByText(/Free plan\. 2 of 2 free mini interviews left\./)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "See the monthly plan" })).toHaveAttribute("href", "/upgrade");
     expect(screen.queryByRole("button", { name: "Cancel plan" })).not.toBeInTheDocument();
   });
@@ -103,7 +105,7 @@ describe("account page", () => {
   it("AC-2: the consent switch saves the new value", async () => {
     signedIn();
     const user = renderAccount();
-    const toggle = await screen.findByRole("switch", { name: "Use my transcripts to improve Strong Hire" });
+    const toggle = await screen.findByRole("switch", { name: CONSENT_LABEL });
     expect(toggle).toHaveAttribute("aria-checked", "false");
     await user.click(toggle);
     expect(await screen.findByText("Saved. Training-data use is on.")).toBeInTheDocument();

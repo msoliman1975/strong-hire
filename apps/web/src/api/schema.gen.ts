@@ -13,7 +13,9 @@ export interface paths {
         };
         /**
          * List Job Targets
-         * @description The signed-in user's job targets, newest first, with dashboard numbers (PR-1).
+         * @description The signed-in user's saved job targets, newest first, with dashboard numbers (PR-1).
+         *
+         *     Deleted job descriptions are left out (R1); their reports are on GET /reports.
          *
          *     match_score comes from the latest ready gap analysis. sessions_count and last_session_at
          *     count rows in the sessions table; they stay 0 and null until sessions exist (P7, P10).
@@ -28,6 +30,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/job-targets/match": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Match Job Target
+         * @description R1: the saved job with the same posting text (formatting ignored) or the same link.
+         *
+         *     Lets the app offer the saved job instead of reading the posting again. Deleted jobs and
+         *     jobs of other users never match.
+         */
+        post: operations["match_job_target_job_targets_match_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/job-targets/{job_target_id}": {
         parameters: {
             query?: never;
@@ -35,7 +60,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get Job Target */
+        /**
+         * Get Job Target
+         * @description One job target. A deleted one still answers, with deleted true and no content (R1).
+         */
         get: operations["get_job_target_job_targets__job_target_id__get"];
         /**
          * Update Job Target
@@ -45,10 +73,21 @@ export interface paths {
          */
         put: operations["update_job_target_job_targets__job_target_id__put"];
         post?: never;
-        delete?: never;
+        /**
+         * Delete Job Target
+         * @description R1: delete a saved job description. Its text, link, parsed data and context go.
+         *
+         *     Gap reports, interview sessions, transcripts, debriefs and progress stay; they show the
+         *     job as deleted. Safe to call twice.
+         */
+        delete: operations["delete_job_target_job_targets__job_target_id__delete"];
         options?: never;
         head?: never;
-        patch?: never;
+        /**
+         * Rename Job Target
+         * @description R1: rename a saved job.
+         */
+        patch: operations["rename_job_target_job_targets__job_target_id__patch"];
         trace?: never;
     };
     "/job-targets/{job_target_id}/jobs/{job_id}": {
@@ -77,7 +116,9 @@ export interface paths {
         };
         /**
          * List Resumes
-         * @description The signed-in user's resumes, newest first. Used to reuse a resume for a new job.
+         * @description The signed-in user's saved resumes, newest first. Used to reuse a resume for a new job.
+         *
+         *     Deleted resumes are left out (R1).
          */
         get: operations["list_resumes_resumes_get"];
         put?: never;
@@ -92,6 +133,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/resumes/match": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Match Resume
+         * @description R1: the saved CV with the same file content (SHA-256 of the file, or of the pasted text
+         *     as UTF-8). Lets the app offer the saved CV instead of reading the file again.
+         */
+        post: operations["match_resume_resumes_match_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/resumes/{resume_id}": {
         parameters: {
             query?: never;
@@ -99,18 +161,35 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get Resume */
+        /**
+         * Get Resume
+         * @description One resume. A deleted one still answers, with deleted true and no content (R1).
+         */
         get: operations["get_resume_resumes__resume_id__get"];
         /**
          * Update Resume
-         * @description Confirm or edit the parsed resume. Gap analyses that used it start again.
+         * @description Confirm or edit the parsed resume ("Check your CV"). Gap analyses that used it start again.
+         *
+         *     The body is validated against the Resume contract. Saving marks the CV as confirmed
+         *     (confirmed_at), so a later re-read of the stored file does not overwrite the user's version
+         *     without asking. Confirming is optional: a gap analysis also runs on an unconfirmed CV.
          */
         put: operations["update_resume_resumes__resume_id__put"];
         post?: never;
-        delete?: never;
+        /**
+         * Delete Resume
+         * @description R1: delete a saved CV: its parsed data now, its encrypted file by a worker job.
+         *
+         *     Gap reports that used it stay and show the CV as deleted. Safe to call twice.
+         */
+        delete: operations["delete_resume_resumes__resume_id__delete"];
         options?: never;
         head?: never;
-        patch?: never;
+        /**
+         * Rename Resume
+         * @description R1: rename a saved CV.
+         */
+        patch: operations["rename_resume_resumes__resume_id__patch"];
         trace?: never;
     };
     "/resumes/{resume_id}/jobs/{job_id}": {
@@ -148,6 +227,26 @@ export interface paths {
          * @description Start the gap analysis for a job and a resume. Free; rate limited per user (GA-4).
          */
         post: operations["start_gap_analysis_job_targets__job_target_id__gap_analysis_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/gap-analyses/{gap_analysis_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Gap Analysis By Id
+         * @description One gap analysis run of the signed-in user (R1 Reports page), also for a deleted job.
+         */
+        get: operations["get_gap_analysis_by_id_gap_analyses__gap_analysis_id__get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -241,7 +340,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get Session */
+        /**
+         * Get Session
+         * @description One session. A session whose brief never came (the worker job was lost) is marked failed
+         *     here, so a page that polls it stops waiting.
+         */
         get: operations["get_session_sessions__session_id__get"];
         put?: never;
         post?: never;
@@ -320,6 +423,9 @@ export interface paths {
         /**
          * Text Turn
          * @description The candidate's turn. Returns the interviewer's reply; the session ends on its own.
+         *
+         *     504 when the reply takes longer than TEXT_TURN_TIMEOUT_S, 503 when the turn could not be
+         *     saved. In both cases the turn is taken back, and the candidate can send it again.
          */
         post: operations["text_turn_sessions__session_id__text_turn_post"];
         delete?: never;
@@ -371,6 +477,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Reports
+         * @description All gap reports and interview debriefs of the signed-in user, newest first (R1).
+         */
+        get: operations["list_reports_reports_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/dev/model-usage": {
         parameters: {
             query?: never;
@@ -380,7 +506,9 @@ export interface paths {
         };
         /**
          * Model Usage
-         * @description Spend today and this month for the app key (claude profile). Dev and test only.
+         * @description Spend today and this month for the app key (claude profile).
+         *
+         *     Dev and test, and in staging for the MODEL_SPEND_VIEWERS emails. Others get 404.
          */
         get: operations["model_usage_dev_model_usage_get"];
         put?: never;
@@ -779,6 +907,126 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Users */
+        get: operations["list_users_admin_users_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Sessions
+         * @description Interviews of all users, newest first, with the interviewer's model cost.
+         */
+        get: operations["list_sessions_admin_sessions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/sessions/{session_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Session
+         * @description One interview. Transcript and traces only when the user's consent is on now.
+         */
+        get: operations["get_session_admin_sessions__session_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/sessions/{session_id}/transcript.txt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download Transcript
+         * @description The transcript as a text file. 404 when the user's consent is off now.
+         */
+        get: operations["download_transcript_admin_sessions__session_id__transcript_txt_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/sessions/{session_id}/audio": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download Audio
+         * @description The recording of an AI candidate voice interview, as stereo Ogg Opus.
+         *
+         *     The left channel is what the candidate heard, the right channel what it said. 404 for every
+         *     other session.
+         */
+        get: operations["download_audio_admin_sessions__session_id__audio_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Audit
+         * @description Newest first. `admin` shows the admin views only; `all` shows every entry.
+         */
+        get: operations["list_audit_admin_audit_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -818,6 +1066,220 @@ export interface components {
             files_deleted_within_hours: number;
             /** Backups Expire Within Days */
             backups_expire_within_days: number;
+        };
+        /** AdminAuditEntry */
+        AdminAuditEntry: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Actor */
+            actor: string;
+            /** Action */
+            action: string;
+            /** Entity */
+            entity: string;
+            /** Org Id */
+            org_id: string | null;
+            /** Details */
+            details: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /** AdminMessage */
+        AdminMessage: {
+            /** Role */
+            role: string;
+            /** Content */
+            content: string;
+            /** Prompt Ref */
+            prompt_ref?: string | null;
+        };
+        /** AdminScore */
+        AdminScore: {
+            competency: components["schemas"]["Competency"];
+            /** Score */
+            score: number;
+        };
+        /**
+         * AdminSession
+         * @description Metadata of one interview. Always shown, with or without consent.
+         */
+        AdminSession: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** User Id */
+            user_id: string | null;
+            /** User Email */
+            user_email: string | null;
+            /** Training Consent */
+            training_consent: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Started At */
+            started_at: string | null;
+            /** Ended At */
+            ended_at: string | null;
+            interview_type: components["schemas"]["InterviewType"];
+            difficulty: components["schemas"]["Difficulty"];
+            mode: components["schemas"]["Mode"];
+            /** Duration Min */
+            duration_min: number;
+            /**
+             * Duration S
+             * @description From start to end. None until it ends.
+             */
+            duration_s: number | null;
+            channel: components["schemas"]["SessionChannel"];
+            status: components["schemas"]["SessionStatus"];
+            /** Minutes Billed */
+            minutes_billed: number;
+            hire_signal: components["schemas"]["HireSignal"] | null;
+            /** Scores */
+            scores: components["schemas"]["AdminScore"][];
+            /** Model Profile */
+            model_profile: string | null;
+            /** Interviewer Model Id */
+            interviewer_model_id: string | null;
+            /** Prompt Version */
+            prompt_version: string | null;
+            /**
+             * Cost Usd
+             * @description Interviewer model cost. From usage events, else from the traces.
+             */
+            cost_usd: number | null;
+            /**
+             * Cost Source
+             * @enum {string}
+             */
+            cost_source: "usage_events" | "traces" | "none";
+        };
+        /** AdminSessionDetail */
+        AdminSessionDetail: {
+            session: components["schemas"]["AdminSession"];
+            /**
+             * Content Visible
+             * @description True when the user has training consent on now. Else only metadata.
+             */
+            content_visible: boolean;
+            /** Transcript */
+            transcript: components["schemas"]["Turn"][] | null;
+            /** Traces */
+            traces: components["schemas"]["AdminTrace"][] | null;
+            /** Trace Retention Days */
+            trace_retention_days: number;
+            /**
+             * Audio Available
+             * @description True when a recording can be downloaded (AI candidate voice interviews).
+             * @default false
+             */
+            audio_available: boolean;
+        };
+        /** AdminSessionList */
+        AdminSessionList: {
+            /** Sessions */
+            sessions: components["schemas"]["AdminSession"][];
+            /**
+             * Daily
+             * @description Cost per day (UTC) of the sessions listed.
+             */
+            daily: components["schemas"]["DailyCost"][];
+            /** Total Cost Usd */
+            total_cost_usd: number;
+            /** Limit */
+            limit: number;
+        };
+        /** AdminTrace */
+        AdminTrace: {
+            /** Seq */
+            seq: number;
+            /** Turn Index */
+            turn_index: number;
+            /** Call */
+            call: string;
+            /** Move */
+            move: string;
+            /** Reason */
+            reason: {
+                [key: string]: unknown;
+            } | null;
+            phase: components["schemas"]["Phase"];
+            /** Elapsed Ms */
+            elapsed_ms: number;
+            /** Phase Deadline Ms */
+            phase_deadline_ms: number | null;
+            /** Question Ref */
+            question_ref: string | null;
+            /** Messages */
+            messages: components["schemas"]["AdminMessage"][] | null;
+            /** Raw Reply */
+            raw_reply: string | null;
+            /** Spoken Text */
+            spoken_text: string | null;
+            /** Model */
+            model: string | null;
+            /** Prompt Refs */
+            prompt_refs: string | null;
+            /** Input Tokens */
+            input_tokens: number;
+            /** Output Tokens */
+            output_tokens: number;
+            /** Cost Usd */
+            cost_usd: number | null;
+            /** Latency Ms */
+            latency_ms: number | null;
+            /** Error */
+            error: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** AdminUser */
+        AdminUser: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Email */
+            email: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Last Sign In At */
+            last_sign_in_at: string | null;
+            /**
+             * Plan
+             * @enum {string}
+             */
+            plan: "free" | "paid";
+            subscription_status: components["schemas"]["SubscriptionStatus"] | null;
+            /** Minutes Used */
+            minutes_used: number;
+            /** Minutes Cap */
+            minutes_cap: number;
+            /** Training Consent */
+            training_consent: boolean;
+            /** Interviews */
+            interviews: number;
+            /** Is Admin */
+            is_admin: boolean;
         };
         /**
          * AuthProvider
@@ -869,6 +1331,12 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Is Admin
+             * @description True for ADMIN_EMAILS users: the web app shows Admin.
+             * @default false
+             */
+            is_admin: boolean;
         };
         /** Body_create_resume_resumes_post */
         Body_create_resume_resumes_post: {
@@ -1086,6 +1554,18 @@ export interface components {
              */
             channel: components["schemas"]["SessionChannel"];
         };
+        /** DailyCost */
+        DailyCost: {
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** Sessions */
+            sessions: number;
+            /** Cost Usd */
+            cost_usd: number;
+        };
         /** Debrief */
         Debrief: {
             session: components["schemas"]["DebriefSession"];
@@ -1093,7 +1573,7 @@ export interface components {
              * Status
              * @enum {string}
              */
-            status: "not_ended" | "scoring" | "ready" | "failed";
+            status: "not_ended" | "not_started" | "scoring" | "ready" | "failed";
             scorecard: components["schemas"]["Scorecard"] | null;
             /** @description PR-2. Null until the debrief is ready. */
             next_session: components["schemas"]["PlannedSession"] | null;
@@ -1133,6 +1613,11 @@ export interface components {
             ended_at: string | null;
             /** Minutes Billed */
             minutes_billed: number;
+            /**
+             * Failure Reason
+             * @description Plain reason when the session failed before it started.
+             */
+            failure_reason?: string | null;
         };
         /** DevLoginRequest */
         DevLoginRequest: {
@@ -1267,6 +1752,21 @@ export interface components {
              * Format: uuid
              */
             resume_id: string;
+            /**
+             * Resume Name
+             * @description R1: the CV's library name. None when deleted.
+             */
+            resume_name: string | null;
+            /**
+             * Resume Deleted
+             * @description R1: the CV used for this analysis was deleted.
+             */
+            resume_deleted: boolean;
+            /**
+             * Job Deleted
+             * @description R1: the job description was deleted.
+             */
+            job_deleted: boolean;
             status: components["schemas"]["GapStatus"];
             /** @description Set when status is ready. */
             analysis: components["schemas"]["GapAnalysis"] | null;
@@ -1284,7 +1784,7 @@ export interface components {
             profile_version: number | null;
             /**
              * Stale
-             * @description The job, the resume or the company profile changed after this analysis. Start it again to update it.
+             * @description The job, the resume or the company profile changed after this analysis. Start it again to update it. Always false when the job or the resume was deleted.
              */
             stale: boolean;
             /**
@@ -1302,6 +1802,12 @@ export interface components {
              * @description The resume to compare with the job. Leave it out to run again with the resume of the latest analysis.
              */
             resume_id?: string | null;
+            /**
+             * Reuse Ready
+             * @description R1: return the latest ready analysis instead of a new run when the job, the resume and the company profile did not change since it was made. The app sets it when the user picks a saved job and a saved CV again.
+             * @default false
+             */
+            reuse_ready: boolean;
         };
         /**
          * GapAssessment
@@ -1363,14 +1869,20 @@ export interface components {
              * @default null
              */
             profile_version: number | null;
-            /** Target Competencies */
+            /**
+             * Target Competencies
+             * @description 4 to 6; a mini interview has 2.
+             */
             target_competencies: components["schemas"]["Competency"][];
             /**
              * Target Values
              * @description Company value names (Principle.name) to probe. Empty in generic mode.
              */
             target_values?: string[];
-            /** Questions */
+            /**
+             * Questions
+             * @description 6 to 10; a mini interview has 3.
+             */
             questions: components["schemas"]["BriefQuestion"][];
             /** Probe Areas */
             probe_areas?: string[];
@@ -1510,6 +2022,23 @@ export interface components {
             stage?: string | null;
             context?: components["schemas"]["JobContext"];
         };
+        /**
+         * JobTargetMatch
+         * @description R1: the saved job with the same text or link, or None.
+         */
+        JobTargetMatch: {
+            job_target: components["schemas"]["JobTargetOut"] | null;
+        };
+        /**
+         * JobTargetMatchIn
+         * @description R1: a posting the user is about to add. Same fields as JobTargetCreate.
+         */
+        JobTargetMatchIn: {
+            /** Text */
+            text?: string | null;
+            /** Url */
+            url?: string | null;
+        };
         /** JobTargetOut */
         JobTargetOut: {
             /**
@@ -1517,6 +2046,16 @@ export interface components {
              * Format: uuid
              */
             id: string;
+            /**
+             * Name
+             * @description R1: the name in the job library. None when the job description is deleted.
+             */
+            name: string | null;
+            /**
+             * Deleted
+             * @description R1: the job description was deleted. Its reports and sessions stay.
+             */
+            deleted: boolean;
             /**
              * Status
              * @enum {string}
@@ -1596,6 +2135,14 @@ export interface components {
             role_family: components["schemas"]["RoleFamily"] | null;
             /** Scope Expectation */
             scope_expectation: string;
+        };
+        /**
+         * LibraryRename
+         * @description R1: a new name for a saved job or CV. Trimmed; 1 to 120 characters.
+         */
+        LibraryRename: {
+            /** Name */
+            name: string;
         };
         /** LoopRound */
         LoopRound: {
@@ -1719,7 +2266,7 @@ export interface components {
             minutes_cap: number;
             /**
              * Free Interviews
-             * @description BL-2: interviews on the free plan.
+             * @description BL-2: interviews on the free plan. They are 10-minute mini interviews.
              */
             free_interviews: number;
             /**
@@ -1899,6 +2446,79 @@ export interface components {
             url: string;
         };
         /**
+         * ReportItem
+         * @description One row of the Reports page. Open a gap report with GET /gap-analyses/{id} and a debrief
+         *     with GET /sessions/{id}/debrief.
+         */
+        ReportItem: {
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "gap_report" | "interview_debrief";
+            /**
+             * Id
+             * Format: uuid
+             * @description The gap analysis id, or the session id of a debrief.
+             */
+            id: string;
+            /**
+             * Job Target Id
+             * Format: uuid
+             */
+            job_target_id: string;
+            /**
+             * Job Name
+             * @description None when the job description was deleted.
+             */
+            job_name: string | null;
+            /** Job Deleted */
+            job_deleted: boolean;
+            /**
+             * Resume Id
+             * @description Gap reports only.
+             */
+            resume_id: string | null;
+            /**
+             * Resume Name
+             * @description Gap reports only. None when the CV was deleted.
+             */
+            resume_name: string | null;
+            /**
+             * Resume Deleted
+             * @description Gap reports only: the CV was deleted.
+             */
+            resume_deleted: boolean;
+            /**
+             * Status
+             * @description Gap reports are always ready. A debrief is scoring, ready or failed.
+             * @enum {string}
+             */
+            status: "ready" | "scoring" | "failed";
+            /**
+             * At
+             * Format: date-time
+             * @description When the report was made; the list is newest first.
+             */
+            at: string;
+            /**
+             * Match Score
+             * @description Gap reports only.
+             */
+            match_score: number | null;
+            /** @description Debriefs only, when ready. */
+            hire_signal: components["schemas"]["HireSignal"] | null;
+            /** @description Debriefs only. */
+            interview_type: components["schemas"]["InterviewType"] | null;
+            /** @description Debriefs only. */
+            mode: components["schemas"]["Mode"] | null;
+            /**
+             * Duration Min
+             * @description Debriefs only.
+             */
+            duration_min: number | null;
+        };
+        /**
          * RequirementKind
          * @enum {string}
          */
@@ -1953,6 +2573,21 @@ export interface components {
             resume: components["schemas"]["ResumeOut"];
             job: components["schemas"]["JobOut"] | null;
         };
+        /**
+         * ResumeMatch
+         * @description R1: the saved CV with the same file content, or None.
+         */
+        ResumeMatch: {
+            resume: components["schemas"]["ResumeOut"] | null;
+        };
+        /**
+         * ResumeMatchIn
+         * @description R1: the SHA-256 of a CV file (or of the pasted text as UTF-8) before it is uploaded.
+         */
+        ResumeMatchIn: {
+            /** Sha256 */
+            sha256: string;
+        };
         /** ResumeOut */
         ResumeOut: {
             /**
@@ -1961,6 +2596,16 @@ export interface components {
              */
             id: string;
             /**
+             * Name
+             * @description R1: the name in the CV library. None when the CV is deleted.
+             */
+            name: string | null;
+            /**
+             * Deleted
+             * @description R1: the CV was deleted. Its gap reports stay.
+             */
+            deleted: boolean;
+            /**
              * Status
              * @enum {string}
              */
@@ -1968,6 +2613,11 @@ export interface components {
             /** Has File */
             has_file: boolean;
             resume: components["schemas"]["Resume"] | null;
+            /**
+             * Confirmed At
+             * @description When the user checked and saved the extracted CV (PUT /resumes/{id}). None: not confirmed yet. A gap analysis does not wait for it.
+             */
+            confirmed_at?: string | null;
             /**
              * Uploaded At
              * Format: date-time
@@ -2060,9 +2710,10 @@ export interface components {
             mode: components["schemas"]["Mode"];
             /**
              * Duration Min
+             * @description 10 is a mini interview.
              * @enum {integer}
              */
-            duration_min: 30 | 45;
+            duration_min: 10 | 30 | 45;
             level: components["schemas"]["Level"];
         };
         /** SessionRecord */
@@ -2091,6 +2742,11 @@ export interface components {
             ended_at: string | null;
             /** Minutes Billed */
             minutes_billed: number;
+            /**
+             * Failure Reason
+             * @description Plain reason when the session failed before it started (status failed, never started), for example when the interview plan could not be built. Such a session is not billed and does not use a free interview. Null otherwise.
+             */
+            failure_reason?: string | null;
         };
         /**
          * SessionStatus
@@ -2225,12 +2881,20 @@ export interface components {
             period_end: string | null;
             /** Cancel At Period End */
             cancel_at_period_end: boolean;
-            /** Free Interviews Total */
+            /**
+             * Free Interviews Total
+             * @description Free mini interviews for the account.
+             */
             free_interviews_total: number;
             /** Free Interviews Left */
             free_interviews_left: number;
             /** Can Start Session */
             can_start_session: boolean;
+            /**
+             * Full Interviews Allowed
+             * @description True when 30 and 45 minute sessions may start (paid plan). Free accounts may start 10-minute mini interviews only.
+             */
+            full_interviews_allowed: boolean;
             /**
              * Block Code
              * @description Why a new session is blocked. Null when it is allowed.
@@ -2365,6 +3029,39 @@ export interface operations {
             };
         };
     };
+    match_job_target_job_targets_match_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JobTargetMatchIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobTargetMatch"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_job_target_job_targets__job_target_id__get: {
         parameters: {
             query?: never;
@@ -2418,6 +3115,70 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["JobTargetAccepted"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_job_target_job_targets__job_target_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rename_job_target_job_targets__job_target_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LibraryRename"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobTargetOut"];
                 };
             };
             /** @description Validation Error */
@@ -2516,6 +3277,39 @@ export interface operations {
             };
         };
     };
+    match_resume_resumes_match_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResumeMatchIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumeMatch"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_resume_resumes__resume_id__get: {
         parameters: {
             query?: never;
@@ -2559,6 +3353,70 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["ResumeUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_resume_resumes__resume_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                resume_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rename_resume_resumes__resume_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                resume_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LibraryRename"];
             };
         };
         responses: {
@@ -2719,6 +3577,44 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    get_gap_analysis_by_id_gap_analyses__gap_analysis_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                gap_analysis_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GapAnalysisOut"];
+                };
+            };
+            /** @description The job target, the resume or the analysis does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
             };
         };
     };
@@ -3060,6 +3956,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["VoiceJoin"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_reports_reports_get: {
+        parameters: {
+            query?: {
+                job_target_id?: string | null;
+                type?: ("gap_report" | "interview_debrief") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportItem"][];
                 };
             };
             /** @description Validation Error */
@@ -3649,6 +4577,184 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AccountDeletedOut"];
+                };
+            };
+        };
+    };
+    list_users_admin_users_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUser"][];
+                };
+            };
+        };
+    };
+    list_sessions_admin_sessions_get: {
+        parameters: {
+            query?: {
+                user_id?: string | null;
+                /** @description First day (UTC), inclusive. */
+                day_from?: string | null;
+                /** @description Last day (UTC), inclusive. */
+                day_to?: string | null;
+                interview_type?: components["schemas"]["InterviewType"] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminSessionList"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_session_admin_sessions__session_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminSessionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    download_transcript_admin_sessions__session_id__transcript_txt_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/plain": string;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    download_audio_admin_sessions__session_id__audio_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_audit_admin_audit_get: {
+        parameters: {
+            query?: {
+                scope?: "admin" | "all";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAuditEntry"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

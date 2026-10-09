@@ -1,0 +1,95 @@
+{
+  "summary": "Backend engineer with 10 years of work on logistics and routing systems.",
+  "roles": [
+    {
+      "title": "Lead Backend Engineer",
+      "company": "Summitline Routing",
+      "start": "2022-05",
+      "end": null,
+      "achievements": [
+        "Lead the routing platform team of 7 engineers.",
+        "Rewrote the route optimizer in Rust; plans compute 5 times faster",
+        "Cut cloud spend by $410,000 a year with spot instances",
+        "Routing project 1: delivered milestone 1 with 11 test cases",
+        "Routing project 2: delivered milestone 2 with 12 test cases",
+        "Routing project 3: delivered milestone 3 with 13 test cases",
+        "Routing project 4: delivered milestone 4 with 14 test cases",
+        "Routing project 5: delivered milestone 5 with 15 test cases",
+        "Routing project 6: delivered milestone 6 with 16 test cases",
+        "Routing project 7: delivered milestone 7 with 17 test cases",
+        "Routing project 8: delivered milestone 8 with 18 test cases",
+        "Routing project 9: delivered milestone 9 with 19 test cases",
+        "Routing project 10: delivered milestone 10 with 20 test cases",
+        "Routing project 11: delivered milestone 11 with 21 test cases",
+        "Routing project 12: delivered milestone 12 with 22 test cases",
+        "Routing project 13: delivered milestone 13 with 23 test cases",
+        "Routing project 14: delivered milestone 14 with 24 test cases",
+        "Routing project 15: delivered milestone 15 with 25 test cases",
+        "Routing project 16: delivered milestone 16 with 26 test cases"
+      ],
+      "skills": []
+    },
+    {
+      "title": "Senior Backend Engineer",
+      "company": "Kestrel Freightworks",
+      "start": "2018-02",
+      "end": "2022-04",
+      "achievements": [
+        "Built the shipment tracking API that serves 2,000 requests per second",
+        "Tracking project 1: delivered milestone 1 with 11 test cases",
+        "Tracking project 2: delivered milestone 2 with 12 test cases",
+        "Tracking project 3: delivered milestone 3 with 13 test cases",
+        "Tracking project 4: delivered milestone 4 with 14 test cases",
+        "Tracking project 5: delivered milestone 5 with 15 test cases",
+        "Tracking project 6: delivered milestone 6 with 16 test cases",
+        "Tracking project 7: delivered milestone 7 with 17 test cases",
+        "Tracking project 8: delivered milestone 8 with 18 test cases",
+        "Tracking project 9: delivered milestone 9 with 19 test cases",
+        "Tracking project 10: delivered milestone 10 with 20 test cases",
+        "Tracking project 11: delivered milestone 11 with 21 test cases",
+        "Tracking project 12: delivered milestone 12 with 22 test cases",
+        "Tracking project 13: delivered milestone 13 with 23 test cases",
+        "Tracking project 14: delivered milestone 14 with 24 test cases",
+        "Tracking project 15: delivered milestone 15 with 25 test cases",
+        "Tracking project 16: delivered milestone 16 with 26 test cases",
+        "Tracking project 17: delivered milestone 17 with 27 test cases",
+        "Tracking project 18: delivered milestone 18 with 28 test cases",
+        "Tracking project 19: delivered milestone 19 with 29 test cases",
+        "Tracking project 20: delivered milestone 20 with 30 test cases",
+        "Tracking project 21: delivered milestone 21 with 31 test cases",
+        "Tracking project 22: delivered milestone 22 with 32 test cases",
+        "Tracking project 23: delivered milestone 23 with 33 test cases",
+        "Tracking project 24: delivered milestone 24 with 34 test cases",
+        "Moved the event bus to Kafka without losing a single message",
+        "Led the on-call rotation for 18 months"
+      ],
+      "skills": []
+    },
+    {
+      "title": "Software Engineer",
+      "company": "Alpenglow Maps",
+      "start": "2015-07",
+      "end": "2018-01",
+      "achievements": [
+        "Wrote the tile cache that cut map load time by 40%"
+      ],
+      "skills": []
+    }
+  ],
+  "skills": [
+    "Rust",
+    "Go",
+    "PostgreSQL",
+    "Kafka",
+    "AWS"
+  ],
+  "education": [
+    {
+      "institution": "Front Range Institute of Technology",
+      "degree": "B.S.",
+      "field_of_study": "Computer Engineering",
+      "end": "2015"
+    }
+  ],
+  "certifications": []
+}

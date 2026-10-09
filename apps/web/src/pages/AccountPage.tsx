@@ -8,6 +8,7 @@ import { billingApi } from "../api/billing";
 import { keys, POLL_MS, useAuth, usePlan, useUsage } from "../api/hooks";
 import type { AuthState, ExitReason, GotJob, Usage } from "../api/types";
 import { ConsentSwitch } from "../components/ConsentSwitch";
+import { SavedLibrary } from "../components/LibrarySection";
 import { ErrorNotice, PageHead } from "../components/ui";
 import { formatDate } from "../labels";
 
@@ -79,7 +80,7 @@ function PlanSection({ usage }: { usage: Usage }) {
         </dl>
       ) : (
         <p>
-          Free plan. {usage.free_interviews_left} of {usage.free_interviews_total} free{" "}
+          Free plan. {usage.free_interviews_left} of {usage.free_interviews_total} free mini{" "}
           {usage.free_interviews_total === 1 ? "interview" : "interviews"} left. Gap analyses are free.{" "}
           <Link to="/upgrade">See the monthly plan</Link>
         </p>
@@ -232,6 +233,8 @@ export function AccountPage() {
 
       {usage.data && <PlanSection usage={usage.data} />}
       {usage.isError && <ErrorNotice error={usage.error} />}
+
+      <SavedLibrary />
 
       <section className="panel" aria-labelledby="privacy-heading">
         <h2 id="privacy-heading">Training data</h2>

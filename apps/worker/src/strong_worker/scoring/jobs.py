@@ -4,7 +4,8 @@ The API (strong_api.scoring.start_scoring) sets the session to SCORING and enque
 `score_session`. The job:
 - reads the transcript (turns), the brief and the exact profile version the session used;
 - runs the scorer and stores one Scorecard row;
-- writes one ProgressSnapshot per competency, for Realistic sessions only (PR-1);
+- writes one ProgressSnapshot per competency, for Realistic sessions only (PR-1). A 10-minute
+  mini interview gets a debrief but no snapshots: 3 questions are a practice signal, not a trend;
 - sets the session to COMPLETED, or FAILED with a reason when scoring is not possible.
 
 FB-3 asks for the debrief within 60 seconds of the session end. The job measures the time from
@@ -29,9 +30,11 @@ from strong_core.db.models import InterviewSession
 from strong_core.db.models import ProgressSnapshot as SnapshotRow
 from strong_core.db.models import Scorecard as ScorecardRow
 from strong_core.db.models import Turn as TurnRow
+from strong_core.db.turns import TURN_ORDER
 from strong_core.gateway import ModelGateway, get_gateway
 from strong_core.profiles import ProfileError, profile_for_session
-from strong_core.schemas import InterviewerBrief, Mode, SessionStatus, Turn
+from strong_core.schemas import MINI_DURATION_MIN, InterviewerBrief, Mode, SessionStatus, Turn
+from strong_core.sim import gateway_for_org
 from strong_worker.scoring.scorer import ScoringError, ScoringOutcome, SessionScorer
 
 log = logging.getLogger(__name__)
@@ -64,7 +67,7 @@ def _aware(at: datetime) -> datetime:
 
 async def load_turns(db: AsyncSession, session_id: uuid.UUID) -> list[Turn]:
     rows = await db.scalars(
-        select(TurnRow).where(TurnRow.session_id == session_id).order_by(TurnRow.start_ms)
+        select(TurnRow).where(TurnRow.session_id == session_id).order_by(*TURN_ORDER)
     )
     return [
         Turn(
@@ -97,7 +100,8 @@ async def score_session(ctx: dict[str, Any], session_id: str, org_id: str) -> di
             return {"outcome": "exists", "scorecard_id": str(existing)}
 
         try:
-            outcome = await _score(db, scoring.gateway, session)
+            gateway = await gateway_for_org(db, session.org_id, scoring.gateway)  # P13
+            outcome = await _score(db, gateway, session)
         except (ScoringError, ProfileError) as exc:
             return await _fail(db, session, str(exc))
         except Exception as exc:  # a model or gateway failure: the user sees a failed debrief
@@ -120,7 +124,7 @@ async def score_session(ctx: dict[str, Any], session_id: str, org_id: str) -> di
         now = datetime.now(UTC)
         ended = _aware(session.ended_at) if session.ended_at else now
         snapshots = 0
-        if session.mode == Mode.REALISTIC:
+        if session.mode == Mode.REALISTIC and session.duration_min != MINI_DURATION_MIN:
             for competency, average in outcome.competency_averages.items():
                 db.add(
                     SnapshotRow(

@@ -1,0 +1,43 @@
+{
+  "summary": "Site reliability engineer for high-traffic consumer services.",
+  "roles": [
+    {
+      "title": "Senior SRE",
+      "company": "Peachtree Streaming",
+      "start": "2021-02",
+      "end": null,
+      "achievements": [
+        "Took availability of the video API from 99.5% to 99.95%",
+        "Wrote the incident review process used by 11 teams"
+      ],
+      "skills": []
+    },
+    {
+      "title": "Systems Engineer",
+      "company": "Riverbend Ticketing",
+      "start": "2017-05",
+      "end": "2021-01",
+      "achievements": [
+        "Automated server builds with Ansible, from 2 days to 40 minutes"
+      ],
+      "skills": []
+    }
+  ],
+  "skills": [
+    "Kubernetes",
+    "Prometheus",
+    "Terraform",
+    "Go",
+    "Ansible",
+    "Linux"
+  ],
+  "education": [
+    {
+      "institution": "Chattahoochee Tech University",
+      "degree": "B.S.",
+      "field_of_study": "Information Systems",
+      "end": "2017"
+    }
+  ],
+  "certifications": []
+}

@@ -4,7 +4,8 @@
  *
  * Steps: check the microphone -> wait for the interview plan (brief) -> join the room (this starts
  * the session and its clock) -> wait for the interviewer -> live -> end -> debrief page, which
- * waits for the score.
+ * waits for the score. If the plan cannot be built, the session fails before it starts: the page
+ * stops waiting, shows the reason, and offers "Try again" (a new session with the same settings).
  */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -67,6 +68,8 @@ export function LiveSessionPage() {
 
   if (session.isPending) return <Loading label="Loading the session" />;
   if (session.isError) return <ErrorNotice error={session.error} />;
+  if (session.data.status === "failed" && session.data.started_at === null)
+    return <NotStartedView session={session.data} />;
   if (session.data.status !== "created" && session.data.status !== "in_progress")
     return <Navigate to={`/sessions/${sessionId}/debrief`} replace />;
   return <LiveView session={session.data} />;
@@ -295,6 +298,48 @@ function LiveView({ session }: { session: SessionRecord }) {
           </button>
         </div>
       </dialog>
+    </div>
+  );
+}
+
+/** Plain text when the API gives no reason. */
+export const NOT_STARTED_TEXT = "We could not prepare your interviewer. Nothing was counted or billed.";
+
+/**
+ * The session failed before it started, for example because the interview plan could not be
+ * built. The page stops waiting and offers a new session with the same settings.
+ */
+function NotStartedView({ session }: { session: SessionRecord }) {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const retry = useMutation({
+    mutationFn: () =>
+      sessionsApi.create({ job_target_id: session.job_target_id, config: session.config, channel: session.channel }),
+    onSuccess: (created) => {
+      void queryClient.invalidateQueries({ queryKey: keys.usage });
+      navigate(`/sessions/${created.id}/live`);
+    },
+    onError: (err) => {
+      if (err instanceof ApiError && err.status === 402) {
+        void queryClient.invalidateQueries({ queryKey: keys.usage });
+        navigate(`/upgrade?reason=${encodeURIComponent(err.code ?? "upgrade_required")}`);
+      }
+    },
+  });
+  return (
+    <div className="page--narrow">
+      <PageHead title="The interview did not start" />
+      <div className="panel" role="alert" data-testid="not-started">
+        <p>{session.failure_reason ?? NOT_STARTED_TEXT}</p>
+        <div className="row section">
+          <button type="button" className="btn" disabled={retry.isPending} onClick={() => retry.mutate()}>
+            Try again
+          </button>
+        </div>
+      </div>
+      {retry.isError && !(retry.error instanceof ApiError && retry.error.status === 402) && (
+        <ErrorNotice error={retry.error} />
+      )}
     </div>
   );
 }
