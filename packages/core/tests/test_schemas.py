@@ -308,3 +308,28 @@ def test_iv3_probe_decision_is_a_constrained_choice() -> None:
     ):
         with pytest.raises(ValidationError):
             ProbeDecision.model_validate(bad)
+
+
+def test_in6_in7_input_check_is_a_constrained_choice() -> None:
+    """IN-6, IN-7: the input check names a known document kind and a short reason."""
+    from strong_core.schemas import DocumentKind, InputCheck
+
+    ok = InputCheck.model_validate({"matches": False, "looks_like": "job_list", "reason": "x"})
+    assert ok.looks_like == DocumentKind.JOB_LIST
+    for bad in (
+        {"matches": True, "looks_like": "poem"},
+        {"matches": True, "looks_like": "resume", "reason": "x" * 201},
+        {"matches": True, "looks_like": "resume", "advice": "extra field"},
+    ):
+        with pytest.raises(ValidationError):
+            InputCheck.model_validate(bad)
+
+
+def test_iv10_answer_check_is_a_constrained_choice() -> None:
+    """IV-10: the answer check allows only ok, off_scope or inappropriate."""
+    from strong_core.schemas import AnswerCheck, AnswerConduct
+
+    assert AnswerCheck.model_validate({"conduct": "off_scope"}).conduct == AnswerConduct.OFF_SCOPE
+    for bad in ({"conduct": "rude"}, {"conduct": "ok", "warn": True}):
+        with pytest.raises(ValidationError):
+            AnswerCheck.model_validate(bad)

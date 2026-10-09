@@ -206,6 +206,32 @@ class ProbeTrigger(StrEnum):
     OFF_TOPIC = "off_topic"
 
 
+class AnswerConduct(StrEnum):
+    """IV-10: whether a candidate turn belongs in the interview.
+
+    `off_scope` is not a weak or off-topic answer (IV-3 probes those). It is a turn about
+    something outside the interview, such as an unrelated subject or a request for an unrelated
+    task. `inappropriate` is abuse, harassment, threats, hate or sexual content.
+    """
+
+    OK = "ok"
+    OFF_SCOPE = "off_scope"
+    INAPPROPRIATE = "inappropriate"
+
+
+class DocumentKind(StrEnum):
+    """IN-6, IN-7: what kind of document a job description or CV input looks like."""
+
+    JOB_POSTING = "job_posting"
+    JOB_LIST = "job_list"  # a careers page or search results with many jobs
+    RESUME = "resume"
+    COVER_LETTER = "cover_letter"
+    COMPANY_PAGE = "company_page"
+    ARTICLE = "article"
+    ERROR_PAGE = "error_page"  # a sign-in page, an error or an empty page
+    OTHER = "other"
+
+
 class SessionChannel(StrEnum):
     """PL-7. How the candidate and the interviewer talk. Text runs the same controller and
     interviewer logic with typed input. It is a dev flag; the simulated-candidate tests use it."""

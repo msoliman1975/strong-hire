@@ -88,6 +88,8 @@ IDs are referenced by the build plan and acceptance tests. Priority: P0 must shi
 | IN-3 | Accept resume as PDF, DOCX or text; parse into roles, achievements, skills, dates. | P0 |
 | IN-4 | Optional context fields: stage, interviewer name/role, recruiter notes, concerns. | P0 |
 | IN-5 | Match company to one of 20 profiles, else run generic mode. | P0 |
+| IN-6 | Refuse a job description input (link or pasted text) that is not a job posting, for example a list of jobs, a company home page, an article or a sign-in page. Show the user the reason. | P0 |
+| IN-7 | Refuse a CV input that is not a CV, for example a job posting, a cover letter or an article. Show the user the reason. | P0 |
 | GA-1 | Produce match score (0 to 100) with breakdown by competency and requirement. | P0 |
 | GA-2 | List strengths with resume evidence, gaps with severity, and likely probe areas. | P0 |
 | GA-3 | Generate a session plan: which interview types and topics to practice first. | P0 |
@@ -101,6 +103,7 @@ IDs are referenced by the build plan and acceptance tests. Priority: P0 must shi
 | IV-7 | Session structure: intro, small talk, core questions, candidate questions, wrap-up; 30 or 45 min timer. | P0 |
 | IV-8 | Mode chosen at start. Coach: pause, hint, redo. Realistic: no interruptions, counts toward scores. | P0 |
 | IV-9 | Graceful recovery from dropped audio: resume the session where it stopped. | P0 |
+| IV-10 | Candidate turns that are outside the interview (an unrelated subject or task) or inappropriate (abuse, harassment, threats, hate, sexual content) get a polite warning. The second warning says the next one ends the interview; the third such turn closes it. A weak or off-topic answer is not a warning; IV-3 probes it. | P0 |
 | FB-1 | Overall hire signal (Strong Hire, Hire, Lean Hire, Lean No Hire, No Hire) with a short written rationale. | P0 |
 | FB-2 | Per-question rubric scores with strengths and misses. | P0 |
 | FB-3 | Debrief ready within 60 seconds of session end. | P0 |
