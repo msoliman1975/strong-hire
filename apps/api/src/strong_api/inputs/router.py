@@ -8,6 +8,9 @@ DELETE is a soft delete: the text, parsed data and stored file go, the row stays
 deleted_at set, so gap reports, sessions and progress that used it are kept. POST .../match
 finds a saved item with the same posting text or link, or the same file content.
 
+LB-2: a job description with a gap analysis or a session cannot be deleted (409). POST
+.../archive hides it from the lists, POST .../restore brings it back.
+
 Create endpoints save the row and enqueue an Arq job, then return 202 with the job id. The
 client polls the job endpoint until the status is "complete", then reads the job result:
 outcome "extracted" (with field-level confidence and the company match), "needs_paste" (the
@@ -24,7 +27,7 @@ from typing import Annotated
 from urllib.parse import urlparse
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Response, UploadFile, status
-from sqlalchemy import func, select
+from sqlalchemy import func, select, true
 
 from strong_api.gap import service as gap_service
 from strong_api.gap.settings import GapSettings, get_gap_settings
@@ -117,6 +120,7 @@ async def _job_target_out(db: Db, target: JobTarget) -> JobTargetOut:
         stage=target.stage,
         context=_context(target),
         created_at=target.created_at,
+        archived_at=target.archived_at,
     )
 
 
@@ -216,10 +220,13 @@ async def create_job_target(
 
 
 @router.get("/job-targets")
-async def list_job_targets(db: Db, me: Me) -> list[JobTargetSummary]:
+async def list_job_targets(
+    db: Db, me: Me, include_archived: bool = False
+) -> list[JobTargetSummary]:
     """The signed-in user's saved job targets, newest first, with dashboard numbers (PR-1).
 
-    Deleted job descriptions are left out (R1); their reports are on GET /reports.
+    Deleted job descriptions are left out (R1); their reports are on GET /reports. Archived
+    ones are left out unless include_archived is true (LB-2).
 
     match_score comes from the latest ready gap analysis. sessions_count and last_session_at
     count rows in the sessions table; they stay 0 and null until sessions exist (P7, P10).
@@ -231,6 +238,7 @@ async def list_job_targets(db: Db, me: Me) -> list[JobTargetSummary]:
                 JobTarget.org_id == me.org_id,
                 JobTarget.user_id == me.user_id,
                 JobTarget.deleted_at.is_(None),
+                true() if include_archived else JobTarget.archived_at.is_(None),
             )
             .order_by(JobTarget.created_at.desc())
         )
@@ -265,6 +273,7 @@ async def list_job_targets(db: Db, me: Me) -> list[JobTargetSummary]:
                 gap_status=history[0].status if history else None,
                 sessions_count=count,
                 last_session_at=last,
+                in_use=bool(history) or count > 0,
             )
         )
     return out
@@ -316,14 +325,58 @@ async def rename_job_target(
     return await _job_target_out(db, target)
 
 
+async def job_target_in_use(db: Db, job_target_id: uuid.UUID) -> bool:
+    """LB-2: the job has a gap analysis or an interview session."""
+    gap = await db.scalar(select(GapRow.id).where(GapRow.job_target_id == job_target_id).limit(1))
+    if gap is not None:
+        return True
+    session = await db.scalar(
+        select(InterviewSession.id).where(InterviewSession.job_target_id == job_target_id).limit(1)
+    )
+    return session is not None
+
+
+@router.post("/job-targets/{job_target_id}/archive")
+async def archive_job_target(job_target_id: uuid.UUID, db: Db, me: Me) -> JobTargetOut:
+    """LB-2: archive a job description. It and its reports stay; pickers leave it out.
+
+    Safe to call twice.
+    """
+    target = await _owned_job_target(db, me, job_target_id, live=True)
+    if target.archived_at is None:
+        target.archived_at = datetime.now(UTC)
+        db.add(_audit(me, "library.job_archived", f"job_target:{target.id}"))
+        await db.commit()
+        await db.refresh(target)
+    return await _job_target_out(db, target)
+
+
+@router.post("/job-targets/{job_target_id}/restore")
+async def restore_job_target(job_target_id: uuid.UUID, db: Db, me: Me) -> JobTargetOut:
+    """LB-2: bring an archived job description back. Safe to call twice."""
+    target = await _owned_job_target(db, me, job_target_id, live=True)
+    if target.archived_at is not None:
+        target.archived_at = None
+        db.add(_audit(me, "library.job_restored", f"job_target:{target.id}"))
+        await db.commit()
+        await db.refresh(target)
+    return await _job_target_out(db, target)
+
+
 @router.delete("/job-targets/{job_target_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_job_target(job_target_id: uuid.UUID, db: Db, me: Me) -> Response:
-    """R1: delete a saved job description. Its text, link, parsed data and context go.
+    """R1, LB-2: delete a saved job description that was never used. Its text, link, parsed
+    data and context go. Safe to call twice.
 
-    Gap reports, interview sessions, transcripts, debriefs and progress stay; they show the
-    job as deleted. Safe to call twice.
+    A job with a gap analysis or a session answers 409: archive it instead, so its reports
+    keep their job.
     """
     target = await _owned_job_target(db, me, job_target_id)
+    if target.deleted_at is None and await job_target_in_use(db, target.id):
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            "This job description has reports. Archive it instead of deleting it.",
+        )
     if target.deleted_at is None:
         target.deleted_at = datetime.now(UTC)
         target.name = None

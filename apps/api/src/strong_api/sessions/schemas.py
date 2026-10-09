@@ -15,6 +15,13 @@ class CreateSessionRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     job_target_id: uuid.UUID
+    resume_id: uuid.UUID | None = Field(
+        default=None,
+        description=(
+            "PR-3: the CV to interview against. It needs a ready gap analysis with this job. "
+            "Default: the CV of the job's latest ready gap analysis."
+        ),
+    )
     config: SessionConfig
     channel: SessionChannel = Field(
         default=SessionChannel.VOICE,
@@ -25,6 +32,9 @@ class CreateSessionRequest(BaseModel):
 class SessionRecord(BaseModel):
     id: uuid.UUID
     job_target_id: uuid.UUID
+    resume_id: uuid.UUID | None = Field(
+        default=None, description="PR-3: the CV used for the session. None for old sessions."
+    )
     config: SessionConfig
     channel: SessionChannel
     status: SessionStatus

@@ -15,7 +15,8 @@ export interface paths {
          * List Job Targets
          * @description The signed-in user's saved job targets, newest first, with dashboard numbers (PR-1).
          *
-         *     Deleted job descriptions are left out (R1); their reports are on GET /reports.
+         *     Deleted job descriptions are left out (R1); their reports are on GET /reports. Archived
+         *     ones are left out unless include_archived is true (LB-2).
          *
          *     match_score comes from the latest ready gap analysis. sessions_count and last_session_at
          *     count rows in the sessions table; they stay 0 and null until sessions exist (P7, P10).
@@ -75,10 +76,11 @@ export interface paths {
         post?: never;
         /**
          * Delete Job Target
-         * @description R1: delete a saved job description. Its text, link, parsed data and context go.
+         * @description R1, LB-2: delete a saved job description that was never used. Its text, link, parsed
+         *     data and context go. Safe to call twice.
          *
-         *     Gap reports, interview sessions, transcripts, debriefs and progress stay; they show the
-         *     job as deleted. Safe to call twice.
+         *     A job with a gap analysis or a session answers 409: archive it instead, so its reports
+         *     keep their job.
          */
         delete: operations["delete_job_target_job_targets__job_target_id__delete"];
         options?: never;
@@ -88,6 +90,48 @@ export interface paths {
          * @description R1: rename a saved job.
          */
         patch: operations["rename_job_target_job_targets__job_target_id__patch"];
+        trace?: never;
+    };
+    "/job-targets/{job_target_id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Archive Job Target
+         * @description LB-2: archive a job description. It and its reports stay; pickers leave it out.
+         *
+         *     Safe to call twice.
+         */
+        post: operations["archive_job_target_job_targets__job_target_id__archive_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/job-targets/{job_target_id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Restore Job Target
+         * @description LB-2: bring an archived job description back. Safe to call twice.
+         */
+        post: operations["restore_job_target_job_targets__job_target_id__restore_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/job-targets/{job_target_id}/jobs/{job_id}": {
@@ -487,6 +531,9 @@ export interface paths {
         /**
          * List Reports
          * @description All gap reports and interview debriefs of the signed-in user, newest first (R1).
+         *
+         *     With resume_id, only the reports made with that CV (PR-3). Debriefs of sessions from
+         *     before the CV was recorded have no CV, so this filter leaves them out.
          */
         get: operations["list_reports_reports_get"];
         put?: never;
@@ -804,6 +851,30 @@ export interface paths {
          *     subscribe, use, cancel flow can be checked before voice sessions exist.
          */
         post: operations["dev_usage_billing_dev_usage_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Profile
+         * @description AC-3: the profile. complete is false until the first save.
+         */
+        get: operations["get_profile_account_profile_get"];
+        /**
+         * Put Profile
+         * @description AC-3: save the profile. The first save sets profile_completed_at.
+         */
+        put: operations["put_profile_account_profile_put"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1337,6 +1408,17 @@ export interface components {
              * @default false
              */
             is_admin: boolean;
+            /**
+             * Full Name
+             * @description AC-3 profile name.
+             */
+            full_name?: string | null;
+            /**
+             * Profile Complete
+             * @description AC-3: false until the user saves the first sign-in profile.
+             * @default false
+             */
+            profile_complete: boolean;
         };
         /** Body_create_resume_resumes_post */
         Body_create_resume_resumes_post: {
@@ -1547,6 +1629,11 @@ export interface components {
              * Format: uuid
              */
             job_target_id: string;
+            /**
+             * Resume Id
+             * @description PR-3: the CV to interview against. It needs a ready gap analysis with this job. Default: the CV of the job's latest ready gap analysis.
+             */
+            resume_id?: string | null;
             config: components["schemas"]["SessionConfig"];
             /**
              * @description text runs the same interviewer with typed input; dev and test only (PL-7)
@@ -2082,6 +2169,11 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Archived At
+             * @description LB-2: set while the job description is archived.
+             */
+            archived_at?: string | null;
         };
         /**
          * JobTargetSummary
@@ -2106,6 +2198,12 @@ export interface components {
              * @description Start of the latest session.
              */
             last_session_at: string | null;
+            /**
+             * In Use
+             * @description LB-2: the job has a gap analysis or a session. Archive it; do not delete.
+             * @default false
+             */
+            in_use: boolean;
         };
         /**
          * JobTargetUpdate
@@ -2356,6 +2454,25 @@ export interface components {
          * @enum {string}
          */
         ProfileField: "values_framework" | "loop_structure" | "question_patterns" | "bar_by_level" | "persona" | "scoring_weights" | "case_style";
+        /**
+         * ProfileIn
+         * @description AC-3: the profile asked for at the first sign-in. No payment details.
+         */
+        ProfileIn: {
+            /** Full Name */
+            full_name: string;
+            /** Years Experience */
+            years_experience: number;
+            target_level: components["schemas"]["Level"];
+            /** Current Title */
+            current_title?: string | null;
+            /** Country */
+            country?: string | null;
+            /** Time Zone */
+            time_zone?: string | null;
+            /** Linkedin Url */
+            linkedin_url?: string | null;
+        };
         /** ProfileMeta */
         ProfileMeta: {
             /** Version */
@@ -2377,6 +2494,27 @@ export interface components {
              * @default null
              */
             published_at: string | null;
+        };
+        /**
+         * ProfileOut
+         * @description AC-3. complete is false until the user saves the profile once.
+         */
+        ProfileOut: {
+            /** Full Name */
+            full_name: string | null;
+            /** Years Experience */
+            years_experience: number | null;
+            target_level: components["schemas"]["Level"] | null;
+            /** Current Title */
+            current_title: string | null;
+            /** Country */
+            country: string | null;
+            /** Time Zone */
+            time_zone: string | null;
+            /** Linkedin Url */
+            linkedin_url: string | null;
+            /** Complete */
+            complete: boolean;
         };
         /**
          * ProfileStatus
@@ -2476,17 +2614,17 @@ export interface components {
             job_deleted: boolean;
             /**
              * Resume Id
-             * @description Gap reports only.
+             * @description The CV used. None for debriefs of sessions from before PR-3 stored it.
              */
             resume_id: string | null;
             /**
              * Resume Name
-             * @description Gap reports only. None when the CV was deleted.
+             * @description None when there is no CV or it was deleted.
              */
             resume_name: string | null;
             /**
              * Resume Deleted
-             * @description Gap reports only: the CV was deleted.
+             * @description The CV was deleted.
              */
             resume_deleted: boolean;
             /**
@@ -2728,6 +2866,11 @@ export interface components {
              * Format: uuid
              */
             job_target_id: string;
+            /**
+             * Resume Id
+             * @description PR-3: the CV used for the session. None for old sessions.
+             */
+            resume_id?: string | null;
             config: components["schemas"]["SessionConfig"];
             channel: components["schemas"]["SessionChannel"];
             status: components["schemas"]["SessionStatus"];
@@ -2978,7 +3121,9 @@ export type $defs = Record<string, never>;
 export interface operations {
     list_job_targets_job_targets_get: {
         parameters: {
-            query?: never;
+            query?: {
+                include_archived?: boolean;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -2992,6 +3137,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["JobTargetSummary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -3171,6 +3325,68 @@ export interface operations {
                 "application/json": components["schemas"]["LibraryRename"];
             };
         };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobTargetOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    archive_job_target_job_targets__job_target_id__archive_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobTargetOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    restore_job_target_job_targets__job_target_id__restore_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {
@@ -3973,6 +4189,7 @@ export interface operations {
         parameters: {
             query?: {
                 job_target_id?: string | null;
+                resume_id?: string | null;
                 type?: ("gap_report" | "interview_debrief") | null;
             };
             header?: never;
@@ -4426,6 +4643,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UsageOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_profile_account_profile_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileOut"];
+                };
+            };
+        };
+    };
+    put_profile_account_profile_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfileIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileOut"];
                 };
             };
             /** @description Validation Error */

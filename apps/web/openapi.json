@@ -6,30 +6,6 @@
   },
   "paths": {
     "/job-targets": {
-      "get": {
-        "tags": [
-          "inputs"
-        ],
-        "summary": "List Job Targets",
-        "description": "The signed-in user's saved job targets, newest first, with dashboard numbers (PR-1).\n\nDeleted job descriptions are left out (R1); their reports are on GET /reports.\n\nmatch_score comes from the latest ready gap analysis. sessions_count and last_session_at\ncount rows in the sessions table; they stay 0 and null until sessions exist (P7, P10).",
-        "operationId": "list_job_targets_job_targets_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/JobTargetSummary"
-                  },
-                  "type": "array",
-                  "title": "Response List Job Targets Job Targets Get"
-                }
-              }
-            }
-          }
-        }
-      },
       "post": {
         "tags": [
           "inputs"
@@ -37,14 +13,14 @@
         "summary": "Create Job Target",
         "operationId": "create_job_target_job_targets_post",
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/JobTargetCreate"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "202": {
@@ -53,6 +29,52 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/JobTargetAccepted"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "inputs"
+        ],
+        "summary": "List Job Targets",
+        "description": "The signed-in user's saved job targets, newest first, with dashboard numbers (PR-1).\n\nDeleted job descriptions are left out (R1); their reports are on GET /reports. Archived\nones are left out unless include_archived is true (LB-2).\n\nmatch_score comes from the latest ready gap analysis. sessions_count and last_session_at\ncount rows in the sessions table; they stay 0 and null until sessions exist (P7, P10).",
+        "operationId": "list_job_targets_job_targets_get",
+        "parameters": [
+          {
+            "name": "include_archived",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Include Archived"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JobTargetSummary"
+                  },
+                  "title": "Response List Job Targets Job Targets Get"
                 }
               }
             }
@@ -212,7 +234,7 @@
           "inputs"
         ],
         "summary": "Delete Job Target",
-        "description": "R1: delete a saved job description. Its text, link, parsed data and context go.\n\nGap reports, interview sessions, transcripts, debriefs and progress stay; they show the\njob as deleted. Safe to call twice.",
+        "description": "R1, LB-2: delete a saved job description that was never used. Its text, link, parsed\ndata and context go. Safe to call twice.\n\nA job with a gap analysis or a session answers 409: archive it instead, so its reports\nkeep their job.",
         "operationId": "delete_job_target_job_targets__job_target_id__delete",
         "parameters": [
           {
@@ -278,6 +300,94 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/JobTargetAccepted"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/job-targets/{job_target_id}/archive": {
+      "post": {
+        "tags": [
+          "inputs"
+        ],
+        "summary": "Archive Job Target",
+        "description": "LB-2: archive a job description. It and its reports stay; pickers leave it out.\n\nSafe to call twice.",
+        "operationId": "archive_job_target_job_targets__job_target_id__archive_post",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobTargetOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/job-targets/{job_target_id}/restore": {
+      "post": {
+        "tags": [
+          "inputs"
+        ],
+        "summary": "Restore Job Target",
+        "description": "LB-2: bring an archived job description back. Safe to call twice.",
+        "operationId": "restore_job_target_job_targets__job_target_id__restore_post",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobTargetOut"
                 }
               }
             }
@@ -1361,7 +1471,7 @@
           "reports"
         ],
         "summary": "List Reports",
-        "description": "All gap reports and interview debriefs of the signed-in user, newest first (R1).",
+        "description": "All gap reports and interview debriefs of the signed-in user, newest first (R1).\n\nWith resume_id, only the reports made with that CV (PR-3). Debriefs of sessions from\nbefore the CV was recorded have no CV, so this filter leaves them out.",
         "operationId": "list_reports_reports_get",
         "parameters": [
           {
@@ -1379,6 +1489,23 @@
                 }
               ],
               "title": "Job Target Id"
+            }
+          },
+          {
+            "name": "resume_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Resume Id"
             }
           },
           {
@@ -1940,6 +2067,68 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UsageOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/profile": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Get Profile",
+        "description": "AC-3: the profile. complete is false until the first save.",
+        "operationId": "get_profile_account_profile_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileOut"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Put Profile",
+        "description": "AC-3: save the profile. The first save sets profile_completed_at.",
+        "operationId": "put_profile_account_profile_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileOut"
                 }
               }
             }
@@ -3268,6 +3457,24 @@
             "title": "Is Admin",
             "description": "True for ADMIN_EMAILS users: the web app shows Admin.",
             "default": false
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name",
+            "description": "AC-3 profile name."
+          },
+          "profile_complete": {
+            "type": "boolean",
+            "title": "Profile Complete",
+            "description": "AC-3: false until the user saves the first sign-in profile.",
+            "default": false
           }
         },
         "type": "object",
@@ -3841,6 +4048,19 @@
             "type": "string",
             "format": "uuid",
             "title": "Job Target Id"
+          },
+          "resume_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resume Id",
+            "description": "PR-3: the CV to interview against. It needs a ready gap analysis with this job. Default: the CV of the job's latest ready gap analysis."
           },
           "config": {
             "$ref": "#/components/schemas/SessionConfig"
@@ -5229,6 +5449,19 @@
             "type": "string",
             "format": "date-time",
             "title": "Created At"
+          },
+          "archived_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Archived At",
+            "description": "LB-2: set while the job description is archived."
           }
         },
         "type": "object",
@@ -5295,6 +5528,12 @@
             ],
             "title": "Last Session At",
             "description": "Start of the latest session."
+          },
+          "in_use": {
+            "type": "boolean",
+            "title": "In Use",
+            "description": "LB-2: the job has a gap analysis or a session. Archive it; do not delete.",
+            "default": false
           }
         },
         "type": "object",
@@ -5875,6 +6114,82 @@
         "title": "ProfileField",
         "type": "string"
       },
+      "ProfileIn": {
+        "properties": {
+          "full_name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Full Name"
+          },
+          "years_experience": {
+            "type": "integer",
+            "maximum": 50.0,
+            "minimum": 0.0,
+            "title": "Years Experience"
+          },
+          "target_level": {
+            "$ref": "#/components/schemas/Level"
+          },
+          "current_title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Title"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "time_zone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Zone"
+          },
+          "linkedin_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Linkedin Url"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "full_name",
+          "years_experience",
+          "target_level"
+        ],
+        "title": "ProfileIn",
+        "description": "AC-3: the profile asked for at the first sign-in. No payment details."
+      },
       "ProfileMeta": {
         "additionalProperties": false,
         "properties": {
@@ -5931,6 +6246,103 @@
         ],
         "title": "ProfileMeta",
         "type": "object"
+      },
+      "ProfileOut": {
+        "properties": {
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "years_experience": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Years Experience"
+          },
+          "target_level": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Level"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "current_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Title"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "time_zone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Zone"
+          },
+          "linkedin_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Linkedin Url"
+          },
+          "complete": {
+            "type": "boolean",
+            "title": "Complete"
+          }
+        },
+        "type": "object",
+        "required": [
+          "full_name",
+          "years_experience",
+          "target_level",
+          "current_title",
+          "country",
+          "time_zone",
+          "linkedin_url",
+          "complete"
+        ],
+        "title": "ProfileOut",
+        "description": "AC-3. complete is false until the user saves the profile once."
       },
       "ProfileStatus": {
         "enum": [
@@ -6134,7 +6546,7 @@
               }
             ],
             "title": "Resume Id",
-            "description": "Gap reports only."
+            "description": "The CV used. None for debriefs of sessions from before PR-3 stored it."
           },
           "resume_name": {
             "anyOf": [
@@ -6146,12 +6558,12 @@
               }
             ],
             "title": "Resume Name",
-            "description": "Gap reports only. None when the CV was deleted."
+            "description": "None when there is no CV or it was deleted."
           },
           "resume_deleted": {
             "type": "boolean",
             "title": "Resume Deleted",
-            "description": "Gap reports only: the CV was deleted."
+            "description": "The CV was deleted."
           },
           "status": {
             "type": "string",
@@ -6745,6 +7157,19 @@
             "type": "string",
             "format": "uuid",
             "title": "Job Target Id"
+          },
+          "resume_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resume Id",
+            "description": "PR-3: the CV used for the session. None for old sessions."
           },
           "config": {
             "$ref": "#/components/schemas/SessionConfig"

@@ -31,6 +31,7 @@ from strong_core.schemas import (
     Mode,
     SessionStatus,
 )
+from strong_worker.gap import jobs as gap_jobs
 from strong_worker.inputs import jobs
 from strong_worker.inputs.jobs import CTX_KEY
 from strong_worker.inputs.testing import set_extractor_output
@@ -293,13 +294,22 @@ async def _add_debrief(maker: Maker, job_id: str, *, ago_min: int = 0) -> uuid.U
         return session.id
 
 
-async def test_r1_delete_job_keeps_reports(
+SESSION_CONFIG = {
+    "interview_type": "behavioral",
+    "difficulty": "realistic",
+    "mode": "realistic",
+    "duration_min": 30,
+    "level": "senior",
+}
+
+
+async def test_lb2_delete_unused_job_clears_its_content(
     client: httpx.AsyncClient, fake_fixtures: Path, sessionmaker: Maker
 ) -> None:
+    """LB-2, R1: a job description with no gap report and no session can be deleted."""
     job = await add_job(client, fake_fixtures, url="https://jobs.example.com/1")
-    cv = await add_resume(client, fake_fixtures)
-    gap = await gap_for(client, job["id"], cv["id"])
-    session_id = await _add_debrief(sessionmaker, job["id"])
+    listed = (await client.get("/job-targets")).json()
+    assert [(r["job_target"]["id"], r["in_use"]) for r in listed] == [(job["id"], False)]
 
     assert (await client.delete(f"/job-targets/{job['id']}")).status_code == 204
     assert (await client.delete(f"/job-targets/{job['id']}")).status_code == 204  # twice is fine
@@ -309,8 +319,6 @@ async def test_r1_delete_job_keeps_reports(
         assert row is not None and row.deleted_at is not None
         assert row.raw_text is None and row.parsed_json is None and row.source_url is None
         assert row.text_hash is None and row.name is None and row.context_notes is None
-        assert await db.get(GapRow, uuid.UUID(gap["id"])) is not None
-        assert await db.get(InterviewSession, session_id) is not None
         logs = await db.scalars(select(AuditLog).where(AuditLog.action == "library.job_deleted"))
         assert [log.entity for log in logs] == [f"job_target:{job['id']}"]
 
@@ -318,28 +326,81 @@ async def test_r1_delete_job_keeps_reports(
     shown = (await client.get(f"/job-targets/{job['id']}")).json()
     assert shown["deleted"] is True and shown["name"] is None and shown["posting"] is None
 
+    # A deleted job cannot be picked again.
+    cv = await add_resume(client, fake_fixtures)
+    url = f"/job-targets/{job['id']}/gap-analysis"
+    assert (await client.post(url, json={"resume_id": cv["id"]})).status_code == 404
+    _, posting = fixture("postings", "swe-stripe-backend")
+    edit = await client.put(f"/job-targets/{job['id']}", json={"posting": posting})
+    assert edit.status_code == 404
+    body = {"job_target_id": job["id"], "config": SESSION_CONFIG}
+    assert (await client.post("/sessions", json=body)).status_code == 404
+    assert (await client.post(f"/job-targets/{job['id']}/archive")).status_code == 404
+
+
+async def test_lb2_job_with_reports_is_archived_not_deleted(
+    client: httpx.AsyncClient, fake_fixtures: Path, sessionmaker: Maker
+) -> None:
+    """LB-2: a job description with reports answers 409 to delete; archive and restore work."""
+    job = await add_job(client, fake_fixtures, url="https://jobs.example.com/1")
+    cv = await add_resume(client, fake_fixtures)
+    await gap_for(client, job["id"], cv["id"])
+    await _add_debrief(sessionmaker, job["id"])
+
+    refused = await client.delete(f"/job-targets/{job['id']}")
+    assert refused.status_code == 409 and "Archive it" in refused.json()["detail"]
+    [summary] = (await client.get("/job-targets")).json()
+    assert summary["in_use"] is True and summary["job_target"]["archived_at"] is None
+
+    archived = await client.post(f"/job-targets/{job['id']}/archive")
+    assert archived.status_code == 200 and archived.json()["archived_at"] is not None
+    again = await client.post(f"/job-targets/{job['id']}/archive")  # twice is fine
+    assert again.json()["archived_at"] == archived.json()["archived_at"]
+    assert (await client.get("/job-targets")).json() == []
+    with_archived = (await client.get("/job-targets", params={"include_archived": True})).json()
+    assert [r["job_target"]["id"] for r in with_archived] == [job["id"]]
+    reports = (await client.get("/reports", params={"job_target_id": job["id"]})).json()
+    assert {r["type"] for r in reports} == {"gap_report", "interview_debrief"}
+
+    restored = await client.post(f"/job-targets/{job['id']}/restore")
+    assert restored.status_code == 200 and restored.json()["archived_at"] is None
+    assert [r["job_target"]["id"] for r in (await client.get("/job-targets")).json()] == [job["id"]]
+
+    async with sessionmaker() as db:
+        actions = [
+            log.action
+            for log in await db.scalars(
+                select(AuditLog)
+                .where(AuditLog.action.like("library.job_%"))
+                .order_by(AuditLog.at, AuditLog.id)
+            )
+        ]
+    assert sorted(actions) == ["library.job_archived", "library.job_restored"]
+
+
+async def test_r1_reports_of_a_deleted_job_stay(
+    client: httpx.AsyncClient, fake_fixtures: Path, sessionmaker: Maker
+) -> None:
+    """R1: a job deleted before LB-2 keeps its gap report, debrief and progress."""
+    job = await add_job(client, fake_fixtures, url="https://jobs.example.com/1")
+    cv = await add_resume(client, fake_fixtures)
+    gap = await gap_for(client, job["id"], cv["id"])
+    session_id = await _add_debrief(sessionmaker, job["id"])
+    async with sessionmaker() as db:  # the R1 soft delete, as it ran before LB-2
+        row = await db.get(JobTarget, uuid.UUID(job["id"]))
+        assert row is not None
+        row.deleted_at = datetime.now(UTC)
+        row.name = row.raw_text = row.parsed_json = row.source_url = None
+        row.context_notes = row.text_hash = None
+        await db.commit()
+
+    assert (await client.get("/job-targets")).json() == []
     report = (await client.get(f"/gap-analyses/{gap['id']}")).json()
     assert report["job_deleted"] is True and report["stale"] is False
     assert report["analysis"]["match_score"] == gap["analysis"]["match_score"]
     debrief = await client.get(f"/sessions/{session_id}/debrief")
     assert debrief.status_code == 200 and debrief.json()["status"] == "ready"
     assert (await client.get(f"/job-targets/{job['id']}/progress")).status_code == 200
-
-    # A deleted job cannot be picked again.
-    url = f"/job-targets/{job['id']}/gap-analysis"
-    assert (await client.post(url, json={"resume_id": cv["id"]})).status_code == 404
-    _, posting = fixture("postings", "swe-stripe-backend")
-    edit = await client.put(f"/job-targets/{job['id']}", json={"posting": posting})
-    assert edit.status_code == 404
-    config = {
-        "interview_type": "behavioral",
-        "difficulty": "realistic",
-        "mode": "realistic",
-        "duration_min": 30,
-        "level": "senior",
-    }
-    resp = await client.post("/sessions", json={"job_target_id": job["id"], "config": config})
-    assert resp.status_code == 404
 
     reports = (await client.get("/reports")).json()
     assert {(r["type"], r["job_deleted"], r["job_name"]) for r in reports} == {
@@ -480,3 +541,55 @@ async def test_r1_routes_need_sign_in(anon_client: httpx.AsyncClient) -> None:
     assert (await anon_client.post("/resumes/match", json={"sha256": "0" * 64})).status_code == 401
     assert (await anon_client.delete(f"/resumes/{some}")).status_code == 401
     assert (await anon_client.patch(f"/job-targets/{some}", json={"name": "x"})).status_code == 401
+
+
+# --- rehearsals: one job and CV pair (PR-3) -------------------------------------------------
+
+
+async def test_pr3_a_session_records_its_cv_and_reports_filter_by_cv(
+    client: httpx.AsyncClient, fake_fixtures: Path, sessionmaker: Maker
+) -> None:
+    """PR-3: a session keeps the CV it was created with; GET /reports can filter by that CV."""
+    job = await add_job(client, fake_fixtures)
+    first = await add_resume(client, fake_fixtures, filename="First CV.txt")
+    second = await add_resume(client, fake_fixtures, filename="Second CV.txt")
+    unused = await add_resume(client, fake_fixtures, filename="Unused CV.txt")
+    gap_first = await gap_for(client, job["id"], first["id"])
+    await gap_for(client, job["id"], second["id"])
+    mini = {**SESSION_CONFIG, "duration_min": 10}
+
+    def body(resume_id: str | None = None) -> dict[str, Any]:
+        out: dict[str, Any] = {"job_target_id": job["id"], "config": mini}
+        if resume_id is not None:
+            out["resume_id"] = resume_id
+        return out
+
+    chosen = await client.post("/sessions", json=body(first["id"]))
+    assert chosen.status_code == 201, chosen.text
+    assert chosen.json()["resume_id"] == first["id"]
+    default = await client.post("/sessions", json=body())
+    assert default.json()["resume_id"] == second["id"]  # the job's latest ready gap analysis
+    no_gap = await client.post("/sessions", json=body(unused["id"]))
+    assert no_gap.status_code == 409
+
+    # The worker builds the brief from the chosen CV's gap analysis.
+    async with sessionmaker() as db:
+        picked = await gap_jobs.latest_ready_gap(db, uuid.UUID(job["id"]), uuid.UUID(first["id"]))
+        assert picked is not None and str(picked.id) == gap_first["id"]
+
+    async with sessionmaker() as db:  # end the first session so it has a debrief
+        row = await db.get(InterviewSession, uuid.UUID(chosen.json()["id"]))
+        assert row is not None
+        row.status = SessionStatus.COMPLETED
+        row.started_at = datetime.now(UTC) - timedelta(minutes=10)
+        row.ended_at = datetime.now(UTC)
+        await db.commit()
+
+    params = {"job_target_id": job["id"], "resume_id": first["id"]}
+    reports = (await client.get("/reports", params=params)).json()
+    assert {(r["type"], r["resume_id"], r["resume_name"]) for r in reports} == {
+        ("gap_report", first["id"], "First CV"),
+        ("interview_debrief", first["id"], "First CV"),
+    }
+    other = (await client.get("/reports", params={**params, "resume_id": second["id"]})).json()
+    assert [r["type"] for r in other] == ["gap_report"]
