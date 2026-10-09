@@ -31,6 +31,7 @@ const JOB: JobTargetOut = {
   stage: null,
   context: { interviewer_name: null, interviewer_role: null, recruiter_notes: null, concerns: null },
   created_at: "2026-10-01T10:00:00Z",
+  archived_at: null,
 };
 
 const PAID: Usage = {

@@ -11,6 +11,7 @@ import type {
   GapAnalysisOut,
   JobOut,
   JobTargetOut,
+  Profile,
   ResumeOut,
   Usage,
 } from "../api/types";
@@ -38,6 +39,8 @@ export interface MockAuth {
 export interface MockDb {
   auth: MockAuth;
   users: Record<string, AuthUser>;
+  /** AC-3: the first sign-in profile, by email. */
+  profiles: Record<string, Profile>;
   jobs: JobTargetOut[];
   resumes: ResumeOut[];
   tasks: Record<string, MockTask>;
@@ -79,6 +82,7 @@ export function emptyDb(): MockDb {
     jobs: [],
     resumes: [],
     tasks: {},
+    profiles: {},
     gaps: {},
     jobTexts: {},
     resumeHashes: {},

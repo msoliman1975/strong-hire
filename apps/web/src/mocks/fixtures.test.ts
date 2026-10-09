@@ -217,18 +217,46 @@ describe("mocks of the R1 library and reports endpoints match openapi.json", () 
     expect(report.resume_name).toBe("My CV");
     for (const row of await reportsApi.list()) expectApiShape("ReportItem", row);
 
+    for (const row of await reportsApi.list({ jobTargetId: job.id, resumeId: record.id })) {
+      expectApiShape("ReportItem", row);
+    }
+
     await resumesApi.remove(record.id);
-    await jobTargetsApi.remove(job.id);
-    const deleted = await jobTargetsApi.get(job.id);
-    expectApiShape("JobTargetOut", deleted);
-    expect(deleted.deleted).toBe(true);
     const gone = await gapApi.getById(started.id);
     expectApiShape("GapAnalysisOut", gone);
-    expect(gone.job_deleted && gone.resume_deleted).toBe(true);
-    const [row] = await reportsApi.list({ type: "gap_report" });
-    expectApiShape("ReportItem", row);
-    expect(row.job_deleted).toBe(true);
-    await expect(gapApi.start(job.id, { resume_id: record.id })).rejects.toMatchObject({ status: 404 });
+    expect(gone.resume_deleted).toBe(true);
+
+    // LB-2: a job with reports is archived, not deleted.
+    await expect(jobTargetsApi.remove(job.id)).rejects.toMatchObject({ status: 409 });
+    const archived = await jobTargetsApi.archive(job.id);
+    expectApiShape("JobTargetOut", archived);
+    expect(archived.archived_at).not.toBeNull();
+    expect(await jobTargetsApi.list()).toEqual([]);
+    for (const row of await jobTargetsApi.list(true)) expectApiShape("JobTargetSummary", row);
+    expectApiShape("JobTargetOut", await jobTargetsApi.restore(job.id));
+
+    // An unused job can be deleted.
+    const { job_target: unused } = await jobTargetsApi.create({ text: "u".repeat(200) });
+    await jobTargetsApi.remove(unused.id);
+    const deleted = await jobTargetsApi.get(unused.id);
+    expectApiShape("JobTargetOut", deleted);
+    expect(deleted.deleted).toBe(true);
+    await expect(gapApi.start(unused.id, { resume_id: record.id })).rejects.toMatchObject({ status: 404 });
+  });
+
+  it("AC-3: profile get and save", async () => {
+    await authApi.devLogin("profile@example.com");
+    const signedUp = await authApi.signup({ age_confirmed: true, terms_accepted: true, training_consent: false });
+    expect(signedUp.user?.profile_complete).toBe(false);
+    const empty = await accountApi.getProfile();
+    expectApiShape("ProfileOut", empty);
+    expect(empty.complete).toBe(false);
+    const saved = await accountApi.saveProfile({ full_name: "Ana Lopez", years_experience: 7, target_level: "senior" });
+    expectApiShape("ProfileOut", saved);
+    expect(saved.complete).toBe(true);
+    const me = await authApi.me();
+    expectApiShape("AuthState", me);
+    expect(me.user?.profile_complete).toBe(true);
   });
 });
 
@@ -278,6 +306,7 @@ describe("mocks of the real P9 endpoints match openapi.json", () => {
     mockStore.db.sessions.push({
       id: "00000000-0000-4000-8000-0000000000c1",
       job_target_id: "00000000-0000-4000-8000-0000000000d1",
+      resume_id: null,
       config: { interview_type: "case", difficulty: "tough", mode: "coach", duration_min: 30, level: "mid" },
       channel: "text",
       brief_ready: true,

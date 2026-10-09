@@ -9,10 +9,16 @@ import { CV_DELETED, JD_DELETED, ReportList } from "../components/ReportList";
 import { Bar, ErrorNotice, Loading, PageHead } from "../components/ui";
 import { competencyLabel, difficultyLabel, formatDate, interviewTypeLabel, severityLabel } from "../labels";
 
-export function setupLink(jobId: string, plan?: PlannedSession | null): string {
-  if (!plan) return `/jobs/${jobId}/sessions/new`;
-  const q = new URLSearchParams({ type: plan.interview_type, difficulty: plan.difficulty });
-  return `/jobs/${jobId}/sessions/new?${q.toString()}`;
+/** Session setup, with the planned type and difficulty, and the CV to interview against (PR-3). */
+export function setupLink(jobId: string, plan?: PlannedSession | null, resumeId?: string | null): string {
+  const q = new URLSearchParams();
+  if (plan) {
+    q.set("type", plan.interview_type);
+    q.set("difficulty", plan.difficulty);
+  }
+  if (resumeId) q.set("resume", resumeId);
+  const query = q.toString();
+  return query ? `/jobs/${jobId}/sessions/new?${query}` : `/jobs/${jobId}/sessions/new`;
 }
 
 /**
@@ -101,7 +107,7 @@ export function GapAnalysisPage() {
         </p>
       )}
       {data?.status === "ready" && data.analysis && (
-        <AnalysisView jobId={jobId} analysis={data.analysis} canPractice={!jobDeleted} />
+        <AnalysisView jobId={jobId} resumeId={data.resume_id} analysis={data.analysis} canPractice={!jobDeleted} />
       )}
       <section className="panel section" aria-labelledby="job-reports-heading">
         <h2 id="job-reports-heading">Reports for this job</h2>
@@ -114,10 +120,13 @@ export function GapAnalysisPage() {
 
 function AnalysisView({
   jobId,
+  resumeId,
   analysis,
   canPractice,
 }: {
   jobId: string;
+  /** PR-3: sessions started here use this analysis's CV. */
+  resumeId: string;
   analysis: GapAnalysis;
   canPractice: boolean;
 }) {
@@ -145,7 +154,7 @@ function AnalysisView({
         </div>
         {first && canPractice && (
           <div className="row">
-            <Link className="btn" to={setupLink(jobId, first)}>
+            <Link className="btn" to={setupLink(jobId, first, resumeId)}>
               Start the recommended session
             </Link>
             <span className="muted">
@@ -250,7 +259,7 @@ function AnalysisView({
                   </p>
                 </div>
                 {canPractice && (
-                  <Link className="btn btn--secondary" to={setupLink(jobId, p)}>
+                  <Link className="btn btn--secondary" to={setupLink(jobId, p, resumeId)}>
                     Set up this session
                   </Link>
                 )}

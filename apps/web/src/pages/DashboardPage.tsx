@@ -5,7 +5,7 @@ import type { JobTargetSummary } from "../api/types";
 import { CompetencySparklines } from "../components/TrendChart";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
 import { difficultyLabel, formatDate, interviewTypeLabel } from "../labels";
-import { setupLink } from "./GapAnalysisPage";
+import { newJobPath } from "../paths";
 
 /** Where an unfinished job setup continues. Display routing only. */
 function nextSetupStep(s: JobTargetSummary): string | null {
@@ -39,12 +39,15 @@ export function DashboardPage() {
 
   return (
     <>
-      <PageHead title="Your interviews">
+      <PageHead title="Interview rehearsals">
         <div className="page-head__row">
-          <p>Each job keeps its own gap analysis and history. Trends count full Realistic sessions only, not mini interviews.</p>
+          <p>
+            Pick the job description you want to rehearse for, then a resume. Each pair keeps its own gap analysis and
+            history. Trends count full Realistic sessions only, not mini interviews.
+          </p>
           {jobs.data && jobs.data.length > 0 && (
-            <Link className="btn btn--secondary" to="/jobs/new">
-              Add another job
+            <Link className="btn btn--secondary" to={newJobPath("rehearsal")}>
+              Add a job description
             </Link>
           )}
         </div>
@@ -54,22 +57,23 @@ export function DashboardPage() {
           <p>Your plan is active. Your minutes are shown at the top of the page.</p>
         </div>
       )}
-      {jobs.isPending && <Loading label="Loading your jobs" />}
+      {jobs.isPending && <Loading label="Loading your job descriptions" />}
       {jobs.isError && <ErrorNotice error={jobs.error} />}
       {jobs.data && jobs.data.length === 0 && (
         <section className="panel" aria-labelledby="empty-heading">
-          <h2 id="empty-heading">Add the job you are interviewing for</h2>
+          <h2 id="empty-heading">Start your first rehearsal</h2>
           <p>
-            Paste the job posting and add your resume. You get a free match score and gap analysis in about five minutes.
+            Add the job description for the job you are interviewing for, then pick or upload your resume. You get a free
+            match score and gap analysis in about five minutes.
           </p>
-          <Link className="btn" to="/jobs/new">
-            Add your first job
+          <Link className="btn" to={newJobPath("rehearsal")}>
+            Add a job description
           </Link>
         </section>
       )}
       {jobs.data && jobs.data.length > 0 && (
         <div className="with-side">
-          <ul className="plain-list job-list" aria-label="Jobs">
+          <ul className="plain-list job-list" aria-label="Job descriptions">
             {jobs.data.map((s) => (
               <JobCard key={s.job_target.id} summary={s} />
             ))}
@@ -120,7 +124,7 @@ function JobCard({ summary }: { summary: JobTargetSummary }) {
             Continue setup
           </Link>
         ) : (
-          <NextSessionButton jobId={job.id} />
+          <RehearseButton jobId={job.id} />
         )}
         {summary.match_score !== null && (
           <Link className="text-link" to={`/jobs/${job.id}/gap`}>
@@ -135,12 +139,13 @@ function JobCard({ summary }: { summary: JobTargetSummary }) {
   );
 }
 
-function NextSessionButton({ jobId }: { jobId: string }) {
+/** PR-3: rehearsing starts with the resume. A pair rehearsed before shows its earlier reports. */
+function RehearseButton({ jobId }: { jobId: string }) {
   const progress = useProgress(jobId);
   const next = progress.data?.next_session ?? null;
   return (
-    <Link className="btn" to={setupLink(jobId, next)}>
-      {next ? `Start next: ${interviewTypeLabel[next.interview_type]}` : "Start a session"}
+    <Link className="btn" to={`/jobs/${jobId}/resume`}>
+      {next ? `Rehearse: ${interviewTypeLabel[next.interview_type]} next` : "Rehearse for this job"}
     </Link>
   );
 }

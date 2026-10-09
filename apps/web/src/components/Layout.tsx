@@ -20,7 +20,7 @@ function Brand({ link }: { link: boolean }) {
     </>
   );
   return link ? (
-    <Link className="brand" to="/" aria-label="Strong Hire, your interviews">
+    <Link className="brand" to="/" aria-label="Strong Hire, interview rehearsals">
       {inner}
     </Link>
   ) : (
@@ -128,6 +128,29 @@ export function AppLayout() {
   }
   if (auth.data.status === "needs_signup") return <Navigate to="/signup" replace />;
 
+  // AC-3: the first sign-in asks for the profile before anything else. The menu waits until it is saved.
+  const welcome = location.pathname === "/welcome";
+  if (auth.data.user && !auth.data.user.profile_complete && !welcome) {
+    return <Navigate to="/welcome" replace state={{ from: location.pathname }} />;
+  }
+  if (welcome) {
+    return (
+      <>
+        <header className="app-header">
+          <div className="app-header__inner">
+            <Brand link={false} />
+            <button type="button" className="header-signout" onClick={() => logout.mutate()}>
+              Sign out
+            </button>
+          </div>
+        </header>
+        <main id="main" className="page">
+          <Outlet />
+        </main>
+      </>
+    );
+  }
+
   // During a live interview the menu is hidden, so nothing pulls the candidate away from the session.
   if (live) {
     return (
@@ -162,11 +185,16 @@ export function AppLayout() {
             <ul>
               <li>
                 <NavLink to="/" end>
-                  Your interviews
+                  Interview rehearsals
                 </NavLink>
               </li>
               <li>
-                <NavLink to="/jobs/new">Add a job</NavLink>
+                <NavLink to="/jobs" end>
+                  Job descriptions
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/resumes">Resumes</NavLink>
               </li>
               <li>
                 <NavLink to="/reports">Reports</NavLink>

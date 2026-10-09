@@ -50,6 +50,7 @@ function session(changes: Partial<SessionRecord> = {}): SessionRecord {
   return {
     id: "s1",
     job_target_id: "j1",
+    resume_id: null,
     config: { interview_type: "behavioral", difficulty: "realistic", mode: "coach", duration_min: 30, level: "senior" },
     channel: "voice",
     status: "created",

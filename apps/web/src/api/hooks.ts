@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
+import { accountApi } from "./account";
 import { authApi } from "./auth";
 import { billingApi } from "./billing";
 import { devApi } from "./dev";
@@ -19,13 +20,16 @@ export const keys = {
   plan: ["billing", "plan"] as const,
   modelUsage: ["dev", "model-usage"] as const,
   jobs: ["jobs"] as const,
+  jobList: (includeArchived: boolean) => ["jobs", "list", includeArchived] as const,
+  profile: ["account", "profile"] as const,
   job: (id: string) => ["jobs", id] as const,
   jobTask: (id: string, taskId: string) => ["jobs", id, "task", taskId] as const,
   jobSessions: (id: string) => ["jobs", id, "sessions"] as const,
   gap: (id: string) => ["jobs", id, "gap"] as const,
   gapReport: (id: string) => ["gap-analyses", id] as const,
   reports: ["reports"] as const,
-  reportList: (filter: ReportFilter) => ["reports", filter.jobTargetId ?? "", filter.type ?? ""] as const,
+  reportList: (filter: ReportFilter) =>
+    ["reports", filter.jobTargetId ?? "", filter.resumeId ?? "", filter.type ?? ""] as const,
   progress: (id: string) => ["jobs", id, "progress"] as const,
   resumes: ["resumes"] as const,
   resume: (id: string) => ["resumes", id] as const,
@@ -58,7 +62,11 @@ export const useModelUsage = (enabled = true) =>
 
 export const usePlan = () => useQuery({ queryKey: keys.plan, queryFn: billingApi.plan });
 
-export const useJobs = () => useQuery({ queryKey: keys.jobs, queryFn: jobTargetsApi.list });
+export const useJobs = (includeArchived = false) =>
+  useQuery({ queryKey: keys.jobList(includeArchived), queryFn: () => jobTargetsApi.list(includeArchived) });
+
+/** AC-3: the profile asked for at the first sign-in. */
+export const useProfile = () => useQuery({ queryKey: keys.profile, queryFn: accountApi.getProfile });
 
 /** A job target. Polls while the posting is still being read, unless `poll` is false. */
 export const useJob = (jobId: string, poll = true) =>

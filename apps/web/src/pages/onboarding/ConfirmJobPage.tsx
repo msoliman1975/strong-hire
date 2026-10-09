@@ -7,7 +7,8 @@ import { jobProblem, jobTargetsApi } from "../../api/inputs";
 import type { JobPosting, JobTargetOut, Level, RoleFamily } from "../../api/types";
 import { ErrorNotice, Loading, ONBOARDING_STEPS, PageHead, Steps } from "../../components/ui";
 import { levelLabel, roleFamilyLabel } from "../../labels";
-import { confirmPath, MIN_POSTING_CHARS } from "./NewJobPage";
+import type { NewJobReturn } from "../../paths";
+import { afterConfirmPath, confirmPath, MIN_POSTING_CHARS, newJobReturn } from "./NewJobPage";
 
 const lines = (value: string) =>
   value
@@ -18,17 +19,18 @@ const lines = (value: string) =>
 export function ConfirmJobPage() {
   const { jobId = "" } = useParams();
   const [params] = useSearchParams();
+  const then = newJobReturn(params.get("then"));
   const task = useJobTask(jobId, params.get("task"));
   const problem = jobProblem(task.data);
   const job = useJob(jobId, problem === null);
 
   return (
     <div className="page--narrow">
-      <Steps current={0} steps={ONBOARDING_STEPS} />
+      {then === "rehearsal" && <Steps current={0} steps={ONBOARDING_STEPS} />}
       {job.isPending && <Loading label="Loading the job" />}
       {job.isError && <ErrorNotice error={job.error} />}
       {task.isError && <ErrorNotice error={task.error} />}
-      {job.data && problem && <PasteInstead job={job.data} message={problem.message} />}
+      {job.data && problem && <PasteInstead job={job.data} message={problem.message} then={then} />}
       {job.data?.status === "pending" && !problem && (
         <>
           <PageHead title="Reading the job posting" />
@@ -36,21 +38,21 @@ export function ConfirmJobPage() {
         </>
       )}
       {job.data?.status === "extracted" && job.data.posting && (
-        <PostingForm key={job.data.id} job={job.data} posting={job.data.posting} />
+        <PostingForm key={job.data.id} job={job.data} posting={job.data.posting} then={then} />
       )}
     </div>
   );
 }
 
 /** IN-1: a link that cannot be read falls back to pasting the text. The link is kept. */
-function PasteInstead({ job, message }: { job: JobTargetOut; message: string }) {
+function PasteInstead({ job, message, then }: { job: JobTargetOut; message: string; then: NewJobReturn }) {
   const navigate = useNavigate();
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
   const create = useMutation({
     mutationFn: () => jobTargetsApi.create({ url: job.source_url, text: text.trim() }),
     onSuccess: (accepted) =>
-      navigate(confirmPath(accepted.job_target.id, accepted.job?.id), { replace: true }),
+      navigate(confirmPath(accepted.job_target.id, accepted.job?.id, then), { replace: true }),
   });
   return (
     <>
@@ -86,7 +88,7 @@ function PasteInstead({ job, message }: { job: JobTargetOut; message: string }) 
 }
 
 /** IN-2: the user confirms or edits what was extracted. */
-function PostingForm({ job, posting }: { job: JobTargetOut; posting: JobPosting }) {
+function PostingForm({ job, posting, then }: { job: JobTargetOut; posting: JobPosting; then: NewJobReturn }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [form, setForm] = useState({
@@ -107,7 +109,7 @@ function PostingForm({ job, posting }: { job: JobTargetOut; posting: JobPosting 
     mutationFn: (p: JobPosting) => jobTargetsApi.update(job.id, { posting: p, stage: job.stage, context: job.context }),
     onSuccess: (saved) => {
       queryClient.setQueryData(keys.job(job.id), saved.job_target);
-      navigate(`/jobs/${job.id}/resume`);
+      navigate(afterConfirmPath(job.id, then));
     },
   });
 

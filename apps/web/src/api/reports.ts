@@ -7,6 +7,8 @@ import type { ReportItem, ReportType } from "./types";
 
 export interface ReportFilter {
   jobTargetId?: string | null;
+  /** PR-3: only the reports made with this CV. */
+  resumeId?: string | null;
   type?: ReportType | null;
 }
 
@@ -17,6 +19,7 @@ export const reportsApi = {
         params: {
           query: {
             job_target_id: filter.jobTargetId ?? undefined,
+            resume_id: filter.resumeId ?? undefined,
             type: filter.type ?? undefined,
           },
         },

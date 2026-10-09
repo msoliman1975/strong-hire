@@ -1,8 +1,8 @@
 /**
  * The main candidate journey in jsdom, against the MSW mock API. Requirement IDs: AC-2
  * (consent off by default), IN-1 (paste fallback), IN-2 (confirm the posting), IN-3 (resume),
- * IN-4 (optional context can be skipped),
- * BL-2 (two free mini interviews, then the paywall), BL-1 (usage meter).
+ * IN-4 (optional context can be skipped), AC-3 (profile at the first sign-in), PR-3 (rehearse a
+ * job and CV pair again), BL-2 (two free mini interviews, then the paywall), BL-1 (usage meter).
  */
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, within } from "@testing-library/react";
@@ -49,13 +49,33 @@ async function startSignup(user: User) {
   expect(await screen.findByRole("heading", { name: "Create your account" })).toBeInTheDocument();
 }
 
+/** AC-3: the first sign-in asks for the profile; the menu appears after it is saved. */
+async function fillProfile(user: User) {
+  expect(await screen.findByRole("heading", { name: "Tell us about yourself" })).toBeInTheDocument();
+  expect(screen.queryByRole("navigation", { name: "Main" })).not.toBeInTheDocument();
+  await user.type(await screen.findByLabelText("Full name"), "Ana Lopez");
+  await user.type(screen.getByLabelText("Years of experience"), "7");
+  await user.selectOptions(screen.getByLabelText("Level you are interviewing for"), "senior");
+  await user.click(screen.getByRole("button", { name: "Save and continue" }));
+  expect(await screen.findByRole("heading", { name: "Interview rehearsals" })).toBeInTheDocument();
+}
+
 async function signUp(user: User) {
   await startSignup(user);
   expect(screen.getByRole("checkbox", { name: CONSENT_LABEL })).not.toBeChecked();
   await user.click(screen.getByLabelText("I am 18 or older."));
   await user.click(screen.getByLabelText("I accept the terms of service and the privacy policy."));
   await user.click(screen.getByRole("button", { name: "Create account" }));
-  expect(await screen.findByRole("heading", { name: "Your interviews" })).toBeInTheDocument();
+  await fillProfile(user);
+}
+
+/** PR-3: rehearse the same job with the saved CV, from the Interview rehearsals page. */
+async function rehearseAgain(user: User) {
+  await user.click(await screen.findByRole("link", { name: /^Rehearse/ }));
+  const saved = await screen.findByRole("region", { name: "Use a resume you saved" });
+  await user.click(within(saved).getByRole("button", { name: "Use this resume" }));
+  expect(await screen.findByRole("heading", { name: /^Rehearse for / })).toBeInTheDocument();
+  await user.click(screen.getByRole("link", { name: "Start a session" }));
 }
 
 /** Setup, live session and debrief of a free mini interview. */
@@ -89,15 +109,15 @@ describe("main journey", () => {
     expect(signupBodies).toEqual([{ age_confirmed: true, terms_accepted: true, training_consent: false }]);
     expect(await screen.findByTestId("usage-meter")).toHaveTextContent("2 free mini interviews left");
 
-    // Job posting, confirm, resume, skip context.
-    await user.click(screen.getByRole("link", { name: "Add a job" }));
+    // Job description, confirm, resume, skip context.
+    await user.click(await screen.findByRole("link", { name: "Add a job description" }));
     await user.type(screen.getByLabelText("Or paste the job posting text"), "Senior engineer, payments. ".repeat(5));
     await user.click(screen.getByRole("button", { name: "Read job posting" }));
     expect(await screen.findByRole("heading", { name: "Check the job details" })).toBeInTheDocument();
     expect(screen.getByLabelText("Company")).toHaveValue("Stripe");
     await user.click(screen.getByRole("button", { name: "Save and continue" }));
 
-    expect(await screen.findByRole("heading", { name: "Add your resume" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Choose a resume" })).toBeInTheDocument();
     await user.type(screen.getByLabelText("Or paste your resume text"), "Backend engineer");
     await user.click(screen.getByRole("button", { name: "Upload resume" }));
     expect(await screen.findByRole("heading", { name: "Roles" })).toBeInTheDocument();
@@ -120,22 +140,22 @@ describe("main journey", () => {
     await runMiniInterview(user);
     expect(screen.getByRole("heading", { name: "Question by question" })).toBeInTheDocument();
 
-    // Dashboard shows the job. A mini is not in the trends.
-    await user.click(within(screen.getByRole("navigation", { name: "Main" })).getByRole("link", { name: "Your interviews" }));
+    // Interview rehearsals shows the job. A mini is not in the trends.
+    await user.click(within(screen.getByRole("navigation", { name: "Main" })).getByRole("link", { name: "Interview rehearsals" }));
     expect(await screen.findByText(/^1 session, last on/)).toBeInTheDocument();
     expect(await screen.findByText(/Trends appear here after your first full Realistic session/)).toBeInTheDocument();
     expect(screen.queryByRole("img", { name: /^Ownership:/ })).not.toBeInTheDocument();
     expect(screen.getByTestId("usage-meter")).toHaveTextContent("1 free mini interview left");
 
-    // The second free mini interview.
-    await user.click(await screen.findByRole("link", { name: /Start next/ }));
+    // The second free mini interview: the same job and CV, with the earlier reports shown.
+    await rehearseAgain(user);
     await runMiniInterview(user);
-    await user.click(within(screen.getByRole("navigation", { name: "Main" })).getByRole("link", { name: "Your interviews" }));
+    await user.click(within(screen.getByRole("navigation", { name: "Main" })).getByRole("link", { name: "Interview rehearsals" }));
     expect(await screen.findByText(/^2 sessions, last on/)).toBeInTheDocument();
     expect(screen.getByTestId("usage-meter")).toHaveTextContent("free mini interviews used");
 
     // BL-2: the API refuses a third free interview, and the app shows the paywall.
-    await user.click(await screen.findByRole("link", { name: /Start next/ }));
+    await rehearseAgain(user);
     await user.click(await screen.findByRole("button", { name: "Start interview" }));
     expect(await screen.findByRole("heading", { name: "Keep practicing" })).toBeInTheDocument();
     expect(screen.getByText("You have used your free mini interviews. Gap analyses stay free.")).toBeInTheDocument();
@@ -150,8 +170,40 @@ describe("main journey", () => {
     await user.click(screen.getByLabelText("I accept the terms of service and the privacy policy."));
     await user.click(screen.getByRole("checkbox", { name: CONSENT_LABEL }));
     await user.click(screen.getByRole("button", { name: "Create account" }));
-    await screen.findByRole("heading", { name: "Your interviews" });
+    await fillProfile(user);
     expect(signupBodies).toEqual([{ age_confirmed: true, terms_accepted: true, training_consent: true }]);
+  });
+
+  it("AC-3: the profile needs a name, the years of experience and a level", async () => {
+    const user = renderApp("/signin");
+    await startSignup(user);
+    await user.click(screen.getByLabelText("I am 18 or older."));
+    await user.click(screen.getByLabelText("I accept the terms of service and the privacy policy."));
+    await user.click(screen.getByRole("button", { name: "Create account" }));
+    expect(await screen.findByRole("heading", { name: "Tell us about yourself" })).toBeInTheDocument();
+    await user.type(await screen.findByLabelText("LinkedIn profile (optional)"), "example.com/ana");
+    await user.click(screen.getByRole("button", { name: "Save and continue" }));
+    expect(screen.getByText("Enter your name.")).toBeInTheDocument();
+    expect(screen.getByText("Enter a whole number from 0 to 50.")).toBeInTheDocument();
+    expect(screen.getByText("Choose the level you are interviewing for.")).toBeInTheDocument();
+    expect(screen.getByText("Use a linkedin.com address, or leave it empty.")).toBeInTheDocument();
+    expect(screen.getByLabelText("Full name")).toHaveAttribute("aria-invalid", "true");
+    expect(screen.queryByLabelText(/card/i)).not.toBeInTheDocument();
+  });
+
+  it("AC-3: the profile is edited under Account, Profile", async () => {
+    const user = renderApp("/signin");
+    await signUp(user);
+    await user.click(within(screen.getByRole("navigation", { name: "Main" })).getByRole("link", { name: "Account" }));
+    const profile = await screen.findByRole("region", { name: "Profile" });
+    expect(await within(profile).findByText("Ana Lopez")).toBeInTheDocument();
+    await user.click(within(profile).getByRole("link", { name: "Edit profile" }));
+    expect(await screen.findByRole("heading", { name: "Your profile" })).toBeInTheDocument();
+    await user.type(await screen.findByLabelText("Current job title (optional)"), "Backend engineer");
+    await user.click(screen.getByRole("button", { name: "Save profile" }));
+    expect(await screen.findByText("Saved. Your profile is up to date.")).toBeInTheDocument();
+    await user.click(screen.getByRole("link", { name: "Back to Account" }));
+    expect(await screen.findByText("Backend engineer")).toBeInTheDocument();
   });
 
   it("sign-up is blocked without the 18+ confirmation", async () => {
@@ -179,7 +231,7 @@ describe("main journey", () => {
     });
     const user = renderApp("/signin");
     await signUp(user);
-    await user.click(screen.getByRole("link", { name: "Add a job" }));
+    await user.click(await screen.findByRole("link", { name: "Add a job description" }));
     const link = "https://www.linkedin.com/jobs/view/1";
     await user.type(screen.getByLabelText("Job posting link"), link);
     await user.click(screen.getByRole("button", { name: "Read job posting" }));
@@ -197,7 +249,7 @@ describe("main journey", () => {
   it("IN-1: when the background job cannot read the page, the user pastes the text", async () => {
     const user = renderApp("/signin");
     await signUp(user);
-    await user.click(screen.getByRole("link", { name: "Add a job" }));
+    await user.click(await screen.findByRole("link", { name: "Add a job description" }));
     await user.type(screen.getByLabelText("Job posting link"), "https://jobs.blocked.example/42");
     await user.click(screen.getByRole("button", { name: "Read job posting" }));
     expect(await screen.findByRole("heading", { name: "Paste the job posting" })).toBeInTheDocument();

@@ -1,10 +1,14 @@
 /**
- * Account self-service (P9: AC-1 export and delete, AC-2 consent). Real API endpoints.
+ * Account self-service (P9: AC-1 export and delete, AC-2 consent; AC-3 profile). Real API endpoints.
  */
 import { apiClient, unwrap } from "./client";
-import type { ExportJob } from "./types";
+import type { ExportJob, Profile, ProfileIn } from "./types";
 
 export const accountApi = {
+  /** AC-3. complete is false until the first save. */
+  getProfile: async () => unwrap(await apiClient.GET("/account/profile")) as Profile,
+  /** AC-3. HTTP 422 when a required field is missing or a value is out of range. */
+  saveProfile: async (body: ProfileIn) => unwrap(await apiClient.PUT("/account/profile", { body })) as Profile,
   /** AC-2. Each change is written to the audit log. */
   setConsent: async (trainingConsent: boolean) =>
     unwrap(await apiClient.PUT("/account/consent", { body: { training_consent: trainingConsent } })),

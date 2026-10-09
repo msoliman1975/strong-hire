@@ -22,8 +22,11 @@ import type {
 } from "./types";
 
 export const jobTargetsApi = {
-  /** The signed-in user's jobs, newest first, with the dashboard numbers. */
-  list: async () => unwrap(await apiClient.GET("/job-targets")) as JobTargetSummary[],
+  /** The signed-in user's jobs, newest first, with the dashboard numbers. Archived ones only on request (LB-2). */
+  list: async (includeArchived = false) =>
+    unwrap(
+      await apiClient.GET("/job-targets", { params: { query: { include_archived: includeArchived } } }),
+    ) as JobTargetSummary[],
   /** IN-1. HTTP 422 with detail.code "paste_required" when the site cannot be read (LinkedIn). */
   create: async (body: JobTargetCreate) =>
     unwrap(await apiClient.POST("/job-targets", { body })) as JobTargetAccepted,
@@ -58,7 +61,21 @@ export const jobTargetsApi = {
         body: { name },
       }),
     ) as JobTargetOut,
-  /** R1: delete a saved job description. Its reports stay. */
+  /** LB-2: archive a job description that has reports. It and its reports stay. */
+  archive: async (jobTargetId: string) =>
+    unwrap(
+      await apiClient.POST("/job-targets/{job_target_id}/archive", {
+        params: { path: { job_target_id: jobTargetId } },
+      }),
+    ) as JobTargetOut,
+  /** LB-2: bring an archived job description back. */
+  restore: async (jobTargetId: string) =>
+    unwrap(
+      await apiClient.POST("/job-targets/{job_target_id}/restore", {
+        params: { path: { job_target_id: jobTargetId } },
+      }),
+    ) as JobTargetOut,
+  /** R1, LB-2: delete a job description that has no reports. HTTP 409 when it has reports. */
   remove: async (jobTargetId: string) => {
     unwrap(
       await apiClient.DELETE("/job-targets/{job_target_id}", {
