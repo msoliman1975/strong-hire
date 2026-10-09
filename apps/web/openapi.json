@@ -1030,6 +1030,7 @@
           "sessions"
         ],
         "summary": "Get Session",
+        "description": "One session. A session whose brief never came (the worker job was lost) is marked failed\nhere, so a page that polls it stops waiting.",
         "operationId": "get_session_sessions__session_id__get",
         "parameters": [
           {
@@ -3804,6 +3805,7 @@
             "type": "string",
             "enum": [
               "not_ended",
+              "not_started",
               "scoring",
               "ready",
               "failed"
@@ -3918,6 +3920,18 @@
           "minutes_billed": {
             "type": "integer",
             "title": "Minutes Billed"
+          },
+          "failure_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Failure Reason",
+            "description": "Plain reason when the session failed before it started."
           }
         },
         "additionalProperties": false,
@@ -6686,6 +6700,18 @@
           "minutes_billed": {
             "type": "integer",
             "title": "Minutes Billed"
+          },
+          "failure_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Failure Reason",
+            "description": "Plain reason when the session failed before it started (status failed, never started), for example when the interview plan could not be built. Such a session is not billed and does not use a free interview. Null otherwise."
           }
         },
         "type": "object",

@@ -52,7 +52,13 @@ class WorkerSettings:
             timeout=600,
             max_tries=inputs_jobs.DELETE_FILE_MAX_TRIES,
         ),
-        *(func(f, keep_result=gap_jobs.RESULT_TTL_S, timeout=600) for f in gap_jobs.FUNCTIONS),
+        func(gap_jobs.run_gap_analysis_job, keep_result=gap_jobs.RESULT_TTL_S, timeout=600),
+        func(
+            gap_jobs.build_interviewer_brief,
+            keep_result=gap_jobs.RESULT_TTL_S,
+            timeout=600,
+            max_tries=gap_jobs.BRIEF_MAX_TRIES,
+        ),
         *(
             func(f, keep_result=scoring_jobs.RESULT_TTL_S, timeout=scoring_jobs.JOB_TIMEOUT_S)
             for f in scoring_jobs.FUNCTIONS

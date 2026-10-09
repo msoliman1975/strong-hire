@@ -38,6 +38,7 @@ from strong_api.billing.entitlements import ensure_can_start_session, record_ses
 from strong_api.inputs.deps import CurrentUser, Db, Me, Queue
 from strong_api.inputs.queue import BUILD_INTERVIEWER_BRIEF, JobQueue
 from strong_api.scoring.router import _brief, _config, _owned_session, _owned_target, start_scoring
+from strong_api.sessions.failure import brief_is_stale, failure_reason
 from strong_api.sessions.schemas import (
     CoachRequest,
     CreateSessionRequest,
@@ -83,6 +84,7 @@ def _record(session: InterviewSession, target: JobTarget | None) -> SessionRecor
         started_at=session.started_at,
         ended_at=session.ended_at,
         minutes_billed=session.minutes_billed or 0,
+        failure_reason=failure_reason(session),
     )
 
 
@@ -141,7 +143,14 @@ async def create_session(body: CreateSessionRequest, db: Db, me: Me, queue: Queu
 
 @router.get("/sessions/{session_id}")
 async def get_session(session_id: uuid.UUID, db: Db, me: Me) -> SessionRecord:
+    """One session. A session whose brief never came (the worker job was lost) is marked failed
+    here, so a page that polls it stops waiting."""
     session = await _owned_session(db, me, session_id)
+    if brief_is_stale(session):
+        log.warning("session %s has waited too long for its brief; marking it failed", session.id)
+        session.status = SessionStatus.FAILED
+        await db.commit()
+        await db.refresh(session)
     return _record(session, await db.get(JobTarget, session.job_target_id))
 
 
@@ -307,6 +316,10 @@ async def text_turn(
     """The candidate's turn. Returns the interviewer's reply; the session ends on its own."""
     session = await _text_session(db, me, session_id)
     runner = _runner(request, session)
+    if runner.busy:
+        # A second turn while the first is still answered (a double submit or a client retry)
+        # would get its own reply, so the interviewer would speak twice for one answer.
+        raise HTTPException(status.HTTP_409_CONFLICT, "The interviewer is still replying.")
     turns = await runner.respond(body.text)
     await _flush_traces(runner)  # the text channel answers after its traces are saved
     if runner.ended:

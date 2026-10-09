@@ -32,6 +32,14 @@ class SessionRecord(BaseModel):
     started_at: datetime | None
     ended_at: datetime | None
     minutes_billed: int
+    failure_reason: str | None = Field(
+        default=None,
+        description=(
+            "Plain reason when the session failed before it started (status failed, never "
+            "started), for example when the interview plan could not be built. Such a session "
+            "is not billed and does not use a free interview. Null otherwise."
+        ),
+    )
 
 
 class TextTurnRequest(BaseModel):

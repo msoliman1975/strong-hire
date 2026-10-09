@@ -672,6 +672,7 @@ export function sessionHandlers(store: MockStore) {
         started_at: null,
         ended_at: null,
         minutes_billed: 0,
+        failure_reason: null,
       };
       db().sessions.push(session);
       store.save();
@@ -799,8 +800,15 @@ export function scoringHandlers(store: MockStore) {
           started_at: s.started_at,
           ended_at: s.ended_at,
           minutes_billed: s.minutes_billed,
+          failure_reason: s.failure_reason ?? null,
         },
-        status: ready ? "ready" : s.status === "failed" ? "failed" : "scoring",
+        status: ready
+          ? "ready"
+          : s.status === "failed"
+            ? s.started_at === null
+              ? "not_started"
+              : "failed"
+            : "scoring",
         scorecard,
         next_session: ready ? sessionPlan[1] : null,
         generic_mode: generic,

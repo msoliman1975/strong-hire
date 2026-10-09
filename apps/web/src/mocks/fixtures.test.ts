@@ -285,6 +285,7 @@ describe("mocks of the real P9 endpoints match openapi.json", () => {
       started_at: "2026-10-07T09:00:00Z",
       ended_at: "2026-10-07T09:30:00Z",
       minutes_billed: 30,
+      failure_reason: null,
     });
     for (const user of await adminApi.users()) expectApiShape("AdminUser", user);
     expectApiShape("AdminSessionList", await adminApi.sessions({ interview_type: "case" }));

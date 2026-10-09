@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import uuid
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -11,11 +13,15 @@ import pytest
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from strong_api.billing.entitlements import count_free_interviews_used
 from strong_api.sessions import router as sessions_router  # the module
+from strong_api.sessions.failure import BRIEF_STALE_AFTER
 from strong_core.config import get_settings
 from strong_core.db.models import InterviewSession, JobTarget
 from strong_core.db.models import Turn as TurnRow
 from strong_core.schemas import Phase, SessionStatus, Speaker
+from strong_worker.gap import jobs as gap_jobs
+from strong_worker.gap.brief import BriefError
 from strong_worker.inputs.testing import set_extractor_output
 
 from .conftest import sign_in
@@ -333,3 +339,91 @@ async def test_internal_end_needs_the_shared_token(
         "/internal/sessions/{session_id}/end"
         not in (await client.get("/openapi.json")).json()["paths"]
     )
+
+
+async def test_brief_failure_fails_the_session_with_a_plain_reason(
+    client: httpx.AsyncClient,
+    fake_fixtures: Path,
+    queue: Any,
+    monkeypatch: pytest.MonkeyPatch,
+    sessionmaker: async_sessionmaker[AsyncSession],
+) -> None:
+    """The brief job fails for good: the session is failed before it started, with a reason,
+    the debrief says it did not start, and no free interview or minutes are used (BL-2)."""
+
+    async def fails(*_: object, **__: object) -> Any:
+        raise BriefError("Brief failed after 2 attempts: credit balance too low")
+
+    monkeypatch.setattr(gap_jobs, "build_brief", fails)
+    queue.ctx["job_try"] = gap_jobs.BRIEF_MAX_TRIES  # the last try
+    job = await ready_job(client, fake_fixtures)
+    record = (await create(client, job["id"])).json()
+    assert record["status"] == "failed" and record["brief_ready"] is False
+    assert record["started_at"] is None and record["minutes_billed"] == 0
+    assert "could not prepare your interviewer" in record["failure_reason"]
+    fetched = (await client.get(f"/sessions/{record['id']}")).json()
+    assert fetched["failure_reason"] == record["failure_reason"]
+
+    debrief = (await client.get(f"/sessions/{record['id']}/debrief")).json()
+    assert debrief["status"] == "not_started"
+    assert debrief["session"]["failure_reason"] == record["failure_reason"]
+    scoring = await client.post(f"/sessions/{record['id']}/scoring")
+    assert scoring.status_code == 409
+    assert (await client.post(f"/sessions/{record['id']}/voice/join")).status_code == 409
+
+    async with sessionmaker() as db:
+        row = await db.get(InterviewSession, uuid.UUID(record["id"]))
+        assert row is not None
+        assert await count_free_interviews_used(db, row.org_id) == 0
+    del queue.ctx["job_try"]
+    monkeypatch.undo()
+    assert (await create(client, job["id"])).status_code == 201  # "Try again" works
+
+
+async def test_ended_before_start_has_its_own_reason(
+    client: httpx.AsyncClient, fake_fixtures: Path
+) -> None:
+    job = await ready_job(client, fake_fixtures)
+    sid = (await create(client, job["id"])).json()["id"]
+    ended = (await client.post(f"/sessions/{sid}/end")).json()
+    assert ended["failure_reason"].startswith("This interview was ended before it started")
+    debrief = (await client.get(f"/sessions/{sid}/debrief")).json()
+    assert debrief["status"] == "not_started"
+
+
+async def test_a_lost_brief_job_fails_the_session_after_a_while(
+    client: httpx.AsyncClient,
+    fake_fixtures: Path,
+    queue: Any,
+    sessionmaker: async_sessionmaker[AsyncSession],
+) -> None:
+    """If the worker job is lost, the page polling GET /sessions/{id} still stops waiting."""
+    job = await ready_job(client, fake_fixtures)
+    queue.run_jobs = False  # the brief job never runs
+    sid = (await create(client, job["id"])).json()["id"]
+    waiting = (await client.get(f"/sessions/{sid}")).json()
+    assert waiting["status"] == "created" and waiting["failure_reason"] is None
+    async with sessionmaker() as db:
+        row = await db.get(InterviewSession, uuid.UUID(sid))
+        assert row is not None
+        row.created_at = datetime.now(UTC) - BRIEF_STALE_AFTER * 2
+        await db.commit()
+    failed = (await client.get(f"/sessions/{sid}")).json()
+    assert failed["status"] == "failed"
+    assert "could not prepare your interviewer" in failed["failure_reason"]
+
+
+async def test_text_turn_while_the_interviewer_is_replying_is_refused(
+    client: httpx.AsyncClient, fake_fixtures: Path, app: Any
+) -> None:
+    """Bug 4: a second turn for the same answer must not get a second reply."""
+    job = await ready_job(client, fake_fixtures)
+    sid = (await create(client, job["id"], channel="text")).json()["id"]
+    await client.post(f"/sessions/{sid}/text/open")
+    runner = app.state.text_runners[uuid.UUID(sid)]
+    async with runner._lock:  # a reply is being prepared
+        busy = await client.post(f"/sessions/{sid}/text/turn", json={"text": "Hello"})
+    assert busy.status_code == 409
+    assert busy.json()["detail"] == "The interviewer is still replying."
+    ok = await client.post(f"/sessions/{sid}/text/turn", json={"text": "Hello"})
+    assert ok.status_code == 200

@@ -38,6 +38,17 @@ export function DebriefPage() {
           </Link>
         </section>
       )}
+      {status === "not_started" && (
+        <section className="section panel" data-testid="not-started">
+          <p>
+            {session.failure_reason ??
+              "This interview did not start, so there is nothing to score. Nothing was counted or billed."}
+          </p>
+          <Link className="btn" to={setupLink(session.job_target_id)}>
+            Set up another session
+          </Link>
+        </section>
+      )}
       {status === "scoring" && <Loading label="Scoring your interview. The debrief is usually ready within a minute." />}
       {status === "failed" && <ErrorNotice error="Scoring failed. Your minutes for this session are refunded." />}
       {status === "ready" && scorecard && (
