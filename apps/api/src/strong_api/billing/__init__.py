@@ -1,7 +1,8 @@
 """Billing (P9): one Stripe plan with a monthly minute cap (BL-1) and the free tier (BL-2).
 
 `install_billing(app)` adds the /billing routes. Other workstreams use:
-- `ensure_can_start_session(db, org_id)` in POST /sessions (HTTP 402 when blocked),
+- `ensure_can_start_session(db, org_id, duration_min)` in POST /sessions (HTTP 402 when blocked;
+  free accounts may start 10-minute mini interviews only),
 - `record_session_minutes(db, session)` when a session ends.
 
 Gap analyses are free; their fair-use rate limit lives in strong_api.gap (P6, GA-4).

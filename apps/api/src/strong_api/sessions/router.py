@@ -1,6 +1,7 @@
 """Interview sessions (P7).
 
-    POST /sessions                         create a session (402 when the plan does not allow it)
+    POST /sessions                         create a session (402 when the plan does not allow it;
+                                           free accounts may start 10-minute minis only)
     GET  /sessions/{id}                    one session
     GET  /job-targets/{id}/sessions        a job's sessions, newest first
     POST /sessions/{id}/end                end it: bill minutes, start scoring
@@ -98,8 +99,8 @@ async def create_session(body: CreateSessionRequest, db: Db, me: Me, queue: Queu
         raise HTTPException(status.HTTP_409_CONFLICT, "The job posting is still being read.")
     if body.channel == SessionChannel.TEXT and not _text_allowed():
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Text sessions are a dev feature.")
-    await ensure_can_start_session(db, me.org_id)
     config = body.config
+    await ensure_can_start_session(db, me.org_id, config.duration_min)
     target.level = config.level  # the level confirmed at setup sets the bar (IV-6)
     session = InterviewSession(
         org_id=me.org_id,

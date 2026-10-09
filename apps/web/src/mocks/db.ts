@@ -55,9 +55,10 @@ export const FREE_USAGE: Usage = {
   period_start: null,
   period_end: null,
   cancel_at_period_end: false,
-  free_interviews_total: 1,
-  free_interviews_left: 1,
+  free_interviews_total: 2,
+  free_interviews_left: 2,
   can_start_session: true,
+  full_interviews_allowed: false,
   block_code: null,
   has_billing_account: false,
 };

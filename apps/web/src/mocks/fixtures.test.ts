@@ -76,6 +76,15 @@ describe("mock payloads match the packages/core schemas", () => {
     const { resume: resumeRecord } = await resumesApi.upload(formWithText("Python engineer"));
     await resumesApi.get(resumeRecord.id);
     await gapApi.start(job.id, { resume_id: resumeRecord.id });
+    // A free account may start mini interviews only, and minis are not in the trends.
+    await expect(
+      sessionsApi.create({
+        job_target_id: job.id,
+        config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min: 30, level: "senior" },
+        channel: "voice",
+      }),
+    ).rejects.toMatchObject({ status: 402, code: "full_interview_requires_plan" });
+    await billingApi.checkout(); // the mock turns the plan on at once
     const session = await sessionsApi.create({
       job_target_id: job.id,
       config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min: 30, level: "senior" },
@@ -185,12 +194,14 @@ describe("mocks of the real P9 endpoints match openapi.json", () => {
     const free = await billingApi.usage();
     expectApiShape("UsageOut", free);
     expect(free.plan).toBe("free");
+    expect(free.full_interviews_allowed).toBe(false);
     await expect(billingApi.portal("manage")).rejects.toMatchObject({ status: 404 });
 
     expectApiShape("RedirectOut", await billingApi.checkout());
     const paid = await billingApi.usage();
     expectApiShape("UsageOut", paid);
     expect(paid.plan).toBe("paid");
+    expect(paid.full_interviews_allowed).toBe(true);
     await expect(billingApi.checkout()).rejects.toMatchObject({ status: 409, code: "already_subscribed" });
 
     expectApiShape("ExitSurveyOut", await billingApi.exitSurvey({ reason: "got_the_job", got_job: "yes" }));

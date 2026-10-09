@@ -143,6 +143,7 @@ async def add_session(
     started: bool = True,
     status: SessionStatus = SessionStatus.COMPLETED,
     minutes: int = 30,
+    duration: int = 45,
 ) -> InterviewSession:
     job = JobTarget(org_id=org_id, user_id=user_id, raw_text="Engineer")
     db.add(job)
@@ -155,7 +156,7 @@ async def add_session(
         type=InterviewType.BEHAVIORAL,
         difficulty=Difficulty.REALISTIC,
         mode=Mode.REALISTIC,
-        duration_min=45,
+        duration_min=duration,
         status=status,
         started_at=start,
         ended_at=now if started else None,

@@ -372,6 +372,7 @@ async def _make_session(
     transcript: str = "beh-01",
     mode: Mode = Mode.REALISTIC,
     company: bool = False,
+    duration_min: int = 30,
 ) -> InterviewSession:
     brief, turns = load_scripted(transcript)
     brief = brief.model_copy(update={"session": brief.session.model_copy(update={"mode": mode})})
@@ -403,7 +404,7 @@ async def _make_session(
             type=brief.session.interview_type,
             difficulty=brief.session.difficulty,
             mode=mode,
-            duration_min=30,
+            duration_min=duration_min,
             profile_version=brief.profile_version,
             brief_json=brief.model_dump(mode="json"),
             status=SessionStatus.SCORING,
@@ -468,6 +469,24 @@ async def test_pr1_coach_sessions_write_no_snapshots(
     async with sessionmaker() as db:
         assert await db.scalar(select(ScorecardRow).where(ScorecardRow.session_id == session.id))
         assert (await db.scalars(select(SnapshotRow))).all() == []
+
+
+async def test_pr1_mini_sessions_get_a_debrief_but_no_snapshots(
+    sessionmaker: async_sessionmaker[AsyncSession], account: tuple[uuid.UUID, uuid.UUID]
+) -> None:
+    """A 10-minute Realistic session is scored, but stays out of the progress trends."""
+    org_id, user_id = account
+    session = await _make_session(sessionmaker, org_id, user_id, duration_min=10)
+    brief, turns = load_scripted("beh-01")
+    backend = ScriptedBackend([scorecard_reply(brief, turns, 3), RATIONALE])
+    result = await jobs.score_session(_job_ctx(sessionmaker, backend), str(session.id), str(org_id))
+    assert result["outcome"] == "scored"
+    assert result["snapshots"] == 0
+    async with sessionmaker() as db:
+        assert await db.scalar(select(ScorecardRow).where(ScorecardRow.session_id == session.id))
+        assert (await db.scalars(select(SnapshotRow))).all() == []
+        stored = await db.get(InterviewSession, session.id)
+        assert stored is not None and stored.status == SessionStatus.COMPLETED
 
 
 async def test_company_session_uses_its_profile_version_and_stores_value_scores(

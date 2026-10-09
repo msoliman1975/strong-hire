@@ -59,12 +59,15 @@ def test_competency_score_needs_a_quote() -> None:
         CompetencyScore(competency="ownership", score=3, justification="x", quotes=[])
 
 
-def test_session_duration_is_30_or_45() -> None:
-    """IV-7."""
+def test_session_duration_is_10_30_or_45() -> None:
+    """IV-7. 10 minutes is the mini interview."""
     base = {"interview_type": "case", "difficulty": "tough", "mode": "coach", "level": "mid"}
     SessionConfig.model_validate({**base, "duration_min": 45})
-    with pytest.raises(ValidationError):
-        SessionConfig.model_validate({**base, "duration_min": 60})
+    assert SessionConfig.model_validate({**base, "duration_min": 10}).is_mini
+    assert not SessionConfig.model_validate({**base, "duration_min": 30}).is_mini
+    for bad in (60, 15):
+        with pytest.raises(ValidationError):
+            SessionConfig.model_validate({**base, "duration_min": bad})
 
 
 def test_contracts_reject_unknown_fields() -> None:
@@ -110,6 +113,42 @@ def test_brief_probe_cap_is_3() -> None:
     """IV-3."""
     with pytest.raises(ValidationError):
         InterviewerBrief.model_validate(_brief() | {"max_probes_per_question": 4})
+
+
+def _mini_brief(**extra: object) -> dict[str, Any]:
+    data: dict[str, Any] = _brief()
+    session = {**data["session"], "duration_min": 10}
+    return data | {
+        "session": session,
+        "questions": data["questions"][:3],
+        "target_competencies": data["target_competencies"][:2],
+        "max_probes_per_question": 1,
+        "time_plan": [],
+        **extra,
+    }
+
+
+def test_mini_brief_has_3_questions_and_at_most_1_probe() -> None:
+    """IV-3, IV-4 in a mini: 3 questions and 2 competencies are enough; 1 probe; no curveball."""
+    data = _mini_brief()
+    for q in data["questions"]:
+        q["competencies"] = data["target_competencies"][:1]
+    InterviewerBrief.model_validate(data)
+    with pytest.raises(ValidationError, match="probe"):
+        InterviewerBrief.model_validate(data | {"max_probes_per_question": 2})
+    tough = {**data["session"], "difficulty": "tough"}
+    with pytest.raises(ValidationError, match="curveball"):
+        InterviewerBrief.model_validate(data | {"session": tough, "curveball": "Why not?"})
+
+
+def test_full_brief_still_needs_6_questions_and_4_competencies() -> None:
+    data = _brief()
+    questions: list[Any] = data["questions"]  # type: ignore[assignment]
+    with pytest.raises(ValidationError, match="6 questions"):
+        InterviewerBrief.model_validate(data | {"questions": questions[:3]})
+    comps: list[Any] = data["target_competencies"]  # type: ignore[assignment]
+    with pytest.raises(ValidationError, match="4 target competencies"):
+        InterviewerBrief.model_validate(data | {"target_competencies": comps[:2]})
 
 
 def test_example_profile_is_valid() -> None:

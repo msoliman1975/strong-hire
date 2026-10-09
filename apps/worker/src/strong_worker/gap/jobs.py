@@ -38,6 +38,7 @@ from strong_core.schemas import (
     Level,
     Resume,
     SessionConfig,
+    session_duration,
 )
 from strong_worker.gap.analysis import GapAnalysisError, run_gap_analysis
 from strong_worker.gap.brief import BriefError, build_brief
@@ -213,7 +214,7 @@ async def build_interviewer_brief(
             interview_type=session.type,
             difficulty=session.difficulty,
             mode=session.mode,
-            duration_min=45 if session.duration_min == 45 else 30,
+            duration_min=session_duration(session.duration_min),
             level=target.level or posting.level or Level.MID,
         )
         try:

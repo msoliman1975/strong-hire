@@ -79,7 +79,7 @@ function PlanSection({ usage }: { usage: Usage }) {
         </dl>
       ) : (
         <p>
-          Free plan. {usage.free_interviews_left} of {usage.free_interviews_total} free{" "}
+          Free plan. {usage.free_interviews_left} of {usage.free_interviews_total} free mini{" "}
           {usage.free_interviews_total === 1 ? "interview" : "interviews"} left. Gap analyses are free.{" "}
           <Link to="/upgrade">See the monthly plan</Link>
         </p>

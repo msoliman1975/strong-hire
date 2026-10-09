@@ -15,7 +15,7 @@ const CONFIG = {
   interview_type: "behavioral",
   difficulty: "realistic",
   mode: "coach",
-  duration_min: 30,
+  duration_min: 10,
   level: "senior",
 };
 

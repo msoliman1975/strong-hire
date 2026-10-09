@@ -8,6 +8,12 @@ controller caps probes per question by difficulty, so a weak model cannot loop.
 Time: each phase gets minutes from the brief's time_plan (or a default plan). CORE stops
 starting new questions when less than MIN_QUESTION_MS is left; lower-priority questions are
 dropped. Coach mode can pause the clock.
+
+A phase with 0 planned minutes is skipped: no SMALL_TALK turn (the greeting may hold one short
+small-talk line) and no CANDIDATE_QUESTIONS turn (CORE goes straight to WRAP_UP). The agenda is
+always said, in one short turn. The 10-minute mini interview uses this: minute 1 is the greeting
+and the agenda, 8 minutes of CORE, 1 minute of WRAP_UP. A mini also has no curveball and at
+most MINI_MAX_PROBES follow-ups per question, whatever the difficulty.
 """
 
 from __future__ import annotations
@@ -19,6 +25,7 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 
 from strong_core.schemas import (
+    MINI_MAX_PROBES,
     BriefQuestion,
     Difficulty,
     InterviewerBrief,
@@ -35,6 +42,14 @@ PROBE_LIMIT: dict[Difficulty, int] = {
 }
 # Minutes per phase when the brief has no time_plan (IV-7). Each plan adds up to the duration.
 DEFAULT_PLAN: dict[int, dict[Phase, int]] = {
+    10: {
+        Phase.INTRO: 1,  # greeting and the agenda
+        Phase.SMALL_TALK: 0,
+        Phase.AGENDA: 0,
+        Phase.CORE: 8,
+        Phase.CANDIDATE_QUESTIONS: 0,
+        Phase.WRAP_UP: 1,
+    },
     30: {
         Phase.INTRO: 1,
         Phase.SMALL_TALK: 2,
@@ -137,6 +152,7 @@ class SessionController:
         self._clock = _Clock(self.clock)
         self._queue = sorted(self.brief.questions, key=lambda q: q.priority)
         minutes = self._plan()
+        self._minutes = minutes
         self._deadline: dict[Phase, int] = {}
         total = 0
         for phase in ORDER:
@@ -189,8 +205,19 @@ class SessionController:
         return self._deadline[phase]
 
     @property
+    def mini(self) -> bool:
+        """A 10-minute mini interview."""
+        return self.brief.session.is_mini
+
+    def _skipped(self, phase: Phase) -> bool:
+        """True when the plan gives the phase 0 minutes, so it gets no turn of its own.
+        A phase the plan does not list keeps its turn, as before."""
+        return self._minutes.get(phase) == 0
+
+    @property
     def probe_limit(self) -> int:
-        return min(self.brief.max_probes_per_question, PROBE_LIMIT[self.brief.session.difficulty])
+        limit = min(self.brief.max_probes_per_question, PROBE_LIMIT[self.brief.session.difficulty])
+        return min(limit, MINI_MAX_PROBES) if self.mini else limit
 
     @property
     def needs_decision(self) -> bool:
@@ -227,10 +254,10 @@ class SessionController:
             return []
         if self.elapsed_ms >= self.total_ms:
             return [self._wrap_up()]
-        if self.phase == Phase.INTRO:
+        if self.phase == Phase.INTRO and not self._skipped(Phase.SMALL_TALK):
             self.phase = Phase.SMALL_TALK
             return [Move(MoveKind.SMALL_TALK, Phase.SMALL_TALK)]
-        if self.phase == Phase.SMALL_TALK:
+        if self.phase in (Phase.INTRO, Phase.SMALL_TALK):
             self.phase = Phase.AGENDA
             return [Move(MoveKind.AGENDA, Phase.AGENDA, expects_answer=False), *self._next_core()]
         if self.phase == Phase.CORE:
@@ -266,7 +293,12 @@ class SessionController:
         self.probes_used = 0
         self.hints_used = 0
         enough_time = self._core_left_ms() >= MIN_QUESTION_MS
-        curveball_due = self.brief.curveball and not self.curveball_used and len(self.asked) == 1
+        curveball_due = (
+            self.brief.curveball
+            and not self.mini
+            and not self.curveball_used
+            and len(self.asked) == 1
+        )
         if curveball_due and enough_time and self.brief.curveball:
             self.curveball_used = True
             self.question = BriefQuestion(
@@ -284,6 +316,8 @@ class SessionController:
         self.dropped.extend(q.id for q in self._queue)
         self._queue = []
         self.question = None
+        if self._skipped(Phase.CANDIDATE_QUESTIONS):
+            return [self._wrap_up()]
         self.phase = Phase.CANDIDATE_QUESTIONS
         return [Move(MoveKind.INVITE_QUESTIONS, Phase.CANDIDATE_QUESTIONS)]
 

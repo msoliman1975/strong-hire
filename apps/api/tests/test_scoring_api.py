@@ -159,10 +159,16 @@ async def make_session(
     mode: Mode = Mode.REALISTIC,
     status: SessionStatus = SessionStatus.SCORING,
     ended_minutes_ago: float = 0,
+    duration_min: int = 30,
 ) -> uuid.UUID:
     org_id, _ = await dev_account(maker)
     brief, turns = load_scripted(transcript)
-    brief = brief.model_copy(update={"session": brief.session.model_copy(update={"mode": mode})})
+    session_config = brief.session.model_copy(update={"mode": mode, "duration_min": duration_min})
+    brief = brief.model_copy(update={"session": session_config})
+    if duration_min == 10:  # a mini brief: no curveball, 1 probe, the 10-minute plan
+        brief = brief.model_copy(
+            update={"curveball": None, "max_probes_per_question": 1, "time_plan": []}
+        )
     async with maker() as db:
         target = await db.get(JobTarget, target_id)
         assert target is not None
@@ -173,7 +179,7 @@ async def make_session(
             type=brief.session.interview_type,
             difficulty=brief.session.difficulty,
             mode=mode,
-            duration_min=30,
+            duration_min=duration_min,
             profile_version=1 if target.company_id else None,
             brief_json=brief.model_dump(mode="json"),
             status=status,
@@ -301,6 +307,71 @@ async def test_pr1_progress_counts_realistic_sessions_only(
     nxt = progress["next_session"]
     assert nxt["interview_type"] == "technical_qa"
     assert "not done it yet" in nxt["reason"]
+
+
+async def test_pr1_mini_sessions_get_a_debrief_but_stay_out_of_progress(
+    sclient: httpx.AsyncClient, sessionmaker: async_sessionmaker[AsyncSession], squeue: ScoringQueue
+) -> None:
+    """A 10-minute mini gets its own debrief and advice, but no snapshots and no trend points."""
+    target = await make_target(sessionmaker, gap=True)
+    first = await make_session(sessionmaker, target, ended_minutes_ago=60)
+    mini = await make_session(sessionmaker, target, ended_minutes_ago=30, duration_min=10)
+    for sid, score in ((first, 3), (mini, 1)):
+        squeue.replies = replies(scores=score)
+        assert (await sclient.post(f"/sessions/{sid}/scoring")).status_code == 202
+
+    debrief = (await sclient.get(f"/sessions/{mini}/debrief")).json()
+    assert debrief["status"] == "ready"
+    assert debrief["session"]["config"]["duration_min"] == 10
+    assert debrief["scorecard"]["per_question"]
+    # The advice uses the mini's own low scores, as it has no snapshots.
+    assert "under the bar" in debrief["next_session"]["reason"]
+
+    progress = (await sclient.get(f"/job-targets/{target}/progress")).json()
+    assert {s["session_id"] for s in progress["snapshots"]} == {str(first)}
+    assert all(t["sessions"] == 1 and t["latest"] == 3.0 for t in progress["trends"])
+    # The mini does not count as practice of the planned behavioral session either.
+    assert progress["next_session"]["interview_type"] in {"behavioral", "technical_qa"}
+
+
+async def test_pr1_old_mini_snapshots_are_ignored(
+    sclient: httpx.AsyncClient, sessionmaker: async_sessionmaker[AsyncSession], squeue: ScoringQueue
+) -> None:
+    """Snapshot rows of a mini (for example written before this rule) are not in the trends."""
+    from strong_core.db.models import ProgressSnapshot as SnapshotRow
+
+    target = await make_target(sessionmaker)
+    mini = await make_session(sessionmaker, target, duration_min=10)
+    org_id, _ = await dev_account(sessionmaker)
+    async with sessionmaker() as db:
+        db.add(
+            SnapshotRow(
+                org_id=org_id,
+                job_target_id=target,
+                session_id=mini,
+                competency=Competency.OWNERSHIP,
+                score=2,
+                at=datetime.now(UTC),
+            )
+        )
+        await db.commit()
+    progress = (await sclient.get(f"/job-targets/{target}/progress")).json()
+    assert progress["snapshots"] == [] and progress["trends"] == []
+
+
+async def test_session_config_keeps_10_minutes_without_a_brief(
+    sclient: httpx.AsyncClient, sessionmaker: async_sessionmaker[AsyncSession]
+) -> None:
+    """Before, any length other than 45 was shown as 30."""
+    target = await make_target(sessionmaker)
+    sid = await make_session(sessionmaker, target, duration_min=10)
+    async with sessionmaker() as db:
+        row = await db.get(InterviewSession, sid)
+        assert row is not None
+        row.brief_json = None
+        await db.commit()
+    debrief = (await sclient.get(f"/sessions/{sid}/debrief")).json()
+    assert debrief["session"]["config"]["duration_min"] == 10
 
 
 def _snap(c: Competency, score: float, day: int) -> ProgressSnapshot:

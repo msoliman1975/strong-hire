@@ -62,6 +62,8 @@ from strong_core.schemas.scoring import (
     ValueScore,
 )
 from strong_core.schemas.session import (
+    MINI_DURATION_MIN,
+    MINI_MAX_PROBES,
     BriefDraft,
     BriefQuestion,
     InterviewerBrief,
@@ -70,6 +72,7 @@ from strong_core.schemas.session import (
     ProbeDecision,
     SessionConfig,
     Turn,
+    session_duration,
 )
 
 # Models exported to schemas/<name>.schema.json by `python -m strong_core.export_schemas`.
@@ -91,6 +94,8 @@ EXPORTED_SCHEMAS: dict[str, type[BaseModel]] = {
 __all__ = [
     "COMPETENCIES_BY_TYPE",
     "EXPORTED_SCHEMAS",
+    "MINI_DURATION_MIN",
+    "MINI_MAX_PROBES",
     "AuthProvider",
     "BriefDraft",
     "BriefQuestion",
@@ -152,4 +157,5 @@ __all__ = [
     "UsageComponent",
     "ValueScore",
     "ValuesFramework",
+    "session_duration",
 ]
