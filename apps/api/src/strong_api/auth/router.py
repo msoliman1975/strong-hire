@@ -50,6 +50,10 @@ class AuthUser(BaseModel):
     is_admin: bool = Field(
         default=False, description="True for ADMIN_EMAILS users: the web app shows Admin."
     )
+    full_name: str | None = Field(default=None, description="AC-3 profile name.")
+    profile_complete: bool = Field(
+        default=False, description="AC-3: false until the user saves the first sign-in profile."
+    )
 
     @classmethod
     def of(cls, user: User, *, is_admin: bool = False) -> AuthUser:
@@ -61,6 +65,8 @@ class AuthUser(BaseModel):
             training_consent=user.training_consent,
             created_at=user.created_at,
             is_admin=is_admin,
+            full_name=user.full_name,
+            profile_complete=user.profile_completed_at is not None,
         )
 
 

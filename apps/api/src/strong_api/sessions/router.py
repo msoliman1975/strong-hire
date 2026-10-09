@@ -60,11 +60,19 @@ from strong_api.sessions.settings import (
     get_text_session_settings,
     get_voice_session_settings,
 )
+from strong_core.db.models import GapAnalysis as GapRow
 from strong_core.db.models import InterviewSession, JobTarget, UsageEvent
 from strong_core.db.models import Turn as TurnRow
 from strong_core.db.turns import next_turn_seq
 from strong_core.gateway import Role, get_gateway
-from strong_core.schemas import JobPosting, SessionChannel, SessionStatus, Turn, UsageComponent
+from strong_core.schemas import (
+    GapStatus,
+    JobPosting,
+    SessionChannel,
+    SessionStatus,
+    Turn,
+    UsageComponent,
+)
 from strong_core.sim import gateway_for_org
 from strong_interview import (
     CoachNotAllowedError,
@@ -90,6 +98,7 @@ def _record(session: InterviewSession, target: JobTarget | None) -> SessionRecor
     return SessionRecord(
         id=session.id,
         job_target_id=session.job_target_id,
+        resume_id=session.resume_id,
         config=_config(session, target),
         channel=session.channel,
         status=session.status,
@@ -118,6 +127,26 @@ def _runners(request: Request) -> dict[uuid.UUID, InterviewRunner]:
     return runners
 
 
+async def _session_resume(
+    db: AsyncSession, me: Me, job_target_id: uuid.UUID, resume_id: uuid.UUID | None
+) -> uuid.UUID | None:
+    """PR-3: the CV for a new session. A chosen CV needs a ready gap analysis with the job;
+    without a choice, the CV of the job's latest ready gap analysis (None when there is none)."""
+    query = select(GapRow).where(
+        GapRow.job_target_id == job_target_id,
+        GapRow.org_id == me.org_id,
+        GapRow.status == GapStatus.READY,
+    )
+    if resume_id is not None:
+        query = query.where(GapRow.resume_id == resume_id)
+    gap = await db.scalar(query.order_by(GapRow.created_at.desc(), GapRow.id.desc()).limit(1))
+    if gap is None and resume_id is not None:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "Run the gap analysis for this CV and job first."
+        )
+    return gap.resume_id if gap is not None else None
+
+
 @router.post("/sessions", status_code=status.HTTP_201_CREATED)
 async def create_session(body: CreateSessionRequest, db: Db, me: Me, queue: Queue) -> SessionRecord:
     """Create a session and queue its interviewer brief (IV-2, IV-4, IV-6, IV-8)."""
@@ -131,10 +160,12 @@ async def create_session(body: CreateSessionRequest, db: Db, me: Me, queue: Queu
     config = body.config
     if not await is_sim_user(db, me.user_id):  # the AI candidate has no plan (P13)
         await ensure_can_start_session(db, me.org_id, config.duration_min)
+    resume_id = await _session_resume(db, me, target.id, body.resume_id)
     target.level = config.level  # the level confirmed at setup sets the bar (IV-6)
     session = InterviewSession(
         org_id=me.org_id,
         job_target_id=target.id,
+        resume_id=resume_id,
         type=config.interview_type,
         difficulty=config.difficulty,
         mode=config.mode,

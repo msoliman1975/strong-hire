@@ -3,7 +3,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 
 import { ApiError } from "../api/client";
-import { keys, useJob, useUsage } from "../api/hooks";
+import { keys, useJob, useProfile, useUsage } from "../api/hooks";
 import { sessionsApi } from "../api/sessions";
 import type { Difficulty, InterviewType, Level, Mode, SessionConfig } from "../api/types";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
@@ -78,6 +78,9 @@ export function SessionSetupPage() {
   const [params] = useSearchParams();
   const job = useJob(jobId);
   const usage = useUsage();
+  const profile = useProfile();
+  // PR-3: the CV chosen for this rehearsal. Without one, the API uses the job's latest gap analysis.
+  const resumeId = params.get("resume");
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -88,7 +91,8 @@ export function SessionSetupPage() {
   const [level, setLevel] = useState<Level | "">("");
 
   const start = useMutation({
-    mutationFn: (config: SessionConfig) => sessionsApi.create({ job_target_id: jobId, config, channel: "voice" }),
+    mutationFn: (config: SessionConfig) =>
+      sessionsApi.create({ job_target_id: jobId, resume_id: resumeId, config, channel: "voice" }),
     onSuccess: (session) => {
       void queryClient.invalidateQueries({ queryKey: keys.usage });
       navigate(`/sessions/${session.id}/live`);
@@ -104,7 +108,8 @@ export function SessionSetupPage() {
   if (job.isPending) return <Loading />;
   if (job.isError) return <ErrorNotice error={job.error} />;
 
-  const chosenLevel: Level | "" = level || job.data.level || "";
+  // AC-3: the profile's target level is the default when the posting gives no level.
+  const chosenLevel: Level | "" = level || job.data.level || profile.data?.target_level || "";
   const posting = job.data.posting;
   // Free accounts get mini interviews only (BL-2). Until the usage is known, assume the free plan.
   const fullAllowed = usage.data?.full_interviews_allowed ?? false;

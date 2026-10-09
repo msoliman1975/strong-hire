@@ -180,13 +180,16 @@ async def _fail(db: AsyncSession, row: GapRow, reason: str) -> dict[str, Any]:
     return {"outcome": "failed", "reason": reason}
 
 
-async def latest_ready_gap(db: AsyncSession, job_target_id: uuid.UUID) -> GapRow | None:
-    return await db.scalar(
-        select(GapRow)
-        .where(GapRow.job_target_id == job_target_id, GapRow.status == GapStatus.READY)
-        .order_by(GapRow.created_at.desc(), GapRow.id.desc())
-        .limit(1)
+async def latest_ready_gap(
+    db: AsyncSession, job_target_id: uuid.UUID, resume_id: uuid.UUID | None = None
+) -> GapRow | None:
+    """The job's latest ready gap analysis; with resume_id, the latest one for that CV (PR-3)."""
+    query = select(GapRow).where(
+        GapRow.job_target_id == job_target_id, GapRow.status == GapStatus.READY
     )
+    if resume_id is not None:
+        query = query.where(GapRow.resume_id == resume_id)
+    return await db.scalar(query.order_by(GapRow.created_at.desc(), GapRow.id.desc()).limit(1))
 
 
 async def build_interviewer_brief(
@@ -256,7 +259,7 @@ async def _build_interviewer_brief(
             await db.commit()
             return {"outcome": "failed", "reason": "The job posting is not ready yet."}
         posting = JobPosting.model_validate(target.parsed_json)
-        gap_row = await latest_ready_gap(db, target.id)
+        gap_row = await latest_ready_gap(db, target.id, session.resume_id)
         analysis = None
         resume = None
         if gap_row is not None and gap_row.breakdown_json is not None:

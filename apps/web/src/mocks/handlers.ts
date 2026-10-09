@@ -22,10 +22,10 @@ import type { CreateSessionRequest, SessionRecord, VoiceJoin } from "../api/sess
 import { MOCK_VOICE_URL } from "../session/voice";
 import type {
   AuthState,
-  ExitSurveyIn,
-  ExportJob,
   CompetencyTrend,
   Debrief,
+  ExitSurveyIn,
+  ExportJob,
   GapAnalysisOut,
   GapAnalysisStart,
   JobContext,
@@ -38,6 +38,8 @@ import type {
   JobTargetOut,
   JobTargetSummary,
   JobTargetUpdate,
+  Profile,
+  ProfileIn,
   ProgressSnapshot,
   ReportItem,
   Resume,
@@ -117,6 +119,8 @@ export function authHandlers(store: MockStore) {
         training_consent: body.training_consent ?? false,
         created_at: new Date().toISOString(),
         is_admin: isMockAdmin(auth.email),
+        full_name: null,
+        profile_complete: false,
       };
       store.db.auth = { status: "signed_in", email: auth.email, userEmail: auth.email };
       store.save();
@@ -150,6 +154,18 @@ const EMPTY_CONTEXT: JobContext = {
   interviewer_role: null,
   recruiter_notes: null,
   concerns: null,
+};
+
+/** AC-3: the profile of a user who has not saved it yet. */
+const EMPTY_PROFILE: Profile = {
+  full_name: null,
+  years_experience: null,
+  target_level: null,
+  current_title: null,
+  country: null,
+  time_zone: null,
+  linkedin_url: null,
+  complete: false,
 };
 
 function safeHost(url: string): string {
@@ -286,6 +302,8 @@ export function inputHandlers(store: MockStore) {
   const db = () => store.db;
   const findJob = (id: unknown) => db().jobs.find((j) => j.id === id);
   const findResume = (id: unknown) => db().resumes.find((r) => r.id === id);
+  /** LB-2: a job with a gap analysis or a session is archived, not deleted. */
+  const jobInUse = (id: string) => Boolean(db().gaps[id]) || db().sessions.some((x) => x.job_target_id === id);
 
   const enqueue = (kind: MockTask["kind"], entityId: string, outcome: MockTask["outcome"]): MockTask => {
     const prefix = kind === "job_target" ? "jt" : "rs";
@@ -342,6 +360,7 @@ export function inputHandlers(store: MockStore) {
         stage: body.stage ?? null,
         context: { ...EMPTY_CONTEXT, ...body.context },
         created_at: new Date().toISOString(),
+        archived_at: null,
       };
       target.name = defaultJobName(target);
       db().jobs.push(target);
@@ -381,10 +400,31 @@ export function inputHandlers(store: MockStore) {
       store.save();
       return HttpResponse.json(target);
     }),
+    http.post(`${API}/job-targets/:jobTargetId/archive`, ({ params }) => {
+      const target = findJob(params.jobTargetId);
+      if (!target || target.deleted) return notFound("Job target");
+      target.archived_at ??= new Date().toISOString();
+      store.save();
+      return HttpResponse.json(target);
+    }),
+    http.post(`${API}/job-targets/:jobTargetId/restore`, ({ params }) => {
+      const target = findJob(params.jobTargetId);
+      if (!target || target.deleted) return notFound("Job target");
+      target.archived_at = null;
+      store.save();
+      return HttpResponse.json(target);
+    }),
     http.delete(`${API}/job-targets/:jobTargetId`, ({ params }) => {
       const target = findJob(params.jobTargetId);
       if (!target) return notFound("Job target");
-      // Like the API: the content goes; reports and sessions stay.
+      // LB-2, like the API: a job with reports is archived, not deleted.
+      if (!target.deleted && jobInUse(target.id)) {
+        return HttpResponse.json(
+          { detail: "This job description has reports. Archive it instead of deleting it." },
+          { status: 409 },
+        );
+      }
+      // Like the API: the content goes.
       Object.assign(target, { deleted: true, name: null, posting: null, source_url: null, context: { ...EMPTY_CONTEXT } });
       delete db().jobTexts[target.id];
       store.save();
@@ -493,9 +533,10 @@ export function inputHandlers(store: MockStore) {
     ),
 
     // ------------------------------------------------------------ lists (P6)
-    http.get(`${API}/job-targets`, () => {
+    http.get(`${API}/job-targets`, ({ request }) => {
       advance(store);
-      const live = db().jobs.filter((j) => !j.deleted);
+      const withArchived = new URL(request.url).searchParams.get("include_archived") === "true";
+      const live = db().jobs.filter((j) => !j.deleted && (withArchived || !j.archived_at));
       const summaries: JobTargetSummary[] = [...live].reverse().map((target) => {
         const sessions = db().sessions.filter((x) => x.job_target_id === target.id);
         const gap = db().gaps[target.id];
@@ -505,6 +546,7 @@ export function inputHandlers(store: MockStore) {
           gap_status: gap?.status ?? null,
           sessions_count: sessions.length,
           last_session_at: sessions.at(-1)?.started_at ?? null,
+          in_use: jobInUse(target.id),
         };
       });
       return HttpResponse.json(summaries);
@@ -566,6 +608,7 @@ export function inputHandlers(store: MockStore) {
       advance(store);
       const query = new URL(request.url).searchParams;
       const jobFilter = query.get("job_target_id");
+      const resumeFilter = query.get("resume_id");
       const typeFilter = query.get("type");
       if (typeFilter && typeFilter !== "gap_report" && typeFilter !== "interview_debrief") {
         return invalid("type must be gap_report or interview_debrief");
@@ -578,6 +621,7 @@ export function inputHandlers(store: MockStore) {
       if (typeFilter !== "interview_debrief") {
         for (const gap of Object.values(db().gaps)) {
           if (gap.status !== "ready" || (jobFilter && gap.job_target_id !== jobFilter)) continue;
+          if (resumeFilter && gap.resume_id !== resumeFilter) continue;
           const view = gapView(store, gap);
           items.push({
             type: "gap_report",
@@ -601,15 +645,17 @@ export function inputHandlers(store: MockStore) {
         for (const s of db().sessions) {
           if (!s.started_at || !["scoring", "completed", "failed"].includes(s.status)) continue;
           if (jobFilter && s.job_target_id !== jobFilter) continue;
+          if (resumeFilter && s.resume_id !== resumeFilter) continue;
           const generic = findJob(s.job_target_id)?.generic_mode ?? true;
+          const cv = s.resume_id ? db().resumes.find((r) => r.id === s.resume_id) : undefined;
           items.push({
             type: "interview_debrief",
             id: s.id,
             job_target_id: s.job_target_id,
             ...jobInfo(s.job_target_id),
-            resume_id: null,
-            resume_name: null,
-            resume_deleted: false,
+            resume_id: s.resume_id,
+            resume_name: cv && !cv.deleted ? cv.name : null,
+            resume_deleted: s.resume_id !== null && (!cv || cv.deleted),
             status: s.status === "completed" ? "ready" : s.status === "failed" ? "failed" : "scoring",
             at: s.ended_at ?? s.started_at,
             match_score: null,
@@ -662,9 +708,16 @@ export function sessionHandlers(store: MockStore) {
           { status: 402 },
         );
       }
+      // PR-3: a chosen CV needs a ready gap analysis with the job; else the job's latest one.
+      const gap = db().gaps[body.job_target_id];
+      const readyCv = gap?.status === "ready" ? gap.resume_id : null;
+      if (body.resume_id && body.resume_id !== readyCv) {
+        return HttpResponse.json({ detail: "Run the gap analysis for this CV and job first." }, { status: 409 });
+      }
       const session: SessionRecord = {
         id: newId(),
         job_target_id: body.job_target_id,
+        resume_id: body.resume_id ?? readyCv,
         config: body.config,
         channel: body.channel ?? "voice",
         brief_ready: true,
@@ -925,6 +978,36 @@ export function accountHandlers(store: MockStore) {
       store.db.exitSurveys.push(body as ExitSurveyIn);
       store.save();
       return HttpResponse.json({ id: newId(), created_at: new Date().toISOString() }, { status: 201 });
+    }),
+    http.get(`${API}/account/profile`, () => {
+      const email = db().auth.userEmail;
+      if (!email) return HttpResponse.json({ detail: "Sign in first" }, { status: 401 });
+      return HttpResponse.json(db().profiles[email] ?? EMPTY_PROFILE);
+    }),
+    http.put(`${API}/account/profile`, async ({ request }) => {
+      const email = db().auth.userEmail;
+      if (!email) return HttpResponse.json({ detail: "Sign in first" }, { status: 401 });
+      const body = (await request.json()) as ProfileIn;
+      const fullName = body.full_name.trim();
+      const years = body.years_experience;
+      if (!fullName || years < 0 || years > 50) {
+        return HttpResponse.json({ detail: [{ msg: "Check the required fields." }] }, { status: 422 });
+      }
+      const blank = (v: string | null | undefined) => (v && v.trim() ? v.trim() : null);
+      const profile: Profile = {
+        full_name: fullName,
+        years_experience: years,
+        target_level: body.target_level,
+        current_title: blank(body.current_title),
+        country: blank(body.country),
+        time_zone: blank(body.time_zone),
+        linkedin_url: blank(body.linkedin_url),
+        complete: true,
+      };
+      db().profiles[email] = profile;
+      if (db().users[email]) Object.assign(db().users[email], { full_name: fullName, profile_complete: true });
+      store.save();
+      return HttpResponse.json(profile);
     }),
     http.put(`${API}/account/consent`, async ({ request }) => {
       const body = (await request.json()) as { training_consent: boolean };

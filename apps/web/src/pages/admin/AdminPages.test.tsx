@@ -23,6 +23,8 @@ function addUser(email: string, isAdmin: boolean, consent = false) {
     training_consent: consent,
     created_at: "2026-10-01T10:00:00Z",
     is_admin: isAdmin,
+    full_name: "Ana Lopez",
+    profile_complete: true,
   };
 }
 
@@ -32,6 +34,7 @@ function seed({ consent = false, signedInAs = "admin@example.com" } = {}) {
   const session: SessionRecord = {
     id: SESSION_ID,
     job_target_id: "00000000-0000-4000-8000-0000000000d1",
+    resume_id: null,
     config: {
       interview_type: "behavioral",
       difficulty: "realistic",

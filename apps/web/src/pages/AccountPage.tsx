@@ -5,12 +5,11 @@ import { Link, useNavigate } from "react-router";
 import { accountApi } from "../api/account";
 import { authApi } from "../api/auth";
 import { billingApi } from "../api/billing";
-import { keys, POLL_MS, useAuth, usePlan, useUsage } from "../api/hooks";
+import { keys, POLL_MS, useAuth, usePlan, useProfile, useUsage } from "../api/hooks";
 import type { AuthState, ExitReason, GotJob, Usage } from "../api/types";
 import { ConsentSwitch } from "../components/ConsentSwitch";
-import { SavedLibrary } from "../components/LibrarySection";
 import { ErrorNotice, PageHead } from "../components/ui";
-import { formatDate } from "../labels";
+import { formatDate, levelLabel } from "../labels";
 
 const EXIT_REASONS: { value: ExitReason; label: string }[] = [
   { value: "got_the_job", label: "I got the job" },
@@ -175,10 +174,11 @@ function PlanSection({ usage }: { usage: Usage }) {
   );
 }
 
-/** AC-1 (export, delete), AC-2 (consent) and BL-1 (plan and cancellation). */
+/** AC-1 (export, delete), AC-2 (consent), AC-3 (profile) and BL-1 (plan and cancellation). */
 export function AccountPage() {
   const auth = useAuth();
   const usage = useUsage();
+  const profile = useProfile();
   const user = auth.data?.user;
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -221,20 +221,38 @@ export function AccountPage() {
   return (
     <div className="page--narrow">
       <PageHead title="Account" />
-      <section className="panel" aria-labelledby="profile-heading">
+      <section className="panel" aria-labelledby="profile-heading" id="profile">
         <h2 id="profile-heading">Profile</h2>
+        {profile.isError && <ErrorNotice error={profile.error} />}
         <dl className="dl">
+          <dt>Name</dt>
+          <dd>{profile.data?.full_name ?? "Not set"}</dd>
+          <dt>Current job title</dt>
+          <dd>{profile.data?.current_title ?? "Not set"}</dd>
+          <dt>Years of experience</dt>
+          <dd>{profile.data?.years_experience ?? "Not set"}</dd>
+          <dt>Level you are interviewing for</dt>
+          <dd>{profile.data?.target_level ? levelLabel[profile.data.target_level] : "Not set"}</dd>
+          <dt>Country</dt>
+          <dd>{profile.data?.country ?? "Not set"}</dd>
+          <dt>Time zone</dt>
+          <dd>{profile.data?.time_zone?.replaceAll("_", " ") ?? "Not set"}</dd>
+          <dt>LinkedIn</dt>
+          <dd>{profile.data?.linkedin_url ?? "Not set"}</dd>
           <dt>Email</dt>
           <dd>{user.email}</dd>
           <dt>Member since</dt>
           <dd>{formatDate(user.created_at)}</dd>
         </dl>
+        <div className="row section">
+          <Link className="btn btn--secondary" to="/account/profile">
+            Edit profile
+          </Link>
+        </div>
       </section>
 
       {usage.data && <PlanSection usage={usage.data} />}
       {usage.isError && <ErrorNotice error={usage.error} />}
-
-      <SavedLibrary />
 
       <section className="panel" aria-labelledby="privacy-heading">
         <h2 id="privacy-heading">Training data</h2>

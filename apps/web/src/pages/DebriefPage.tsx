@@ -98,7 +98,7 @@ export function DebriefPage() {
   );
 }
 
-/** "Your interviews / job title, company / Debrief". The job name is extra: the page works without it. */
+/** "Interview rehearsals / job title, company / Debrief". The job name is extra: the page works without it. */
 function Breadcrumb({ jobId, company }: { jobId: string; company: string | null }) {
   const job = useJob(jobId, false);
   const posting = job.data?.posting;
@@ -107,7 +107,7 @@ function Breadcrumb({ jobId, company }: { jobId: string; company: string | null 
     <nav className="breadcrumb" aria-label="Breadcrumb">
       <ol>
         <li>
-          <Link to="/">Your interviews</Link>
+          <Link to="/">Interview rehearsals</Link>
         </li>
         {name && <li>{name}</li>}
         <li aria-current="page">Debrief</li>

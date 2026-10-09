@@ -6,6 +6,7 @@ import { keys, useResume } from "../../api/hooks";
 import { resumesApi } from "../../api/inputs";
 import type { Resume } from "../../api/types";
 import { ErrorNotice, Loading, ONBOARDING_STEPS, PageHead, Steps } from "../../components/ui";
+import { rehearsalPath } from "../../paths";
 
 /** One role as the form edits it. Dates are text; an empty end means the current role. */
 export interface RoleDraft {
@@ -85,10 +86,10 @@ export function validateResumeDraft(
   return { errors, resume };
 }
 
-const contextPath = (jobId: string, resumeId: string) =>
-  `/jobs/${jobId}/context?resume=${encodeURIComponent(resumeId)}`;
-
-/** IN-3 "Check your CV": the user fixes the extracted roles and skills, then confirms. */
+/**
+ * IN-3 "Check your CV": the user fixes the extracted roles and skills, then confirms.
+ * Inside a rehearsal it goes on to that job and CV; from the Resumes page (no job) it goes back there.
+ */
 export function CheckResumePage() {
   const { jobId = "", resumeId = "" } = useParams();
   const record = useResume(resumeId);
@@ -96,7 +97,7 @@ export function CheckResumePage() {
 
   return (
     <div className="page--narrow">
-      <Steps current={1} steps={ONBOARDING_STEPS} />
+      {jobId && <Steps current={1} steps={ONBOARDING_STEPS} />}
       <PageHead title="Check your CV">
         <p>
           This is what we read from your CV. Check that each achievement is under the right job, fix
@@ -123,7 +124,7 @@ function ResumeEditor({ jobId, resumeId, original }: { jobId: string; resumeId: 
     onSuccess: (saved) => {
       queryClient.setQueryData(keys.resume(resumeId), saved);
       void queryClient.invalidateQueries({ queryKey: keys.resumes, exact: true });
-      navigate(contextPath(jobId, resumeId));
+      navigate(jobId ? rehearsalPath(jobId, resumeId) : "/resumes");
     },
   });
 

@@ -25,9 +25,11 @@ class ReportItem(BaseModel):
     job_target_id: uuid.UUID
     job_name: str | None = Field(description="None when the job description was deleted.")
     job_deleted: bool
-    resume_id: uuid.UUID | None = Field(description="Gap reports only.")
-    resume_name: str | None = Field(description="Gap reports only. None when the CV was deleted.")
-    resume_deleted: bool = Field(description="Gap reports only: the CV was deleted.")
+    resume_id: uuid.UUID | None = Field(
+        description="The CV used. None for debriefs of sessions from before PR-3 stored it."
+    )
+    resume_name: str | None = Field(description="None when there is no CV or it was deleted.")
+    resume_deleted: bool = Field(description="The CV was deleted.")
     status: ReportStatus = Field(
         description="Gap reports are always ready. A debrief is scoring, ready or failed."
     )

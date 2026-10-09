@@ -2,8 +2,9 @@ import { expect, test, type Page } from "@playwright/test";
 
 /**
  * Smoke test of the main journey with every API call mocked:
- * sign in, sign up, job posting, resume, context, gap analysis, session setup, live session,
- * debrief, dashboard, paywall after the two free mini interviews (BL-2), subscribe, account.
+ * sign in, sign up, profile (AC-3), job description, resume, context, gap analysis, session setup,
+ * live session, debrief, interview rehearsals with the earlier reports of a job and CV (PR-3),
+ * paywall after the two free mini interviews (BL-2), subscribe, account.
  */
 
 const SHOTS = process.env.E2E_SCREENSHOTS;
@@ -28,12 +29,30 @@ async function signUp(page: Page, email: string, consent = false) {
   await page.getByLabel("I accept the terms of service and the privacy policy.").check();
   if (consent) await page.getByRole("checkbox", { name: CONSENT_LABEL }).check();
   await page.getByRole("button", { name: "Create account" }).click();
-  await expect(page.getByRole("heading", { name: "Your interviews" })).toBeVisible();
+
+  // AC-3: the first sign-in asks for a short profile, with no payment details.
+  await expect(page.getByRole("heading", { name: "Tell us about yourself" })).toBeVisible();
+  await page.getByLabel("Full name").fill("Ana Lopez");
+  await page.getByLabel("Years of experience").fill("7");
+  await page.getByLabel("Level you are interviewing for").selectOption("senior");
+  await shot(page, "02a-profile");
+  await page.getByRole("button", { name: "Save and continue" }).click();
+  await expect(page.getByRole("heading", { name: "Interview rehearsals" })).toBeVisible();
+}
+
+/** PR-3: the same job with the saved CV shows the earlier reports, then starts a session. */
+async function rehearseAgain(page: Page, screenshots = false) {
+  await page.getByRole("link", { name: /^Rehearse/ }).click();
+  await page.getByRole("region", { name: "Use a resume you saved" }).getByRole("button", { name: "Use this resume" }).click();
+  await expect(page.getByRole("heading", { name: /^Rehearse for / })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Earlier reports for this job and CV" })).toBeVisible();
+  if (screenshots) await shot(page, "11b-rehearsal");
+  await page.getByRole("link", { name: "Start a session" }).click();
 }
 
 async function addJob(page: Page) {
-  await page.getByRole("link", { name: "Add a job" }).first().click();
-  await expect(page.getByRole("heading", { name: "Add a job posting" })).toBeVisible();
+  await page.getByRole("link", { name: "Add a job description" }).first().click();
+  await expect(page.getByRole("heading", { name: "Add a job description" })).toBeVisible();
   await page.getByLabel("Job posting link").fill("https://example-board.test/jobs/1234");
   await shot(page, "03-job");
   await page.getByRole("button", { name: "Read job posting" }).click();
@@ -43,7 +62,7 @@ async function addJob(page: Page) {
   await shot(page, "04-confirm");
   await page.getByRole("button", { name: "Save and continue" }).click();
 
-  await expect(page.getByRole("heading", { name: "Add your resume" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Choose a resume" })).toBeVisible();
   await page.getByLabel("Or paste your resume text").fill("Backend engineer, 7 years of Python and payments.");
   await page.getByRole("button", { name: "Upload resume" }).click();
   await expect(page.getByRole("heading", { name: "Roles" })).toBeVisible({ timeout: 10_000 });
@@ -97,21 +116,21 @@ test("main journey from sign-up to paywall", async ({ page }) => {
   await expect(page.getByTestId("hire-signal")).toHaveText("Lean Hire");
   await expect(page.getByRole("heading", { name: "Question by question" })).toBeVisible();
 
-  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Your interviews" }).click();
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Interview rehearsals" }).click();
   await expect(page.getByText(/^1 session, last on/)).toBeVisible();
   // A mini interview is not in the trends.
   await expect(page.getByText(/Trends appear here after your first full Realistic session/)).toBeVisible();
   await expect(page.getByTestId("usage-meter")).toContainText("1 free mini interview left");
   await shot(page, "11-dashboard");
 
-  // The second free mini interview.
-  await page.getByRole("link", { name: /Start next/ }).click();
+  // The second free mini interview, with the same job and CV.
+  await rehearseAgain(page, true);
   await runSession(page, false);
-  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Your interviews" }).click();
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Interview rehearsals" }).click();
   await expect(page.getByTestId("usage-meter")).toContainText("free mini interviews used");
 
   // BL-2: the third interview needs a plan.
-  await page.getByRole("link", { name: /Start next/ }).click();
+  await rehearseAgain(page);
   await page.getByRole("button", { name: "Start interview" }).click();
   await expect(page.getByRole("heading", { name: "Keep practicing" })).toBeVisible();
   await expect(page.getByText("You have used your free mini interviews.")).toBeVisible();

@@ -7,6 +7,7 @@ import { jobProblem, resumesApi, sha256Hex } from "../../api/inputs";
 import type { ResumeAccepted, ResumeOut } from "../../api/types";
 import { ErrorNotice, Loading, ONBOARDING_STEPS, PageHead, Steps } from "../../components/ui";
 import { formatDate } from "../../labels";
+import { checkPath, rehearsalPath } from "../../paths";
 
 /** The API accepts files up to 5 MB. */
 export const MAX_RESUME_BYTES = 5 * 1024 * 1024;
@@ -23,14 +24,6 @@ export function validateResumeInput(file: File | null, text: string): string | n
   return null;
 }
 
-/** The context step starts the gap analysis with the chosen resume. */
-const contextPath = (jobId: string, resumeId: string) =>
-  `/jobs/${jobId}/context?resume=${encodeURIComponent(resumeId)}`;
-
-/** "Check your CV": the user checks and fixes the extracted CV before the gap analysis. */
-const checkPath = (jobId: string, resumeId: string) =>
-  `/jobs/${jobId}/resume/${encodeURIComponent(resumeId)}/check`;
-
 export function ResumePage() {
   const { jobId = "" } = useParams();
   const navigate = useNavigate();
@@ -41,15 +34,16 @@ export function ResumePage() {
   const uploaded = useResume(upload?.id ?? null, problem === null);
 
   const ready = (existing.data ?? []).filter((r) => r.status === "extracted");
-  // A CV the user has not checked yet goes to "Check your CV" first; a confirmed one goes on.
+  // A CV the user has not checked yet goes to "Check your CV" first. A confirmed one goes to the
+  // rehearsal page, which shows the earlier reports for this job and CV, or starts the gap analysis (PR-3).
   const choose = (saved: ResumeOut) =>
-    navigate(saved.confirmed_at ? contextPath(jobId, saved.id) : checkPath(jobId, saved.id));
+    navigate(saved.confirmed_at ? rehearsalPath(jobId, saved.id) : checkPath(jobId, saved.id));
 
   return (
     <div className="page--narrow">
       <Steps current={1} steps={ONBOARDING_STEPS} />
-      <PageHead title="Add your resume">
-        <p>We compare your resume with the job to find your strengths and gaps.</p>
+      <PageHead title="Choose a resume">
+        <p>Pick a resume you saved, or upload a new one. We save it for next time. We compare it with the job to find your strengths and gaps.</p>
       </PageHead>
 
       {ready.length > 0 && !upload && (
@@ -106,7 +100,7 @@ export function ResumePage() {
   );
 }
 
-function UploadForm({
+export function UploadForm({
   onUploaded,
   onUseSaved,
 }: {

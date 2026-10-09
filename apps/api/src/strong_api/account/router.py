@@ -1,5 +1,7 @@
-"""Account endpoints: training-data consent (AC-2), export and delete (AC-1).
+"""Account endpoints: profile (AC-3), training-data consent (AC-2), export and delete (AC-1).
 
+GET    /account/profile                    the profile asked for at the first sign-in
+PUT    /account/profile                    save it; the first save completes the profile
 PUT    /account/consent                    change the consent; each change goes to AuditLog
 POST   /account/export                     start an export (background job)
 GET    /account/export/{id}                export status
@@ -31,6 +33,8 @@ from strong_api.account.schemas import (
     ConsentOut,
     ExportOut,
     ExportStatus,
+    ProfileIn,
+    ProfileOut,
 )
 from strong_api.account.settings import AccountSettings
 from strong_api.auth import CurrentUser
@@ -39,7 +43,7 @@ from strong_api.auth.settings import AuthSettings
 from strong_api.billing.entitlements import get_subscription
 from strong_api.billing.router import Stripe
 from strong_api.inputs.deps import Queue
-from strong_core.db.models import AuditLog
+from strong_core.db.models import AuditLog, User
 
 log = logging.getLogger(__name__)
 
@@ -66,9 +70,45 @@ def _actor(user_id: uuid.UUID) -> str:
     return f"user:{user_id}"
 
 
+def profile_out(user: User) -> ProfileOut:
+    return ProfileOut(
+        full_name=user.full_name,
+        years_experience=user.years_experience,
+        target_level=user.target_level,
+        current_title=user.current_title,
+        country=user.country,
+        time_zone=user.time_zone,
+        linkedin_url=user.linkedin_url,
+        complete=user.profile_completed_at is not None,
+    )
+
+
 def build_router(auth_settings: AuthSettings) -> APIRouter:
     router = APIRouter(prefix="/account", tags=["account"])
     api_base = auth_settings.api_public_url.rstrip("/")
+
+    @router.get("/profile")
+    async def get_profile(user: CurrentUser) -> ProfileOut:
+        """AC-3: the profile. complete is false until the first save."""
+        return profile_out(user)
+
+    @router.put("/profile")
+    async def put_profile(db: DbSession, user: CurrentUser, body: ProfileIn) -> ProfileOut:
+        """AC-3: save the profile. The first save sets profile_completed_at."""
+        for field, value in body.model_dump().items():
+            setattr(user, field, value)
+        if user.profile_completed_at is None:
+            user.profile_completed_at = datetime.now(UTC)
+            db.add(
+                AuditLog(
+                    org_id=user.org_id,
+                    actor=_actor(user.id),
+                    action="account.profile_completed",
+                    entity=f"user:{user.id}",
+                )
+            )
+        await db.commit()
+        return profile_out(user)
 
     @router.put("/consent")
     async def set_consent(db: DbSession, user: CurrentUser, body: ConsentIn) -> ConsentOut:

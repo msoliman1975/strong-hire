@@ -128,6 +128,9 @@ class JobTargetOut(BaseModel):
     stage: str | None
     context: JobContext
     created_at: datetime
+    archived_at: datetime | None = Field(
+        default=None, description="LB-2: set while the job description is archived."
+    )
 
 
 class ResumeOut(BaseModel):
@@ -169,6 +172,10 @@ class JobTargetSummary(BaseModel):
     )
     sessions_count: int = Field(ge=0, description="Interview sessions for this job.")
     last_session_at: datetime | None = Field(description="Start of the latest session.")
+    in_use: bool = Field(
+        default=False,
+        description="LB-2: the job has a gap analysis or a session. Archive it; do not delete.",
+    )
 
 
 class JobTargetMatch(BaseModel):
