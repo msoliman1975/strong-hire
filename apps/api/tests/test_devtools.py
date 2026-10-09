@@ -112,3 +112,27 @@ async def test_only_in_dev_and_signed_in(
 
     monkeypatch.setattr(devtools, "get_auth_settings", lambda: Prod())
     assert (await client.get("/dev/model-usage")).status_code == 404
+
+
+async def test_staging_only_for_spend_viewers(
+    client: httpx.AsyncClient, app: FastAPI, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The hosted test server shows the meter to the owner, not to testers."""
+    from strong_api.auth.settings import AppEnv
+
+    app_key(monkeypatch)
+    fake_litellm(app, lambda r: httpx.Response(200, json=KEY if "key" in r.url.path else TEAM))
+
+    class Staging:
+        app_env = AppEnv.STAGING
+        spend_viewers: set[str] = set()
+
+    monkeypatch.setattr(devtools, "get_auth_settings", lambda: Staging())
+    assert (await client.get("/dev/model-usage")).status_code == 404
+
+    Staging.spend_viewers = {"someone-else@example.com"}
+    assert (await client.get("/dev/model-usage")).status_code == 404
+
+    Staging.spend_viewers = {"dev@example.com"}  # the signed-in test user
+    out = await client.get("/dev/model-usage")
+    assert out.status_code == 200 and out.json()["tracked"] is True

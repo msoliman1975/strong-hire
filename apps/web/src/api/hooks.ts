@@ -38,13 +38,17 @@ export const useProviders = () =>
 export const useUsage = (enabled = true) =>
   useQuery({ queryKey: keys.usage, queryFn: billingApi.usage, enabled });
 
-/** Dev builds only: Claude spend against the LiteLLM budgets, refreshed every 30 seconds. */
+/**
+ * Claude spend against the LiteLLM budgets, refreshed every 30 seconds. The API answers in dev and,
+ * on the hosted test server, only for the owner (MODEL_SPEND_VIEWERS). Anyone else gets 404: the
+ * meter stays hidden and the page stops asking.
+ */
 export const useModelUsage = (enabled = true) =>
   useQuery({
     queryKey: keys.modelUsage,
     queryFn: devApi.modelUsage,
-    enabled: enabled && import.meta.env.DEV,
-    refetchInterval: 30_000,
+    enabled,
+    refetchInterval: (q) => (q.state.status === "error" ? false : 30_000),
     retry: false,
   });
 
