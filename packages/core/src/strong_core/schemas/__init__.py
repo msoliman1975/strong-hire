@@ -18,10 +18,12 @@ from strong_core.schemas.analysis import (
 from strong_core.schemas.base import Contract
 from strong_core.schemas.enums import (
     COMPETENCIES_BY_TYPE,
+    AnswerConduct,
     AuthProvider,
     Competency,
     Confidence,
     Difficulty,
+    DocumentKind,
     GapStatus,
     HireSignal,
     InterviewType,
@@ -39,7 +41,7 @@ from strong_core.schemas.enums import (
     SubscriptionStatus,
     UsageComponent,
 )
-from strong_core.schemas.inputs import Education, JobPosting, Resume, ResumeRole
+from strong_core.schemas.inputs import Education, InputCheck, JobPosting, Resume, ResumeRole
 from strong_core.schemas.profile import (
     CaseStyle,
     CompanyProfile,
@@ -64,6 +66,7 @@ from strong_core.schemas.scoring import (
 from strong_core.schemas.session import (
     MINI_DURATION_MIN,
     MINI_MAX_PROBES,
+    AnswerCheck,
     BriefDraft,
     BriefQuestion,
     InterviewerBrief,
@@ -87,6 +90,8 @@ EXPORTED_SCHEMAS: dict[str, type[BaseModel]] = {
     "interviewer_brief": InterviewerBrief,
     "turn": Turn,
     "probe_decision": ProbeDecision,
+    "answer_check": AnswerCheck,
+    "input_check": InputCheck,
     "scorecard": Scorecard,
     "progress_snapshot": ProgressSnapshot,
 }
@@ -96,6 +101,8 @@ __all__ = [
     "EXPORTED_SCHEMAS",
     "MINI_DURATION_MIN",
     "MINI_MAX_PROBES",
+    "AnswerCheck",
+    "AnswerConduct",
     "AuthProvider",
     "BriefDraft",
     "BriefQuestion",
@@ -108,12 +115,14 @@ __all__ = [
     "Confidence",
     "Contract",
     "Difficulty",
+    "DocumentKind",
     "Education",
     "Gap",
     "GapAnalysis",
     "GapAssessment",
     "GapStatus",
     "HireSignal",
+    "InputCheck",
     "InterviewType",
     "InterviewerBrief",
     "JobPosting",

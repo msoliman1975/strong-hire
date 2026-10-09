@@ -1353,6 +1353,31 @@ export interface components {
             is_admin: boolean;
         };
         /**
+         * AnswerCheck
+         * @description IV-12: the interviewer model's check of one candidate turn, before the reply.
+         *
+         *     The runner warns the candidate on a turn that is not `ok`, and closes the interview when
+         *     the warnings run out. `reason` goes to the admin traces only, never to the candidate.
+         */
+        AnswerCheck: {
+            conduct: components["schemas"]["AnswerConduct"];
+            /**
+             * Reason
+             * @default
+             */
+            reason: string;
+        };
+        /**
+         * AnswerConduct
+         * @description IV-12: whether a candidate turn belongs in the interview.
+         *
+         *     `off_scope` is not a weak or off-topic answer (IV-3 probes those). It is a turn about
+         *     something outside the interview, such as an unrelated subject or a request for an unrelated
+         *     task. `inappropriate` is abuse, harassment, threats, hate or sexual content.
+         * @enum {string}
+         */
+        AnswerConduct: "ok" | "off_scope" | "inappropriate";
+        /**
          * AuthProvider
          * @enum {string}
          */
@@ -1725,6 +1750,12 @@ export interface components {
          * @enum {string}
          */
         Difficulty: "friendly" | "realistic" | "tough";
+        /**
+         * DocumentKind
+         * @description IN-6, IN-7: what kind of document a job description or CV input looks like.
+         * @enum {string}
+         */
+        DocumentKind: "job_posting" | "job_list" | "resume" | "cover_letter" | "company_page" | "article" | "error_page" | "other";
         /** Education */
         Education: {
             /** Institution */
@@ -1931,6 +1962,24 @@ export interface components {
          * @enum {string}
          */
         HireSignal: "Strong Hire" | "Hire" | "Lean Hire" | "Lean No Hire" | "No Hire";
+        /**
+         * InputCheck
+         * @description Is the text the kind of document the user gave it as (IN-6 job description, IN-7 CV)?
+         *
+         *     The worker runs this check before the extraction. When `matches` is false, it refuses the
+         *     input and shows the user a fixed sentence for `looks_like` with the short `reason`.
+         */
+        InputCheck: {
+            /** Matches */
+            matches: boolean;
+            looks_like: components["schemas"]["DocumentKind"];
+            /**
+             * Reason
+             * @description One short sentence on what the text is.
+             * @default
+             */
+            reason: string;
+        };
         /**
          * InterviewType
          * @description The four v1 interview types (IV-2).
