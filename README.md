@@ -91,7 +91,7 @@ removed afterwards. The local-models and voice jobs are not included. About 6 mi
   Results are development data (PL-6), and interviewing is weak.
 - `local`: `config/models.local.yaml`, through LiteLLM to Ollama in Docker.
 - `hosted`: `config/models.hosted.yaml`, through LiteLLM to hosted APIs. Needs `HOSTED_API_KEY` in `.env`.
-- `claude`: `config/models.claude.yaml`. Claude Haiku 4.5 (extractor, interviewer) and Claude Sonnet 5.5
+- `claude`: `config/models.claude.yaml`. Claude Haiku 5.5 (extractor, interviewer) and Claude Sonnet 5.5
   (planner, scorer); speech-to-text and text-to-speech stay local. Needs `ANTHROPIC_API_KEY` as an
   environment variable (a Windows user variable is fine); it is never written to a file.
 

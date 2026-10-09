@@ -1095,7 +1095,7 @@ export interface components {
              * Status
              * @enum {string}
              */
-            status: "scoring" | "ready" | "failed";
+            status: "not_ended" | "scoring" | "ready" | "failed";
             scorecard: components["schemas"]["Scorecard"] | null;
             /** @description PR-2. Null until the debrief is ready. */
             next_session: components["schemas"]["PlannedSession"] | null;

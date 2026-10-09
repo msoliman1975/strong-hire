@@ -21,7 +21,9 @@ from strong_core.schemas import (
     SessionStatus,
 )
 
-DebriefStatus = Literal["scoring", "ready", "failed"]
+# "not_ended": the interview has not ended yet (created, in progress or interrupted), so nothing
+# is being scored. The web app must not wait for a scorecard then.
+DebriefStatus = Literal["not_ended", "scoring", "ready", "failed"]
 TrendDirection = Literal["up", "down", "flat", "single"]
 
 

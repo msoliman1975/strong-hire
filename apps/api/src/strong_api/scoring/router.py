@@ -1,6 +1,7 @@
 """Debrief and progress endpoints (FB-1 to FB-3, PR-1, PR-2), and the scoring trigger.
 
-- GET  /sessions/{id}/debrief      status "scoring", "ready" or "failed"; the scorecard when ready
+- GET  /sessions/{id}/debrief      status "not_ended", "scoring", "ready" or "failed";
+                                   the scorecard when ready
 - GET  /job-targets/{id}/progress  Realistic-session snapshots, trends and the next session
 
 A 10-minute mini interview gets its own debrief, but it is left out of the progress snapshots,
@@ -60,6 +61,9 @@ from strong_core.schemas import (
 SCORE_SESSION = "score_session"
 
 router = APIRouter(tags=["scoring"])
+
+# Sessions that can still start or continue. Their debrief has nothing to score yet.
+NOT_ENDED = {SessionStatus.CREATED, SessionStatus.IN_PROGRESS, SessionStatus.INTERRUPTED}
 
 ENDED = {SessionStatus.SCORING, SessionStatus.FAILED, SessionStatus.INTERRUPTED}
 
@@ -210,6 +214,8 @@ async def get_debrief(session_id: uuid.UUID, db: Db, me: Me) -> Debrief:
         state = "ready"
     elif session.status == SessionStatus.FAILED:
         state = "failed"
+    elif session.status in NOT_ENDED:
+        state = "not_ended"
     else:
         state = "scoring"
 
