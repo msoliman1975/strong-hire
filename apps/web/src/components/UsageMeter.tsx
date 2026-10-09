@@ -12,8 +12,8 @@ export function UsageMeter({ usage }: { usage: Usage }) {
   if (usage.plan === "free") {
     return (
       <Link className="usage" to="/upgrade" data-testid="usage-meter">
-        <span>{freeText(usage.free_interviews_left)}</span>
-        <span className="muted">Upgrade for full interviews</span>
+        <span className="usage__value">{freeText(usage.free_interviews_left)}</span>
+        <span>Upgrade for full interviews</span>
       </Link>
     );
   }
@@ -21,8 +21,14 @@ export function UsageMeter({ usage }: { usage: Usage }) {
   const pct = cap > 0 ? Math.min(100, (usage.minutes_used / cap) * 100) : 100;
   return (
     <div className="usage" data-testid="usage-meter">
-      <span id="usage-label">
+      <span id="usage-label" className="visually-hidden">
         {usage.minutes_used} of {cap} minutes used
+      </span>
+      <span className="usage__text" aria-hidden="true">
+        <span>Minutes</span>
+        <span className="usage__value">
+          {usage.minutes_used} of {cap}
+        </span>
       </span>
       <div
         className="usage__track"

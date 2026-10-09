@@ -121,7 +121,7 @@ describe("main journey", () => {
     expect(screen.getByRole("heading", { name: "Question by question" })).toBeInTheDocument();
 
     // Dashboard shows the job. A mini is not in the trends.
-    await user.click(screen.getByRole("link", { name: "Dashboard" }));
+    await user.click(within(screen.getByRole("navigation", { name: "Main" })).getByRole("link", { name: "Your interviews" }));
     expect(await screen.findByText(/^1 session, last on/)).toBeInTheDocument();
     expect(await screen.findByText(/Trends appear here after your first full Realistic session/)).toBeInTheDocument();
     expect(screen.queryByRole("img", { name: /^Ownership:/ })).not.toBeInTheDocument();
@@ -130,7 +130,7 @@ describe("main journey", () => {
     // The second free mini interview.
     await user.click(await screen.findByRole("link", { name: /Start next/ }));
     await runMiniInterview(user);
-    await user.click(screen.getByRole("link", { name: "Dashboard" }));
+    await user.click(within(screen.getByRole("navigation", { name: "Main" })).getByRole("link", { name: "Your interviews" }));
     expect(await screen.findByText(/^2 sessions, last on/)).toBeInTheDocument();
     expect(screen.getByTestId("usage-meter")).toHaveTextContent("free mini interviews used");
 

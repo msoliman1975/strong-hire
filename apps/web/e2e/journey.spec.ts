@@ -97,7 +97,7 @@ test("main journey from sign-up to paywall", async ({ page }) => {
   await expect(page.getByTestId("hire-signal")).toHaveText("Lean Hire");
   await expect(page.getByRole("heading", { name: "Question by question" })).toBeVisible();
 
-  await page.getByRole("link", { name: "Dashboard" }).click();
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Your interviews" }).click();
   await expect(page.getByText(/^1 session, last on/)).toBeVisible();
   // A mini interview is not in the trends.
   await expect(page.getByText(/Trends appear here after your first full Realistic session/)).toBeVisible();
@@ -107,7 +107,7 @@ test("main journey from sign-up to paywall", async ({ page }) => {
   // The second free mini interview.
   await page.getByRole("link", { name: /Start next/ }).click();
   await runSession(page, false);
-  await page.getByRole("link", { name: "Dashboard" }).click();
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Your interviews" }).click();
   await expect(page.getByTestId("usage-meter")).toContainText("free mini interviews used");
 
   // BL-2: the third interview needs a plan.

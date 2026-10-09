@@ -78,6 +78,78 @@ function TrendSmall({
   );
 }
 
+/** Competency scores grouped by competency, oldest first. */
+function byCompetency(snapshots: ProgressSnapshot[]): [Competency, ProgressSnapshot[]][] {
+  const map = new Map<Competency, ProgressSnapshot[]>();
+  for (const s of [...snapshots].sort((a, b) => a.at.localeCompare(b.at))) {
+    const list = map.get(s.competency) ?? [];
+    list.push(s);
+    map.set(s.competency, list);
+  }
+  return [...map.entries()];
+}
+
+const SW = 90;
+const SH = 26;
+
+/**
+ * One small line per competency: ink line, dashed line at 3 (meets the bar), end point green at
+ * 3.0 or more and amber below. The latest score is also written as a number next to it.
+ */
+function Sparkline({ name, points }: { name: string; points: ProgressSnapshot[] }) {
+  const pad = 4;
+  const x = (i: number) => (points.length === 1 ? SW / 2 : pad + (i / (points.length - 1)) * (SW - 2 * pad));
+  const y = (score: number) => pad + ((4 - score) / 3) * (SH - 2 * pad);
+  const last = points[points.length - 1];
+  return (
+    <svg
+      className="sparkline"
+      viewBox={`0 0 ${SW} ${SH}`}
+      width={SW}
+      height={SH}
+      role="img"
+      aria-label={`${name}: ${points.map((p) => p.score.toFixed(1)).join(", ")}`}
+    >
+      <line x1={0} x2={SW} y1={y(3)} y2={y(3)} stroke="var(--line-strong)" strokeDasharray="2 3" />
+      {points.length > 1 && (
+        <polyline
+          points={points.map((p, i) => `${x(i).toFixed(1)},${y(p.score).toFixed(1)}`).join(" ")}
+          fill="none"
+          stroke="var(--ink)"
+          strokeWidth={1.6}
+          strokeLinejoin="round"
+        />
+      )}
+      <circle
+        cx={x(points.length - 1)}
+        cy={y(last.score)}
+        r={3.4}
+        fill={last.score >= 3 ? "var(--ok)" : "var(--light)"}
+        stroke="var(--surface)"
+        strokeWidth={1.2}
+      />
+    </svg>
+  );
+}
+
+/** PR-1, compact: one row per competency with a sparkline and the latest score. */
+export function CompetencySparklines({ snapshots }: { snapshots: ProgressSnapshot[] }) {
+  return (
+    <ul className="sparklines">
+      {byCompetency(snapshots).map(([competency, points]) => {
+        const name = competencyLabel(competency);
+        return (
+          <li key={competency}>
+            <span>{name}</span>
+            <Sparkline name={name} points={points} />
+            <span className="sparklines__value">{points[points.length - 1].score.toFixed(1)}</span>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 /** PR-1: competency trends from Realistic sessions, as small multiples with a table view. */
 export function CompetencyTrends({ snapshots, trends = [] }: { snapshots: ProgressSnapshot[]; trends?: CompetencyTrend[] }) {
   const byCompetency = new Map<Competency, ProgressSnapshot[]>();
