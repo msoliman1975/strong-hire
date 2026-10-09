@@ -8,6 +8,7 @@ from pydantic import Field, model_validator
 
 from strong_core.schemas.base import Contract
 from strong_core.schemas.enums import (
+    AnswerConduct,
     Competency,
     Difficulty,
     InterviewType,
@@ -190,3 +191,14 @@ class ProbeDecision(Contract):
     missing: list[ProbeTrigger] = Field(
         default_factory=list, max_length=5, description="What the answer lacks; empty to move on."
     )
+
+
+class AnswerCheck(Contract):
+    """IV-10: the interviewer model's check of one candidate turn, before the reply.
+
+    The runner warns the candidate on a turn that is not `ok`, and closes the interview when
+    the warnings run out. `reason` goes to the admin traces only, never to the candidate.
+    """
+
+    conduct: AnswerConduct
+    reason: str = Field(default="", max_length=200)
