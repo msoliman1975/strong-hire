@@ -40,3 +40,4 @@ models:
     sample_rate: 24000
     options:
       voice: af_heart
+    voice_gender: female   # IV-10: the interviewer face matches the voice
