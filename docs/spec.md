@@ -31,7 +31,7 @@ v1 is deliberately narrow: tech roles, 20 curated companies plus a generic mode,
 | Area | v1 (Dec 2026) | Later releases | Out of scope |
 | --- | --- | --- | --- |
 | Platform | Desktop web app | Native iOS and Android | Mobile web as a primary target |
-| Modality | Real-time voice | AI interviewer video avatar (v2) | Candidate video, posture or eye contact analysis |
+| Modality | Real-time voice, with an animated 3D interviewer avatar drawn in the browser (IV-10) | Photo-real AI interviewer video avatar (v2) | Candidate video, posture or eye contact analysis |
 | Roles | Tech only: SWE, data/ML, PM, design, TPM | Adjacent corporate roles | Non-tech roles |
 | Companies | 20 curated profiles researched offline and imported, generic mode for others | Auto-profiles for other companies at job setup, more curated profiles, community interview reports | |
 | Interview types | Behavioral, hiring manager deep dive, verbal technical Q&A, case (product sense, estimation, system thinking) | Recruiter screen, panel with multiple personas | Live coding, whiteboard, written system design |
@@ -101,6 +101,7 @@ IDs are referenced by the build plan and acceptance tests. Priority: P0 must shi
 | IV-7 | Session structure: intro, small talk, core questions, candidate questions, wrap-up; 30 or 45 min timer. | P0 |
 | IV-8 | Mode chosen at start. Coach: pause, hint, redo. Realistic: no interruptions, counts toward scores. | P0 |
 | IV-9 | Graceful recovery from dropped audio: resume the session where it stopped. | P0 |
+| IV-10 | Interviewer avatar: a 3D head on the live screen shows when the interviewer listens, thinks and speaks, and moves its lips with the interviewer's audio. It runs in the browser only: no extra service, no cost per minute, no audio sent anywhere. Without WebGL a flat face shows the same states. Captions stay. | P1 |
 | FB-1 | Overall hire signal (Strong Hire, Hire, Lean Hire, Lean No Hire, No Hire) with a short written rationale. | P0 |
 | FB-2 | Per-question rubric scores with strengths and misses. | P0 |
 | FB-3 | Debrief ready within 60 seconds of session end. | P0 |

@@ -1486,6 +1486,112 @@ th.num {
   color: #b8c0cc;
 }
 
+/* The interviewer avatar (session/avatar). The canvas is drawn by three.js on a clear background. */
+.avatar {
+  position: relative;
+  margin: 0 0 var(--space-4);
+  height: clamp(220px, 42vw, 340px);
+  border-radius: var(--radius);
+  background: radial-gradient(ellipse at 50% 35%, #3a4f63 0%, #22303e 60%, #1a2531 100%);
+  overflow: hidden;
+}
+
+.avatar__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.avatar__state {
+  position: absolute;
+  left: var(--space-3);
+  bottom: var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  border-radius: 999px;
+  background: rgb(20 32 43 / 75%);
+  color: #f2f4f7;
+  font-size: 0.9rem;
+}
+
+.avatar__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #8b96a6;
+}
+
+.avatar[data-activity="speaking"] .avatar__dot {
+  background: var(--light);
+}
+
+.avatar[data-activity="listening"] .avatar__dot {
+  background: #f2f4f7;
+}
+
+/* The flat face: used without WebGL. The mouth opens while the interviewer speaks. */
+.avatar__flat {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 140px;
+  height: 160px;
+  border-radius: 48% 48% 46% 46%;
+  background: #c98f6b;
+}
+
+.avatar__eyes,
+.avatar__eyes::after {
+  position: absolute;
+  top: 62px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #2a2522;
+}
+
+.avatar__eyes {
+  left: 38px;
+}
+
+.avatar__eyes::after {
+  content: "";
+  top: 0;
+  left: 50px;
+}
+
+.avatar__mouth {
+  position: absolute;
+  left: 50%;
+  bottom: 34px;
+  width: 36px;
+  height: 6px;
+  margin-left: -18px;
+  border-radius: 50%;
+  background: #4a1f1f;
+}
+
+.avatar[data-activity="speaking"] .avatar__mouth {
+  animation: avatar-talk 0.36s ease-in-out infinite alternate;
+}
+
+@keyframes avatar-talk {
+  to {
+    height: 18px;
+    bottom: 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar[data-activity="speaking"] .avatar__mouth {
+    animation: none;
+    height: 12px;
+  }
+}
+
 /* What the interviewer said: light text on a slightly lighter dark box, easy to read. */
 .live__captions {
   background: #2c3746;
