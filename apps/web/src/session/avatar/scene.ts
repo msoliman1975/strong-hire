@@ -12,6 +12,9 @@ import type { AgentActivity } from "../voice";
 import type { LipSync } from "./lipsync";
 import { REST_POSE, arkitFromPose, easePose, type MouthPose } from "./visemes";
 
+/** Vertical field of view in degrees. Narrow, like a portrait lens, so the face is not distorted. */
+const CAMERA_FOV = 24;
+
 export interface AvatarScene {
   setActivity: (activity: AgentActivity) => void;
   setLipSync: (lipSync: LipSync | null) => void;
@@ -47,7 +50,7 @@ export async function createAvatarScene(canvas: HTMLCanvasElement, options: Avat
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(24, 1, 0.05, 50);
+  const camera = new THREE.PerspectiveCamera(CAMERA_FOV, 1, 0.05, 50);
   scene.add(new THREE.HemisphereLight(0xdfe8f2, 0x2c3746, 1.4));
   const key = new THREE.DirectionalLight(0xffffff, 2.2);
   key.position.set(1.2, 1.6, 2.4);
@@ -196,20 +199,14 @@ async function loadModelFace(url: string): Promise<Face | null> {
   const rest = turn.quaternion.clone();
   const neckRest = neckBone?.quaternion.clone();
 
+  // Frame the top of the model: the face and a little neck. A face-only model (convert-rocketbox)
+  // fits whole; a full body shows from the chest up.
   root.updateMatrixWorld(true);
-  const focus = new THREE.Vector3();
-  let distance: number;
-  if (headBone) {
-    headBone.getWorldPosition(focus);
-    focus.y += 0.06; // the bone sits at the base of the skull
-    distance = 1.25;
-  } else {
-    const box = new THREE.Box3().setFromObject(root);
-    const size = box.getSize(new THREE.Vector3());
-    box.getCenter(focus);
-    focus.y = box.max.y - Math.min(size.y, size.x * 1.4) * 0.45;
-    distance = Math.max(size.x, 0.18) * 4.2;
-  }
+  const box = new THREE.Box3().setFromObject(root);
+  const size = box.getSize(new THREE.Vector3());
+  const shown = Math.min(size.y * 0.76, 0.42);
+  const focus = new THREE.Vector3((box.min.x + box.max.x) / 2, box.max.y - shown * 0.47, (box.min.z + box.max.z) / 2);
+  const distance = (shown * 0.5) / Math.tan(THREE.MathUtils.degToRad(CAMERA_FOV / 2)) + size.z / 2;
 
   const euler = new THREE.Euler();
   const q = new THREE.Quaternion();

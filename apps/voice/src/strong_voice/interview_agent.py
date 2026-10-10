@@ -9,6 +9,8 @@ From the browser, on the data channel (topic "coach"): {"command": "hint" | "red
 To the browser (topic "session"):
   {"type": "state", "phase", "paused", "elapsed_ms", "said": [lines]}  after each interviewer turn
   {"type": "ended"}                                                     when the session is over
+Participant attribute "sh.interviewer.voice": "female" or "male", how the TTS voice sounds. The
+live page shows the interviewer face that matches it (IV-10).
 """
 
 from __future__ import annotations
@@ -24,7 +26,7 @@ from livekit.agents import Agent, AgentSession, JobContext, StopResponse, llm
 from livekit.agents.voice.room_io import RoomOptions
 
 from strong_core.db import get_sessionmaker
-from strong_core.gateway import get_gateway
+from strong_core.gateway import Role, get_gateway
 from strong_core.sim import gateway_for_org
 from strong_interview import (
     CoachNotAllowedError,
@@ -49,6 +51,13 @@ log = logging.getLogger("strong_voice.interview")
 COACH_TOPIC = "coach"
 SESSION_TOPIC = "session"
 COACH_COMMANDS = {"hint", "redo", "pause", "resume"}
+INTERVIEWER_VOICE_ATTRIBUTE = "sh.interviewer.voice"
+
+
+def interviewer_attributes() -> dict[str, str]:
+    """IV-10: tells the browser which interviewer face matches the TTS voice."""
+    gender = get_gateway().capabilities(Role.TTS).voice_gender
+    return {INTERVIEWER_VOICE_ATTRIBUTE: gender.value} if gender else {}
 
 
 def state_message(interview: VoiceInterview, said: list[str]) -> bytes:
@@ -199,6 +208,11 @@ async def run_session(ctx: JobContext, build_session: Any) -> bool:
                 ctx.shutdown("candidate did not reconnect")
                 return
             await asyncio.sleep(1)
+
+    try:
+        await ctx.room.local_participant.set_attributes(interviewer_attributes())
+    except Exception:
+        log.warning("could not send the interviewer voice to the browser", exc_info=True)
 
     await agent_session.start(
         agent=agent, room=ctx.room, room_options=RoomOptions(close_on_disconnect=False)

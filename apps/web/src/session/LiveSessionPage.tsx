@@ -25,6 +25,7 @@ import {
   type AgentActivity,
   type AgentCommand,
   type AgentState,
+  type InterviewerVoice,
   type VoiceConnection,
   type VoiceConnector,
 } from "./voice";
@@ -90,6 +91,7 @@ function LiveView({ session }: { session: SessionRecord }) {
   const [agent, setAgent] = useState<AgentState | null>(null);
   const [activity, setActivity] = useState<AgentActivity>("idle");
   const [agentAudio, setAgentAudio] = useState<MediaStreamTrack | null>(null);
+  const [voice, setVoice] = useState<InterviewerVoice | null>(null);
   const [slowAgent, setSlowAgent] = useState(false);
   const now = useNow();
   const { config } = session;
@@ -123,6 +125,7 @@ function LiveView({ session }: { session: SessionRecord }) {
         onConnection: setLink,
         onActivity: setActivity,
         onAgentAudio: setAgentAudio,
+        onInterviewerVoice: setVoice,
       });
     } catch (err) {
       setStage("failed");
@@ -231,7 +234,11 @@ function LiveView({ session }: { session: SessionRecord }) {
               </li>
             ))}
           </ol>
-          <InterviewerAvatar activity={stage === "live" ? activity : "idle"} audioTrack={agentAudio} />
+          <InterviewerAvatar
+            activity={stage === "live" ? activity : "idle"}
+            audioTrack={agentAudio}
+            voice={voice}
+          />
           <div
             className="live__captions"
             aria-live="polite"

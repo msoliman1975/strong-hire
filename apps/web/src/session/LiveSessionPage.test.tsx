@@ -10,7 +10,7 @@ import type { SessionRecord, VoiceJoin } from "../api/types";
 import { createQueryClient } from "../App";
 import { server } from "../mocks/node";
 import { AGENT_WAIT_MS, LiveSessionPage } from "./LiveSessionPage";
-import { MOCK_VOICE_URL, parseAgentActivity, parseAgentMessage, remainingMs, type AgentCommand, type VoiceHandlers } from "./voice";
+import { MOCK_VOICE_URL, parseAgentActivity, parseAgentMessage, parseInterviewerVoice, remainingMs, type AgentCommand, type VoiceHandlers } from "./voice";
 
 const voice = vi.hoisted(() => ({
   handlers: null as VoiceHandlers | null,
@@ -214,6 +214,13 @@ describe("live session page", () => {
 });
 
 describe("agent messages", () => {
+  it("IV-10: reads the interviewer voice, and ignores anything else", () => {
+    expect(parseInterviewerVoice("male")).toBe("male");
+    expect(parseInterviewerVoice("female")).toBe("female");
+    expect(parseInterviewerVoice("robot")).toBeNull();
+    expect(parseInterviewerVoice(undefined)).toBeNull();
+  });
+
   it("IV-10: reads the LiveKit agent state, and unknown states are idle", () => {
     expect(parseAgentActivity("speaking")).toBe("speaking");
     expect(parseAgentActivity("thinking")).toBe("thinking");
