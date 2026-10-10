@@ -53,3 +53,4 @@ models:
     sample_rate: 24000
     options:
       voice: am_michael     # a different voice from the interviewer (af_heart)
+    voice_gender: male   # IV-10: the interviewer face matches the voice

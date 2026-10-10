@@ -65,3 +65,4 @@ models:
     options:
       voice: troy
       response_format: wav    # the provider sends WAV only; the gateway removes the header
+    voice_gender: male   # IV-10: the interviewer face matches the voice

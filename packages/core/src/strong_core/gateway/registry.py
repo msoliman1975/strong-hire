@@ -19,6 +19,13 @@ class ModelKind(StrEnum):
     TTS = "tts"
 
 
+class VoiceGender(StrEnum):
+    """How a TTS voice sounds. The live page shows an interviewer face that matches it (IV-10)."""
+
+    FEMALE = "female"
+    MALE = "male"
+
+
 class CapabilityTier(StrEnum):
     """How strong a chat model is. The prompt loader picks prompt variants by tier (PL-5)."""
 
@@ -50,11 +57,18 @@ class ModelCapabilities(BaseModel):
     options: dict[str, str] = Field(
         default_factory=dict, description="Per-model request options, such as a TTS voice."
     )
+    voice_gender: VoiceGender | None = Field(
+        default=None,
+        description="TTS only: whether the voice in options sounds female or male, so the "
+        "interviewer avatar matches it.",
+    )
 
     @model_validator(mode="after")
     def _tier_only_for_chat(self) -> ModelCapabilities:
         if self.tier is not None and self.kind != ModelKind.CHAT:
             raise ValueError(f"tier is for chat models only, not {self.kind.value}")
+        if self.voice_gender is not None and self.kind != ModelKind.TTS:
+            raise ValueError(f"voice_gender is for tts models only, not {self.kind.value}")
         return self
 
 

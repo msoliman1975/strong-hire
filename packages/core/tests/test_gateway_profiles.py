@@ -13,10 +13,11 @@ import wave
 
 import pytest
 import yaml
+from pydantic import ValidationError
 
 from strong_core.config import Settings, find_repo_root
 from strong_core.gateway import Role, build_gateway, load_models_config
-from strong_core.gateway.registry import ModelKind
+from strong_core.gateway.registry import ModelCapabilities, ModelKind, VoiceGender
 from strong_core.gateway.smoke import main as smoke_main
 from strong_core.gateway.smoke import run_smoke
 
@@ -49,6 +50,15 @@ def test_pl1_capability_registry_is_filled(profile: str) -> None:
         if caps.kind == ModelKind.TTS:
             assert caps.sample_rate and caps.streaming, alias
             assert "voice" in caps.options, alias
+            assert caps.voice_gender is not None, f"{alias}: set voice_gender (IV-10)"
+
+
+def test_iv10_voice_gender_is_for_tts_only() -> None:
+    """IV-10: the TTS voice says how it sounds, so the live page shows a matching face."""
+    caps = ModelCapabilities(kind=ModelKind.TTS, voice_gender=VoiceGender.MALE)
+    assert caps.voice_gender == "male"
+    with pytest.raises(ValidationError, match="voice_gender is for tts models only"):
+        ModelCapabilities(kind=ModelKind.CHAT, voice_gender=VoiceGender.FEMALE)
 
 
 def test_pl1_profiles_cover_the_same_roles_with_the_same_code() -> None:
