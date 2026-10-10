@@ -162,6 +162,7 @@ def fake_models_config() -> ModelsConfig:
             context_window=32768,
             streaming=role == Role.TTS,
             sample_rate=16000 if role == Role.TTS else None,
+            voice_gender=VoiceGender.FEMALE if role == Role.TTS else None,
         )
         for role in Role
     }
