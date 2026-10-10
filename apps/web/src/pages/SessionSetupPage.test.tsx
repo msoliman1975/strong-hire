@@ -113,6 +113,14 @@ describe("session setup durations", () => {
     expect(bodies[0].config.duration_min).toBe(10);
   });
 
+  it("IV-8: Coach mode is chosen first, so the controls show unless the candidate picks Realistic", async () => {
+    const { user, bodies } = renderSetup(PAID);
+    expect(await screen.findByRole("radio", { name: /^Coach/ })).toBeChecked();
+    await user.click(screen.getByRole("button", { name: "Start interview" }));
+    await screen.findByTestId("upgrade-reason");
+    expect(bodies[0].config.mode).toBe("coach");
+  });
+
   it("the paywall explains the full_interview_requires_plan reason", async () => {
     const { user } = renderSetup(FREE_USAGE, true);
     await screen.findByRole("radio", { name: /^10 minutes \(mini\)/ });

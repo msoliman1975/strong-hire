@@ -87,7 +87,8 @@ export function SessionSetupPage() {
   const [type, setType] = useState<InterviewType>(pick(params.get("type"), TYPES, "behavioral"));
   const [difficulty, setDifficulty] = useState<Difficulty>(pick(params.get("difficulty"), DIFFICULTIES, "realistic"));
   const [duration, setDuration] = useState<Duration | null>(null);
-  const [mode, setMode] = useState<Mode>("realistic");
+  // Coach first: the controls (pause, hint, redo) help a new candidate; Realistic is one click away.
+  const [mode, setMode] = useState<Mode>(pick(params.get("mode"), MODES, "coach"));
   const [level, setLevel] = useState<Level | "">("");
 
   const start = useMutation({

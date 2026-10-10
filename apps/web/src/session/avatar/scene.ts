@@ -202,10 +202,10 @@ async function loadModelFace(url: string): Promise<Face | null> {
   // Frame the top of the model: the face and a little neck. A face-only model (convert-rocketbox)
   // fits whole; a full body shows from the chest up.
   root.updateMatrixWorld(true);
-  const box = new THREE.Box3().setFromObject(root);
+  const box = restBox(root);
   const size = box.getSize(new THREE.Vector3());
-  const shown = Math.min(size.y * 0.76, 0.42);
-  const focus = new THREE.Vector3((box.min.x + box.max.x) / 2, box.max.y - shown * 0.47, (box.min.z + box.max.z) / 2);
+  const shown = Math.min(size.y * 1.04, 0.42);
+  const focus = new THREE.Vector3((box.min.x + box.max.x) / 2, box.max.y - shown * 0.5, (box.min.z + box.max.z) / 2);
   const distance = (shown * 0.5) / Math.tan(THREE.MathUtils.degToRad(CAMERA_FOV / 2)) + size.z / 2;
 
   const euler = new THREE.Euler();
@@ -256,6 +256,22 @@ async function loadModelFace(url: string): Promise<Face | null> {
     },
     dispose: () => disposeTree(root),
   };
+}
+
+/**
+ * The box around the model's vertices at rest. Box3.setFromObject also grows the box by every
+ * blend shape offset (three.js adds the morph targets), which made a face model look off-center.
+ */
+export function restBox(root: THREE.Object3D): THREE.Box3 {
+  const box = new THREE.Box3();
+  const v = new THREE.Vector3();
+  root.updateMatrixWorld(true);
+  root.traverse((o) => {
+    if (!(o instanceof THREE.Mesh)) return;
+    const position = o.geometry.getAttribute("position");
+    for (let i = 0; i < position.count; i++) box.expandByPoint(v.fromBufferAttribute(position, i).applyMatrix4(o.matrixWorld));
+  });
+  return box;
 }
 
 // --------------------------------------------------------------------------- built-in head
