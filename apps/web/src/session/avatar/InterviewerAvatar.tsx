@@ -3,16 +3,17 @@
  * the lip-sync worklet load only on this page. Without WebGL, or if the scene fails, a flat face
  * shows the same states. The captions stay the text alternative; the avatar is decoration.
  *
- * Model file: put a GLB head at public/avatar/interviewer.glb (see scene.ts for what it needs).
- * Without it the built-in head is used.
+ * Model files: public/avatar/interviewer-female.glb and interviewer-male.glb, faces made from
+ * Microsoft Rocketbox avatars (MIT) by scripts/avatar/convert-rocketbox.mjs. The face matches the
+ * interviewer's voice. If a file cannot be loaded, the built-in head is used.
  */
 import { useEffect, useRef, useState } from "react";
 
-import type { AgentActivity } from "../voice";
+import type { AgentActivity, InterviewerVoice } from "../voice";
 import type { LipSync } from "./lipsync";
 import type { AvatarScene } from "./scene";
 
-export const AVATAR_MODEL_URL = "/avatar/interviewer.glb";
+export const avatarModelUrl = (voice: InterviewerVoice) => `/avatar/interviewer-${voice}.glb`;
 
 export const activityLabel: Record<AgentActivity, string> = {
   idle: "Joining",
@@ -36,25 +37,29 @@ const prefersReducedMotion = () =>
 export function InterviewerAvatar({
   activity,
   audioTrack,
+  voice,
 }: {
   activity: AgentActivity;
   audioTrack: MediaStreamTrack | null;
+  /** null until the agent says. An agent that never says (an older version) gets the female face. */
+  voice: InterviewerVoice | null;
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const scene = useRef<AvatarScene | null>(null);
   const [webgl] = useState(hasWebGL);
   const [ready, setReady] = useState<boolean | "failed">(false);
   const mode = !webgl || ready === "failed" ? "flat" : ready ? "3d" : "loading";
+  const face = voice ?? (activity === "idle" ? null : "female");
 
   useEffect(() => {
-    if (!webgl || !canvas.current) return;
+    if (!webgl || !face || !canvas.current) return;
     let gone = false;
     const target = canvas.current;
     void (async () => {
       try {
         const { createAvatarScene } = await import("./scene");
         const created = await createAvatarScene(target, {
-          modelUrl: AVATAR_MODEL_URL,
+          modelUrl: avatarModelUrl(face),
           reducedMotion: prefersReducedMotion(),
         });
         if (gone) return created.dispose();
@@ -68,8 +73,9 @@ export function InterviewerAvatar({
       gone = true;
       scene.current?.dispose();
       scene.current = null;
+      setReady(false);
     };
-  }, [webgl]);
+  }, [webgl, face]);
 
   useEffect(() => scene.current?.setActivity(activity), [activity, mode]);
 

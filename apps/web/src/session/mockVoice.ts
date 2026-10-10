@@ -49,6 +49,7 @@ export const connectMockVoice: VoiceConnector = async (_join, handlers) => {
   handlers.onConnection("connected");
   later(() => {
     handlers.onAgentJoined();
+    handlers.onInterviewerVoice("female");
     say([MOCK_OPENING]);
   }, 200);
   later(() => {

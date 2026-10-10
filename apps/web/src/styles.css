@@ -1500,6 +1500,8 @@ th.num {
   display: block;
   width: 100%;
   height: 100%;
+  /* The face model ends at the neck; fade it out before the edge. */
+  mask-image: linear-gradient(to bottom, #000 72%, transparent 96%);
 }
 
 .avatar__state {

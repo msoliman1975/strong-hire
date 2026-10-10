@@ -8,10 +8,12 @@ import { RemoteParticipant, Room, RoomEvent, Track } from "livekit-client";
 import {
   AGENT_STATE_ATTRIBUTE,
   COACH_TOPIC,
+  INTERVIEWER_VOICE_ATTRIBUTE,
   SESSION_TOPIC,
   encodeCommand,
   parseAgentActivity,
   parseAgentMessage,
+  parseInterviewerVoice,
   type VoiceConnector,
 } from "./voice";
 
@@ -19,10 +21,15 @@ export const connectLiveKit: VoiceConnector = async (join, handlers) => {
   const room = new Room({ adaptiveStream: true, dynacast: true });
   const audio: HTMLMediaElement[] = [];
   let leaving = false;
+  const agentAttributes = (p: RemoteParticipant) => {
+    handlers.onActivity(parseAgentActivity(p.attributes[AGENT_STATE_ATTRIBUTE]));
+    const voice = parseInterviewerVoice(p.attributes[INTERVIEWER_VOICE_ATTRIBUTE]);
+    if (voice) handlers.onInterviewerVoice(voice);
+  };
   const agentHere = (p: RemoteParticipant) => {
     if (!p.isAgent) return;
     handlers.onAgentJoined();
-    handlers.onActivity(parseAgentActivity(p.attributes[AGENT_STATE_ATTRIBUTE]));
+    agentAttributes(p);
   };
 
   room
@@ -34,8 +41,7 @@ export const connectLiveKit: VoiceConnector = async (join, handlers) => {
       if (message?.type === "ended") handlers.onEnded();
     })
     .on(RoomEvent.ParticipantAttributesChanged, (_changed, participant) => {
-      if (participant instanceof RemoteParticipant && participant.isAgent)
-        handlers.onActivity(parseAgentActivity(participant.attributes[AGENT_STATE_ATTRIBUTE]));
+      if (participant instanceof RemoteParticipant && participant.isAgent) agentAttributes(participant);
     })
     .on(RoomEvent.TrackSubscribed, (track, _publication, participant) => {
       if (track.kind !== Track.Kind.Audio) return;

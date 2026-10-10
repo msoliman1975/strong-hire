@@ -206,6 +206,13 @@ async def test_state_message_for_the_browser() -> None:
     }
 
 
+def test_iv10_agent_tells_the_browser_how_the_voice_sounds() -> None:
+    """IV-10: the live page picks the interviewer face from this attribute."""
+    from strong_voice.interview_agent import INTERVIEWER_VOICE_ATTRIBUTE, interviewer_attributes
+
+    assert interviewer_attributes() == {INTERVIEWER_VOICE_ATTRIBUTE: "female"}  # the fake TTS
+
+
 async def test_voice_interview_takes_back_and_keeps_the_question_open() -> None:
     """With the real runner (fake model): a taken-back reply leaves no trace, and a request for
     time saves both lines without moving on."""

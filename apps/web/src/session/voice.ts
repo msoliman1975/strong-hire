@@ -9,6 +9,8 @@
  *
  * LiveKit Agents also sets the participant attribute "lk.agent.state" (listening, thinking,
  * speaking). The interviewer avatar shows it, and moves its mouth from the agent's audio track.
+ * The voice agent sets "sh.interviewer.voice" (female or male), and the avatar shows a face that
+ * matches the voice.
  */
 import type { Phase, VoiceJoin } from "../api/types";
 
@@ -39,6 +41,15 @@ export function parseAgentActivity(value: string | undefined): AgentActivity {
   return value === "listening" || value === "thinking" || value === "speaking" ? value : "idle";
 }
 
+/** How the interviewer's TTS voice sounds (IV-10). */
+export type InterviewerVoice = "female" | "male";
+
+export const INTERVIEWER_VOICE_ATTRIBUTE = "sh.interviewer.voice";
+
+export function parseInterviewerVoice(value: string | undefined): InterviewerVoice | null {
+  return value === "female" || value === "male" ? value : null;
+}
+
 export type ConnectionState = "connected" | "reconnecting" | "disconnected";
 
 export interface VoiceHandlers {
@@ -49,6 +60,7 @@ export interface VoiceHandlers {
   onActivity: (activity: AgentActivity) => void;
   /** The interviewer's audio, for the avatar's lip sync. null when it stops. */
   onAgentAudio: (track: MediaStreamTrack | null) => void;
+  onInterviewerVoice: (voice: InterviewerVoice) => void;
 }
 
 export interface VoiceConnection {

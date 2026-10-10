@@ -57,10 +57,18 @@ state (`lk.agent.state`: listening, thinking, speaking). HeadAudio, an audio wor
 interviewer's audio into mouth shapes in the browser. Nothing is sent to a server. The code loads
 only on the live page.
 
-- Model: put a GLB file at `public/avatar/interviewer.glb`. It needs ARKit blend shapes (`jawOpen`,
-  `eyeBlinkLeft`, ...) or Oculus visemes (`viseme_aa`, ...). Bones named `Head` and `Neck` are used
-  for head movement. Meshopt compression works; Draco and KTX2 do not. Without the file, a simple
-  built-in head is drawn.
+- Faces: `public/avatar/interviewer-female.glb` (1.3 MB) and `interviewer-male.glb` (0.4 MB). The
+  voice agent sets the participant attribute `sh.interviewer.voice` from `voice_gender` in
+  `config/models.<profile>.yaml`, and the page shows the face that matches the voice. Before the
+  agent says, or with an older agent, the female face shows.
+- The faces are Microsoft Rocketbox avatars (MIT, see `public/avatar/LICENSE-Rocketbox.txt`),
+  converted by `scripts/avatar/convert-rocketbox.mjs`: head, hair and glasses only, 46 face shapes
+  (15 Oculus visemes and 31 ARKit shapes), smaller textures, Meshopt compression. To convert
+  another avatar, download its `Export/<Name>_facial.fbx` and `Textures/*.tga`, then run
+  `node scripts/avatar/convert-rocketbox.mjs <folder> public/avatar/<file>.glb`.
+- A GLB file needs ARKit blend shapes (`jawOpen`, `eyeBlinkLeft`, ...) or Oculus visemes
+  (`viseme_aa`, ...). A node named `Head` turns for head movement. Meshopt compression works; Draco
+  and KTX2 do not. If a file cannot be loaded, a simple built-in head is drawn.
 - Without WebGL, a flat face shows the same states. With `prefers-reduced-motion`, the head does not
   sway; the lips still move.
 - The mock voice (`mockVoice.ts`) reports speaking and listening, so `VITE_API_MOCKS=all` shows the
