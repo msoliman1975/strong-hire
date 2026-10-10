@@ -10,7 +10,7 @@ import type { SessionRecord, VoiceJoin } from "../api/types";
 import { createQueryClient } from "../App";
 import { server } from "../mocks/node";
 import { AGENT_WAIT_MS, LiveSessionPage } from "./LiveSessionPage";
-import { MOCK_VOICE_URL, parseAgentMessage, remainingMs, type AgentCommand, type VoiceHandlers } from "./voice";
+import { MOCK_VOICE_URL, parseAgentActivity, parseAgentMessage, remainingMs, type AgentCommand, type VoiceHandlers } from "./voice";
 
 const voice = vi.hoisted(() => ({
   handlers: null as VoiceHandlers | null,
@@ -151,6 +151,17 @@ describe("live session page", () => {
     expect(screen.getByRole("button", { name: "Ask for a hint" })).toBeDisabled();
   });
 
+  it("IV-10: the avatar shows when the interviewer speaks and listens", async () => {
+    const { user } = renderLive(session());
+    await joinRoom(user);
+    expect(screen.getByTestId("interviewer-avatar")).toHaveTextContent("Interviewer: Joining");
+    act(() => voice.handlers!.onAgentJoined());
+    act(() => voice.handlers!.onActivity("speaking"));
+    expect(screen.getByTestId("interviewer-avatar")).toHaveTextContent("Interviewer: Speaking");
+    act(() => voice.handlers!.onActivity("listening"));
+    expect(screen.getByTestId("interviewer-avatar")).toHaveAttribute("data-activity", "listening");
+  });
+
   it("Realistic mode has no Coach controls", async () => {
     const realistic = session({ config: { ...session().config, mode: "realistic" } });
     const { user } = renderLive(realistic);
@@ -203,6 +214,13 @@ describe("live session page", () => {
 });
 
 describe("agent messages", () => {
+  it("IV-10: reads the LiveKit agent state, and unknown states are idle", () => {
+    expect(parseAgentActivity("speaking")).toBe("speaking");
+    expect(parseAgentActivity("thinking")).toBe("thinking");
+    expect(parseAgentActivity("initializing")).toBe("idle");
+    expect(parseAgentActivity(undefined)).toBe("idle");
+  });
+
   it("reads state and ended messages, and ignores anything else", () => {
     const bytes = (v: unknown) => new TextEncoder().encode(JSON.stringify(v));
     const state = parseAgentMessage(

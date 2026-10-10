@@ -50,6 +50,22 @@ browser console.
 6. When the agent ends the session, or the candidate clicks End interview, the page opens the
    debrief, which waits for the score.
 
+### Interviewer avatar (IV-10)
+
+`src/session/avatar/` draws the interviewer as a 3D head with three.js. It shows the LiveKit agent
+state (`lk.agent.state`: listening, thinking, speaking). HeadAudio, an audio worklet, turns the
+interviewer's audio into mouth shapes in the browser. Nothing is sent to a server. The code loads
+only on the live page.
+
+- Model: put a GLB file at `public/avatar/interviewer.glb`. It needs ARKit blend shapes (`jawOpen`,
+  `eyeBlinkLeft`, ...) or Oculus visemes (`viseme_aa`, ...). Bones named `Head` and `Neck` are used
+  for head movement. Meshopt compression works; Draco and KTX2 do not. Without the file, a simple
+  built-in head is drawn.
+- Without WebGL, a flat face shows the same states. With `prefers-reduced-motion`, the head does not
+  sway; the lips still move.
+- The mock voice (`mockVoice.ts`) reports speaking and listening, so `VITE_API_MOCKS=all` shows the
+  avatar moving without audio.
+
 ## Typed API client
 
 `openapi.json` comes from the FastAPI app plus every shared contract in `strong_core.schemas`.

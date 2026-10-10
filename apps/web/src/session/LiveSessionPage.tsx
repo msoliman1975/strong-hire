@@ -1,6 +1,6 @@
 /**
- * Live session screen (P10): microphone check, the voice room, phase and timer, captions, Coach
- * controls, reconnect, and the end of the interview. P10 owns apps/web/src/session.
+ * Live session screen (P10): microphone check, the voice room, phase and timer, the interviewer
+ * avatar, captions, Coach controls, reconnect, and the end of the interview. P10 owns apps/web/src/session.
  *
  * Steps: check the microphone -> wait for the interview plan (brief) -> join the room (this starts
  * the session and its clock) -> wait for the interviewer -> live -> end -> debrief page, which
@@ -17,10 +17,12 @@ import { sessionsApi } from "../api/sessions";
 import type { Phase, SessionRecord } from "../api/types";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
 import { difficultyLabel, interviewTypeLabel, modeLabel, phaseLabel } from "../labels";
+import { InterviewerAvatar } from "./avatar/InterviewerAvatar";
 import { micProblem, micProblemText, openMicrophone, type MicCheck, type MicProblem } from "./microphone";
 import {
   isMockVoice,
   remainingMs,
+  type AgentActivity,
   type AgentCommand,
   type AgentState,
   type VoiceConnection,
@@ -86,6 +88,8 @@ function LiveView({ session }: { session: SessionRecord }) {
   const [failure, setFailure] = useState<string | null>(null);
   const [link, setLink] = useState<"connected" | "reconnecting" | "disconnected">("connected");
   const [agent, setAgent] = useState<AgentState | null>(null);
+  const [activity, setActivity] = useState<AgentActivity>("idle");
+  const [agentAudio, setAgentAudio] = useState<MediaStreamTrack | null>(null);
   const [slowAgent, setSlowAgent] = useState(false);
   const now = useNow();
   const { config } = session;
@@ -117,6 +121,8 @@ function LiveView({ session }: { session: SessionRecord }) {
           toDebrief();
         },
         onConnection: setLink,
+        onActivity: setActivity,
+        onAgentAudio: setAgentAudio,
       });
     } catch (err) {
       setStage("failed");
@@ -225,6 +231,7 @@ function LiveView({ session }: { session: SessionRecord }) {
               </li>
             ))}
           </ol>
+          <InterviewerAvatar activity={stage === "live" ? activity : "idle"} audioTrack={agentAudio} />
           <div
             className="live__captions"
             aria-live="polite"

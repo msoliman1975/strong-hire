@@ -1,10 +1,14 @@
 /**
  * A voice room without LiveKit, for the browser mocks (VITE_API_MOCKS=all) and the tests. The
  * mocked join returns a "mock:" URL, and the live page uses this connector for it. A scripted
- * interviewer joins, says one line per command, and never ends by itself.
+ * interviewer joins, says one line per command, and never ends by itself. It "speaks" each line
+ * for a time that fits its length (no audio), then listens, so the avatar moves.
  */
 import type { Phase } from "../api/types";
 import type { AgentCommand, AgentState, VoiceConnector } from "./voice";
+
+/** About 14 characters a second, the pace of the TTS voice. */
+export const speakingMs = (line: string) => Math.min(6000, Math.max(800, line.length * 70));
 
 export const MOCK_OPENING = "Hi, thanks for joining. I am your interviewer today. How is your day going?";
 export const MOCK_QUESTION = "Tell me about a time you led a project without formal authority.";
@@ -32,15 +36,24 @@ export const connectMockVoice: VoiceConnector = async (_join, handlers) => {
     setTimeout(() => {
       if (open) fn();
     }, ms);
+  let quiet: ReturnType<typeof setTimeout> | undefined;
+  const say = (said: string[]) => {
+    handlers.onState(state(said));
+    const line = said.join(" ");
+    if (!line) return;
+    clearTimeout(quiet);
+    handlers.onActivity("speaking");
+    quiet = later(() => handlers.onActivity("listening"), speakingMs(line));
+  };
 
   handlers.onConnection("connected");
   later(() => {
     handlers.onAgentJoined();
-    handlers.onState(state([MOCK_OPENING]));
+    say([MOCK_OPENING]);
   }, 200);
   later(() => {
     phase = "core";
-    handlers.onState(state([MOCK_QUESTION]));
+    say([MOCK_QUESTION]);
   }, 800);
 
   return {
@@ -55,10 +68,11 @@ export const connectMockVoice: VoiceConnector = async (_join, handlers) => {
         pausedMs += Date.now() - pausedAt;
       }
       const line = LINES[command];
-      later(() => handlers.onState(state(line ? [line] : [])), 50);
+      later(() => say(line ? [line] : []), 50);
     },
     disconnect: async () => {
       open = false;
+      clearTimeout(quiet);
     },
   };
 };

@@ -6,6 +6,9 @@
  *   {"type": "state", "phase", "paused", "elapsed_ms", "said": [lines]}  after each interviewer turn
  *   {"type": "ended"}                                                     when the session is over
  * Browser to agent, data topic "coach": {"command": "hint" | "redo" | "pause" | "resume" | "end"}
+ *
+ * LiveKit Agents also sets the participant attribute "lk.agent.state" (listening, thinking,
+ * speaking). The interviewer avatar shows it, and moves its mouth from the agent's audio track.
  */
 import type { Phase, VoiceJoin } from "../api/types";
 
@@ -27,6 +30,15 @@ export interface AgentState {
   receivedAt: number;
 }
 
+/** What the interviewer is doing now. "idle": not in the room yet, or a state we do not know. */
+export type AgentActivity = "idle" | "listening" | "thinking" | "speaking";
+
+export const AGENT_STATE_ATTRIBUTE = "lk.agent.state";
+
+export function parseAgentActivity(value: string | undefined): AgentActivity {
+  return value === "listening" || value === "thinking" || value === "speaking" ? value : "idle";
+}
+
 export type ConnectionState = "connected" | "reconnecting" | "disconnected";
 
 export interface VoiceHandlers {
@@ -34,6 +46,9 @@ export interface VoiceHandlers {
   onState: (state: AgentState) => void;
   onEnded: () => void;
   onConnection: (state: ConnectionState) => void;
+  onActivity: (activity: AgentActivity) => void;
+  /** The interviewer's audio, for the avatar's lip sync. null when it stops. */
+  onAgentAudio: (track: MediaStreamTrack | null) => void;
 }
 
 export interface VoiceConnection {
