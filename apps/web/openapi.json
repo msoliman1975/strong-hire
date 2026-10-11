@@ -3770,6 +3770,14 @@
             "title": "Question Patterns",
             "type": "array"
           },
+          "sample_questions": {
+            "description": "Publicly reported questions, paraphrased. The planner may draw on them.",
+            "items": {
+              "$ref": "#/components/schemas/SampleQuestion"
+            },
+            "title": "Sample Questions",
+            "type": "array"
+          },
           "bar_by_level": {
             "items": {
               "$ref": "#/components/schemas/LevelBar"
@@ -7087,6 +7095,58 @@
           "other"
         ],
         "title": "RoleFamily"
+      },
+      "SampleQuestion": {
+        "additionalProperties": false,
+        "description": "A question the company or candidates published, paraphrased, with its source.\nNever an NDA-protected question or copied paid content.",
+        "properties": {
+          "interview_type": {
+            "$ref": "#/components/schemas/InterviewType"
+          },
+          "question": {
+            "description": "Paraphrased, not copied.",
+            "maxLength": 400,
+            "minLength": 1,
+            "title": "Question",
+            "type": "string"
+          },
+          "strong_answer": {
+            "description": "What a strong answer covers. Our own guidance, not a copied answer.",
+            "maxLength": 800,
+            "minLength": 1,
+            "title": "Strong Answer",
+            "type": "string"
+          },
+          "competencies": {
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "title": "Competencies",
+            "type": "array"
+          },
+          "values": {
+            "description": "Principle names from values_framework this probes.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Values",
+            "type": "array"
+          },
+          "source_url": {
+            "description": "Public page that reports the question.",
+            "minLength": 1,
+            "title": "Source Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "interview_type",
+          "question",
+          "strong_answer",
+          "source_url"
+        ],
+        "title": "SampleQuestion",
+        "type": "object"
       },
       "Scorecard": {
         "properties": {

@@ -183,6 +183,28 @@ def test_iv5_profile_question_patterns_name_known_values() -> None:
         CompanyProfile.model_validate(data)
 
 
+def test_iv5_profile_sample_questions_are_optional_and_name_known_values() -> None:
+    """IV-5: sample questions default to none and point at known company values."""
+    assert CompanyProfile.model_validate(_profile()).sample_questions == []
+
+    data = _profile()
+    data["sample_questions"] = [
+        {
+            "interview_type": "behavioral",
+            "question": "Tell me about a time you owned a problem outside your team.",
+            "strong_answer": "A specific story, own actions, and a measured result.",
+            "competencies": ["ownership"],
+            "values": ["Own the outcome"],
+            "source_url": "https://example.com/interview-guide",
+        }
+    ]
+    assert CompanyProfile.model_validate(data).sample_questions[0].values == ["Own the outcome"]
+
+    data["sample_questions"][0]["values"] = ["Move fast"]
+    with pytest.raises(ValidationError, match="sample_questions use unknown values: Move fast"):
+        CompanyProfile.model_validate(data)
+
+
 def test_iv5_profile_value_names_are_unique() -> None:
     data = _profile()
     principles = data["values_framework"]["principles"]

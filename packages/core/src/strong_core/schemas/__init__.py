@@ -53,6 +53,7 @@ from strong_core.schemas.profile import (
     ProfileField,
     ProfileMeta,
     QuestionPattern,
+    SampleQuestion,
     Source,
     ValuesFramework,
 )
@@ -153,6 +154,7 @@ __all__ = [
     "Resume",
     "ResumeRole",
     "RoleFamily",
+    "SampleQuestion",
     "Scorecard",
     "SessionChannel",
     "SessionConfig",
