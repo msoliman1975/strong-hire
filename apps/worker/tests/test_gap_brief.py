@@ -94,7 +94,7 @@ async def test_brief_has_the_required_parts(gateway: ModelGateway, gap: GapAnaly
     assert brief.seniority_bar == GENERIC_BARS[Level.SENIOR]
     assert [p.phase for p in brief.time_plan] == list(Phase)
     assert sum(p.minutes for p in brief.time_plan) == 30
-    assert built.model_version.startswith("fake-planner planner/interviewer_brief.v1")
+    assert built.model_version.startswith("fake-planner planner/interviewer_brief.v2")
 
 
 def test_brief_stays_under_the_token_limit() -> None:
@@ -271,6 +271,35 @@ def test_company_mode_uses_the_profile() -> None:
     assert brief.target_values[0] == "Own the outcome"
     # The heaviest weighted behavioral competency comes first.
     assert brief.target_competencies[0] == Competency.OWNERSHIP
+
+
+def test_company_sample_questions_reach_the_planner_prompt() -> None:
+    """IV-5: reported questions for the interview type go to the planner, on-target first."""
+    data = json.loads((ROOT / "profiles/examples/example-corp.json").read_text(encoding="utf-8"))
+    sample = {
+        "strong_answer": "A specific story with the candidate's own actions and a result.",
+        "source_url": "https://example.com/interview-guide",
+    }
+    data["sample_questions"] = [
+        sample | {"interview_type": "case", "question": "Estimate the number of bike shops."},
+        sample | {"interview_type": "behavioral", "question": "Describe a time you disagreed."},
+        sample
+        | {
+            "interview_type": "behavioral",
+            "question": "Tell me about a project you owned end to end.",
+            "competencies": ["ownership"],
+        },
+    ]
+    profile = ResolvedProfile.from_profile(
+        CompanyProfile.model_validate(data), company_id=uuid.uuid4(), version=3
+    )
+    text = build_messages(config(), POSTING, RESUME, profile, None)[1].content
+    assert "bike shops" not in text
+    assert text.index("project you owned") < text.index("time you disagreed")
+    assert "strong answer: A specific story" in text
+
+    generic = build_messages(config(), POSTING, RESUME, generic_profile(), None)[1].content
+    assert "strong answer covers:\n(none)" in generic
 
 
 def test_generic_mode_has_no_values() -> None:

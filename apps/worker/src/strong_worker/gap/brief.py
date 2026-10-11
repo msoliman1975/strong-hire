@@ -61,6 +61,8 @@ MAX_HINTS = 3
 MAX_TEXT = 240
 MAX_HINT = 120
 MAX_PATTERNS = 5
+MAX_SAMPLES = 4
+MAX_SAMPLE_ANSWER = 200
 
 QUESTIONS_BY_DURATION = {10: 3, 30: 8, 45: 10}
 COMPETENCIES_BY_DURATION = {10: 2, 30: 5, 45: 6}
@@ -208,6 +210,22 @@ def persona(config: SessionConfig, profile: ResolvedProfile) -> PersonaBrief:
     )
 
 
+def sample_questions(
+    config: SessionConfig, profile: ResolvedProfile, comps: list[Competency]
+) -> list[str]:
+    """Up to 4 reported questions for this interview type, those on target competencies first."""
+    if profile.profile is None:
+        return []
+    samples = [
+        q for q in profile.profile.sample_questions if q.interview_type == config.interview_type
+    ]
+    samples.sort(key=lambda q: not set(q.competencies) & set(comps))
+    return [
+        f"- {q.question} (strong answer: {q.strong_answer[:MAX_SAMPLE_ANSWER]})"
+        for q in samples[:MAX_SAMPLES]
+    ]
+
+
 def probe_areas(gap: GapAnalysis | None) -> list[str]:
     if gap is None:
         return []
@@ -257,6 +275,7 @@ def build_messages(
             competencies=", ".join(c.value for c in comps),
             values="\n".join(signals) or "(none: generic mode, leave values empty)",
             patterns="\n".join(patterns) or "(none)",
+            sample_questions="\n".join(sample_questions(config, profile, comps)) or "(none)",
             curveball="Write one curveball." if curveball else "Set curveball to null.",
             probe_areas="\n".join(probe_areas(gap)) or "(none)",
             gaps="\n".join(gaps) or "(none)",
