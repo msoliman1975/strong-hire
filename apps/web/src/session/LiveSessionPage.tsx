@@ -1,6 +1,6 @@
 /**
  * Live session screen (P10): microphone check, the voice room, phase and timer, the interviewer
- * avatar, captions, Coach controls, reconnect, and the end of the interview. P10 owns apps/web/src/session.
+ * avatar, captions, prep time (IV-11), Coach controls, reconnect, and the end of the interview. P10 owns apps/web/src/session.
  *
  * Steps: check the microphone -> wait for the interview plan (brief) -> join the room (this starts
  * the session and its clock) -> wait for the interviewer -> live -> end -> debrief page, which
@@ -21,6 +21,8 @@ import { InterviewerAvatar } from "./avatar/InterviewerAvatar";
 import { micProblem, micProblemText, openMicrophone, type MicCheck, type MicProblem } from "./microphone";
 import {
   isMockVoice,
+  PREP_MINUTES,
+  prepLeftMs,
   remainingMs,
   type AgentActivity,
   type AgentCommand,
@@ -170,6 +172,9 @@ function LiveView({ session }: { session: SessionRecord }) {
 
   const phase: Phase = agent?.phase ?? "intro";
   const paused = agent?.paused ?? false;
+  // IV-11: while the candidate prepares, the interview clock is stopped and a prep timer runs.
+  const prepLeft = stage === "live" ? prepLeftMs(agent, now) : null;
+  const preparing = prepLeft !== null;
   const inRoom = stage === "waiting" || stage === "live";
 
   return (
@@ -222,9 +227,11 @@ function LiveView({ session }: { session: SessionRecord }) {
                 ? slowAgent
                   ? "The interviewer is starting. This can take up to a minute."
                   : "Waiting for the interviewer to join"
-                : paused
-                  ? "Paused"
-                  : "Connected"}
+                : preparing
+                  ? "Preparing. The clock is stopped."
+                  : paused
+                    ? "Paused"
+                    : "Connected"}
             </p>
           </div>
           <ol className="phases" aria-label="Interview phases">
@@ -252,12 +259,36 @@ function LiveView({ session }: { session: SessionRecord }) {
             )}
           </div>
           <p className="muted">Your audio is never stored. Only the text of the interview is kept.</p>
+          <div className="row section" aria-label="Prep time">
+            {preparing ? (
+              <>
+                <p>
+                  Prep time left: <span data-testid="prep-timer">{clock(prepLeft)}</span>
+                </p>
+                <button type="button" className="btn" onClick={() => void send("ready")}>
+                  I am ready
+                </button>
+              </>
+            ) : (
+              PREP_MINUTES.map((minutes) => (
+                <button
+                  key={minutes}
+                  type="button"
+                  className="btn btn--secondary"
+                  disabled={stage !== "live" || paused}
+                  onClick={() => void send({ prep: minutes })}
+                >
+                  Take {minutes} {minutes === 1 ? "minute" : "minutes"} to prepare
+                </button>
+              ))
+            )}
+          </div>
           {config.mode === "coach" && (
             <div className="row section">
               <button
                 type="button"
                 className="btn btn--secondary"
-                disabled={stage !== "live"}
+                disabled={stage !== "live" || preparing}
                 onClick={() => void send(paused ? "resume" : "pause")}
               >
                 {paused ? "Resume" : "Pause"}

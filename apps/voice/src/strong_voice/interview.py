@@ -11,6 +11,10 @@ talking while the reply is prepared (`superseded`). The candidate's words are th
 together with what they say next. A request for time to think ("give me a moment") gets one
 short line, and the question stays open; after a long silence the interviewer checks in once.
 
+Prep time (IV-11): the candidate asks for 1 to 3 minutes to prepare, by voice ("give me 3
+minutes") or with a button. The clock stops in every mode. Prep ends when the time is up, when
+the candidate says they are ready, or when they start to answer.
+
 Reconnect (IV-9): when the candidate drops, the session clock stops. If they come back within
 RECONNECT_S, the interviewer says a short line and repeats its last turn, so the session goes on
 at the same phase and question. If not, the session ends as interrupted and is billed for the
@@ -37,6 +41,16 @@ TRACE_FLUSH_S = 5.0
 WELCOME_BACK = "Welcome back. Let me repeat where we were."
 TAKE_YOUR_TIME = "Sure, take your time. Go ahead whenever you are ready."
 CHECK_IN = "No rush. Go ahead whenever you are ready, or ask me to repeat the question."
+MAX_PREP_MIN = 3
+PREP_OVER = "Time is up. Go ahead whenever you are ready."
+PREP_READY = "Great. Go ahead."
+
+
+def prep_line(minutes: int) -> str:
+    unit = "minute" if minutes == 1 else "minutes"
+    return (
+        f"Sure, take {minutes} {unit} to prepare. The clock is stopped. Tell me when you are ready."
+    )
 
 
 class SessionStore(Protocol):
@@ -66,6 +80,7 @@ class VoiceInterview:
     now: Callable[[], float]
     reconnect_s: float = RECONNECT_S
     disconnected_at: float | None = None
+    prep_until: float | None = None
     finished: bool = False
     _saved: int = field(default=0, init=False)
 
@@ -123,6 +138,41 @@ class VoiceInterview:
         await self.runner.line(TAKE_YOUR_TIME, kind="take_your_time")
         return await self._flush()
 
+    @property
+    def preparing(self) -> bool:
+        return self.prep_until is not None
+
+    def prep_ms_left(self) -> int | None:
+        if self.prep_until is None:
+            return None
+        return max(0, int((self.prep_until - self.now()) * 1000))
+
+    async def start_prep(
+        self, minutes: int, text: str | None = None, spoken_s: float | None = None
+    ) -> list[str]:
+        """IV-11: 1 to MAX_PREP_MIN minutes to prepare, clock stopped. `text` is the spoken ask."""
+        if self.ended or self.preparing:
+            return []
+        minutes = max(1, min(MAX_PREP_MIN, minutes))
+        if text:
+            start, end = self._timing(spoken_s)
+            await self.runner.note(text, start_ms=start, end_ms=end)
+        self.prep_until = self.now() + minutes * 60
+        self.runner.controller.hold()
+        await self.runner.line(prep_line(minutes), kind="prep_time")
+        return await self._flush()
+
+    async def end_prep(self, *, timed_out: bool = False, say: bool = True) -> list[str]:
+        """Prep is over: the clock runs again. `say=False` when the candidate starts to answer."""
+        if not self.preparing:
+            return []
+        self.prep_until = None
+        self.runner.controller.release()
+        if not say or self.ended:
+            return []
+        await self.runner.line(PREP_OVER if timed_out else PREP_READY, kind="prep_over")
+        return await self._flush()
+
     async def check_in(self) -> list[str]:
         """A long silence after a request for time: one gentle line, no new question."""
         if self.ended or self.disconnected_at is not None:
@@ -147,6 +197,7 @@ class VoiceInterview:
         if self.ended or self.disconnected_at is not None:
             return
         self.disconnected_at = self.now()
+        self.prep_until = None  # the clock stays stopped until the candidate is back
         self.runner.controller.hold()
 
     def on_reconnect(self) -> list[str]:

@@ -3,9 +3,12 @@
  * speaks the interview; this module carries its messages to the live page.
  *
  * Agent to browser, data topic "session":
- *   {"type": "state", "phase", "paused", "elapsed_ms", "said": [lines]}  after each interviewer turn
+ *   {"type": "state", "phase", "paused", "elapsed_ms", "prep_ms_left", "said": [lines]}
+ *                                                                         after each interviewer turn
  *   {"type": "ended"}                                                     when the session is over
- * Browser to agent, data topic "coach": {"command": "hint" | "redo" | "pause" | "resume" | "end"}
+ * Browser to agent, data topic "coach": {"command": "hint" | "redo" | "pause" | "resume" | "end"}.
+ * In every mode (IV-11): {"command": "prep", "minutes": 1 | 3} starts prep time, and
+ * {"command": "ready"} ends it.
  *
  * LiveKit Agents also sets the participant attribute "lk.agent.state" (listening, thinking,
  * speaking). The interviewer avatar shows it, and moves its mouth from the agent's audio track.
@@ -21,12 +24,18 @@ export const COACH_TOPIC = "coach";
 export const MOCK_VOICE_URL = "mock://voice";
 export const isMockVoice = (url: string) => url.startsWith("mock:");
 
-export type AgentCommand = "hint" | "redo" | "pause" | "resume" | "end";
+/** Prep time the candidate can ask for with a button (IV-11). */
+export type PrepMinutes = 1 | 3;
+export const PREP_MINUTES: PrepMinutes[] = [1, 3];
+
+export type AgentCommand = "hint" | "redo" | "pause" | "resume" | "end" | "ready" | { prep: PrepMinutes };
 
 export interface AgentState {
   phase: Phase;
   paused: boolean;
   elapsedMs: number;
+  /** Prep time left when the message was sent (IV-11), or null when the candidate is not preparing. */
+  prepMsLeft: number | null;
   said: string[];
   /** Date.now() when the browser got the message; the timer runs on from here. */
   receivedAt: number;
@@ -90,17 +99,27 @@ export function parseAgentMessage(data: Uint8Array, now = Date.now()): AgentMess
       phase: m.phase as Phase,
       paused: m.paused === true,
       elapsedMs: typeof m.elapsed_ms === "number" ? m.elapsed_ms : 0,
+      prepMsLeft: typeof m.prep_ms_left === "number" ? m.prep_ms_left : null,
       said: Array.isArray(m.said) ? m.said.filter((s): s is string => typeof s === "string") : [],
       receivedAt: now,
     },
   };
 }
 
-export const encodeCommand = (command: AgentCommand) => new TextEncoder().encode(JSON.stringify({ command }));
+export const encodeCommand = (command: AgentCommand) =>
+  new TextEncoder().encode(
+    JSON.stringify(typeof command === "string" ? { command } : { command: "prep", minutes: command.prep }),
+  );
 
 /** Milliseconds left on the interview clock. The clock stops while paused. */
 export function remainingMs(durationMin: number, state: AgentState | null, now: number): number {
   if (!state) return durationMin * 60_000;
   const elapsed = state.elapsedMs + (state.paused ? 0 : Math.max(0, now - state.receivedAt));
   return Math.max(0, durationMin * 60_000 - elapsed);
+}
+
+/** Milliseconds of prep time left (IV-11), or null when the candidate is not preparing. */
+export function prepLeftMs(state: AgentState | null, now: number): number | null {
+  if (state?.prepMsLeft == null) return null;
+  return Math.max(0, state.prepMsLeft - Math.max(0, now - state.receivedAt));
 }

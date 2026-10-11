@@ -10,11 +10,21 @@ import type { SessionRecord, VoiceJoin } from "../api/types";
 import { createQueryClient } from "../App";
 import { server } from "../mocks/node";
 import { AGENT_WAIT_MS, LiveSessionPage } from "./LiveSessionPage";
-import { MOCK_VOICE_URL, parseAgentActivity, parseAgentMessage, parseInterviewerVoice, remainingMs, type AgentCommand, type VoiceHandlers } from "./voice";
+import {
+  encodeCommand,
+  MOCK_VOICE_URL,
+  parseAgentActivity,
+  parseAgentMessage,
+  parseInterviewerVoice,
+  prepLeftMs,
+  remainingMs,
+  type AgentCommand,
+  type VoiceHandlers,
+} from "./voice";
 
 const voice = vi.hoisted(() => ({
   handlers: null as VoiceHandlers | null,
-  sent: [] as string[],
+  sent: [] as AgentCommand[],
   micError: null as Error | null,
 }));
 
@@ -95,8 +105,13 @@ async function joinRoom(user: ReturnType<typeof userEvent.setup>) {
   await screen.findByText("Waiting for the interviewer to join");
 }
 
-const say = (phase: "intro" | "core", said: string[], paused = false, elapsedMs = 60_000) =>
-  act(() => voice.handlers!.onState({ phase, paused, elapsedMs, said, receivedAt: Date.now() }));
+const say = (
+  phase: "intro" | "core",
+  said: string[],
+  paused = false,
+  elapsedMs = 60_000,
+  prepMsLeft: number | null = null,
+) => act(() => voice.handlers!.onState({ phase, paused, elapsedMs, prepMsLeft, said, receivedAt: Date.now() }));
 
 describe("live session page", () => {
   it("shows a clear message when the browser blocks the microphone", async () => {
@@ -160,6 +175,38 @@ describe("live session page", () => {
     expect(screen.getByTestId("interviewer-avatar")).toHaveTextContent("Interviewer: Speaking");
     act(() => voice.handlers!.onActivity("listening"));
     expect(screen.getByTestId("interviewer-avatar")).toHaveAttribute("data-activity", "listening");
+  });
+
+  it("IV-11: prep time in Realistic mode: the clock stops, a prep timer runs, and I am ready ends it", async () => {
+    const realistic = session({ config: { ...session().config, mode: "realistic" } });
+    const { user } = renderLive(realistic);
+    await joinRoom(user);
+    act(() => voice.handlers!.onAgentJoined());
+    say("core", ["Tell me about a time you led without authority."]);
+    expect(screen.getByRole("button", { name: "Take 1 minute to prepare" })).toBeEnabled();
+    await user.click(screen.getByRole("button", { name: "Take 3 minutes to prepare" }));
+    expect(voice.sent).toEqual([{ prep: 3 }]);
+
+    say("core", ["Sure, take 3 minutes to prepare."], true, 60_000, 180_000);
+    expect(screen.getByRole("status")).toHaveTextContent("Preparing. The clock is stopped.");
+    expect(screen.getByTestId("prep-timer")).toHaveTextContent(/^(3:00|2:59)$/);
+    expect(screen.getByTestId("timer")).toHaveTextContent("29:00");
+    expect(screen.queryByRole("button", { name: "Take 1 minute to prepare" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "I am ready" }));
+    expect(voice.sent).toEqual([{ prep: 3 }, "ready"]);
+
+    say("core", ["Great. Go ahead."]);
+    expect(screen.queryByTestId("prep-timer")).not.toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("Connected");
+  });
+
+  it("IV-11: in Coach mode, Pause is off during prep time", async () => {
+    const { user } = renderLive(session());
+    await joinRoom(user);
+    act(() => voice.handlers!.onAgentJoined());
+    say("core", ["Sure, take 1 minute to prepare."], true, 60_000, 60_000);
+    expect(screen.getByRole("button", { name: "Resume" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "I am ready" })).toBeEnabled();
   });
 
   it("Realistic mode has no Coach controls", async () => {
@@ -236,17 +283,30 @@ describe("agent messages", () => {
     );
     expect(state).toEqual({
       type: "state",
-      state: { phase: "core", paused: false, elapsedMs: 1000, said: ["Hi"], receivedAt: 5 },
+      state: { phase: "core", paused: false, elapsedMs: 1000, prepMsLeft: null, said: ["Hi"], receivedAt: 5 },
     });
+    const prep = parseAgentMessage(bytes({ type: "state", phase: "core", paused: true, prep_ms_left: 60_000 }), 5);
+    expect(prep?.type === "state" && prep.state.prepMsLeft).toBe(60_000);
     expect(parseAgentMessage(bytes({ type: "ended" }))).toEqual({ type: "ended" });
     expect(parseAgentMessage(bytes({ type: "other" }))).toBeNull();
     expect(parseAgentMessage(new TextEncoder().encode("not json"))).toBeNull();
   });
 
   it("the timer counts down from the agent's clock and stops while paused", () => {
-    const base = { phase: "core" as const, said: [], receivedAt: 0 };
+    const base = { phase: "core" as const, said: [], receivedAt: 0, prepMsLeft: null };
     expect(remainingMs(30, null, 0)).toBe(1_800_000);
     expect(remainingMs(30, { ...base, paused: false, elapsedMs: 60_000 }, 10_000)).toBe(1_730_000);
     expect(remainingMs(30, { ...base, paused: true, elapsedMs: 60_000 }, 10_000)).toBe(1_740_000);
+  });
+
+  it("IV-11: the prep timer counts down, and the prep commands are encoded for the agent", () => {
+    const base = { phase: "core" as const, said: [], paused: true, elapsedMs: 0, receivedAt: 0 };
+    expect(prepLeftMs(null, 0)).toBeNull();
+    expect(prepLeftMs({ ...base, prepMsLeft: null }, 0)).toBeNull();
+    expect(prepLeftMs({ ...base, prepMsLeft: 60_000 }, 10_000)).toBe(50_000);
+    expect(prepLeftMs({ ...base, prepMsLeft: 60_000 }, 90_000)).toBe(0);
+    const decode = (c: AgentCommand) => JSON.parse(new TextDecoder().decode(encodeCommand(c))) as unknown;
+    expect(decode({ prep: 3 })).toEqual({ command: "prep", minutes: 3 });
+    expect(decode("ready")).toEqual({ command: "ready" });
   });
 });

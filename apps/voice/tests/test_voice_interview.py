@@ -202,6 +202,7 @@ async def test_state_message_for_the_browser() -> None:
         "phase": "intro",
         "paused": True,
         "elapsed_ms": rig.voice.runner.controller.elapsed_ms,
+        "prep_ms_left": None,
         "said": lines,
     }
 
@@ -235,3 +236,36 @@ async def test_voice_interview_takes_back_and_keeps_the_question_open() -> None:
     assert lines == [TAKE_YOUR_TIME]
     assert [t.speaker for t in rig.store.turns[saved:]] == [Speaker.CANDIDATE, Speaker.INTERVIEWER]
     assert controller.snapshot() == state
+
+
+async def test_iv11_prep_time_stops_the_clock_in_realistic_mode_too() -> None:
+    """IV-11: prep time is allowed in every mode, and the interview clock stops during it."""
+    from strong_voice.interview import PREP_OVER, prep_line
+
+    rig = make_rig(mode=Mode.REALISTIC)
+    await rig.voice.opening()
+    rig.clock.advance(ms=30_000)
+    lines = await rig.voice.start_prep(3, "Could I have three minutes to prepare?", spoken_s=2.0)
+    assert lines == [prep_line(3)]
+    assert rig.voice.preparing and rig.voice.prep_ms_left() == 180_000
+    elapsed = rig.voice.runner.controller.elapsed_ms
+    rig.clock.advance(minutes=3)
+    rig.wall[0] += 180
+    assert rig.voice.runner.controller.elapsed_ms == elapsed  # prep is not interview time
+    assert rig.voice.prep_ms_left() == 0
+    assert await rig.voice.end_prep(timed_out=True) == [PREP_OVER]
+    rig.clock.advance(ms=10_000)
+    assert rig.voice.runner.controller.elapsed_ms == elapsed + 10_000
+    speakers = [t.speaker for t in rig.store.turns[-3:]]
+    assert speakers == [Speaker.CANDIDATE, Speaker.INTERVIEWER, Speaker.INTERVIEWER]
+
+
+async def test_iv11_prep_is_capped_at_three_minutes_and_ends_once() -> None:
+    rig = make_rig()
+    await rig.voice.opening()
+    await rig.voice.start_prep(10)
+    assert rig.voice.prep_ms_left() == 180_000
+    assert await rig.voice.start_prep(1) == []  # already preparing
+    assert await rig.voice.end_prep(say=False) == []
+    assert await rig.voice.end_prep() == []  # not preparing any more
+    assert not rig.voice.preparing

@@ -5,9 +5,11 @@ strong_interview through VoiceInterview, and speaks what it returns. LiveKit's o
 skipped (StopResponse): the interviewer and the controller decide what is said.
 
 From the browser, on the data channel (topic "coach"): {"command": "hint" | "redo" | "pause" |
-"resume" | "end"}. "end" means the candidate clicked End interview.
+"resume" | "end"}. "end" means the candidate clicked End interview. In every mode (IV-11):
+{"command": "prep", "minutes": 1 | 3} starts prep time, {"command": "ready"} ends it.
 To the browser (topic "session"):
-  {"type": "state", "phase", "paused", "elapsed_ms", "said": [lines]}  after each interviewer turn
+  {"type": "state", "phase", "paused", "elapsed_ms", "prep_ms_left", "said": [lines]}
+                                                                        after each interviewer turn
   {"type": "ended"}                                                     when the session is over
 Participant attribute "sh.interviewer.voice": "female" or "male", how the TTS voice sounds. The
 live page shows the interviewer face that matches it (IV-10).
@@ -69,6 +71,7 @@ def state_message(interview: VoiceInterview, said: list[str]) -> bytes:
             "phase": controller.phase.value,
             "paused": controller.paused,
             "elapsed_ms": controller.elapsed_ms,
+            "prep_ms_left": interview.prep_ms_left(),
             "said": said,
         }
     ).encode()
@@ -175,11 +178,16 @@ async def run_session(ctx: JobContext, build_session: Any) -> bool:
         if packet.topic != COACH_TOPIC:
             return
         try:
-            command = json.loads(packet.data.decode()).get("command")
-        except ValueError:
+            message = json.loads(packet.data.decode())
+            command = message.get("command")
+        except (ValueError, AttributeError):
             return
         if command == "end":
             background(ended())
+        elif command == "prep" and message.get("minutes") in (1, 2, 3):
+            background(agent.turns.start_prep(message["minutes"]))
+        elif command == "ready":
+            background(agent.turns.ready())
         elif command in COACH_COMMANDS:
             background(_coach(command))
 

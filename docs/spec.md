@@ -102,6 +102,7 @@ IDs are referenced by the build plan and acceptance tests. Priority: P0 must shi
 | IV-8 | Mode chosen at start. Coach: pause, hint, redo. Realistic: no interruptions, counts toward scores. | P0 |
 | IV-9 | Graceful recovery from dropped audio: resume the session where it stopped. | P0 |
 | IV-10 | Interviewer avatar: a 3D head on the live screen shows when the interviewer listens, thinks and speaks, and moves its lips with the interviewer's audio. It runs in the browser only: no extra service, no cost per minute, no audio sent anywhere. The face matches the voice: a woman for a female TTS voice, a man for a male one. Without WebGL a flat face shows the same states. Captions stay. | P1 |
+| IV-11 | Prep time: in every mode the candidate can ask for 1 to 3 minutes to prepare an answer, by voice ("give me 3 minutes") or with a button. The interview clock stops and the live screen shows a prep timer. Prep ends when the time is up, when the candidate says or clicks that they are ready, or when they start to answer. | P1 |
 | FB-1 | Overall hire signal (Strong Hire, Hire, Lean Hire, Lean No Hire, No Hire) with a short written rationale. | P0 |
 | FB-2 | Per-question rubric scores with strengths and misses. | P0 |
 | FB-3 | Debrief ready within 60 seconds of session end. | P0 |
