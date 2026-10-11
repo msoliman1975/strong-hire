@@ -119,6 +119,7 @@ async def test_r2_voice_session_writes_trace_rows(maker: Maker) -> None:
         "agenda",
         "ask",
         "take_your_time",
+        "check_answer",
         "decide",
         "probe",
         "welcome_back",

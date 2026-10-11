@@ -99,8 +99,8 @@ async def test_r2_moving_on_at_the_probe_limit_says_why(
     nxt = sink.records[-1]
     assert nxt.move in ("ask", "curveball")
     assert nxt.reason["why"][0] == "probe_limit_reached"
-    # No decide call is made once the limit is reached.
-    assert sink.records[-2].call == "say"
+    # No decide call is made once the limit is reached; only the answer check (IV-12).
+    assert [r.call for r in sink.records[-3:-1]] == ["say", "check"]
 
 
 async def test_r2_core_time_up_is_the_reason(gateway: ModelGateway, clock: FakeClock) -> None:

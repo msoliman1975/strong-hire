@@ -25,6 +25,11 @@ small-talk line) and no CANDIDATE_QUESTIONS turn (CORE goes straight to WRAP_UP)
 always said, in one short turn. The 10-minute mini interview uses this: minute 1 is the greeting
 and the agenda, 8 minutes of CORE, 1 minute of WRAP_UP. A mini also has no curveball and at
 most MINI_MAX_PROBES follow-ups per question, whatever the difficulty.
+
+IV-12: a candidate turn outside the interview, or an inappropriate one, is a conduct strike
+(`conduct_strike`). The first MAX_CONDUCT_WARNINGS strikes get a WARN move: the phase, the open
+question and the probe count stay as they were, so the candidate answers the same question
+again. The next strike closes the interview at once; the session ends after the closing line.
 """
 
 from __future__ import annotations
@@ -37,6 +42,7 @@ from enum import StrEnum
 
 from strong_core.schemas import (
     MINI_MAX_PROBES,
+    AnswerConduct,
     BriefQuestion,
     Difficulty,
     InterviewerBrief,
@@ -44,6 +50,7 @@ from strong_core.schemas import (
     ProbeDecision,
     ProbeTrigger,
 )
+from strong_interview.conduct import MAX_CONDUCT_WARNINGS
 
 # IV-3: most follow-ups per question. The brief's max_probes_per_question can only lower it.
 PROBE_LIMIT: dict[Difficulty, int] = {
@@ -117,6 +124,8 @@ class Why(StrEnum):
     CANDIDATE_QUESTION_LEFT_OPEN = "candidate_question_left_open"
     ENDED_EARLY = "ended_early"
     COACH_REQUEST = "coach_request"
+    CONDUCT_WARNING = "conduct_warning"
+    CONDUCT_LIMIT = "conduct_limit"
     UNEXPECTED_PHASE = "unexpected_phase"
 
 
@@ -134,6 +143,7 @@ class MoveKind(StrEnum):
     WRAP_UP = "wrap_up"
     HINT = "hint"
     REDO = "redo"
+    WARN = "warn"  # IV-12: a fixed warning line, then the same question again
 
 
 @dataclass(frozen=True)
@@ -149,6 +159,9 @@ class Move:
     closing: bool = False
     # WRAP_UP: the candidate asked a question there is no time left to answer.
     open_question: bool = False
+    # IV-12: WARN, or the WRAP_UP that closes the interview, for this kind of turn.
+    conduct: AnswerConduct | None = None
+    last_warning: bool = False  # WARN: the next strike closes the interview
 
     @property
     def question_ref(self) -> str | None:
@@ -193,6 +206,7 @@ class SessionController:
     candidate_questions: int = 0
     # The gaps (ProbeDecision.missing) already probed on the current question.
     probed_missing: list[ProbeTrigger] = field(default_factory=list)
+    conduct_strikes: int = 0  # IV-12
 
     def __post_init__(self) -> None:
         self._clock = _Clock(self.clock)
@@ -226,6 +240,7 @@ class SessionController:
         "curveball_used",
         "candidate_questions",
         "probed_missing",
+        "conduct_strikes",
         "_queue",
     )
 
@@ -376,6 +391,28 @@ class SessionController:
         if decision is None:
             return Why.NO_DECISION
         return Why.MODEL_CHOSE_MOVE_ON
+
+    def conduct_strike(self, conduct: AnswerConduct) -> Move:
+        """IV-12: the candidate's turn was outside the interview or inappropriate.
+
+        Returns a WARN move while warnings are left; the question and the phase stay. Else the
+        closing WRAP_UP, and the session has ended.
+        """
+        self.conduct_strikes += 1
+        if self.conduct_strikes <= MAX_CONDUCT_WARNINGS:
+            return Move(
+                MoveKind.WARN,
+                self.phase,
+                self.question if self.phase == Phase.CORE else None,
+                reason=(Why.CONDUCT_WARNING,),
+                conduct=conduct,
+                last_warning=self.conduct_strikes == MAX_CONDUCT_WARNINGS,
+            )
+        move = self._wrap_up(Why.CONDUCT_LIMIT)
+        self.ended = True
+        return Move(
+            move.kind, move.phase, expects_answer=False, reason=move.reason, conduct=conduct
+        )
 
     def end_now(self) -> Move:
         """Close the session early, for example when the candidate wants to stop."""

@@ -22,7 +22,7 @@ export interface MockTask extends JobOut {
   kind: "job_target" | "resume";
   entityId: string;
   /** What the job reports when it finishes. */
-  outcome: "extracted" | "needs_paste";
+  outcome: "extracted" | "needs_paste" | "rejected";
 }
 
 /** A gap analysis as the mock keeps it. The R1 name fields are filled in when it is sent. */

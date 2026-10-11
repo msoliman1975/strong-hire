@@ -13,6 +13,11 @@ in the text API) leaves the runner usable: the runner lock is released, a turn t
 hook could not save is taken back out of the transcript, and the controller goes back to its
 state before the turn unless an interviewer turn was already said. So the candidate can send
 the same answer again.
+
+IV-12: each candidate turn is screened for clear abuse, and in CORE and the candidate questions
+phase the interviewer model checks it too, at the same time as the probe decision. A turn that
+is outside the interview or inappropriate gets a fixed warning line instead of the usual moves;
+after the warnings, a fixed closing line ends the session (see strong_interview.conduct).
 """
 
 from __future__ import annotations
@@ -26,8 +31,9 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from typing import Any, Literal
 
-from strong_core.schemas import Phase, ProbeDecision, Speaker, Turn
-from strong_interview.controller import Move, SessionController
+from strong_core.schemas import AnswerCheck, AnswerConduct, Phase, ProbeDecision, Speaker, Turn
+from strong_interview.conduct import closing_line, screen_turn, warning_line
+from strong_interview.controller import Move, MoveKind, SessionController
 from strong_interview.interviewer import Interviewer
 from strong_interview.trace import ModelCall, TraceCall, TraceRecord, TraceSink, message_dicts
 
@@ -50,6 +56,8 @@ _ASKS = re.compile(
     r"|\btell me (?:more |a bit |a little )*(?:about|what|how|why|who)\b",
     re.IGNORECASE,
 )
+
+CHECKED_PHASES = (Phase.CORE, Phase.CANDIDATE_QUESTIONS)  # IV-12: the model checks these turns
 
 TurnHook = Callable[[Turn], Awaitable[None] | None]
 StageHook = Callable[[str], None]
@@ -182,6 +190,16 @@ class InterviewRunner:
         return turn
 
     async def _say(self, move: Move, decision: ProbeDecision | None = None) -> Turn:
+        if move.conduct is not None:  # IV-12: a fixed line, never model output
+            if move.kind == MoveKind.WARN:
+                question = move.question.text if move.question else None
+                line = warning_line(
+                    move.conduct, last=move.last_warning, phase=move.phase, question=question
+                )
+            else:
+                line = closing_line(move.conduct)
+            kind = "conduct_warning" if move.kind == MoveKind.WARN else "conduct_close"
+            return await self._fixed(line, kind, move)
         before = self.controller.elapsed_ms
         reason: dict[str, Any] = {
             "why": [w.value for w in move.reason],
@@ -313,30 +331,102 @@ class InterviewRunner:
             )
         )
         self._stage("candidate_turn_saved", on_stage)
+        conduct = screen_turn(text) if ctl.phase != Phase.WRAP_UP else None
+        check = conduct is None and ctl.phase in CHECKED_PHASES
+        deciding = ctl.needs_decision and ctl.question is not None
         decision = None
-        if ctl.needs_decision and ctl.question is not None:
-            self.stage = "deciding"
-            before = ctl.elapsed_ms
-            timer = self._timer(Phase.CORE)
-            self.interviewer.last_call = None
-            decision = await self.interviewer.decide(ctl.question, text, self.turns)
-            self._emit(
-                "decide",
-                "decide",
-                {"decision": decision.model_dump(mode="json"), **timer},
-                phase=Phase.CORE,
-                elapsed_ms=before,
-                question_ref=ctl.question.id,
-                model_call=self.interviewer.last_call,
-            )
-            self._stage("decide_done", on_stage)
-        moves = ctl.after_answer(decision, has_question=wants_to_ask(text))
+        if check or deciding:
+            self.stage = "deciding" if deciding else "checking"
+            decision, model_conduct = await self._decide_and_check(text, deciding, check)
+            conduct = conduct or model_conduct
+            self._stage("decide_done" if deciding else "check_done", on_stage)
+        if conduct is not None and conduct != AnswerConduct.OK:
+            moves = [ctl.conduct_strike(conduct)]
+        else:
+            moves = ctl.after_answer(decision, has_question=wants_to_ask(text))
         turns = []
         for move in moves:
             self.stage = f"saying_{move.kind.value}"
             turns.append(await self._say(move, decision))
             self._stage(f"say_done_{move.kind.value}", on_stage)
         return turns
+
+    async def _decide_and_check(
+        self, text: str, deciding: bool, check: bool
+    ) -> tuple[ProbeDecision | None, AnswerConduct | None]:
+        """The probe decision and the answer check (IV-12), at the same time. Each is traced."""
+        ctl = self.controller
+        phase = ctl.phase
+        before = ctl.elapsed_ms
+        timer = self._timer(phase)
+        ref = ctl.question.id if phase == Phase.CORE and ctl.question else None
+
+        async def decide() -> tuple[ProbeDecision, ModelCall | None] | None:
+            if not deciding or ctl.question is None:
+                return None
+            self.interviewer.last_call = None
+            decision = await self.interviewer.decide(ctl.question, text, self.turns)
+            return decision, self.interviewer.last_call
+
+        async def check_answer() -> tuple[AnswerCheck, ModelCall] | None:
+            if not check:
+                return None
+            return await self.interviewer.check_answer(text, self.turns, phase)
+
+        decided, checked = await asyncio.gather(decide(), check_answer())
+        # Traced after both are done, in a fixed order: the check, then the decision.
+        conduct = None
+        if checked is not None:
+            result, call = checked
+            conduct = result.conduct
+            self._emit(
+                "check",
+                "check_answer",
+                {"check": result.model_dump(mode="json"), **timer},
+                phase=phase,
+                elapsed_ms=before,
+                question_ref=ref,
+                model_call=call,
+            )
+        decision = None
+        if decided is not None:
+            decision, decide_call = decided
+            self._emit(
+                "decide",
+                "decide",
+                {"decision": decision.model_dump(mode="json"), **timer},
+                phase=Phase.CORE,
+                elapsed_ms=before,
+                question_ref=ref,
+                model_call=decide_call,
+            )
+        return decision, conduct
+
+    async def _fixed(self, text: str, kind: str, move: Move) -> Turn:
+        """Say a fixed line for `move` (no model call), traced with the move's reason."""
+        start = self.controller.elapsed_ms
+        self._emit(
+            "line",
+            kind,
+            {
+                "why": [w.value for w in move.reason],
+                "conduct_strikes": self.controller.conduct_strikes,
+            },
+            phase=move.phase,
+            elapsed_ms=start,
+            question_ref=move.question_ref,
+            spoken=text,
+        )
+        return await self._add(
+            Turn(
+                speaker=Speaker.INTERVIEWER,
+                phase=move.phase,
+                text=text,
+                start_ms=start,
+                end_ms=start + max(1, len(text.split())) * MS_PER_WORD,
+                question_ref=move.question_ref,
+            )
+        )
 
     def checkpoint(self) -> Checkpoint:
         return Checkpoint(len(self.turns), self.controller.snapshot())

@@ -18,7 +18,7 @@ from typing import Any, Literal, Protocol
 from strong_core.gateway.types import Message
 from strong_core.schemas import Phase
 
-TraceCall = Literal["say", "decide", "line", "rollback"]
+TraceCall = Literal["say", "decide", "check", "line", "rollback"]
 
 
 @dataclass(frozen=True)

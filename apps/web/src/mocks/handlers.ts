@@ -235,6 +235,20 @@ function gapView(store: MockStore, gap: MockGap): GapAnalysisOut {
 /** Mock only: links to this host act like a job board that blocks reading (outcome needs_paste). */
 const isBlockedBoard = (url: string) => safeHost(url).endsWith("blocked.example");
 
+/**
+ * Mock only (IN-6): a list of jobs is a link to this host with no text (pasted text is checked
+ * instead of the link), or text that starts with "Open roles".
+ */
+const isJobList = (url: string | null, text: string | null) =>
+  text ? /^\s*open roles/i.test(text) : url !== null && safeHost(url).endsWith("careers.example");
+/** Mock only (IN-7): a CV file or text that says "we are hiring" is a job description. */
+const isNotCv = (name: string, text: string) => /job-description/i.test(name) || /we are hiring/i.test(text);
+
+export const MOCK_JOB_LIST_REFUSAL =
+  "This link shows a list of jobs, not one job description. Open one job and use its link, or paste its text. The page lists 12 open jobs.";
+export const MOCK_NOT_CV_REFUSAL =
+  "This looks like a job description, not a CV. Add it under Job descriptions. It describes a job opening.";
+
 const taskView = (task: MockTask): JobOut => ({
   id: task.id,
   status: task.status,
@@ -258,6 +272,10 @@ function advance(store: MockStore) {
         task.result = { outcome: "needs_paste", reason: "blocked", detail: "This job board blocks automatic reading." };
         continue;
       }
+      if (task.outcome === "rejected") {
+        task.result = { outcome: "rejected", reason: MOCK_JOB_LIST_REFUSAL, looks_like: "job_list" };
+        continue;
+      }
       if (target.deleted) continue;
       const posting: JobPosting = { ...jobPosting, source_url: target.source_url };
       target.status = "extracted";
@@ -268,6 +286,10 @@ function advance(store: MockStore) {
     } else {
       const r = d.resumes.find((x) => x.id === task.entityId);
       if (!r || r.deleted) continue;
+      if (task.outcome === "rejected") {
+        task.result = { outcome: "rejected", reason: MOCK_NOT_CV_REFUSAL, looks_like: "job_posting" };
+        continue;
+      }
       r.status = "extracted";
       r.resume = resume;
       task.result = { outcome: "extracted", kind: r.has_file ? "pdf" : "text" };
@@ -366,7 +388,8 @@ export function inputHandlers(store: MockStore) {
       db().jobs.push(target);
       if (text) db().jobTexts[target.id] = normalizeText(text);
       const blocked = url !== null && !text && isBlockedBoard(url);
-      const task = enqueue("job_target", target.id, blocked ? "needs_paste" : "extracted");
+      const outcome = blocked ? "needs_paste" : isJobList(url, text) ? "rejected" : "extracted";
+      const task = enqueue("job_target", target.id, outcome);
       store.save();
       const accepted: JobTargetAccepted = { job_target: target, job: taskView(task) };
       return HttpResponse.json(accepted, { status: 202 });
@@ -483,7 +506,8 @@ export function inputHandlers(store: MockStore) {
       };
       db().resumes.push(record);
       db().resumeHashes[record.id] = await sha256Of(hasFile ? await file.arrayBuffer() : String(text));
-      const task = enqueue("resume", record.id, "extracted");
+      const refused = isNotCv(hasFile ? file.name : "", hasFile ? "" : String(text));
+      const task = enqueue("resume", record.id, refused ? "rejected" : "extracted");
       store.save();
       const accepted: ResumeAccepted = { resume: record, job: taskView(task) };
       return HttpResponse.json(accepted, { status: 202 });

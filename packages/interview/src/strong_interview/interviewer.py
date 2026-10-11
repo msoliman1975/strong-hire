@@ -10,6 +10,9 @@ removed and a wrong session length is fixed. If nothing usable is left, or the r
 previous question, the model is asked once more with a stricter instruction; after that a fixed
 line for the move is said. Each model call of a `say`, with its guard result, is kept in
 `last_calls` for the traces (R2).
+
+IV-12: `check_answer` asks whether a candidate turn belongs in the interview. It returns its
+ModelCall instead of setting `last_call`, because it runs at the same time as `decide`.
 """
 
 from __future__ import annotations
@@ -27,6 +30,8 @@ from strong_core.gateway.registry import CapabilityTier
 from strong_core.gateway.types import Completion, Message
 from strong_core.prompts import load_prompt
 from strong_core.schemas import (
+    AnswerCheck,
+    AnswerConduct,
     BriefQuestion,
     InterviewerBrief,
     Phase,
@@ -310,6 +315,54 @@ class Interviewer:
         self.prompt_refs.update(m.prompt_ref for m in messages if m.prompt_ref)
         async for chunk in self.gateway.stream(Role.INTERVIEWER, messages):
             yield chunk
+
+    async def check_answer(
+        self, answer: str, turns: Sequence[Turn], phase: Phase
+    ) -> tuple[AnswerCheck, ModelCall]:
+        """IV-12: is the candidate's turn outside the interview or inappropriate? Ok on failure."""
+        messages = [
+            load_prompt(Role.INTERVIEWER, "check_answer").message("system"),
+            load_prompt(Role.INTERVIEWER, "check_answer_input").message(
+                "user",
+                interview_type=self.brief.session.interview_type.value.replace("_", " "),
+                phase=phase.value.replace("_", " "),
+                asked=previous_interviewer_text(turns) or "(nothing yet)",
+                answer=answer,
+            ),
+        ]
+        started = time.perf_counter()
+        try:
+            done = await self.gateway.complete(Role.INTERVIEWER, messages, output_type=AnswerCheck)
+        except Exception as exc:
+            log.warning("answer check failed; the turn counts as ok", exc_info=True)
+            return AnswerCheck(conduct=AnswerConduct.OK), ModelCall(
+                messages=tuple(messages),
+                raw_reply=None,
+                model=self.gateway.config.alias_for(Role.INTERVIEWER),
+                prompt_refs=tuple(m.prompt_ref for m in messages if m.prompt_ref),
+                latency_ms=_ms_since(started),
+                error=f"{type(exc).__name__}: {exc}"[:2000],
+            )
+        self.prompt_refs.update(done.prompt_refs)
+        self.input_tokens += done.usage.input_tokens
+        self.output_tokens += done.usage.output_tokens
+        try:
+            cost = cost_usd(done.profile, done.model, done.usage)
+        except Exception:
+            log.warning("could not price the answer check", exc_info=True)
+            cost = None
+        self.cost_usd += cost or 0.0
+        call = ModelCall(
+            messages=tuple(messages),
+            raw_reply=done.output.model_dump_json(),
+            model=done.model,
+            prompt_refs=done.prompt_refs,
+            input_tokens=done.usage.input_tokens,
+            output_tokens=done.usage.output_tokens,
+            cost_usd=cost,
+            latency_ms=_ms_since(started),
+        )
+        return done.output, call
 
     async def decide(
         self, question: BriefQuestion, answer: str, turns: Sequence[Turn]

@@ -71,7 +71,9 @@ export function ResumePage() {
           <h2 id="parsed-heading">Your resume</h2>
           {uploaded.isError && <ErrorNotice error={uploaded.error} />}
           {task.isError && <ErrorNotice error={task.error} />}
-          {problem && <ErrorNotice error={`${problem.message} Try pasting the text instead.`} />}
+          {problem && (
+            <ErrorNotice error={problem.refused ? problem.message : `${problem.message} Try pasting the text instead.`} />
+          )}
           {!problem && (uploaded.isPending || uploaded.data?.status === "pending") && (
             <Loading label="Reading your resume. This takes up to a minute." />
           )}

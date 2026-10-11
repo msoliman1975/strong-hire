@@ -1,7 +1,7 @@
 /**
  * The main candidate journey in jsdom, against the MSW mock API. Requirement IDs: AC-2
  * (consent off by default), IN-1 (paste fallback), IN-2 (confirm the posting), IN-3 (resume),
- * IN-4 (optional context can be skipped), AC-3 (profile at the first sign-in), PR-3 (rehearse a
+ * IN-4 (optional context can be skipped), IN-6 (not a job description), IN-7 (not a CV), AC-3 (profile at the first sign-in), PR-3 (rehearse a
  * job and CV pair again), BL-2 (two free mini interviews, then the paywall), BL-1 (usage meter).
  */
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -12,6 +12,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { AppRoutes, createQueryClient } from "./App";
 import { CONSENT_LABEL } from "./components/ConsentSwitch";
+import { MOCK_JOB_LIST_REFUSAL, MOCK_NOT_CV_REFUSAL } from "./mocks/handlers";
 import { server } from "./mocks/node";
 import { MOCK_QUESTION } from "./session/mockVoice";
 
@@ -258,5 +259,36 @@ describe("main journey", () => {
     await user.type(screen.getByLabelText("Job posting text"), "Senior engineer, payments. ".repeat(5));
     await user.click(screen.getByRole("button", { name: "Read job posting" }));
     expect(await screen.findByRole("heading", { name: "Check the job details" })).toBeInTheDocument();
+  });
+
+  it("IN-6: a link to a list of jobs is refused with the reason, and the user pastes one posting", async () => {
+    const user = renderApp("/signin");
+    await signUp(user);
+    await user.click(await screen.findByRole("link", { name: "Add a job description" }));
+    await user.type(screen.getByLabelText("Job posting link"), "https://jobs.careers.example/all");
+    await user.click(screen.getByRole("button", { name: "Read job posting" }));
+    expect(await screen.findByRole("heading", { name: "This is not a job description" })).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent(MOCK_JOB_LIST_REFUSAL);
+    expect(screen.getByRole("link", { name: "Use a different link or text" })).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText("Job posting text"), "Senior engineer, payments. ".repeat(5));
+    await user.click(screen.getByRole("button", { name: "Read job posting" }));
+    expect(await screen.findByRole("heading", { name: "Check the job details" })).toBeInTheDocument();
+  });
+
+  it("IN-7: a CV input that is a job description is refused with the reason", async () => {
+    const user = renderApp("/signin");
+    await signUp(user);
+    await user.click(await screen.findByRole("link", { name: "Add a job description" }));
+    await user.type(screen.getByLabelText("Or paste the job posting text"), "Senior engineer, payments. ".repeat(5));
+    await user.click(screen.getByRole("button", { name: "Read job posting" }));
+    await user.click(await screen.findByRole("button", { name: "Save and continue" }));
+
+    expect(await screen.findByRole("heading", { name: "Choose a resume" })).toBeInTheDocument();
+    await user.type(screen.getByLabelText("Or paste your resume text"), "We are hiring a senior payments engineer.");
+    await user.click(screen.getByRole("button", { name: "Upload resume" }));
+    expect(await screen.findByText(MOCK_NOT_CV_REFUSAL)).toBeInTheDocument();
+    expect(screen.queryByText(/Try pasting the text instead/)).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Roles" })).not.toBeInTheDocument();
   });
 });

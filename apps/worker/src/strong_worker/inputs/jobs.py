@@ -2,7 +2,10 @@
 
 Each job returns a JSON-safe dict that the API shows through its status endpoint:
 
-    {"outcome": "extracted" | "needs_paste" | "failed", ...details}
+    {"outcome": "extracted" | "needs_paste" | "rejected" | "failed", ...details}
+
+"rejected" means the input is not a job description (IN-6) or not a CV (IN-7); its "reason" is
+a message for the user. A refused CV file is not stored.
 
 Jobs return a failure outcome instead of raising, so users see a plain reason.
 """
@@ -26,10 +29,18 @@ from strong_core.gateway import ModelGateway, get_gateway
 from strong_core.library import default_job_name, posting_text_hash
 from strong_core.schemas import JobPosting
 from strong_core.sim import gateway_for_org
+from strong_worker.inputs.check import check_input
 from strong_worker.inputs.documents import KIND_EXTENSIONS, DocumentError, document_text
-from strong_worker.inputs.extract import ExtractionError, extract_job_posting, extract_resume
+from strong_worker.inputs.extract import (
+    MIN_POSTING_CHARS,
+    MIN_RESUME_CHARS,
+    ExtractionError,
+    extract_job_posting,
+    extract_resume,
+)
 from strong_worker.inputs.fetch import PostingFetcher, playwright_render
 from strong_worker.inputs.matching import match_and_log
+from strong_worker.inputs.sanitize import sanitize_untrusted
 from strong_worker.inputs.settings import get_inputs_settings
 from strong_worker.inputs.storage import FileStore, build_file_store
 
@@ -88,6 +99,7 @@ async def extract_job_target(
             return _failed("job target not found")
 
         board = None
+        fetched_now = False
         if not target.raw_text:
             if not target.source_url:
                 return _failed("The job target has no text and no URL.")
@@ -101,11 +113,18 @@ async def extract_job_target(
             target.raw_text = fetched.text
             target.text_hash = posting_text_hash(fetched.text)
             board = fetched.board
+            fetched_now = True
             await db.commit()
 
         assert target.raw_text is not None
         try:
             gateway = await gateway_for_org(db, target.org_id, inputs.gateway)  # P13
+            if _long_enough(target.raw_text, MIN_POSTING_CHARS):  # else the extraction says why
+                refusal = await check_input(
+                    gateway, target.raw_text, "job_posting", "link" if fetched_now else "text"
+                )
+                if refusal is not None:  # IN-6
+                    return refusal.result()
             extraction = await extract_job_posting(
                 gateway, target.raw_text, source_url=target.source_url
             )
@@ -178,6 +197,14 @@ async def parse_resume(
         except DocumentError as exc:
             return _failed(str(exc))
 
+        if _long_enough(text, MIN_RESUME_CHARS):  # else the extraction says why
+            gateway = await gateway_for_org(db, row.org_id, inputs.gateway)  # P13
+            refusal = await check_input(
+                gateway, text, "resume", "text" if kind == "text" else "file"
+            )
+            if refusal is not None:  # IN-7: the file is not stored
+                return refusal.result()
+
         key = f"resumes/{row.org_id}/{row.id}.{KIND_EXTENSIONS[kind]}"
         ref = await inputs.store.put(key, data)
         row.file_ref = ref
@@ -220,6 +247,10 @@ async def delete_resume_file(
             raise Retry(defer=DELETE_RETRY_DELAY_S * job_try) from exc
         raise
     return {"outcome": "deleted", "resume_id": resume_id, "org_id": org_id}
+
+
+def _long_enough(text: str, minimum: int) -> bool:
+    return len(sanitize_untrusted(text).text) >= minimum
 
 
 async def _job_target(db: AsyncSession, job_target_id: str, org_id: str) -> JobTarget | None:

@@ -1,0 +1,7 @@
+Interview type: $interview_type. Phase: $phase.
+
+The interviewer's last turn:
+$asked
+
+The candidate's turn to check:
+$answer

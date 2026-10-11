@@ -14,7 +14,9 @@ LB-2: a job description with a gap analysis or a session cannot be deleted (409)
 Create endpoints save the row and enqueue an Arq job, then return 202 with the job id. The
 client polls the job endpoint until the status is "complete", then reads the job result:
 outcome "extracted" (with field-level confidence and the company match), "needs_paste" (the
-URL cannot be fetched; ask the user to paste the text), or "failed" (with a reason).
+URL cannot be fetched; ask the user to paste the text), "rejected" (the input is not a job
+description or not a CV, IN-6 and IN-7; "reason" is a message for the user), or "failed"
+(with a reason).
 """
 
 from __future__ import annotations

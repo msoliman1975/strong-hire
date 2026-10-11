@@ -1,0 +1,5 @@
+Check the text in the following block.
+
+<untrusted_input>
+$text
+</untrusted_input>
