@@ -1,13 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 
 import { keys, useJob, useJobTask } from "../../api/hooks";
 import { jobProblem, jobTargetsApi } from "../../api/inputs";
 import type { JobPosting, JobTargetOut, Level, RoleFamily } from "../../api/types";
 import { ErrorNotice, Loading, ONBOARDING_STEPS, PageHead, Steps } from "../../components/ui";
 import { levelLabel, roleFamilyLabel } from "../../labels";
-import type { NewJobReturn } from "../../paths";
+import { newJobPath, type NewJobReturn } from "../../paths";
 import { afterConfirmPath, confirmPath, MIN_POSTING_CHARS, newJobReturn } from "./NewJobPage";
 
 const lines = (value: string) =>
@@ -30,7 +30,9 @@ export function ConfirmJobPage() {
       {job.isPending && <Loading label="Loading the job" />}
       {job.isError && <ErrorNotice error={job.error} />}
       {task.isError && <ErrorNotice error={task.error} />}
-      {job.data && problem && <PasteInstead job={job.data} message={problem.message} then={then} />}
+      {job.data && problem && (
+        <PasteInstead job={job.data} message={problem.message} refused={problem.refused} then={then} />
+      )}
       {job.data?.status === "pending" && !problem && (
         <>
           <PageHead title="Reading the job posting" />
@@ -44,8 +46,22 @@ export function ConfirmJobPage() {
   );
 }
 
-/** IN-1: a link that cannot be read falls back to pasting the text. The link is kept. */
-function PasteInstead({ job, message, then }: { job: JobTargetOut; message: string; then: NewJobReturn }) {
+/**
+ * IN-1: a link that cannot be read falls back to pasting the text. The link is kept.
+ * IN-6: an input that is not a job description is refused with the reason; the user pastes the
+ * posting text, or starts again with a different link.
+ */
+function PasteInstead({
+  job,
+  message,
+  refused,
+  then,
+}: {
+  job: JobTargetOut;
+  message: string;
+  refused: boolean;
+  then: NewJobReturn;
+}) {
   const navigate = useNavigate();
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -56,9 +72,14 @@ function PasteInstead({ job, message, then }: { job: JobTargetOut; message: stri
   });
   return (
     <>
-      <PageHead title="Paste the job posting" />
+      <PageHead title={refused ? "This is not a job description" : "Paste the job posting"} />
       <div className="notice notice--error" role="alert">
         <p>{message}</p>
+        {refused && (
+          <p>
+            <Link to={newJobPath(then)}>Use a different link or text</Link>
+          </p>
+        )}
       </div>
       <form
         className="panel"

@@ -208,3 +208,79 @@ async def test_in3_unreadable_file_fails_with_a_reason(
     result = await jobs.parse_resume(ctx, str(row.id), str(account[0]), b"\x89PNG\x00\xff", "a.pdf")
     assert result["outcome"] == "failed"
     assert "Unsupported file type" in result["reason"]
+
+
+async def test_in6_a_link_to_a_list_of_jobs_is_refused(
+    ctx: dict[str, Any],
+    sessionmaker: async_sessionmaker[AsyncSession],
+    account: Account,
+    fake_fixtures: Path,
+) -> None:
+    set_extractor_output(
+        fake_fixtures,
+        "InputCheck",
+        {"matches": False, "looks_like": "job_list", "reason": "The page lists 40 open jobs."},
+    )
+    listing = "<h1>Open roles at Acme</h1>" + "".join(
+        f"<p><a href='/jobs/{i}'>Engineer {i}</a> Remote</p>" for i in range(40)
+    )
+    ctx[CTX_KEY].fetcher = make_fetcher(
+        {"acme.example/careers": httpx.Response(200, html=f"<html><body>{listing}</body></html>")}
+    )
+    target = await new_job_target(sessionmaker, account, source_url="https://acme.example/careers")
+
+    result = await jobs.extract_job_target(ctx, str(target.id), str(account[0]))
+
+    assert result["outcome"] == "rejected"
+    assert result["looks_like"] == "job_list"
+    assert result["reason"].startswith("This link shows a list of jobs, not one job description.")
+    assert result["reason"].endswith("The page lists 40 open jobs.")
+    assert (await reload(sessionmaker, target.id)).parsed_json is None
+
+
+async def test_in6_pasted_text_that_is_a_cv_is_refused(
+    ctx: dict[str, Any],
+    sessionmaker: async_sessionmaker[AsyncSession],
+    account: Account,
+    fake_fixtures: Path,
+) -> None:
+    set_extractor_output(fake_fixtures, "InputCheck", {"matches": False, "looks_like": "resume"})
+    text = (FIXTURES / "resumes/backend-senior.txt").read_text(encoding="utf-8")
+    target = await new_job_target(sessionmaker, account, raw_text=text)
+
+    result = await jobs.extract_job_target(ctx, str(target.id), str(account[0]))
+
+    assert result["outcome"] == "rejected"
+    assert (
+        result["reason"]
+        == "This text looks like a CV, not a job description. Add your CV under Resumes."
+    )
+
+
+async def test_in7_a_file_that_is_not_a_cv_is_refused_and_not_stored(
+    ctx: dict[str, Any],
+    sessionmaker: async_sessionmaker[AsyncSession],
+    account: Account,
+    fake_fixtures: Path,
+) -> None:
+    set_extractor_output(
+        fake_fixtures,
+        "InputCheck",
+        {"matches": False, "looks_like": "job_posting", "reason": "It describes a job opening."},
+    )
+    text, _ = posting("swe-stripe-backend")
+    row = await new_resume(sessionmaker, account)
+
+    result = await jobs.parse_resume(
+        ctx, str(row.id), str(account[0]), make_pdf(text.splitlines()), "cv.pdf"
+    )
+
+    assert result["outcome"] == "rejected"
+    assert result["reason"] == (
+        "This file looks like a job description, not a CV. Add it under Job descriptions. "
+        "It describes a job opening."
+    )
+    async with sessionmaker() as db:
+        saved = await db.get(ResumeRow, row.id)
+    assert saved is not None and saved.file_ref is None and saved.parsed_json is None
+    assert not list(ctx[CTX_KEY].store.root.rglob("*.enc"))

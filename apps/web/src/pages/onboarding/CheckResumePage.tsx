@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
-import { useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 
-import { keys, useResume } from "../../api/hooks";
-import { resumesApi } from "../../api/inputs";
+import { keys, useResume, useResumeTask } from "../../api/hooks";
+import { jobProblem, resumesApi } from "../../api/inputs";
 import type { Resume } from "../../api/types";
 import { ErrorNotice, Loading, ONBOARDING_STEPS, PageHead, Steps } from "../../components/ui";
 import { rehearsalPath } from "../../paths";
@@ -92,7 +92,11 @@ export function validateResumeDraft(
  */
 export function CheckResumePage() {
   const { jobId = "", resumeId = "" } = useParams();
-  const record = useResume(resumeId);
+  const [params] = useSearchParams();
+  // A new upload from the Resumes page brings its reading job, so a refused CV shows why (IN-7).
+  const task = useResumeTask(resumeId, params.get("task"));
+  const problem = jobProblem(task.data);
+  const record = useResume(resumeId, problem === null);
   const parsed = record.data?.resume ?? null;
 
   return (
@@ -105,7 +109,15 @@ export function CheckResumePage() {
         </p>
       </PageHead>
       {record.isError && <ErrorNotice error={record.error} />}
-      {(record.isPending || record.data?.status === "pending") && <Loading label="Reading your resume." />}
+      {problem && (
+        <div className="notice notice--error" role="alert">
+          <p>{problem.message}</p>
+          <p>
+            <Link to="/resumes">Upload a different CV</Link>
+          </p>
+        </div>
+      )}
+      {!problem && (record.isPending || record.data?.status === "pending") && <Loading label="Reading your resume." />}
       {record.data?.deleted && <ErrorNotice error="This CV was deleted. Go back and add a resume." />}
       {parsed && !record.data?.deleted && (
         <ResumeEditor key={resumeId} jobId={jobId} resumeId={resumeId} original={parsed} />

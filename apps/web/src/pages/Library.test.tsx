@@ -12,6 +12,7 @@ import { describe, expect, it } from "vitest";
 import { gapApi } from "../api/gap";
 import { jobTargetsApi, resumesApi, sha256Hex } from "../api/inputs";
 import { AppRoutes, createQueryClient } from "../App";
+import { MOCK_NOT_CV_REFUSAL } from "../mocks/handlers";
 import { mockStore } from "../mocks/node";
 
 const POSTING = "Senior Software Engineer at Stripe. Payments reliability, Python, Go. ".repeat(4);
@@ -221,6 +222,18 @@ describe("LB-1 Resumes page", () => {
     const cvs = await screen.findByRole("region", { name: "Saved CVs" });
     expect(await within(cvs).findAllByRole("listitem")).toHaveLength(1);
     expect(mockStore.db.resumes[0].confirmed_at).not.toBeNull();
+  });
+
+  it("IN-7: a CV that is a job description is refused on the check page, with the reason", async () => {
+    signedIn();
+    const user = renderAt("/resumes");
+    expect(await screen.findByText("You have no saved CVs.")).toBeInTheDocument();
+    await user.click(screen.getByLabelText("Or paste your resume text"));
+    await user.paste("We are hiring a senior payments engineer to own checkout.");
+    await user.click(screen.getByRole("button", { name: "Upload resume" }));
+    expect(await screen.findByRole("alert", {}, { timeout: 4000 })).toHaveTextContent(MOCK_NOT_CV_REFUSAL);
+    expect(screen.getByRole("link", { name: "Upload a different CV" })).toHaveAttribute("href", "/resumes");
+    expect(screen.queryByText("Reading your resume.")).not.toBeInTheDocument();
   });
 
   it("deletes a CV after a confirmation that says reports are kept", async () => {

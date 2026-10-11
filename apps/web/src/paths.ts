@@ -8,8 +8,12 @@ export const contextPath = (jobId: string, resumeId: string) =>
 export const checkPath = (jobId: string, resumeId: string) =>
   `/jobs/${jobId}/resume/${encodeURIComponent(resumeId)}/check`;
 
-/** "Check your CV" from the Resumes page (LB-1), with no job. */
-export const resumeCheckPath = (resumeId: string) => `/resumes/${encodeURIComponent(resumeId)}/check`;
+/**
+ * "Check your CV" from the Resumes page (LB-1), with no job. `task` is the reading job of a new
+ * upload, so a refused CV shows why (IN-7).
+ */
+export const resumeCheckPath = (resumeId: string, task?: string | null) =>
+  `/resumes/${encodeURIComponent(resumeId)}/check${task ? `?task=${encodeURIComponent(task)}` : ""}`;
 
 /** PR-3: one job and CV pair, with its earlier reports. */
 export const rehearsalPath = (jobId: string, resumeId: string) =>

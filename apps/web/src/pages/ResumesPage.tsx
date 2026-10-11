@@ -19,7 +19,7 @@ export function ResumesPage() {
       <UploadForm
         onUploaded={(accepted) => {
           refresh();
-          navigate(resumeCheckPath(accepted.resume.id));
+          navigate(resumeCheckPath(accepted.resume.id, accepted.job?.id));
         }}
         onUseSaved={(saved) => navigate(resumeCheckPath(saved.id))}
       />

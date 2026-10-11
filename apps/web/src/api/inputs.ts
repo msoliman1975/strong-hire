@@ -3,7 +3,8 @@
  *
  * Create and update calls return 202 with a background job. The app polls the job until its
  * status is "complete", then reads `result.outcome`: "extracted", "needs_paste" (the URL cannot
- * be read; the user pastes the text) or "failed" (with a reason).
+ * be read; the user pastes the text), "rejected" (the input is not a job description, IN-6, or not
+ * a CV, IN-7; `reason` says why) or "failed" (with a reason).
  */
 import { apiClient, unwrap } from "./client";
 import type {
@@ -151,17 +152,26 @@ export const jobRunning = (job: JobOut | undefined) =>
  * Why a finished background job did not produce data, in words for the user. Null when it worked.
  * Display only: the worker decides the outcome.
  */
-export function jobProblem(job: JobOut | undefined): { needsPaste: boolean; message: string } | null {
+export interface JobProblem {
+  needsPaste: boolean;
+  /** IN-6, IN-7: the input is not a job description or not a CV. */
+  refused: boolean;
+  message: string;
+}
+
+export function jobProblem(job: JobOut | undefined): JobProblem | null {
   if (!job || jobRunning(job)) return null;
-  if (job.status === "failed") return { needsPaste: false, message: job.error ?? "The background job failed." };
-  if (job.status === "not_found") return { needsPaste: false, message: "The background job has expired." };
+  const problem = (message: string, needsPaste = false, refused = false) => ({ needsPaste, refused, message });
+  if (job.status === "failed") return problem(job.error ?? "The background job failed.");
+  if (job.status === "not_found") return problem("The background job has expired.");
   const result = job.result ?? {};
   const outcome = result.outcome;
   const detail = typeof result.detail === "string" ? result.detail : null;
   const reason = typeof result.reason === "string" ? result.reason : null;
   if (outcome === "needs_paste") {
-    return { needsPaste: true, message: detail ?? "We could not read that link. Paste the job posting text." };
+    return problem(detail ?? "We could not read that link. Paste the job posting text.", true);
   }
-  if (outcome === "failed") return { needsPaste: false, message: reason ?? "We could not read it." };
+  if (outcome === "rejected") return problem(reason ?? "This is not the kind of document we expected.", false, true);
+  if (outcome === "failed") return problem(reason ?? "We could not read it.");
   return null;
 }

@@ -132,7 +132,8 @@ async def test_r2_consent_gates_transcript_and_traces_and_views_are_audited(
             )
         )
     moves = [r.move for r in rows]
-    assert moves[:4] == ["greet", "agenda", "ask", "decide"]  # a mini skips small talk
+    # A mini skips small talk. The answer check (IV-12) is traced before the decision.
+    assert moves[:5] == ["greet", "agenda", "ask", "check_answer", "decide"]
     assert "probe" in moves
     decide = rows[moves.index("decide")]
     assert decide.reason_json is not None and decide.reason_json["decision"]["action"] == "probe"
