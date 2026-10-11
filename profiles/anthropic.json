@@ -1,0 +1,600 @@
+{
+  "company_name": "Anthropic",
+  "company_slug": "anthropic",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-10",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Anthropic values",
+    "principles": [
+      {
+        "name": "Act for the global good",
+        "description": "Make decisions that maximize positive outcomes for humanity in the long run, even when that costs short-term gain.",
+        "evidence_signals": [
+          "Weighs long-term societal impact, not only team or company metrics",
+          "Describes giving up a short-term win for a better long-term outcome",
+          "Considers people affected beyond the direct user"
+        ],
+        "weight": 1.1
+      },
+      {
+        "name": "Hold light and shade",
+        "description": "Take AI's risks seriously while also seeing its potential benefits; hold both at once.",
+        "evidence_signals": [
+          "Articulates concrete risks and concrete benefits of the same technology",
+          "Avoids both hype and doom; reasons with nuance and uncertainty",
+          "Changes position when presented with good evidence"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Be good to our users",
+        "description": "Bring generosity and kindness to interactions with customers, policymakers, colleagues and affected communities.",
+        "evidence_signals": [
+          "Shows care for users' real needs and trust",
+          "Describes treating colleagues and partners generously",
+          "Balances helpfulness with protecting users"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Ignite a race to the top on safety",
+        "description": "Set industry standards for trustworthy AI and show that safety and capability can go together, inspiring others to follow.",
+        "evidence_signals": [
+          "Treats safety as a design requirement, not an afterthought",
+          "Raised the bar on security, privacy or safety in past work",
+          "Has thought-through views on AI safety practices and policy"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Do the simple thing that works",
+        "description": "Be empirical and pragmatic: prefer simple, measurable approaches that deliver impact over unnecessary complexity.",
+        "evidence_signals": [
+          "Chose a simple solution and explains why it was enough",
+          "Uses experiments and data to decide",
+          "Cuts complexity that did not pay off"
+        ],
+        "weight": 1.1
+      },
+      {
+        "name": "Be helpful, honest, and harmless",
+        "description": "Operate as a high-trust, low-ego organization; communicate directly and kindly and be honest even when it is uncomfortable.",
+        "evidence_signals": [
+          "Admits mistakes and uncertainty plainly",
+          "Gives or receives hard feedback directly and kindly",
+          "Credits others; low ego in disagreements"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Put the mission first",
+        "description": "A shared purpose, the safe transition through transformative AI, is the final arbiter of decisions.",
+        "evidence_signals": [
+          "Motivation is clearly tied to the mission, not only the role or brand",
+          "Describes putting the shared goal above personal or team credit",
+          "Can engage critically with the mission and Anthropic's strategy"
+        ],
+        "weight": 1.4
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": [],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, interest in Anthropic and logistics. Not simulated in v1."
+        },
+        {
+          "name": "Online assessment / technical screen",
+          "interview_type": null,
+          "duration_min": 90,
+          "interviewer_role": "Engineer",
+          "notes": "CodeSignal-style multi-level practical problem or live coding. Not simulated in v1."
+        },
+        {
+          "name": "Coding (onsite)",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Engineer",
+          "notes": "Practical coding where requirements change mid-round. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior engineer",
+          "notes": "Often LLM infrastructure: inference APIs, batching, GPU utilization, distributing model weights."
+        },
+        {
+          "name": "Culture / values interview",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Senior employee, often from another team",
+          "notes": "Mission alignment, AI safety views and ethical judgment. Reported as the most common reason strong engineers are rejected."
+        },
+        {
+          "name": "Project deep dive",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Engineer",
+          "notes": "Second-day loop: technical deep dive into past work."
+        },
+        {
+          "name": "Hiring manager / experience and goals",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager",
+          "notes": "Experience, goals and team fit; references follow."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": [],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Research or team lead",
+          "notes": "Technical discussion of background, ML and systems experience and approach to research engineering."
+        },
+        {
+          "name": "Coding assessment",
+          "interview_type": null,
+          "duration_min": 90,
+          "interviewer_role": null,
+          "notes": "CodeSignal or Replit Python coding. Not simulated in v1."
+        },
+        {
+          "name": "ML coding / research implementation",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Research engineer",
+          "notes": "Hands-on ML work, sometimes in Colab with GPU. Not simulated in v1."
+        },
+        {
+          "name": "Research thinking / LLM fundamentals",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Researcher",
+          "notes": "How the candidate designs experiments and understands LLM behaviour."
+        },
+        {
+          "name": "Culture / values interview",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Senior employee",
+          "notes": "Mission alignment and safety judgment."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": [],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, motivation and views on AI safety. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 50,
+          "interviewer_role": "Product lead",
+          "notes": "Products led, metrics and a past failure."
+        },
+        {
+          "name": "Case presentation / product sense",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product manager",
+          "notes": "AI-focused design and strategy; prompts can be broader than the role."
+        },
+        {
+          "name": "Analytical and execution",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "PM or data partner",
+          "notes": "Metrics, diagnosis and prioritization."
+        },
+        {
+          "name": "Behavioral panels",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "PMs, TPMs, engineers and research partners",
+          "notes": "User centricity, cross-functional leadership and engineering or research partnership."
+        },
+        {
+          "name": "Culture and AI safety",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Senior employee",
+          "notes": "Standalone values interview testing conviction and safety judgment."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Values conflict",
+      "pattern": "A time work conflicted with the candidate's values or ethics, and what they did",
+      "competencies": ["ownership", "communication"],
+      "values": ["Act for the global good", "Be helpful, honest, and harmless"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Speed versus safety",
+      "pattern": "A trade-off between shipping fast and security, privacy or safety, and how it was decided",
+      "competencies": ["ownership", "impact"],
+      "values": ["Ignite a race to the top on safety", "Do the simple thing that works"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Hard feedback and honesty",
+      "pattern": "Receiving negative feedback or admitting a missed commitment, and what changed",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Be helpful, honest, and harmless"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Disagreement and low ego",
+      "pattern": "A disagreement with a manager or senior stakeholder and how it was resolved",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["Be helpful, honest, and harmless", "Put the mission first"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "AI risk views",
+      "pattern": "The candidate's view on risks and benefits of advanced AI, defended under follow-up",
+      "competencies": ["communication"],
+      "values": ["Hold light and shade", "Ignite a race to the top on safety"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Mission motivation and critique",
+      "pattern": "Why Anthropic, and what concerns or disagreements the candidate has with its approach",
+      "competencies": ["motivation", "judgment"],
+      "values": ["Put the mission first", "Hold light and shade"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Proudest work and decisions",
+      "pattern": "A past project, the key decisions, and how the candidate knew it worked",
+      "competencies": ["depth_of_experience", "scope_at_level"],
+      "values": ["Do the simple thing that works"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "LLM inference infrastructure",
+      "pattern": "Design inference serving: batching, KV cache, GPU utilization, latency versus throughput",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Do the simple thing that works"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Large-scale distribution",
+      "pattern": "Move or cache very large artifacts (model weights, files) across thousands of machines",
+      "competencies": ["technical_depth", "trade_offs"],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Model behaviour and safety",
+      "pattern": "Explain or mitigate an LLM failure mode such as hallucination, data leakage or agent misuse",
+      "competencies": ["accuracy", "reasoning", "clarity_of_explanation"],
+      "values": ["Ignite a race to the top on safety", "Be good to our users"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "AI product sense",
+      "pattern": "Improve or design a feature for an AI assistant or developer tool for a chosen user group",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Be good to our users"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Helpfulness versus harm",
+      "pattern": "Set launch criteria or priorities when capability, helpfulness and safety conflict",
+      "competencies": ["problem_framing", "prioritization", "recommendation"],
+      "values": ["Ignite a race to the top on safety", "Hold light and shade"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a moral or ethical conflict you faced at work. What did you do?",
+      "strong_answer": "Choose a real situation with genuine tension (privacy, misleading users, cutting a safety corner). Explain the stakes, who was affected, the options you weighed, and what you did, including raising it with the right people. Be honest about uncertainty and the cost to you. Interviewers look for principled judgment and honesty, not heroics. Pitfall: a clean story with no real trade-off.",
+      "competencies": ["ownership", "communication"],
+      "values": ["Act for the global good", "Be helpful, honest, and harmless"],
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you had to balance delivery speed against security or safety.",
+      "strong_answer": "Lay out the deadline pressure and the specific risk. Show how you quantified the risk, looked for the simplest mitigation that made shipping safe (a flag, limited rollout, extra review), and who decided. Give the outcome and what you would do again. Strong answers treat safety as a requirement, not a blocker.",
+      "competencies": ["ownership", "impact"],
+      "values": ["Ignite a race to the top on safety", "Do the simple thing that works"],
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you received negative feedback. How did you respond?",
+      "strong_answer": "Pick feedback that stung and was at least partly right. Describe your first reaction honestly, how you sought to understand it, and the concrete change you made with evidence it stuck. Low ego and direct, kind communication are the signals. Pitfall: feedback that was really a compliment.",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Be helpful, honest, and harmless"],
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about shipping something you were not fully comfortable with.",
+      "strong_answer": "Explain what worried you and why it shipped anyway. Show that you voiced the concern clearly, proposed mitigations, and owned the follow-up (monitoring, fixes). Reflect honestly on whether it was the right call. Anthropic interviewers value candour and judgment over a perfect record.",
+      "competencies": ["ownership", "learning_from_failure"],
+      "values": ["Be helpful, honest, and harmless", "Hold light and shade"],
+      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you failed to deliver on a commitment.",
+      "strong_answer": "Own it plainly: what you committed, why you missed, and when you told people. Spend most time on recovery and what you changed (estimation, scope, saying no earlier). Pitfall: blaming dependencies without your part.",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Be helpful, honest, and harmless"],
+      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a disagreement with your manager or a senior stakeholder.",
+      "strong_answer": "Pick a substantive issue. Show you stated your view directly with evidence, genuinely engaged with theirs, and resolved it by what best served the shared goal, whether or not you won. Describe the outcome and relationship afterwards. Low ego and mission-first reasoning are key.",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["Be helpful, honest, and harmless", "Put the mission first"],
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Which risk from advanced AI do you think is most underrated, and why?",
+      "strong_answer": "Name a specific risk and argue it with reasoning and evidence, acknowledging counterarguments and uncertainty. Also note benefits you think are real. Show how the risk could be measured or mitigated and how it connects to your work. Interviewers test conviction and depth, so expect follow-ups. Pitfall: vague doom or dismissiveness.",
+      "competencies": ["communication"],
+      "values": ["Hold light and shade", "Ignite a race to the top on safety"],
+      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "What ethical risks do you see in deploying autonomous AI agents, and how would you reduce them?",
+      "strong_answer": "Identify concrete risks: unintended actions, misuse, data exposure, over-reliance, unclear accountability. Propose layered mitigations: scoped permissions, human confirmation for consequential actions, monitoring and audit logs, staged rollout, and evaluations. Weigh these against usefulness. Strong answers are specific and balanced.",
+      "competencies": ["communication", "ownership"],
+      "values": ["Ignite a race to the top on safety", "Hold light and shade"],
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why Anthropic specifically, and do you have any concerns about its mission or approach?",
+      "strong_answer": "Give a specific, personal reason tied to the mission and to what Anthropic does differently (for example its safety research or deployment policies). Then engage honestly with a real concern or tension (such as building frontier models while warning of their risks) and how you reconcile it. Interviewers value critical thinking over flattery.",
+      "competencies": ["motivation", "judgment"],
+      "values": ["Put the mission first", "Hold light and shade"],
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Walk me through a past project you are proud of and the key decisions you made.",
+      "strong_answer": "Cover the problem, users, your role, two or three key decisions with the alternatives, and the measured outcome. Highlight where you chose a simpler approach and why it was enough, and what you learned. Be ready for detailed follow-ups.",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Do the simple thing that works", "Be good to our users"],
+      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "How do you turn research findings into product requirements?",
+      "strong_answer": "Describe a concrete example: understanding what the research shows and its limits, translating capabilities into user value, defining requirements and evaluation criteria with researchers, and handling uncertainty with staged launches. Show respect for empirical evidence and close partnership with research.",
+      "competencies": ["role_fit", "judgment", "depth_of_experience"],
+      "values": ["Do the simple thing that works", "Be good to our users"],
+      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a batch inference API for a large language model.",
+      "strong_answer": "Clarify the contract: submit many requests, poll or get notified, results within an SLA, lower price. Cover a job store, queueing, packing requests into GPU batches by length, scheduling around interactive traffic, retries, partial results, and cost accounting. Discuss throughput versus latency and fairness between customers. Start simple and scale.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Do the simple thing that works"],
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a token-generation service that handles around 100,000 requests per second.",
+      "strong_answer": "Estimate GPU capacity from tokens per request and per-GPU throughput. Cover load balancing, continuous batching, KV cache memory management, streaming responses, autoscaling, admission control and priority tiers. Discuss tail latency, failure of a GPU mid-generation, and observability (utilization, queue depth). Show numbers.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Do the simple thing that works"],
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you distribute very large model files to thousands of machines quickly?",
+      "strong_answer": "Compute the naive cost from a single source to show the bottleneck. Propose peer-to-peer or tree distribution, chunking with checksums, rack-aware placement, local caching, and resumable transfers. Discuss verifying integrity, rollout of new versions, and handling stragglers. Compare with object storage plus caching layers.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": [],
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "What is an LLM hallucination, why does it happen, and how can it be reduced?",
+      "strong_answer": "Define it as fluent output not supported by facts or provided context. Explain causes: next-token training objective, gaps in training data, pressure to answer, decoding choices. Mitigations: grounding with retrieval and citations, training to express uncertainty, evaluations that reward abstaining, and product design that shows sources. Be precise and honest about limits.",
+      "competencies": ["accuracy", "clarity_of_explanation", "reasoning"],
+      "values": ["Be helpful, honest, and harmless"],
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "A model is found to reveal sensitive data from its training set. How do you respond?",
+      "strong_answer": "Treat it as an incident: contain (filters, block patterns), assess scope and affected people, notify appropriately. Then root cause: data pipeline filtering, deduplication, memorization tests. Longer term: privacy reviews, red-teaming for extraction, and evaluations before release. Balance speed with user trust.",
+      "competencies": ["reasoning", "technical_depth", "accuracy"],
+      "values": ["Be good to our users", "Ignite a race to the top on safety"],
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you improve an AI assistant's web app for first-time users?",
+      "strong_answer": "Define who new users are and what success looks like (first useful outcome, return within a week). Find where they struggle (blank-page problem, not knowing capabilities, trust). Propose a few ideas, prioritize one, and define metrics and guardrails. Consider safety and honesty about limits as part of the experience.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Be good to our users"],
+      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you set launch criteria that balance a model's helpfulness against potential harms?",
+      "strong_answer": "Define both sides measurably: helpfulness evaluations and over-refusal rates, harm evaluations by risk category and severity. Propose thresholds, red-teaming, staged rollout and monitoring, and who decides when they conflict. Explain that unhelpfulness has costs too. Strong answers are concrete and reflect holding risk and benefit together.",
+      "competencies": ["problem_framing", "structure", "recommendation"],
+      "values": ["Hold light and shade", "Ignite a race to the top on safety"],
+      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you prioritize capability improvements against safety improvements on a product roadmap?",
+      "strong_answer": "Reject the false binary: show how some safety work enables capability launches and trust. Propose a framework weighing user value, risk severity and likelihood, and commitments. Give an example trade-off and your decision, plus how you would revisit it. Mission-first reasoning with clear prioritization.",
+      "competencies": ["prioritization", "recommendation", "user_and_business_sense"],
+      "values": ["Put the mission first", "Ignite a race to the top on safety"],
+      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you find high-potential use cases for a new AI capability before you have usage data?",
+      "strong_answer": "Use proxies: customer interviews, early-access partners, internal dogfooding, analogous products, and the capability's evaluated strengths. Size candidate use cases by value and frequency, test quickly with prototypes, and define what signal would confirm demand. Keep it empirical and simple.",
+      "competencies": ["problem_framing", "estimation_logic", "prioritization"],
+      "values": ["Do the simple thing that works", "Be good to our users"],
+      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "Design an AI feature for enterprise users of an AI assistant.",
+      "strong_answer": "Pick a specific enterprise persona and job to be done. Cover enterprise needs: admin controls, data privacy, integrations, auditability. Propose the feature, the minimum lovable version, and metrics (adoption, retention, seat expansion), with risks and mitigations.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Be good to our users"],
+      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview"
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "Member of Technical Staff (reported internal T4)",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Levels are not public; everyone is titled Member of Technical Staff. Expect independent ownership of well-scoped projects."
+    },
+    {
+      "level_name": "Member of Technical Staff (reported internal T5)",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Levels not public. Expect leading significant projects with little direction and strong judgment on trade-offs."
+    },
+    {
+      "level_name": "Member of Technical Staff (reported internal T6)",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Levels not public. Expect cross-team technical leadership on critical systems or research directions."
+    }
+  ],
+  "persona": {
+    "tone": "Warm, thoughtful and candid; low ego and genuinely curious",
+    "pace": "Unhurried; leaves space for the candidate to reason aloud and admit uncertainty",
+    "pushback_style": "Probes the reasoning behind views with 'why do you believe that?' and 'what would change your mind?', and asks for the simplest thing that would work",
+    "closing_style": "Invites honest questions, including critical ones about Anthropic's mission and approach"
+  },
+  "scoring_weights": {
+    "ownership": 1.2,
+    "communication": 1.3,
+    "collaboration": 1.2,
+    "learning_from_failure": 1.2,
+    "judgment": 1.4,
+    "motivation": 1.3,
+    "technical_depth": 1.3,
+    "trade_offs": 1.2,
+    "reasoning": 1.3,
+    "recommendation": 1.1
+  },
+  "values_share": 0.35,
+  "case_style": {
+    "product_sense": 0.5,
+    "estimation": 0.1,
+    "system_thinking": 0.4,
+    "notes": "Cases are AI-specific and often turn on safety versus helpfulness trade-offs and launch criteria. Estimation is rare."
+  },
+  "sources": [
+    {
+      "url": "https://www.anthropic.com/careers",
+      "title": "Anthropic careers (values and interview process)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework", "loop_structure", "persona"]
+    },
+    {
+      "url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/",
+      "title": "Get a job at Anthropic: interview process and top questions",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/what-is-the-anthropic-interview-process-like-round-by-round",
+      "title": "What is the Anthropic interview process like, round by round",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://www.interviewquery.com/guides/anthropic-software-engineer",
+      "title": "Anthropic software engineer interview guide",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "scoring_weights"]
+    },
+    {
+      "url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview",
+      "title": "Anthropic product manager interview",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.tryexponent.com/blog/anthropic-interview-process",
+      "title": "Anthropic interview process",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure"]
+    },
+    {
+      "url": "https://www.teamblind.com/post/anthropic-levels-mppxx5qy",
+      "title": "Blind: Anthropic levels",
+      "retrieved_at": "2026-10-10",
+      "fields": ["bar_by_level"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "medium",
+    "scoring_weights": "low",
+    "case_style": "low"
+  },
+  "low_confidence_notes": [
+    "bar_by_level: Anthropic does not publish levels; all engineers are titled Member of Technical Staff. Internal level labels (T4-T6) come from anonymous Blind posts seen in search only. No new-grad or PM levels listed.",
+    "loop_structure: round order and durations come from candidate reports and prep guides; the careers page only confirms live coding for technical roles and conversational interviews for others. The research engineer loop is less well sourced.",
+    "values_share: set to 0.35 because several reports say the culture interview is the most common rejection point; this is a judgment call.",
+    "scoring_weights: estimated; no public source gives weights.",
+    "case_style: PM case reports are few and come from one guide."
+  ]
+}

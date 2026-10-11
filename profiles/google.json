@@ -1,0 +1,560 @@
+{
+  "company_name": "Google",
+  "company_slug": "google",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-10",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Google hiring attributes",
+    "principles": [
+      {
+        "name": "General Cognitive Ability",
+        "description": "How the candidate learns and solves hard, ambiguous problems: breaking them down, stating assumptions, and using data to decide.",
+        "evidence_signals": [
+          "Asks clarifying questions before solving and states assumptions out loud",
+          "Breaks an open problem into parts and compares options with trade-offs",
+          "Uses data or a metric to decide, and says how success would be measured"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Role-Related Knowledge",
+        "description": "The experience, domain expertise and technical skills that the specific role needs.",
+        "evidence_signals": [
+          "Explains a past system or product in depth, including why choices were made",
+          "Uses correct domain vocabulary and catches edge cases unprompted",
+          "Connects own experience to the problems of the target team"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Leadership",
+        "description": "Emergent leadership: stepping up when one's skills are needed, mobilizing others without formal authority, and stepping back when someone else should lead.",
+        "evidence_signals": [
+          "Describes leading a project or decision they did not formally own",
+          "Shows how they aligned people with different goals",
+          "Mentions stepping back or handing over when another person was better placed"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Googleyness",
+        "description": "Working well with others at Google: comfort with ambiguity, bias to action, intellectual humility, collaboration, conscientiousness and care for users.",
+        "evidence_signals": [
+          "Admits a mistake or a gap in knowledge and says what they learned",
+          "Acts without full information and adjusts as they learn",
+          "Argues for the user or for doing the right thing under pressure",
+          "Helps teammates and gives credit to others"
+        ],
+        "weight": 1.0
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["L3", "L4", "L5", "L6", "L7"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, role match and logistics. Not simulated in v1."
+        },
+        {
+          "name": "Technical phone screen",
+          "interview_type": null,
+          "duration_min": 45,
+          "interviewer_role": "Software engineer",
+          "notes": "Live coding in a shared doc. Not simulated in v1."
+        },
+        {
+          "name": "Coding interviews",
+          "interview_type": null,
+          "duration_min": 45,
+          "interviewer_role": "Software engineer",
+          "notes": "Two to three algorithm and data structure rounds in the onsite or virtual loop. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Senior or staff software engineer",
+          "notes": "Usually L5 and above; senior loops can have one to three design rounds. Scale, reliability and trade-offs."
+        },
+        {
+          "name": "Googleyness and Leadership",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Googler, often from another team",
+          "notes": "Past-behavior and hypothetical questions on collaboration, ambiguity, conflict and leading without authority."
+        },
+        {
+          "name": "Team matching",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Hiring manager",
+          "notes": "After the hiring committee. Conversation about the team, motivation and past projects."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": ["APM", "PM", "Senior PM", "Group PM"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Not simulated in v1."
+        },
+        {
+          "name": "Product design",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product manager",
+          "notes": "Improve or design a product for a user group; prioritization and success metrics."
+        },
+        {
+          "name": "Analytical and estimation",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product manager",
+          "notes": "Market sizing, metrics and data reasoning (GCA-style hypotheticals)."
+        },
+        {
+          "name": "Strategy",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Senior product manager",
+          "notes": "Market entry, competition and platform strategy."
+        },
+        {
+          "name": "Technical",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Software engineer",
+          "notes": "How web and system concepts work; light system design. No live coding for most PM roles."
+        },
+        {
+          "name": "Googleyness and Leadership",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Product manager or cross-functional partner",
+          "notes": null
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Leading without authority",
+      "pattern": "A time the candidate led a project or decision they did not formally own and had to bring others along",
+      "competencies": ["ownership", "collaboration", "impact"],
+      "values": ["Leadership"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Disagreement with a teammate",
+      "pattern": "A disagreement with a peer or manager about a technical or product choice and how it was resolved",
+      "competencies": ["conflict_handling", "communication", "collaboration"],
+      "values": ["Googleyness"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Failure and feedback",
+      "pattern": "A project that did not work or hard feedback received, and what the candidate changed afterwards",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Googleyness"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Hypothetical team situation",
+      "pattern": "What the candidate would do in a hypothetical team scenario, such as a struggling teammate or competing visions for delivery",
+      "competencies": ["collaboration", "conflict_handling", "communication"],
+      "values": ["Googleyness", "Leadership"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Working with ambiguity",
+      "pattern": "A time the candidate started work with incomplete information or unclear goals and how they made progress",
+      "competencies": ["ownership", "impact"],
+      "values": ["Googleyness", "General Cognitive Ability"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Recent project deep dive",
+      "pattern": "Walk through a recent or interesting project: the problem, own contribution, key decisions and the result",
+      "competencies": ["depth_of_experience", "scope_at_level", "role_fit"],
+      "values": ["Role-Related Knowledge"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Motivation for the team",
+      "pattern": "Why Google, why this team, and what kind of work the candidate wants next",
+      "competencies": ["motivation", "team_fit"],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Large-scale system design",
+      "pattern": "Design a well-known Google-scale product or service and discuss storage, scaling, consistency and failure handling",
+      "competencies": ["technical_depth", "trade_offs", "reasoning", "clarity_of_explanation"],
+      "values": ["Role-Related Knowledge", "General Cognitive Ability"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "How it works under the hood",
+      "pattern": "Explain how a common web or infrastructure mechanism works end to end and where it gets slow or fails",
+      "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
+      "values": ["Role-Related Knowledge"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Improve a Google product",
+      "pattern": "Pick a user group of a Google product, find their main pain point and propose a prioritized improvement with metrics",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["General Cognitive Ability", "Googleyness"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Estimation",
+      "pattern": "Estimate a quantity related to usage, storage or market size from first principles and sanity-check it",
+      "competencies": ["estimation_logic", "structure"],
+      "values": ["General Cognitive Ability"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Open-ended hypothetical",
+      "pattern": "An unfamiliar real-world problem (open a business, run an event, fix a city problem) to test structured reasoning",
+      "competencies": ["problem_framing", "structure", "recommendation"],
+      "values": ["General Cognitive Ability"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Product strategy",
+      "pattern": "Whether and how Google should enter a market or set strategy for a platform, with one key metric",
+      "competencies": ["user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["General Cognitive Ability"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you led a project or effort that you did not formally own. How did you get people to follow?",
+      "strong_answer": "Pick a real case where authority was missing. Set the context briefly, then spend most of the time on own actions: how the need was spotted, how stakeholders were aligned (data, prototypes, one-on-ones), and how trade-offs were made. Use 'I' for own decisions. End with a measurable result and what the candidate would repeat. Strong answers also show stepping back when someone else was better placed. Pitfalls: a story where the candidate was the manager, or vague 'we' with no own action.",
+      "competencies": ["ownership", "collaboration", "impact"],
+      "values": ["Leadership"],
+      "source_url": "https://designgurus.io/answers/detail/what-questions-are-asked-in-a-google-behavioral-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Talk about a disagreement with a teammate over how to build something. What happened and how did it end?",
+      "strong_answer": "Show respect for the other view: state their reasoning fairly before your own. Explain how the disagreement was made concrete (criteria, data, a quick experiment) rather than a battle of opinions. Show the outcome, including if the candidate was wrong and changed their mind. Mention the working relationship afterwards. Pitfalls: a villain story, escalating to a manager as the first step, or 'we never disagree'.",
+      "competencies": ["conflict_handling", "communication", "collaboration"],
+      "values": ["Googleyness"],
+      "source_url": "https://designgurus.io/answers/detail/what-questions-are-asked-in-a-google-behavioral-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you failed at something. What did you take away from it?",
+      "strong_answer": "Choose a real failure with real stakes, not a disguised strength. Own the part that was the candidate's fault without blaming others. Explain the root cause, the immediate fix, and a lasting change in how they work, ideally with a later example where the lesson paid off. Intellectual humility and calm self-reflection are the signals. Pitfalls: trivial failures, blaming the team, or no concrete change.",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Googleyness"],
+      "source_url": "https://igotanoffer.com/blogs/tech/google-gca-interviews"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you pushed for what users needed even though a deadline or a stakeholder was pushing the other way.",
+      "strong_answer": "Name the user group and the harm they would have faced. Show how the candidate made the user case with evidence (feedback, data, a demo), proposed a workable compromise (scope cut, phased launch), and still respected the deadline where possible. Close with the user outcome and the stakeholder relationship. Pitfalls: 'I refused to ship' with no alternative, or no evidence for the user claim.",
+      "competencies": ["ownership", "communication", "impact"],
+      "values": ["Googleyness"],
+      "source_url": "https://designgurus.io/answers/detail/what-questions-are-asked-in-a-google-behavioral-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Hypothetically, your team has two senior members with competing visions for how a project should be delivered. What would you do?",
+      "strong_answer": "Treat it as a structured hypothetical. First understand both visions and the goals behind them through one-on-ones. Make the decision criteria explicit (user impact, risk, time, cost) and agree on who decides. Suggest ways to reduce risk such as a spike or prototype. Communicate the decision and keep both people engaged. Strong answers mention escalation only as a last resort and checking back later. Pitfalls: picking a side immediately or ignoring the people side.",
+      "competencies": ["conflict_handling", "collaboration", "communication"],
+      "values": ["Leadership", "Googleyness"],
+      "source_url": "https://igotanoffer.com/blogs/tech/google-rrk-interview"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Walk me through a recent project you worked on that you found interesting.",
+      "strong_answer": "Give a 30-second summary (problem, users, own role, result), then go deep on two or three decisions the candidate made and why. Quantify impact. Be ready for follow-ups on alternatives, what broke, and what they would change. Scope should match the target level: at L5+ the project should involve design ownership and influence on other engineers. Pitfalls: listing technologies without decisions, or claiming team work as own work.",
+      "competencies": ["depth_of_experience", "scope_at_level", "role_fit"],
+      "values": ["Role-Related Knowledge"],
+      "source_url": "https://igotanoffer.com/blogs/tech/google-rrk-interview"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why do you want to work at Google, and why on this team in particular?",
+      "strong_answer": "Connect specific facts about the team's product or problems to the candidate's past work and goals. Show what they would bring in the first months and what they want to learn. Strong answers are specific and honest about motivation. Pitfalls: generic praise of perks or brand, or no knowledge of what the team does.",
+      "competencies": ["motivation", "team_fit"],
+      "values": [],
+      "source_url": "https://designgurus.io/answers/detail/what-questions-are-asked-in-a-google-behavioral-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design a collaborative document editor where many people edit the same document at the same time?",
+      "strong_answer": "Clarify requirements: number of concurrent editors, latency target, offline support, version history. Cover the core concurrency approach (operational transformation or CRDTs) and why, the session server that orders operations per document, persistence as an operation log with periodic snapshots, presence and cursors, and access control. Discuss scaling by sharding documents, reconnect and conflict handling, and trade-offs between consistency and latency. Pitfalls: ignoring concurrent edits, or locking the whole document.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning", "clarity_of_explanation"],
+      "values": ["Role-Related Knowledge", "General Cognitive Ability"],
+      "source_url": "https://www.designgurus.io/blog/google-system-design-interview-questions-ultimate-guide"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a global video platform where users upload and stream videos.",
+      "strong_answer": "Scope it: uploads per day, watch traffic, regions. Cover the upload path (chunked upload, object storage, async transcoding into several resolutions), metadata storage, the streaming path through CDNs with adaptive bitrate, and view counts at scale. Estimate storage and bandwidth roughly. Discuss hot versus long-tail content caching, failure handling, and what to keep strongly consistent versus eventually consistent. Pitfalls: serving video from the app server, or no numbers at all.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Role-Related Knowledge"],
+      "source_url": "https://www.designgurus.io/blog/google-system-design-interview-questions-ultimate-guide"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design search autocomplete that suggests queries as the user types?",
+      "strong_answer": "Clarify latency target (tens of milliseconds), personalization and freshness. Cover a prefix structure (trie or precomputed top-k per prefix), offline aggregation of query logs, serving from memory with sharding by prefix, caching at the edge, and filtering of unsafe suggestions. Discuss update frequency trade-offs and how to handle trending queries. Pitfalls: querying the main database on every keystroke, or forgetting ranking.",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["Role-Related Knowledge"],
+      "source_url": "https://www.designgurus.io/blog/google-system-design-interview-questions-ultimate-guide"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "For a PM technical round: describe what a typical distribution of web page load times looks like on desktop and what drives it.",
+      "strong_answer": "Explain that load times are right-skewed with a long tail, so medians and high percentiles (p90, p99) matter more than the mean. Walk through the drivers: DNS, connection setup, server time, payload size, rendering, third-party scripts, device and network. Suggest how to measure (real-user monitoring versus lab tests) and which levers to pull first. Pitfalls: giving one number, or ignoring the tail.",
+      "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
+      "values": ["Role-Related Knowledge"],
+      "source_url": "https://igotanoffer.com/blogs/tech/google-rrk-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you improve Google Maps for people with visual impairments?",
+      "strong_answer": "Clarify scope (blind versus low-vision users, walking versus transit) and the goal. Map the journey: planning a route, navigating, finding the entrance, handling surprises. Pick the biggest pain point, such as the last 50 metres to a door, and generate options (precise audio cues, haptics, accessible entrance data from the community). Prioritize by impact and feasibility, define success metrics (completed trips, confidence surveys) and safety guardrails. Pitfalls: designing without the user's context, or no metric.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["General Cognitive Ability", "Googleyness"],
+      "source_url": "https://www.productleadership.com/blog/google-product-manager-interview-guide/"
+    },
+    {
+      "interview_type": "case",
+      "question": "Estimate how many Google Search queries are made worldwide each day.",
+      "strong_answer": "State the approach before numbers: internet users times share using Google times searches per user per day, possibly segmented by device or region. Use round, defensible assumptions and say them out loud. Compute clearly, then sanity-check against something known and give a range. Mention what would change the estimate (voice and AI answers, regions where Google is not dominant). Pitfalls: an unexplained number, or false precision.",
+      "competencies": ["estimation_logic", "structure", "clarity_of_explanation"],
+      "values": ["General Cognitive Ability"],
+      "source_url": "https://www.productleadership.com/blog/google-product-manager-interview-guide/"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you improve the recommendations on YouTube?",
+      "strong_answer": "Clarify the goal: watch time, satisfaction, or creator health. Segment users (new viewers, kids, power users, creators) and choose one. Identify pain points such as repetitive or low-quality recommendations. Propose solutions, including user controls and signals beyond clicks, and prioritize. Define metrics such as satisfaction surveys alongside watch time, and guardrails for harmful content. Pitfalls: optimizing only for watch time, or ignoring the creator side.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["General Cognitive Ability"],
+      "source_url": "https://www.aced.io/guides/google-product-manager-interview/questions"
+    },
+    {
+      "interview_type": "case",
+      "question": "Imagine you lead the Pixel phone. What would you do to make it the best phone it can be over the next three years?",
+      "strong_answer": "Start with the mission and market position, then segment target users and pick a focus. Look at Google's advantages (AI, software, services) versus competitors. Propose two or three strategic bets, prioritize, and sequence them over three years. Define success metrics such as share in a target segment, retention and satisfaction. Address risks like partner relationships with other Android makers. Pitfalls: a feature list with no strategy, or no metrics.",
+      "competencies": ["user_and_business_sense", "prioritization", "recommendation", "structure"],
+      "values": ["General Cognitive Ability"],
+      "source_url": "https://www.aced.io/guides/google-product-manager-interview/questions"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you plan the grand opening of a new Google office?",
+      "strong_answer": "Clarify the goal (recruiting, local community, press) and constraints (budget, size, date). Structure the work: audience, program, logistics, communications, risks. Prioritize what matters for the goal and define how success is measured, such as attendee numbers or applications. Close with a short plan and timeline. The signal is structured thinking on an unfamiliar problem. Pitfalls: listing ideas with no goal, or never stating assumptions.",
+      "competencies": ["problem_framing", "structure", "recommendation"],
+      "values": ["General Cognitive Ability"],
+      "source_url": "https://igotanoffer.com/blogs/tech/google-gca-interviews"
+    },
+    {
+      "interview_type": "case",
+      "question": "You are the chief traffic officer for New York City. How would you reduce gridlock?",
+      "strong_answer": "Clarify the definition and measurement of gridlock. Break down the causes (demand peaks, intersections, deliveries, incidents, parking). Use data to find the biggest contributors, then propose options across pricing, signal timing, enforcement and transit, with trade-offs and rough impact. Recommend a phased plan with pilots and metrics such as average travel time. Pitfalls: one silver-bullet idea, or no way to measure progress.",
+      "competencies": ["problem_framing", "structure", "estimation_logic", "recommendation"],
+      "values": ["General Cognitive Ability"],
+      "source_url": "https://igotanoffer.com/blogs/tech/google-gca-interviews"
+    },
+    {
+      "interview_type": "case",
+      "question": "You own an internal AI platform that other teams build agents on. What is your strategy, and if you could track only one metric, which one?",
+      "strong_answer": "Identify the customers (internal developer teams) and their jobs: build, evaluate, deploy, and run agents safely. Find the main friction and set a strategy that reduces it (paved road, shared evals, safety guardrails). Prioritize platform investments. For the single metric, pick something tied to value delivered, such as agents in production with active usage, and explain why vanity metrics like sign-ups fail. Pitfalls: no customer view, or a metric that can be gamed.",
+      "competencies": ["user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["General Cognitive Ability", "Role-Related Knowledge"],
+      "source_url": "https://www.aced.io/guides/google-product-manager-interview/questions"
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "L3",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Software Engineer II. Delivers well-scoped tasks with guidance and grows toward independence in familiar areas."
+    },
+    {
+      "level_name": "L4",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Software Engineer III. Owns features end to end within a team with little day-to-day guidance."
+    },
+    {
+      "level_name": "L5",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Senior Software Engineer. Works with little direction, designs systems, leads small to medium projects and mentors others."
+    },
+    {
+      "level_name": "L6",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Staff Software Engineer. Sets technical direction across several teams and leads large projects."
+    },
+    {
+      "level_name": "L7",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Senior Staff Software Engineer. Leads multiple projects and shapes product and engineering direction for an organization."
+    },
+    {
+      "level_name": "APM",
+      "normalized_level": "new_grad",
+      "role_family": "pm",
+      "scope_expectation": "Associate Product Manager. Owns a feature area with support, learns product craft through rotations."
+    },
+    {
+      "level_name": "PM",
+      "normalized_level": "mid",
+      "role_family": "pm",
+      "scope_expectation": "Owns a product area's roadmap and metrics with engineering and design partners."
+    },
+    {
+      "level_name": "Senior PM",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns a significant product or platform, sets strategy for it and influences adjacent teams."
+    },
+    {
+      "level_name": "Group PM",
+      "normalized_level": "staff_principal",
+      "role_family": "pm",
+      "scope_expectation": "Leads a group of PMs and a multi-product area, sets multi-year strategy."
+    }
+  ],
+  "persona": {
+    "tone": "Friendly, calm and structured; neutral rather than warm",
+    "pace": "Moderate; leaves silence for thinking and expects the candidate to think out loud",
+    "pushback_style": "Changes constraints and asks 'what if' follow-ups; probes assumptions and asks how the candidate would measure success",
+    "closing_style": "Leaves about five minutes for the candidate's questions; gives no feedback on performance"
+  },
+  "scoring_weights": {
+    "reasoning": 1.4,
+    "problem_framing": 1.4,
+    "structure": 1.3,
+    "trade_offs": 1.3,
+    "technical_depth": 1.3,
+    "collaboration": 1.2,
+    "learning_from_failure": 1.2,
+    "user_and_business_sense": 1.2,
+    "estimation_logic": 1.1,
+    "communication": 1.1
+  },
+  "values_share": 0.25,
+  "case_style": {
+    "product_sense": 0.45,
+    "estimation": 0.25,
+    "system_thinking": 0.3,
+    "notes": "PM cases mix product design on Google products, market sizing, and open-ended GCA hypotheticals that test structured thinking. Technical PM rounds add light system thinking."
+  },
+  "sources": [
+    {
+      "url": "https://www.google.com/about/careers/applications/how-we-hire/",
+      "title": "Google Careers: How we hire",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure"]
+    },
+    {
+      "url": "https://www.weforum.org/stories/2015/04/13-qualities-google-looks-for-in-job-candidates/",
+      "title": "13 qualities Google looks for in job candidates (World Economic Forum)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework", "scoring_weights"]
+    },
+    {
+      "url": "https://www.businessinsider.in/heres-exactly-what-google-grades-interviewees-on-when-its-hiring/articleshow/43247184.cms",
+      "title": "What Google grades interviewees on (Business Insider)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework", "scoring_weights"]
+    },
+    {
+      "url": "https://igotanoffer.com/blogs/tech/google-gca-interviews",
+      "title": "Google GCA interviews (IGotAnOffer)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework", "question_patterns", "case_style", "persona"]
+    },
+    {
+      "url": "https://igotanoffer.com/blogs/tech/google-rrk-interview",
+      "title": "Google RRK interview (IGotAnOffer)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["question_patterns", "loop_structure"]
+    },
+    {
+      "url": "https://designgurus.io/answers/detail/what-questions-are-asked-in-a-google-behavioral-interview",
+      "title": "Google behavioral interview questions (Design Gurus)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["question_patterns"]
+    },
+    {
+      "url": "https://www.designgurus.io/blog/google-system-design-interview-questions-ultimate-guide",
+      "title": "Google system design interview questions (Design Gurus)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["question_patterns", "loop_structure", "bar_by_level"]
+    },
+    {
+      "url": "https://www.aced.io/guides/google-product-manager-interview/questions",
+      "title": "Google product manager interview questions (Exponent / Aced)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.productleadership.com/blog/google-product-manager-interview-guide/",
+      "title": "Google product manager interview guide (Product Leadership)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.designgurus.io/blog/google-software-engineer-levels",
+      "title": "Google software engineer levels (Design Gurus)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://mentorcruise.com/blog/the-google-interview-process-25c6e/",
+      "title": "The Google interview process (MentorCruise)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "persona"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "high",
+    "bar_by_level": "medium",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "medium"
+  },
+  "low_confidence_notes": [
+    "values_framework: Google does not publish interview values as a list on its careers site; the four hiring attributes come from press coverage and prep sites that quote former Google recruiting material.",
+    "loop_structure: the team matching round is a conversation after the hiring committee, not a scored interview; modelled as hiring_manager so it can be practised.",
+    "bar_by_level: PM level labels (APM, PM, Senior PM, Group PM) are common titles, not verified against an official Google ladder; numeric L-levels for PMs are omitted.",
+    "persona: inferred from candidate reports and prep guides; no official source describes interviewer style.",
+    "scoring_weights: estimated from the emphasis on General Cognitive Ability and structured problem solving; no public source gives weights.",
+    "sample_questions: the internal AI platform question comes from a recent candidate-reported list on a prep site; treat as a single report."
+  ]
+}

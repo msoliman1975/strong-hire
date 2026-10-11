@@ -1,0 +1,766 @@
+{
+  "company_name": "Meta",
+  "company_slug": "meta",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-10",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Meta values",
+    "principles": [
+      {
+        "name": "Move fast",
+        "description": "Act with urgency, build and learn quickly, remove barriers to the highest-priority work, and move together in one direction.",
+        "evidence_signals": [
+          "Shipped an early version quickly to learn, then iterated",
+          "Removed a blocker that was slowing a team down",
+          "Explains how speed was balanced against quality and risk"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "Build awesome things",
+        "description": "Push past 'good enough' to ship products that are excellent and inspiring for billions of people.",
+        "evidence_signals": [
+          "Raised the quality bar of a product beyond the original plan",
+          "Cares about craft and user delight, not only shipping",
+          "Shows measurable user impact at scale"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Be direct and respect your colleagues",
+        "description": "Give and receive direct, meaningful feedback; raise disagreement openly and respect colleagues' expertise.",
+        "evidence_signals": [
+          "Raised a disagreement early and in the open, without personal attacks",
+          "Asked for and acted on critical feedback",
+          "Represents the other person's view fairly"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Focus on long-term impact",
+        "description": "Take on the most impactful challenges even when results take years, rather than optimizing for near-term wins.",
+        "evidence_signals": [
+          "Chose a harder project because of its long-term impact",
+          "Explains a trade-off between a quick win and lasting value"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Live in the future",
+        "description": "Build the future of work and products the company makes; be early adopters and work in ways that fit where things are going.",
+        "evidence_signals": [
+          "Adopted a new tool or technology early and brought others along",
+          "Designs for where users and technology are heading, not only today"
+        ],
+        "weight": 0.8
+      },
+      {
+        "name": "Meta, Metamates, me",
+        "description": "Be good stewards of the company and mission; take shared responsibility for collective success and support each other.",
+        "evidence_signals": [
+          "Put team or company success ahead of personal credit",
+          "Helped another team or colleague succeed at a cost to own work"
+        ],
+        "weight": 1.0
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": [
+        "E3",
+        "E4",
+        "E5",
+        "E6",
+        "E7"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter call",
+          "interview_type": null,
+          "duration_min": 15,
+          "interviewer_role": "Recruiter",
+          "notes": "Informational call. Not simulated in v1."
+        },
+        {
+          "name": "Technical screen",
+          "interview_type": null,
+          "duration_min": 45,
+          "interviewer_role": "Software engineer",
+          "notes": "One or two coding problems. Not simulated in v1."
+        },
+        {
+          "name": "Coding interviews",
+          "interview_type": null,
+          "duration_min": 45,
+          "interviewer_role": "Software engineer",
+          "notes": "Two rounds for E4 and above, three for new grads. Not simulated in v1."
+        },
+        {
+          "name": "System design or product architecture",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Senior software engineer",
+          "notes": "E4 and above; senior levels may get two design rounds. Product architecture is the product-engineering flavor (APIs, data model, client-server)."
+        },
+        {
+          "name": "Behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Senior engineer or engineering manager",
+          "notes": "Signals: resolving conflict, growing continuously, embracing ambiguity, driving results, communicating effectively. Includes a past-project deep dive."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": [
+        "IC4",
+        "IC5",
+        "IC6",
+        "IC7"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter call",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Not simulated in v1."
+        },
+        {
+          "name": "Product sense",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product manager",
+          "notes": "Identify a user problem and design a solution for a Meta product. Usually once in the screen and once in the full loop."
+        },
+        {
+          "name": "Analytical thinking (execution)",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product manager",
+          "notes": "Goals and metrics, root-cause analysis of a metric change, trade-offs. Usually once in the screen and once in the full loop."
+        },
+        {
+          "name": "Leadership and drive",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Product leader",
+          "notes": "Four or five behavioral questions on motivation, leading teams, driving results, growth and cross-functional work."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Resolving conflict",
+      "pattern": "A disagreement with a teammate or cross-functional partner and how it was resolved directly and respectfully",
+      "competencies": [
+        "conflict_handling",
+        "communication",
+        "collaboration"
+      ],
+      "values": [
+        "Be direct and respect your colleagues"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Growing continuously",
+      "pattern": "Hard feedback received or a failure, and what the candidate changed in how they work",
+      "competencies": [
+        "learning_from_failure",
+        "communication"
+      ],
+      "values": [
+        "Be direct and respect your colleagues"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Embracing ambiguity",
+      "pattern": "Progress made when requirements were unclear or priorities shifted mid-project",
+      "competencies": [
+        "ownership",
+        "impact"
+      ],
+      "values": [
+        "Move fast"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Driving results",
+      "pattern": "A project the candidate pushed to completion despite obstacles, with measured impact",
+      "competencies": [
+        "impact",
+        "ownership"
+      ],
+      "values": [
+        "Move fast",
+        "Build awesome things"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Prioritizing for impact",
+      "pattern": "How the candidate chose between several projects or demands and what they said no to",
+      "competencies": [
+        "impact",
+        "communication"
+      ],
+      "values": [
+        "Focus on long-term impact"
+      ]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Proudest project",
+      "pattern": "The candidate's biggest accomplishment: own role, decisions, scale of impact and what they would change",
+      "competencies": [
+        "depth_of_experience",
+        "scope_at_level",
+        "motivation"
+      ],
+      "values": [
+        "Build awesome things"
+      ]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Why Meta",
+      "pattern": "Why Meta, what kind of impact the candidate wants, and how they like to work",
+      "competencies": [
+        "motivation",
+        "team_fit"
+      ],
+      "values": [
+        "Meta, Metamates, me"
+      ]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Social product at scale",
+      "pattern": "Design a feed, messaging, media or real-time feature for billions of users, with storage, caching and latency trade-offs",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "reasoning",
+        "clarity_of_explanation"
+      ],
+      "values": [
+        "Build awesome things"
+      ]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Product architecture",
+      "pattern": "Design a user-facing product end to end: APIs, data model, client and server responsibilities",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "clarity_of_explanation"
+      ],
+      "values": [
+        "Build awesome things",
+        "Move fast"
+      ]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Product sense",
+      "pattern": "Improve or design a Meta product for a specific user group: mission, segment, pain points, solutions and prioritization",
+      "competencies": [
+        "problem_framing",
+        "user_and_business_sense",
+        "prioritization",
+        "recommendation"
+      ],
+      "values": [
+        "Build awesome things",
+        "Focus on long-term impact"
+      ]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Goals and metrics",
+      "pattern": "Define the goal, north-star metric and guardrails for a Meta product or feature",
+      "competencies": [
+        "problem_framing",
+        "user_and_business_sense",
+        "structure"
+      ],
+      "values": [
+        "Focus on long-term impact"
+      ]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Metric change diagnosis",
+      "pattern": "A key metric moved unexpectedly; find the cause and decide what to do",
+      "competencies": [
+        "problem_framing",
+        "structure",
+        "prioritization"
+      ],
+      "values": [
+        "Move fast"
+      ]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Trade-off decision",
+      "pattern": "Decide between two goals in tension, such as revenue versus engagement, using data",
+      "competencies": [
+        "user_and_business_sense",
+        "prioritization",
+        "recommendation"
+      ],
+      "values": [
+        "Focus on long-term impact"
+      ]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you disagreed with someone on your team. How did you handle it?",
+      "strong_answer": "Show directness with respect: the candidate raised the disagreement early and openly, stated the other view fairly, and used data or a quick experiment to decide. Show the outcome, including changing their own mind if they were wrong, and the relationship afterwards. At senior levels the conflict should involve real stakes or cross-team impact. Pitfalls: avoiding the conflict, escalating first, or a story where the other person is simply wrong.",
+      "competencies": [
+        "conflict_handling",
+        "communication",
+        "collaboration"
+      ],
+      "values": [
+        "Be direct and respect your colleagues"
+      ],
+      "source_url": "https://igotanoffer.com/en/advice/meta-leadership-and-drive-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe some difficult feedback you received and what you did with it.",
+      "strong_answer": "Quote the feedback in substance, show the first reaction honestly, then the steps taken to change. Give evidence of the change (a later result, the person noticing). Strong answers show the candidate seeks feedback actively. Pitfalls: feedback that is really praise, or no visible change.",
+      "competencies": [
+        "learning_from_failure",
+        "communication"
+      ],
+      "values": [
+        "Be direct and respect your colleagues"
+      ],
+      "source_url": "https://igotanoffer.com/en/advice/meta-leadership-and-drive-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a product or project failure. What did you learn from it?",
+      "strong_answer": "Explain the context and why the plan seemed right at the time. Own the candidate's part without blame, describe how the failure was detected and how fast it was addressed, and what they do differently now, ideally with a later example. Meta values speed, so show the decision pace was reasonable and the recovery quick. Pitfalls: a disguised success, blaming others, or no concrete learning.",
+      "competencies": [
+        "learning_from_failure",
+        "ownership"
+      ],
+      "values": [
+        "Move fast"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/meta/product-manager"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to juggle several projects. How did you prioritize?",
+      "strong_answer": "List the competing projects and stakeholders briefly. Show explicit criteria (impact, urgency, effort, long-term value), what was dropped or delayed, and how that was communicated. End with the results and what the candidate learned about prioritizing. Pitfalls: doing everything by working longer, or no clear trade-off.",
+      "competencies": [
+        "impact",
+        "communication",
+        "ownership"
+      ],
+      "values": [
+        "Focus on long-term impact",
+        "Move fast"
+      ],
+      "source_url": "https://igotanoffer.com/en/advice/meta-leadership-and-drive-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time an unexpected challenge hit a project and how you still delivered.",
+      "strong_answer": "Describe the surprise (changed requirements, outage, departure) and its impact. Show how the candidate re-planned quickly, made decisions with partial information, and kept others informed. Quantify the result. This probes embracing ambiguity and driving results. Pitfalls: waiting for direction, or a story where nothing was really at risk.",
+      "competencies": [
+        "ownership",
+        "impact"
+      ],
+      "values": [
+        "Move fast",
+        "Meta, Metamates, me"
+      ],
+      "source_url": "https://igotanoffer.com/en/advice/meta-leadership-and-drive-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a situation where the direction of a product or project was unclear. How did you move forward?",
+      "strong_answer": "Show what was ambiguous (goals, requirements, ownership) and why waiting was costly. Explain how the candidate created clarity: talking to users or stakeholders, proposing a direction, defining a small first step and a way to measure it. Show how they adjusted as they learned and the result. This probes the embracing-ambiguity signal. Pitfalls: waiting for a manager to decide, or claiming certainty that was not there.",
+      "competencies": [
+        "ownership",
+        "impact",
+        "communication"
+      ],
+      "values": [
+        "Move fast",
+        "Live in the future"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/meta/product-manager"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "What is your biggest accomplishment, and what impact did it have on users or the team?",
+      "strong_answer": "Pick the accomplishment with the largest scope that the candidate clearly drove. Give a short summary, then the hard decisions and the candidate's own role. Quantify user or business impact. Say what they would do differently. Match scope to the target level. Pitfalls: a team win with unclear personal contribution, or impact without numbers.",
+      "competencies": [
+        "depth_of_experience",
+        "scope_at_level",
+        "motivation"
+      ],
+      "values": [
+        "Build awesome things"
+      ],
+      "source_url": "https://site.joinleland.com/library/a/how-to-ace-your-facebook-product-manager-interview-a-step-by-step-guide"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why Meta?",
+      "strong_answer": "Be specific: link products, technical problems or scale at Meta to the candidate's past work and goals. Show what impact they want to have and how they like to work (fast, with feedback). Pitfalls: generic praise, or only compensation and brand.",
+      "competencies": [
+        "motivation",
+        "team_fit"
+      ],
+      "values": [
+        "Meta, Metamates, me"
+      ],
+      "source_url": "https://igotanoffer.com/en/advice/meta-leadership-and-drive-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design the news feed for a social network with billions of users.",
+      "strong_answer": "Clarify scope: post types, ranking or chronological, latency target. Cover the write path and fan-out choices (fan-out on write for most users, on read for celebrities), feed storage and caching, ranking as a separate service, pagination, and media served through a CDN. Estimate load roughly. Discuss consistency (eventual is fine), hot users, and failure handling. Pitfalls: computing the whole feed on each request, or ignoring celebrity accounts.",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "reasoning",
+        "clarity_of_explanation"
+      ],
+      "values": [
+        "Build awesome things"
+      ],
+      "source_url": "https://www.designgurus.io/blog/meta-system-design-interview-questions"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a messaging app like Messenger with real-time delivery and chat history.",
+      "strong_answer": "Clarify one-to-one versus group, read receipts, history, encryption. Cover persistent connections through gateway servers, a routing layer to find the recipient's connection, message storage partitioned by conversation, ordering with per-conversation sequence numbers, offline delivery via push, and multi-device sync. Discuss delivery guarantees and how end-to-end encryption limits server features. Pitfalls: polling, or no plan for offline users.",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "reasoning"
+      ],
+      "values": [
+        "Build awesome things"
+      ],
+      "source_url": "https://www.designgurus.io/blog/meta-system-design-interview-questions"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design live comments for a live video watched by many thousands of people at once?",
+      "strong_answer": "Clarify scale per stream and latency target. Cover comment ingestion, storage, and fan-out to viewers through a pub/sub layer and persistent connections, with partitioning by video. Discuss sampling or rate limiting for very popular streams, ordering, moderation hooks, and what happens when a viewer reconnects. Pitfalls: viewers polling the database, or no plan for hot streams.",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "clarity_of_explanation"
+      ],
+      "values": [
+        "Build awesome things",
+        "Move fast"
+      ],
+      "source_url": "https://www.designgurus.io/blog/meta-system-design-interview-questions"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a service that shows the top trending topics, updated continuously.",
+      "strong_answer": "Clarify the time window, regions and freshness. Cover event ingestion through a stream, approximate counting (count-min sketch or windowed counters), per-partition top-K and merge, and caching the result for reads. Discuss accuracy versus memory, spam and manipulation, and late events. Pitfalls: exact counts over all events in a database, or ignoring windowing.",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "reasoning"
+      ],
+      "values": [
+        "Move fast"
+      ],
+      "source_url": "https://www.designgurus.io/blog/meta-system-design-interview-questions"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you improve Facebook Groups to increase engagement among college students?",
+      "strong_answer": "Start with the mission of Groups and why college students matter. Segment students (first-years, clubs, study groups) and pick one. List their pain points (finding groups, noise, competition from other apps). Generate solutions, prioritize by impact and effort, and recommend one. Define a success metric (for example weekly active student group members) and guardrails like spam. Pitfalls: jumping to features before the user, or many ideas with no prioritization.",
+      "competencies": [
+        "problem_framing",
+        "user_and_business_sense",
+        "prioritization",
+        "recommendation"
+      ],
+      "values": [
+        "Build awesome things"
+      ],
+      "source_url": "https://site.joinleland.com/library/a/how-to-ace-your-facebook-product-manager-interview-a-step-by-step-guide"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you increase user engagement on Facebook Marketplace?",
+      "strong_answer": "Clarify engagement (listings, messages, completed trades). Note the two sides: buyers and sellers. Pick the side or segment with the biggest constraint, map the journey, and find the main pain (trust, slow replies, poor search). Propose and prioritize solutions, recommend one, and define success and guardrail metrics such as scam reports. Pitfalls: ignoring one side of the marketplace.",
+      "competencies": [
+        "problem_framing",
+        "user_and_business_sense",
+        "prioritization"
+      ],
+      "values": [
+        "Build awesome things"
+      ],
+      "source_url": "https://site.joinleland.com/library/a/how-to-ace-your-facebook-product-manager-interview-a-step-by-step-guide"
+    },
+    {
+      "interview_type": "case",
+      "question": "Messenger voice calls went up but video calls dropped. How would you investigate and what would you do?",
+      "strong_answer": "Confirm the data and the time window. Check if the change is substitution (users switching from video to voice) or separate. Segment by platform, app version, region and network quality. Look for causes: a release, a bug, a UI change, network issues, seasonality. Rank hypotheses and say what data confirms each. Decide on action depending on whether the shift harms user goals. Pitfalls: assuming the drop is bad without checking total calls.",
+      "competencies": [
+        "problem_framing",
+        "structure",
+        "prioritization"
+      ],
+      "values": [
+        "Move fast"
+      ],
+      "source_url": "https://site.joinleland.com/library/a/how-to-ace-your-facebook-product-manager-interview-a-step-by-step-guide"
+    },
+    {
+      "interview_type": "case",
+      "question": "Facebook Groups usage dropped 10%. What do you do?",
+      "strong_answer": "Clarify the metric definition and whether the drop is sudden or gradual. Rule out data issues, then segment by platform, region, group type, and user cohort. Check internal changes (releases, ranking, notifications) and external factors. Form and rank hypotheses, name the data to test each, and propose next steps including a rollback if a launch caused it. Pitfalls: a list of random causes with no structure.",
+      "competencies": [
+        "problem_framing",
+        "structure",
+        "prioritization"
+      ],
+      "values": [
+        "Move fast"
+      ],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/facebook-execution-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you set goals and measure success for Instagram Stories?",
+      "strong_answer": "Start from the product's mission (easy, low-pressure sharing with close friends). Define a goal, then a north-star metric such as daily users who create or view stories, with supporting metrics (creation rate, completion rate, replies) and guardrails (feed engagement cannibalization, time spent quality). Explain trade-offs among them. Pitfalls: many metrics with no primary one, or ignoring creators.",
+      "competencies": [
+        "problem_framing",
+        "user_and_business_sense",
+        "structure"
+      ],
+      "values": [
+        "Focus on long-term impact"
+      ],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/facebook-execution-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you decide on a change that increases ad revenue but reduces user retention?",
+      "strong_answer": "Quantify both sides: revenue gain now versus lifetime value lost from lower retention. Segment to see who is affected. Consider long-term effects on the ecosystem and alternatives that capture part of the gain with less harm. Propose an experiment and a decision rule. Strong answers lean toward long-term value. Pitfalls: choosing revenue without modelling retention, or refusing to quantify.",
+      "competencies": [
+        "user_and_business_sense",
+        "prioritization",
+        "recommendation",
+        "estimation_logic"
+      ],
+      "values": [
+        "Focus on long-term impact"
+      ],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/facebook-execution-interview"
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "E3",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Delivers well-scoped tasks with guidance; coding-focused loop without system design."
+    },
+    {
+      "level_name": "E4",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns features independently, handles some ambiguity and drives results within assigned scope."
+    },
+    {
+      "level_name": "E5",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Owns large features and subsystems with loosely defined requirements and cross-component design; influences the team."
+    },
+    {
+      "level_name": "E6",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Staff engineer; sets direction for several teams and leads cross-team technical efforts."
+    },
+    {
+      "level_name": "E7",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Senior staff; shapes technical strategy for an organization."
+    },
+    {
+      "level_name": "IC4",
+      "normalized_level": "mid",
+      "role_family": "pm",
+      "scope_expectation": "Owns features within a product area with support."
+    },
+    {
+      "level_name": "IC5",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns a product area, its goals and metrics, and leads a cross-functional team."
+    },
+    {
+      "level_name": "IC6",
+      "normalized_level": "staff_principal",
+      "role_family": "pm",
+      "scope_expectation": "Owns a large or ambiguous product space and sets strategy across teams."
+    }
+  ],
+  "persona": {
+    "tone": "Direct, energetic and friendly",
+    "pace": "Fast; covers several questions in 45 minutes and moves on when a point is made",
+    "pushback_style": "Asks direct follow-ups such as 'what was your part?', 'what was the impact in numbers?', 'what would you do differently?'; pushes on prioritization",
+    "closing_style": "Leaves about five minutes for the candidate's questions"
+  },
+  "scoring_weights": {
+    "impact": 1.5,
+    "ownership": 1.3,
+    "conflict_handling": 1.3,
+    "learning_from_failure": 1.2,
+    "communication": 1.2,
+    "scope_at_level": 1.3,
+    "trade_offs": 1.3,
+    "technical_depth": 1.2,
+    "problem_framing": 1.3,
+    "prioritization": 1.3,
+    "user_and_business_sense": 1.2
+  },
+  "values_share": 0.2,
+  "case_style": {
+    "product_sense": 0.5,
+    "estimation": 0.1,
+    "system_thinking": 0.4,
+    "notes": "PM cases are product sense on Meta products and analytical thinking: goals and metrics, metric-drop diagnosis and trade-offs. Market sizing is rare."
+  },
+  "sources": [
+    {
+      "url": "https://www.metacareers.com/culture",
+      "title": "Meta culture and values (Meta Careers)",
+      "retrieved_at": "2026-10-10",
+      "fields": [
+        "values_framework"
+      ]
+    },
+    {
+      "url": "https://www.metacareers.com/swe-prep-onsite/",
+      "title": "Preparing for your full loop interview at Meta (Meta Careers)",
+      "retrieved_at": "2026-10-10",
+      "fields": [
+        "loop_structure"
+      ]
+    },
+    {
+      "url": "https://www.hellointerview.com/blog/the-meta-swe-interview",
+      "title": "SWE interviews at Meta explained (Hello Interview)",
+      "retrieved_at": "2026-10-10",
+      "fields": [
+        "loop_structure",
+        "question_patterns",
+        "bar_by_level",
+        "scoring_weights",
+        "persona"
+      ]
+    },
+    {
+      "url": "https://www.techinterview.org/post/3233477365/meta-behavioral-interview-cheat-sheet/",
+      "title": "Meta behavioral interview cheat sheet (techinterview.org)",
+      "retrieved_at": "2026-10-10",
+      "fields": [
+        "question_patterns",
+        "bar_by_level"
+      ]
+    },
+    {
+      "url": "https://igotanoffer.com/en/advice/meta-leadership-and-drive-interview",
+      "title": "Meta leadership and drive interview (IGotAnOffer)",
+      "retrieved_at": "2026-10-10",
+      "fields": [
+        "loop_structure",
+        "question_patterns",
+        "persona"
+      ]
+    },
+    {
+      "url": "https://igotanoffer.com/blogs/product-manager/facebook-execution-interview",
+      "title": "Meta analytical thinking interview (IGotAnOffer)",
+      "retrieved_at": "2026-10-10",
+      "fields": [
+        "question_patterns",
+        "case_style"
+      ]
+    },
+    {
+      "url": "https://site.joinleland.com/library/a/how-to-ace-your-facebook-product-manager-interview-a-step-by-step-guide",
+      "title": "Meta product manager interview guide (Leland)",
+      "retrieved_at": "2026-10-10",
+      "fields": [
+        "loop_structure",
+        "question_patterns",
+        "case_style"
+      ]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/meta/product-manager",
+      "title": "Meta product manager interview (CleverPrep)",
+      "retrieved_at": "2026-10-10",
+      "fields": [
+        "question_patterns"
+      ]
+    },
+    {
+      "url": "https://www.designgurus.io/blog/meta-system-design-interview-questions",
+      "title": "Meta system design interview questions (Design Gurus)",
+      "retrieved_at": "2026-10-10",
+      "fields": [
+        "question_patterns",
+        "loop_structure"
+      ]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "high",
+    "question_patterns": "high",
+    "bar_by_level": "medium",
+    "persona": "medium",
+    "scoring_weights": "medium",
+    "case_style": "medium"
+  },
+  "low_confidence_notes": [
+    "values_framework: values come from the Meta careers culture page; Meta interviews score behavioral signals (conflict, growth, ambiguity, results, communication) rather than the values directly, so values_share is set low at 0.2.",
+    "bar_by_level: PM IC level labels and scope text are not from an official Meta source; E-level scope for E6 and E7 is our summary.",
+    "persona: inferred from prep guides written by former interviewers; no official description of interviewer style.",
+    "scoring_weights: based on the published behavioral signals (driving results, resolving conflict, growing continuously) mapped to our competencies; weights are our estimate.",
+    "sample_questions: two behavioral questions come from CleverPrep's Meta PM question list, a prep site that aggregates candidate reports."
+  ]
+}

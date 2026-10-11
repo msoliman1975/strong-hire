@@ -1,0 +1,597 @@
+{
+  "company_name": "Uber",
+  "company_slug": "uber",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-10",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Uber values",
+    "principles": [
+      {
+        "name": "Go get it",
+        "description": "Bring a champion mindset: ambition, hustle, and how you respond on the worst days, not only the best ones.",
+        "evidence_signals": [
+          "Describes pushing through a real setback without waiting for permission",
+          "Sets an ambitious goal and shows the concrete steps taken to reach it",
+          "Talks about bias for action backed by a measurable result"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Trip obsessed",
+        "description": "Make the marketplace work for everyone on a trip: riders, earners, eaters, merchants and carriers, balancing hard trade-offs between them.",
+        "evidence_signals": [
+          "Names more than one side of a marketplace and the trade-off between them",
+          "Simplifies a complex system for the end user",
+          "Blends data or algorithms with human judgment"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Build with heart",
+        "description": "Care about the real-world impact of products on people and communities, and let that care drive craft.",
+        "evidence_signals": [
+          "Puts themselves in the user's or driver's shoes with specific detail",
+          "Shows care for quality and craft beyond the minimum",
+          "Connects the work to impact on real people"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Stand for safety",
+        "description": "Embed safety into everything; the work of safety never stops.",
+        "evidence_signals": [
+          "Raises safety, abuse or failure risks unprompted",
+          "Gives a concrete example of trading speed for safety or reliability",
+          "Designs guardrails, monitoring or rollback plans"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "See the forest and the trees",
+        "description": "Hold the big picture and the important details at once; small improvements compound at global scale.",
+        "evidence_signals": [
+          "Moves between strategy and implementation detail fluently",
+          "Notices a detail that changed the approach",
+          "Quantifies how a small improvement compounds at scale"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "One Uber",
+        "description": "Do what is best for Uber over the individual or team; support teammates, say what you mean, disagree and commit.",
+        "evidence_signals": [
+          "Describes disagreeing openly and then committing to the decision",
+          "Helps another team succeed at a cost to their own priorities",
+          "Credits the team while being clear about own role"
+        ],
+        "weight": 1.1
+      },
+      {
+        "name": "Great minds don't think alike",
+        "description": "Seek and embrace diversity of ideas, identity, experience and education to make better decisions.",
+        "evidence_signals": [
+          "Actively sought dissenting views before deciding",
+          "Changed their mind because of a different perspective",
+          "Built an inclusive team or process"
+        ],
+        "weight": 0.8
+      },
+      {
+        "name": "Do the right thing",
+        "description": "The guiding value: act ethically and with integrity, period.",
+        "evidence_signals": [
+          "Describes choosing the ethical path when it was costly",
+          "Escalates or speaks up about a problem rather than hiding it"
+        ],
+        "weight": 1.0
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["L3", "L4", "L5A", "L5B", "L6", "L7"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, motivation and level calibration. Not simulated in v1."
+        },
+        {
+          "name": "Technical screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Live coding on CodeSignal, medium to hard algorithmic problems. Not simulated in v1."
+        },
+        {
+          "name": "Coding (onsite)",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "One or two live coding rounds. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior or staff engineer",
+          "notes": "Uber-scale real-time systems (dispatch, location, pricing). Candidates must defend the design, not just sketch it. Usually mid-level and up."
+        },
+        {
+          "name": "Collaboration and leadership",
+          "interview_type": "behavioral",
+          "duration_min": 75,
+          "interviewer_role": "Hiring manager",
+          "notes": "Dedicated behavioral round on leadership, conflict and teamwork, framed around Uber values."
+        },
+        {
+          "name": "Bar raiser",
+          "interview_type": "behavioral",
+          "duration_min": 60,
+          "interviewer_role": "Experienced engineer from another team",
+          "notes": "Values and hiring bar focus; may include a technical deep dive into past work."
+        },
+        {
+          "name": "Hiring manager conversation",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager",
+          "notes": "Role expectations, team fit and scope. Sometimes part of team matching."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": ["PM I", "PM II", "Senior PM", "Group PM"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Level-setting with light behavioral questions. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager (product)",
+          "notes": "Mix of behavioral and a short case."
+        },
+        {
+          "name": "Product sense",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Senior product manager",
+          "notes": "Design or improve a product for riders, drivers, eaters or merchants."
+        },
+        {
+          "name": "Analytical / metrics",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Data scientist or PM",
+          "notes": "Metric diagnosis (for example a drop in bookings), experiments, marketplace data."
+        },
+        {
+          "name": "Engineering screen",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Engineering lead",
+          "notes": "Technical conversation on how a product's systems work and trade-offs."
+        },
+        {
+          "name": "Cross-functional / behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Designer or cross-functional partner",
+          "notes": "Collaboration with design and engineering, handling disagreement."
+        },
+        {
+          "name": "Take-home presentation",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager and peer PM",
+          "notes": "Some loops include presenting a take-home assignment and defending it under pushback."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Ambitious goal",
+      "pattern": "The most ambitious goal the candidate set, how they pursued it, and what happened when it got hard",
+      "competencies": ["ownership", "impact"],
+      "values": ["Go get it"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Opposing stakeholders",
+      "pattern": "A situation where two groups wanted opposite outcomes and how the candidate found a path",
+      "competencies": ["conflict_handling", "collaboration", "communication"],
+      "values": ["One Uber", "Trip obsessed"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Speed versus quality or safety",
+      "pattern": "A time moving fast caused a problem, or the candidate chose to slow down for safety or reliability",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Stand for safety", "Go get it"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Disagree and commit",
+      "pattern": "A time the candidate disagreed with a decision, said so, and then committed",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["One Uber", "Great minds don't think alike"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Failure and setback",
+      "pattern": "A significant failure or setback, the candidate's role in it, and what changed afterwards",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Go get it", "Do the right thing"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Leading a project",
+      "pattern": "Walk through a project the candidate led end to end: scope, decisions, people, result",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["See the forest and the trees"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Motivation for Uber",
+      "pattern": "Why Uber and this team, connected to the candidate's past work and the marketplace",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["Build with heart"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Real-time marketplace systems",
+      "pattern": "Design a real-time system for a two-sided marketplace (dispatch, location, pricing) and defend the choices",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Trip obsessed", "See the forest and the trees"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Reliability at global scale",
+      "pattern": "How a high-throughput service stays correct and available under failure, partitions and traffic spikes",
+      "competencies": ["technical_depth", "trade_offs", "accuracy"],
+      "values": ["Stand for safety"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Past system deep dive",
+      "pattern": "Explain a system the candidate built, its bottlenecks, and what they would redesign",
+      "competencies": ["technical_depth", "clarity_of_explanation"],
+      "values": []
+    },
+    {
+      "interview_type": "case",
+      "theme": "Marketplace product sense",
+      "pattern": "Improve or design a product for one side of the marketplace without hurting the other side",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Trip obsessed", "Build with heart"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Metric diagnosis",
+      "pattern": "A key marketplace metric moved; diagnose the cause and decide what to do",
+      "competencies": ["problem_framing", "structure", "recommendation"],
+      "values": ["See the forest and the trees"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Estimation",
+      "pattern": "Estimate demand, supply or volume for a city, place or time window",
+      "competencies": ["estimation_logic", "structure"],
+      "values": []
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about the most ambitious goal you have ever set for yourself at work and how it turned out.",
+      "strong_answer": "Pick a goal that was clearly a stretch at the time, with a number. Explain why it mattered, the plan, and the hardest moment (a setback, a no from leadership, a failed approach) and how you kept going. Own your decisions with 'I', credit others. End with the measured result and, if you missed, what you learned and did next. Interviewers listen for champion mindset on a bad day, not just success. Pitfall: a goal that was really a team target with no personal role.",
+      "competencies": ["ownership", "impact"],
+      "values": ["Go get it"],
+      "source_url": "https://www.designgurus.io/blog/uber-interview-guide"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a situation where two groups you worked with wanted opposite things. What did you do?",
+      "strong_answer": "Name the two groups and the real conflict (for example ops wanting speed versus engineering wanting stability). Show you understood each side's goal and constraint, made the trade-off explicit with data, and found a decision both could commit to, or escalated cleanly. Describe how you communicated the outcome and kept relationships intact. Uber looks for doing what's best for the company over any one team and for balancing several sides like a marketplace. Pitfall: a story where you simply sided with whoever was more senior.",
+      "competencies": ["conflict_handling", "collaboration", "communication"],
+      "values": ["One Uber", "Trip obsessed"],
+      "source_url": "https://www.designgurus.io/blog/uber-interview-guide"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time when moving quickly caused a problem. What happened and what did you change?",
+      "strong_answer": "Be honest about a real incident or mistake caused by speed. Explain the context and why speed seemed right, the impact (users, money, safety), how you detected and fixed it, and the lasting change (tests, rollout gates, checklists). Show you still value urgency but now pair it with guardrails. Strong answers mention safety or reliability unprompted. Pitfall: blaming others or choosing a trivial example.",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Stand for safety", "Go get it"],
+      "source_url": "https://www.designgurus.io/blog/uber-interview-guide"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "How have you handled a failure or major setback on a project?",
+      "strong_answer": "Use a STAR structure with a real failure where you had a clear role. Quantify the impact, take responsibility without self-flagellation, and spend most of the time on what you did to recover and what you changed in your process afterwards. Mention how you communicated the failure upward. Interviewers look for resilience and integrity. Pitfall: a 'failure' that is a disguised success.",
+      "competencies": ["learning_from_failure", "ownership", "communication"],
+      "values": ["Go get it", "Do the right thing"],
+      "source_url": "https://www.educative.io/blog/uber-interview-process-and-questions"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a conflict with a teammate and how you resolved it.",
+      "strong_answer": "Pick a substantive disagreement (design, priority, ownership), not a personality clash. Show you listened first, separated facts from opinions, proposed a way to decide (data, prototype, escalation), and committed to the result even if you lost. Close with the outcome and the relationship afterwards. Uber values disagree-and-commit and seeking different views. Pitfall: presenting yourself as right and the other person as difficult.",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["One Uber", "Great minds don't think alike"],
+      "source_url": "https://www.educative.io/blog/uber-interview-process-and-questions"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you disagreed with engineers or designers on a product decision.",
+      "strong_answer": "Describe the decision, both positions, and why you held yours, ideally grounded in user or marketplace data. Show how you invited their reasoning, what you learned from it, and how the decision was made. Strong answers show changing your mind when evidence warranted, or persuading with data rather than authority. End with the result and what the partnership looked like afterwards.",
+      "competencies": ["conflict_handling", "collaboration", "communication"],
+      "values": ["Great minds don't think alike", "One Uber"],
+      "source_url": "https://www.aced.io/guides/uber-product-manager-interview"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Walk me through the shipped feature you are proudest of and how you measured its success.",
+      "strong_answer": "Frame the problem and who it served, your exact role, key decisions and trade-offs, and the metrics: the primary success metric, guardrails, and the actual numbers. Explain how you knew the change caused the result (experiment, holdout). Mention a detail that changed the approach. Hiring managers calibrate level from scope and judgment here. Pitfall: vanity metrics or no numbers at all.",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["See the forest and the trees"],
+      "source_url": "https://www.aced.io/guides/uber-product-manager-interview"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why do you want to work at Uber, and on this team in particular?",
+      "strong_answer": "Connect specifics: something about Uber's marketplace or a product you use and its real-world impact, the team's problem space, and how your past experience transfers. Show you know what is hard about the domain (real-time, multi-sided, physical world). Mention what you want to learn. Pitfall: generic praise or focusing only on the brand or pay.",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["Build with heart"],
+      "source_url": "https://www.designgurus.io/blog/uber-interview-guide"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Tell me about a project you led and how you handled competing priorities and a tight deadline.",
+      "strong_answer": "Lay out scope, team size and the deadline. Explain how you prioritized (impact versus effort, what you cut and why), how you communicated trade-offs to stakeholders, and how you protected quality and safety. Give the result and what you would do differently. At senior levels show influence beyond your team.",
+      "competencies": ["scope_at_level", "judgment", "depth_of_experience"],
+      "values": ["See the forest and the trees", "Go get it"],
+      "source_url": "https://www.educative.io/blog/uber-interview-process-and-questions"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design the backend for a ride-hailing service that matches riders with nearby drivers in real time.",
+      "strong_answer": "Clarify scale (cities, concurrent drivers, location update rate) and latency goals. Cover location ingestion, a geospatial index (geohash, quadtree or H3 cells) sharded by region, a dispatch service that ranks candidates by ETA, the trip state machine, and handling disconnects. Discuss consistency (avoid double-assigning a driver), hot cells in dense areas, and failover. Uber interviewers push on defending choices and failure modes. Pitfall: drawing generic boxes without numbers or trade-offs.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Trip obsessed", "See the forest and the trees"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-are-the-top-system-design-interview-questions-for-uber-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design a dynamic (surge) pricing system based on supply and demand?",
+      "strong_answer": "Define goals for both sides: restore balance, keep prices fair and predictable. Describe streaming supply and demand counts per area and time window, computing a multiplier, smoothing to avoid flapping, caps, and showing the price before confirmation. Cover data freshness versus cost, regional rules, experiment design, and safety cases (emergencies, price caps). Strong answers connect the system to rider and driver trust.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Trip obsessed", "Stand for safety"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-are-the-top-system-design-interview-questions-for-uber-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a service that tracks the live location of millions of drivers and riders.",
+      "strong_answer": "Estimate write rate (drivers times update frequency) and read patterns. Discuss ingestion via a gateway and stream, in-memory storage of latest position with TTL, partitioning by region, fan-out to riders watching a trip, and archiving history for ETA models. Cover mobile network flakiness, battery trade-offs on update frequency, and backpressure. Pitfall: writing every update to a relational database.",
+      "competencies": ["technical_depth", "trade_offs", "accuracy"],
+      "values": ["See the forest and the trees"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-are-the-top-system-design-interview-questions-for-uber-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a payments system for trips that handles charges, refunds, promo codes and tips.",
+      "strong_answer": "Cover the trip-to-charge flow, authorization then capture, idempotency keys to avoid double charges, a ledger with double-entry records, async reconciliation with processors, and fraud checks. Discuss multi-currency, retries, and how partial failures are surfaced to users and support. Strong answers prioritize correctness and auditability over raw throughput.",
+      "competencies": ["technical_depth", "accuracy", "trade_offs"],
+      "values": ["Do the right thing", "Stand for safety"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-are-the-top-system-design-interview-questions-for-uber-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a notification system that sends push, SMS and email messages across the platform.",
+      "strong_answer": "Separate producers from a delivery pipeline: queue, templating, user preferences, rate limiting, per-channel providers, retries with backoff, and deduplication. Discuss priority lanes (safety and trip-critical messages first), delivery tracking, and provider failover. Explain trade-offs between at-least-once delivery and duplicate messages.",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["Stand for safety"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-are-the-top-system-design-interview-questions-for-uber-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "As a PM, explain how a shared-ride pooling feature might decide which riders to group together.",
+      "strong_answer": "Explain at a conceptual level: candidate riders within a time and detour window, route compatibility, scoring by added detour and wait, and batching requests over a short window versus matching instantly. Discuss trade-offs between efficiency (fewer cars) and rider experience (detours, ETA accuracy) and how you would measure both. PMs are judged on clear explanation and trade-off reasoning, not code.",
+      "competencies": ["clarity_of_explanation", "trade_offs", "reasoning"],
+      "values": ["Trip obsessed"],
+      "source_url": "https://www.aced.io/guides/uber-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you grow adoption of Uber's grocery delivery several times over?",
+      "strong_answer": "Clarify the goal metric and time frame. Segment users (current Eats users, riders who never ordered, lapsed grocery buyers) and map the funnel to find the biggest drop-off. Consider merchant supply and courier capacity as constraints, not just demand. Generate a few solutions, prioritize by impact and effort, pick one, and define success and guardrail metrics (basket size, substitutions, delivery time). Pitfall: only marketing ideas with no supply-side view.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Trip obsessed"],
+      "source_url": "https://www.aced.io/guides/uber-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you reward drivers who have been on the platform for a long time?",
+      "strong_answer": "Start from why long-tenured drivers matter (reliability, ratings, lower churn cost) and what they value (earnings, flexibility, respect, predictability). Segment drivers, propose options (earnings boosts, priority features, recognition, benefits), and weigh cost against retention lift. Consider fairness to new drivers and gaming risk. Define how you would test and measure retention.",
+      "competencies": ["user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["Build with heart", "Trip obsessed"],
+      "source_url": "https://www.aced.io/guides/uber-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "Gross bookings for rides are down this week. How would you figure out why?",
+      "strong_answer": "Clarify the size and timing of the drop and confirm it is real (data pipeline, definition changes). Decompose bookings into requests, conversion, completed trips and price per trip, then cut by city, platform, app version and rider segment. Check supply-side causes (driver availability, surge) and external events. Form hypotheses, prioritize, and say what you would do once the cause is found. Pitfall: listing causes without a structure.",
+      "competencies": ["problem_framing", "structure", "recommendation"],
+      "values": ["See the forest and the trees"],
+      "source_url": "https://www.aced.io/guides/uber-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you reduce trip cancellations?",
+      "strong_answer": "Separate rider cancellations from driver cancellations and by stage (before match, after match, at pickup). Find the largest segments and their causes (long ETA, wrong pickup spot, low fare for driver). Propose targeted fixes for each side, prioritize, and define metrics including guardrails like wait time and driver earnings. Good answers balance both sides of the marketplace.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Trip obsessed"],
+      "source_url": "https://www.aced.io/guides/uber-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "Estimate how many people might be waiting for rides at a single busy pickup spot during peak time.",
+      "strong_answer": "Pick a concrete place (an airport terminal or stadium) and state assumptions. Build from arrivals per hour, share who use ride-hailing, and average wait time (Little's law: waiting = arrival rate x wait). Sanity-check against capacity. Then say what the number means for product decisions (pickup zones, queueing). Speak assumptions aloud and round sensibly.",
+      "competencies": ["estimation_logic", "structure"],
+      "values": [],
+      "source_url": "https://www.aced.io/guides/uber-product-manager-interview"
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "L3",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Entry-level engineer; delivers well-scoped tasks with guidance."
+    },
+    {
+      "level_name": "L4",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Works independently; owns medium-sized projects and makes reasonable design choices with PM, design and data partners."
+    },
+    {
+      "level_name": "L5A",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Senior engineer; drives complex, team-level projects to completion."
+    },
+    {
+      "level_name": "L5B",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Leads complex cross-team projects; titled Staff Engineer since the 2022 title change."
+    },
+    {
+      "level_name": "L6",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Owns complex, organization-wide technical efforts; rare level."
+    },
+    {
+      "level_name": "Senior PM",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns a product area and its metrics, works across marketplace sides and teams."
+    }
+  ],
+  "persona": {
+    "tone": "Direct, energetic and practical",
+    "pace": "Brisk; expects structured answers and moves on once a point is made",
+    "pushback_style": "Asks 'how would this hold at Uber scale?', pushes for numbers, and challenges the candidate to defend design choices and consider the other side of the marketplace",
+    "closing_style": "Leaves about 5 minutes for questions about the team and Uber"
+  },
+  "scoring_weights": {
+    "ownership": 1.3,
+    "impact": 1.3,
+    "collaboration": 1.1,
+    "conflict_handling": 1.1,
+    "scope_at_level": 1.2,
+    "technical_depth": 1.2,
+    "trade_offs": 1.3,
+    "problem_framing": 1.1,
+    "user_and_business_sense": 1.3,
+    "estimation_logic": 1.1
+  },
+  "values_share": 0.25,
+  "case_style": {
+    "product_sense": 0.45,
+    "estimation": 0.2,
+    "system_thinking": 0.35,
+    "notes": "Cases centre on a multi-sided marketplace (riders, drivers, eaters, merchants) and on data: metric diagnosis and experiment design are common. Estimation questions are often tied to physical places and times."
+  },
+  "sources": [
+    {
+      "url": "https://www.uber.com/in/mr/careers/values",
+      "title": "Uber careers: values",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://fourweekmba.com/uber-values/",
+      "title": "Uber values (summary of Uber's published values)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://www.uber.com/newsroom/ubers-new-cultural-norms",
+      "title": "Uber's new cultural norms (2017, predecessor framework)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework", "persona"]
+    },
+    {
+      "url": "https://www.educative.io/blog/uber-interview-process-and-questions",
+      "title": "Uber's interview process and questions",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.designgurus.io/blog/uber-interview-guide",
+      "title": "Uber interview guide",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "values_framework", "persona"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/what-are-the-top-system-design-interview-questions-for-uber-interview",
+      "title": "Top system design interview questions for Uber",
+      "retrieved_at": "2026-10-10",
+      "fields": ["question_patterns", "scoring_weights"]
+    },
+    {
+      "url": "https://www.interviewquery.com/guides/uber-software-engineer",
+      "title": "Uber software engineer interview guide",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "persona"]
+    },
+    {
+      "url": "https://www.aced.io/guides/uber-product-manager-interview",
+      "title": "Uber product manager interview guide",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://blog.pragmaticengineer.com/uber-engineering-levels/",
+      "title": "Uber's engineering level changes",
+      "retrieved_at": "2026-10-10",
+      "fields": ["bar_by_level"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "medium",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "medium",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "medium"
+  },
+  "low_confidence_notes": [
+    "values_framework: the official Uber values page now redirects to jobs.uber.com and did not render the value list; names come from Uber's values page as indexed in search plus secondary summaries. Verify against the live page. Weights are our estimate.",
+    "loop_structure: round names and durations come from third-party prep guides and candidate reports, not from Uber. The PM loop varies a lot by team; the take-home presentation round appears in some reports only.",
+    "bar_by_level: SWE levels from one public newsletter; L5B was retitled Staff Engineer in 2022. PM level names (PM I, PM II, Senior PM, Group PM) are assumed from common industry usage and not confirmed.",
+    "persona: inferred from candidate reports that stress defending designs and data-heavy PM rounds; no official source.",
+    "scoring_weights: estimated; no public source gives weights."
+  ]
+}

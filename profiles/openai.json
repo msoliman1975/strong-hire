@@ -1,0 +1,593 @@
+{
+  "company_name": "OpenAI",
+  "company_slug": "openai",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-10",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "OpenAI core values",
+    "principles": [
+      {
+        "name": "AGI focus",
+        "description": "Committed to building safe, beneficial AGI with a large positive impact on humanity; work that does not help with that is out of scope.",
+        "evidence_signals": [
+          "Connects motivation and past work to the mission of safe, beneficial AGI",
+          "Shows a considered view on AI safety and benefits, not hype",
+          "Cuts work that does not serve the core goal"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Intense and scrappy",
+        "description": "Work hard with urgency, including on unglamorous tasks; be unpretentious, do what works, and take good ideas from anywhere.",
+        "evidence_signals": [
+          "Describes doing unglamorous work to unblock a result",
+          "Ships a simple solution fast and iterates",
+          "Ramps up quickly in an unfamiliar domain and produces results"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Scale",
+        "description": "Believe scale in models, systems, people, processes and ambition is powerful; when in doubt, scale it up.",
+        "evidence_signals": [
+          "Reasons about what breaks at 10x or 100x",
+          "Designs systems and processes that grow without rewrites",
+          "Shows ambition in the size of problems taken on"
+        ],
+        "weight": 1.1
+      },
+      {
+        "name": "Make something people love",
+        "description": "Technology and products should have a transformative positive effect on people's lives.",
+        "evidence_signals": [
+          "Talks about real users and how the work changed their experience",
+          "Uses user feedback or data to decide what to build",
+          "Cares about polish and usefulness, not only capability"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Team spirit",
+        "description": "Big advances come from collaboration within and across teams; goals stay aligned and nothing is someone else's problem.",
+        "evidence_signals": [
+          "Picks up a problem outside their remit because it mattered",
+          "Works through disagreement with another team to a shared goal",
+          "Is open to feedback and communicates clearly"
+        ],
+        "weight": 1.1
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["L3", "L4", "L5", "L6"],
+      "rounds": [
+        {
+          "name": "Recruiter call",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, interest in OpenAI and timing. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Hiring manager",
+          "notes": "Can be substantive: past projects, failures and complexity."
+        },
+        {
+          "name": "Technical screen (coding)",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Engineer",
+          "notes": "Practical coding on CoderPad, sometimes a take-home or timed test. Not simulated in v1."
+        },
+        {
+          "name": "Technical screen (system design)",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Engineer",
+          "notes": "System design, sometimes before the final round."
+        },
+        {
+          "name": "Final: coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Engineer",
+          "notes": "Practical coding and refactoring. Not simulated in v1."
+        },
+        {
+          "name": "Final: system design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior engineer",
+          "notes": "Designs often relate to LLM products or infrastructure."
+        },
+        {
+          "name": "Final: project deep dive",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Engineer or manager",
+          "notes": "Walk through a past project and the candidate's role in depth."
+        },
+        {
+          "name": "Final: behavioral / working style",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Manager or cross-functional partner",
+          "notes": "Collaboration, communication, openness to feedback, mission alignment."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": ["L3", "L4", "L5", "L6"],
+      "rounds": [
+        {
+          "name": "Recruiter call",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Research manager",
+          "notes": "Deep dive into research, publications or ML engineering work."
+        },
+        {
+          "name": "Skills assessment",
+          "interview_type": null,
+          "duration_min": 135,
+          "interviewer_role": null,
+          "notes": "Timed coding test or structured technical loop, often ML-flavoured coding. Not simulated in v1."
+        },
+        {
+          "name": "Final: ML coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Research engineer",
+          "notes": "Implement or debug ML code (for example transformer pieces). Not simulated in v1."
+        },
+        {
+          "name": "Final: ML systems design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Research engineer or scientist",
+          "notes": "Training and inference systems, evaluation and data pipelines."
+        },
+        {
+          "name": "Final: ML depth / research discussion",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Research scientist",
+          "notes": "ML theory, past research and how the candidate reasons about experiments."
+        },
+        {
+          "name": "Final: mission and working style",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Research lead",
+          "notes": "Fit with mission, research culture, safety views and career goals."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": [],
+      "rounds": [
+        {
+          "name": "Recruiter call",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Product lead",
+          "notes": "Past launches, failures and motivation."
+        },
+        {
+          "name": "Product sense",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product manager",
+          "notes": "AI-native product design and goal setting."
+        },
+        {
+          "name": "Product strategy / execution",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product manager or lead",
+          "notes": "Trade-offs such as capability versus cost, experiments, metrics."
+        },
+        {
+          "name": "Technical / cross-functional",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Engineer or researcher",
+          "notes": "Working with research and engineering; explaining model limits."
+        },
+        {
+          "name": "Behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Cross-functional partner",
+          "notes": "Collaboration, conflict and communication."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Disagreement with manager",
+      "pattern": "A time the candidate disagreed with a manager or another team and how they reached alignment",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["Team spirit"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Failure with business impact",
+      "pattern": "A time the candidate's work hurt the business or a launch failed, and what they learned",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Intense and scrappy"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Explaining limits to non-experts",
+      "pattern": "Explaining a technical or model limitation to a non-technical stakeholder",
+      "competencies": ["communication", "collaboration"],
+      "values": ["Team spirit", "Make something people love"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Fast ramp-up",
+      "pattern": "A time the candidate learned a new domain quickly and delivered results",
+      "competencies": ["impact", "ownership"],
+      "values": ["Intense and scrappy"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Mission motivation",
+      "pattern": "Why OpenAI, and how the candidate thinks about safe and beneficial AGI",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["AGI focus"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Most impactful project",
+      "pattern": "The project the candidate is proudest of and their exact personal contribution",
+      "competencies": ["depth_of_experience", "scope_at_level"],
+      "values": ["Make something people love"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "LLM product infrastructure",
+      "pattern": "Design a system that serves or builds on LLMs (search, playground, agents) and its trade-offs",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Scale", "Make something people love"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Compute and scale",
+      "pattern": "Design scheduling, training or inference systems where GPUs are the scarce resource",
+      "competencies": ["technical_depth", "trade_offs"],
+      "values": ["Scale"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "ML fundamentals",
+      "pattern": "Explain why a modelling technique works, or diagnose a training or evaluation problem",
+      "competencies": ["accuracy", "reasoning", "clarity_of_explanation"],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Classic distributed design",
+      "pattern": "Design a well-known product or service (chat, webhooks, storage) at large scale",
+      "competencies": ["technical_depth", "trade_offs"],
+      "values": ["Scale"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "AI product trade-off",
+      "pattern": "Decide how to ship a model or feature when capability, cost and safety pull in different directions",
+      "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
+      "values": ["Make something people love", "AGI focus"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Goals and experiments",
+      "pattern": "Set goals and design an experiment for an AI product launch or onboarding flow",
+      "competencies": ["structure", "prioritization", "estimation_logic"],
+      "values": ["Make something people love"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you disagreed with your manager. How did it go?",
+      "strong_answer": "Pick a real disagreement on substance (priority, design, approach). Show you raised it directly with evidence, listened to the reasoning, and either persuaded or committed fully. Describe the outcome and the relationship afterwards. OpenAI looks for openness to feedback and collaboration over ego. Pitfall: a story where you went around your manager.",
+      "competencies": ["conflict_handling", "communication"],
+      "values": ["Team spirit"],
+      "source_url": "https://www.aced.io/blog/openai-interview-process"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time your work had a negative effect on the business. What did you do?",
+      "strong_answer": "Be candid: what happened, the measurable impact, and your part. Focus on the response: fast detection, mitigation, honest communication, and the durable fix. Show you moved with urgency and did unglamorous cleanup. End with what you do differently now. Pitfall: minimizing or blaming.",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Intense and scrappy"],
+      "source_url": "https://www.aced.io/blog/openai-interview-process"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about collaborating with a team that disagreed with your approach.",
+      "strong_answer": "Explain the shared goal, the competing approaches and why each team held its view. Show how you aligned on the overall goal first, used data or a quick experiment to decide, and treated the outcome as joint. Mention how you kept the relationship healthy. 'Nothing is someone else's problem' is the spirit to show.",
+      "competencies": ["collaboration", "conflict_handling"],
+      "values": ["Team spirit"],
+      "source_url": "https://www.aced.io/blog/openai-interview-process"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "How did you explain a technical limitation to a non-technical stakeholder?",
+      "strong_answer": "Describe the stakeholder, what they wanted and the limitation. Show you translated it into impact and options (what is possible, at what cost or risk) using plain language and an example, then agreed next steps. For AI roles, explaining model limits honestly (hallucination, evaluation gaps) is a plus. Pitfall: jargon or just saying no.",
+      "competencies": ["communication", "collaboration"],
+      "values": ["Team spirit", "Make something people love"],
+      "source_url": "https://www.aced.io/blog/openai-interview-process"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you showed leadership.",
+      "strong_answer": "Leadership need not mean managing: show taking ownership of an unclear problem, rallying others, making decisions, and delivering. Give scope, obstacles, your actions and a measured result. Show intensity and pragmatism. Pitfall: describing a title rather than actions.",
+      "competencies": ["ownership", "impact"],
+      "values": ["Intense and scrappy", "Team spirit"],
+      "source_url": "https://igotanoffer.com/en/advice/openai-interview-questions"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why do you want to work at OpenAI?",
+      "strong_answer": "Be specific and sincere: what draws you to the mission of safe, beneficial AGI, which OpenAI work you have followed or used, and how your skills fit this team. Show a balanced view of benefits and risks of AI. Mention what you would contribute, not just gain. Pitfall: generic hype or only prestige.",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["AGI focus"],
+      "source_url": "https://igotanoffer.com/en/advice/openai-interview-questions"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Walk me through your most impactful project and exactly what you personally did.",
+      "strong_answer": "Give context, the goal, your exact contributions versus the team's, key decisions and alternatives, and the result in numbers. Be ready for deep follow-ups on any detail. Show ramp-up speed and pragmatism. Pitfall: vague 'we' with no clear personal ownership.",
+      "competencies": ["depth_of_experience", "scope_at_level"],
+      "values": ["Make something people love", "Intense and scrappy"],
+      "source_url": "https://www.aced.io/blog/openai-interview-process"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "What is your view on AI safety and alignment, and what do you think is the most important open problem?",
+      "strong_answer": "Show you have thought about it: name a concrete problem (for example scalable oversight, evaluation of dangerous capabilities, robustness), explain why it matters and what progress could look like, and how your work could help. Be honest about uncertainty. Interviewers want genuine engagement, not a memorized line.",
+      "competencies": ["motivation", "judgment"],
+      "values": ["AGI focus"],
+      "source_url": "https://igotanoffer.com/en/advice/openai-research-scientist-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you build an LLM-powered search system for a company's internal documents?",
+      "strong_answer": "Clarify sources, scale, permissions and latency. Cover ingestion and chunking, embeddings plus keyword retrieval, access control enforced at retrieval time, re-ranking, prompt construction with citations, and caching. Discuss evaluation (relevance, groundedness), hallucination mitigation, freshness, and cost per query. Strong answers tie design to user trust.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Make something people love", "Scale"],
+      "source_url": "https://igotanoffer.com/en/advice/openai-interview-questions"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a system that schedules GPU jobs across teams using a credit or quota scheme.",
+      "strong_answer": "Define job types (training, inference, eval), priorities and how credits are granted and spent. Cover a queue and scheduler, bin-packing across nodes, preemption and checkpointing, fairness versus utilization, and accounting. Discuss failure handling when nodes die and how users see wait times. Show reasoning about scarce compute at scale.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Scale"],
+      "source_url": "https://igotanoffer.com/en/advice/openai-interview-questions"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a playground-style product where developers try models through a web UI backed by an API.",
+      "strong_answer": "Split frontend and API concerns: auth, model selection and parameters, streaming responses, rate limits and quotas, saving and sharing prompts, and usage metering. Discuss latency (streaming tokens), abuse prevention, and how to roll out new models safely. Show user empathy for developers.",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["Make something people love"],
+      "source_url": "https://www.aced.io/blog/openai-interview-process"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a team chat application like Slack.",
+      "strong_answer": "Clarify features (channels, DMs, presence, search) and scale. Cover persistent connections for real-time delivery, message storage partitioned by channel, ordering, fan-out to large channels, offline sync, and search indexing. Discuss trade-offs in consistency and delivery guarantees. Quantify load.",
+      "competencies": ["technical_depth", "trade_offs"],
+      "values": ["Scale"],
+      "source_url": "https://www.aced.io/blog/openai-interview-process"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design a system to train a large model across many machines?",
+      "strong_answer": "Cover data, tensor and pipeline parallelism and when each helps, communication cost (all-reduce, interconnect), checkpointing and recovery from node failure, data loading throughput, and monitoring loss and hardware health. Discuss trade-offs between memory, speed and complexity. Strong answers reason from bottlenecks with rough numbers.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Scale"],
+      "source_url": "https://igotanoffer.com/en/advice/openai-research-scientist-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Why does layer normalization tend to work better than batch normalization in transformers?",
+      "strong_answer": "Explain both: batch norm normalizes across the batch per feature, layer norm across features per example. Layer norm does not depend on batch size or statistics across variable-length sequences, behaves the same in training and inference, and suits autoregressive and small-batch settings. Mention pre-norm versus post-norm and training stability. Be precise and admit uncertainty where it exists.",
+      "competencies": ["accuracy", "reasoning", "clarity_of_explanation"],
+      "values": [],
+      "source_url": "https://igotanoffer.com/en/advice/openai-research-scientist-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Your model performs well on the test set but poorly in production. How do you diagnose a train-test distribution mismatch?",
+      "strong_answer": "Confirm the gap with production samples and labels. Compare input distributions (feature statistics, embeddings), check for leakage or pipeline differences, and slice errors by segment. Remedies: collect representative data, reweighting, domain adaptation, better evals that mirror production, and monitoring for drift. Show a systematic, experiment-driven approach.",
+      "competencies": ["reasoning", "technical_depth", "accuracy"],
+      "values": ["Intense and scrappy"],
+      "source_url": "https://igotanoffer.com/en/advice/openai-research-scientist-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you build an evaluation suite for an AI agent that must hit accuracy and cost targets?",
+      "strong_answer": "Define tasks representative of real use, success criteria and graders (exact checks, model graders with calibration, human review). Track accuracy, cost per task, latency and failure categories. Discuss contamination, variance across runs, and regression gating in CI. Explain how results drive model or prompt changes.",
+      "competencies": ["technical_depth", "reasoning", "trade_offs"],
+      "values": ["Make something people love"],
+      "source_url": "https://www.aced.io/blog/openai-interview-process"
+    },
+    {
+      "interview_type": "case",
+      "question": "A new model is ten times more capable but ten times more expensive to run. What would you do with it?",
+      "strong_answer": "Frame who benefits most from the extra capability and what they would pay. Options: premium tier, route only hard queries to it, use it to distill cheaper models, or limited access while cost falls. Consider safety review, capacity, and cannibalization. Recommend a path with metrics (value per query, margin, satisfaction).",
+      "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
+      "values": ["Make something people love", "Scale"],
+      "source_url": "https://www.aced.io/blog/openai-interview-process"
+    },
+    {
+      "interview_type": "case",
+      "question": "Design an experiment to improve onboarding for new ChatGPT users.",
+      "strong_answer": "Define the goal (early activation and retention) and a measurable activation event. Form a hypothesis from where new users drop off, design variants, pick primary and guardrail metrics, set sample size and duration, and watch novelty effects and segments. Say what result would change your decision.",
+      "competencies": ["structure", "user_and_business_sense", "prioritization"],
+      "values": ["Make something people love"],
+      "source_url": "https://www.aced.io/blog/openai-interview-process"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you measure success for OpenAI as a company?",
+      "strong_answer": "Tie metrics to the mission and the business: user value (active use, retention, task success), developer adoption, revenue and compute efficiency, plus safety and trust indicators. Explain trade-offs between them and which you would use as north star. Strong answers acknowledge that mission and growth can conflict.",
+      "competencies": ["problem_framing", "structure", "user_and_business_sense"],
+      "values": ["AGI focus", "Make something people love"],
+      "source_url": "https://igotanoffer.com/en/advice/openai-interview-questions"
+    },
+    {
+      "interview_type": "case",
+      "question": "Set goals for a hypothetical AI assistant device used in shared public spaces.",
+      "strong_answer": "Clarify users (owners, bystanders), use cases and constraints (privacy, noise, multiple speakers). Define success metrics for usefulness, adoption and trust, with privacy and safety guardrails. Prioritize a launch scope and say how you would learn before scaling.",
+      "competencies": ["problem_framing", "prioritization", "user_and_business_sense"],
+      "values": ["Make something people love"],
+      "source_url": "https://www.aced.io/blog/openai-interview-process"
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "L3",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Early-career engineer delivering scoped work on a team. Public title is Member of Technical Staff."
+    },
+    {
+      "level_name": "L4",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Independent engineer who owns features or components end to end."
+    },
+    {
+      "level_name": "L5",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Senior engineer who leads significant projects and sets direction within a team."
+    },
+    {
+      "level_name": "L6",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Leads technical direction across teams or a major system."
+    }
+  ],
+  "persona": {
+    "tone": "Intense, curious and pragmatic; informal but high-bar",
+    "pace": "Fast; follows up quickly and drills into details of the candidate's own work",
+    "pushback_style": "Asks 'what exactly did you do?', 'what breaks at 10x?' and 'how would you know it works?', and stretches the candidate beyond their comfort zone",
+    "closing_style": "Leaves a few minutes for the candidate's questions about the team and mission"
+  },
+  "scoring_weights": {
+    "ownership": 1.3,
+    "impact": 1.3,
+    "collaboration": 1.2,
+    "communication": 1.2,
+    "depth_of_experience": 1.2,
+    "motivation": 1.2,
+    "technical_depth": 1.4,
+    "reasoning": 1.3,
+    "trade_offs": 1.2,
+    "user_and_business_sense": 1.1
+  },
+  "values_share": 0.2,
+  "case_style": {
+    "product_sense": 0.5,
+    "estimation": 0.1,
+    "system_thinking": 0.4,
+    "notes": "PM cases are AI-native: model capability versus cost and safety, experiments for ChatGPT, goal setting for new devices. Classic estimation is rare."
+  },
+  "sources": [
+    {
+      "url": "https://openai.com/interview-guide/",
+      "title": "OpenAI interview guide",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://www.semafor.com/article/10/12/2023/openai-quietly-changed-its-core-values",
+      "title": "OpenAI has quietly changed its core values (Semafor)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://btw.media/openai-quietly-updates-its-core-values-to-emphasize-agi-development",
+      "title": "OpenAI quietly updates its core values to emphasize AGI development",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://igotanoffer.com/en/advice/openai-interview-questions",
+      "title": "OpenAI interview process and questions",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.aced.io/blog/openai-interview-process",
+      "title": "OpenAI interview process",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://igotanoffer.com/en/advice/openai-research-scientist-interview",
+      "title": "OpenAI research scientist interview",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.levels.fyi/companies/openai/salaries/software-engineer/levels/l2",
+      "title": "Levels.fyi: OpenAI software engineer levels",
+      "retrieved_at": "2026-10-10",
+      "fields": ["bar_by_level"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "medium",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "low"
+  },
+  "low_confidence_notes": [
+    "values_framework: the five values are as reported by press in October 2023; openai.com returned 403 to our fetcher, so the current careers page could not be checked. Confirm the values are unchanged.",
+    "loop_structure: OpenAI's interview guide (seen via search, not fully read) confirms recruiter and hiring manager calls, a skills-based assessment, and 4-6 hours of finals with 4-6 people; individual round names and durations come from prep guides and vary by team.",
+    "bar_by_level: level names L2-L6 appear only on Levels.fyi compensation pages; scope text is our generic mapping. Everyone's public title is Member of Technical Staff. PM levels are not public.",
+    "persona: inferred from the interview guide wording ('stretch you beyond your comfort zone') and candidate reports.",
+    "scoring_weights: estimated; no public source gives weights.",
+    "case_style: few public PM case reports."
+  ]
+}

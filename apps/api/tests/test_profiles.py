@@ -412,3 +412,22 @@ def test_launch_companies_are_the_20_from_the_spec() -> None:
     slugs = [slug for slug, _ in LAUNCH_COMPANIES]
     assert len(slugs) == len(set(slugs)) == 20
     assert "atlassian" in slugs and "ebay" not in slugs
+
+
+# --- researched launch profiles (R1) ---------------------------------------------------------
+
+
+@pytest.mark.parametrize("slug", [slug for slug, _ in LAUNCH_COMPANIES])
+def test_ad1_every_launch_company_has_a_valid_profile_file(slug: str) -> None:
+    """AD-1: profiles/<slug>.json exists for each launch company and passes validation."""
+    profile = load_profile_file(REPO / "profiles" / f"{slug}.json")
+    assert profile.company_slug == slug
+    assert profile.sample_questions, "researched profiles carry sample questions"
+    cited = {s.url for s in profile.sources}
+    assert all(q.source_url in cited for q in profile.sample_questions)
+
+
+def test_ad1_profile_files_are_launch_companies_only() -> None:
+    slugs = {slug for slug, _ in LAUNCH_COMPANIES}
+    files = {p.stem for p in (REPO / "profiles").glob("*.json")}
+    assert files <= slugs, f"profiles for unknown companies: {sorted(files - slugs)}"

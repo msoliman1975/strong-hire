@@ -1,0 +1,649 @@
+{
+  "company_name": "Amazon",
+  "company_slug": "amazon",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-10",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Leadership Principles",
+    "principles": [
+      {
+        "name": "Customer Obsession",
+        "description": "Start with the customer and work backwards; earn and keep customer trust; focus on customers more than competitors.",
+        "evidence_signals": [
+          "Names a specific customer and the pain they had, with evidence such as feedback or data",
+          "Made a trade-off in the customer's favor even when it cost the team something",
+          "Measured the result for the customer, not only for the team"
+        ],
+        "weight": 1.5
+      },
+      {
+        "name": "Ownership",
+        "description": "Think long term, act on behalf of the whole company, and never say 'that's not my job'.",
+        "evidence_signals": [
+          "Took on a problem outside their formal scope and saw it through",
+          "Accepted a short-term cost for long-term value and explains why",
+          "Uses 'I' for own actions and follows up after launch"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "Invent and Simplify",
+        "description": "Expect innovation, look for new ideas everywhere, and find ways to simplify.",
+        "evidence_signals": [
+          "Replaced a complex process or system with a simpler one and shows the effect",
+          "Borrowed an idea from outside the team and adapted it"
+        ],
+        "weight": 1.1
+      },
+      {
+        "name": "Are Right, A Lot",
+        "description": "Have strong judgment and good instincts; seek diverse perspectives and work to disconfirm own beliefs.",
+        "evidence_signals": [
+          "Made a sound call with incomplete data and explains the reasoning",
+          "Actively sought views that could prove them wrong",
+          "Describes a time their judgment was wrong and how they corrected it"
+        ],
+        "weight": 1.1
+      },
+      {
+        "name": "Learn and Be Curious",
+        "description": "Never stop learning and always look to improve; explore new possibilities.",
+        "evidence_signals": [
+          "Learned a new domain or skill quickly to solve a real problem",
+          "Asks probing questions and shows curiosity beyond the task"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Hire and Develop the Best",
+        "description": "Raise the performance bar with every hire and promotion; develop and coach others.",
+        "evidence_signals": [
+          "Mentored or coached someone with a visible result",
+          "Helped hire or raised the bar on a team's standards for people"
+        ],
+        "weight": 0.8
+      },
+      {
+        "name": "Insist on the Highest Standards",
+        "description": "Keep relentlessly high standards; do not let defects pass downstream; fix problems so they stay fixed.",
+        "evidence_signals": [
+          "Refused to ship something below the bar and explains the cost of that choice",
+          "Added a mechanism (test, check, review) so a problem did not return"
+        ],
+        "weight": 1.1
+      },
+      {
+        "name": "Think Big",
+        "description": "Create and communicate a bold direction that inspires results; think differently and look for new ways to serve customers.",
+        "evidence_signals": [
+          "Proposed a direction larger than the original ask and got buy-in",
+          "Describes a long-term vision with concrete first steps"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Bias for Action",
+        "description": "Speed matters; many decisions are reversible and do not need extensive study; take calculated risks.",
+        "evidence_signals": [
+          "Acted quickly on a reversible decision and explains why waiting was worse",
+          "Distinguishes one-way from two-way door decisions"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Frugality",
+        "description": "Accomplish more with less; constraints breed resourcefulness and invention.",
+        "evidence_signals": [
+          "Delivered with limited budget, people or time and shows the creative workaround",
+          "Cut cost or waste with a measured saving"
+        ],
+        "weight": 0.8
+      },
+      {
+        "name": "Earn Trust",
+        "description": "Listen attentively, speak candidly, treat others respectfully; be self-critical even when it is awkward.",
+        "evidence_signals": [
+          "Admits own mistakes openly and early",
+          "Gave or received hard feedback in a respectful way",
+          "Rebuilt a strained working relationship"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Dive Deep",
+        "description": "Operate at all levels, stay connected to details, audit often, and be skeptical when metrics and anecdotes differ.",
+        "evidence_signals": [
+          "Found a root cause by going into data or code personally",
+          "Can answer detailed follow-up questions about numbers in the story",
+          "Noticed that a metric and an anecdote disagreed and investigated"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Have Backbone; Disagree and Commit",
+        "description": "Respectfully challenge decisions when you disagree, even when uncomfortable; once decided, commit fully.",
+        "evidence_signals": [
+          "Challenged a senior person's decision with data",
+          "Committed fully after losing an argument and helped the chosen path succeed"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Deliver Results",
+        "description": "Focus on the key inputs and deliver them with the right quality and on time; rise to setbacks and never settle.",
+        "evidence_signals": [
+          "Shipped despite a serious obstacle and explains how it was handled",
+          "States quantified results tied to clear goals"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Strive to be Earth's Best Employer",
+        "description": "Work to create a safer, more productive, more diverse and more just work environment; lead with empathy.",
+        "evidence_signals": [
+          "Improved the working environment or growth of teammates",
+          "Shows empathy and care for people's wellbeing in a story"
+        ],
+        "weight": 0.6
+      },
+      {
+        "name": "Success and Scale Bring Broad Responsibility",
+        "description": "Be humble and thoughtful about secondary effects of actions on communities, the planet and future generations.",
+        "evidence_signals": [
+          "Considered downstream or societal effects of a decision",
+          "Changed a plan to reduce harm to people outside the immediate customer"
+        ],
+        "weight": 0.6
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["SDE I (L4)", "SDE II (L5)", "SDE III (L6)", "Principal SDE (L7)"],
+      "rounds": [
+        {
+          "name": "Online assessment",
+          "interview_type": null,
+          "duration_min": 90,
+          "interviewer_role": "Automated",
+          "notes": "Coding problems and a work-style survey, mostly for SDE I and II. Not simulated in v1."
+        },
+        {
+          "name": "Technical phone screen",
+          "interview_type": "behavioral",
+          "duration_min": 60,
+          "interviewer_role": "Senior engineer or engineering manager",
+          "notes": "About half Leadership Principle questions and half coding or design. Only the behavioral half is simulated."
+        },
+        {
+          "name": "Coding interviews",
+          "interview_type": null,
+          "duration_min": 55,
+          "interviewer_role": "Software development engineer",
+          "notes": "Two loop rounds, each also opening with one or two Leadership Principle questions. Coding part not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 55,
+          "interviewer_role": "Senior SDE",
+          "notes": "High-level distributed design for SDE II and above; object-oriented or low-level design for SDE I. Scored on practicality, reliability and scalability."
+        },
+        {
+          "name": "Leadership Principles interview",
+          "interview_type": "behavioral",
+          "duration_min": 55,
+          "interviewer_role": "Engineer or manager from the team",
+          "notes": "Two or three STAR questions with deep follow-ups on details and metrics."
+        },
+        {
+          "name": "Bar Raiser",
+          "interview_type": "behavioral",
+          "duration_min": 55,
+          "interviewer_role": "Bar Raiser from another team",
+          "notes": "Trained interviewer outside the hiring team with veto power; mostly Leadership Principles, sometimes technical."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 55,
+          "interviewer_role": "Hiring manager",
+          "notes": "Past projects, scope and Leadership Principles; often combined with a technical topic."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": ["PM (L5)", "Senior PM (L6)", "Principal PM (L7)"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Not simulated in v1."
+        },
+        {
+          "name": "Writing assessment",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Hiring team",
+          "notes": "Some teams ask for a written narrative; Amazon is document-driven. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager",
+          "notes": "Behavioral and product strategy questions."
+        },
+        {
+          "name": "Product sense and strategy",
+          "interview_type": "case",
+          "duration_min": 55,
+          "interviewer_role": "Senior PM",
+          "notes": "Customer-backwards product design, metrics and pricing questions on Amazon products."
+        },
+        {
+          "name": "Technical",
+          "interview_type": "technical_qa",
+          "duration_min": 55,
+          "interviewer_role": "SDE or engineering manager",
+          "notes": "Architecture and scalability discussion for technical PM roles."
+        },
+        {
+          "name": "Leadership Principles interviews",
+          "interview_type": "behavioral",
+          "duration_min": 55,
+          "interviewer_role": "PMs and cross-functional partners",
+          "notes": "Every round includes Leadership Principle questions."
+        },
+        {
+          "name": "Bar Raiser",
+          "interview_type": "behavioral",
+          "duration_min": 55,
+          "interviewer_role": "Bar Raiser from another team",
+          "notes": null
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Customer first",
+      "pattern": "A time the candidate went beyond what was asked to solve a real customer pain point, and how they knew it worked",
+      "competencies": ["impact", "ownership"],
+      "values": ["Customer Obsession"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Beyond own scope",
+      "pattern": "A problem outside the candidate's role that they took on, or a short-term sacrifice for a long-term gain",
+      "competencies": ["ownership", "impact"],
+      "values": ["Ownership"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Disagree and commit",
+      "pattern": "A time the candidate challenged a decision by someone more senior, and what they did after the decision was made",
+      "competencies": ["conflict_handling", "communication"],
+      "values": ["Have Backbone; Disagree and Commit", "Earn Trust"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Deadline under pressure",
+      "pattern": "A project with a tight deadline or a major setback and how the candidate still delivered",
+      "competencies": ["impact", "ownership"],
+      "values": ["Deliver Results", "Bias for Action"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Root cause from data",
+      "pattern": "A time the candidate dug into data or details to find the real cause of a problem others missed",
+      "competencies": ["ownership", "impact"],
+      "values": ["Dive Deep"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Decision with incomplete data",
+      "pattern": "A decision made quickly without full information and how the risk was managed",
+      "competencies": ["learning_from_failure", "impact"],
+      "values": ["Are Right, A Lot", "Bias for Action"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Simplification",
+      "pattern": "A complex process or system the candidate simplified or reinvented, with measured effect",
+      "competencies": ["impact", "ownership"],
+      "values": ["Invent and Simplify", "Frugality"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Failure and standards",
+      "pattern": "A project that did not go well or a time the candidate would not accept lower quality",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Insist on the Highest Standards", "Earn Trust"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Most complex project",
+      "pattern": "Walk through the most technically or organizationally complex project the candidate drove, with metrics",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Ownership", "Dive Deep"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Amazon-flavored system design",
+      "pattern": "Design a retail or logistics system at Amazon scale and discuss reliability, scalability and trade-offs",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Customer Obsession", "Insist on the Highest Standards"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Work backwards from the customer",
+      "pattern": "Improve or launch an Amazon product for a specific customer segment, starting from their need and ending with metrics",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["Customer Obsession", "Think Big"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Metrics and diagnosis",
+      "pattern": "Define success metrics for a product, or diagnose a sudden metric drop",
+      "competencies": ["problem_framing", "structure", "estimation_logic"],
+      "values": ["Dive Deep"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Pricing and business model",
+      "pattern": "Decide whether to add, remove or price a benefit or tier, weighing customer value against cost",
+      "competencies": ["user_and_business_sense", "estimation_logic", "recommendation"],
+      "values": ["Customer Obsession", "Frugality"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you went well beyond what was expected for a customer.",
+      "strong_answer": "Use STAR with most time on Action. Name the customer (internal or external) and the specific pain, with evidence. Explain what the candidate personally did beyond the normal process and what it cost. Quantify the result for the customer (time saved, tickets reduced, retention). Strong answers show working backwards from the need rather than a request. Expect follow-ups on how the need was confirmed and what the candidate would do differently. Pitfalls: a team story with no 'I', or no measurable outcome.",
+      "competencies": ["impact", "ownership"],
+      "values": ["Customer Obsession"],
+      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you accepted a short-term sacrifice to get a better long-term result.",
+      "strong_answer": "Show the two options clearly and why the long-term option was better for the customer or company. Explain how the candidate convinced others to accept the short-term cost, and how the risk was managed. Close with data showing the long-term payoff. Pitfalls: a sacrifice that was really no cost, or no evidence that the long term turned out better.",
+      "competencies": ["ownership", "judgment"],
+      "values": ["Ownership", "Think Big"],
+      "source_url": "https://www.aced.io/blog/how-to-nail-amazons-behavioral-interview-questions"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you took on a problem that was clearly outside your role.",
+      "strong_answer": "Explain why nobody owned it and what would have happened if it stayed unowned. Show the candidate's own steps to fix it while keeping their main work on track, and how they involved the right owners. Quantify the outcome and mention a mechanism left behind so it stays fixed. Pitfalls: stepping on others without telling them, or dropping core responsibilities.",
+      "competencies": ["ownership", "impact"],
+      "values": ["Ownership"],
+      "source_url": "https://www.careerflow.ai/blog/amazon-behavioral-interview-questions"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you disagreed with a decision and had to commit to it anyway.",
+      "strong_answer": "Show backbone: the candidate raised the disagreement directly, with data, to the right person and at the right time. Then show commitment: once decided, they backed the decision fully and helped it succeed, without 'I told you so'. Strong answers state what they learned about the other side's reasoning. Pitfalls: silently going along, continuing to resist after the decision, or a story with trivial stakes.",
+      "competencies": ["conflict_handling", "communication", "collaboration"],
+      "values": ["Have Backbone; Disagree and Commit", "Earn Trust"],
+      "source_url": "https://www.joinleland.com/library/a/amazon-product-manager-interview-process"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a project with a tight deadline. How did you make sure it shipped?",
+      "strong_answer": "Set up the deadline and why it mattered to customers. Describe how scope was cut or prioritized, how risks were tracked, and what the candidate did when something went wrong. Show quality was kept where it mattered. End with the delivered result in numbers and a lesson. Pitfalls: heroics with no planning, or hitting the date by shipping a broken product.",
+      "competencies": ["impact", "ownership"],
+      "values": ["Deliver Results", "Bias for Action"],
+      "source_url": "https://www.aced.io/blog/how-to-nail-amazons-behavioral-interview-questions"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to decide without complete data.",
+      "strong_answer": "Explain what data was missing and why waiting was costly. Show how the candidate judged whether the decision was reversible, what assumptions they made, and how they reduced risk (small rollout, monitoring, a fallback). Say how the decision turned out and what they would change. Pitfalls: claiming certainty, or never checking the outcome.",
+      "competencies": ["judgment", "learning_from_failure"],
+      "values": ["Are Right, A Lot", "Bias for Action"],
+      "source_url": "https://www.careerflow.ai/blog/amazon-behavioral-interview-questions"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Give an example of a simple solution you found for a hard or complex problem.",
+      "strong_answer": "Describe the complexity and its cost first (time, errors, operational load). Explain how the candidate found the simpler path, what they removed, and how they convinced others. Quantify the improvement. Strong answers mention trade-offs accepted for simplicity. Pitfalls: a simple solution to an already simple problem, or no measurable gain.",
+      "competencies": ["impact", "ownership"],
+      "values": ["Invent and Simplify"],
+      "source_url": "https://www.careerflow.ai/blog/amazon-behavioral-interview-questions"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a project you wish you had done better.",
+      "strong_answer": "Pick a real shortfall. Own the candidate's part honestly and specifically. Explain the root cause, the recovery, and the lasting change in how they work, with a later example. Amazon interviewers look for self-criticism without defensiveness. Pitfalls: blaming others or circumstances, or a project that actually went fine.",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Earn Trust", "Insist on the Highest Standards"],
+      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Walk me through a time you had to handle several competing priorities at once.",
+      "strong_answer": "Lay out the competing demands and stakeholders. Show the criteria used to prioritize (customer impact, deadlines, reversibility), how the trade-offs were communicated, and what was explicitly not done. Close with the outcome and how stakeholders reacted. At senior levels, show building a mechanism for prioritization rather than a one-off call. Pitfalls: doing everything by working longer, or no explicit trade-off.",
+      "competencies": ["judgment", "scope_at_level", "depth_of_experience"],
+      "values": ["Deliver Results", "Ownership"],
+      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a parcel locker system: assign packages to lockers, give customers pickup codes, and handle expired pickups.",
+      "strong_answer": "Clarify scale (locations, lockers, sizes) and flows: delivery drop-off, customer pickup, expiry and return. Model the core entities (locker, compartment, package, reservation) and the allocation logic by size and availability. Cover code generation and security, concurrency when two packages compete for one slot, offline operation of a locker, and notifications. Discuss trade-offs between central and local state. Pitfalls: ignoring concurrency or failure of a locker unit.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Customer Obsession"],
+      "source_url": "https://www.designgurus.io/blog/amazon-interview-guide"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design an order tracking system that shows customers where their package is?",
+      "strong_answer": "Clarify sources of events (warehouse, carriers, drivers), update frequency and read traffic. Propose event ingestion through a queue, an event store per shipment, and a read-optimized view for customers. Cover idempotency and out-of-order events, carrier integration failures, notifications, and caching hot lookups. Discuss consistency expectations and peak events such as holiday sales. Pitfalls: synchronous calls to carriers on every page view.",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["Customer Obsession", "Insist on the Highest Standards"],
+      "source_url": "https://www.designgurus.io/blog/amazon-interview-guide"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a product recommendation service for an online store.",
+      "strong_answer": "Clarify where recommendations appear and the latency budget. Separate offline work (candidate generation from co-purchase and browsing data, model training) from online serving (fetch candidates, rank, filter out-of-stock items). Cover cold start, freshness, caching, A/B testing and fallbacks when the service is slow. Tie metrics to customers (conversion, satisfaction). Pitfalls: computing everything on request, or no fallback.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Customer Obsession"],
+      "source_url": "https://www.designgurus.io/blog/amazon-interview-guide"
+    },
+    {
+      "interview_type": "case",
+      "question": "Should Amazon include a $4 gift-wrapping benefit for free in Prime? How would you decide?",
+      "strong_answer": "Clarify goal: Prime sign-ups, retention, or gift-season sales. Identify customer segments who value gifting and estimate the cost (usage rate times unit cost) against the gain (retention lift, incremental orders). Consider alternatives such as a cheaper option or seasonal-only. Propose a test, the metrics to watch, and a decision rule. Pitfalls: deciding on intuition, or ignoring cost and operations.",
+      "competencies": ["user_and_business_sense", "estimation_logic", "recommendation"],
+      "values": ["Customer Obsession", "Frugality"],
+      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions"
+    },
+    {
+      "interview_type": "case",
+      "question": "Amazon orders are down 25%. What do you do?",
+      "strong_answer": "First confirm the data (tracking or pipeline issue, comparison period). Segment the drop by region, platform, category, new versus returning customers, and funnel step. Check internal causes (release, pricing, outage) and external ones (seasonality, competitor, holiday). Form hypotheses, prioritize by likelihood, and say what data would confirm each. End with immediate actions and longer-term fixes. Pitfalls: jumping to a solution before locating the drop.",
+      "competencies": ["problem_framing", "structure", "prioritization"],
+      "values": ["Dive Deep"],
+      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions"
+    },
+    {
+      "interview_type": "case",
+      "question": "What are the most important metrics to measure the success of the Echo Dot?",
+      "strong_answer": "Start with the product's goal in Amazon's strategy (engagement with Alexa, ecosystem lock-in, shopping) rather than device profit alone. Propose a north star such as weekly active devices, then supporting metrics (setup completion, interactions per day, skills used, retention at 30 and 90 days, returns) and guardrails (privacy complaints). Explain trade-offs between metrics. Pitfalls: listing many metrics without a primary one, or units sold only.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Customer Obsession", "Dive Deep"],
+      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you improve Amazon Fresh grocery delivery?",
+      "strong_answer": "Clarify the goal (order frequency, basket size, margin). Segment customers (busy families, older customers, urban singles) and pick one. Map the journey from browsing to delivery and find the biggest pain (slot availability, substitutions, freshness). Generate ideas, prioritize, and recommend one with success metrics and operational cost. Pitfalls: features without a customer segment, or ignoring the cost of delivery operations.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["Customer Obsession"],
+      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions"
+    },
+    {
+      "interview_type": "case",
+      "question": "About 40% of reviews in a category look fake. How would you tackle it?",
+      "strong_answer": "Clarify how 'fake' is measured and its impact on customer trust and purchases. Break down sources (paid review rings, incentivized reviews, seller self-reviews). Propose layered solutions: detection models, verified-purchase weighting, seller penalties, and customer-facing signals. Prioritize by impact and false-positive risk, and define metrics such as trust surveys and return rates. Pitfalls: deleting reviews broadly and hurting honest sellers.",
+      "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
+      "values": ["Customer Obsession", "Success and Scale Bring Broad Responsibility"],
+      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions"
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "SDE I (L4)",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Delivers well-defined features with guidance; writes tested, maintainable code."
+    },
+    {
+      "level_name": "SDE II (L5)",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns features and services end to end, designs components and handles ambiguity within a team."
+    },
+    {
+      "level_name": "SDE III (L6)",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Senior engineer who designs systems across a team or several teams, leads projects and mentors."
+    },
+    {
+      "level_name": "Principal SDE (L7)",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Sets technical direction for an organization and solves cross-team architecture problems."
+    },
+    {
+      "level_name": "PM (L5)",
+      "normalized_level": "mid",
+      "role_family": "pm",
+      "scope_expectation": "Owns features or a product area and its metrics with an engineering team."
+    },
+    {
+      "level_name": "Senior PM (L6)",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns a product line, writes the working-backwards documents and drives multi-team launches."
+    },
+    {
+      "level_name": "Principal PM (L7)",
+      "normalized_level": "staff_principal",
+      "role_family": "pm",
+      "scope_expectation": "Sets multi-year strategy for a business area and influences senior leadership."
+    }
+  ],
+  "persona": {
+    "tone": "Professional, direct and probing; polite but not chatty",
+    "pace": "Brisk; two or three stories per hour with many follow-ups",
+    "pushback_style": "Drills into each story with 'what did you do specifically?', 'what was the metric?', 'what would you do differently?'; redirects 'we' to 'I'",
+    "closing_style": "Leaves a few minutes for the candidate's questions; no feedback given"
+  },
+  "scoring_weights": {
+    "ownership": 1.5,
+    "impact": 1.4,
+    "judgment": 1.2,
+    "conflict_handling": 1.2,
+    "learning_from_failure": 1.2,
+    "depth_of_experience": 1.2,
+    "user_and_business_sense": 1.4,
+    "trade_offs": 1.2,
+    "technical_depth": 1.2,
+    "communication": 1.1
+  },
+  "values_share": 0.4,
+  "case_style": {
+    "product_sense": 0.5,
+    "estimation": 0.25,
+    "system_thinking": 0.25,
+    "notes": "Cases start from a customer segment and work backwards; metrics, pricing and business-model questions are common. Leadership Principles are probed in every round, including case rounds."
+  },
+  "sources": [
+    {
+      "url": "https://www.amazon.jobs/content/en/our-workplace/leadership-principles",
+      "title": "Amazon Leadership Principles (amazon.jobs)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework", "scoring_weights"]
+    },
+    {
+      "url": "https://amazon.jobs/content/en/how-we-hire/sde-iii-interview-prep",
+      "title": "SDE III interview prep (amazon.jobs)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "bar_by_level", "persona"]
+    },
+    {
+      "url": "https://www.amazon.jobs/content/en/how-we-hire/interviewing-at-amazon",
+      "title": "Interviewing at Amazon (amazon.jobs)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure"]
+    },
+    {
+      "url": "https://www.aced.io/blog/how-to-nail-amazons-behavioral-interview-questions",
+      "title": "How to nail Amazon's behavioral interview questions (Exponent / Aced)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["question_patterns", "persona"]
+    },
+    {
+      "url": "https://www.careerflow.ai/blog/amazon-behavioral-interview-questions",
+      "title": "Amazon behavioral interview questions (Careerflow)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["question_patterns"]
+    },
+    {
+      "url": "https://www.designgurus.io/blog/amazon-interview-guide",
+      "title": "Amazon interview guide (Design Gurus)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "bar_by_level"]
+    },
+    {
+      "url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions",
+      "title": "Amazon product manager interview questions (Interview Kickstart)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.joinleland.com/library/a/amazon-product-manager-interview-process",
+      "title": "Amazon product manager interview process (Leland)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "bar_by_level", "case_style"]
+    },
+    {
+      "url": "https://rajendrauppal.substack.com/p/understanding-levels-at-google-microsoft",
+      "title": "Understanding levels at Google, Microsoft and Amazon",
+      "retrieved_at": "2026-10-10",
+      "fields": ["bar_by_level"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "high",
+    "question_patterns": "high",
+    "bar_by_level": "medium",
+    "persona": "medium",
+    "scoring_weights": "medium",
+    "case_style": "medium"
+  },
+  "low_confidence_notes": [
+    "values_framework: principle descriptions are paraphrased from amazon.jobs; principle weights are our estimate of interview emphasis, not published by Amazon.",
+    "loop_structure: the online assessment duration varies by year and role; the PM writing assessment is reported by one prep site and is team-dependent.",
+    "bar_by_level: SDE level-to-L mapping is widely reported but not on an official Amazon ladder page; PM scope text is our summary.",
+    "scoring_weights: derived from the weight Amazon puts on Leadership Principles in every round; no public source gives competency weights.",
+    "sample_questions: several PM cases come from a single prep-site list of candidate-reported questions."
+  ]
+}

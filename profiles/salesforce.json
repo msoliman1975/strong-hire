@@ -1,0 +1,539 @@
+{
+  "company_name": "Salesforce",
+  "company_slug": "salesforce",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-10",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Salesforce core values",
+    "principles": [
+      {
+        "name": "Trust",
+        "description": "Build trust through the integrity of people and technology, transparency and ethical leadership; deliver on commitments and protect customer data.",
+        "evidence_signals": [
+          "Chose reliability, security or data protection over speed when they conflicted, and explains the cost",
+          "Was transparent about a problem or missed commitment with customers or stakeholders",
+          "Describes keeping commitments and following through"
+        ],
+        "weight": 1.5
+      },
+      {
+        "name": "Customer Success",
+        "description": "Earn the privilege of guiding customers to achieve extraordinary things; when customers succeed, Salesforce succeeds.",
+        "evidence_signals": [
+          "Names specific customers or user groups and the business outcome they got",
+          "Advocated for a customer need internally and changed a plan because of it",
+          "Measures success by customer adoption or outcomes, not only by shipping"
+        ],
+        "weight": 1.5
+      },
+      {
+        "name": "Innovation",
+        "description": "Innovate together with new solutions, products and releases, applying creative problem solving and continuous learning at scale.",
+        "evidence_signals": [
+          "Championed a new approach or technology and got others to adopt it",
+          "Shows a learner's mindset: asked for feedback and incorporated it",
+          "Talks about how AI or automation changed a workflow"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Equality",
+        "description": "Be active allies in building an inclusive workplace and advancing equality for all.",
+        "evidence_signals": [
+          "Describes including different voices or supporting a colleague from an underrepresented group",
+          "Considered accessibility or fairness in a product or process decision"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Sustainability",
+        "description": "Drive systemic change toward net zero carbon emissions and a nature-positive business.",
+        "evidence_signals": [
+          "Mentions efficiency or environmental impact as a factor in a technical or business decision",
+          "Took part in or led a sustainability or community effort"
+        ],
+        "weight": 0.6
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["AMTS", "MTS", "SMTS", "LMTS", "PMTS", "Architect"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background and role alignment. Not simulated in v1."
+        },
+        {
+          "name": "Online assessment or technical phone screen",
+          "interview_type": null,
+          "duration_min": 45,
+          "interviewer_role": "Software engineer",
+          "notes": "HackerRank assessment or live coding. Not simulated in v1."
+        },
+        {
+          "name": "Onsite coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Data structures and algorithms, often with a short behavioral segment at the start. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior or lead engineer",
+          "notes": "Multi-tenant SaaS services, APIs, data modeling, and object-oriented design; often opens with behavioral questions."
+        },
+        {
+          "name": "Behavioral (values)",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager or senior engineer",
+          "notes": "STAR stories mapped to Trust, Customer Success, Innovation and Equality."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager",
+          "notes": "Team fit, ownership, cross-team communication, and time management."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": ["Product Manager", "Senior Product Manager", "Director, Product Management"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background and product area fit. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager interview",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Product leader (hiring manager)",
+          "notes": "Past products, backlog prioritization, ambiguity and change."
+        },
+        {
+          "name": "Product sense",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product manager",
+          "notes": "User-centric problem solving on enterprise and AI products."
+        },
+        {
+          "name": "Analytical and metrics",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product manager",
+          "notes": "Success metrics and trade-off reasoning."
+        },
+        {
+          "name": "Cross-functional panel",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineering, design and peer PM partners",
+          "notes": "Stakeholder disagreement and building alignment."
+        },
+        {
+          "name": "Panel presentation",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Leadership panel",
+          "notes": "Presentation of a past project or a strategy exercise, then questions."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Trust over speed",
+      "pattern": "A time the candidate protected reliability, security or customer data even though it slowed delivery",
+      "competencies": ["ownership", "communication"],
+      "values": ["Trust", "Customer Success"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Customer advocacy",
+      "pattern": "A time the candidate pushed for a customer need inside the company and what changed",
+      "competencies": ["impact", "communication"],
+      "values": ["Customer Success"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Championing a new idea",
+      "pattern": "A new approach or technology the candidate championed and how they got adoption",
+      "competencies": ["impact", "collaboration"],
+      "values": ["Innovation"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Disagreement with partners",
+      "pattern": "A disagreement with engineering, design or another team, and how alignment was built",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["Trust"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Failure",
+      "pattern": "A project that failed or slipped, how the candidate communicated it, and what they learned",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Trust"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Inclusion",
+      "pattern": "How the candidate made sure different voices were heard on a team or in a decision",
+      "competencies": ["collaboration", "communication"],
+      "values": ["Equality"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Project end to end",
+      "pattern": "Walk through a product or system from idea to delivery, with own decisions and measured results",
+      "competencies": ["depth_of_experience", "scope_at_level"],
+      "values": ["Customer Success"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Prioritization and time management",
+      "pattern": "How the candidate prioritizes a backlog or competing work under limited capacity",
+      "competencies": ["judgment", "role_fit"],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Multi-tenant SaaS design",
+      "pattern": "Design a service used by many enterprise customers, covering tenant isolation, limits and reliability",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Trust"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "API and object-oriented design",
+      "pattern": "Design the APIs, components and interactions for a business service and explain modularity choices",
+      "competencies": ["clarity_of_explanation", "trade_offs", "technical_depth"],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Security and integration",
+      "pattern": "Explain an authentication or integration mechanism and its security trade-offs",
+      "competencies": ["technical_depth", "accuracy"],
+      "values": ["Trust"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Enterprise AI product design",
+      "pattern": "Design an AI-powered feature for a specific enterprise user, with adoption and trust in mind",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Customer Success", "Innovation", "Trust"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Metrics for a B2B feature",
+      "pattern": "Define success metrics for a feature sold to businesses, separating admin, end user and business outcomes",
+      "competencies": ["structure", "user_and_business_sense", "recommendation"],
+      "values": ["Customer Success"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Competitive strategy",
+      "pattern": "Recommend how a Salesforce product should compete in a segment or extend into a new use case",
+      "competencies": ["problem_framing", "prioritization", "recommendation"],
+      "values": ["Innovation"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you put customer trust ahead of shipping fast.",
+      "strong_answer": "Describe a concrete conflict between speed and reliability, security or data integrity. Explain the risk you saw, how you quantified it, and how you made the case to stakeholders who wanted speed. Show the outcome for the customer and how you communicated transparently about the delay. Salesforce's top value is Trust, so link the story to it naturally. Pitfall: a story where nothing was really at risk.",
+      "competencies": ["ownership", "communication", "impact"],
+      "values": ["Trust", "Customer Success"],
+      "source_url": "https://codemia.io/guides/salesforce-software-engineer"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you championed an innovative approach. How did you get people to adopt it?",
+      "strong_answer": "Explain the problem with the status quo, the new approach, and the evidence you gathered (prototype, pilot, data). Show how you brought skeptics along and handled risk, for example with a staged rollout. Quantify the result for customers or the team. Strong answers show innovation done together, not alone. Pitfall: novelty with no measured benefit.",
+      "competencies": ["impact", "collaboration", "communication"],
+      "values": ["Innovation"],
+      "source_url": "https://codemia.io/guides/salesforce-software-engineer"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a disagreement with an engineering or design partner and how you reached alignment.",
+      "strong_answer": "Lay out the disagreement and each side's reasons fairly. Show your approach: listening, bringing customer data, agreeing on decision criteria, and finding a compromise or escalation path if needed. Describe the outcome and the relationship afterwards. Salesforce panels look for polished, structured communication and respect for partners. Pitfall: winning the argument at the cost of the relationship.",
+      "competencies": ["conflict_handling", "collaboration", "communication"],
+      "values": ["Trust"],
+      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Share a time you advocated internally for what a customer needed.",
+      "strong_answer": "Name the customer or segment and the specific pain, with evidence such as support cases, interviews or revenue at risk. Explain who you had to convince and how you framed it in business terms. Describe what changed in the roadmap and the customer result. Show empathy and business sense together. Pitfall: building whatever one loud customer asked for without judgment.",
+      "competencies": ["impact", "communication", "ownership"],
+      "values": ["Customer Success"],
+      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a project that failed or missed its goals. What did you do and learn?",
+      "strong_answer": "Use STAR. Own your part clearly, explain how and when you told stakeholders (transparency matters for Trust), what you did to recover, and the concrete change you made afterwards. Show a learner's mindset. Pitfall: blaming other teams, or a failure with no real consequences.",
+      "competencies": ["learning_from_failure", "ownership", "communication"],
+      "values": ["Trust"],
+      "source_url": "https://roundz.substack.com/p/interview-experience-104-salesforce-smts"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you resolved a conflict within your team or took the lead in a difficult team situation.",
+      "strong_answer": "Describe the conflict and its effect on delivery. Show how you got each person's view, focused on shared goals, and agreed a path forward. Mention making sure quieter members were heard. Close with the result and what you would repeat. Pitfall: vague 'we talked it out' without your specific actions.",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["Equality", "Trust"],
+      "source_url": "https://roundz.substack.com/p/interview-experience-104-salesforce-smts"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Tell me about a product you launched. Walk me through the process from idea to delivery.",
+      "strong_answer": "Structure it as a clear story: the customer problem and evidence, how you defined scope and success metrics, key trade-offs and cuts, working with engineering and design, launch and adoption results. Salesforce rewards clear, polished storytelling that is ready for senior stakeholders, so keep it structured and quantified. Be ready for depth on any step. Pitfall: listing activities without decisions and outcomes.",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Customer Success"],
+      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "How would you decide between paying down technical debt and building new features?",
+      "strong_answer": "Show a framework: customer impact (incidents, performance, trust), velocity cost of the debt, revenue opportunity of features, and risk. Quantify where possible and propose a balanced plan, such as a fixed share of capacity plus targeted debt tied to features. Explain how you would get engineering and business leaders to agree. Pitfall: treating debt as purely an engineering concern.",
+      "competencies": ["judgment", "role_fit"],
+      "values": ["Trust", "Customer Success"],
+      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "How do you handle ownership and communication when your work depends on other teams?",
+      "strong_answer": "Give a concrete example of a cross-team dependency. Show proactive ownership: clear agreements, regular check-ins, surfacing risks early, and offering help rather than waiting. Explain how you managed your own time and priorities. Close with the result. Pitfall: describing only how others let you down.",
+      "competencies": ["team_fit", "judgment", "scope_at_level"],
+      "values": ["Trust"],
+      "source_url": "https://roundz.substack.com/p/interview-experience-104-salesforce-smts"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a notification service that many enterprise customers share, sending email, mobile and in-app notifications.",
+      "strong_answer": "Clarify channels, volume and latency needs. Cover an intake API, a queue, per-channel workers, templates and user preferences, retries with idempotency, and delivery tracking. Multi-tenancy is the key Salesforce angle: tenant isolation, per-tenant rate limits and quotas so one customer cannot starve others, and data security. Discuss scaling and monitoring. Strong answers make trade-offs explicit, for example at-least-once delivery with deduplication.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Trust"],
+      "source_url": "https://codemia.io/guides/salesforce-software-engineer"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a rate limiter for an API platform used by many customers.",
+      "strong_answer": "Compare algorithms (token bucket, sliding window) and pick one with reasons. Decide where limits apply (per tenant, per user, per endpoint) and where state lives, using a fast shared store with atomic operations. Discuss behavior when the store fails, accuracy versus latency, and how clients are told they were limited. Tie limits to fairness between tenants and platform trust. Pitfall: ignoring distributed state.",
+      "competencies": ["technical_depth", "trade_offs", "accuracy"],
+      "values": ["Trust"],
+      "source_url": "https://codemia.io/guides/salesforce-software-engineer"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a dispatch service, for example one that assigns field service jobs to technicians. Describe the APIs and how the components interact.",
+      "strong_answer": "Clarify the domain objects: jobs, technicians, skills, locations, schedules. Propose clean components (job intake, matching or assignment, scheduling, notifications) with clear API contracts. Discuss the assignment logic and its trade-offs (greedy versus optimized batching), concurrency when two dispatchers act at once, and extensibility. Clear, modular object-oriented thinking is the main signal.",
+      "competencies": ["clarity_of_explanation", "trade_offs", "technical_depth"],
+      "values": [],
+      "source_url": "https://roundz.substack.com/p/interview-experience-104-salesforce-smts"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design an e-commerce system with search, cart and shipment modules. How do you keep the modules independent and the data consistent?",
+      "strong_answer": "Define module boundaries and the data each owns. Explain communication between modules (synchronous APIs versus events), how to keep cart, inventory and orders consistent (transactions within a service, sagas or compensating actions across services), and search indexing with eventual consistency. Discuss failure handling and scaling peaks. Strong answers justify each boundary and consistency choice.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": [],
+      "source_url": "https://roundz.substack.com/p/interview-experience-104-salesforce-smts"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Explain how an OAuth authorization flow and JWT tokens work together when integrating two systems, and what can go wrong.",
+      "strong_answer": "Explain the roles (client, resource owner, authorization server, resource server), the authorization code flow, and how access tokens and refresh tokens are used. Describe JWT structure and signature verification, expiry, and scopes. Cover risks: token leakage, missing validation of audience or signature, long-lived tokens, and revocation difficulty. Tie it to protecting customer data. Pitfall: confusing authentication with authorization.",
+      "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
+      "values": ["Trust"],
+      "source_url": "https://www.interviewquery.com/guides/salesforce-software-engineer"
+    },
+    {
+      "interview_type": "case",
+      "question": "Design a new AI feature that helps sales reps close more deals.",
+      "strong_answer": "Pick a specific user (for example a mid-market account executive) and a key pain such as knowing which deals need attention. Propose a feature (deal risk insights, next best action, auto-drafted follow-ups), explain the data it needs, and address trust: explainability, data privacy, and human control. Define metrics like adoption, win rate and cycle time, plus guardrails. Pitfall: generic AI with no workflow fit or trust story.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Customer Success", "Innovation", "Trust"],
+      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you improve the onboarding experience for a new Salesforce customer?",
+      "strong_answer": "Separate the personas: admin who configures, end users who adopt, and the executive buyer. Identify the biggest drop-off points (setup complexity, data import, low user adoption) with assumed data. Prioritize one or two solutions such as guided setup or templates by industry, and define time-to-value and adoption metrics. Pitfall: designing only for the end user and ignoring the admin.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Customer Success"],
+      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you measure whether a new Slack integration feature is successful?",
+      "strong_answer": "Start from the feature goal and the users. Propose a metric tree: adoption (workspaces enabled, active users), engagement (actions completed from Slack), outcome (time saved, faster deal or case resolution), and business impact (retention, expansion). Add guardrails such as notification fatigue. Explain how you would attribute impact. Pitfall: counting installs only.",
+      "competencies": ["structure", "user_and_business_sense", "estimation_logic"],
+      "values": ["Customer Success"],
+      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager"
+    },
+    {
+      "interview_type": "case",
+      "question": "What metrics would you set for a customer service chatbot product?",
+      "strong_answer": "Cover both the business buying it and the end customer using it: containment or resolution rate, customer satisfaction, escalation quality, handle time saved for agents, and cost per case. Add trust guardrails like wrong-answer rate and safe handoff to humans. Explain which is the primary metric and why. Pitfall: optimizing containment at the cost of satisfaction.",
+      "competencies": ["structure", "user_and_business_sense", "recommendation"],
+      "values": ["Customer Success", "Trust"],
+      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager"
+    },
+    {
+      "interview_type": "case",
+      "question": "How should Salesforce compete against a lighter-weight CRM rival for small and mid-size businesses?",
+      "strong_answer": "Frame the segment's needs: ease of setup, price, and quick value. Compare strengths and weaknesses honestly. Propose a strategy (simpler packaging, guided setup, AI features, ecosystem) and the trade-offs with the enterprise business. Define success metrics and first steps. Pitfall: assuming enterprise strengths matter to small businesses.",
+      "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
+      "values": ["Customer Success", "Innovation"],
+      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager"
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "AMTS",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Works on defined tasks with guidance from senior engineers while learning the codebase and tools."
+    },
+    {
+      "level_name": "MTS",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns features end to end and takes part in design discussions; receives problems rather than tasks."
+    },
+    {
+      "level_name": "SMTS",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Owns a service or system, leads its design, reviews code and drives small projects."
+    },
+    {
+      "level_name": "LMTS",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Owns the architecture of an area several teams build in and sets their standards."
+    },
+    {
+      "level_name": "PMTS",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Sets technical direction for a product area and resolves disagreements teams cannot settle."
+    },
+    {
+      "level_name": "Architect",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Owns architecture across multiple systems and sets standards for the wider engineering organization."
+    }
+  ],
+  "persona": {
+    "tone": "Warm, polished and professional; friendly with a focus on clear communication",
+    "pace": "Moderate and structured; expects STAR-shaped answers",
+    "pushback_style": "Asks for the customer impact and the business result, and how a choice affected trust; asks for specifics when answers stay high level",
+    "closing_style": "Leaves time for questions and talks about team culture and values"
+  },
+  "scoring_weights": {
+    "communication": 1.4,
+    "collaboration": 1.3,
+    "user_and_business_sense": 1.4,
+    "impact": 1.2,
+    "ownership": 1.2,
+    "trade_offs": 1.2,
+    "clarity_of_explanation": 1.3,
+    "structure": 1.2,
+    "team_fit": 1.1
+  },
+  "values_share": 0.3,
+  "case_style": {
+    "product_sense": 0.5,
+    "estimation": 0.1,
+    "system_thinking": 0.4,
+    "notes": "Cases are B2B and enterprise: AI features for sales and service users, onboarding, metrics for integrations, and competitive strategy. PM loops often end with a presentation to a leadership panel."
+  },
+  "sources": [
+    {
+      "url": "https://www.salesforce.com/company/legal/compliance/code-of-conduct/leadership-and-values/",
+      "title": "Salesforce Code of Conduct: leadership and values",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://www.salesforce.com/blog/salesforce-candidate-interview-tips/",
+      "title": "Salesforce candidate interview tips",
+      "retrieved_at": "2026-10-10",
+      "fields": ["persona", "question_patterns"]
+    },
+    {
+      "url": "https://codemia.io/guides/salesforce-software-engineer",
+      "title": "Salesforce software engineer interview guide",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "scoring_weights"]
+    },
+    {
+      "url": "https://roundz.substack.com/p/interview-experience-104-salesforce-smts",
+      "title": "Interview experience: Salesforce Senior MTS",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.interviewquery.com/guides/salesforce-software-engineer",
+      "title": "Salesforce software engineer interview guide",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/salesforce/product-manager",
+      "title": "Salesforce product manager interview",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.designgurus.io/blog/salesforce-software-engineer-levels",
+      "title": "Salesforce software engineer levels",
+      "retrieved_at": "2026-10-10",
+      "fields": ["bar_by_level"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "medium",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "medium"
+  },
+  "low_confidence_notes": [
+    "values_framework: Sustainability weight is set low because no source shows it being probed in interviews.",
+    "loop_structure: PM level names are generic; no public source confirms Salesforce PM titles. PM round list comes from one aggregated guide.",
+    "bar_by_level: Salesforce publishes no level map; scopes come from one third-party source and Blind discussions.",
+    "persona: inferred from the official interview tips (STAR, authenticity) and candidate reports.",
+    "question_patterns: the OAuth/JWT question comes from a search-result summary of an interview guide, not from a candidate report opened directly.",
+    "scoring_weights: estimated; no public source gives weights."
+  ]
+}

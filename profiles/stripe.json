@@ -1,0 +1,558 @@
+{
+  "company_name": "Stripe",
+  "company_slug": "stripe",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-10",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Stripe operating principles",
+    "principles": [
+      {
+        "name": "Users first",
+        "description": "Put the needs and trust of the businesses and developers who depend on Stripe ahead of everything else.",
+        "evidence_signals": [
+          "Names the specific user (developer, merchant, finance team) and their pain",
+          "Treats reliability and trust as user features",
+          "Changed a plan after talking to users"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "Create with craft and beauty",
+        "description": "Approach work with care and high standards so the result is excellent, including the parts no one sees.",
+        "evidence_signals": [
+          "Talks about quality of code, docs, API design or writing, not only shipping",
+          "Describes polishing details that improved the user experience",
+          "Explains a quality bar they held and why"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Move with urgency and focus",
+        "description": "Execute quickly on what matters most while still investing in long-term improvements.",
+        "evidence_signals": [
+          "Shows clear prioritization and saying no to lower-value work",
+          "Ships iteratively with a short feedback loop",
+          "Balances speed with long-term health of the system"
+        ],
+        "weight": 1.1
+      },
+      {
+        "name": "Collaborate egolessly",
+        "description": "Work as one team: question assumptions, debate openly, and drop an idea when a better one appears.",
+        "evidence_signals": [
+          "Describes abandoning own idea for a better one",
+          "Invites critique and credits others",
+          "Handles disagreement on substance, not status"
+        ],
+        "weight": 1.1
+      },
+      {
+        "name": "Stay curious",
+        "description": "Keep learning about how businesses and the world work, and go deep on unfamiliar problems.",
+        "evidence_signals": [
+          "Shows genuine interest in payments, economics or the user's business",
+          "Describes learning a new domain fast to solve a problem",
+          "Asks thoughtful questions back"
+        ],
+        "weight": 0.9
+      },
+      {
+        "name": "Obsess over talent",
+        "description": "Everyone owns hiring and raising the bar; push for high standards across the organization.",
+        "evidence_signals": [
+          "Describes interviewing, mentoring or developing others",
+          "Gives an example of raising the bar on a team",
+          "Makes a clear, hard people decision"
+        ],
+        "weight": 0.8
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["L1", "L2", "L3", "L4", "L5"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Experience, motivation and knowledge of Stripe. Not simulated in v1."
+        },
+        {
+          "name": "Technical phone screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Practical coding, clean code valued over puzzle tricks. Not simulated in v1."
+        },
+        {
+          "name": "Coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Practical problems with evolving requirements. Not simulated in v1."
+        },
+        {
+          "name": "Bug bash / bug squash",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Debug an unfamiliar codebase with failing tests. Not simulated in v1."
+        },
+        {
+          "name": "Integration",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Build a small feature against an API from its docs, with error handling. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior or staff engineer",
+          "notes": "API-centric and practical: failure modes, idempotency, backward compatibility, monitoring. Mid-level and up."
+        },
+        {
+          "name": "Behavioral and values",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager or senior engineer",
+          "notes": "Structured around the operating principles; ownership and craft."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": [],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background and fit. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager (product)",
+          "notes": "Past products, judgment and PM fundamentals."
+        },
+        {
+          "name": "Written take-home",
+          "interview_type": null,
+          "duration_min": null,
+          "interviewer_role": null,
+          "notes": "Written exercise reflecting a real problem; Stripe weights written communication heavily. Not simulated in v1."
+        },
+        {
+          "name": "Product sense",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product manager",
+          "notes": "Design, improvement and strategy prompts, often about payments, APIs or e-commerce."
+        },
+        {
+          "name": "Technical depth",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Engineer",
+          "notes": "Explain and defend technical and API design choices."
+        },
+        {
+          "name": "Analytical",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Data scientist or PM",
+          "notes": "Metrics definition and diagnosis."
+        },
+        {
+          "name": "Execution and behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Product leader",
+          "notes": "Behavioral depth on shipping, prioritization and ambiguity."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Mistake on a large project",
+      "pattern": "A mistake the candidate made while leading something big, and how they fixed it",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Collaborate egolessly"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Holding a quality bar",
+      "pattern": "A time the candidate insisted on a higher quality bar, and what it cost and gained",
+      "competencies": ["ownership", "impact"],
+      "values": ["Create with craft and beauty"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Saying no and focus",
+      "pattern": "A recent time the candidate said no to something in order to focus on what mattered",
+      "competencies": ["communication", "impact"],
+      "values": ["Move with urgency and focus"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Conflict and changing one's mind",
+      "pattern": "A disagreement where the candidate debated openly and the better idea won, whoever owned it",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["Collaborate egolessly"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Proudest delivery",
+      "pattern": "A product or system the candidate is proud of: the user, own role, decisions and result",
+      "competencies": ["depth_of_experience", "scope_at_level"],
+      "values": ["Users first"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Talent and team building",
+      "pattern": "How the candidate hires, grows or raises the bar for the people around them",
+      "competencies": ["team_fit", "judgment"],
+      "values": ["Obsess over talent"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Ambiguity",
+      "pattern": "How the candidate makes progress when the problem and goals are unclear",
+      "competencies": ["judgment", "role_fit"],
+      "values": ["Stay curious", "Move with urgency and focus"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "API as a product",
+      "pattern": "Design a developer-facing API and its backend, with idempotency, versioning and error semantics",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["Users first", "Create with craft and beauty"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Financial correctness",
+      "pattern": "Design a system where money must never be lost or double counted (ledger, billing, reconciliation)",
+      "competencies": ["technical_depth", "accuracy", "trade_offs"],
+      "values": ["Users first"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Failure modes and operations",
+      "pattern": "Walk through how a service behaves under partial failure, retries and dependency outages",
+      "competencies": ["reasoning", "trade_offs", "accuracy"],
+      "values": ["Create with craft and beauty"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Product design for a new user group",
+      "pattern": "Design a product for an unusual user group and justify the core experience",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Users first"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Company strategy",
+      "pattern": "Step into a leader's role and choose the few things that matter most for a business",
+      "competencies": ["problem_framing", "prioritization", "recommendation"],
+      "values": ["Move with urgency and focus", "Stay curious"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Metrics definition",
+      "pattern": "Define the right metrics for a business or experience and what to watch daily",
+      "competencies": ["structure", "user_and_business_sense", "estimation_logic"],
+      "values": ["Users first"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a mistake you made while leading a significant project. How did you fix it?",
+      "strong_answer": "Choose a real, consequential mistake that was yours. Explain context, how you noticed, the impact on users or the team, and the concrete fix. Show egoless behavior: you surfaced it quickly, did not blame others, and accepted better ideas. End with the process change you made. Stripe interviewers value candour and learning. Pitfall: a minor or blame-shifting example.",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Collaborate egolessly"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/stripe-product-manager-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "When did you last say no to a request or idea, and why?",
+      "strong_answer": "Pick a recent, specific case where saying no was hard (a senior stakeholder, a customer, a teammate). Explain how you weighed it against priorities, how you communicated the no with reasoning and an alternative, and what happened. Shows focus and respectful directness. Pitfall: a trivial no, or one with no reasoning.",
+      "competencies": ["communication", "impact"],
+      "values": ["Move with urgency and focus"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/stripe-product-manager-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "How do you work when a problem is highly ambiguous? Give an example.",
+      "strong_answer": "Describe a real ambiguous situation and your method: clarify the goal, list unknowns, talk to users or experts, pick a small step to learn fast, and write down decisions. Show curiosity about the domain and how you converged on a direction quickly. Mention how you kept stakeholders aligned. Pitfall: generic framework talk with no example.",
+      "competencies": ["ownership", "communication"],
+      "values": ["Stay curious", "Move with urgency and focus"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/stripe-product-manager-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you held a high quality bar when others wanted to ship sooner.",
+      "strong_answer": "Explain what 'quality' meant concretely (correctness, API ergonomics, docs, performance) and why it mattered to users. Show how you made the case, what trade-off you agreed (scope cut, phased launch) and the outcome. Stripe looks for craft balanced with urgency, so acknowledge the cost of delay. Pitfall: perfectionism with no user reason.",
+      "competencies": ["ownership", "impact", "communication"],
+      "values": ["Create with craft and beauty", "Move with urgency and focus"],
+      "source_url": "https://www.aced.io/blog/stripe-interview-process"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a conflict with a colleague and how it was resolved.",
+      "strong_answer": "Pick a substantive disagreement. Show you stated your view, sought theirs, tested assumptions with data or a prototype, and supported the better idea even if it was not yours. Describe the outcome and the relationship afterwards. Egoless collaboration is the core signal. Pitfall: framing the other person as the problem.",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["Collaborate egolessly"],
+      "source_url": "https://www.aced.io/blog/stripe-interview-process"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Tell me about a product or system you delivered that you are most proud of.",
+      "strong_answer": "State the user problem, your specific role, the key design or product decisions and trade-offs, and the result with numbers. Point out a detail of craft (API shape, docs, reliability) that made a difference to users. Hiring managers calibrate scope from this, so be clear about team size and your influence. Pitfall: describing the team's work without your part.",
+      "competencies": ["depth_of_experience", "scope_at_level"],
+      "values": ["Users first", "Create with craft and beauty"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/stripe-product-manager-interview"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "As a manager, tell me about a strategic hiring decision you made and how it played out.",
+      "strong_answer": "Explain the team need, how you defined the role and bar, how you evaluated candidates, and a hard call (waiting longer, rejecting a strong but wrong-fit candidate, hiring for potential). Describe results and what you learned. Stripe expects everyone to own talent. Pitfall: hiring to fill a seat quickly with no bar.",
+      "competencies": ["judgment", "team_fit"],
+      "values": ["Obsess over talent"],
+      "source_url": "https://www.aced.io/blog/stripe-interview-process"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why are you looking to leave your current role, and why Stripe?",
+      "strong_answer": "Be positive and specific: what you want next (scope, domain, craft) and why Stripe's problems in payments and developer infrastructure fit. Show curiosity about how money moves on the internet and knowledge of a Stripe product. Pitfall: complaining about the current employer.",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["Stay curious"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/stripe-product-manager-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a ledger service that records money movements for a payments platform.",
+      "strong_answer": "Clarify requirements: immutability, double-entry, auditability, multi-currency, query patterns. Propose append-only entries, balanced transactions, idempotent writes, and derived balances with snapshots. Discuss consistency (strong for writes), reconciliation with external processors, corrections via reversing entries, and scaling by account sharding. Stripe values correctness and failure handling over buzzwords.",
+      "competencies": ["technical_depth", "accuracy", "trade_offs"],
+      "values": ["Users first", "Create with craft and beauty"],
+      "source_url": "https://www.aced.io/blog/stripe-interview-process"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design an API rate limiter for a public API.",
+      "strong_answer": "Define limits per key or account and the response contract (status code, headers, retry-after). Compare token bucket, sliding window and fixed window. Discuss a distributed counter store, accuracy versus latency, and what happens when the store is slow or down (fail open or closed, local fallback). Mention observability and how developers understand they are throttled.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Users first"],
+      "source_url": "https://www.aced.io/blog/stripe-interview-process"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a metrics service that collects and serves operational metrics.",
+      "strong_answer": "Clarify writers, cardinality and query needs. Cover ingestion with batching, time-series storage with downsampling and retention, aggregation, and a query API. Discuss high-cardinality labels, late data, and keeping the metrics pipeline more available than what it monitors. Explain trade-offs clearly with numbers.",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["Create with craft and beauty"],
+      "source_url": "https://www.aced.io/blog/stripe-interview-process"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a payment processing API and the system behind it, considering how developers will integrate with it.",
+      "strong_answer": "Treat the API as a product: resources, states (created, authorized, captured, refunded), idempotency keys so retries are safe, clear error types, versioning and backward compatibility. Then the internal workflow: async calls to card networks, partial failures, webhooks for state changes, and the ledger. Discuss how developers observe what happened. Strong answers balance internal correctness and external predictability.",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["Users first", "Create with craft and beauty"],
+      "source_url": "https://engineeringenablement.substack.com/p/how-i-would-approach-the-stripe-system"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design reliable webhook delivery when merchants' servers are sometimes slow or down?",
+      "strong_answer": "Cover an event log, a delivery queue per endpoint, retries with exponential backoff and jitter, at-least-once semantics with event IDs so receivers can deduplicate, signatures for authenticity, ordering caveats, and disabling or alerting on persistently failing endpoints. Explain how a bad endpoint is isolated so it cannot slow others. Mention a dashboard for developers to replay events.",
+      "competencies": ["technical_depth", "reasoning", "trade_offs"],
+      "values": ["Users first"],
+      "source_url": "https://engineeringenablement.substack.com/p/how-i-would-approach-the-stripe-system"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "In your view, what makes an API good?",
+      "strong_answer": "Give principles with examples: consistent naming and resources, predictable errors, idempotency, sensible defaults, versioning without breaking users, excellent docs and examples, and observability. Tie each to developer trust and time to integrate. Contrast with an API you found painful. Pitfall: listing REST rules without a user perspective.",
+      "competencies": ["clarity_of_explanation", "technical_depth"],
+      "values": ["Create with craft and beauty", "Users first"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/stripe-product-manager-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you approach detecting fraud in a payments product?",
+      "strong_answer": "Frame the trade-off between blocking fraud and blocking good customers, and that both cost merchants. Cover signals (device, velocity, card history, network-wide patterns), a rules plus model approach, real-time scoring latency, feedback from disputes, and letting merchants tune thresholds. Discuss metrics like false positive rate and dispute rate.",
+      "competencies": ["reasoning", "trade_offs", "technical_depth"],
+      "values": ["Users first"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/stripe-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "If you were Stripe's CEO, what would be your top three priorities?",
+      "strong_answer": "Show you understand Stripe's business: who pays, how revenue grows, competition and risks. Pick three priorities with clear reasoning and trade-offs (what you would not do). Tie each to user needs and a way to measure progress. Strong answers are focused and opinionated, not a laundry list.",
+      "competencies": ["problem_framing", "prioritization", "recommendation"],
+      "values": ["Move with urgency and focus", "Stay curious"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/stripe-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "Design a communication product for young children.",
+      "strong_answer": "Clarify age range and the buyers versus users (parents versus kids). Identify needs and constraints: safety, privacy, literacy, parental control. Brainstorm, prioritize one core experience, sketch it, and define success metrics and risks. Interviewers want user empathy and fast but intentional decisions. Pitfall: ignoring safety and the parent as customer.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Users first"],
+      "source_url": "https://www.aced.io/blog/stripe-interview-process"
+    },
+    {
+      "interview_type": "case",
+      "question": "What metrics should Stripe look at every day?",
+      "strong_answer": "Organize by goal: health of the business (payment volume, revenue, new accounts), user trust (API availability, latency, authorization rate, dispute rate), and growth (activation of new integrations). Explain why each matters, what would trigger action, and avoid vanity metrics. Discuss leading versus lagging indicators.",
+      "competencies": ["structure", "user_and_business_sense"],
+      "values": ["Users first"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/stripe-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you measure customer satisfaction with airport baggage claim?",
+      "strong_answer": "Define the user journey and what satisfaction means (wait time, uncertainty, lost bags). Propose a north-star metric and supporting metrics (time to first bag, variance, mishandling rate, survey score), how to collect them, and guardrails. Explain trade-offs between measurability and what users feel. Concise structure wins.",
+      "competencies": ["problem_framing", "structure", "estimation_logic"],
+      "values": ["Users first"],
+      "source_url": "https://www.aced.io/blog/stripe-interview-process"
+    },
+    {
+      "interview_type": "case",
+      "question": "You run product at a struggling retail chain with physical stores and no online presence. What would you do?",
+      "strong_answer": "Diagnose before prescribing: why it struggles, customers, margins, strengths of stores. Consider options (e-commerce, buy online pick up in store, inventory visibility) and prioritize by impact, cost and time. Propose a phased plan with metrics. Strong answers connect to payments and commerce infrastructure realistically.",
+      "competencies": ["problem_framing", "prioritization", "recommendation"],
+      "values": ["Move with urgency and focus"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/stripe-product-manager-interview"
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "L1",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Works on defined tasks within one team with supervision. Title: Software Engineer."
+    },
+    {
+      "level_name": "L2",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns complete features within a team and reviews peers' work independently. Title: Software Engineer."
+    },
+    {
+      "level_name": "L3",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Decides what should be built and drives work across team boundaries; the step to L3 is about scope. Title still Software Engineer."
+    },
+    {
+      "level_name": "L4",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Staff Software Engineer; sets technical direction for an organizational area and leads multiple teams."
+    },
+    {
+      "level_name": "L5",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Senior Staff Software Engineer; leads technical strategy across a large group."
+    }
+  ],
+  "persona": {
+    "tone": "Thoughtful, precise and low-ego; values clear written-style communication",
+    "pace": "Measured; gives room to reason but expects crisp, well-structured answers",
+    "pushback_style": "Probes failure modes, edge cases and user impact ('what happens if this call is retried?', 'how does the developer know?'), and asks the candidate to justify trade-offs",
+    "closing_style": "Leaves time for questions and welcomes curious questions about Stripe's users and business"
+  },
+  "scoring_weights": {
+    "ownership": 1.2,
+    "collaboration": 1.2,
+    "communication": 1.3,
+    "technical_depth": 1.2,
+    "accuracy": 1.3,
+    "trade_offs": 1.3,
+    "clarity_of_explanation": 1.3,
+    "user_and_business_sense": 1.3,
+    "problem_framing": 1.1
+  },
+  "values_share": 0.25,
+  "case_style": {
+    "product_sense": 0.5,
+    "estimation": 0.15,
+    "system_thinking": 0.35,
+    "notes": "Product cases range from playful design prompts to Stripe strategy and metrics; systems thinking about APIs, payments and developer experience runs through them. Classic market-sizing is rare."
+  },
+  "sources": [
+    {
+      "url": "https://stripe.com/jobs/culture",
+      "title": "Stripe culture and operating principles",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://igotanoffer.com/en/advice/stripe-interview-process",
+      "title": "Stripe interview process (software engineering)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.aced.io/blog/stripe-interview-process",
+      "title": "Stripe interview process",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://igotanoffer.com/blogs/product-manager/stripe-product-manager-interview",
+      "title": "Stripe product manager interview",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://engineeringenablement.substack.com/p/how-i-would-approach-the-stripe-system",
+      "title": "How I would approach the Stripe system design interview today",
+      "retrieved_at": "2026-10-10",
+      "fields": ["question_patterns", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://www.glassdoor.fr/Entretien/Stripe-Entretien-E671932-RVW45809795.htm",
+      "title": "Glassdoor candidate report (Stripe, Seattle)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure"]
+    },
+    {
+      "url": "https://www.designgurus.io/blog/stripe-software-engineer-levels",
+      "title": "Stripe software engineer levels",
+      "retrieved_at": "2026-10-10",
+      "fields": ["bar_by_level"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "medium",
+    "persona": "medium",
+    "scoring_weights": "low",
+    "case_style": "low"
+  },
+  "low_confidence_notes": [
+    "loop_structure: rounds come from prep guides and candidate reports; Stripe does not publish its loop. The Glassdoor report was only seen as a search result, not opened. PM levels are not public, so the PM loop lists no levels.",
+    "bar_by_level: level names L1-L5 and scope come from one third-party guide; Stripe job posts show only three titles. No PM level data.",
+    "case_style: few PM case reports; weights estimated.",
+    "scoring_weights: estimated from the operating principles and reports that stress clean code, writing and failure handling."
+  ]
+}

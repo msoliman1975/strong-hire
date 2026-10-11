@@ -1,0 +1,536 @@
+{
+  "company_name": "Apple",
+  "company_slug": "apple",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-10",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Apple hiring traits and values",
+    "principles": [
+      {
+        "name": "Expertise and craft",
+        "description": "Deep domain knowledge, attention to detail, and an uncompromising standard for quality in what ships.",
+        "evidence_signals": [
+          "Explains own work at a level of detail that shows real hands-on depth",
+          "Describes polishing details others would skip and why they mattered to the user",
+          "Talks about how quality was tested and verified, not assumed"
+        ],
+        "weight": 1.5
+      },
+      {
+        "name": "Collaboration",
+        "description": "Work across functions, resolve conflict, influence without authority, and take accountability rather than deflect blame.",
+        "evidence_signals": [
+          "Gives a concrete example of aligning hardware, design, or other engineering teams",
+          "Describes influencing a decision without formal authority",
+          "Owns own part of a failure instead of blaming partners"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Creativity",
+        "description": "Think differently and approach problems from new angles instead of accepting the conventional answer.",
+        "evidence_signals": [
+          "Proposes a non-obvious solution and explains why the default one was not good enough",
+          "Shows simplification: removed features or steps to make the experience better"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Curiosity",
+        "description": "Investigate root causes, ask probing questions, learn quickly, and deeply understand the user's experience.",
+        "evidence_signals": [
+          "Went beyond the first fix to find the real root cause",
+          "Describes learning an unfamiliar area quickly to unblock work",
+          "Asks clarifying questions about users before designing"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "User focus and privacy",
+        "description": "Start from how the experience feels to the person using it, and treat privacy and user trust as a design requirement, not an afterthought.",
+        "evidence_signals": [
+          "Describes the user experience in concrete terms, including edge cases like new devices or restore",
+          "Raises privacy, on-device processing, or data minimization without being prompted",
+          "Shows passion for Apple products and can say why specific design choices work"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Accessibility and inclusion",
+        "description": "Build products and teams that work for everyone, consistent with Apple's published values.",
+        "evidence_signals": [
+          "Considers users with disabilities or different needs in a design",
+          "Describes making room for different perspectives on a team"
+        ],
+        "weight": 0.7
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["ICT2", "ICT3", "ICT4", "ICT5", "ICT6"],
+      "rounds": [
+        {
+          "name": "Recruiter or hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Recruiter or hiring manager",
+          "notes": "Background, why Apple, and fit for the specific team."
+        },
+        {
+          "name": "Technical phone screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Live coding on a shared editor. Not simulated in v1. Some teams use a design screen instead."
+        },
+        {
+          "name": "Onsite coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "One or two coding rounds, sometimes object-oriented design. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior engineer",
+          "notes": "Product-shaped design such as photo sync or messaging; privacy, multi-device sync and device constraints are common follow-ups. Usually for ICT4 and above."
+        },
+        {
+          "name": "Domain technical deep dive",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Team engineer",
+          "notes": "Team-specific expertise, for example battery or performance on device, frameworks, or ML."
+        },
+        {
+          "name": "Behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineer or manager from the team or a partner team",
+          "notes": "Collaboration, conflict, failure and quality; behavioral questions also appear inside technical rounds."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Engineering manager",
+          "notes": "Biggest-impact project, conflicting priorities, cross-team work, and culture fit."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": ["Product Manager", "Senior Product Manager"],
+      "rounds": [
+        {
+          "name": "Hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager",
+          "notes": "Background, why Apple, why product management."
+        },
+        {
+          "name": "Product sense screen",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product manager",
+          "notes": "Situational product design questions."
+        },
+        {
+          "name": "Technical PM screen",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Engineering lead",
+          "notes": "Deep dive into technical products from the candidate's background."
+        },
+        {
+          "name": "Onsite product sense and Apple strategy",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Senior product manager",
+          "notes": "Design or improve a product; Apple-specific strategy questions."
+        },
+        {
+          "name": "Onsite cross-functional behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineering, design or operations partner",
+          "notes": "Influence without authority, customer advocacy, handling change."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Influence without authority",
+      "pattern": "A time the candidate had to convince people they did not manage to change a plan or adopt an approach",
+      "competencies": ["collaboration", "communication"],
+      "values": ["Collaboration"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Technical disagreement",
+      "pattern": "A disagreement with a colleague about a technical approach and how it was resolved",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["Collaboration", "Expertise and craft"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Failure",
+      "pattern": "A time the candidate failed or shipped something with a defect, and what they learned and changed",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Expertise and craft"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Learning fast",
+      "pattern": "A time the candidate lacked the knowledge a task needed and closed the gap quickly",
+      "competencies": ["learning_from_failure", "impact"],
+      "values": ["Curiosity"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Quality and attention to detail",
+      "pattern": "How the candidate makes sure the work they ship is high quality, with a concrete example",
+      "competencies": ["ownership", "impact"],
+      "values": ["Expertise and craft", "User focus and privacy"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Biggest-impact project",
+      "pattern": "Walk through the project with the most impact: own role, hard decisions, and result",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Expertise and craft"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Why Apple",
+      "pattern": "Why Apple and this team, and how the candidate sees Apple products",
+      "competencies": ["motivation", "team_fit"],
+      "values": ["User focus and privacy"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Conflicting priorities",
+      "pattern": "How the candidate handles competing priorities from several stakeholders when overloaded",
+      "competencies": ["judgment", "role_fit"],
+      "values": ["Collaboration"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Product-shaped system design",
+      "pattern": "Design the backend and client behavior of an Apple-like service, covering multi-device sync, privacy and failure cases",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["User focus and privacy", "Expertise and craft"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "On-device constraints",
+      "pattern": "Explain how to meet battery, memory or performance limits on a device for a given feature",
+      "competencies": ["technical_depth", "accuracy", "trade_offs"],
+      "values": ["Expertise and craft"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Design for a specific user",
+      "pattern": "Design a product for a narrow user group with special needs, focusing on the experience",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["User focus and privacy", "Accessibility and inclusion", "Creativity"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Apple product strategy",
+      "pattern": "Improve, keep or cut an Apple product and justify it in terms of the user and the ecosystem",
+      "competencies": ["user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["User focus and privacy", "Creativity"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you needed to convince someone to go along with your idea when you had no authority over them.",
+      "strong_answer": "Set up who the person was, why they disagreed, and why it mattered. Show how you understood their constraints first, then used evidence such as a prototype, data or a user demo to persuade. Apple teams are deeply cross-functional, so naming partners like design or hardware helps. End with the result and the relationship afterwards. Pitfall: escalating to a manager as the main tactic.",
+      "competencies": ["collaboration", "communication"],
+      "values": ["Collaboration"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/apple-product-manager-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you disagreed with colleagues about how to solve a technical problem. How did it end?",
+      "strong_answer": "Pick a real technical disagreement with stakes. Explain both positions fairly, the criteria you proposed to decide (performance, user impact, maintainability), and how you tested assumptions rather than arguing. Show you could accept being wrong. Interviewers look for respect, depth, and accountability. Pitfall: a story where the other person was simply incompetent.",
+      "competencies": ["conflict_handling", "collaboration", "communication"],
+      "values": ["Collaboration", "Expertise and craft"],
+      "source_url": "https://igotanoffer.com/en/advice/apple-behavioral-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you failed.",
+      "strong_answer": "Choose a real failure with consequences, ideally one where your own decision contributed. Explain what happened briefly, own your part without excuses, and spend most of the time on what you learned and what you changed in process or habits. A second example of applying the lesson is strong. Apple cares about quality, so failures involving a missed detail and the fix that prevented repeats work well. Pitfall: a fake failure.",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Expertise and craft"],
+      "source_url": "https://igotanoffer.com/en/advice/apple-behavioral-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you did not have the technical knowledge a task needed. How did you close the gap?",
+      "strong_answer": "Describe the gap honestly and why it mattered. Show a deliberate learning plan: reading code or specs, building a small prototype, asking an expert specific questions. Quantify how fast you got productive and the result. Interviewers look for curiosity and humility plus speed. Pitfall: implying you never have gaps, or that someone else did the work.",
+      "competencies": ["learning_from_failure", "impact"],
+      "values": ["Curiosity"],
+      "source_url": "https://igotanoffer.com/en/advice/apple-behavioral-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "How do you make sure the code you ship is high quality? Give an example.",
+      "strong_answer": "Cover your habits: design review, tests at the right levels, code review, profiling, and testing on real devices and edge cases. Then give a specific example where these caught a serious problem or where you raised the bar for the team. Apple's bar is craft, so mention user-visible details like performance, battery or accessibility. Pitfall: generic 'I write unit tests' with no story.",
+      "competencies": ["ownership", "impact", "communication"],
+      "values": ["Expertise and craft", "User focus and privacy"],
+      "source_url": "https://igotanoffer.com/en/advice/apple-behavioral-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to make a difficult decision with incomplete information.",
+      "strong_answer": "State the decision, the deadline, and what was unknown. Explain how you reduced risk: the facts you could get quickly, the experts you consulted, and whether the decision was reversible. Make your reasoning explicit and say what you would have done if new data arrived. Close with the outcome and the lesson. Pitfall: waiting until information was complete, which avoids the question.",
+      "competencies": ["ownership", "impact", "communication"],
+      "values": ["Curiosity"],
+      "source_url": "https://igotanoffer.com/en/advice/apple-behavioral-interview"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why do you want to work at Apple, and what three words would you use to describe Apple products?",
+      "strong_answer": "Give a specific, personal reason tied to this team's products, not general prestige. Mention a product detail you admire and why it reflects good engineering or design. For the three words, pick ones you can defend with examples (for example simple, integrated, private). Show you understand that teams are secretive and product-focused. Pitfall: generic praise or focusing on perks.",
+      "competencies": ["motivation", "team_fit"],
+      "values": ["User focus and privacy"],
+      "source_url": "https://igotanoffer.com/en/advice/apple-behavioral-interview"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Walk me through the project where you had the biggest impact.",
+      "strong_answer": "Frame the problem and why it mattered to users or the business. Make your personal contribution explicit, describe one or two hard technical decisions and the trade-offs, and quantify the result. Be ready for deep follow-ups on any detail, because Apple managers probe for real hands-on depth. Mention collaboration with other functions. Pitfall: a project too broad to explain in detail.",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Expertise and craft"],
+      "source_url": "https://prachub.com/interview-experiences/apple-software-engineer-interview-experience-two-phone-screens-then-a-four-round-onsite"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "How do you handle conflicting priorities, for example when two partner teams both need something from you at once?",
+      "strong_answer": "Show a clear method: understand the impact and deadline of each request, align with your manager on priorities, communicate trade-offs openly to both teams, and negotiate scope or dates. Give a real example and the result. Mention protecting quality rather than cutting corners silently. Pitfall: saying you just work longer hours.",
+      "competencies": ["judgment", "role_fit", "team_fit"],
+      "values": ["Collaboration"],
+      "source_url": "https://prachub.com/interview-experiences/apple-software-engineer-interview-experience-two-phone-screens-then-a-four-round-onsite"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Tell me about something you built that shows your craftsmanship and attention to detail.",
+      "strong_answer": "Pick work where the details visibly mattered: performance, polish, reliability or accessibility. Describe specific details you cared about, how you found them (testing, user feedback, profiling), and the trade-offs you made to protect quality. Connect it to the user's experience. Pitfall: talking about scale or speed only, with no evidence of care for details.",
+      "competencies": ["depth_of_experience", "role_fit"],
+      "values": ["Expertise and craft", "User focus and privacy"],
+      "source_url": "https://codemia.io/guides/apple-software-engineer"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a cloud photo storage and sync service similar to iCloud Photos.",
+      "strong_answer": "Clarify scale and requirements: upload, download, multiple devices, edits, and shared albums. Separate metadata (database) from image blobs (object storage), cover deduplication, thumbnails and derived versions, and a sync protocol with change tokens so a new device converges. Discuss hot versus cold storage tiers, offline edits and conflict resolution, and end-to-end encryption options and their effect on server features. Apple values how it feels when a user restores a phone, so cover that path.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning", "clarity_of_explanation"],
+      "values": ["User focus and privacy", "Expertise and craft"],
+      "source_url": "https://prachub.com/interview-experiences/apple-software-engineer-interview-experience-two-phone-screens-then-a-four-round-onsite"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a distributed rate limiter, for example with a token bucket, for a service that runs in many data centers.",
+      "strong_answer": "Explain the token bucket algorithm and parameters. Discuss where state lives (local, central store, or hybrid), atomic updates, and the latency added to each request. Cover accuracy versus availability: what happens when the store is unreachable (fail open or closed), clock skew, and hot keys. Mention per-user and per-API limits and how clients learn they were limited. Strong answers quantify request rates and defend the chosen consistency level.",
+      "competencies": ["technical_depth", "trade_offs", "accuracy"],
+      "values": ["Expertise and craft"],
+      "source_url": "https://prachub.com/interview-experiences/apple-software-engineer-interview-experience-two-phone-screens-then-a-four-round-onsite"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a messaging service like iMessage with end-to-end encryption, multi-device sync and offline delivery.",
+      "strong_answer": "Cover identity and per-device keys, how a sender encrypts for each recipient device, and a server that stores encrypted messages it cannot read. Explain offline queues, push notifications, delivery and read receipts, and ordering. Discuss adding a new device, key rotation and what history the new device can see. Trade-offs: privacy versus server-side features like search, and fan-out cost for group chats. Privacy reasoning is a strong signal for Apple.",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["User focus and privacy"],
+      "source_url": "https://codemia.io/guides/apple-software-engineer"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "A feature syncs data in the background and drains battery. How would you investigate and reduce its energy use?",
+      "strong_answer": "Start by measuring: energy and network profiling, wake-up counts, radio usage. Then explain common causes: frequent small requests, polling, keeping the radio awake, heavy CPU work. Propose fixes such as batching and coalescing, using system background scheduling and push instead of polling, deferring work to charging and Wi-Fi, and incremental sync. Discuss the trade-off with data freshness and how you would verify the improvement on real devices.",
+      "competencies": ["technical_depth", "reasoning", "trade_offs"],
+      "values": ["Expertise and craft", "User focus and privacy"],
+      "source_url": "https://codemia.io/guides/apple-software-engineer"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Describe the components you would need for a data processing system, and how they fit together.",
+      "strong_answer": "Lay out ingestion, durable storage or a log, processing (batch and or stream), serving storage, and monitoring. Explain when to choose batch versus streaming, how to handle late or duplicate data, schema evolution, and backfills. For a PM audience, connect each choice to product needs like freshness and cost. Strong answers keep a clear, layered explanation and name failure modes.",
+      "competencies": ["clarity_of_explanation", "technical_depth", "trade_offs"],
+      "values": [],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/apple-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "Design a voice assistant product for kids.",
+      "strong_answer": "Clarify the age range and who the customers are (child user, parent buyer). Identify key needs: simple interaction, learning and fun, safety, parental controls and privacy. Prioritize a few core use cases, describe the experience and how it handles misunderstood speech. Address privacy explicitly, such as on-device processing and no ad tracking. Define success metrics for kids and parents. Pitfall: ignoring the parent or privacy.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["User focus and privacy", "Creativity"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/apple-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "Design an alarm clock for people who are blind.",
+      "strong_answer": "Start with the users' real routines and pain points, ideally by stating assumptions you would validate with blind users. Consider non-visual input and feedback (tactile controls, voice, haptics, sound), setting and checking alarms without sight, and failure cases like power loss. Prioritize a simple core and explain what you left out. Link to accessibility as a core value. Pitfall: just adding voice to a normal clock without thinking about setup and confirmation.",
+      "competencies": ["problem_framing", "user_and_business_sense", "structure"],
+      "values": ["Accessibility and inclusion", "User focus and privacy", "Creativity"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/apple-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "Design a computer keyboard.",
+      "strong_answer": "Ask who it is for and the context (laptop or external, pro or casual). Segment users, pick one, and identify their needs: comfort, typing feel, portability, shortcuts, accessibility. Generate ideas, prioritize, and describe trade-offs like thinness versus key travel. Show taste and attention to detail typical of Apple products. Define how you would judge success. Pitfall: listing features without a target user.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Expertise and craft", "Creativity"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/apple-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "If you were running Apple, which product would you discontinue, and why?",
+      "strong_answer": "Show a framework: user value, strategic fit with the ecosystem, overlap with other products, margin and growth. Pick one product and argue it with evidence, then cover the risks: loyal users, ecosystem dependencies, and how to migrate them. Apple is known for focus and saying no, so a clear, reasoned choice beats hedging. Pitfall: picking a product without considering its role in the ecosystem.",
+      "competencies": ["user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["User focus and privacy"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/apple-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "Pick an Apple product you use. How would you improve it?",
+      "strong_answer": "Choose a product you know well, define a user segment and a real pain point, and explain why it matters. Propose one or two improvements consistent with Apple's design style (simple, integrated, private), and explain what you would not do. Define success metrics and how to validate. Pitfall: suggesting features that conflict with privacy or simplicity.",
+      "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
+      "values": ["User focus and privacy", "Creativity"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/apple-product-manager-interview"
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "ICT2",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Works on defined coding tasks under close mentorship from senior engineers."
+    },
+    {
+      "level_name": "ICT3",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Works independently on tasks of moderate complexity and contributes to design discussions."
+    },
+    {
+      "level_name": "ICT4",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Designs and builds large components, often as technical lead of a feature; mentors ICT2 and ICT3 and represents the area cross-functionally."
+    },
+    {
+      "level_name": "ICT5",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Leads the technology for a whole area, usually across several teams, and is a domain authority."
+    },
+    {
+      "level_name": "ICT6",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Defines technical direction for a large part of Apple's products with industry-wide influence."
+    }
+  ],
+  "persona": {
+    "tone": "Professional, reserved and detail-oriented; friendly but gives little away about the team's work",
+    "pace": "Steady; lingers on details and goes several levels deep on one topic",
+    "pushback_style": "Asks 'why that way?' and 'how would that feel to the user?'; probes for hands-on detail and privacy or quality considerations",
+    "closing_style": "Leaves time for questions but answers about unreleased work are limited"
+  },
+  "scoring_weights": {
+    "technical_depth": 1.5,
+    "accuracy": 1.3,
+    "depth_of_experience": 1.4,
+    "collaboration": 1.3,
+    "ownership": 1.2,
+    "trade_offs": 1.2,
+    "user_and_business_sense": 1.3,
+    "role_fit": 1.2,
+    "clarity_of_explanation": 1.1
+  },
+  "values_share": 0.2,
+  "case_style": {
+    "product_sense": 0.65,
+    "estimation": 0.05,
+    "system_thinking": 0.3,
+    "notes": "PM cases are product design and Apple product strategy, with emphasis on user experience, simplicity and privacy. Estimation is rarely reported."
+  },
+  "sources": [
+    {
+      "url": "https://www.apple.com/careers/us/",
+      "title": "Apple careers",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://igotanoffer.com/en/advice/apple-behavioral-interview",
+      "title": "Apple behavioral interview (questions and assessed traits)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework", "question_patterns", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://igotanoffer.com/blogs/product-manager/apple-product-manager-interview",
+      "title": "Apple product manager interview (questions from Glassdoor and Blind reports)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.tryexponent.com/guides/apple-product-manager-interview",
+      "title": "Apple product manager interview guide",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure"]
+    },
+    {
+      "url": "https://prachub.com/interview-experiences/apple-software-engineer-interview-experience-two-phone-screens-then-a-four-round-onsite",
+      "title": "Apple software engineer interview experience",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://codemia.io/guides/apple-software-engineer",
+      "title": "Apple software engineer interview guide",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "persona"]
+    },
+    {
+      "url": "https://www.designgurus.io/blog/apple-ict-levels",
+      "title": "Apple ICT levels",
+      "retrieved_at": "2026-10-10",
+      "fields": ["bar_by_level"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "low",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "medium",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "medium"
+  },
+  "low_confidence_notes": [
+    "values_framework: Apple publishes no interview values. Collaboration, Creativity, Curiosity and Expertise come from a third-party guide; privacy and accessibility come from Apple's published values on its careers page. Names are our own synthesis.",
+    "loop_structure: Apple loops are team-driven with no standard template; round count and order vary widely.",
+    "loop_structure: PM level names are generic; Apple PMs may also use ICT levels.",
+    "persona: based on candidate reports of secrecy and detail focus, not on an official description.",
+    "scoring_weights: estimated; no public source gives weights."
+  ]
+}

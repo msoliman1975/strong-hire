@@ -1,0 +1,534 @@
+{
+  "company_name": "LinkedIn",
+  "company_slug": "linkedin",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-10",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "LinkedIn Shared Values",
+    "principles": [
+      {
+        "name": "We put members first",
+        "description": "When making decisions large and small, do what is right for members to make them more productive and successful, in service of creating economic opportunity.",
+        "evidence_signals": [
+          "Chose member trust or quality over a short-term growth metric and explains the trade-off",
+          "Pushed back on a feature or experiment that could harm users",
+          "Connects the work to members' careers or economic opportunity"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "We trust and care about each other",
+        "description": "Start from a position of trust and practice respect, compassion, honesty and integrity with colleagues.",
+        "evidence_signals": [
+          "Repaired or improved a difficult working relationship",
+          "Supported a colleague through a hard situation or helped them grow",
+          "Assumes good intent and builds trust across teams"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "We are open, honest and constructive",
+        "description": "Seek the truth, welcome feedback, and turn hard problems into solutions through learning and candid communication.",
+        "evidence_signals": [
+          "Gave or received direct feedback with care and shows what changed",
+          "Disagreed with a manager or lead openly and constructively",
+          "Explains decisions clearly and at the right altitude for the audience"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "We act as One LinkedIn",
+        "description": "Act as owners under one vision, put the whole company ahead of the local team, and recognize collective impact.",
+        "evidence_signals": [
+          "Drove an initiative across team boundaries without being asked",
+          "Made a trade-off that helped the company even when it cost their own team",
+          "Uses 'I' for own decisions and credits partners for shared outcomes"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "We embody diversity, inclusion and belonging",
+        "description": "Welcome different perspectives, ensure fair access to opportunity, and help build a fair, accessible world of work.",
+        "evidence_signals": [
+          "Actively sought out or amplified a different perspective that changed a decision",
+          "Made a process, product or team more accessible or fair",
+          "Mentored or sponsored people from under-represented backgrounds"
+        ],
+        "weight": 0.9
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["Software Engineer", "Senior Software Engineer", "Staff Software Engineer", "Senior Staff Software Engineer", "Principal Staff Software Engineer"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background and logistics. Not simulated in v1."
+        },
+        {
+          "name": "Technical phone screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "One or two coding problems. Not simulated in v1."
+        },
+        {
+          "name": "Onsite coding (two rounds)",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Data structures and algorithms. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior or staff engineer",
+          "notes": "Usually a LinkedIn-like product: feed, notifications, People You May Know, search, messaging, top-K."
+        },
+        {
+          "name": "Technical communication",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Candidate explains a past project in depth; the interviewer probes design decisions and clarity of explanation."
+        },
+        {
+          "name": "Host manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Engineering manager (host manager)",
+          "notes": "Walks through each prior role: why the candidate left, team size, own contribution; behavioral and values questions."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": ["Product Manager", "Senior Product Manager", "Principal Product Manager", "Director of Product"],
+      "rounds": [
+        {
+          "name": "HR phone screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background and motivation. Not simulated in v1."
+        },
+        {
+          "name": "PM phone screen",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product manager",
+          "notes": "Product design and analytics questions; one or two calls."
+        },
+        {
+          "name": "Product design",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Senior product manager",
+          "notes": "About half of reported PM questions; improve or design a LinkedIn feature."
+        },
+        {
+          "name": "Analytics / metrics",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Senior product manager or data scientist",
+          "notes": "Success metrics, A/B tests and diagnosing metric drops."
+        },
+        {
+          "name": "Behavioral and leadership",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Product leader or cross-functional leader",
+          "notes": "Why LinkedIn, PM principles, collaboration and values."
+        },
+        {
+          "name": "Strategy",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager",
+          "notes": "Business strategy and vision for the product area; no coding for PMs."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Members over metrics",
+      "pattern": "A time the candidate chose user trust or long-term value over a short-term metric, or opposed a feature that could harm users",
+      "competencies": ["ownership", "impact"],
+      "values": ["We put members first"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Constructive candor",
+      "pattern": "A time the candidate gave hard feedback or disagreed with a manager or lead, and how it was received",
+      "competencies": ["conflict_handling", "communication"],
+      "values": ["We are open, honest and constructive"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Next play after a setback",
+      "pattern": "A cancelled or failed project and what the candidate did immediately afterward",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["We are open, honest and constructive"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Difficult relationship",
+      "pattern": "How the candidate improved a difficult working relationship across teams",
+      "competencies": ["collaboration", "conflict_handling"],
+      "values": ["We trust and care about each other", "We act as One LinkedIn"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Creating opportunity and inclusion",
+      "pattern": "A time the candidate created opportunity for others or brought in a perspective that was missing",
+      "competencies": ["impact", "collaboration"],
+      "values": ["We embody diversity, inclusion and belonging"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Career walk-through",
+      "pattern": "Each previous role: what the team did, its size, the candidate's contribution, and why they moved on",
+      "competencies": ["depth_of_experience", "scope_at_level", "motivation"],
+      "values": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Cross-team ownership",
+      "pattern": "An initiative the candidate drove across team boundaries without being asked",
+      "competencies": ["judgment", "scope_at_level"],
+      "values": ["We act as One LinkedIn"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Past project explained",
+      "pattern": "Explain a past project to an engineer from another team, defending each major design decision",
+      "competencies": ["clarity_of_explanation", "technical_depth", "trade_offs"],
+      "values": ["We are open, honest and constructive"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Social product at scale",
+      "pattern": "Design a LinkedIn-style product such as the feed, notifications, connection suggestions or search at very large scale",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["We put members first"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Streaming aggregation",
+      "pattern": "Design a system that counts or ranks events over a sliding time window, such as top-K or profile views",
+      "competencies": ["technical_depth", "accuracy", "trade_offs"],
+      "values": []
+    },
+    {
+      "interview_type": "case",
+      "theme": "Improve a LinkedIn feature",
+      "pattern": "Pick a member segment and improve a LinkedIn feature such as profile, messaging, onboarding or endorsements",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["We put members first"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Metrics and experiments",
+      "pattern": "Define success for a feature, design an A/B test, or diagnose a drop in a key metric",
+      "competencies": ["structure", "estimation_logic", "problem_framing"],
+      "values": []
+    },
+    {
+      "interview_type": "case",
+      "theme": "Business strategy",
+      "pattern": "Reason about a strategic business decision such as an acquisition, a new market or a subscription product",
+      "competencies": ["structure", "user_and_business_sense", "recommendation"],
+      "values": []
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you chose user trust or product quality over a growth metric.",
+      "strong_answer": "Describes the metric at stake and the risk to users (spam, privacy, misleading UX), the data gathered, and how the candidate argued the case to stakeholders. States the decision, the measured effect on trust and long-term engagement, and any metric given up. Signals: member-first judgment backed by evidence, not just principle. Pitfall: a story with no real trade-off.",
+      "competencies": ["ownership", "impact"],
+      "values": ["We put members first"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-linkedin-behavioral-interview-questions-and-how-to-answer-them"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you had to give constructive feedback under pressure.",
+      "strong_answer": "Sets the context and why the feedback could not wait. Explains how the candidate prepared, delivered it privately and specifically, and listened. Shows the outcome for the person and the work, and how the relationship held. Signals: candor with care, structured communication. Pitfall: harsh feedback framed as honesty, or avoiding the conversation.",
+      "competencies": ["communication", "conflict_handling"],
+      "values": ["We are open, honest and constructive", "We trust and care about each other"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-linkedin-behavioral-interview-questions-and-how-to-answer-them"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a project that was cancelled or failed. What did you do right after?",
+      "strong_answer": "Owns the candidate's part in the failure, explains the cause honestly, and focuses on the quick next step: what was salvaged, how the team re-focused, what changed in the candidate's approach. Shows resilience and moving to the next play without dwelling. Pitfall: blaming leadership or presenting it as nobody's fault.",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["We are open, honest and constructive"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-linkedin-behavioral-interview-questions-and-how-to-answer-them"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe how you improved a difficult working relationship.",
+      "strong_answer": "Explains the friction and its impact on work, the candidate's own contribution to the problem, and concrete steps: a direct conversation, understanding the other person's goals, agreeing on working norms. Shows a lasting improvement and a shared result. Pitfall: the other person changed and the candidate did nothing.",
+      "competencies": ["collaboration", "conflict_handling"],
+      "values": ["We trust and care about each other"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-linkedin-behavioral-interview-questions-and-how-to-answer-them"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about an intelligent risk you took and how you sized it.",
+      "strong_answer": "Describes the opportunity and the downside, how the candidate estimated likelihood and impact, and how they limited exposure (experiment, flag, phased rollout). Gives the outcome and what they would size differently. Signals: calculated, not reckless, with excellence in execution. Pitfall: a risk with no analysis.",
+      "competencies": ["ownership", "impact"],
+      "values": [],
+      "source_url": "https://www.designgurus.io/answers/detail/top-linkedin-behavioral-interview-questions-and-how-to-answer-them"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "How has your work created economic opportunity for other people?",
+      "strong_answer": "Connects a concrete project or action to people's jobs, skills or income: a hiring tool, mentoring, a product that helped small businesses, open source used by others. Quantifies reach where possible and reflects on why it matters to the candidate. Ties to LinkedIn's mission without sounding scripted. Pitfall: vague claims with no people affected.",
+      "competencies": ["impact", "communication"],
+      "values": ["We put members first", "We embody diversity, inclusion and belonging"],
+      "source_url": "https://techinterview.org/linkedin-interview/"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Walk me through each of your previous jobs: what the team did, how big it was, what you contributed and why you left.",
+      "strong_answer": "Keeps each role brief and structured: team mission and size, the candidate's own scope and one notable result, and a positive reason for moving on. Shows a clear growth arc toward this role. Is ready for deep follow-ups on any role. Pitfall: long rambling history or negative comments about past employers.",
+      "competencies": ["depth_of_experience", "scope_at_level", "motivation"],
+      "values": [],
+      "source_url": "https://www.glassdoor.com/Interview/LinkedIn-Interview-E34865-RVW21588665.htm"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Tell me about an initiative you drove that nobody asked you to do.",
+      "strong_answer": "Explains the gap, why it mattered to the business or members, how the candidate built support across teams and delivered, and the measurable result. Shows judgment in choosing this over assigned work and that the work outlived the candidate's involvement. Pitfall: going rogue without alignment.",
+      "competencies": ["judgment", "scope_at_level"],
+      "values": ["We act as One LinkedIn"],
+      "source_url": "https://techinterview.org/linkedin-interview/"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why LinkedIn, and why this role?",
+      "strong_answer": "Connects personal motivation to the mission of economic opportunity, shows knowledge of the product area and its members, and explains what the candidate would bring and want to learn. Specific and honest. Pitfall: generic praise or answers about compensation and brand only.",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["We put members first"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/linkedin-product-manager-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Explain a project you worked on in depth to an engineer from another team, including the decisions you made.",
+      "strong_answer": "Starts with the problem and why it mattered, then a high-level architecture before details. Covers two or three key decisions with alternatives and trade-offs, how the candidate validated them, and what they would change. Adjusts depth to the listener and answers follow-ups precisely. Pitfall: jargon-heavy detail without structure, or not knowing why decisions were made.",
+      "competencies": ["clarity_of_explanation", "technical_depth", "trade_offs"],
+      "values": ["We are open, honest and constructive"],
+      "source_url": "https://www.glassdoor.com/Interview/LinkedIn-Interview-E34865-RVW21588665.htm"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design the LinkedIn feed for members with very different network sizes.",
+      "strong_answer": "Clarifies requirements and scale, then covers fan-out on write versus read with a hybrid for high-follower accounts, candidate generation and ranking, caching, and freshness. Discusses member-first concerns like low-quality content and notification fatigue. Explains bottlenecks and failure handling, and ties choices to member and business impact. Pitfall: ignoring the celebrity fan-out problem.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["We put members first"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-linkedin-system-design-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a service that tracks events over a sliding time window and returns the top K, for example most viewed items in the last hour.",
+      "strong_answer": "Clarifies accuracy versus latency needs. Covers streaming ingestion, windowed counting (bucketed counters, count-min sketch for approximation), merging partial top-K across partitions, and storage of results. Discusses exactness trade-offs, late events, and scaling. Pitfall: recomputing everything from raw logs on each request.",
+      "competencies": ["technical_depth", "accuracy", "trade_offs"],
+      "values": [],
+      "source_url": "https://www.glassdoor.com/Interview/LinkedIn-Interview-E34865-RVW21588665.htm"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design a 'People You May Know' recommendation system for a very large professional network?",
+      "strong_answer": "Separates candidate generation (second-degree connections, shared schools or companies) from ranking with features and a model. Discusses offline precompute versus online serving, graph storage and partitioning, cold start for new members, and privacy limits. Defines how success is measured. Pitfall: a full graph traversal per request.",
+      "competencies": ["technical_depth", "reasoning", "trade_offs"],
+      "values": ["We put members first"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-linkedin-system-design-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you improve LinkedIn's skill endorsements feature?",
+      "strong_answer": "Clarifies the goal of endorsements (trust signal for recruiters, engagement) and the users on both sides. Identifies problems such as low signal quality, then proposes and prioritizes improvements (context, verification, prompts). Defines success metrics and guardrails like spam. Pitfall: adding engagement prompts that make the signal worse.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["We put members first"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/linkedin-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you redesign the LinkedIn profile page?",
+      "strong_answer": "Picks a segment (job seekers, recruiters viewing profiles, students) and the job the profile does for them. Finds key pains, proposes a few changes, and prioritizes by impact on member outcomes. Considers both the profile owner and the viewer. Defines metrics such as profile completeness and recruiter contact rate. Pitfall: visual redesign with no user goal.",
+      "competencies": ["problem_framing", "structure", "user_and_business_sense"],
+      "values": ["We put members first"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/linkedin-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you measure the success of the skills and endorsements feature?",
+      "strong_answer": "Starts from the feature's goal, then lists metrics by funnel: adoption, engagement, and value delivered (recruiter searches using skills, member outcomes). Picks one primary metric with guardrails and explains how to validate it with an experiment. Pitfall: listing every metric with no priority.",
+      "competencies": ["problem_framing", "structure", "recommendation"],
+      "values": [],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/linkedin-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "After a change to the sign-up flow, retention dropped by 2 percent. How would you respond?",
+      "strong_answer": "Checks data validity first, then segments by platform, region, cohort and acquisition channel, and compares with the change timeline. Forms hypotheses linked to the sign-up change, proposes analyses or a rollback test, and decides based on the trade-off with whatever the change improved. Pitfall: jumping to a single cause without checking the data.",
+      "competencies": ["structure", "problem_framing", "recommendation"],
+      "values": [],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/linkedin-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you design an A/B test for the People You May Know feature?",
+      "strong_answer": "States the hypothesis and primary metric (accepted invites, meaningful connections), guardrails (spam reports, invite declines), and the unit of randomization. Addresses network effects between test and control and how to handle them (cluster randomization). Covers sample size and duration. Pitfall: ignoring interference in a social graph.",
+      "competencies": ["structure", "estimation_logic", "problem_framing"],
+      "values": [],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/linkedin-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you improve retention for LinkedIn Premium subscribers?",
+      "strong_answer": "Segments subscribers by reason for buying (job seekers, sales, recruiters) and diagnoses why each churns, for example after landing a job. Proposes targeted levers and prioritizes them, considering revenue and member value. Defines retention metrics and an experiment plan. Pitfall: one discount for everyone.",
+      "competencies": ["user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["We put members first"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/linkedin-product-manager-interview"
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "Software Engineer (IC2)",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Builds features inside a defined area; larger design decisions are made by someone more senior."
+    },
+    {
+      "level_name": "Senior Software Engineer (IC3)",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns a system or service end to end; a career level where engineers may stay long term."
+    },
+    {
+      "level_name": "Staff Software Engineer (IC4)",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Sets technical direction for an area that several teams depend on."
+    },
+    {
+      "level_name": "Senior Staff Software Engineer (IC5)",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Owns technical strategy across an organization and resolves disagreements between staff engineers."
+    },
+    {
+      "level_name": "Principal Staff Software Engineer (IC6)",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Sets direction for a major part of LinkedIn's technology."
+    },
+    {
+      "level_name": "Senior Product Manager",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns a product area's strategy, metrics and roadmap and leads cross-functional partners."
+    }
+  ],
+  "persona": {
+    "tone": "Professional, friendly and collegial",
+    "pace": "Steady and structured, with time for deep follow-ups",
+    "pushback_style": "Asks the candidate to explain decisions more clearly, at the right level, and how members were affected",
+    "closing_style": "Leaves time for the candidate's questions about the team and mission"
+  },
+  "scoring_weights": {
+    "communication": 1.4,
+    "clarity_of_explanation": 1.4,
+    "collaboration": 1.2,
+    "conflict_handling": 1.1,
+    "learning_from_failure": 1.1,
+    "depth_of_experience": 1.2,
+    "trade_offs": 1.2,
+    "user_and_business_sense": 1.3,
+    "problem_framing": 1.2,
+    "structure": 1.2
+  },
+  "values_share": 0.25,
+  "case_style": {
+    "product_sense": 0.6,
+    "estimation": 0.15,
+    "system_thinking": 0.25,
+    "notes": "Product design dominates PM cases (about half of reported questions), followed by analytics and A/B testing; strategy questions are less common."
+  },
+  "sources": [
+    {
+      "url": "https://careers.linkedin.com/culture-and-values",
+      "title": "LinkedIn culture and values",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework", "persona"]
+    },
+    {
+      "url": "https://igotanoffer.com/blogs/product-manager/linkedin-product-manager-interview",
+      "title": "LinkedIn product manager interview (IGotAnOffer)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/top-linkedin-behavioral-interview-questions-and-how-to-answer-them",
+      "title": "Top LinkedIn behavioral interview questions",
+      "retrieved_at": "2026-10-10",
+      "fields": ["question_patterns", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://www.glassdoor.com/Interview/LinkedIn-Interview-E34865-RVW21588665.htm",
+      "title": "LinkedIn interview review (Glassdoor)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://techinterview.org/linkedin-interview/",
+      "title": "LinkedIn interview guide 2026",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-linkedin-system-design-interview",
+      "title": "What to expect in the LinkedIn system design interview",
+      "retrieved_at": "2026-10-10",
+      "fields": ["question_patterns", "scoring_weights"]
+    },
+    {
+      "url": "https://www.designgurus.io/blog/linkedin-software-engineer-levels",
+      "title": "LinkedIn software engineer levels",
+      "retrieved_at": "2026-10-10",
+      "fields": ["bar_by_level"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "medium",
+    "persona": "medium",
+    "scoring_weights": "low",
+    "case_style": "medium"
+  },
+  "low_confidence_notes": [
+    "values_framework: LinkedIn's older six values (members first, relationships matter, act like an owner, take intelligent risks, and others) still appear in prep guides; we use the five shared values on the current careers page. Weights are our estimate.",
+    "loop_structure: the Glassdoor review was seen only in search results (the page blocks fetching); the technical communication and host manager rounds are reported in several sources but may vary by team.",
+    "loop_structure: PM round names and durations are inferred from a prep guide that lists question shares, not an official LinkedIn page.",
+    "bar_by_level: IC mapping comes from a third-party guide; one other guide uses E4 to E6 labels instead. PM level names are generic.",
+    "scoring_weights: no public source gives weights; communication is weighted up because several guides say the loop grades clarity of explanation explicitly."
+  ]
+}

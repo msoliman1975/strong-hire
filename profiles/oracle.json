@@ -1,0 +1,583 @@
+{
+  "company_name": "Oracle",
+  "company_slug": "oracle",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-10",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Oracle Core Values",
+    "principles": [
+      {
+        "name": "Integrity",
+        "description": "Be honest and choose the path of integrity in every business dealing, acting ethically and in compliance with laws and policy.",
+        "evidence_signals": [
+          "Raised or fixed a problem honestly even when it reflected badly on self or team",
+          "Refused a shortcut that would have broken a rule, a commitment or customer trust",
+          "Gives an accurate account of own role without overclaiming"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Mutual Respect",
+        "description": "Treat every individual with respect and dignity.",
+        "evidence_signals": [
+          "Handled a disagreement while keeping respect for the other person",
+          "Listened to and acted on views from people with less authority"
+        ],
+        "weight": 0.9
+      },
+      {
+        "name": "Teamwork",
+        "description": "Work together as a team for the benefit of the company, across team and org boundaries.",
+        "evidence_signals": [
+          "Helped another team hit a goal or unblocked a shared dependency",
+          "Describes clear coordination across teams and shared credit",
+          "Resolved team conflict and kept the project moving"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Communication",
+        "description": "Share information effectively with colleagues while protecting confidential information.",
+        "evidence_signals": [
+          "Explains technical decisions clearly to different audiences",
+          "Kept stakeholders informed of risks and changes early",
+          "Knows what must stay confidential and handles it properly"
+        ],
+        "weight": 1.1
+      },
+      {
+        "name": "Customer Satisfaction",
+        "description": "Treat customer satisfaction as a top priority.",
+        "evidence_signals": [
+          "Worked directly with an enterprise customer issue or escalation and resolved it",
+          "Made a design or priority decision based on customer impact",
+          "Measured the result in terms customers care about: uptime, latency, cost, ease of use"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Quality",
+        "description": "Build excellence and quality into the work and keep improving it.",
+        "evidence_signals": [
+          "Improved reliability, testing or operational practices with measurable results",
+          "Owns production quality: on-call, incident follow-up, root cause fixes",
+          "Raised the quality bar for the team, not only for own code"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Fairness",
+        "description": "Deal fairly with customers, suppliers, partners and colleagues.",
+        "evidence_signals": [
+          "Balanced competing stakeholder interests openly and even-handedly",
+          "Gave fair credit and fair feedback to colleagues"
+        ],
+        "weight": 0.7
+      },
+      {
+        "name": "Innovation",
+        "description": "Seek new and creative approaches to solving problems.",
+        "evidence_signals": [
+          "Proposed a new approach that beat the obvious solution and explains why",
+          "Learned a new technology quickly and applied it to a real problem",
+          "Took a calculated technical risk and managed its downside"
+        ],
+        "weight": 1.1
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["IC1", "IC2", "IC3", "IC4", "IC5", "IC6"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Qualifications, location and routing to a team. Not simulated in v1."
+        },
+        {
+          "name": "Online assessment / technical phone screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Coding, plus some SQL, Java and OS fundamentals. Not simulated in v1."
+        },
+        {
+          "name": "Onsite coding (one to two rounds)",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Easy to medium algorithm problems. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior or principal engineer",
+          "notes": "OCI teams go deep on multi-tenancy, replication, storage and network virtualization; other orgs lean on Java, SQL and enterprise patterns. May include concurrency topics."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Hiring manager",
+          "notes": "Resume and project deep dive plus behavioral questions; about half the time is for the candidate's questions."
+        },
+        {
+          "name": "Bartender round",
+          "interview_type": "behavioral",
+          "duration_min": 60,
+          "interviewer_role": "Engineer or manager from outside the hiring team",
+          "notes": "Calibration round similar to a bar raiser, mostly behavioral against the values. Mainly reported for OCI."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": ["Product Manager", "Senior Product Manager", "Principal Product Manager", "Director, Product Management"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background and fit. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager",
+          "notes": "PM experience and some product sense."
+        },
+        {
+          "name": "Behavioral interviews (several)",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Product managers and cross-functional peers",
+          "notes": "Candidates report up to three behavioral rounds in STAR format."
+        },
+        {
+          "name": "Product sense",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Cross-functional peer",
+          "notes": "Improve or design a product, often with a metrics or prioritization follow-up."
+        },
+        {
+          "name": "Technical vetting",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Engineer or technical PM",
+          "notes": "Explain technical concepts simply and reason about tech debt versus features; depth depends on the team."
+        },
+        {
+          "name": "Final interview",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Senior stakeholder",
+          "notes": "Fit and any competencies not yet covered."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Conflict resolution",
+      "pattern": "A workplace disagreement or conflict and how the candidate resolved it",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["Mutual Respect", "Teamwork"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Pressure and deadlines",
+      "pattern": "A time the candidate delivered under a tight deadline and what they traded off",
+      "competencies": ["ownership", "impact"],
+      "values": ["Quality"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Mistake and lesson",
+      "pattern": "A past mistake, how the candidate owned it, and what changed afterward",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Integrity"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Customer escalation",
+      "pattern": "A time the candidate handled a customer issue or escalation and the result for the customer",
+      "competencies": ["ownership", "impact"],
+      "values": ["Customer Satisfaction"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Pivot mid-project",
+      "pattern": "A major change of direction halfway through a project and how the candidate managed it",
+      "competencies": ["ownership", "communication"],
+      "values": ["Communication", "Teamwork"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Resume project deep dive",
+      "pattern": "A detailed walk through a project on the resume, including technical decisions and own role",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Quality"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Why Oracle",
+      "pattern": "Why Oracle, why this team or org (OCI, database, applications), and what the candidate wants next",
+      "competencies": ["motivation", "role_fit"],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Cloud infrastructure design",
+      "pattern": "Design a multi-tenant cloud service such as block storage, a virtual network or a key-value store, with isolation and replication",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Customer Satisfaction", "Quality"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Concurrency and distributed fundamentals",
+      "pattern": "Explain locking, reader-writer problems or distributed coordination and their trade-offs",
+      "competencies": ["accuracy", "technical_depth", "clarity_of_explanation"],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Explain simply",
+      "pattern": "Explain a technical concept or a past technical decision clearly to a non-specialist",
+      "competencies": ["clarity_of_explanation", "reasoning"],
+      "values": ["Communication"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Improve a product",
+      "pattern": "Pick a product, a user segment and a pain point, and propose an improvement with metrics",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Customer Satisfaction"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Root cause of a metric drop",
+      "pattern": "Diagnose a sudden drop in a product metric such as app rating or payment success",
+      "competencies": ["structure", "problem_framing", "recommendation"],
+      "values": ["Quality"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Enterprise strategy",
+      "pattern": "Set priorities or a market entry plan for an enterprise or cloud business",
+      "competencies": ["structure", "user_and_business_sense", "recommendation"],
+      "values": ["Innovation"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a disagreement at work and how you resolved it.",
+      "strong_answer": "States the disagreement and both positions fairly, then the candidate's actions: listening, bringing data, finding the shared goal, escalating only if needed. Gives the outcome and how the relationship continued. Uses STAR and keeps the focus on own behavior. Pitfall: portraying the other person as wrong and unreasonable.",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["Mutual Respect", "Teamwork"],
+      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a mistake you made at work and what you learned from it.",
+      "strong_answer": "Chooses a real mistake with real consequences, owns it plainly, and explains how it was detected and fixed, including telling affected people. Shows the lasting change in process or habit and evidence that it worked. Signals honesty and quality mindset. Pitfall: a fake weakness or blaming others.",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Integrity", "Quality"],
+      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you managed a major pivot halfway through a project.",
+      "strong_answer": "Explains the trigger for the pivot (customer feedback, strategy shift, technical blocker), how the candidate re-planned scope and timeline, and how they communicated the change to the team and stakeholders. Covers what was salvaged and the final result. Pitfall: describing the pivot as chaos without the candidate's own actions.",
+      "competencies": ["ownership", "communication"],
+      "values": ["Communication", "Teamwork"],
+      "source_url": "https://dataford.io/interview-guides/oracle/product-manager"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to deliver under a very tight deadline.",
+      "strong_answer": "Sets the stakes and the deadline, then how the candidate prioritized, cut or deferred scope, and protected quality where it mattered. Mentions communication with stakeholders about risk. Gives the result and any follow-up work to pay down shortcuts. Pitfall: heroic overtime with no prioritization or quality thinking.",
+      "competencies": ["ownership", "impact"],
+      "values": ["Quality"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-does-oracle-ask-in-an-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a challenge you faced on a project and how you overcame it.",
+      "strong_answer": "Picks a challenge that matches the target level, explains why it was hard, the options considered, the action the candidate personally took, and a measurable result. Ends with what they would do differently. Pitfall: a challenge that resolved itself or a team story with no individual role.",
+      "competencies": ["ownership", "learning_from_failure"],
+      "values": ["Innovation"],
+      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why Oracle, and why product management?",
+      "strong_answer": "Connects the candidate's background to Oracle's business (cloud infrastructure, database, enterprise applications, health) and to the specific team. Explains why the role fits their strengths and what they want to learn. Shows awareness of enterprise customers. Pitfall: generic answers or none about the team.",
+      "competencies": ["motivation", "role_fit"],
+      "values": [],
+      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Walk me through a project on your resume in depth, including the technical choices you made.",
+      "strong_answer": "Gives the business context, architecture and the candidate's specific responsibility. Explains two or three technical choices with alternatives and trade-offs, how quality was ensured, and the outcome with numbers. Is ready for detailed follow-ups. Pitfall: unable to explain details or why choices were made.",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Quality"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-is-the-oracle-interview-process-like-round-by-round"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "How would you decide between paying down technical debt and starting a growth project?",
+      "strong_answer": "Frames both options in terms of customer and business impact, risk and cost of delay. Uses data such as incident rates, velocity loss or revenue opportunity. Proposes a decision rule or a mix, and how to explain it to stakeholders. Pitfall: an absolute rule (always fix debt first) without context.",
+      "competencies": ["judgment", "role_fit"],
+      "values": ["Quality", "Customer Satisfaction"],
+      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design a system to move a live block storage volume to new hardware without dropping active I/O?",
+      "strong_answer": "Clarifies consistency and downtime goals, then describes a staged migration: background copy, tracking dirty blocks, mirrored writes during cutover, a short final sync and atomic switch, and rollback. Discusses throttling to protect customer latency, failure handling, and verification. Pitfall: a stop-copy-start plan that causes downtime.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Customer Satisfaction", "Quality"],
+      "source_url": "https://www.interviewquery.com/guides/oracle-software-engineer"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a multi-tenant virtual cloud network.",
+      "strong_answer": "Covers tenant isolation (overlay networks, encapsulation), the control plane versus data plane, address management and overlapping ranges, routing and security lists, and scaling. Discusses noisy neighbors, failure domains and how changes propagate safely. Pitfall: ignoring isolation guarantees between tenants.",
+      "competencies": ["technical_depth", "trade_offs", "accuracy"],
+      "values": ["Quality"],
+      "source_url": "https://www.interviewquery.com/guides/oracle-software-engineer"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a rate limiter for a multi-tenant API.",
+      "strong_answer": "Clarifies limits per tenant and per user, then compares algorithms (token bucket, sliding window), where state lives (local versus distributed store), and accuracy versus latency. Covers bursts, fairness between tenants, failure modes when the store is down, and client feedback. Pitfall: one global counter with no tenant fairness.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Fairness"],
+      "source_url": "https://www.interviewquery.com/guides/oracle-software-engineer"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Explain how you would handle reader-writer concurrency for a shared resource, and how that changes in a distributed system.",
+      "strong_answer": "Explains locks, semaphores and reader-writer locks, starvation and fairness. Then moves to distributed coordination: leases, consensus-based locks, fencing tokens, and why clocks and failures make it harder. Gives a practical example and trade-offs. Pitfall: treating a distributed lock like a local mutex.",
+      "competencies": ["accuracy", "technical_depth", "clarity_of_explanation"],
+      "values": [],
+      "source_url": "https://leetcode.com/discuss/interview-experience/508029/oracle-oci-software-enginner-2-ic4-level-member-of-staff-engineer-redwood-city-ca"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a highly available, replicated key-value store.",
+      "strong_answer": "Clarifies consistency, latency and durability needs. Covers partitioning, replication (leader-follower or quorum), failure detection and failover, consistency trade-offs, and storage engine basics. Explains how to handle network partitions and data repair. Pitfall: claiming strong consistency and full availability together without trade-offs.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Quality"],
+      "source_url": "https://www.interviewquery.com/guides/oracle-software-engineer"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Explain what a protocol is, in simple terms, to someone non-technical.",
+      "strong_answer": "Uses a clear everyday analogy (agreed rules for a conversation), then links it to a real example like HTTP. Checks understanding and avoids jargon. Short and accurate. Pitfall: technical terms that need their own explanation.",
+      "competencies": ["clarity_of_explanation", "accuracy"],
+      "values": ["Communication"],
+      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you improve an app you like?",
+      "strong_answer": "Picks a product and states its goal, chooses a user segment and their biggest pain, generates a few solutions and prioritizes one by impact and effort. Defines success metrics and guardrails. Keeps it structured and user-centered. Pitfall: listing features without a user or a reason.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Customer Satisfaction"],
+      "source_url": "https://dataford.io/interview-guides/oracle/product-manager"
+    },
+    {
+      "interview_type": "case",
+      "question": "An Android app's rating dropped from about 4.2 to 2 stars. How would you find out why?",
+      "strong_answer": "Checks timing against releases and external events, reads review text, segments by device, OS version, region and app version, and checks crash and performance data. Forms hypotheses, confirms the root cause, proposes a fix and a plan to recover ratings. Pitfall: guessing a cause without segmenting.",
+      "competencies": ["structure", "problem_framing", "recommendation"],
+      "values": ["Quality"],
+      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "Payment declines suddenly increased. How would you debug it?",
+      "strong_answer": "Confirms the metric and its definition, segments by processor, card type, region, platform and merchant, and checks recent releases or partner changes. Separates technical failures from fraud rules and customer issues. Prioritizes by revenue impact and proposes a fix plus monitoring. Pitfall: no segmentation or ignoring third-party processors.",
+      "competencies": ["structure", "problem_framing", "recommendation"],
+      "values": ["Customer Satisfaction"],
+      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "If you were Oracle's CEO, what would your top three priorities be?",
+      "strong_answer": "Shows understanding of Oracle's businesses (cloud infrastructure, database, applications) and market forces such as AI workloads and cloud competition. Picks three priorities with a clear rationale, expected impact and risks, and how to measure progress. Pitfall: generic priorities with no link to Oracle's position.",
+      "competencies": ["structure", "user_and_business_sense", "recommendation"],
+      "values": ["Innovation"],
+      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you prioritize features for a content moderation tool?",
+      "strong_answer": "Clarifies users (moderators, admins, end users) and goals (speed, accuracy, safety). Lists candidate features, scores them by impact, effort and risk, and explains the chosen order and the V1 scope. Defines metrics such as review time and error rate. Pitfall: prioritizing by personal preference without a framework.",
+      "competencies": ["prioritization", "structure", "user_and_business_sense"],
+      "values": [],
+      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview"
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "IC1 (Software Developer 1)",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Entry level; delivers scoped tasks with close guidance."
+    },
+    {
+      "level_name": "IC2 (Member of Technical Staff)",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Early-career engineer; owns small features with some guidance."
+    },
+    {
+      "level_name": "IC3 (Senior Member of Technical Staff)",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns features and components end to end within a team; one of the two most common hiring levels."
+    },
+    {
+      "level_name": "IC4 (Principal Member of Technical Staff)",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Leads design of services or major components and guides other engineers."
+    },
+    {
+      "level_name": "IC5 (Consulting Member of Technical Staff)",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Sets technical direction across teams or a product area."
+    },
+    {
+      "level_name": "IC6 (Architect)",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Architect level; shapes architecture for a large organization or product line."
+    },
+    {
+      "level_name": "Principal Product Manager",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns a product area for enterprise or cloud customers and drives its roadmap with engineering."
+    }
+  ],
+  "persona": {
+    "tone": "Professional and matter-of-fact",
+    "pace": "Steady; focused on details of past work and technical depth",
+    "pushback_style": "Asks for specifics: exact role, numbers, what went wrong, and how the design handles failure",
+    "closing_style": "Leaves time for questions about the team; the hiring manager may spend half the round on them"
+  },
+  "scoring_weights": {
+    "technical_depth": 1.3,
+    "trade_offs": 1.2,
+    "accuracy": 1.2,
+    "depth_of_experience": 1.3,
+    "ownership": 1.2,
+    "conflict_handling": 1.1,
+    "collaboration": 1.1,
+    "communication": 1.1,
+    "structure": 1.1,
+    "prioritization": 1.1
+  },
+  "values_share": 0.2,
+  "case_style": {
+    "product_sense": 0.45,
+    "estimation": 0.15,
+    "system_thinking": 0.4,
+    "notes": "Cases vary by team; product improvement, root cause and prioritization questions are common, with more technical and enterprise or cloud context than consumer product companies."
+  },
+  "sources": [
+    {
+      "url": "https://www.oracle.com/webfolder/assets/ebook/employee-code-of-conduct-and-ethics/pdf/code-of-conduct.pdf",
+      "title": "Oracle Code of Ethics and Business Conduct",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/what-is-the-oracle-interview-process-like-round-by-round",
+      "title": "What is the Oracle interview process like, round by round",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "persona"]
+    },
+    {
+      "url": "https://www.interviewquery.com/guides/oracle-software-engineer",
+      "title": "Oracle software engineer interview guide (Interview Query)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://leetcode.com/discuss/interview-experience/508029/oracle-oci-software-enginner-2-ic4-level-member-of-staff-engineer-redwood-city-ca",
+      "title": "Oracle OCI software engineer interview experience (LeetCode Discuss)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.teamblind.com/post/oci-behavioral-tpnxzoe4",
+      "title": "OCI behavioral (Blind thread)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview",
+      "title": "Oracle product manager interview (IGotAnOffer)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://dataford.io/interview-guides/oracle/product-manager",
+      "title": "Oracle product manager interview guide",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/what-does-oracle-ask-in-an-interview",
+      "title": "What does Oracle ask in an interview",
+      "retrieved_at": "2026-10-10",
+      "fields": ["question_patterns"]
+    },
+    {
+      "url": "https://www.designgurus.io/blog/oracle-software-engineer-levels",
+      "title": "Oracle software engineer levels",
+      "retrieved_at": "2026-10-10",
+      "fields": ["bar_by_level"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "medium",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "medium",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "low"
+  },
+  "low_confidence_notes": [
+    "values_framework: these are the core values from Oracle's Code of Ethics and Business Conduct (seen in search results; the PDF blocked fetching). They are not an interview rubric. OCI is reported to score behavioral rounds against its own set of about nine values, but no public source we found names them.",
+    "values_framework: Ethics and Compliance are folded into Integrity; weights are our estimate.",
+    "loop_structure: Oracle's process is team-dependent (OCI versus database versus applications); the bartender round is reported mainly for OCI.",
+    "loop_structure: the PM technical vetting round is inferred from technical questions listed in a prep guide.",
+    "bar_by_level: IC scope descriptions are inferred from titles in a third-party guide; IC1 and IC2 both map to new_grad.",
+    "persona: inferred from candidate reports describing detail-focused, conversational rounds; no direct source.",
+    "case_style: PM cases vary strongly by team; weights are an estimate.",
+    "sample_questions: Interview Query system design questions were seen in search result summaries only; the page returned rate-limit errors when opened."
+  ]
+}
