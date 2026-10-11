@@ -81,6 +81,24 @@ class QuestionPattern(Contract):
     )
 
 
+class SampleQuestion(Contract):
+    """A question the company or candidates published, paraphrased, with its source.
+    Never an NDA-protected question or copied paid content."""
+
+    interview_type: InterviewType
+    question: str = Field(min_length=1, max_length=400, description="Paraphrased, not copied.")
+    strong_answer: str = Field(
+        min_length=1,
+        max_length=800,
+        description="What a strong answer covers. Our own guidance, not a copied answer.",
+    )
+    competencies: list[Competency] = Field(default_factory=list)
+    values: list[str] = Field(
+        default_factory=list, description="Principle names from values_framework this probes."
+    )
+    source_url: str = Field(min_length=1, description="Public page that reports the question.")
+
+
 class LevelBar(Contract):
     level_name: str = Field(min_length=1, description="Company label, for example 'L5' or 'E5'.")
     normalized_level: Level
@@ -128,6 +146,10 @@ class CompanyProfile(Contract):
     values_framework: ValuesFramework
     loop_structure: list[LoopStructure] = Field(min_length=1)
     question_patterns: list[QuestionPattern] = Field(min_length=1)
+    sample_questions: list[SampleQuestion] = Field(
+        default_factory=list,
+        description="Publicly reported questions, paraphrased. The planner may draw on them.",
+    )
     bar_by_level: list[LevelBar] = Field(min_length=1)
     persona: PersonaNotes
     scoring_weights: dict[Competency, float] = Field(
@@ -167,6 +189,9 @@ class CompanyProfile(Contract):
         unknown = sorted({v for q in self.question_patterns for v in q.values} - set(values))
         if unknown:
             raise ValueError(f"question_patterns use unknown values: {', '.join(unknown)}")
+        unknown = sorted({v for q in self.sample_questions for v in q.values} - set(values))
+        if unknown:
+            raise ValueError(f"sample_questions use unknown values: {', '.join(unknown)}")
         return self
 
     @property

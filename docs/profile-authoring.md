@@ -10,8 +10,8 @@ background.
 - The schema is `schemas/company_profile.schema.json`. It is generated from the Pydantic
   model `strong_core.schemas.CompanyProfile`. Do not edit the schema by hand.
 - Unknown fields are rejected. A spelling mistake in a field name fails validation.
-- Write patterns and expectations only. Do not include leaked or NDA-protected questions, copied
-  paid content, or claims about named interviewers.
+- Sample questions come from public pages only, are paraphrased, and cite their source. Do not
+  include NDA-protected questions, copied paid content, or claims about named interviewers.
 
 ## Workflow
 
@@ -55,6 +55,7 @@ uv run strongctl profiles show acme --version 1         # read any version, also
 | `loop_structure[].rounds[].interview_type` | No | One of `behavioral`, `hiring_manager`, `technical_qa`, `case`. Use `null` for rounds v1 does not simulate, such as live coding. |
 | `question_patterns[]` | Yes, 1 or more | `interview_type`, `theme`, `pattern`, optional `competencies`, and optional `values`. Write a pattern, never a real question. |
 | `question_patterns[].values` | No | Principle names from `values_framework` that this pattern probes. An unknown name fails validation. |
+| `sample_questions[]` | No | Publicly reported questions. Each has `interview_type`, `question` (paraphrased, up to 400 characters), `strong_answer` (what a strong answer covers, our own words, up to 800 characters), optional `competencies` and `values`, and `source_url`. An unknown value name fails validation. |
 | `bar_by_level[]` | Yes, 1 or more | `level_name` (company label, for example "E5"), `normalized_level` (`new_grad`, `mid`, `senior`, `staff_principal`), optional `role_family`, and `scope_expectation`. |
 | `persona` | Yes | `tone`, `pace`, `pushback_style`, `closing_style`. The interviewer uses these (IV-5). |
 | `scoring_weights` | Yes, 1 or more | Competency name to a positive number. Competencies you leave out weigh 1.0. Use values above 1.0 for what the company stresses. |

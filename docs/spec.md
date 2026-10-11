@@ -166,6 +166,7 @@ Each of the 20 companies gets a versioned profile, researched offline with Claud
 | Values framework | Named principles (e.g. Amazon Leadership Principles) with what evidence of each sounds like |
 | Loop structure | Typical rounds by role family and level, round length, who interviews |
 | Question patterns | Recurring themes per interview type, phrased as patterns, not leaked questions |
+| Sample questions | Questions the company or candidates published, paraphrased, each with a source URL and a note on what a strong answer covers |
 | Bar by level | Level names (L5, E5, Senior) and scope expected at each |
 | Persona notes | Interviewer tone, pace, pushback style, how they close |
 | Scoring weights | Relative weight of each competency in the hire signal |
@@ -182,7 +183,7 @@ Each of the 20 companies gets a versioned profile, researched offline with Claud
 5. Each session records the profile version it used, so scores stay explainable after refreshes.
 6. Quarterly refresh: the same prompt re-researches a company and outputs a diff for your approval.
 
-**Content rules.** No leaked or NDA-protected questions, no copied paid content, no claims about specific named interviewers. Profiles describe patterns and expectations, which keeps the product on safe legal ground and still feels authentic.
+**Content rules.** Sample questions come only from public pages: company career and interview-prep pages, engineering blogs, and candidate reports posted publicly. Each is paraphrased and cites its source. The strong-answer note is our own guidance, not a copied answer. No NDA-protected questions, no copied paid content (for example paid question banks or courses), no claims about specific named interviewers. The interviewer adapts sample questions to the candidate rather than reading them out.
 
 **Companies outside the 20.**
 

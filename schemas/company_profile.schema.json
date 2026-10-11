@@ -442,6 +442,58 @@
       "title": "RoleFamily",
       "type": "string"
     },
+    "SampleQuestion": {
+      "additionalProperties": false,
+      "description": "A question the company or candidates published, paraphrased, with its source.\nNever an NDA-protected question or copied paid content.",
+      "properties": {
+        "competencies": {
+          "items": {
+            "$ref": "#/$defs/Competency"
+          },
+          "title": "Competencies",
+          "type": "array"
+        },
+        "interview_type": {
+          "$ref": "#/$defs/InterviewType"
+        },
+        "question": {
+          "description": "Paraphrased, not copied.",
+          "maxLength": 400,
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "source_url": {
+          "description": "Public page that reports the question.",
+          "minLength": 1,
+          "title": "Source Url",
+          "type": "string"
+        },
+        "strong_answer": {
+          "description": "What a strong answer covers. Our own guidance, not a copied answer.",
+          "maxLength": 800,
+          "minLength": 1,
+          "title": "Strong Answer",
+          "type": "string"
+        },
+        "values": {
+          "description": "Principle names from values_framework this probes.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Values",
+          "type": "array"
+        }
+      },
+      "required": [
+        "interview_type",
+        "question",
+        "strong_answer",
+        "source_url"
+      ],
+      "title": "SampleQuestion",
+      "type": "object"
+    },
     "Source": {
       "additionalProperties": false,
       "properties": {
@@ -575,6 +627,14 @@
       },
       "minItems": 1,
       "title": "Question Patterns",
+      "type": "array"
+    },
+    "sample_questions": {
+      "description": "Publicly reported questions, paraphrased. The planner may draw on them.",
+      "items": {
+        "$ref": "#/$defs/SampleQuestion"
+      },
+      "title": "Sample Questions",
       "type": "array"
     },
     "scoring_weights": {

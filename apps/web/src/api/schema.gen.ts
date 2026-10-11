@@ -1537,6 +1537,11 @@ export interface components {
             loop_structure: components["schemas"]["LoopStructure"][];
             /** Question Patterns */
             question_patterns: components["schemas"]["QuestionPattern"][];
+            /**
+             * Sample Questions
+             * @description Publicly reported questions, paraphrased. The planner may draw on them.
+             */
+            sample_questions?: components["schemas"]["SampleQuestion"][];
             /** Bar By Level */
             bar_by_level: components["schemas"]["LevelBar"][];
             persona: components["schemas"]["PersonaNotes"];
@@ -2838,6 +2843,36 @@ export interface components {
          * @enum {string}
          */
         RoleFamily: "swe" | "data_ml" | "pm" | "design" | "tpm" | "other";
+        /**
+         * SampleQuestion
+         * @description A question the company or candidates published, paraphrased, with its source.
+         *     Never an NDA-protected question or copied paid content.
+         */
+        SampleQuestion: {
+            interview_type: components["schemas"]["InterviewType"];
+            /**
+             * Question
+             * @description Paraphrased, not copied.
+             */
+            question: string;
+            /**
+             * Strong Answer
+             * @description What a strong answer covers. Our own guidance, not a copied answer.
+             */
+            strong_answer: string;
+            /** Competencies */
+            competencies?: components["schemas"]["Competency"][];
+            /**
+             * Values
+             * @description Principle names from values_framework this probes.
+             */
+            values?: string[];
+            /**
+             * Source Url
+             * @description Public page that reports the question.
+             */
+            source_url: string;
+        };
         /** Scorecard */
         Scorecard: {
             hire_signal: components["schemas"]["HireSignal"];
