@@ -3352,6 +3352,36 @@
         ],
         "title": "AdminUser"
       },
+      "AnswerCheck": {
+        "additionalProperties": false,
+        "description": "IV-12: the interviewer model's check of one candidate turn, before the reply.\n\nThe runner warns the candidate on a turn that is not `ok`, and closes the interview when\nthe warnings run out. `reason` goes to the admin traces only, never to the candidate.",
+        "properties": {
+          "conduct": {
+            "$ref": "#/components/schemas/AnswerConduct"
+          },
+          "reason": {
+            "default": "",
+            "maxLength": 200,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "conduct"
+        ],
+        "title": "AnswerCheck",
+        "type": "object"
+      },
+      "AnswerConduct": {
+        "description": "IV-12: whether a candidate turn belongs in the interview.\n\n`off_scope` is not a weak or off-topic answer (IV-3 probes those). It is a turn about\nsomething outside the interview, such as an unrelated subject or a request for an unrelated\ntask. `inappropriate` is abuse, harassment, threats, hate or sexual content.",
+        "enum": [
+          "ok",
+          "off_scope",
+          "inappropriate"
+        ],
+        "title": "AnswerConduct",
+        "type": "string"
+      },
       "AuthProvider": {
         "type": "string",
         "enum": [
@@ -4294,6 +4324,21 @@
         "title": "Difficulty",
         "description": "IV-4."
       },
+      "DocumentKind": {
+        "description": "IN-6, IN-7: what kind of document a job description or CV input looks like.",
+        "enum": [
+          "job_posting",
+          "job_list",
+          "resume",
+          "cover_letter",
+          "company_page",
+          "article",
+          "error_page",
+          "other"
+        ],
+        "title": "DocumentKind",
+        "type": "string"
+      },
       "Education": {
         "properties": {
           "institution": {
@@ -4806,6 +4851,32 @@
         ],
         "title": "HireSignal",
         "description": "FB-1. Ordered from strongest to weakest."
+      },
+      "InputCheck": {
+        "additionalProperties": false,
+        "description": "Is the text the kind of document the user gave it as (IN-6 job description, IN-7 CV)?\n\nThe worker runs this check before the extraction. When `matches` is false, it refuses the\ninput and shows the user a fixed sentence for `looks_like` with the short `reason`.",
+        "properties": {
+          "matches": {
+            "title": "Matches",
+            "type": "boolean"
+          },
+          "looks_like": {
+            "$ref": "#/components/schemas/DocumentKind"
+          },
+          "reason": {
+            "default": "",
+            "description": "One short sentence on what the text is.",
+            "maxLength": 200,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "matches",
+          "looks_like"
+        ],
+        "title": "InputCheck",
+        "type": "object"
       },
       "InterviewType": {
         "type": "string",
