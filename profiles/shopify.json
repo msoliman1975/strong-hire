@@ -1,0 +1,521 @@
+{
+  "company_name": "Shopify",
+  "company_slug": "shopify",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-10",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Shopify Values",
+    "principles": [
+      {
+        "name": "Merchant Obsessed",
+        "description": "Make commerce better for everyone by caring about the merchants, often small business owners, whose livelihoods run on the platform.",
+        "evidence_signals": [
+          "Frames the outcome in terms of the merchant or end customer: sales protected, time saved, risk removed",
+          "Shows direct contact with users or merchants and how it changed a decision",
+          "Weighs reliability for small businesses when making technical trade-offs"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "Thrive on Change",
+        "description": "Stay effective, even energized, in an unpredictable environment with frequent reorganizations and shifting priorities.",
+        "evidence_signals": [
+          "Describes a reorg, pivot or cancelled project and how they adapted quickly",
+          "Shows comfort shipping under ambiguity without waiting for full clarity",
+          "Talks about change as an opportunity rather than a grievance"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Build for the Long Term",
+        "description": "Make decisions and build systems meant to outlast the current sprint; trade short-term wins for durable value when it matters.",
+        "evidence_signals": [
+          "Explains a decision that paid off later, such as investing in tests, tooling or a clean data model",
+          "Names the technical or product debt they avoided or paid down and why",
+          "Considers maintainability and future scale in design discussions"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Be a Constant Learner",
+        "description": "Growth is an expectation: seek out new skills, reflect on mistakes, and keep a steep slope of improvement over time.",
+        "evidence_signals": [
+          "Life story shows a clear upward slope and deliberate learning choices",
+          "Reflects honestly on failures and the lessons applied afterward",
+          "Describes learning a new domain or tool quickly and applying it"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "High Agency and Execution",
+        "description": "Care deeply and get things done: obsess over problems, build out loud, start scrappy and still ship with craft.",
+        "evidence_signals": [
+          "Made deliberate choices at career decision points instead of drifting",
+          "Drove an outcome personally rather than letting it happen to them",
+          "Shipped something polished from a scrappy start, with attention to craft"
+        ],
+        "weight": 1.3
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["L4", "L5", "L6", "L7", "L8", "L9"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter (talent acquisition)",
+          "notes": "Background, motivation, level calibration. Not simulated in v1."
+        },
+        {
+          "name": "Life Story",
+          "interview_type": "behavioral",
+          "duration_min": 60,
+          "interviewer_role": "Talent acquisition partner or senior employee",
+          "notes": "Conversational walk through the whole career: decision points, setbacks, lessons. Reported to be heavily weighted."
+        },
+        {
+          "name": "Craft assessment and pair programming",
+          "interview_type": null,
+          "duration_min": 90,
+          "interviewer_role": "Software developer",
+          "notes": "Online assessment, then practical pair programming in the candidate's own IDE; AI tools may be allowed. Not simulated in v1."
+        },
+        {
+          "name": "Technical deep dive / system design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior or staff developer",
+          "notes": "Deep dive on a past project, or design of a commerce system such as checkout or inventory under flash-sale load."
+        },
+        {
+          "name": "Team placement / hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Engineering manager",
+          "notes": "Team fit and matching after the craft interviews."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": ["Product Manager", "Senior Product Manager", "Group Product Manager"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Motivation and background. Not simulated in v1."
+        },
+        {
+          "name": "Life Story",
+          "interview_type": "behavioral",
+          "duration_min": 60,
+          "interviewer_role": "Talent acquisition partner",
+          "notes": "Reported traits: impact, trust, engagement, self-awareness and readiness."
+        },
+        {
+          "name": "Product case study",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Senior product manager",
+          "notes": "Live case built around a real merchant problem; the process matters more than the answer."
+        },
+        {
+          "name": "Thought leadership / product vision",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Product leader",
+          "notes": "Market perspective, product vision and past decisions."
+        },
+        {
+          "name": "Dev/UX partner interview",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineer and designer",
+          "notes": "Cross-functional collaboration. Some recent loops add a prototyping or vibe-coding exercise."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Life story decision points",
+      "pattern": "Walk through the candidate's life and career, explaining why they made each major choice and what made them move on",
+      "competencies": ["communication", "ownership"],
+      "values": ["High Agency and Execution", "Be a Constant Learner"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Trophies and bruises",
+      "pattern": "A period when things were not working, what the candidate did about it, and what they learned",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Be a Constant Learner"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Adapting to change",
+      "pattern": "A reorg, pivot or sudden priority change and how the candidate stayed effective",
+      "competencies": ["ownership", "collaboration"],
+      "values": ["Thrive on Change"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Helping merchants or creators",
+      "pattern": "A time the candidate helped a small business, creator or customer succeed and how they knew it worked",
+      "competencies": ["impact", "communication"],
+      "values": ["Merchant Obsessed"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Past project deep dive",
+      "pattern": "Detailed walk-through of a past project on the resume: decisions, trade-offs, own role and long-term result",
+      "competencies": ["depth_of_experience", "judgment", "scope_at_level"],
+      "values": ["Build for the Long Term"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Remote and async work",
+      "pattern": "How the candidate communicates and collaborates in a remote-first, written-first team",
+      "competencies": ["team_fit", "role_fit"],
+      "values": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Motivation",
+      "pattern": "What motivates the candidate and why commerce and Shopify in particular",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["Merchant Obsessed"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Commerce at peak load",
+      "pattern": "Design or discuss checkout, cart or inventory systems that stay correct during flash sales or holiday peaks",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Merchant Obsessed"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Multi-tenant platform",
+      "pattern": "Explain how to isolate tenants, shard data and protect co-tenant stores when one store goes viral",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["Build for the Long Term"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Merchant problem case",
+      "pattern": "Take a real merchant pain point, frame the problem, choose a merchant segment and propose a solution with metrics",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Merchant Obsessed"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Platform and ecosystem",
+      "pattern": "Reason about supply and demand in a two-sided ecosystem such as the app store or partners, and recommend a change",
+      "competencies": ["structure", "user_and_business_sense", "recommendation"],
+      "values": ["Build for the Long Term"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Metrics and experiments",
+      "pattern": "Define success metrics and an experiment for a merchant-facing feature, including guardrails",
+      "competencies": ["problem_framing", "estimation_logic", "structure"],
+      "values": []
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Walk me through your life story, starting wherever you think it makes sense.",
+      "strong_answer": "Picks a sensible starting point and moves through key chapters in 10 to 15 minutes, leaving room for follow-ups. At each decision point (school, first job, moves) explains why, showing deliberate choice and agency. Includes setbacks as well as wins and the lessons taken forward. Shows a rising slope of growth. Pitfall: reciting the resume, or a narrative where things just happened to the candidate.",
+      "competencies": ["communication", "ownership"],
+      "values": ["High Agency and Execution", "Be a Constant Learner"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-shopify-behavioral-interview-questions-and-how-to-answer-them"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Why did you choose your first job, and what made you decide to leave it?",
+      "strong_answer": "Gives the real reasoning at the time, including trade-offs considered, and the specific trigger for leaving: growth plateau, a new challenge, a mismatch. Shows forward momentum rather than running away, and what was learned. Keeps it honest and without blaming former employers. Pitfall: vague 'it was time for a change'.",
+      "competencies": ["communication", "learning_from_failure"],
+      "values": ["High Agency and Execution"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-shopify-behavioral-interview-questions-and-how-to-answer-them"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time when things were not working. What was going on and what did you do?",
+      "strong_answer": "Describes a real low point (failing project, poor fit, burnout, team conflict) with specifics. Explains how the candidate diagnosed it, what action they took, and how it turned out. Ends with a lesson they have applied since. Signals: resilience, self-awareness, ownership. Pitfall: a disguised success story or blaming others.",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Be a Constant Learner", "Thrive on Change"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-shopify-behavioral-interview-questions-and-how-to-answer-them"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "What is something you are most proud of that never made it onto your resume?",
+      "strong_answer": "Shares something authentic that shows initiative or resourcefulness: a side business, community work, a hard personal goal. Explains why it mattered and what it reveals about how the candidate works. Brief and genuine. Pitfall: picking something trivial or repeating a resume item.",
+      "competencies": ["ownership", "impact"],
+      "values": ["High Agency and Execution"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-shopify-behavioral-interview-questions-and-how-to-answer-them"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "How have you helped a small business or a creator succeed?",
+      "strong_answer": "Names the business or creator and their concrete problem, what the candidate built or did, and the measurable effect on that business (sales, hours saved, errors avoided). If the experience is indirect, connects engineering or product work to end merchants. Shows empathy for owners with limited time and money. Pitfall: generic customer-focus talk with no real user.",
+      "competencies": ["impact", "communication"],
+      "values": ["Merchant Obsessed"],
+      "source_url": "https://techinterview.org/shopify-interview/"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time your priorities or team changed suddenly. How did you handle it?",
+      "strong_answer": "Describes the change (reorg, cancelled project, new strategy), the candidate's first reaction, and the concrete steps taken to re-plan, hand over or ramp up. Shows ownership of the transition and a positive effect on the team or product. Signals comfort with ambiguity. Pitfall: complaining about leadership or waiting passively for clarity.",
+      "competencies": ["ownership", "collaboration"],
+      "values": ["Thrive on Change"],
+      "source_url": "https://www.techinterview.org/post/3233476853/what-shopify-tests-engineering-interviews/"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "What motivates you, and tell me about a time you worked really well on a team.",
+      "strong_answer": "Gives a specific, honest motivation and backs it with evidence from past choices. Then a concrete team story: the goal, the candidate's role, how they communicated and supported others, and the result. Connects motivation to the role and Shopify's mission. Pitfall: clichés like 'I love challenges' with no example.",
+      "competencies": ["motivation", "team_fit"],
+      "values": [],
+      "source_url": "https://www.aced.io/experiences/shopify-senior-product-manager-interview-516d5b"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Pick a project from your resume and walk me through the key decisions you made and why.",
+      "strong_answer": "Chooses a project at the target level, explains the context and goal, then two or three key decisions with the options considered and the reasoning. Clarifies own role versus the team. Covers the outcome, including what happened long after launch, and what the candidate would change. Expect many follow-ups. Pitfall: shallow overview or not knowing details.",
+      "competencies": ["depth_of_experience", "judgment", "scope_at_level"],
+      "values": ["Build for the Long Term"],
+      "source_url": "https://www.aced.io/experiences/shopify-senior-product-manager-interview-516d5b"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "How do you communicate and keep work moving in a remote-first team that relies on written, async collaboration?",
+      "strong_answer": "Describes concrete practices: design docs, written updates, clear decision records, choosing sync time sparingly. Gives an example where good writing unblocked a team or avoided a mistake. Mentions time zones and inclusivity. Pitfall: saying 'I just use Slack' or relying on meetings for everything.",
+      "competencies": ["team_fit", "role_fit"],
+      "values": [],
+      "source_url": "https://techinterview.org/shopify-interview/"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design a checkout and inventory system that stays correct during a flash sale with a huge spike of buyers?",
+      "strong_answer": "Clarifies scale and correctness goals (no overselling, checkout availability). Covers a waiting room or queue to smooth traffic, inventory reservation with expiry, atomic decrements in a cache with a durable commit, idempotent payment calls, and isolation so other stores are unaffected. Discusses graceful degradation: drop non-critical features before checkout. Pitfall: ignoring overselling or the merchant impact of downtime.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Merchant Obsessed"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-is-the-shopify-interview-process-like-round-by-round"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you structure a multi-tenant commerce platform so one store's traffic spike does not hurt other stores?",
+      "strong_answer": "Explains tenant isolation options (shared database with tenant id, sharding by shop, pods or cells), per-shop rate limits, and moving a hot shop. Discusses trade-offs of cost, operational complexity and blast radius, plus how to rebalance shards over time. Mentions observability per tenant. Pitfall: one big database with no isolation plan.",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["Build for the Long Term"],
+      "source_url": "https://techinterview.org/shopify-interview/"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "If search is degraded and checkout is at risk at the same time during a peak, how would you decide what to protect and how would you design for that?",
+      "strong_answer": "Prioritizes checkout because it directly protects merchant revenue, then explains load shedding, feature flags, circuit breakers and separate capacity for critical paths. Describes how to detect the problem with metrics and alerts and how to communicate during the incident. Pitfall: treating all services as equally important.",
+      "competencies": ["reasoning", "trade_offs", "accuracy"],
+      "values": ["Merchant Obsessed"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-is-the-shopify-interview-process-like-round-by-round"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Explain how you would model products, variants and inventory across several locations for an online store.",
+      "strong_answer": "Proposes a clear data model (product, variant or SKU, inventory item, location, inventory level) and explains how orders reserve and decrement stock, including fulfillment from several locations. Discusses consistency, concurrency on stock counts and how the model extends to bundles or returns. Pitfall: storing stock as one number on the product.",
+      "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
+      "values": ["Build for the Long Term"],
+      "source_url": "https://techinterview.org/shopify-interview/"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you improve the returns process for merchants and their customers?",
+      "strong_answer": "Clarifies the goal and picks a merchant segment (for example small apparel stores). Maps the return journey for both merchant and buyer, finds the biggest pains (cost, manual work, fraud, refunds delay), proposes options and prioritizes one with clear reasoning. Defines success metrics and guardrails such as return rate and merchant time spent. Pitfall: designing only for shoppers and forgetting the merchant.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Merchant Obsessed"],
+      "source_url": "https://www.interviewquery.com/interview-guides/shopify-product-manager"
+    },
+    {
+      "interview_type": "case",
+      "question": "Design a way to help new merchants choose and buy a domain name, keeping search visibility in mind.",
+      "strong_answer": "Starts with the new merchant's goals and knowledge level, then the moments where a domain decision happens during setup. Proposes a guided flow with suggestions, availability check and simple SEO guidance, and discusses the business model. Prioritizes a V1 and metrics such as custom domain adoption and store launch rate. Pitfall: deep SEO detail while ignoring a non-technical user.",
+      "competencies": ["problem_framing", "user_and_business_sense", "structure"],
+      "values": ["Merchant Obsessed"],
+      "source_url": "https://www.interviewquery.com/interview-guides/shopify-product-manager"
+    },
+    {
+      "interview_type": "case",
+      "question": "The app store has an imbalance between the apps merchants need and the apps developers build. How would you analyze and fix it?",
+      "strong_answer": "Frames it as a two-sided marketplace and defines supply (apps, developers) and demand (merchant needs, searches without good results). Proposes data to find gaps, then levers for each side: developer incentives, discovery and ranking, quality bars. Prioritizes and defines metrics like install success and merchant retention. Pitfall: only fixing one side.",
+      "competencies": ["structure", "user_and_business_sense", "recommendation"],
+      "values": ["Build for the Long Term"],
+      "source_url": "https://www.interviewquery.com/interview-guides/shopify-product-manager"
+    },
+    {
+      "interview_type": "case",
+      "question": "Prototype, or describe, a solution that helps shop owners find and access the right apps from the app marketplace.",
+      "strong_answer": "Clarifies who the shop owner is and why finding apps is hard today. Proposes a focused solution (recommendations based on store type, guided setup, trials) and explains what a quick prototype would test first. Defines success metrics and how feedback would shape iteration. Shows bias to building and learning. Pitfall: a long spec with nothing testable.",
+      "competencies": ["problem_framing", "prioritization", "recommendation"],
+      "values": ["Merchant Obsessed", "High Agency and Execution"],
+      "source_url": "https://www.aced.io/experiences/shopify-senior-product-manager-interview-516d5b"
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "L4",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Early-career developer; delivers scoped tasks with support and grows craft quickly."
+    },
+    {
+      "level_name": "L5",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Software developer; proficient, owns features and contributes to improving the product within a team."
+    },
+    {
+      "level_name": "L6",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Senior developer; designs and implements complex solutions, leads projects and mentors other developers."
+    },
+    {
+      "level_name": "L7",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Staff developer; sets technical direction across teams and solves cross-cutting problems."
+    },
+    {
+      "level_name": "L8",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Senior staff developer; shapes architecture for a large area of the platform."
+    },
+    {
+      "level_name": "Senior Product Manager",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns a merchant-facing product area, its vision and metrics, and can prototype and test ideas quickly."
+    }
+  ],
+  "persona": {
+    "tone": "Casual, curious and direct; a conversation rather than an interrogation",
+    "pace": "Brisk, with frequent 'why' follow-ups at each decision point",
+    "pushback_style": "Asks why the candidate made a choice, what was going on when things went wrong, and how merchants were affected",
+    "closing_style": "Leaves time for questions and checks what the candidate wants to learn next"
+  },
+  "scoring_weights": {
+    "ownership": 1.4,
+    "learning_from_failure": 1.3,
+    "impact": 1.2,
+    "communication": 1.2,
+    "judgment": 1.2,
+    "depth_of_experience": 1.2,
+    "trade_offs": 1.2,
+    "technical_depth": 1.1,
+    "user_and_business_sense": 1.4,
+    "problem_framing": 1.2
+  },
+  "values_share": 0.35,
+  "case_style": {
+    "product_sense": 0.6,
+    "estimation": 0.1,
+    "system_thinking": 0.3,
+    "notes": "Cases start from a real merchant problem and value the process over the final answer; ecosystem and platform reasoning is common, estimation is rare. Some PM loops now include prototyping."
+  },
+  "sources": [
+    {
+      "url": "https://www.shopify.com/careers",
+      "title": "Shopify Careers",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://www.shopify.com/au/careers/candidate-guide",
+      "title": "Shopify candidate guide",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "persona"]
+    },
+    {
+      "url": "https://www.shopify.com/news/thriving-on-change",
+      "title": "Thriving on change (Shopify news)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/top-shopify-behavioral-interview-questions-and-how-to-answer-them",
+      "title": "Top Shopify behavioral interview questions",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework", "question_patterns", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/what-is-the-shopify-interview-process-like-round-by-round",
+      "title": "What is the Shopify interview process like, round by round",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.techinterview.org/post/3233476853/what-shopify-tests-engineering-interviews/",
+      "title": "What Shopify actually tests in its engineering interviews",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "values_framework", "scoring_weights"]
+    },
+    {
+      "url": "https://techinterview.org/shopify-interview/",
+      "title": "Shopify interview guide",
+      "retrieved_at": "2026-10-10",
+      "fields": ["question_patterns"]
+    },
+    {
+      "url": "https://www.aced.io/guides/shopify-product-manager-interview",
+      "title": "Shopify product manager interview guide",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "case_style"]
+    },
+    {
+      "url": "https://www.aced.io/experiences/shopify-senior-product-manager-interview-516d5b",
+      "title": "Shopify senior product manager interview experience",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.interviewquery.com/interview-guides/shopify-product-manager",
+      "title": "Shopify product manager interview guide (Interview Query)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.levels.fyi/company/Shopify/salaries/Software-Engineer/L7",
+      "title": "Shopify software engineer levels (Levels.fyi)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["bar_by_level"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "medium",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "medium",
+    "scoring_weights": "low",
+    "case_style": "medium"
+  },
+  "low_confidence_notes": [
+    "values_framework: Shopify has no single stable values list; the current careers page groups values as building different, high agency and execution, and collaborative growth, while merchant obsession, thrive on change, build for the long term and constant learning come from Shopify news and third-party guides. Principle names are ours.",
+    "loop_structure: round durations differ between guides (pair programming 60 to 90 minutes); PM loop names come from one prep guide plus one candidate report.",
+    "bar_by_level: level numbering conflicts between sources (one guide maps L3 to L6 to developer through principal; Levels.fyi maps L5 to developer and L6 to senior). We follow Levels.fyi; L4 scope is inferred.",
+    "scoring_weights: no public source gives weights; set from the Life Story emphasis on agency, slope and resilience.",
+    "question_patterns: the three PM case topics (returns, domains, app store balance) were seen in search result summaries of Interview Query and Exponent; the full pages were not opened."
+  ]
+}

@@ -1,0 +1,558 @@
+{
+  "company_name": "Netflix",
+  "company_slug": "netflix",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-10",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Netflix Culture Memo values",
+    "principles": [
+      {
+        "name": "Judgment",
+        "description": "Make wise decisions for the long term, using data and intuition, and get to the core of hard problems despite ambiguity.",
+        "evidence_signals": [
+          "Explains the options considered and why one was chosen, including what data and what intuition drove it",
+          "Separates root cause from symptom and names the long-term cost of a short-term fix",
+          "Describes making a call with incomplete information and how it was checked afterwards"
+        ],
+        "weight": 1.5
+      },
+      {
+        "name": "Candor",
+        "description": "Give and ask for direct, honest feedback, say what you think even when it is uncomfortable, and admit mistakes openly.",
+        "evidence_signals": [
+          "Gives a concrete example of feedback given to a peer or manager, and how it was received",
+          "Describes critical feedback received and the specific change made because of it",
+          "Admits own mistakes plainly without blaming others"
+        ],
+        "weight": 1.5
+      },
+      {
+        "name": "Selflessness",
+        "description": "Put what is best for Netflix ahead of personal or team interest, and help colleagues succeed.",
+        "evidence_signals": [
+          "Chose the outcome that was best for the company over the one that made own team look good",
+          "Shares credit and describes helping others unblock their work",
+          "Disagrees and commits, then supports the decision fully"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Courage",
+        "description": "Say what you think when it is in Netflix's interest, take smart risks, and question actions that are not aligned with the values.",
+        "evidence_signals": [
+          "Describes dissenting from a senior person's decision and how the dissent was raised",
+          "Took a calculated risk that could have failed, and explains the reasoning",
+          "Raised an unpopular concern early instead of waiting"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Curiosity",
+        "description": "Learn rapidly and eagerly, seek perspectives different from your own, and contribute beyond your own specialty.",
+        "evidence_signals": [
+          "Gives an example of learning a new domain quickly to solve a problem",
+          "Actively asked for opinions that differed from own view and changed course because of them"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Creativity",
+        "description": "Welcome new ideas and approaches, and find practical new solutions to hard problems.",
+        "evidence_signals": [
+          "Proposes a non-obvious approach and explains why the obvious one was weaker",
+          "Shows an idea taken from concept to a shipped or tested result"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Inclusion",
+        "description": "Counter biases, ensure everyone can do their best work, and seek out different viewpoints.",
+        "evidence_signals": [
+          "Describes making room for quieter or different voices in a decision",
+          "Notices and corrects for bias in a process such as hiring, reviews or design"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Resilience",
+        "description": "Adapt quickly to change, recover from setbacks, and keep going on hard challenges.",
+        "evidence_signals": [
+          "Describes a setback or failure and the concrete recovery steps",
+          "Adjusted plans quickly when the situation changed, without losing momentum"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "People over process",
+        "description": "Freedom and responsibility: act with context and good judgment rather than rules and approvals, and own the result.",
+        "evidence_signals": [
+          "Made a significant decision without waiting for approval, with context shared openly",
+          "Takes full responsibility for outcomes of own decisions, good or bad",
+          "Prefers giving context to others over controlling them"
+        ],
+        "weight": 1.3
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["L3", "L4", "L5", "L6", "L7"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, motivation and familiarity with the culture memo. Not simulated in v1."
+        },
+        {
+          "name": "Technical screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Practical live coding tied to the team's domain. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager interview",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager",
+          "notes": "Past work, how feedback was received, dissent, team fit. Can happen before or after the onsite."
+        },
+        {
+          "name": "Onsite coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Practical coding round. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior software engineer",
+          "notes": "Deep design discussion with many follow-ups on trade-offs; candidates report up to two design rounds."
+        },
+        {
+          "name": "Data modeling or second design round",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior software engineer",
+          "notes": "Team dependent; for example data models behind an ads or content workflow."
+        },
+        {
+          "name": "Culture and behavioral interviews",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineers and managers from the team or partner teams",
+          "notes": "Probes the culture memo values: judgment, candor, selflessness, courage. Often more than one round."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": ["Product Manager", "Senior Product Manager", "Director, Product"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": "behavioral",
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Why Netflix and views on the culture memo."
+        },
+        {
+          "name": "Hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Product leader (hiring manager)",
+          "notes": "Deep dive on experience; often followed by a take-home case."
+        },
+        {
+          "name": "Case study presentation",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Panel of product and engineering leaders",
+          "notes": "Short presentation of the take-home case, then questions."
+        },
+        {
+          "name": "Product sense and strategy",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product manager",
+          "notes": "Improve Netflix for a segment, metrics, experimentation trade-offs."
+        },
+        {
+          "name": "Cross-functional interviews",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineering, data science or design partner",
+          "notes": "Influence without authority and working through disagreement."
+        },
+        {
+          "name": "Final culture interview",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Recruiter or senior leader",
+          "notes": "In-depth discussion of the culture memo values."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Dissent",
+      "pattern": "A time the candidate disagreed with a decision made above them, how they raised it, and what happened if they could not persuade others",
+      "competencies": ["conflict_handling", "communication"],
+      "values": ["Courage", "Candor", "Selflessness"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Receiving critical feedback",
+      "pattern": "Hard feedback the candidate received and how it changed their behavior over time",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Candor", "Curiosity"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Giving feedback",
+      "pattern": "A time the candidate gave direct feedback to a peer or manager, and how they framed it",
+      "competencies": ["communication", "collaboration"],
+      "values": ["Candor", "Inclusion"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Acting with ambiguity and freedom",
+      "pattern": "A significant decision the candidate made without a clear owner or approval, and how they owned the result",
+      "competencies": ["ownership", "impact"],
+      "values": ["People over process", "Judgment"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Failure and recovery",
+      "pattern": "A project or bet that did not work, what the candidate learned, and what they did next",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Resilience", "Candor"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Reaction to the culture memo",
+      "pattern": "Which parts of the culture memo the candidate agrees with, which they find hard, and why",
+      "competencies": ["communication"],
+      "values": ["Candor", "Judgment"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Complex project walk-through",
+      "pattern": "The most complex project the candidate led: why it was complex, own decisions, and measurable outcome",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Judgment"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Motivation and fit",
+      "pattern": "Why Netflix and this team now, and what the candidate wants from the next role",
+      "competencies": ["motivation", "team_fit"],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Large-scale design with trade-offs",
+      "pattern": "Design a high-scale service close to the team's domain (streaming, ads, recommendations), then defend trade-offs under follow-up",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Judgment"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Platform ownership decisions",
+      "pattern": "An engineering-org trade-off such as owning a shared library versus documenting an API for others to build on",
+      "competencies": ["trade_offs", "clarity_of_explanation"],
+      "values": ["Selflessness", "Judgment"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Data modeling",
+      "pattern": "Model the entities and relationships for a business workflow and explain access patterns and consistency choices",
+      "competencies": ["technical_depth", "accuracy", "trade_offs"],
+      "values": []
+    },
+    {
+      "interview_type": "case",
+      "theme": "Improve Netflix for a segment",
+      "pattern": "Pick a member segment, identify an unmet need, propose a feature, and define how an A/B test would judge it",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Creativity", "Judgment"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Metrics for a streaming product",
+      "pattern": "Define the metrics that show whether a Netflix feature or business line is healthy, including guardrails",
+      "competencies": ["structure", "user_and_business_sense", "recommendation"],
+      "values": ["Judgment"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Strategy bet",
+      "pattern": "Decide on a new market, product line or top company priorities and argue for it with risks",
+      "competencies": ["problem_framing", "prioritization", "recommendation"],
+      "values": ["Courage", "Judgment"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you disagreed with a decision and could not convince the people who made it. What did you do afterwards?",
+      "strong_answer": "Pick a real, substantive disagreement, not a style preference. Explain the decision, your reasoning and data, and how you raised the dissent directly with the decision maker. The key Netflix signal is what happened after losing: you committed fully, helped execute, and later checked whether you were right, without passive resistance. Show you separated ego from outcome. Pitfalls: a story where you were secretly proven right and gloat, or where you escalated around people instead of talking to them.",
+      "competencies": ["conflict_handling", "communication", "collaboration"],
+      "values": ["Courage", "Candor", "Selflessness"],
+      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you had to move forward in a situation with a lot of ambiguity. How did you decide what to do?",
+      "strong_answer": "Describe the unknowns concretely (unclear goal, owner, or data). Show how you created clarity: framed the problem, gathered the minimum facts, made a reversible call, and set checkpoints. Netflix interviewers look for independent judgment without waiting for permission, plus sharing context with others so they could act. End with the outcome and what you would change. Pitfall: describing ambiguity that was resolved by your manager telling you what to do.",
+      "competencies": ["ownership", "impact"],
+      "values": ["Judgment", "People over process"],
+      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Talk about a complex project you led. What made it complex, and how did you deal with that complexity?",
+      "strong_answer": "Name the sources of complexity: technical, organizational, or timeline. Explain your own decisions using 'I', the trade-offs you made, and the people you aligned. Quantify the result. Netflix probes depth, so be ready for follow-ups on edge cases and why you rejected alternatives. Mention one thing that went wrong and how you handled it openly. Pitfall: listing team activities with no clear personal contribution.",
+      "competencies": ["ownership", "impact", "communication"],
+      "values": ["Judgment"],
+      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Which ideas in the Netflix culture memo stood out to you, and was anything surprising or something you would push back on?",
+      "strong_answer": "Show you actually read the memo. Name two or three specific ideas (for example the keeper test, candor, or context over control) and connect each to a real experience of yours. Then give an honest point of tension, such as how candor can go wrong without care, and how you would handle it. Netflix values a genuine, thoughtful view over flattery. Pitfall: generic praise, or claiming you agree with everything.",
+      "competencies": ["communication"],
+      "values": ["Candor", "Judgment"],
+      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Give an example of working with a difficult coworker and how you handled the relationship.",
+      "strong_answer": "Describe the behavior, not the person's character. Show that you addressed it directly and early with candid but respectful feedback, tried to understand their view, and focused on the shared goal. Include what changed and what you learned about yourself. Netflix expects candor plus decency; brilliant but unkind behavior is not tolerated. Pitfall: going to the manager first or complaining without having talked to the person.",
+      "competencies": ["conflict_handling", "collaboration", "communication"],
+      "values": ["Candor", "Inclusion"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/netflix-product-manager-interview"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Tell me about a time you received critical feedback. How have you kept applying it since then?",
+      "strong_answer": "Pick feedback that stung and was valid. Say who gave it, what it was, and your first reaction honestly. The strong part is the follow-through: specific behavior changes, how you checked they worked, and ideally a later example. Netflix wants people who seek feedback, not only accept it. Bonus: you thanked the person and now ask for feedback regularly. Pitfall: a 'weakness' that is really a strength.",
+      "competencies": ["learning_from_failure", "communication", "judgment"],
+      "values": ["Candor", "Curiosity"],
+      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Tell me about a time you dissented from a team or leadership decision. Can you give a second, different example?",
+      "strong_answer": "Prepare more than one dissent story, because Netflix often asks for a second one. Vary them: one where you changed the outcome and one where you did not. For each, show how you raised the concern directly, with data, at the right time, and how you behaved after the decision. The interviewer checks that dissent is a habit, not a one-off. Pitfall: running out of stories, or stories where you only complained privately.",
+      "competencies": ["judgment", "team_fit", "depth_of_experience"],
+      "values": ["Courage", "Candor"],
+      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "How do you use AI tools in your daily engineering work?",
+      "strong_answer": "Be concrete: which tasks you use AI for (code drafts, tests, exploring unfamiliar code, writing docs), how you verify the output, and where you do not trust it. Show judgment about correctness, security and review. A short example of AI speeding up real work, and one where it misled you and how you caught it, works well. Pitfall: either dismissing the tools or over-claiming without verification habits.",
+      "competencies": ["judgment", "role_fit"],
+      "values": ["Judgment", "Curiosity"],
+      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Walk me through your main achievements in your current role, and tell me something about you that is not on your resume.",
+      "strong_answer": "Choose two or three achievements with clear scope, your personal decisions, and measurable impact. Tie them to what this team needs. For the off-resume part, share something authentic that shows curiosity or resilience. Netflix hires for senior-level independence, so show you operated with little oversight. Pitfall: reading the resume back or claiming team results as your own.",
+      "competencies": ["depth_of_experience", "scope_at_level", "motivation"],
+      "values": [],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/netflix-product-manager-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a frequency capping system for an advertising platform, so a member does not see the same ad more than a set number of times.",
+      "strong_answer": "Clarify the cap rules (per ad, campaign, time window, device vs account) and scale. Propose counters keyed by member and campaign with time windows, a low-latency store, and a decision service on the ad serving path. Discuss accuracy versus latency: approximate counts, eventual consistency across regions, and what happens when the counter store is down (fail open vs fail closed and the business cost of each). Cover data retention and privacy. Strong candidates quantify read/write rates and defend trade-offs when pushed.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Judgment"],
+      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Should a platform team build and own client libraries for its service, or publish good documentation and let other teams write their own clients? Argue your position.",
+      "strong_answer": "Lay out both sides. Owned libraries give consistent retries, auth, metrics and faster upgrades, but cost maintenance, language coverage and coupling. Docs-only gives freedom and less load but leads to divergent, buggy clients. A strong answer picks based on context: number of consumers, languages, how critical correctness is, and team capacity, and may propose a middle path (thin generated clients, reference implementation). Show you think about the whole company, not only your own team's load.",
+      "competencies": ["trade_offs", "clarity_of_explanation", "reasoning"],
+      "values": ["Selflessness", "Judgment"],
+      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design a recommendation system for Netflix that updates as members watch content?",
+      "strong_answer": "Split into offline training, candidate generation, ranking, and online serving. Discuss signals (watch history, completion, time of day, device), feature stores, and how near-real-time events update recommendations. Cover cold start for new members and new titles, latency budgets for the home page, caching per profile, and evaluation through A/B tests rather than offline metrics alone. Trade-offs: freshness vs cost, personalization vs diversity. Pitfall: going deep into ML math while ignoring the serving system.",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["Judgment"],
+      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "What data model would you need so an advertiser can set up a campaign and the system can show its ads to members?",
+      "strong_answer": "Identify entities: advertiser, campaign, budget, flight dates, ad creative, targeting rules, placements, impressions and billing events. Explain relationships and keys, which data is transactional versus high-volume event data, and the read paths at serving time. Discuss denormalizing for fast ad decisions, consistency of budgets, and auditability for billing. Strong answers mention versioning of campaign changes and privacy limits on targeting.",
+      "competencies": ["technical_depth", "accuracy", "trade_offs"],
+      "values": [],
+      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you improve Netflix? Pick one area and walk me through your proposal.",
+      "strong_answer": "Start with Netflix's goal (member joy and retention) and choose a specific segment and problem, for example members who browse and leave without watching. Size the problem, generate a few solutions, pick one with clear reasoning, and define the A/B test: primary metric (such as retention or hours of satisfied viewing) and guardrails. Netflix is experiment-driven, so mention how you would read results. Pitfall: listing many features without choosing.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["Creativity", "Judgment"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/netflix-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you know whether the Netflix recommendation engine is doing a good job?",
+      "strong_answer": "Define what good means for members (finding something they enjoy quickly) and the business (retention). Propose a metric hierarchy: a north star such as retention or satisfied viewing, plus proxies like take rate from rows, time to first play, completion rate, and browse abandonment. Add guardrails such as diversity and catalog coverage. Explain why offline metrics need online A/B confirmation. Pitfall: using clicks alone, which can reward clickbait artwork.",
+      "competencies": ["structure", "user_and_business_sense", "estimation_logic"],
+      "values": ["Judgment"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/netflix-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "Which numbers should Netflix leadership look at every day, and why?",
+      "strong_answer": "Group metrics by question: are we growing (sign-ups, cancellations), are members engaged (viewing hours, active profiles), is the service healthy (play start failures, rebuffering), and is the business working (revenue, ad fill if relevant). Explain why each is daily rather than weekly, and which ones trigger action. Show you know daily data is noisy and needs baselines. Pitfall: a long unprioritized list.",
+      "competencies": ["structure", "user_and_business_sense", "prioritization"],
+      "values": ["Judgment"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/netflix-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "If you were running Netflix, which new product line would you launch to grow revenue, and how would you test it?",
+      "strong_answer": "State the growth lever (new members, higher revenue per member, or new revenue streams). Evaluate two or three options such as live events, games, or ad tiers against member value, fit with the brand, cost and risk. Pick one, explain the first small test and the kill criteria. Netflix rewards bold but reasoned bets, so show courage and judgment together. Pitfall: ignoring cannibalization or cost.",
+      "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
+      "values": ["Courage", "Creativity", "Judgment"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/netflix-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you approach expanding Netflix in a new international market?",
+      "strong_answer": "Frame the decision: which market, why now, and what success means. Use criteria such as broadband and device reach, willingness to pay, local content needs, competition, and payment methods. Propose an entry plan (pricing, local content, partnerships, mobile plans) and the leading metrics to watch. A rough size estimate with stated assumptions helps. Pitfall: copying the home-market plan without local adaptation.",
+      "competencies": ["problem_framing", "estimation_logic", "recommendation"],
+      "values": ["Judgment", "Curiosity"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/netflix-product-manager-interview"
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "L3",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Works on defined tasks with guidance from senior engineers. Rarely hired at Netflix."
+    },
+    {
+      "level_name": "L4",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns a component and delivers moderate-sized projects independently, with high autonomy."
+    },
+    {
+      "level_name": "L5",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Owns a significant system or area end to end and sets its technical direction with minimal supervision. The core Netflix hiring level."
+    },
+    {
+      "level_name": "L6",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Influences several teams or a whole area of Netflix technology and guides technical direction across it."
+    },
+    {
+      "level_name": "L7",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Sets technical direction for a large part of the platform, such as streaming or recommendations."
+    }
+  ],
+  "persona": {
+    "tone": "Direct, candid and adult-to-adult; conversational rather than scripted",
+    "pace": "Moderate, but with many quick follow-ups on details and edge cases",
+    "pushback_style": "Asks for a second example, probes where the candidate disagreed or was wrong, and asks what they would do differently; challenges vague 'we' answers",
+    "closing_style": "Invites candid questions about the culture and how the team really works"
+  },
+  "scoring_weights": {
+    "judgment": 1.5,
+    "ownership": 1.3,
+    "communication": 1.3,
+    "conflict_handling": 1.3,
+    "learning_from_failure": 1.2,
+    "scope_at_level": 1.2,
+    "trade_offs": 1.3,
+    "technical_depth": 1.2,
+    "user_and_business_sense": 1.2,
+    "recommendation": 1.2
+  },
+  "values_share": 0.4,
+  "case_style": {
+    "product_sense": 0.55,
+    "estimation": 0.1,
+    "system_thinking": 0.35,
+    "notes": "Cases center on improving Netflix for a member segment, metrics and A/B testing, and strategic bets. PM loops often include a take-home case presented to a panel. Pure estimation is rare."
+  },
+  "sources": [
+    {
+      "url": "https://jobs.netflix.com/culture",
+      "title": "Netflix culture memo",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://www.aced.io/guides/netflix-software-engineer-interview",
+      "title": "Netflix software engineer interview guide (formerly tryexponent.com)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "persona"]
+    },
+    {
+      "url": "https://igotanoffer.com/blogs/product-manager/netflix-product-manager-interview",
+      "title": "Netflix product manager interview (questions from Glassdoor reports)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.tryexponent.com/guides/netflix-product-manager-interview",
+      "title": "Netflix product manager interview guide",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "case_style"]
+    },
+    {
+      "url": "https://www.designgurus.io/blog/netflix-software-engineer-levels",
+      "title": "Netflix software engineer levels",
+      "retrieved_at": "2026-10-10",
+      "fields": ["bar_by_level"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "medium",
+    "persona": "medium",
+    "scoring_weights": "low",
+    "case_style": "medium"
+  },
+  "low_confidence_notes": [
+    "values_framework: 'People over process' is one of the culture memo's core principles, not one of the eight listed values; added because freedom and responsibility is widely probed.",
+    "loop_structure: Netflix loops vary strongly by team; the number of design and culture rounds is a typical pattern, not a fixed template.",
+    "loop_structure: PM level names are generic; no public source confirms Netflix PM titles.",
+    "bar_by_level: levels L3-L7 come from third-party sources; Netflix historically used a single Senior Software Engineer title.",
+    "scoring_weights: estimated from the culture memo and candidate reports; no public source gives weights."
+  ]
+}

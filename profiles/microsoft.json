@@ -1,0 +1,761 @@
+{
+  "company_name": "Microsoft",
+  "company_slug": "microsoft",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-10",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Microsoft culture and values",
+    "principles": [
+      {
+        "name": "Growth mindset",
+        "description": "Potential is nurtured, not fixed: stay curious, keep learning, experiment, and learn from failure.",
+        "evidence_signals": [
+          "Describes a failure or feedback and a concrete change in behavior afterwards",
+          "Learned a new skill or domain to meet a need",
+          "Talks about experiments and what they learned, not only wins"
+        ],
+        "weight": 1.5
+      },
+      {
+        "name": "Customer obsessed",
+        "description": "Understand customers and their business with a beginner's mind and build solutions that meet their real needs.",
+        "evidence_signals": [
+          "Names the customer and how their need was learned (interviews, telemetry, support data)",
+          "Changed a plan because of customer evidence"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Diverse and inclusive",
+        "description": "Seek out different perspectives and make sure every voice contributes.",
+        "evidence_signals": [
+          "Actively brought quieter or different voices into a decision",
+          "Adapted communication or a product for people unlike themselves"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "One Microsoft",
+        "description": "Work as one company toward a shared mission: build on others' ideas and collaborate across team boundaries.",
+        "evidence_signals": [
+          "Delivered a result that needed several teams or orgs to cooperate",
+          "Reused or built on another team's work instead of starting from zero",
+          "Resolved a cross-team conflict in favor of the shared goal"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Respect",
+        "description": "Treat colleagues and customers with respect, including when disagreeing.",
+        "evidence_signals": [
+          "Describes disagreement without blame and represents the other view fairly",
+          "Gave hard feedback in a respectful way"
+        ],
+        "weight": 0.8
+      },
+      {
+        "name": "Integrity",
+        "description": "Be honest and transparent, including about one's own mistakes and abilities.",
+        "evidence_signals": [
+          "Admits a mistake or a knowledge gap plainly",
+          "Raised a risk or bad news early instead of hiding it"
+        ],
+        "weight": 0.8
+      },
+      {
+        "name": "Accountability",
+        "description": "Own commitments and outcomes, and follow through.",
+        "evidence_signals": [
+          "Uses 'I' for own commitments and explains how they were met",
+          "Followed up after launch to fix what went wrong"
+        ],
+        "weight": 1.0
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": [
+        "59",
+        "60",
+        "61",
+        "62",
+        "63",
+        "64",
+        "65",
+        "66",
+        "67"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, motivation and logistics. Not simulated in v1."
+        },
+        {
+          "name": "Technical screen",
+          "interview_type": null,
+          "duration_min": 45,
+          "interviewer_role": "Software engineer",
+          "notes": "Coding problem and a few behavioral questions. Not simulated in v1."
+        },
+        {
+          "name": "Coding interviews",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineers on the team",
+          "notes": "Two or three loop rounds, each usually opening with behavioral questions. Coding part not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior or principal engineer",
+          "notes": "Mostly for 62 and above. Cloud-scale design with attention to security, enterprise needs and cost."
+        },
+        {
+          "name": "Behavioral and collaboration",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Cross-functional colleague",
+          "notes": "Often folded into the start of each technical round rather than a separate round."
+        },
+        {
+          "name": "As Appropriate (AA)",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Senior manager or hiring manager",
+          "notes": "Final round with a senior leader who has seen earlier feedback; resume, behavioral, sometimes design, and team questions. Often decides the hire."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": [
+        "Product Manager (59-62)",
+        "Senior PM (63-64)",
+        "Principal PM (65-67)"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Hiring manager",
+          "notes": "Alignment on background and the team's area."
+        },
+        {
+          "name": "Product design",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Product manager",
+          "notes": "Open-ended prompts about Microsoft products such as Teams, Copilot or Azure."
+        },
+        {
+          "name": "Analytical and execution",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Product manager",
+          "notes": "Metrics and root-cause diagnosis."
+        },
+        {
+          "name": "Technical",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Engineer",
+          "notes": "Technical parts of the resume, architecture of an AI or cloud feature for senior roles."
+        },
+        {
+          "name": "Behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Product manager or partner",
+          "notes": "STAR answers with reflection; growth mindset and collaboration."
+        },
+        {
+          "name": "As Appropriate (AA)",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Senior leader",
+          "notes": null
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Growth mindset",
+      "pattern": "A time the candidate received hard feedback or failed and how they changed afterwards",
+      "competencies": [
+        "learning_from_failure",
+        "communication"
+      ],
+      "values": [
+        "Growth mindset",
+        "Integrity"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Cross-team collaboration",
+      "pattern": "A result that needed several teams with different priorities to work together",
+      "competencies": [
+        "collaboration",
+        "impact",
+        "communication"
+      ],
+      "values": [
+        "One Microsoft"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Conflict",
+      "pattern": "A disagreement with a teammate or stakeholder and how it was resolved respectfully",
+      "competencies": [
+        "conflict_handling",
+        "collaboration"
+      ],
+      "values": [
+        "Respect",
+        "One Microsoft"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Influence without authority",
+      "pattern": "A time the candidate had to influence a team or partner they did not manage",
+      "competencies": [
+        "collaboration",
+        "ownership",
+        "communication"
+      ],
+      "values": [
+        "One Microsoft"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Including other perspectives",
+      "pattern": "A time the candidate sought out a different perspective that changed a decision or product",
+      "competencies": [
+        "collaboration",
+        "communication"
+      ],
+      "values": [
+        "Diverse and inclusive",
+        "Customer obsessed"
+      ]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Resume deep dive",
+      "pattern": "Walk through the technical parts of a past project, own decisions and what the candidate would change",
+      "competencies": [
+        "depth_of_experience",
+        "scope_at_level",
+        "judgment"
+      ],
+      "values": [
+        "Accountability"
+      ]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Why Microsoft",
+      "pattern": "Why Microsoft, why this team, and what the candidate wants to learn next",
+      "competencies": [
+        "motivation",
+        "team_fit",
+        "role_fit"
+      ],
+      "values": [
+        "Growth mindset"
+      ]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Cloud-scale design",
+      "pattern": "Design a Microsoft-style cloud or collaboration service with attention to scale, security, enterprise needs and cost",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "reasoning",
+        "clarity_of_explanation"
+      ],
+      "values": [
+        "Customer obsessed"
+      ]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Technical challenge discussion",
+      "pattern": "Explain a hard technical problem from past work, the options considered and the final trade-off",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "accuracy"
+      ],
+      "values": [
+        "Growth mindset"
+      ]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Improve a Microsoft product",
+      "pattern": "Improve a Microsoft product for a specific user group, with prioritization and success metrics",
+      "competencies": [
+        "problem_framing",
+        "user_and_business_sense",
+        "prioritization",
+        "recommendation"
+      ],
+      "values": [
+        "Customer obsessed"
+      ]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Metric diagnosis",
+      "pattern": "A key product metric changed suddenly; find the cause and decide what to do",
+      "competencies": [
+        "problem_framing",
+        "structure",
+        "prioritization"
+      ],
+      "values": [
+        "Customer obsessed"
+      ]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Market opportunity",
+      "pattern": "Assess a new market or segment for a Microsoft product and size the opportunity",
+      "competencies": [
+        "user_and_business_sense",
+        "estimation_logic",
+        "recommendation"
+      ],
+      "values": [
+        "Customer obsessed"
+      ]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you showed a growth mindset.",
+      "strong_answer": "Pick a concrete moment of struggle: a skill gap, a failed attempt or tough feedback. Show the candidate's reaction (curiosity rather than defensiveness), the specific steps taken to learn, and the measurable result. Add a reflection on how it changed their approach later, since Microsoft interviewers like STAR plus reflection. Pitfalls: abstract statements about loving learning, or a story with no setback.",
+      "competencies": [
+        "learning_from_failure",
+        "communication"
+      ],
+      "values": [
+        "Growth mindset"
+      ],
+      "source_url": "https://www.productleadership.com/blog/microsoft-product-manager-interview-questions/"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you had to work with a difficult stakeholder.",
+      "strong_answer": "Describe the stakeholder's goals fairly, not as a villain. Show how the candidate found the underlying concern, adjusted their communication, and found a shared goal. Show the outcome and the state of the relationship after. Reflection on what they would do earlier next time is a plus. Pitfalls: escalation as the only tool, or blaming the stakeholder.",
+      "competencies": [
+        "conflict_handling",
+        "collaboration",
+        "communication"
+      ],
+      "values": [
+        "Respect",
+        "One Microsoft"
+      ],
+      "source_url": "https://www.aced.io/guides/microsoft-pm-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a conflict on your team and how it was resolved.",
+      "strong_answer": "Make the conflict concrete (a design choice, priorities, ownership). Show listening, separating facts from opinions, and agreeing on decision criteria. Show the candidate's specific role in resolving it and the result for the project. Strong answers mention keeping trust and include a reflection. Pitfalls: avoiding the conflict, or a story where the candidate simply won.",
+      "competencies": [
+        "conflict_handling",
+        "collaboration"
+      ],
+      "values": [
+        "Respect",
+        "One Microsoft"
+      ],
+      "source_url": "https://www.levels.fyi/blog/ace-microsoft-hiring.html"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a project that failed or did not go as planned.",
+      "strong_answer": "Choose a real failure with stakes. Own the candidate's part without blame. Explain the root cause, the recovery, and what changed afterwards, with a later example where the lesson helped. Microsoft looks for the growth mindset signal: learning from failure rather than avoiding it. Pitfalls: a disguised success, or no lasting change.",
+      "competencies": [
+        "learning_from_failure",
+        "communication"
+      ],
+      "values": [
+        "Growth mindset",
+        "Integrity",
+        "Accountability"
+      ],
+      "source_url": "https://www.levels.fyi/blog/ace-microsoft-hiring.html"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you used data to improve a product's performance.",
+      "strong_answer": "Name the metric and the customer behavior behind it. Explain how data was gathered (telemetry, experiments), what insight it gave, and the change the candidate drove. Show the measured result and any surprise. Mention A/B testing and guardrail metrics if relevant. Pitfalls: vanity metrics, or data used only to justify a decision already made.",
+      "competencies": [
+        "impact",
+        "ownership"
+      ],
+      "values": [
+        "Customer obsessed",
+        "Growth mindset"
+      ],
+      "source_url": "https://www.productleadership.com/blog/microsoft-product-manager-interview-questions/"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Walk me through the technical parts of your resume.",
+      "strong_answer": "Pick the two most relevant projects and explain each at the right depth: the problem, architecture, the candidate's own decisions, and results. Prepare for 'why' and 'what would you change' follow-ups. Match the story to the scope expected for the level, and tie it to the team's work. Pitfalls: reciting the resume line by line, or vague ownership.",
+      "competencies": [
+        "depth_of_experience",
+        "scope_at_level",
+        "role_fit"
+      ],
+      "values": [
+        "Accountability"
+      ],
+      "source_url": "https://www.aced.io/guides/microsoft-pm-interview"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why do you want to work at Microsoft, and on this team?",
+      "strong_answer": "Show specific knowledge of the team's products and Microsoft's direction, for example in cloud or AI. Link it to the candidate's experience and what they want to learn. Show enthusiasm for the technology and the people. Have good questions ready for the interviewer. Pitfalls: generic answers that fit any company.",
+      "competencies": [
+        "motivation",
+        "team_fit"
+      ],
+      "values": [
+        "Growth mindset"
+      ],
+      "source_url": "https://careers.microsoft.com/us/en/interviewtips"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Describe a technical challenge you faced in a past project and how you worked across functions to solve it.",
+      "strong_answer": "Explain the challenge with enough technical detail to be credible, the options considered and why one was chosen. Show how the candidate worked with other functions (design, PM, other engineering teams) to land it. Quantify impact and mention what they learned. Pitfalls: all technical with no collaboration, or all collaboration with no technical substance.",
+      "competencies": [
+        "depth_of_experience",
+        "judgment",
+        "scope_at_level"
+      ],
+      "values": [
+        "One Microsoft"
+      ],
+      "source_url": "https://www.productleadership.com/blog/microsoft-product-manager-interview-questions/"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design the chat service behind a team collaboration app like Microsoft Teams.",
+      "strong_answer": "Clarify scope: one-to-one and group chat, channels, presence, message history, enterprise compliance. Cover persistent connections (WebSockets) through gateway servers, message routing and fan-out, storage partitioned by conversation, ordering and delivery guarantees, offline sync, search, and retention or legal hold for enterprises. Discuss scaling large channels and multi-region trade-offs. Pitfalls: ignoring enterprise requirements such as compliance and tenant isolation.",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "reasoning",
+        "clarity_of_explanation"
+      ],
+      "values": [
+        "Customer obsessed"
+      ],
+      "source_url": "https://designgurus.io/blog/microsoft-system-design-interview-questions"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design a cloud file storage and sync service like OneDrive?",
+      "strong_answer": "Clarify file sizes, devices per user and sharing. Cover chunking and deduplication, metadata service versus blob storage, the sync protocol with change journals, conflict handling when two devices edit, sharing permissions, and versioning. Discuss bandwidth savings, consistency of metadata, encryption, and cost of storage tiers. Pitfalls: re-uploading whole files on every change, or no conflict strategy.",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "reasoning"
+      ],
+      "values": [
+        "Customer obsessed"
+      ],
+      "source_url": "https://designgurus.io/blog/microsoft-system-design-interview-questions"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design an enterprise notification service that sends alerts by email, push and in-app messages.",
+      "strong_answer": "Clarify volume, priority levels and delivery guarantees. Cover an intake API, a queue per channel, templates and user preferences, rate limiting, retries with backoff, deduplication, and tracking delivery status. Address tenant isolation, quiet hours, and failover between providers. Discuss at-least-once delivery trade-offs. Pitfalls: sending synchronously from the caller, or no handling for provider outages.",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "clarity_of_explanation"
+      ],
+      "values": [
+        "Customer obsessed"
+      ],
+      "source_url": "https://designgurus.io/blog/microsoft-system-design-interview-questions"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Explain how you would architect a real-time collaboration feature end to end.",
+      "strong_answer": "Clarify what is shared (documents, whiteboard, cursors) and latency targets. Explain the real-time channel, the concurrency approach (operational transformation or CRDTs), persistence and snapshots, presence, and access control. Discuss offline edits, scaling sessions, and failure handling. A PM candidate should explain plainly and focus on trade-offs that affect users. Pitfalls: ignoring concurrent edits.",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "clarity_of_explanation"
+      ],
+      "values": [
+        "Customer obsessed"
+      ],
+      "source_url": "https://www.productleadership.com/blog/microsoft-product-manager-interview-questions/"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you improve Microsoft Teams for remote workers?",
+      "strong_answer": "Clarify the goal (engagement, meeting effectiveness, retention against competitors). Segment remote workers (new hires, frontline, managers, people across time zones) and pick one. Find their key pain, such as meeting fatigue or async coordination. Generate solutions, prioritize by impact and effort, and recommend one with success metrics and guardrails. Pitfalls: a feature list without a user, or ignoring enterprise admin constraints.",
+      "competencies": [
+        "problem_framing",
+        "user_and_business_sense",
+        "prioritization",
+        "recommendation"
+      ],
+      "values": [
+        "Customer obsessed"
+      ],
+      "source_url": "https://www.productleadership.com/blog/microsoft-product-manager-interview-questions/"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you improve the experience of Xbox Game Pass?",
+      "strong_answer": "Clarify the goal (subscriber growth, retention, engagement). Segment players (casual, core, PC, cloud) and pick one. Map their journey: discovering games, starting to play, staying subscribed. Find the biggest drop-off, propose and prioritize solutions such as better discovery, and define metrics like monthly retention and hours played per subscriber. Pitfalls: ignoring content economics or developer partners.",
+      "competencies": [
+        "problem_framing",
+        "user_and_business_sense",
+        "prioritization"
+      ],
+      "values": [
+        "Customer obsessed"
+      ],
+      "source_url": "https://www.productleadership.com/blog/microsoft-product-manager-interview-questions/"
+    },
+    {
+      "interview_type": "case",
+      "question": "Analyze a new market opportunity for Microsoft Surface devices.",
+      "strong_answer": "Define candidate segments (education, frontline workers, creators) and size them with a simple top-down or bottom-up estimate. Assess customer needs, competitors and Microsoft's advantages (Windows, Office, enterprise relationships). Pick one segment, propose a go-to-market approach, and define success metrics and risks. Pitfalls: picking a market without sizing it, or ignoring channel and partner effects.",
+      "competencies": [
+        "user_and_business_sense",
+        "estimation_logic",
+        "recommendation",
+        "structure"
+      ],
+      "values": [
+        "Customer obsessed"
+      ],
+      "source_url": "https://www.productleadership.com/blog/microsoft-product-manager-interview-questions/"
+    },
+    {
+      "interview_type": "case",
+      "question": "Bookings for a ride-sharing app dropped this week. How would you find out why?",
+      "strong_answer": "Confirm the data first (tracking change, time window, compared to what). Segment by region, platform, user type and funnel step. Check internal causes (release, pricing, outages) and external ones (weather, holidays, competitor promotions). Form hypotheses, rank them, and say which data would confirm each. Finish with next steps. Pitfalls: guessing a single cause before locating the drop.",
+      "competencies": [
+        "problem_framing",
+        "structure",
+        "prioritization"
+      ],
+      "values": [
+        "Customer obsessed"
+      ],
+      "source_url": "https://www.aced.io/guides/microsoft-pm-interview"
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "59-60 (Software Engineer)",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Entry level. Delivers well-defined tasks with guidance and learns the team's systems."
+    },
+    {
+      "level_name": "61-62 (Software Engineer II)",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns features independently and contributes to component design."
+    },
+    {
+      "level_name": "63-64 (Senior Software Engineer)",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Leads design of large components, drives projects across a team and mentors others."
+    },
+    {
+      "level_name": "65-67 (Principal Software Engineer)",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Owns technical strategy for a domain or organization and influences several teams."
+    },
+    {
+      "level_name": "Product Manager (59-62)",
+      "normalized_level": "mid",
+      "role_family": "pm",
+      "scope_expectation": "Owns features and their specs and metrics with an engineering team."
+    },
+    {
+      "level_name": "Senior PM (63-64)",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns a product area and its strategy, aligns several teams."
+    },
+    {
+      "level_name": "Principal PM (65-67)",
+      "normalized_level": "staff_principal",
+      "role_family": "pm",
+      "scope_expectation": "Sets direction for a large product area across organizations."
+    }
+  ],
+  "persona": {
+    "tone": "Friendly, conversational and collaborative",
+    "pace": "Moderate; often starts with a few minutes of resume and behavioral talk before the main topic",
+    "pushback_style": "Asks 'how did you decide?' and 'what did you learn?'; gives hints and watches how the candidate takes feedback",
+    "closing_style": "Leaves time for the candidate's questions and expects thoughtful ones about the team"
+  },
+  "scoring_weights": {
+    "learning_from_failure": 1.4,
+    "collaboration": 1.4,
+    "communication": 1.2,
+    "conflict_handling": 1.1,
+    "motivation": 1.2,
+    "team_fit": 1.2,
+    "trade_offs": 1.2,
+    "clarity_of_explanation": 1.2,
+    "user_and_business_sense": 1.2
+  },
+  "values_share": 0.25,
+  "case_style": {
+    "product_sense": 0.55,
+    "estimation": 0.15,
+    "system_thinking": 0.3,
+    "notes": "Product cases center on Microsoft products (Teams, Outlook, Xbox, Azure, Copilot). Metrics and root-cause diagnosis are common; estimation is light. Loops vary by organization because each hiring manager designs their own."
+  },
+  "sources": [
+    {
+      "url": "https://careers.microsoft.com/us/en/culture",
+      "title": "Microsoft culture (Microsoft Careers)",
+      "retrieved_at": "2026-10-10",
+      "fields": [
+        "values_framework",
+        "scoring_weights"
+      ]
+    },
+    {
+      "url": "https://careers.microsoft.com/us/en/interviewtips",
+      "title": "Interview tips (Microsoft Careers)",
+      "retrieved_at": "2026-10-10",
+      "fields": [
+        "values_framework",
+        "loop_structure",
+        "persona"
+      ]
+    },
+    {
+      "url": "https://careers.microsoft.com/v2/global/en/hiring-tips/student-interviewing",
+      "title": "Student interviewing (Microsoft Careers)",
+      "retrieved_at": "2026-10-10",
+      "fields": [
+        "loop_structure",
+        "values_framework"
+      ]
+    },
+    {
+      "url": "https://www.levels.fyi/blog/ace-microsoft-hiring.html",
+      "title": "How to ace Microsoft's hiring process (Levels.fyi)",
+      "retrieved_at": "2026-10-10",
+      "fields": [
+        "loop_structure",
+        "question_patterns",
+        "bar_by_level",
+        "persona"
+      ]
+    },
+    {
+      "url": "https://designgurus.io/blog/microsoft-system-design-interview-questions",
+      "title": "Microsoft system design interview questions (Design Gurus)",
+      "retrieved_at": "2026-10-10",
+      "fields": [
+        "question_patterns",
+        "case_style"
+      ]
+    },
+    {
+      "url": "https://www.productleadership.com/blog/microsoft-product-manager-interview-questions/",
+      "title": "Microsoft product manager interview questions (Product Leadership)",
+      "retrieved_at": "2026-10-10",
+      "fields": [
+        "question_patterns",
+        "loop_structure",
+        "case_style"
+      ]
+    },
+    {
+      "url": "https://www.aced.io/guides/microsoft-pm-interview",
+      "title": "Microsoft PM interview guide (Exponent / Aced)",
+      "retrieved_at": "2026-10-10",
+      "fields": [
+        "loop_structure",
+        "question_patterns",
+        "persona",
+        "case_style"
+      ]
+    },
+    {
+      "url": "https://shiftmag.dev/microsofts-software-engineering-career-ladder-9318/",
+      "title": "Microsoft's software engineering career ladder (ShiftMag)",
+      "retrieved_at": "2026-10-10",
+      "fields": [
+        "bar_by_level"
+      ]
+    },
+    {
+      "url": "https://www.designgurus.io/blog/microsoft-software-engineer-levels",
+      "title": "Microsoft software engineer levels (Design Gurus)",
+      "retrieved_at": "2026-10-10",
+      "fields": [
+        "bar_by_level"
+      ]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "medium",
+    "persona": "medium",
+    "scoring_weights": "low",
+    "case_style": "low"
+  },
+  "low_confidence_notes": [
+    "values_framework: the culture page lists growth mindset, customer obsessed, diverse and inclusive and One Microsoft; respect, integrity and accountability come from the interview tips page. Weights are our estimate.",
+    "loop_structure: Microsoft loops vary by organization and hiring manager; behavioral questions are often folded into technical rounds rather than a separate round.",
+    "bar_by_level: PM level bands are assumed to follow the same numeric bands as engineering; not confirmed by an official page.",
+    "scoring_weights: estimated from Microsoft's emphasis on growth mindset and collaboration; no public source gives weights.",
+    "case_style: the split between product sense, estimation and system thinking is our estimate from prep-site question lists.",
+    "sample_questions: the ride-sharing diagnosis question is a recent candidate report on one prep site and is not Microsoft-specific."
+  ]
+}

@@ -1,0 +1,573 @@
+{
+  "company_name": "Airbnb",
+  "company_slug": "airbnb",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-10",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Airbnb Core Values",
+    "principles": [
+      {
+        "name": "Champion the Mission",
+        "description": "Work in partnership with the host and guest community to create connection and a sense of belonging; the mission is the reason for the work, not a slogan.",
+        "evidence_signals": [
+          "Explains a personal, specific reason the belonging mission matters to them",
+          "Frames decisions around the effect on hosts and guests, not only on internal metrics",
+          "Describes building or contributing to a community, at work or outside it"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Be a Host",
+        "description": "Be caring, open and encouraging with everyone you work with; make teammates and users feel welcome.",
+        "evidence_signals": [
+          "Gives a concrete example of making a new teammate or user feel welcome or included",
+          "Shares credit and time generously and helps others succeed",
+          "Handles disagreement with empathy and keeps the relationship intact",
+          "Cares for the user beyond the ticket or the spec"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "Embrace the Adventure",
+        "description": "Bring open curiosity and hopeful resilience; believe that every person, including yourself, can grow.",
+        "evidence_signals": [
+          "Describes a setback met with energy and learning rather than cynicism",
+          "Chose an uncertain path deliberately and explains why",
+          "Shows active learning: new domain, skill or feedback taken on board"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Be a Cereal Entrepreneur",
+        "description": "Be determined and creative in turning bold ambitions into reality, named after the founders funding the company by selling cereal boxes.",
+        "evidence_signals": [
+          "Built something from scratch or delivered with very few resources",
+          "Found a creative way around a constraint instead of waiting for permission",
+          "Sets an ambitious goal and shows the scrappy steps taken to reach it"
+        ],
+        "weight": 1.1
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["L3", "L4", "L5", "L6", "L7"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, motivation and early check of mission alignment. Not simulated in v1."
+        },
+        {
+          "name": "Technical phone screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Live coding, fully working code expected. Not simulated in v1."
+        },
+        {
+          "name": "Onsite coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "One or two practical coding rounds; some loops include a code review round. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior or staff engineer",
+          "notes": "Mid level and above. Often an Airbnb-like domain: search, booking, payments, messaging."
+        },
+        {
+          "name": "Experience deep dive / hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager",
+          "notes": "Candidates report detailed questions on every project listed on the resume."
+        },
+        {
+          "name": "Core values interview (1 to 2 rounds)",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Employee from outside the candidate's discipline",
+          "notes": "Reported to carry veto power; interviewers may not read the resume. Personal-life examples are accepted."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": ["Product Manager", "Senior Product Manager", "Principal Product Manager", "Director"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background and culture fit. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager interview",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Product leader (hiring manager)",
+          "notes": "Domain knowledge, past products, and some product sense questions."
+        },
+        {
+          "name": "PM peer interview",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Product manager",
+          "notes": "Collaboration with engineering and design, disagreements, ownership."
+        },
+        {
+          "name": "Case study presentation",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Panel of about five cross-functional interviewers",
+          "notes": "Candidate presents a prepared product or strategy case, then breakout one-on-ones follow."
+        },
+        {
+          "name": "Product sense breakout",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product manager or designer",
+          "notes": "Improve or design an Airbnb experience for hosts or guests; metrics follow-ups."
+        },
+        {
+          "name": "Core values / cross-functional panel",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Senior leaders from other functions",
+          "notes": "Culture and values fit."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": ["L4", "L5", "L6", "L7"],
+      "rounds": [
+        {
+          "name": "Technical screen or take-home",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Data scientist",
+          "notes": "SQL or analysis exercise. Not simulated in v1."
+        },
+        {
+          "name": "Product analytics case",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Data scientist",
+          "notes": "Metrics definition, experiment design and diagnosing metric changes on the marketplace."
+        },
+        {
+          "name": "Core values interview",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Employee from outside the discipline",
+          "notes": null
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Being a host",
+      "pattern": "A time the candidate made a colleague, user or stranger feel welcome or included, and what they did specifically",
+      "competencies": ["collaboration", "communication"],
+      "values": ["Be a Host"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Belonging and community",
+      "pattern": "What belonging means to the candidate, a time they lacked it, or a community they contributed to",
+      "competencies": ["communication", "impact"],
+      "values": ["Champion the Mission", "Be a Host"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Scrappy delivery",
+      "pattern": "A time the candidate built something from scratch or delivered with almost no resources",
+      "competencies": ["ownership", "impact"],
+      "values": ["Be a Cereal Entrepreneur"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Risk and resilience",
+      "pattern": "The biggest risk the candidate took, a setback that followed, and how they responded and grew",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Embrace the Adventure"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Conflict with a teammate",
+      "pattern": "A disagreement with a teammate or a cross-functional partner and how the candidate kept the relationship healthy",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["Be a Host"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Resume project deep dive",
+      "pattern": "Walk through a project on the resume in depth: own decisions, trade-offs, result, and what came after launch",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Why Airbnb",
+      "pattern": "Why the candidate wants to work at Airbnb and how the mission connects to their own experience",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["Champion the Mission"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Working with product and design",
+      "pattern": "How the candidate partners with product managers and designers to shape a feature, including a time they pushed back",
+      "competencies": ["team_fit", "judgment"],
+      "values": ["Be a Host"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Marketplace system design",
+      "pattern": "Design a core marketplace system such as listing search, booking with availability, or payments, and discuss consistency and scale",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Correctness under concurrency",
+      "pattern": "Explain how a system prevents conflicting writes, such as double booking or double charging, and the trade-offs of the chosen approach",
+      "competencies": ["accuracy", "trade_offs", "clarity_of_explanation"],
+      "values": []
+    },
+    {
+      "interview_type": "case",
+      "theme": "Improve a host or guest experience",
+      "pattern": "Pick a host or guest segment, find a pain point in an Airbnb flow, propose a solution and define success metrics",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Champion the Mission"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Marketplace strategy",
+      "pattern": "Decide whether Airbnb should enter a new line of business or market, weighing supply, demand, trust and risk",
+      "competencies": ["structure", "user_and_business_sense", "recommendation"],
+      "values": ["Be a Cereal Entrepreneur"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Metrics and north star",
+      "pattern": "Define success metrics for a product area, choose a north star, and explain how to diagnose a drop",
+      "competencies": ["problem_framing", "estimation_logic", "structure"],
+      "values": []
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a moment when you were a good host, for someone at work or in your personal life.",
+      "strong_answer": "Picks a specific person and situation, not a generic claim of kindness. Explains what that person needed, what the candidate noticed, and the concrete actions taken (onboarding a new teammate, helping a stranger, hosting guests). Shows how the person felt afterward and what the candidate learned. Ties it back to caring and openness. Pitfall: describing a party or describing hospitality as a transaction.",
+      "competencies": ["collaboration", "communication"],
+      "values": ["Be a Host"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "What does belonging mean to you, and has there been a time you felt you did not belong?",
+      "strong_answer": "Gives an honest, personal answer with a real situation and the emotions involved. Moves from the experience to what helped (or would have helped) and how it changed the way the candidate treats others. A strong answer links this to Airbnb's mission of belonging without sounding rehearsed. Pitfall: an abstract definition with no story, or a story with no reflection.",
+      "competencies": ["communication", "learning_from_failure"],
+      "values": ["Champion the Mission"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-airbnb-behavioral-interview-questions-and-how-to-answer-them"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you had almost no resources but still delivered something meaningful.",
+      "strong_answer": "Sets the constraint clearly (time, people, budget, access), then the goal and why it mattered. Walks through the creative steps: reusing what existed, cutting scope, persuading helpers, doing unglamorous work personally. Gives a measurable result and what the candidate would repeat. Signals: resourcefulness, determination, bias to action. Pitfall: blaming the lack of resources or a story where someone else unblocked everything.",
+      "competencies": ["ownership", "impact"],
+      "values": ["Be a Cereal Entrepreneur"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-airbnb-behavioral-interview-questions-and-how-to-answer-them"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "What is the biggest risk you have taken, and how did it turn out?",
+      "strong_answer": "Describes a real decision with uncertainty (career change, bold project bet, moving country), the reasoning and how the downside was managed. Covers the result honestly, including what went wrong, and shows resilience and growth. Strong answers show the risk was deliberate, not reckless. Pitfall: a tiny risk dressed up as a big one, or no reflection on what was learned.",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Embrace the Adventure"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-airbnb-behavioral-interview-questions-and-how-to-answer-them"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about something you built from scratch that you are proud of.",
+      "strong_answer": "Explains the problem and why nothing existed, the candidate's own role, and the hard choices made along the way. Includes adoption or impact numbers and what happened after launch. Shows ambition plus follow-through. Use 'I' for own decisions. Pitfall: listing features instead of explaining decisions and outcomes.",
+      "competencies": ["ownership", "impact"],
+      "values": ["Be a Cereal Entrepreneur"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-airbnb-behavioral-interview-questions-and-how-to-answer-them"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you disagreed with your engineering or design partners. How was it resolved?",
+      "strong_answer": "States the disagreement neutrally and shows understanding of the other side's reasons. Describes how the candidate gathered data or user evidence, listened, and reached a decision (including disagree-and-commit). Shows the relationship stayed strong. Signals: empathy, openness, focus on users. Pitfall: a story where the candidate 'won' and the partner is the villain.",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["Be a Host"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a community you were part of and what you contributed to it.",
+      "strong_answer": "Names the community (open source, volunteer group, sports club, team guild) and the candidate's specific contribution, ideally something that helped others connect or grow. Shows sustained involvement rather than one event and the effect on members. Links to connection and belonging. Pitfall: just being a member with no contribution.",
+      "competencies": ["collaboration", "impact"],
+      "values": ["Champion the Mission", "Be a Host"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-airbnb-behavioral-interview-questions-and-how-to-answer-them"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why do you want to work at Airbnb in particular?",
+      "strong_answer": "Connects a personal experience with travel, hosting or belonging to the mission, then to the specific team and role. Shows knowledge of the product and the two-sided marketplace, and what the candidate would bring. Signals genuine motivation. Pitfall: brand admiration only, or answers that would work for any company.",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["Champion the Mission"],
+      "source_url": "https://www.aced.io/blog/airbnb-interview-process"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Tell me about a time you went beyond your job description to get something done.",
+      "strong_answer": "Explains the gap nobody owned, why it mattered for users or the team, and what the candidate did beyond their role. Shows judgment about when to step in and how they brought others along. Gives the result and how ownership was handed off or kept. Pitfall: hero stories that ignore the team or that show poor prioritization of core work.",
+      "competencies": ["scope_at_level", "judgment"],
+      "values": ["Be a Cereal Entrepreneur"],
+      "source_url": "https://www.aced.io/blog/airbnb-interview-process"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Tell me about something that is not on your resume.",
+      "strong_answer": "Shares something real and relevant that reveals character or values: a side project, a hobby with depth, a life experience. Connects it briefly to how the candidate works or what they care about. Keeps it short and authentic. Pitfall: repeating resume content or picking something with no insight.",
+      "competencies": ["team_fit", "motivation"],
+      "values": ["Embrace the Adventure"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design the listing search system for a home-sharing marketplace, including location, dates and filters.",
+      "strong_answer": "Clarifies scale and latency goals, then covers geo indexing (geohash, quadtree or a search engine), availability filtering by date, ranking and personalization, caching, and how listing updates reach the index. Discusses freshness versus speed and consistency between search results and actual availability. Signals: clear requirements, data model, bottlenecks, failure handling. Pitfall: jumping to boxes without requirements.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": [],
+      "source_url": "https://www.aced.io/blog/airbnb-interview-process"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a booking system for stays that guarantees two guests can never book the same home for overlapping dates.",
+      "strong_answer": "Defines the availability data model, then explains the booking flow with a transaction and row locks or optimistic concurrency, holds with expiry during payment, and idempotent requests. Covers what happens with payment failure, retries and time zones, and how to scale reads separately from the strongly consistent booking path. Pitfall: ignoring race conditions or the payment step.",
+      "competencies": ["accuracy", "trade_offs", "technical_depth"],
+      "values": [],
+      "source_url": "https://techinterview.org/system-design-hotel-booking-airbnb/"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a payments or wallet system for a marketplace that pays hosts and charges guests in many currencies.",
+      "strong_answer": "Covers a double-entry ledger, idempotency keys, integration with payment processors, payout schedules, currency conversion, and reconciliation. Explains consistency guarantees and how failures and retries avoid double charges. Mentions auditing and fraud checks. Signals: correctness first, clear failure modes. Pitfall: treating money like ordinary eventual-consistency data.",
+      "competencies": ["technical_depth", "accuracy", "trade_offs"],
+      "values": [],
+      "source_url": "https://www.aced.io/blog/airbnb-interview-process"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design a messaging or chatbot service for guests and hosts?",
+      "strong_answer": "Clarifies use cases (host-guest chat, support bot), then covers message storage, delivery (websockets or push), ordering, read receipts, and moderation for trust and safety. For a bot, explains intent handling and hand-off to a human agent. Discusses scaling and offline delivery. Pitfall: no attention to safety or abuse in a marketplace context.",
+      "competencies": ["technical_depth", "reasoning", "clarity_of_explanation"],
+      "values": [],
+      "source_url": "https://www.aced.io/blog/airbnb-interview-process"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you improve Airbnb's reservation experience?",
+      "strong_answer": "Clarifies the goal (conversion, trust, guest satisfaction) and picks a user segment, such as first-time guests or families. Maps the booking journey, finds the biggest pain points, proposes two or three solutions and prioritizes one by impact and effort. Considers the host side too. Defines a primary metric and guardrails. Pitfall: a list of features with no user or no metric.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Champion the Mission"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "Design an app that helps people organize a trip.",
+      "strong_answer": "Defines the target traveler and the jobs to be done (planning, coordinating with a group, itinerary, bookings). Prioritizes the most painful need, sketches the core flow, and explains how it connects to Airbnb stays and experiences. States a success metric and a V1 scope. Pitfall: building everything at once with no prioritization.",
+      "competencies": ["problem_framing", "structure", "user_and_business_sense"],
+      "values": ["Champion the Mission"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "Propose a strategy to grow host supply in a specific market.",
+      "strong_answer": "Segments potential hosts and diagnoses the barrier (trust, regulation, effort, earnings). Uses rough numbers to size the gap between demand and supply. Proposes and prioritizes levers (onboarding, pricing tools, insurance, co-hosting) and notes regulatory risk. Defines metrics such as new active listings and booked nights. Pitfall: ignoring local regulation and quality of supply.",
+      "competencies": ["structure", "user_and_business_sense", "estimation_logic"],
+      "values": ["Be a Cereal Entrepreneur"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you measure host satisfaction?",
+      "strong_answer": "Defines what a satisfied host looks like and separates leading behavior metrics (listing stays active, calendar updates, response rate, repeat hosting) from survey metrics. Proposes a composite or north star plus guardrails and segments by host type. Explains how to spot problems and validate the metric. Pitfall: relying only on NPS or picking a metric guests control.",
+      "competencies": ["problem_framing", "structure", "recommendation"],
+      "values": ["Be a Host"],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "What do you think are Airbnb's biggest risks, and what would you do about one of them?",
+      "strong_answer": "Groups risks (regulation, trust and safety, competition from hotels, supply quality, macro travel demand), ranks them by likelihood and impact, and picks one to address with concrete product or policy moves. Shows understanding of both sides of the marketplace. Pitfall: a long list with no prioritization or recommendation.",
+      "competencies": ["structure", "user_and_business_sense", "recommendation"],
+      "values": [],
+      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "What should Airbnb's north star metric be, and why?",
+      "strong_answer": "Proposes a metric that captures value for both guests and hosts, such as nights booked or successful stays, and explains why it beats alternatives like revenue or app visits. Lists input metrics and guardrails (cancellations, review scores, trust incidents). Pitfall: picking a vanity metric or ignoring marketplace balance.",
+      "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
+      "values": ["Champion the Mission"],
+      "source_url": "https://www.aced.io/blog/airbnb-interview-process"
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "L3",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Ships well-scoped tasks, learns the codebase and takes feedback; not expected to define architecture."
+    },
+    {
+      "level_name": "L4",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns features end to end within one team with limited guidance."
+    },
+    {
+      "level_name": "L5",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Leads meaningful projects, makes technical trade-offs, influences the team roadmap and helps the team move faster."
+    },
+    {
+      "level_name": "L6",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Force multiplier across several teams; sets technical direction for an area."
+    },
+    {
+      "level_name": "L7",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Senior staff; shapes architecture and strategy across an organization."
+    },
+    {
+      "level_name": "Senior Product Manager",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns a product area for hosts or guests, its metrics and roadmap, and leads cross-functional partners."
+    }
+  ],
+  "persona": {
+    "tone": "Warm, conversational and curious; interested in the person as well as the work",
+    "pace": "Relaxed, with room for personal stories",
+    "pushback_style": "Asks for the specific moment and what the candidate personally did, and how the other person felt",
+    "closing_style": "Invites questions and asks what belonging or the mission means to the candidate"
+  },
+  "scoring_weights": {
+    "collaboration": 1.4,
+    "communication": 1.2,
+    "ownership": 1.2,
+    "learning_from_failure": 1.2,
+    "conflict_handling": 1.1,
+    "motivation": 1.3,
+    "team_fit": 1.2,
+    "trade_offs": 1.1,
+    "user_and_business_sense": 1.4,
+    "problem_framing": 1.2
+  },
+  "values_share": 0.4,
+  "case_style": {
+    "product_sense": 0.6,
+    "estimation": 0.1,
+    "system_thinking": 0.3,
+    "notes": "Cases start from hosts or guests and the two-sided marketplace; strategy and metrics questions are common, pure estimation is rare."
+  },
+  "sources": [
+    {
+      "url": "https://careers.airbnb.com/life-at-airbnb/",
+      "title": "Life at Airbnb (core values)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework", "persona"]
+    },
+    {
+      "url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview",
+      "title": "Airbnb product manager interview (IGotAnOffer)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.aced.io/blog/airbnb-interview-process",
+      "title": "Airbnb interview process and top questions",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/top-airbnb-behavioral-interview-questions-and-how-to-answer-them",
+      "title": "Top Airbnb behavioral interview questions",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework", "question_patterns", "persona"]
+    },
+    {
+      "url": "https://www.teamblind.com/post/Airbnb-Core-Values-interview-KvNUPJbB",
+      "title": "Airbnb Core Values interview (Blind thread)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://www.teamblind.com/post/airbnb-cross-functional-interview-4nnlsysc",
+      "title": "Airbnb cross functional interview (Blind thread)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure"]
+    },
+    {
+      "url": "https://techinterview.org/system-design-hotel-booking-airbnb/",
+      "title": "System design interview: hotel booking system (Airbnb)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["question_patterns"]
+    },
+    {
+      "url": "https://codemia.io/guides/airbnb-software-engineer",
+      "title": "Airbnb software engineer interview guide",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure"]
+    },
+    {
+      "url": "https://www.designgurus.io/blog/airbnb-software-engineer-levels",
+      "title": "Airbnb software engineer levels",
+      "retrieved_at": "2026-10-10",
+      "fields": ["bar_by_level"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "medium",
+    "persona": "medium",
+    "scoring_weights": "low",
+    "case_style": "medium"
+  },
+  "low_confidence_notes": [
+    "values_framework: weights are an estimate; Be a Host and Champion the Mission appear most often in candidate reports.",
+    "loop_structure: data_ml loop is thinly sourced and inferred from general Airbnb guides; durations are typical reported values, not official.",
+    "loop_structure: the number of core values rounds (one or two) varies across candidate reports.",
+    "bar_by_level: L4 and L7 descriptions and the PM level names come from third-party guides, not an official Airbnb ladder.",
+    "scoring_weights: no public source gives weights; set from the emphasis on core values and cross-functional work.",
+    "sample_questions: system design questions come from prep sites that aggregate candidate reports, not first-hand posts."
+  ]
+}

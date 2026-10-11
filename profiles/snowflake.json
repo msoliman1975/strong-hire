@@ -1,0 +1,560 @@
+{
+  "company_name": "Snowflake",
+  "company_slug": "snowflake",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-10",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Snowflake Values",
+    "principles": [
+      {
+        "name": "Put Customers First",
+        "description": "Succeed only when customers succeed. Earn their trust daily, understand their pain points, and deliver products they love.",
+        "evidence_signals": [
+          "Names a specific customer and the problem that was solved for them",
+          "Changed priorities based on what customers actually needed",
+          "Measured success in customer outcomes"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Integrity Always",
+        "description": "Be open, honest and respectful. Speak up candidly even when uncomfortable, debate respectfully, and commit fully once a decision is made.",
+        "evidence_signals": [
+          "Raised an unpopular concern openly and respectfully",
+          "Disagreed, then committed fully once the decision was made",
+          "Admits mistakes plainly"
+        ],
+        "weight": 1.1
+      },
+      {
+        "name": "Think Big",
+        "description": "Be ambitious, focus on what matters, innovate and take prudent risks to make a lasting impact.",
+        "evidence_signals": [
+          "Pursued an ambitious goal beyond the obvious scope",
+          "Took a prudent, well-reasoned risk",
+          "Focused effort on the highest-impact problem"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Be Excellent",
+        "description": "Quality counts. Hold yourself and others to the highest standards, value simplicity and practicality, and balance today with tomorrow.",
+        "evidence_signals": [
+          "Raised quality or performance with measured results",
+          "Chose a simple, practical solution over a clever one",
+          "Considered long-term maintainability alongside short-term delivery"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Get it Done",
+        "description": "Results matter. Execute precisely and accountably while staying nimble; make commitments and deliver.",
+        "evidence_signals": [
+          "Delivered on a commitment despite obstacles",
+          "Describes concrete execution steps and results, not intentions",
+          "Adapted plans quickly when conditions changed"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Own It",
+        "description": "Build the product and company as if it were yours. Take initiative, step up to own issues, and when you make a mistake, own it, fix it and learn.",
+        "evidence_signals": [
+          "Took ownership of a problem outside their formal scope",
+          "Owned a mistake, fixed it and changed something afterwards",
+          "Uses 'I' clearly for own decisions"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Make Each Other The Best",
+        "description": "Treat people with kindness and respect, collaborate inclusively, give and ask for help and feedback, and teach and learn every day.",
+        "evidence_signals": [
+          "Helped teammates grow or asked for help when needed",
+          "Gave or received constructive feedback and acted on it",
+          "Brought people and ideas together across teams"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Embrace Each Other's Differences",
+        "description": "Accept and appreciate people from every walk of life, stay mindful that others have different experiences, and use differences as a strength.",
+        "evidence_signals": [
+          "Worked effectively with people of very different backgrounds or views",
+          "Adjusted own approach after understanding another perspective"
+        ],
+        "weight": 0.8
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["IC1", "IC2", "IC3", "IC4", "IC5"],
+      "rounds": [
+        {
+          "name": "Recruiter or hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Engineering manager or recruiter",
+          "notes": "Hiring managers are often the first contact; casual conversation about the role, the candidate's work and goals."
+        },
+        {
+          "name": "Technical phone screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Live coding (sometimes with a design part, up to 2 hours). Not simulated in v1."
+        },
+        {
+          "name": "Coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "One or two onsite coding rounds; harder-than-average problems with systems flavor. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior engineer",
+          "notes": "Data infrastructure focus: query engines, storage, caching, multi-tenancy, security."
+        },
+        {
+          "name": "Expertise / technical deep dive",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior engineer from the hiring team",
+          "notes": "CS fundamentals and database internals, plus the depth of the candidate's own projects."
+        },
+        {
+          "name": "Presentation / tech talk",
+          "interview_type": "technical_qa",
+          "duration_min": 30,
+          "interviewer_role": "Panel of engineers",
+          "notes": "Reported for senior and principal candidates: present a past project and take questions."
+        },
+        {
+          "name": "Behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 60,
+          "interviewer_role": "Engineering manager",
+          "notes": "Ownership, collaboration, mistakes and impact; reflects Snowflake values."
+        },
+        {
+          "name": "Cross-functional",
+          "interview_type": "behavioral",
+          "duration_min": 60,
+          "interviewer_role": "Leaders from partner teams",
+          "notes": "Reported for IC5 and above."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": ["Product Manager", "Senior Product Manager", "Principal Product Manager"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Motivation and logistics. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager deep dive",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Director of product",
+          "notes": "Deep questions on products the candidate launched: roadmap, trade-offs, UX."
+        },
+        {
+          "name": "Product sense / strategy",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Senior product manager",
+          "notes": "Live product strategy case; may follow a presentation the candidate prepared."
+        },
+        {
+          "name": "Analytical / execution",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Product manager",
+          "notes": "Metrics definition, root-cause debugging and experiments."
+        },
+        {
+          "name": "Technical",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Engineering leader",
+          "notes": "Technical chops on data systems; domain gaps are tolerated."
+        },
+        {
+          "name": "Behavioral and leadership",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Product leader",
+          "notes": "Ownership, influence, conflict."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Owning a mistake",
+      "pattern": "A mistake the candidate made, how they owned and fixed it, and what they changed",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Own It", "Integrity Always"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Cross-team delivery",
+      "pattern": "A project that needed several teams to finish and how the candidate made the collaboration work",
+      "competencies": ["collaboration", "impact"],
+      "values": ["Make Each Other The Best", "Get it Done"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Performance and quality",
+      "pattern": "A time the candidate made a system faster or more reliable and proved it with numbers",
+      "competencies": ["impact", "ownership"],
+      "values": ["Be Excellent"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Independent leadership",
+      "pattern": "A project the candidate drove independently from ambiguity to result",
+      "competencies": ["ownership", "impact", "communication"],
+      "values": ["Own It", "Think Big"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Values alignment",
+      "pattern": "How the candidate's past experience lines up with the company's values, with specific examples",
+      "competencies": ["team_fit", "motivation"],
+      "values": ["Integrity Always"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Launched-product deep dive",
+      "pattern": "Walk through a product or system the candidate launched, then defend roadmap and design trade-offs under follow-up",
+      "competencies": ["depth_of_experience", "judgment", "scope_at_level"],
+      "values": ["Get it Done"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Query and storage engines",
+      "pattern": "Design part of a cloud data warehouse (query engine, storage format, metadata, cache) for very large data",
+      "competencies": ["technical_depth", "trade_offs", "accuracy"],
+      "values": ["Be Excellent"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Multi-tenant cloud service",
+      "pattern": "Design isolation, scaling and security for many customers sharing a cloud data platform",
+      "competencies": ["technical_depth", "reasoning", "trade_offs"],
+      "values": ["Put Customers First"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Database fundamentals",
+      "pattern": "Explain a core database concept (storage layout, indexing, concurrency, consensus) and its trade-offs",
+      "competencies": ["accuracy", "clarity_of_explanation", "technical_depth"],
+      "values": []
+    },
+    {
+      "interview_type": "case",
+      "theme": "Data platform product strategy",
+      "pattern": "Propose a new product or feature for a data platform entering a new workload or market",
+      "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
+      "values": ["Think Big", "Put Customers First"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Developer experience",
+      "pattern": "Improve the experience of a technical persona (data engineer, analyst) using the platform",
+      "competencies": ["problem_framing", "prioritization", "user_and_business_sense"],
+      "values": ["Put Customers First"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a system that ingests events with timestamps and organizes them so they can be retrieved quickly, for example by time range.",
+      "strong_answer": "Clarify volume, query patterns (time range, by key, latest N), retention and ordering guarantees. Discuss in-memory structures (sorted maps, skip lists) for one node, then time-partitioned storage with indexes, buffering and compaction for scale. Handle late or out-of-order events and hot partitions. State read versus write trade-offs and complexity of each operation.",
+      "competencies": ["technical_depth", "accuracy", "trade_offs"],
+      "values": [],
+      "source_url": "https://interviewing.io/snowflake-interview-questions"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a cloud-native SQL query engine that can run queries over petabytes of data.",
+      "strong_answer": "Separate storage (columnar files on object storage with metadata such as min/max per file) from elastic compute. Walk the query path: parse, optimize (pruning, predicate pushdown, join order), distribute plan fragments to workers, exchange data, aggregate results. Cover skew and stragglers, caching, spilling to disk, failure retry, and concurrency between workloads. Explain why each choice fits analytical workloads.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Be Excellent"],
+      "source_url": "https://codemia.io/guides/snowflake-software-engineer"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design resource management for a multi-tenant data platform with isolation between customers and automatic scaling.",
+      "strong_answer": "Clarify isolation needs (performance, security, cost). Compare dedicated compute per tenant versus shared pools with quotas. Cover admission control, queuing, autoscaling signals and cool-down, noisy-neighbor protection, and billing/metering. Discuss cold-start latency versus cost and how to fail safely.",
+      "competencies": ["technical_depth", "reasoning", "trade_offs"],
+      "values": ["Put Customers First"],
+      "source_url": "https://codemia.io/guides/snowflake-software-engineer"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a distributed cache for query results, including how to invalidate entries when the data changes.",
+      "strong_answer": "Define the cache key (normalized query plus data versions of referenced tables plus user context such as role). Invalidate by version change rather than by scanning. Cover placement, size limits and eviction, consistency guarantees, security (results must respect access rights), and hit-rate metrics. Discuss when caching is not worth it.",
+      "competencies": ["technical_depth", "trade_offs", "accuracy"],
+      "values": [],
+      "source_url": "https://codemia.io/guides/snowflake-software-engineer"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Compare columnar and row-based storage. When would you choose each?",
+      "strong_answer": "Row storage suits transactional workloads with point reads and writes of whole records. Columnar storage suits analytics: reads only needed columns, compresses well, enables vectorized execution, but makes single-row updates costly. Mention hybrid approaches and how micro-partitions with metadata enable pruning. Give a concrete example of each.",
+      "competencies": ["accuracy", "clarity_of_explanation", "technical_depth"],
+      "values": [],
+      "source_url": "https://codemia.io/guides/snowflake-software-engineer"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a data security and governance system for a data platform.",
+      "strong_answer": "Cover identity and authentication, role-based and attribute-based access control, row and column level policies, masking of sensitive fields, encryption at rest and in transit with key management, audit logging, data classification and lineage. Discuss performance cost of policy checks and how to manage policies at scale for many tenants.",
+      "competencies": ["technical_depth", "reasoning", "trade_offs"],
+      "values": ["Integrity Always"],
+      "source_url": "https://www.aced.io/blog/snowflake-interview-process"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a video sharing service like YouTube, with focus on the caching layer.",
+      "strong_answer": "Outline upload, transcoding, storage and metadata quickly, then go deep on caching: CDN for video segments, application cache for metadata and popular lists, cache keys, TTLs, invalidation on updates, and handling viral spikes. Quantify read/write ratios and storage. Discuss cost versus latency trade-offs.",
+      "competencies": ["technical_depth", "trade_offs"],
+      "values": [],
+      "source_url": "https://www.aced.io/blog/snowflake-interview-process"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you made a mistake.",
+      "strong_answer": "Pick a real mistake with consequences. Say plainly what you did wrong, how you told others, how you fixed it, and what you changed to prevent a repeat. Snowflake's 'own it, fix it, learn from it, move on' wording fits this structure. Pitfall: a fake mistake or blaming others.",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Own It", "Integrity Always"],
+      "source_url": "https://www.aced.io/blog/snowflake-interview-process"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe an experience where you had to collaborate across teams to get a project done.",
+      "strong_answer": "Explain the goal and why other teams were needed. Show how you aligned priorities, handled dependencies and disagreements, and kept communication clear. Give credit to others and state the delivered result. Pitfall: describing only meetings, not outcomes.",
+      "competencies": ["collaboration", "communication", "impact"],
+      "values": ["Make Each Other The Best", "Get it Done"],
+      "source_url": "https://www.aced.io/blog/snowflake-interview-process"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a project you owned and led independently.",
+      "strong_answer": "Show the ambiguity you started with, how you defined the plan, made decisions, and kept it moving without being told. Quantify the result and name what you would do differently. Make your own role distinct from the team's.",
+      "competencies": ["ownership", "impact"],
+      "values": ["Own It"],
+      "source_url": "https://www.aced.io/blog/snowflake-interview-process"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you optimized a system for performance.",
+      "strong_answer": "State the baseline and target with numbers. Explain how you profiled and found the real bottleneck, options you considered, the change you made and its trade-offs, and the measured result. Mention how you prevented regressions. Pitfall: optimizing without measuring.",
+      "competencies": ["impact", "ownership"],
+      "values": ["Be Excellent"],
+      "source_url": "https://codemia.io/guides/snowflake-software-engineer"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe your most innovative idea and what happened with it.",
+      "strong_answer": "Describe the problem, the insight behind the idea, and why it was not obvious. Show how you tested it cheaply, won support, and what impact it had. If it failed, say what you learned. Strong answers show ambition with prudent risk.",
+      "competencies": ["impact", "communication"],
+      "values": ["Think Big"],
+      "source_url": "https://www.interviewquery.com/interview-guides/snowflake-product-manager"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "How does your experience align with Snowflake's values?",
+      "strong_answer": "Know the values (for example Put Customers First, Own It, Get it Done). Pick two that truly fit you and give a short, specific story for each. Avoid listing all values. Interviewers look for authenticity and evidence, not slogans.",
+      "competencies": ["team_fit", "motivation"],
+      "values": ["Own It", "Put Customers First"],
+      "source_url": "https://prepfully.com/answers/values-alignment-snowflake"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Walk me through a product you launched and your role in its roadmap, trade-offs and design.",
+      "strong_answer": "Give context, then your specific decisions: what went on the roadmap and why, what you cut, a key trade-off and its data, and how you worked with engineering and design. Expect the interviewer to double-click on details, so pick something you know deeply. End with results.",
+      "competencies": ["depth_of_experience", "judgment", "scope_at_level"],
+      "values": ["Get it Done"],
+      "source_url": "https://www.teamblind.com/post/what-to-expect-from-snowflake-sr-product-manager-interview-hdzpabjg"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Explain a recent project in technical depth: what you built, why, and what you would change.",
+      "strong_answer": "Cover the problem, architecture, your part, the hardest technical decision, and measurable outcome. Be honest about weaknesses in the design. Match the depth to the role; for this company, data and performance details are welcome.",
+      "competencies": ["depth_of_experience", "role_fit"],
+      "values": [],
+      "source_url": "https://www.aced.io/blog/snowflake-interview-process"
+    },
+    {
+      "interview_type": "case",
+      "question": "If you could make Snowflake better, what would you change?",
+      "strong_answer": "Pick one persona (for example data engineer or admin) and a concrete pain you can back up (cost visibility, onboarding, pipelines). Explain why it matters to customers and the business, propose a solution with MVP scope, and define a success metric. Show you know the product and its competitors. Pitfall: vague 'make it faster'.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Put Customers First"],
+      "source_url": "https://prepfully.com/answers/improvement-suggestions-snowflake"
+    },
+    {
+      "interview_type": "case",
+      "question": "Snowflake wants to enter real-time analytics on streaming data. Design a new product or feature for that market.",
+      "strong_answer": "Clarify target customers and use cases (monitoring, personalization, fraud). Size the opportunity roughly. Map needs versus current strengths and gaps (latency, ingestion). Propose a product with clear scope and differentiation from competitors, a phased plan, and success metrics such as adoption and consumption. Name technical and go-to-market risks.",
+      "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
+      "values": ["Think Big"],
+      "source_url": "https://www.interviewquery.com/interview-guides/snowflake-product-manager"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you improve the developer experience for data engineers who use Snowflake?",
+      "strong_answer": "Map the data engineer workflow (ingest, transform, test, deploy, monitor). Find the biggest pains with evidence. Prioritize one by impact and effort. Propose a solution, how it integrates with existing tools, and metrics such as time to first pipeline or failed-job rate. Mention trade-offs and validation.",
+      "competencies": ["problem_framing", "prioritization", "user_and_business_sense"],
+      "values": ["Put Customers First"],
+      "source_url": "https://www.interviewquery.com/interview-guides/snowflake-product-manager"
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "IC1",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Software Engineer I. Delivers well-defined tasks with strong coding fundamentals."
+    },
+    {
+      "level_name": "IC2",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Software Engineer II. Owns features independently within a team."
+    },
+    {
+      "level_name": "IC3",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Senior Software Engineer. Leads design of significant components and mentors others."
+    },
+    {
+      "level_name": "IC4",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Senior or staff-level engineer. Owns large areas and drives technical direction across teams."
+    },
+    {
+      "level_name": "IC5",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Principal Software Engineer. Sets architecture for a major product area and influences the organization."
+    }
+  ],
+  "persona": {
+    "tone": "Professional and direct, casual in early conversations with hiring managers",
+    "pace": "Steady, then deep: double-clicks on details of the candidate's answers",
+    "pushback_style": "Asks for data-system specifics, performance numbers and the reasoning behind trade-offs",
+    "closing_style": "Leaves a few minutes for candidate questions"
+  },
+  "scoring_weights": {
+    "technical_depth": 1.4,
+    "accuracy": 1.2,
+    "trade_offs": 1.3,
+    "ownership": 1.3,
+    "impact": 1.2,
+    "depth_of_experience": 1.2,
+    "user_and_business_sense": 1.2
+  },
+  "values_share": 0.2,
+  "case_style": {
+    "product_sense": 0.5,
+    "estimation": 0.15,
+    "system_thinking": 0.35,
+    "notes": "PM cases are strategy and product sense on a data platform, often after a presentation; interviewers probe technical understanding."
+  },
+  "sources": [
+    {
+      "url": "https://s26.q4cdn.com/463892824/files/doc_downloads/governance_docs/2026/02/2026-02-23-Snowflake-Global-Code-of-Conduct-and-Ethics-Final.pdf",
+      "title": "Snowflake Global Code of Conduct and Ethics (lists company values)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://interviewing.io/snowflake-interview-questions",
+      "title": "Snowflake interview process and questions (interviewing.io)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.aced.io/blog/snowflake-interview-process",
+      "title": "Snowflake interview process",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "persona"]
+    },
+    {
+      "url": "https://codemia.io/guides/snowflake-software-engineer",
+      "title": "Snowflake software engineer interview guide (Codemia)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "scoring_weights"]
+    },
+    {
+      "url": "https://www.teamblind.com/post/what-to-expect-from-snowflake-sr-product-manager-interview-hdzpabjg",
+      "title": "What to expect from Snowflake Sr PM interview (Blind thread)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "persona", "case_style"]
+    },
+    {
+      "url": "https://www.interviewquery.com/interview-guides/snowflake-product-manager",
+      "title": "Snowflake product manager interview guide (Interview Query)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://prepfully.com/answers/improvement-suggestions-snowflake",
+      "title": "Snowflake PM question: what would you change (Prepfully)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["question_patterns"]
+    },
+    {
+      "url": "https://prepfully.com/answers/values-alignment-snowflake",
+      "title": "Snowflake question: values alignment (Prepfully)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["question_patterns"]
+    },
+    {
+      "url": "https://www.levels.fyi/en-gb/companies/snowflake/salaries/software-engineer",
+      "title": "Snowflake software engineer levels (Levels.fyi)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["bar_by_level"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "low"
+  },
+  "low_confidence_notes": [
+    "values_framework: values come from Snowflake's Code of Conduct; no public source says how they are scored in interviews. 'Embrace Each Other's Differences' is weighted lower because it is rarely probed directly.",
+    "loop_structure: round names and durations vary across third-party guides (onsite of 3-5 rounds); the presentation and cross-functional rounds are reported for senior levels only. PM loop comes from third-party guides and one Blind thread.",
+    "question_patterns: the streaming-analytics and developer-experience PM cases and the innovative-idea question were seen only in a search summary of the Interview Query PM guide, which returned HTTP 429 when opened; verify before publishing.",
+    "bar_by_level: IC4 is described as Staff by some sources and Senior by others; mapped to staff_principal tentatively.",
+    "persona: inferred from candidate reports of casual HM screens and deep follow-ups.",
+    "scoring_weights: estimated; no public source gives weights.",
+    "case_style: thin public evidence for PM case formats."
+  ]
+}

@@ -1,0 +1,534 @@
+{
+  "company_name": "Nvidia",
+  "company_slug": "nvidia",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-10",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "NVIDIA core values",
+    "principles": [
+      {
+        "name": "Innovation",
+        "description": "Invent things the world does not yet know it needs, guided by first principles rather than consensus.",
+        "evidence_signals": [
+          "Reasons from first principles (hardware limits, physics, math) instead of copying what others do",
+          "Describes a new approach the candidate originated and how it was proven"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Intellectual Honesty",
+        "description": "Seek the truth, know your real capabilities, acknowledge weaknesses openly, and learn from mistakes.",
+        "evidence_signals": [
+          "Says plainly 'I don't know' or 'I was wrong' and explains how they found out",
+          "Reports bad news or a failed result early instead of hiding it",
+          "Separates measured facts from assumptions when explaining results"
+        ],
+        "weight": 1.5
+      },
+      {
+        "name": "Speed and Agility",
+        "description": "Stay alert, keep learning, and change course quickly when reality changes, so products ship at high speed.",
+        "evidence_signals": [
+          "Describes changing a plan quickly after new data and the result",
+          "Shows fast iteration loops, for example prototypes or parallel experiments"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Excellence and Determination",
+        "description": "Hold the highest standards and measure against what is theoretically possible (the speed-of-light test), not against competitors.",
+        "evidence_signals": [
+          "Compares achieved performance with the theoretical limit, for example bandwidth or compute peak",
+          "Persists through a very hard technical problem and explains the steps",
+          "Quantifies results with precise numbers"
+        ],
+        "weight": 1.5
+      },
+      {
+        "name": "One Team",
+        "description": "Share information openly and work as one integrated team across hardware, software and research.",
+        "evidence_signals": [
+          "Gives an example of working across the hardware and software boundary or with another org",
+          "Shares knowledge and credit and helps other teams succeed"
+        ],
+        "weight": 1.0
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["IC1", "IC2", "IC3", "IC4", "IC5", "IC6"],
+      "rounds": [
+        {
+          "name": "Recruiter call",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background and logistics; sometimes skipped for referrals. Not simulated in v1."
+        },
+        {
+          "name": "Technical phone screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Coding, often in C or C++, under time pressure. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager call",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Engineering manager",
+          "notes": "Past work and fit with the team's domain; not always included before the onsite."
+        },
+        {
+          "name": "Onsite coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Usually two coding rounds, often systems-flavored (memory, concurrency, bit manipulation). Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior engineer",
+          "notes": "Classic distributed design or GPU/CPU architecture design, tailored to the team."
+        },
+        {
+          "name": "Domain technical deep dive",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Team engineer",
+          "notes": "Team-specific concepts such as CUDA, GPU memory, operating systems, compilers, or LLM internals; may mix explanation with coding."
+        },
+        {
+          "name": "Hiring manager onsite",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Engineering manager",
+          "notes": "Behavioral and project deep dive; disagreements, feedback, and motivation."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": ["Product Manager", "Senior Product Manager"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": "behavioral",
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, motivation and culture fit."
+        },
+        {
+          "name": "Product sense screen",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager or senior PM",
+          "notes": "Problem definition, trade-offs and execution, often anchored in past work."
+        },
+        {
+          "name": "Technical depth",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Engineer or researcher",
+          "notes": "GPU, CUDA and AI concepts; depth depends on the team."
+        },
+        {
+          "name": "Onsite product and strategy",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product leader",
+          "notes": "Product improvement, market opportunity, prioritization and metrics."
+        },
+        {
+          "name": "Hiring manager and cross-functional",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager",
+          "notes": "Products led end to end and cross-functional challenges."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Disagreeing with a senior person",
+      "pattern": "A time the candidate disagreed with a manager or senior engineer on a technical call, and how it was settled",
+      "competencies": ["conflict_handling", "communication"],
+      "values": ["Intellectual Honesty", "One Team"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Hardest technical problem",
+      "pattern": "The most challenging technical problem the candidate solved, the dead ends, and how they persisted",
+      "competencies": ["ownership", "impact"],
+      "values": ["Excellence and Determination"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Negative feedback and mistakes",
+      "pattern": "Feedback or a mistake the candidate had to face openly, and what changed",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Intellectual Honesty"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Changing course fast",
+      "pattern": "A time new information forced the candidate to change plans quickly",
+      "competencies": ["impact", "ownership"],
+      "values": ["Speed and Agility"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Project deep dive",
+      "pattern": "Walk through a project from the resume in depth, including low-level technical details and the candidate's own decisions",
+      "competencies": ["depth_of_experience", "scope_at_level"],
+      "values": ["Excellence and Determination"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Motivation and domain fit",
+      "pattern": "Why NVIDIA and why this team's domain (GPU software, AI infrastructure, drivers, and so on)",
+      "competencies": ["motivation", "role_fit"],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "GPU and CUDA performance",
+      "pattern": "Explain a GPU programming concept and how it affects performance, and reason about the theoretical limit",
+      "competencies": ["technical_depth", "accuracy", "reasoning"],
+      "values": ["Excellence and Determination"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Systems fundamentals",
+      "pattern": "Explain an operating system or memory concept and its cost in real systems",
+      "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Infrastructure design",
+      "pattern": "Design a service or low-level component (scheduler, allocator, inference service) and defend trade-offs",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Innovation"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "ML and LLM concepts",
+      "pattern": "Explain a modern deep learning technique and why it matters for compute or memory",
+      "competencies": ["technical_depth", "clarity_of_explanation"],
+      "values": []
+    },
+    {
+      "interview_type": "case",
+      "theme": "Product improvement",
+      "pattern": "Improve an NVIDIA product for a user segment and define success metrics",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Innovation"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Market opportunity",
+      "pattern": "Size and evaluate a market opportunity for NVIDIA technology and recommend a move",
+      "competencies": ["estimation_logic", "user_and_business_sense", "recommendation"],
+      "values": ["Innovation", "Speed and Agility"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Prioritization trade-off",
+      "pattern": "Choose between competing product investments with limited resources and explain the trade-offs",
+      "competencies": ["prioritization", "structure", "recommendation"],
+      "values": []
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you disagreed with your manager or someone more senior about a technical decision.",
+      "strong_answer": "Pick a real technical disagreement. Explain both positions and the evidence you brought, such as a benchmark or prototype, rather than opinion. Show you raised it directly and respectfully, and that you would change your mind if the data said so. NVIDIA prizes intellectual honesty, so say clearly if you turned out to be wrong. End with the outcome and the working relationship. Pitfall: a story about personalities with no technical substance.",
+      "competencies": ["conflict_handling", "communication"],
+      "values": ["Intellectual Honesty", "One Team"],
+      "source_url": "https://igotanoffer.com/en/advice/nvidia-software-engineer-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe the most challenging technical problem you have worked on and how you solved it.",
+      "strong_answer": "Choose a problem with real depth, such as a performance, concurrency or hardware-related bug. Explain why it was hard, the hypotheses you tested, the tools you used (profilers, debuggers, counters), and dead ends. Quantify the result and, if possible, compare it with the theoretical best. Interviewers will drill into low-level details, so choose something you know thoroughly. Pitfall: a broad project summary with no technical specifics.",
+      "competencies": ["ownership", "impact", "communication"],
+      "values": ["Excellence and Determination"],
+      "source_url": "https://igotanoffer.com/en/advice/nvidia-software-engineer-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "How do you deal with negative feedback? Give an example.",
+      "strong_answer": "Give a concrete case: the feedback, who gave it, your first reaction, and the specific changes you made. Show you treat feedback as information about reality, which is how NVIDIA frames intellectual honesty. Mention how you checked that the change worked. Pitfall: defensive framing or a trivial example.",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Intellectual Honesty"],
+      "source_url": "https://igotanoffer.com/en/advice/nvidia-software-engineer-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a conflict on a team you were part of and how it was resolved.",
+      "strong_answer": "Describe the conflict and the stakes briefly, then your actions: understanding each side, getting facts, proposing a decision rule, and keeping information open. Show a one-team mindset across hardware, software or research groups when possible. Close with the result and what you would do differently. Pitfall: taking all the credit or blaming others.",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["One Team"],
+      "source_url": "https://igotanoffer.com/en/advice/nvidia-software-engineer-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a hard decision you had to make with limited information.",
+      "strong_answer": "Explain the situation, what was unknown, and the cost of waiting. Show how you gathered the most important facts quickly, made a call you could revisit, and set signals to check it. Be honest about the outcome, including what you got wrong. NVIDIA values speed with honesty, so show both. Pitfall: a decision that was not actually hard.",
+      "competencies": ["ownership", "impact"],
+      "values": ["Speed and Agility", "Intellectual Honesty"],
+      "source_url": "https://igotanoffer.com/en/advice/nvidia-product-manager-interview"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why NVIDIA, and why this team in particular?",
+      "strong_answer": "Connect your experience and interests to the team's actual domain (for example CUDA libraries, AI infrastructure, drivers, or autonomous vehicles). Mention specific NVIDIA technologies you have used or studied and what you want to learn. Show enthusiasm for hard technical problems and the platform approach. Pitfall: talking only about stock price or the AI boom.",
+      "competencies": ["motivation", "role_fit"],
+      "values": [],
+      "source_url": "https://igotanoffer.com/en/advice/nvidia-product-manager-interview"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Tell me about yourself and walk me through a project on your resume that is closest to this team's work.",
+      "strong_answer": "Keep the intro short and relevant. For the project, explain the goal, your specific role, the technical design, and measured results. Expect deep technical follow-ups on language, memory, and performance details, so choose a project you can explain at the lowest level. Show how you worked with other teams. Pitfall: a long chronological history.",
+      "competencies": ["depth_of_experience", "scope_at_level", "role_fit"],
+      "values": ["Excellence and Determination"],
+      "source_url": "https://igotanoffer.com/en/advice/nvidia-software-engineer-interview"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Tell me about a product you led from start to finish.",
+      "strong_answer": "Cover the problem and customer, how you defined requirements with engineering, the key trade-offs and cuts, launch, and measured results. For NVIDIA, technical credibility matters: show you understood the architecture well enough to make good calls. Include a setback and how you handled it. Pitfall: describing only process and meetings.",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["One Team"],
+      "source_url": "https://igotanoffer.com/en/advice/nvidia-product-manager-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "What is memory coalescing in CUDA, and why does it matter for performance?",
+      "strong_answer": "Explain that threads in a warp access global memory together, and when their addresses fall in contiguous, aligned segments the hardware combines them into few transactions. Uncoalesced access multiplies transactions and wastes bandwidth. Give an example such as row versus column access in a matrix, and fixes like data layout changes (structure of arrays), shared memory tiling, or transposes. Strong answers relate it to achieved versus peak bandwidth and mention profiling to confirm.",
+      "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
+      "values": ["Excellence and Determination"],
+      "source_url": "https://igotanoffer.com/en/advice/nvidia-software-engineer-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you reduce the cost of moving data between host (CPU) memory and device (GPU) memory?",
+      "strong_answer": "Start with why transfers are expensive: interconnect bandwidth is far below device memory bandwidth. Then cover techniques: minimize transfers and keep data on the device, batch small copies, use pinned memory, overlap copies with compute using streams and async copies, and consider unified memory with prefetching. Mention measuring with a profiler and comparing with link bandwidth limits. Pitfall: listing APIs without explaining the reason they help.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Excellence and Determination"],
+      "source_url": "https://igotanoffer.com/en/advice/nvidia-software-engineer-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Explain the difference between kernel mode and user mode, and why the distinction exists.",
+      "strong_answer": "Explain privilege levels: kernel mode can execute privileged instructions and access all memory, while user mode is restricted for protection and stability. Describe how user code enters the kernel (system calls, interrupts, exceptions) and the cost of mode switches. Connect it to drivers, which NVIDIA builds, and why moving work to user space can reduce overhead. Clear, accurate layering is the main signal.",
+      "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
+      "values": [],
+      "source_url": "https://igotanoffer.com/en/advice/nvidia-software-engineer-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Describe how virtual memory works and what it costs.",
+      "strong_answer": "Cover address translation through page tables, the TLB, page faults and demand paging, and protection between processes. Discuss costs: TLB misses, page walks, and faults; mention large pages as a mitigation. A strong answer links to GPUs: unified virtual addressing and page migration between host and device. Pitfall: confusing virtual memory with swap only.",
+      "competencies": ["technical_depth", "accuracy", "reasoning"],
+      "values": [],
+      "source_url": "https://igotanoffer.com/en/advice/nvidia-software-engineer-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a memory allocator, and explain the design choices you would make for performance.",
+      "strong_answer": "Clarify the workload: allocation sizes, threads, and whether it is for CPU or GPU memory. Discuss free lists, size classes, slabs or buddy allocation, fragmentation, and thread-local caches to avoid lock contention. For GPU memory, mention pooling to avoid expensive device allocation calls and stream-ordered reuse. Explain how you would measure fragmentation and latency. Strong answers name trade-offs between speed, memory overhead and fragmentation.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Excellence and Determination"],
+      "source_url": "https://igotanoffer.com/en/advice/nvidia-software-engineer-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a system for submitting and managing GPU jobs across a shared cluster.",
+      "strong_answer": "Clarify users, job types (training, inference, batch) and scale. Cover the job API, a queue and scheduler, resource accounting per GPU, priorities and quotas, preemption and checkpointing, placement aware of interconnect topology, and monitoring of utilization and failures. Discuss fairness versus utilization trade-offs and how to handle node failures for long jobs. Pitfall: treating GPUs like generic CPUs and ignoring topology and memory.",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["Innovation", "One Team"],
+      "source_url": "https://igotanoffer.com/en/advice/nvidia-software-engineer-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Explain what a mixture-of-experts model is and why it changes the compute and memory picture compared to a dense model.",
+      "strong_answer": "Explain that a router sends each token to a small subset of expert sub-networks, so compute per token stays low while total parameters grow. Discuss consequences: memory to hold all experts, load balancing across experts, communication when experts sit on different GPUs, and batching inefficiency. Compare briefly with dense models. Strong answers also mention how this affects inference serving. Pitfall: vague description with no systems implications.",
+      "competencies": ["technical_depth", "clarity_of_explanation", "trade_offs"],
+      "values": [],
+      "source_url": "https://interviewing.io/nvidia-interview-questions"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you explain the use of GPUs for deep learning to a business stakeholder?",
+      "strong_answer": "Explain that deep learning is dominated by large matrix operations that can be split into many independent pieces, which GPUs run in parallel across thousands of cores with high memory bandwidth. Mention the software stack (CUDA and libraries) that makes this usable. Tie it to business outcomes like training time and inference cost. Keep it simple and accurate. Pitfall: jargon without a clear causal chain.",
+      "competencies": ["clarity_of_explanation", "accuracy"],
+      "values": [],
+      "source_url": "https://igotanoffer.com/en/advice/nvidia-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you improve the user experience of GeForce NOW?",
+      "strong_answer": "Define the users (gamers on low-end devices, travelers, and so on) and their main pains, such as latency, queue times, game library and price. Pick one segment and problem, propose solutions, and prioritize by impact and feasibility given infrastructure costs. Define metrics like session length, retention and conversion to paid tiers, plus guardrails like latency. Pitfall: ignoring the cost of server capacity.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Innovation"],
+      "source_url": "https://igotanoffer.com/en/advice/nvidia-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "What new market could NVIDIA's AI technology expand into, and how would you evaluate it?",
+      "strong_answer": "Generate a few candidate markets, then evaluate with clear criteria: market size (with a rough estimate and assumptions), fit with NVIDIA's platform strengths, competition, and time to revenue. Pick one and recommend a first step such as a partnership, SDK, or reference design. Address risks. NVIDIA thinks in platforms and ecosystems, so mention developers. Pitfall: picking a market without sizing it.",
+      "competencies": ["estimation_logic", "user_and_business_sense", "recommendation"],
+      "values": ["Innovation", "Speed and Agility"],
+      "source_url": "https://igotanoffer.com/en/advice/nvidia-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "Sales of one of your products are declining. How would you investigate?",
+      "strong_answer": "Clarify the size and timing of the drop, then segment: region, channel, customer type, product SKU. Check external factors (competitor launch, seasonality, supply constraints, a new generation announced) and internal ones (price changes, quality issues). Form hypotheses, say what data confirms each, and recommend actions. Pitfall: jumping to a single cause.",
+      "competencies": ["problem_framing", "structure", "recommendation"],
+      "values": ["Intellectual Honesty"],
+      "source_url": "https://igotanoffer.com/en/advice/nvidia-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "You can fund either a user-facing feature or stability and performance work this quarter. How do you choose?",
+      "strong_answer": "Lay out a framework: customer impact, revenue or retention risk, effort, and strategic importance. Quantify where possible, for example crash rates or support costs versus expected adoption of the feature. Consider options like partial scope. Make a clear recommendation and explain how you would communicate it. Pitfall: refusing to choose.",
+      "competencies": ["prioritization", "structure", "recommendation"],
+      "values": [],
+      "source_url": "https://igotanoffer.com/en/advice/nvidia-product-manager-interview"
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "IC1",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Works on defined tasks with review from a more senior engineer."
+    },
+    {
+      "level_name": "IC2",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns small features end to end with light review; work is still scoped by others."
+    },
+    {
+      "level_name": "IC3",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Owns a component and delivers against goals without close supervision; reviews code and debugs across module boundaries."
+    },
+    {
+      "level_name": "IC4",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Sets the plan for an area and carries projects that depend on two or more teams, often across hardware and software."
+    },
+    {
+      "level_name": "IC5",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Owns a large product area and sets its technical direction; other teams consult them before building."
+    },
+    {
+      "level_name": "IC6",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Principal engineer: sets technical direction across several teams or a whole area of NVIDIA software."
+    }
+  ],
+  "persona": {
+    "tone": "Technical, direct and no-nonsense; respectful but not chatty",
+    "pace": "Fast, with several questions per session and quick drills into low-level detail",
+    "pushback_style": "Asks 'how close is that to the theoretical limit?' and 'what does the hardware actually do?'; challenges hand-wavy answers and asks for numbers",
+    "closing_style": "Short closing with a few minutes for questions about the team's technical work"
+  },
+  "scoring_weights": {
+    "technical_depth": 1.6,
+    "accuracy": 1.4,
+    "reasoning": 1.3,
+    "trade_offs": 1.2,
+    "depth_of_experience": 1.3,
+    "role_fit": 1.2,
+    "learning_from_failure": 1.1,
+    "collaboration": 1.1,
+    "estimation_logic": 1.1
+  },
+  "values_share": 0.2,
+  "case_style": {
+    "product_sense": 0.35,
+    "estimation": 0.25,
+    "system_thinking": 0.4,
+    "notes": "PM cases mix product improvement for NVIDIA products, market sizing and expansion, and prioritization with technical constraints. Technical depth expectations rise for AI infrastructure and CUDA teams."
+  },
+  "sources": [
+    {
+      "url": "https://images.nvidia.com/aem-dam/en-zz/Solutions/about-us/NVIDIA-Code-of-Conduct-External.pdf",
+      "title": "NVIDIA Code of Conduct (core values)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://www.kirstinferguson.com/nvidia-built-its-culture-around-1-principle-and-it-saved-the-company/",
+      "title": "NVIDIA built its culture around one principle (intellectual honesty)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework", "persona"]
+    },
+    {
+      "url": "https://igotanoffer.com/en/advice/nvidia-software-engineer-interview",
+      "title": "NVIDIA software engineer interview (questions from Glassdoor reports)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://interviewing.io/nvidia-interview-questions",
+      "title": "NVIDIA interview process and questions",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://igotanoffer.com/en/advice/nvidia-product-manager-interview",
+      "title": "NVIDIA product manager interview",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.designgurus.io/blog/nvidia-software-engineer-levels",
+      "title": "NVIDIA software engineer levels",
+      "retrieved_at": "2026-10-10",
+      "fields": ["bar_by_level"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "low"
+  },
+  "low_confidence_notes": [
+    "values_framework: the Code of Conduct PDF was too large to open; value names and summaries are from the search snippet of that PDF and secondary pages quoting it.",
+    "loop_structure: NVIDIA hires by team and loops vary widely; the round list is a typical pattern.",
+    "loop_structure: PM level names are generic; no public source confirms NVIDIA PM titles.",
+    "bar_by_level: NVIDIA publishes no level map; IC1-IC6 and scopes come from one third-party source and levels.fyi data.",
+    "persona: inferred from candidate reports of fast, detail-heavy technical rounds.",
+    "case_style: PM case mix is based on one aggregated guide.",
+    "scoring_weights: estimated; no public source gives weights."
+  ]
+}

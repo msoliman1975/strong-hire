@@ -1,0 +1,518 @@
+{
+  "company_name": "Adobe",
+  "company_slug": "adobe",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-10",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Adobe Core Values",
+    "principles": [
+      {
+        "name": "Create the future",
+        "description": "Builders and inventors driven by deep empathy for customers. Look around the corner, welcome new ideas, and make bold bets real.",
+        "evidence_signals": [
+          "Proposed or built something new from a customer insight, not just a request",
+          "Took a bold bet and explains how the risk was managed",
+          "Shows curiosity about where the product or technology (for example AI) is going"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Own the outcome",
+        "description": "Think and act like an owner. Take initiative, bias toward action, and own the end result, not just your part.",
+        "evidence_signals": [
+          "Took initiative on a problem nobody assigned",
+          "Followed through after launch and fixed what broke",
+          "Talks about the business result, not only the task completed"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Raise the bar",
+        "description": "Aim high and play to win. Focus relentlessly on execution, celebrate excellence, and be intellectually honest about where to improve.",
+        "evidence_signals": [
+          "Raised quality or performance with a measurable before and after",
+          "Admits honestly where the work fell short and what changed",
+          "Holds self and team to a high standard of execution"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Be genuine",
+        "description": "Be yourself, embrace and respect diversity, and support and challenge each other by being honest and direct.",
+        "evidence_signals": [
+          "Gave honest, direct feedback respectfully",
+          "Included or supported people with different views or backgrounds",
+          "Answers candidly, including about mistakes"
+        ],
+        "weight": 1.0
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["MTS 1", "MTS 2", "Computer Scientist", "Senior Computer Scientist", "Principal Scientist"],
+      "rounds": [
+        {
+          "name": "Talent partner screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter (talent partner)",
+          "notes": "Background, goals and role expectations. Not simulated in v1."
+        },
+        {
+          "name": "Online assessment",
+          "interview_type": null,
+          "duration_min": 90,
+          "interviewer_role": null,
+          "notes": "Sometimes required, mainly for early-career roles. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager",
+          "notes": "Resume projects, technical deep dive on past decisions, ownership and impact, culture fit."
+        },
+        {
+          "name": "Coding (data structures and algorithms)",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Usually two rounds. Live coding. Not simulated in v1."
+        },
+        {
+          "name": "Low-level / object-oriented design",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Senior engineer",
+          "notes": "Design and code classes for a system such as an in-memory file system or rental platform. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior or principal engineer",
+          "notes": "High-level design; senior candidates get problems grounded in Adobe products (document services, large assets, AI features)."
+        },
+        {
+          "name": "Director / leadership round",
+          "interview_type": "behavioral",
+          "duration_min": 60,
+          "interviewer_role": "Engineering director or senior manager",
+          "notes": "Behavioral and leadership questions, sometimes with a high-level design discussion."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": ["Product Manager", "Senior Product Manager", "Principal Product Manager"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Group product manager",
+          "notes": "Background, past products and motivation."
+        },
+        {
+          "name": "Product design case",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Senior product manager",
+          "notes": "Design or improve a product for a user segment; MVP scope and success metrics."
+        },
+        {
+          "name": "Analytics and metrics",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Product manager",
+          "notes": "Subscription, trial conversion and engagement metrics; diagnosing metric changes."
+        },
+        {
+          "name": "Technical collaboration",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager or engineer",
+          "notes": "How the PM works with engineering and reasons about technical trade-offs."
+        },
+        {
+          "name": "Leadership and behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Product leader",
+          "notes": null
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Initiative to improve",
+      "pattern": "A time the candidate improved a process or solved a problem on their own initiative",
+      "competencies": ["ownership", "impact"],
+      "values": ["Own the outcome"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Team disagreement",
+      "pattern": "A disagreement within the team and how the candidate handled it honestly and respectfully",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["Be genuine"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Raising quality",
+      "pattern": "A time the candidate pushed work to a higher standard than required and measured the difference",
+      "competencies": ["impact", "learning_from_failure"],
+      "values": ["Raise the bar"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "People leadership dilemma",
+      "pattern": "How the candidate would handle a strong performer who is hurting team health or engagement",
+      "competencies": ["communication", "conflict_handling"],
+      "values": ["Be genuine"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Proud project deep dive",
+      "pattern": "Walk through a project on the resume: architecture, obstacles, own decisions and measurable impact",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Own the outcome"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Delivery under constraints",
+      "pattern": "How the candidate would deliver a project with far fewer people or time than estimated",
+      "competencies": ["judgment", "scope_at_level"],
+      "values": ["Own the outcome"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Motivation and company bets",
+      "pattern": "Why Adobe, and how the candidate would contribute to the company's next big bets",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["Create the future"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Creative document and asset systems",
+      "pattern": "Design a service for rich documents or large binary assets with versioning, sync and collaboration",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Classic distributed building blocks",
+      "pattern": "Design a common backend component such as a cache, queue or search suggestion service and discuss scaling",
+      "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "AI features at scale",
+      "pattern": "Design how a generative AI feature is served to many users while balancing latency and compute cost",
+      "competencies": ["trade_offs", "reasoning"],
+      "values": ["Create the future"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Product for a new segment",
+      "pattern": "Adapt an existing creative or document product for a specific user segment or market",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Create the future"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Success metrics",
+      "pattern": "Define how to measure success for a product or feature, including subscription and engagement metrics",
+      "competencies": ["structure", "user_and_business_sense", "recommendation"],
+      "values": []
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Give an example of a time you took the initiative to improve a process or fix a problem at work.",
+      "strong_answer": "Pick a problem nobody owned. Describe how you noticed it, sized the cost, and acted without waiting. Explain how you got buy-in, what you changed, and the measurable result (time saved, incidents reduced). Show follow-through after the change. Pitfall: an improvement that was really your assigned task.",
+      "competencies": ["ownership", "impact"],
+      "values": ["Own the outcome"],
+      "source_url": "https://interviewing.io/adobe-interview-questions"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "How would you deal with a manager on your team who is very strong technically but has very low team engagement scores?",
+      "strong_answer": "Start by understanding, not judging: look at the feedback, talk to the manager and the team. Separate technical credibility from people leadership. Give direct, specific feedback, agree on a plan (coaching, delegation, 1:1 practice), and set check-in points with measures. Say what you would do if it does not improve. Show care for both the person and the team.",
+      "competencies": ["communication", "conflict_handling"],
+      "values": ["Be genuine"],
+      "source_url": "https://interviewing.io/adobe-interview-questions"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a disagreement in your team and how you handled it.",
+      "strong_answer": "Choose a real disagreement with stakes. Show you understood the other view, argued with data, stayed respectful and direct, and helped the team reach a decision. Describe the outcome and the relationship afterwards. Pitfall: a story where you simply won.",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["Be genuine"],
+      "source_url": "https://www.aced.io/blog/adobe-interview-process"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "The estimate for a project is 9 people for 9 months, but you have 3 people and 3 months. How would you deliver it?",
+      "strong_answer": "Clarify the real goal and the must-have outcome. Cut scope to an MVP, sequence by risk and value, and reuse existing components or buy where possible. Be explicit about what you drop and the quality bar you keep. Negotiate with stakeholders openly and set checkpoints. Show judgment, not heroics. Pitfall: promising everything by working nights.",
+      "competencies": ["judgment", "scope_at_level"],
+      "values": ["Own the outcome"],
+      "source_url": "https://interviewing.io/adobe-interview-questions"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "What do you think Adobe's big future bets are, and how would you help with them in this role?",
+      "strong_answer": "Show real research: for example generative AI in creative and document products, cloud collaboration, and digital experience. Link one bet to the team you would join and to your concrete skills. Offer one thoughtful idea or question. Pitfall: generic praise of the brand.",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["Create the future"],
+      "source_url": "https://interviewing.io/adobe-interview-questions"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Describe a past project you are proud of.",
+      "strong_answer": "Pick a project at the scope of the target level. Explain the problem, your role, two key decisions with trade-offs, and measurable impact for users or the business. Be ready for deep technical follow-ups on the architecture. Say what you would do differently.",
+      "competencies": ["depth_of_experience", "scope_at_level"],
+      "values": ["Own the outcome"],
+      "source_url": "https://www.aced.io/blog/adobe-interview-process"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Explain the architecture of your current project and the main obstacles you have faced in your role.",
+      "strong_answer": "Give a short system overview with the main components and data flow. Pick one or two real obstacles (technical or organizational), what you did, and the outcome. Show you understand why the system is built as it is. Pitfall: blaming others for obstacles.",
+      "competencies": ["depth_of_experience", "judgment"],
+      "values": [],
+      "source_url": "https://leetcode.com/discuss/interview-experience/6177012/"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why do you want to join Adobe?",
+      "strong_answer": "Connect a specific product or technology area to your experience and goals. Mention what you would bring in the first months. Be genuine; Adobe's own interview tips stress real interest in the products and curious questions.",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["Be genuine"],
+      "source_url": "https://www.aced.io/blog/adobe-interview-process"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a cloud document service for files with complex internal structure such as layers and embedded assets, supporting version history, sync across devices and collaborative editing.",
+      "strong_answer": "Clarify document sizes, users per document and offline needs. Model the document as a tree of components so changes are small deltas. Store large assets separately (object storage, content-addressed chunks). Version with an operation log plus periodic snapshots. Sync deltas, and choose a conflict strategy (OT, CRDT, or per-component locking) with reasons. Cover permissions, undo, and storage cost. Pitfall: re-uploading whole files on every change.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": [],
+      "source_url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-adobe-system-design-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a pipeline to store and deliver very large binary creative assets to users around the world.",
+      "strong_answer": "Cover chunked, resumable uploads, content hashing and dedup, object storage with lifecycle tiers, metadata store, thumbnail and preview generation jobs, CDN delivery with cache keys and invalidation, and delta sync for edits. Discuss cost versus latency and regional replication. Strong answers quantify sizes and bandwidth.",
+      "competencies": ["technical_depth", "trade_offs"],
+      "values": [],
+      "source_url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-adobe-system-design-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design the backend for a generative AI image feature used inside a creative app at large scale.",
+      "strong_answer": "Clarify latency targets and request volume. Describe a request gateway, queueing, GPU inference pool with autoscaling and batching, result storage and delivery. Cover quotas and entitlement checks, content safety filtering, caching repeated prompts, and graceful degradation. The key trade-off is interactive latency versus GPU cost; state how you balance it and what you would measure.",
+      "competencies": ["trade_offs", "reasoning", "technical_depth"],
+      "values": ["Create the future"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-adobe-system-design-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a typeahead search box that suggests completions as the user types.",
+      "strong_answer": "Requirements: latency budget per keystroke, ranking by popularity, personalization, freshness. Data structure: prefix trie or precomputed top-k per prefix. Serving: in-memory shards, client debouncing, caching common prefixes. Offline pipeline to rebuild counts from logs. Discuss trade-offs of freshness versus cost and how to filter bad suggestions.",
+      "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
+      "values": [],
+      "source_url": "https://www.aced.io/blog/adobe-interview-process"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a message queue for communication between services.",
+      "strong_answer": "Clarify delivery guarantees (at-least-once, ordering per key), throughput and retention. Describe producers, partitioned append-only logs, consumer groups with offsets, replication and leader election, acknowledgments and retries, dead-letter handling. Discuss back-pressure and the trade-off between durability and latency.",
+      "competencies": ["technical_depth", "accuracy", "trade_offs"],
+      "values": [],
+      "source_url": "https://www.aced.io/blog/adobe-interview-process"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a caching layer that runs across multiple nodes.",
+      "strong_answer": "Cover consistent hashing for key placement, replication for hot keys, eviction policy, TTLs, and invalidation on writes (write-through, write-behind or cache-aside) with consistency trade-offs. Discuss node failure and rebalancing, thundering herd protection, and metrics such as hit rate.",
+      "competencies": ["technical_depth", "trade_offs"],
+      "values": [],
+      "source_url": "https://www.aced.io/blog/adobe-interview-process"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a warehouse management system where storage spaces are rented to different firms and orders for their stored items must be processed efficiently.",
+      "strong_answer": "Clarify entities (warehouse, space, firm, item, order) and the key operations. Model data and APIs, then the allocation strategy for spaces (fit, fragmentation) and order processing flow with concurrency control. Discuss scale, consistency for inventory counts, and extensibility. A reported pitfall is weak structure; break the problem into components early.",
+      "competencies": ["reasoning", "technical_depth", "clarity_of_explanation"],
+      "values": [],
+      "source_url": "https://leetcode.com/discuss/interview-experience/7376948"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you position Creative Cloud to win small businesses in a specific Asian market such as Singapore?",
+      "strong_answer": "Clarify goal (new subscribers, revenue). Segment small businesses by need (social content, print, web). Size the opportunity roughly. Identify barriers: price, skills, local payment, competition from simpler tools. Propose a focused offer (templates, simpler app, bundles, partners) and a go-to-market. Define metrics: trial starts, conversion, retention. Recommend one path with risks.",
+      "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
+      "values": ["Create the future"],
+      "source_url": "https://www.aced.io/blog/adobe-interview-process"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you measure the success of a short-video feature in a social app?",
+      "strong_answer": "State the feature goal first. Pick a north star (for example time spent watching or creators posting weekly) and supporting metrics for creators, viewers and the business. Add guardrails such as impact on other surfaces. Explain how to attribute change (experiments, cohorts). Pitfall: a long list of metrics with no hierarchy.",
+      "competencies": ["structure", "user_and_business_sense"],
+      "values": [],
+      "source_url": "https://www.aced.io/blog/adobe-interview-process"
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "MTS 1",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Member of Technical Staff 1. Delivers well-defined tasks with guidance."
+    },
+    {
+      "level_name": "MTS 2",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Member of Technical Staff 2. Owns features independently inside one team."
+    },
+    {
+      "level_name": "Computer Scientist",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Owns components or services end to end, leads designs and mentors engineers."
+    },
+    {
+      "level_name": "Senior Computer Scientist",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Technical lead for a product area; drives architecture across teams."
+    },
+    {
+      "level_name": "Principal Scientist",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Sets technical direction for a large product or platform and influences the organization."
+    },
+    {
+      "level_name": "Senior Product Manager",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns a product area, its roadmap and metrics, and leads cross-functional teams."
+    }
+  ],
+  "persona": {
+    "tone": "Professional and friendly, relationship-driven, genuinely curious about the candidate's work",
+    "pace": "Moderate; moves quickly through resume topics then goes deep on one project",
+    "pushback_style": "Probes trade-offs behind technical decisions and asks for measurable impact; may shift requirements mid-design",
+    "closing_style": "Invites thoughtful questions about the team and products"
+  },
+  "scoring_weights": {
+    "ownership": 1.3,
+    "impact": 1.2,
+    "technical_depth": 1.3,
+    "trade_offs": 1.2,
+    "depth_of_experience": 1.2,
+    "user_and_business_sense": 1.2,
+    "structure": 1.1
+  },
+  "values_share": 0.2,
+  "case_style": {
+    "product_sense": 0.6,
+    "estimation": 0.1,
+    "system_thinking": 0.3,
+    "notes": "PM cases center on improving Adobe products for a segment (SMB, new markets) and on subscription and engagement metrics. Estimation is light."
+  },
+  "sources": [
+    {
+      "url": "https://blog.adobe.com/en/publish/2023/03/07/evolving-adobes-values-culture",
+      "title": "Evolving Adobe's values and culture (Adobe blog)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://www.adobe.com/careers/interviewing-at-adobe",
+      "title": "Interviewing at Adobe (Adobe careers)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "persona"]
+    },
+    {
+      "url": "https://interviewing.io/adobe-interview-questions",
+      "title": "Adobe's interview process and questions (interviewing.io)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.aced.io/blog/adobe-interview-process",
+      "title": "Get a job at Adobe: interview process and top questions",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-adobe-system-design-interview",
+      "title": "What to expect in the Adobe system design interview",
+      "retrieved_at": "2026-10-10",
+      "fields": ["question_patterns", "scoring_weights"]
+    },
+    {
+      "url": "https://leetcode.com/discuss/interview-experience/7376948",
+      "title": "Adobe MTS-2 interview, Nov 2025 (candidate report)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://leetcode.com/discuss/interview-experience/6177012/",
+      "title": "Adobe MTS 2 interview (candidate report)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://shiftmag.dev/?p=9464",
+      "title": "Inside Adobe's career ladder (ShiftMag)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://www.interviewquery.com/interview-guides/adobe-product-manager",
+      "title": "Adobe product manager interview guide (Interview Query)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "case_style"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "low"
+  },
+  "low_confidence_notes": [
+    "values_framework: Adobe has no dedicated values round; values are probed inside hiring manager and leadership rounds. Adobe's careers page still mentions the older values (genuine, exceptional, innovative, involved), so interviewers may use either set.",
+    "loop_structure: rounds vary widely by team and country; many India candidate reports show 2 DSA + LLD + HM/director rounds. PM loop comes from third-party guides only.",
+    "bar_by_level: Adobe does not publish its ladder; title-to-level mapping comes from third-party summaries, and US postings also use Software Engineer / Senior Software Engineer titles.",
+    "persona: based on Adobe's 'relationship-driven' interview tips and candidate reports; thin evidence.",
+    "scoring_weights: estimated; no public source gives weights.",
+    "case_style: PM case examples come from third-party guides (one example uses a non-Adobe product)."
+  ]
+}

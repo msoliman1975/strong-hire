@@ -1,0 +1,536 @@
+{
+  "company_name": "Atlassian",
+  "company_slug": "atlassian",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-10",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Atlassian Values",
+    "principles": [
+      {
+        "name": "Open company, no bullshit",
+        "description": "Information is open by default. Communicate honestly and directly, share bad news early, and give and take candid feedback with care.",
+        "evidence_signals": [
+          "Describes sharing a problem or bad news early instead of hiding it",
+          "Gave or asked for direct feedback and explains how it was received",
+          "Made work or decisions visible to others so they could challenge it"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Build with heart and balance",
+        "description": "Care deeply about the craft and the people affected, while weighing impact, cost, speed and sustainability before acting.",
+        "evidence_signals": [
+          "Weighs options and trade-offs explicitly before committing",
+          "Shows pride in the quality of the work and the long-term health of the system",
+          "Balances urgency with sustainable pace for the team"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Don't #@!% the customer",
+        "description": "Customers come first. Decisions start from the customer impact, especially when the trade-off is uncomfortable for the team.",
+        "evidence_signals": [
+          "Names the specific customer and the pain the work addressed",
+          "Chose the harder path internally to avoid hurting customers",
+          "Measured the outcome in customer terms, not only output"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Play, as a team",
+        "description": "Put the team ahead of individual credit. Collaborate with humility, help others succeed, and keep work enjoyable.",
+        "evidence_signals": [
+          "Uses 'we' for team results and credits others specifically",
+          "Resolved friction in a team by listening and finding common ground",
+          "Helped a teammate or another team without being asked"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Be the change you seek",
+        "description": "Improve the systems you work in instead of complaining about them. Take initiative to fix processes, tools and culture.",
+        "evidence_signals": [
+          "Spotted a broken process and changed it without being told",
+          "Drove adoption of the change and measured whether it worked",
+          "Shows a growth mindset about own mistakes and what changed after"
+        ],
+        "weight": 1.0
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["P30", "P40", "P50", "P60", "P70"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Talent acquisition partner",
+          "notes": "Background, motivation and logistics. Not simulated in v1."
+        },
+        {
+          "name": "Coding: data structures",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Live coding in the candidate's language; focus on how the candidate thinks. Not simulated in v1."
+        },
+        {
+          "name": "Coding: code design",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Live coding of a small extensible design (for example a rate limiter) with changing requirements. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior or principal engineer",
+          "notes": "Laddered design question; follow-ups add constraints such as reliability and cost. Often about Atlassian-like products, for example a tagging service."
+        },
+        {
+          "name": "Craft / project deep dive",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior or principal engineer",
+          "notes": "Reported for P60 and above: architecture, challenges, trade-offs and scope of a past project."
+        },
+        {
+          "name": "Manager interview",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Engineering manager or senior team member",
+          "notes": "Career goals, past projects, technical challenges, collaboration and communication style."
+        },
+        {
+          "name": "Values interview",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Atlassian employee from outside the hiring team",
+          "notes": "Informal behavioral conversation against the five values. A hiring committee reviews all feedback afterwards."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": ["P40", "P50", "P60"],
+      "rounds": [
+        {
+          "name": "Hiring manager conversation",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Group product manager",
+          "notes": "Background, motivation and fit before the panel."
+        },
+        {
+          "name": "Lead and inspire",
+          "interview_type": "behavioral",
+          "duration_min": 60,
+          "interviewer_role": "Product leader",
+          "notes": "Influence without authority, rallying teams behind a shared goal, championing unpopular ideas."
+        },
+        {
+          "name": "Product craft",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Senior product manager",
+          "notes": "Customer focus and T-shaped product skills; may include a product case such as improving a feature, roadmap trade-offs or metrics."
+        },
+        {
+          "name": "Deliver outcomes",
+          "interview_type": "behavioral",
+          "duration_min": 60,
+          "interviewer_role": "Product leader",
+          "notes": "Measurable customer and business impact of past work, not output."
+        },
+        {
+          "name": "Values interview",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Atlassian employee from outside the hiring team",
+          "notes": "Same values interview as other roles."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Transparency under pressure",
+      "pattern": "A time the candidate shared uncomfortable information or bad news openly and what happened next",
+      "competencies": ["communication", "ownership"],
+      "values": ["Open company, no bullshit"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Customer over convenience",
+      "pattern": "A time the candidate chose the option that was harder for the team because it was better for customers",
+      "competencies": ["impact", "ownership"],
+      "values": ["Don't #@!% the customer"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Difficult team dynamics",
+      "pattern": "A time the candidate worked through friction or disagreement inside a team or across teams",
+      "competencies": ["collaboration", "conflict_handling"],
+      "values": ["Play, as a team"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Fixing the system",
+      "pattern": "A time the candidate noticed a broken process or tool and changed it on their own initiative",
+      "competencies": ["ownership", "impact"],
+      "values": ["Be the change you seek"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Balancing speed and quality",
+      "pattern": "A decision where the candidate had to balance shipping fast against quality, cost or team wellbeing",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Build with heart and balance"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Influence without authority",
+      "pattern": "A time the candidate got people they did not manage behind a shared goal or an unpopular idea",
+      "competencies": ["collaboration", "communication", "impact"],
+      "values": ["Play, as a team", "Open company, no bullshit"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Project walkthrough",
+      "pattern": "Walk through a recent project end to end: the goal, own role, planning, trade-offs and result",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Career direction",
+      "pattern": "Where the candidate wants to grow next and why this team and Atlassian fit that direction",
+      "competencies": ["motivation", "role_fit", "team_fit"],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Multi-product platform service",
+      "pattern": "Design a shared backend service used by several collaboration products, then handle new constraints on scale, reliability and cost",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Build with heart and balance"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Past architecture deep dive",
+      "pattern": "Explain the architecture of a system the candidate built, the hardest problem, and the options rejected",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": []
+    },
+    {
+      "interview_type": "case",
+      "theme": "Improve a team-collaboration product",
+      "pattern": "Pick a user segment of a collaboration or work-management tool, find a pain point, and propose a change with a success metric",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Don't #@!% the customer"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Metrics and diagnosis",
+      "pattern": "Define the key metric for a product and explain how to investigate a sudden drop in it",
+      "competencies": ["structure", "problem_framing", "recommendation"],
+      "values": []
+    },
+    {
+      "interview_type": "case",
+      "theme": "Growth strategy",
+      "pattern": "Choose a market or growth lever for an existing product and defend the choice against alternatives",
+      "competencies": ["user_and_business_sense", "prioritization", "estimation_logic"],
+      "values": []
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "technical_qa",
+      "question": "Design one tagging service that all Atlassian products (issue tracker, wiki, code hosting) can use to attach tags to their content, and support listing the most popular tags.",
+      "strong_answer": "Clarify scope: tag CRUD, tag-to-entity mapping across products, popular-tags query, tenant isolation. Size it with rough numbers (tenants, entities, tag writes per second). Define APIs (add/remove tag, list by entity, list entities by tag, top-k). Pick storage with reasons: relational or wide-column for mappings keyed by tenant, with a separate counter path (stream plus aggregation, or approximate counts) for top-k. Cover sharding by tenant, caching hot tags, eventual consistency of counts, and failure handling. Expect follow-ups and defend trade-offs. Pitfall: skipping multi-tenancy or treating top-k as an exact global scan.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Build with heart and balance"],
+      "source_url": "https://leetcode.com/discuss/interview-experience/2231218/"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a web crawler that fetches pages starting from seed URLs and stores their content, then discuss how it scales.",
+      "strong_answer": "Start with requirements: scale, politeness, freshness, content types. Components: URL frontier with per-host queues, fetchers, parser, dedup of URLs and content (hashes), storage. Address cycles and duplicate URLs early (normalization, seen-set or Bloom filter), robots.txt and rate limits per host, retries and timeouts. Scale horizontally by partitioning the frontier by host. Discuss failure recovery and monitoring. A reported pitfall is missing loop handling until prompted, so raise it yourself.",
+      "competencies": ["technical_depth", "reasoning", "trade_offs"],
+      "values": [],
+      "source_url": "https://leetcode.com/discuss/interview-experience/4133665/"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "You built a per-customer rate limiter on one machine. How would you make it work across many servers, and what are the thread-safety and consistency concerns?",
+      "strong_answer": "Name the algorithm (token or leaky bucket, sliding window) and why. For one node, discuss concurrent maps and atomic updates. For many nodes: a shared store with atomic increments or scripts, or local buckets with periodic sync and the over-admission that causes. Cover clock skew, hot customers, failure mode when the store is down (fail open or closed and why), and how unused quota carry-over changes the state. Strong answers quantify latency added per request.",
+      "competencies": ["technical_depth", "trade_offs", "accuracy"],
+      "values": [],
+      "source_url": "https://leetcode.com/discuss/interview-experience/4133665/"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Pick a system you designed. Walk through its architecture, the hardest technical challenge, the trade-offs you made, and the scope of its impact.",
+      "strong_answer": "Give context in one minute: users, scale, constraints. Draw the main components and data flow. Pick one hard problem and go deep: options considered, why you chose one, what it cost. Show what you owned versus the team. Quantify impact (latency, cost, incidents, adoption). Say what you would change now. Pitfall: staying at a buzzword level or being unable to answer 'why not X?'.",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["Build with heart and balance"],
+      "source_url": "https://leetcode.com/discuss/interview-experience/4133665/"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "In a system design discussion, the interviewer adds new constraints mid-way, such as a stricter reliability target or a cost limit. Explain how your design changes.",
+      "strong_answer": "Restate the new constraint and its impact before changing anything. Show which parts of the design are affected (replication, caching, storage tier, regions) and which are not. Compare at least two options with their cost and failure behavior. Ask clarifying questions instead of guessing. Atlassian says it uses laddered follow-ups to see learning agility, so adapting calmly matters more than a perfect first design.",
+      "competencies": ["reasoning", "trade_offs", "clarity_of_explanation"],
+      "values": ["Build with heart and balance"],
+      "source_url": "https://www.atlassian.com/company/careers/resources/interviewing/how-to-nail-your-engineering-interview"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Walk me through a project you planned and delivered end to end. What was your role, how did you plan it, and what were the results?",
+      "strong_answer": "Use a clear arc: problem and why it mattered, your specific role, how you broke the work down and sequenced it, risks and how you handled them, stakeholders, and measurable results. Mention a trade-off you made and its business reason. Match scope to the level you apply for. Pitfall: describing the team's work with no clear personal contribution.",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": [],
+      "source_url": "https://leetcode.com/discuss/interview-experience/2231218/"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "What are your career goals, and what do you want to grow into over the next few years at Atlassian?",
+      "strong_answer": "Be specific: the kind of problems and scope you want, the skills you are building, and evidence you already work on them. Tie it to the team and Atlassian's products honestly. Show self-awareness about gaps. Pitfall: generic answers or answers only about title and pay.",
+      "competencies": ["motivation", "role_fit", "team_fit"],
+      "values": [],
+      "source_url": "https://www.atlassian.com/company/careers/resources/interviewing/how-to-nail-your-engineering-interview"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Tell me about a significant achievement and a trade-off you had to make to get there.",
+      "strong_answer": "Pick an achievement at the right scope. State the constraint that forced the trade-off (time, people, quality, cost), the options, why you chose one, who you aligned with, and the outcome including what the trade-off cost later. Show judgment, not luck. Pitfall: an achievement with no real choice in it.",
+      "competencies": ["judgment", "depth_of_experience", "scope_at_level"],
+      "values": ["Build with heart and balance"],
+      "source_url": "https://leetcode.com/discuss/interview-experience/4133665/"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you led a group toward a shared goal when you had no direct authority over them.",
+      "strong_answer": "Describe the goal and why people were not aligned. Show how you built the case (data, customer evidence), listened to objections, adjusted the plan, and kept people moving together. Give credit with 'we' where the team did the work. End with the result and what you learned about influence. Pitfall: 'I escalated to my manager' as the main tactic.",
+      "competencies": ["collaboration", "communication", "impact"],
+      "values": ["Play, as a team"],
+      "source_url": "https://www.atlassian.com/company/careers/resources/interviewing/how-to-nail-your-product-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a project and the outcome it had for customers and the business. How did you know it worked?",
+      "strong_answer": "Lead with the customer problem and who had it. Separate output (what shipped) from outcome (behavior or metric that changed). Give before and after numbers and how you measured them. Say what did not work and what you did next. Atlassian's product handbook stresses impact over output, so make the metric concrete.",
+      "competencies": ["impact", "ownership", "communication"],
+      "values": ["Don't #@!% the customer"],
+      "source_url": "https://www.atlassian.com/company/careers/resources/interviewing/how-to-nail-your-product-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you received difficult feedback. How did you respond?",
+      "strong_answer": "Pick real, specific feedback that stung. Show your first reaction honestly, how you checked whether it was true, and the concrete change you made. Show you later asked for feedback again. This maps to openness and growth. Pitfall: a disguised strength ('I work too hard').",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Open company, no bullshit", "Be the change you seek"],
+      "source_url": "https://www.joinleland.com/library/a/how-to-prepare-for-atlassian-product-management-case-interviews"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "How do you handle conflict inside a cross-functional team? Give an example.",
+      "strong_answer": "Give one real conflict with stakes (for example engineering versus design on scope). Show you sought to understand each side, moved the discussion to shared goals and data, proposed options, and reached a decision people committed to. Describe the relationship afterwards. Pitfall: a story where the other side was simply wrong.",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["Play, as a team", "Open company, no bullshit"],
+      "source_url": "https://www.joinleland.com/library/a/how-to-prepare-for-atlassian-product-management-case-interviews"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you failed. What did you learn and what changed afterwards?",
+      "strong_answer": "Choose a real failure you owned, not a team failure you watched. Explain the cause honestly, the impact, how you communicated it, and the fix. Most important: the lasting change in how you or the team work. Atlassian values openness and improving the system, so show both.",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Be the change you seek", "Open company, no bullshit"],
+      "source_url": "https://www.aced.io/guides/atlassian-pm-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Which values matter most to you at work, and can you give an example of acting on one of them?",
+      "strong_answer": "Know Atlassian's five values and pick one that is genuinely yours. Tell a specific story that shows the value in action, with a cost you accepted for it. Avoid reciting the values list. Interviewers from outside the team use this to judge authenticity.",
+      "competencies": ["communication", "ownership"],
+      "values": ["Open company, no bullshit", "Play, as a team"],
+      "source_url": "https://www.joinleland.com/library/a/how-to-prepare-for-atlassian-product-management-case-interviews"
+    },
+    {
+      "interview_type": "case",
+      "question": "Walk me through a roadmap decision you made: what you chose to build, what you dropped, and why.",
+      "strong_answer": "Frame the goal and constraints first. Show the candidate options and the criteria you used (customer impact, effort, strategic fit, risk). Explain how you used data and customer input, how you aligned stakeholders, and what you said no to. Close with the result and whether the call held up. Pitfall: listing features with no prioritization logic.",
+      "competencies": ["prioritization", "structure", "recommendation"],
+      "values": ["Don't #@!% the customer"],
+      "source_url": "https://www.joinleland.com/library/a/how-to-prepare-for-atlassian-product-management-case-interviews"
+    },
+    {
+      "interview_type": "case",
+      "question": "What would be the north star metric for a team-collaboration product, and how would you investigate if it suddenly dropped?",
+      "strong_answer": "Pick a metric tied to value delivered (for example weekly active teams completing work), and explain why not vanity metrics. For a drop: confirm data and tracking first, then segment by time, platform, region, plan, new versus existing users, and recent releases or outages. Form hypotheses, check them in order of likelihood, and state the action you would take. Pitfall: jumping to a cause without segmenting.",
+      "competencies": ["problem_framing", "structure", "user_and_business_sense"],
+      "values": [],
+      "source_url": "https://www.aced.io/guides/atlassian-pm-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you take an existing product to 100 million users? Which market or segment would you go after first?",
+      "strong_answer": "Clarify the product and current base. Size the gap with simple estimation (segments times reachable users times adoption). Compare two or three growth levers (new segment, free tier, integrations, geography) by size, cost and fit. Recommend one with first steps and a metric. Name risks. Pitfall: listing ideas without choosing.",
+      "competencies": ["estimation_logic", "user_and_business_sense", "recommendation"],
+      "values": [],
+      "source_url": "https://www.aced.io/guides/atlassian-pm-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "Pick a feature of one of our products and tell me how you would improve it and what metrics you would track.",
+      "strong_answer": "Choose a user segment and a real job to be done. Name two or three pain points from the user's view, prioritize one, and propose a solution with an MVP scope. Define a primary success metric and a guardrail. Mention how you would validate before building. Strong answers show customer empathy and clear trade-offs.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Don't #@!% the customer"],
+      "source_url": "https://www.joinleland.com/library/a/how-to-prepare-for-atlassian-product-management-case-interviews"
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "P30",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Graduate or junior engineer. Delivers well-scoped tasks with guidance and learns the codebase."
+    },
+    {
+      "level_name": "P40",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Engineer. Owns features within a team from design to release with limited guidance."
+    },
+    {
+      "level_name": "P50",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Senior engineer. Leads designs for a team's systems, mentors others and handles ambiguity."
+    },
+    {
+      "level_name": "P60",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Principal engineer. Sets technical direction across teams and drives cross-team architecture."
+    },
+    {
+      "level_name": "P70",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Senior principal engineer. Shapes architecture and strategy across a product or platform area."
+    },
+    {
+      "level_name": "P50",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Senior product manager. Owns a product area, its roadmap and its customer outcomes."
+    }
+  ],
+  "persona": {
+    "tone": "Friendly, informal and conversational, with genuine interest in the candidate as a person",
+    "pace": "Relaxed but steady; leaves room to think and expects clarifying questions",
+    "pushback_style": "Ladders up the difficulty with new constraints and asks 'why that choice?' and 'what would you trade off?'",
+    "closing_style": "Leaves time for the candidate's questions about the team and culture"
+  },
+  "scoring_weights": {
+    "collaboration": 1.4,
+    "communication": 1.3,
+    "ownership": 1.2,
+    "impact": 1.2,
+    "trade_offs": 1.3,
+    "reasoning": 1.2,
+    "user_and_business_sense": 1.3,
+    "team_fit": 1.2
+  },
+  "values_share": 0.35,
+  "case_style": {
+    "product_sense": 0.6,
+    "estimation": 0.1,
+    "system_thinking": 0.3,
+    "notes": "PM craft cases start from the customer of team-collaboration tools: improving a feature, roadmap trade-offs and metrics. Estimation is rare."
+  },
+  "sources": [
+    {
+      "url": "https://www.atlassian.com/company/values",
+      "title": "Atlassian core values",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework", "persona"]
+    },
+    {
+      "url": "https://www.atlassian.com/company/careers/resources/interviewing/how-to-nail-your-engineering-interview",
+      "title": "How to nail your engineering interview (Atlassian careers)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "persona"]
+    },
+    {
+      "url": "https://www.atlassian.com/company/careers/resources/interviewing/how-to-nail-your-product-interview",
+      "title": "How to nail your product interview (Atlassian careers)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "case_style", "scoring_weights"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/what-is-the-atlassian-values-interview",
+      "title": "What is the Atlassian values interview?",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework", "loop_structure"]
+    },
+    {
+      "url": "https://leetcode.com/discuss/interview-experience/2231218/",
+      "title": "Atlassian P4/SDE2 interview experience (candidate report)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://leetcode.com/discuss/interview-experience/4133665/",
+      "title": "Atlassian P6 Sydney interview experience (candidate report)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "bar_by_level"]
+    },
+    {
+      "url": "https://www.designgurus.io/blog/atlassian-software-engineer-levels",
+      "title": "Atlassian software engineer levels",
+      "retrieved_at": "2026-10-10",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://www.joinleland.com/library/a/how-to-prepare-for-atlassian-product-management-case-interviews",
+      "title": "Atlassian interview process guide (Leland)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.aced.io/guides/atlassian-pm-interview",
+      "title": "Atlassian PM interview guide",
+      "retrieved_at": "2026-10-10",
+      "fields": ["question_patterns", "case_style"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "high",
+    "question_patterns": "medium",
+    "bar_by_level": "medium",
+    "persona": "medium",
+    "scoring_weights": "low",
+    "case_style": "low"
+  },
+  "low_confidence_notes": [
+    "values_framework: the official values page did not render in the fetch tool; value names and descriptions are confirmed by several third-party guides that quote it.",
+    "loop_structure: PM round durations are not published; 45-60 minutes is estimated from third-party guides. The craft deep-dive round is reported only for P60 candidates.",
+    "bar_by_level: P30-P70 names come from third-party level guides and candidate reports; PM level names (P40-P60) are inferred from the shared P-scale and not confirmed.",
+    "scoring_weights: estimated from the values and handbook emphasis; no public source gives weights.",
+    "case_style: inferred from PM handbook and third-party guides; Atlassian does not publish case formats."
+  ]
+}

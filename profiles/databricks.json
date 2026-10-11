@@ -1,0 +1,536 @@
+{
+  "company_name": "Databricks",
+  "company_slug": "databricks",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-10",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Databricks Culture Principles",
+    "principles": [
+      {
+        "name": "Customer obsessed",
+        "description": "The customer is at the center of everything. What is best for the customer is best for Databricks.",
+        "evidence_signals": [
+          "Changed a technical or product plan because of customer feedback",
+          "Describes customer impact in concrete terms (latency, cost, reliability, time saved)",
+          "Treats internal users and developers as customers too"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Raise the bar",
+        "description": "Every day is a chance to do better, as team members and as a company. Hold work and hiring to a high standard.",
+        "evidence_signals": [
+          "Quantified a quality, performance or reliability improvement",
+          "Came back to fix work they shipped but were not satisfied with",
+          "Pushes peers and self toward higher standards"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Truth seeking",
+        "description": "Make decisions based on data and adapt as the data changes. Value being right over winning the argument.",
+        "evidence_signals": [
+          "Changed own mind when new evidence appeared",
+          "Used measurements or experiments to settle a disagreement",
+          "Openly says when they were wrong"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "First principles",
+        "description": "Start with why. Reason from fundamentals rather than copying convention, which drives innovation and leadership.",
+        "evidence_signals": [
+          "Broke a problem down to fundamentals instead of following the usual approach",
+          "Questioned an assumption and showed why it did not hold",
+          "Explains the reasoning behind a design, not just the choice"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Bias for action",
+        "description": "Speed is critical. Debate, plan, execute and iterate with urgency.",
+        "evidence_signals": [
+          "Shipped fast with a conscious decision about what to defer",
+          "Unblocked work instead of waiting for perfect information",
+          "Iterated quickly based on early results"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Company first",
+        "description": "Do what is best for the company, which includes all the other principles, even above team or personal interest.",
+        "evidence_signals": [
+          "Gave up a team goal or resource for a bigger company priority",
+          "Helped another team succeed at a cost to own roadmap",
+          "Frames decisions in terms of overall company outcomes"
+        ],
+        "weight": 1.0
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["L3", "L4", "L5", "L6", "L7"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, motivation, why Databricks. Not simulated in v1."
+        },
+        {
+          "name": "Technical phone screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Live coding (CoderPad or CodeSignal), medium to hard problems. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager call",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Engineering manager",
+          "notes": "Background, past projects with deep follow-ups, how the candidate handles ambiguity and disagreement."
+        },
+        {
+          "name": "Coding: algorithms",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Usually two coding rounds. Live coding. Not simulated in v1."
+        },
+        {
+          "name": "Coding: concurrency",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Multithreading and thread safety in code. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior or staff engineer",
+          "notes": "Often in a shared doc. Distributed systems and data platform topics; senior loops may have two design rounds (single box and distributed)."
+        },
+        {
+          "name": "Cross-functional / behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 60,
+          "interviewer_role": "Engineer or manager from another team",
+          "notes": "Culture principles and collaboration. Reference checks (a manager and senior peers) follow and weigh heavily; a hiring committee decides."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": ["Product Manager", "Senior Product Manager", "Staff Product Manager"],
+      "rounds": [
+        {
+          "name": "Recruiter call",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Group product manager",
+          "notes": "Background, launches, decisions and trade-offs."
+        },
+        {
+          "name": "Product sense",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Senior product manager",
+          "notes": "Design or improve a product, often a Databricks or data product; strategy and pricing questions also reported."
+        },
+        {
+          "name": "Technical",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Engineer or technical PM",
+          "notes": "Data processing architecture, AI concepts such as RAG, and the architecture of past projects."
+        },
+        {
+          "name": "Behavioral and project deep dive",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Product leader",
+          "notes": "Mistakes, conflict, influence and calculated risks. Reference checks follow."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Changing your mind",
+      "pattern": "A time new data made the candidate abandon their original position",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Truth seeking"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Challenging convention",
+      "pattern": "A time the usual approach was wrong and the candidate reasoned from fundamentals to a better one",
+      "competencies": ["impact", "ownership"],
+      "values": ["First principles"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Speed with deliberate trade-offs",
+      "pattern": "A time the candidate shipped quickly and consciously chose what to defer",
+      "competencies": ["ownership", "impact"],
+      "values": ["Bias for action"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Conflict resolved by evidence",
+      "pattern": "A disagreement with a coworker, how it was resolved, and who turned out to be right",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["Truth seeking"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Owning a mistake",
+      "pattern": "A mistake the candidate made on an important project, how they fixed it and what changed",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Raise the bar"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Proudest project with deep follow-ups",
+      "pattern": "Walk through the project the candidate is most proud of, then defend each key decision under detailed questions",
+      "competencies": ["depth_of_experience", "judgment", "scope_at_level"],
+      "values": ["First principles"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Motivation",
+      "pattern": "Why Databricks and why now, tied to the candidate's experience with data or AI platforms",
+      "competencies": ["motivation", "role_fit"],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Distributed data infrastructure",
+      "pattern": "Design a storage or processing system for large data (file system, data lake, pipeline) and discuss consistency and scaling",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["First principles"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "ML platform",
+      "pattern": "Design an end-to-end ML or MLOps system for training, deployment and monitoring on large datasets",
+      "competencies": ["technical_depth", "trade_offs"],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Service integration design",
+      "pattern": "Design a customer-facing service that aggregates data from many external providers",
+      "competencies": ["reasoning", "clarity_of_explanation", "trade_offs"],
+      "values": ["Customer obsessed"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Data product sense",
+      "pattern": "Design or improve a feature of a data or AI platform for a specific user persona",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Customer obsessed"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Pricing and growth strategy",
+      "pattern": "Reason about pricing, monetization or new product bets for a platform business",
+      "competencies": ["user_and_business_sense", "estimation_logic", "recommendation"],
+      "values": ["Company first"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a service that finds customers the cheapest available copy of a book by querying many book distributors.",
+      "strong_answer": "Clarify scale, freshness and latency needs. Components: search API, distributor adapters, price cache, aggregation and ranking. Discuss fan-out with timeouts, partial results, rate limits per distributor, caching versus freshness of prices, and handling slow or failing providers. Show API and data model. Strong answers reason about consistency of prices at checkout and cost of calls.",
+      "competencies": ["reasoning", "trade_offs", "clarity_of_explanation"],
+      "values": ["Customer obsessed"],
+      "source_url": "https://interviewing.io/databricks-interview-questions"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a distributed file system.",
+      "strong_answer": "Clarify file sizes, read/write patterns and durability targets. Separate metadata (namespace service, possibly replicated with consensus) from data (chunks on storage nodes with replication or erasure coding). Cover writes and leases, reads with locality, failure detection and re-replication, consistency model, and hot spots. Explain trade-offs from first principles rather than naming products.",
+      "competencies": ["technical_depth", "trade_offs", "accuracy"],
+      "values": ["First principles"],
+      "source_url": "https://www.aced.io/blog/databricks-interview-process"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a data lake that supports both streaming and batch data.",
+      "strong_answer": "Cover ingestion (stream and batch), storage on object storage in an open columnar format, a transaction log or table format for ACID and schema evolution, compaction of small files, partitioning, and serving to SQL and ML workloads. Discuss exactly-once ingestion, late data, governance and deletion requests. Show trade-offs between latency and cost.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": [],
+      "source_url": "https://www.aced.io/blog/databricks-interview-process"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design an ML pipeline that handles large datasets and automates training and deployment.",
+      "strong_answer": "Describe stages: data ingestion and validation, feature computation and store, distributed training, experiment tracking, model registry, deployment (batch or online serving), monitoring for drift and rollback. Discuss reproducibility, versioning of data and models, and cost of compute. Strong answers name failure modes and how to detect them.",
+      "competencies": ["technical_depth", "trade_offs"],
+      "values": [],
+      "source_url": "https://www.aced.io/blog/databricks-interview-process"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Walk me through the components you would need for a data processing system, and the architecture of one you worked on.",
+      "strong_answer": "Lay out sources, ingestion, storage, compute engine, orchestration, serving and monitoring, and why each exists. Then map your real project onto that picture, naming the choices and the trade-offs you made. For a PM, show enough depth to discuss options with engineers without hand-waving.",
+      "competencies": ["technical_depth", "clarity_of_explanation"],
+      "values": [],
+      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Explain how retrieval-augmented generation works and when you would use it.",
+      "strong_answer": "Explain the flow: chunk and embed documents, store vectors, retrieve relevant chunks for a query, and pass them with the prompt to the model. Say when it beats fine-tuning (fresh or private data, citations). Cover pitfalls: chunking, retrieval quality, latency, evaluation, and access control on retrieved data.",
+      "competencies": ["accuracy", "clarity_of_explanation", "reasoning"],
+      "values": [],
+      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Describe the project you are most proud of. Expect detailed follow-up questions on each decision.",
+      "strong_answer": "Pick a project where you made the key calls. Give context briefly, then go deep: the problem, alternatives considered, why you chose one, what you measured, and what went wrong. Know the numbers. Databricks interviewers dig deep, so avoid projects you only observed. Show scope that matches the level.",
+      "competencies": ["depth_of_experience", "judgment", "scope_at_level"],
+      "values": ["First principles"],
+      "source_url": "https://interviewing.io/databricks-interview-questions"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why did you make that specific decision in your project, and what trade-offs did you consider?",
+      "strong_answer": "Restate the goal and constraints, list the real options, and explain the reasoning from fundamentals (cost, latency, risk, team skill). Say what the choice cost you and whether you would choose it again. Pitfall: 'it was the standard choice' with no reasoning.",
+      "competencies": ["judgment", "depth_of_experience"],
+      "values": ["First principles", "Truth seeking"],
+      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why do you want to work at Databricks?",
+      "strong_answer": "Be specific about the platform (lakehouse, open formats, data and AI workloads) and how it connects to your experience. Show you understand the customer and the pace of the company. Mention what you would contribute. Pitfall: talking only about growth or compensation.",
+      "competencies": ["motivation", "role_fit"],
+      "values": [],
+      "source_url": "https://www.aced.io/blog/databricks-interview-process"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had a conflict with a coworker.",
+      "strong_answer": "Pick a real technical or priority conflict. Show you sought the facts, used data or a quick experiment to settle it, and kept the relationship. Say who turned out to be right, even if it was the other person. Pitfall: a vague personality clash with no resolution.",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["Truth seeking"],
+      "source_url": "https://interviewing.io/databricks-interview-questions"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Have you made a mistake while leading a big project? How did you fix it and what did you learn?",
+      "strong_answer": "Own a real mistake with real impact. Explain how you found it, told stakeholders quickly, fixed the immediate problem, and changed the process so it would not recur. Show the lesson in a later project. Pitfall: blaming circumstances.",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Raise the bar", "Truth seeking"],
+      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you tried to convince your manager of a product direction and did not succeed.",
+      "strong_answer": "Describe your case and the evidence. Show you listened to the counter-arguments, considered whether you were wrong, and then committed to the decision. Say what happened afterwards and what you would do differently in making the case. Strong answers show truth seeking over ego.",
+      "competencies": ["communication", "conflict_handling"],
+      "values": ["Truth seeking", "Company first"],
+      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a calculated risk you took.",
+      "strong_answer": "Explain the opportunity, what could go wrong, and how you sized and limited the risk (experiment, rollback plan, staged rollout). Show you moved fast instead of waiting for certainty. Give the outcome and what you learned, even if the bet failed.",
+      "competencies": ["ownership", "impact"],
+      "values": ["Bias for action"],
+      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you changed your mind after seeing new data.",
+      "strong_answer": "State your original view and why it was reasonable. Describe the data that contradicted it, how you checked it, and how quickly you changed course and told others. Show the result of the change. Pitfall: a trivial example with no cost to changing.",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Truth seeking"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-databricks-behavioral-interview-questions-and-how-to-answer-them"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you shipped something quickly. What did you consciously defer?",
+      "strong_answer": "Explain why speed mattered, what you cut or deferred and why it was safe, how you communicated the trade-off, and whether you came back to pay the debt. Show urgency without carelessness.",
+      "competencies": ["ownership", "impact"],
+      "values": ["Bias for action", "Raise the bar"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-databricks-behavioral-interview-questions-and-how-to-answer-them"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time the conventional approach was wrong and you worked from first principles instead.",
+      "strong_answer": "Name the convention and the assumption behind it. Show how you broke the problem down, what evidence showed the assumption failed in your case, and how you validated your alternative. Give the measurable result. Pitfall: contrarian for its own sake.",
+      "competencies": ["impact", "ownership"],
+      "values": ["First principles"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-databricks-behavioral-interview-questions-and-how-to-answer-them"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you design a new feature for an existing Databricks product?",
+      "strong_answer": "Pick a persona (data engineer, analyst, ML engineer, admin) and a real workflow pain. Prioritize one problem, propose a solution with MVP scope, and define success metrics (adoption, time saved, consumption). Address enterprise needs such as governance and cost. Recommend and name risks.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Customer obsessed"],
+      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "How could Databricks increase revenue by lowering prices?",
+      "strong_answer": "Clarify the pricing model (usage-based). Reason about price elasticity: lower unit price can grow workloads moved to the platform, new use cases and competitive wins. Build a simple estimate of volume needed to offset the price cut. Consider segments, cannibalization and margin. Recommend a targeted change and how to test it.",
+      "competencies": ["estimation_logic", "user_and_business_sense", "recommendation"],
+      "values": ["Company first"],
+      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview"
+    },
+    {
+      "interview_type": "case",
+      "question": "You are a PM at a startup working with large sports data. What is the first product you would ship?",
+      "strong_answer": "Identify possible customers (teams, broadcasters, fans, betting) and their needs. Pick one segment with the clearest pain and willingness to pay. Define an MVP, how data will be sourced and processed, and the success metric. Explain why this beats the alternatives.",
+      "competencies": ["problem_framing", "prioritization", "recommendation"],
+      "values": [],
+      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview"
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "L3",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Entry-level engineer. Delivers scoped tasks with strong coding fundamentals and guidance."
+    },
+    {
+      "level_name": "L4",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Software engineer. Owns features and components independently within a team."
+    },
+    {
+      "level_name": "L5",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Senior engineer. Leads design of significant distributed systems and drives projects across a team."
+    },
+    {
+      "level_name": "L6",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Staff engineer. Sets technical direction across teams for a product or platform area."
+    },
+    {
+      "level_name": "L7",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Senior staff or principal engineer. Shapes architecture and strategy across the organization."
+    }
+  ],
+  "persona": {
+    "tone": "Direct, technical and fast-moving; respectful but not chatty",
+    "pace": "Brisk, with many deep follow-up questions on details",
+    "pushback_style": "Digs into 'why' behind each decision, asks for data and first-principles reasoning, probes thread safety and failure cases",
+    "closing_style": "Short time for candidate questions; expects a thoughtful 'why Databricks'"
+  },
+  "scoring_weights": {
+    "technical_depth": 1.4,
+    "reasoning": 1.3,
+    "trade_offs": 1.3,
+    "accuracy": 1.2,
+    "ownership": 1.2,
+    "impact": 1.2,
+    "judgment": 1.2,
+    "depth_of_experience": 1.2
+  },
+  "values_share": 0.25,
+  "case_style": {
+    "product_sense": 0.45,
+    "estimation": 0.15,
+    "system_thinking": 0.4,
+    "notes": "PM cases mix product design on a data and AI platform with strategy and pricing; technical depth on data systems is expected."
+  },
+  "sources": [
+    {
+      "url": "https://www.databricks.com/company/careers/culture",
+      "title": "Databricks culture principles",
+      "retrieved_at": "2026-10-10",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://www.databricks.com/company/careers/interview-prep",
+      "title": "Interviewing with Databricks",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "persona"]
+    },
+    {
+      "url": "https://interviewing.io/databricks-interview-questions",
+      "title": "Databricks interview process and questions (interviewing.io)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "persona"]
+    },
+    {
+      "url": "https://www.aced.io/blog/databricks-interview-process",
+      "title": "Databricks interview process",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview",
+      "title": "Databricks product manager interview (IGotAnOffer)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/top-databricks-behavioral-interview-questions-and-how-to-answer-them",
+      "title": "Top Databricks behavioral interview questions",
+      "retrieved_at": "2026-10-10",
+      "fields": ["question_patterns", "values_framework"]
+    },
+    {
+      "url": "https://www.levels.fyi/company/Databricks/salaries/Software-Engineer",
+      "title": "Databricks software engineer levels (Levels.fyi)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://www.1point3acres.com/interview/thread/1072913",
+      "title": "Databricks L5 onsite interview experience (candidate report)",
+      "retrieved_at": "2026-10-10",
+      "fields": ["loop_structure"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "medium",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "low"
+  },
+  "low_confidence_notes": [
+    "loop_structure: the official interview-prep page gives stages but not engineering round names; round list comes from third-party guides and candidate reports. Senior loops may differ (two design rounds).",
+    "question_patterns: several behavioral questions come from a prep site mapping questions to principles, not from verified candidate reports.",
+    "bar_by_level: level names come from Levels.fyi; scope text is our summary, not a Databricks ladder. PM levels are not mapped.",
+    "persona: inferred from candidate reports that describe deep, fast follow-ups.",
+    "scoring_weights: estimated; no public source gives weights.",
+    "case_style: based on one third-party PM guide."
+  ]
+}
