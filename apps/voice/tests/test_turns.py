@@ -9,8 +9,8 @@ from dataclasses import dataclass, field
 
 import pytest
 
-from strong_voice.interview import CHECK_IN, TAKE_YOUR_TIME
-from strong_voice.turns import CandidateTurns, is_thinking_request
+from strong_voice.interview import CHECK_IN, PREP_OVER, PREP_READY, TAKE_YOUR_TIME, prep_line
+from strong_voice.turns import CandidateTurns, is_ready, is_thinking_request, prep_request_minutes
 
 
 @pytest.mark.parametrize(
@@ -51,6 +51,9 @@ class FakeInterview:
     calls: list[str] = field(default_factory=list)
     thinking: list[str] = field(default_factory=list)
     check_ins: int = 0
+    prep: list[int] = field(default_factory=list)
+    prep_ended: list[str] = field(default_factory=list)
+    preparing: bool = False
 
     async def on_candidate(
         self, text: str, spoken_s: float | None = None, superseded: Callable[[], bool] | None = None
@@ -71,16 +74,35 @@ class FakeInterview:
         self.check_ins += 1
         return [CHECK_IN]
 
+    async def start_prep(
+        self, minutes: int, text: str | None = None, spoken_s: float | None = None
+    ) -> list[str]:
+        self.prep.append(minutes)
+        self.preparing = True
+        return [prep_line(minutes)]
+
+    async def end_prep(self, *, timed_out: bool = False, say: bool = True) -> list[str]:
+        if not self.preparing:
+            return []
+        self.preparing = False
+        self.prep_ended.append("timeout" if timed_out else "ready" if say else "answer")
+        if not say:
+            return []
+        return [PREP_OVER if timed_out else PREP_READY]
+
 
 def make_turns(
-    interview: FakeInterview, *, think: float = 60.0, resume: float = 0.05
+    interview: FakeInterview, *, think: float = 60.0, resume: float = 0.05, minute: float = 60.0
 ) -> tuple[CandidateTurns, list[str]]:
     said: list[str] = []
 
     async def speak(lines: list[str]) -> None:
         said.extend(lines)
 
-    return CandidateTurns(interview, speak, thinking_wait_s=think, resume_wait_s=resume), said
+    turns = CandidateTurns(
+        interview, speak, thinking_wait_s=think, resume_wait_s=resume, minute_s=minute
+    )
+    return turns, said
 
 
 async def test_one_turn_one_reply() -> None:
@@ -146,3 +168,73 @@ async def test_no_check_in_once_the_candidate_speaks() -> None:
     turns.on_user_state("speaking")
     await asyncio.sleep(0.05)
     assert said == [TAKE_YOUR_TIME] and interview.check_ins == 0
+
+
+# --------------------------------------------------------------------------- prep time (IV-11)
+
+
+@pytest.mark.parametrize(
+    ("text", "minutes"),
+    [
+        ("Can I take a minute?", 1),
+        ("Could I have three minutes to prepare?", 3),
+        ("Give me 2 minutes please.", 2),
+        ("I need a few minutes.", 3),
+        ("Give me 30 seconds.", None),
+        ("We cut the build from 40 minutes to six.", None),
+    ],
+)
+def test_iv11_prep_requests(text: str, minutes: int | None) -> None:
+    assert prep_request_minutes(text) == minutes
+
+
+@pytest.mark.parametrize(
+    ("text", "ready"),
+    [
+        ("Okay, I'm ready.", True),
+        ("Ready.", True),
+        ("Alright, let's go.", True),
+        ("I was ready to lead it.", False),
+    ],
+)
+def test_iv11_ready_phrases(text: str, ready: bool) -> None:
+    assert is_ready(text) is ready
+
+
+async def test_iv11_spoken_request_starts_prep_and_the_timer_ends_it() -> None:
+    interview = FakeInterview()
+    turns, said = make_turns(interview, minute=0.01)
+    await turns.on_turn("Could I have three minutes to prepare?", 2.0)
+    assert interview.prep == [3] and said == [prep_line(3)]
+    assert interview.thinking == [] and interview.calls == []  # not an answer, no check-in path
+    await asyncio.sleep(0.08)
+    assert interview.prep_ended == ["timeout"] and said[-1] == PREP_OVER
+
+
+async def test_iv11_during_prep_thinking_aloud_is_ignored_and_ready_ends_it() -> None:
+    interview = FakeInterview()
+    turns, said = make_turns(interview)
+    await turns.start_prep(1)  # the prep button
+    await turns.on_turn("Hmm, okay, so first...", 1.0)
+    assert interview.calls == [] and interview.preparing
+    await turns.on_turn("Okay, I'm ready.", 1.0)
+    assert interview.prep_ended == ["ready"] and said[-1] == PREP_READY
+    turns.close()
+
+
+async def test_iv11_a_real_answer_ends_prep_and_gets_a_reply() -> None:
+    interview = FakeInterview()
+    turns, said = make_turns(interview)
+    await turns.start_prep(3)
+    answer = "At eBay I led the checkout migration across four teams in one quarter."
+    await turns.on_turn(answer, 5.0)
+    assert interview.prep_ended == ["answer"]
+    assert said[-1] == f"reply to: {answer}"
+
+
+async def test_iv11_ready_button_ends_prep() -> None:
+    interview = FakeInterview()
+    turns, said = make_turns(interview)
+    await turns.start_prep(1)
+    await turns.ready()
+    assert interview.prep_ended == ["ready"] and said == [prep_line(1), PREP_READY]
