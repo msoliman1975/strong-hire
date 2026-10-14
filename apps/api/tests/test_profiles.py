@@ -380,7 +380,8 @@ def test_ad1_cli_end_to_end_with_fictional_example(cli_db: Path, tmp_path: Path)
     assert listed.exit_code == 0
     row = next(line for line in listed.output.splitlines() if line.startswith("example-corp"))
     assert row.split()[-4:] == ["2", "2", "2", "no"]
-    assert len([ln for ln in listed.output.splitlines()[1:] if ln.strip()]) == 21
+    listed_rows = [ln for ln in listed.output.splitlines()[1:] if ln.strip()]
+    assert len(listed_rows) == len(LAUNCH_COMPANIES) + 1  # plus example-corp
 
     old = invoke("profiles", "show", "example-corp", "--version", "1", "--json")
     assert old.exit_code == 0, old.output
@@ -408,10 +409,10 @@ def test_ad1_cli_import_rejects_invalid_file_before_database(cli_db: Path, tmp_p
     sync.dispose()
 
 
-def test_launch_companies_are_the_20_from_the_spec() -> None:
+def test_launch_companies_are_the_21_from_the_spec() -> None:
     slugs = [slug for slug, _ in LAUNCH_COMPANIES]
-    assert len(slugs) == len(set(slugs)) == 20
-    assert "atlassian" in slugs and "ebay" not in slugs
+    assert len(slugs) == len(set(slugs)) == 21
+    assert "atlassian" in slugs and "walmart" in slugs and "ebay" not in slugs
 
 
 # --- researched launch profiles (R1) ---------------------------------------------------------

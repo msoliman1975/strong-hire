@@ -64,7 +64,7 @@ async def sessionmaker() -> AsyncIterator[async_sessionmaker[AsyncSession]]:
 
 @pytest.fixture
 async def account(sessionmaker: async_sessionmaker[AsyncSession]) -> tuple[uuid.UUID, uuid.UUID]:
-    """(org_id, user_id) of a test user, with the 20 launch companies seeded."""
+    """(org_id, user_id) of a test user, with the launch companies seeded."""
     async with sessionmaker() as db:
         org = Org(name="Test org")
         db.add(org)

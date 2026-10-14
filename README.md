@@ -13,7 +13,7 @@ A voice interview simulator for tech candidates. The product and technical spec 
 6. Start the core stack: `./scripts/dev.ps1 up`. The first run builds the images and takes a few minutes.
    It also creates `.env` from `.env.example` and applies the database migrations.
 7. Open <http://localhost:5180>. The page shows "API status: OK".
-8. Load the 20 launch companies: `./scripts/dev.ps1 seed`.
+8. Load the launch companies: `./scripts/dev.ps1 seed`.
 9. Install the local Python tools: `uv sync --all-packages`.
 10. Install the web tools: `pnpm --dir apps/web install`.
 11. Run the tests: `./scripts/dev.ps1 test`. Run the linters: `./scripts/dev.ps1 lint`.

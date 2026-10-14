@@ -40,7 +40,7 @@ v1 is deliberately narrow: tech roles, 20 curated companies plus a generic mode,
 | Business | B2C, one paid plan with monthly cap | Org accounts and seats (B2B) | |
 | Markets | US and Canada, English | Other languages (Arabic is a candidate) | |
 
-The 20 launch companies: Google, Amazon, Microsoft, Meta, Apple, Netflix, Nvidia, Salesforce, Uber, Stripe, OpenAI, Anthropic, Airbnb, Shopify, LinkedIn, Oracle, Adobe, Databricks, Snowflake, Atlassian. eBay was dropped from the list to avoid a conflict with your current employer; Atlassian is a placeholder for the 20th slot.
+The 21 launch companies: Google, Amazon, Microsoft, Meta, Apple, Netflix, Nvidia, Salesforce, Uber, Stripe, OpenAI, Anthropic, Airbnb, Shopify, LinkedIn, Oracle, Adobe, Databricks, Snowflake, Atlassian, Walmart. eBay was dropped from the list to avoid a conflict with your current employer; Atlassian is a placeholder for the 20th slot. Walmart was added later as the 21st.
 
 **Environments.** Development runs fully local on Docker for several weeks, using small open-weight models on your machine. Hosting on Hetzner starts only when the product works end to end locally. Moving between the two is a configuration change, not a code change.
 
@@ -157,7 +157,7 @@ The interviewer and the scorer are separate components. The interviewer runs the
 
 ## Company profiles
 
-Each of the 20 companies gets a versioned profile, researched offline with Claude (Code or chat) against a fixed JSON schema, reviewed by you, then imported into the app. No research runs inside the app or during an interview. Profiles refresh quarterly, or on demand when a company changes its process.
+Each of the launch companies gets a versioned profile, researched offline with Claude (Code or chat) against a fixed JSON schema, reviewed by you, then imported into the app. No research runs inside the app or during an interview. Profiles refresh quarterly, or on demand when a company changes its process.
 
 **Profile structure (stored as versioned JSON).**
 
@@ -185,7 +185,7 @@ Each of the 20 companies gets a versioned profile, researched offline with Claud
 
 **Content rules.** Sample questions come only from public pages: company career and interview-prep pages, engineering blogs, and candidate reports posted publicly. Each is paraphrased and cites its source. The strong-answer note is our own guidance, not a copied answer. No NDA-protected questions, no copied paid content (for example paid question banks or courses), no claims about specific named interviewers. The interviewer adapts sample questions to the candidate rather than reading them out.
 
-**Companies outside the 20.**
+**Companies outside the launch list.**
 
 - **v1, generic mode:** the brief is built from the job posting and resume alone, with a default tech-industry persona and equal competency weights. The UI labels it clearly.
 - **v1, request this company:** requests are logged; the most-requested companies get promoted to curated profiles through the offline process.
@@ -328,7 +328,7 @@ Postgres is the single source of truth, with an `org_id` on every user-owned tab
 | Subscription | user_id, stripe_customer_id, status, period_start, period_end, minutes_cap, minutes_used | Usage resets each period |
 | Resume | id, user_id, parsed_json, file_ref, uploaded_at | Original file encrypted in object storage |
 | JobTarget | id, user_id, company_id (nullable), source_url, raw_text, parsed_json, level, stage, context_notes | Null company_id means generic mode |
-| Company | id, name, slug, active | The 20 launch companies |
+| Company | id, name, slug, active | The launch companies |
 | CompanyProfile | id, company_id, version, status, profile_json, sources_json, reviewed_by, published_at | Only Published versions are used |
 | GapAnalysis | id, job_target_id, resume_id, match_score, breakdown_json, session_plan_json, model_profile, model_id, prompt_version | Recomputed when resume or job changes |
 | Session | id, job_target_id, type, difficulty, mode, channel (voice or text), duration_min, profile_version, brief_json, model_profile, interviewer_model_id, prompt_version, status, started_at, ended_at, minutes_billed | Coach and dev-profile sessions excluded from trends |
@@ -336,7 +336,7 @@ Postgres is the single source of truth, with an `org_id` on every user-owned tab
 | Scorecard | id, session_id, hire_signal, rationale, competency_scores_json, value_scores_json, per_question_json, model_profile, model_id, prompt_version, rubric_version | One per Realistic or Coach session. Value scores are empty in generic mode |
 | ProgressSnapshot | id, job_target_id, competency, score, session_id, at | Realistic sessions only |
 | UsageEvent | id, session_id, component (stt, llm, tts), units, cost_usd | Drives cost per session tracking |
-| CompanyRequest | id, org_id, user_id, job_target_id, company_name, normalized_name, matched_company_id, source_host, created_at | Every company name entered at job setup. Null matched_company_id means a request for a company outside the 20 |
+| CompanyRequest | id, org_id, user_id, job_target_id, company_name, normalized_name, matched_company_id, source_host, created_at | Every company name entered at job setup. Null matched_company_id means a request for a company outside the launch list |
 | AuditLog | id, actor, action, entity, at | Deletes, exports, consent changes, profile approvals |
 
 The model registry and runtime profiles live in config files, not the database. Provenance fields (PL-6) are written on every AI output so results from different models are never mixed silently.
