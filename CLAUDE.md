@@ -16,6 +16,7 @@ spec is `docs/spec.md`. Read the sections that touch your task before you change
 | `config/` | `models.<profile>.yaml` (role to model alias, capabilities), `litellm.<profile>.yaml` (real model ids) | P1 |
 | `schemas/` | JSON Schemas generated from `strong_core.schemas`. Never edit by hand. | Generated |
 | `profiles/` | Company profile JSON files | R1 research, P4 import |
+| `questions/` | General question bank (`general.json`) for the Questions page (QB-1 to QB-5) | QB workstream |
 | `evals/` | Eval harness and fixtures | P5, P11 |
 | `infra/` | `compose.yaml`, Dockerfiles, Caddy config | P0, P12 |
 | `scripts/` | PowerShell helpers (`dev.ps1`) | P0 |

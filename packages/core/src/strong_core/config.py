@@ -51,6 +51,7 @@ class Settings(BaseSettings):
     repo_root: Path = Field(default_factory=find_repo_root)
     config_dir: Path | None = None
     prompts_dir: Path | None = None
+    questions_dir: Path | None = None
     fake_fixtures_dir: Path | None = None
 
     @property
@@ -60,6 +61,10 @@ class Settings(BaseSettings):
     @property
     def resolved_prompts_dir(self) -> Path:
         return self.prompts_dir or self.repo_root / "prompts"
+
+    @property
+    def resolved_questions_dir(self) -> Path:
+        return self.questions_dir or self.repo_root / "questions"
 
 
 @lru_cache

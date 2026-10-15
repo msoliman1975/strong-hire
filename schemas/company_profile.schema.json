@@ -389,6 +389,55 @@
       "title": "ProfileStatus",
       "type": "string"
     },
+    "QuestionHints": {
+      "additionalProperties": false,
+      "description": "QB-2: short bullets shown under a question on the Questions page.",
+      "properties": {
+        "looking_for": {
+          "description": "What the interviewer is assessing.",
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "title": "Looking For",
+          "type": "array"
+        },
+        "strong_signals": {
+          "description": "What a strong answer shows.",
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "title": "Strong Signals",
+          "type": "array"
+        },
+        "watch_outs": {
+          "description": "Common ways answers fall short.",
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "title": "Watch Outs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "looking_for",
+        "strong_signals",
+        "watch_outs"
+      ],
+      "title": "QuestionHints",
+      "type": "object"
+    },
     "QuestionPattern": {
       "additionalProperties": false,
       "description": "A recurring theme, phrased as a pattern. Never a leaked or NDA-protected question.",
@@ -453,8 +502,28 @@
           "title": "Competencies",
           "type": "array"
         },
+        "hints": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QuestionHints"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "QB-2: key hints for the Questions page, from strong_answer."
+        },
         "interview_type": {
           "$ref": "#/$defs/InterviewType"
+        },
+        "levels": {
+          "description": "QB-1: levels it fits. Empty means all.",
+          "items": {
+            "$ref": "#/$defs/Level"
+          },
+          "title": "Levels",
+          "type": "array"
         },
         "question": {
           "description": "Paraphrased, not copied.",
@@ -462,6 +531,14 @@
           "minLength": 1,
           "title": "Question",
           "type": "string"
+        },
+        "role_families": {
+          "description": "QB-1: job categories it fits. Empty means all.",
+          "items": {
+            "$ref": "#/$defs/RoleFamily"
+          },
+          "title": "Role Families",
+          "type": "array"
         },
         "source_url": {
           "description": "Public page that reports the question.",
