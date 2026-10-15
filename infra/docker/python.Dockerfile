@@ -38,6 +38,7 @@ COPY packages/interview packages/interview
 COPY ${APP_DIR} ${APP_DIR}
 COPY config config
 COPY prompts prompts
+COPY questions questions
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev --package ${PACKAGE}
 

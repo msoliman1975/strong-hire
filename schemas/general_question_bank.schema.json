@@ -1,0 +1,199 @@
+{
+  "$defs": {
+    "Competency": {
+      "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.",
+      "enum": [
+        "ownership",
+        "impact",
+        "collaboration",
+        "conflict_handling",
+        "learning_from_failure",
+        "communication",
+        "role_fit",
+        "depth_of_experience",
+        "judgment",
+        "motivation",
+        "team_fit",
+        "scope_at_level",
+        "technical_depth",
+        "accuracy",
+        "reasoning",
+        "trade_offs",
+        "clarity_of_explanation",
+        "problem_framing",
+        "structure",
+        "user_and_business_sense",
+        "estimation_logic",
+        "prioritization",
+        "recommendation"
+      ],
+      "title": "Competency",
+      "type": "string"
+    },
+    "GeneralQuestion": {
+      "additionalProperties": false,
+      "description": "A question asked across many companies. Written in our own words (QB-5).",
+      "properties": {
+        "competencies": {
+          "items": {
+            "$ref": "#/$defs/Competency"
+          },
+          "maxItems": 3,
+          "minItems": 1,
+          "title": "Competencies",
+          "type": "array"
+        },
+        "hints": {
+          "$ref": "#/$defs/QuestionHints"
+        },
+        "id": {
+          "description": "Stable slug, unique in the bank.",
+          "maxLength": 80,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "interview_type": {
+          "$ref": "#/$defs/InterviewType"
+        },
+        "levels": {
+          "description": "Empty means all levels.",
+          "items": {
+            "$ref": "#/$defs/Level"
+          },
+          "title": "Levels",
+          "type": "array"
+        },
+        "question": {
+          "maxLength": 400,
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "role_families": {
+          "description": "Job categories it fits. Empty means all.",
+          "items": {
+            "$ref": "#/$defs/RoleFamily"
+          },
+          "title": "Role Families",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "interview_type",
+        "question",
+        "hints",
+        "competencies"
+      ],
+      "title": "GeneralQuestion",
+      "type": "object"
+    },
+    "InterviewType": {
+      "description": "The four v1 interview types (IV-2).",
+      "enum": [
+        "behavioral",
+        "hiring_manager",
+        "technical_qa",
+        "case"
+      ],
+      "title": "InterviewType",
+      "type": "string"
+    },
+    "Level": {
+      "description": "Normalized seniority (IV-6). Company-specific labels such as L5 or E5 map to these.",
+      "enum": [
+        "new_grad",
+        "mid",
+        "senior",
+        "staff_principal"
+      ],
+      "title": "Level",
+      "type": "string"
+    },
+    "QuestionHints": {
+      "additionalProperties": false,
+      "description": "QB-2: short bullets shown under a question on the Questions page.",
+      "properties": {
+        "looking_for": {
+          "description": "What the interviewer is assessing.",
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "title": "Looking For",
+          "type": "array"
+        },
+        "strong_signals": {
+          "description": "What a strong answer shows.",
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "title": "Strong Signals",
+          "type": "array"
+        },
+        "watch_outs": {
+          "description": "Common ways answers fall short.",
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "title": "Watch Outs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "looking_for",
+        "strong_signals",
+        "watch_outs"
+      ],
+      "title": "QuestionHints",
+      "type": "object"
+    },
+    "RoleFamily": {
+      "enum": [
+        "swe",
+        "data_ml",
+        "pm",
+        "design",
+        "tpm",
+        "other"
+      ],
+      "title": "RoleFamily",
+      "type": "string"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/general_question_bank.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The file questions/general.json.",
+  "properties": {
+    "questions": {
+      "items": {
+        "$ref": "#/$defs/GeneralQuestion"
+      },
+      "title": "Questions",
+      "type": "array"
+    },
+    "version": {
+      "minimum": 1,
+      "title": "Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "version"
+  ],
+  "title": "GeneralQuestionBank",
+  "type": "object"
+}

@@ -57,6 +57,7 @@ from strong_core.schemas.profile import (
     Source,
     ValuesFramework,
 )
+from strong_core.schemas.questions import GeneralQuestion, GeneralQuestionBank, QuestionHints
 from strong_core.schemas.scoring import (
     CompetencyScore,
     ProgressSnapshot,
@@ -95,6 +96,7 @@ EXPORTED_SCHEMAS: dict[str, type[BaseModel]] = {
     "input_check": InputCheck,
     "scorecard": Scorecard,
     "progress_snapshot": ProgressSnapshot,
+    "general_question_bank": GeneralQuestionBank,
 }
 
 __all__ = [
@@ -122,6 +124,8 @@ __all__ = [
     "GapAnalysis",
     "GapAssessment",
     "GapStatus",
+    "GeneralQuestion",
+    "GeneralQuestionBank",
     "HireSignal",
     "InputCheck",
     "InterviewType",
@@ -145,6 +149,7 @@ __all__ = [
     "ProfileMeta",
     "ProfileStatus",
     "ProgressSnapshot",
+    "QuestionHints",
     "QuestionPattern",
     "QuestionScore",
     "Rating",

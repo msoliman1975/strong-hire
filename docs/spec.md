@@ -119,6 +119,11 @@ IDs are referenced by the build plan and acceptance tests. Priority: P0 must shi
 | AC-3 | At the first sign-in, ask for a short profile: full name, years of experience and target level, plus optional current title, country, time zone and LinkedIn URL. No payment details. The user edits it under Account, Profile. | P0 |
 | LB-1 | A top-level Resumes page lists saved CVs. The user can add, rename and delete a CV there. | P0 |
 | LB-2 | A top-level Job descriptions page lists saved job postings. A job description with no gap report and no session can be deleted. One that has reports can be archived and restored; a "Show archived" switch shows archived ones. | P0 |
+| QB-1 | Questions page, opened from the main menu, for any signed-in user. It lists the question bank: the sample questions of the Published company profiles plus a general set. Filters: company (or General), interview type, question area (competency, narrowed to the chosen type), job category (role family), level, and text search. | P1 |
+| QB-2 | Each question shows its interview type, areas, job categories and levels, and key hints: what it is looking for, strong signals and watch-outs. No model answers. | P1 |
+| QB-3 | With a company selected, that company's questions come first. General questions that match the other filters follow under "Also common". | P1 |
+| QB-4 | The debrief links to the Questions page with filters set: the session's company (General when the company is not curated), its interview type, and the two or three competencies with the lowest scores. Every filter can be cleared. | P1 |
+| QB-5 | General questions live in `questions/general.json`; company questions live in the profiles. Hints are our own guidance, written from the strong-answer note, and follow the profile content rules. | P1 |
 | AD-1 | Profile import command: validate a profile JSON file against the schema, store it as a new version with sources and import date, and publish it after confirmation. | P0 |
 | AD-2 | Admin dashboard: users, sessions, cost per session, failed sessions. | P1 |
 | PL-1 | Every model call is routed by role through the model gateway, so local and hosted models switch by config (see Architecture). | P0 |
