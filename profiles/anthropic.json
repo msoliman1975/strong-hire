@@ -329,7 +329,23 @@
       "strong_answer": "Choose a real situation with genuine tension (privacy, misleading users, cutting a safety corner). Explain the stakes, who was affected, the options you weighed, and what you did, including raising it with the right people. Be honest about uncertainty and the cost to you. Interviewers look for principled judgment and honesty, not heroics. Pitfall: a clean story with no real trade-off.",
       "competencies": ["ownership", "communication"],
       "values": ["Act for the global good", "Be helpful, honest, and harmless"],
-      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/"
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/",
+      "hints": {
+        "looking_for": [
+          "Your judgment when values are in tension",
+          "Whether you raise concerns with the right people"
+        ],
+        "strong_signals": [
+          "Explains the stakes, who was affected and the options",
+          "Is honest about uncertainty and personal cost"
+        ],
+        "watch_outs": [
+          "A clean story with no real trade-off",
+          "Heroics instead of honest judgment"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -337,7 +353,23 @@
       "strong_answer": "Lay out the deadline pressure and the specific risk. Show how you quantified the risk, looked for the simplest mitigation that made shipping safe (a flag, limited rollout, extra review), and who decided. Give the outcome and what you would do again. Strong answers treat safety as a requirement, not a blocker.",
       "competencies": ["ownership", "impact"],
       "values": ["Ignite a race to the top on safety", "Do the simple thing that works"],
-      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/"
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/",
+      "hints": {
+        "looking_for": [
+          "Whether you treat safety as a requirement",
+          "How you find the simplest mitigation that lets you ship"
+        ],
+        "strong_signals": [
+          "Quantifies the risk and says who decided",
+          "Uses flags, limited rollout or extra review"
+        ],
+        "watch_outs": [
+          "Treating safety as a blocker to get around",
+          "No outcome or reflection"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -345,7 +377,23 @@
       "strong_answer": "Pick feedback that stung and was at least partly right. Describe your first reaction honestly, how you sought to understand it, and the concrete change you made with evidence it stuck. Low ego and direct, kind communication are the signals. Pitfall: feedback that was really a compliment.",
       "competencies": ["learning_from_failure", "communication"],
       "values": ["Be helpful, honest, and harmless"],
-      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/"
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/",
+      "hints": {
+        "looking_for": [
+          "How you take feedback that stings",
+          "Whether you change and can show it"
+        ],
+        "strong_signals": [
+          "Is honest about your first reaction",
+          "Shows a concrete change with evidence it stuck"
+        ],
+        "watch_outs": [
+          "Feedback that was really a compliment",
+          "Getting defensive"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -353,7 +401,23 @@
       "strong_answer": "Explain what worried you and why it shipped anyway. Show that you voiced the concern clearly, proposed mitigations, and owned the follow-up (monitoring, fixes). Reflect honestly on whether it was the right call. Anthropic interviewers value candour and judgment over a perfect record.",
       "competencies": ["ownership", "learning_from_failure"],
       "values": ["Be helpful, honest, and harmless", "Hold light and shade"],
-      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you voice concerns clearly",
+          "How you own follow-up after a hard call"
+        ],
+        "strong_signals": [
+          "Proposed mitigations and monitored the result",
+          "Reflects honestly on whether it was right"
+        ],
+        "watch_outs": [
+          "Pretending there was no concern",
+          "No ownership of what came after"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -361,7 +425,23 @@
       "strong_answer": "Own it plainly: what you committed, why you missed, and when you told people. Spend most time on recovery and what you changed (estimation, scope, saying no earlier). Pitfall: blaming dependencies without your part.",
       "competencies": ["learning_from_failure", "ownership"],
       "values": ["Be helpful, honest, and harmless"],
-      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you own a miss plainly",
+          "How you recover and change how you work"
+        ],
+        "strong_signals": [
+          "Says when you told people",
+          "Spends most time on recovery and changes"
+        ],
+        "watch_outs": [
+          "Blaming dependencies without your part",
+          "Telling people too late"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -369,7 +449,23 @@
       "strong_answer": "Pick a substantive issue. Show you stated your view directly with evidence, genuinely engaged with theirs, and resolved it by what best served the shared goal, whether or not you won. Describe the outcome and relationship afterwards. Low ego and mission-first reasoning are key.",
       "competencies": ["conflict_handling", "collaboration"],
       "values": ["Be helpful, honest, and harmless", "Put the mission first"],
-      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/"
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/",
+      "hints": {
+        "looking_for": [
+          "Whether you state your view directly with evidence",
+          "Whether you put the shared goal above winning"
+        ],
+        "strong_signals": [
+          "Engages genuinely with the other view",
+          "Describes the outcome and relationship afterwards"
+        ],
+        "watch_outs": [
+          "A trivial disagreement",
+          "Ego-driven framing of who won"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -377,7 +473,23 @@
       "strong_answer": "Name a specific risk and argue it with reasoning and evidence, acknowledging counterarguments and uncertainty. Also note benefits you think are real. Show how the risk could be measured or mitigated and how it connects to your work. Interviewers test conviction and depth, so expect follow-ups. Pitfall: vague doom or dismissiveness.",
       "competencies": ["communication"],
       "values": ["Hold light and shade", "Ignite a race to the top on safety"],
-      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you hold a reasoned view on AI risk",
+          "How you handle counterarguments and uncertainty"
+        ],
+        "strong_signals": [
+          "Names a specific risk and argues it with evidence",
+          "Notes real benefits and ways to measure or reduce the risk"
+        ],
+        "watch_outs": [
+          "Vague doom",
+          "Dismissing risk entirely"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -385,7 +497,23 @@
       "strong_answer": "Identify concrete risks: unintended actions, misuse, data exposure, over-reliance, unclear accountability. Propose layered mitigations: scoped permissions, human confirmation for consequential actions, monitoring and audit logs, staged rollout, and evaluations. Weigh these against usefulness. Strong answers are specific and balanced.",
       "competencies": ["communication", "ownership"],
       "values": ["Ignite a race to the top on safety", "Hold light and shade"],
-      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/"
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/",
+      "hints": {
+        "looking_for": [
+          "Whether you see concrete risks in autonomous agents",
+          "How you design layered mitigations"
+        ],
+        "strong_signals": [
+          "Names specific risks like misuse or unclear accountability",
+          "Weighs mitigations against usefulness"
+        ],
+        "watch_outs": [
+          "Generic worries with no mitigation",
+          "Mitigations that make the agent useless"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -393,7 +521,23 @@
       "strong_answer": "Give a specific, personal reason tied to the mission and to what Anthropic does differently (for example its safety research or deployment policies). Then engage honestly with a real concern or tension (such as building frontier models while warning of their risks) and how you reconcile it. Interviewers value critical thinking over flattery.",
       "competencies": ["motivation", "judgment"],
       "values": ["Put the mission first", "Hold light and shade"],
-      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/"
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/",
+      "hints": {
+        "looking_for": [
+          "Whether your reason for joining is specific and personal",
+          "Whether you think critically about the mission"
+        ],
+        "strong_signals": [
+          "Ties your reason to what the company does differently",
+          "Engages honestly with a real concern"
+        ],
+        "watch_outs": [
+          "Flattery with no critical thought",
+          "Refusing to name any concern"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -401,7 +545,23 @@
       "strong_answer": "Cover the problem, users, your role, two or three key decisions with the alternatives, and the measured outcome. Highlight where you chose a simpler approach and why it was enough, and what you learned. Be ready for detailed follow-ups.",
       "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
       "values": ["Do the simple thing that works", "Be good to our users"],
-      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "The depth of your past work and your role in it",
+          "How you weigh alternatives in key decisions"
+        ],
+        "strong_signals": [
+          "Highlights where a simpler approach was enough",
+          "Gives a measured outcome and a lesson"
+        ],
+        "watch_outs": [
+          "Vague about your own decisions",
+          "Not ready for detailed follow-ups"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -409,7 +569,24 @@
       "strong_answer": "Describe a concrete example: understanding what the research shows and its limits, translating capabilities into user value, defining requirements and evaluation criteria with researchers, and handling uncertainty with staged launches. Show respect for empirical evidence and close partnership with research.",
       "competencies": ["role_fit", "judgment", "depth_of_experience"],
       "values": ["Do the simple thing that works", "Be good to our users"],
-      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you translate research into user value",
+          "How you handle uncertainty in what research shows"
+        ],
+        "strong_signals": [
+          "Uses a concrete example with researchers",
+          "Defines requirements and evaluation criteria",
+          "Uses staged launches"
+        ],
+        "watch_outs": [
+          "Overstating what the research proves",
+          "Ignoring the research team's input"
+        ]
+      },
+      "role_families": ["pm", "tpm", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -417,7 +594,23 @@
       "strong_answer": "Clarify the contract: submit many requests, poll or get notified, results within an SLA, lower price. Cover a job store, queueing, packing requests into GPU batches by length, scheduling around interactive traffic, retries, partial results, and cost accounting. Discuss throughput versus latency and fairness between customers. Start simple and scale.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": ["Do the simple thing that works"],
-      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/"
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/",
+      "hints": {
+        "looking_for": [
+          "How you design a high-throughput, lower-cost inference API",
+          "Whether you clarify the contract first"
+        ],
+        "strong_signals": [
+          "Batches requests efficiently and schedules around live traffic",
+          "Covers retries, partial results and fairness"
+        ],
+        "watch_outs": [
+          "Ignoring cost or fairness between customers",
+          "Over-engineering before a simple version"
+        ]
+      },
+      "role_families": ["swe", "data_ml", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -425,7 +618,23 @@
       "strong_answer": "Estimate GPU capacity from tokens per request and per-GPU throughput. Cover load balancing, continuous batching, KV cache memory management, streaming responses, autoscaling, admission control and priority tiers. Discuss tail latency, failure of a GPU mid-generation, and observability (utilization, queue depth). Show numbers.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": ["Do the simple thing that works"],
-      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/"
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/",
+      "hints": {
+        "looking_for": [
+          "Whether you size capacity from real numbers",
+          "How you manage GPU memory and tail latency"
+        ],
+        "strong_signals": [
+          "Estimates GPU needs from tokens and throughput",
+          "Covers batching, streaming, admission control and autoscaling"
+        ],
+        "watch_outs": [
+          "No numbers",
+          "Ignoring a GPU failing mid-generation"
+        ]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -433,7 +642,24 @@
       "strong_answer": "Compute the naive cost from a single source to show the bottleneck. Propose peer-to-peer or tree distribution, chunking with checksums, rack-aware placement, local caching, and resumable transfers. Discuss verifying integrity, rollout of new versions, and handling stragglers. Compare with object storage plus caching layers.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": [],
-      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/"
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/",
+      "hints": {
+        "looking_for": [
+          "Whether you spot the bandwidth bottleneck",
+          "How you distribute large files at scale"
+        ],
+        "strong_signals": [
+          "Shows the naive cost first",
+          "Proposes peer or tree distribution with checksums",
+          "Handles stragglers and resumable transfers"
+        ],
+        "watch_outs": [
+          "A single source with no estimate",
+          "Skipping integrity checks"
+        ]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -441,7 +667,23 @@
       "strong_answer": "Define it as fluent output not supported by facts or provided context. Explain causes: next-token training objective, gaps in training data, pressure to answer, decoding choices. Mitigations: grounding with retrieval and citations, training to express uncertainty, evaluations that reward abstaining, and product design that shows sources. Be precise and honest about limits.",
       "competencies": ["accuracy", "clarity_of_explanation", "reasoning"],
       "values": ["Be helpful, honest, and harmless"],
-      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/"
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/",
+      "hints": {
+        "looking_for": [
+          "Whether you can define hallucination precisely",
+          "Whether you understand its causes and limits"
+        ],
+        "strong_signals": [
+          "Links causes to training and decoding",
+          "Proposes grounding, abstention and source display"
+        ],
+        "watch_outs": [
+          "Claiming it can be fully solved",
+          "A vague definition"
+        ]
+      },
+      "role_families": ["data_ml", "swe"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -449,7 +691,23 @@
       "strong_answer": "Treat it as an incident: contain (filters, block patterns), assess scope and affected people, notify appropriately. Then root cause: data pipeline filtering, deduplication, memorization tests. Longer term: privacy reviews, red-teaming for extraction, and evaluations before release. Balance speed with user trust.",
       "competencies": ["reasoning", "technical_depth", "accuracy"],
       "values": ["Be good to our users", "Ignite a race to the top on safety"],
-      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/"
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/",
+      "hints": {
+        "looking_for": [
+          "How you respond to a data exposure incident",
+          "Whether you balance speed with user trust"
+        ],
+        "strong_signals": [
+          "Contains first, then assesses scope and notifies",
+          "Finds the root cause and adds checks before release"
+        ],
+        "watch_outs": [
+          "Jumping to root cause before containment",
+          "No plan to prevent it recurring"
+        ]
+      },
+      "role_families": ["data_ml", "swe"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -457,7 +715,23 @@
       "strong_answer": "Define who new users are and what success looks like (first useful outcome, return within a week). Find where they struggle (blank-page problem, not knowing capabilities, trust). Propose a few ideas, prioritize one, and define metrics and guardrails. Consider safety and honesty about limits as part of the experience.",
       "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
       "values": ["Be good to our users"],
-      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you define new users and early success",
+          "How you find where they struggle"
+        ],
+        "strong_signals": [
+          "Prioritizes one idea with metrics and guardrails",
+          "Treats honesty about limits as part of the experience"
+        ],
+        "watch_outs": [
+          "Ideas with no user insight",
+          "No success metric"
+        ]
+      },
+      "role_families": ["pm", "design", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -465,7 +739,23 @@
       "strong_answer": "Define both sides measurably: helpfulness evaluations and over-refusal rates, harm evaluations by risk category and severity. Propose thresholds, red-teaming, staged rollout and monitoring, and who decides when they conflict. Explain that unhelpfulness has costs too. Strong answers are concrete and reflect holding risk and benefit together.",
       "competencies": ["problem_framing", "structure", "recommendation"],
       "values": ["Hold light and shade", "Ignite a race to the top on safety"],
-      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you measure both helpfulness and harm",
+          "Who decides when they conflict"
+        ],
+        "strong_signals": [
+          "Proposes concrete evaluations and thresholds",
+          "Recognizes that unhelpfulness has costs too"
+        ],
+        "watch_outs": [
+          "Only measuring harm",
+          "Vague criteria with no thresholds"
+        ]
+      },
+      "role_families": ["pm", "data_ml", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -473,7 +763,23 @@
       "strong_answer": "Reject the false binary: show how some safety work enables capability launches and trust. Propose a framework weighing user value, risk severity and likelihood, and commitments. Give an example trade-off and your decision, plus how you would revisit it. Mission-first reasoning with clear prioritization.",
       "competencies": ["prioritization", "recommendation", "user_and_business_sense"],
       "values": ["Put the mission first", "Ignite a race to the top on safety"],
-      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you see past a false choice between capability and safety",
+          "How you build a clear prioritization framework"
+        ],
+        "strong_signals": [
+          "Weighs user value, risk severity and commitments",
+          "Gives an example trade-off and decision"
+        ],
+        "watch_outs": [
+          "Treating safety and capability as pure opposites",
+          "No clear decision"
+        ]
+      },
+      "role_families": ["pm", "design", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -481,7 +787,23 @@
       "strong_answer": "Use proxies: customer interviews, early-access partners, internal dogfooding, analogous products, and the capability's evaluated strengths. Size candidate use cases by value and frequency, test quickly with prototypes, and define what signal would confirm demand. Keep it empirical and simple.",
       "competencies": ["problem_framing", "estimation_logic", "prioritization"],
       "values": ["Do the simple thing that works", "Be good to our users"],
-      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you find demand before you have usage data",
+          "Whether you keep it empirical"
+        ],
+        "strong_signals": [
+          "Uses proxies like interviews and early partners",
+          "Sizes use cases and defines confirming signals"
+        ],
+        "watch_outs": [
+          "Guessing with no way to test",
+          "No sizing of value or frequency"
+        ]
+      },
+      "role_families": ["pm", "design", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -489,7 +811,23 @@
       "strong_answer": "Pick a specific enterprise persona and job to be done. Cover enterprise needs: admin controls, data privacy, integrations, auditability. Propose the feature, the minimum lovable version, and metrics (adoption, retention, seat expansion), with risks and mitigations.",
       "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
       "values": ["Be good to our users"],
-      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/anthropic-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you design for a specific enterprise persona",
+          "Whether you understand enterprise needs"
+        ],
+        "strong_signals": [
+          "Covers admin controls, privacy and auditability",
+          "Defines a minimum version and adoption metrics"
+        ],
+        "watch_outs": [
+          "A consumer feature with no enterprise needs",
+          "No risks or mitigations"
+        ]
+      },
+      "role_families": ["pm", "design", "tpm"],
+      "levels": []
     }
   ],
   "bar_by_level": [

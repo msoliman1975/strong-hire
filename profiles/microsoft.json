@@ -369,7 +369,24 @@
       "values": [
         "Growth mindset"
       ],
-      "source_url": "https://www.productleadership.com/blog/microsoft-product-manager-interview-questions/"
+      "source_url": "https://www.productleadership.com/blog/microsoft-product-manager-interview-questions/",
+      "hints": {
+        "looking_for": [
+          "How you respond when something is hard or goes wrong",
+          "Whether you learn on purpose, with concrete steps"
+        ],
+        "strong_signals": [
+          "A real setback met with curiosity, not defensiveness",
+          "Specific learning steps and a measurable result",
+          "Reflects on how it changed your later approach"
+        ],
+        "watch_outs": [
+          "Saying you love learning with no story behind it",
+          "A story with no struggle or setback"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -384,7 +401,24 @@
         "Respect",
         "One Microsoft"
       ],
-      "source_url": "https://www.aced.io/guides/microsoft-pm-interview"
+      "source_url": "https://www.aced.io/guides/microsoft-pm-interview",
+      "hints": {
+        "looking_for": [
+          "How you understand a stakeholder's real concern",
+          "Whether you can adapt your communication to find common ground"
+        ],
+        "strong_signals": [
+          "Describes the stakeholder's goals fairly",
+          "Finds a shared goal and shows the relationship after",
+          "Says what you would do sooner next time"
+        ],
+        "watch_outs": [
+          "Painting the stakeholder as a villain",
+          "Escalation as your only move"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -398,7 +432,24 @@
         "Respect",
         "One Microsoft"
       ],
-      "source_url": "https://www.levels.fyi/blog/ace-microsoft-hiring.html"
+      "source_url": "https://www.levels.fyi/blog/ace-microsoft-hiring.html",
+      "hints": {
+        "looking_for": [
+          "How you help a team work through a real disagreement",
+          "Whether you separate facts from opinions"
+        ],
+        "strong_signals": [
+          "A concrete conflict with a clear personal role in solving it",
+          "Agreeing on decision criteria and keeping trust",
+          "Shows the result for the project and a reflection"
+        ],
+        "watch_outs": [
+          "Avoiding the conflict instead of resolving it",
+          "A story where you simply won the argument"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -413,7 +464,24 @@
         "Integrity",
         "Accountability"
       ],
-      "source_url": "https://www.levels.fyi/blog/ace-microsoft-hiring.html"
+      "source_url": "https://www.levels.fyi/blog/ace-microsoft-hiring.html",
+      "hints": {
+        "looking_for": [
+          "Whether you own your part of a failure",
+          "How you find root causes and change what you do"
+        ],
+        "strong_signals": [
+          "A real failure with stakes and no blaming",
+          "Explains the root cause and the recovery",
+          "A later example where the lesson paid off"
+        ],
+        "watch_outs": [
+          "A success dressed up as a failure",
+          "No lasting change after the lesson"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -427,7 +495,24 @@
         "Customer obsessed",
         "Growth mindset"
       ],
-      "source_url": "https://www.productleadership.com/blog/microsoft-product-manager-interview-questions/"
+      "source_url": "https://www.productleadership.com/blog/microsoft-product-manager-interview-questions/",
+      "hints": {
+        "looking_for": [
+          "How you turn data into a product decision",
+          "Whether you pick metrics tied to real customer behavior"
+        ],
+        "strong_signals": [
+          "Names the metric and how the data was gathered",
+          "Shows the change you drove and the measured result",
+          "Mentions experiments or guardrail metrics where relevant"
+        ],
+        "watch_outs": [
+          "Vanity metrics that do not reflect customers",
+          "Using data only to justify a decision already made"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -441,7 +526,24 @@
       "values": [
         "Accountability"
       ],
-      "source_url": "https://www.aced.io/guides/microsoft-pm-interview"
+      "source_url": "https://www.aced.io/guides/microsoft-pm-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you can explain your work at the right depth",
+          "How clearly you show your own decisions and results"
+        ],
+        "strong_signals": [
+          "Picks the two most relevant projects, not every line",
+          "Explains problem, design, your choices and outcomes",
+          "Handles why and what-would-you-change follow-ups"
+        ],
+        "watch_outs": [
+          "Reading the resume back line by line",
+          "Vague about what you personally owned"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -454,7 +556,24 @@
       "values": [
         "Growth mindset"
       ],
-      "source_url": "https://careers.microsoft.com/us/en/interviewtips"
+      "source_url": "https://careers.microsoft.com/us/en/interviewtips",
+      "hints": {
+        "looking_for": [
+          "Whether your interest in this team is specific and real",
+          "How your experience and goals connect to the role"
+        ],
+        "strong_signals": [
+          "Shows knowledge of the team's products and direction",
+          "Links your background to what you want to learn",
+          "Comes with thoughtful questions for the interviewer"
+        ],
+        "watch_outs": [
+          "An answer that would fit any company",
+          "Talking only about what the company can give you"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -468,7 +587,24 @@
       "values": [
         "One Microsoft"
       ],
-      "source_url": "https://www.productleadership.com/blog/microsoft-product-manager-interview-questions/"
+      "source_url": "https://www.productleadership.com/blog/microsoft-product-manager-interview-questions/",
+      "hints": {
+        "looking_for": [
+          "Whether your technical depth is credible",
+          "How you work across functions to land a solution"
+        ],
+        "strong_signals": [
+          "Explains options considered and why one was chosen",
+          "Shows how design, PM or other teams were brought in",
+          "Quantifies impact and names what you learned"
+        ],
+        "watch_outs": [
+          "All technical detail with no collaboration",
+          "All collaboration with no technical substance"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -483,7 +619,24 @@
       "values": [
         "Customer obsessed"
       ],
-      "source_url": "https://designgurus.io/blog/microsoft-system-design-interview-questions"
+      "source_url": "https://designgurus.io/blog/microsoft-system-design-interview-questions",
+      "hints": {
+        "looking_for": [
+          "How you scope a real-time messaging system",
+          "Whether you handle enterprise needs as well as scale"
+        ],
+        "strong_signals": [
+          "Clarifies chat types, presence, history and compliance up front",
+          "Covers persistent connections, fan-out, ordering and offline sync",
+          "Discusses large channels, multi-region and tenant isolation"
+        ],
+        "watch_outs": [
+          "Ignoring compliance, retention and tenant isolation",
+          "Skipping delivery and ordering guarantees"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -497,7 +650,24 @@
       "values": [
         "Customer obsessed"
       ],
-      "source_url": "https://designgurus.io/blog/microsoft-system-design-interview-questions"
+      "source_url": "https://designgurus.io/blog/microsoft-system-design-interview-questions",
+      "hints": {
+        "looking_for": [
+          "How you design file sync across many devices",
+          "Whether you reason about storage cost and consistency"
+        ],
+        "strong_signals": [
+          "Separates metadata service from blob storage",
+          "Covers chunking, dedup, change tracking and versioning",
+          "Has a clear plan for conflicting edits from two devices"
+        ],
+        "watch_outs": [
+          "Re-uploading whole files on every change",
+          "No strategy for sync conflicts"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -511,7 +681,24 @@
       "values": [
         "Customer obsessed"
       ],
-      "source_url": "https://designgurus.io/blog/microsoft-system-design-interview-questions"
+      "source_url": "https://designgurus.io/blog/microsoft-system-design-interview-questions",
+      "hints": {
+        "looking_for": [
+          "How you design reliable delivery across several channels",
+          "Whether you plan for failures and user preferences"
+        ],
+        "strong_signals": [
+          "Clarifies volume, priority and delivery guarantees first",
+          "Uses queues, retries with backoff, dedup and rate limits",
+          "Handles provider outages, quiet hours and tenant isolation"
+        ],
+        "watch_outs": [
+          "Sending notifications synchronously from the caller",
+          "No plan when an email or push provider is down"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -525,7 +712,24 @@
       "values": [
         "Customer obsessed"
       ],
-      "source_url": "https://www.productleadership.com/blog/microsoft-product-manager-interview-questions/"
+      "source_url": "https://www.productleadership.com/blog/microsoft-product-manager-interview-questions/",
+      "hints": {
+        "looking_for": [
+          "How you handle concurrent edits in real time",
+          "Whether you can explain trade-offs in plain terms"
+        ],
+        "strong_signals": [
+          "Clarifies what is shared and the latency target",
+          "Explains a concurrency approach such as OT or CRDTs",
+          "Covers persistence, presence, offline edits and access control"
+        ],
+        "watch_outs": [
+          "Ignoring what happens when two people edit at once",
+          "Jargon without tying choices to the user experience"
+        ]
+      },
+      "role_families": ["swe", "tpm", "pm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -540,7 +744,24 @@
       "values": [
         "Customer obsessed"
       ],
-      "source_url": "https://www.productleadership.com/blog/microsoft-product-manager-interview-questions/"
+      "source_url": "https://www.productleadership.com/blog/microsoft-product-manager-interview-questions/",
+      "hints": {
+        "looking_for": [
+          "How you frame a goal before proposing features",
+          "Whether you pick a specific user segment and pain"
+        ],
+        "strong_signals": [
+          "States the goal and chooses one remote-worker segment",
+          "Prioritizes ideas by impact and effort",
+          "Ends with a recommendation, success metrics and guardrails"
+        ],
+        "watch_outs": [
+          "A feature list with no user in mind",
+          "Forgetting enterprise admin and IT constraints"
+        ]
+      },
+      "role_families": ["pm", "design", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -554,7 +775,24 @@
       "values": [
         "Customer obsessed"
       ],
-      "source_url": "https://www.productleadership.com/blog/microsoft-product-manager-interview-questions/"
+      "source_url": "https://www.productleadership.com/blog/microsoft-product-manager-interview-questions/",
+      "hints": {
+        "looking_for": [
+          "How you diagnose a subscription product's user journey",
+          "Whether you balance player needs with business economics"
+        ],
+        "strong_signals": [
+          "Clarifies the goal and picks one player segment",
+          "Maps the journey and finds the biggest drop-off",
+          "Defines metrics such as retention and engagement"
+        ],
+        "watch_outs": [
+          "Ignoring content costs or developer partners",
+          "Jumping to features before finding the problem"
+        ]
+      },
+      "role_families": ["pm", "design", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -569,7 +807,24 @@
       "values": [
         "Customer obsessed"
       ],
-      "source_url": "https://www.productleadership.com/blog/microsoft-product-manager-interview-questions/"
+      "source_url": "https://www.productleadership.com/blog/microsoft-product-manager-interview-questions/",
+      "hints": {
+        "looking_for": [
+          "How you size and compare market segments",
+          "Whether you tie an opportunity to the company's strengths"
+        ],
+        "strong_signals": [
+          "Sizes candidate segments with stated assumptions",
+          "Weighs customer needs, competitors and existing advantages",
+          "Picks one with a go-to-market plan, metrics and risks"
+        ],
+        "watch_outs": [
+          "Choosing a market without sizing it",
+          "Ignoring channel and partner effects"
+        ]
+      },
+      "role_families": ["pm", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -583,7 +838,24 @@
       "values": [
         "Customer obsessed"
       ],
-      "source_url": "https://www.aced.io/guides/microsoft-pm-interview"
+      "source_url": "https://www.aced.io/guides/microsoft-pm-interview",
+      "hints": {
+        "looking_for": [
+          "How you structure a metric investigation",
+          "Whether you locate the problem before guessing causes"
+        ],
+        "strong_signals": [
+          "Confirms the data is real before digging in",
+          "Segments by region, platform, user type and funnel step",
+          "Ranks hypotheses and names data to confirm each"
+        ],
+        "watch_outs": [
+          "Guessing one cause before finding where the drop is",
+          "Forgetting external factors like holidays or competitors"
+        ]
+      },
+      "role_families": ["pm", "data_ml"],
+      "levels": []
     }
   ],
   "bar_by_level": [

@@ -323,7 +323,24 @@
       "strong_answer": "Pick a real disagreement on substance (priority, design, approach). Show you raised it directly with evidence, listened to the reasoning, and either persuaded or committed fully. Describe the outcome and the relationship afterwards. OpenAI looks for openness to feedback and collaboration over ego. Pitfall: a story where you went around your manager.",
       "competencies": ["conflict_handling", "communication"],
       "values": ["Team spirit"],
-      "source_url": "https://www.aced.io/blog/openai-interview-process"
+      "source_url": "https://www.aced.io/blog/openai-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you raise disagreement directly, with evidence",
+          "Whether you put collaboration ahead of ego"
+        ],
+        "strong_signals": [
+          "A real disagreement on substance",
+          "Listens to the reasoning, then persuades or commits",
+          "Shows the outcome and the relationship afterwards"
+        ],
+        "watch_outs": [
+          "Going around your manager",
+          "A disagreement over trivial preferences"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -331,7 +348,24 @@
       "strong_answer": "Be candid: what happened, the measurable impact, and your part. Focus on the response: fast detection, mitigation, honest communication, and the durable fix. Show you moved with urgency and did unglamorous cleanup. End with what you do differently now. Pitfall: minimizing or blaming.",
       "competencies": ["learning_from_failure", "ownership"],
       "values": ["Intense and scrappy"],
-      "source_url": "https://www.aced.io/blog/openai-interview-process"
+      "source_url": "https://www.aced.io/blog/openai-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you own mistakes candidly",
+          "How fast and thoroughly you respond to damage"
+        ],
+        "strong_signals": [
+          "Clear about what happened, the impact and your part",
+          "Fast detection, mitigation and honest communication",
+          "A durable fix and what you do differently now"
+        ],
+        "watch_outs": [
+          "Minimizing the impact",
+          "Blaming others or circumstances"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -339,7 +373,24 @@
       "strong_answer": "Explain the shared goal, the competing approaches and why each team held its view. Show how you aligned on the overall goal first, used data or a quick experiment to decide, and treated the outcome as joint. Mention how you kept the relationship healthy. 'Nothing is someone else's problem' is the spirit to show.",
       "competencies": ["collaboration", "conflict_handling"],
       "values": ["Team spirit"],
-      "source_url": "https://www.aced.io/blog/openai-interview-process"
+      "source_url": "https://www.aced.io/blog/openai-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you work with a team that sees it differently",
+          "Whether you use data to settle disagreements"
+        ],
+        "strong_signals": [
+          "Aligns on the shared goal first",
+          "Uses data or a quick experiment to decide",
+          "Treats the outcome as joint and keeps the relationship healthy"
+        ],
+        "watch_outs": [
+          "Treating the other team as an obstacle",
+          "Winning the argument at the cost of trust"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -347,7 +398,24 @@
       "strong_answer": "Describe the stakeholder, what they wanted and the limitation. Show you translated it into impact and options (what is possible, at what cost or risk) using plain language and an example, then agreed next steps. For AI roles, explaining model limits honestly (hallucination, evaluation gaps) is a plus. Pitfall: jargon or just saying no.",
       "competencies": ["communication", "collaboration"],
       "values": ["Team spirit", "Make something people love"],
-      "source_url": "https://www.aced.io/blog/openai-interview-process"
+      "source_url": "https://www.aced.io/blog/openai-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you translate technical limits into impact and options",
+          "Whether you communicate honestly in plain language"
+        ],
+        "strong_signals": [
+          "Explains the limitation through impact, cost and risk",
+          "Uses a concrete example and agrees on next steps",
+          "Is honest about model limits where relevant"
+        ],
+        "watch_outs": [
+          "Jargon the stakeholder cannot follow",
+          "Just saying no without options"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -355,7 +423,24 @@
       "strong_answer": "Leadership need not mean managing: show taking ownership of an unclear problem, rallying others, making decisions, and delivering. Give scope, obstacles, your actions and a measured result. Show intensity and pragmatism. Pitfall: describing a title rather than actions.",
       "competencies": ["ownership", "impact"],
       "values": ["Intense and scrappy", "Team spirit"],
-      "source_url": "https://igotanoffer.com/en/advice/openai-interview-questions"
+      "source_url": "https://igotanoffer.com/en/advice/openai-interview-questions",
+      "hints": {
+        "looking_for": [
+          "Whether you lead through ownership, with or without a title",
+          "How you rally others to deliver"
+        ],
+        "strong_signals": [
+          "Takes on an unclear problem and makes decisions",
+          "Gives scope, obstacles, actions and a measured result",
+          "Shows urgency and pragmatism"
+        ],
+        "watch_outs": [
+          "Describing a title instead of actions",
+          "A story where others did the hard parts"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -363,7 +448,24 @@
       "strong_answer": "Be specific and sincere: what draws you to the mission of safe, beneficial AGI, which OpenAI work you have followed or used, and how your skills fit this team. Show a balanced view of benefits and risks of AI. Mention what you would contribute, not just gain. Pitfall: generic hype or only prestige.",
       "competencies": ["motivation", "role_fit"],
       "values": ["AGI focus"],
-      "source_url": "https://igotanoffer.com/en/advice/openai-interview-questions"
+      "source_url": "https://igotanoffer.com/en/advice/openai-interview-questions",
+      "hints": {
+        "looking_for": [
+          "Whether your interest in the mission is specific and sincere",
+          "How you see both benefits and risks of AI"
+        ],
+        "strong_signals": [
+          "Names work you have followed or used",
+          "Shows a balanced view of AI benefits and risks",
+          "Explains what you would contribute, not just gain"
+        ],
+        "watch_outs": [
+          "Generic hype",
+          "Wanting the job mainly for prestige"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -371,7 +473,24 @@
       "strong_answer": "Give context, the goal, your exact contributions versus the team's, key decisions and alternatives, and the result in numbers. Be ready for deep follow-ups on any detail. Show ramp-up speed and pragmatism. Pitfall: vague 'we' with no clear personal ownership.",
       "competencies": ["depth_of_experience", "scope_at_level"],
       "values": ["Make something people love", "Intense and scrappy"],
-      "source_url": "https://www.aced.io/blog/openai-interview-process"
+      "source_url": "https://www.aced.io/blog/openai-interview-process",
+      "hints": {
+        "looking_for": [
+          "Exactly what you did versus the team",
+          "Whether you can go deep on any detail"
+        ],
+        "strong_signals": [
+          "Separates your contributions from the team's",
+          "Explains key decisions and alternatives",
+          "Gives results in numbers"
+        ],
+        "watch_outs": [
+          "A vague 'we' with no clear ownership",
+          "Falling apart on follow-up questions"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -379,7 +498,24 @@
       "strong_answer": "Show you have thought about it: name a concrete problem (for example scalable oversight, evaluation of dangerous capabilities, robustness), explain why it matters and what progress could look like, and how your work could help. Be honest about uncertainty. Interviewers want genuine engagement, not a memorized line.",
       "competencies": ["motivation", "judgment"],
       "values": ["AGI focus"],
-      "source_url": "https://igotanoffer.com/en/advice/openai-research-scientist-interview"
+      "source_url": "https://igotanoffer.com/en/advice/openai-research-scientist-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you have thought seriously about AI safety",
+          "How you reason about an open, uncertain problem"
+        ],
+        "strong_signals": [
+          "Names a concrete open problem and why it matters",
+          "Describes what progress could look like",
+          "Honest about uncertainty and how your work could help"
+        ],
+        "watch_outs": [
+          "A memorized line with no real view",
+          "Dismissing safety concerns entirely"
+        ]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -387,7 +523,24 @@
       "strong_answer": "Clarify sources, scale, permissions and latency. Cover ingestion and chunking, embeddings plus keyword retrieval, access control enforced at retrieval time, re-ranking, prompt construction with citations, and caching. Discuss evaluation (relevance, groundedness), hallucination mitigation, freshness, and cost per query. Strong answers tie design to user trust.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": ["Make something people love", "Scale"],
-      "source_url": "https://igotanoffer.com/en/advice/openai-interview-questions"
+      "source_url": "https://igotanoffer.com/en/advice/openai-interview-questions",
+      "hints": {
+        "looking_for": [
+          "How you design retrieval-based LLM search end to end",
+          "Whether you build in permissions, evaluation and trust"
+        ],
+        "strong_signals": [
+          "Clarifies sources, scale, permissions and latency",
+          "Covers chunking, hybrid retrieval, re-ranking and citations",
+          "Discusses evaluation, hallucination and cost per query"
+        ],
+        "watch_outs": [
+          "Leaking documents a user should not see",
+          "No way to measure answer quality"
+        ]
+      },
+      "role_families": ["data_ml", "swe"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -395,7 +548,24 @@
       "strong_answer": "Define job types (training, inference, eval), priorities and how credits are granted and spent. Cover a queue and scheduler, bin-packing across nodes, preemption and checkpointing, fairness versus utilization, and accounting. Discuss failure handling when nodes die and how users see wait times. Show reasoning about scarce compute at scale.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": ["Scale"],
-      "source_url": "https://igotanoffer.com/en/advice/openai-interview-questions"
+      "source_url": "https://igotanoffer.com/en/advice/openai-interview-questions",
+      "hints": {
+        "looking_for": [
+          "How you design a fair scheduler for scarce compute",
+          "Whether you handle credits, preemption and failures"
+        ],
+        "strong_signals": [
+          "Defines job types and how credits are granted and spent",
+          "Covers bin-packing, preemption and checkpointing",
+          "Weighs fairness vs utilization and shows users wait times"
+        ],
+        "watch_outs": [
+          "Ignoring node failures on long jobs",
+          "No accounting for how credits are used"
+        ]
+      },
+      "role_families": ["swe", "tpm", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -403,7 +573,24 @@
       "strong_answer": "Split frontend and API concerns: auth, model selection and parameters, streaming responses, rate limits and quotas, saving and sharing prompts, and usage metering. Discuss latency (streaming tokens), abuse prevention, and how to roll out new models safely. Show user empathy for developers.",
       "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
       "values": ["Make something people love"],
-      "source_url": "https://www.aced.io/blog/openai-interview-process"
+      "source_url": "https://www.aced.io/blog/openai-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you design a developer-facing product and its API",
+          "Whether you show empathy for developer users"
+        ],
+        "strong_signals": [
+          "Separates frontend and API concerns",
+          "Covers auth, streaming, quotas and usage metering",
+          "Plans abuse prevention and safe rollout of new models"
+        ],
+        "watch_outs": [
+          "Ignoring streaming and latency",
+          "No rate limits or abuse controls"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -411,7 +598,24 @@
       "strong_answer": "Clarify features (channels, DMs, presence, search) and scale. Cover persistent connections for real-time delivery, message storage partitioned by channel, ordering, fan-out to large channels, offline sync, and search indexing. Discuss trade-offs in consistency and delivery guarantees. Quantify load.",
       "competencies": ["technical_depth", "trade_offs"],
       "values": ["Scale"],
-      "source_url": "https://www.aced.io/blog/openai-interview-process"
+      "source_url": "https://www.aced.io/blog/openai-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you design a real-time messaging system at scale",
+          "Whether you reason about consistency and delivery"
+        ],
+        "strong_signals": [
+          "Clarifies features and scale, then quantifies load",
+          "Covers persistent connections, partitioned storage and fan-out",
+          "Discusses ordering, offline sync and search"
+        ],
+        "watch_outs": [
+          "No plan for very large channels",
+          "Skipping delivery guarantees"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -419,7 +623,24 @@
       "strong_answer": "Cover data, tensor and pipeline parallelism and when each helps, communication cost (all-reduce, interconnect), checkpointing and recovery from node failure, data loading throughput, and monitoring loss and hardware health. Discuss trade-offs between memory, speed and complexity. Strong answers reason from bottlenecks with rough numbers.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": ["Scale"],
-      "source_url": "https://igotanoffer.com/en/advice/openai-research-scientist-interview"
+      "source_url": "https://igotanoffer.com/en/advice/openai-research-scientist-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you understand distributed training parallelism",
+          "How you reason from bottlenecks"
+        ],
+        "strong_signals": [
+          "Explains data, tensor and pipeline parallelism and when each helps",
+          "Covers communication cost, checkpointing and node failures",
+          "Uses rough numbers to find the bottleneck"
+        ],
+        "watch_outs": [
+          "Naming techniques without saying when to use them",
+          "Ignoring failure recovery on long runs"
+        ]
+      },
+      "role_families": ["data_ml", "swe"],
+      "levels": ["senior", "staff_principal"]
     },
     {
       "interview_type": "technical_qa",
@@ -427,7 +648,24 @@
       "strong_answer": "Explain both: batch norm normalizes across the batch per feature, layer norm across features per example. Layer norm does not depend on batch size or statistics across variable-length sequences, behaves the same in training and inference, and suits autoregressive and small-batch settings. Mention pre-norm versus post-norm and training stability. Be precise and admit uncertainty where it exists.",
       "competencies": ["accuracy", "reasoning", "clarity_of_explanation"],
       "values": [],
-      "source_url": "https://igotanoffer.com/en/advice/openai-research-scientist-interview"
+      "source_url": "https://igotanoffer.com/en/advice/openai-research-scientist-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you understand normalization precisely",
+          "How you reason about why one method suits transformers"
+        ],
+        "strong_signals": [
+          "Explains which axis each method normalizes over",
+          "Covers batch size, variable length and train vs inference behavior",
+          "Admits uncertainty where it exists"
+        ],
+        "watch_outs": [
+          "Mixing up the two methods",
+          "Confident claims that are not accurate"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -435,7 +673,24 @@
       "strong_answer": "Confirm the gap with production samples and labels. Compare input distributions (feature statistics, embeddings), check for leakage or pipeline differences, and slice errors by segment. Remedies: collect representative data, reweighting, domain adaptation, better evals that mirror production, and monitoring for drift. Show a systematic, experiment-driven approach.",
       "competencies": ["reasoning", "technical_depth", "accuracy"],
       "values": ["Intense and scrappy"],
-      "source_url": "https://igotanoffer.com/en/advice/openai-research-scientist-interview"
+      "source_url": "https://igotanoffer.com/en/advice/openai-research-scientist-interview",
+      "hints": {
+        "looking_for": [
+          "How you diagnose a production performance gap",
+          "Whether your approach is systematic and experiment-driven"
+        ],
+        "strong_signals": [
+          "Confirms the gap with real production samples",
+          "Compares distributions and checks pipeline differences",
+          "Proposes remedies plus drift monitoring"
+        ],
+        "watch_outs": [
+          "Jumping to retraining before diagnosing",
+          "Ignoring leakage or pipeline bugs"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -443,7 +698,24 @@
       "strong_answer": "Define tasks representative of real use, success criteria and graders (exact checks, model graders with calibration, human review). Track accuracy, cost per task, latency and failure categories. Discuss contamination, variance across runs, and regression gating in CI. Explain how results drive model or prompt changes.",
       "competencies": ["technical_depth", "reasoning", "trade_offs"],
       "values": ["Make something people love"],
-      "source_url": "https://www.aced.io/blog/openai-interview-process"
+      "source_url": "https://www.aced.io/blog/openai-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you design evaluations that reflect real use",
+          "Whether you track cost and reliability, not just accuracy"
+        ],
+        "strong_signals": [
+          "Defines representative tasks and graders",
+          "Tracks accuracy, cost, latency and failure types",
+          "Handles variance across runs and gates regressions in CI"
+        ],
+        "watch_outs": [
+          "A single accuracy number with no cost view",
+          "Ignoring test contamination"
+        ]
+      },
+      "role_families": ["data_ml", "swe"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -451,7 +723,24 @@
       "strong_answer": "Frame who benefits most from the extra capability and what they would pay. Options: premium tier, route only hard queries to it, use it to distill cheaper models, or limited access while cost falls. Consider safety review, capacity, and cannibalization. Recommend a path with metrics (value per query, margin, satisfaction).",
       "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
       "values": ["Make something people love", "Scale"],
-      "source_url": "https://www.aced.io/blog/openai-interview-process"
+      "source_url": "https://www.aced.io/blog/openai-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you match a costly capability to real value",
+          "Whether you weigh cost, safety and capacity"
+        ],
+        "strong_signals": [
+          "Identifies who benefits most and what they would pay",
+          "Compares options like routing, premium tiers or distillation",
+          "Recommends a path with metrics such as margin per query"
+        ],
+        "watch_outs": [
+          "Launching to everyone regardless of cost",
+          "Forgetting safety review or capacity"
+        ]
+      },
+      "role_families": ["pm", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -459,7 +748,24 @@
       "strong_answer": "Define the goal (early activation and retention) and a measurable activation event. Form a hypothesis from where new users drop off, design variants, pick primary and guardrail metrics, set sample size and duration, and watch novelty effects and segments. Say what result would change your decision.",
       "competencies": ["structure", "user_and_business_sense", "prioritization"],
       "values": ["Make something people love"],
-      "source_url": "https://www.aced.io/blog/openai-interview-process"
+      "source_url": "https://www.aced.io/blog/openai-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you design a sound product experiment",
+          "Whether you define activation and success clearly"
+        ],
+        "strong_signals": [
+          "Defines a measurable activation event",
+          "Forms a hypothesis from where users drop off",
+          "Sets primary and guardrail metrics, sample size and duration"
+        ],
+        "watch_outs": [
+          "No hypothesis behind the variants",
+          "Ignoring novelty effects or segments"
+        ]
+      },
+      "role_families": ["pm", "design", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -467,7 +773,24 @@
       "strong_answer": "Tie metrics to the mission and the business: user value (active use, retention, task success), developer adoption, revenue and compute efficiency, plus safety and trust indicators. Explain trade-offs between them and which you would use as north star. Strong answers acknowledge that mission and growth can conflict.",
       "competencies": ["problem_framing", "structure", "user_and_business_sense"],
       "values": ["AGI focus", "Make something people love"],
-      "source_url": "https://igotanoffer.com/en/advice/openai-interview-questions"
+      "source_url": "https://igotanoffer.com/en/advice/openai-interview-questions",
+      "hints": {
+        "looking_for": [
+          "How you tie company metrics to mission and business",
+          "Whether you see tensions between goals"
+        ],
+        "strong_signals": [
+          "Covers user value, developer adoption, revenue and efficiency",
+          "Includes safety and trust indicators",
+          "Picks a north star and explains trade-offs"
+        ],
+        "watch_outs": [
+          "Only growth or revenue metrics",
+          "Ignoring that mission and growth can conflict"
+        ]
+      },
+      "role_families": ["pm", "tpm"],
+      "levels": ["senior", "staff_principal"]
     },
     {
       "interview_type": "case",
@@ -475,7 +798,24 @@
       "strong_answer": "Clarify users (owners, bystanders), use cases and constraints (privacy, noise, multiple speakers). Define success metrics for usefulness, adoption and trust, with privacy and safety guardrails. Prioritize a launch scope and say how you would learn before scaling.",
       "competencies": ["problem_framing", "prioritization", "user_and_business_sense"],
       "values": ["Make something people love"],
-      "source_url": "https://www.aced.io/blog/openai-interview-process"
+      "source_url": "https://www.aced.io/blog/openai-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you set goals for a new product in a sensitive setting",
+          "Whether you account for privacy and bystanders"
+        ],
+        "strong_signals": [
+          "Clarifies users including bystanders, and constraints",
+          "Defines metrics for usefulness, adoption and trust",
+          "Prioritizes a launch scope and a plan to learn first"
+        ],
+        "watch_outs": [
+          "Ignoring privacy and multiple speakers",
+          "Scaling before learning"
+        ]
+      },
+      "role_families": ["pm", "design", "tpm"],
+      "levels": []
     }
   ],
   "bar_by_level": [

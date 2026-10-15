@@ -266,7 +266,23 @@
       "strong_answer": "Describe a concrete conflict between speed and reliability, security or data integrity. Explain the risk you saw, how you quantified it, and how you made the case to stakeholders who wanted speed. Show the outcome for the customer and how you communicated transparently about the delay. Salesforce's top value is Trust, so link the story to it naturally. Pitfall: a story where nothing was really at risk.",
       "competencies": ["ownership", "communication", "impact"],
       "values": ["Trust", "Customer Success"],
-      "source_url": "https://codemia.io/guides/salesforce-software-engineer"
+      "source_url": "https://codemia.io/guides/salesforce-software-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you weigh customer risk against speed with evidence",
+          "How you make the case to people who want to ship now"
+        ],
+        "strong_signals": [
+          "Names a real risk to reliability, security or data and how you sized it",
+          "Shows open communication about the delay and the customer outcome"
+        ],
+        "watch_outs": [
+          "A story where nothing was truly at risk",
+          "Treating speed as the villain without acknowledging its cost"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -274,7 +290,23 @@
       "strong_answer": "Explain the problem with the status quo, the new approach, and the evidence you gathered (prototype, pilot, data). Show how you brought skeptics along and handled risk, for example with a staged rollout. Quantify the result for customers or the team. Strong answers show innovation done together, not alone. Pitfall: novelty with no measured benefit.",
       "competencies": ["impact", "collaboration", "communication"],
       "values": ["Innovation"],
-      "source_url": "https://codemia.io/guides/salesforce-software-engineer"
+      "source_url": "https://codemia.io/guides/salesforce-software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you spot a weak status quo and test a better way",
+          "How you bring skeptics along"
+        ],
+        "strong_signals": [
+          "Backs the idea with a pilot, prototype or data",
+          "Shows a measured result and a careful rollout"
+        ],
+        "watch_outs": [
+          "Novelty with no measured benefit",
+          "A lone-hero story where others just complied"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -282,7 +314,23 @@
       "strong_answer": "Lay out the disagreement and each side's reasons fairly. Show your approach: listening, bringing customer data, agreeing on decision criteria, and finding a compromise or escalation path if needed. Describe the outcome and the relationship afterwards. Salesforce panels look for polished, structured communication and respect for partners. Pitfall: winning the argument at the cost of the relationship.",
       "competencies": ["conflict_handling", "collaboration", "communication"],
       "values": ["Trust"],
-      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager"
+      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you represent both sides fairly",
+          "How you reach alignment without damaging the relationship"
+        ],
+        "strong_signals": [
+          "Uses customer data or agreed decision criteria",
+          "Describes the outcome and how the partnership held up"
+        ],
+        "watch_outs": [
+          "Winning the argument at the cost of trust",
+          "Casting the partner as the obstacle"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -290,7 +338,23 @@
       "strong_answer": "Name the customer or segment and the specific pain, with evidence such as support cases, interviews or revenue at risk. Explain who you had to convince and how you framed it in business terms. Describe what changed in the roadmap and the customer result. Show empathy and business sense together. Pitfall: building whatever one loud customer asked for without judgment.",
       "competencies": ["impact", "communication", "ownership"],
       "values": ["Customer Success"],
-      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager"
+      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you bring evidence of real customer pain",
+          "How you frame customer needs in business terms"
+        ],
+        "strong_signals": [
+          "Names the customer, the pain and the proof",
+          "Shows what changed and the result for the customer"
+        ],
+        "watch_outs": [
+          "Building whatever one loud customer demanded",
+          "Empathy with no business reasoning"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -298,7 +362,23 @@
       "strong_answer": "Use STAR. Own your part clearly, explain how and when you told stakeholders (transparency matters for Trust), what you did to recover, and the concrete change you made afterwards. Show a learner's mindset. Pitfall: blaming other teams, or a failure with no real consequences.",
       "competencies": ["learning_from_failure", "ownership", "communication"],
       "values": ["Trust"],
-      "source_url": "https://roundz.substack.com/p/interview-experience-104-salesforce-smts"
+      "source_url": "https://roundz.substack.com/p/interview-experience-104-salesforce-smts",
+      "hints": {
+        "looking_for": [
+          "Whether you own your part of the miss",
+          "How early and openly you told stakeholders"
+        ],
+        "strong_signals": [
+          "Describes the recovery steps you took",
+          "Names a concrete change you made afterwards"
+        ],
+        "watch_outs": [
+          "Blaming other teams",
+          "A failure with no real consequences"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -306,7 +386,23 @@
       "strong_answer": "Describe the conflict and its effect on delivery. Show how you got each person's view, focused on shared goals, and agreed a path forward. Mention making sure quieter members were heard. Close with the result and what you would repeat. Pitfall: vague 'we talked it out' without your specific actions.",
       "competencies": ["conflict_handling", "collaboration"],
       "values": ["Equality", "Trust"],
-      "source_url": "https://roundz.substack.com/p/interview-experience-104-salesforce-smts"
+      "source_url": "https://roundz.substack.com/p/interview-experience-104-salesforce-smts",
+      "hints": {
+        "looking_for": [
+          "How you get every view on the table, including quiet ones",
+          "Whether you steer people toward a shared goal"
+        ],
+        "strong_signals": [
+          "Shows the specific actions you took",
+          "Ends with the result and what you would repeat"
+        ],
+        "watch_outs": [
+          "A vague 'we talked it out'",
+          "Skipping how the conflict affected delivery"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -314,7 +410,23 @@
       "strong_answer": "Structure it as a clear story: the customer problem and evidence, how you defined scope and success metrics, key trade-offs and cuts, working with engineering and design, launch and adoption results. Salesforce rewards clear, polished storytelling that is ready for senior stakeholders, so keep it structured and quantified. Be ready for depth on any step. Pitfall: listing activities without decisions and outcomes.",
       "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
       "values": ["Customer Success"],
-      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager"
+      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager",
+      "hints": {
+        "looking_for": [
+          "How you take a product from customer problem to launch",
+          "Whether you tell a structured story fit for senior leaders"
+        ],
+        "strong_signals": [
+          "Covers evidence, scope, success metrics and key trade-offs",
+          "Gives adoption or impact numbers and holds up under follow-ups"
+        ],
+        "watch_outs": [
+          "Listing activities with no decisions or outcomes",
+          "Losing the thread in too much detail"
+        ]
+      },
+      "role_families": ["pm", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -322,7 +434,23 @@
       "strong_answer": "Show a framework: customer impact (incidents, performance, trust), velocity cost of the debt, revenue opportunity of features, and risk. Quantify where possible and propose a balanced plan, such as a fixed share of capacity plus targeted debt tied to features. Explain how you would get engineering and business leaders to agree. Pitfall: treating debt as purely an engineering concern.",
       "competencies": ["judgment", "role_fit"],
       "values": ["Trust", "Customer Success"],
-      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager"
+      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager",
+      "hints": {
+        "looking_for": [
+          "How you weigh debt against features with a clear framework",
+          "Whether you can get engineering and business leaders to agree"
+        ],
+        "strong_signals": [
+          "Ties debt to customer impact, velocity and risk",
+          "Proposes a balanced plan, such as reserved capacity"
+        ],
+        "watch_outs": [
+          "Treating debt as purely an engineering concern",
+          "An all-or-nothing answer"
+        ]
+      },
+      "role_families": ["swe", "pm", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -330,7 +458,23 @@
       "strong_answer": "Give a concrete example of a cross-team dependency. Show proactive ownership: clear agreements, regular check-ins, surfacing risks early, and offering help rather than waiting. Explain how you managed your own time and priorities. Close with the result. Pitfall: describing only how others let you down.",
       "competencies": ["team_fit", "judgment", "scope_at_level"],
       "values": ["Trust"],
-      "source_url": "https://roundz.substack.com/p/interview-experience-104-salesforce-smts"
+      "source_url": "https://roundz.substack.com/p/interview-experience-104-salesforce-smts",
+      "hints": {
+        "looking_for": [
+          "Whether you own outcomes that depend on other teams",
+          "How you surface risks early"
+        ],
+        "strong_signals": [
+          "Gives a concrete example with clear agreements and check-ins",
+          "Shows offering help rather than waiting"
+        ],
+        "watch_outs": [
+          "Only describing how others let you down",
+          "No result at the end"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -338,7 +482,23 @@
       "strong_answer": "Clarify channels, volume and latency needs. Cover an intake API, a queue, per-channel workers, templates and user preferences, retries with idempotency, and delivery tracking. Multi-tenancy is the key Salesforce angle: tenant isolation, per-tenant rate limits and quotas so one customer cannot starve others, and data security. Discuss scaling and monitoring. Strong answers make trade-offs explicit, for example at-least-once delivery with deduplication.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": ["Trust"],
-      "source_url": "https://codemia.io/guides/salesforce-software-engineer"
+      "source_url": "https://codemia.io/guides/salesforce-software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you scope a shared multi-tenant service",
+          "Whether you protect tenants from each other"
+        ],
+        "strong_signals": [
+          "Covers queueing, per-channel workers, retries and idempotency",
+          "Adds per-tenant limits and quotas and states delivery trade-offs"
+        ],
+        "watch_outs": [
+          "Ignoring tenant isolation and data security",
+          "Skipping retries, deduplication or monitoring"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -346,7 +506,23 @@
       "strong_answer": "Compare algorithms (token bucket, sliding window) and pick one with reasons. Decide where limits apply (per tenant, per user, per endpoint) and where state lives, using a fast shared store with atomic operations. Discuss behavior when the store fails, accuracy versus latency, and how clients are told they were limited. Tie limits to fairness between tenants and platform trust. Pitfall: ignoring distributed state.",
       "competencies": ["technical_depth", "trade_offs", "accuracy"],
       "values": ["Trust"],
-      "source_url": "https://codemia.io/guides/salesforce-software-engineer"
+      "source_url": "https://codemia.io/guides/salesforce-software-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you can compare limiting algorithms and choose one",
+          "How you handle shared state across many servers"
+        ],
+        "strong_signals": [
+          "Decides the limit scope and where counters live, with atomic updates",
+          "Explains failure behavior and how clients learn they were limited"
+        ],
+        "watch_outs": [
+          "Ignoring distributed state",
+          "No link to fairness between customers"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -354,7 +530,23 @@
       "strong_answer": "Clarify the domain objects: jobs, technicians, skills, locations, schedules. Propose clean components (job intake, matching or assignment, scheduling, notifications) with clear API contracts. Discuss the assignment logic and its trade-offs (greedy versus optimized batching), concurrency when two dispatchers act at once, and extensibility. Clear, modular object-oriented thinking is the main signal.",
       "competencies": ["clarity_of_explanation", "trade_offs", "technical_depth"],
       "values": [],
-      "source_url": "https://roundz.substack.com/p/interview-experience-104-salesforce-smts"
+      "source_url": "https://roundz.substack.com/p/interview-experience-104-salesforce-smts",
+      "hints": {
+        "looking_for": [
+          "How cleanly you model the domain and split components",
+          "Whether your API contracts are clear"
+        ],
+        "strong_signals": [
+          "Defines jobs, technicians, skills and schedules before drawing boxes",
+          "Discusses assignment trade-offs and two dispatchers acting at once"
+        ],
+        "watch_outs": [
+          "Jumping to infrastructure before the domain model",
+          "Ignoring concurrency"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -362,7 +554,23 @@
       "strong_answer": "Define module boundaries and the data each owns. Explain communication between modules (synchronous APIs versus events), how to keep cart, inventory and orders consistent (transactions within a service, sagas or compensating actions across services), and search indexing with eventual consistency. Discuss failure handling and scaling peaks. Strong answers justify each boundary and consistency choice.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": [],
-      "source_url": "https://roundz.substack.com/p/interview-experience-104-salesforce-smts"
+      "source_url": "https://roundz.substack.com/p/interview-experience-104-salesforce-smts",
+      "hints": {
+        "looking_for": [
+          "How you draw module boundaries and data ownership",
+          "How you keep data consistent across modules"
+        ],
+        "strong_signals": [
+          "Chooses sync calls or events with reasons",
+          "Uses sagas or compensating steps and accepts eventual consistency for search"
+        ],
+        "watch_outs": [
+          "A shared database that couples every module",
+          "No plan for failures or traffic peaks"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -370,7 +578,23 @@
       "strong_answer": "Explain the roles (client, resource owner, authorization server, resource server), the authorization code flow, and how access tokens and refresh tokens are used. Describe JWT structure and signature verification, expiry, and scopes. Cover risks: token leakage, missing validation of audience or signature, long-lived tokens, and revocation difficulty. Tie it to protecting customer data. Pitfall: confusing authentication with authorization.",
       "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
       "values": ["Trust"],
-      "source_url": "https://www.interviewquery.com/guides/salesforce-software-engineer"
+      "source_url": "https://www.interviewquery.com/guides/salesforce-software-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you understand the OAuth roles and code flow",
+          "How well you know token risks"
+        ],
+        "strong_signals": [
+          "Explains access and refresh tokens, JWT signatures, expiry and scopes",
+          "Names failure modes like leakage, weak validation and revocation"
+        ],
+        "watch_outs": [
+          "Confusing authentication with authorization",
+          "Reciting terms without explaining the flow"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -378,7 +602,23 @@
       "strong_answer": "Pick a specific user (for example a mid-market account executive) and a key pain such as knowing which deals need attention. Propose a feature (deal risk insights, next best action, auto-drafted follow-ups), explain the data it needs, and address trust: explainability, data privacy, and human control. Define metrics like adoption, win rate and cycle time, plus guardrails. Pitfall: generic AI with no workflow fit or trust story.",
       "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
       "values": ["Customer Success", "Innovation", "Trust"],
-      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager"
+      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you pick a specific user and pain",
+          "How you build trust into an AI feature"
+        ],
+        "strong_signals": [
+          "Ties the feature to the rep's workflow and the data it needs",
+          "Defines adoption and outcome metrics with guardrails"
+        ],
+        "watch_outs": [
+          "Generic AI with no workflow fit",
+          "Ignoring explainability, privacy and human control"
+        ]
+      },
+      "role_families": ["pm", "design"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -386,7 +626,23 @@
       "strong_answer": "Separate the personas: admin who configures, end users who adopt, and the executive buyer. Identify the biggest drop-off points (setup complexity, data import, low user adoption) with assumed data. Prioritize one or two solutions such as guided setup or templates by industry, and define time-to-value and adoption metrics. Pitfall: designing only for the end user and ignoring the admin.",
       "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
       "values": ["Customer Success"],
-      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager"
+      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you separate admin, end user and buyer needs",
+          "How you find and prioritize the biggest drop-offs"
+        ],
+        "strong_signals": [
+          "Picks one or two focused fixes with clear reasons",
+          "Defines time-to-value and adoption metrics"
+        ],
+        "watch_outs": [
+          "Designing only for end users and forgetting admins",
+          "A long feature list with no priority"
+        ]
+      },
+      "role_families": ["pm", "design"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -394,7 +650,23 @@
       "strong_answer": "Start from the feature goal and the users. Propose a metric tree: adoption (workspaces enabled, active users), engagement (actions completed from Slack), outcome (time saved, faster deal or case resolution), and business impact (retention, expansion). Add guardrails such as notification fatigue. Explain how you would attribute impact. Pitfall: counting installs only.",
       "competencies": ["structure", "user_and_business_sense", "estimation_logic"],
       "values": ["Customer Success"],
-      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager"
+      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager",
+      "hints": {
+        "looking_for": [
+          "How you build a metric tree from the feature goal",
+          "Whether you think about attribution"
+        ],
+        "strong_signals": [
+          "Covers adoption, engagement, outcomes and business impact",
+          "Adds guardrails such as notification fatigue"
+        ],
+        "watch_outs": [
+          "Counting installs only",
+          "Metrics with no link to user value"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -402,7 +674,23 @@
       "strong_answer": "Cover both the business buying it and the end customer using it: containment or resolution rate, customer satisfaction, escalation quality, handle time saved for agents, and cost per case. Add trust guardrails like wrong-answer rate and safe handoff to humans. Explain which is the primary metric and why. Pitfall: optimizing containment at the cost of satisfaction.",
       "competencies": ["structure", "user_and_business_sense", "recommendation"],
       "values": ["Customer Success", "Trust"],
-      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager"
+      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you consider both the buying business and its customers",
+          "How you choose a primary metric"
+        ],
+        "strong_signals": [
+          "Balances resolution, satisfaction and cost per case",
+          "Adds trust guardrails like wrong answers and handoff quality"
+        ],
+        "watch_outs": [
+          "Optimizing containment at the cost of satisfaction",
+          "No reason for the chosen primary metric"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -410,7 +698,23 @@
       "strong_answer": "Frame the segment's needs: ease of setup, price, and quick value. Compare strengths and weaknesses honestly. Propose a strategy (simpler packaging, guided setup, AI features, ecosystem) and the trade-offs with the enterprise business. Define success metrics and first steps. Pitfall: assuming enterprise strengths matter to small businesses.",
       "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
       "values": ["Customer Success", "Innovation"],
-      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager"
+      "source_url": "https://www.cleverprep.com/companies/salesforce/product-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you understand what small businesses value",
+          "How you weigh strategy trade-offs against the core business"
+        ],
+        "strong_signals": [
+          "Compares strengths and weaknesses honestly",
+          "Proposes a focused strategy with metrics and first steps"
+        ],
+        "watch_outs": [
+          "Assuming enterprise strengths matter to small businesses",
+          "Ignoring the cost to the existing business"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
     }
   ],
   "bar_by_level": [

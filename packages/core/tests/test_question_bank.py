@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any
 
@@ -9,6 +10,7 @@ import pytest
 from pydantic import ValidationError
 
 from strong_core.config import find_repo_root
+from strong_core.profiles import parse_profile
 from strong_core.question_bank import QuestionBankError, load_general_bank
 from strong_core.schemas import (
     GeneralQuestion,
@@ -99,3 +101,14 @@ def test_qb5_loader_reports_a_bad_file(tmp_path: Path) -> None:
     missing.write_text('{"version": 0}', encoding="utf-8")
     with pytest.raises(QuestionBankError, match="version"):
         load_general_bank(missing)
+
+
+def test_qb2_every_checked_in_question_has_hints() -> None:
+    """QB-2, QB-5: every company sample question and general question shows key hints, and the
+    general set covers every interview type."""
+    for path in sorted((REPO / "profiles").glob("*.json")):
+        profile = parse_profile(json.loads(path.read_text(encoding="utf-8")))
+        missing = [q.question for q in profile.sample_questions if q.hints is None]
+        assert not missing, f"{path.name}: no hints for {missing}"
+    bank = load_general_bank(REPO / "questions" / "general.json")
+    assert {q.interview_type for q in bank.questions} == set(InterviewType)
