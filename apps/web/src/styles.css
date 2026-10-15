@@ -695,6 +695,7 @@ a.usage:hover .usage__value {
 }
 
 input[type="text"],
+input[type="search"],
 input[type="email"],
 input[type="url"],
 input[type="number"],

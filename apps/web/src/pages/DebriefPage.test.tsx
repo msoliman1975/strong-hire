@@ -9,7 +9,7 @@ import type { Debrief } from "../api/types";
 import { createQueryClient } from "../App";
 import { scorecardFor, sessionPlan } from "../mocks/fixtures";
 import { server } from "../mocks/node";
-import { DebriefPage } from "./DebriefPage";
+import { DebriefPage, weakestCompetencies } from "./DebriefPage";
 
 function debrief(generic: boolean, duration_min: 10 | 30 | 45 = 30): Debrief {
   return {
@@ -129,5 +129,34 @@ describe("debrief page", () => {
       "general interview style, with no company profile. Company values are not scored.",
     );
     expect(screen.queryByText("(company value)")).toBeNull();
+  });
+
+  it("QB-4: links to practice questions for the company, interview type and weakest areas", async () => {
+    const body = debrief(false);
+    renderDebrief(body);
+    const link = await screen.findByRole("link", { name: "Practice questions for your weak areas" });
+    const url = new URL(link.getAttribute("href") ?? "", "http://x");
+    expect(url.pathname).toBe("/questions");
+    expect(url.searchParams.get("company")).toBe("example-corp");
+    expect(url.searchParams.get("type")).toBe("behavioral");
+    expect(url.searchParams.getAll("area")).toEqual(weakestCompetencies(body.scorecard));
+  });
+
+  it("QB-4: a company outside the curated list opens the general questions", async () => {
+    renderDebrief(debrief(true));
+    const link = await screen.findByRole("link", { name: "Practice questions for your weak areas" });
+    expect(new URL(link.getAttribute("href") ?? "", "http://x").searchParams.get("company")).toBe("general");
+  });
+
+  it("QB-4: the weakest two areas, plus a third only when it ties the second", () => {
+    const card = scorecardFor("behavioral", true);
+    const comps = ["ownership", "impact", "collaboration", "conflict_handling"] as const;
+    const scored = (scores: (1 | 2 | 3 | 4)[]) => ({
+      ...card,
+      competency_scores: scores.map((score, i) => ({ ...card.competency_scores[0], competency: comps[i], score })),
+    });
+    expect(weakestCompetencies(scored([4, 2, 3, 1]))).toEqual(["conflict_handling", "impact"]);
+    expect(weakestCompetencies(scored([3, 1, 2, 2]))).toEqual(["impact", "collaboration", "conflict_handling"]);
+    expect(weakestCompetencies(null)).toEqual([]);
   });
 });
