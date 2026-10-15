@@ -40,6 +40,9 @@ def slug_of(name: str | None, url: str | None = None) -> str | None:
         ("NVIDIA Corporation", "nvidia"),
         ("The Atlassian Group", "atlassian"),
         ("OpenAI", "openai"),
+        ("Walmart Inc.", "walmart"),
+        ("Walmart Global Tech", "walmart"),
+        ("Sam's Club", "walmart"),
     ],
 )
 def test_in5_matches_by_name(name: str, slug: str) -> None:
@@ -58,6 +61,8 @@ def test_in5_matches_by_name(name: str, slug: str) -> None:
         ("https://jobs.ashbyhq.com/openai/abc", "openai"),
         ("https://nvidia.wd5.myworkdayjobs.com/en-US/External/job/X/Y_1", "nvidia"),
         ("https://careers.linkedin.com/jobs/1", "linkedin"),
+        ("https://careers.walmart.com/us/jobs/WD123-software-engineer-iii", "walmart"),
+        ("https://walmart.wd5.myworkdayjobs.com/en-US/WalmartExternal/job/X_1", "walmart"),
     ],
 )
 def test_in5_matches_by_domain_when_the_name_is_unknown(url: str, slug: str) -> None:

@@ -34,7 +34,7 @@ The developer machine is Windows with PowerShell. Do not add bash-only scripts.
 ./scripts/dev.ps1 test      # pytest with MODEL_PROFILE=fake, then Vitest
 ./scripts/dev.ps1 lint      # ruff, mypy, schema freshness, ESLint, tsc
 ./scripts/dev.ps1 migrate   # alembic upgrade head inside the api container
-./scripts/dev.ps1 seed      # the 20 launch companies
+./scripts/dev.ps1 seed      # the launch companies
 ./scripts/dev.ps1 schemas   # regenerate schemas/ after changing a contract
 ```
 

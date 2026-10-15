@@ -1,4 +1,4 @@
-"""Seed reference data: the 20 launch companies (spec, Scope section). Safe to run twice.
+"""Seed reference data: the 21 launch companies (spec, Scope section). Safe to run twice.
 
 uv run python -m strong_core.db.seed
 """
@@ -32,6 +32,7 @@ LAUNCH_COMPANIES: tuple[tuple[str, str], ...] = (
     ("databricks", "Databricks"),
     ("snowflake", "Snowflake"),
     ("atlassian", "Atlassian"),
+    ("walmart", "Walmart"),
 )
 
 

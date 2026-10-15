@@ -1,0 +1,628 @@
+{
+  "company_name": "Walmart",
+  "company_slug": "walmart",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-14",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Walmart Values",
+    "principles": [
+      {
+        "name": "Respect the Individual",
+        "description": "Listen to each other, show empathy, celebrate differences, and know that great ideas can come from anywhere; build teams where associates feel supported and can grow.",
+        "evidence_signals": [
+          "Sought out and used an idea from a junior colleague, a store associate or another team",
+          "Handled a disagreement by listening first and shows empathy for the other side",
+          "Mentored or developed teammates with a visible result",
+          "Treats front-line users (store associates, drivers, pickers) as people whose time matters"
+        ],
+        "weight": 1.1
+      },
+      {
+        "name": "Act with Integrity",
+        "description": "Do the right thing; be honest, fair and transparent; do what you say you will do and earn trust.",
+        "evidence_signals": [
+          "Raised a bad-news issue (risk, defect, missed date) early and openly",
+          "Kept a commitment or explicitly reset it instead of letting it slip silently",
+          "Chose the compliant or fair option when a shortcut was available, and explains the cost",
+          "Credits others accurately and owns own mistakes"
+        ],
+        "weight": 1.1
+      },
+      {
+        "name": "Serve Our Customers and Members",
+        "description": "Work every day to improve the experience of customers, Sam's Club members and the associates who serve them, aiming to exceed their expectations and help them save money and live better.",
+        "evidence_signals": [
+          "Names a concrete customer, member or associate pain and how it was measured",
+          "Ties a technical or product decision to price, availability, convenience or trust for the customer",
+          "Weighs cost to serve so savings can be passed on (everyday low cost supports everyday low price)",
+          "Checked the result for the customer after launch"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "Strive for Excellence",
+        "description": "Move with speed, pay attention to detail, and hold high expectations of yourself and those you work with; keep improving and innovating.",
+        "evidence_signals": [
+          "Delivered quickly while protecting quality on what mattered, for example a peak-season readiness plan",
+          "Caught a detail others missed (data error, edge case, capacity gap) and fixed the root cause",
+          "Improved a process or system with a measured gain in speed, reliability or cost",
+          "Raised the bar for the team with a mechanism such as tests, load tests or reviews"
+        ],
+        "weight": 1.2
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": [
+        "Software Engineer II",
+        "Software Engineer III",
+        "Senior Software Engineer",
+        "Staff Software Engineer",
+        "Principal Software Engineer"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, interest in retail tech, logistics, sometimes light technical questions. Not simulated in v1."
+        },
+        {
+          "name": "Online assessment",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Automated (HackerRank) or third-party interviewer (Karat)",
+          "notes": "One or two medium-to-hard data structures problems, sometimes SQL. Reported as 60 to 90 minutes. Not simulated in v1."
+        },
+        {
+          "name": "Coding round",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Live coding plus questions on resume projects and core fundamentals (Java, concurrency, Spring Boot are often reported). Not simulated in v1."
+        },
+        {
+          "name": "Design round",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior or staff engineer",
+          "notes": "Low-level object design for earlier levels; high-level distributed design at retail scale (inventory, order management, checkout under burst, pickup, pricing) for senior and above. Often includes a deep dive on a past system."
+        },
+        {
+          "name": "Hiring manager round",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Engineering manager",
+          "notes": "Conversational but behavioral in substance; STAR answers expected on ownership, conflict, scale and why Walmart. Some light technical discussion."
+        },
+        {
+          "name": "Behavioral and values discussion",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager or senior engineer",
+          "notes": "Often folded into the hiring manager round rather than a separate interview; probes collaboration, mistakes and the four Walmart values."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": ["Product Manager III", "Senior Product Manager", "Director, Product Management"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, eligibility and motivation. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager interview",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Hiring manager",
+          "notes": "Experience, culture fit and behavioral questions."
+        },
+        {
+          "name": "Product sense and case",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Senior product manager or product leader",
+          "notes": "Product design and metrics questions on Walmart products; some teams give a case or take-home a few days ahead and ask for a presentation."
+        },
+        {
+          "name": "Leadership and collaboration",
+          "interview_type": "behavioral",
+          "duration_min": 60,
+          "interviewer_role": "Cross-functional partners and product leaders",
+          "notes": "Leading projects, working with engineering and business partners, failures and trade-offs."
+        },
+        {
+          "name": "Director interview",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Department director",
+          "notes": "Optional final round reported for some roles; strategic case discussion."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": ["Data Scientist III", "Senior Data Scientist", "Staff Data Scientist"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Not simulated in v1."
+        },
+        {
+          "name": "Online assessment",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Automated (HackerRank)",
+          "notes": "SQL and Python, sometimes an ML problem such as time-series forecasting. Not simulated in v1."
+        },
+        {
+          "name": "Statistics and ML fundamentals",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Data scientist",
+          "notes": "Regression, classification, overfitting, model evaluation, experimentation; reported as several 30 to 45 minute rounds."
+        },
+        {
+          "name": "ML case study",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Senior data scientist",
+          "notes": "A business problem (forecasting, pricing, fraud, search) judged on framing, data pipeline, model choice and evaluation."
+        },
+        {
+          "name": "Hiring manager and behavioral",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Data science manager",
+          "notes": "Past projects, conflict, stress and why Walmart."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Customer or associate impact",
+      "pattern": "A time the candidate improved something for an end customer or a front-line user and how they knew it worked",
+      "competencies": ["impact", "ownership"],
+      "values": ["Serve Our Customers and Members"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Owning a mistake",
+      "pattern": "A mistake the candidate made, how they surfaced it, and what changed afterwards",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Act with Integrity"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Cross-functional disagreement",
+      "pattern": "A disagreement with a partner team, product or business stakeholder and how it was resolved",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["Respect the Individual", "Act with Integrity"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Speed with quality under peak pressure",
+      "pattern": "Delivering against a fixed, high-stakes date (a holiday peak, a launch) without letting quality slip",
+      "competencies": ["impact", "ownership"],
+      "values": ["Strive for Excellence"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Adapting to change",
+      "pattern": "A time priorities, requirements or the organization changed suddenly and how the candidate adjusted",
+      "competencies": ["collaboration", "learning_from_failure"],
+      "values": ["Strive for Excellence", "Respect the Individual"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Developing others",
+      "pattern": "Mentoring, onboarding or growing a teammate, or including a quieter voice in a decision",
+      "competencies": ["collaboration", "communication"],
+      "values": ["Respect the Individual"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Building at scale",
+      "pattern": "Walk through a system or product the candidate built that runs at large scale, their own role, and the hardest technical challenge",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Strive for Excellence"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Decision with incomplete information",
+      "pattern": "A critical technical or product decision made without full data and how risk was managed",
+      "competencies": ["judgment", "depth_of_experience"],
+      "values": ["Act with Integrity", "Strive for Excellence"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Why Walmart",
+      "pattern": "Motivation for Walmart Global Tech specifically and how the candidate's goals fit the team",
+      "competencies": ["motivation", "role_fit", "team_fit"],
+      "values": ["Serve Our Customers and Members"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Omnichannel inventory and orders",
+      "pattern": "Design inventory, order management or fulfillment routing across stores, warehouses, pickup and delivery, with consistency and reconciliation trade-offs",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Serve Our Customers and Members", "Strive for Excellence"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Burst traffic and reliability",
+      "pattern": "Design or harden a customer-facing flow (cart, checkout, search) for a known traffic spike many times the baseline",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["Strive for Excellence"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Store systems at the edge",
+      "pattern": "Design a system that runs in thousands of stores with unreliable connectivity, such as sensors, pickup scheduling or associate tools",
+      "competencies": ["technical_depth", "reasoning", "trade_offs"],
+      "values": ["Respect the Individual", "Strive for Excellence"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "ML fundamentals in a retail setting",
+      "pattern": "Explain a model choice, evaluation method or failure mode (overfitting, bias, drift) for a retail problem such as forecasting or fraud",
+      "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
+      "values": []
+    },
+    {
+      "interview_type": "case",
+      "theme": "Improve a Walmart experience",
+      "pattern": "Improve a Walmart digital product (app, pickup and delivery, Walmart+) for a chosen customer segment and define success metrics",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["Serve Our Customers and Members"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Metrics and diagnosis",
+      "pattern": "Choose success metrics for a feature, or explain how a feature moves a given metric",
+      "competencies": ["problem_framing", "structure", "estimation_logic"],
+      "values": ["Strive for Excellence"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Cost to serve and low prices",
+      "pattern": "Weigh customer value against operating cost for a fulfillment, pricing or membership decision, consistent with everyday low cost and everyday low price",
+      "competencies": ["user_and_business_sense", "estimation_logic", "recommendation"],
+      "values": ["Serve Our Customers and Members", "Act with Integrity"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you made a mistake at work. What happened next?",
+      "strong_answer": "Pick a real mistake with real consequences. Explain how the candidate noticed it, how quickly and openly they told the people affected, and what they did to limit the damage. Then show the root cause and the lasting change (a test, a checklist, a review step) with evidence it worked. Walmart interviewers listen for honesty and follow-through rather than a perfect record. Pitfalls: a disguised strength, blaming others, or no change afterwards.",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Act with Integrity"],
+      "source_url": "https://www.aced.io/blog/walmart-interview-process"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "How do you handle challenges or disagreements with cross-functional teams?",
+      "strong_answer": "Use a specific story, not a general philosophy. Describe the partner team and what each side wanted. Show the candidate listening to understand the other side's constraints, using data to frame options, and agreeing on a decision and an owner. Close with the outcome and how the relationship held up. Strong answers mention respect for the other team's goals. Pitfalls: winning by escalation, or a conflict with no real stakes.",
+      "competencies": ["conflict_handling", "collaboration", "communication"],
+      "values": ["Respect the Individual"],
+      "source_url": "https://www.aced.io/guides/walmart-product-manager-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a project you spearheaded from start to finish.",
+      "strong_answer": "Set the goal and why it mattered to customers or the business. Show what the candidate personally drove: framing the problem, getting buy-in, planning, and unblocking the team. Name one hard moment and how it was handled. Quantify the result and what was learned. At senior levels show influence across teams. Pitfalls: 'we' with no clear personal role, or a project with no measurable outcome.",
+      "competencies": ["ownership", "impact"],
+      "values": ["Strive for Excellence"],
+      "source_url": "https://www.aced.io/guides/walmart-product-manager-interview"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you successfully handled a challenging customer issue.",
+      "strong_answer": "Name the customer (external or internal) and the issue in concrete terms. Show the candidate taking ownership, finding the real cause rather than the symptom, and keeping the customer informed. Describe the fix and a step that stopped it happening again for other customers. Quantify the result where possible. Pitfalls: a story where the customer was simply wrong, or a fix that only helped one person.",
+      "competencies": ["ownership", "impact", "communication"],
+      "values": ["Serve Our Customers and Members"],
+      "source_url": "https://site.joinleland.com/library/a/how-to-become-a-walmart-product-manager-the-ultimate-guide"
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to adapt to a significant change.",
+      "strong_answer": "Describe the change (reorg, new priority, new technology) and its impact on the candidate's work. Show how they re-planned quickly, kept the team informed, and protected the most important commitments. Mention what they let go of and why. Close with the result and what they would repeat. Pitfalls: complaining about the change, or simply waiting for direction.",
+      "competencies": ["collaboration", "learning_from_failure"],
+      "values": ["Strive for Excellence", "Respect the Individual"],
+      "source_url": "https://site.joinleland.com/library/a/how-to-become-a-walmart-product-manager-the-ultimate-guide"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Tell me about something you built at large scale and the main technical challenges you faced.",
+      "strong_answer": "Give scale in numbers (requests, data volume, stores, users). Explain the architecture briefly, then the hardest problem (consistency, latency, peak load, migration) and the options considered. Be clear about the candidate's own decisions versus the team's. Close with results, an incident or lesson, and what they would change today. Pitfalls: listing technologies without trade-offs, or no clear personal contribution.",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Strive for Excellence"],
+      "source_url": "https://www.cleverprep.com/companies/walmart/software-engineer"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Describe a critical technical decision you had to make with incomplete information.",
+      "strong_answer": "Explain what was unknown and why waiting was costly. Show how the candidate gathered the best available evidence, judged whether the decision was reversible, and reduced risk (feature flag, staged rollout, fallback). Say who they consulted and how they communicated the uncertainty honestly. Close with how it turned out and what they learned. Pitfalls: claiming certainty, or never revisiting the decision.",
+      "competencies": ["judgment", "depth_of_experience"],
+      "values": ["Act with Integrity", "Strive for Excellence"],
+      "source_url": "https://www.cleverprep.com/companies/walmart/software-engineer"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why Walmart Global Tech rather than another tech company?",
+      "strong_answer": "Connect the candidate's interests to what is distinctive about Walmart: physical and digital commerce at huge scale, problems where software touches stores, supply chain and millions of customers, and a mission of saving people money. Mention a specific team area or public engineering topic. Tie it to the candidate's career goals. Pitfalls: generic praise, or only compensation and stability.",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["Serve Our Customers and Members"],
+      "source_url": "https://www.cleverprep.com/companies/walmart/software-engineer"
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "How do you prioritize between two conflicting product requests?",
+      "strong_answer": "Lay out a clear method: the goal both requests serve, the impact on customers and the business, cost and effort, urgency, and reversibility. Show how the candidate would get data, involve the requesters, decide, and explain the trade-off openly. Mention what happens to the lower-priority request. Pitfalls: trying to do both, or deciding by who is most senior.",
+      "competencies": ["judgment", "role_fit", "scope_at_level"],
+      "values": ["Serve Our Customers and Members", "Act with Integrity"],
+      "source_url": "https://site.joinleland.com/library/a/how-to-become-a-walmart-product-manager-the-ultimate-guide"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a real-time inventory system for about 10,000 stores plus the online site.",
+      "strong_answer": "Clarify scale (stores times SKUs), update sources (POS sales, receiving, returns, online orders) and freshness needs. Propose event-driven updates per store into a central availability service, with reservations for online and pickup orders. Discuss that store counts are physically uncertain, so promise from a buffered number and reconcile with scans. Cover partitioning by store, idempotent events, offline stores, and strong consistency at reservation versus eventual consistency for browse. Pitfalls: one global lock or ignoring shrink.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Serve Our Customers and Members"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-walmart-global-tech-system-design-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design cart and checkout so it survives Black Friday traffic many times the normal peak.",
+      "strong_answer": "Estimate peak load and the hot items. Pre-scale for the known date and load test. Keep browse cacheable and checkout strongly consistent. Use a queue or waiting room with honest position updates, inventory reservations with timeouts for hot items, idempotent payment calls, and graceful degradation (turn off recommendations before checkout). Discuss monitoring, rollback and a game-day plan. Pitfalls: assuming autoscaling alone handles a doorbuster spike, or overselling.",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["Strive for Excellence", "Serve Our Customers and Members"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-walmart-global-tech-system-design-interview"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design an online-order, pick-up-in-store (curbside) system.",
+      "strong_answer": "Cover the flow: order, slot booking, store picking, staging, customer arrival and handoff. Model slot capacity from associate labor and parking spots, not only from inventory. Handle substitutions when an item is missing, real-time arrival check-in, and associate devices that must work with poor store Wi-Fi. Discuss notifications, failure modes and metrics such as wait time and order accuracy. Pitfalls: ignoring the associate's workflow or store capacity.",
+      "competencies": ["technical_depth", "reasoning", "trade_offs"],
+      "values": ["Serve Our Customers and Members", "Respect the Individual"],
+      "source_url": "https://www.educative.io/blog/walmart-system-design-interview-questions"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a pricing system that recommends prices and lets merchants approve changes.",
+      "strong_answer": "Separate price recommendation (models using demand, competitor and cost data) from price publication. Add business rules and guardrails (floors, price-match rules, legal limits), an approval workflow, and an audit trail. Explain how prices reach the site and thousands of store shelves consistently, with effective dates and rollback. Keep EDLP in mind: stable prices matter more than constant swings. Pitfalls: letting a model publish prices with no controls.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Act with Integrity", "Serve Our Customers and Members"],
+      "source_url": "https://www.educative.io/blog/walmart-system-design-interview-questions"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you detect and reduce overfitting or bias in a classifier?",
+      "strong_answer": "Define overfitting as a gap between training and validation performance. Cover proper splits (time-based for retail data), cross-validation, regularization, simpler models, more data and early stopping. For bias, check performance by segment, look at label and sampling bias, and pick fairness or calibration metrics that fit the use case. Mention monitoring for drift after launch. Pitfalls: only listing techniques without saying how to diagnose the problem.",
+      "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
+      "values": ["Act with Integrity"],
+      "source_url": "https://www.aced.io/blog/walmart-interview-process"
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "What do you consider when building a predictive model, for example for demand forecasting?",
+      "strong_answer": "Start from the business decision the forecast drives (replenishment, staffing) and its cost of error. Cover data (sales history, promotions, holidays, weather, stockouts that hide true demand), feature design, a baseline model, then candidate models. Explain evaluation over time with backtesting, the right error metric, and how forecasts are served and monitored. Pitfalls: treating sales as demand when items were out of stock.",
+      "competencies": ["technical_depth", "reasoning", "trade_offs"],
+      "values": ["Serve Our Customers and Members"],
+      "source_url": "https://interviewkickstart.com/blogs/companies/walmart-data-scientist-interview-process"
+    },
+    {
+      "interview_type": "case",
+      "question": "Design a feature for the Walmart app that increases customer loyalty.",
+      "strong_answer": "Clarify what loyalty means (repeat purchase, Walmart+ retention, share of grocery spend). Pick a segment, for example busy families buying weekly groceries, and map their pain points. Generate options (smart reorder lists, pickup reminders, price tracking) and prioritize by impact and effort. Recommend one with a success metric, guardrails, and a test plan. Pitfalls: features with no segment, or ignoring cost to serve.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["Serve Our Customers and Members"],
+      "source_url": "https://site.joinleland.com/library/a/how-to-become-a-walmart-product-manager-the-ultimate-guide"
+    },
+    {
+      "interview_type": "case",
+      "question": "Walk me through how you would launch a new grocery pickup service.",
+      "strong_answer": "Clarify goals (adoption, frequency, margin) and target customers. Cover the customer journey and the store operations behind it: picking labor, staging space, slot capacity, substitutions. Propose a pilot in a few stores, launch criteria, and metrics (order accuracy, wait time, repeat rate, cost per order). Explain how to scale and what would stop the rollout. Pitfalls: treating it as only an app feature and ignoring store operations.",
+      "competencies": ["structure", "user_and_business_sense", "prioritization"],
+      "values": ["Serve Our Customers and Members", "Respect the Individual"],
+      "source_url": "https://site.joinleland.com/library/a/how-to-become-a-walmart-product-manager-the-ultimate-guide"
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you improve walmart.com or the Walmart mobile shopping experience?",
+      "strong_answer": "Ask for the goal and pick one customer segment. Walk through the journey (search, product page, cart, checkout, delivery) and find the biggest drop-off or pain with data. Propose two or three solutions, prioritize one, and define a primary metric (conversion, repeat purchase) and guardrails (returns, cost per order). Pitfalls: a list of features with no prioritization, or ignoring the low-price promise.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["Serve Our Customers and Members"],
+      "source_url": "https://www.aced.io/blog/walmart-interview-process"
+    },
+    {
+      "interview_type": "case",
+      "question": "What metrics would you use to measure the success of a new product or feature?",
+      "strong_answer": "Start from the feature's goal and the customer behavior it should change. Choose one primary metric, supporting metrics along the funnel, and guardrails (cost, latency, cannibalization). Explain how to set targets and measure causally with an experiment. Show how the answer changes if the metric moves the wrong way. Pitfalls: long lists with no primary metric, or vanity metrics.",
+      "competencies": ["problem_framing", "structure", "estimation_logic"],
+      "values": ["Strive for Excellence"],
+      "source_url": "https://www.aced.io/guides/walmart-product-manager-interview"
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "Software Engineer II",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Entry level; delivers well-defined tasks and features with guidance and writes tested code."
+    },
+    {
+      "level_name": "Software Engineer III",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns features or services within a team, handles moderate ambiguity, and starts to lead small projects and help junior engineers."
+    },
+    {
+      "level_name": "Senior Software Engineer",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Leads complex projects and designs systems for a team, mentors others, and owns reliability for peak events."
+    },
+    {
+      "level_name": "Staff Software Engineer",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Technical leader across several teams; shapes architecture and influences technical strategy."
+    },
+    {
+      "level_name": "Principal Software Engineer",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Sets technical direction for an organization or platform and drives cross-org initiatives."
+    },
+    {
+      "level_name": "Product Manager III",
+      "normalized_level": "mid",
+      "role_family": "pm",
+      "scope_expectation": "Owns features or a product area and its metrics with an engineering team."
+    },
+    {
+      "level_name": "Senior Product Manager",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns a product line, sets its roadmap with business partners, and drives multi-team launches."
+    },
+    {
+      "level_name": "Senior Data Scientist",
+      "normalized_level": "senior",
+      "role_family": "data_ml",
+      "scope_expectation": "Owns models end to end for a business problem, from framing to production monitoring, and guides junior data scientists."
+    }
+  ],
+  "persona": {
+    "tone": "Friendly, practical and down to earth; conversational rather than adversarial",
+    "pace": "Moderate; time for clarifying questions, with steady follow-ups on details",
+    "pushback_style": "Asks for scale and numbers, 'what was your part?', and how the design or decision holds up at peak or in a real store; brings answers back to the customer and to cost",
+    "closing_style": "Leaves time for the candidate's questions about the team; no feedback given in the room"
+  },
+  "scoring_weights": {
+    "ownership": 1.2,
+    "impact": 1.2,
+    "collaboration": 1.3,
+    "communication": 1.2,
+    "learning_from_failure": 1.1,
+    "depth_of_experience": 1.2,
+    "motivation": 1.1,
+    "team_fit": 1.1,
+    "technical_depth": 1.2,
+    "trade_offs": 1.3,
+    "user_and_business_sense": 1.4,
+    "structure": 1.1
+  },
+  "values_share": 0.25,
+  "case_style": {
+    "product_sense": 0.45,
+    "estimation": 0.2,
+    "system_thinking": 0.35,
+    "notes": "Cases start from a customer segment and Walmart's physical plus digital footprint: stores, pickup and delivery, Walmart+, marketplace and associates as users. Strong answers weigh cost to serve (everyday low cost supports everyday low price) and store operations, and end with metrics. Some PM teams give the case ahead of time and ask for a presentation."
+  },
+  "sources": [
+    {
+      "url": "https://corporate.walmart.com/about/international/purpose/ethics",
+      "title": "Walmart ethics and integrity: our values (corporate.walmart.com)",
+      "retrieved_at": "2026-10-14",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://corporate.walmart.com/about/pricing-a-comprehensive-overview-of-our-approach",
+      "title": "Pricing: a comprehensive overview of our approach (corporate.walmart.com)",
+      "retrieved_at": "2026-10-14",
+      "fields": ["values_framework", "case_style"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/what-is-the-walmart-global-tech-interview-process-like-round-by-round",
+      "title": "What is the Walmart Global Tech interview process like, round by round (Design Gurus)",
+      "retrieved_at": "2026-10-14",
+      "fields": ["loop_structure", "question_patterns", "persona"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-walmart-global-tech-system-design-interview",
+      "title": "What to expect in the Walmart Global Tech system design interview (Design Gurus)",
+      "retrieved_at": "2026-10-14",
+      "fields": ["question_patterns", "case_style", "scoring_weights"]
+    },
+    {
+      "url": "https://www.educative.io/blog/walmart-system-design-interview-questions",
+      "title": "Walmart system design interview questions (Educative)",
+      "retrieved_at": "2026-10-14",
+      "fields": ["question_patterns"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/walmart/software-engineer",
+      "title": "Walmart software engineer interview (CleverPrep)",
+      "retrieved_at": "2026-10-14",
+      "fields": ["loop_structure", "question_patterns", "bar_by_level"]
+    },
+    {
+      "url": "https://www.aced.io/blog/walmart-interview-process",
+      "title": "Walmart interview process (Exponent / Aced)",
+      "retrieved_at": "2026-10-14",
+      "fields": ["loop_structure", "question_patterns", "persona"]
+    },
+    {
+      "url": "https://www.aced.io/guides/walmart-product-manager-interview",
+      "title": "Walmart product manager interview guide (Exponent / Aced)",
+      "retrieved_at": "2026-10-14",
+      "fields": ["loop_structure", "question_patterns", "bar_by_level", "case_style"]
+    },
+    {
+      "url": "https://site.joinleland.com/library/a/how-to-become-a-walmart-product-manager-the-ultimate-guide",
+      "title": "Walmart product manager interview: process, questions and tips (Leland)",
+      "retrieved_at": "2026-10-14",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://interviewkickstart.com/blogs/companies/walmart-data-scientist-interview-process",
+      "title": "Walmart data scientist interview process (Interview Kickstart)",
+      "retrieved_at": "2026-10-14",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.levels.fyi/companies/walmart/salaries/software-engineer",
+      "title": "Walmart software engineer levels (Levels.fyi)",
+      "retrieved_at": "2026-10-14",
+      "fields": ["bar_by_level", "loop_structure"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "medium",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "medium"
+  },
+  "low_confidence_notes": [
+    "values_framework: the four value names and descriptions come from corporate.walmart.com; evidence signals and weights are our estimate. Walmart also has internal Leadership Expectations built on the same values, but no official public page was found, so they are not modeled separately.",
+    "loop_structure: all round details come from third-party prep sites, not a Walmart hiring page. A separate behavioral round is not consistently reported; behavioral questions are usually inside the hiring manager round. The data_ml loop comes mainly from one prep site.",
+    "bar_by_level: level names follow Levels.fyi; internal codes (P2 to P5 and similar) are reported inconsistently across sites and are left out. Scope text is our summary. PM and data science level names come from job titles and one prep guide.",
+    "persona: no public source describes interviewer style in detail; 'conversational but behavioral in substance' is from one prep site, the rest is our inference.",
+    "scoring_weights: no public source gives competency weights; derived from the stress on customers, collaboration and retail-scale design.",
+    "sample_questions: Glassdoor pages could not be read directly; questions come from prep-site lists of candidate-reported questions. Several system design questions are illustrative examples from prep sites rather than verified candidate reports."
+  ]
+}

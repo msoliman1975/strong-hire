@@ -23,7 +23,7 @@ from strong_evals.transcripts import TRANSCRIPTS_DIR, Quality, load_transcripts
 
 LAUNCH_COMPANIES = (
     "Google|Amazon|Microsoft|Meta|Apple|Netflix|Nvidia|Salesforce|Uber|Stripe|OpenAI|Anthropic|"
-    "Airbnb|Shopify|LinkedIn|Oracle|Adobe|Databricks|Snowflake|Atlassian|eBay"
+    "Airbnb|Shopify|LinkedIn|Oracle|Adobe|Databricks|Snowflake|Atlassian|Walmart|eBay"
 )
 
 
