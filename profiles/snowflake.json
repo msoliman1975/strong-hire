@@ -290,7 +290,23 @@
       "strong_answer": "Clarify volume, query patterns (time range, by key, latest N), retention and ordering guarantees. Discuss in-memory structures (sorted maps, skip lists) for one node, then time-partitioned storage with indexes, buffering and compaction for scale. Handle late or out-of-order events and hot partitions. State read versus write trade-offs and complexity of each operation.",
       "competencies": ["technical_depth", "accuracy", "trade_offs"],
       "values": [],
-      "source_url": "https://interviewing.io/snowflake-interview-questions"
+      "source_url": "https://interviewing.io/snowflake-interview-questions",
+      "hints": {
+        "looking_for": [
+          "How you clarify query patterns before choosing structures",
+          "Whether you scale from one node to many"
+        ],
+        "strong_signals": [
+          "Covers sorted structures, time partitioning, indexes and compaction",
+          "Handles late events and hot partitions and states operation costs"
+        ],
+        "watch_outs": [
+          "Ignoring out-of-order data",
+          "No read versus write trade-off"
+        ]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -298,7 +314,23 @@
       "strong_answer": "Separate storage (columnar files on object storage with metadata such as min/max per file) from elastic compute. Walk the query path: parse, optimize (pruning, predicate pushdown, join order), distribute plan fragments to workers, exchange data, aggregate results. Cover skew and stragglers, caching, spilling to disk, failure retry, and concurrency between workloads. Explain why each choice fits analytical workloads.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": ["Be Excellent"],
-      "source_url": "https://codemia.io/guides/snowflake-software-engineer"
+      "source_url": "https://codemia.io/guides/snowflake-software-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you understand separated storage and compute",
+          "How you walk a query from parsing to results"
+        ],
+        "strong_signals": [
+          "Covers pruning, pushdown, distributed plans and data exchange",
+          "Handles skew, spilling, retries and competing workloads"
+        ],
+        "watch_outs": [
+          "Generic boxes with no query path",
+          "Ignoring stragglers and failures"
+        ]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -306,7 +338,23 @@
       "strong_answer": "Clarify isolation needs (performance, security, cost). Compare dedicated compute per tenant versus shared pools with quotas. Cover admission control, queuing, autoscaling signals and cool-down, noisy-neighbor protection, and billing/metering. Discuss cold-start latency versus cost and how to fail safely.",
       "competencies": ["technical_depth", "reasoning", "trade_offs"],
       "values": ["Put Customers First"],
-      "source_url": "https://codemia.io/guides/snowflake-software-engineer"
+      "source_url": "https://codemia.io/guides/snowflake-software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you balance isolation, cost and scaling",
+          "Whether you protect customers from noisy neighbors"
+        ],
+        "strong_signals": [
+          "Compares dedicated and shared compute with quotas",
+          "Covers admission control, autoscaling signals and metering"
+        ],
+        "watch_outs": [
+          "Ignoring cold-start latency versus cost",
+          "No plan for failing safely"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -314,7 +362,23 @@
       "strong_answer": "Define the cache key (normalized query plus data versions of referenced tables plus user context such as role). Invalidate by version change rather than by scanning. Cover placement, size limits and eviction, consistency guarantees, security (results must respect access rights), and hit-rate metrics. Discuss when caching is not worth it.",
       "competencies": ["technical_depth", "trade_offs", "accuracy"],
       "values": [],
-      "source_url": "https://codemia.io/guides/snowflake-software-engineer"
+      "source_url": "https://codemia.io/guides/snowflake-software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you define cache keys and invalidation",
+          "Whether cached results respect access rights"
+        ],
+        "strong_signals": [
+          "Invalidates by data version rather than scanning",
+          "Covers eviction, consistency, hit rate and when not to cache"
+        ],
+        "watch_outs": [
+          "Serving cached results to users with different permissions",
+          "Stale results with no versioning plan"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -322,7 +386,23 @@
       "strong_answer": "Row storage suits transactional workloads with point reads and writes of whole records. Columnar storage suits analytics: reads only needed columns, compresses well, enables vectorized execution, but makes single-row updates costly. Mention hybrid approaches and how micro-partitions with metadata enable pruning. Give a concrete example of each.",
       "competencies": ["accuracy", "clarity_of_explanation", "technical_depth"],
       "values": [],
-      "source_url": "https://codemia.io/guides/snowflake-software-engineer"
+      "source_url": "https://codemia.io/guides/snowflake-software-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you know when each storage layout fits",
+          "How clearly you explain the trade-offs"
+        ],
+        "strong_signals": [
+          "Links row storage to transactions and columnar to analytics",
+          "Gives a concrete example and mentions pruning or hybrids"
+        ],
+        "watch_outs": [
+          "Saying one is simply better",
+          "No mention of update cost for columnar"
+        ]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -330,7 +410,23 @@
       "strong_answer": "Cover identity and authentication, role-based and attribute-based access control, row and column level policies, masking of sensitive fields, encryption at rest and in transit with key management, audit logging, data classification and lineage. Discuss performance cost of policy checks and how to manage policies at scale for many tenants.",
       "competencies": ["technical_depth", "reasoning", "trade_offs"],
       "values": ["Integrity Always"],
-      "source_url": "https://www.aced.io/blog/snowflake-interview-process"
+      "source_url": "https://www.aced.io/blog/snowflake-interview-process",
+      "hints": {
+        "looking_for": [
+          "How broadly you cover access, protection and audit",
+          "Whether you think about policy cost at scale"
+        ],
+        "strong_signals": [
+          "Covers role and attribute access, row and column policies and masking",
+          "Includes encryption, key management, audit logs and lineage"
+        ],
+        "watch_outs": [
+          "Stopping at authentication",
+          "Ignoring the performance cost of policy checks"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -338,7 +434,23 @@
       "strong_answer": "Outline upload, transcoding, storage and metadata quickly, then go deep on caching: CDN for video segments, application cache for metadata and popular lists, cache keys, TTLs, invalidation on updates, and handling viral spikes. Quantify read/write ratios and storage. Discuss cost versus latency trade-offs.",
       "competencies": ["technical_depth", "trade_offs"],
       "values": [],
-      "source_url": "https://www.aced.io/blog/snowflake-interview-process"
+      "source_url": "https://www.aced.io/blog/snowflake-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you go deep on caching after a quick outline",
+          "How you handle viral traffic"
+        ],
+        "strong_signals": [
+          "Uses a CDN for video segments and app caches for metadata",
+          "Quantifies read and write ratios and weighs cost against latency"
+        ],
+        "watch_outs": [
+          "Spending the whole time on upload and transcoding",
+          "No invalidation or TTL plan"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -346,7 +458,23 @@
       "strong_answer": "Pick a real mistake with consequences. Say plainly what you did wrong, how you told others, how you fixed it, and what you changed to prevent a repeat. Snowflake's 'own it, fix it, learn from it, move on' wording fits this structure. Pitfall: a fake mistake or blaming others.",
       "competencies": ["learning_from_failure", "ownership"],
       "values": ["Own It", "Integrity Always"],
-      "source_url": "https://www.aced.io/blog/snowflake-interview-process"
+      "source_url": "https://www.aced.io/blog/snowflake-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you own a real mistake plainly",
+          "How you fix it and prevent a repeat"
+        ],
+        "strong_signals": [
+          "Says what you did wrong and how you told others",
+          "Names the change you made afterwards"
+        ],
+        "watch_outs": [
+          "A fake or trivial mistake",
+          "Blaming others"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -354,7 +482,23 @@
       "strong_answer": "Explain the goal and why other teams were needed. Show how you aligned priorities, handled dependencies and disagreements, and kept communication clear. Give credit to others and state the delivered result. Pitfall: describing only meetings, not outcomes.",
       "competencies": ["collaboration", "communication", "impact"],
       "values": ["Make Each Other The Best", "Get it Done"],
-      "source_url": "https://www.aced.io/blog/snowflake-interview-process"
+      "source_url": "https://www.aced.io/blog/snowflake-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you align teams with different priorities",
+          "Whether you keep communication clear through dependencies"
+        ],
+        "strong_signals": [
+          "Shows how you handled a disagreement between teams",
+          "Credits others and states the delivered result"
+        ],
+        "watch_outs": [
+          "Describing meetings, not outcomes",
+          "No clear role for you"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -362,7 +506,23 @@
       "strong_answer": "Show the ambiguity you started with, how you defined the plan, made decisions, and kept it moving without being told. Quantify the result and name what you would do differently. Make your own role distinct from the team's.",
       "competencies": ["ownership", "impact"],
       "values": ["Own It"],
-      "source_url": "https://www.aced.io/blog/snowflake-interview-process"
+      "source_url": "https://www.aced.io/blog/snowflake-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you handle ambiguity without direction",
+          "Whether you drive decisions yourself"
+        ],
+        "strong_signals": [
+          "Shows how you defined the plan and kept it moving",
+          "Quantifies the result and names what you would change"
+        ],
+        "watch_outs": [
+          "Blurring your role with the team's",
+          "No measurable outcome"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -370,7 +530,23 @@
       "strong_answer": "State the baseline and target with numbers. Explain how you profiled and found the real bottleneck, options you considered, the change you made and its trade-offs, and the measured result. Mention how you prevented regressions. Pitfall: optimizing without measuring.",
       "competencies": ["impact", "ownership"],
       "values": ["Be Excellent"],
-      "source_url": "https://codemia.io/guides/snowflake-software-engineer"
+      "source_url": "https://codemia.io/guides/snowflake-software-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you measure before you optimize",
+          "How you find the real bottleneck"
+        ],
+        "strong_signals": [
+          "States the baseline, target and measured result",
+          "Explains options, trade-offs and how you prevent regressions"
+        ],
+        "watch_outs": [
+          "Optimizing without measuring",
+          "No numbers"
+        ]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -378,7 +554,23 @@
       "strong_answer": "Describe the problem, the insight behind the idea, and why it was not obvious. Show how you tested it cheaply, won support, and what impact it had. If it failed, say what you learned. Strong answers show ambition with prudent risk.",
       "competencies": ["impact", "communication"],
       "values": ["Think Big"],
-      "source_url": "https://www.interviewquery.com/interview-guides/snowflake-product-manager"
+      "source_url": "https://www.interviewquery.com/interview-guides/snowflake-product-manager",
+      "hints": {
+        "looking_for": [
+          "How you spot a non-obvious opportunity",
+          "Whether you pair ambition with careful risk"
+        ],
+        "strong_signals": [
+          "Shows a cheap test and how you won support",
+          "States the impact, or the lesson if it failed"
+        ],
+        "watch_outs": [
+          "An idea that never left your head",
+          "No evidence it worked"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -386,7 +578,23 @@
       "strong_answer": "Know the values (for example Put Customers First, Own It, Get it Done). Pick two that truly fit you and give a short, specific story for each. Avoid listing all values. Interviewers look for authenticity and evidence, not slogans.",
       "competencies": ["team_fit", "motivation"],
       "values": ["Own It", "Put Customers First"],
-      "source_url": "https://prepfully.com/answers/values-alignment-snowflake"
+      "source_url": "https://prepfully.com/answers/values-alignment-snowflake",
+      "hints": {
+        "looking_for": [
+          "Whether you know the company's values",
+          "Whether your fit is real and backed by evidence"
+        ],
+        "strong_signals": [
+          "Picks two values with a short, specific story for each",
+          "Sounds authentic, not rehearsed"
+        ],
+        "watch_outs": [
+          "Listing every value",
+          "Slogans with no stories"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -394,7 +602,23 @@
       "strong_answer": "Give context, then your specific decisions: what went on the roadmap and why, what you cut, a key trade-off and its data, and how you worked with engineering and design. Expect the interviewer to double-click on details, so pick something you know deeply. End with results.",
       "competencies": ["depth_of_experience", "judgment", "scope_at_level"],
       "values": ["Get it Done"],
-      "source_url": "https://www.teamblind.com/post/what-to-expect-from-snowflake-sr-product-manager-interview-hdzpabjg"
+      "source_url": "https://www.teamblind.com/post/what-to-expect-from-snowflake-sr-product-manager-interview-hdzpabjg",
+      "hints": {
+        "looking_for": [
+          "How you make roadmap and design trade-offs",
+          "Whether you know your work in depth"
+        ],
+        "strong_signals": [
+          "Explains what you cut and the data behind a key trade-off",
+          "Shows how you worked with engineering and design, and the results"
+        ],
+        "watch_outs": [
+          "Picking a project you cannot go deep on",
+          "No results"
+        ]
+      },
+      "role_families": ["pm", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -402,7 +626,23 @@
       "strong_answer": "Cover the problem, architecture, your part, the hardest technical decision, and measurable outcome. Be honest about weaknesses in the design. Match the depth to the role; for this company, data and performance details are welcome.",
       "competencies": ["depth_of_experience", "role_fit"],
       "values": [],
-      "source_url": "https://www.aced.io/blog/snowflake-interview-process"
+      "source_url": "https://www.aced.io/blog/snowflake-interview-process",
+      "hints": {
+        "looking_for": [
+          "How deep your technical understanding goes",
+          "Whether you can critique your own design"
+        ],
+        "strong_signals": [
+          "Covers the architecture, your part and the hardest decision",
+          "Gives a measurable outcome and honest weaknesses"
+        ],
+        "watch_outs": [
+          "Staying at a high level",
+          "Claiming the design had no flaws"
+        ]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -410,7 +650,23 @@
       "strong_answer": "Pick one persona (for example data engineer or admin) and a concrete pain you can back up (cost visibility, onboarding, pipelines). Explain why it matters to customers and the business, propose a solution with MVP scope, and define a success metric. Show you know the product and its competitors. Pitfall: vague 'make it faster'.",
       "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
       "values": ["Put Customers First"],
-      "source_url": "https://prepfully.com/answers/improvement-suggestions-snowflake"
+      "source_url": "https://prepfully.com/answers/improvement-suggestions-snowflake",
+      "hints": {
+        "looking_for": [
+          "Whether you know the product and its users",
+          "How you prioritize one concrete pain"
+        ],
+        "strong_signals": [
+          "Picks a persona and a pain you can back up",
+          "Proposes a small first scope and a success metric"
+        ],
+        "watch_outs": [
+          "A vague 'make it faster'",
+          "No awareness of competitors"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -418,7 +674,23 @@
       "strong_answer": "Clarify target customers and use cases (monitoring, personalization, fraud). Size the opportunity roughly. Map needs versus current strengths and gaps (latency, ingestion). Propose a product with clear scope and differentiation from competitors, a phased plan, and success metrics such as adoption and consumption. Name technical and go-to-market risks.",
       "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
       "values": ["Think Big"],
-      "source_url": "https://www.interviewquery.com/interview-guides/snowflake-product-manager"
+      "source_url": "https://www.interviewquery.com/interview-guides/snowflake-product-manager",
+      "hints": {
+        "looking_for": [
+          "How you frame and roughly size a new market",
+          "Whether you build on strengths and address gaps"
+        ],
+        "strong_signals": [
+          "Defines target customers, use cases and differentiation",
+          "Lays out a phased plan, metrics and risks"
+        ],
+        "watch_outs": [
+          "No differentiation from competitors",
+          "Skipping technical or go-to-market risks"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -426,7 +698,23 @@
       "strong_answer": "Map the data engineer workflow (ingest, transform, test, deploy, monitor). Find the biggest pains with evidence. Prioritize one by impact and effort. Propose a solution, how it integrates with existing tools, and metrics such as time to first pipeline or failed-job rate. Mention trade-offs and validation.",
       "competencies": ["problem_framing", "prioritization", "user_and_business_sense"],
       "values": ["Put Customers First"],
-      "source_url": "https://www.interviewquery.com/interview-guides/snowflake-product-manager"
+      "source_url": "https://www.interviewquery.com/interview-guides/snowflake-product-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you understand the data engineer's workflow",
+          "How you prioritize by impact and effort"
+        ],
+        "strong_signals": [
+          "Maps the workflow and finds the biggest pain with evidence",
+          "Defines metrics like time to first pipeline"
+        ],
+        "watch_outs": [
+          "Ignoring the tools they already use",
+          "Solving a pain with no evidence"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
     }
   ],
   "bar_by_level": [

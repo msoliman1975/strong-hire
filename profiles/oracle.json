@@ -289,7 +289,24 @@
       "strong_answer": "States the disagreement and both positions fairly, then the candidate's actions: listening, bringing data, finding the shared goal, escalating only if needed. Gives the outcome and how the relationship continued. Uses STAR and keeps the focus on own behavior. Pitfall: portraying the other person as wrong and unreasonable.",
       "competencies": ["conflict_handling", "collaboration"],
       "values": ["Mutual Respect", "Teamwork"],
-      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you resolve disagreement respectfully",
+          "Whether you focus on your own behavior"
+        ],
+        "strong_signals": [
+          "States both positions fairly",
+          "Listens, brings data and finds the shared goal",
+          "Shows the outcome and how the relationship continued"
+        ],
+        "watch_outs": [
+          "Portraying the other person as unreasonable",
+          "Escalating as the first step"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -297,7 +314,24 @@
       "strong_answer": "Chooses a real mistake with real consequences, owns it plainly, and explains how it was detected and fixed, including telling affected people. Shows the lasting change in process or habit and evidence that it worked. Signals honesty and quality mindset. Pitfall: a fake weakness or blaming others.",
       "competencies": ["learning_from_failure", "communication"],
       "values": ["Integrity", "Quality"],
-      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you own mistakes honestly",
+          "How you build lasting fixes"
+        ],
+        "strong_signals": [
+          "A real mistake with real consequences",
+          "Explains detection, the fix and telling affected people",
+          "Shows a lasting process change and evidence it worked"
+        ],
+        "watch_outs": [
+          "A fake weakness",
+          "Blaming others"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -305,7 +339,24 @@
       "strong_answer": "Explains the trigger for the pivot (customer feedback, strategy shift, technical blocker), how the candidate re-planned scope and timeline, and how they communicated the change to the team and stakeholders. Covers what was salvaged and the final result. Pitfall: describing the pivot as chaos without the candidate's own actions.",
       "competencies": ["ownership", "communication"],
       "values": ["Communication", "Teamwork"],
-      "source_url": "https://dataford.io/interview-guides/oracle/product-manager"
+      "source_url": "https://dataford.io/interview-guides/oracle/product-manager",
+      "hints": {
+        "looking_for": [
+          "How you re-plan when direction changes mid-project",
+          "Whether you communicate change clearly"
+        ],
+        "strong_signals": [
+          "Names the trigger for the pivot",
+          "Re-plans scope and timeline and tells stakeholders",
+          "Explains what was salvaged and the final result"
+        ],
+        "watch_outs": [
+          "Describing chaos without your own actions",
+          "No communication with stakeholders"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -313,7 +364,24 @@
       "strong_answer": "Sets the stakes and the deadline, then how the candidate prioritized, cut or deferred scope, and protected quality where it mattered. Mentions communication with stakeholders about risk. Gives the result and any follow-up work to pay down shortcuts. Pitfall: heroic overtime with no prioritization or quality thinking.",
       "competencies": ["ownership", "impact"],
       "values": ["Quality"],
-      "source_url": "https://www.designgurus.io/answers/detail/what-does-oracle-ask-in-an-interview"
+      "source_url": "https://www.designgurus.io/answers/detail/what-does-oracle-ask-in-an-interview",
+      "hints": {
+        "looking_for": [
+          "How you prioritize under pressure",
+          "Whether you protect quality where it matters"
+        ],
+        "strong_signals": [
+          "Cuts or defers scope deliberately",
+          "Communicates risk to stakeholders",
+          "Follows up to pay down shortcuts"
+        ],
+        "watch_outs": [
+          "Heroic overtime with no prioritization",
+          "Shipping with no thought for quality"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -321,7 +389,24 @@
       "strong_answer": "Picks a challenge that matches the target level, explains why it was hard, the options considered, the action the candidate personally took, and a measurable result. Ends with what they would do differently. Pitfall: a challenge that resolved itself or a team story with no individual role.",
       "competencies": ["ownership", "learning_from_failure"],
       "values": ["Innovation"],
-      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you overcome obstacles",
+          "Whether your personal role is clear"
+        ],
+        "strong_signals": [
+          "A challenge that fits the level you are aiming for",
+          "Options considered and the action you took",
+          "A measurable result and what you would change"
+        ],
+        "watch_outs": [
+          "A challenge that resolved itself",
+          "A team story with no individual role"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -329,7 +414,24 @@
       "strong_answer": "Connects the candidate's background to Oracle's business (cloud infrastructure, database, enterprise applications, health) and to the specific team. Explains why the role fits their strengths and what they want to learn. Shows awareness of enterprise customers. Pitfall: generic answers or none about the team.",
       "competencies": ["motivation", "role_fit"],
       "values": [],
-      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether your interest in the company and role is specific",
+          "How your strengths fit product management"
+        ],
+        "strong_signals": [
+          "Connects your background to the business and team",
+          "Explains why the role fits and what you want to learn",
+          "Shows awareness of enterprise customers"
+        ],
+        "watch_outs": [
+          "A generic answer",
+          "Nothing about the specific team"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -337,7 +439,24 @@
       "strong_answer": "Gives the business context, architecture and the candidate's specific responsibility. Explains two or three technical choices with alternatives and trade-offs, how quality was ensured, and the outcome with numbers. Is ready for detailed follow-ups. Pitfall: unable to explain details or why choices were made.",
       "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
       "values": ["Quality"],
-      "source_url": "https://www.designgurus.io/answers/detail/what-is-the-oracle-interview-process-like-round-by-round"
+      "source_url": "https://www.designgurus.io/answers/detail/what-is-the-oracle-interview-process-like-round-by-round",
+      "hints": {
+        "looking_for": [
+          "How deeply you understand your own technical work",
+          "Whether you can explain choices and trade-offs"
+        ],
+        "strong_signals": [
+          "Gives business context and your specific responsibility",
+          "Explains a few choices with alternatives",
+          "Covers quality and outcomes with numbers"
+        ],
+        "watch_outs": [
+          "Unable to explain why choices were made",
+          "Vague about your own part"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -345,7 +464,24 @@
       "strong_answer": "Frames both options in terms of customer and business impact, risk and cost of delay. Uses data such as incident rates, velocity loss or revenue opportunity. Proposes a decision rule or a mix, and how to explain it to stakeholders. Pitfall: an absolute rule (always fix debt first) without context.",
       "competencies": ["judgment", "role_fit"],
       "values": ["Quality", "Customer Satisfaction"],
-      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you weigh long-term health against growth",
+          "Whether you use data to decide"
+        ],
+        "strong_signals": [
+          "Frames both options by impact, risk and cost of delay",
+          "Uses data like incident rates or velocity loss",
+          "Proposes a decision rule and how to explain it"
+        ],
+        "watch_outs": [
+          "An absolute rule with no context",
+          "No mention of stakeholders"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -353,7 +489,24 @@
       "strong_answer": "Clarifies consistency and downtime goals, then describes a staged migration: background copy, tracking dirty blocks, mirrored writes during cutover, a short final sync and atomic switch, and rollback. Discusses throttling to protect customer latency, failure handling, and verification. Pitfall: a stop-copy-start plan that causes downtime.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": ["Customer Satisfaction", "Quality"],
-      "source_url": "https://www.interviewquery.com/guides/oracle-software-engineer"
+      "source_url": "https://www.interviewquery.com/guides/oracle-software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you migrate live data without downtime",
+          "Whether you protect customer latency during the move"
+        ],
+        "strong_signals": [
+          "Clarifies consistency and downtime goals",
+          "Describes background copy, dirty tracking and mirrored writes",
+          "Covers throttling, verification and rollback"
+        ],
+        "watch_outs": [
+          "A stop, copy and restart plan",
+          "No rollback path"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -361,7 +514,24 @@
       "strong_answer": "Covers tenant isolation (overlay networks, encapsulation), the control plane versus data plane, address management and overlapping ranges, routing and security lists, and scaling. Discusses noisy neighbors, failure domains and how changes propagate safely. Pitfall: ignoring isolation guarantees between tenants.",
       "competencies": ["technical_depth", "trade_offs", "accuracy"],
       "values": ["Quality"],
-      "source_url": "https://www.interviewquery.com/guides/oracle-software-engineer"
+      "source_url": "https://www.interviewquery.com/guides/oracle-software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you design isolation in a shared network",
+          "Whether you separate control and data planes"
+        ],
+        "strong_signals": [
+          "Covers overlays, encapsulation and overlapping address ranges",
+          "Explains routing, security rules and scaling",
+          "Discusses noisy neighbors, failure domains and safe change rollout"
+        ],
+        "watch_outs": [
+          "Ignoring isolation between tenants",
+          "No thought on how config changes propagate"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -369,7 +539,24 @@
       "strong_answer": "Clarifies limits per tenant and per user, then compares algorithms (token bucket, sliding window), where state lives (local versus distributed store), and accuracy versus latency. Covers bursts, fairness between tenants, failure modes when the store is down, and client feedback. Pitfall: one global counter with no tenant fairness.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": ["Fairness"],
-      "source_url": "https://www.interviewquery.com/guides/oracle-software-engineer"
+      "source_url": "https://www.interviewquery.com/guides/oracle-software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you compare rate limiting approaches",
+          "Whether you ensure fairness between tenants"
+        ],
+        "strong_signals": [
+          "Clarifies limits per tenant and per user",
+          "Compares algorithms and where state lives",
+          "Covers bursts, store failures and client feedback"
+        ],
+        "watch_outs": [
+          "One global counter with no tenant fairness",
+          "Ignoring what happens when the store is down"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -377,7 +564,24 @@
       "strong_answer": "Explains locks, semaphores and reader-writer locks, starvation and fairness. Then moves to distributed coordination: leases, consensus-based locks, fencing tokens, and why clocks and failures make it harder. Gives a practical example and trade-offs. Pitfall: treating a distributed lock like a local mutex.",
       "competencies": ["accuracy", "technical_depth", "clarity_of_explanation"],
       "values": [],
-      "source_url": "https://leetcode.com/discuss/interview-experience/508029/oracle-oci-software-enginner-2-ic4-level-member-of-staff-engineer-redwood-city-ca"
+      "source_url": "https://leetcode.com/discuss/interview-experience/508029/oracle-oci-software-enginner-2-ic4-level-member-of-staff-engineer-redwood-city-ca",
+      "hints": {
+        "looking_for": [
+          "Whether you understand local concurrency primitives",
+          "How you reason about distributed coordination"
+        ],
+        "strong_signals": [
+          "Explains reader-writer locks, starvation and fairness",
+          "Covers leases, consensus locks and fencing tokens",
+          "Explains why clocks and failures make it harder"
+        ],
+        "watch_outs": [
+          "Treating a distributed lock like a local mutex",
+          "No practical example"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -385,7 +589,24 @@
       "strong_answer": "Clarifies consistency, latency and durability needs. Covers partitioning, replication (leader-follower or quorum), failure detection and failover, consistency trade-offs, and storage engine basics. Explains how to handle network partitions and data repair. Pitfall: claiming strong consistency and full availability together without trade-offs.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": ["Quality"],
-      "source_url": "https://www.interviewquery.com/guides/oracle-software-engineer"
+      "source_url": "https://www.interviewquery.com/guides/oracle-software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you reason about consistency and availability",
+          "Whether you clarify requirements before designing"
+        ],
+        "strong_signals": [
+          "Clarifies consistency, latency and durability needs",
+          "Covers partitioning, replication and failover",
+          "Explains handling network partitions and repair"
+        ],
+        "watch_outs": [
+          "Claiming strong consistency and full availability together",
+          "Skipping failure detection"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -393,7 +614,24 @@
       "strong_answer": "Uses a clear everyday analogy (agreed rules for a conversation), then links it to a real example like HTTP. Checks understanding and avoids jargon. Short and accurate. Pitfall: technical terms that need their own explanation.",
       "competencies": ["clarity_of_explanation", "accuracy"],
       "values": ["Communication"],
-      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you can explain a technical idea simply",
+          "How well you check that your listener understood"
+        ],
+        "strong_signals": [
+          "A clear everyday analogy",
+          "Links it to one real example",
+          "Short, accurate and free of jargon"
+        ],
+        "watch_outs": [
+          "Terms that need their own explanation",
+          "Going on too long"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -401,7 +639,24 @@
       "strong_answer": "Picks a product and states its goal, chooses a user segment and their biggest pain, generates a few solutions and prioritizes one by impact and effort. Defines success metrics and guardrails. Keeps it structured and user-centered. Pitfall: listing features without a user or a reason.",
       "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
       "values": ["Customer Satisfaction"],
-      "source_url": "https://dataford.io/interview-guides/oracle/product-manager"
+      "source_url": "https://dataford.io/interview-guides/oracle/product-manager",
+      "hints": {
+        "looking_for": [
+          "How you structure a product improvement",
+          "Whether you stay focused on a real user"
+        ],
+        "strong_signals": [
+          "States the product goal and picks a segment",
+          "Prioritizes solutions by impact and effort",
+          "Defines success metrics and guardrails"
+        ],
+        "watch_outs": [
+          "Listing features without a user or a reason",
+          "Picking an app you cannot discuss in depth"
+        ]
+      },
+      "role_families": ["pm", "design", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -409,7 +664,24 @@
       "strong_answer": "Checks timing against releases and external events, reads review text, segments by device, OS version, region and app version, and checks crash and performance data. Forms hypotheses, confirms the root cause, proposes a fix and a plan to recover ratings. Pitfall: guessing a cause without segmenting.",
       "competencies": ["structure", "problem_framing", "recommendation"],
       "values": ["Quality"],
-      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you investigate a sudden quality drop",
+          "Whether you segment before concluding"
+        ],
+        "strong_signals": [
+          "Checks timing against releases and outside events",
+          "Reads reviews and segments by device, OS and version",
+          "Confirms root cause, then plans a fix and recovery"
+        ],
+        "watch_outs": [
+          "Guessing a cause without segmenting",
+          "Ignoring crash and performance data"
+        ]
+      },
+      "role_families": ["pm", "swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -417,7 +689,24 @@
       "strong_answer": "Confirms the metric and its definition, segments by processor, card type, region, platform and merchant, and checks recent releases or partner changes. Separates technical failures from fraud rules and customer issues. Prioritizes by revenue impact and proposes a fix plus monitoring. Pitfall: no segmentation or ignoring third-party processors.",
       "competencies": ["structure", "problem_framing", "recommendation"],
       "values": ["Customer Satisfaction"],
-      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you debug a business metric spike",
+          "Whether you separate technical, fraud and customer causes"
+        ],
+        "strong_signals": [
+          "Confirms the metric and its definition",
+          "Segments by processor, card type, region and platform",
+          "Prioritizes by revenue impact and adds monitoring"
+        ],
+        "watch_outs": [
+          "No segmentation",
+          "Ignoring third-party processors"
+        ]
+      },
+      "role_families": ["pm", "swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -425,7 +714,24 @@
       "strong_answer": "Shows understanding of Oracle's businesses (cloud infrastructure, database, applications) and market forces such as AI workloads and cloud competition. Picks three priorities with a clear rationale, expected impact and risks, and how to measure progress. Pitfall: generic priorities with no link to Oracle's position.",
       "competencies": ["structure", "user_and_business_sense", "recommendation"],
       "values": ["Innovation"],
-      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you understand the company's business and market",
+          "How you prioritize at the strategy level"
+        ],
+        "strong_signals": [
+          "Picks three priorities tied to the company's position",
+          "Gives rationale, impact and risks for each",
+          "Explains how to measure progress"
+        ],
+        "watch_outs": [
+          "Generic priorities that fit any company",
+          "No link to market forces"
+        ]
+      },
+      "role_families": ["pm", "tpm"],
+      "levels": ["senior", "staff_principal"]
     },
     {
       "interview_type": "case",
@@ -433,7 +739,24 @@
       "strong_answer": "Clarifies users (moderators, admins, end users) and goals (speed, accuracy, safety). Lists candidate features, scores them by impact, effort and risk, and explains the chosen order and the V1 scope. Defines metrics such as review time and error rate. Pitfall: prioritizing by personal preference without a framework.",
       "competencies": ["prioritization", "structure", "user_and_business_sense"],
       "values": [],
-      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/oracle-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you prioritize with a clear framework",
+          "Whether you consider all user groups"
+        ],
+        "strong_signals": [
+          "Clarifies users and goals like speed, accuracy and safety",
+          "Scores features by impact, effort and risk",
+          "Defines V1 scope and metrics"
+        ],
+        "watch_outs": [
+          "Prioritizing by personal preference",
+          "Forgetting moderators' own needs"
+        ]
+      },
+      "role_families": ["pm", "design", "tpm"],
+      "levels": []
     }
   ],
   "bar_by_level": [

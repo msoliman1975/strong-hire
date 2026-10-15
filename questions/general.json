@@ -1,4 +1,2036 @@
 {
   "version": 1,
-  "questions": []
+  "questions": [
+    {
+      "id": "disagreed-with-manager",
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you disagreed with your manager.",
+      "hints": {
+        "looking_for": [
+          "Whether you push back with data, not opinion",
+          "Whether you commit once a decision is made"
+        ],
+        "strong_signals": [
+          "Names the stakes and the outcome",
+          "Shows what you learned about working together"
+        ],
+        "watch_outs": [
+          "Blaming the manager",
+          "A story with no real disagreement"
+        ]
+      },
+      "competencies": [
+        "conflict_handling",
+        "communication"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "conflict-with-teammate",
+      "interview_type": "behavioral",
+      "question": "Describe a conflict with a teammate. How did you handle it, and where do things stand now?",
+      "hints": {
+        "looking_for": [
+          "How you separate the person from the problem",
+          "Whether you seek to understand before you argue"
+        ],
+        "strong_signals": [
+          "Describes a direct, private conversation",
+          "Ends with a working relationship that improved"
+        ],
+        "watch_outs": [
+          "Casting the teammate as the villain",
+          "Escalating to a manager as the first move"
+        ]
+      },
+      "competencies": [
+        "conflict_handling",
+        "collaboration"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "project-that-failed",
+      "interview_type": "behavioral",
+      "question": "Tell me about a project that failed or did not go as planned.",
+      "hints": {
+        "looking_for": [
+          "Whether you own your part of the failure",
+          "What you changed afterwards"
+        ],
+        "strong_signals": [
+          "Names a specific mistake you made",
+          "Shows a concrete habit or process you adopted after"
+        ],
+        "watch_outs": [
+          "A disguised success story",
+          "Blaming circumstances or other people"
+        ]
+      },
+      "competencies": [
+        "learning_from_failure",
+        "ownership"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "biggest-mistake",
+      "interview_type": "behavioral",
+      "question": "What is the biggest professional mistake you have made, and what did you do about it?",
+      "hints": {
+        "looking_for": [
+          "Honesty about a real mistake with real cost",
+          "How fast you surfaced it and fixed it"
+        ],
+        "strong_signals": [
+          "Explains the impact without minimizing it",
+          "Shows what you do differently now"
+        ],
+        "watch_outs": [
+          "A trivial mistake chosen to look safe",
+          "No clear lesson or change in behavior"
+        ]
+      },
+      "competencies": [
+        "learning_from_failure"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "most-proud-impact",
+      "interview_type": "behavioral",
+      "question": "Tell me about the work you are most proud of and the impact it had.",
+      "hints": {
+        "looking_for": [
+          "The size and kind of impact you can drive",
+          "Your personal contribution within the team"
+        ],
+        "strong_signals": [
+          "Quantifies the outcome or describes it concretely",
+          "Explains why it mattered to users or the business"
+        ],
+        "watch_outs": [
+          "Describing activity instead of results",
+          "Using 'we' so much your role disappears"
+        ]
+      },
+      "competencies": [
+        "impact",
+        "ownership"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "went-beyond-role",
+      "interview_type": "behavioral",
+      "question": "Describe a time you took on something outside your job description because it needed doing.",
+      "hints": {
+        "looking_for": [
+          "Whether you act like an owner without being asked",
+          "How you balance it with your core work"
+        ],
+        "strong_signals": [
+          "Spots a gap others ignored and closes it",
+          "Keeps stakeholders informed while stepping in"
+        ],
+        "watch_outs": [
+          "Stepping on others' ownership without talking to them",
+          "Dropping your own commitments"
+        ]
+      },
+      "competencies": [
+        "ownership",
+        "impact"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "tight-deadline",
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to deliver under a very tight deadline.",
+      "hints": {
+        "looking_for": [
+          "How you prioritize and cut scope under pressure",
+          "Whether you communicate risk early"
+        ],
+        "strong_signals": [
+          "Makes explicit trade-offs and explains them",
+          "Resets expectations before the deadline, not after"
+        ],
+        "watch_outs": [
+          "Heroics with no plan",
+          "Silently shipping lower quality"
+        ]
+      },
+      "competencies": [
+        "ownership",
+        "communication"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "explain-to-non-technical",
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to explain something complex to a non-technical audience.",
+      "hints": {
+        "looking_for": [
+          "Whether you adapt to your audience",
+          "How you check that the message landed"
+        ],
+        "strong_signals": [
+          "Uses an analogy or framing tied to what they care about",
+          "Describes the decision the audience then made"
+        ],
+        "watch_outs": [
+          "Talking down to the audience",
+          "Drowning them in jargon"
+        ]
+      },
+      "competencies": [
+        "communication"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "influence-without-authority",
+      "interview_type": "behavioral",
+      "question": "Describe a time you convinced people to change direction when you had no authority over them.",
+      "hints": {
+        "looking_for": [
+          "How you build support without a title",
+          "Whether you use evidence and listen to objections"
+        ],
+        "strong_signals": [
+          "Brings data or a prototype to make the case",
+          "Wins over a skeptic by addressing their concern"
+        ],
+        "watch_outs": [
+          "Going over people's heads",
+          "Winning the argument but losing the relationship"
+        ]
+      },
+      "competencies": [
+        "communication",
+        "collaboration",
+        "impact"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "cross-team-collaboration",
+      "interview_type": "behavioral",
+      "question": "Tell me about a project where you depended on another team to succeed.",
+      "hints": {
+        "looking_for": [
+          "How you align goals across teams",
+          "How you handle slips you do not control"
+        ],
+        "strong_signals": [
+          "Sets up shared milestones and regular check-ins",
+          "Finds a win for the other team too"
+        ],
+        "watch_outs": [
+          "Treating the other team as a blocker to blame",
+          "No plan for when the dependency slipped"
+        ]
+      },
+      "competencies": [
+        "collaboration",
+        "ownership"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "helped-teammate-grow",
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you helped a teammate get better at their work.",
+      "hints": {
+        "looking_for": [
+          "Whether you invest in others",
+          "How you give feedback that people can use"
+        ],
+        "strong_signals": [
+          "Shows the teammate's measurable growth",
+          "Tailors the help to the person"
+        ],
+        "watch_outs": [
+          "Doing the work for them instead of teaching",
+          "A vague story with no clear change"
+        ]
+      },
+      "competencies": [
+        "collaboration",
+        "impact"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "hard-feedback-received",
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you got critical feedback. How did you respond?",
+      "hints": {
+        "looking_for": [
+          "Whether you can hear criticism without defending",
+          "What you actually changed"
+        ],
+        "strong_signals": [
+          "Describes the feedback plainly, even if it stung",
+          "Shows follow-through over time"
+        ],
+        "watch_outs": [
+          "Explaining why the feedback was wrong",
+          "Feedback that is really a compliment"
+        ]
+      },
+      "competencies": [
+        "learning_from_failure",
+        "communication"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "ambiguous-problem",
+      "interview_type": "behavioral",
+      "question": "Describe a time you were handed a vague problem with no clear owner or plan.",
+      "hints": {
+        "looking_for": [
+          "How you create clarity from ambiguity",
+          "Whether you take ownership of the outcome"
+        ],
+        "strong_signals": [
+          "Defines the problem and success before acting",
+          "Breaks it down and gets early feedback"
+        ],
+        "watch_outs": [
+          "Waiting for someone else to define the work",
+          "Jumping to a solution without framing the problem"
+        ]
+      },
+      "competencies": [
+        "ownership",
+        "communication"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "data-changed-mind",
+      "interview_type": "behavioral",
+      "question": "Tell me about a time data or evidence changed your mind about something you believed.",
+      "hints": {
+        "looking_for": [
+          "Whether you hold opinions loosely",
+          "How you weigh evidence against intuition"
+        ],
+        "strong_signals": [
+          "Names the original belief and what shifted it",
+          "Shows how the decision changed as a result"
+        ],
+        "watch_outs": [
+          "Only stories where you were right all along",
+          "Unclear what the evidence actually was"
+        ]
+      },
+      "competencies": [
+        "learning_from_failure",
+        "impact"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "said-no-to-stakeholder",
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to say no to a request from a stakeholder.",
+      "hints": {
+        "looking_for": [
+          "How you protect priorities without damaging trust",
+          "Whether you offer alternatives"
+        ],
+        "strong_signals": [
+          "Explains the reasoning in terms the stakeholder cares about",
+          "Offers a smaller option or a later date"
+        ],
+        "watch_outs": [
+          "Saying yes to everything",
+          "A flat no with no explanation"
+        ]
+      },
+      "competencies": [
+        "conflict_handling",
+        "communication"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "school-or-internship-project",
+      "interview_type": "behavioral",
+      "question": "Tell me about a school, internship, or side project you are proud of. What was your role?",
+      "hints": {
+        "looking_for": [
+          "What you personally built or decided",
+          "How you work with others early in your career"
+        ],
+        "strong_signals": [
+          "Clear about your part versus the group's",
+          "Explains a hard problem you solved and how"
+        ],
+        "watch_outs": [
+          "Listing technologies with no story",
+          "Hiding behind the team's work"
+        ]
+      },
+      "competencies": [
+        "ownership",
+        "collaboration"
+      ],
+      "role_families": [],
+      "levels": [
+        "new_grad",
+        "mid"
+      ]
+    },
+    {
+      "id": "learned-fast",
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to learn something new very quickly to get work done.",
+      "hints": {
+        "looking_for": [
+          "How you learn under pressure",
+          "Whether you know when to ask for help"
+        ],
+        "strong_signals": [
+          "Describes a concrete learning approach",
+          "Shows the result the new skill made possible"
+        ],
+        "watch_outs": [
+          "Claiming you learned it all alone overnight",
+          "No outcome tied to the learning"
+        ]
+      },
+      "competencies": [
+        "learning_from_failure",
+        "impact"
+      ],
+      "role_families": [],
+      "levels": [
+        "new_grad",
+        "mid"
+      ]
+    },
+    {
+      "id": "led-through-change",
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you led a team or group through a major change, like a reorg or a big shift in direction.",
+      "hints": {
+        "looking_for": [
+          "How you bring people along through uncertainty",
+          "Whether you balance delivery with morale"
+        ],
+        "strong_signals": [
+          "Explains the why and listens to concerns",
+          "Keeps the team focused and shows the result"
+        ],
+        "watch_outs": [
+          "Announcing the change and moving on",
+          "Ignoring the people who were affected"
+        ]
+      },
+      "competencies": [
+        "communication",
+        "collaboration",
+        "impact"
+      ],
+      "role_families": [],
+      "levels": [
+        "senior",
+        "staff_principal"
+      ]
+    },
+    {
+      "id": "drove-org-wide-initiative",
+      "interview_type": "behavioral",
+      "question": "Describe an initiative you drove that changed how several teams work.",
+      "hints": {
+        "looking_for": [
+          "Whether your impact reaches beyond your own team",
+          "How you drive adoption, not just build"
+        ],
+        "strong_signals": [
+          "Shows broad adoption and a lasting result",
+          "Names how you handled resistance"
+        ],
+        "watch_outs": [
+          "A team-level project framed as org-wide",
+          "Mandating change with no buy-in"
+        ]
+      },
+      "competencies": [
+        "impact",
+        "ownership",
+        "collaboration"
+      ],
+      "role_families": [],
+      "levels": [
+        "senior",
+        "staff_principal"
+      ]
+    },
+    {
+      "id": "difficult-decision-for-team",
+      "interview_type": "behavioral",
+      "question": "Tell me about a hard call you made that not everyone on the team agreed with.",
+      "hints": {
+        "looking_for": [
+          "How you decide when consensus is not possible",
+          "How you keep trust after a contested call"
+        ],
+        "strong_signals": [
+          "Shows you heard the dissent before deciding",
+          "Explains the call and revisits it with data"
+        ],
+        "watch_outs": [
+          "Deciding alone with no input",
+          "Avoiding the decision until it was made for you"
+        ]
+      },
+      "competencies": [
+        "conflict_handling",
+        "ownership"
+      ],
+      "role_families": [],
+      "levels": [
+        "senior",
+        "staff_principal"
+      ]
+    },
+    {
+      "id": "why-this-role",
+      "interview_type": "hiring_manager",
+      "question": "Why are you interested in this role, and why now?",
+      "hints": {
+        "looking_for": [
+          "Whether your interest is specific, not generic",
+          "How the role fits your path"
+        ],
+        "strong_signals": [
+          "Connects your experience to what the role needs",
+          "Gives a clear reason for the timing"
+        ],
+        "watch_outs": [
+          "An answer that fits any company",
+          "Focusing only on pay or escaping your current job"
+        ]
+      },
+      "competencies": [
+        "motivation",
+        "role_fit"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "walk-through-background",
+      "interview_type": "hiring_manager",
+      "question": "Walk me through your background and how it led you here.",
+      "hints": {
+        "looking_for": [
+          "Whether you can tell a focused career story",
+          "Which experiences matter most for this role"
+        ],
+        "strong_signals": [
+          "Keeps it short and links each step to the next",
+          "Ends on why this role is the logical next step"
+        ],
+        "watch_outs": [
+          "Reading your resume line by line",
+          "Running long with no thread"
+        ]
+      },
+      "competencies": [
+        "role_fit",
+        "motivation"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "deep-dive-recent-project",
+      "interview_type": "hiring_manager",
+      "question": "Pick a recent project and take me deep into it. What were the hardest decisions?",
+      "hints": {
+        "looking_for": [
+          "How deep your hands-on knowledge goes",
+          "The quality of decisions you made yourself"
+        ],
+        "strong_signals": [
+          "Explains options you weighed and why you chose one",
+          "Answers follow-ups with specifics"
+        ],
+        "watch_outs": [
+          "Staying at a surface level",
+          "Describing what the team did with no decisions of your own"
+        ]
+      },
+      "competencies": [
+        "depth_of_experience",
+        "judgment"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "what-would-you-do-differently",
+      "interview_type": "hiring_manager",
+      "question": "Looking back at that project, what would you do differently?",
+      "hints": {
+        "looking_for": [
+          "Whether you reflect honestly on your own work",
+          "How you have grown since"
+        ],
+        "strong_signals": [
+          "Names a real decision you would change and why",
+          "Shows how you apply the lesson now"
+        ],
+        "watch_outs": [
+          "Saying you would change nothing",
+          "Only blaming constraints outside your control"
+        ]
+      },
+      "competencies": [
+        "judgment",
+        "depth_of_experience"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "first-ninety-days",
+      "interview_type": "hiring_manager",
+      "question": "If you joined, what would your first 90 days look like?",
+      "hints": {
+        "looking_for": [
+          "Whether you learn before you change things",
+          "How you plan to build trust and deliver early"
+        ],
+        "strong_signals": [
+          "Balances listening with an early, concrete win",
+          "Shows awareness of what you do not yet know"
+        ],
+        "watch_outs": [
+          "Promising to overhaul everything right away",
+          "A plan with no deliverables"
+        ]
+      },
+      "competencies": [
+        "role_fit",
+        "judgment"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "ideal-team-and-manager",
+      "interview_type": "hiring_manager",
+      "question": "What kind of team and manager do you do your best work with?",
+      "hints": {
+        "looking_for": [
+          "Whether your working style fits this team",
+          "Self-awareness about how you work"
+        ],
+        "strong_signals": [
+          "Gives specific, honest examples",
+          "Shows you can adapt to different styles"
+        ],
+        "watch_outs": [
+          "Describing a team no one could match",
+          "Saying you work well with anyone, with no detail"
+        ]
+      },
+      "competencies": [
+        "team_fit"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "tradeoff-quality-vs-speed",
+      "interview_type": "hiring_manager",
+      "question": "Tell me about a time you had to choose between shipping fast and doing it right.",
+      "hints": {
+        "looking_for": [
+          "How you weigh speed against quality",
+          "Whether you think about the long-term cost"
+        ],
+        "strong_signals": [
+          "Names the factors that drove the choice",
+          "Explains how you contained the risk you took"
+        ],
+        "watch_outs": [
+          "Always picking one side as a rule",
+          "No awareness of the cost of the choice"
+        ]
+      },
+      "competencies": [
+        "judgment"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "strengths-and-growth",
+      "interview_type": "hiring_manager",
+      "question": "What are you strongest at, and what are you working to get better at?",
+      "hints": {
+        "looking_for": [
+          "Self-awareness and honesty",
+          "Whether your strengths match what the role needs"
+        ],
+        "strong_signals": [
+          "Backs each strength with a short example",
+          "Names a real growth area and a plan for it"
+        ],
+        "watch_outs": [
+          "A weakness that is really a strength",
+          "Strengths with no evidence"
+        ]
+      },
+      "competencies": [
+        "role_fit",
+        "team_fit"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "what-motivates-you",
+      "interview_type": "hiring_manager",
+      "question": "What kind of work energizes you, and what drains you?",
+      "hints": {
+        "looking_for": [
+          "Whether the day-to-day work will keep you engaged",
+          "How well you know yourself"
+        ],
+        "strong_signals": [
+          "Ties answers to concrete past experiences",
+          "Shows what you do about work that drains you"
+        ],
+        "watch_outs": [
+          "Saying nothing drains you",
+          "Naming core parts of this job as draining"
+        ]
+      },
+      "competencies": [
+        "motivation",
+        "team_fit"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "prioritize-competing-demands",
+      "interview_type": "hiring_manager",
+      "question": "How do you decide what to work on when everything feels urgent?",
+      "hints": {
+        "looking_for": [
+          "Your method for setting priorities",
+          "Whether you align priorities with others"
+        ],
+        "strong_signals": [
+          "Uses impact and cost to rank work, with an example",
+          "Shows you renegotiate priorities openly"
+        ],
+        "watch_outs": [
+          "Working longer hours as the only answer",
+          "No clear method"
+        ]
+      },
+      "competencies": [
+        "judgment",
+        "scope_at_level"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "technical-or-domain-depth",
+      "interview_type": "hiring_manager",
+      "question": "What is an area where you have real depth? Teach me something about it.",
+      "hints": {
+        "looking_for": [
+          "Where your expertise is deepest",
+          "Whether you can explain it clearly"
+        ],
+        "strong_signals": [
+          "Goes beyond textbook knowledge with first-hand lessons",
+          "Adjusts the level to the listener"
+        ],
+        "watch_outs": [
+          "Claiming depth you cannot back up under questions",
+          "Picking a topic you only know at a surface level"
+        ]
+      },
+      "competencies": [
+        "depth_of_experience"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "questions-for-me",
+      "interview_type": "hiring_manager",
+      "question": "What questions do you have for me about the team or the role?",
+      "hints": {
+        "looking_for": [
+          "Whether you have thought about this role seriously",
+          "What matters to you in a job"
+        ],
+        "strong_signals": [
+          "Asks about real challenges, success, and how the team works",
+          "Follows up on what you heard"
+        ],
+        "watch_outs": [
+          "Having no questions",
+          "Only asking about perks"
+        ]
+      },
+      "competencies": [
+        "motivation",
+        "team_fit"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "new-grad-why-this-path",
+      "interview_type": "hiring_manager",
+      "question": "What drew you to this field, and what kind of work do you want to grow into?",
+      "hints": {
+        "looking_for": [
+          "Genuine interest in the field",
+          "Whether you have a sense of direction"
+        ],
+        "strong_signals": [
+          "Points to projects or classes that shaped your interest",
+          "Names skills you want to build here"
+        ],
+        "watch_outs": [
+          "A generic answer about tech being exciting",
+          "No link between your interests and this role"
+        ]
+      },
+      "competencies": [
+        "motivation",
+        "role_fit"
+      ],
+      "role_families": [],
+      "levels": [
+        "new_grad",
+        "mid"
+      ]
+    },
+    {
+      "id": "scope-largest-responsibility",
+      "interview_type": "hiring_manager",
+      "question": "What is the largest scope you have owned, in people, systems, or budget?",
+      "hints": {
+        "looking_for": [
+          "Whether your scope matches the level of this role",
+          "How you managed that scope"
+        ],
+        "strong_signals": [
+          "Gives clear numbers or boundaries for the scope",
+          "Explains how you delegated and kept quality"
+        ],
+        "watch_outs": [
+          "Inflating scope you only touched",
+          "Unclear what you owned versus supported"
+        ]
+      },
+      "competencies": [
+        "scope_at_level",
+        "depth_of_experience"
+      ],
+      "role_families": [],
+      "levels": [
+        "senior",
+        "staff_principal"
+      ]
+    },
+    {
+      "id": "setting-direction",
+      "interview_type": "hiring_manager",
+      "question": "Tell me how you set technical or product direction for a group beyond your own team.",
+      "hints": {
+        "looking_for": [
+          "Whether you operate at senior or staff scope",
+          "How you align many people on one direction"
+        ],
+        "strong_signals": [
+          "Shows a written plan or strategy others adopted",
+          "Balances long-term bets with near-term delivery"
+        ],
+        "watch_outs": [
+          "Direction that only covered your own work",
+          "Setting direction with no buy-in from others"
+        ]
+      },
+      "competencies": [
+        "scope_at_level",
+        "judgment"
+      ],
+      "role_families": [],
+      "levels": [
+        "senior",
+        "staff_principal"
+      ]
+    },
+    {
+      "id": "developing-others",
+      "interview_type": "hiring_manager",
+      "question": "How have you grown the people around you, and how do you know it worked?",
+      "hints": {
+        "looking_for": [
+          "Whether you multiply the team's impact",
+          "How you measure growth in others"
+        ],
+        "strong_signals": [
+          "Names people who grew and what changed for them",
+          "Describes repeatable practices, not one-off help"
+        ],
+        "watch_outs": [
+          "Only talking about your own output",
+          "Mentoring claims with no result"
+        ]
+      },
+      "competencies": [
+        "scope_at_level",
+        "team_fit"
+      ],
+      "role_families": [],
+      "levels": [
+        "senior",
+        "staff_principal"
+      ]
+    },
+    {
+      "id": "design-url-shortener-concepts",
+      "interview_type": "technical_qa",
+      "question": "Walk me through how you would design a URL shortener at a high level. What are the key components?",
+      "hints": {
+        "looking_for": [
+          "Whether you can break a system into clear parts",
+          "How you reason about scale and storage"
+        ],
+        "strong_signals": [
+          "Clarifies requirements and scale before designing",
+          "Covers ID generation, storage, caching, and redirects"
+        ],
+        "watch_outs": [
+          "Diving into details before the big picture",
+          "Ignoring read-heavy traffic and caching"
+        ]
+      },
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "clarity_of_explanation"
+      ],
+      "role_families": [
+        "swe",
+        "tpm"
+      ],
+      "levels": []
+    },
+    {
+      "id": "sql-vs-nosql",
+      "interview_type": "technical_qa",
+      "question": "How do you decide between a relational database and a NoSQL store for a new service?",
+      "hints": {
+        "looking_for": [
+          "Whether you choose storage based on access patterns",
+          "Your grasp of consistency and schema trade-offs"
+        ],
+        "strong_signals": [
+          "Starts from the data model and query patterns",
+          "Names concrete trade-offs like joins, scaling, and transactions"
+        ],
+        "watch_outs": [
+          "Treating one option as always better",
+          "Choosing by trend instead of requirements"
+        ]
+      },
+      "competencies": [
+        "trade_offs",
+        "technical_depth"
+      ],
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cap-theorem",
+      "interview_type": "technical_qa",
+      "question": "Explain the CAP theorem and how it shows up in a real system you know.",
+      "hints": {
+        "looking_for": [
+          "Accurate understanding of consistency and availability under partitions",
+          "Ability to apply theory to practice"
+        ],
+        "strong_signals": [
+          "Explains that the real choice is made during a partition",
+          "Gives a concrete example and its trade-off"
+        ],
+        "watch_outs": [
+          "Saying you pick any two of three, with no nuance",
+          "Mixing up consistency in CAP and in ACID"
+        ]
+      },
+      "competencies": [
+        "accuracy",
+        "technical_depth",
+        "reasoning"
+      ],
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "id": "caching-strategy",
+      "interview_type": "technical_qa",
+      "question": "How would you add caching to a slow service? What can go wrong?",
+      "hints": {
+        "looking_for": [
+          "Knowledge of cache patterns and placement",
+          "Awareness of failure modes"
+        ],
+        "strong_signals": [
+          "Discusses invalidation, expiry, and consistency",
+          "Mentions stampedes, cold starts, and hit-rate monitoring"
+        ],
+        "watch_outs": [
+          "Assuming a cache fixes everything",
+          "No plan for stale data"
+        ]
+      },
+      "competencies": [
+        "trade_offs",
+        "technical_depth"
+      ],
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "id": "rest-api-design",
+      "interview_type": "technical_qa",
+      "question": "What makes a well-designed API? Walk me through choices you would make for a new public API.",
+      "hints": {
+        "looking_for": [
+          "Your judgment on API design and evolution",
+          "Whether you think about the API's users"
+        ],
+        "strong_signals": [
+          "Covers naming, versioning, pagination, errors, and auth",
+          "Explains how to change the API without breaking clients"
+        ],
+        "watch_outs": [
+          "Only listing HTTP verbs",
+          "Ignoring backward compatibility"
+        ]
+      },
+      "competencies": [
+        "technical_depth",
+        "clarity_of_explanation",
+        "trade_offs"
+      ],
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "id": "debug-latency-spike",
+      "interview_type": "technical_qa",
+      "question": "A service's latency suddenly doubled in production. How do you investigate?",
+      "hints": {
+        "looking_for": [
+          "A calm, structured approach to debugging",
+          "Which signals and tools you reach for"
+        ],
+        "strong_signals": [
+          "Checks recent changes, metrics, and dependencies first",
+          "Narrows the cause with hypotheses and evidence"
+        ],
+        "watch_outs": [
+          "Guessing a fix before gathering data",
+          "Forgetting to mitigate impact while you investigate"
+        ]
+      },
+      "competencies": [
+        "reasoning",
+        "technical_depth"
+      ],
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "id": "message-queues",
+      "interview_type": "technical_qa",
+      "question": "When would you put a message queue between two services, and what problems does it introduce?",
+      "hints": {
+        "looking_for": [
+          "Understanding of async communication",
+          "Awareness of delivery guarantees"
+        ],
+        "strong_signals": [
+          "Explains decoupling, buffering, and retries",
+          "Discusses ordering, duplicates, and idempotency"
+        ],
+        "watch_outs": [
+          "Assuming messages arrive exactly once",
+          "Adding a queue with no reason"
+        ]
+      },
+      "competencies": [
+        "trade_offs",
+        "technical_depth",
+        "accuracy"
+      ],
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "id": "scaling-a-database",
+      "interview_type": "technical_qa",
+      "question": "Your main database is hitting its limits. What options do you have to scale it?",
+      "hints": {
+        "looking_for": [
+          "Breadth of scaling techniques",
+          "Whether you pick the simplest option first"
+        ],
+        "strong_signals": [
+          "Orders options from indexing and caching to replicas and sharding",
+          "Names the cost of each step"
+        ],
+        "watch_outs": [
+          "Jumping straight to sharding",
+          "Ignoring how the data is queried"
+        ]
+      },
+      "competencies": [
+        "trade_offs",
+        "reasoning"
+      ],
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "id": "reliability-practices",
+      "interview_type": "technical_qa",
+      "question": "How do you make a service reliable? Talk about the practices you have used.",
+      "hints": {
+        "looking_for": [
+          "Practical reliability experience",
+          "How you define and measure reliability"
+        ],
+        "strong_signals": [
+          "Mentions SLOs, alerting, graceful degradation, and safe rollouts",
+          "Gives an example from an incident"
+        ],
+        "watch_outs": [
+          "Listing buzzwords with no experience behind them",
+          "No idea how reliability is measured"
+        ]
+      },
+      "competencies": [
+        "technical_depth",
+        "clarity_of_explanation"
+      ],
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "id": "bias-variance",
+      "interview_type": "technical_qa",
+      "question": "Explain the bias-variance trade-off and how it affects the models you build.",
+      "hints": {
+        "looking_for": [
+          "Accurate grasp of a core ML concept",
+          "Whether you link theory to practical choices"
+        ],
+        "strong_signals": [
+          "Connects it to model complexity and regularization",
+          "Describes how you diagnose it with validation curves"
+        ],
+        "watch_outs": [
+          "A textbook definition with no application",
+          "Confusing bias with fairness bias"
+        ]
+      },
+      "competencies": [
+        "accuracy",
+        "clarity_of_explanation"
+      ],
+      "role_families": [
+        "data_ml"
+      ],
+      "levels": []
+    },
+    {
+      "id": "model-evaluation-metrics",
+      "interview_type": "technical_qa",
+      "question": "How do you choose an evaluation metric for a classification model?",
+      "hints": {
+        "looking_for": [
+          "Whether you tie metrics to the business problem",
+          "Knowledge of precision, recall, and related metrics"
+        ],
+        "strong_signals": [
+          "Discusses class imbalance and the cost of each error type",
+          "Separates offline metrics from online success"
+        ],
+        "watch_outs": [
+          "Defaulting to accuracy every time",
+          "Ignoring how the model is used"
+        ]
+      },
+      "competencies": [
+        "reasoning",
+        "accuracy",
+        "trade_offs"
+      ],
+      "role_families": [
+        "data_ml"
+      ],
+      "levels": []
+    },
+    {
+      "id": "overfitting",
+      "interview_type": "technical_qa",
+      "question": "Your model does great on training data but poorly in production. What could be going on?",
+      "hints": {
+        "looking_for": [
+          "Structured diagnosis of model problems",
+          "Awareness beyond simple overfitting"
+        ],
+        "strong_signals": [
+          "Considers overfitting, leakage, and data drift",
+          "Explains how you would test each cause"
+        ],
+        "watch_outs": [
+          "Naming only overfitting",
+          "Retraining without understanding the cause"
+        ]
+      },
+      "competencies": [
+        "reasoning",
+        "technical_depth"
+      ],
+      "role_families": [
+        "data_ml",
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "id": "data-pipeline-quality",
+      "interview_type": "technical_qa",
+      "question": "How do you build a data pipeline people can trust? What checks do you put in place?",
+      "hints": {
+        "looking_for": [
+          "Experience with real data pipelines",
+          "Attention to data quality and monitoring"
+        ],
+        "strong_signals": [
+          "Covers schema checks, freshness, volume, and lineage",
+          "Explains how failures are caught and alerted"
+        ],
+        "watch_outs": [
+          "Assuming upstream data is always correct",
+          "No plan for backfills or late data"
+        ]
+      },
+      "competencies": [
+        "technical_depth",
+        "trade_offs"
+      ],
+      "role_families": [
+        "data_ml",
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "id": "ab-test-design",
+      "interview_type": "technical_qa",
+      "question": "How would you design an A/B test for a new feature, and how do you know the result is real?",
+      "hints": {
+        "looking_for": [
+          "Sound grasp of experiment design",
+          "Understanding of statistical significance and power"
+        ],
+        "strong_signals": [
+          "Sets a hypothesis, primary metric, and sample size up front",
+          "Mentions peeking, novelty effects, and guardrails"
+        ],
+        "watch_outs": [
+          "Stopping the test as soon as it looks good",
+          "No clear success metric"
+        ]
+      },
+      "competencies": [
+        "accuracy",
+        "reasoning",
+        "technical_depth"
+      ],
+      "role_families": [
+        "data_ml",
+        "pm"
+      ],
+      "levels": []
+    },
+    {
+      "id": "feature-engineering",
+      "interview_type": "technical_qa",
+      "question": "Tell me how you approach feature engineering for a new modeling problem.",
+      "hints": {
+        "looking_for": [
+          "How you turn domain knowledge into signal",
+          "Awareness of leakage and cost"
+        ],
+        "strong_signals": [
+          "Starts from the problem and a simple baseline",
+          "Checks features for leakage and stability"
+        ],
+        "watch_outs": [
+          "Adding features with no hypothesis",
+          "Ignoring what is available at prediction time"
+        ]
+      },
+      "competencies": [
+        "technical_depth",
+        "reasoning"
+      ],
+      "role_families": [
+        "data_ml"
+      ],
+      "levels": []
+    },
+    {
+      "id": "tpm-managing-dependencies",
+      "interview_type": "technical_qa",
+      "question": "How do you manage technical dependencies across several teams in a large program?",
+      "hints": {
+        "looking_for": [
+          "How you map and track critical paths",
+          "Whether you understand the technical risk"
+        ],
+        "strong_signals": [
+          "Describes a dependency map and early risk flags",
+          "Explains how you resolve conflicts between teams"
+        ],
+        "watch_outs": [
+          "Tracking status with no grasp of the technology",
+          "Finding blockers only at the deadline"
+        ]
+      },
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "clarity_of_explanation"
+      ],
+      "role_families": [
+        "tpm"
+      ],
+      "levels": []
+    },
+    {
+      "id": "tpm-migration-tradeoffs",
+      "interview_type": "technical_qa",
+      "question": "A team wants to migrate a critical system to a new platform. How do you plan and de-risk it?",
+      "hints": {
+        "looking_for": [
+          "Whether you understand migration risk",
+          "How you phase work to protect users"
+        ],
+        "strong_signals": [
+          "Proposes phased rollout, parallel runs, and rollback",
+          "Sets clear exit criteria for each phase"
+        ],
+        "watch_outs": [
+          "A big-bang cutover with no rollback",
+          "Ignoring data migration and testing"
+        ]
+      },
+      "competencies": [
+        "trade_offs",
+        "reasoning"
+      ],
+      "role_families": [
+        "tpm",
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "id": "tpm-build-vs-buy",
+      "interview_type": "technical_qa",
+      "question": "How would you help a team decide whether to build a component in-house or use a vendor?",
+      "hints": {
+        "looking_for": [
+          "How you structure a technical decision",
+          "Whether you weigh cost beyond the first release"
+        ],
+        "strong_signals": [
+          "Compares total cost, control, risk, and time to value",
+          "Brings the decision to a clear recommendation"
+        ],
+        "watch_outs": [
+          "Deciding on gut feel",
+          "Ignoring maintenance and lock-in"
+        ]
+      },
+      "competencies": [
+        "trade_offs",
+        "reasoning",
+        "clarity_of_explanation"
+      ],
+      "role_families": [
+        "tpm"
+      ],
+      "levels": []
+    },
+    {
+      "id": "design-system-value",
+      "interview_type": "technical_qa",
+      "question": "What makes a design system successful, and how do you keep it from slowing teams down?",
+      "hints": {
+        "looking_for": [
+          "Understanding of design systems at scale",
+          "How you balance consistency and flexibility"
+        ],
+        "strong_signals": [
+          "Talks about components, tokens, docs, and adoption",
+          "Explains how contributions and versions are governed"
+        ],
+        "watch_outs": [
+          "Treating it as a static component library",
+          "No thought for the teams who use it"
+        ]
+      },
+      "competencies": [
+        "technical_depth",
+        "trade_offs"
+      ],
+      "role_families": [
+        "design"
+      ],
+      "levels": []
+    },
+    {
+      "id": "accessibility-approach",
+      "interview_type": "technical_qa",
+      "question": "How do you make sure a product is accessible? Walk me through what you check.",
+      "hints": {
+        "looking_for": [
+          "Practical accessibility knowledge",
+          "Whether accessibility is part of your process"
+        ],
+        "strong_signals": [
+          "Covers contrast, keyboard use, screen readers, and focus",
+          "Tests with real assistive tools or users"
+        ],
+        "watch_outs": [
+          "Treating accessibility as a final checklist",
+          "Only mentioning color contrast"
+        ]
+      },
+      "competencies": [
+        "technical_depth",
+        "accuracy"
+      ],
+      "role_families": [
+        "design",
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "id": "explain-system-you-built",
+      "interview_type": "technical_qa",
+      "question": "Explain a complex system you built or worked on, as if I were a new teammate.",
+      "hints": {
+        "looking_for": [
+          "Whether you understand your system end to end",
+          "How clearly you explain technical work"
+        ],
+        "strong_signals": [
+          "Starts with the purpose, then the main parts and data flow",
+          "Names a key design choice and why it was made"
+        ],
+        "watch_outs": [
+          "Getting lost in details too early",
+          "Not knowing parts you claim to have built"
+        ]
+      },
+      "competencies": [
+        "clarity_of_explanation",
+        "technical_depth"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "hardest-technical-problem",
+      "interview_type": "technical_qa",
+      "question": "What is the hardest technical problem you have solved? How did you get to the answer?",
+      "hints": {
+        "looking_for": [
+          "How you reason through hard problems",
+          "The depth of your technical work"
+        ],
+        "strong_signals": [
+          "Explains why it was hard and the options you tried",
+          "Shows how you validated the solution"
+        ],
+        "watch_outs": [
+          "A problem that was hard only because of process",
+          "Skipping the reasoning to state the answer"
+        ]
+      },
+      "competencies": [
+        "reasoning",
+        "technical_depth"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "design-product-for-elderly",
+      "interview_type": "case",
+      "question": "Design a product to help older adults stay connected with their families.",
+      "hints": {
+        "looking_for": [
+          "How you pick a user and a problem to focus on",
+          "Whether you design from real needs"
+        ],
+        "strong_signals": [
+          "Segments users and picks one with a clear reason",
+          "Ends with a focused solution and a success metric"
+        ],
+        "watch_outs": [
+          "Jumping to features before defining the user",
+          "Listing ideas with no prioritization"
+        ]
+      },
+      "competencies": [
+        "problem_framing",
+        "user_and_business_sense",
+        "recommendation"
+      ],
+      "role_families": [
+        "pm",
+        "design"
+      ],
+      "levels": []
+    },
+    {
+      "id": "improve-favorite-product",
+      "interview_type": "case",
+      "question": "Pick a product you use often. How would you improve it?",
+      "hints": {
+        "looking_for": [
+          "Whether you think like a product owner",
+          "How you connect user pain to business value"
+        ],
+        "strong_signals": [
+          "Names a specific user pain and why it matters",
+          "Prioritizes one improvement and how to measure it"
+        ],
+        "watch_outs": [
+          "Surface-level cosmetic changes",
+          "Ideas with no user or business reason"
+        ]
+      },
+      "competencies": [
+        "user_and_business_sense",
+        "prioritization"
+      ],
+      "role_families": [
+        "pm",
+        "design"
+      ],
+      "levels": []
+    },
+    {
+      "id": "design-commute-app",
+      "interview_type": "case",
+      "question": "How would you design an app that makes daily commuting less stressful?",
+      "hints": {
+        "looking_for": [
+          "How you explore a broad problem space",
+          "Your ability to structure the answer"
+        ],
+        "strong_signals": [
+          "Breaks the commute into steps and finds the worst pain",
+          "Proposes a solution and an MVP scope"
+        ],
+        "watch_outs": [
+          "Designing for everyone at once",
+          "No clear framework"
+        ]
+      },
+      "competencies": [
+        "problem_framing",
+        "structure",
+        "user_and_business_sense"
+      ],
+      "role_families": [
+        "pm",
+        "design"
+      ],
+      "levels": []
+    },
+    {
+      "id": "new-feature-for-maps",
+      "interview_type": "case",
+      "question": "You are the product lead for a maps app. What new feature would you build next, and why?",
+      "hints": {
+        "looking_for": [
+          "Product judgment and strategic thinking",
+          "How you weigh user value against business goals"
+        ],
+        "strong_signals": [
+          "Ties the feature to a clear goal for the product",
+          "Considers risks and how to test it cheaply"
+        ],
+        "watch_outs": [
+          "A pet feature with no rationale",
+          "Ignoring what the product already does well"
+        ]
+      },
+      "competencies": [
+        "user_and_business_sense",
+        "recommendation"
+      ],
+      "role_families": [
+        "pm"
+      ],
+      "levels": []
+    },
+    {
+      "id": "product-for-first-time-investors",
+      "interview_type": "case",
+      "question": "Design a product that helps people make their first investment.",
+      "hints": {
+        "looking_for": [
+          "Empathy for an anxious, new user",
+          "Whether you consider trust and risk"
+        ],
+        "strong_signals": [
+          "Identifies fears and knowledge gaps as the core problem",
+          "Designs for trust and a safe first step"
+        ],
+        "watch_outs": [
+          "Skipping the user's emotions",
+          "Ignoring regulation and risk"
+        ]
+      },
+      "competencies": [
+        "problem_framing",
+        "user_and_business_sense"
+      ],
+      "role_families": [
+        "pm",
+        "design"
+      ],
+      "levels": []
+    },
+    {
+      "id": "onboarding-drop-off",
+      "interview_type": "case",
+      "question": "Half of new users drop off during onboarding. How would you fix it?",
+      "hints": {
+        "looking_for": [
+          "How you diagnose before solving",
+          "Use of data and user research"
+        ],
+        "strong_signals": [
+          "Finds where and why users drop with data and interviews",
+          "Proposes changes and how to test them"
+        ],
+        "watch_outs": [
+          "Redesigning everything without a diagnosis",
+          "Assuming the cause"
+        ]
+      },
+      "competencies": [
+        "problem_framing",
+        "structure",
+        "recommendation"
+      ],
+      "role_families": [
+        "pm",
+        "design"
+      ],
+      "levels": []
+    },
+    {
+      "id": "should-we-launch-feature",
+      "interview_type": "case",
+      "question": "Your team built a feature, but early tests are mixed. Do you launch it?",
+      "hints": {
+        "looking_for": [
+          "How you make a call with incomplete data",
+          "Whether you weigh risk and reversibility"
+        ],
+        "strong_signals": [
+          "Breaks down what mixed means across segments and metrics",
+          "Makes a clear call with conditions to revisit"
+        ],
+        "watch_outs": [
+          "Refusing to decide",
+          "Launching because the work is done"
+        ]
+      },
+      "competencies": [
+        "recommendation",
+        "user_and_business_sense"
+      ],
+      "role_families": [
+        "pm"
+      ],
+      "levels": []
+    },
+    {
+      "id": "estimate-ride-share-trips",
+      "interview_type": "case",
+      "question": "Estimate how many ride-share trips happen in a large city on a weekday.",
+      "hints": {
+        "looking_for": [
+          "How you break a number into parts",
+          "Whether your assumptions are reasonable and stated"
+        ],
+        "strong_signals": [
+          "States a clear formula before plugging in numbers",
+          "Sanity-checks the final number another way"
+        ],
+        "watch_outs": [
+          "Guessing a number with no structure",
+          "Hiding assumptions"
+        ]
+      },
+      "competencies": [
+        "estimation_logic",
+        "structure"
+      ],
+      "role_families": [
+        "pm",
+        "data_ml"
+      ],
+      "levels": []
+    },
+    {
+      "id": "estimate-storage-photos",
+      "interview_type": "case",
+      "question": "Estimate the storage a photo-sharing app needs for one year of uploads.",
+      "hints": {
+        "looking_for": [
+          "Comfort with technical back-of-envelope math",
+          "Clear, stated assumptions"
+        ],
+        "strong_signals": [
+          "Splits users, uploads per user, and size per photo",
+          "Mentions replicas, thumbnails, and growth"
+        ],
+        "watch_outs": [
+          "Unit errors with no check",
+          "Forgetting copies and metadata"
+        ]
+      },
+      "competencies": [
+        "estimation_logic",
+        "structure"
+      ],
+      "role_families": [
+        "tpm",
+        "swe",
+        "data_ml"
+      ],
+      "levels": []
+    },
+    {
+      "id": "estimate-market-size",
+      "interview_type": "case",
+      "question": "How would you size the market for a new language-learning app?",
+      "hints": {
+        "looking_for": [
+          "How you size a market from first principles",
+          "Whether you segment the market"
+        ],
+        "strong_signals": [
+          "Uses top-down and bottom-up and compares them",
+          "Narrows from total to reachable market"
+        ],
+        "watch_outs": [
+          "Quoting one big number with no logic",
+          "Ignoring who will actually pay"
+        ]
+      },
+      "competencies": [
+        "estimation_logic",
+        "user_and_business_sense"
+      ],
+      "role_families": [
+        "pm"
+      ],
+      "levels": []
+    },
+    {
+      "id": "estimate-coffee-shops",
+      "interview_type": "case",
+      "question": "Estimate how many coffee shops there are in a large city.",
+      "hints": {
+        "looking_for": [
+          "Structured reasoning with rough numbers",
+          "Whether you check your answer"
+        ],
+        "strong_signals": [
+          "Builds from demand or from supply, with stated assumptions",
+          "Rounds sensibly and checks plausibility"
+        ],
+        "watch_outs": [
+          "False precision",
+          "Getting stuck on not knowing exact figures"
+        ]
+      },
+      "competencies": [
+        "estimation_logic"
+      ],
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "id": "estimate-support-team",
+      "interview_type": "case",
+      "question": "How many support agents would a new consumer app need in its first year?",
+      "hints": {
+        "looking_for": [
+          "How you link estimates to a real plan",
+          "Whether you model growth and peaks"
+        ],
+        "strong_signals": [
+          "Models contact rate, handle time, and peak load",
+          "Turns the number into a staffing recommendation"
+        ],
+        "watch_outs": [
+          "A single static number with no growth",
+          "Ignoring self-serve options"
+        ]
+      },
+      "competencies": [
+        "estimation_logic",
+        "recommendation"
+      ],
+      "role_families": [
+        "pm",
+        "tpm"
+      ],
+      "levels": []
+    },
+    {
+      "id": "system-notification-service",
+      "interview_type": "case",
+      "question": "How would you design a notification system that sends alerts to millions of users?",
+      "hints": {
+        "looking_for": [
+          "How you frame requirements before designing",
+          "Whether you think about scale and failure"
+        ],
+        "strong_signals": [
+          "Clarifies channels, latency, and volume first",
+          "Addresses fan-out, rate limits, retries, and user preferences"
+        ],
+        "watch_outs": [
+          "Designing before agreeing on requirements",
+          "Ignoring duplicates and failures"
+        ]
+      },
+      "competencies": [
+        "problem_framing",
+        "structure"
+      ],
+      "role_families": [
+        "swe",
+        "tpm"
+      ],
+      "levels": []
+    },
+    {
+      "id": "system-launch-in-new-region",
+      "interview_type": "case",
+      "question": "Your service must launch in a new region in three months. How do you plan it?",
+      "hints": {
+        "looking_for": [
+          "How you structure a large, multi-part effort",
+          "Whether you spot risks early"
+        ],
+        "strong_signals": [
+          "Breaks it into workstreams with a critical path",
+          "Names legal, latency, and data residency concerns"
+        ],
+        "watch_outs": [
+          "A plan with no milestones",
+          "Missing non-technical constraints"
+        ]
+      },
+      "competencies": [
+        "structure",
+        "prioritization"
+      ],
+      "role_families": [
+        "tpm",
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "id": "system-reduce-cloud-costs",
+      "interview_type": "case",
+      "question": "Cloud costs grew 50 percent last quarter. How would you bring them down?",
+      "hints": {
+        "looking_for": [
+          "How you find the biggest levers first",
+          "Whether you weigh savings against risk"
+        ],
+        "strong_signals": [
+          "Breaks costs down by service before acting",
+          "Ranks fixes by savings and effort"
+        ],
+        "watch_outs": [
+          "Cutting blindly across the board",
+          "Ignoring the impact on reliability"
+        ]
+      },
+      "competencies": [
+        "problem_framing",
+        "prioritization",
+        "recommendation"
+      ],
+      "role_families": [
+        "swe",
+        "tpm"
+      ],
+      "levels": []
+    },
+    {
+      "id": "system-incident-response-process",
+      "interview_type": "case",
+      "question": "Outages keep recurring across teams. How would you design a better incident process?",
+      "hints": {
+        "looking_for": [
+          "Whether you think in systems, not single fixes",
+          "How you change behavior across teams"
+        ],
+        "strong_signals": [
+          "Covers detection, roles, communication, and reviews",
+          "Measures improvement over time"
+        ],
+        "watch_outs": [
+          "Blaming individual teams",
+          "A process with no follow-through"
+        ]
+      },
+      "competencies": [
+        "structure",
+        "problem_framing"
+      ],
+      "role_families": [
+        "swe",
+        "tpm"
+      ],
+      "levels": []
+    },
+    {
+      "id": "metric-dropped",
+      "interview_type": "case",
+      "question": "A key engagement metric dropped 10 percent last week. How do you find out why?",
+      "hints": {
+        "looking_for": [
+          "A structured approach to metric diagnosis",
+          "Whether you rule out simple causes first"
+        ],
+        "strong_signals": [
+          "Checks data issues, seasonality, and segments first",
+          "Forms hypotheses and tests each one"
+        ],
+        "watch_outs": [
+          "Jumping to a single explanation",
+          "Ignoring tracking or data bugs"
+        ]
+      },
+      "competencies": [
+        "problem_framing",
+        "structure"
+      ],
+      "role_families": [
+        "pm",
+        "data_ml"
+      ],
+      "levels": []
+    },
+    {
+      "id": "prioritize-roadmap",
+      "interview_type": "case",
+      "question": "You have five feature requests and capacity for two. How do you choose?",
+      "hints": {
+        "looking_for": [
+          "Your framework for prioritization",
+          "Whether you tie choices to goals"
+        ],
+        "strong_signals": [
+          "Scores options on impact, effort, and fit with strategy",
+          "Explains how you communicate the choice"
+        ],
+        "watch_outs": [
+          "Picking what the loudest stakeholder wants",
+          "A framework with no final decision"
+        ]
+      },
+      "competencies": [
+        "prioritization",
+        "recommendation"
+      ],
+      "role_families": [
+        "pm",
+        "data_ml"
+      ],
+      "levels": []
+    }
+  ]
 }

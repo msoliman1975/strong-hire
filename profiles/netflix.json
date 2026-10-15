@@ -311,7 +311,25 @@
       "strong_answer": "Pick a real, substantive disagreement, not a style preference. Explain the decision, your reasoning and data, and how you raised the dissent directly with the decision maker. The key Netflix signal is what happened after losing: you committed fully, helped execute, and later checked whether you were right, without passive resistance. Show you separated ego from outcome. Pitfalls: a story where you were secretly proven right and gloat, or where you escalated around people instead of talking to them.",
       "competencies": ["conflict_handling", "communication", "collaboration"],
       "values": ["Courage", "Candor", "Selflessness"],
-      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview"
+      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you dissent directly and with reasons",
+          "How you behave after a decision goes against you"
+        ],
+        "strong_signals": [
+          "A substantive disagreement raised with the decision maker",
+          "Commits fully and helps execute after losing",
+          "Separates ego from outcome and checks results later"
+        ],
+        "watch_outs": [
+          "Gloating that you were secretly right",
+          "Going around people instead of talking to them",
+          "Passive resistance after the decision"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -319,7 +337,24 @@
       "strong_answer": "Describe the unknowns concretely (unclear goal, owner, or data). Show how you created clarity: framed the problem, gathered the minimum facts, made a reversible call, and set checkpoints. Netflix interviewers look for independent judgment without waiting for permission, plus sharing context with others so they could act. End with the outcome and what you would change. Pitfall: describing ambiguity that was resolved by your manager telling you what to do.",
       "competencies": ["ownership", "impact"],
       "values": ["Judgment", "People over process"],
-      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview"
+      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "How you create clarity when goals or data are unclear",
+          "Whether you act on judgment without waiting for permission"
+        ],
+        "strong_signals": [
+          "Names the unknowns concretely",
+          "Makes a reversible call with checkpoints",
+          "Shares context so others can act too"
+        ],
+        "watch_outs": [
+          "Ambiguity that ended when your manager told you what to do",
+          "Waiting for perfect information before acting"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -327,7 +362,24 @@
       "strong_answer": "Name the sources of complexity: technical, organizational, or timeline. Explain your own decisions using 'I', the trade-offs you made, and the people you aligned. Quantify the result. Netflix probes depth, so be ready for follow-ups on edge cases and why you rejected alternatives. Mention one thing that went wrong and how you handled it openly. Pitfall: listing team activities with no clear personal contribution.",
       "competencies": ["ownership", "impact", "communication"],
       "values": ["Judgment"],
-      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview"
+      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "How you break down and manage complexity",
+          "Whether your personal decisions are clear"
+        ],
+        "strong_signals": [
+          "Names technical, organizational or timeline sources of complexity",
+          "Uses 'I' for decisions and trade-offs, with quantified results",
+          "Owns something that went wrong and how it was handled"
+        ],
+        "watch_outs": [
+          "Team activities with no clear personal contribution",
+          "Unable to explain why alternatives were rejected"
+        ]
+      },
+      "role_families": [],
+      "levels": ["senior", "staff_principal"]
     },
     {
       "interview_type": "behavioral",
@@ -335,7 +387,23 @@
       "strong_answer": "Show you actually read the memo. Name two or three specific ideas (for example the keeper test, candor, or context over control) and connect each to a real experience of yours. Then give an honest point of tension, such as how candor can go wrong without care, and how you would handle it. Netflix values a genuine, thoughtful view over flattery. Pitfall: generic praise, or claiming you agree with everything.",
       "competencies": ["communication"],
       "values": ["Candor", "Judgment"],
-      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview"
+      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you have truly engaged with the culture",
+          "Whether you can share an honest, balanced view"
+        ],
+        "strong_signals": [
+          "Names a few specific ideas and ties each to your experience",
+          "Raises a genuine tension and how you would handle it"
+        ],
+        "watch_outs": [
+          "Generic praise with no specifics",
+          "Claiming you agree with everything"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -343,7 +411,24 @@
       "strong_answer": "Describe the behavior, not the person's character. Show that you addressed it directly and early with candid but respectful feedback, tried to understand their view, and focused on the shared goal. Include what changed and what you learned about yourself. Netflix expects candor plus decency; brilliant but unkind behavior is not tolerated. Pitfall: going to the manager first or complaining without having talked to the person.",
       "competencies": ["conflict_handling", "collaboration", "communication"],
       "values": ["Candor", "Inclusion"],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/netflix-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/netflix-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you give candid feedback directly and early",
+          "How you stay respectful while addressing behavior"
+        ],
+        "strong_signals": [
+          "Describes behavior, not character",
+          "Talks to the person first and seeks their view",
+          "Shows what changed and what you learned about yourself"
+        ],
+        "watch_outs": [
+          "Going to the manager before talking to the person",
+          "Complaining without any direct conversation"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -351,7 +436,24 @@
       "strong_answer": "Pick feedback that stung and was valid. Say who gave it, what it was, and your first reaction honestly. The strong part is the follow-through: specific behavior changes, how you checked they worked, and ideally a later example. Netflix wants people who seek feedback, not only accept it. Bonus: you thanked the person and now ask for feedback regularly. Pitfall: a 'weakness' that is really a strength.",
       "competencies": ["learning_from_failure", "communication", "judgment"],
       "values": ["Candor", "Curiosity"],
-      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview"
+      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you take hard feedback seriously",
+          "How you turn feedback into lasting behavior change"
+        ],
+        "strong_signals": [
+          "Feedback that stung and was valid, with your honest reaction",
+          "Specific changes and evidence they worked",
+          "Shows you now seek feedback actively"
+        ],
+        "watch_outs": [
+          "A weakness that is really a strength",
+          "No follow-through after hearing the feedback"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -359,7 +461,24 @@
       "strong_answer": "Prepare more than one dissent story, because Netflix often asks for a second one. Vary them: one where you changed the outcome and one where you did not. For each, show how you raised the concern directly, with data, at the right time, and how you behaved after the decision. The interviewer checks that dissent is a habit, not a one-off. Pitfall: running out of stories, or stories where you only complained privately.",
       "competencies": ["judgment", "team_fit", "depth_of_experience"],
       "values": ["Courage", "Candor"],
-      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview"
+      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "Whether dissent is a habit, not a one-off",
+          "How you raise concerns and act after the decision"
+        ],
+        "strong_signals": [
+          "Two different stories, one won and one lost",
+          "Raised directly, with data, at the right time",
+          "Shows how you behaved once the call was made"
+        ],
+        "watch_outs": [
+          "Running out of examples",
+          "Concerns voiced only in private"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -367,7 +486,24 @@
       "strong_answer": "Be concrete: which tasks you use AI for (code drafts, tests, exploring unfamiliar code, writing docs), how you verify the output, and where you do not trust it. Show judgment about correctness, security and review. A short example of AI speeding up real work, and one where it misled you and how you caught it, works well. Pitfall: either dismissing the tools or over-claiming without verification habits.",
       "competencies": ["judgment", "role_fit"],
       "values": ["Judgment", "Curiosity"],
-      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview"
+      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "How you use AI tools with sound judgment",
+          "Whether you verify output before trusting it"
+        ],
+        "strong_signals": [
+          "Names specific tasks where AI helps you",
+          "Explains how you check correctness and security",
+          "Gives a case where AI misled you and how you caught it"
+        ],
+        "watch_outs": [
+          "Dismissing the tools entirely",
+          "Over-claiming with no verification habits"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -375,7 +511,24 @@
       "strong_answer": "Choose two or three achievements with clear scope, your personal decisions, and measurable impact. Tie them to what this team needs. For the off-resume part, share something authentic that shows curiosity or resilience. Netflix hires for senior-level independence, so show you operated with little oversight. Pitfall: reading the resume back or claiming team results as your own.",
       "competencies": ["depth_of_experience", "scope_at_level", "motivation"],
       "values": [],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/netflix-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/netflix-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "The scope and impact of your recent work",
+          "Whether you operate independently with little oversight"
+        ],
+        "strong_signals": [
+          "Two or three achievements with personal decisions and measured impact",
+          "Ties achievements to what this team needs",
+          "An authentic off-resume detail that shows curiosity or resilience"
+        ],
+        "watch_outs": [
+          "Reading the resume back",
+          "Claiming team results as your own"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -383,7 +536,24 @@
       "strong_answer": "Clarify the cap rules (per ad, campaign, time window, device vs account) and scale. Propose counters keyed by member and campaign with time windows, a low-latency store, and a decision service on the ad serving path. Discuss accuracy versus latency: approximate counts, eventual consistency across regions, and what happens when the counter store is down (fail open vs fail closed and the business cost of each). Cover data retention and privacy. Strong candidates quantify read/write rates and defend trade-offs when pushed.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": ["Judgment"],
-      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview"
+      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "How you design a low-latency counting system at scale",
+          "Whether you weigh accuracy against latency and cost"
+        ],
+        "strong_signals": [
+          "Clarifies cap rules, windows and scale first",
+          "Places a fast decision service on the ad serving path",
+          "Defends fail-open vs fail-closed with the business cost of each"
+        ],
+        "watch_outs": [
+          "Ignoring what happens when the counter store is down",
+          "No estimate of read and write rates"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -391,7 +561,24 @@
       "strong_answer": "Lay out both sides. Owned libraries give consistent retries, auth, metrics and faster upgrades, but cost maintenance, language coverage and coupling. Docs-only gives freedom and less load but leads to divergent, buggy clients. A strong answer picks based on context: number of consumers, languages, how critical correctness is, and team capacity, and may propose a middle path (thin generated clients, reference implementation). Show you think about the whole company, not only your own team's load.",
       "competencies": ["trade_offs", "clarity_of_explanation", "reasoning"],
       "values": ["Selflessness", "Judgment"],
-      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview"
+      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "How you argue a position with clear trade-offs",
+          "Whether you think about the whole company, not just your team"
+        ],
+        "strong_signals": [
+          "Lays out the costs and benefits of both sides",
+          "Picks a side based on context like consumers and languages",
+          "Considers a middle path such as generated thin clients"
+        ],
+        "watch_outs": [
+          "Refusing to take a position",
+          "Optimizing only for your own team's workload"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": ["senior", "staff_principal"]
     },
     {
       "interview_type": "technical_qa",
@@ -399,7 +586,24 @@
       "strong_answer": "Split into offline training, candidate generation, ranking, and online serving. Discuss signals (watch history, completion, time of day, device), feature stores, and how near-real-time events update recommendations. Cover cold start for new members and new titles, latency budgets for the home page, caching per profile, and evaluation through A/B tests rather than offline metrics alone. Trade-offs: freshness vs cost, personalization vs diversity. Pitfall: going deep into ML math while ignoring the serving system.",
       "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
       "values": ["Judgment"],
-      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview"
+      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "How you design a recommender end to end, not just the model",
+          "Whether you handle freshness, latency and evaluation"
+        ],
+        "strong_signals": [
+          "Splits training, candidate generation, ranking and serving",
+          "Covers near-real-time updates and cold start",
+          "Evaluates with A/B tests, not offline metrics alone"
+        ],
+        "watch_outs": [
+          "Deep ML math while ignoring the serving system",
+          "No plan for new members or new titles"
+        ]
+      },
+      "role_families": ["data_ml", "swe"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -407,7 +611,24 @@
       "strong_answer": "Identify entities: advertiser, campaign, budget, flight dates, ad creative, targeting rules, placements, impressions and billing events. Explain relationships and keys, which data is transactional versus high-volume event data, and the read paths at serving time. Discuss denormalizing for fast ad decisions, consistency of budgets, and auditability for billing. Strong answers mention versioning of campaign changes and privacy limits on targeting.",
       "competencies": ["technical_depth", "accuracy", "trade_offs"],
       "values": [],
-      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview"
+      "source_url": "https://www.aced.io/guides/netflix-software-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "How you model entities and relationships for a real product",
+          "Whether you separate transactional data from event data"
+        ],
+        "strong_signals": [
+          "Identifies the core entities and their keys",
+          "Explains serving read paths and denormalization",
+          "Covers budget consistency, auditability and change history"
+        ],
+        "watch_outs": [
+          "A flat model with no relationships",
+          "Ignoring billing accuracy and privacy limits on targeting"
+        ]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -415,7 +636,24 @@
       "strong_answer": "Start with Netflix's goal (member joy and retention) and choose a specific segment and problem, for example members who browse and leave without watching. Size the problem, generate a few solutions, pick one with clear reasoning, and define the A/B test: primary metric (such as retention or hours of satisfied viewing) and guardrails. Netflix is experiment-driven, so mention how you would read results. Pitfall: listing many features without choosing.",
       "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
       "values": ["Creativity", "Judgment"],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/netflix-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/netflix-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you choose a focused problem to solve",
+          "Whether you can prove an idea works through experiments"
+        ],
+        "strong_signals": [
+          "Starts from the company goal and picks one segment and problem",
+          "Chooses one solution with clear reasoning",
+          "Defines an A/B test with a primary metric and guardrails"
+        ],
+        "watch_outs": [
+          "Listing many features without choosing",
+          "No plan for measuring success"
+        ]
+      },
+      "role_families": ["pm", "design", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -423,7 +661,24 @@
       "strong_answer": "Define what good means for members (finding something they enjoy quickly) and the business (retention). Propose a metric hierarchy: a north star such as retention or satisfied viewing, plus proxies like take rate from rows, time to first play, completion rate, and browse abandonment. Add guardrails such as diversity and catalog coverage. Explain why offline metrics need online A/B confirmation. Pitfall: using clicks alone, which can reward clickbait artwork.",
       "competencies": ["structure", "user_and_business_sense", "estimation_logic"],
       "values": ["Judgment"],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/netflix-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/netflix-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you define success for members and the business",
+          "Whether you build a sensible metric hierarchy"
+        ],
+        "strong_signals": [
+          "Sets a north star with supporting proxy metrics",
+          "Adds guardrails such as diversity and catalog coverage",
+          "Explains why offline metrics need online confirmation"
+        ],
+        "watch_outs": [
+          "Relying on clicks alone",
+          "Metrics with no link to member satisfaction"
+        ]
+      },
+      "role_families": ["pm", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -431,7 +686,24 @@
       "strong_answer": "Group metrics by question: are we growing (sign-ups, cancellations), are members engaged (viewing hours, active profiles), is the service healthy (play start failures, rebuffering), and is the business working (revenue, ad fill if relevant). Explain why each is daily rather than weekly, and which ones trigger action. Show you know daily data is noisy and needs baselines. Pitfall: a long unprioritized list.",
       "competencies": ["structure", "user_and_business_sense", "prioritization"],
       "values": ["Judgment"],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/netflix-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/netflix-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you prioritize the metrics that matter most",
+          "Whether you understand noise in daily data"
+        ],
+        "strong_signals": [
+          "Groups metrics by growth, engagement, health and revenue",
+          "Explains why each is daily and what triggers action",
+          "Mentions baselines for noisy daily numbers"
+        ],
+        "watch_outs": [
+          "A long unprioritized list of numbers",
+          "Ignoring service health metrics"
+        ]
+      },
+      "role_families": ["pm", "tpm"],
+      "levels": ["senior", "staff_principal"]
     },
     {
       "interview_type": "case",
@@ -439,7 +711,24 @@
       "strong_answer": "State the growth lever (new members, higher revenue per member, or new revenue streams). Evaluate two or three options such as live events, games, or ad tiers against member value, fit with the brand, cost and risk. Pick one, explain the first small test and the kill criteria. Netflix rewards bold but reasoned bets, so show courage and judgment together. Pitfall: ignoring cannibalization or cost.",
       "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
       "values": ["Courage", "Creativity", "Judgment"],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/netflix-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/netflix-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you make a bold but reasoned product bet",
+          "Whether you plan a cheap test before scaling"
+        ],
+        "strong_signals": [
+          "Names the growth lever and compares a few options",
+          "Picks one and defines a first test with kill criteria",
+          "Weighs member value, brand fit, cost and risk"
+        ],
+        "watch_outs": [
+          "Ignoring cannibalization or cost",
+          "A big launch with no way to learn first"
+        ]
+      },
+      "role_families": ["pm", "tpm"],
+      "levels": ["senior", "staff_principal"]
     },
     {
       "interview_type": "case",
@@ -447,7 +736,24 @@
       "strong_answer": "Frame the decision: which market, why now, and what success means. Use criteria such as broadband and device reach, willingness to pay, local content needs, competition, and payment methods. Propose an entry plan (pricing, local content, partnerships, mobile plans) and the leading metrics to watch. A rough size estimate with stated assumptions helps. Pitfall: copying the home-market plan without local adaptation.",
       "competencies": ["problem_framing", "estimation_logic", "recommendation"],
       "values": ["Judgment", "Curiosity"],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/netflix-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/netflix-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you frame a market entry decision",
+          "Whether you adapt a plan to local conditions"
+        ],
+        "strong_signals": [
+          "Uses clear criteria like reach, willingness to pay and competition",
+          "Gives a rough size with stated assumptions",
+          "Proposes an entry plan and leading metrics"
+        ],
+        "watch_outs": [
+          "Copying the home-market plan unchanged",
+          "Picking a market with no criteria"
+        ]
+      },
+      "role_families": ["pm", "tpm"],
+      "levels": []
     }
   ],
   "bar_by_level": [
