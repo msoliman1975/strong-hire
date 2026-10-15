@@ -890,6 +890,7 @@ export function scoringHandlers(store: MockStore) {
         next_session: ready ? sessionPlan[1] : null,
         generic_mode: generic,
         company_name: job?.posting?.company_name ?? null,
+        company_slug: generic ? null : (job?.posting?.company_name ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "-") || null,
         values_framework: generic ? null : "Company values",
       };
       return HttpResponse.json(debrief);
