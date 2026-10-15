@@ -25,6 +25,7 @@ from strong_api.devtools import router as dev_router
 from strong_api.gap.router import router as gap_router
 from strong_api.inputs import router as inputs_router
 from strong_api.inputs.queue import ArqJobQueue, JobQueue
+from strong_api.questions import router as questions_router
 from strong_api.reports import router as reports_router
 from strong_api.scoring import router as scoring_router
 from strong_api.sessions.router import router as sessions_router
@@ -94,6 +95,7 @@ def create_app(
     app.include_router(scoring_router)
     app.include_router(sessions_router)
     app.include_router(reports_router)
+    app.include_router(questions_router)
     app.include_router(dev_router)
     install_auth(app)
     install_billing(app)
