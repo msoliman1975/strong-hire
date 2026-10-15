@@ -1557,6 +1557,166 @@
         }
       }
     },
+    "/questions/companies": {
+      "get": {
+        "tags": [
+          "questions"
+        ],
+        "summary": "List Bank Companies",
+        "description": "QB-1: companies for the company filter, by name. Only companies with a Published\nprofile are listed.",
+        "operationId": "list_bank_companies_questions_companies_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BankCompany"
+                  },
+                  "type": "array",
+                  "title": "Response List Bank Companies Questions Companies Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/questions": {
+      "get": {
+        "tags": [
+          "questions"
+        ],
+        "summary": "List Questions",
+        "description": "QB-1 to QB-3. 404 when `company` names a company with no Published profile.",
+        "operationId": "list_questions_questions_get",
+        "parameters": [
+          {
+            "name": "company",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Company"
+            }
+          },
+          {
+            "name": "interview_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/InterviewType"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Interview Type"
+            }
+          },
+          {
+            "name": "competency",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Competency"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Competency"
+            }
+          },
+          {
+            "name": "role_family",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/RoleFamily"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Role Family"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Level"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Level"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionList"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/dev/model-usage": {
       "get": {
         "tags": [
@@ -3518,6 +3678,150 @@
         ],
         "title": "AuthUser"
       },
+      "BankCompany": {
+        "properties": {
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "question_count": {
+            "type": "integer",
+            "title": "Question Count",
+            "description": "Company questions in its Published profile."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "slug",
+          "name",
+          "question_count"
+        ],
+        "title": "BankCompany"
+      },
+      "BankQuestion": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "'<company slug>-<n>' for a company question, else the bank id."
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "company",
+              "general"
+            ],
+            "title": "Source"
+          },
+          "company_slug": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company Slug",
+            "description": "None for general questions."
+          },
+          "company_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company Name"
+          },
+          "interview_type": {
+            "$ref": "#/components/schemas/InterviewType"
+          },
+          "question": {
+            "type": "string",
+            "title": "Question"
+          },
+          "competencies": {
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "type": "array",
+            "title": "Competencies"
+          },
+          "values": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Values",
+            "description": "Company values the question probes."
+          },
+          "role_families": {
+            "items": {
+              "$ref": "#/components/schemas/RoleFamily"
+            },
+            "type": "array",
+            "title": "Role Families",
+            "description": "Empty means every job category."
+          },
+          "levels": {
+            "items": {
+              "$ref": "#/components/schemas/Level"
+            },
+            "type": "array",
+            "title": "Levels",
+            "description": "Empty means every level."
+          },
+          "hints": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/QuestionHints"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "None until hints are written for it."
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url",
+            "description": "Public page that reports a company question."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "company_slug",
+          "company_name",
+          "interview_type",
+          "question",
+          "competencies",
+          "values",
+          "role_families",
+          "levels",
+          "hints",
+          "source_url"
+        ],
+        "title": "BankQuestion",
+        "description": "QB-2: one question with its tags and key hints."
+      },
       "Body_create_resume_resumes_post": {
         "properties": {
           "file": {
@@ -4193,6 +4497,18 @@
               }
             ],
             "title": "Company Name"
+          },
+          "company_slug": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company Slug",
+            "description": "QB-4: the company to filter the Questions page by. None in generic mode."
           },
           "values_framework": {
             "anyOf": [
@@ -6555,53 +6871,91 @@
         "description": "One competency score from one Realistic session, for trend charts (PR-1)."
       },
       "QuestionHints": {
-        "additionalProperties": false,
-        "description": "QB-2: short bullets shown under a question on the Questions page.",
         "properties": {
           "looking_for": {
-            "description": "What the interviewer is assessing.",
             "items": {
+              "type": "string",
               "maxLength": 200,
-              "minLength": 1,
-              "type": "string"
+              "minLength": 1
             },
+            "type": "array",
             "maxItems": 4,
             "minItems": 1,
             "title": "Looking For",
-            "type": "array"
+            "description": "What the interviewer is assessing."
           },
           "strong_signals": {
-            "description": "What a strong answer shows.",
             "items": {
+              "type": "string",
               "maxLength": 200,
-              "minLength": 1,
-              "type": "string"
+              "minLength": 1
             },
+            "type": "array",
             "maxItems": 4,
             "minItems": 1,
             "title": "Strong Signals",
-            "type": "array"
+            "description": "What a strong answer shows."
           },
           "watch_outs": {
-            "description": "Common ways answers fall short.",
             "items": {
+              "type": "string",
               "maxLength": 200,
-              "minLength": 1,
-              "type": "string"
+              "minLength": 1
             },
+            "type": "array",
             "maxItems": 4,
             "minItems": 1,
             "title": "Watch Outs",
-            "type": "array"
+            "description": "Common ways answers fall short."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "looking_for",
           "strong_signals",
           "watch_outs"
         ],
         "title": "QuestionHints",
-        "type": "object"
+        "description": "QB-2: short bullets shown under a question on the Questions page."
+      },
+      "QuestionList": {
+        "properties": {
+          "company": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BankCompany"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The selected company, if any."
+          },
+          "company_questions": {
+            "items": {
+              "$ref": "#/components/schemas/BankQuestion"
+            },
+            "type": "array",
+            "title": "Company Questions"
+          },
+          "general_questions": {
+            "items": {
+              "$ref": "#/components/schemas/BankQuestion"
+            },
+            "type": "array",
+            "title": "General Questions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "company",
+          "company_questions",
+          "general_questions"
+        ],
+        "title": "QuestionList",
+        "description": "QB-3: with a company selected, company_questions hold its questions and\ngeneral_questions the general ones that match the other filters (\"Also common\")."
       },
       "QuestionPattern": {
         "additionalProperties": false,

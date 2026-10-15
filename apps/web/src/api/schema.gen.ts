@@ -544,6 +544,47 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/questions/companies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Bank Companies
+         * @description QB-1: companies for the company filter, by name. Only companies with a Published
+         *     profile are listed.
+         */
+        get: operations["list_bank_companies_questions_companies_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/questions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Questions
+         * @description QB-1 to QB-3. 404 when `company` names a company with no Published profile.
+         */
+        get: operations["list_questions_questions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/dev/model-usage": {
         parameters: {
             query?: never;
@@ -1445,6 +1486,68 @@ export interface components {
              */
             profile_complete: boolean;
         };
+        /** BankCompany */
+        BankCompany: {
+            /** Slug */
+            slug: string;
+            /** Name */
+            name: string;
+            /**
+             * Question Count
+             * @description Company questions in its Published profile.
+             */
+            question_count: number;
+        };
+        /**
+         * BankQuestion
+         * @description QB-2: one question with its tags and key hints.
+         */
+        BankQuestion: {
+            /**
+             * Id
+             * @description '<company slug>-<n>' for a company question, else the bank id.
+             */
+            id: string;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "company" | "general";
+            /**
+             * Company Slug
+             * @description None for general questions.
+             */
+            company_slug: string | null;
+            /** Company Name */
+            company_name: string | null;
+            interview_type: components["schemas"]["InterviewType"];
+            /** Question */
+            question: string;
+            /** Competencies */
+            competencies: components["schemas"]["Competency"][];
+            /**
+             * Values
+             * @description Company values the question probes.
+             */
+            values: string[];
+            /**
+             * Role Families
+             * @description Empty means every job category.
+             */
+            role_families: components["schemas"]["RoleFamily"][];
+            /**
+             * Levels
+             * @description Empty means every level.
+             */
+            levels: components["schemas"]["Level"][];
+            /** @description None until hints are written for it. */
+            hints: components["schemas"]["QuestionHints"] | null;
+            /**
+             * Source Url
+             * @description Public page that reports a company question.
+             */
+            source_url: string | null;
+        };
         /** Body_create_resume_resumes_post */
         Body_create_resume_resumes_post: {
             /** File */
@@ -1701,6 +1804,11 @@ export interface components {
             generic_mode: boolean;
             /** Company Name */
             company_name: string | null;
+            /**
+             * Company Slug
+             * @description QB-4: the company to filter the Questions page by. None in generic mode.
+             */
+            company_slug?: string | null;
             /**
              * Values Framework
              * @description Name of the company's values framework, for example 'Leadership Principles'.
@@ -2656,6 +2764,19 @@ export interface components {
              * @description Common ways answers fall short.
              */
             watch_outs: string[];
+        };
+        /**
+         * QuestionList
+         * @description QB-3: with a company selected, company_questions hold its questions and
+         *     general_questions the general ones that match the other filters ("Also common").
+         */
+        QuestionList: {
+            /** @description The selected company, if any. */
+            company: components["schemas"]["BankCompany"] | null;
+            /** Company Questions */
+            company_questions: components["schemas"]["BankQuestion"][];
+            /** General Questions */
+            general_questions: components["schemas"]["BankQuestion"][];
         };
         /**
          * QuestionPattern
@@ -4362,6 +4483,62 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ReportItem"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_bank_companies_questions_companies_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BankCompany"][];
+                };
+            };
+        };
+    };
+    list_questions_questions_get: {
+        parameters: {
+            query?: {
+                company?: string | null;
+                interview_type?: components["schemas"]["InterviewType"] | null;
+                competency?: components["schemas"]["Competency"][] | null;
+                role_family?: components["schemas"]["RoleFamily"] | null;
+                level?: components["schemas"]["Level"] | null;
+                q?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionList"];
                 };
             };
             /** @description Validation Error */
