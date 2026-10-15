@@ -15,6 +15,7 @@ import { authApi } from "../api/auth";
 import { billingApi } from "../api/billing";
 import { gapApi } from "../api/gap";
 import { jobTargetsApi, resumesApi, sha256Hex } from "../api/inputs";
+import { questionsApi } from "../api/questions";
 import { reportsApi } from "../api/reports";
 import { sessionsApi } from "../api/sessions";
 import { debriefApi } from "../api/scoring";
@@ -322,6 +323,15 @@ describe("mocks of the real P9 endpoints match openapi.json", () => {
     expectApiShape("AdminSessionDetail", detail);
     expect(detail.traces?.length).toBeGreaterThan(0);
     for (const entry of await adminApi.audit("all")) expectApiShape("AdminAuditEntry", entry);
+  });
+});
+
+describe("mocks of the Questions endpoints match openapi.json (QB-1)", () => {
+  it("companies and question lists", async () => {
+    for (const c of await questionsApi.companies()) expectApiShape("BankCompany", c);
+    expectApiShape("QuestionList", await questionsApi.list());
+    expectApiShape("QuestionList", await questionsApi.list({ company: "stripe", interviewType: "behavioral" }));
+    await expect(questionsApi.list({ company: "nope" })).rejects.toMatchObject({ status: 404 });
   });
 });
 

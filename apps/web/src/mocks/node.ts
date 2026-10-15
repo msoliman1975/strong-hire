@@ -4,6 +4,7 @@ import { setupServer } from "msw/node";
 import { adminHandlers } from "./adminHandlers";
 import { createStore } from "./db";
 import { accountHandlers, authHandlers, inputHandlers, sessionHandlers, scoringHandlers } from "./handlers";
+import { questionHandlers } from "./questionHandlers";
 
 export const mockStore = createStore({ persist: false, delayMs: 0 });
 export const server = setupServer(
@@ -13,4 +14,5 @@ export const server = setupServer(
   ...authHandlers(mockStore),
   ...accountHandlers(mockStore),
   ...adminHandlers(mockStore),
+  ...questionHandlers(),
 );

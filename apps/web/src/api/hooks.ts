@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import { accountApi } from "./account";
 import { authApi } from "./auth";
@@ -6,6 +6,7 @@ import { billingApi } from "./billing";
 import { devApi } from "./dev";
 import { gapApi } from "./gap";
 import { jobRunning, jobTargetsApi, resumesApi } from "./inputs";
+import { questionsApi, type QuestionFilter } from "./questions";
 import { sessionsApi } from "./sessions";
 import { reportsApi, type ReportFilter } from "./reports";
 import { debriefApi } from "./scoring";
@@ -31,6 +32,18 @@ export const keys = {
   reportList: (filter: ReportFilter) =>
     ["reports", filter.jobTargetId ?? "", filter.resumeId ?? "", filter.type ?? ""] as const,
   progress: (id: string) => ["jobs", id, "progress"] as const,
+  bankCompanies: ["questions", "companies"] as const,
+  questionList: (f: QuestionFilter) =>
+    [
+      "questions",
+      "list",
+      f.company ?? "",
+      f.interviewType ?? "",
+      [...(f.competencies ?? [])].sort().join(","),
+      f.roleFamily ?? "",
+      f.level ?? "",
+      f.text?.trim() ?? "",
+    ] as const,
   resumes: ["resumes"] as const,
   resume: (id: string) => ["resumes", id] as const,
   resumeTask: (id: string, taskId: string) => ["resumes", id, "task", taskId] as const,
@@ -124,6 +137,18 @@ export const useGapReport = (gapAnalysisId: string | null) =>
 /** R1: gap reports and debriefs, newest first. */
 export const useReports = (filter: ReportFilter = {}) =>
   useQuery({ queryKey: keys.reportList(filter), queryFn: () => reportsApi.list(filter) });
+
+/** QB-1: companies with a Published profile, for the company filter. */
+export const useBankCompanies = () =>
+  useQuery({ queryKey: keys.bankCompanies, queryFn: questionsApi.companies, staleTime: 5 * 60_000 });
+
+/** QB-1 to QB-3. Keeps the previous list on screen while a new filter loads. */
+export const useQuestions = (filter: QuestionFilter) =>
+  useQuery({
+    queryKey: keys.questionList(filter),
+    queryFn: () => questionsApi.list(filter),
+    placeholderData: keepPreviousData,
+  });
 
 export const useJobSessions = (jobId: string) =>
   useQuery({ queryKey: keys.jobSessions(jobId), queryFn: () => sessionsApi.listForJob(jobId) });
