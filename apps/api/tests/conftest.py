@@ -17,6 +17,7 @@ from sqlalchemy.pool import StaticPool
 from strong_api.account.exports import MemoryExportStore
 from strong_api.auth import get_db, install_auth
 from strong_api.auth.magic_links import MagicLinks, MemoryUsedTokenStore
+from strong_api.auth.passwords import MemoryLoginThrottle
 from strong_api.auth.settings import AppEnv, AuthSettings
 from strong_api.inputs.queue import JobInfo
 from strong_api.main import create_app
@@ -177,11 +178,24 @@ async def client(app: FastAPI) -> AsyncIterator[httpx.AsyncClient]:
 
 
 class RecordingEmailSender:
+    """`sent` holds magic links; `mail` holds every email as (kind, to, link)."""
+
     def __init__(self) -> None:
         self.sent: list[tuple[str, str]] = []
+        self.mail: list[tuple[str, str, str]] = []
 
     async def send_magic_link(self, to: str, link: str) -> None:
         self.sent.append((to, link))
+        self.mail.append(("magic_link", to, link))
+
+    async def send_email_confirmation(self, to: str, link: str) -> None:
+        self.mail.append(("confirm", to, link))
+
+    async def send_password_reset(self, to: str, link: str) -> None:
+        self.mail.append(("reset", to, link))
+
+    async def send_account_exists(self, to: str, signin_url: str) -> None:
+        self.mail.append(("exists", to, signin_url))
 
 
 class AuthHarness:
@@ -219,12 +233,15 @@ def build_harness(app_env: AppEnv = AppEnv.LOCAL, google: Any = None) -> Iterato
     )
     email = RecordingEmailSender()
     app = FastAPI()
+    store = MemoryUsedTokenStore()
     install_auth(
         app,
         settings,
-        magic_links=MagicLinks(settings.session_secret, 900, MemoryUsedTokenStore()),
+        magic_links=MagicLinks(settings.session_secret, 900, store),
         email_sender=email,
         google=google,
+        token_store=store,
+        throttle=MemoryLoginThrottle(),
     )
     app.dependency_overrides[get_db] = _db
     with TestClient(app, base_url="http://web.test") as client:

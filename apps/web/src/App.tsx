@@ -3,6 +3,7 @@ import { lazy, Suspense, useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 
 import { ApiError } from "./api/client";
+import { AuthLayout } from "./components/AuthLayout";
 import { AppLayout, PublicLayout } from "./components/Layout";
 import { AccountPage } from "./pages/AccountPage";
 import { AdminAuditPage } from "./pages/admin/AdminAuditPage";
@@ -23,6 +24,7 @@ import { PaywallPage } from "./pages/PaywallPage";
 import { EditProfilePage, WelcomePage } from "./pages/ProfilePage";
 import { RehearsalPage } from "./pages/RehearsalPage";
 import { ReportsPage } from "./pages/ReportsPage";
+import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { ResumesPage } from "./pages/ResumesPage";
 import { SessionSetupPage } from "./pages/SessionSetupPage";
 import { SignInPage } from "./pages/SignInPage";
@@ -49,8 +51,11 @@ export function createQueryClient(): QueryClient {
 export function AppRoutes() {
   return (
     <Routes>
-      <Route element={<PublicLayout />}>
+      <Route element={<AuthLayout />}>
         <Route path="/signin" element={<SignInPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+      </Route>
+      <Route element={<PublicLayout />}>
         <Route path="/signup" element={<SignupPage />} />
       </Route>
       <Route element={<AppLayout />}>
