@@ -183,6 +183,7 @@ class OrgType(StrEnum):
 class AuthProvider(StrEnum):
     GOOGLE = "google"
     EMAIL = "email"
+    PASSWORD = "password"
     DEV = "dev"
 
 

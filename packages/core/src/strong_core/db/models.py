@@ -132,6 +132,14 @@ class User(Base):
     last_sign_in_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), comment="Set at each sign-in (admin users page)"
     )
+    # AC-4: email and password sign-in. NULL for users who only use a magic link or Google.
+    password_hash: Mapped[str | None] = mapped_column(
+        String(255), comment="AC-4: Argon2id hash. NULL: no password set"
+    )
+    email_verified_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        comment="AC-4: when the user proved they own the email. NULL: not confirmed yet",
+    )
     # AC-3: profile asked for at the first sign-in. No payment details here.
     full_name: Mapped[str | None] = mapped_column(String(120), comment="AC-3")
     current_title: Mapped[str | None] = mapped_column(String(120), comment="AC-3: optional")
