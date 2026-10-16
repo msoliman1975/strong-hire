@@ -1381,7 +1381,7 @@ export interface components {
          * AuthProvider
          * @enum {string}
          */
-        AuthProvider: "google" | "email" | "dev";
+        AuthProvider: "google" | "email" | "password" | "dev";
         /** AuthProviders */
         AuthProviders: {
             /** Google */
