@@ -117,6 +117,9 @@ IDs are referenced by the build plan and acceptance tests. Priority: P0 must shi
 | AC-1 | Self-service export and full delete of account and all data. | P0 |
 | AC-2 | Training-data consent toggle, off by default, changeable any time. | P0 |
 | AC-3 | At the first sign-in, ask for a short profile: full name, years of experience and target level, plus optional current title, country, time zone and LinkedIn URL. No payment details. The user edits it under Account, Profile. | P0 |
+| AC-4 | Sign up and sign in with email and password. Sign-up asks for the 18+ confirmation and the terms, then emails a link to confirm the address; password sign-in works only after that. Passwords have at least 12 characters and must not contain the email name. An email magic link stays as a second way to sign in. Google can be turned back on by config. | P0 |
+| AC-5 | Forgot password: the user asks for a reset link by email, and the link sets a new password and signs them in. The reply is the same whether or not the email has an account. | P0 |
+| AC-6 | Repeated wrong passwords for one email are refused for 15 minutes after 5 failures. | P0 |
 | LB-1 | A top-level Resumes page lists saved CVs. The user can add, rename and delete a CV there. | P0 |
 | LB-2 | A top-level Job descriptions page lists saved job postings. A job description with no gap report and no session can be deleted. One that has reports can be archived and restored; a "Show archived" switch shows archived ones. | P0 |
 | AD-1 | Profile import command: validate a profile JSON file against the schema, store it as a new version with sources and import date, and publish it after confirmation. | P0 |
@@ -244,7 +247,7 @@ The voice agent is the latency-critical path. Background workers do all slow wor
 | TTS | Kokoro-82M, streaming, on CPU in both environments | Near-zero cost, natural voices, open weights |
 | Jobs | Arq on Redis | Simple async Python job queue |
 | Scraping and parsing | httpx + trafilatura, Playwright fallback; pypdf and python-docx | Covers most job boards and resume formats |
-| Auth | Google OAuth + email magic links (Authlib); local dev login bypass | No passwords to store |
+| Auth | Email and password (Argon2id hashes), email magic links, Google OAuth (Authlib, off by config); local dev login bypass | Password is the familiar default; magic links stay for users who prefer no password |
 | Billing | Stripe Checkout, Customer Portal, webhooks (test mode until launch) | Fastest path to subscriptions with usage caps |
 | Deploy | Docker Compose locally (Docker Desktop with WSL2), same compose files on Hetzner later; Caddy for TLS; GitHub Actions | One stack definition for both environments |
 | Observability | Sentry, Prometheus + Grafana, PostHog, OpenTelemetry traces from Pydantic AI | Errors, latency, cost and product analytics |
@@ -324,7 +327,7 @@ Postgres is the single source of truth, with an `org_id` on every user-owned tab
 | Entity | Key fields | Notes |
 | --- | --- | --- |
 | Org | id, name, type (personal, business), plan | One personal org per user in v1 |
-| User | id, org_id, email, auth_provider, training_consent, created_at | Consent defaults to false |
+| User | id, org_id, email, auth_provider, password_hash, email_verified_at, training_consent, created_at | Consent defaults to false; password_hash is NULL for magic-link and Google users |
 | Subscription | user_id, stripe_customer_id, status, period_start, period_end, minutes_cap, minutes_used | Usage resets each period |
 | Resume | id, user_id, parsed_json, file_ref, uploaded_at | Original file encrypted in object storage |
 | JobTarget | id, user_id, company_id (nullable), source_url, raw_text, parsed_json, level, stage, context_notes | Null company_id means generic mode |
@@ -357,7 +360,7 @@ The design rule is to keep as little as possible: audio never touches disk, and 
 
 **User rights (self-service in v1).** Export all data as JSON plus original resume files. Delete account removes all rows and files within 24 hours and purges backups on their normal rotation (30 days max), with the deletion recorded in the audit log.
 
-**Security basics.** Passwordless or OAuth login, rate limits on scraping and gap analysis, server-side prompt templates only (no user text can change system instructions), prompt-injection filtering on job postings and resumes, secrets in a vault, least-privilege admin roles, and an AuditLog for sensitive actions.
+**Security basics.** Email and password login with Argon2id hashes, a confirmed email and a lockout after repeated failures, plus magic links, rate limits on scraping and gap analysis, server-side prompt templates only (no user text can change system instructions), prompt-injection filtering on job postings and resumes, secrets in a vault, least-privilege admin roles, and an AuditLog for sensitive actions.
 
 **Age.** Users must be 18 or older; enforce at sign-up in the terms and a checkbox.
 
