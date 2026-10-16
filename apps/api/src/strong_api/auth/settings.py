@@ -40,6 +40,8 @@ class AuthSettings(BaseSettings):
     google_client_secret: str | None = None
 
     magic_link_max_age_s: int = 15 * 60
+    confirm_link_max_age_s: int = Field(default=24 * 3600, description="AC-4 confirm email")
+    reset_link_max_age_s: int = Field(default=30 * 60, description="AC-5 reset password")
     smtp_host: str | None = None
     smtp_port: int = 587
     smtp_username: str | None = None

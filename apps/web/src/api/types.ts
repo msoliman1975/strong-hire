@@ -21,6 +21,7 @@ export type AuthState = S["AuthState"];
 export type AuthUser = S["AuthUser"];
 export type AuthProviders = S["AuthProviders"];
 export type MagicLinkSent = S["MagicLinkSent"];
+export type EmailSent = S["EmailSent"];
 
 // Job and resume inputs (real endpoints in apps/api inputs, P2).
 export type JobTargetCreate = S["JobTargetCreate"];

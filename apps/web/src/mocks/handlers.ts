@@ -68,6 +68,9 @@ function unauthorized() {
   return HttpResponse.json({ detail: "Sign in first" }, { status: 401 });
 }
 
+/** Mock passwords, by email (AC-4). A reset token in the mock is the email itself. */
+const mockPasswords = new Map<string, string>();
+
 export function authHandlers(store: MockStore) {
   const state = (): AuthState => {
     const { auth, users } = store.db;
@@ -88,7 +91,7 @@ export function authHandlers(store: MockStore) {
   };
 
   return [
-    http.get(`${API}/auth/providers`, () => HttpResponse.json({ google: false, email: true, dev: true })),
+    http.get(`${API}/auth/providers`, () => HttpResponse.json({ google: false, email: true, password: true, dev: true })),
     http.get(`${API}/auth/me`, () => HttpResponse.json(state())),
     http.post(`${API}/auth/dev-login`, async ({ request }) => {
       const body = (await request.json()) as { email?: string };
@@ -125,6 +128,47 @@ export function authHandlers(store: MockStore) {
       store.db.auth = { status: "signed_in", email: auth.email, userEmail: auth.email };
       store.save();
       return HttpResponse.json(state());
+    }),
+    // AC-4, AC-5. The mock confirms the email at once and keeps passwords in memory only.
+    http.post(`${API}/auth/password/signup`, async ({ request }) => {
+      const body = (await request.json()) as { email: string; password: string; full_name?: string | null };
+      const email = body.email.trim().toLowerCase();
+      if (body.password.length < 12) return HttpResponse.json({ detail: "Use at least 12 characters." }, { status: 422 });
+      if (!store.db.users[email]) {
+        store.db.users[email] = {
+          id: newId(),
+          org_id: newId(),
+          email,
+          auth_provider: "password",
+          training_consent: false,
+          created_at: new Date().toISOString(),
+          is_admin: isMockAdmin(email),
+          full_name: body.full_name ?? null,
+          profile_complete: false,
+        };
+        mockPasswords.set(email, body.password);
+        store.save();
+      }
+      return HttpResponse.json({ sent: true, dev_link: null }, { status: 202 });
+    }),
+    http.post(`${API}/auth/password/login`, async ({ request }) => {
+      const body = (await request.json()) as { email: string; password: string };
+      const email = body.email.trim().toLowerCase();
+      if (!store.db.users[email] || mockPasswords.get(email) !== body.password) {
+        return HttpResponse.json({ detail: "The email or password is wrong." }, { status: 401 });
+      }
+      return HttpResponse.json(signInAs(email));
+    }),
+    http.post(`${API}/auth/password/resend`, () => HttpResponse.json({ sent: true, dev_link: null }, { status: 202 })),
+    http.post(`${API}/auth/password/forgot`, () => HttpResponse.json({ sent: true, dev_link: null }, { status: 202 })),
+    http.post(`${API}/auth/password/reset`, async ({ request }) => {
+      const body = (await request.json()) as { token: string; password: string };
+      const email = body.token.trim().toLowerCase();
+      if (!store.db.users[email]) {
+        return HttpResponse.json({ detail: "That reset link is not valid. Ask for a new one." }, { status: 400 });
+      }
+      mockPasswords.set(email, body.password);
+      return HttpResponse.json(signInAs(email));
     }),
     http.post(`${API}/auth/logout`, () => {
       store.db.auth = { status: "signed_out", email: null, userEmail: null };
