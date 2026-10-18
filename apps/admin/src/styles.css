@@ -1344,3 +1344,104 @@ tbody tr:hover {
     gap: 0;
   }
 }
+
+/* ------------------------------------------------------------------ content (AT) */
+
+.field textarea.code-input {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+}
+
+.row--between {
+  justify-content: space-between;
+}
+
+.section-actions {
+  margin-bottom: var(--space-4);
+}
+
+.import {
+  margin-bottom: var(--space-5);
+}
+
+.problems {
+  margin: var(--space-3) 0 0;
+  padding-left: var(--space-6);
+}
+
+.profile-status {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius);
+  border: 1px solid var(--line-strong);
+  color: var(--muted);
+}
+
+.profile-status[data-status="published"],
+.profile-status[data-status="added"] {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.profile-status[data-status="in_review"],
+.profile-status[data-status="planned"] {
+  color: var(--signal-neutral);
+  border-color: var(--signal-neutral);
+}
+
+.json-view {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  max-height: 560px;
+  overflow: auto;
+}
+
+.sources {
+  padding-left: var(--space-6);
+}
+
+.diff__field {
+  margin-top: var(--space-5);
+}
+
+.diff__table td {
+  font-size: 0.88rem;
+  overflow-wrap: anywhere;
+}
+
+.diff__table .diff__old,
+.diff__inline .diff__old {
+  background: var(--danger-bg);
+}
+
+.diff__table .diff__new,
+.diff__inline .diff__new {
+  background: var(--info-bg);
+  text-decoration: none;
+}
+
+.diff__inline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.diff__inline li {
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--line);
+  overflow-wrap: anywhere;
+}
+
+.diff__sign {
+  font-family: var(--mono);
+  font-weight: 700;
+}

@@ -29,7 +29,7 @@ def parse_profile_text(text: str, path: Path | None = None) -> CompanyProfile:
     """Validate the text of a profile file. Raises ProfileFileError with readable problems."""
     where = path or Path("<upload>")
     try:
-        data = json.loads(text.removeprefix("﻿"))
+        data = json.loads(text.removeprefix("\ufeff"))
     except json.JSONDecodeError as exc:
         raise ProfileFileError(
             where, [f"not valid JSON: {exc.msg} at line {exc.lineno}, column {exc.colno}"]

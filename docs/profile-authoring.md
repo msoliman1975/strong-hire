@@ -37,6 +37,12 @@ uv run strongctl profiles show acme --version 1         # read any version, also
 - Sessions store the version they used in `sessions.profile_version`. Generic mode stores NULL.
 - The commands use `DATABASE_URL`. The default is the local Docker Postgres on port 55432.
 
+The admin app does the same from a screen (Companies, AT-1 to AT-4): import a file or pasted
+JSON (same validation as `validate`), view any version with its sources, diff two versions, and
+move a version through draft → in_review → published → archived. An archived version can be
+published again to roll back. The admin app and `strongctl` share the code in
+`strong_api.profiles`; `strongctl profiles publish` may still publish a draft directly.
+
 ## Fields
 
 | Field | Required | What to write |

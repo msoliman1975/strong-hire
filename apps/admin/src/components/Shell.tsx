@@ -26,6 +26,8 @@ const SECTIONS: { to: string; label: string; group?: string; badge?: ComponentTy
   { to: "/ops/jobs", label: "Jobs", group: "Operations" },
   { to: "/ops/spend", label: "Spend", group: "Operations" },
   { to: "/ops/controls", label: "Controls", group: "Operations" },
+  { to: "/content/companies", label: "Companies", group: "Content" },
+  { to: "/content/requests", label: "Company requests", group: "Content" },
   { to: "/audit", label: "Audit log" },
 ];
 
