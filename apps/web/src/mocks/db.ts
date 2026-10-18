@@ -14,6 +14,7 @@ import type {
   JobTargetOut,
   Profile,
   ResumeOut,
+  SavedQuestion,
   Usage,
 } from "../api/types";
 
@@ -58,6 +59,8 @@ export interface MockDb {
   exitSurveys: ExitSurveyIn[];
   /** OC-1 to OC-4: what GET /status answers. */
   siteStatus: SiteStatus;
+  /** CU-8: "My questions", newest first. */
+  savedQuestions: SavedQuestion[];
 }
 
 /** GET /status with every ops control at its default. */
@@ -104,6 +107,7 @@ export function emptyDb(): MockDb {
     exports: {},
     exitSurveys: [],
     siteStatus: { ...OPEN_STATUS },
+    savedQuestions: [],
   };
 }
 

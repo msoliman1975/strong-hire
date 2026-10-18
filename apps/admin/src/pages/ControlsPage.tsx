@@ -8,6 +8,7 @@ import {
   useOpsSettings,
   useSetSetting,
   type BannerSeverity,
+  type CustomAccess,
   type JobKind,
   type OpsSettings,
   type SettingKey,
@@ -348,6 +349,59 @@ function JobsControl({ settings, ask }: { settings: OpsSettings; ask: (c: Change
   );
 }
 
+const CUSTOM_ACCESS: { value: CustomAccess; label: string; hint: string }[] = [
+  { value: "everyone", label: "Everyone", hint: "Every user. Free accounts may run a 30-minute Custom interview." },
+  { value: "paid_only", label: "Paid plans only", hint: "Free accounts see Custom locked with an upgrade prompt." },
+];
+
+/** CU-11: who may build and run Custom interviews. */
+function CustomAccessControl({ settings, ask }: { settings: OpsSettings; ask: (c: Change) => void }) {
+  const current = settings.values.custom_interview_access;
+  const label = (v: CustomAccess) => CUSTOM_ACCESS.find((a) => a.value === v)?.label ?? v;
+  return (
+    <section className="panel control" aria-labelledby="ctl-custom">
+      <h2 id="ctl-custom">Custom interviews (CU-11)</h2>
+      <p>
+        Open to: <strong data-testid="custom-access">{label(current)}</strong>. Under paid plans only, a free account
+        cannot start a Custom interview or check its own questions; saved questions stay.
+      </p>
+      <ul className="control__list">
+        {CUSTOM_ACCESS.map((a) => (
+          <li key={a.value}>
+            <span className="control__name">{a.label}</span>
+            <span className="muted small">{a.hint}</span>
+            {a.value === current ? (
+              <span className="state state--on">Current</span>
+            ) : (
+              <button
+                type="button"
+                className={a.value === "paid_only" ? "btn btn--small btn--danger" : "btn btn--small btn--primary"}
+                onClick={() =>
+                  ask({
+                    key: "custom_interview_access",
+                    value: a.value,
+                    title: a.value === "paid_only" ? "Limit Custom to paid plans" : "Open Custom to everyone",
+                    summary: (
+                      <p>
+                        Custom interviews: {label(current)} → <strong>{a.label}</strong>. {a.hint}
+                      </p>
+                    ),
+                    confirmLabel: a.value === "paid_only" ? "Limit to paid plans" : "Open to everyone",
+                    danger: a.value === "paid_only",
+                  })
+                }
+              >
+                {a.value === "paid_only" ? "Limit to paid plans" : "Open to everyone"}
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
+      <LastChanged settings={settings} keyName="custom_interview_access" />
+    </section>
+  );
+}
+
 function ModelProfilePanel() {
   const models = useOpsModels();
   return (
@@ -440,7 +494,7 @@ function ModelProfilePanel() {
   );
 }
 
-/** Operations → Controls: runtime settings without a redeploy (OC-1 to OC-6, AA-7). */
+/** Operations → Controls: runtime settings without a redeploy (OC-1 to OC-6, AA-7, CU-11). */
 export function ControlsPage() {
   const settings = useOpsSettings();
   const setSetting = useSetSetting();
@@ -470,6 +524,7 @@ export function ControlsPage() {
             <SpendCapControl key={`cap-${settings.data.values.daily_spend_cap_usd}`} settings={settings.data} ask={ask} />
             <JobsControl key={`jobs-${settings.data.values.jobs_paused.join(",")}`} settings={settings.data} ask={ask} />
             <BannerControl settings={settings.data} ask={ask} />
+            <CustomAccessControl settings={settings.data} ask={ask} />
           </div>
         </>
       )}

@@ -19,6 +19,8 @@ export type SettingKey = S["SettingKey"];
 export type JobKind = S["JobKind"];
 export type SiteBanner = S["SiteBanner"];
 export type BannerSeverity = NonNullable<SiteBanner["severity"]>;
+/** CU-11: who may run Custom interviews. */
+export type CustomAccess = S["CustomInterviewAccess"];
 export type RuntimeSettings = DeepRequired<S["RuntimeSettings"]>;
 export type OpsSettings = Omit<DeepRequired<S["OpsSettings"]>, "values" | "defaults"> & {
   values: RuntimeSettings;
@@ -89,6 +91,9 @@ export function activeControls(settings: OpsSettings, now = Date.now()): string[
     out.push("Spend cap reached: new sessions refused");
   }
   if (bannerActive(v.site_banner, now)) out.push("Site banner shown");
+  if (v.custom_interview_access !== settings.defaults.custom_interview_access) {
+    out.push(v.custom_interview_access === "paid_only" ? "Custom interviews for paid plans only" : "Custom interviews open to everyone");
+  }
   for (const { kind, label } of JOB_KINDS) {
     if (v.jobs_paused.includes(kind)) out.push(`${label} jobs paused`);
   }

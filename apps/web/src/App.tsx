@@ -11,6 +11,7 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { DebriefPage } from "./pages/DebriefPage";
 import { GapAnalysisPage } from "./pages/GapAnalysisPage";
 import { JobsPage } from "./pages/JobsPage";
+import { MyQuestionsPage } from "./pages/MyQuestionsPage";
 import { ConfirmJobPage } from "./pages/onboarding/ConfirmJobPage";
 import { ContextPage } from "./pages/onboarding/ContextPage";
 import { NewJobPage } from "./pages/onboarding/NewJobPage";
@@ -73,6 +74,7 @@ export function AppRoutes() {
           <Route path="/sessions/:sessionId/live" element={<LiveSessionPage />} />
           <Route path="/sessions/:sessionId/debrief" element={<DebriefPage />} />
           <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/questions/mine" element={<MyQuestionsPage />} />
           <Route path="/account" element={<AccountPage />} />
           <Route path="/account/profile" element={<EditProfilePage />} />
           <Route path="/upgrade" element={<PaywallPage />} />

@@ -95,6 +95,8 @@ function check(key: SettingKey, value: unknown): string | null {
       return Array.isArray(value) && value.every((v) => v === "gap_analysis" || v === "scoring")
         ? null
         : "unknown job kind";
+    case "custom_interview_access":
+      return value === "everyone" || value === "paid_only" ? null : "must be everyone or paid_only";
     default:
       return typeof value === "boolean" ? null : "must be true or false";
   }

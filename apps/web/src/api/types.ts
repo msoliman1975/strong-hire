@@ -95,3 +95,21 @@ export type SessionRecord = DeepRequired<S["SessionRecord"]>;
 export type CreateSessionRequest = S["CreateSessionRequest"];
 export type VoiceJoin = S["VoiceJoin"];
 export type SubscriptionStatus = S["SubscriptionStatus"];
+
+// Custom interview (docs/custom-interview-spec.md, CU-1 to CU-11).
+export type StandardType = Exclude<InterviewType, "custom">;
+export type CustomSessionSpec = DeepRequired<S["CustomSessionSpec"]>;
+export type CustomCategory = DeepRequired<S["CustomCategory"]>;
+export type CustomQuestion = DeepRequired<S["CustomQuestion"]>;
+export type QuestionRefusal = S["QuestionRefusal"];
+export type QuestionCheckRequest = S["QuestionCheckRequest"];
+export type QuestionCheckOut = DeepRequired<S["QuestionCheckOut"]>;
+export type CategoryFocus = DeepRequired<S["CategoryFocus"]>;
+export type FocusSuggestions = DeepRequired<S["FocusSuggestions"]>;
+export type SavedQuestionIn = S["SavedQuestionIn"];
+export type SavedQuestionPatch = S["SavedQuestionPatch"];
+export type SavedQuestion = DeepRequired<S["SavedQuestionOut"]>;
+export type SessionSetup = DeepRequired<S["SessionSetup"]>;
+export type DebriefQuestion = DeepRequired<S["DebriefQuestion"]>;
+export type OwnQuestionPoint = DeepRequired<S["OwnQuestionPoint"]>;
+export type CustomInterviewAccess = S["CustomInterviewAccess"];
