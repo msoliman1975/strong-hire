@@ -7,7 +7,7 @@ The admin app sets them (strong_api.admin.controls); this module enforces them:
 - `ensure_sessions_open` (OC-2, OC-3): creating a session and starting it (the first voice join,
   the text open) call it. A session already in progress is never stopped.
 - `GET /status` (OC-4): public. The active site banner and whether sign-ups and new sessions
-  are available, for the candidate app.
+  are available, for the candidate app, and `custom_interview_access` (CU-11).
 
 Refusals are HTTP 503 with detail {"code", "message"}:
 `signups_paused`, `sessions_paused` and `spend_cap_reached`.
@@ -161,6 +161,9 @@ class SiteStatus(BaseModel):
     signups_open: bool = Field(description="OC-1: false while new accounts are refused")
     voice_sessions_open: bool = Field(description="OC-2, OC-3: new voice sessions can start")
     text_sessions_open: bool = Field(description="OC-2, OC-3: new text sessions can start")
+    custom_interview_access: rs.CustomInterviewAccess = Field(
+        description="CU-11: everyone, or paid_only (free accounts see Custom locked)"
+    )
 
 
 def active_banner(settings: rs.RuntimeSettings, now: datetime | None = None) -> BannerOut | None:
@@ -186,7 +189,8 @@ router = APIRouter(tags=["status"])
 
 @router.get("/status")
 async def site_status(db: Annotated[AsyncSession, Depends(_db)]) -> SiteStatus:
-    """Public: the active site banner and whether sign-ups and new sessions are open."""
+    """Public: the active site banner, whether sign-ups and new sessions are open, and who may
+    run Custom interviews (CU-11)."""
     settings = await rs.get_all(db)
     capped = await spend_cap_reached(db, settings)
     return SiteStatus(
@@ -194,4 +198,5 @@ async def site_status(db: Annotated[AsyncSession, Depends(_db)]) -> SiteStatus:
         signups_open=not settings.signups_paused,
         voice_sessions_open=not (settings.sessions_paused_voice or capped),
         text_sessions_open=not (settings.sessions_paused_text or capped),
+        custom_interview_access=settings.custom_interview_access,
     )

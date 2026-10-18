@@ -66,6 +66,7 @@ export const OPEN_STATUS: SiteStatus = {
   signups_open: true,
   voice_sessions_open: true,
   text_sessions_open: true,
+  custom_interview_access: "everyone",
 };
 
 /** The real API's answer for a new user (GET /billing/usage). */

@@ -5,6 +5,8 @@
     GET  /sessions/{id}                    one session
     GET  /job-targets/{id}/sessions        a job's sessions, newest first
     POST /sessions/{id}/end                end it: bill minutes, start scoring
+    POST /sessions/{id}/repeat             CU-9: the setup of an earlier session, to prefill a
+                                           new one (nothing is created)
     POST /sessions/{id}/text/open          text channel: the interviewer greets (PL-7)
     POST /sessions/{id}/text/turn          text channel: a candidate turn and the reply
     POST /sessions/{id}/coach              pause, resume, hint, redo (Coach mode only, IV-8)
@@ -14,6 +16,13 @@
 Creating or starting a session (the first voice join, the text open) answers 503 while new
 sessions are paused or the daily spend cap is reached (OC-2, OC-3, strong_api.controls).
 Sessions in progress always go on.
+
+A Custom session (CU-1, `config.interview_type == "custom"` with `config.custom`) stores its
+setup in `sessions.custom_json`; the worker builds the brief from it. Under the runtime setting
+`custom_interview_access=paid_only` a user without a paid plan gets 403 `upgrade_required`
+(CU-11, strong_api.custom.access). The plan rules apply as for any session: Custom has no mini
+interview (D-14), so a free account gets 402 `full_interview_requires_plan` from the
+entitlement check even when Custom is open to everyone.
 
 Creating a session queues the interviewer brief job (P6). The text channel runs the same
 controller and interviewer as the voice agent (strong_interview), with typed input. It exists
@@ -46,6 +55,7 @@ from strong_api.auth.settings import AppEnv, get_auth_settings
 from strong_api.auth.sim import is_sim_user
 from strong_api.billing.entitlements import ensure_can_start_session, record_session_minutes
 from strong_api.controls import ensure_sessions_open
+from strong_api.custom.access import ensure_custom_allowed
 from strong_api.inputs.deps import CurrentUser, Db, Me, Queue
 from strong_api.inputs.queue import BUILD_INTERVIEWER_BRIEF, JobQueue
 from strong_api.scoring.router import _brief, _config, _owned_session, _owned_target, start_scoring
@@ -55,6 +65,7 @@ from strong_api.sessions.schemas import (
     CreateSessionRequest,
     InternalEndRequest,
     SessionRecord,
+    SessionSetup,
     TextTurnRequest,
     TextTurns,
     VoiceJoin,
@@ -164,6 +175,8 @@ async def create_session(body: CreateSessionRequest, db: Db, me: Me, queue: Queu
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Text sessions are a dev feature.")
     await ensure_sessions_open(db, body.channel)  # OC-2, OC-3
     config = body.config
+    if config.is_custom:
+        await ensure_custom_allowed(db, me)  # CU-11
     if not await is_sim_user(db, me.user_id):  # the AI candidate has no plan (P13)
         await ensure_can_start_session(db, me.org_id, config.duration_min)
     resume_id = await _session_resume(db, me, target.id, body.resume_id)
@@ -178,6 +191,7 @@ async def create_session(body: CreateSessionRequest, db: Db, me: Me, queue: Queu
         duration_min=config.duration_min,
         channel=body.channel,
         model_profile=get_gateway().profile,
+        custom_json=config.custom.model_dump(mode="json") if config.custom else None,
     )
     db.add(session)
     await db.commit()
@@ -202,6 +216,21 @@ async def get_session(session_id: uuid.UUID, db: Db, me: Me) -> SessionRecord:
         await db.commit()
         await db.refresh(session)
     return _record(session, await db.get(JobTarget, session.job_target_id))
+
+
+@router.post("/sessions/{session_id}/repeat")
+async def repeat_session(session_id: uuid.UUID, db: Db, me: Me) -> SessionSetup:
+    """CU-9: the setup of an earlier session (type, difficulty, mode, length, level, and for a
+    Custom session its categories, focus chips and own questions), shaped like the body of
+    POST /sessions so the web app can prefill the setup screen. Creates nothing."""
+    session = await _owned_session(db, me, session_id)
+    target = await db.get(JobTarget, session.job_target_id)
+    return SessionSetup(
+        job_target_id=session.job_target_id,
+        resume_id=session.resume_id,
+        config=_config(session, target),
+        channel=session.channel,
+    )
 
 
 @router.get("/job-targets/{job_target_id}/sessions")
