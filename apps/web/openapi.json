@@ -9132,6 +9132,19 @@
             },
             "type": "array",
             "title": "Jobs Paused"
+          },
+          "sim_paused": {
+            "type": "boolean",
+            "title": "Sim Paused",
+            "default": false
+          },
+          "sim_max_live_sessions": {
+            "type": "integer",
+            "maximum": 20.0,
+            "minimum": 0.0,
+            "title": "Sim Max Live Sessions",
+            "description": "SM-3: a sim run does not start while this many real sessions are live",
+            "default": 3
           }
         },
         "additionalProperties": false,
@@ -9512,7 +9525,9 @@
           "sessions_paused_text",
           "daily_spend_cap_usd",
           "site_banner",
-          "jobs_paused"
+          "jobs_paused",
+          "sim_paused",
+          "sim_max_live_sessions"
         ],
         "title": "SettingKey"
       },

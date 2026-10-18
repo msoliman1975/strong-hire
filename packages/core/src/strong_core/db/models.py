@@ -56,6 +56,7 @@ from strong_core.schemas.enums import (
     ProfileStatus,
     SessionChannel,
     SessionStatus,
+    SimRunStatus,
     Speaker,
     SubscriptionStatus,
     TriageState,
@@ -117,6 +118,7 @@ USER_OWNED_TABLES = (
     "interviewer_traces",
     "minute_grants",
     "voice_turn_timings",
+    "sim_runs",
 )
 
 # Platform tables: no org_id, not owned by one user. A test checks that every table is in
@@ -848,3 +850,61 @@ class CompanyRequestTriage(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
+
+
+class SimRun(Base):
+    """SM: one AI candidate interview started from the admin app. Owned by the sim org.
+
+    The run's files live in SIM_RESULTS_DIR/<run_dir>/ (transcript, audio, judge, debrief). Delete
+    (SM-13) and retention (SM-14) remove the folder and set deleted_at; the row stays as a stub so
+    the list and its costs keep the history.
+    """
+
+    __tablename__ = "sim_runs"
+    __table_args__ = (Index("ix_sim_runs_status_created_at", "status", "created_at"),)
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    org_id: Mapped[uuid.UUID] = _org_fk()
+    scenario_json: Mapped[dict[str, Any]] = mapped_column(
+        comment="strong_sim Scenario, as the admin chose it (SM-1)"
+    )
+    status: Mapped[SimRunStatus] = mapped_column(
+        str_enum(SimRunStatus, "sim_run_status"),
+        default=SimRunStatus.QUEUED,
+        server_default="queued",
+    )
+    status_reason: Mapped[str | None] = mapped_column(
+        Text, comment="Why it waits, failed or was cancelled"
+    )
+    run_dir: Mapped[str | None] = mapped_column(
+        String(200), unique=True, comment="Folder name under SIM_RESULTS_DIR; set when it starts"
+    )
+    session_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("sessions.id", ondelete="SET NULL"), index=True
+    )
+    created_by: Mapped[str] = mapped_column(String(320), comment="Admin email")
+    created_at: Mapped[datetime] = _created_at()
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    progress_s: Mapped[int] = mapped_column(
+        Integer, default=0, server_default="0", comment="SM-4: interview time so far"
+    )
+    cost_sim_usd: Mapped[Decimal] = mapped_column(
+        Numeric(10, 4),
+        default=Decimal(0),
+        server_default="0",
+        comment="Candidate and judge cost; the app side is in usage_events of the session",
+    )
+    cancel_requested_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), comment="SM-5"
+    )
+    keep: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default="false", comment="SM-13: retention skips it"
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), comment="SM-13, SM-14: files deleted"
+    )
+    deleted_by: Mapped[str | None] = mapped_column(
+        String(320), comment="Admin email, or 'retention'"
+    )
+    delete_reason: Mapped[str | None] = mapped_column(Text)

@@ -34,6 +34,7 @@ SPEC_TABLES = {
     "alert_events",  # AL-4
     "runtime_settings",  # OC
     "company_request_triage",  # AT-5
+    "sim_runs",  # SM-2..SM-5, SM-13, SM-14
 }
 
 

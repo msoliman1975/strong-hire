@@ -267,6 +267,23 @@ class GrantKind(StrEnum):
     COMP_PLAN = "comp_plan"
 
 
+class SimRunStatus(StrEnum):
+    """SM-4: an admin-started AI candidate run (docs/admin-spec.md, Simulations)."""
+
+    QUEUED = "queued"
+    WAITING = "waiting"  # SM-3: too many real sessions live; checked again every 60 s
+    STARTING = "starting"
+    INTERVIEWING = "interviewing"
+    JUDGING = "judging"
+    DONE = "done"
+    FAILED = "failed"
+    CANCELLED = "cancelled"
+
+    @property
+    def finished(self) -> bool:
+        return self in (SimRunStatus.DONE, SimRunStatus.FAILED, SimRunStatus.CANCELLED)
+
+
 class ErrorGroupStatus(StrEnum):
     """OB-12: a resolved group that happens again reopens."""
 
