@@ -26,6 +26,11 @@ always said, in one short turn. The 10-minute mini interview uses this: minute 1
 and the agenda, 8 minutes of CORE, 1 minute of WRAP_UP. A mini also has no curveball and at
 most MINI_MAX_PROBES follow-ups per question, whatever the difficulty.
 
+Custom sessions (CU-4, D-6): CORE runs category by category in the order the candidate set
+(`brief.session.custom.categories`), and by priority within a category. Must-ask questions are
+guaranteed by this controller, never by the model. See the time-pressure rule above
+`_probe_fits`. The four standard types never take these paths.
+
 IV-12: a candidate turn outside the interview, or an inappropriate one, is a conduct strike
 (`conduct_strike`). The first MAX_CONDUCT_WARNINGS strikes get a WARN move: the phase, the open
 question and the probe count stay as they were, so the candidate answers the same question
@@ -36,7 +41,7 @@ from __future__ import annotations
 
 import copy
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from enum import StrEnum
 
@@ -49,6 +54,9 @@ from strong_core.schemas import (
     Phase,
     ProbeDecision,
     ProbeTrigger,
+    QuestionSource,
+    Speaker,
+    Turn,
 )
 from strong_interview.conduct import MAX_CONDUCT_WARNINGS
 
@@ -97,6 +105,10 @@ MIN_QUESTION_MS = 2 * 60 * 1000  # do not start a new CORE question with less ti
 MAX_HINTS_PER_QUESTION = 2
 MAX_CANDIDATE_QUESTIONS = 3
 CURVEBALL_REF = "curveball"
+# CU-4: the time a Custom session plans per must-ask question and per follow-up. Both are low on
+# purpose: nothing is cut while the session runs to time, only when the clock is really short.
+MUST_ASK_QUESTION_MS = MIN_QUESTION_MS  # a must-ask question with no follow-up
+PROBE_MS = 60 * 1000  # one follow-up and its answer
 
 
 class Why(StrEnum):
@@ -127,6 +139,10 @@ class Why(StrEnum):
     CONDUCT_WARNING = "conduct_warning"
     CONDUCT_LIMIT = "conduct_limit"
     UNEXPECTED_PHASE = "unexpected_phase"
+    # CU-4, Custom sessions only
+    PROBES_CUT_FOR_MUST_ASK = "probes_cut_for_must_ask"
+    SKIPPED_FOR_TIME = "questions_skipped_for_time"
+    MUST_ASK_GUARANTEED = "must_ask_guaranteed"
 
 
 class MoveKind(StrEnum):
@@ -210,7 +226,7 @@ class SessionController:
 
     def __post_init__(self) -> None:
         self._clock = _Clock(self.clock)
-        self._queue = sorted(self.brief.questions, key=lambda q: q.priority)
+        self._queue = self._order(self.brief.questions)
         minutes = self._plan()
         self._minutes = minutes
         self._deadline: dict[Phase, int] = {}
@@ -219,6 +235,19 @@ class SessionController:
             total += minutes.get(phase, 0) * 60 * 1000
             self._deadline[phase] = total
         self.total_ms = self.brief.session.duration_min * 60 * 1000
+
+    def _order(self, questions: Sequence[BriefQuestion]) -> list[BriefQuestion]:
+        """By priority. A Custom session runs its categories in the candidate's order (CU-4),
+        by priority within each category."""
+        custom = self.brief.session.custom
+        if custom is None:
+            return sorted(questions, key=lambda q: q.priority)
+        rank = {c.category: i for i, c in enumerate(custom.categories)}
+
+        def key(q: BriefQuestion) -> tuple[int, int]:
+            return (rank.get(q.category, len(rank)) if q.category else len(rank), q.priority)
+
+        return sorted(questions, key=key)
 
     def _plan(self) -> dict[Phase, int]:
         if self.brief.time_plan:
@@ -290,7 +319,82 @@ class SessionController:
             and self.question is not None
             and self.probes_used < self.probe_limit
             and self.elapsed_ms < self._deadline[Phase.CORE]
+            and self._probe_fits()
         )
+
+    # ------------------------------------------------------------------ Custom sessions (CU-4)
+
+    @property
+    def custom(self) -> bool:
+        """A Custom session (CU-1): categories, own questions, must-ask questions."""
+        return self.brief.session.custom is not None
+
+    @property
+    def must_ask_left(self) -> list[str]:
+        """CU-4: the must-ask questions not asked yet. Derived from the queue, so a snapshot,
+        a restore and `rebuild` from the transcript all keep it."""
+        return [q.id for q in self._queue if q.must_ask]
+
+    def _must_reserve_ms(self, probes: int) -> int:
+        """The time the must-ask questions still to come need, with `probes` follow-ups each."""
+        return len(self.must_ask_left) * (MUST_ASK_QUESTION_MS + probes * PROBE_MS)
+
+    # The time-pressure rule (CU-4, D-6). While must-ask questions are still to come, the
+    # controller gives way in this order as the CORE time left shrinks:
+    #   1. Follow-ups on questions that are not must-ask stop (`_probe_fits`): a follow-up must
+    #      leave time for one more question and for every must-ask question with one follow-up.
+    #   2. Unasked questions that are not must-ask are skipped, the interviewer's (planner)
+    #      questions before the candidate's own (`_pick_custom`): one is started only while the
+    #      must-ask questions keep time for one follow-up each.
+    #   3. Follow-ups on must-ask questions stop: one must leave time for the other must-ask
+    #      questions with no follow-up.
+    #   4. A must-ask question is never skipped. It is started even with less than
+    #      MIN_QUESTION_MS of CORE left, then with no follow-up (the CORE deadline stops
+    #      probes): asking it with 0 probes is preferred over running late with probes, so CORE
+    #      ends late only by what the answers take. The session's hard end (duration_min) still
+    #      wins; the controller, never the model, ends the session. The reserve is kept from the
+    #      first question and the CU-3 caps keep the must-ask floor (2 minutes each) well under
+    #      the CORE time, so only very long answers can reach the hard end first.
+    # With no must-ask question left, a Custom session probes like the standard types; only
+    # the skipping order (planner questions before the candidate's own) differs.
+
+    def _probe_fits(self) -> bool:
+        """CU-4: whether one more follow-up on the current question leaves time for the
+        must-ask questions still to come (steps 1 and 3 above). Always true outside Custom."""
+        if not self.custom or self.question is None or not self.must_ask_left:
+            return True
+        left = self._core_left_ms() - PROBE_MS
+        if self.question.must_ask:
+            return left >= self._must_reserve_ms(probes=0)
+        more = MIN_QUESTION_MS if any(not q.must_ask for q in self._queue) else 0
+        return left >= self._must_reserve_ms(probes=1) + more
+
+    def _pick_custom(self) -> tuple[BriefQuestion | None, list[Why]]:
+        """CU-4: the next question of a Custom session (steps 2 and 4 above).
+
+        Counts how many questions that are not must-ask still fit, keeping the candidate's own
+        before the planner's. The first must-ask or kept question in queue order is asked, so
+        the category order holds. Questions passed over are dropped for good, so the session
+        never goes back to an earlier category.
+        """
+        left = self._core_left_ms()
+        others = [q for q in self._queue if not q.must_ask]
+        fit = 0
+        if left >= MIN_QUESTION_MS:
+            fit = max(0, (left - self._must_reserve_ms(probes=1)) // MIN_QUESTION_MS)
+        own = [q for q in others if q.source == QuestionSource.CANDIDATE]
+        planner = [q for q in others if q.source != QuestionSource.CANDIDATE]
+        keep = {q.id for q in [*own, *planner][:fit]}
+        for i, q in enumerate(self._queue):
+            if q.must_ask or q.id in keep:
+                skipped = self._queue[:i]
+                self.dropped.extend(s.id for s in skipped)
+                self._queue = self._queue[i + 1 :]
+                why = [Why.SKIPPED_FOR_TIME] if skipped else []
+                if q.must_ask and left < MIN_QUESTION_MS:
+                    why.append(Why.MUST_ASK_GUARANTEED)
+                return q, why
+        return None, []
 
     # ------------------------------------------------------------------ flow
 
@@ -388,6 +492,8 @@ class SessionController:
             return Why.PROBE_LIMIT_REACHED
         if self.elapsed_ms >= self._deadline[Phase.CORE]:
             return Why.CORE_TIME_UP
+        if not self._probe_fits():
+            return Why.PROBES_CUT_FOR_MUST_ASK
         if decision is None:
             return Why.NO_DECISION
         return Why.MODEL_CHOSE_MOVE_ON
@@ -427,6 +533,8 @@ class SessionController:
         self.probed_missing = []
         self.hints_used = 0
         enough_time = self._core_left_ms() >= MIN_QUESTION_MS
+        if self.custom:  # the curveball must leave time for the must-ask questions (CU-4)
+            enough_time = self._core_left_ms() >= MIN_QUESTION_MS + self._must_reserve_ms(1)
         curveball_due = (
             self.brief.curveball
             and not self.mini
@@ -435,17 +543,19 @@ class SessionController:
         )
         if curveball_due and enough_time and self.brief.curveball:
             self.curveball_used = True
-            self.question = BriefQuestion(
-                id=CURVEBALL_REF,
-                text=self.brief.curveball,
-                competencies=self.brief.target_competencies[:1],
-                priority=99,
-            )
+            self.question = self._curveball(self.brief.curveball)
             self.asked.append(CURVEBALL_REF)
             return [
                 Move(MoveKind.CURVEBALL, Phase.CORE, self.question, reason=(why, Why.CURVEBALL_DUE))
             ]
-        if self._queue and enough_time:
+        if self.custom:
+            picked, extra = self._pick_custom()
+            if picked is not None:
+                self.question = picked
+                self.asked.append(picked.id)
+                reason = (why, *extra, Why.NEXT_QUESTION)
+                return [Move(MoveKind.ASK, Phase.CORE, picked, reason=reason)]
+        elif self._queue and enough_time:
             self.question = self._queue.pop(0)
             self.asked.append(self.question.id)
             return [Move(MoveKind.ASK, Phase.CORE, self.question, reason=(why, Why.NEXT_QUESTION))]
@@ -458,6 +568,14 @@ class SessionController:
         self.phase = Phase.CANDIDATE_QUESTIONS
         return [Move(MoveKind.INVITE_QUESTIONS, Phase.CANDIDATE_QUESTIONS, reason=(why, stop))]
 
+    def _curveball(self, text: str) -> BriefQuestion:
+        return BriefQuestion(
+            id=CURVEBALL_REF,
+            text=text,
+            competencies=self.brief.target_competencies[:1],
+            priority=99,
+        )
+
     def _wrap_up(self, *why: Why, open_question: bool = False) -> Move:
         if self.phase == Phase.CORE:
             self.dropped.extend(q.id for q in self._queue)
@@ -467,6 +585,48 @@ class SessionController:
         return Move(MoveKind.WRAP_UP, Phase.WRAP_UP, reason=why, open_question=open_question)
 
     # ------------------------------------------------------------------ dropped connection (IV-9)
+
+    def rebuild(self, turns: Sequence[Turn]) -> None:
+        """IV-9: catch a new controller up with a saved transcript, for a resume that rebuilds
+        the runner. The question bookkeeping comes from the interviewer turns' question_refs,
+        not from memory: questions asked leave the queue (so `must_ask_left` holds), questions
+        passed over before the last one asked are dropped, and the phase, the open question,
+        its follow-up count and the session time go on from the last turn.
+        """
+        if not turns:
+            return
+        asked = list(
+            dict.fromkeys(
+                t.question_ref
+                for t in turns
+                if t.speaker == Speaker.INTERVIEWER and t.phase == Phase.CORE and t.question_ref
+            )
+        )
+        by_id = {q.id: q for q in self.brief.questions}
+        order = [q.id for q in self._order(self.brief.questions)]
+        last_pos = max((order.index(ref) for ref in asked if ref in by_id), default=-1)
+        self.asked = asked
+        self.curveball_used = CURVEBALL_REF in asked
+        self.dropped = [ref for ref in order[: last_pos + 1] if ref not in asked]
+        self._queue = [by_id[ref] for ref in order[last_pos + 1 :]]
+        last = turns[-1]
+        self.phase = last.phase
+        self.question = None
+        self.probes_used = 0
+        self.probed_missing = []
+        self.hints_used = 0
+        if last.phase == Phase.CORE and asked:
+            current = asked[-1]
+            if current == CURVEBALL_REF and self.brief.curveball:
+                self.question = self._curveball(self.brief.curveball)
+            else:
+                self.question = by_id.get(current)
+            said = [
+                t for t in turns if t.speaker == Speaker.INTERVIEWER and t.question_ref == current
+            ]
+            self.probes_used = max(0, len(said) - 1)  # the ask, then one turn per follow-up
+        if self._clock.started is None:
+            self._clock.started = self.clock() - last.end_ms
 
     def hold(self) -> None:
         """Stop the clock while the candidate is disconnected. Allowed in every mode."""

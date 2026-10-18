@@ -13,6 +13,12 @@ line for the move is said. Each model call of a `say`, with its guard result, is
 
 IV-12: `check_answer` asks whether a candidate turn belongs in the interview. It returns its
 ModelCall instead of setting `last_call`, because it runs at the same time as `decide`.
+
+Custom sessions (CU-4, CU-12, D-7, D-9): the prompts name the current question's category as
+the interview type, and the agenda names the categories. A question the candidate wrote goes
+into the prompts wrapped as quoted data (prompts/interviewer/question_candidate). It gets the
+same follow-up rules as the planner's. A verbatim question is enforced in code: the model writes
+only a short lead-in, and the spoken line is that lead-in plus the question text, unchanged.
 """
 
 from __future__ import annotations
@@ -36,10 +42,11 @@ from strong_core.schemas import (
     InterviewerBrief,
     Phase,
     ProbeDecision,
+    QuestionSource,
     Speaker,
     Turn,
 )
-from strong_interview.controller import DEFAULT_PLAN, Move
+from strong_interview.controller import DEFAULT_PLAN, Move, MoveKind
 from strong_interview.guard import GuardResult, fallback_line, guard_reply
 from strong_interview.trace import ModelCall
 
@@ -50,6 +57,29 @@ WINDOW = 16
 SMALL_MAX_WORDS = 30
 MAX_WORDS = 35  # about 14 seconds of speech; two short sentences
 _LABEL = re.compile(r"^\s*(interviewer|[a-z]+)\s*:\s*", re.IGNORECASE)
+LEAD_IN_MAX_WORDS = 12  # D-7: the lead-in said before a verbatim question
+VERBATIM_MOVES = (MoveKind.ASK, MoveKind.REDO)
+_FIRST_SENTENCE = re.compile(r"^.*?[.!](?=\s|$)")
+
+
+def lead_in(text: str) -> str:
+    """D-7: the short lead-in before a verbatim question, from the model's reply.
+
+    Its first sentence, when it is short and asks nothing; else nothing, and the question is
+    said on its own.
+    """
+    match = _FIRST_SENTENCE.match(text.strip())
+    first = match.group(0).strip() if match else text.strip()
+    if not first or "?" in first or len(first.split()) > LEAD_IN_MAX_WORDS:
+        return ""
+    return first
+
+
+def say_names(names: Sequence[str]) -> str:
+    """'behavioral', 'behavioral and technical', 'behavioral, technical and case'."""
+    if len(names) <= 1:
+        return "".join(names)
+    return f"{', '.join(names[:-1])} and {names[-1]}"
 
 
 @dataclass(frozen=True)
@@ -141,15 +171,45 @@ class Interviewer:
                 "questions."
             )
         if questions <= 0:
-            return f"About {core} minutes of questions, then a short close."
-        return (
-            f"About {core} minutes of questions, then about {questions} minutes for the "
-            "candidate's questions, then a short close."
-        )
+            plan = f"About {core} minutes of questions, then a short close."
+        else:
+            plan = (
+                f"About {core} minutes of questions, then about {questions} minutes for the "
+                "candidate's questions, then a short close."
+            )
+        categories = self.categories()
+        if len(categories) > 1:  # IV-7 for Custom: name the categories, in order
+            plan += f" The questions cover {say_names(categories)}, in that order."
+        return plan
 
     # ------------------------------------------------------------------ prompts
 
-    def _system(self) -> Message:
+    def categories(self) -> list[str]:
+        """A Custom session's categories in the candidate's order, as words. Empty otherwise."""
+        custom = self.brief.session.custom
+        if custom is None:
+            return []
+        return [c.category.value.replace("_", " ") for c in custom.categories]
+
+    def interview_type(self, question: BriefQuestion | None = None) -> str:
+        """The interview type for the prompts. In a Custom session, the question's category
+        ("behavioral"), or all the categories when there is no question (CU-12)."""
+        if question is not None and question.category is not None:
+            return question.category.value.replace("_", " ")
+        categories = self.categories()
+        if categories:
+            return say_names(categories)
+        return self.brief.session.interview_type.value.replace("_", " ")
+
+    def question_text(self, question: BriefQuestion) -> str:
+        """The question for the prompts. The candidate's own text is wrapped as quoted data, so
+        it is never read as an instruction (CU-5 risk)."""
+        if question.source == QuestionSource.CANDIDATE:
+            prompt = load_prompt(Role.INTERVIEWER, "question_candidate")
+            return prompt.render(text=question.text).strip()
+        return question.text
+
+    def _system(self, question: BriefQuestion | None = None) -> Message:
         brief = self.brief
         company = (
             f"The company is {brief.company_name}."
@@ -159,7 +219,7 @@ class Interviewer:
         return load_prompt(Role.INTERVIEWER, "turn").message(
             "system",
             interviewer_name=self.name,
-            interview_type=brief.session.interview_type.value.replace("_", " "),
+            interview_type=self.interview_type(question),
             level=brief.session.level.value.replace("_", " "),
             company_line=company,
             tone=brief.persona.tone,
@@ -176,21 +236,28 @@ class Interviewer:
             return load_prompt(Role.INTERVIEWER, "note_last_question").render().strip()
         if move.open_question:
             return load_prompt(Role.INTERVIEWER, "note_open_question").render().strip()
+        if self.verbatim(move):
+            return load_prompt(Role.INTERVIEWER, "note_verbatim").render().strip()
         return "none"
+
+    @staticmethod
+    def verbatim(move: Move) -> bool:
+        """D-7: the move reads the question word for word."""
+        return move.kind in VERBATIM_MOVES and move.question is not None and move.question.verbatim
 
     def turn_messages(self, move: Move, turns: Sequence[Turn]) -> list[Message]:
         user = load_prompt(Role.INTERVIEWER, "turn_input").message(
             "user",
             transcript=render_transcript(turns, self.window),
             move=move.kind.value,
-            question=move.question.text if move.question else "none",
+            question=self.question_text(move.question) if move.question else "none",
             missing=", ".join(m.value.replace("_", " ") for m in move.missing) or "none",
             pushback="on" if move.pushback else "off",
             duration_min=str(self.duration_min),
             plan=self.plan_text(),
             note=self._move_note(move),
         )
-        return [self._system(), user]
+        return [self._system(move.question), user]
 
     def retry_messages(self, messages: list[Message]) -> list[Message]:
         """The same turn, with a stricter instruction after a reply the guard rejected."""
@@ -274,6 +341,8 @@ class Interviewer:
         previous = previous_interviewer_text(turns)
         self.last_call = None
         self.last_calls = []
+        if self.verbatim(move):
+            return await self._say_verbatim(move, messages, previous)
         result = await self._say_once(move, messages, previous, attempt=1)
         if result.usable:
             return result.text
@@ -306,6 +375,22 @@ class Interviewer:
             open_question=move.open_question,
         )
 
+    async def _say_verbatim(self, move: Move, messages: list[Message], previous: str | None) -> str:
+        """D-7: the model's short lead-in, then the question text exactly as written.
+
+        The model never says the question itself, so it cannot reword it. A lead-in the guard
+        rejects, one that is long or asks something, or a failed call leaves only the question.
+        """
+        assert move.question is not None
+        lead = ""
+        try:
+            result = await self._say_once(move, messages, previous, attempt=1)
+            if result.usable:
+                lead = lead_in(result.text)
+        except Exception:
+            log.warning("verbatim lead-in failed; saying the question alone", exc_info=True)
+        return f"{lead} {move.question.text}".strip()
+
     async def say_stream(self, move: Move, turns: Sequence[Turn]) -> AsyncIterator[str]:
         """The same prompt as `say`, streamed, so speech could start before the reply is done.
 
@@ -317,14 +402,21 @@ class Interviewer:
             yield chunk
 
     async def check_answer(
-        self, answer: str, turns: Sequence[Turn], phase: Phase
+        self,
+        answer: str,
+        turns: Sequence[Turn],
+        phase: Phase,
+        question: BriefQuestion | None = None,
     ) -> tuple[AnswerCheck, ModelCall]:
-        """IV-12: is the candidate's turn outside the interview or inappropriate? Ok on failure."""
+        """IV-12: is the candidate's turn outside the interview or inappropriate? Ok on failure.
+
+        `question` is the open CORE question, which names the category of a Custom session.
+        """
         messages = [
             load_prompt(Role.INTERVIEWER, "check_answer").message("system"),
             load_prompt(Role.INTERVIEWER, "check_answer_input").message(
                 "user",
-                interview_type=self.brief.session.interview_type.value.replace("_", " "),
+                interview_type=self.interview_type(question),
                 phase=phase.value.replace("_", " "),
                 asked=previous_interviewer_text(turns) or "(nothing yet)",
                 answer=answer,
@@ -373,9 +465,9 @@ class Interviewer:
             load_prompt(Role.INTERVIEWER, "decide").message("system"),
             load_prompt(Role.INTERVIEWER, "decide_input").message(
                 "user",
-                interview_type=brief.session.interview_type.value.replace("_", " "),
+                interview_type=self.interview_type(question),
                 level=brief.session.level.value.replace("_", " "),
-                question=question.text,
+                question=self.question_text(question),
                 probe_hints="; ".join(question.probe_hints) or "none",
                 answer=answer,
                 transcript=render_transcript(turns, self.window),
