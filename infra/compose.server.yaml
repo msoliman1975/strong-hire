@@ -54,7 +54,7 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       # Emails that see the model spend meter (strong_api.devtools). Testers do not.
       MODEL_SPEND_VIEWERS: ${MODEL_SPEND_VIEWERS:-}
-      # Emails that may use the admin app (https://admin.$DOMAIN). Everyone else gets 404.
+      # AA-1: seeds the admins of https://admin.$DOMAIN on the first start (admin_users empty).
       ADMIN_EMAILS: ${ADMIN_EMAILS:-}
       LIVEKIT_PUBLIC_URL: wss://rtc.${DOMAIN}
       STRONG_INTERNAL_TOKEN: ${STRONG_INTERNAL_TOKEN:?set STRONG_INTERNAL_TOKEN in .env}

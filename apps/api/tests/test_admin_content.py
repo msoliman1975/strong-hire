@@ -23,7 +23,7 @@ from strong_core.db.models import AuditLog, Company, CompanyRequest, CompanyRequ
 from strong_core.db.models import CompanyProfile as ProfileRow
 from strong_core.schemas import ProfileStatus
 
-from .conftest import InlineQueue, sign_in
+from .conftest import InlineQueue, sign_in, sign_in_admin
 
 Maker = async_sessionmaker[AsyncSession]
 ADMIN = "boss@example.com"
@@ -51,7 +51,6 @@ async def _ok() -> None:
 def app(
     sessionmaker: Maker, queue: InlineQueue, monkeypatch: pytest.MonkeyPatch
 ) -> Iterator[FastAPI]:
-    monkeypatch.setenv("ADMIN_EMAILS", ADMIN)
     get_auth_settings.cache_clear()
     yield create_app({"database": _ok}, sessionmaker=sessionmaker, queue=queue)
     get_auth_settings.cache_clear()
@@ -61,7 +60,8 @@ def app(
 async def admin(app: FastAPI) -> AsyncIterator[httpx.AsyncClient]:
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as http:
-        await sign_in(http, ADMIN)
+        await sign_in(http, ADMIN)  # the admin's candidate account
+        await sign_in_admin(http, app, ADMIN)  # AA-4: the admin session
         yield http
 
 

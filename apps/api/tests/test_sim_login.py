@@ -18,7 +18,7 @@ from strong_api.main import create_app
 from strong_core.db.models import AuditLog, User
 
 from .accounts_support import add_session
-from .conftest import sign_in
+from .conftest import sign_in, sign_in_admin
 from .test_sessions_api import create, ready_job
 
 TOKEN = "s" * 40
@@ -185,7 +185,7 @@ async def test_sim_user_has_consent_and_the_admin_downloads_its_transcript_and_a
     tmp_path: Path,
 ) -> None:
     """Our own test user: the admin sees its transcripts and downloads them and its recordings."""
-    _env(monkeypatch, SIM_ENABLED="true", SIM_TOKEN=TOKEN, ADMIN_EMAILS="boss@example.com")
+    _env(monkeypatch, SIM_ENABLED="true", SIM_TOKEN=TOKEN)
     monkeypatch.setenv("SIM_RESULTS_DIR", str(tmp_path))
     get_auth_settings.cache_clear()
     app = _app(sessionmaker, queue)
@@ -225,7 +225,7 @@ async def test_sim_user_has_consent_and_the_admin_downloads_its_transcript_and_a
     (real_dir / "audio.ogg").write_bytes(b"not served")
 
     async for admin in _client(app):
-        await sign_in(admin, "boss@example.com")
+        await sign_in_admin(admin, app, "boss@example.com")
         detail = (await admin.get(f"/admin/sessions/{sid}")).json()
         assert detail["content_visible"] is True and detail["audio_available"] is True
 
@@ -262,6 +262,6 @@ async def test_sim_user_has_consent_and_the_admin_downloads_its_transcript_and_a
         sim.training_consent = False
         await db.commit()
     async for admin in _client(app):
-        await sign_in(admin, "boss@example.com")
+        await sign_in_admin(admin, app, "boss@example.com", make=False)
         assert (await admin.get(f"/admin/sessions/{sid}/audio")).status_code == 404
         assert (await admin.get(f"/admin/sessions/{sid}/transcript.txt")).status_code == 404

@@ -30,6 +30,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from strong_api.admin.actions import ActionIn, AdminWrite, audit_action
 from strong_api.admin.deps import Admin, admin_settings
+from strong_api.admin.identity import active_admin_emails, is_active_admin
 from strong_api.admin.router import _costs, _pairs, _session_out
 from strong_api.admin.schemas import AdminAuditEntry
 from strong_api.admin.users_schemas import (
@@ -266,14 +267,14 @@ async def list_users(
     total = int(await db.scalar(count_query) or 0)
     users = list(await db.scalars(query.offset((page - 1) * page_size).limit(page_size)))
 
-    settings = admin_settings(request)
+    admins = await active_admin_emails(db)  # AA-1: admin_users, not ADMIN_EMAILS
     billing = _billing(request)
     counts = await _interview_counts(db, [u.org_id for u in users])
     rows = []
     for user in users:
         ent = await get_entitlement(db, user.org_id, billing, now)
         rows.append(
-            _user_out(user, ent, int(counts.get(user.org_id, 0)), settings.is_admin(user.email))
+            _user_out(user, ent, int(counts.get(user.org_id, 0)), user.email.lower() in admins)
         )
     return AdminUserPage(users=rows, total=total, page=page, page_size=page_size)
 
@@ -298,7 +299,7 @@ async def _detail(db: AsyncSession, request: Request, user: User) -> AdminUserDe
     org_id = user.org_id
     ent = await get_entitlement(db, org_id, billing, now)
     counts = await _interview_counts(db, [org_id])
-    is_admin = admin_settings(request).is_admin(user.email)
+    is_admin = await is_active_admin(db, user.email)
 
     org = await db.get(Org, org_id)
     sub = await get_subscription(db, org_id)
@@ -629,7 +630,7 @@ async def suspend_user(
     user = await _get_user(db, user_id)
     if user.suspended_at is not None:
         raise HTTPException(status.HTTP_409_CONFLICT, "The user is already suspended")
-    if admin_settings(request).is_admin(user.email):
+    if await is_active_admin(db, user.email):
         raise HTTPException(status.HTTP_409_CONFLICT, "Remove the admin access first")
     user.suspended_at = datetime.now(UTC)
     user.suspended_reason = body.reason

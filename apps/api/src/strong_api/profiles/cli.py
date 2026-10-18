@@ -5,6 +5,7 @@
     uv run strongctl profiles publish google 2
     uv run strongctl profiles list
     uv run strongctl profiles show google [--version 1] [--json]
+    uv run strongctl admin list | add <email> | remove <email>    (strong_api.admin.cli, AA-1)
 
 The commands use DATABASE_URL (default: the local Docker Postgres on port 55432).
 """
@@ -22,6 +23,7 @@ import typer
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine as _create_async_engine
 
+from strong_api.admin.cli import admin_app
 from strong_api.profiles import repository as repo
 from strong_api.profiles.diff import DIFF_FIELDS, format_diff
 from strong_api.profiles.validation import (
@@ -39,6 +41,7 @@ profiles_app = typer.Typer(
     help="Company profiles: validate, import, publish.", no_args_is_help=True
 )
 app.add_typer(profiles_app, name="profiles")
+app.add_typer(admin_app, name="admin")
 
 
 def make_engine() -> AsyncEngine:

@@ -4,7 +4,7 @@ text channel writes."""
 from __future__ import annotations
 
 import uuid
-from collections.abc import AsyncIterator, Iterator
+from collections.abc import AsyncIterator
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
@@ -16,7 +16,6 @@ from fastapi import FastAPI
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from strong_api.auth.settings import get_auth_settings
 from strong_api.main import create_app
 from strong_core.db.models import (
     AuditLog,
@@ -29,7 +28,7 @@ from strong_core.gateway import UsageRecord, set_usage_sink
 from strong_core.schemas import InterviewType, Phase, UsageComponent
 
 from .accounts_support import add_session
-from .conftest import InlineQueue, sign_in
+from .conftest import InlineQueue, sign_in, sign_in_admin
 from .test_sessions_api import create, ready_job
 
 Maker = async_sessionmaker[AsyncSession]
@@ -42,26 +41,21 @@ async def _ok() -> None:
 
 
 @pytest.fixture
-def app(
-    sessionmaker: Maker,
-    queue: InlineQueue,
-    export_store: Any,
-    monkeypatch: pytest.MonkeyPatch,
-) -> Iterator[FastAPI]:
-    """The app with ADMIN_EMAILS set (mixed case and spaces, to check the parsing)."""
-    monkeypatch.setenv("ADMIN_EMAILS", " Boss@Example.com , other-admin@example.com")
-    get_auth_settings.cache_clear()
+def app(sessionmaker: Maker, queue: InlineQueue, export_store: Any) -> FastAPI:
     app = create_app({"database": _ok}, sessionmaker=sessionmaker, queue=queue)
     app.state.export_store = export_store
-    yield app
-    get_auth_settings.cache_clear()
+    return app
 
 
 @pytest.fixture
 async def admin(app: FastAPI) -> AsyncIterator[httpx.AsyncClient]:
+    """The admin: a candidate account (so it shows in the users list) and, in its own client,
+    an admin session."""
     transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://test") as candidate:
+        await sign_in(candidate, ADMIN)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as http:
-        await sign_in(http, ADMIN)
+        await sign_in_admin(http, app, ADMIN)
         yield http
 
 
@@ -72,16 +66,13 @@ async def _user(maker: Maker, email: str) -> User:
         return user
 
 
-async def test_r2_admin_routes_are_404_for_everyone_else(
+async def test_r2_aa4_admin_routes_are_404_for_everyone_else(
     anon_client: httpx.AsyncClient, client: httpx.AsyncClient, admin: httpx.AsyncClient
 ) -> None:
     for path in ROUTES:
         assert (await anon_client.get(path)).status_code == 404, path
         assert (await client.get(path)).status_code == 404, path
-    me = (await client.get("/auth/me")).json()
-    assert me["user"]["is_admin"] is False
-    boss = (await admin.get("/auth/me")).json()
-    assert boss["user"]["is_admin"] is True
+    assert "is_admin" not in (await client.get("/auth/me")).json()["user"]
     assert (await admin.get("/admin/users")).status_code == 200
 
 

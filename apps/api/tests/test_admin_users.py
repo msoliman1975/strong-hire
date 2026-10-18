@@ -33,7 +33,7 @@ from strong_core.db.models import (
 from strong_core.schemas import GapStatus, SessionChannel, SessionStatus, SubscriptionStatus
 
 from .accounts_support import CUSTOMER_ID, FakeStripe, add_session, load_event, post_event
-from .conftest import AuthHarness, InlineQueue, RecordingEmailSender, sign_in
+from .conftest import AuthHarness, InlineQueue, RecordingEmailSender, sign_in, sign_in_admin
 from .test_billing import billing_settings, subscribe
 
 Maker = async_sessionmaker[AsyncSession]
@@ -60,7 +60,6 @@ class FakeRooms:
 def app(
     sessionmaker: Maker, queue: InlineQueue, export_store: Any, monkeypatch: pytest.MonkeyPatch
 ) -> Iterator[FastAPI]:
-    monkeypatch.setenv("ADMIN_EMAILS", ADMIN)
     get_auth_settings.cache_clear()
     app = create_app({"database": _ok}, sessionmaker=sessionmaker, queue=queue)
     app.state.export_store = export_store
@@ -76,7 +75,8 @@ def app(
 async def admin(app: FastAPI) -> AsyncIterator[httpx.AsyncClient]:
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as http:
-        await sign_in(http, ADMIN)
+        await sign_in(http, ADMIN)  # the admin's candidate account
+        await sign_in_admin(http, app, ADMIN)  # AA-4: the admin session
         yield http
 
 
