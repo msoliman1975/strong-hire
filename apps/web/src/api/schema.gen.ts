@@ -4560,7 +4560,9 @@ export interface operations {
     };
     send_magic_link_auth_magic_link_post: {
         parameters: {
-            query?: never;
+            query?: {
+                app?: "web" | "admin";
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -4595,6 +4597,7 @@ export interface operations {
         parameters: {
             query: {
                 token: string;
+                app?: "web" | "admin";
             };
             header?: never;
             path?: never;
@@ -4624,7 +4627,9 @@ export interface operations {
     };
     google_login_auth_google_login_get: {
         parameters: {
-            query?: never;
+            query?: {
+                app?: "web" | "admin";
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -4638,6 +4643,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

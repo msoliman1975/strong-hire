@@ -35,6 +35,11 @@ class AuthSettings(BaseSettings):
         default="http://localhost:5180/api",
         description="The API as the browser sees it (through the web proxy). Used for links.",
     )
+    admin_base_url: str = Field(
+        default="http://localhost:5181",
+        description="Where the admin app is served (D-1). Its API is at <this>/api. Sign-in "
+        "links and Google sign-in started from the admin app return here.",
+    )
 
     google_client_id: str | None = None
     google_client_secret: str | None = None

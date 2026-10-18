@@ -230,6 +230,7 @@ def build_harness(app_env: AppEnv = AppEnv.LOCAL, google: Any = None) -> Iterato
         session_secret="x" * 40,
         web_base_url="http://web.test",
         api_public_url="http://web.test/api",
+        admin_base_url="http://admin.test",
     )
     email = RecordingEmailSender()
     app = FastAPI()

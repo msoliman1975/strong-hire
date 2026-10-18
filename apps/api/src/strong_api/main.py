@@ -82,7 +82,7 @@ def create_app(
     app = FastAPI(title="Strong Hire API", version=__version__, lifespan=lifespan)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:5180"],
+        allow_origins=["http://localhost:5180", "http://localhost:5181"],
         allow_methods=["*"],
         allow_headers=["*"],
     )
