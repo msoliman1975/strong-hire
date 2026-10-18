@@ -1,8 +1,8 @@
 import { useState } from "react";
 
-import { type AuditScope, useAdminAudit } from "../../api/admin";
-import { ErrorNotice, Loading, PageHead } from "../../components/ui";
-import { utc } from "./format";
+import { type AuditScope, useAdminAudit } from "../api/admin";
+import { ErrorNotice, Loading, PageHead } from "../components/ui";
+import { utc } from "../format";
 
 /** The audit log (R2). By default only admin views of transcripts and traces. */
 export function AdminAuditPage() {

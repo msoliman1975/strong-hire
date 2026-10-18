@@ -1,10 +1,10 @@
 import { Link, useSearchParams } from "react-router";
 
-import { type AdminSessionFilters, useAdminSessions, useAdminUsers } from "../../api/admin";
-import type { InterviewType } from "../../api/types";
-import { ErrorNotice, Loading, PageHead } from "../../components/ui";
-import { difficultyLabel, interviewTypeLabel, modeLabel } from "../../labels";
-import { clock, money, utc, words } from "./format";
+import { type AdminSessionFilters, useAdminSessions, useAdminUsers } from "../api/admin";
+import type { InterviewType } from "../api/types";
+import { ErrorNotice, Loading, PageHead } from "../components/ui";
+import { difficultyLabel, interviewTypeLabel, modeLabel } from "../labels";
+import { clock, money, utc, words } from "../format";
 
 const TYPES = Object.keys(interviewTypeLabel) as InterviewType[];
 
@@ -139,7 +139,7 @@ export function AdminSessionsPage() {
                     {sessions.data.sessions.map((s) => (
                       <tr key={s.id}>
                         <td>
-                          <Link to={`/admin/interviews/${s.id}`}>{utc(s.created_at)}</Link>
+                          <Link to={`/interviews/${s.id}`}>{utc(s.created_at)}</Link>
                         </td>
                         <td>
                           {s.user_email ?? "-"}
