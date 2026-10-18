@@ -68,7 +68,7 @@ from strong_core.db.models import (
 )
 from strong_core.db.models import Turn as TurnRow
 from strong_core.db.turns import TURN_ORDER
-from strong_core.schemas import InterviewType, SessionStatus, Turn, UsageComponent
+from strong_core.schemas import InterviewType, SessionStatus, Turn
 
 SESSION_LIMIT = 500
 # AI-1: the status filter, with "stuck" (scoring, or in progress past its length, + 15 min).
