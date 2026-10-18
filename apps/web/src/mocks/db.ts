@@ -4,6 +4,7 @@
  * saved to localStorage so a page reload keeps it. This file is mock-only and never ships.
  */
 import type { SessionRecord } from "../api/sessions";
+import type { SiteStatus } from "../api/status";
 import type {
   AuthUser,
   ExitSurveyIn,
@@ -55,7 +56,17 @@ export interface MockDb {
   usage: Usage;
   exports: Record<string, ExportJob & { readyAt: number }>;
   exitSurveys: ExitSurveyIn[];
+  /** OC-1 to OC-4: what GET /status answers. */
+  siteStatus: SiteStatus;
 }
+
+/** GET /status with every ops control at its default. */
+export const OPEN_STATUS: SiteStatus = {
+  banner: null,
+  signups_open: true,
+  voice_sessions_open: true,
+  text_sessions_open: true,
+};
 
 /** The real API's answer for a new user (GET /billing/usage). */
 export const FREE_USAGE: Usage = {
@@ -91,6 +102,7 @@ export function emptyDb(): MockDb {
     usage: { ...FREE_USAGE },
     exports: {},
     exitSurveys: [],
+    siteStatus: { ...OPEN_STATUS },
   };
 }
 

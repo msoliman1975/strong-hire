@@ -566,6 +566,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Site Status
+         * @description Public: the active site banner and whether sign-ups and new sessions are open.
+         */
+        get: operations["site_status_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/providers": {
         parameters: {
             query?: never;
@@ -1210,6 +1230,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/ops/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Ops Settings
+         * @description OC-1..OC-5: every control, its default, and who changed it last.
+         */
+        get: operations["get_ops_settings_admin_ops_settings_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/ops/settings/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Put Ops Setting
+         * @description Change one control (AA-6: audited with the value before and after).
+         */
+        put: operations["put_ops_setting_admin_ops_settings__key__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/ops/models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Ops Models
+         * @description OC-6, D-11: what runs, read-only. Never names a model: aliases and tiers only.
+         */
+        get: operations["get_ops_models_admin_ops_models_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -1562,6 +1642,21 @@ export interface components {
              * @default false
              */
             profile_complete: boolean;
+        };
+        /** BannerOut */
+        BannerOut: {
+            /** Text */
+            text: string;
+            /**
+             * Severity
+             * @enum {string}
+             */
+            severity: "info" | "warning" | "critical";
+            /**
+             * Until
+             * Format: date-time
+             */
+            until: string;
         };
         /** Body_create_resume_resumes_post */
         Body_create_resume_resumes_post: {
@@ -2213,6 +2308,12 @@ export interface components {
             /** Concerns */
             concerns?: string | null;
         };
+        /**
+         * JobKind
+         * @description OC-5: background job types that can be paused.
+         * @enum {string}
+         */
+        JobKind: "gap_analysis" | "scoring";
         /** JobOut */
         JobOut: {
             /** Id */
@@ -2492,6 +2593,28 @@ export interface components {
          * @enum {string}
          */
         Mode: "coach" | "realistic";
+        /** ModelProfileOut */
+        ModelProfileOut: {
+            /** Api Profile */
+            api_profile: string;
+            /** Roles */
+            roles: components["schemas"]["RoleModel"][];
+            /**
+             * Services
+             * @description From heartbeat:<service>:<instance>
+             */
+            services: components["schemas"]["ServiceProfile"][];
+            /**
+             * Heartbeats Available
+             * @description False when Redis could not be read
+             */
+            heartbeats_available: boolean;
+            /**
+             * Mismatch
+             * @description A service reports a profile other than the API's
+             */
+            mismatch: boolean;
+        };
         /** ModelUsage */
         ModelUsage: {
             /** Profile */
@@ -2502,6 +2625,32 @@ export interface components {
             month?: components["schemas"]["Budget"] | null;
             /** Rpm Limit */
             rpm_limit?: number | null;
+        };
+        /** OpsSettingMeta */
+        OpsSettingMeta: {
+            key: components["schemas"]["SettingKey"];
+            /** Is Default */
+            is_default: boolean;
+            /**
+             * Updated By
+             * @description Admin email of the last change; None: never set
+             */
+            updated_by: string | null;
+            /** Updated At */
+            updated_at: string | null;
+        };
+        /** OpsSettings */
+        OpsSettings: {
+            /** @description The value in force for every key */
+            values: components["schemas"]["RuntimeSettings"];
+            defaults: components["schemas"]["RuntimeSettings"];
+            /** Meta */
+            meta: components["schemas"]["OpsSettingMeta"][];
+            /**
+             * Spend Today Usd
+             * @description OC-3: model cost since UTC midnight (30 s cache)
+             */
+            spend_today_usd: number;
         };
         /** PasswordLoginRequest */
         PasswordLoginRequest: {
@@ -3021,6 +3170,54 @@ export interface components {
          * @enum {string}
          */
         RoleFamily: "swe" | "data_ml" | "pm" | "design" | "tpm" | "other";
+        /** RoleModel */
+        RoleModel: {
+            /** Role */
+            role: string;
+            /**
+             * Alias
+             * @description LiteLLM alias from config/models.<profile>.yaml
+             */
+            alias: string;
+            /** Kind */
+            kind: string;
+            /** Tier */
+            tier: string | null;
+            /**
+             * Test Only
+             * @description Roles only the AI candidate (P13) uses
+             */
+            test_only: boolean;
+        };
+        /**
+         * RuntimeSettings
+         * @description Every ops control with its type and default. Field names are the setting keys.
+         */
+        RuntimeSettings: {
+            /**
+             * Signups Paused
+             * @default false
+             */
+            signups_paused: boolean;
+            /**
+             * Sessions Paused Voice
+             * @default false
+             */
+            sessions_paused_voice: boolean;
+            /**
+             * Sessions Paused Text
+             * @default false
+             */
+            sessions_paused_text: boolean;
+            /**
+             * Daily Spend Cap Usd
+             * @default 25
+             */
+            daily_spend_cap_usd: number;
+            site_banner?: components["schemas"]["SiteBanner"] | null;
+            /** Jobs Paused */
+            jobs_paused?: components["schemas"]["JobKind"][];
+        };
         /**
          * SampleQuestion
          * @description A question the company or candidates published, paraphrased, with its source.
@@ -3093,6 +3290,22 @@ export interface components {
             job_id: string;
             status: components["schemas"]["SessionStatus"];
         };
+        /** ServiceProfile */
+        ServiceProfile: {
+            /** Service */
+            service: string;
+            /** Instance */
+            instance: string;
+            /** Model Profile */
+            model_profile: string | null;
+            /** Version */
+            version: string | null;
+            /**
+             * At
+             * @description When the heartbeat was written
+             */
+            at: string | null;
+        };
         /**
          * SessionChannel
          * @description PL-7. How the candidate and the interviewer talk. Text runs the same controller and
@@ -3158,6 +3371,24 @@ export interface components {
          * @enum {string}
          */
         SessionStatus: "created" | "in_progress" | "interrupted" | "scoring" | "completed" | "failed";
+        /** SettingIn */
+        SettingIn: {
+            /**
+             * Reason
+             * @description Why, for the audit log
+             */
+            reason: string;
+            /**
+             * Value
+             * @description The new value; its type depends on the key (null clears)
+             */
+            value: unknown;
+        };
+        /**
+         * SettingKey
+         * @enum {string}
+         */
+        SettingKey: "signups_paused" | "sessions_paused_voice" | "sessions_paused_text" | "daily_spend_cap_usd" | "site_banner" | "jobs_paused";
         /**
          * Severity
          * @enum {string}
@@ -3178,6 +3409,48 @@ export interface components {
              * @default false
              */
             training_consent: boolean;
+        };
+        /**
+         * SiteBanner
+         * @description OC-4: a banner in the candidate app until `until`.
+         */
+        SiteBanner: {
+            /** Text */
+            text: string;
+            /**
+             * Severity
+             * @default info
+             * @enum {string}
+             */
+            severity: "info" | "warning" | "critical";
+            /**
+             * Until
+             * Format: date-time
+             */
+            until: string;
+        };
+        /**
+         * SiteStatus
+         * @description What the candidate app shows: the site banner and what is paused (OC-1 to OC-4).
+         */
+        SiteStatus: {
+            /** @description OC-4: the active banner, None after `until` */
+            banner: components["schemas"]["BannerOut"] | null;
+            /**
+             * Signups Open
+             * @description OC-1: false while new accounts are refused
+             */
+            signups_open: boolean;
+            /**
+             * Voice Sessions Open
+             * @description OC-2, OC-3: new voice sessions can start
+             */
+            voice_sessions_open: boolean;
+            /**
+             * Text Sessions Open
+             * @description OC-2, OC-3: new text sessions can start
+             */
+            text_sessions_open: boolean;
         };
         /** Source */
         Source: {
@@ -4500,6 +4773,26 @@ export interface operations {
             };
         };
     };
+    site_status_status_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteStatus"];
+                };
+            };
+        };
+    };
     providers_auth_providers_get: {
         parameters: {
             query?: never;
@@ -5497,6 +5790,83 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_ops_settings_admin_ops_settings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsSettings"];
+                };
+            };
+        };
+    };
+    put_ops_setting_admin_ops_settings__key__put: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SettingIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsSettings"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_ops_models_admin_ops_models_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModelProfileOut"];
                 };
             };
         };

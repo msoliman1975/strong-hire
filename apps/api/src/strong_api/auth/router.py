@@ -44,6 +44,7 @@ from strong_api.auth.passwords import (
 )
 from strong_api.auth.settings import AuthSettings
 from strong_api.auth.users import create_user, find_user, normalize_email
+from strong_api.controls import SIGNUPS_PAUSED, ControlRefusedError, ensure_signups_open
 from strong_core.db.models import AuditLog, User
 from strong_core.schemas import AuthProvider
 
@@ -193,6 +194,7 @@ async def _finish_sign_in(
             user.password_hash = None
         await _sign_in_user(request, db, user)
     else:
+        await ensure_signups_open(db)  # OC-1: no new accounts while sign-ups are paused
         request.session.clear()
         request.session[SESSION_PENDING_KEY] = {"email": email, "provider": provider.value}
     return _state(request, user, settings)
@@ -274,9 +276,11 @@ def build_router(
             email = await magic_links.redeem(token)
         except InvalidMagicLinkError as exc:
             return web_redirect("/signin", app, error=f"link_{exc}")
-        return after_sign_in(
-            await _finish_sign_in(request, db, email, AuthProvider.EMAIL, settings), app
-        )
+        try:
+            state = await _finish_sign_in(request, db, email, AuthProvider.EMAIL, settings)
+        except ControlRefusedError:
+            return web_redirect("/signin", app, error=SIGNUPS_PAUSED)
+        return after_sign_in(state, app)
 
     @router.get("/google/login")
     async def google_login(request: Request, app: SignInApp = "web") -> Response:
@@ -295,9 +299,13 @@ def build_router(
             identity = await google.fetch_identity(request)
         except GoogleSignInError:
             return web_redirect("/signin", app, error="google")
-        return after_sign_in(
-            await _finish_sign_in(request, db, identity.email, AuthProvider.GOOGLE, settings), app
-        )
+        try:
+            state = await _finish_sign_in(
+                request, db, identity.email, AuthProvider.GOOGLE, settings
+            )
+        except ControlRefusedError:
+            return web_redirect("/signin", app, error=SIGNUPS_PAUSED)
+        return after_sign_in(state, app)
 
     # ------------------------------------------------------------ email and password (AC-4)
 
@@ -322,6 +330,7 @@ def build_router(
                 status.HTTP_409_CONFLICT,
                 "An account with this email already exists. Sign in, or reset your password.",
             )
+        await ensure_signups_open(db)  # OC-1
         user = await create_user(
             db,
             email=email,
@@ -446,6 +455,7 @@ def build_router(
             raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Accept the terms first")
         user = await find_user(db, pending["email"])
         if user is None:
+            await ensure_signups_open(db)  # OC-1: the pause may have started after the link
             user = await create_user(
                 db,
                 email=pending["email"],

@@ -2174,3 +2174,27 @@ dialog::backdrop {
     }
   }
 }
+
+/* ------------------------------------------------------------ site banner (OC-4) */
+
+.site-banner {
+  border-bottom: 1px solid var(--line);
+  border-left: 4px solid var(--accent);
+  background: var(--accent-soft);
+  padding: var(--space-3) var(--space-4);
+}
+
+.site-banner p {
+  margin: 0 auto;
+  max-width: 72rem;
+}
+
+.site-banner[data-severity="warning"] {
+  border-left-color: var(--signal-neutral);
+  background: var(--light-soft);
+}
+
+.site-banner[data-severity="critical"] {
+  border-left-color: var(--danger);
+  background: var(--danger-soft);
+}

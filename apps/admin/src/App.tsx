@@ -8,6 +8,7 @@ import { AdminAuditPage } from "./pages/AdminAuditPage";
 import { AdminSessionPage } from "./pages/AdminSessionPage";
 import { AdminSessionsPage } from "./pages/AdminSessionsPage";
 import { AdminUsersPage } from "./pages/AdminUsersPage";
+import { ControlsPage } from "./pages/ControlsPage";
 import { SignInPage } from "./pages/SignInPage";
 
 export function createQueryClient(): QueryClient {
@@ -33,6 +34,7 @@ export function AppRoutes() {
         <Route path="/interviews/:sessionId" element={<AdminSessionPage />} />
         <Route path="/users" element={<AdminUsersPage />} />
         <Route path="/audit" element={<AdminAuditPage />} />
+        <Route path="/ops/controls" element={<ControlsPage />} />
         <Route path="*" element={<Navigate to="/interviews" replace />} />
       </Route>
     </Routes>

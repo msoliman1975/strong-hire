@@ -5,6 +5,7 @@ import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 import { ApiError } from "../api/client";
 import { keys, useJob, useProfile, useUsage } from "../api/hooks";
 import { sessionsApi } from "../api/sessions";
+import { isPausedError, SESSIONS_UNAVAILABLE, statusKey, useSiteStatus } from "../api/status";
 import type { Difficulty, InterviewType, Level, Mode, SessionConfig } from "../api/types";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
 import {
@@ -91,6 +92,7 @@ export function SessionSetupPage() {
   const [mode, setMode] = useState<Mode>(pick(params.get("mode"), MODES, "coach"));
   const [level, setLevel] = useState<Level | "">("");
 
+  const siteStatus = useSiteStatus();
   const start = useMutation({
     mutationFn: (config: SessionConfig) =>
       sessionsApi.create({ job_target_id: jobId, resume_id: resumeId, config, channel: "voice" }),
@@ -99,6 +101,7 @@ export function SessionSetupPage() {
       navigate(`/sessions/${session.id}/live`);
     },
     onError: (err) => {
+      if (isPausedError(err)) void queryClient.invalidateQueries({ queryKey: statusKey });
       if (err instanceof ApiError && err.status === 402) {
         void queryClient.invalidateQueries({ queryKey: keys.usage });
         navigate(`/upgrade?reason=${encodeURIComponent(err.code ?? "upgrade_required")}`);
@@ -115,6 +118,7 @@ export function SessionSetupPage() {
   // Free accounts get mini interviews only (BL-2). Until the usage is known, assume the free plan.
   const fullAllowed = usage.data?.full_interviews_allowed ?? false;
   const chosenDuration: Duration = fullAllowed ? (duration ?? 30) : MINI;
+  const sessionsClosed = siteStatus.data?.voice_sessions_open === false;
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -199,11 +203,17 @@ export function SessionSetupPage() {
           {!chosenLevel && <p className="field-error">Choose a level to start.</p>}
         </div>
         <p className="muted">Before the interview starts, we check your microphone and connection.</p>
-        {start.isError && !(start.error instanceof ApiError && start.error.status === 402) && (
-          <ErrorNotice error={start.error} />
+        {/* OC-2, OC-3: new sessions are paused, or the daily spend cap is reached. */}
+        {(sessionsClosed || isPausedError(start.error)) && (
+          <div className="notice" role="status" data-testid="sessions-unavailable">
+            <p>{isPausedError(start.error) ? start.error.message : SESSIONS_UNAVAILABLE}</p>
+          </div>
         )}
+        {start.isError &&
+          !isPausedError(start.error) &&
+          !(start.error instanceof ApiError && start.error.status === 402) && <ErrorNotice error={start.error} />}
         <div className="row section">
-          <button type="submit" className="btn" disabled={start.isPending || !chosenLevel}>
+          <button type="submit" className="btn" disabled={start.isPending || !chosenLevel || sessionsClosed}>
             Start interview
           </button>
         </div>

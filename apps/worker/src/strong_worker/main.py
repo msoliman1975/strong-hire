@@ -5,7 +5,8 @@ P0 registers one `ping` job to prove the queue works. P2 adds the job and resume
 (strong_worker.gap.jobs). P8 adds the scorer job (strong_worker.scoring.jobs). P9 adds the
 account export and file delete jobs (strong_worker.account.jobs). R1 adds the file delete for
 one saved CV (delete_resume_file). R2 adds a daily cron job that deletes interviewer traces older
-than 90 days (strong_worker.retention).
+than 90 days (strong_worker.retention). A6 lets admins pause the gap analysis and scoring jobs
+(OC-5, strong_worker.pause).
 """
 
 from __future__ import annotations
@@ -20,6 +21,7 @@ from strong_worker import retention
 from strong_worker.account import jobs as account_jobs
 from strong_worker.gap import jobs as gap_jobs
 from strong_worker.inputs import jobs as inputs_jobs
+from strong_worker.pause import PAUSED_MAX_TRIES
 from strong_worker.scoring import jobs as scoring_jobs
 
 
@@ -52,7 +54,12 @@ class WorkerSettings:
             timeout=600,
             max_tries=inputs_jobs.DELETE_FILE_MAX_TRIES,
         ),
-        func(gap_jobs.run_gap_analysis_job, keep_result=gap_jobs.RESULT_TTL_S, timeout=600),
+        func(
+            gap_jobs.run_gap_analysis_job,
+            keep_result=gap_jobs.RESULT_TTL_S,
+            timeout=600,
+            max_tries=PAUSED_MAX_TRIES,  # OC-5: a paused job retries every 60 s
+        ),
         func(
             gap_jobs.build_interviewer_brief,
             keep_result=gap_jobs.RESULT_TTL_S,
@@ -60,7 +67,12 @@ class WorkerSettings:
             max_tries=gap_jobs.BRIEF_MAX_TRIES,
         ),
         *(
-            func(f, keep_result=scoring_jobs.RESULT_TTL_S, timeout=scoring_jobs.JOB_TIMEOUT_S)
+            func(
+                f,
+                keep_result=scoring_jobs.RESULT_TTL_S,
+                timeout=scoring_jobs.JOB_TIMEOUT_S,
+                max_tries=PAUSED_MAX_TRIES,  # OC-5
+            )
             for f in scoring_jobs.FUNCTIONS
         ),
         func(account_jobs.export_account, keep_result=account_jobs.RESULT_TTL_S, timeout=600),

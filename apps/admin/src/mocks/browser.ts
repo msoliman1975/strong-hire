@@ -11,6 +11,7 @@
 import { setupWorker } from "msw/browser";
 
 import { adminHandlers } from "./adminHandlers";
+import { controlsHandlers } from "./controlsHandlers";
 import { createStore, type MockDb } from "./db";
 import { authHandlers } from "./handlers";
 
@@ -54,7 +55,7 @@ function seed(db: MockDb): void {
 export async function startMocks(mode: MockMode): Promise<void> {
   if (mode === "off") return;
   const store = createStore({ persist: true, seed });
-  await setupWorker(...authHandlers(store), ...adminHandlers(store)).start({
+  await setupWorker(...authHandlers(store), ...adminHandlers(store), ...controlsHandlers(store)).start({
     onUnhandledFrame: "bypass",
     quiet: true,
   });

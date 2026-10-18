@@ -1,7 +1,7 @@
 """Strong Hire API. P0 exposes /health; P2 adds the job target and resume input routes; P6 adds
 the gap analysis routes; P8 adds the debrief and progress routes; P9 adds billing (/billing) and
 account self-service (/account). R1 adds the saved job and CV library and /reports. R2 adds
-the admin area (/admin)."""
+the admin area (/admin). A6 adds the public /status (site banner, paused controls)."""
 
 from __future__ import annotations
 
@@ -21,6 +21,7 @@ from strong_api.account import install_account
 from strong_api.admin import install_admin
 from strong_api.auth import install_auth
 from strong_api.billing import install_billing
+from strong_api.controls import router as status_router
 from strong_api.devtools import router as dev_router
 from strong_api.gap.router import router as gap_router
 from strong_api.inputs import router as inputs_router
@@ -95,6 +96,7 @@ def create_app(
     app.include_router(sessions_router)
     app.include_router(reports_router)
     app.include_router(dev_router)
+    app.include_router(status_router)
     install_auth(app)
     install_billing(app)
     install_account(app)

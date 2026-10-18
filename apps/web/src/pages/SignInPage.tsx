@@ -4,6 +4,7 @@ import { Navigate, useNavigate, useSearchParams } from "react-router";
 
 import { authApi } from "../api/auth";
 import { keys, useAuth, useProviders } from "../api/hooks";
+import { useSiteStatus } from "../api/status";
 import type { AuthState, EmailSent } from "../api/types";
 import { AuthHeading } from "../components/AuthLayout";
 import { PasswordField, passwordProblem } from "../components/PasswordField";
@@ -12,11 +13,16 @@ import { ErrorNotice, Loading } from "../components/ui";
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const EMAIL_ERROR = "Enter an email address, for example name@example.com.";
 
+/** OC-1: the API refuses new accounts with the same words. */
+const SIGNUPS_PAUSED =
+  "We are not taking new sign-ups right now. Write to support@getstronghire.com to join the waitlist, and we will email you when we open again.";
+
 const LINK_ERRORS: Record<string, string> = {
   link_expired: "That link has expired. Ask for a new one.",
   link_used: "That link was already used. Ask for a new one.",
   link_invalid: "That link is not valid. Ask for a new one.",
   google: "Google sign-in did not finish. Try again, or use your email and password.",
+  signups_paused: SIGNUPS_PAUSED,
 };
 
 type Mode = "signin" | "signup" | "link" | "forgot";
@@ -108,6 +114,7 @@ type Errors = { email?: string; password?: string; agreed?: string };
 export function SignInPage() {
   const auth = useAuth();
   const providers = useProviders();
+  const siteStatus = useSiteStatus();
   const [params] = useSearchParams();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -257,6 +264,11 @@ export function SignInPage() {
           </form>
         )}
 
+        {mode === "signup" && siteStatus.data?.signups_open === false && (
+          <div className="notice" role="status">
+            <p>{SIGNUPS_PAUSED}</p>
+          </div>
+        )}
         {mode === "signup" && (
           <form onSubmit={onSignUp} noValidate>
             <EmailField value={email} onChange={setEmail} error={errors.email} />

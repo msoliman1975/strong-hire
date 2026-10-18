@@ -27,6 +27,7 @@ from arq import Retry
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from strong_core import runtime_settings as rs
 from strong_core.db import get_sessionmaker
 from strong_core.db.models import GapAnalysis as GapRow
 from strong_core.db.models import InterviewSession, JobTarget
@@ -46,6 +47,7 @@ from strong_core.schemas import (
 from strong_core.sim import gateway_for_org
 from strong_worker.gap.analysis import GapAnalysisError, run_gap_analysis
 from strong_worker.gap.brief import BriefError, build_brief
+from strong_worker.pause import wait_if_paused
 
 log = logging.getLogger(__name__)
 
@@ -93,8 +95,9 @@ def context_notes(target: JobTarget) -> str | None:
 async def run_gap_analysis_job(
     ctx: dict[str, Any], gap_analysis_id: str, org_id: str
 ) -> dict[str, Any]:
-    """Compute one gap analysis row (GA-1 to GA-3)."""
+    """Compute one gap analysis row (GA-1 to GA-3). Waits in the queue while paused (OC-5)."""
     gap = _gap(ctx)
+    await wait_if_paused(ctx, gap.sessionmaker, rs.JobKind.GAP_ANALYSIS)  # before the try below
     try:
         return await _run_gap_analysis(gap, gap_analysis_id, org_id)
     except BaseException:
