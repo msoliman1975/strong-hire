@@ -3,7 +3,6 @@ import { useState, type FormEvent, type KeyboardEvent, type ReactNode } from "re
 import { Navigate, useNavigate, useSearchParams } from "react-router";
 
 import { authApi } from "../api/auth";
-import { ApiError } from "../api/client";
 import { keys, useAuth, useProviders } from "../api/hooks";
 import type { AuthState, EmailSent } from "../api/types";
 import { AuthHeading } from "../components/AuthLayout";
@@ -119,7 +118,7 @@ export function SignInPage() {
   const [fullName, setFullName] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
-  const [sent, setSent] = useState<{ kind: "confirm" | "link" | "reset"; reply: EmailSent } | null>(null);
+  const [sent, setSent] = useState<{ kind: "link" | "reset"; reply: EmailSent } | null>(null);
   const [devEmail, setDevEmail] = useState("dev@example.com");
 
   const signedIn = (state: AuthState) => {
@@ -128,11 +127,8 @@ export function SignInPage() {
   };
 
   const login = useMutation({ mutationFn: authApi.passwordLogin, onSuccess: signedIn });
-  const signup = useMutation({
-    mutationFn: authApi.passwordSignup,
-    onSuccess: (reply) => setSent({ kind: "confirm", reply }),
-  });
-  const resend = useMutation({ mutationFn: authApi.resendConfirmation });
+  // AC-4: sign-up signs the user in at once; the confirmation email follows.
+  const signup = useMutation({ mutationFn: authApi.passwordSignup, onSuccess: signedIn });
   const magicLink = useMutation({
     mutationFn: authApi.sendMagicLink,
     onSuccess: (reply) => setSent({ kind: "link", reply }),
@@ -152,7 +148,7 @@ export function SignInPage() {
     setMode(next);
     setErrors({});
     setSent(null);
-    for (const m of [login, signup, magicLink, forgot, resend]) m.reset();
+    for (const m of [login, signup, magicLink, forgot]) m.reset();
   };
   const emailError = () => (EMAIL_RE.test(cleanEmail) ? undefined : EMAIL_ERROR);
 
@@ -192,30 +188,6 @@ export function SignInPage() {
 
   if (sent) {
     const back = () => switchMode("signin");
-    if (sent.kind === "confirm") {
-      return (
-        <Sent onBack={back}>
-          <p>
-            We sent a link to <strong>{cleanEmail}</strong>. Open it to confirm your email and sign in. It works for 24
-            hours.
-          </p>
-          <DevLink sent={resend.data ?? sent.reply} label="open the confirmation link" />
-          <p className="muted">
-            No email after a few minutes? Check your spam folder, or{" "}
-            <button
-              type="button"
-              className="link-button"
-              disabled={resend.isPending}
-              onClick={() => resend.mutate(cleanEmail)}
-            >
-              send it again
-            </button>
-            .
-          </p>
-          {resend.isSuccess && <p className="muted">Sent again.</p>}
-        </Sent>
-      );
-    }
     if (sent.kind === "reset") {
       return (
         <Sent onBack={back}>
@@ -238,7 +210,6 @@ export function SignInPage() {
   }
 
   const linkError = params.get("error");
-  const unconfirmed = login.error instanceof ApiError && login.error.status === 403;
   const tabbed = mode === "signin" || mode === "signup";
 
   return (
@@ -279,25 +250,7 @@ export function SignInPage() {
                 </button>
               }
             />
-            {unconfirmed ? (
-              <div className="notice notice--error" role="alert">
-                <p>{login.error?.message}</p>
-                {resend.isSuccess ? (
-                  <p>We sent the link again.</p>
-                ) : (
-                  <button
-                    type="button"
-                    className="btn btn--secondary"
-                    disabled={resend.isPending}
-                    onClick={() => resend.mutate(cleanEmail)}
-                  >
-                    Send the confirmation link again
-                  </button>
-                )}
-              </div>
-            ) : (
-              login.isError && <ErrorNotice error={login.error} />
-            )}
+            {login.isError && <ErrorNotice error={login.error} />}
             <button type="submit" className="btn btn--block" disabled={login.isPending}>
               Sign in
             </button>
@@ -349,7 +302,7 @@ export function SignInPage() {
             <button type="submit" className="btn btn--block" disabled={signup.isPending}>
               Create account
             </button>
-            <p className="auth-fine">We email you a link to confirm your address before your first interview.</p>
+            <p className="auth-fine">We also email you a link to confirm your address.</p>
           </form>
         )}
 

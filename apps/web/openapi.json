@@ -1816,7 +1816,7 @@
           "auth"
         ],
         "summary": "Password Signup",
-        "description": "AC-4: create an account with a password. The reply is the same for a new email and\na taken one, so it does not reveal accounts; the owner of a taken email gets a note.",
+        "description": "AC-4: create an account with a password and sign in. The email is confirmed later,\nfrom the link we send.",
         "operationId": "password_signup_auth_password_signup_post",
         "requestBody": {
           "content": {
@@ -1829,12 +1829,12 @@
           "required": true
         },
         "responses": {
-          "202": {
+          "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EmailSent"
+                  "$ref": "#/components/schemas/AuthState"
                 }
               }
             }

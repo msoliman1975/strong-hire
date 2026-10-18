@@ -128,12 +128,18 @@ export function authHandlers(store: MockStore) {
       store.save();
       return HttpResponse.json(state());
     }),
-    // AC-4, AC-5. The mock confirms the email at once and keeps passwords in memory only.
+    // AC-4, AC-5. Sign-up signs in at once. The mock keeps passwords in memory only.
     http.post(`${API}/auth/password/signup`, async ({ request }) => {
       const body = (await request.json()) as { email: string; password: string; full_name?: string | null };
       const email = body.email.trim().toLowerCase();
-      if (body.password.length < 12) return HttpResponse.json({ detail: "Use at least 12 characters." }, { status: 422 });
-      if (!store.db.users[email]) {
+      if (body.password.length < 8) return HttpResponse.json({ detail: "Use at least 8 characters." }, { status: 422 });
+      if (store.db.users[email]) {
+        return HttpResponse.json(
+          { detail: "An account with this email already exists. Sign in, or reset your password." },
+          { status: 409 },
+        );
+      }
+      {
         store.db.users[email] = {
           id: newId(),
           org_id: newId(),
@@ -148,7 +154,7 @@ export function authHandlers(store: MockStore) {
         mockPasswords.set(email, body.password);
         store.save();
       }
-      return HttpResponse.json({ sent: true, dev_link: null }, { status: 202 });
+      return HttpResponse.json(signInAs(email));
     }),
     http.post(`${API}/auth/password/login`, async ({ request }) => {
       const body = (await request.json()) as { email: string; password: string };

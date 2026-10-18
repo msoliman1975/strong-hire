@@ -194,9 +194,6 @@ class RecordingEmailSender:
     async def send_password_reset(self, to: str, link: str) -> None:
         self.mail.append(("reset", to, link))
 
-    async def send_account_exists(self, to: str, signin_url: str) -> None:
-        self.mail.append(("exists", to, signin_url))
-
 
 class AuthHarness:
     def __init__(self, app: FastAPI, client: TestClient, sessionmaker: Any, email: Any) -> None:
