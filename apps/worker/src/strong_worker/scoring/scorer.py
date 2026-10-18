@@ -26,7 +26,6 @@ from strong_core.gateway import Message, ModelGateway, Role
 from strong_core.profiles import ResolvedProfile
 from strong_core.prompts import load_prompt
 from strong_core.schemas import (
-    COMPETENCIES_BY_TYPE,
     BriefQuestion,
     Competency,
     CompetencyScore,
@@ -38,6 +37,7 @@ from strong_core.schemas import (
     Speaker,
     Turn,
     ValueScore,
+    session_competencies,
 )
 from strong_worker.scoring.levels import level_expectations
 from strong_worker.scoring.quotes import QuoteChecker
@@ -219,14 +219,15 @@ class SessionScorer:
         budget = int(window * TRANSCRIPT_SHARE * CHARS_PER_TOKEN)
         return load_prompt(ROLE, "rubric_input").message(
             "user",
-            interview_type=brief.session.interview_type.value,
+            interview_type=interview_type_text(brief),
             level=brief.session.level.value,
             company=profile.company_name if not profile.generic else "generic mode",
             level_expectations=level_expectations(brief.session.level, profile),
             competencies=", ".join(c.value for c in _scored_competencies(brief, asked)),
             values=_values_text(profile, allowed_values),
             questions="\n".join(
-                f"{q.id}: {q.text} [{', '.join(c.value for c in q.competencies)}] "
+                f"{q.id}{f' ({q.category.value})' if q.category else ''}: {q.text} "
+                f"[{', '.join(c.value for c in q.competencies)}] "
                 f"{{{', '.join(v for v in q.values if v in allowed_values)}}}"
                 for q in asked
             )
@@ -248,7 +249,7 @@ class SessionScorer:
         user = load_prompt(ROLE, "rationale_input").message(
             "user",
             hire_signal=signal.signal.value,
-            interview_type=brief.session.interview_type.value,
+            interview_type=interview_type_text(brief),
             level=brief.session.level.value,
             average=f"{signal.average:.2f}",
             rules=" ".join(signal.rules) or "none",
@@ -289,6 +290,16 @@ def render_transcript(turns: Sequence[Turn], max_chars: int | None = None) -> st
         kept = [t for t in kept if t.phase != phase]
         text = "\n".join(line(t) for t in kept)
     return text or "(empty transcript)"
+
+
+def interview_type_text(brief: InterviewerBrief) -> str:
+    """The interview type for the scorer prompts. A Custom session names its categories, and
+    each question line shows its own category (CU-6)."""
+    custom = brief.session.custom
+    if custom is None:
+        return brief.session.interview_type.value
+    kinds = ", ".join(c.category.value for c in custom.categories)
+    return f"custom, mixing {kinds} questions (each question shows its category)"
 
 
 def _asked_questions(brief: InterviewerBrief, turns: Sequence[Turn]) -> list[BriefQuestion]:
@@ -335,7 +346,7 @@ def _clean(
 ) -> _Draft:
     """Keep scores for asked questions, allowed competencies and values, and valid quotes."""
     draft = _Draft()
-    type_comps = set(COMPETENCIES_BY_TYPE[brief.session.interview_type])
+    type_comps = set(session_competencies(brief.session))
     asked_by_id = {q.id: q for q in asked}
 
     def keep_comp(key: str, s: CompetencyScore) -> CompetencyScore | None:
