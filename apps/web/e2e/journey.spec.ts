@@ -16,7 +16,7 @@ async function shot(page: Page, name: string) {
   if (SHOTS) await page.screenshot({ path: `${SHOTS}/${name}.png`, fullPage: true });
 }
 
-test("AC-4: create an account with email and password, then sign in with it", async ({ page }) => {
+test("AC-4: create an account with email and password and go straight in", async ({ page }) => {
   await page.goto("/signin");
   await shot(page, "00-signin-password");
   await page.getByRole("tab", { name: "Create account" }).click();
@@ -24,10 +24,7 @@ test("AC-4: create an account with email and password, then sign in with it", as
   await page.getByLabel("Password", { exact: true }).fill("correct horse battery");
   await page.getByLabel(/I am 18 or older, and I accept/).check();
   await page.getByRole("button", { name: "Create account" }).click();
-  await expect(page.getByRole("heading", { name: "Check your email" })).toBeVisible();
-  await page.getByRole("button", { name: "Back to sign in" }).click();
-  await page.getByLabel("Password", { exact: true }).fill("correct horse battery");
-  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  // Signed in at once; the confirmation email does not block the password.
   await expect(page.getByRole("heading", { name: "Tell us about yourself" })).toBeVisible();
 });
 

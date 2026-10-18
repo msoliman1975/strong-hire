@@ -14,7 +14,7 @@ from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError
 from redis.asyncio import Redis
 
-MIN_LENGTH = 12
+MIN_LENGTH = 8
 MAX_LENGTH = 128
 LOCKOUT_FAILURES = 5
 LOCKOUT_WINDOW_S = 15 * 60

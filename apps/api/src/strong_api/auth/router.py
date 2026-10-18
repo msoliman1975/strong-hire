@@ -6,9 +6,10 @@ pending sign-up, and the web app asks for the 18+ confirmation, the terms and th
 consent (AC-2, default off) before POST /auth/signup creates the user.
 
 Password flow (AC-4): POST /auth/password/signup takes the confirmations with the password,
-creates an unverified user and emails a confirmation link. Password sign-in works once the link
-is opened. A link or Google sign-in also proves the email; for an unverified user it removes the
-password, because nobody proved that the person who chose it owns the email.
+creates the user, signs them in and emails a link to confirm the address. Password sign-in works
+before the link is opened. A link or Google sign-in also proves the email; for an unconfirmed
+user it removes the password, because nobody proved that the person who chose it owns the
+email.
 """
 
 from __future__ import annotations
@@ -300,10 +301,12 @@ def build_router(
 
     # ------------------------------------------------------------ email and password (AC-4)
 
-    @router.post("/password/signup", status_code=status.HTTP_202_ACCEPTED)
-    async def password_signup(db: DbSession, body: PasswordSignupRequest) -> EmailSent:
-        """AC-4: create an account with a password. The reply is the same for a new email and
-        a taken one, so it does not reveal accounts; the owner of a taken email gets a note."""
+    @router.post("/password/signup")
+    async def password_signup(
+        request: Request, db: DbSession, body: PasswordSignupRequest
+    ) -> AuthState:
+        """AC-4: create an account with a password and sign in. The email is confirmed later,
+        from the link we send."""
         if not body.age_confirmed:
             raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "You must be 18 or older")
         if not body.terms_accepted:
@@ -313,30 +316,26 @@ def build_router(
         if problem:
             raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, problem)
         full_name = (body.full_name or "").strip() or None
-        user = await find_user(db, email)
-        if user is not None and user.email_verified_at is not None:
-            await email_sender.send_account_exists(email, web_link("/signin"))
-            return EmailSent(sent=True)
-        if user is None:
-            user = await create_user(
-                db,
-                email=email,
-                provider=AuthProvider.PASSWORD,
-                age_confirmed=body.age_confirmed,
-                terms_accepted=body.terms_accepted,
-                training_consent=body.training_consent,
-                email_verified=False,
-                password_hash=hash_password(body.password),
-                full_name=full_name,
+        if await find_user(db, email) is not None:
+            # Never replace the password of an existing account, confirmed or not.
+            raise HTTPException(
+                status.HTTP_409_CONFLICT,
+                "An account with this email already exists. Sign in, or reset your password.",
             )
-        else:
-            # Not confirmed yet: the latest sign-up wins, and older links stop working.
-            user.password_hash = hash_password(body.password)
-            user.full_name = full_name or user.full_name
-            user.training_consent = body.training_consent
-            await db.commit()
-        link = await send_confirmation(user)
-        return EmailSent(sent=True, dev_link=link if settings.is_local else None)
+        user = await create_user(
+            db,
+            email=email,
+            provider=AuthProvider.PASSWORD,
+            age_confirmed=body.age_confirmed,
+            terms_accepted=body.terms_accepted,
+            training_consent=body.training_consent,
+            email_verified=False,
+            password_hash=hash_password(body.password),
+            full_name=full_name,
+        )
+        await send_confirmation(user)
+        await _sign_in_user(request, db, user)
+        return _state(request, user, settings)
 
     @router.post("/password/resend", status_code=status.HTTP_202_ACCEPTED)
     async def resend_confirmation(db: DbSession, body: EmailOnlyRequest) -> EmailSent:
@@ -383,11 +382,6 @@ def build_router(
             await throttle.fail(email)
             raise HTTPException(status.HTTP_401_UNAUTHORIZED, "The email or password is wrong.")
         await throttle.reset(email)
-        if user.email_verified_at is None:
-            raise HTTPException(
-                status.HTTP_403_FORBIDDEN,
-                "Confirm your email first. Open the link we sent you, or ask for a new one.",
-            )
         if hashed and needs_rehash(hashed):
             user.password_hash = hash_password(body.password)
         await _sign_in_user(request, db, user)

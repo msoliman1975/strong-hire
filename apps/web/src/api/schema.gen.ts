@@ -696,8 +696,8 @@ export interface paths {
         put?: never;
         /**
          * Password Signup
-         * @description AC-4: create an account with a password. The reply is the same for a new email and
-         *     a taken one, so it does not reveal accounts; the owner of a taken email gets a note.
+         * @description AC-4: create an account with a password and sign in. The email is confirmed later,
+         *     from the link we send.
          */
         post: operations["password_signup_auth_password_signup_post"];
         delete?: never;
@@ -4690,12 +4690,12 @@ export interface operations {
         };
         responses: {
             /** @description Successful Response */
-            202: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["EmailSent"];
+                    "application/json": components["schemas"]["AuthState"];
                 };
             };
             /** @description Validation Error */

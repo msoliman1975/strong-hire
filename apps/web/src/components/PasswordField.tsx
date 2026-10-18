@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-/** The password rules the API checks (AC-4): at least 12 characters, not the email name. */
-export const PASSWORD_MIN = 12;
+/** The password rules the API checks (AC-4): at least 8 characters, not the email name. */
+export const PASSWORD_MIN = 8;
 
 export function passwordRules(password: string, email: string) {
   const name = email.split("@")[0]?.trim().toLowerCase() ?? "";
