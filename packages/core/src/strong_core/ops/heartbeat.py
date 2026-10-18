@@ -3,8 +3,9 @@
 Each api, worker and voice process writes `heartbeat:<service>:<instance>` every 15 s with a
 60 s TTL. The value is JSON: {service, instance, version, model_profile, started_at, at}. A
 service with no live key is down. The model profile in each value is how the admin app shows
-what every service runs and flags a mismatch (D-11: no runtime profile switch, OC-6). The worker sampler turns the keys into `heartbeat.up`
-samples, and GET /health fails when no worker key exists (AL-8).
+what every service runs and flags a mismatch (D-11: no runtime profile switch, OC-6). The
+worker sampler turns the keys into `heartbeat.up` samples, and GET /health fails when no
+worker key exists (AL-8).
 
     beat = Heartbeat(redis, "api", model_profile="local")
     beat.start()          # a background task; never raises
