@@ -16,8 +16,10 @@ from enum import StrEnum
 from typing import Any
 
 from sqlalchemy import (
+    BigInteger,
     Boolean,
     DateTime,
+    Double,
     Enum,
     ForeignKey,
     Index,
@@ -34,10 +36,17 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from strong_core.schemas.enums import (
+    AlertAggregation,
+    AlertComparator,
+    AlertEventKind,
+    AlertSeverity,
+    AlertState,
     AuthProvider,
     Competency,
     Difficulty,
+    ErrorGroupStatus,
     GapStatus,
+    GrantKind,
     HireSignal,
     InterviewType,
     Level,
@@ -49,6 +58,7 @@ from strong_core.schemas.enums import (
     SessionStatus,
     Speaker,
     SubscriptionStatus,
+    TriageState,
     UsageComponent,
 )
 
@@ -105,6 +115,27 @@ USER_OWNED_TABLES = (
     "company_requests",
     "exit_surveys",
     "interviewer_traces",
+    "minute_grants",
+    "voice_turn_timings",
+)
+
+# Platform tables: no org_id, not owned by one user. A test checks that every table is in
+# exactly one of the two lists, so each new table is classified on purpose.
+PLATFORM_TABLES = (
+    "orgs",
+    "companies",
+    "company_profiles",
+    "stripe_events",
+    "audit_logs",
+    "admin_users",
+    "admin_sessions",
+    "error_groups",
+    "error_events",
+    "ops_samples",
+    "alert_rules",
+    "alert_events",
+    "runtime_settings",
+    "company_request_triage",
 )
 
 
@@ -152,6 +183,19 @@ class User(Base):
     linkedin_url: Mapped[str | None] = mapped_column(String(300), comment="AC-3: optional")
     profile_completed_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), comment="AC-3: NULL until the user saves the profile once"
+    )
+    # AU-7 and AU-8: admin support actions.
+    suspended_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), comment="AU-7: requests get 403 while set. NULL: active"
+    )
+    suspended_reason: Mapped[str | None] = mapped_column(
+        Text, comment="AU-7: the admin's reason, shown in the admin app only"
+    )
+    session_epoch: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
+        server_default="0",
+        comment="AU-8: carried in the session cookie; bumping it signs the user out everywhere",
     )
 
 
@@ -396,6 +440,9 @@ class Turn(Base):
 
 
 TRACE_RETENTION_DAYS = 90  # a worker cron job deletes older interviewer traces (R2)
+OPS_SAMPLE_RETENTION_DAYS = 30  # OB-5: older ops_samples rows are deleted daily
+ERROR_EVENT_RETENTION_DAYS = 30  # OB-4: older error_events rows go; error_groups stay
+VOICE_TIMING_RETENTION_DAYS = 90  # OB-3: like traces
 
 
 class InterviewerTrace(Base):
@@ -485,6 +532,16 @@ class UsageEvent(Base):
     component: Mapped[UsageComponent] = mapped_column(str_enum(UsageComponent, "usage_component"))
     units: Mapped[Decimal] = mapped_column(Numeric(14, 4), comment="Tokens, seconds or characters")
     cost_usd: Mapped[Decimal] = mapped_column(Numeric(12, 6))
+    role: Mapped[str | None] = mapped_column(
+        String(32),
+        comment="OB-2: gateway role (strong_core.gateway.Role value). NULL: written before OB-2",
+    )
+    cost_known: Mapped[bool] = mapped_column(
+        Boolean,
+        default=True,
+        server_default="true",
+        comment="OB-2, D-12: false when the model has no price in config (cost_usd is then 0)",
+    )
     created_at: Mapped[datetime] = _created_at()
 
 
@@ -532,3 +589,262 @@ class AuditLog(Base):
     entity: Mapped[str] = mapped_column(String(200))
     details_json: Mapped[dict[str, Any] | None] = mapped_column()
     at: Mapped[datetime] = _created_at()
+
+
+# --- Admin app (docs/admin-spec.md, "Data model changes") ------------------------------------
+
+
+class AdminUser(Base):
+    """AA-1: who may use the admin app. Seeded once from ADMIN_EMAILS when the table is empty."""
+
+    __tablename__ = "admin_users"
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    email: Mapped[str] = mapped_column(String(320), unique=True, comment="Stored lower case")
+    added_by: Mapped[str | None] = mapped_column(
+        String(320), comment="Admin email, 'ADMIN_EMAILS' for the seed, or 'strongctl'"
+    )
+    added_at: Mapped[datetime] = _created_at()
+    disabled_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), comment="Removed admin. NULL: active"
+    )
+
+
+class AdminSession(Base):
+    """AA-3: a server-side admin session. The sh_admin cookie holds a random token; the row
+    stores only its SHA-256, so a database leak does not leak live sessions."""
+
+    __tablename__ = "admin_sessions"
+
+    id: Mapped[str] = mapped_column(
+        String(64), primary_key=True, comment="SHA-256 hex of the sh_admin cookie token"
+    )
+    admin_user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("admin_users.id", ondelete="CASCADE"), index=True
+    )
+    created_at: Mapped[datetime] = _created_at()
+    last_seen_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), comment="AA-3: idle timeout 2 h from here"
+    )
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), comment="AA-3: absolute timeout, created_at + 12 h"
+    )
+    ip: Mapped[str | None] = mapped_column(String(45))
+    user_agent: Mapped[str | None] = mapped_column(String(500))
+    revoked_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), comment="Sign-out or AA-8 revoke. NULL: live"
+    )
+
+
+class MinuteGrant(Base):
+    """AU-3..AU-5: support grants on top of the plan. Never written into subscriptions.
+
+    Removing a grant sets revoked_at; rows are not deleted, so the ledger keeps the history.
+    """
+
+    __tablename__ = "minute_grants"
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    org_id: Mapped[uuid.UUID] = _org_fk()
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    kind: Mapped[GrantKind] = mapped_column(str_enum(GrantKind, "grant_kind"))
+    amount: Mapped[int] = mapped_column(
+        Integer,
+        comment="minutes: minutes (negative removes); free_interviews: count; "
+        "comp_plan: the minutes cap of the comp",
+    )
+    expires_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), comment="NULL: does not expire. Required for comp_plan"
+    )
+    reason: Mapped[str] = mapped_column(Text, comment="AA-6: the reason the admin gave")
+    granted_by: Mapped[str] = mapped_column(String(320), comment="Admin email")
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    revoked_by: Mapped[str | None] = mapped_column(String(320), comment="Admin email")
+    created_at: Mapped[datetime] = _created_at()
+
+
+class VoiceTurnTiming(Base):
+    """OB-3: latency of one voice turn, by component. Deleted after 90 days, like traces."""
+
+    __tablename__ = "voice_turn_timings"
+    __table_args__ = (Index("ix_voice_turn_timings_session_turn", "session_id", "turn_index"),)
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    org_id: Mapped[uuid.UUID] = _org_fk()
+    session_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("sessions.id", ondelete="CASCADE"))
+    turn_index: Mapped[int] = mapped_column(Integer, comment="Order of the turn in the session")
+    e2e_ms: Mapped[int | None] = mapped_column(
+        Integer, comment="End of candidate speech to first interviewer audio"
+    )
+    turn_detection_ms: Mapped[int | None] = mapped_column(Integer)
+    stt_ms: Mapped[int | None] = mapped_column(Integer)
+    llm_ttft_ms: Mapped[int | None] = mapped_column(Integer, comment="LLM time to first token")
+    tts_ttfb_ms: Mapped[int | None] = mapped_column(Integer, comment="TTS time to first byte")
+    other_ms: Mapped[int | None] = mapped_column(Integer, comment="e2e minus the parts above")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False, index=True
+    )
+
+
+class ErrorGroup(Base):
+    """OB-4: errors grouped by fingerprint. Groups are kept; their events go after 30 days."""
+
+    __tablename__ = "error_groups"
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    fingerprint: Mapped[str] = mapped_column(
+        String(64), unique=True, comment="Hash of exception type + top in-app frames"
+    )
+    service: Mapped[str] = mapped_column(String(20), comment="api, worker or voice")
+    exception_type: Mapped[str] = mapped_column(String(200))
+    message: Mapped[str] = mapped_column(Text, comment="PII scrubbed before writing")
+    first_seen: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    last_seen: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    count: Mapped[int] = mapped_column(Integer, default=1, server_default="1")
+    status: Mapped[ErrorGroupStatus] = mapped_column(
+        str_enum(ErrorGroupStatus, "error_group_status"),
+        default=ErrorGroupStatus.OPEN,
+        server_default="open",
+    )
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    resolved_by: Mapped[str | None] = mapped_column(String(320), comment="Admin email")
+    sample_stack: Mapped[str | None] = mapped_column(Text, comment="One scrubbed stack trace")
+    release: Mapped[str | None] = mapped_column(String(100), comment="Latest release seen")
+
+
+class ErrorEvent(Base):
+    """OB-4: one occurrence of an error group. Deleted after 30 days."""
+
+    __tablename__ = "error_events"
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    group_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("error_groups.id", ondelete="CASCADE"), index=True
+    )
+    at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False, index=True
+    )
+    service: Mapped[str] = mapped_column(String(20))
+    release: Mapped[str | None] = mapped_column(String(100))
+    request_id: Mapped[str | None] = mapped_column(String(64))
+    session_id: Mapped[uuid.UUID | None] = mapped_column(
+        comment="Interview session, if any. No FK: errors outlive deleted sessions"
+    )
+
+
+class OpsSample(Base):
+    """OB-5: one metric value from the sampler cron (every minute). Deleted after 30 days."""
+
+    __tablename__ = "ops_samples"
+    __table_args__ = (Index("ix_ops_samples_metric_ts", "metric", "ts"),)
+
+    id: Mapped[int] = mapped_column(
+        BigInteger().with_variant(Integer, "sqlite"), primary_key=True, autoincrement=True
+    )
+    ts: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    metric: Mapped[str] = mapped_column(String(100), comment="For example probe.postgres.ok")
+    value: Mapped[float] = mapped_column(Double)
+    labels_json: Mapped[dict[str, Any] | None] = mapped_column(
+        comment="Small string map, for example {'service': 'api'}"
+    )
+
+
+class AlertRule(Base):
+    """AL-1: a threshold rule the alert cron checks every minute (AL-2)."""
+
+    __tablename__ = "alert_rules"
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    name: Mapped[str] = mapped_column(String(100), unique=True)
+    metric: Mapped[str] = mapped_column(
+        String(100), comment="An ops_samples metric or a domain metric the engine knows"
+    )
+    labels_json: Mapped[dict[str, Any] | None] = mapped_column(
+        comment="Only samples with these labels count. NULL: all"
+    )
+    aggregation: Mapped[AlertAggregation] = mapped_column(
+        str_enum(AlertAggregation, "alert_aggregation")
+    )
+    window_s: Mapped[int] = mapped_column(Integer, comment="Samples from the last window_s count")
+    comparator: Mapped[AlertComparator] = mapped_column(
+        str_enum(AlertComparator, "alert_comparator")
+    )
+    threshold: Mapped[float] = mapped_column(Double)
+    min_samples: Mapped[int] = mapped_column(
+        Integer, default=1, server_default="1", comment="Fewer samples: the rule stays as it is"
+    )
+    for_s: Mapped[int] = mapped_column(
+        Integer, default=0, server_default="0", comment="Pending this long before firing"
+    )
+    severity: Mapped[AlertSeverity] = mapped_column(str_enum(AlertSeverity, "alert_severity"))
+    renotify_s: Mapped[int | None] = mapped_column(
+        Integer, comment="Re-send while firing. NULL: never (AL-3)"
+    )
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
+    muted_until: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), comment="No email until then; state still changes"
+    )
+    state: Mapped[AlertState] = mapped_column(
+        str_enum(AlertState, "alert_state"), default=AlertState.OK, server_default="ok"
+    )
+    state_since: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    last_notified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    last_value: Mapped[float | None] = mapped_column(Double, comment="At the last evaluation")
+    created_at: Mapped[datetime] = _created_at()
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class AlertEvent(Base):
+    """AL-4: alert history. A row with notified false is retried on the next tick (AL-5)."""
+
+    __tablename__ = "alert_events"
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    rule_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("alert_rules.id", ondelete="CASCADE"), index=True
+    )
+    kind: Mapped[AlertEventKind] = mapped_column(str_enum(AlertEventKind, "alert_event_kind"))
+    value: Mapped[float | None] = mapped_column(Double)
+    at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False, index=True
+    )
+    notified: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    notify_error: Mapped[str | None] = mapped_column(Text, comment="Last send failure")
+
+
+class RuntimeSetting(Base):
+    """OC: one ops control. Read through strong_core.runtime_settings (10 s cache)."""
+
+    __tablename__ = "runtime_settings"
+
+    key: Mapped[str] = mapped_column(String(100), primary_key=True)
+    value_json: Mapped[Any] = mapped_column(
+        JSONB, nullable=True, comment="Validated by strong_core.runtime_settings"
+    )
+    updated_by: Mapped[str] = mapped_column(String(320), comment="Admin email")
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+
+class CompanyRequestTriage(Base):
+    """AT-5: admin triage of a requested company name. company_requests rows are not edited."""
+
+    __tablename__ = "company_request_triage"
+
+    normalized_name: Mapped[str] = mapped_column(
+        String(200), primary_key=True, comment="company_requests.normalized_name"
+    )
+    state: Mapped[TriageState] = mapped_column(
+        str_enum(TriageState, "triage_state"), default=TriageState.NEW, server_default="new"
+    )
+    company_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("companies.id", ondelete="SET NULL"), comment="Set when state is added"
+    )
+    note: Mapped[str | None] = mapped_column(Text)
+    updated_by: Mapped[str] = mapped_column(String(320), comment="Admin email")
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
