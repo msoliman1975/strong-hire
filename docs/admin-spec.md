@@ -268,18 +268,22 @@ to D-18.
 ### How it runs
 
 ```
- admin app ── POST /admin/sim/runs ──▶ api ── checks (SM-3) ──▶ sim_runs row + Arq job (queue "sim")
+ admin app ── POST /admin/sim/runs ──▶ api ── checks (SM-3) ──▶ sim_runs row (queued)
                                                                        │
- sim service (main server, 2 CPUs, 2 GB)  ◀────────────────────────────┘  one job at a time
+ sim service (main server, 2 CPUs, 2 GB)  ◀────────────────────────────┘  oldest queued row first
    - signs in with sim-login and runs the interview through the public URL, as a browser does
    - candidate and judge through the main LiteLLM with SIM_LITELLM_KEY (the $5/day sim budget)
    - candidate voice from the main server's Kokoro (tts service)
    - writes /srv/stronghire/sim/<run-id>/ (read-write mount); status and progress in sim_runs
 ```
 
-- The `sim` service is `apps/sim` in a new mode, `strong-sim serve`: an Arq worker on its own
-  queue (`sim`) with `max_jobs=1`. It is in `compose.server.yaml` under the `sim` profile, with
-  `cpus: 2` and `mem_limit: 2g`. It starts only when `SIM_ENABLED=true`.
+- The `sim` service is `apps/sim` in a new mode, `strong-sim serve`: one loop that takes the
+  oldest queued or waiting `sim_runs` row every 2 s and runs it; one run at a time. `sim_runs` is
+  the queue: the api only writes rows, and cancel (SM-5) and delete (SM-13) are columns the loop
+  reads. No Arq job, so nothing can get out of step between Redis and the table. It is in
+  `compose.server.yaml` under the `sim` profile, with `cpus: 2` and `mem_limit: 2g`. Runs fail at
+  the gate unless `SIM_ENABLED=true`. A restart fails the run that was active (its session and
+  audio are gone).
 - The interview itself still goes through HTTP and LiveKit like a real browser, so a run tests the
   real path. The service reads and writes `sim_runs` directly (it has `DATABASE_URL`).
 - Models: the main `config/litellm.<profile>.yaml` gets the `sim-candidate`, `sim-judge` and
@@ -294,7 +298,7 @@ to D-18.
 | ID | Requirement | Priority |
 | --- | --- | --- |
 | SM-1 | **New run form:** persona (the 6 resume fixtures; the posting and level follow), interview type, difficulty, mode, duration (5, 10, 15, 20, 30 min), candidate quality, behavior (voice-only behaviors only when channel is voice) and channel (voice by default). The form shows the cost estimate for the chosen duration, what is left of today's sim budget, and the current gate state (SM-3). | P0 |
-| SM-2 | **Start:** creates a `sim_runs` row (`queued`) and an Arq job, writes an audit row, and returns the run. At most one run is active; up to 5 more wait in the queue in order. | P0 |
+| SM-2 | **Start:** creates a `sim_runs` row (`queued`), writes an audit row, and returns the run. At most one run is active; up to 5 more wait in the queue in order. | P0 |
 | SM-3 | **Gates,** checked when the admin clicks Start (409 with a reason the form shows) and again when the job begins: `SIM_ENABLED` is on; the `sim_paused` setting is off; fewer than `sim_max_live_sessions` (default 3) real sessions are `in_progress` (the sim org does not count); the estimate fits what is left of today's sim budget. At job start, a failed live-sessions gate sets the run to `waiting` and checks again every 60 s; after 30 min it fails with the reason. The other gates fail the run at once. | P0 |
 | SM-4 | **Status:** `queued → waiting → starting → interviewing → judging → done`, or `failed` (with the error) or `cancelled`. While `interviewing`, the row shows elapsed / planned minutes, updated every 10 s. Cost so far = sim side (from the sim's meter) + app side (`usage_events` of the session). The list polls every 5 s while any run is not finished. | P0 |
 | SM-5 | **Cancel:** sets `cancel_requested_at`. A queued or waiting run is cancelled at once. An active run ends its session on the server within 5 s, saves the transcript and audio so far, skips the judge, and ends `cancelled`. Audited. | P0 |
@@ -306,7 +310,7 @@ to D-18.
 | SM-11 | **Scorecard panel:** the debrief's hire signal, competency scores and evidence, as the candidate would see them. | P0 |
 | SM-12 | **Runs list:** started by, scenario summary, status, length, hire signal, failed judge rules, p50 response time, cost, Keep. Filters: status, channel, started by admin or by suite. Runs from `sim-run.ps1` are read from disk and shown with "suite" as the source; they open in the same replay page (with "times are approximate" when they predate SM-6). | P1 |
 | SM-13 | **Keep and Delete:** Keep marks a run so retention never deletes it. Delete (with a reason and confirmation) deletes the run folder at once and sets `deleted_at` on the row, so the list and costs keep a stub. The interview session itself stays in Interviews. Both audited. | P0 |
-| SM-14 | **Retention** moves from the host cron into a daily Arq cron in the `sim` service: delete run folders older than `SIM_KEEP_DAYS` (default 90), then the oldest until under `SIM_KEEP_GB` (default 10). It skips runs marked Keep and the newest run, and records each deletion on the run's row. `infra/sim/server-setup.sh` stops installing the host cron. | P0 |
+| SM-14 | **Retention** moves from the host cron into the `sim` service (hourly): delete run folders older than `SIM_KEEP_DAYS` (default 90), then the oldest until under `SIM_KEEP_GB` (default 10). It skips runs marked Keep and the newest run, and records each deletion on the run's row. `infra/sim/server-setup.sh` stops installing the host cron. | P0 |
 | SM-15 | **Controls:** "Pause sim runs" (`sim_paused`) and "Live sessions limit for sim runs" (`sim_max_live_sessions`, 0–20) on the Controls page, audited like OC-1..OC-5. Pausing also offers "stop the active run" (= SM-5). | P0 |
 | SM-16 | **Interview page link:** an interview of the sim user that has a run folder shows "Replay". | P1 |
 
@@ -387,7 +391,7 @@ OpenAPI, as `apps/web` does.
 | A6 | `feat/a6-ops-controls` | OC-1..OC-4 in api, voice and web, Controls page | A1 |
 | A7 | `feat/a7-admin-content` | AT-1..AT-5 | A1 |
 | S0 | `feat/s0-sim-core` | `sim_runs` model and migration, the two runtime settings | none |
-| S1 | `feat/s1-sim-serve` | apps/sim: audio-clock timing (SM-6), `serve` mode with cancel, progress, gates at job start and retention (SM-3..SM-5, SM-14); infra: `sim` service, LiteLLM aliases, server-setup change | S0 |
+| S1 | `feat/s1-sim-serve` | apps/sim: audio-clock timing (SM-6), `serve` mode with cancel, progress, gates at run start and retention (SM-3..SM-5, SM-14); infra: `sim` service, LiteLLM aliases, server-setup change | S0 |
 | S2 | `feat/s2-sim-api` | Admin routes, gates at Start, replay route, audio Range (SM-1..SM-5, SM-7..SM-13) | S0 |
 | S3 | `feat/s3-sim-web` | Simulations list and form, replay page, Controls additions, interview link (SM-1, SM-7..SM-16) | S2 |
 
