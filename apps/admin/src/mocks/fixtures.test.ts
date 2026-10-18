@@ -10,6 +10,7 @@ import { adminApi } from "../api/admin";
 import { alertsApi } from "../api/alerts";
 import { authApi } from "../api/auth";
 import { controlsApi } from "../api/controls";
+import { usersApi } from "../api/users";
 import { mockStore } from "./node";
 
 const OPENAPI = JSON.parse(readFileSync(resolve(__dirname, "../../../web/openapi.json"), "utf8")) as object;
@@ -68,7 +69,7 @@ describe("admin mocks match openapi.json", () => {
       minutes_billed: 30,
       failure_reason: null,
     });
-    for (const u of await adminApi.users()) expectApiShape("AdminUser", u);
+    expectApiShape("AdminUserPage", await adminApi.users());
     expectApiShape("AdminSessionList", await adminApi.sessions({ interview_type: "case" }));
     const detail = await adminApi.session("00000000-0000-4000-8000-0000000000c1");
     expectApiShape("AdminSessionDetail", detail);
@@ -94,5 +95,22 @@ describe("admin mocks match openapi.json", () => {
     for (const r of rules) expectApiShape("AlertRuleOut", r);
     for (const e of await alertsApi.events()) expectApiShape("AlertEventOut", e);
     expectApiShape("AlertTestOut", await alertsApi.test(rules[0].id, "check the inbox"));
+  });
+
+  it("users and support (AU-1..AU-9)", async () => {
+    mockStore.db.users["ana@example.com"] = user("ana@example.com", 1, true);
+    mockStore.db.users["admin@example.com"] = user("admin@example.com", 9, false);
+    await authApi.devLogin("admin@example.com");
+    const id = "00000000-0000-4000-8000-0000000000a1";
+    expectApiShape("AdminUserPage", await usersApi.list({ q: "ana" }));
+    const until = new Date(Date.now() + 86_400_000).toISOString();
+    const grant = await usersApi.grant(id, { kind: "comp_plan", amount: 120, expires_at: until, reason: "beta tester" });
+    expectApiShape("AdminGrant", grant);
+    expectApiShape("AdminGrant", await usersApi.revokeGrant(id, grant.id, "ended early"));
+    expectApiShape("AdminActionOut", await usersApi.suspend(id, "abuse report"));
+    expectApiShape("AdminActionOut", await usersApi.unsuspend(id, "resolved"));
+    expectApiShape("AdminActionOut", await usersApi.signOut(id, "lost laptop"));
+    expectApiShape("AdminActionOut", await usersApi.resendLink(id, "cannot sign in"));
+    expectApiShape("AdminUserDetail", await usersApi.detail(id));
   });
 });

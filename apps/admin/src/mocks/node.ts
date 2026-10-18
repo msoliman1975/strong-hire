@@ -6,6 +6,7 @@ import { alertsHandlers } from "./alertsHandlers";
 import { controlsHandlers } from "./controlsHandlers";
 import { createStore } from "./db";
 import { authHandlers } from "./handlers";
+import { usersHandlers } from "./usersHandlers";
 
 export const mockStore = createStore({ persist: false });
-export const server = setupServer(...authHandlers(mockStore), ...adminHandlers(mockStore), ...alertsHandlers(mockStore), ...controlsHandlers(mockStore));
+export const server = setupServer(...authHandlers(mockStore), ...adminHandlers(mockStore), ...alertsHandlers(mockStore), ...controlsHandlers(mockStore), ...usersHandlers(mockStore));

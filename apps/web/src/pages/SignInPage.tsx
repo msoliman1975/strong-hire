@@ -21,6 +21,7 @@ const LINK_ERRORS: Record<string, string> = {
   link_expired: "That link has expired. Ask for a new one.",
   link_used: "That link was already used. Ask for a new one.",
   link_invalid: "That link is not valid. Ask for a new one.",
+  account_unavailable: "This account is not available. Contact support for help.",
   google: "Google sign-in did not finish. Try again, or use your email and password.",
   signups_paused: SIGNUPS_PAUSED,
 };

@@ -10,6 +10,7 @@ import { AlertRuleEditPage } from "./pages/AlertRuleEditPage";
 import { AlertRulesPage } from "./pages/AlertRulesPage";
 import { AdminSessionPage } from "./pages/AdminSessionPage";
 import { AdminSessionsPage } from "./pages/AdminSessionsPage";
+import { AdminUserPage } from "./pages/AdminUserPage";
 import { AdminUsersPage } from "./pages/AdminUsersPage";
 import { ControlsPage } from "./pages/ControlsPage";
 import { SignInPage } from "./pages/SignInPage";
@@ -36,6 +37,7 @@ export function AppRoutes() {
         <Route path="/interviews" element={<AdminSessionsPage />} />
         <Route path="/interviews/:sessionId" element={<AdminSessionPage />} />
         <Route path="/users" element={<AdminUsersPage />} />
+        <Route path="/users/:userId" element={<AdminUserPage />} />
         <Route path="/audit" element={<AdminAuditPage />} />
         <Route path="/ops/controls" element={<ControlsPage />} />
         <Route path="/alerts" element={<Navigate to="/alerts/rules" replace />} />

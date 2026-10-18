@@ -1,6 +1,5 @@
 """Admin area (R2): review test interviews and the interviewer's reasoning.
 
-    GET /admin/users                 every user: plan, minutes, consent, interviews, last sign-in
     GET /admin/sessions              interviews of all users (filters: user, date, type), with
                                      model cost and a cost total per day
     GET /admin/sessions/{id}         one interview: metadata always; transcript and traces only
@@ -44,14 +43,13 @@ from strong_api.admin.schemas import (
     AdminSessionDetail,
     AdminSessionList,
     AdminTrace,
-    AdminUser,
     CostSource,
     DailyCost,
 )
 from strong_api.auth.deps import DbSession
 from strong_api.auth.settings import AuthSettings
 from strong_api.auth.sim import is_sim_user
-from strong_api.billing.entitlements import as_utc, get_entitlement
+from strong_api.billing.entitlements import as_utc
 from strong_core.db.models import (
     TRACE_RETENTION_DAYS,
     AuditLog,
@@ -166,38 +164,6 @@ def _session_out(
 
 def _day_start(day: date) -> datetime:
     return datetime.combine(day, time.min, tzinfo=UTC)
-
-
-@router.get("/users")
-async def list_users(db: DbSession, admin: Admin, request: Request) -> list[AdminUser]:
-    settings = admin_settings(request)
-    users = list(await db.scalars(select(User).order_by(User.created_at.desc())))
-    counts = _pairs(
-        await db.execute(
-            select(InterviewSession.org_id, func.count(InterviewSession.id)).group_by(
-                InterviewSession.org_id
-            )
-        )
-    )
-    out = []
-    for user in users:
-        ent = await get_entitlement(db, user.org_id)
-        out.append(
-            AdminUser(
-                id=user.id,
-                email=user.email,
-                created_at=user.created_at,
-                last_sign_in_at=user.last_sign_in_at,
-                plan=ent.plan,
-                subscription_status=ent.status,
-                minutes_used=ent.minutes_used,
-                minutes_cap=ent.minutes_cap,
-                training_consent=user.training_consent,
-                interviews=int(counts.get(user.org_id, 0)),
-                is_admin=settings.is_admin(user.email),
-            )
-        )
-    return out
 
 
 @router.get("/sessions")
