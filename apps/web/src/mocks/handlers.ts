@@ -50,6 +50,20 @@ import type {
 import { newId, type MockGap, type MockStore, type MockTask } from "./db";
 import { gapAnalysis, jobPosting, resume, scorecardFor, sessionPlan } from "./fixtures";
 
+/** CU-1: fill the defaults the API adds to a Custom setup. */
+function withCustomDefaults(custom: CreateSessionRequest["config"]["custom"]): SessionRecord["config"]["custom"] {
+  if (!custom) return null;
+  return {
+    categories: custom.categories.map((c) => ({ ...c, focus: c.focus ?? [] })),
+    questions: (custom.questions ?? []).map((q) => ({
+      ...q,
+      must_ask: q.must_ask ?? true,
+      verbatim: q.verbatim ?? false,
+      saved_question_id: q.saved_question_id ?? null,
+    })),
+  };
+}
+
 const API = "*/api";
 
 function notFound(what: string) {
@@ -805,7 +819,7 @@ export function sessionHandlers(store: MockStore) {
         id: newId(),
         job_target_id: body.job_target_id,
         resume_id: body.resume_id ?? readyCv,
-        config: body.config,
+        config: { ...body.config, custom: withCustomDefaults(body.config.custom) },
         channel: body.channel ?? "voice",
         brief_ready: true,
         status: "created",

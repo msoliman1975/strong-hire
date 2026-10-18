@@ -15,6 +15,7 @@ from strong_core.gateway.smoke import SmokeAnswer
 from strong_core.schemas import (
     COMPETENCIES_BY_TYPE,
     EXPORTED_SCHEMAS,
+    STANDARD_INTERVIEW_TYPES,
     CompanyProfile,
     CompetencyScore,
     HireSignal,
@@ -43,8 +44,9 @@ def test_hire_signal_values_match_spec() -> None:
 
 
 def test_every_interview_type_has_competencies() -> None:
-    """IV-2: four interview types, each with scored competencies."""
-    assert set(COMPETENCIES_BY_TYPE) == set(InterviewType)
+    """IV-2: four interview types, each with scored competencies. Custom (CU-1) mixes them."""
+    assert set(COMPETENCIES_BY_TYPE) == set(STANDARD_INTERVIEW_TYPES)
+    assert set(InterviewType) == {*STANDARD_INTERVIEW_TYPES, InterviewType.CUSTOM}
     assert all(len(c) >= 5 for c in COMPETENCIES_BY_TYPE.values())
 
 

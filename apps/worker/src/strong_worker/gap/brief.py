@@ -34,6 +34,7 @@ from strong_core.schemas import (
     BriefQuestion,
     Competency,
     Difficulty,
+    DraftQuestion,
     GapAnalysis,
     InterviewerBrief,
     JobPosting,
@@ -360,7 +361,7 @@ async def build_brief(
 
 
 def _clean_questions(
-    draft: list[BriefQuestion], comps: list[Competency], values: list[str], flags: list[str]
+    draft: list[DraftQuestion], comps: list[Competency], values: list[str], flags: list[str]
 ) -> list[BriefQuestion]:
     out: list[BriefQuestion] = []
     seen_ids: set[str] = set()
@@ -380,16 +381,13 @@ def _clean_questions(
             kept = [_least_covered(out, comps)]
             flags.append(f"competency_reassigned: {qid}")
         out.append(
-            q.model_copy(
-                update={
-                    "id": qid,
-                    "text": text,
-                    "competencies": list(dict.fromkeys(kept)),
-                    "values": [v for v in dict.fromkeys(q.values) if v in values],
-                    "probe_hints": [h.strip()[:MAX_HINT] for h in q.probe_hints if h.strip()][
-                        :MAX_HINTS
-                    ],
-                }
+            BriefQuestion(
+                id=qid,
+                text=text,
+                competencies=list(dict.fromkeys(kept)),
+                values=[v for v in dict.fromkeys(q.values) if v in values],
+                priority=q.priority,
+                probe_hints=[h.strip()[:MAX_HINT] for h in q.probe_hints if h.strip()][:MAX_HINTS],
             )
         )
     return out

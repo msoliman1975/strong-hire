@@ -6,6 +6,7 @@ export const interviewTypeLabel: Record<InterviewType, string> = {
   hiring_manager: "Hiring manager deep dive",
   technical_qa: "Verbal technical Q&A",
   case: "Case",
+  custom: "Custom",
 };
 
 export const difficultyLabel: Record<Difficulty, string> = {

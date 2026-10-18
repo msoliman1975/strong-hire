@@ -78,7 +78,7 @@ async function seed() {
     id: "00000000-0000-4000-8000-00000000d001",
     job_target_id: job.id,
     resume_id: resume.id,
-    config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min: 10, level: "senior" },
+    config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min: 10, level: "senior", custom: null },
     channel: "voice",
     brief_ready: true,
     status: "completed",

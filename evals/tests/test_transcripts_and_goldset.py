@@ -9,7 +9,12 @@ from pathlib import Path
 
 import pytest
 
-from strong_core.schemas import Competency, HireSignal, InterviewType, Level
+from strong_core.schemas import (
+    STANDARD_INTERVIEW_TYPES,
+    Competency,
+    HireSignal,
+    Level,
+)
 from strong_evals.goldset import (
     COLUMNS,
     GoldSetError,
@@ -31,7 +36,7 @@ def test_thirty_transcripts_cover_types_levels_and_quality() -> None:
     """IV-2 and IV-6: four interview types, three levels, strong, average and weak answers."""
     transcripts = load_transcripts()
     assert len(transcripts) == 30
-    assert {t.session.interview_type for t in transcripts} == set(InterviewType)
+    assert {t.session.interview_type for t in transcripts} == set(STANDARD_INTERVIEW_TYPES)
     assert {t.session.level for t in transcripts} == {Level.NEW_GRAD, Level.MID, Level.SENIOR}
     assert Counter(t.quality for t in transcripts) == {q: 10 for q in Quality}
 

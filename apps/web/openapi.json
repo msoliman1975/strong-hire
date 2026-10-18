@@ -7793,7 +7793,7 @@
         "properties": {
           "questions": {
             "items": {
-              "$ref": "#/components/schemas/BriefQuestion"
+              "$ref": "#/components/schemas/DraftQuestion"
             },
             "maxItems": 12,
             "minItems": 6,
@@ -7862,6 +7862,41 @@
             },
             "title": "Probe Hints",
             "type": "array"
+          },
+          "source": {
+            "$ref": "#/components/schemas/QuestionSource",
+            "default": "planner",
+            "description": "CU-3: candidate for the candidate's own."
+          },
+          "category": {
+            "anyOf": [
+              {
+                "enum": [
+                  "behavioral",
+                  "hiring_manager",
+                  "technical_qa",
+                  "case"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Custom sessions only: the question's category (CU-1)."
+          },
+          "must_ask": {
+            "default": false,
+            "description": "CU-4: the session controller asks it before CANDIDATE_QUESTIONS.",
+            "title": "Must Ask",
+            "type": "boolean"
+          },
+          "verbatim": {
+            "default": false,
+            "description": "CU-4: read the text word for word.",
+            "title": "Verbatim",
+            "type": "boolean"
           }
         },
         "required": [
@@ -8413,6 +8448,206 @@
         ],
         "title": "CreateSessionRequest"
       },
+      "CustomCategory": {
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "behavioral",
+              "hiring_manager",
+              "technical_qa",
+              "case"
+            ]
+          },
+          "share": {
+            "type": "number",
+            "maximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Share",
+            "description": "Share of the core time. Shares add up to 1."
+          },
+          "focus": {
+            "items": {
+              "type": "string",
+              "maxLength": 60,
+              "minLength": 1
+            },
+            "type": "array",
+            "maxItems": 8,
+            "title": "Focus",
+            "description": "Topics to focus on, for example 'conflict' or 'Kubernetes' (CU-2)."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "category",
+          "share"
+        ],
+        "title": "CustomCategory",
+        "description": "One question category in a Custom session (CU-1, CU-2)."
+      },
+      "CustomInterviewAccess": {
+        "type": "string",
+        "enum": [
+          "everyone",
+          "paid_only"
+        ],
+        "title": "CustomInterviewAccess",
+        "description": "CU-11: who may run a Custom interview. Everyone while we test; paid plans when live."
+      },
+      "CustomQuestion": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Text"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "behavioral",
+              "hiring_manager",
+              "technical_qa",
+              "case"
+            ]
+          },
+          "competencies": {
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 1,
+            "title": "Competencies",
+            "description": "From COMPETENCIES_BY_TYPE for the category. Tagged by the CU-5 check."
+          },
+          "must_ask": {
+            "type": "boolean",
+            "title": "Must Ask",
+            "description": "CU-4: the session controller asks it.",
+            "default": true
+          },
+          "verbatim": {
+            "type": "boolean",
+            "title": "Verbatim",
+            "description": "CU-4: read the text word for word.",
+            "default": false
+          },
+          "saved_question_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Saved Question Id",
+            "description": "CU-8: the saved_questions row it came from."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text",
+          "category",
+          "competencies"
+        ],
+        "title": "CustomQuestion",
+        "description": "A question the candidate wrote or saved (CU-3, CU-4)."
+      },
+      "CustomQuestionCheck": {
+        "additionalProperties": false,
+        "description": "CU-5: the check of one own question or focus chip before the session.\n\nThe worker refuses the text when `is_question` is false and shows the candidate a fixed\nsentence for `refusal` with the short `reason`. Text that tries to instruct the interviewer\nis refused, never forwarded.",
+        "properties": {
+          "is_question": {
+            "description": "For a focus chip: whether it is a fair interview topic.",
+            "title": "Is Question",
+            "type": "boolean"
+          },
+          "refusal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/QuestionRefusal"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Set when refused."
+          },
+          "reason": {
+            "default": "",
+            "description": "One short sentence the candidate sees.",
+            "maxLength": 200,
+            "title": "Reason",
+            "type": "string"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "enum": [
+                  "behavioral",
+                  "hiring_manager",
+                  "technical_qa",
+                  "case"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Set when accepted."
+          },
+          "competencies": {
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "maxItems": 3,
+            "title": "Competencies",
+            "type": "array"
+          }
+        },
+        "required": [
+          "is_question"
+        ],
+        "title": "CustomQuestionCheck",
+        "type": "object"
+      },
+      "CustomSessionSpec": {
+        "properties": {
+          "categories": {
+            "items": {
+              "$ref": "#/components/schemas/CustomCategory"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 1,
+            "title": "Categories"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/CustomQuestion"
+            },
+            "type": "array",
+            "maxItems": 8,
+            "title": "Questions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "categories"
+        ],
+        "title": "CustomSessionSpec",
+        "description": "What the candidate builds for a Custom session. Stored in sessions.custom_json."
+      },
       "DailyCost": {
         "properties": {
           "day": {
@@ -8642,6 +8877,76 @@
         ],
         "title": "DocumentKind",
         "type": "string"
+      },
+      "DraftQuestion": {
+        "additionalProperties": false,
+        "description": "One question as the planner model writes it. The worker turns it into a BriefQuestion;\nonly code sets the source, must-ask and verbatim fields.",
+        "properties": {
+          "id": {
+            "pattern": "^[a-z0-9_-]+$",
+            "title": "Id",
+            "type": "string"
+          },
+          "text": {
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          },
+          "competencies": {
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "minItems": 1,
+            "title": "Competencies",
+            "type": "array"
+          },
+          "values": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Values",
+            "type": "array"
+          },
+          "priority": {
+            "description": "1 is asked first.",
+            "minimum": 1,
+            "title": "Priority",
+            "type": "integer"
+          },
+          "probe_hints": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Probe Hints",
+            "type": "array"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "enum": [
+                  "behavioral",
+                  "hiring_manager",
+                  "technical_qa",
+                  "case"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Custom sessions only: one of the session's categories."
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "competencies",
+          "priority"
+        ],
+        "title": "DraftQuestion",
+        "type": "object"
       },
       "Education": {
         "properties": {
@@ -9384,10 +9689,11 @@
           "behavioral",
           "hiring_manager",
           "technical_qa",
-          "case"
+          "case",
+          "custom"
         ],
         "title": "InterviewType",
-        "description": "The four v1 interview types (IV-2)."
+        "description": "The four v1 interview types (IV-2), plus Custom (CU-1).\n\nA Custom session mixes 1 to 3 of the four standard types as question categories\n(`SessionConfig.custom`). Custom is never a question category itself and has no entry in\nCOMPETENCIES_BY_TYPE; use `session_competencies(config)` for a session's competency pool."
       },
       "InterviewerBrief": {
         "additionalProperties": false,
@@ -10337,7 +10643,13 @@
           "interview_type": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/InterviewType"
+                "enum": [
+                  "behavioral",
+                  "hiring_manager",
+                  "technical_qa",
+                  "case"
+                ],
+                "type": "string"
               },
               {
                 "type": "null"
@@ -11907,7 +12219,13 @@
             "description": "1 is the first session to run."
           },
           "interview_type": {
-            "$ref": "#/components/schemas/InterviewType"
+            "type": "string",
+            "enum": [
+              "behavioral",
+              "hiring_manager",
+              "technical_qa",
+              "case"
+            ]
           },
           "difficulty": {
             "$ref": "#/components/schemas/Difficulty",
@@ -12332,7 +12650,13 @@
         "description": "A recurring theme, phrased as a pattern. Never a leaked or NDA-protected question.",
         "properties": {
           "interview_type": {
-            "$ref": "#/components/schemas/InterviewType"
+            "enum": [
+              "behavioral",
+              "hiring_manager",
+              "technical_qa",
+              "case"
+            ],
+            "type": "string"
           },
           "theme": {
             "minLength": 1,
@@ -12367,6 +12691,16 @@
         ],
         "title": "QuestionPattern",
         "type": "object"
+      },
+      "QuestionRefusal": {
+        "description": "CU-5: why a candidate's own question or focus chip is refused.",
+        "enum": [
+          "not_a_question",
+          "inappropriate",
+          "instructions"
+        ],
+        "title": "QuestionRefusal",
+        "type": "string"
       },
       "QuestionScore": {
         "properties": {
@@ -12418,6 +12752,15 @@
           "scores"
         ],
         "title": "QuestionScore"
+      },
+      "QuestionSource": {
+        "description": "Who wrote a brief question: the planner, or the candidate in a Custom session (CU-3).",
+        "enum": [
+          "planner",
+          "candidate"
+        ],
+        "title": "QuestionSource",
+        "type": "string"
       },
       "RedirectOut": {
         "properties": {
@@ -13045,6 +13388,10 @@
             "title": "Sim Max Live Sessions",
             "description": "SM-3: a sim run does not start while this many real sessions are live. 0 turns the limit off.",
             "default": 3
+          },
+          "custom_interview_access": {
+            "$ref": "#/components/schemas/CustomInterviewAccess",
+            "default": "everyone"
           }
         },
         "additionalProperties": false,
@@ -13057,7 +13404,13 @@
         "description": "A question the company or candidates published, paraphrased, with its source.\nNever an NDA-protected question or copied paid content.",
         "properties": {
           "interview_type": {
-            "$ref": "#/components/schemas/InterviewType"
+            "enum": [
+              "behavioral",
+              "hiring_manager",
+              "technical_qa",
+              "case"
+            ],
+            "type": "string"
           },
           "question": {
             "description": "Paraphrased, not copied.",
@@ -13275,6 +13628,17 @@
           },
           "level": {
             "$ref": "#/components/schemas/Level"
+          },
+          "custom": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CustomSessionSpec"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "CU-1: required for the Custom type, absent for the others."
           }
         },
         "additionalProperties": false,
@@ -13427,7 +13791,8 @@
           "site_banner",
           "jobs_paused",
           "sim_paused",
-          "sim_max_live_sessions"
+          "sim_max_live_sessions",
+          "custom_interview_access"
         ],
         "title": "SettingKey"
       },

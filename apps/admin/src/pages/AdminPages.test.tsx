@@ -41,6 +41,7 @@ function seed({ consent = false, signedInAs = "admin@example.com" } = {}) {
       mode: "realistic",
       duration_min: 10,
       level: "senior",
+      custom: null,
     },
     channel: "voice",
     brief_ready: true,

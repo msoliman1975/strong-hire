@@ -1,0 +1,105 @@
+{
+  "$defs": {
+    "Competency": {
+      "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.",
+      "enum": [
+        "ownership",
+        "impact",
+        "collaboration",
+        "conflict_handling",
+        "learning_from_failure",
+        "communication",
+        "role_fit",
+        "depth_of_experience",
+        "judgment",
+        "motivation",
+        "team_fit",
+        "scope_at_level",
+        "technical_depth",
+        "accuracy",
+        "reasoning",
+        "trade_offs",
+        "clarity_of_explanation",
+        "problem_framing",
+        "structure",
+        "user_and_business_sense",
+        "estimation_logic",
+        "prioritization",
+        "recommendation"
+      ],
+      "title": "Competency",
+      "type": "string"
+    },
+    "QuestionRefusal": {
+      "description": "CU-5: why a candidate's own question or focus chip is refused.",
+      "enum": [
+        "not_a_question",
+        "inappropriate",
+        "instructions"
+      ],
+      "title": "QuestionRefusal",
+      "type": "string"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/custom_question_check.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "CU-5: the check of one own question or focus chip before the session.\n\nThe worker refuses the text when `is_question` is false and shows the candidate a fixed\nsentence for `refusal` with the short `reason`. Text that tries to instruct the interviewer\nis refused, never forwarded.",
+  "properties": {
+    "category": {
+      "anyOf": [
+        {
+          "enum": [
+            "behavioral",
+            "hiring_manager",
+            "technical_qa",
+            "case"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Set when accepted."
+    },
+    "competencies": {
+      "items": {
+        "$ref": "#/$defs/Competency"
+      },
+      "maxItems": 3,
+      "title": "Competencies",
+      "type": "array"
+    },
+    "is_question": {
+      "description": "For a focus chip: whether it is a fair interview topic.",
+      "title": "Is Question",
+      "type": "boolean"
+    },
+    "reason": {
+      "default": "",
+      "description": "One short sentence the candidate sees.",
+      "maxLength": 200,
+      "title": "Reason",
+      "type": "string"
+    },
+    "refusal": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/QuestionRefusal"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Set when refused."
+    }
+  },
+  "required": [
+    "is_question"
+  ],
+  "title": "CustomQuestionCheck",
+  "type": "object"
+}

@@ -1,4 +1,5 @@
-"""Ops controls that change without a redeploy (admin spec OC-1..OC-5, SM-15).
+"""Ops controls that change without a redeploy (admin spec OC-1..OC-5, SM-15, custom
+spec CU-11).
 
 Values live in the runtime_settings table (key, value_json). Every key has a type and a
 default here; a missing row means the default. Reads go through a 10 s in-process cache, so a
@@ -45,6 +46,7 @@ class SettingKey(StrEnum):
     JOBS_PAUSED = "jobs_paused"  # OC-5
     SIM_PAUSED = "sim_paused"  # SM-15
     SIM_MAX_LIVE_SESSIONS = "sim_max_live_sessions"  # SM-3, SM-15
+    CUSTOM_INTERVIEW_ACCESS = "custom_interview_access"  # CU-11
 
 
 class JobKind(StrEnum):
@@ -52,6 +54,13 @@ class JobKind(StrEnum):
 
     GAP_ANALYSIS = "gap_analysis"
     SCORING = "scoring"
+
+
+class CustomInterviewAccess(StrEnum):
+    """CU-11: who may run a Custom interview. Everyone while we test; paid plans when live."""
+
+    EVERYONE = "everyone"
+    PAID_ONLY = "paid_only"
 
 
 class SiteBanner(BaseModel):
@@ -86,6 +95,7 @@ class RuntimeSettings(BaseModel):
         description="SM-3: a sim run does not start while this many real sessions are live. "
         "0 turns the limit off.",
     )
+    custom_interview_access: CustomInterviewAccess = CustomInterviewAccess.EVERYONE
 
 
 KEYS: tuple[str, ...] = tuple(SettingKey)

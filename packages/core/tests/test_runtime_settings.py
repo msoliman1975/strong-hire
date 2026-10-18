@@ -143,3 +143,11 @@ async def test_sim_settings_defaults_and_bounds(db: AsyncSession) -> None:
     for bad in (-1, 21, "many"):
         with pytest.raises(ValidationError):
             await rs.set(db, rs.SettingKey.SIM_MAX_LIVE_SESSIONS, bad, actor="a@example.com")
+
+
+def test_cu11_custom_interview_is_open_to_everyone_until_switched() -> None:
+    """CU-11: everyone while we test; paid_only when live."""
+    assert rs.DEFAULTS.custom_interview_access == rs.CustomInterviewAccess.EVERYONE
+    assert rs.validate("custom_interview_access", "paid_only") == rs.CustomInterviewAccess.PAID_ONLY
+    with pytest.raises(ValidationError):
+        rs.validate("custom_interview_access", "free_only")

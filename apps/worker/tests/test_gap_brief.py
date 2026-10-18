@@ -17,6 +17,7 @@ from strong_core.gateway import ModelGateway
 from strong_core.profiles import ResolvedProfile, generic_profile
 from strong_core.schemas import (
     COMPETENCIES_BY_TYPE,
+    STANDARD_INTERVIEW_TYPES,
     BriefDraft,
     CompanyProfile,
     Competency,
@@ -100,7 +101,7 @@ async def test_brief_has_the_required_parts(gateway: ModelGateway, gap: GapAnaly
 def test_brief_stays_under_the_token_limit() -> None:
     """Keep the brief under 1,500 tokens so the live loop stays fast, for every setup."""
     for itype, diff, level, minutes, mode in itertools.product(
-        InterviewType, Difficulty, Level, (10, 30, 45), Mode
+        STANDARD_INTERVIEW_TYPES, Difficulty, Level, (10, 30, 45), Mode
     ):
         cfg = config(
             interview_type=itype, difficulty=diff, level=level, duration_min=minutes, mode=mode
@@ -223,7 +224,7 @@ def test_duration_sets_the_time_plan_and_question_count() -> None:
     assert len(long.target_competencies) >= len(short.target_competencies)
 
 
-@pytest.mark.parametrize("itype", list(InterviewType))
+@pytest.mark.parametrize("itype", STANDARD_INTERVIEW_TYPES)
 @pytest.mark.parametrize("difficulty", list(Difficulty))
 def test_mini_brief_for_every_type(itype: InterviewType, difficulty: Difficulty) -> None:
     """IV-7 mini: 10 minutes, 3 questions, 2 competencies, 1 probe at most, no curveball,

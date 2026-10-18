@@ -109,25 +109,32 @@ softer scoring because the candidate chose them.
 
 All in `packages/core` (one PR that merges first).
 
-- `InterviewType.CUSTOM` in `schemas/enums.py`. Code that maps type to competencies or personas
-  handles it explicitly.
-- `QuestionCategory` enum: `behavioral`, `technical`, `hiring_manager`, `case`. Maps to the four
-  `InterviewType` values for competencies.
+- `InterviewType.CUSTOM` in `schemas/enums.py`, and `STANDARD_INTERVIEW_TYPES` for the other
+  four. Custom has no entry in `COMPETENCIES_BY_TYPE`; `session_competencies(config)` returns a
+  session's pool (the union over a Custom session's categories).
+- Question categories reuse the four standard `InterviewType` values through the `StandardType`
+  annotation, which refuses `custom`. Company profiles and the gap analysis session plan use it
+  too, so they can never name Custom.
+- `QuestionSource` (`planner`, `candidate`) and `QuestionRefusal` (`not_a_question`,
+  `inappropriate`, `instructions`) enums.
 - New contracts in `schemas/custom.py`:
   - `CustomCategory`: `category`, `share` (0 to 1), `focus` (list of chip strings).
   - `CustomQuestion`: `text`, `category`, `competencies`, `must_ask`, `verbatim`,
     `saved_question_id` (optional).
-  - `CustomSessionSpec`: `categories` (1 to 3), `questions` (0 to 8), with validators for D-3 and
-    the caps in CU-3.
-  - `CustomQuestionCheck`: `is_question`, `refusal_reason`, `category`, `competencies`.
+  - `CustomSessionSpec`: `categories` (1 to 3), `questions` (0 to 8), with validators for D-3,
+    shares and duplicates.
+  - `CustomQuestionCheck`: `is_question`, `refusal`, `reason`, `category`, `competencies`.
 - `SessionConfig.custom: CustomSessionSpec | None`, required when `interview_type` is `custom` and
-  absent otherwise.
+  absent otherwise. `SessionConfig` checks the rules that need the duration: no mini, the CU-3
+  caps, Case needs 45 minutes.
 - `BriefQuestion` gains `source` (`planner` default, `candidate`), `category` (optional),
   `must_ask` (default false) and `verbatim` (default false). Defaults keep existing briefs valid.
+  `BriefDraft` now holds `DraftQuestion`s (the old fields plus an optional `category`), so the
+  planner model can never set `source`, `must_ask` or `verbatim`; only code does.
 - New table `saved_questions`: `id`, `org_id` (FK `orgs`, non-null), `user_id`, `text`,
   `category`, `competencies`, `bank_ref` (optional, when added from the bank), timestamps. In
   `USER_OWNED_TABLES`; in the AC-1 export and delete.
-- `sessions` keeps the spec inside the stored `SessionConfig` (JSON); no extra table.
+- `sessions.custom_json` holds the `CustomSessionSpec` (NULL for the standard types).
 - Runtime setting `custom_interview_access` in `strong_core/runtime_settings.py`, shown on the admin
   Controls page.
 - `./scripts/dev.ps1 schemas` after the contract changes; fake fixtures for `CustomQuestionCheck`

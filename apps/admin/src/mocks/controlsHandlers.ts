@@ -16,6 +16,7 @@ export const MOCK_DEFAULTS: RuntimeSettings = {
   daily_spend_cap_usd: 25,
   site_banner: null,
   jobs_paused: [],
+  custom_interview_access: "everyone",
 };
 
 const KEYS = Object.keys(MOCK_DEFAULTS) as SettingKey[];
