@@ -58,6 +58,13 @@ class Settings(BaseSettings):
 
     # Admin app (docs/admin-spec.md).
     alert_email: str = Field(default="", description="D-10: the one address all alerts go to.")
+    admin_base_url: str = Field(
+        default="http://localhost:5181", description="The admin app, for links in alert emails."
+    )
+    alert_digest: bool = Field(default=False, description="AL-7: send the daily alert digest.")
+    alert_digest_hour_utc: int = Field(
+        default=8, ge=0, le=23, description="AL-7: hour (UTC) the daily digest goes out."
+    )
     infra_monthly_usd: float | None = Field(
         default=None, description="D-12, OB-15: server cost per month, for the server share."
     )

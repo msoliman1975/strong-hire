@@ -6,7 +6,8 @@ P0 registers one `ping` job to prove the queue works. P2 adds the job and resume
 account export and file delete jobs (strong_worker.account.jobs). R1 adds the file delete for
 one saved CV (delete_resume_file). R2 adds a daily cron job that deletes interviewer traces older
 than 90 days (strong_worker.retention). A6 lets admins pause the gap analysis and scoring jobs
-(OC-5, strong_worker.pause).
+(OC-5, strong_worker.pause). A5 adds the alert engine (strong_worker.alerts): a cron every
+minute, the optional daily digest, and seeding the default rules at startup.
 """
 
 from __future__ import annotations
@@ -19,6 +20,7 @@ from arq.connections import RedisSettings
 from strong_core.config import get_settings
 from strong_worker import retention
 from strong_worker.account import jobs as account_jobs
+from strong_worker.alerts import jobs as alert_jobs
 from strong_worker.gap import jobs as gap_jobs
 from strong_worker.inputs import jobs as inputs_jobs
 from strong_worker.pause import PAUSED_MAX_TRIES
@@ -34,6 +36,7 @@ async def startup(ctx: dict[str, Any]) -> None:
     await gap_jobs.startup(ctx)
     await scoring_jobs.startup(ctx)
     await account_jobs.startup(ctx)
+    await alert_jobs.startup(ctx)
 
 
 async def shutdown(ctx: dict[str, Any]) -> None:
@@ -88,6 +91,21 @@ class WorkerSettings:
             retention.trace_retention,
             hour=retention.RUN_AT_HOUR_UTC,
             minute=retention.RUN_AT_MINUTE,
+            run_at_startup=False,
+            unique=True,
+        ),
+        # AL-2: every minute, at second 0.
+        cron(
+            alert_jobs.evaluate_alerts,
+            run_at_startup=False,
+            unique=True,
+            timeout=alert_jobs.TICK_TIMEOUT_S,
+        ),
+        # AL-7: off unless ALERT_DIGEST=true (checked inside the job).
+        cron(
+            alert_jobs.alert_digest,
+            hour=get_settings().alert_digest_hour_utc,
+            minute=0,
             run_at_startup=False,
             unique=True,
         ),

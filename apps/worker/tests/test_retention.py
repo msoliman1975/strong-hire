@@ -87,8 +87,12 @@ async def test_r2_old_traces_are_deleted_and_turns_stay(
 async def test_r2_retention_runs_as_a_daily_cron_job(
     sessionmaker: Maker, account: tuple[uuid.UUID, uuid.UUID]
 ) -> None:
-    jobs = [j for j in WorkerSettings.cron_jobs if isinstance(j, CronJob)]
-    assert [j.coroutine for j in jobs] == [retention.trace_retention]
+    jobs = [
+        j
+        for j in WorkerSettings.cron_jobs
+        if isinstance(j, CronJob) and j.coroutine is retention.trace_retention
+    ]
+    assert len(jobs) == 1
     job = jobs[0]
     assert job.hour == retention.RUN_AT_HOUR_UTC and job.minute == retention.RUN_AT_MINUTE
     await _fill(sessionmaker, *account, datetime.now(UTC))

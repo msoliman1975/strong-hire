@@ -38,6 +38,8 @@ services:
       API_PUBLIC_URL: https://${DOMAIN}/api
       # The admin app (D-1). Its sign-in links and Google sign-in come back to this host.
       ADMIN_BASE_URL: https://admin.${DOMAIN}
+      # Alerts page "Test" button (AL-6) sends to this address.
+      ALERT_EMAIL: ${ALERT_EMAIL:-}
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_USERNAME: ${SMTP_USERNAME:-}
@@ -74,6 +76,15 @@ services:
       SIM_ENABLED: ${SIM_ENABLED:-false}
       SIM_EMAIL: ${SIM_EMAIL:-sim@getstronghire.com}
       SIM_LITELLM_KEY: ${SIM_LITELLM_KEY:-}
+      # The alert engine (docs/alerts.md): every alert goes to ALERT_EMAIL (D-10), by SMTP.
+      ALERT_EMAIL: ${ALERT_EMAIL:-}
+      ALERT_DIGEST: ${ALERT_DIGEST:-false}
+      ADMIN_BASE_URL: https://admin.${DOMAIN}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
     volumes:
       - uploads-data:/data/uploads
     restart: unless-stopped

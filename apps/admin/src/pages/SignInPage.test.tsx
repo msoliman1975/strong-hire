@@ -55,7 +55,14 @@ describe("admin sign-in (D-1)", () => {
     await user.click(screen.getByRole("button", { name: "Sign in" }));
     expect(await screen.findByRole("heading", { name: "Interviews" })).toBeInTheDocument();
     const nav = screen.getByRole("navigation", { name: "Admin" });
-    expect(within(nav).getAllByRole("link").map((a) => a.textContent)).toEqual(["Interviews", "Users", "Audit log", "Controls"]);
+    // The first text node is the section name; a count badge (Alerts) may follow it.
+    expect(within(nav).getAllByRole("link").map((a) => a.firstChild?.textContent)).toEqual([
+      "Interviews",
+      "Users",
+      "Alerts",
+      "Audit log",
+      "Controls",
+    ]);
     expect(screen.getByText("admin@example.com")).toBeInTheDocument();
     expect(await screen.findByTitle("Model profile on this server")).toHaveTextContent("fake");
   });

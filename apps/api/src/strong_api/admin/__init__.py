@@ -6,11 +6,12 @@ from __future__ import annotations
 
 from fastapi import APIRouter, FastAPI
 
+from strong_api.admin.alerts import router as alerts_router
 from strong_api.admin.controls import router as controls_router
 from strong_api.admin.router import router
 from strong_api.auth.settings import AuthSettings, get_auth_settings
 
-ROUTERS: list[APIRouter] = [router, controls_router]
+ROUTERS: list[APIRouter] = [router, controls_router, alerts_router]
 
 
 def install_admin(app: FastAPI, settings: AuthSettings | None = None) -> None:
