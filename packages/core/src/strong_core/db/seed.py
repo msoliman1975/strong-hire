@@ -1,4 +1,5 @@
-"""Seed reference data: the 21 launch companies (spec, Scope section). Safe to run twice.
+"""Seed reference data: the 21 launch companies (spec, Scope section) and the default alert
+rules (admin spec AL, strong_core.ops.alerts). Safe to run twice.
 
 uv run python -m strong_core.db.seed
 """
@@ -10,6 +11,7 @@ from sqlalchemy.orm import Session
 
 from strong_core.config import get_settings
 from strong_core.db.models import Company
+from strong_core.ops.alerts import seed_default_rules_sync
 
 LAUNCH_COMPANIES: tuple[tuple[str, str], ...] = (
     ("google", "Google"),
@@ -51,7 +53,9 @@ def main() -> None:
     engine = create_engine(get_settings().database_url)
     with Session(engine) as db:
         added = seed(db)
+        rules = seed_default_rules_sync(db)
     print(f"Seed done: {added} companies added, {len(LAUNCH_COMPANIES) - added} already present.")
+    print(f"Alert rules: {rules} default rules added.")
 
 
 if __name__ == "__main__":

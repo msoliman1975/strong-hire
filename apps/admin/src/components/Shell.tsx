@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, type ComponentType } from "react";
 import { Link, Navigate, NavLink, Outlet } from "react-router";
 
 import { activeControls, useOpsSettings } from "../api/controls";
 
 import { useHealth } from "../api/health";
 import { useAuth, useSignOut } from "../api/hooks";
+import { FiringCount } from "./alerts";
 import { Brand } from "./Brand";
 import { applyTheme, savedTheme, systemTheme, type Theme } from "./theme";
 import { ErrorNotice, Loading, PageHead } from "./ui";
@@ -13,9 +14,10 @@ import { ErrorNotice, Loading, PageHead } from "./ui";
  * The sections of the admin app (Information architecture in docs/admin-spec.md). Only the ones
  * that exist are listed; later PRs add Overview, Content, Operations, Alerts and Settings here.
  */
-const SECTIONS = [
+const SECTIONS: { to: string; label: string; badge?: ComponentType }[] = [
   { to: "/interviews", label: "Interviews" },
   { to: "/users", label: "Users" },
+  { to: "/alerts", label: "Alerts", badge: FiringCount },
   { to: "/audit", label: "Audit log" },
   { to: "/ops/controls", label: "Controls" },
 ];
@@ -124,7 +126,10 @@ export function Shell() {
           <ul>
             {SECTIONS.map((s) => (
               <li key={s.to}>
-                <NavLink to={s.to}>{s.label}</NavLink>
+                <NavLink to={s.to}>
+                  {s.label}
+                  {s.badge && <s.badge />}
+                </NavLink>
               </li>
             ))}
           </ul>

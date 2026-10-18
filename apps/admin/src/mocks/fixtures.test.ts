@@ -7,6 +7,7 @@ import addFormats from "ajv-formats";
 import { describe, expect, it } from "vitest";
 
 import { adminApi } from "../api/admin";
+import { alertsApi } from "../api/alerts";
 import { authApi } from "../api/auth";
 import { controlsApi } from "../api/controls";
 import { mockStore } from "./node";
@@ -83,5 +84,15 @@ describe("admin mocks match openapi.json", () => {
     expectApiShape("OpsSettings", await controlsApi.set("site_banner", banner, "planned work"));
     expectApiShape("OpsSettings", await controlsApi.set("jobs_paused", ["scoring"], "provider down"));
     expectApiShape("ModelProfileOut", await controlsApi.models());
+  });
+
+  it("alerts: metrics, rules, events, test (AL-1, AL-4, AL-6)", async () => {
+    mockStore.db.users["admin@example.com"] = user("admin@example.com", 9, false);
+    await authApi.devLogin("admin@example.com");
+    for (const m of await alertsApi.metrics()) expectApiShape("AlertMetric", m);
+    const rules = await alertsApi.rules();
+    for (const r of rules) expectApiShape("AlertRuleOut", r);
+    for (const e of await alertsApi.events()) expectApiShape("AlertEventOut", e);
+    expectApiShape("AlertTestOut", await alertsApi.test(rules[0].id, "check the inbox"));
   });
 });

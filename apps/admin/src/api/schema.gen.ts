@@ -1290,6 +1290,120 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/alerts/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Metrics */
+        get: operations["list_metrics_admin_alerts_metrics_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/alerts/rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Rules
+         * @description Firing first, then pending, then by name.
+         */
+        get: operations["list_rules_admin_alerts_rules_get"];
+        put?: never;
+        /** Create Rule */
+        post: operations["create_rule_admin_alerts_rules_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/alerts/rules/{rule_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Rule */
+        delete: operations["delete_rule_admin_alerts_rules__rule_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Rule */
+        patch: operations["update_rule_admin_alerts_rules__rule_id__patch"];
+        trace?: never;
+    };
+    "/admin/alerts/rules/{rule_id}/mute": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mute Rule */
+        post: operations["mute_rule_admin_alerts_rules__rule_id__mute_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/alerts/rules/{rule_id}/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Test Rule
+         * @description AL-6: email a test alert for this rule to ALERT_EMAIL now. A failed send is retried by
+         *     the engine on its next tick, like any other event (AL-5).
+         */
+        post: operations["test_rule_admin_alerts_rules__rule_id__test_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/alerts/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Events
+         * @description Newest first.
+         */
+        get: operations["list_events_admin_alerts_events_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -1329,6 +1443,17 @@ export interface components {
             files_deleted_within_hours: number;
             /** Backups Expire Within Days */
             backups_expire_within_days: number;
+        };
+        /**
+         * ActionIn
+         * @description Base for admin write bodies: the reason is required and saved in the audit log.
+         */
+        ActionIn: {
+            /**
+             * Reason
+             * @description Why, for the audit log
+             */
+            reason: string;
         };
         /** AdminAuditEntry */
         AdminAuditEntry: {
@@ -1543,6 +1668,237 @@ export interface components {
             interviews: number;
             /** Is Admin */
             is_admin: boolean;
+        };
+        /**
+         * AlertAggregation
+         * @description AL-1: how an alert rule reduces the samples in its window to one value.
+         * @enum {string}
+         */
+        AlertAggregation: "last" | "avg" | "p95" | "rate" | "count";
+        /**
+         * AlertComparator
+         * @enum {string}
+         */
+        AlertComparator: "gt" | "gte" | "lt" | "lte";
+        /**
+         * AlertEventKind
+         * @description AL-4, AL-6.
+         * @enum {string}
+         */
+        AlertEventKind: "fired" | "resolved" | "test";
+        /** AlertEventOut */
+        AlertEventOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Rule Id
+             * Format: uuid
+             */
+            rule_id: string;
+            /** Rule Name */
+            rule_name: string;
+            severity: components["schemas"]["AlertSeverity"];
+            kind: components["schemas"]["AlertEventKind"];
+            /** Value */
+            value: number | null;
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Notified */
+            notified: boolean;
+            /** Notify Error */
+            notify_error: string | null;
+        };
+        /** AlertMetric */
+        AlertMetric: {
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /** Unit */
+            unit: string;
+            /** Labels */
+            labels: string[];
+            /** Derived */
+            derived: boolean;
+            /**
+             * Up
+             * @description 1 = up, 0 = down; no sample in the window counts as down
+             */
+            up: boolean;
+            /** @description Derived metrics: the one aggregation they support */
+            aggregation: components["schemas"]["AlertAggregation"] | null;
+        };
+        /** AlertMuteIn */
+        AlertMuteIn: {
+            /**
+             * Reason
+             * @description Why, for the audit log
+             */
+            reason: string;
+            /**
+             * Until
+             * @description No email until then. null: unmute
+             */
+            until: string | null;
+        };
+        /** AlertRuleCreateIn */
+        AlertRuleCreateIn: {
+            /** Name */
+            name: string;
+            /** Metric */
+            metric: string;
+            /** Labels */
+            labels?: {
+                [key: string]: string | string[];
+            } | null;
+            aggregation: components["schemas"]["AlertAggregation"];
+            /** Window S */
+            window_s: number;
+            comparator: components["schemas"]["AlertComparator"];
+            /** Threshold */
+            threshold: number;
+            /**
+             * Min Samples
+             * @default 1
+             */
+            min_samples: number;
+            /**
+             * For S
+             * @default 0
+             */
+            for_s: number;
+            severity: components["schemas"]["AlertSeverity"];
+            /** Renotify S */
+            renotify_s?: number | null;
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
+            /**
+             * Reason
+             * @description Why, for the audit log
+             */
+            reason: string;
+        };
+        /** AlertRuleOut */
+        AlertRuleOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Metric */
+            metric: string;
+            /** Labels */
+            labels: {
+                [key: string]: string | string[];
+            } | null;
+            aggregation: components["schemas"]["AlertAggregation"];
+            /** Window S */
+            window_s: number;
+            comparator: components["schemas"]["AlertComparator"];
+            /** Threshold */
+            threshold: number;
+            /** Min Samples */
+            min_samples: number;
+            /** For S */
+            for_s: number;
+            severity: components["schemas"]["AlertSeverity"];
+            /** Renotify S */
+            renotify_s: number | null;
+            /** Enabled */
+            enabled: boolean;
+            /** Muted Until */
+            muted_until: string | null;
+            state: components["schemas"]["AlertState"];
+            /** State Since */
+            state_since: string | null;
+            /** Last Notified At */
+            last_notified_at: string | null;
+            /** Last Value */
+            last_value: number | null;
+            /**
+             * Is Default
+             * @description Seeded default rule: cannot be deleted or renamed
+             */
+            is_default: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Updated At */
+            updated_at: string | null;
+        };
+        /**
+         * AlertRulePatchIn
+         * @description Only the fields that are set change. `labels` and `renotify_s` may be set to null.
+         */
+        AlertRulePatchIn: {
+            /** Name */
+            name?: string | null;
+            /** Metric */
+            metric?: string | null;
+            /** Labels */
+            labels?: {
+                [key: string]: string | string[];
+            } | null;
+            aggregation?: components["schemas"]["AlertAggregation"] | null;
+            /** Window S */
+            window_s?: number | null;
+            comparator?: components["schemas"]["AlertComparator"] | null;
+            /** Threshold */
+            threshold?: number | null;
+            /** Min Samples */
+            min_samples?: number | null;
+            /** For S */
+            for_s?: number | null;
+            severity?: components["schemas"]["AlertSeverity"] | null;
+            /** Renotify S */
+            renotify_s?: number | null;
+            /** Enabled */
+            enabled?: boolean | null;
+            /**
+             * Reason
+             * @description Why, for the audit log
+             */
+            reason: string;
+        };
+        /**
+         * AlertSeverity
+         * @enum {string}
+         */
+        AlertSeverity: "critical" | "warning";
+        /**
+         * AlertState
+         * @description AL-2: ok -> pending -> firing -> ok.
+         * @enum {string}
+         */
+        AlertState: "ok" | "pending" | "firing";
+        /** AlertTestIn */
+        AlertTestIn: {
+            /**
+             * Reason
+             * @description Why, for the audit log
+             */
+            reason: string;
+        };
+        /** AlertTestOut */
+        AlertTestOut: {
+            /** Sent */
+            sent: boolean;
+            /** Error */
+            error: string | null;
+            event: components["schemas"]["AlertEventOut"];
         };
         /**
          * AnswerCheck
@@ -5867,6 +6223,264 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ModelProfileOut"];
+                };
+            };
+        };
+    };
+    list_metrics_admin_alerts_metrics_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertMetric"][];
+                };
+            };
+        };
+    };
+    list_rules_admin_alerts_rules_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertRuleOut"][];
+                };
+            };
+        };
+    };
+    create_rule_admin_alerts_rules_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AlertRuleCreateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertRuleOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_rule_admin_alerts_rules__rule_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                rule_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_rule_admin_alerts_rules__rule_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                rule_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AlertRulePatchIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertRuleOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mute_rule_admin_alerts_rules__rule_id__mute_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                rule_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AlertMuteIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertRuleOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    test_rule_admin_alerts_rules__rule_id__test_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                rule_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AlertTestIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertTestOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_events_admin_alerts_events_get: {
+        parameters: {
+            query?: {
+                rule_id?: string | null;
+                kind?: components["schemas"]["AlertEventKind"] | null;
+                /** @description From (inclusive) */
+                since?: string | null;
+                /** @description To (exclusive) */
+                until?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertEventOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

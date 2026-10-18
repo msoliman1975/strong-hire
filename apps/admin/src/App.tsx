@@ -5,6 +5,9 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { ApiError } from "./api/client";
 import { Shell } from "./components/Shell";
 import { AdminAuditPage } from "./pages/AdminAuditPage";
+import { AlertHistoryPage } from "./pages/AlertHistoryPage";
+import { AlertRuleEditPage } from "./pages/AlertRuleEditPage";
+import { AlertRulesPage } from "./pages/AlertRulesPage";
 import { AdminSessionPage } from "./pages/AdminSessionPage";
 import { AdminSessionsPage } from "./pages/AdminSessionsPage";
 import { AdminUsersPage } from "./pages/AdminUsersPage";
@@ -35,6 +38,10 @@ export function AppRoutes() {
         <Route path="/users" element={<AdminUsersPage />} />
         <Route path="/audit" element={<AdminAuditPage />} />
         <Route path="/ops/controls" element={<ControlsPage />} />
+        <Route path="/alerts" element={<Navigate to="/alerts/rules" replace />} />
+        <Route path="/alerts/rules" element={<AlertRulesPage />} />
+        <Route path="/alerts/rules/:ruleId" element={<AlertRuleEditPage />} />
+        <Route path="/alerts/history" element={<AlertHistoryPage />} />
         <Route path="*" element={<Navigate to="/interviews" replace />} />
       </Route>
     </Routes>
