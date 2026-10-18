@@ -30,11 +30,12 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi import APIRouter, HTTPException, Query, Request, status
 from fastapi.responses import FileResponse, PlainTextResponse
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from strong_api.admin.deps import Admin, admin_settings
 from strong_api.admin.schemas import (
     AdminAuditEntry,
     AdminMessage,
@@ -47,7 +48,7 @@ from strong_api.admin.schemas import (
     CostSource,
     DailyCost,
 )
-from strong_api.auth.deps import DbSession, optional_user
+from strong_api.auth.deps import DbSession
 from strong_api.auth.settings import AuthSettings
 from strong_api.auth.sim import is_sim_user
 from strong_api.billing.entitlements import as_utc, get_entitlement
@@ -67,23 +68,6 @@ from strong_core.schemas import InterviewType, Turn, UsageComponent
 SESSION_LIMIT = 500
 AUDIT_LIMIT = 500
 
-
-def admin_settings(request: Request) -> AuthSettings:
-    settings: AuthSettings = request.app.state.admin_auth_settings
-    return settings
-
-
-async def require_admin(
-    user: Annotated[User | None, Depends(optional_user)],
-    settings: Annotated[AuthSettings, Depends(admin_settings)],
-) -> User:
-    """The signed-in admin. 404 for everyone else, so the area does not show it exists."""
-    if user is None or not settings.is_admin(user.email):
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Not Found")
-    return user
-
-
-Admin = Annotated[User, Depends(require_admin)]
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
