@@ -1,7 +1,7 @@
 /**
- * Admin area (R2): users, interviews with model cost, interview detail with transcript and
- * interviewer traces (only when the user's consent is on), and the audit log. The API answers 404
- * to everyone who is not in ADMIN_EMAILS.
+ * Admin routes (R2, moved from apps/web): users, interviews with model cost, interview detail with
+ * transcript and interviewer traces (only when the user's consent is on), and the audit log. The
+ * API answers 404 to everyone who is not an admin (AA-4).
  */
 import { useQuery } from "@tanstack/react-query";
 

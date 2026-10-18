@@ -1,5 +1,6 @@
 /**
- * MSW handlers for the admin area (R2), with the same paths and shapes as openapi.json.
+ * MSW handlers for the admin routes (R2, moved from apps/web), with the same paths and shapes as
+ * openapi.json.
  *
  * In the mock, admin@example.com is the admin (ADMIN_EMAILS in the real API). Everyone else gets
  * 404. Every session in the mock store belongs to the first user who is not an admin. The
@@ -19,16 +20,10 @@ import type {
 } from "../api/admin";
 import type { AuthUser, SessionRecord, Turn } from "../api/types";
 import { newId, type MockDb, type MockStore } from "./db";
+import { API, isMockAdmin } from "./handlers";
 
-const API = "*/api";
 const SESSION_LIMIT = 500;
 const MOCK_COST_USD = 0.0123;
-
-export const MOCK_ADMIN_EMAILS = ["admin@example.com"];
-
-export function isMockAdmin(email: string): boolean {
-  return MOCK_ADMIN_EMAILS.includes(email.trim().toLowerCase());
-}
 
 /** Audit entries per mock database, so a store reset starts a new log. */
 const audits = new WeakMap<MockDb, AdminAuditEntry[]>();

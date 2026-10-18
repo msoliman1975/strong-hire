@@ -1,6 +1,6 @@
 /**
- * Admin area (R2) against the admin mocks: only admins see it; transcript and traces need the
- * user's consent; each view adds audit entries.
+ * Admin pages (R2, moved from apps/web) against the admin mocks: only admins see them; transcript
+ * and traces need the user's consent; each view adds audit entries.
  */
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, within } from "@testing-library/react";
@@ -8,9 +8,9 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
-import { AppRoutes, createQueryClient } from "../../App";
-import type { SessionRecord } from "../../api/types";
-import { mockStore } from "../../mocks/node";
+import { AppRoutes, createQueryClient } from "../App";
+import type { SessionRecord } from "../api/types";
+import { mockStore } from "../mocks/node";
 
 const SESSION_ID = "00000000-0000-4000-8000-0000000000c1";
 
@@ -66,21 +66,21 @@ function renderAt(path: string) {
   return user;
 }
 
-describe("admin area (R2)", () => {
-  it("is hidden from users who are not admins", async () => {
+describe("admin pages (R2, AI pages moved)", () => {
+  it("AA-4: are hidden from users who are not admins", async () => {
     seed({ signedInAs: "ana@example.com" });
-    renderAt("/admin/interviews");
+    renderAt("/interviews");
     expect(await screen.findByRole("heading", { name: "Page not found" })).toBeInTheDocument();
-    const nav = screen.getByRole("navigation", { name: "Main" });
-    expect(within(nav).queryByRole("link", { name: "Admin" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("navigation", { name: "Admin" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Interviews" })).not.toBeInTheDocument();
   });
 
-  it("lists interviews with cost and a daily total, and shows the Admin link", async () => {
+  it("lists interviews with cost and a daily total, under the admin nav", async () => {
     seed();
-    renderAt("/admin");
+    renderAt("/");
     expect(await screen.findByRole("heading", { name: "Interviews" })).toBeInTheDocument();
-    const nav = screen.getByRole("navigation", { name: "Main" });
-    expect(within(nav).getByRole("link", { name: "Admin" })).toHaveAttribute("href", "/admin");
+    const nav = screen.getByRole("navigation", { name: "Admin" });
+    expect(within(nav).getByRole("link", { name: "Interviews" })).toHaveAttribute("href", "/interviews");
     const daily = (await screen.findByRole("heading", { name: "Cost per day" })).closest("section");
     expect(daily).not.toBeNull();
     expect(within(daily as HTMLElement).getByRole("cell", { name: "2026-10-07" })).toBeInTheDocument();
@@ -91,7 +91,7 @@ describe("admin area (R2)", () => {
 
   it("shows metadata only when the user has no consent, and writes no audit entry", async () => {
     seed({ consent: false });
-    const user = renderAt(`/admin/interviews/${SESSION_ID}`);
+    const user = renderAt(`/interviews/${SESSION_ID}`);
     expect(await screen.findByText("This user has not given consent. You can see the details above only.")).toBeInTheDocument();
     expect(screen.getByText("Lean Hire")).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Transcript" })).not.toBeInTheDocument();
@@ -103,7 +103,7 @@ describe("admin area (R2)", () => {
 
   it("shows the transcript and the traces with consent, and audits the view", async () => {
     seed({ consent: true });
-    const user = renderAt(`/admin/interviews/${SESSION_ID}`);
+    const user = renderAt(`/interviews/${SESSION_ID}`);
     expect(await screen.findByRole("heading", { name: "Transcript" })).toBeInTheDocument();
     expect(screen.getByText("Happy to be here.")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Download transcript" })).toHaveAttribute(
@@ -126,13 +126,13 @@ describe("admin area (R2)", () => {
 
   it("lists users with plan, consent and interviews", async () => {
     seed({ consent: true });
-    renderAt("/admin/users");
+    renderAt("/users");
     const row = (await screen.findByRole("link", { name: "ana@example.com" })).closest("tr") as HTMLElement;
     expect(within(row).getByRole("cell", { name: "Yes" })).toBeInTheDocument();
     expect(within(row).getByRole("cell", { name: "1" })).toBeInTheDocument();
     expect(within(row).getByRole("link", { name: "ana@example.com" })).toHaveAttribute(
       "href",
-      "/admin/interviews?user=00000000-0000-4000-8000-0000000000a1",
+      "/interviews?user=00000000-0000-4000-8000-0000000000a1",
     );
   });
 });

@@ -1,8 +1,8 @@
 import { Link } from "react-router";
 
-import { useAdminUsers } from "../../api/admin";
-import { ErrorNotice, Loading, PageHead } from "../../components/ui";
-import { utc } from "./format";
+import { useAdminUsers } from "../api/admin";
+import { ErrorNotice, Loading, PageHead } from "../components/ui";
+import { utc } from "../format";
 
 export function AdminUsersPage() {
   const users = useAdminUsers();
@@ -36,7 +36,7 @@ export function AdminUsersPage() {
               {users.data.map((u) => (
                 <tr key={u.id}>
                   <td>
-                    <Link to={`/admin/interviews?user=${u.id}`}>{u.email}</Link>
+                    <Link to={`/interviews?user=${u.id}`}>{u.email}</Link>
                     {u.is_admin && <span className="tag"> Admin</span>}
                   </td>
                   <td>{utc(u.created_at)}</td>

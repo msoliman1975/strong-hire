@@ -1,9 +1,9 @@
 import { Link, useParams } from "react-router";
 
-import { type AdminSession, type AdminTrace, adminDownloads, useAdminSession } from "../../api/admin";
-import { ErrorNotice, Loading, PageHead } from "../../components/ui";
-import { difficultyLabel, interviewTypeLabel, modeLabel, phaseLabel } from "../../labels";
-import { clock, money, utc, words } from "./format";
+import { type AdminSession, type AdminTrace, adminDownloads, useAdminSession } from "../api/admin";
+import { ErrorNotice, Loading, PageHead } from "../components/ui";
+import { difficultyLabel, interviewTypeLabel, modeLabel, phaseLabel } from "../labels";
+import { clock, money, utc, words } from "../format";
 
 function Metadata({ session: s }: { session: AdminSession }) {
   return (
@@ -148,7 +148,7 @@ export function AdminSessionPage() {
     <>
       <PageHead title="Interview">
         <p>
-          <Link to="/admin/interviews">Back to interviews</Link>
+          <Link to="/interviews">Back to interviews</Link>
         </p>
       </PageHead>
       <Metadata session={session} />

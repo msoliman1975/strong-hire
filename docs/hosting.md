@@ -8,7 +8,7 @@ text-to-speech (Kokoro) run on the server CPU.
 | --- | --- |
 | Server | `stronghire-test`, type cx43 (8 vCPU shared, 16 GB, 160 GB disk), Nuremberg (nbg1) |
 | Cost | $18.49 per month, billed by the hour while the server exists |
-| Address | `https://getstronghire.com` (web and `/api`), `https://rtc.getstronghire.com` (LiveKit) |
+| Address | `https://getstronghire.com` (web and `/api`), `https://admin.getstronghire.com` (admin app and its own `/api`), `https://rtc.getstronghire.com` (LiveKit) |
 | Firewall | Hetzner firewall `stronghire-fw`: 22, 80, 443/tcp, 443/udp, 7881/tcp, 7882/udp |
 | Repo on the server | `/opt/stronghire/strong-hire`, read-only deploy key |
 | Anthropic key | `/etc/stronghire/anthropic.key`, readable by root only, never in the repo or `.env` |
@@ -23,7 +23,12 @@ American users. Moving to the US region later is the same setup on a new server.
 adds `infra/compose.server.yaml`, which:
 
 - adds Caddy (`infra/docker/caddy.Dockerfile`). Caddy serves the production web build, sends
-  `/api/*` to the API, and gets TLS certificates from Let's Encrypt.
+  `/api/*` to the API, and gets TLS certificates from Let's Encrypt. On the main host it answers
+  404 to `/api/admin/*`, so the candidate origin never reaches admin routes.
+- serves the admin app (`apps/admin`, D-1) on `admin.$DOMAIN`, from its own build in
+  `/srv-admin`, with its own `/api/*` proxy and strict headers (CSP `default-src 'self'`,
+  `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`; AA-9). The session cookie is
+  host-only, so signing in to one host does not sign you in to the other.
 - runs LiveKit in production mode with real keys (`infra/livekit/livekit.server.yaml`).
 - runs the API in staging mode: no dev login, a real session secret, no code reload.
 - publishes no ports except Caddy and LiveKit media. The API (8700) and LiteLLM (4000) listen on
@@ -33,7 +38,7 @@ Sign-in uses email and password (AC-4), with email links as a second way in. The
 
 ## First setup
 
-1. In the domain's DNS, add two A records: `@` and `rtc`, both to the server IP.
+1. In the domain's DNS, add three A records: `@`, `admin` and `rtc`, all to the server IP.
 2. SSH in as root. Check that cloud-init finished: `cloud-init status` says `done`.
 3. Create a deploy key and add it to GitHub as read-only:
    `ssh-keygen -t ed25519 -N "" -f ~/.ssh/github` and
@@ -46,6 +51,24 @@ Sign-in uses email and password (AC-4), with email links as a second way in. The
 7. Start: `./scripts/server-deploy.sh`. The first run builds the images and downloads the speech
    models.
 8. Load the launch companies once: `pwsh scripts/dev.ps1 seed`.
+
+## Admin app
+
+The admin app is at `https://admin.$DOMAIN`. Only the emails in `ADMIN_EMAILS` get past its
+sign-in; anyone else sees "Page not found". It signs in with email and password, an email link,
+or Google. `ADMIN_BASE_URL` (set by `infra/compose.server.yaml` to `https://admin.$DOMAIN`) tells
+the API where email links and Google sign-in from the admin app return.
+
+To add the admin host to a running server:
+
+1. Add the DNS A record `admin` to the server IP, and wait until `nslookup admin.<domain>`
+   answers with it.
+2. If Google sign-in is on (`GOOGLE_CLIENT_ID`), add this authorized redirect URI to the OAuth
+   client in the Google Cloud console (APIs & Services > Credentials):
+   `https://admin.<domain>/api/auth/google/callback`. Until then, Google sign-in on the admin
+   host fails with `redirect_uri_mismatch`; password and email links still work.
+3. Deploy (`./scripts/server-deploy.sh`). Caddy gets the certificate for the new host on its
+   first request.
 
 ## Update to the latest main
 

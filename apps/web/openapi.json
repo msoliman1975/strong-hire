@@ -1642,15 +1642,31 @@
         ],
         "summary": "Send Magic Link",
         "operationId": "send_magic_link_auth_magic_link_post",
+        "parameters": [
+          {
+            "name": "app",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "web",
+                "admin"
+              ],
+              "type": "string",
+              "default": "web",
+              "title": "App"
+            }
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/MagicLinkRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "202": {
@@ -1692,6 +1708,20 @@
               "type": "string",
               "title": "Token"
             }
+          },
+          {
+            "name": "app",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "web",
+                "admin"
+              ],
+              "type": "string",
+              "default": "web",
+              "title": "App"
+            }
           }
         ],
         "responses": {
@@ -1723,12 +1753,38 @@
         ],
         "summary": "Google Login",
         "operationId": "google_login_auth_google_login_get",
+        "parameters": [
+          {
+            "name": "app",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "web",
+                "admin"
+              ],
+              "type": "string",
+              "default": "web",
+              "title": "App"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }

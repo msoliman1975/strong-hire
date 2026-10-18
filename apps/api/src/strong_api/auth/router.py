@@ -48,6 +48,12 @@ from strong_core.schemas import AuthProvider
 
 _DEV_EMAIL = re.compile(r"^[^@\s]+@[^@\s]+$")
 
+SignInApp = Literal["web", "admin"]
+"""Which app started a link or Google sign-in (D-1). The callback runs on that app's host, so the
+host-only session cookie is set there, and the browser returns to that app."""
+
+_SESSION_APP_KEY = "sign_in_app"
+
 OptionalUser = Annotated[User | None, Depends(optional_user)]
 
 
@@ -216,13 +222,23 @@ def build_router(
         await email_sender.send_email_confirmation(user.email, link)
         return link
 
-    def web_redirect(path: str, **query: str) -> RedirectResponse:
-        url = settings.web_base_url.rstrip("/") + path
+    def app_api(app: SignInApp) -> str:
+        """The API as the browser sees it on the host of `app`."""
+        if app == "admin":
+            return settings.admin_base_url.rstrip("/") + "/api"
+        return settings.api_public_url.rstrip("/")
+
+    def web_redirect(path: str, app: SignInApp = "web", **query: str) -> RedirectResponse:
+        base = settings.admin_base_url if app == "admin" else settings.web_base_url
+        url = base.rstrip("/") + path
         if query:
             url += "?" + urlencode(query)
         return RedirectResponse(url, status_code=status.HTTP_303_SEE_OTHER)
 
-    def after_sign_in(state: AuthState) -> RedirectResponse:
+    def after_sign_in(state: AuthState, app: SignInApp = "web") -> RedirectResponse:
+        # The admin app has no sign-up: it shows "not found" to anyone who is not an admin.
+        if app == "admin":
+            return web_redirect("/", app)
         return web_redirect("/" if state.status == "signed_in" else "/signup")
 
     @router.get("/providers")
@@ -239,43 +255,47 @@ def build_router(
         return Response(status_code=status.HTTP_204_NO_CONTENT)
 
     @router.post("/magic-link", status_code=status.HTTP_202_ACCEPTED)
-    async def send_magic_link(body: MagicLinkRequest) -> MagicLinkSent:
+    async def send_magic_link(body: MagicLinkRequest, app: SignInApp = "web") -> MagicLinkSent:
         email = normalize_email(str(body.email))
         token = magic_links.issue(email)
-        link = (
-            f"{settings.api_public_url.rstrip('/')}/auth/magic-link/callback?token={quote(token)}"
-        )
+        link = f"{app_api(app)}/auth/magic-link/callback?token={quote(token)}"
+        if app == "admin":
+            link += "&app=admin"
         await email_sender.send_magic_link(email, link)
         # The reply is the same for known and unknown emails, so it does not reveal accounts.
         return MagicLinkSent(sent=True, dev_link=link if settings.is_local else None)
 
     @router.get("/magic-link/callback")
-    async def magic_link_callback(request: Request, db: DbSession, token: str) -> Response:
+    async def magic_link_callback(
+        request: Request, db: DbSession, token: str, app: SignInApp = "web"
+    ) -> Response:
         try:
             email = await magic_links.redeem(token)
         except InvalidMagicLinkError as exc:
-            return web_redirect("/signin", error=f"link_{exc}")
+            return web_redirect("/signin", app, error=f"link_{exc}")
         return after_sign_in(
-            await _finish_sign_in(request, db, email, AuthProvider.EMAIL, settings)
+            await _finish_sign_in(request, db, email, AuthProvider.EMAIL, settings), app
         )
 
     @router.get("/google/login")
-    async def google_login(request: Request) -> Response:
+    async def google_login(request: Request, app: SignInApp = "web") -> Response:
         if google is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "Google sign-in is not configured")
-        redirect_uri = f"{settings.api_public_url.rstrip('/')}/auth/google/callback"
+        request.session[_SESSION_APP_KEY] = app
+        redirect_uri = f"{app_api(app)}/auth/google/callback"
         return await google.authorize_redirect(request, redirect_uri)
 
     @router.get("/google/callback")
     async def google_callback(request: Request, db: DbSession) -> Response:
         if google is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "Google sign-in is not configured")
+        app: SignInApp = "admin" if request.session.get(_SESSION_APP_KEY) == "admin" else "web"
         try:
             identity = await google.fetch_identity(request)
         except GoogleSignInError:
-            return web_redirect("/signin", error="google")
+            return web_redirect("/signin", app, error="google")
         return after_sign_in(
-            await _finish_sign_in(request, db, identity.email, AuthProvider.GOOGLE, settings)
+            await _finish_sign_in(request, db, identity.email, AuthProvider.GOOGLE, settings), app
         )
 
     # ------------------------------------------------------------ email and password (AC-4)
