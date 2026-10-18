@@ -247,14 +247,16 @@ async def test_cu1_cu3_bad_custom_setups_are_refused_with_422(
     assert message in resp.text
 
 
-async def test_cu11_free_account_gets_the_plan_rule_when_custom_is_open_to_everyone(
+async def test_cu11_free_account_may_run_a_30_minute_custom_while_open_to_everyone(
     client: httpx.AsyncClient, fake_fixtures: Path, queue: Any
 ) -> None:
-    """CU-11 with `everyone`: Custom is not locked, but it has no mini (D-14), and free accounts
-    run minis only (BL-2), so the entitlement check answers 402 full_interview_requires_plan."""
+    """CU-11 with `everyone`: Custom has no mini (D-14), so a free account may use a free
+    interview for a 30-minute Custom session while we test. 45 minutes still needs the plan."""
     job = await ready_job(client, fake_fixtures)
     queue.run_jobs = False
-    resp = await create_custom(client, job["id"])
+    resp = await create_custom(client, job["id"], {**custom_config(), "duration_min": 30})
+    assert resp.status_code == 201, resp.text
+    resp = await create_custom(client, job["id"], {**custom_config(), "duration_min": 45})
     assert resp.status_code == 402
     assert resp.json()["detail"]["code"] == "full_interview_requires_plan"
 

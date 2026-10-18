@@ -3,9 +3,9 @@
 The runtime setting `custom_interview_access` (strong_core.runtime_settings) switches it without
 a deploy:
 
-- `everyone` (default while we test): every signed-in user. The plan rules still apply when the
-  session is created (BL-1, BL-2): Custom has no 10-minute mini (D-14), so a free account that
-  may only run minis gets the usual 402 `full_interview_requires_plan` from POST /sessions.
+- `everyone` (default while we test): every signed-in user. Custom has no 10-minute mini
+  (D-14), so a free account may run a 30-minute Custom session as one of its free interviews
+  (`FREE_CUSTOM_DURATION`); 45 minutes still needs the plan. Paid plans count minutes as usual.
 - `paid_only`: a user without a paid plan (`Entitlement.full_interviews_allowed`, the same rule
   that allows 30 and 45 minute sessions) gets HTTP 403 with detail
   {"code": "upgrade_required", "message", "upgrade_url"}. The free interview (BL-2) can never
@@ -28,6 +28,15 @@ UPGRADE_REQUIRED = "upgrade_required"
 CUSTOM_LOCKED_MESSAGE = (
     "Custom interviews are part of the subscription. Subscribe to build your own interview."
 )
+
+
+FREE_CUSTOM_DURATION = 30
+"""CU-11: the Custom session length a free account may run while Custom is open to everyone."""
+
+
+async def custom_open_to_everyone(db: AsyncSession) -> bool:
+    settings = await rs.get_all(db)
+    return settings.custom_interview_access == rs.CustomInterviewAccess.EVERYONE
 
 
 async def custom_allowed(db: AsyncSession, me: CurrentUser) -> bool:

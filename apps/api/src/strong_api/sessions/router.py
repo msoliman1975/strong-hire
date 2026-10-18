@@ -21,8 +21,8 @@ A Custom session (CU-1, `config.interview_type == "custom"` with `config.custom`
 setup in `sessions.custom_json`; the worker builds the brief from it. Under the runtime setting
 `custom_interview_access=paid_only` a user without a paid plan gets 403 `upgrade_required`
 (CU-11, strong_api.custom.access). The plan rules apply as for any session: Custom has no mini
-interview (D-14), so a free account gets 402 `full_interview_requires_plan` from the
-entitlement check even when Custom is open to everyone.
+interview (D-14), so while Custom is open to everyone a free account may run a 30-minute Custom
+session as one of its free interviews; under `paid_only` it is locked.
 
 Creating a session queues the interviewer brief job (P6). The text channel runs the same
 controller and interviewer as the voice agent (strong_interview), with typed input. It exists
@@ -55,7 +55,11 @@ from strong_api.auth.settings import AppEnv, get_auth_settings
 from strong_api.auth.sim import is_sim_user
 from strong_api.billing.entitlements import ensure_can_start_session, record_session_minutes
 from strong_api.controls import ensure_sessions_open
-from strong_api.custom.access import ensure_custom_allowed
+from strong_api.custom.access import (
+    FREE_CUSTOM_DURATION,
+    custom_open_to_everyone,
+    ensure_custom_allowed,
+)
 from strong_api.inputs.deps import CurrentUser, Db, Me, Queue
 from strong_api.inputs.queue import BUILD_INTERVIEWER_BRIEF, JobQueue
 from strong_api.scoring.router import _brief, _config, _owned_session, _owned_target, start_scoring
@@ -175,10 +179,14 @@ async def create_session(body: CreateSessionRequest, db: Db, me: Me, queue: Queu
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Text sessions are a dev feature.")
     await ensure_sessions_open(db, body.channel)  # OC-2, OC-3
     config = body.config
+    free_full = False
     if config.is_custom:
         await ensure_custom_allowed(db, me)  # CU-11
+        free_full = config.duration_min == FREE_CUSTOM_DURATION and await custom_open_to_everyone(
+            db
+        )
     if not await is_sim_user(db, me.user_id):  # the AI candidate has no plan (P13)
-        await ensure_can_start_session(db, me.org_id, config.duration_min)
+        await ensure_can_start_session(db, me.org_id, config.duration_min, free_full=free_full)
     resume_id = await _session_resume(db, me, target.id, body.resume_id)
     target.level = config.level  # the level confirmed at setup sets the bar (IV-6)
     session = InterviewSession(

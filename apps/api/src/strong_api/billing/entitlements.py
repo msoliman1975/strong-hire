@@ -95,10 +95,16 @@ class Entitlement:
         """30 and 45 minute sessions need the paid plan. Free accounts get mini interviews."""
         return self.plan == "paid"
 
-    def start_block(self, duration_min: int) -> StartBlockCode | None:
-        """Why a session of `duration_min` minutes may not start now, or None."""
+    def start_block(self, duration_min: int, *, free_full: bool = False) -> StartBlockCode | None:
+        """Why a session of `duration_min` minutes may not start now, or None.
+
+        `free_full` lets a free account use a free interview for a longer session (CU-11: a
+        30-minute Custom session while Custom is open to everyone).
+        """
         if self.block_code is not None:
             return self.block_code
+        if free_full and self.plan == "free":
+            return None
         if duration_min != MINI_DURATION_MIN and not self.full_interviews_allowed:
             return "full_interview_requires_plan"
         return None
@@ -230,6 +236,8 @@ async def ensure_can_start_session(
     org_id: uuid.UUID,
     duration_min: int,
     settings: BillingSettings | None = None,
+    *,
+    free_full: bool = False,
 ) -> Entitlement:
     """Raise HTTP 402 when the plan does not allow a new session of this length (BL-1, BL-2).
 
@@ -238,7 +246,7 @@ async def ensure_can_start_session(
     full_interview_requires_plan (a free account asked for 30 or 45 minutes).
     """
     ent = await get_entitlement(db, org_id, settings)
-    code = ent.start_block(duration_min)
+    code = ent.start_block(duration_min, free_full=free_full)
     if code is not None:
         raise HTTPException(
             status.HTTP_402_PAYMENT_REQUIRED,
