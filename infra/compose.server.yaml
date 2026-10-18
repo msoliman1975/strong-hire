@@ -1,7 +1,7 @@
 # Override for the test server (Hetzner). ./scripts/profile.ps1 adds it with -f when .env has
 # STACK_TARGET=server; do not use it alone. See docs/hosting.md.
-#   - Caddy is the only public entry: https://$DOMAIN (web and /api) and https://rtc.$DOMAIN
-#     (LiveKit signaling). LiveKit media also uses 7881/tcp and 7882/udp.
+#   - Caddy is the only public entry: https://$DOMAIN (web and /api), https://admin.$DOMAIN
+#     (the admin app and its own /api) and https://rtc.$DOMAIN (LiveKit signaling). LiveKit media also uses 7881/tcp and 7882/udp.
 #   - Other services publish no host ports, except the API and LiteLLM on 127.0.0.1 for
 #     ./scripts/profile.ps1 (health check, LiteLLM app key).
 #   - The API runs without --reload, in staging mode (no dev login, real session secret).
@@ -36,6 +36,8 @@ services:
       SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET in .env}
       WEB_BASE_URL: https://${DOMAIN}
       API_PUBLIC_URL: https://${DOMAIN}/api
+      # The admin app (D-1). Its sign-in links and Google sign-in come back to this host.
+      ADMIN_BASE_URL: https://admin.${DOMAIN}
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_USERNAME: ${SMTP_USERNAME:-}
@@ -45,7 +47,7 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       # Emails that see the model spend meter (strong_api.devtools). Testers do not.
       MODEL_SPEND_VIEWERS: ${MODEL_SPEND_VIEWERS:-}
-      # Emails that may open the admin area (/admin). Everyone else gets 404.
+      # Emails that may use the admin app (https://admin.$DOMAIN). Everyone else gets 404.
       ADMIN_EMAILS: ${ADMIN_EMAILS:-}
       LIVEKIT_PUBLIC_URL: wss://rtc.${DOMAIN}
       STRONG_INTERNAL_TOKEN: ${STRONG_INTERNAL_TOKEN:?set STRONG_INTERNAL_TOKEN in .env}
