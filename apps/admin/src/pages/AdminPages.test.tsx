@@ -77,7 +77,7 @@ describe("admin pages (R2, AI pages moved)", () => {
 
   it("lists interviews with cost and a daily total, under the admin nav", async () => {
     seed();
-    renderAt("/");
+    renderAt("/interviews");
     expect(await screen.findByRole("heading", { name: "Interviews" })).toBeInTheDocument();
     const nav = screen.getByRole("navigation", { name: "Admin" });
     expect(within(nav).getByRole("link", { name: "Interviews" })).toHaveAttribute("href", "/interviews");

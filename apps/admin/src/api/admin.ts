@@ -16,6 +16,9 @@ export type AdminSessionDetail = S["AdminSessionDetail"];
 export type AdminTrace = S["AdminTrace"];
 export type AdminAuditEntry = S["AdminAuditEntry"];
 export type DailyCost = S["DailyCost"];
+export type AdminCostLine = S["AdminCostLine"];
+export type AdminTurnLatency = S["AdminTurnLatency"];
+export type AdminLatencyStat = S["AdminLatencyStat"];
 export type AuditScope = "admin" | "all";
 
 export interface AdminSessionFilters {
@@ -23,6 +26,8 @@ export interface AdminSessionFilters {
   day_from?: string;
   day_to?: string;
   interview_type?: S["InterviewType"];
+  /** AI-1: a session status, or "stuck". */
+  status?: "created" | "in_progress" | "interrupted" | "scoring" | "completed" | "failed" | "stuck";
 }
 
 export const adminApi = {

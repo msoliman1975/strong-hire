@@ -16,6 +16,7 @@ import { controlsHandlers } from "./controlsHandlers";
 import { createStore, type MockDb } from "./db";
 import { authHandlers } from "./handlers";
 import { usersHandlers } from "./usersHandlers";
+import { opsHandlers } from "./opsHandlers";
 
 export type MockMode = "all" | "off";
 
@@ -57,7 +58,7 @@ function seed(db: MockDb): void {
 export async function startMocks(mode: MockMode): Promise<void> {
   if (mode === "off") return;
   const store = createStore({ persist: true, seed });
-  await setupWorker(...authHandlers(store), ...adminHandlers(store), ...alertsHandlers(store), ...controlsHandlers(store), ...usersHandlers(store)).start({
+  await setupWorker(...authHandlers(store), ...adminHandlers(store), ...alertsHandlers(store), ...controlsHandlers(store), ...usersHandlers(store), ...opsHandlers(store)).start({
     onUnhandledFrame: "bypass",
     quiet: true,
   });

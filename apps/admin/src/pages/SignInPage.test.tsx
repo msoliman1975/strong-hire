@@ -47,21 +47,27 @@ describe("admin sign-in (D-1)", () => {
     expect(screen.queryByRole("navigation", { name: "Admin" })).not.toBeInTheDocument();
   });
 
-  it("signs an admin in with email and password and opens Interviews", async () => {
+  it("signs an admin in with email and password and opens the Overview", async () => {
     addUser("admin@example.com", "correct horse battery");
     const user = renderAt("/signin");
     await user.type(await screen.findByLabelText("Email address"), "admin@example.com");
     await user.type(screen.getByLabelText("Password"), "correct horse battery");
     await user.click(screen.getByRole("button", { name: "Sign in" }));
-    expect(await screen.findByRole("heading", { name: "Interviews" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Overview", level: 1 })).toBeInTheDocument();
     const nav = screen.getByRole("navigation", { name: "Admin" });
     // The first text node is the section name; a count badge (Alerts) may follow it.
     expect(within(nav).getAllByRole("link").map((a) => a.firstChild?.textContent)).toEqual([
+      "Overview",
       "Interviews",
       "Users",
       "Alerts",
-      "Audit log",
+      "Health",
+      "Performance",
+      "Errors",
+      "Jobs",
+      "Spend",
       "Controls",
+      "Audit log",
     ]);
     expect(screen.getByText("admin@example.com")).toBeInTheDocument();
     expect(await screen.findByTitle("Model profile on this server")).toHaveTextContent("fake");

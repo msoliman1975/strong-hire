@@ -22,8 +22,9 @@ Set `VITE_API_MOCKS=all` to run without the API (seeded data, see `src/mocks/bro
 | `src/App.tsx` | Routes. New sections add their routes under `<Shell />`. |
 | `src/components/Shell.tsx` | Sidebar, nav (`SECTIONS`), environment label, sign-out, and the admin check (AA-4) |
 | `src/components/ui.tsx` | `PageHead`, `Loading`, `ErrorNotice` |
+| `src/components/charts.tsx`, `metrics.tsx` | Inline SVG charts (sparkline, line, stacked bars), KPI tiles, the reason form for writes |
 | `src/pages/` | One file per page, with its test next to it |
-| `src/api/` | `client.ts` (typed `openapi-fetch` client), `schema.gen.ts` (generated), one module per area (`admin.ts`, `auth.ts`, `health.ts`) |
+| `src/api/` | `client.ts` (typed `openapi-fetch` client), `schema.gen.ts` (generated), one module per area (`admin.ts`, `auth.ts`, `health.ts`, `ops.ts` for Overview and Operations) |
 | `src/mocks/` | MSW handlers for tests and `VITE_API_MOCKS=all`. Only tests and `main.tsx` may import them. |
 | `src/styles.css` | All styles. Colors are tokens on `:root`, with a dark set for `prefers-color-scheme` and `html[data-theme]`. |
 
