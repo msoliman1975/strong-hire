@@ -16,6 +16,21 @@ async function shot(page: Page, name: string) {
   if (SHOTS) await page.screenshot({ path: `${SHOTS}/${name}.png`, fullPage: true });
 }
 
+test("AC-4: create an account with email and password, then sign in with it", async ({ page }) => {
+  await page.goto("/signin");
+  await shot(page, "00-signin-password");
+  await page.getByRole("tab", { name: "Create account" }).click();
+  await page.getByLabel("Email address").fill("pw@example.com");
+  await page.getByLabel("Password", { exact: true }).fill("correct horse battery");
+  await page.getByLabel(/I am 18 or older, and I accept/).check();
+  await page.getByRole("button", { name: "Create account" }).click();
+  await expect(page.getByRole("heading", { name: "Check your email" })).toBeVisible();
+  await page.getByRole("button", { name: "Back to sign in" }).click();
+  await page.getByLabel("Password", { exact: true }).fill("correct horse battery");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Tell us about yourself" })).toBeVisible();
+});
+
 async function signUp(page: Page, email: string, consent = false) {
   await page.goto("/");
   await expect(page).toHaveURL(/\/signin$/);
@@ -174,6 +189,8 @@ test("the main pages can be used with the keyboard only", async ({ page }) => {
   await page.goto("/signin");
   // The page moves focus to its heading, so the next Tab reaches the first field.
   await expect(page.getByRole("heading", { name: "Sign in" })).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("tab", { name: "Sign in" })).toBeFocused();
   await page.keyboard.press("Tab");
   await expect(page.getByLabel("Email address")).toBeFocused();
   await page.getByLabel("Email for dev login").focus();

@@ -1754,6 +1754,254 @@
         }
       }
     },
+    "/auth/password/signup": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Password Signup",
+        "description": "AC-4: create an account with a password. The reply is the same for a new email and\na taken one, so it does not reveal accounts; the owner of a taken email gets a note.",
+        "operationId": "password_signup_auth_password_signup_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordSignupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailSent"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/password/resend": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Resend Confirmation",
+        "operationId": "resend_confirmation_auth_password_resend_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailOnlyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailSent"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/password/confirm": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Confirm Email",
+        "operationId": "confirm_email_auth_password_confirm_get",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/password/login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Password Login",
+        "operationId": "password_login_auth_password_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordLoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/password/forgot": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Forgot Password",
+        "description": "AC-5: email a reset link. Same reply whether or not the email has an account.",
+        "operationId": "forgot_password_auth_password_forgot_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailOnlyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailSent"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/password/reset": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Reset Password",
+        "description": "AC-5: set a new password from a reset link, and sign in.",
+        "operationId": "reset_password_auth_password_reset_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/signup": {
       "post": {
         "tags": [
@@ -3402,6 +3650,12 @@
             "type": "boolean",
             "title": "Email"
           },
+          "password": {
+            "type": "boolean",
+            "title": "Password",
+            "description": "AC-4 email and password sign-in",
+            "default": true
+          },
           "dev": {
             "type": "boolean",
             "title": "Dev"
@@ -4399,6 +4653,46 @@
           "institution"
         ],
         "title": "Education"
+      },
+      "EmailOnlyRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "EmailOnlyRequest"
+      },
+      "EmailSent": {
+        "properties": {
+          "sent": {
+            "type": "boolean",
+            "title": "Sent"
+          },
+          "dev_link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dev Link",
+            "description": "Only when APP_ENV=local, so no email server is needed."
+          }
+        },
+        "type": "object",
+        "required": [
+          "sent"
+        ],
+        "title": "EmailSent"
       },
       "ExitSurveyIn": {
         "properties": {
@@ -5912,6 +6206,98 @@
           "tracked"
         ],
         "title": "ModelUsage"
+      },
+      "PasswordLoginRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 128,
+            "title": "Password"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "PasswordLoginRequest"
+      },
+      "PasswordResetRequest": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "maxLength": 2000,
+            "title": "Token"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 128,
+            "title": "Password"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "token",
+          "password"
+        ],
+        "title": "PasswordResetRequest"
+      },
+      "PasswordSignupRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 128,
+            "title": "Password"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "age_confirmed": {
+            "type": "boolean",
+            "title": "Age Confirmed",
+            "description": "The user confirmed they are 18 or older."
+          },
+          "terms_accepted": {
+            "type": "boolean",
+            "title": "Terms Accepted"
+          },
+          "training_consent": {
+            "type": "boolean",
+            "title": "Training Consent",
+            "description": "AC-2: off unless the user opts in.",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "email",
+          "password",
+          "age_confirmed",
+          "terms_accepted"
+        ],
+        "title": "PasswordSignupRequest"
       },
       "PersonaBrief": {
         "additionalProperties": false,
