@@ -1110,6 +1110,224 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/auth/providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin Providers */
+        get: operations["admin_providers_admin_auth_providers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/auth/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Admin Password Sign In
+         * @description AA-2: the admin's user account password (AC-4). The account's email must be confirmed,
+         *     so a password set by someone who never proved the inbox cannot open the admin app.
+         */
+        post: operations["admin_password_sign_in_admin_auth_password_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/auth/link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Admin Send Link
+         * @description AA-2: a sign-in link goes only to an active admin. The reply is the same either way.
+         */
+        post: operations["admin_send_link_admin_auth_link_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/auth/link/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Admin Verify Link */
+        post: operations["admin_verify_link_admin_auth_link_verify_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/auth/google/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin Google Login */
+        get: operations["admin_google_login_admin_auth_google_login_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/auth/google/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin Google Callback */
+        get: operations["admin_google_callback_admin_auth_google_callback_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/auth/signout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Admin Sign Out */
+        post: operations["admin_sign_out_admin_auth_signout_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin Me */
+        get: operations["admin_me_admin_me_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/me/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Sessions
+         * @description AA-8: my live sessions, newest first.
+         */
+        get: operations["my_sessions_admin_me_sessions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/me/sessions/{session_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Revoke My Session
+         * @description AA-8: revoke one of my sessions (the current one too: that signs me out).
+         */
+        delete: operations["revoke_my_session_admin_me_sessions__session_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/admins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Admins */
+        get: operations["list_admins_admin_admins_get"];
+        put?: never;
+        /** Create Admin */
+        post: operations["create_admin_admin_admins_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/admins/{admin_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove Admin */
+        delete: operations["remove_admin_admin_admins__admin_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/admin/sessions": {
         parameters: {
             query?: never;
@@ -1951,6 +2169,40 @@ export interface components {
              */
             reason: string;
         };
+        /** AddAdminIn */
+        AddAdminIn: {
+            /**
+             * Reason
+             * @description Why, for the audit log
+             */
+            reason: string;
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+        };
+        /** AdminAccount */
+        AdminAccount: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Email */
+            email: string;
+            /** Added By */
+            added_by: string | null;
+            /**
+             * Added At
+             * Format: date-time
+             */
+            added_at: string;
+            /** Disabled At */
+            disabled_at: string | null;
+            /** Live Sessions */
+            live_sessions: number;
+        };
         /** AdminActionOut */
         AdminActionOut: {
             /** Action */
@@ -2171,6 +2423,45 @@ export interface components {
             /** P95 Ms */
             p95_ms: number | null;
         };
+        /** AdminLinkIn */
+        AdminLinkIn: {
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+        };
+        /** AdminLinkSent */
+        AdminLinkSent: {
+            /**
+             * Sent
+             * @description Always true, so the reply does not say who is an admin.
+             */
+            sent: boolean;
+            /**
+             * Dev Link
+             * @description Only when APP_ENV=local and a link was sent.
+             */
+            dev_link?: string | null;
+        };
+        /** AdminLinkVerifyIn */
+        AdminLinkVerifyIn: {
+            /** Token */
+            token: string;
+        };
+        /** AdminMe */
+        AdminMe: {
+            /** Id */
+            id: string;
+            /** Email */
+            email: string;
+            /**
+             * Session Expires At
+             * Format: date-time
+             * @description When this session ends unless it is used again (idle 2 h, absolute 12 h).
+             */
+            session_expires_at: string;
+        };
         /** AdminMessage */
         AdminMessage: {
             /** Role */
@@ -2268,6 +2559,31 @@ export interface components {
             usage: components["schemas"]["OverviewUsage"];
             cost: components["schemas"]["OverviewCost"];
             quality: components["schemas"]["OverviewQuality"];
+        };
+        /** AdminPasswordIn */
+        AdminPasswordIn: {
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            /** Password */
+            password: string;
+        };
+        /** AdminProviders */
+        AdminProviders: {
+            /** Google */
+            google: boolean;
+            /**
+             * Email
+             * @default true
+             */
+            email: boolean;
+            /**
+             * Password
+             * @default true
+             */
+            password: boolean;
         };
         /**
          * AdminRefund
@@ -2451,6 +2767,45 @@ export interface components {
             total_cost_usd: number;
             /** Limit */
             limit: number;
+        };
+        /**
+         * AdminSignInSession
+         * @description AA-8: one of my admin sessions.
+         */
+        AdminSignInSession: {
+            /** Id */
+            id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Last Seen At
+             * Format: date-time
+             */
+            last_seen_at: string;
+            /**
+             * Expires At
+             * Format: date-time
+             * @description The absolute end, 12 h after sign-in.
+             */
+            expires_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             * @description When it ends unless it is used again.
+             */
+            ends_at: string;
+            /** Ip */
+            ip: string | null;
+            /** User Agent */
+            user_agent: string | null;
+            /**
+             * Current
+             * @description The session of this request.
+             */
+            current: boolean;
         };
         /** AdminSubscription */
         AdminSubscription: {
@@ -3015,12 +3370,6 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
-            /**
-             * Is Admin
-             * @description True for ADMIN_EMAILS users: the web app shows Admin.
-             * @default false
-             */
-            is_admin: boolean;
             /**
              * Full Name
              * @description AC-3 profile name.
@@ -4995,6 +5344,14 @@ export interface components {
             /** Url */
             url: string;
         };
+        /** RemoveAdminIn */
+        RemoveAdminIn: {
+            /**
+             * Reason
+             * @description Why, for the audit log
+             */
+            reason: string;
+        };
         /**
          * ReportItem
          * @description One row of the Reports page. Open a gap report with GET /gap-analyses/{id} and a debrief
@@ -6952,9 +7309,7 @@ export interface operations {
     };
     send_magic_link_auth_magic_link_post: {
         parameters: {
-            query?: {
-                app?: "web" | "admin";
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -6989,7 +7344,6 @@ export interface operations {
         parameters: {
             query: {
                 token: string;
-                app?: "web" | "admin";
             };
             header?: never;
             path?: never;
@@ -7019,9 +7373,7 @@ export interface operations {
     };
     google_login_auth_google_login_get: {
         parameters: {
-            query?: {
-                app?: "web" | "admin";
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -7035,15 +7387,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -7711,6 +8054,353 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AccountDeletedOut"];
+                };
+            };
+        };
+    };
+    admin_providers_admin_auth_providers_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProviders"];
+                };
+            };
+        };
+    };
+    admin_password_sign_in_admin_auth_password_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminPasswordIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminMe"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_send_link_admin_auth_link_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminLinkIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminLinkSent"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_verify_link_admin_auth_link_verify_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminLinkVerifyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminMe"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_google_login_admin_auth_google_login_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    admin_google_callback_admin_auth_google_callback_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    admin_sign_out_admin_auth_signout_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    admin_me_admin_me_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminMe"];
+                };
+            };
+            /** @description No admin session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    my_sessions_admin_me_sessions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminSignInSession"][];
+                };
+            };
+        };
+    };
+    revoke_my_session_admin_me_sessions__session_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_admins_admin_admins_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAccount"][];
+                };
+            };
+        };
+    };
+    create_admin_admin_admins_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddAdminIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAccount"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_admin_admin_admins__admin_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                admin_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RemoveAdminIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAccount"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
