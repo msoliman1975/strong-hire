@@ -63,6 +63,15 @@ function publicView<T extends { readyAt: number }>(record: T): Omit<T, "readyAt"
   return copy as Omit<T, "readyAt">;
 }
 
+/** The API's OC-1 to OC-3 refusal (strong_api.controls). */
+function paused(code: "signups_paused" | "sessions_paused" | "spend_cap_reached") {
+  const message =
+    code === "signups_paused"
+      ? "We are not taking new sign-ups right now. Write to support@getstronghire.com to join the waitlist, and we will email you when we open again."
+      : "New interviews are temporarily unavailable. Please try again in a little while.";
+  return HttpResponse.json({ detail: { code, message } }, { status: 503 });
+}
+
 function unauthorized() {
   return HttpResponse.json({ detail: "Sign in first" }, { status: 401 });
 }
@@ -90,6 +99,7 @@ export function authHandlers(store: MockStore) {
   };
 
   return [
+    http.get(`${API}/status`, () => HttpResponse.json(store.db.siteStatus)),
     http.get(`${API}/auth/providers`, () => HttpResponse.json({ google: false, email: true, password: true, dev: true })),
     http.get(`${API}/auth/me`, () => HttpResponse.json(state())),
     http.post(`${API}/auth/dev-login`, async ({ request }) => {
@@ -113,6 +123,7 @@ export function authHandlers(store: MockStore) {
       if (auth.status !== "needs_signup" || !auth.email) return unauthorized();
       if (!body.age_confirmed) return HttpResponse.json({ detail: "You must be 18 or older" }, { status: 422 });
       if (!body.terms_accepted) return HttpResponse.json({ detail: "Accept the terms first" }, { status: 422 });
+      if (!store.db.siteStatus.signups_open) return paused("signups_paused");
       store.db.users[auth.email] = {
         id: newId(),
         org_id: newId(),
@@ -139,6 +150,7 @@ export function authHandlers(store: MockStore) {
           { status: 409 },
         );
       }
+      if (!store.db.siteStatus.signups_open) return paused("signups_paused");
       {
         store.db.users[email] = {
           id: newId(),
@@ -763,6 +775,8 @@ export function sessionHandlers(store: MockStore) {
       const body = (await request.json()) as CreateSessionRequest;
       const target = findJob(body.job_target_id);
       if (!target || target.deleted) return notFound("Job target");
+      const open = body.channel === "text" ? db().siteStatus.text_sessions_open : db().siteStatus.voice_sessions_open;
+      if (!open) return paused("sessions_paused");
       const usage = db().usage;
       // Same answer as strong_api.billing.ensure_can_start_session.
       const code: string | null = !usage.can_start_session

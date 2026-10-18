@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Navigate, NavLink, Outlet } from "react-router";
+import { Link, Navigate, NavLink, Outlet } from "react-router";
+
+import { activeControls, useOpsSettings } from "../api/controls";
 
 import { useHealth } from "../api/health";
 import { useAuth, useSignOut } from "../api/hooks";
@@ -15,7 +17,24 @@ const SECTIONS = [
   { to: "/interviews", label: "Interviews" },
   { to: "/users", label: "Users" },
   { to: "/audit", label: "Audit log" },
+  { to: "/ops/controls", label: "Controls" },
 ];
+
+/**
+ * OC: a banner on every admin page while any ops control is not at its default, so nobody
+ * forgets that sign-ups or sessions are paused.
+ */
+function ControlsBanner() {
+  const settings = useOpsSettings();
+  if (!settings.data) return null;
+  const active = activeControls(settings.data);
+  if (active.length === 0) return null;
+  return (
+    <div className="ops-banner" role="status">
+      <strong>Ops controls on:</strong> {active.join(" · ")}. <Link to="/ops/controls">Open Controls</Link>
+    </div>
+  );
+}
 
 /** The server's model profile (from /api/health), so admins see which environment this is. */
 function EnvLabel() {
@@ -121,6 +140,7 @@ export function Shell() {
         </div>
       </header>
       <main id="main" className="content">
+        <ControlsBanner />
         <Outlet />
       </main>
     </div>

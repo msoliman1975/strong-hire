@@ -8,6 +8,7 @@ import { describe, expect, it } from "vitest";
 
 import { adminApi } from "../api/admin";
 import { authApi } from "../api/auth";
+import { controlsApi } from "../api/controls";
 import { mockStore } from "./node";
 
 const OPENAPI = JSON.parse(readFileSync(resolve(__dirname, "../../../web/openapi.json"), "utf8")) as object;
@@ -72,5 +73,15 @@ describe("admin mocks match openapi.json", () => {
     expectApiShape("AdminSessionDetail", detail);
     expect(detail.traces?.length).toBeGreaterThan(0);
     for (const entry of await adminApi.audit("all")) expectApiShape("AdminAuditEntry", entry);
+  });
+
+  it("controls: settings, a change, models (OC-1 to OC-6)", async () => {
+    mockStore.db.users["admin@example.com"] = user("admin@example.com", 9, false);
+    await authApi.devLogin("admin@example.com");
+    expectApiShape("OpsSettings", await controlsApi.settings());
+    const banner = { text: "Maintenance", severity: "info" as const, until: "2099-01-01T00:00:00Z" };
+    expectApiShape("OpsSettings", await controlsApi.set("site_banner", banner, "planned work"));
+    expectApiShape("OpsSettings", await controlsApi.set("jobs_paused", ["scoring"], "provider down"));
+    expectApiShape("ModelProfileOut", await controlsApi.models());
   });
 });

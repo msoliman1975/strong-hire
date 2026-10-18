@@ -5,6 +5,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { ApiError } from "./api/client";
 import { AuthLayout } from "./components/AuthLayout";
 import { AppLayout, PublicLayout } from "./components/Layout";
+import { SiteBanner } from "./components/SiteBanner";
 import { AccountPage } from "./pages/AccountPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { DebriefPage } from "./pages/DebriefPage";
@@ -45,47 +46,50 @@ export function createQueryClient(): QueryClient {
 
 export function AppRoutes() {
   return (
-    <Routes>
-      <Route element={<AuthLayout />}>
-        <Route path="/signin" element={<SignInPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
-      </Route>
-      <Route element={<PublicLayout />}>
-        <Route path="/signup" element={<SignupPage />} />
-      </Route>
-      <Route element={<AppLayout />}>
-        <Route index element={<DashboardPage />} />
-        <Route path="/welcome" element={<WelcomePage />} />
-        <Route path="/jobs" element={<JobsPage />} />
-        <Route path="/resumes" element={<ResumesPage />} />
-        <Route path="/resumes/:resumeId/check" element={<CheckResumePage />} />
-        <Route path="/jobs/new" element={<NewJobPage />} />
-        <Route path="/jobs/:jobId/confirm" element={<ConfirmJobPage />} />
-        <Route path="/jobs/:jobId/resume" element={<ResumePage />} />
-        <Route path="/jobs/:jobId/resume/:resumeId/check" element={<CheckResumePage />} />
-        <Route path="/jobs/:jobId/rehearse/:resumeId" element={<RehearsalPage />} />
-        <Route path="/jobs/:jobId/context" element={<ContextPage />} />
-        <Route path="/jobs/:jobId/gap" element={<GapAnalysisPage />} />
-        <Route path="/jobs/:jobId/sessions/new" element={<SessionSetupPage />} />
-        <Route path="/sessions/:sessionId/live" element={<LiveSessionPage />} />
-        <Route path="/sessions/:sessionId/debrief" element={<DebriefPage />} />
-        <Route path="/reports" element={<ReportsPage />} />
-        <Route path="/account" element={<AccountPage />} />
-        <Route path="/account/profile" element={<EditProfilePage />} />
-        <Route path="/upgrade" element={<PaywallPage />} />
-        {DevTextInterviewPage && (
-          <Route
-            path="/dev/interview"
-            element={
-              <Suspense fallback={null}>
-                <DevTextInterviewPage />
-              </Suspense>
-            }
-          />
-        )}
-      </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <>
+      <SiteBanner />
+      <Routes>
+        <Route element={<AuthLayout />}>
+          <Route path="/signin" element={<SignInPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+        </Route>
+        <Route element={<PublicLayout />}>
+          <Route path="/signup" element={<SignupPage />} />
+        </Route>
+        <Route element={<AppLayout />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="/welcome" element={<WelcomePage />} />
+          <Route path="/jobs" element={<JobsPage />} />
+          <Route path="/resumes" element={<ResumesPage />} />
+          <Route path="/resumes/:resumeId/check" element={<CheckResumePage />} />
+          <Route path="/jobs/new" element={<NewJobPage />} />
+          <Route path="/jobs/:jobId/confirm" element={<ConfirmJobPage />} />
+          <Route path="/jobs/:jobId/resume" element={<ResumePage />} />
+          <Route path="/jobs/:jobId/resume/:resumeId/check" element={<CheckResumePage />} />
+          <Route path="/jobs/:jobId/rehearse/:resumeId" element={<RehearsalPage />} />
+          <Route path="/jobs/:jobId/context" element={<ContextPage />} />
+          <Route path="/jobs/:jobId/gap" element={<GapAnalysisPage />} />
+          <Route path="/jobs/:jobId/sessions/new" element={<SessionSetupPage />} />
+          <Route path="/sessions/:sessionId/live" element={<LiveSessionPage />} />
+          <Route path="/sessions/:sessionId/debrief" element={<DebriefPage />} />
+          <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/account" element={<AccountPage />} />
+          <Route path="/account/profile" element={<EditProfilePage />} />
+          <Route path="/upgrade" element={<PaywallPage />} />
+          {DevTextInterviewPage && (
+            <Route
+              path="/dev/interview"
+              element={
+                <Suspense fallback={null}>
+                  <DevTextInterviewPage />
+                </Suspense>
+              }
+            />
+          )}
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   );
 }
 

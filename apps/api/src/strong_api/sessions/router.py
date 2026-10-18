@@ -11,6 +11,10 @@
     POST /sessions/{id}/voice/join         voice channel: start, and a LiveKit token for the room
     POST /internal/sessions/{id}/end       the voice agent ends a session (shared token)
 
+Creating or starting a session (the first voice join, the text open) answers 503 while new
+sessions are paused or the daily spend cap is reached (OC-2, OC-3, strong_api.controls).
+Sessions in progress always go on.
+
 Creating a session queues the interviewer brief job (P6). The text channel runs the same
 controller and interviewer as the voice agent (strong_interview), with typed input. It exists
 only when APP_ENV is local or test, and its runners live in this API process: if the API
@@ -41,6 +45,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from strong_api.auth.settings import AppEnv, get_auth_settings
 from strong_api.auth.sim import is_sim_user
 from strong_api.billing.entitlements import ensure_can_start_session, record_session_minutes
+from strong_api.controls import ensure_sessions_open
 from strong_api.inputs.deps import CurrentUser, Db, Me, Queue
 from strong_api.inputs.queue import BUILD_INTERVIEWER_BRIEF, JobQueue
 from strong_api.scoring.router import _brief, _config, _owned_session, _owned_target, start_scoring
@@ -157,6 +162,7 @@ async def create_session(body: CreateSessionRequest, db: Db, me: Me, queue: Queu
         raise HTTPException(status.HTTP_409_CONFLICT, "The job posting is still being read.")
     if body.channel == SessionChannel.TEXT and not await _text_allowed(db, me):
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Text sessions are a dev feature.")
+    await ensure_sessions_open(db, body.channel)  # OC-2, OC-3
     config = body.config
     if not await is_sim_user(db, me.user_id):  # the AI candidate has no plan (P13)
         await ensure_can_start_session(db, me.org_id, config.duration_min)
@@ -383,6 +389,7 @@ async def open_text_session(
     brief = _brief(session)
     if brief is None:
         raise HTTPException(status.HTTP_409_CONFLICT, "The interview plan is not ready yet.")
+    await ensure_sessions_open(db, SessionChannel.TEXT)  # OC-2, OC-3: only before it starts
     gateway = await gateway_for_org(db, session.org_id, get_gateway())  # sim budget (P13)
     target = await db.get(JobTarget, session.job_target_id)
     interviewer = Interviewer(gateway, brief, facts=_facts(target, brief.company_name))
@@ -535,6 +542,8 @@ async def join_voice_session(
     if _brief(session) is None:
         raise HTTPException(status.HTTP_409_CONFLICT, "The interview plan is not ready yet.")
     if session.started_at is None:
+        # OC-2, OC-3: a new session may not start; a rejoin (IV-9) of a started one always may.
+        await ensure_sessions_open(db, SessionChannel.VOICE)
         gateway = get_gateway()
         session.status = SessionStatus.IN_PROGRESS
         session.started_at = datetime.now(UTC)

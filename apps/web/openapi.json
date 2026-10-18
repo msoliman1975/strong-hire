@@ -1579,6 +1579,28 @@
         }
       }
     },
+    "/status": {
+      "get": {
+        "tags": [
+          "status"
+        ],
+        "summary": "Site Status",
+        "description": "Public: the active site banner and whether sign-ups and new sessions are open.",
+        "operationId": "site_status_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/providers": {
       "get": {
         "tags": [
@@ -2927,6 +2949,119 @@
         }
       }
     },
+    "/admin/ops/settings": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Ops Settings",
+        "description": "OC-1..OC-5: every control, its default, and who changed it last.",
+        "operationId": "get_ops_settings_admin_ops_settings_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpsSettings"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ops/settings/{key}": {
+      "put": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Put Ops Setting",
+        "description": "Change one control (AA-6: audited with the value before and after).",
+        "operationId": "put_ops_setting_admin_ops_settings__key__put",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Key"
+            }
+          },
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpsSettings"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ops/models": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Ops Models",
+        "description": "OC-6, D-11: what runs, read-only. Never names a model: aliases and tiers only.",
+        "operationId": "get_ops_models_admin_ops_models_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelProfileOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -3828,6 +3963,35 @@
           "created_at"
         ],
         "title": "AuthUser"
+      },
+      "BannerOut": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "info",
+              "warning",
+              "critical"
+            ],
+            "title": "Severity"
+          },
+          "until": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Until"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text",
+          "severity",
+          "until"
+        ],
+        "title": "BannerOut"
       },
       "Body_create_resume_resumes_post": {
         "properties": {
@@ -5445,6 +5609,15 @@
         "title": "JobContext",
         "description": "Optional context the user adds about the interview (IN-4). Stage has its own column."
       },
+      "JobKind": {
+        "type": "string",
+        "enum": [
+          "gap_analysis",
+          "scoring"
+        ],
+        "title": "JobKind",
+        "description": "OC-5: background job types that can be paused."
+      },
       "JobOut": {
         "properties": {
           "id": {
@@ -6214,6 +6387,48 @@
         "title": "Mode",
         "description": "IV-8. Only Realistic sessions count toward progress trends (PR-1)."
       },
+      "ModelProfileOut": {
+        "properties": {
+          "api_profile": {
+            "type": "string",
+            "title": "Api Profile"
+          },
+          "roles": {
+            "items": {
+              "$ref": "#/components/schemas/RoleModel"
+            },
+            "type": "array",
+            "title": "Roles"
+          },
+          "services": {
+            "items": {
+              "$ref": "#/components/schemas/ServiceProfile"
+            },
+            "type": "array",
+            "title": "Services",
+            "description": "From heartbeat:<service>:<instance>"
+          },
+          "heartbeats_available": {
+            "type": "boolean",
+            "title": "Heartbeats Available",
+            "description": "False when Redis could not be read"
+          },
+          "mismatch": {
+            "type": "boolean",
+            "title": "Mismatch",
+            "description": "A service reports a profile other than the API's"
+          }
+        },
+        "type": "object",
+        "required": [
+          "api_profile",
+          "roles",
+          "services",
+          "heartbeats_available",
+          "mismatch"
+        ],
+        "title": "ModelProfileOut"
+      },
       "ModelUsage": {
         "properties": {
           "profile": {
@@ -6262,6 +6477,80 @@
           "tracked"
         ],
         "title": "ModelUsage"
+      },
+      "OpsSettingMeta": {
+        "properties": {
+          "key": {
+            "$ref": "#/components/schemas/SettingKey"
+          },
+          "is_default": {
+            "type": "boolean",
+            "title": "Is Default"
+          },
+          "updated_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated By",
+            "description": "Admin email of the last change; None: never set"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "is_default",
+          "updated_by",
+          "updated_at"
+        ],
+        "title": "OpsSettingMeta"
+      },
+      "OpsSettings": {
+        "properties": {
+          "values": {
+            "$ref": "#/components/schemas/RuntimeSettings",
+            "description": "The value in force for every key"
+          },
+          "defaults": {
+            "$ref": "#/components/schemas/RuntimeSettings"
+          },
+          "meta": {
+            "items": {
+              "$ref": "#/components/schemas/OpsSettingMeta"
+            },
+            "type": "array",
+            "title": "Meta"
+          },
+          "spend_today_usd": {
+            "type": "number",
+            "title": "Spend Today Usd",
+            "description": "OC-3: model cost since UTC midnight (30 s cache)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "values",
+          "defaults",
+          "meta",
+          "spend_today_usd"
+        ],
+        "title": "OpsSettings"
       },
       "PasswordLoginRequest": {
         "properties": {
@@ -7539,6 +7828,94 @@
         ],
         "title": "RoleFamily"
       },
+      "RoleModel": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "alias": {
+            "type": "string",
+            "title": "Alias",
+            "description": "LiteLLM alias from config/models.<profile>.yaml"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "tier": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tier"
+          },
+          "test_only": {
+            "type": "boolean",
+            "title": "Test Only",
+            "description": "Roles only the AI candidate (P13) uses"
+          }
+        },
+        "type": "object",
+        "required": [
+          "role",
+          "alias",
+          "kind",
+          "tier",
+          "test_only"
+        ],
+        "title": "RoleModel"
+      },
+      "RuntimeSettings": {
+        "properties": {
+          "signups_paused": {
+            "type": "boolean",
+            "title": "Signups Paused",
+            "default": false
+          },
+          "sessions_paused_voice": {
+            "type": "boolean",
+            "title": "Sessions Paused Voice",
+            "default": false
+          },
+          "sessions_paused_text": {
+            "type": "boolean",
+            "title": "Sessions Paused Text",
+            "default": false
+          },
+          "daily_spend_cap_usd": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Daily Spend Cap Usd",
+            "default": 25.0
+          },
+          "site_banner": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SiteBanner"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "jobs_paused": {
+            "items": {
+              "$ref": "#/components/schemas/JobKind"
+            },
+            "type": "array",
+            "title": "Jobs Paused"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "RuntimeSettings",
+        "description": "Every ops control with its type and default. Field names are the setting keys."
+      },
       "SampleQuestion": {
         "additionalProperties": false,
         "description": "A question the company or candidates published, paraphrased, with its source.\nNever an NDA-protected question or copied paid content.",
@@ -7673,6 +8050,62 @@
           "status"
         ],
         "title": "ScoringAccepted"
+      },
+      "ServiceProfile": {
+        "properties": {
+          "service": {
+            "type": "string",
+            "title": "Service"
+          },
+          "instance": {
+            "type": "string",
+            "title": "Instance"
+          },
+          "model_profile": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Profile"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          },
+          "at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "At",
+            "description": "When the heartbeat was written"
+          }
+        },
+        "type": "object",
+        "required": [
+          "service",
+          "instance",
+          "model_profile",
+          "version",
+          "at"
+        ],
+        "title": "ServiceProfile"
       },
       "SessionChannel": {
         "type": "string",
@@ -7826,6 +8259,40 @@
         ],
         "title": "SessionStatus"
       },
+      "SettingIn": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason",
+            "description": "Why, for the audit log"
+          },
+          "value": {
+            "title": "Value",
+            "description": "The new value; its type depends on the key (null clears)"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reason",
+          "value"
+        ],
+        "title": "SettingIn"
+      },
+      "SettingKey": {
+        "type": "string",
+        "enum": [
+          "signups_paused",
+          "sessions_paused_voice",
+          "sessions_paused_text",
+          "daily_spend_cap_usd",
+          "site_banner",
+          "jobs_paused"
+        ],
+        "title": "SettingKey"
+      },
       "Severity": {
         "type": "string",
         "enum": [
@@ -7860,6 +8327,78 @@
           "terms_accepted"
         ],
         "title": "SignupRequest"
+      },
+      "SiteBanner": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Text"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "info",
+              "warning",
+              "critical"
+            ],
+            "title": "Severity",
+            "default": "info"
+          },
+          "until": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Until"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text",
+          "until"
+        ],
+        "title": "SiteBanner",
+        "description": "OC-4: a banner in the candidate app until `until`."
+      },
+      "SiteStatus": {
+        "properties": {
+          "banner": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BannerOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "OC-4: the active banner, None after `until`"
+          },
+          "signups_open": {
+            "type": "boolean",
+            "title": "Signups Open",
+            "description": "OC-1: false while new accounts are refused"
+          },
+          "voice_sessions_open": {
+            "type": "boolean",
+            "title": "Voice Sessions Open",
+            "description": "OC-2, OC-3: new voice sessions can start"
+          },
+          "text_sessions_open": {
+            "type": "boolean",
+            "title": "Text Sessions Open",
+            "description": "OC-2, OC-3: new text sessions can start"
+          }
+        },
+        "type": "object",
+        "required": [
+          "banner",
+          "signups_open",
+          "voice_sessions_open",
+          "text_sessions_open"
+        ],
+        "title": "SiteStatus",
+        "description": "What the candidate app shows: the site banner and what is paused (OC-1 to OC-4)."
       },
       "Source": {
         "additionalProperties": false,
