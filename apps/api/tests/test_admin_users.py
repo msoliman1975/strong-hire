@@ -440,7 +440,9 @@ async def test_au6_charge_refunded_is_recorded_once_and_shown_on_the_user(
         }
     ]
     async with sessionmaker() as db:
-        rows = list(await db.scalars(select(AuditLog).where(AuditLog.action == "billing.charge_refunded")))
+        rows = list(
+            await db.scalars(select(AuditLog).where(AuditLog.action == "billing.charge_refunded"))
+        )
     assert len(rows) == 1 and rows[0].actor == "stripe"
 
 
