@@ -11,6 +11,7 @@ import { alertsApi } from "../api/alerts";
 import { authApi } from "../api/auth";
 import { controlsApi } from "../api/controls";
 import { usersApi } from "../api/users";
+import { opsApi } from "../api/ops";
 import { mockStore } from "./node";
 
 const OPENAPI = JSON.parse(readFileSync(resolve(__dirname, "../../../web/openapi.json"), "utf8")) as object;
@@ -112,5 +113,36 @@ describe("admin mocks match openapi.json", () => {
     expectApiShape("AdminActionOut", await usersApi.signOut(id, "lost laptop"));
     expectApiShape("AdminActionOut", await usersApi.resendLink(id, "cannot sign in"));
     expectApiShape("AdminUserDetail", await usersApi.detail(id));
+  });
+
+  it("overview and operations (AO, OB-10..OB-14, AI)", async () => {
+    mockStore.db.users["admin@example.com"] = user("admin@example.com", 9, false);
+    await authApi.devLogin("admin@example.com");
+    for (const range of ["24h", "7d", "30d", "90d"] as const) expectApiShape("AdminOverview", await opsApi.overview(range));
+    expectApiShape("OpsHealth", await opsApi.health());
+    expectApiShape("OpsPerformance", await opsApi.performance("7d"));
+    const groups = await opsApi.errors("all");
+    for (const g of groups) expectApiShape("OpsErrorGroup", g);
+    expectApiShape("OpsErrorDetail", await opsApi.error(groups[0].id));
+    expectApiShape("OpsErrorDetail", await opsApi.updateError(groups[0].id, "resolved", "fixed it"));
+    const jobs = await opsApi.jobs();
+    expectApiShape("OpsJobs", jobs);
+    expectApiShape("OpsRetryOut", await opsApi.retry("scoring", jobs.scorings[0].id, "try again"));
+    expectApiShape("OpsSpend", await opsApi.spend());
+    mockStore.db.sessions.push({
+      id: "00000000-0000-4000-8000-0000000000c2",
+      job_target_id: "00000000-0000-4000-8000-0000000000d1",
+      resume_id: null,
+      config: { interview_type: "case", difficulty: "tough", mode: "coach", duration_min: 30, level: "mid" },
+      channel: "voice",
+      brief_ready: true,
+      status: "failed",
+      started_at: "2026-10-07T09:00:00Z",
+      ended_at: "2026-10-07T09:30:00Z",
+      minutes_billed: 30,
+      failure_reason: null,
+    });
+    expectApiShape("AdminSessionList", await adminApi.sessions({ status: "failed" }));
+    expectApiShape("AdminSessionDetail", await adminApi.session("00000000-0000-4000-8000-0000000000c2"));
   });
 });

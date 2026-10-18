@@ -170,6 +170,38 @@ export function mockTraces(at: string): AdminTrace[] {
   ];
 }
 
+/** AI-2, AI-3: the cost breakdown and per-turn latency of a mock interview that started. */
+function mockSessionExtras(session: AdminSession) {
+  if (!session.started_at) return { cost_breakdown: [], cost_total_usd: null, turn_latency: [], latency_summary: [] };
+  const turns = [620, 780, 910, 1340].map((e2e, i) => ({
+    turn_index: i,
+    e2e_ms: e2e,
+    turn_detection_ms: 200,
+    stt_ms: 120 + i * 10,
+    llm_ttft_ms: 250 + i * 40,
+    tts_ttfb_ms: 90,
+    other_ms: null,
+    created_at: session.started_at as string,
+  }));
+  return {
+    cost_breakdown: [
+      { component: "llm", role: "interviewer", units: 12_000, cost_usd: MOCK_COST_USD, rows: 1, cost_known: true },
+      { component: "llm", role: "scorer", units: 6_000, cost_usd: 0.004, rows: 1, cost_known: true },
+      { component: "stt", role: "stt", units: 540, cost_usd: 0, rows: 1, cost_known: false },
+    ],
+    cost_total_usd: Number((MOCK_COST_USD + 0.004).toFixed(6)),
+    turn_latency: turns,
+    latency_summary: [
+      { key: "e2e", n: 4, p50_ms: 780, p95_ms: 1340 },
+      { key: "turn_detection", n: 4, p50_ms: 200, p95_ms: 200 },
+      { key: "stt", n: 4, p50_ms: 130, p95_ms: 150 },
+      { key: "llm_ttft", n: 4, p50_ms: 290, p95_ms: 370 },
+      { key: "tts_ttfb", n: 4, p50_ms: 90, p95_ms: 90 },
+      { key: "other", n: 0, p50_ms: null, p95_ms: null },
+    ],
+  };
+}
+
 export function adminHandlers(store: MockStore) {
   const db = () => store.db;
   const admin = (): AuthUser | null => {
@@ -210,6 +242,9 @@ export function adminHandlers(store: MockStore) {
       prompt_version: "interviewer/turn.v2,interviewer/turn_input.v1",
       cost_usd: s.started_at ? MOCK_COST_USD : null,
       cost_source: s.started_at ? "usage_events" : "none",
+      failure_kind: s.status === "failed" ? (s.started_at ? "scoring_failed" : "brief_failed") : null,
+      failure_reason: s.status === "failed" ? (s.failure_reason ?? "Scoring failed after the interview ended.") : null,
+      stuck: false,
     };
   };
 
@@ -218,6 +253,7 @@ export function adminHandlers(store: MockStore) {
       if (!admin()) return notFound();
       const query = new URL(request.url).searchParams;
       const userId = query.get("user_id");
+      const status = query.get("status");
       const type = query.get("interview_type");
       const from = query.get("day_from");
       const to = query.get("day_to");
@@ -225,6 +261,7 @@ export function adminHandlers(store: MockStore) {
         .sessions.map(toAdmin)
         .filter((s) => !userId || s.user_id === userId)
         .filter((s) => !type || s.interview_type === type)
+        .filter((s) => !status || (status === "stuck" ? s.stuck : s.status === status))
         .filter((s) => !from || s.created_at.slice(0, 10) >= from)
         .filter((s) => !to || s.created_at.slice(0, 10) <= to)
         .sort((a, b) => b.created_at.localeCompare(a.created_at))
@@ -286,6 +323,7 @@ export function adminHandlers(store: MockStore) {
         traces,
         trace_retention_days: 90,
         audio_available: false,
+        ...mockSessionExtras(session),
       };
       return HttpResponse.json(body);
     }),

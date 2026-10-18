@@ -55,6 +55,13 @@ class AdminSession(BaseModel):
         description="Interviewer model cost. From usage events, else from the traces."
     )
     cost_source: CostSource
+    failure_kind: str | None = Field(
+        default=None, description="AI-4: brief_failed, scoring_failed, stuck_scoring, ..."
+    )
+    failure_reason: str | None = Field(
+        default=None, description="AI-4: the derived reason (sessions/failure.py and stuck rules)"
+    )
+    stuck: bool = Field(default=False, description="AI-1: scoring or in progress for too long")
 
 
 class DailyCost(BaseModel):
@@ -111,6 +118,18 @@ class AdminSessionDetail(BaseModel):
         default=False,
         description="True when a recording can be downloaded (AI candidate voice interviews).",
     )
+    cost_breakdown: list[AdminCostLine] = Field(
+        default_factory=list, description="AI-2: usage_events by component and role"
+    )
+    cost_total_usd: float | None = Field(
+        default=None, description="AI-2: every component and role. None without usage rows."
+    )
+    turn_latency: list[AdminTurnLatency] = Field(
+        default_factory=list, description="AI-3: per-turn voice latency (OB-3)"
+    )
+    latency_summary: list[AdminLatencyStat] = Field(
+        default_factory=list, description="AI-3: p50/p95 per component over the session's turns"
+    )
 
 
 class AdminAuditEntry(BaseModel):
@@ -121,3 +140,36 @@ class AdminAuditEntry(BaseModel):
     entity: str
     org_id: uuid.UUID | None
     details: dict[str, Any] | None
+
+
+# --- Interviews additions (AI-2, AI-3) ---------------------------------------------------------
+
+
+class AdminCostLine(BaseModel):
+    component: str
+    role: str
+    units: float
+    cost_usd: float
+    rows: int
+    cost_known: bool = Field(description="False when a row had no price (self-hosted: $0)")
+
+
+class AdminTurnLatency(BaseModel):
+    turn_index: int
+    e2e_ms: int | None
+    turn_detection_ms: int | None
+    stt_ms: int | None
+    llm_ttft_ms: int | None
+    tts_ttfb_ms: int | None
+    other_ms: int | None
+    created_at: datetime
+
+
+class AdminLatencyStat(BaseModel):
+    key: str
+    n: int
+    p50_ms: float | None
+    p95_ms: float | None
+
+
+AdminSessionDetail.model_rebuild()
