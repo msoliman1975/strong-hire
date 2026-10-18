@@ -48,6 +48,20 @@ class Settings(BaseSettings):
     sim_email: str = "sim@getstronghire.com"
     sim_litellm_key: SecretStr | None = None
 
+    # Outgoing email (strong_core.email). Same variables as the API's sign-in emails. Without
+    # SMTP_HOST, emails are logged instead of sent.
+    smtp_host: str | None = None
+    smtp_port: int = 587
+    smtp_username: str | None = None
+    smtp_password: str | None = None
+    smtp_from: str = "Strong Hire <no-reply@stronghire.local>"
+
+    # Admin app (docs/admin-spec.md).
+    alert_email: str = Field(default="", description="D-10: the one address all alerts go to.")
+    infra_monthly_usd: float | None = Field(
+        default=None, description="D-12, OB-15: server cost per month, for the server share."
+    )
+
     repo_root: Path = Field(default_factory=find_repo_root)
     config_dir: Path | None = None
     prompts_dir: Path | None = None

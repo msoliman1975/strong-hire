@@ -254,3 +254,68 @@ class UsageComponent(StrEnum):
     STT = "stt"
     LLM = "llm"
     TTS = "tts"
+
+
+# --- Admin app (docs/admin-spec.md). Stored in the database only; no contract uses them. ---
+
+
+class GrantKind(StrEnum):
+    """AU-3..AU-5: what a minute_grants row gives the user."""
+
+    MINUTES = "minutes"
+    FREE_INTERVIEWS = "free_interviews"
+    COMP_PLAN = "comp_plan"
+
+
+class ErrorGroupStatus(StrEnum):
+    """OB-12: a resolved group that happens again reopens."""
+
+    OPEN = "open"
+    RESOLVED = "resolved"
+
+
+class AlertAggregation(StrEnum):
+    """AL-1: how an alert rule reduces the samples in its window to one value."""
+
+    LAST = "last"
+    AVG = "avg"
+    P95 = "p95"
+    RATE = "rate"
+    COUNT = "count"
+
+
+class AlertComparator(StrEnum):
+    GT = "gt"
+    GTE = "gte"
+    LT = "lt"
+    LTE = "lte"
+
+
+class AlertSeverity(StrEnum):
+    CRITICAL = "critical"
+    WARNING = "warning"
+
+
+class AlertState(StrEnum):
+    """AL-2: ok -> pending -> firing -> ok."""
+
+    OK = "ok"
+    PENDING = "pending"
+    FIRING = "firing"
+
+
+class AlertEventKind(StrEnum):
+    """AL-4, AL-6."""
+
+    FIRED = "fired"
+    RESOLVED = "resolved"
+    TEST = "test"
+
+
+class TriageState(StrEnum):
+    """AT-5: admin triage of a requested company name."""
+
+    NEW = "new"
+    PLANNED = "planned"
+    DECLINED = "declined"
+    ADDED = "added"
