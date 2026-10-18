@@ -10,6 +10,7 @@ import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
 import { AppRoutes, createQueryClient } from "../App";
+import { mockSignIn } from "../mocks/handlers";
 import { mockStore } from "../mocks/node";
 
 // These pages render many tiles; give slow CI machines time.
@@ -23,11 +24,10 @@ function signInAdmin() {
     auth_provider: "dev",
     training_consent: false,
     created_at: "2026-10-01T10:00:00Z",
-    is_admin: true,
     full_name: null,
     profile_complete: true,
   };
-  mockStore.db.auth = { status: "signed_in", email: "admin@example.com", userEmail: "admin@example.com" };
+  mockSignIn(mockStore, "admin@example.com");
 }
 
 function renderAt(path: string) {

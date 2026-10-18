@@ -2,8 +2,7 @@
  * MSW handlers for the admin routes (R2, moved from apps/web), with the same paths and shapes as
  * openapi.json.
  *
- * In the mock, admin@example.com is the admin (ADMIN_EMAILS in the real API). Everyone else gets
- * 404. Every session in the mock store belongs to the first user who is not an admin. The
+ * Only a signed-in mock admin (handlers.ts, AA-4) gets answers. Everyone else gets 404. Every session in the mock store belongs to the first user who is not an admin. The
  * transcript and the traces are fixtures, shown only while that user's consent is on, and each
  * view adds two audit entries, like the real API.
  */
@@ -19,7 +18,7 @@ import type {
 } from "../api/admin";
 import type { AuthUser, SessionRecord, Turn } from "../api/types";
 import { newId, type MockDb, type MockStore } from "./db";
-import { API, isMockAdmin } from "./handlers";
+import { activeAdmin, API, currentAdmin } from "./handlers";
 
 const SESSION_LIMIT = 500;
 const MOCK_COST_USD = 0.0123;
@@ -204,11 +203,8 @@ function mockSessionExtras(session: AdminSession) {
 
 export function adminHandlers(store: MockStore) {
   const db = () => store.db;
-  const admin = (): AuthUser | null => {
-    const { auth, users } = db();
-    const user = auth.status === "signed_in" && auth.userEmail ? users[auth.userEmail] : undefined;
-    return user && isMockAdmin(user.email) ? user : null;
-  };
+  const admin = () => currentAdmin(db());
+  const isMockAdmin = (email: string) => activeAdmin(db(), email) !== null;
   const owner = (): AuthUser | undefined => {
     const users = Object.values(db().users);
     return users.find((u) => !isMockAdmin(u.email)) ?? users[0];
