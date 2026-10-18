@@ -1730,6 +1730,176 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/companies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Companies
+         * @description AT-1: every company with its active flag, versions and request count.
+         */
+        get: operations["list_companies_admin_companies_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/companies/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Set Company Active
+         * @description AT-1: turn a company on or off. Company matching (IN-5) only uses active companies.
+         */
+        patch: operations["set_company_active_admin_companies__slug__patch"];
+        trace?: never;
+    };
+    "/admin/companies/{slug}/profiles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Profile Versions
+         * @description AT-2: the stored versions of one company, oldest first.
+         */
+        get: operations["list_profile_versions_admin_companies__slug__profiles_get"];
+        put?: never;
+        /**
+         * Import Profile
+         * @description AT-3: validate a profile like `strongctl profiles validate` and store it as a Draft.
+         *
+         *     The slug in the URL must match the file's company_slug. With create_company, a new slug adds
+         *     the company, inactive, as `strongctl profiles import --create-company` does.
+         */
+        post: operations["import_profile_admin_companies__slug__profiles_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/companies/{slug}/profiles/diff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Diff Versions
+         * @description AT-2: what changed from version a to version b (profiles/diff.py, meta ignored).
+         */
+        get: operations["diff_versions_admin_companies__slug__profiles_diff_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/companies/{slug}/profiles/{version}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Profile Version
+         * @description AT-2: one version's stored JSON and its sources.
+         */
+        get: operations["get_profile_version_admin_companies__slug__profiles__version__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/companies/{slug}/profiles/{version}/transition": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Transition Profile
+         * @description AT-4: draft -> in_review -> published -> archived, in_review -> draft, and archived ->
+         *     published (rollback). Publishing records reviewed_by and archives the version published
+         *     before, in one transaction.
+         */
+        post: operations["transition_profile_admin_companies__slug__profiles__version__transition_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/company-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Company Requests
+         * @description AT-5: names users asked for that are not curated, grouped by normalized name. Triage
+         *     state 'new' when nobody has triaged the name yet.
+         */
+        get: operations["list_company_requests_admin_company_requests_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/company-requests/{normalized_name}/triage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Triage
+         * @description AT-5: set the triage state of a requested name. company_requests rows are not edited.
+         */
+        put: operations["set_triage_admin_company_requests__normalized_name__triage_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -1819,6 +1989,35 @@ export interface components {
             details: {
                 [key: string]: unknown;
             } | null;
+        };
+        /** AdminCompany */
+        AdminCompany: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Slug */
+            slug: string;
+            /** Name */
+            name: string;
+            /** Active */
+            active: boolean;
+            /** Published Version */
+            published_version: number | null;
+            /** Latest Version */
+            latest_version: number | null;
+            /** Version Count */
+            version_count: number;
+            /** Draft Count */
+            draft_count: number;
+            /** In Review Count */
+            in_review_count: number;
+            /**
+             * Request Users
+             * @description Distinct users whose job setup matched the company
+             */
+            request_users: number;
         };
         /** AdminCostLine */
         AdminCostLine: {
@@ -2921,6 +3120,11 @@ export interface components {
              */
             notes: string | null;
         };
+        /**
+         * ChangeKind
+         * @enum {string}
+         */
+        ChangeKind: "added" | "removed" | "changed";
         /** CoachRequest */
         CoachRequest: {
             /**
@@ -2928,6 +3132,16 @@ export interface components {
              * @enum {string}
              */
             command: "pause" | "resume" | "hint" | "redo";
+        };
+        /** CompanyActiveIn */
+        CompanyActiveIn: {
+            /**
+             * Reason
+             * @description Why, for the audit log
+             */
+            reason: string;
+            /** Active */
+            active: boolean;
         };
         /** CompanyProfile */
         CompanyProfile: {
@@ -2977,6 +3191,39 @@ export interface components {
              * @description Fields or claims flagged for reviewer attention.
              */
             low_confidence_notes?: string[];
+        };
+        /** CompanyProfiles */
+        CompanyProfiles: {
+            company: components["schemas"]["AdminCompany"];
+            /** Versions */
+            versions: components["schemas"]["ProfileVersion"][];
+        };
+        /** CompanyRequestGroup */
+        CompanyRequestGroup: {
+            /** Normalized Name */
+            normalized_name: string;
+            /**
+             * Names
+             * @description The names users typed, most common first
+             */
+            names: string[];
+            /** Users */
+            users: number;
+            /** Requests */
+            requests: number;
+            /**
+             * First Requested
+             * Format: date-time
+             */
+            first_requested: string;
+            /**
+             * Last Requested
+             * Format: date-time
+             */
+            last_requested: string;
+            /** Source Hosts */
+            source_hosts: string[];
+            triage: components["schemas"]["TriageInfo"];
         };
         /**
          * Competency
@@ -3177,6 +3424,23 @@ export interface components {
         DevUsageIn: {
             /** Minutes */
             minutes: number;
+        };
+        /** DiffChange */
+        DiffChange: {
+            /** Path */
+            path: string;
+            kind: components["schemas"]["ChangeKind"];
+            /** Old */
+            old?: unknown;
+            /** New */
+            new?: unknown;
+        };
+        /** DiffField */
+        DiffField: {
+            /** Field */
+            field: string;
+            /** Changes */
+            changes: components["schemas"]["DiffChange"][];
         };
         /**
          * Difficulty
@@ -4492,12 +4756,71 @@ export interface components {
          * @enum {string}
          */
         ProbeTrigger: "own_role" | "measurable_result" | "concrete_example" | "tradeoff_reasoning" | "off_topic";
+        /** ProfileDiff */
+        ProfileDiff: {
+            /**
+             * A
+             * @description The old version. None means no old version
+             */
+            a: number | null;
+            /** B */
+            b: number;
+            /** Total */
+            total: number;
+            /**
+             * Fields
+             * @description Every top-level field, changed or not
+             */
+            fields: components["schemas"]["DiffField"][];
+        };
         /**
          * ProfileField
          * @description Top-level profile fields that carry sources and a confidence level.
          * @enum {string}
          */
         ProfileField: "values_framework" | "loop_structure" | "question_patterns" | "bar_by_level" | "persona" | "scoring_weights" | "case_style";
+        /**
+         * ProfileImportIn
+         * @description The file text (from a file picker or pasted) or the parsed JSON. Exactly one of them.
+         */
+        ProfileImportIn: {
+            /**
+             * Reason
+             * @description Why, for the audit log
+             */
+            reason: string;
+            /** Profile Text */
+            profile_text?: string | null;
+            /** Profile */
+            profile?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Create Company
+             * @description Add the company (inactive) when the slug is new
+             * @default false
+             */
+            create_company: boolean;
+            /**
+             * Force
+             * @description Store it even if nothing changed
+             * @default false
+             */
+            force: boolean;
+        };
+        /** ProfileImportOut */
+        ProfileImportOut: {
+            company: components["schemas"]["AdminCompany"];
+            version: components["schemas"]["ProfileVersion"];
+            /** Company Created */
+            company_created: boolean;
+            /** File Version */
+            file_version: number;
+            /** Summary */
+            summary: string[];
+            /** @description Against the published version, if there is one */
+            diff: components["schemas"]["ProfileDiff"];
+        };
         /**
          * ProfileIn
          * @description AC-3: the profile asked for at the first sign-in. No payment details.
@@ -4565,6 +4888,51 @@ export interface components {
          * @enum {string}
          */
         ProfileStatus: "draft" | "in_review" | "published" | "archived";
+        /** ProfileVersion */
+        ProfileVersion: {
+            /** Version */
+            version: number;
+            status: components["schemas"]["ProfileStatus"];
+            /**
+             * Imported At
+             * Format: date-time
+             */
+            imported_at: string;
+            /** Published At */
+            published_at: string | null;
+            /** Reviewed By */
+            reviewed_by: string | null;
+            /** Source Count */
+            source_count: number;
+        };
+        /** ProfileVersionDetail */
+        ProfileVersionDetail: {
+            /** Version */
+            version: number;
+            status: components["schemas"]["ProfileStatus"];
+            /**
+             * Imported At
+             * Format: date-time
+             */
+            imported_at: string;
+            /** Published At */
+            published_at: string | null;
+            /** Reviewed By */
+            reviewed_by: string | null;
+            /** Source Count */
+            source_count: number;
+            /** Profile */
+            profile: {
+                [key: string]: unknown;
+            };
+            /** Sources */
+            sources: unknown[];
+            /**
+             * Problems
+             * @description Empty when the stored JSON still matches the CompanyProfile schema
+             */
+            problems: string[];
+        };
         /**
          * ProgressSnapshot
          * @description One competency score from one Realistic session, for trend charts (PR-1).
@@ -5182,6 +5550,65 @@ export interface components {
             /** Phase */
             phase: string;
         };
+        /** TransitionIn */
+        TransitionIn: {
+            /**
+             * Reason
+             * @description Why, for the audit log
+             */
+            reason: string;
+            /**
+             * To
+             * @enum {string}
+             */
+            to: "draft" | "in_review" | "published" | "archived";
+        };
+        /** TransitionOut */
+        TransitionOut: {
+            version: components["schemas"]["ProfileVersion"];
+            from_status: components["schemas"]["ProfileStatus"];
+            /**
+             * Archived Version
+             * @description On publish: the version published before, now archived
+             */
+            archived_version: number | null;
+        };
+        /** TriageIn */
+        TriageIn: {
+            /**
+             * Reason
+             * @description Why, for the audit log
+             */
+            reason: string;
+            state: components["schemas"]["TriageState"];
+            /**
+             * Company Id
+             * @description Required when state is added
+             */
+            company_id?: string | null;
+            /** Note */
+            note?: string | null;
+        };
+        /** TriageInfo */
+        TriageInfo: {
+            state: components["schemas"]["TriageState"];
+            /** Company Id */
+            company_id: string | null;
+            /** Company Slug */
+            company_slug: string | null;
+            /** Note */
+            note: string | null;
+            /** Updated By */
+            updated_by: string | null;
+            /** Updated At */
+            updated_at: string | null;
+        };
+        /**
+         * TriageState
+         * @description AT-5: admin triage of a requested company name.
+         * @enum {string}
+         */
+        TriageState: "new" | "planned" | "declined" | "added";
         /**
          * Turn
          * @description One utterance in the transcript. Text only; audio is never stored.
@@ -8372,6 +8799,324 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OpsSpend"];
+                };
+            };
+        };
+    };
+    list_companies_admin_companies_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCompany"][];
+                };
+            };
+        };
+    };
+    set_company_active_admin_companies__slug__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompanyActiveIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCompany"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_profile_versions_admin_companies__slug__profiles_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyProfiles"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    import_profile_admin_companies__slug__profiles_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfileImportIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileImportOut"];
+                };
+            };
+            /** @description The company is new and create_company is off */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Same content as the latest version (detail.code 'unchanged') */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description detail.code 'invalid_profile' with detail.problems, or a bad body */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    diff_versions_admin_companies__slug__profiles_diff_get: {
+        parameters: {
+            query: {
+                /** @description Old version */
+                a: number;
+                /** @description New version */
+                b: number;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileDiff"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_profile_version_admin_companies__slug__profiles__version__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+                version: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    transition_profile_admin_companies__slug__profiles__version__transition_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                slug: string;
+                version: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TransitionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TransitionOut"];
+                };
+            };
+            /** @description The workflow does not allow it (detail.code) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_company_requests_admin_company_requests_get: {
+        parameters: {
+            query?: {
+                state?: components["schemas"]["TriageState"] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyRequestGroup"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_triage_admin_company_requests__normalized_name__triage_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                normalized_name: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TriageIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyRequestGroup"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

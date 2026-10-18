@@ -23,20 +23,22 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine as _create_async_engine
 
 from strong_api.profiles import repository as repo
-from strong_api.profiles.diff import format_diff
-from strong_api.profiles.validation import ProfileFileError, load_profile_file
+from strong_api.profiles.diff import DIFF_FIELDS, format_diff
+from strong_api.profiles.validation import (
+    ProfileFileError,
+    load_profile_file,
+    profile_summary,
+)
 from strong_core.config import get_settings
 from strong_core.db.engine import async_database_url
 from strong_core.profiles import ProfileError, get_profile_version, get_published_row
-from strong_core.schemas import CompanyProfile, Confidence
+from strong_core.schemas import CompanyProfile
 
 app = typer.Typer(help="Strong Hire admin commands.", no_args_is_help=True)
 profiles_app = typer.Typer(
     help="Company profiles: validate, import, publish.", no_args_is_help=True
 )
 app.add_typer(profiles_app, name="profiles")
-
-DIFF_FIELDS = [name for name in CompanyProfile.model_fields if name != "meta"]
 
 
 def make_engine() -> AsyncEngine:
@@ -82,21 +84,6 @@ def load_or_exit(path: Path) -> CompanyProfile:
         raise typer.Exit(code=1) from exc
 
 
-def summary_lines(profile: CompanyProfile) -> list[str]:
-    low = [f.value for f, c in profile.field_confidence.items() if c is Confidence.LOW]
-    return [
-        f"Company: {profile.company_name} ({profile.company_slug})",
-        f"Values framework: {profile.values_framework.name}, "
-        f"{len(profile.values_framework.principles)} principles, values share "
-        f"{profile.values_share:g}",
-        f"Loops: {len(profile.loop_structure)}, question patterns: "
-        f"{len(profile.question_patterns)}, levels: {len(profile.bar_by_level)}",
-        f"Scoring weights: {len(profile.scoring_weights)} competencies, sources: "
-        f"{len(profile.sources)}",
-        "Low-confidence fields: " + (", ".join(low) if low else "none"),
-    ]
-
-
 @profiles_app.command("validate")
 def validate_cmd(
     file: Annotated[Path, typer.Argument(help="Profile JSON file.")],
@@ -104,7 +91,7 @@ def validate_cmd(
     """Check a profile file against the CompanyProfile schema. Does not use the database."""
     profile = load_or_exit(file)
     typer.secho(f"Valid: {file}", fg=typer.colors.GREEN)
-    for line in summary_lines(profile):
+    for line in profile_summary(profile):
         typer.echo(f"  {line}")
 
 
@@ -240,7 +227,7 @@ def show_cmd(
         typer.echo(line)
     typer.echo(f"Showing {label}:")
     if data is not None:
-        for line in summary_lines(CompanyProfile.model_validate(data)):
+        for line in profile_summary(CompanyProfile.model_validate(data)):
             typer.echo(f"  {line}")
 
 
