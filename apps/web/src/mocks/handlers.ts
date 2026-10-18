@@ -47,7 +47,6 @@ import type {
   ResumeOut,
   Usage,
 } from "../api/types";
-import { isMockAdmin } from "./adminHandlers";
 import { newId, type MockGap, type MockStore, type MockTask } from "./db";
 import { gapAnalysis, jobPosting, resume, scorecardFor, sessionPlan } from "./fixtures";
 
@@ -121,7 +120,7 @@ export function authHandlers(store: MockStore) {
         auth_provider: "dev",
         training_consent: body.training_consent ?? false,
         created_at: new Date().toISOString(),
-        is_admin: isMockAdmin(auth.email),
+        is_admin: false,
         full_name: null,
         profile_complete: false,
       };
@@ -142,7 +141,7 @@ export function authHandlers(store: MockStore) {
           auth_provider: "password",
           training_consent: false,
           created_at: new Date().toISOString(),
-          is_admin: isMockAdmin(email),
+          is_admin: false,
           full_name: body.full_name ?? null,
           profile_complete: false,
         };
