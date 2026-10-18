@@ -18,6 +18,7 @@ from strong_sim.candidate import SILENCE, Candidate
 from strong_sim.client import AppClient
 from strong_sim.scenarios import Behavior, Scenario
 from strong_sim.settings import SimSettings
+from strong_sim.timing import align_voice, latencies, speech_spans
 from strong_sim.transcript import Line
 
 log = logging.getLogger("strong_sim")
@@ -36,6 +37,7 @@ class Conversation:
     audio_path: Path | None = None
     turn_latency_ms: list[float] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
+    timing: str = "server"  # "audio": the times are positions in audio.ogg (SM-6)
 
 
 class _Clock:
@@ -46,7 +48,13 @@ class _Clock:
         return int((time.perf_counter() - self.t0) * 1000)
 
 
-def _interviewer_lines(conv: Conversation, clock: _Clock, turns: list[dict[str, Any]]) -> None:
+def _interviewer_lines(
+    conv: Conversation,
+    clock: _Clock,
+    turns: list[dict[str, Any]],
+    latency_ms: int | None = None,
+) -> None:
+    """Add the interviewer's lines; the first gets latency_ms (SM-9: the server's reply time)."""
     for t in turns:
         if t["speaker"] != "interviewer":
             continue
@@ -59,8 +67,10 @@ def _interviewer_lines(conv: Conversation, clock: _Clock, turns: list[dict[str, 
                 end_ms=now,
                 phase=t.get("phase"),
                 question_ref=t.get("question_ref"),
+                latency_ms=latency_ms,
             )
         )
+        latency_ms = None
 
 
 async def run_text(
@@ -96,8 +106,9 @@ async def run_text(
         )
         sent = time.perf_counter()
         out = await client.text_turn(sid, "..." if silent else reply)
-        conv.turn_latency_ms.append((time.perf_counter() - sent) * 1000)
-        _interviewer_lines(conv, clock, out["turns"])
+        took = (time.perf_counter() - sent) * 1000
+        conv.turn_latency_ms.append(took)
+        _interviewer_lines(conv, clock, out["turns"], latency_ms=round(took))
         turns += 1
     conv.ended_by_server = True
     return conv
@@ -151,6 +162,17 @@ class _Room:
         await self.room.disconnect()
 
 
+def _align(conv: Conversation, recorder: Recorder) -> None:
+    """SM-6: put the interviewer's lines on the audio clock and measure each reply's latency."""
+    try:
+        align_voice(conv.lines, speech_spans(bytes(recorder.tracks[0]), recorder.rate))
+    except Exception:  # never lose the recording over the times
+        log.exception("could not align the transcript with the audio")
+        return
+    conv.timing = "audio"
+    conv.turn_latency_ms = [float(ms) for ms in latencies(conv.lines)]
+
+
 async def _speech(gateway: ModelGateway, text: str) -> bytes:
     return b"".join([chunk async for chunk in gateway.synthesize_stream(text)])
 
@@ -171,6 +193,7 @@ async def run_voice(
     join = await client.voice_join(sid)
     room = _Room(recorder, said)
     recorder.start()
+    clock.t0 = recorder.t0  # one clock for notes, captions and the recording
     await room.connect(join["livekit_url"], join["token"])
     deadline = time.perf_counter() + (scenario.duration_min + GRACE_MIN) * 60
     turns = 0
@@ -203,24 +226,21 @@ async def run_voice(
                 await room.ear.wait_quiet(heard_at)
             reply = await candidate.reply(conv.lines)
             if reply == SILENCE:
-                start = clock.ms()
+                start = recorder.ms(1)
                 conv.lines.append(
-                    Line(speaker="candidate", text="...", start_ms=start, end_ms=start,
+                    Line(speaker="candidate", text="...", start_ms=start,
+                         end_ms=start + int(settings.voice_silence_s * 1000),
                          note=f"silent for {settings.voice_silence_s:.0f} s")
                 )  # fmt: skip
                 await asyncio.sleep(settings.voice_silence_s)
                 continue
             pcm = await _speech(gateway, reply)
-            start = clock.ms()
-            await room.mouth.say(pcm)
-            spoke_until = time.perf_counter()
+            fallback = recorder.ms(1)
+            start, end = await room.mouth.say(pcm) or (fallback, fallback)
             conv.lines.append(
-                Line(speaker="candidate", text=reply, start_ms=start, end_ms=clock.ms(),
+                Line(speaker="candidate", text=reply, start_ms=start, end_ms=end,
                      note="interrupted the interviewer" if interrupt else None)
             )  # fmt: skip
-            took = await room.ear.wait_first_loud(spoke_until, timeout_s=30)
-            if took is not None:  # end of the candidate's speech to the first reply audio
-                conv.turn_latency_ms.append(took * 1000)
             if scenario.behavior == Behavior.DROPS_CONNECTION and not dropped and turns >= 5:
                 dropped = True
                 conv.notes.append(f"connection dropped at {clock.ms() // 1000} s")
@@ -232,6 +252,7 @@ async def run_voice(
                 conv.notes.append(f"reconnected at {clock.ms() // 1000} s")
     finally:
         await room.close()
+        _align(conv, recorder)
         conv.audio_path = recorder.save_ogg(audio_path)
     if not conv.ended_by_server:
         await client.end(sid)

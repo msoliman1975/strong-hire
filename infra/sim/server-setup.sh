@@ -4,8 +4,8 @@
 #
 # - /srv/stronghire/sim holds one folder per run. It is never deleted with the sim server.
 # - User "simup" can only write there: its key is forced to rrsync, with no shell, no forwarding.
-# - A cron job keeps the folder under SIM_KEEP_GB (default 10), deleting the oldest runs first
-#   and never the newest one.
+# - Retention (SIM_KEEP_GB, SIM_KEEP_DAYS) is done by the sim service (SM-14); this script
+#   removes the cron job older versions installed.
 # Safe to run more than once.
 set -euo pipefail
 
@@ -22,9 +22,5 @@ chown -R simup:simup /home/simup/.ssh
 chmod 700 /home/simup/.ssh
 chmod 600 /home/simup/.ssh/authorized_keys
 
-install -m 755 "$REPO/infra/sim/sim-retention.sh" /usr/local/bin/stronghire-sim-retention
-cat > /etc/cron.d/stronghire-sim-retention <<'CRON'
-# AI candidate results: keep /srv/stronghire/sim under the size limit (P13).
-17 * * * * root /usr/local/bin/stronghire-sim-retention >> /var/log/stronghire-sim-retention.log 2>&1
-CRON
-echo "simup and $DIR are ready; retention runs hourly."
+rm -f /etc/cron.d/stronghire-sim-retention /usr/local/bin/stronghire-sim-retention
+echo "simup and $DIR are ready. Retention runs in the sim service (--profile sim)."
