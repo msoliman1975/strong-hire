@@ -83,7 +83,8 @@ class RuntimeSettings(BaseModel):
         default=DEFAULT_SIM_MAX_LIVE_SESSIONS,
         ge=0,
         le=20,
-        description="SM-3: a sim run does not start while this many real sessions are live",
+        description="SM-3: a sim run does not start while this many real sessions are live. "
+        "0 turns the limit off.",
     )
 
 
