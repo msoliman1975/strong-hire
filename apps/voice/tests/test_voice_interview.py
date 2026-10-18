@@ -11,8 +11,8 @@ from pathlib import Path
 import pytest
 
 from strong_core.config import ModelProfile, Settings
-from strong_core.gateway import build_gateway
-from strong_core.schemas import Difficulty, Mode, Phase, Speaker, Turn, UsageComponent
+from strong_core.gateway import UsageRecord, build_gateway, set_usage_sink, usage_context
+from strong_core.schemas import Difficulty, Mode, Phase, Speaker, Turn
 from strong_interview import CoachNotAllowedError, Interviewer, InterviewRunner, SessionController
 from strong_interview.testing import FakeClock, make_brief
 from strong_voice import interview as interview_module
@@ -26,17 +26,11 @@ WRITES = re.compile(r"open\([^)]*['\"]w|write_bytes|\.wav|wave\.open|AudioFrame\
 @dataclass
 class FakeStore:
     turns: list[Turn] = field(default_factory=list)
-    usage: dict[UsageComponent, float] = field(default_factory=dict)
     prompt_version: str | None = None
 
     async def save_turn(self, session_id: uuid.UUID, turn: Turn) -> None:
         assert session_id == SID
         self.turns.append(turn)
-
-    async def save_usage(
-        self, session_id: uuid.UUID, component: UsageComponent, units: float, cost_usd: float = 0.0
-    ) -> None:
-        self.usage[component] = units
 
     async def save_provenance(self, session_id: uuid.UUID, prompt_version: str | None) -> None:
         self.prompt_version = prompt_version
@@ -89,7 +83,7 @@ async def test_candidate_turn_is_saved_with_its_timing() -> None:
     assert await rig.voice.on_candidate("   ") == []  # silence is not a turn
 
 
-async def test_iv7_session_ends_once_with_usage_and_provenance() -> None:
+async def test_iv7_session_ends_once_with_provenance() -> None:
     """The controller ends the session; the agent then ends it in the API once (FB-3)."""
     rig = make_rig()
     await rig.voice.opening()
@@ -104,9 +98,6 @@ async def test_iv7_session_ends_once_with_usage_and_provenance() -> None:
     assert rig.finisher.calls == [False]
     await rig.voice.finish(interrupted=True)  # safe to call again
     assert rig.finisher.calls == [False]
-    assert rig.store.usage[UsageComponent.STT] > 0
-    assert rig.store.usage[UsageComponent.TTS] > 0
-    assert UsageComponent.LLM in rig.store.usage
     assert rig.store.prompt_version and "interviewer/turn" in rig.store.prompt_version
     assert rig.store.turns == rig.voice.runner.turns  # every turn saved
     assert rig.store.turns[-1].phase == Phase.WRAP_UP
@@ -269,3 +260,27 @@ async def test_iv11_prep_is_capped_at_three_minutes_and_ends_once() -> None:
     assert await rig.voice.end_prep(say=False) == []
     assert await rig.voice.end_prep() == []  # not preparing any more
     assert not rig.voice.preparing
+
+
+async def test_ob2_voice_usage_comes_from_the_gateway_once_per_call() -> None:
+    """OB-2: inside the session's usage context every interviewer call reports a row with its
+    role; the end of the session writes no rows of its own (nothing is counted twice)."""
+    records: list[UsageRecord] = []
+
+    async def sink(record: UsageRecord) -> None:
+        records.append(record)
+
+    previous = set_usage_sink(sink)
+    org = uuid.uuid4()
+    try:
+        rig = make_rig()
+        with usage_context(org, session_id=SID):
+            await rig.voice.opening()
+            rig.clock.advance(ms=30_000)
+            await rig.voice.on_candidate("Happy to be here.", spoken_s=4.0)
+        calls = len(records)
+        await rig.voice.finish(interrupted=False)
+    finally:
+        set_usage_sink(previous)
+    assert calls > 0 and len(records) == calls
+    assert {(r.role.value, r.org_id, r.session_id) for r in records} == {("interviewer", org, SID)}

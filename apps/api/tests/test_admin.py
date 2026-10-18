@@ -25,6 +25,7 @@ from strong_core.db.models import (
     UsageEvent,
     User,
 )
+from strong_core.gateway import UsageRecord, set_usage_sink
 from strong_core.schemas import InterviewType, Phase, UsageComponent
 
 from .accounts_support import add_session
@@ -108,6 +109,12 @@ async def test_r2_consent_gates_transcript_and_traces_and_views_are_audited(
     sessionmaker: Maker,
 ) -> None:
     """A whole text session writes traces; the admin sees them only while consent is on."""
+    usage: list[UsageRecord] = []
+
+    async def sink(record: UsageRecord) -> None:
+        usage.append(record)
+
+    set_usage_sink(sink)  # OB-2: the gateway reports each call (the autouse fixture restores)
     job = await ready_job(client, fake_fixtures)
     sid = (await create(client, job["id"], channel="text")).json()["id"]
     await client.post(f"/sessions/{sid}/text/open")
@@ -125,12 +132,6 @@ async def test_r2_consent_gates_transcript_and_traces_and_views_are_audited(
                 .order_by(InterviewerTrace.seq)
             )
         )
-        usage = await db.scalar(
-            select(UsageEvent).where(
-                UsageEvent.session_id == uuid.UUID(sid),
-                UsageEvent.component == UsageComponent.LLM,
-            )
-        )
     moves = [r.move for r in rows]
     # A mini skips small talk. The answer check (IV-12) is traced before the decision.
     assert moves[:5] == ["greet", "agenda", "ask", "check_answer", "decide"]
@@ -140,7 +141,10 @@ async def test_r2_consent_gates_transcript_and_traces_and_views_are_audited(
     probe = rows[moves.index("probe")]
     assert probe.reason_json is not None and probe.reason_json["why"] == ["model_chose_probe"]
     assert probe.phase == Phase.CORE and probe.messages_json and probe.raw_reply
-    assert usage is not None and usage.units > 0  # the text channel saves its tokens too
+    # The text channel's interviewer tokens: one usage row per gateway call (OB-2).
+    interviewer = [u for u in usage if u.role.value == "interviewer"]
+    assert interviewer and {u.session_id for u in interviewer} == {uuid.UUID(sid)}
+    assert sum(u.units for u in interviewer) > 0
 
     # Consent off (the default): metadata only, and no audit row.
     detail = (await admin.get(f"/admin/sessions/{sid}")).json()
@@ -189,7 +193,7 @@ async def test_r2_consent_gates_transcript_and_traces_and_views_are_audited(
     assert len(await admin_views()) == 2
 
 
-async def test_r2_session_cost_daily_totals_and_filters(
+async def test_r2_ob2_session_cost_daily_totals_and_filters(
     client: httpx.AsyncClient, admin: httpx.AsyncClient, sessionmaker: Maker
 ) -> None:
     dev = await _user(sessionmaker, "dev@example.com")
@@ -203,15 +207,26 @@ async def test_r2_session_cost_daily_totals_and_filters(
         assert row is not None
         row.created_at = datetime.now(UTC) - timedelta(days=3)
         row.type = InterviewType.CASE
-        db.add(
-            UsageEvent(
-                org_id=dev.org_id,
-                session_id=a.id,
-                component=UsageComponent.LLM,
-                units=Decimal(1000),
-                cost_usd=Decimal("0.0125"),
+        # OB-2: every component and role counts: the interviewer, the brief, scoring and
+        # self-hosted speech (cost 0, cost unknown).
+        for component, role, cost in (
+            (UsageComponent.LLM, "interviewer", "0.0100"),
+            (UsageComponent.LLM, "planner", "0.0015"),
+            (UsageComponent.LLM, "scorer", "0.0010"),
+            (UsageComponent.STT, "stt", "0"),
+            (UsageComponent.TTS, "tts", "0"),
+        ):
+            db.add(
+                UsageEvent(
+                    org_id=dev.org_id,
+                    session_id=a.id,
+                    component=component,
+                    role=role,
+                    units=Decimal(1000),
+                    cost_usd=Decimal(cost),
+                    cost_known=cost != "0",
+                )
             )
-        )
         for seq, cost in ((1, "0.001"), (2, "0.002")):
             db.add(
                 InterviewerTrace(

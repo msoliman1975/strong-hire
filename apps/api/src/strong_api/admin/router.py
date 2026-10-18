@@ -114,11 +114,9 @@ async def _costs(
         return {}
     usage = _pairs(
         await db.execute(
+            # Every component and role (OB-2): interviewer, brief, scoring, stt and tts.
             select(UsageEvent.session_id, func.sum(UsageEvent.cost_usd))
-            .where(
-                UsageEvent.session_id.in_(session_ids),
-                UsageEvent.component == UsageComponent.LLM,
-            )
+            .where(UsageEvent.session_id.in_(session_ids))
             .group_by(UsageEvent.session_id)
         )
     )

@@ -33,6 +33,7 @@ services:
     command: ["uvicorn", "strong_api.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--forwarded-allow-ips", "*"]
     environment:
       APP_ENV: staging
+      LOG_FORMAT: json   # OB-7: one JSON object per log line (service, request_id, session_id)
       SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET in .env}
       WEB_BASE_URL: https://${DOMAIN}
       API_PUBLIC_URL: https://${DOMAIN}/api
@@ -69,6 +70,7 @@ services:
     environment:
       APP_ENV: staging
       ENV: staging
+      LOG_FORMAT: json   # OB-7
       # Encrypted resume files, kept in a volume so they survive restarts.
       INPUTS_STORAGE_DIR: /data/uploads
       INPUTS_STORAGE_KEY: ${INPUTS_STORAGE_KEY:?set INPUTS_STORAGE_KEY in .env}
@@ -87,6 +89,8 @@ services:
       SMTP_FROM: ${SMTP_FROM:-}
     volumes:
       - uploads-data:/data/uploads
+      # OB-5: the metrics sampler reads the Postgres volume's disk use (host.disk_pct, pgdata).
+      - postgres-data:/mnt/pgdata:ro
     restart: unless-stopped
 
   # Caddy serves the built web app, so the Vite dev server is not needed.
@@ -115,6 +119,7 @@ services:
 
   voice:
     environment:
+      LOG_FORMAT: json   # OB-7
       LIVEKIT_PUBLIC_URL: wss://rtc.${DOMAIN}
       STRONG_INTERNAL_TOKEN: ${STRONG_INTERNAL_TOKEN}
       # The sim org's voice interviews use the sim key (P13).
