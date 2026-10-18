@@ -47,8 +47,8 @@ from strong_core.schemas import (
 from strong_core.sim import gateway_for_org
 from strong_worker.gap.analysis import GapAnalysisError, run_gap_analysis
 from strong_worker.gap.brief import BriefError, build_brief
-from strong_worker.pause import wait_if_paused
 from strong_worker.ops.context import job_context
+from strong_worker.pause import wait_if_paused
 
 log = logging.getLogger(__name__)
 

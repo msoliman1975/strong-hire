@@ -27,8 +27,8 @@ from strong_worker.account import jobs as account_jobs
 from strong_worker.alerts import jobs as alert_jobs
 from strong_worker.gap import jobs as gap_jobs
 from strong_worker.inputs import jobs as inputs_jobs
-from strong_worker.pause import PAUSED_MAX_TRIES
 from strong_worker.ops import sampler
+from strong_worker.pause import PAUSED_MAX_TRIES
 from strong_worker.scoring import jobs as scoring_jobs
 
 

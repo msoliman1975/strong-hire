@@ -36,8 +36,8 @@ from strong_core.gateway import ModelGateway, get_gateway
 from strong_core.profiles import ProfileError, profile_for_session
 from strong_core.schemas import MINI_DURATION_MIN, InterviewerBrief, Mode, SessionStatus, Turn
 from strong_core.sim import gateway_for_org
-from strong_worker.pause import wait_if_paused
 from strong_worker.ops.context import job_context
+from strong_worker.pause import wait_if_paused
 from strong_worker.scoring.scorer import ScoringError, ScoringOutcome, SessionScorer
 
 log = logging.getLogger(__name__)
