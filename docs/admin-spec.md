@@ -34,6 +34,12 @@ platform.
 | D-10 | All alerts go to one ops address, `ALERT_EMAIL` (was OQ-3). |
 | D-11 | No runtime model-profile switch. Changing the profile is an `.env` edit and a restart; the admin app shows what runs (OC-6). Provider outages are covered by LiteLLM fallbacks: each alias in `config/litellm.<profile>.yaml` may name a backup model (was OQ-4). |
 | D-12 | Self-hosted speech is costed three ways, kept apart: session cost counts metered providers only ($0 marked self-hosted); the overview shows a separate "server share per session" from `INFRA_MONTHLY_USD`; the Spend page shows a "hosted equivalent" from shadow per-unit prices in config (was OQ-6). |
+| D-13 | Admin-started AI interviews run in a `sim` service on the main server, one at a time. `sim-run.ps1` and the short-lived sim server stay for suites (SM). |
+| D-14 | The admin starts one interview at a time from a form, with the 6 fixture personas. No pasted postings. |
+| D-15 | The replay page shows audio and a synced transcript, the scorecard, the judge verdicts with links to times, and a response-time marker on each interviewer turn. |
+| D-16 | While a run is in progress the admin sees its status and can cancel it. No live transcript or listen-in. |
+| D-17 | Live users come first: the `sim` container is capped at 2 CPUs and 2 GB, a Controls switch pauses runs, and a run does not start while 3 or more real sessions are live (setting). |
+| D-18 | Runs are kept under 10 GB and 90 days, oldest first. The admin can mark a run Keep (never deleted automatically) or delete it now. |
 
 ### Non-goals (v1)
 
@@ -105,6 +111,7 @@ Users           search -> user detail -> actions
 Interviews      list -> detail (transcript, traces, latency, cost breakdown)   [R2, moved]
 Content         Companies & profiles · Company requests · Question bank (read-only)
 Operations      Health · Errors · Jobs · Controls
+Simulations     runs list + new run form -> run detail (replay)                   [SM]
 Alerts          Rules · History
 Audit log       [R2, moved]
 Settings        Admins · My sessions
@@ -250,6 +257,59 @@ in-process cache. Every change is audited and shows as a banner in the admin app
 | OC-5 | **Pause background jobs** by type (gap analysis, scoring): jobs wait in the queue rather than run, for incidents with a model provider. | P2 |
 | OC-6 | **Model profile:** read-only. Shows the running profile per service and per-role models (from `config/models.<profile>.yaml`) and flags a mismatch between services (D-11). | P1 |
 
+## Simulations (SM)
+
+An admin starts an interview between the AI interviewer and the AI candidate (P13,
+`docs/sim-candidate.md`). It runs in the background on the main server, with audio. When it
+ends, the admin replays it: the recording plays and the transcript follows it, next to the
+scorecard, the judge's verdicts and the interviewer's response time on each turn. Decisions D-13
+to D-18.
+
+### How it runs
+
+```
+ admin app ── POST /admin/sim/runs ──▶ api ── checks (SM-3) ──▶ sim_runs row + Arq job (queue "sim")
+                                                                       │
+ sim service (main server, 2 CPUs, 2 GB)  ◀────────────────────────────┘  one job at a time
+   - signs in with sim-login and runs the interview through the public URL, as a browser does
+   - candidate and judge through the main LiteLLM with SIM_LITELLM_KEY (the $5/day sim budget)
+   - candidate voice from the main server's Kokoro (tts service)
+   - writes /srv/stronghire/sim/<run-id>/ (read-write mount); status and progress in sim_runs
+```
+
+- The `sim` service is `apps/sim` in a new mode, `strong-sim serve`: an Arq worker on its own
+  queue (`sim`) with `max_jobs=1`. It is in `compose.server.yaml` under the `sim` profile, with
+  `cpus: 2` and `mem_limit: 2g`. It starts only when `SIM_ENABLED=true`.
+- The interview itself still goes through HTTP and LiveKit like a real browser, so a run tests the
+  real path. The service reads and writes `sim_runs` directly (it has `DATABASE_URL`).
+- Models: the main `config/litellm.<profile>.yaml` gets the `sim-candidate`, `sim-judge` and
+  `sim-tts` aliases, and the main LiteLLM gets `GEMINI_API_KEY`. The sim calls them with
+  `SIM_LITELLM_KEY`, so LiteLLM enforces the $5/day budget on both sides. In this mode the sim
+  must **not** call `POST /auth/sim-spend` (it would count the cost twice).
+- `sim-run.ps1` suites on the short-lived server keep working as before. Their runs appear in the
+  list too, read from disk (SM-12).
+
+### Requirements
+
+| ID | Requirement | Priority |
+| --- | --- | --- |
+| SM-1 | **New run form:** persona (the 6 resume fixtures; the posting and level follow), interview type, difficulty, mode, duration (5, 10, 15, 20, 30 min), candidate quality, behavior (voice-only behaviors only when channel is voice) and channel (voice by default). The form shows the cost estimate for the chosen duration, what is left of today's sim budget, and the current gate state (SM-3). | P0 |
+| SM-2 | **Start:** creates a `sim_runs` row (`queued`) and an Arq job, writes an audit row, and returns the run. At most one run is active; up to 5 more wait in the queue in order. | P0 |
+| SM-3 | **Gates,** checked when the admin clicks Start (409 with a reason the form shows) and again when the job begins: `SIM_ENABLED` is on; the `sim_paused` setting is off; fewer than `sim_max_live_sessions` (default 3) real sessions are `in_progress` (the sim org does not count); the estimate fits what is left of today's sim budget. At job start, a failed live-sessions gate sets the run to `waiting` and checks again every 60 s; after 30 min it fails with the reason. The other gates fail the run at once. | P0 |
+| SM-4 | **Status:** `queued → waiting → starting → interviewing → judging → done`, or `failed` (with the error) or `cancelled`. While `interviewing`, the row shows elapsed / planned minutes, updated every 10 s. Cost so far = sim side (from the sim's meter) + app side (`usage_events` of the session). The list polls every 5 s while any run is not finished. | P0 |
+| SM-5 | **Cancel:** sets `cancel_requested_at`. A queued or waiting run is cancelled at once. An active run ends its session on the server within 5 s, saves the transcript and audio so far, skips the judge, and ends `cancelled`. Audited. | P0 |
+| SM-6 | **Audio-clock timing (apps/sim):** in voice runs, every `start_ms`/`end_ms` is measured from the first sample of `audio.ogg`. Interviewer line: start = the first loud frame on the left channel after the previous candidate line ended; end = the last loud frame before the next candidate line starts. Candidate line: start and end = first and last frame the candidate's mic track sent. Each interviewer line also gets `latency_ms` = its start − the previous candidate line's end. `meta.json` gets `"timing": "audio"`. A test with a synthetic recording checks the times within 150 ms. | P0 |
+| SM-7 | **Replay player:** play/pause, back/forward 10 s, speed 1×, 1.25×, 1.5×, 2×, a scrubber with markers for slow turns and judge problems. "Mixed" (default: both voices in both ears) or "Stereo" (interviewer left, candidate right) through Web Audio. The audio route supports HTTP Range so seeking works without downloading the file. | P0 |
+| SM-8 | **Synced transcript:** each line shows its time, speaker and phase. The line being played is highlighted and kept in view; scrolling by hand stops the auto-scroll until "Follow" is clicked. Clicking a line's time seeks there and plays. Keys: space play/pause, ←/→ 10 s, J/K previous/next line, N next slow turn. Runs without `"timing": "audio"` (older runs) show "times are approximate". Text runs show the same transcript without a player. | P0 |
+| SM-9 | **Response time:** a chip before each interviewer line shows `latency_ms`: green under 800 ms (the spec's p50 budget), amber 800–1500 ms, red over 1500 ms. The header shows p50 and p90 for the run and the number of red turns. | P0 |
+| SM-10 | **Judge panel:** each rule with pass/fail/n/a and the reason, and the problems list. Every `mm:ss` in a reason or a problem's `at` is a link that seeks the player. | P0 |
+| SM-11 | **Scorecard panel:** the debrief's hire signal, competency scores and evidence, as the candidate would see them. | P0 |
+| SM-12 | **Runs list:** started by, scenario summary, status, length, hire signal, failed judge rules, p50 response time, cost, Keep. Filters: status, channel, started by admin or by suite. Runs from `sim-run.ps1` are read from disk and shown with "suite" as the source; they open in the same replay page (with "times are approximate" when they predate SM-6). | P1 |
+| SM-13 | **Keep and Delete:** Keep marks a run so retention never deletes it. Delete (with a reason and confirmation) deletes the run folder at once and sets `deleted_at` on the row, so the list and costs keep a stub. The interview session itself stays in Interviews. Both audited. | P0 |
+| SM-14 | **Retention** moves from the host cron into a daily Arq cron in the `sim` service: delete run folders older than `SIM_KEEP_DAYS` (default 90), then the oldest until under `SIM_KEEP_GB` (default 10). It skips runs marked Keep and the newest run, and records each deletion on the run's row. `infra/sim/server-setup.sh` stops installing the host cron. | P0 |
+| SM-15 | **Controls:** "Pause sim runs" (`sim_paused`) and "Live sessions limit for sim runs" (`sim_max_live_sessions`, 0–20) on the Controls page, audited like OC-1..OC-5. Pausing also offers "stop the active run" (= SM-5). | P0 |
+| SM-16 | **Interview page link:** an interview of the sim user that has a run folder shows "Replay". | P1 |
+
 ## Data model changes
 
 These are all in `packages/core`, so they go in one small shared PR that merges first (the CLAUDE.md
@@ -268,6 +328,8 @@ rule). The new user-owned tables have `org_id` and go in `USER_OWNED_TABLES`.
 | `alert_rules`, `alert_events` | new, platform | AL-1, AL-4 |
 | `runtime_settings` | new, platform | OC |
 | `company_request_triage` | new, platform | AT-5 |
+| `sim_runs` | new, user-owned (the sim org) | SM: id, org_id, scenario_json, status (enum, SM-4), status_reason, run_dir, session_id (nullable FK), created_by (admin_users), created_at, started_at, finished_at, progress_s, cost_sim_usd, cancel_requested_at, keep, deleted_at, deleted_by, delete_reason |
+| `runtime_settings` keys `sim_paused`, `sim_max_live_sessions` | settings | SM-15 |
 
 Platform tables have no `org_id`. The ownership test needs an explicit `PLATFORM_TABLES` list
 next to `USER_OWNED_TABLES`, so every table is classified on purpose.
@@ -300,6 +362,12 @@ GET    /admin/alerts/rules             POST/PATCH/DELETE /admin/alerts/rules[/{i
 GET    /admin/alerts/events
 GET    /admin/admins                   POST/DELETE /admin/admins[/{id}]
 GET    /admin/audit                    (R2)
+GET    /admin/sim/options              personas, choices, estimates, budget left, gate state (SM-1)
+GET    /admin/sim/runs?status=&channel=&source=      POST /admin/sim/runs   (SM-2, SM-3, SM-12)
+GET    /admin/sim/runs/{id}            PATCH {keep}    DELETE {reason}        (SM-13)
+POST   /admin/sim/runs/{id}/cancel     (SM-5)
+GET    /admin/sessions/{id}/replay     transcript with times and latency, judge, scorecard, audio info (SM-7..SM-11)
+GET    /admin/sessions/{id}/audio      now answers Range requests with 206 (SM-7)
 ```
 
 Contracts for these responses live in `strong_api.admin.schemas`, not `strong_core.schemas`,
@@ -318,6 +386,10 @@ OpenAPI, as `apps/web` does.
 | A5 | `feat/a5-alerts` | Alert engine, default rules, Alerts pages | A3 |
 | A6 | `feat/a6-ops-controls` | OC-1..OC-4 in api, voice and web, Controls page | A1 |
 | A7 | `feat/a7-admin-content` | AT-1..AT-5 | A1 |
+| S0 | `feat/s0-sim-core` | `sim_runs` model and migration, the two runtime settings | none |
+| S1 | `feat/s1-sim-serve` | apps/sim: audio-clock timing (SM-6), `serve` mode with cancel, progress, gates at job start and retention (SM-3..SM-5, SM-14); infra: `sim` service, LiteLLM aliases, server-setup change | S0 |
+| S2 | `feat/s2-sim-api` | Admin routes, gates at Start, replay route, audio Range (SM-1..SM-5, SM-7..SM-13) | S0 |
+| S3 | `feat/s3-sim-web` | Simulations list and form, replay page, Controls additions, interview link (SM-1, SM-7..SM-16) | S2 |
 
 A3 and A5 can run in parallel with A1 and A2. For the private beta on Nov 30 the minimum is A0, A1,
 A3, A5 (to know when it breaks), A6 OC-1..OC-3 (to stop the bleeding) and AU-3/AU-5/AU-7 (to look
