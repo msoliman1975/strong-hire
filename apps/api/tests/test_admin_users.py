@@ -33,7 +33,7 @@ from strong_core.db.models import (
 from strong_core.schemas import GapStatus, SessionChannel, SessionStatus, SubscriptionStatus
 
 from .accounts_support import CUSTOMER_ID, FakeStripe, add_session, load_event, post_event
-from .conftest import InlineQueue, RecordingEmailSender, sign_in
+from .conftest import AuthHarness, InlineQueue, RecordingEmailSender, sign_in
 from .test_billing import billing_settings, subscribe
 
 Maker = async_sessionmaker[AsyncSession]
@@ -511,26 +511,36 @@ async def test_au7_admins_cannot_be_suspended(
     assert resp.status_code == 409
 
 
-async def test_au7_password_sign_in_of_a_suspended_user_is_refused(
-    app: FastAPI, admin: httpx.AsyncClient, sessionmaker: Maker
-) -> None:
-    transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as anon:
-        body = {
-            "email": "pat@example.com",
-            "password": "a long enough passphrase",
-            "age_confirmed": True,
-            "terms_accepted": True,
-        }
-        assert (await anon.post("/auth/password/signup", json=body)).status_code == 200
-        await anon.post("/auth/logout")
-        pat = await _user(sessionmaker, "pat@example.com")
-        await admin.post(f"/admin/users/{pat.id}/suspend", json={"reason": REASON}, headers=W)
-        login = {"email": "pat@example.com", "password": "a long enough passphrase"}
-        resp = await anon.post("/auth/password/login", json=login)
-        assert resp.status_code == 403 and resp.json()["detail"] == SUSPENDED_MESSAGE
-        wrong = await anon.post("/auth/password/login", json={**login, "password": "nope nope 1"})
-        assert wrong.status_code == 401  # the wrong password still gets the usual answer
+def test_au7_password_and_link_sign_in_of_a_suspended_user_are_refused(auth: AuthHarness) -> None:
+    """The auth harness has an in-memory login throttle, so no Redis is needed."""
+    body = {
+        "email": "pat@example.com",
+        "password": "a long enough passphrase",
+        "age_confirmed": True,
+        "terms_accepted": True,
+    }
+    assert auth.client.post("/auth/password/signup", json=body).status_code == 200
+    auth.client.post("/auth/logout")
+
+    async def suspend(db: AsyncSession) -> None:
+        user = await db.scalar(select(User).where(User.email == "pat@example.com"))
+        assert user is not None
+        user.suspended_at = datetime.now(UTC)
+        await db.commit()
+
+    auth.query(suspend)
+    login = {"email": "pat@example.com", "password": "a long enough passphrase"}
+    resp = auth.client.post("/auth/password/login", json=login)
+    assert resp.status_code == 403 and resp.json()["detail"] == SUSPENDED_MESSAGE
+    wrong = auth.client.post("/auth/password/login", json={**login, "password": "nope nope 1"})
+    assert wrong.status_code == 401  # a wrong password still gets the usual answer
+
+    auth.client.post("/auth/magic-link", json={"email": "pat@example.com"})
+    link = auth.email.sent[-1][1]
+    resp = auth.client.get(link.replace("http://web.test/api", ""), follow_redirects=False)
+    assert resp.status_code == 303
+    assert resp.headers["location"] == "http://web.test/signin?error=account_unavailable"
+    assert auth.client.get("/auth/me").json()["status"] == "signed_out"
 
 
 # ---------------------------------------------------------------- AU-8 force sign-out
