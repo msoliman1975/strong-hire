@@ -15,7 +15,6 @@ import type {
   AdminSessionDetail,
   AdminSessionList,
   AdminTrace,
-  AdminUser,
   DailyCost,
 } from "../api/admin";
 import type { AuthUser, SessionRecord, Turn } from "../api/types";
@@ -28,7 +27,7 @@ const MOCK_COST_USD = 0.0123;
 /** Audit entries per mock database, so a store reset starts a new log. */
 const audits = new WeakMap<MockDb, AdminAuditEntry[]>();
 
-function auditLog(db: MockDb): AdminAuditEntry[] {
+export function auditLog(db: MockDb): AdminAuditEntry[] {
   let log = audits.get(db);
   if (!log) {
     log = [];
@@ -215,26 +214,6 @@ export function adminHandlers(store: MockStore) {
   };
 
   return [
-    http.get(`${API}/admin/users`, () => {
-      if (!admin()) return notFound();
-      const sessions = db().sessions.length;
-      const ownerId = owner()?.id;
-      const users: AdminUser[] = Object.values(db().users).map((u) => ({
-        id: u.id,
-        email: u.email,
-        created_at: u.created_at,
-        last_sign_in_at: u.created_at,
-        plan: db().usage.plan,
-        subscription_status: db().usage.status,
-        minutes_used: db().usage.minutes_used,
-        minutes_cap: db().usage.minutes_cap,
-        training_consent: u.training_consent,
-        interviews: u.id === ownerId ? sessions : 0,
-        is_admin: isMockAdmin(u.email),
-      }));
-      return HttpResponse.json(users);
-    }),
-
     http.get(`${API}/admin/sessions`, ({ request }) => {
       if (!admin()) return notFound();
       const query = new URL(request.url).searchParams;

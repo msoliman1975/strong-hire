@@ -9,9 +9,10 @@ from fastapi import APIRouter, FastAPI
 from strong_api.admin.alerts import router as alerts_router
 from strong_api.admin.controls import router as controls_router
 from strong_api.admin.router import router
+from strong_api.admin.users import router as users_router
 from strong_api.auth.settings import AuthSettings, get_auth_settings
 
-ROUTERS: list[APIRouter] = [router, controls_router, alerts_router]
+ROUTERS: list[APIRouter] = [router, controls_router, alerts_router, users_router]
 
 
 def install_admin(app: FastAPI, settings: AuthSettings | None = None) -> None:

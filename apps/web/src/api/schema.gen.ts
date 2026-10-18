@@ -1110,23 +1110,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/users": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List Users */
-        get: operations["list_users_admin_users_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/admin/sessions": {
         parameters: {
             query?: never;
@@ -1404,6 +1387,166 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Users
+         * @description Users, newest first, that match every filter given (AU-1).
+         */
+        get: operations["list_users_admin_users_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get User Detail
+         * @description AU-2. Resumes and gap analyses are metadata only (D-8).
+         */
+        get: operations["get_user_detail_admin_users__user_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/{user_id}/grants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add Grant
+         * @description Add minutes (AU-3), free interviews (AU-4) or a comp plan (AU-5).
+         */
+        post: operations["add_grant_admin_users__user_id__grants_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/{user_id}/grants/{grant_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Revoke Grant
+         * @description Revoke a grant. The row stays in the ledger with revoked_at and revoked_by.
+         */
+        delete: operations["revoke_grant_admin_users__user_id__grants__grant_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/{user_id}/suspend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Suspend User
+         * @description AU-7: the user's requests and sign-ins get 403 with a neutral message. Sessions in
+         *     progress end cleanly.
+         */
+        post: operations["suspend_user_admin_users__user_id__suspend_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/{user_id}/unsuspend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Unsuspend User */
+        post: operations["unsuspend_user_admin_users__user_id__unsuspend_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/{user_id}/signout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Force Sign Out
+         * @description AU-8: every session cookie of the user stops working; they sign in again.
+         */
+        post: operations["force_sign_out_admin_users__user_id__signout_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/{user_id}/resend-link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Resend Sign In Link
+         * @description AU-9: email the user a sign-in link. At most RESEND_LIMIT per user per 15 minutes.
+         *
+         *     The link goes to the user's inbox only; the admin never sees it (no impersonation).
+         */
+        post: operations["resend_sign_in_link_admin_users__user_id__resend_link_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -1455,6 +1598,20 @@ export interface components {
              */
             reason: string;
         };
+        /** AdminActionOut */
+        AdminActionOut: {
+            /** Action */
+            action: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Details */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
         /** AdminAuditEntry */
         AdminAuditEntry: {
             /**
@@ -1480,6 +1637,129 @@ export interface components {
                 [key: string]: unknown;
             } | null;
         };
+        /** AdminEntitlement */
+        AdminEntitlement: {
+            /**
+             * Plan
+             * @enum {string}
+             */
+            plan: "free" | "paid";
+            /** Minutes Used */
+            minutes_used: number;
+            /**
+             * Plan Minutes Cap
+             * @description From the subscription or the comp plan.
+             */
+            plan_minutes_cap: number;
+            /**
+             * Minutes Granted
+             * @description Active minute grants (0 on the free plan).
+             */
+            minutes_granted: number;
+            /** Minutes Cap */
+            minutes_cap: number;
+            /** Minutes Left */
+            minutes_left: number;
+            /** Free Interviews Total */
+            free_interviews_total: number;
+            /** Free Interviews Granted */
+            free_interviews_granted: number;
+            /** Free Interviews Used */
+            free_interviews_used: number;
+            /** Free Interviews Left */
+            free_interviews_left: number;
+            /** Comp Until */
+            comp_until: string | null;
+            /** Block Code */
+            block_code: string | null;
+        };
+        /**
+         * AdminGapMeta
+         * @description D-8: metadata only. Never the findings, the scores or the brief.
+         */
+        AdminGapMeta: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Job Target Id
+             * Format: uuid
+             */
+            job_target_id: string;
+            /**
+             * Resume Id
+             * Format: uuid
+             */
+            resume_id: string;
+            status: components["schemas"]["GapStatus"];
+            /** Has Error */
+            has_error: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Updated At */
+            updated_at: string | null;
+        };
+        /** AdminGrant */
+        AdminGrant: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            kind: components["schemas"]["GrantKind"];
+            /** Amount */
+            amount: number;
+            /** Expires At */
+            expires_at: string | null;
+            /** Reason */
+            reason: string;
+            /** Granted By */
+            granted_by: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Revoked At */
+            revoked_at: string | null;
+            /** Revoked By */
+            revoked_by: string | null;
+            /**
+             * Active
+             * @description Not revoked and not expired.
+             */
+            active: boolean;
+        };
+        /**
+         * AdminJobTarget
+         * @description Company, title and level only (AU-2). No posting text.
+         */
+        AdminJobTarget: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Company */
+            company: string | null;
+            /** Title */
+            title: string | null;
+            level: components["schemas"]["Level"] | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Archived At */
+            archived_at: string | null;
+            /** Deleted At */
+            deleted_at: string | null;
+        };
         /** AdminMessage */
         AdminMessage: {
             /** Role */
@@ -1488,6 +1768,71 @@ export interface components {
             content: string;
             /** Prompt Ref */
             prompt_ref?: string | null;
+        };
+        /** AdminOrg */
+        AdminOrg: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            type: components["schemas"]["OrgType"];
+            /** Plan */
+            plan: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * AdminRefund
+         * @description AU-6: a refund made in the Stripe dashboard, from the charge.refunded webhook.
+         */
+        AdminRefund: {
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Charge Id */
+            charge_id: string | null;
+            /**
+             * Amount Refunded
+             * @description In the currency's smallest unit (cents).
+             */
+            amount_refunded: number | null;
+            /** Currency */
+            currency: string | null;
+            /** Livemode */
+            livemode: boolean;
+        };
+        /**
+         * AdminResumeMeta
+         * @description D-8: metadata only. Never the file, the text or the extracted fields.
+         */
+        AdminResumeMeta: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Uploaded At
+             * Format: date-time
+             */
+            uploaded_at: string;
+            /** Confirmed At */
+            confirmed_at: string | null;
+            /** Deleted At */
+            deleted_at: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "reading" | "to_confirm" | "confirmed" | "deleted";
         };
         /** AdminScore */
         AdminScore: {
@@ -1589,6 +1934,39 @@ export interface components {
             /** Limit */
             limit: number;
         };
+        /** AdminSubscription */
+        AdminSubscription: {
+            status: components["schemas"]["SubscriptionStatus"];
+            /** Stripe Customer Id */
+            stripe_customer_id: string | null;
+            /** Stripe Subscription Id */
+            stripe_subscription_id: string | null;
+            /**
+             * Stripe Customer Url
+             * @description The customer in the Stripe dashboard (refunds are made there, D-7).
+             */
+            stripe_customer_url: string | null;
+            /**
+             * Stripe Mode
+             * @description From the API's Stripe key prefix.
+             */
+            stripe_mode: ("test" | "live") | null;
+            /** Period Start */
+            period_start: string | null;
+            /** Period End */
+            period_end: string | null;
+            /** Minutes Cap */
+            minutes_cap: number;
+            /** Minutes Used */
+            minutes_used: number;
+            /** Cancel At Period End */
+            cancel_at_period_end: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /** AdminTrace */
         AdminTrace: {
             /** Seq */
@@ -1636,7 +2014,10 @@ export interface components {
              */
             created_at: string;
         };
-        /** AdminUser */
+        /**
+         * AdminUser
+         * @description One row of the Users list (AU-1).
+         */
         AdminUser: {
             /**
              * Id
@@ -1645,6 +2026,9 @@ export interface components {
             id: string;
             /** Email */
             email: string;
+            /** Full Name */
+            full_name: string | null;
+            auth_provider: components["schemas"]["AuthProvider"];
             /**
              * Created At
              * Format: date-time
@@ -1654,20 +2038,130 @@ export interface components {
             last_sign_in_at: string | null;
             /**
              * Plan
+             * @description paid: an active subscription or an active comp grant.
              * @enum {string}
              */
             plan: "free" | "paid";
             subscription_status: components["schemas"]["SubscriptionStatus"] | null;
+            /**
+             * Comp Until
+             * @description Set while a comp plan grant is active.
+             */
+            comp_until: string | null;
             /** Minutes Used */
             minutes_used: number;
-            /** Minutes Cap */
+            /**
+             * Minutes Cap
+             * @description Plan cap plus active minute grants. 0 on free.
+             */
             minutes_cap: number;
+            /** Minutes Left */
+            minutes_left: number;
+            /** Free Interviews Left */
+            free_interviews_left: number;
             /** Training Consent */
             training_consent: boolean;
             /** Interviews */
             interviews: number;
             /** Is Admin */
             is_admin: boolean;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "suspended";
+            /** Suspended At */
+            suspended_at: string | null;
+        };
+        /**
+         * AdminUserDetail
+         * @description AU-2: everything support needs about one user.
+         */
+        AdminUserDetail: {
+            user: components["schemas"]["AdminUser"];
+            profile: components["schemas"]["AdminUserProfile"];
+            org: components["schemas"]["AdminOrg"] | null;
+            /** Suspended Reason */
+            suspended_reason: string | null;
+            /** Session Epoch */
+            session_epoch: number;
+            subscription: components["schemas"]["AdminSubscription"] | null;
+            entitlement: components["schemas"]["AdminEntitlement"];
+            /** Grants */
+            grants: components["schemas"]["AdminGrant"][];
+            /** Sessions */
+            sessions: components["schemas"]["AdminSession"][];
+            /** Job Targets */
+            job_targets: components["schemas"]["AdminJobTarget"][];
+            /** Resume Count */
+            resume_count: number;
+            /** Resumes */
+            resumes: components["schemas"]["AdminResumeMeta"][];
+            /** Gap Analysis Count */
+            gap_analysis_count: number;
+            /** Gap Analyses */
+            gap_analyses: components["schemas"]["AdminGapMeta"][];
+            /**
+             * Cost To Date Usd
+             * @description All model usage of the account (usage_events).
+             */
+            cost_to_date_usd: number;
+            /**
+             * Cost Unknown Events
+             * @description Usage rows with no known price (D-12).
+             */
+            cost_unknown_events: number;
+            /** Refunds */
+            refunds: components["schemas"]["AdminRefund"][];
+            /**
+             * Privacy Actions
+             * @description AU-10: the user's own exports and deletes. Admins see them, never run them.
+             */
+            privacy_actions: components["schemas"]["AdminAuditEntry"][];
+            /**
+             * Audit
+             * @description Audit entries about this user, newest first.
+             */
+            audit: components["schemas"]["AdminAuditEntry"][];
+        };
+        /** AdminUserPage */
+        AdminUserPage: {
+            /** Users */
+            users: components["schemas"]["AdminUser"][];
+            /**
+             * Total
+             * @description Users that match the filters, on all pages.
+             */
+            total: number;
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+        };
+        /**
+         * AdminUserProfile
+         * @description The AC-3 profile. No resume data.
+         */
+        AdminUserProfile: {
+            /** Full Name */
+            full_name: string | null;
+            /** Current Title */
+            current_title: string | null;
+            /** Years Experience */
+            years_experience: number | null;
+            target_level: components["schemas"]["Level"] | null;
+            /** Country */
+            country: string | null;
+            /** Time Zone */
+            time_zone: string | null;
+            /** Linkedin Url */
+            linkedin_url: string | null;
+            /** Profile Completed At */
+            profile_completed_at: string | null;
+            /** Email Verified At */
+            email_verified_at: string | null;
+            /** Has Password */
+            has_password: boolean;
         };
         /**
          * AlertAggregation
@@ -2543,6 +3037,34 @@ export interface components {
          * @enum {string}
          */
         GapStatus: "running" | "ready" | "failed";
+        /**
+         * GrantIn
+         * @description AU-3 minutes (negative removes), AU-4 free interviews, AU-5 comp plan (cap + end date).
+         */
+        GrantIn: {
+            /**
+             * Reason
+             * @description Why, for the audit log
+             */
+            reason: string;
+            kind: components["schemas"]["GrantKind"];
+            /**
+             * Amount
+             * @description Minutes, free interviews, or the comp plan's minute cap.
+             */
+            amount: number;
+            /**
+             * Expires At
+             * @description Required for comp_plan.
+             */
+            expires_at?: string | null;
+        };
+        /**
+         * GrantKind
+         * @description AU-3..AU-5: what a minute_grants row gives the user.
+         * @enum {string}
+         */
+        GrantKind: "minutes" | "free_interviews" | "comp_plan";
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -3008,6 +3530,11 @@ export interface components {
              */
             spend_today_usd: number;
         };
+        /**
+         * OrgType
+         * @enum {string}
+         */
+        OrgType: "personal" | "business";
         /** PasswordLoginRequest */
         PasswordLoginRequest: {
             /**
@@ -5972,26 +6499,6 @@ export interface operations {
             };
         };
     };
-    list_users_admin_users_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminUser"][];
-                };
-            };
-        };
-    };
     list_sessions_admin_sessions_get: {
         parameters: {
             query?: {
@@ -6472,6 +6979,304 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AlertEventOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_users_admin_users_get: {
+        parameters: {
+            query?: {
+                /** @description Email, name or user id. */
+                q?: string | null;
+                plan?: ("free" | "paid") | null;
+                status?: ("active" | "suspended") | null;
+                /** @description UTC day, inclusive. */
+                signed_up_from?: string | null;
+                /** @description UTC day, inclusive. */
+                signed_up_to?: string | null;
+                /** @description UTC day, inclusive. */
+                last_sign_in_from?: string | null;
+                /** @description UTC day, inclusive. */
+                last_sign_in_to?: string | null;
+                page?: number;
+                page_size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_user_detail_admin_users__user_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_grant_admin_users__user_id__grants_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GrantIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminGrant"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoke_grant_admin_users__user_id__grants__grant_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                user_id: string;
+                grant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminGrant"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    suspend_user_admin_users__user_id__suspend_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminActionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unsuspend_user_admin_users__user_id__unsuspend_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminActionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    force_sign_out_admin_users__user_id__signout_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminActionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resend_sign_in_link_admin_users__user_id__resend_link_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminActionOut"];
                 };
             };
             /** @description Validation Error */

@@ -38,7 +38,7 @@ export function AdminSessionsPage() {
           <label htmlFor="f-user">User</label>
           <select id="f-user" value={filters.user_id ?? ""} onChange={(e) => setFilter("user", e.target.value)}>
             <option value="">All users</option>
-            {users.data?.map((u) => (
+            {users.data?.users.map((u) => (
               <option key={u.id} value={u.id}>
                 {u.email}
               </option>

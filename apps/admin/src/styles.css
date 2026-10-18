@@ -968,3 +968,59 @@ tbody tr:hover {
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+/* ------------------------------------------------------------------ users (AU) */
+
+.dialog__summary {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.dialog__summary p:last-child {
+  margin-bottom: 0;
+}
+
+.pager {
+  justify-content: space-between;
+  margin-top: var(--space-4);
+}
+
+.action-bar {
+  margin-top: var(--space-4);
+}
+
+.status-pill {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line-strong);
+}
+
+.status-pill[data-status="suspended"] {
+  color: var(--danger);
+  border-color: var(--danger);
+  background: var(--danger-bg);
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-5);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

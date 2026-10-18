@@ -132,7 +132,7 @@ describe("admin pages (R2, AI pages moved)", () => {
     expect(within(row).getByRole("cell", { name: "1" })).toBeInTheDocument();
     expect(within(row).getByRole("link", { name: "ana@example.com" })).toHaveAttribute(
       "href",
-      "/interviews?user=00000000-0000-4000-8000-0000000000a1",
+      "/users/00000000-0000-4000-8000-0000000000a1",
     );
   });
 });

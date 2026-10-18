@@ -17,25 +17,10 @@ from strong_core.schemas import (
     Phase,
     SessionChannel,
     SessionStatus,
-    SubscriptionStatus,
     Turn,
 )
 
 CostSource = Literal["usage_events", "traces", "none"]
-
-
-class AdminUser(BaseModel):
-    id: uuid.UUID
-    email: str
-    created_at: datetime
-    last_sign_in_at: datetime | None
-    plan: Literal["free", "paid"]
-    subscription_status: SubscriptionStatus | None
-    minutes_used: int
-    minutes_cap: int
-    training_consent: bool
-    interviews: int
-    is_admin: bool
 
 
 class AdminScore(BaseModel):
