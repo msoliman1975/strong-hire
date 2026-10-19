@@ -40,6 +40,7 @@ platform.
 | D-16 | While a run is in progress the admin sees its status and can cancel it. No live transcript or listen-in. |
 | D-17 | Live users come first: the `sim` container is capped at 2 CPUs and 2 GB, a Controls switch pauses runs, and a run does not start while 3 or more real sessions are live (setting). |
 | D-18 | Runs are kept under 10 GB and 90 days, oldest first. The admin can mark a run Keep (never deleted automatically) or delete it now. |
+| D-19 | Amends D-14: the admin may also paste a job posting, a CV, or both, into the new-run form. Each is optional and replaces only its own half of the persona. A pasted job needs a level chosen by the admin. The texts stay with the run, are shown on the replay, and prefill Run again. No library of saved texts, and no real users' jobs or CVs (D-8). |
 
 ### Non-goals (v1)
 
@@ -263,7 +264,7 @@ An admin starts an interview between the AI interviewer and the AI candidate (P1
 `docs/sim-candidate.md`). It runs in the background on the main server, with audio. When it
 ends, the admin replays it: the recording plays and the transcript follows it, next to the
 scorecard, the judge's verdicts and the interviewer's response time on each turn. Decisions D-13
-to D-18.
+to D-19.
 
 ### How it runs
 
@@ -313,6 +314,11 @@ to D-18.
 | SM-14 | **Retention** moves from the host cron into the `sim` service (hourly): delete run folders older than `SIM_KEEP_DAYS` (default 90), then the oldest until under `SIM_KEEP_GB` (default 10). It skips runs marked Keep and the newest run, and records each deletion on the run's row. `infra/sim/server-setup.sh` stops installing the host cron. | P0 |
 | SM-15 | **Controls:** "Pause sim runs" (`sim_paused`) and "Live sessions limit for sim runs" (`sim_max_live_sessions`, 0–20) on the Controls page, audited like OC-1..OC-5. Pausing also offers "stop the active run" (= SM-5). | P0 |
 | SM-16 | **Interview page link:** an interview of the sim user that has a run folder shows "Replay". | P1 |
+| SM-17 | **Pasted job and CV (D-19):** the form gets two optional text boxes, "Job posting" and "CV" (plain text, up to 60,000 characters each, the app's own limits), with the note "Use synthetic or public texts; never a real candidate's CV." Each is used on its own: a pasted job with the persona's CV, the persona's job with a pasted CV, or both (then the persona only names the run). Empty or whitespace-only text counts as not pasted. | P0 |
+| SM-18 | **Level:** when a job is pasted, a Level field (new grad, mid, senior, staff/principal) is required and the run uses it at setup; without a pasted job the persona's level is used and the field is hidden. Start without a level for a pasted job is a 422 with the field named. | P0 |
+| SM-19 | **How a pasted run is set up (apps/sim):** a pasted job or CV gets its own job target, resume and gap analysis through the public API, as a browser would; they are not shared with the persona's cached job target. The AI candidate's prompt uses the pasted CV in place of the fixture resume. The texts are written to the run folder as `job.txt` and `cv.txt`. A pasted job that the app's extractor rejects fails the run with the app's reason. | P0 |
+| SM-20 | **Kept with the run:** the texts are stored in `scenario_json` (no new table) and in the run folder, and go with the run on Delete and retention (SM-13, SM-14); after Delete the list row keeps only "custom job" / "custom CV". The runs list shows "custom job" / "custom CV" in the scenario summary. The replay page shows collapsible "Job posting" and "CV" panels (the texts) and the level used. | P0 |
+| SM-21 | **Run again:** every admin run that is not deleted has "Run again", which opens the form filled in with its settings and pasted texts; the admin can change anything before Start. A deleted run's texts are gone, so Run again keeps only its settings. | P1 |
 
 ## Data model changes
 
@@ -332,7 +338,7 @@ rule). The new user-owned tables have `org_id` and go in `USER_OWNED_TABLES`.
 | `alert_rules`, `alert_events` | new, platform | AL-1, AL-4 |
 | `runtime_settings` | new, platform | OC |
 | `company_request_triage` | new, platform | AT-5 |
-| `sim_runs` | new, user-owned (the sim org) | SM: id, org_id, scenario_json, status (enum, SM-4), status_reason, run_dir, session_id (nullable FK), created_by (admin_users), created_at, started_at, finished_at, progress_s, cost_sim_usd, cancel_requested_at, keep, deleted_at, deleted_by, delete_reason |
+| `sim_runs` | new, user-owned (the sim org). SM-17..SM-20 add `job_text`, `cv_text`, `level` inside `scenario_json`, no migration; Delete clears them | SM: id, org_id, scenario_json, status (enum, SM-4), status_reason, run_dir, session_id (nullable FK), created_by (admin_users), created_at, started_at, finished_at, progress_s, cost_sim_usd, cancel_requested_at, keep, deleted_at, deleted_by, delete_reason |
 | `runtime_settings` keys `sim_paused`, `sim_max_live_sessions` | settings | SM-15 |
 
 Platform tables have no `org_id`. The ownership test needs an explicit `PLATFORM_TABLES` list
@@ -394,6 +400,8 @@ OpenAPI, as `apps/web` does.
 | S1 | `feat/s1-sim-serve` | apps/sim: audio-clock timing (SM-6), `serve` mode with cancel, progress, gates at run start and retention (SM-3..SM-5, SM-14); infra: `sim` service, LiteLLM aliases, server-setup change | S0 |
 | S2 | `feat/s2-sim-api` | Admin routes, gates at Start, replay route, audio Range (SM-1..SM-5, SM-7..SM-13) | S0 |
 | S3 | `feat/s3-sim-web` | Simulations list and form, replay page, Controls additions, interview link (SM-1, SM-7..SM-16) | S2 |
+| S4 | `feat/s4-sim-pasted-inputs` | apps/sim and api: pasted job and CV, level, run folder texts, clearing on Delete, replay fields (SM-17..SM-20) | S1, S2 |
+| S5 | `feat/s5-sim-pasted-web` | Form boxes and Level, list summary, replay panels, Run again (SM-17, SM-18, SM-20, SM-21) | S4 |
 
 A3 and A5 can run in parallel with A1 and A2. For the private beta on Nov 30 the minimum is A0, A1,
 A3, A5 (to know when it breaks), A6 OC-1..OC-3 (to stop the bleeding) and AU-3/AU-5/AU-7 (to look
