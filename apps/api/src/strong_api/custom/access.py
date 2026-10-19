@@ -60,3 +60,13 @@ async def ensure_custom_allowed(db: AsyncSession, me: CurrentUser) -> None:
                 "upgrade_url": UPGRADE_PATH,
             },
         )
+
+
+async def custom_advice_scope(db: AsyncSession, me: CurrentUser) -> tuple[bool, bool]:
+    """CU-10: whether the progress may recommend a Custom session to this user, and whether it
+    may be 45 minutes long (a Case category needs that, D-3). Locked users (CU-11) get none."""
+    if not await custom_allowed(db, me):
+        return False, False
+    if await is_sim_user(db, me.user_id):
+        return True, True
+    return True, (await get_entitlement(db, me.org_id)).full_interviews_allowed

@@ -3,7 +3,8 @@
 - GET  /sessions/{id}/debrief      status "not_ended", "not_started", "scoring", "ready" or
                                    "failed";
                                    the scorecard when ready
-- GET  /job-targets/{id}/progress  Realistic-session snapshots, trends and the next session;
+- GET  /job-targets/{id}/progress  Realistic-session snapshots, trends and the next session
+                                   (and a Custom one when the gaps span types, CU-10);
                                    `?exclude_own_questions=true` leaves out the scores of a
                                    Custom session's own questions (CU-7)
 
@@ -31,6 +32,7 @@ from pydantic import ValidationError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from strong_api.custom.access import custom_advice_scope
 from strong_api.inputs.deps import Db, Me, Queue
 from strong_api.inputs.queue import JobQueue
 from strong_api.scoring.progress import (
@@ -38,11 +40,13 @@ from strong_api.scoring.progress import (
     competency_trends,
     latest_scores,
     own_question_points,
+    recommend_custom_session,
     recommend_next_session,
     split_question_scores,
     without_own_questions,
 )
 from strong_api.scoring.schemas import (
+    CustomRecommendation,
     Debrief,
     DebriefQuestion,
     DebriefSession,
@@ -199,14 +203,25 @@ async def _plan(db: AsyncSession, job_target_id: uuid.UUID) -> list[PlannedSessi
 
 
 async def _practiced(db: AsyncSession, job_target_id: uuid.UUID) -> list[InterviewType]:
-    rows = await db.scalars(
-        select(InterviewSession.type).where(
+    """Types with a completed full session. A Custom session also practices each of its
+    categories (CU-10), so the standard advice does not call them untried."""
+    rows = await db.execute(
+        select(InterviewSession.type, InterviewSession.custom_json).where(
             InterviewSession.job_target_id == job_target_id,
             InterviewSession.status == SessionStatus.COMPLETED,
             InterviewSession.duration_min != MINI_DURATION_MIN,
         )
     )
-    return list(rows)
+    out: list[InterviewType] = []
+    for itype, custom in rows:
+        out.append(itype)
+        if itype == InterviewType.CUSTOM and custom:
+            try:
+                spec = CustomSessionSpec.model_validate(custom)
+            except ValidationError:
+                continue
+            out.extend(c.category for c in spec.categories)
+    return out
 
 
 async def _snapshots(db: AsyncSession, job_target_id: uuid.UUID) -> list[ProgressSnapshot]:
@@ -222,16 +237,28 @@ async def _snapshots(db: AsyncSession, job_target_id: uuid.UUID) -> list[Progres
     return [snapshot_contract(r) for r in rows]
 
 
-async def next_session_for(
-    db: AsyncSession, job_target_id: uuid.UUID, extra: dict[Competency, float] | None = None
-) -> PlannedSession | None:
-    """PR-2. `extra` adds the scores of the session being debriefed (a Coach session has no
-    snapshots, but its debrief still advises from its own scores)."""
+async def _next_sessions(
+    db: AsyncSession,
+    job_target_id: uuid.UUID,
+    extra: dict[Competency, float] | None = None,
+    custom_scope: tuple[bool, bool] = (False, False),
+) -> tuple[PlannedSession | None, CustomRecommendation | None]:
+    """PR-2 and CU-10: the standard next session, and a Custom one when `custom_scope` (from
+    `custom_advice_scope`: allowed, 45 minutes allowed) lets it and the gaps call for it.
+    `extra` adds the scores of the session being debriefed (a Coach session has no snapshots,
+    but its debrief still advises from its own scores)."""
     scores = latest_scores(await _snapshots(db, job_target_id))
     scores.update(extra or {})
-    return recommend_next_session(
-        scores, await _plan(db, job_target_id), await _practiced(db, job_target_id)
+    plan = await _plan(db, job_target_id)
+    practiced = await _practiced(db, job_target_id)
+    standard = recommend_next_session(scores, plan, practiced)
+    allowed, long_allowed = custom_scope
+    custom = (
+        recommend_custom_session(scores, plan, practiced, long_allowed=long_allowed)
+        if allowed
+        else None
     )
+    return standard, custom
 
 
 def _debrief_questions(brief: InterviewerBrief | None) -> list[DebriefQuestion]:
@@ -243,6 +270,7 @@ def _debrief_questions(brief: InterviewerBrief | None) -> list[DebriefQuestion]:
             text=q.text,
             source=q.source,
             category=q.category,
+            competencies=list(q.competencies),
             must_ask=q.must_ask,
             verbatim=q.verbatim,
         )
@@ -304,6 +332,7 @@ async def get_debrief(session_id: uuid.UUID, db: Db, me: Me) -> Debrief:
         generic, company, framework = session.profile_version is None, None, None
 
     next_session = None
+    next_custom = None
     if card is not None:
         # Realistic sessions already have snapshots with exact averages. Coach sessions and
         # mini interviews do not.
@@ -311,7 +340,9 @@ async def get_debrief(session_id: uuid.UUID, db: Db, me: Me) -> Debrief:
         own = (
             {c.competency: float(c.score) for c in card.competency_scores} if no_snapshots else None
         )
-        next_session = await next_session_for(db, session.job_target_id, own)
+        next_session, next_custom = await _next_sessions(
+            db, session.job_target_id, own, await custom_advice_scope(db, me)
+        )
     return Debrief(
         session=DebriefSession(
             id=session.id,
@@ -326,6 +357,7 @@ async def get_debrief(session_id: uuid.UUID, db: Db, me: Me) -> Debrief:
         status=state,
         scorecard=card,
         next_session=next_session,
+        next_custom_session=next_custom,
         generic_mode=generic,
         company_name=company,
         values_framework=framework,
@@ -351,11 +383,15 @@ async def get_progress(
     if exclude_own_questions:
         snapshots = without_own_questions(snapshots, splits)
         marked = []
+    next_session, next_custom = await _next_sessions(
+        db, target.id, custom_scope=await custom_advice_scope(db, me)
+    )
     return JobProgress(
         job_target_id=target.id,
         snapshots=snapshots,
         trends=competency_trends(snapshots),
-        next_session=await next_session_for(db, target.id),
+        next_session=next_session,
+        next_custom_session=next_custom,
         own_question_points=marked,
         own_questions_excluded=exclude_own_questions,
     )

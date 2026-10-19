@@ -10831,6 +10831,56 @@
         "title": "CustomQuestionCheck",
         "type": "object"
       },
+      "CustomRecommendation": {
+        "properties": {
+          "interview_type": {
+            "type": "string",
+            "const": "custom",
+            "title": "Interview Type",
+            "default": "custom"
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/Difficulty"
+          },
+          "duration_min": {
+            "type": "integer",
+            "enum": [
+              30,
+              45
+            ],
+            "title": "Duration Min",
+            "description": "45 when Case is a category (D-3)."
+          },
+          "custom": {
+            "$ref": "#/components/schemas/CustomSessionSpec"
+          },
+          "focus_topics": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Focus Topics",
+            "description": "The lead focus chip of each category, for the title."
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Reason"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "difficulty",
+          "duration_min",
+          "custom",
+          "focus_topics",
+          "reason"
+        ],
+        "title": "CustomRecommendation",
+        "description": "CU-10: a Custom session to practice the open gaps of several interview types together.\n`custom` is a ready setup (even shares, focus chips from the gaps, no own questions) that the\nweb app opens prefilled."
+      },
       "CustomSessionSpec": {
         "properties": {
           "categories": {
@@ -10920,6 +10970,17 @@
             ],
             "description": "PR-2. Null until the debrief is ready."
           },
+          "next_custom_session": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CustomRecommendation"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "CU-10: a Custom session that mixes the open gaps, when one fits and the user may run Custom. Shown in place of `next_session` by the web app."
+          },
           "generic_mode": {
             "type": "boolean",
             "title": "Generic Mode",
@@ -11001,6 +11062,14 @@
               }
             ],
             "description": "Custom sessions: the category."
+          },
+          "competencies": {
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "type": "array",
+            "title": "Competencies",
+            "description": "The competencies the question targets. CU-9: the web app saves an interviewer question to My questions with them."
           },
           "must_ask": {
             "type": "boolean",
@@ -12448,6 +12517,17 @@
               }
             ],
             "description": "PR-2."
+          },
+          "next_custom_session": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CustomRecommendation"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "CU-10: a Custom session that mixes the open gaps, when one fits and the user may run Custom."
           },
           "own_question_points": {
             "items": {

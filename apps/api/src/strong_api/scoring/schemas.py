@@ -14,6 +14,8 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from strong_core.schemas import (
     Competency,
+    CustomSessionSpec,
+    Difficulty,
     PlannedSession,
     ProgressSnapshot,
     QuestionSource,
@@ -58,8 +60,28 @@ class DebriefQuestion(_Out):
     text: str
     source: QuestionSource = Field(description="candidate for the candidate's own question.")
     category: StandardType | None = Field(description="Custom sessions: the category.")
+    competencies: list[Competency] = Field(
+        default_factory=list,
+        description="The competencies the question targets. CU-9: the web app saves an "
+        "interviewer question to My questions with them.",
+    )
     must_ask: bool
     verbatim: bool
+
+
+class CustomRecommendation(_Out):
+    """CU-10: a Custom session to practice the open gaps of several interview types together.
+    `custom` is a ready setup (even shares, focus chips from the gaps, no own questions) that the
+    web app opens prefilled."""
+
+    interview_type: Literal["custom"] = "custom"
+    difficulty: Difficulty
+    duration_min: Literal[30, 45] = Field(description="45 when Case is a category (D-3).")
+    custom: CustomSessionSpec
+    focus_topics: list[str] = Field(
+        min_length=1, description="The lead focus chip of each category, for the title."
+    )
+    reason: str = Field(min_length=1)
 
 
 class Debrief(_Out):
@@ -68,6 +90,11 @@ class Debrief(_Out):
     scorecard: Scorecard | None
     next_session: PlannedSession | None = Field(
         description="PR-2. Null until the debrief is ready."
+    )
+    next_custom_session: CustomRecommendation | None = Field(
+        default=None,
+        description="CU-10: a Custom session that mixes the open gaps, when one fits and the "
+        "user may run Custom. Shown in place of `next_session` by the web app.",
     )
     generic_mode: bool = Field(description="True when no company profile was used: no values.")
     company_name: str | None
@@ -110,6 +137,11 @@ class JobProgress(_Out):
     )
     trends: list[CompetencyTrend] = Field(description="Weakest latest score first.")
     next_session: PlannedSession | None = Field(description="PR-2.")
+    next_custom_session: CustomRecommendation | None = Field(
+        default=None,
+        description="CU-10: a Custom session that mixes the open gaps, when one fits and the "
+        "user may run Custom.",
+    )
     own_question_points: list[OwnQuestionPoint] = Field(
         default_factory=list,
         description="CU-7: the snapshots that use scores of the candidate's own questions. "

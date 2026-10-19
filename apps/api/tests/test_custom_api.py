@@ -1,4 +1,4 @@
-"""Custom interview API (docs/custom-interview-spec.md): CU-1, CU-2, CU-3, CU-5 to CU-9, CU-11."""
+"""Custom interview API (docs/custom-interview-spec.md): CU-1, CU-2, CU-3, CU-5 to CU-11."""
 
 from __future__ import annotations
 
@@ -27,6 +27,7 @@ from strong_api.custom.check import (
 from strong_api.custom.focus import suggest_focus
 from strong_api.custom.guard import AcceptedTexts
 from strong_api.custom.limits import CustomSettings, SlidingWindowLimiter, get_custom_settings
+from strong_api.scoring.progress import recommend_custom_session, recommend_next_session
 from strong_core import runtime_settings as rs
 from strong_core.config import find_repo_root
 from strong_core.db.models import GapAnalysis as GapRow
@@ -48,6 +49,7 @@ from strong_core.schemas import (
     InterviewType,
     JobPosting,
     Mode,
+    PlannedSession,
     SessionStatus,
     SubscriptionStatus,
 )
@@ -1132,3 +1134,220 @@ async def test_cu1_session_record_without_a_brief_keeps_the_custom_setup(
     assert body["config"]["interview_type"] == "custom"
     assert body["config"]["custom"] == spec()
     assert body["brief_ready"] is False
+
+
+# --- CU-9: interviewer questions carry their competencies -----------------------------------
+
+
+async def test_cu9_debrief_questions_carry_competencies(
+    client: httpx.AsyncClient, sessionmaker: Maker
+) -> None:
+    """CU-9: each debrief question lists its competencies, so the web app can save an
+    interviewer question to My questions with its category and competencies."""
+    job_id, _ = await _job_with_gap(sessionmaker, gap=False)
+    sid = await _scored_custom_session(sessionmaker, job_id)
+    body = (await client.get(f"/sessions/{sid}/debrief")).json()
+    questions = {q["question_ref"]: q for q in body["questions"]}
+    assert questions["q2"]["competencies"] == ["conflict_handling", "collaboration"]
+    assert questions["q3"]["competencies"] == ["technical_depth"]
+    # The saved-question body the web app sends for an interviewer question is accepted.
+    saved = await client.post(
+        "/questions/mine",
+        json={
+            "text": questions["q2"]["text"],
+            "category": questions["q2"]["category"],
+            "competencies": questions["q2"]["competencies"],
+        },
+    )
+    assert saved.status_code == 201, saved.text
+
+
+async def test_cu9_repeat_keeps_own_questions_and_lets_the_planner_draw_fresh(
+    client: httpx.AsyncClient, sessionmaker: Maker
+) -> None:
+    """CU-9: the repeated setup reuses the categories, chips and own questions. The
+    interviewer questions are not in it, so the planner draws them fresh."""
+    job_id, _ = await _job_with_gap(sessionmaker, gap=False)
+    sid = await _scored_custom_session(sessionmaker, job_id)
+    setup = (await client.post(f"/sessions/{sid}/repeat")).json()
+    assert setup["config"]["custom"] == spec()
+    texts = {q["text"] for q in setup["config"]["custom"]["questions"]}
+    assert "Tell me about a conflict on your team." not in texts
+
+
+# --- CU-10: a Custom next session -----------------------------------------------------------
+
+C = Competency
+B, T, H, K = (
+    InterviewType.BEHAVIORAL,
+    InterviewType.TECHNICAL_QA,
+    InterviewType.HIRING_MANAGER,
+    InterviewType.CASE,
+)
+CU10_PLAN = [
+    PlannedSession(
+        priority=1, interview_type=B, focus_topics=["Leading without authority"], reason="Gap"
+    ),
+    PlannedSession(priority=2, interview_type=T, focus_topics=["Kubernetes"], reason="Core"),
+]
+
+
+def test_cu10_gaps_across_two_practiced_types_suggest_a_custom_session() -> None:
+    scores = {C.CONFLICT_HANDLING: 2.0, C.TRADE_OFFS: 1.5, C.OWNERSHIP: 3.0}
+    rec = recommend_custom_session(scores, CU10_PLAN, [B, T])
+    assert rec is not None
+    assert rec.interview_type == "custom" and rec.duration_min == 30
+    assert rec.difficulty == Difficulty.REALISTIC
+    kinds = [(c.category, c.share) for c in rec.custom.categories]
+    assert kinds == [(T, 0.5), (B, 0.5)]  # the weakest type first
+    assert rec.custom.categories[0].focus == ["Trade offs", "Kubernetes"]
+    assert rec.custom.categories[1].focus == ["Conflict handling", "Leading without authority"]
+    assert rec.custom.questions == []
+    assert rec.focus_topics == ["Trade offs", "Conflict handling"]
+    assert "trade offs 1.5" in rec.reason
+    # The standard advice is unchanged (PR-2).
+    standard = recommend_next_session(scores, CU10_PLAN, [B, T])
+    assert standard is not None and standard.interview_type == T
+
+
+def test_cu10_scores_from_a_custom_session_count_as_practiced() -> None:
+    """Gaps found in a Custom session point to types without a session of their own."""
+    scores = {C.CONFLICT_HANDLING: 2.0, C.TECHNICAL_DEPTH: 2.5}
+    rec = recommend_custom_session(scores, [], [InterviewType.CUSTOM])
+    assert rec is not None
+    assert [c.category for c in rec.custom.categories] == [B, T]
+
+
+def test_cu10_no_custom_for_gaps_in_one_type_or_nothing_to_go_on() -> None:
+    one_type = {C.TRADE_OFFS: 1.5, C.ACCURACY: 2.0}
+    assert recommend_custom_session(one_type, CU10_PLAN, [B, T]) is None
+    assert recommend_custom_session({}, CU10_PLAN, []) is None
+    assert recommend_custom_session({}, [], []) is None
+    at_bar = {C.OWNERSHIP: 3.0, C.TECHNICAL_DEPTH: 3.5}
+    assert recommend_custom_session(at_bar, CU10_PLAN, [B, T]) is None
+
+
+def test_cu10_an_untried_planned_session_comes_first() -> None:
+    """A planned type that was never practiced (no session, no scores) gets the standard
+    session first, even when other gaps span two types."""
+    extra = PlannedSession(priority=3, interview_type=H, focus_topics=["Why"], reason="x")
+    plan = [*CU10_PLAN, extra]
+    scores = {C.CONFLICT_HANDLING: 2.0, C.TRADE_OFFS: 1.5}
+    assert recommend_custom_session(scores, plan, [B, T]) is None
+    assert recommend_custom_session(scores, plan, [B, T, H]) is not None
+
+
+def test_cu10_three_categories_with_even_shares() -> None:
+    scores = {C.CONFLICT_HANDLING: 2.0, C.TRADE_OFFS: 1.5, C.JUDGMENT: 2.5, C.OWNERSHIP: 1.0}
+    rec = recommend_custom_session(scores, [], [B, T, H])
+    assert rec is not None
+    assert [c.category for c in rec.custom.categories] == [B, T, H]
+    shares = [c.share for c in rec.custom.categories]
+    assert abs(sum(shares) - 1) < 0.01 and max(shares) - min(shares) <= 0.011
+    assert rec.custom.categories[0].focus == ["Ownership", "Conflict handling"]
+    assert len(rec.focus_topics) == 3
+
+
+def test_cu10_case_needs_45_minutes_and_one_other_category() -> None:
+    scores = {C.STRUCTURE: 1.0, C.ESTIMATION_LOGIC: 1.5, C.TRADE_OFFS: 2.0, C.OWNERSHIP: 2.5}
+    rec = recommend_custom_session(scores, [], [B, T, K])
+    assert rec is not None
+    assert [(c.category, c.share) for c in rec.custom.categories] == [(K, 0.5), (T, 0.5)]
+    assert rec.duration_min == 45
+    # Without 45-minute sessions, Case is left out and the others are mixed in 30 minutes.
+    short = recommend_custom_session(scores, [], [B, T, K], long_allowed=False)
+    assert short is not None
+    assert [c.category for c in short.custom.categories] == [T, B]
+    assert short.duration_min == 30
+    # Case plus one other type, without 45 minutes: one category left, so no Custom advice.
+    two = {C.STRUCTURE: 1.0, C.TRADE_OFFS: 2.0}
+    assert recommend_custom_session(two, [], [T, K], long_allowed=False) is None
+
+
+def test_cu10_chips_are_capped_at_three_and_60_characters() -> None:
+    long_topic = "Designing idempotent payment retries across " + "regions " * 10
+    plan = [PlannedSession(priority=1, interview_type=T, focus_topics=[long_topic], reason="x")]
+    scores = {C.TRADE_OFFS: 1.5, C.ACCURACY: 2.0, C.REASONING: 2.2, C.OWNERSHIP: 2.0}
+    rec = recommend_custom_session(scores, plan, [B, T])
+    assert rec is not None
+    technical = next(c for c in rec.custom.categories if c.category == T)
+    assert technical.focus == ["Trade offs", "Accuracy", "Reasoning"]
+    plan_only = recommend_custom_session({C.TRADE_OFFS: 1.5, C.OWNERSHIP: 2.0}, plan, [B, T])
+    assert plan_only is not None
+    chips = next(c for c in plan_only.custom.categories if c.category == T).focus
+    assert len(chips) == 2 and all(len(c) <= 60 for c in chips)
+
+
+async def _weak_custom_progress(maker: Maker, job_id: uuid.UUID) -> None:
+    """A Realistic Custom session with scores under the bar in behavioral and technical Q&A."""
+    org_id, _ = await account(maker)
+    ended = datetime.now(UTC)
+    async with maker() as db:
+        session = InterviewSession(
+            org_id=org_id,
+            job_target_id=job_id,
+            type=InterviewType.CUSTOM,
+            difficulty=Difficulty.REALISTIC,
+            mode=Mode.REALISTIC,
+            duration_min=30,
+            status=SessionStatus.COMPLETED,
+            started_at=ended - timedelta(minutes=30),
+            ended_at=ended,
+            minutes_billed=30,
+            brief_json=custom_brief(),
+            custom_json=spec(),
+        )
+        db.add(session)
+        await db.flush()
+        for competency, score in (("conflict_handling", "2.00"), ("technical_depth", "1.50")):
+            db.add(
+                SnapshotRow(
+                    org_id=org_id,
+                    job_target_id=job_id,
+                    session_id=session.id,
+                    competency=Competency(competency),
+                    score=Decimal(score),
+                    at=ended,
+                )
+            )
+        await db.commit()
+
+
+async def test_cu10_progress_recommends_a_custom_session(
+    client: httpx.AsyncClient, sessionmaker: Maker
+) -> None:
+    """CU-10: the progress keeps the standard advice and adds a Custom one. Under paid_only a
+    free account gets no Custom advice (CU-11); a paid one does."""
+    job_id, _ = await _job_with_gap(sessionmaker, gap=False)
+    await _weak_custom_progress(sessionmaker, job_id)
+    body = (await client.get(f"/job-targets/{job_id}/progress")).json()
+    assert body["next_session"]["interview_type"] == "technical_qa"
+    rec = body["next_custom_session"]
+    assert rec["interview_type"] == "custom" and rec["duration_min"] == 30
+    assert [c["category"] for c in rec["custom"]["categories"]] == ["technical_qa", "behavioral"]
+    assert rec["focus_topics"] == ["Technical depth", "Conflict handling"]
+    assert rec["custom"]["questions"] == []
+
+    await set_access(sessionmaker, "paid_only")
+    locked = (await client.get(f"/job-targets/{job_id}/progress")).json()
+    assert locked["next_custom_session"] is None
+    assert locked["next_session"]["interview_type"] == "technical_qa"
+
+    await make_paid(sessionmaker)
+    paid = (await client.get(f"/job-targets/{job_id}/progress")).json()
+    assert paid["next_custom_session"] is not None
+
+
+async def test_cu10_a_custom_session_practices_its_categories(
+    client: httpx.AsyncClient, sessionmaker: Maker
+) -> None:
+    """CU-10, PR-2: a completed Custom session counts as practice for each of its categories,
+    so the standard advice does not call those types untried."""
+    from strong_api.scoring.router import _practiced
+
+    job_id, _ = await _job_with_gap(sessionmaker, gap=False)
+    await _weak_custom_progress(sessionmaker, job_id)
+    async with sessionmaker() as db:
+        done = set(await _practiced(db, job_id))
+    categories = {InterviewType(c["category"]) for c in spec()["categories"]}
+    assert done == {InterviewType.CUSTOM, *categories}

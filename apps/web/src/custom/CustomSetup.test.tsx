@@ -12,9 +12,17 @@ import { MemoryRouter, Route, Routes, useParams, useSearchParams } from "react-r
 import { describe, expect, it } from "vitest";
 
 import type { SiteStatus } from "../api/status";
-import type { CreateSessionRequest, JobTargetOut, QuestionCheckRequest, SavedQuestion, SessionSetup, Usage } from "../api/types";
+import type {
+  CreateSessionRequest,
+  CustomRecommendation,
+  JobTargetOut,
+  QuestionCheckRequest,
+  SavedQuestion,
+  SessionSetup,
+  Usage,
+} from "../api/types";
 import { createQueryClient } from "../App";
-import { mockCheck, mockFocus } from "../mocks/custom";
+import { mockCheck, mockCustomRecommendation, mockFocus } from "../mocks/custom";
 import { FREE_USAGE, OPEN_STATUS } from "../mocks/db";
 import { jobPosting } from "../mocks/fixtures";
 import { mockStore, server } from "../mocks/node";
@@ -62,11 +70,12 @@ interface Options {
   usage?: Usage;
   status?: Partial<SiteStatus>;
   setup?: SessionSetup;
+  recommended?: CustomRecommendation;
   /** The answer to POST /sessions; "mock" leaves it to the default mock. */
   create?: ((body: CreateSessionRequest) => Response) | "mock";
 }
 
-function renderSetup({ usage = PAID, status = {}, setup, create }: Options = {}) {
+function renderSetup({ usage = PAID, status = {}, setup, recommended, create }: Options = {}) {
   const bodies: CreateSessionRequest[] = [];
   const checks: unknown[] = [];
   mockStore.db.siteStatus = { ...OPEN_STATUS, ...status };
@@ -89,7 +98,7 @@ function renderSetup({ usage = PAID, status = {}, setup, create }: Options = {})
   const user = userEvent.setup();
   render(
     <QueryClientProvider client={createQueryClient()}>
-      <MemoryRouter initialEntries={[{ pathname: "/jobs/j1/sessions/new", state: setup ? { setup } : null }]}>
+      <MemoryRouter initialEntries={[{ pathname: "/jobs/j1/sessions/new", state: setup ? { setup } : recommended ? { recommended } : null }]}>
         <Routes>
           <Route path="/jobs/:jobId/sessions/new" element={<SessionSetupPage />} />
           <Route path="/sessions/:sessionId/live" element={<Live />} />
@@ -367,6 +376,23 @@ describe("Custom setup", { timeout: 20_000 }, () => {
     await user.click(screen.getByRole("button", { name: "Start interview" }));
     await screen.findByTestId("live");
     expect(bodies[0].config.custom).toEqual(setup.config.custom);
+  });
+
+  it("CU-10: a recommended Custom session opens with its kinds, chips and length, and no own questions", async () => {
+    const recommended = mockCustomRecommendation();
+    const { user, bodies } = renderSetup({ recommended });
+    expect(await screen.findByRole("radio", { name: /^Custom/ })).toBeChecked();
+    expect(screen.getByRole("radio", { name: /^30 minutes/ })).toBeChecked();
+    expect(kind(/^Verbal technical/)).toBeChecked();
+    expect(kind(/^Behavioral/)).toBeChecked();
+    expect(kind(/^Case/)).not.toBeChecked();
+    expect(screen.getByRole("button", { name: "Trade offs" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Conflict handling" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.queryByTestId("own-question")).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Start interview" }));
+    await screen.findByTestId("live");
+    expect(bodies[0].config.interview_type).toBe("custom");
+    expect(bodies[0].config.custom).toEqual(recommended.custom);
   });
 });
 
