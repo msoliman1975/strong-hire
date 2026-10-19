@@ -22,6 +22,7 @@ function progress(excluded: boolean): JobProgress {
     ],
     trends: [],
     next_session: null,
+    next_custom_session: null,
     own_question_points: excluded ? [] : [{ session_id: S2, competency: "ownership", own_questions: 2, other_questions: 1 }],
     own_questions_excluded: excluded,
   };

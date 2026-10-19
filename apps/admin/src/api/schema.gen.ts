@@ -3350,6 +3350,35 @@ export interface components {
             competencies?: components["schemas"]["Competency"][];
         };
         /**
+         * CustomRecommendation
+         * @description CU-10: a Custom session to practice the open gaps of several interview types together.
+         *     `custom` is a ready setup (even shares, focus chips from the gaps, no own questions) that the
+         *     web app opens prefilled.
+         */
+        CustomRecommendation: {
+            /**
+             * Interview Type
+             * @default custom
+             * @constant
+             */
+            interview_type: "custom";
+            difficulty: components["schemas"]["Difficulty"];
+            /**
+             * Duration Min
+             * @description 45 when Case is a category (D-3).
+             * @enum {integer}
+             */
+            duration_min: 30 | 45;
+            custom: components["schemas"]["CustomSessionSpec"];
+            /**
+             * Focus Topics
+             * @description The lead focus chip of each category, for the title.
+             */
+            focus_topics: string[];
+            /** Reason */
+            reason: string;
+        };
+        /**
          * CustomSessionSpec
          * @description What the candidate builds for a Custom session. Stored in sessions.custom_json.
          */
@@ -3382,6 +3411,8 @@ export interface components {
             scorecard: components["schemas"]["Scorecard"] | null;
             /** @description PR-2. Null until the debrief is ready. */
             next_session: components["schemas"]["PlannedSession"] | null;
+            /** @description CU-10: a Custom session that mixes the open gaps, when one fits and the user may run Custom. Shown in place of `next_session` by the web app. */
+            next_custom_session?: components["schemas"]["CustomRecommendation"] | null;
             /**
              * Generic Mode
              * @description True when no company profile was used: no values.
@@ -3417,6 +3448,11 @@ export interface components {
             source: components["schemas"]["QuestionSource"];
             /** @description Custom sessions: the category. */
             category: ("behavioral" | "hiring_manager" | "technical_qa" | "case") | null;
+            /**
+             * Competencies
+             * @description The competencies the question targets. CU-9: the web app saves an interviewer question to My questions with them.
+             */
+            competencies?: components["schemas"]["Competency"][];
             /** Must Ask */
             must_ask: boolean;
             /** Verbatim */
@@ -3991,6 +4027,8 @@ export interface components {
             trends: components["schemas"]["CompetencyTrend"][];
             /** @description PR-2. */
             next_session: components["schemas"]["PlannedSession"] | null;
+            /** @description CU-10: a Custom session that mixes the open gaps, when one fits and the user may run Custom. */
+            next_custom_session?: components["schemas"]["CustomRecommendation"] | null;
             /**
              * Own Question Points
              * @description CU-7: the snapshots that use scores of the candidate's own questions. Empty when own questions are excluded.

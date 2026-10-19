@@ -8,6 +8,8 @@ import { describe, expect, it } from "vitest";
 
 import type { Debrief } from "../api/types";
 import { createQueryClient } from "../App";
+import type { SetupState } from "../custom/repeat";
+import { mockCustomRecommendation } from "../mocks/custom";
 import { scorecardFor, sessionPlan } from "../mocks/fixtures";
 import { mockStore, server } from "../mocks/node";
 import { DebriefPage } from "./DebriefPage";
@@ -27,6 +29,7 @@ function debrief(generic: boolean, duration_min: 10 | 30 | 45 = 30): Debrief {
     status: "ready",
     scorecard: scorecardFor("behavioral", generic),
     next_session: sessionPlan[1],
+    next_custom_session: null,
     generic_mode: generic,
     company_name: generic ? null : "Example Corp",
     values_framework: generic ? null : "Example Values",
@@ -185,17 +188,18 @@ function customDebrief(): Debrief {
       ],
     },
     questions: [
-      { question_ref: "own-1", text: "How would you make a payment API safe to retry?", source: "candidate", category: "technical_qa", must_ask: true, verbatim: false },
-      { question_ref: "q1", text: "Tell me about a project you owned end to end.", source: "planner", category: "behavioral", must_ask: false, verbatim: false },
-      { question_ref: "q2", text: "Tell me about a time you disagreed with another team.", source: "planner", category: "behavioral", must_ask: false, verbatim: false },
+      { question_ref: "own-1", text: "How would you make a payment API safe to retry?", source: "candidate", category: "technical_qa", competencies: ["technical_depth"], must_ask: true, verbatim: false },
+      { question_ref: "q1", text: "Tell me about a project you owned end to end.", source: "planner", category: "behavioral", competencies: ["ownership", "impact"], must_ask: false, verbatim: false },
+      { question_ref: "q2", text: "Tell me about a time you disagreed with another team.", source: "planner", category: "behavioral", competencies: ["ownership", "impact"], must_ask: false, verbatim: false },
     ],
   };
 }
 
 function SetupProbe() {
   const location = useLocation();
-  const state = location.state as { setup?: { config: { interview_type: string } } } | null;
-  return <p data-testid="setup-probe">{`${location.pathname}${location.search} ${state?.setup?.config.interview_type ?? "none"}`}</p>;
+  const state = location.state as SetupState | null;
+  const kind = state?.setup?.config.interview_type ?? (state?.recommended ? `recommended ${state.recommended.custom.categories.map((c) => c.category).join("+")}` : "none");
+  return <p data-testid="setup-probe">{`${location.pathname}${location.search} ${kind}`}</p>;
 }
 
 function renderCustomDebrief(body: Debrief) {
@@ -247,6 +251,33 @@ describe("Custom debrief", () => {
     await user.click(await screen.findByRole("button", { name: "Run this setup again" }));
     expect(await screen.findByTestId("setup-probe")).toHaveTextContent("/jobs/j1/sessions/new?resume=r1 custom");
     expect(repeats).toEqual(["s1"]);
+  });
+
+  it("CU-9: an interviewer question can be saved to My questions with its category and competencies", async () => {
+    const { user } = renderCustomDebrief(customDebrief());
+    await screen.findByTestId("hire-signal");
+    // Only the interviewer's questions get the button, not the candidate's own.
+    const buttons = screen.getAllByRole("button", { name: /^Save to My questions/ });
+    expect(buttons).toHaveLength(2);
+    const technical = within(screen.getByTestId("group-technical_qa"));
+    expect(technical.queryByRole("button", { name: /^Save to My questions/ })).not.toBeInTheDocument();
+
+    const text = "Tell me about a time you disagreed with another team.";
+    await user.click(screen.getByRole("button", { name: `Save to My questions: ${text}` }));
+    expect(await screen.findByText(/Saved to/)).toHaveTextContent("Saved to My questions.");
+    const saved = mockStore.db.savedQuestions.find((q) => q.text === text);
+    expect(saved).toMatchObject({ category: "behavioral", competencies: ["ownership", "impact"] });
+    expect(screen.queryByRole("button", { name: `Save to My questions: ${text}` })).not.toBeInTheDocument();
+  });
+
+  it("CU-10: a Custom recommendation reads 'Practice ...' and opens the Custom setup prefilled", async () => {
+    const { user } = renderCustomDebrief({ ...customDebrief(), next_custom_session: mockCustomRecommendation() });
+    const card = await screen.findByTestId("custom-next");
+    expect(card).toHaveTextContent("Practice trade offs and conflict handling");
+    await user.click(within(card).getByRole("link", { name: "Set up this Custom interview" }));
+    expect(await screen.findByTestId("setup-probe")).toHaveTextContent(
+      "/jobs/j1/sessions/new recommended technical_qa+behavioral",
+    );
   });
 
   it("CU-8: 'Save my questions' saves the own questions that are not saved yet", async () => {

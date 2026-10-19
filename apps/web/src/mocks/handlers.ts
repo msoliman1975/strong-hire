@@ -49,7 +49,13 @@ import type {
   Usage,
 } from "../api/types";
 import { newId, type MockGap, type MockStore, type MockTask } from "./db";
-import { customDebriefQuestions, customProblem, customRefusal, customScorecard } from "./custom";
+import {
+  customDebriefQuestions,
+  customProblem,
+  customRefusal,
+  customScorecard,
+  mockCustomRecommendation,
+} from "./custom";
 import { gapAnalysis, jobPosting, resume, scorecardFor, sessionPlan } from "./fixtures";
 
 /** CU-1: fill the defaults the API adds to a Custom setup. */
@@ -977,6 +983,13 @@ export function scoringHandlers(store: MockStore) {
     );
   };
 
+  /** CU-10: a Custom next session once the job has two Realistic sessions, unless Custom is locked (CU-11). */
+  const customNext = (jobId: string) => {
+    const locked = db().siteStatus.custom_interview_access === "paid_only" && !db().usage.full_interviews_allowed;
+    const sessions = new Set(progressFor(jobId).map((p) => p.session_id));
+    return !locked && sessions.size >= 2 ? mockCustomRecommendation() : null;
+  };
+
   return [
     http.get(`${API}/sessions/:sessionId/debrief`, ({ params }) => {
       advanceAll();
@@ -1012,6 +1025,7 @@ export function scoringHandlers(store: MockStore) {
             : "scoring",
         scorecard,
         next_session: ready ? sessionPlan[1] : null,
+        next_custom_session: ready ? customNext(s.job_target_id) : null,
         generic_mode: generic,
         company_name: job?.posting?.company_name ?? null,
         values_framework: generic ? null : "Company values",
@@ -1038,6 +1052,7 @@ export function scoringHandlers(store: MockStore) {
         snapshots,
         trends: trendsFor(snapshots),
         next_session: db().gaps[jobId]?.analysis ? sessionPlan[snapshots.length ? 1 : 0] : null,
+        next_custom_session: customNext(jobId),
         own_question_points: exclude
           ? []
           : snapshots

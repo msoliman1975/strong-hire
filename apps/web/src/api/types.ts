@@ -73,6 +73,8 @@ export type JobPosting = DeepRequired<S["JobPosting"]>;
 export type Resume = DeepRequired<S["Resume"]>;
 export type GapAnalysis = DeepRequired<S["GapAnalysis"]>;
 export type PlannedSession = DeepRequired<S["PlannedSession"]>;
+/** CU-10: a recommended Custom session with a ready setup. */
+export type CustomRecommendation = DeepRequired<S["CustomRecommendation"]>;
 export type SessionConfig = DeepRequired<S["SessionConfig"]>;
 export type Scorecard = DeepRequired<S["Scorecard"]>;
 export type CompetencyScore = DeepRequired<S["CompetencyScore"]>;

@@ -1,10 +1,11 @@
 import { Link, Navigate, useParams } from "react-router";
 
-import { useGapReport, useJob, useReports, useResume } from "../api/hooks";
-import type { ReportItem } from "../api/types";
+import { useGapReport, useJob, useJobSessions, useReports, useResume } from "../api/hooks";
+import type { ReportItem, SessionRecord } from "../api/types";
 import { CV_DELETED, ReportList } from "../components/ReportList";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
-import { formatDate, severityLabel } from "../labels";
+import { useRepeatSetup } from "../custom/repeat";
+import { formatDate, interviewTypeLabel, severityLabel } from "../labels";
 import { contextPath } from "../paths";
 import { setupLink } from "./GapAnalysisPage";
 
@@ -98,11 +99,66 @@ export function RehearsalPage() {
           </div>
         )}
 
+        <CustomSetups jobId={jobId} resumeId={resumeId} />
+
         <section className="panel" aria-labelledby="pair-reports-heading">
           <h2 id="pair-reports-heading">Earlier reports for this job and CV</h2>
           <ReportList reports={reports.data} showJob={false} />
         </section>
       </div>
     </>
+  );
+}
+
+/** How many earlier Custom setups the rehearsals view offers to run again. */
+const MAX_CUSTOM_SETUPS = 3;
+
+/** A Custom session worth running again: it started (a failed start has nothing to repeat). */
+function isRepeatable(s: SessionRecord, resumeId: string): boolean {
+  return s.config.custom !== null && s.started_at !== null && (s.resume_id === null || s.resume_id === resumeId);
+}
+
+/**
+ * CU-9: the latest Custom setups for this job and CV, each with "Run this setup again". The
+ * setup keeps the kinds of question, focus chips and own questions; the interviewer's
+ * questions are drawn fresh.
+ */
+function CustomSetups({ jobId, resumeId }: { jobId: string; resumeId: string }) {
+  const sessions = useJobSessions(jobId);
+  const repeat = useRepeatSetup();
+  const custom = (sessions.data ?? [])
+    .filter((s) => isRepeatable(s, resumeId))
+    .sort((a, b) => (b.started_at ?? "").localeCompare(a.started_at ?? ""))
+    .slice(0, MAX_CUSTOM_SETUPS);
+  if (custom.length === 0) return null;
+  return (
+    <section className="panel" aria-labelledby="pair-custom-heading">
+      <h2 id="pair-custom-heading">Your Custom setups</h2>
+      <ul className="plain-list stack">
+        {custom.map((s) => {
+          const spec = s.config.custom!;
+          const kinds = spec.categories.map((c) => interviewTypeLabel[c.category]).join(", ");
+          const own = spec.questions.length;
+          return (
+            <li key={s.id} className="row" data-testid="custom-setup">
+              <span>
+                {kinds}. {own === 1 ? "1 of your questions" : `${own} of your questions`}
+                {s.started_at && `, ${formatDate(s.started_at)}`}.
+              </span>
+              <button
+                type="button"
+                className="btn btn--secondary"
+                disabled={repeat.isPending}
+                onClick={() => repeat.mutate(s.id)}
+                aria-label={`Run this setup again: ${kinds}`}
+              >
+                Run this setup again
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+      {repeat.isError && <ErrorNotice error={repeat.error} />}
+    </section>
   );
 }

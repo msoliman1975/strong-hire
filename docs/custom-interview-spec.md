@@ -1,6 +1,6 @@
 # Strong Hire Custom Interview: Product & Technical Spec v1
 
-Status: v1, agreed 2026-10-18. Decisions D-1 to D-14 below. Ships before the private beta (Nov 30).
+Status: v1, agreed 2026-10-18. Decisions D-1 to D-15 below. Ships before the private beta (Nov 30).
 This spec extends `docs/spec.md` (IV-2 interview types, the interviewer brief, FB-2, PR-1 to PR-3,
 BL-1, BL-2, AC-1) and the Questions page (QB-1 to QB-5, PRs #78 to #81).
 
@@ -32,6 +32,7 @@ Everything new lives inside Custom, so it cannot change their scoring, rubrics o
 | D-12 | Realistic Custom sessions count toward PR-1 trends. Points that come from candidate-written questions are marked and can be filtered out. Coach sessions do not count (as today). |
 | D-13 | Custom is a paid feature at launch, but open to every user while we test. A runtime setting switches it (`everyone` now, `paid_only` when live), with no deploy. While it is `everyone`, a free account may use one of its free interviews for a 30-minute Custom session (Custom has no mini, D-14); 45 minutes needs the plan. |
 | D-14 | Custom is not offered as a 10-minute mini interview. |
+| D-15 | "Run this setup again" (CU-9) always reuses the categories, focus chips and own questions, and always draws the interviewer's questions fresh. There is no keep-or-redraw toggle: keeping the interviewer's questions would need a core contract change (the setup has no place for planner questions). Instead, each interviewer question on the debrief has "Save to My questions", which saves it with its category and competencies; the candidate can add it to the next setup as an own question. Decided 2026-10-18 in C5. |
 
 ### Non-goals (v1)
 
@@ -54,7 +55,8 @@ Everything new lives inside Custom, so it cannot change their scoring, rubrics o
 6. A summary shows the plan: "About 7 questions: 3 of yours, 4 chosen by the interviewer from your
    focus areas." Then mic check and the session as in journey 2 of `docs/spec.md`.
 7. **Debrief:** as today, with the per-question breakdown grouped by category and a "Your question"
-   badge. Buttons: "Run this setup again" and "Save my questions".
+   badge. Buttons: "Run this setup again" and "Save my questions"; each interviewer question has
+   "Save to My questions" (D-15).
 
 ## Functional requirements
 
@@ -68,8 +70,8 @@ Everything new lives inside Custom, so it cannot change their scoring, rubrics o
 | CU-6 | The scorer scores each question on its own competencies (it already does, `scorer.py` `_scored_competencies`). The debrief groups the breakdown by category and shows "Your question" on own questions. The hire signal uses the normal weights and hard rules. | P0 |
 | CU-7 | Realistic Custom sessions count toward PR-1. Trend points from own questions are marked; a filter hides them. | P0 |
 | CU-8 | "My questions": a saved list per user on the Questions page (add, edit, delete). "Add to my interview" from a saved or bank question. Saved questions are in the AC-1 export and delete. | P0 |
-| CU-9 | "Run this setup again" from the debrief and from the rehearsals view (PR-3) reuses the categories, chips and own questions. A toggle keeps or redraws the interviewer's questions. | P1 |
-| CU-10 | PR-2 can recommend a Custom session with chips filled from the open gaps ("Practice conflict handling and Kubernetes"). | P1 |
+| CU-9 | "Run this setup again" from the debrief and from the rehearsals view (PR-3) reuses the categories, chips and own questions; the interviewer's questions are always drawn fresh (D-15). On the debrief each interviewer question has "Save to My questions", which saves it with its category and competencies (CU-8). | P1 |
+| CU-10 | PR-2 can recommend a Custom session with chips filled from the open gaps ("Practice conflict handling and Kubernetes"): when scores under the bar span at least two interview types and the candidate has practiced every type the gaps point to. The setup mixes the gap types with the most points (at most 3, even shares, Case rules of D-3), up to 3 chips per category from the weakest competencies and the plan's focus topics, no own questions, 30 minutes (45 with Case). The standard advice stays next to it; it is not offered when Custom is locked (CU-11), and without 45-minute sessions Case is left out. | P1 |
 | CU-11 | Runtime setting `custom_interview_access`: `everyone` (default) or `paid_only`. Under `paid_only` free users see Custom locked with an upgrade prompt; the free interview (BL-2) cannot be Custom. Custom uses plan minutes like any session (BL-1). | P0 |
 | CU-12 | Company persona and values (IV-5) still apply. The planner fills the interviewer's questions from the focus chips and the company sample questions. Difficulty, seniority and Coach or Realistic work as in the other types. | P0 |
 
@@ -149,6 +151,8 @@ All in `packages/core` (one PR that merges first).
 | `GET /custom/focus?job_id=&resume_id=` | Suggested chips per category from the gap analysis and the job (CU-2). |
 | `GET/POST/PATCH/DELETE /questions/mine` | Saved questions (CU-8). |
 | `POST /sessions/{id}/repeat` | Builds a new setup from an earlier Custom session (CU-9). |
+| `GET /sessions/{id}/debrief` | `questions[]` gains `competencies` (CU-9); `next_custom_session` is the CU-10 advice. |
+| `GET /job-targets/{id}/progress` | Gains `next_custom_session`, a Custom setup to prefill, or null (CU-10). |
 | `GET /status` | `SiteStatus` gains `custom_interview_access` so the web app can show the lock. |
 
 ## Delivery plan

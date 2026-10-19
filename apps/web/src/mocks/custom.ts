@@ -9,6 +9,7 @@ import { http, HttpResponse } from "msw/http";
 import type { CreateSessionRequest } from "../api/sessions";
 import type {
   Competency,
+  CustomRecommendation,
   CustomSessionSpec,
   DebriefQuestion,
   FocusSuggestions,
@@ -184,6 +185,7 @@ export function customDebriefQuestions(custom: CustomSessionSpec): DebriefQuesti
     text: q.question_text,
     source: "planner",
     category: kinds[i % kinds.length],
+    competencies: MOCK_COMPETENCIES[kinds[i % kinds.length]].slice(0, 2),
     must_ask: false,
     verbatim: false,
   }));
@@ -192,10 +194,39 @@ export function customDebriefQuestions(custom: CustomSessionSpec): DebriefQuesti
     text: q.text,
     source: "candidate",
     category: q.category,
+    competencies: q.competencies,
     must_ask: q.must_ask,
     verbatim: q.verbatim,
   }));
   return [...own.filter((q) => q.must_ask), ...planner, ...own.filter((q) => !q.must_ask)];
+}
+
+/**
+ * CU-10: the mock's Custom next session, behavioral and technical Q&A with chips from the session
+ * plan. The real rule (gaps under the bar in two or more practiced types) is in
+ * strong_api.scoring.progress; the mock offers it once a job has two completed Realistic sessions.
+ */
+export function mockCustomRecommendation(): CustomRecommendation {
+  const topics = (type: StandardType, lead: string) => [
+    lead,
+    ...(gapAnalysis.session_plan.find((p) => p.interview_type === type)?.focus_topics ?? []).slice(0, 2),
+  ];
+  return {
+    interview_type: "custom",
+    difficulty: "realistic",
+    duration_min: 30,
+    custom: {
+      categories: [
+        { category: "technical_qa", share: 0.5, focus: topics("technical_qa", "Trade offs") },
+        { category: "behavioral", share: 0.5, focus: topics("behavioral", "Conflict handling") },
+      ],
+      questions: [],
+    },
+    focus_topics: ["Trade offs", "Conflict handling"],
+    reason:
+      "Your scores under the bar of 3 span several kinds of interview: technical Q&A (trade offs 2.0), " +
+      "behavioral (conflict handling 2.5). A Custom session practices them together.",
+  };
 }
 
 /** CU-2: chips from the gap analysis and the posting, the first few preselected. */

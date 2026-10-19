@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, useParams } from "react-router";
 
 import { ApiError } from "../api/client";
-import { customApi, savedQuestionsApi } from "../api/custom";
+import { savedQuestionsApi } from "../api/custom";
 import { keys, useDebrief, useJob, useProgress } from "../api/hooks";
 import type {
   CustomSessionSpec,
@@ -16,6 +16,8 @@ import type {
 } from "../api/types";
 import { JobTrend } from "../components/TrendChart";
 import { ErrorNotice, HireSignalScale, Loading, PageHead, Rubric } from "../components/ui";
+import { CustomNext } from "../custom/CustomNext";
+import { useRepeatSetup } from "../custom/repeat";
 import { competencyLabel, difficultyLabel, formatDate, interviewTypeLabel, modeLabel } from "../labels";
 import { setupLink } from "./GapAnalysisPage";
 
@@ -87,7 +89,9 @@ export function DebriefPage() {
               <h2 id="next-heading" className="next-card__tag">
                 Next rehearsal
               </h2>
-              {next ? (
+              {debrief.data.next_custom_session ? (
+                <CustomNext jobId={session.job_target_id} rec={debrief.data.next_custom_session} />
+              ) : next ? (
                 <>
                   <p>
                     <strong>
@@ -118,15 +122,8 @@ export function DebriefPage() {
  * session's own questions that are not in "My questions" yet.
  */
 function CustomActions({ session, custom }: { session: DebriefSession; custom: CustomSessionSpec }) {
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const repeat = useMutation({
-    mutationFn: () => customApi.repeat(session.id),
-    onSuccess: (setup) => {
-      const query = setup.resume_id ? `?resume=${encodeURIComponent(setup.resume_id)}` : "";
-      navigate(`/jobs/${setup.job_target_id}/sessions/new${query}`, { state: { setup } });
-    },
-  });
+  const repeat = useRepeatSetup();
   const unsaved = custom.questions.filter((q) => q.saved_question_id === null);
   const save = useMutation({
     mutationFn: async () => {
@@ -155,7 +152,7 @@ function CustomActions({ session, custom }: { session: DebriefSession; custom: C
         {own === 1 ? "1 of your questions." : `${own} of your questions.`}
       </p>
       <div className="stack">
-        <button type="button" className="btn" disabled={repeat.isPending} onClick={() => repeat.mutate()}>
+        <button type="button" className="btn" disabled={repeat.isPending} onClick={() => repeat.mutate(session.id)}>
           Run this setup again
         </button>
         {unsaved.length > 0 && (
@@ -281,7 +278,7 @@ function ScorecardView({
               </h3>
               <ol className="plain-list question-list">
                 {group.items.map((q) => (
-                  <QuestionCard key={q.question_ref} q={q} plan={byRef.get(q.question_ref)} />
+                  <QuestionCard key={q.question_ref} q={q} plan={byRef.get(q.question_ref)} canSave />
                 ))}
               </ol>
             </section>
@@ -358,9 +355,11 @@ function groupByCategory(
 }
 
 /** FB-2: one question with its average score, what was strong, what was missing, and the scores behind it. */
-function QuestionCard({ q, plan }: { q: QuestionScore; plan?: DebriefQuestion }) {
+function QuestionCard({ q, plan, canSave = false }: { q: QuestionScore; plan?: DebriefQuestion; canSave?: boolean }) {
   const avg = questionAverage(q);
   const own = plan?.source === "candidate";
+  // CU-9: an interviewer question of a Custom session can be kept for a later setup.
+  const savable = canSave && plan?.source === "planner" && plan.category !== null && plan.competencies.length > 0;
   return (
     <li className="question-card" data-own={own || undefined}>
       <div className="question-card__head">
@@ -375,6 +374,7 @@ function QuestionCard({ q, plan }: { q: QuestionScore; plan?: DebriefQuestion })
         </h3>
         {avg !== null && <span className="score-mono">{avg.toFixed(1)} / 4</span>}
       </div>
+      {savable && plan && <SaveQuestion plan={plan} />}
       {avg !== null && (
         <div className="score-bar" data-tone={scoreTone(avg)} aria-hidden="true">
           <span style={{ width: `${(avg / 4) * 100}%` }} />
@@ -424,6 +424,53 @@ function QuestionCard({ q, plan }: { q: QuestionScore; plan?: DebriefQuestion })
         </ul>
       </details>
     </li>
+  );
+}
+
+const MAX_SAVED_COMPETENCIES = 3;
+
+/**
+ * CU-9: "Save to My questions" for an interviewer question, with its category and competencies.
+ * The interviewer's questions are drawn fresh when a setup runs again, so this keeps a good one.
+ */
+function SaveQuestion({ plan }: { plan: DebriefQuestion }) {
+  const queryClient = useQueryClient();
+  const save = useMutation({
+    mutationFn: async () => {
+      try {
+        await savedQuestionsApi.create({
+          text: plan.text,
+          category: plan.category as StandardType,
+          competencies: plan.competencies.slice(0, MAX_SAVED_COMPETENCIES),
+        });
+        return "saved" as const;
+      } catch (err) {
+        if (err instanceof ApiError && err.code === "duplicate_question") return "already" as const;
+        throw err;
+      }
+    },
+    onSettled: () => void queryClient.invalidateQueries({ queryKey: keys.savedQuestions }),
+  });
+  return (
+    <div className="row">
+      {save.data ? (
+        <p className="muted small" role="status">
+          {save.data === "saved" ? "Saved to " : "Already in "}
+          <Link to="/questions/mine">My questions</Link>.
+        </p>
+      ) : (
+        <button
+          type="button"
+          className="btn btn--quiet"
+          disabled={save.isPending}
+          onClick={() => save.mutate()}
+          aria-label={`Save to My questions: ${plan.text}`}
+        >
+          Save to My questions
+        </button>
+      )}
+      {save.isError && <ErrorNotice error={save.error} />}
+    </div>
   );
 }
 

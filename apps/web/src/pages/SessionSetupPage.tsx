@@ -5,11 +5,20 @@ import { Link, useLocation, useNavigate, useParams, useSearchParams } from "reac
 import { keys, useJob, useProfile, useUsage } from "../api/hooks";
 import { CUSTOM_LOCKED_REASON, paywallReason, sessionsApi } from "../api/sessions";
 import { isPausedError, SESSIONS_UNAVAILABLE, statusKey, useSiteStatus } from "../api/status";
-import type { Difficulty, InterviewType, Level, Mode, SessionConfig, SessionSetup } from "../api/types";
+import type {
+  CustomRecommendation,
+  Difficulty,
+  InterviewType,
+  Level,
+  Mode,
+  SessionConfig,
+  SessionSetup,
+} from "../api/types";
 import { Choices } from "../components/Choices";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
 import { CustomFields } from "../custom/CustomFields";
 import type { CustomDuration } from "../custom/rules";
+import type { SetupState } from "../custom/repeat";
 import { useCustomSetup } from "../custom/useCustomSetup";
 import {
   difficultyHint,
@@ -32,11 +41,6 @@ const MINI: Duration = 10;
 
 export { CUSTOM_LOCKED_REASON };
 
-/** Router state that prefills the setup: "Run this setup again" (CU-9). */
-export interface SetupState {
-  setup?: SessionSetup;
-}
-
 function durationLabel(minutes: Duration): string {
   return minutes === MINI ? "10 minutes (mini)" : `${minutes} minutes`;
 }
@@ -57,6 +61,10 @@ export function SessionSetupPage() {
   const location = useLocation();
   // CU-9: an earlier session's setup, from "Run this setup again".
   const [prefill] = useState<SessionSetup | null>(() => (location.state as SetupState | null)?.setup ?? null);
+  // CU-10: a recommended Custom session (categories, chips, length), from the dashboard or debrief.
+  const [recommended] = useState<CustomRecommendation | null>(
+    () => (prefill ? null : ((location.state as SetupState | null)?.recommended ?? null)),
+  );
   const job = useJob(jobId);
   const usage = useUsage();
   const profile = useProfile();
@@ -67,10 +75,10 @@ export function SessionSetupPage() {
   const queryClient = useQueryClient();
 
   const [type, setType] = useState<InterviewType>(
-    prefill?.config.interview_type ?? pick(params.get("type"), TYPES, "behavioral"),
+    prefill?.config.interview_type ?? (recommended ? "custom" : pick(params.get("type"), TYPES, "behavioral")),
   );
   const [difficulty, setDifficulty] = useState<Difficulty>(
-    prefill?.config.difficulty ?? pick(params.get("difficulty"), DIFFICULTIES, "realistic"),
+    prefill?.config.difficulty ?? recommended?.difficulty ?? pick(params.get("difficulty"), DIFFICULTIES, "realistic"),
   );
   const [duration, setDuration] = useState<Duration | null>(prefill ? prefill.config.duration_min : null);
   // Coach first: the controls (pause, hint, redo) help a new candidate; Realistic is one click away.
@@ -91,8 +99,10 @@ export function SessionSetupPage() {
     longAllowed: fullAllowed,
     init: {
       duration:
-        prefill && prefill.config.duration_min !== MINI ? (prefill.config.duration_min as CustomDuration) : undefined,
-      spec: prefill?.config.custom ?? null,
+        prefill && prefill.config.duration_min !== MINI
+          ? (prefill.config.duration_min as CustomDuration)
+          : recommended?.duration_min,
+      spec: prefill?.config.custom ?? recommended?.custom ?? null,
     },
   });
 
