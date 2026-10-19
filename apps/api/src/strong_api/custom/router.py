@@ -9,12 +9,15 @@
 
 The check calls the model once (role extractor), so it is rate limited per user and locked like
 Custom sessions under `custom_interview_access=paid_only` (CU-11, strong_api.custom.access).
-Saved questions and focus chips are plain data and are never locked.
+Saved questions and focus chips are never locked. Saving or editing a question (text or
+category) runs the same check on the server (strong_api.custom.guard), counted in the same
+rate limit; the cleaned text is stored.
 
 Error details are {"code", "message", ...}:
 - 403 `upgrade_required` (CU-11), 429 `rate_limited` (with `retry_after_s`),
   503 `check_unavailable` when the model call failed;
-- 409 `saved_questions_full` and `duplicate_question` for saved questions.
+- 409 `saved_questions_full` and `duplicate_question` for saved questions;
+- 422 `question_refused` (with `refusal` and `reason`) when a saved question fails the check.
 """
 
 from __future__ import annotations
@@ -24,14 +27,14 @@ import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
-from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 from sqlalchemy import select
 
 from strong_api.custom.access import ensure_custom_allowed
-from strong_api.custom.check import check_question, find_duplicate, normalize_for_duplicates
+from strong_api.custom.check import clean_text, find_duplicate, normalize_for_duplicates
 from strong_api.custom.focus import suggest_focus
-from strong_api.custom.limits import CustomSettings, SlidingWindowLimiter, get_custom_settings
+from strong_api.custom.guard import accepted_texts, check_saved_question, count_check, run_check
+from strong_api.custom.limits import CustomSettings, get_custom_settings
 from strong_api.custom.schemas import (
     CategoryFocus,
     FocusSuggestions,
@@ -46,6 +49,8 @@ from strong_core.db.models import GapAnalysis as GapRow
 from strong_core.db.models import JobTarget, SavedQuestion
 from strong_core.gateway import get_gateway
 from strong_core.schemas import (
+    COMPETENCIES_BY_TYPE,
+    Competency,
     CustomQuestion,
     GapAnalysis,
     GapStatus,
@@ -59,8 +64,6 @@ router = APIRouter(tags=["custom interview"])
 
 Settings = Annotated[CustomSettings, Depends(get_custom_settings)]
 
-RATE_LIMITED = "rate_limited"
-CHECK_UNAVAILABLE = "check_unavailable"
 SAVED_QUESTIONS_FULL = "saved_questions_full"
 DUPLICATE_QUESTION = "duplicate_question"
 
@@ -71,16 +74,13 @@ _CHECK_RESPONSES: dict[int | str, dict[str, object]] = {
 }
 _SAVED_RESPONSES: dict[int | str, dict[str, object]] = {
     409: {"description": "detail.code is 'saved_questions_full' or 'duplicate_question'."},
-    422: {"description": "The competencies do not belong to the category, or a bad field."},
+    422: {
+        "description": "CU-5: detail.code is 'question_refused' (with refusal and reason) when "
+        "the check refuses the text; else a bad field."
+    },
+    429: {"description": "Rate limited. detail.code is 'rate_limited'; see Retry-After."},
+    503: {"description": "The check could not run. detail.code is 'check_unavailable'."},
 }
-
-
-def _limiter(request: Request) -> SlidingWindowLimiter:
-    limiter: SlidingWindowLimiter | None = getattr(request.app.state, "custom_check_limiter", None)
-    if limiter is None:
-        limiter = SlidingWindowLimiter()
-        request.app.state.custom_check_limiter = limiter
-    return limiter
 
 
 # --- CU-5 ------------------------------------------------------------------------------------
@@ -94,33 +94,12 @@ async def check_custom_question(
     the interviewer; else tag it with a category and 1 to 3 competencies. Flags a near-duplicate
     of an entry of `existing`. Rate limited per user."""
     await ensure_custom_allowed(db, me)
-    wait = _limiter(request).hit(
-        me.user_id, settings.custom_check_per_minute, settings.custom_check_per_day
-    )
-    if wait:
-        return JSONResponse(  # type: ignore[return-value]
-            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            headers={"Retry-After": str(wait)},
-            content={
-                "detail": {
-                    "code": RATE_LIMITED,
-                    "message": "You checked many questions. Wait a moment, then try again.",
-                    "retry_after_s": wait,
-                }
-            },
-        )
-    try:
-        result = await check_question(get_gateway(), body.text, body.kind, body.category)
-    except Exception as exc:
-        log.warning("custom question check failed: %s", type(exc).__name__)
-        raise HTTPException(
-            status.HTTP_503_SERVICE_UNAVAILABLE,
-            {
-                "code": CHECK_UNAVAILABLE,
-                "message": "We could not check this right now. Please try again.",
-            },
-        ) from exc
-    if not result.accepted:
+    count_check(request, me.user_id, settings)
+    result = await run_check(get_gateway(), body.text, body.kind, body.category)
+    if result.accepted:
+        # A session created soon with this text needs no second model call (guard.py).
+        accepted_texts(request).remember(me.user_id, body.kind, clean_text(body.text))
+    else:
         log.info("custom %s refused: %s", body.kind, result.refusal)
     return QuestionCheckOut(
         accepted=result.accepted,
@@ -222,6 +201,17 @@ def _validated(text: str, category: InterviewType, competencies: list[str]) -> C
         ) from exc
 
 
+def _competencies(
+    category: InterviewType, given: list[Competency], checked: tuple[Competency, ...]
+) -> list[str]:
+    """The given competencies when there are some and all belong to the category, else the
+    ones the CU-5 check tagged."""
+    allowed = COMPETENCIES_BY_TYPE[category]
+    if given and all(c in allowed for c in given):
+        return [c.value for c in given]
+    return [c.value for c in checked]
+
+
 async def _mine(db: Db, me: Me) -> list[SavedQuestion]:
     rows = await db.scalars(
         select(SavedQuestion)
@@ -261,10 +251,13 @@ async def list_saved_questions(db: Db, me: Me) -> list[SavedQuestionOut]:
 
 @router.post("/questions/mine", status_code=status.HTTP_201_CREATED, responses=_SAVED_RESPONSES)
 async def save_question(
-    body: SavedQuestionIn, db: Db, me: Me, settings: Settings
+    body: SavedQuestionIn, request: Request, db: Db, me: Me, settings: Settings
 ) -> SavedQuestionOut:
-    """CU-8: save a question (typed, from a session, or from the bank with `bank_ref`)."""
-    question = _validated(body.text, body.category, [c.value for c in body.competencies])
+    """CU-8: save a question (typed, from a session, or from the bank with `bank_ref`).
+
+    CU-5: the text is checked on the server first (422 `question_refused`) and stored cleaned.
+    Without competencies, or with ones not of the category, the check's tags are stored."""
+    text = clean_text(body.text)
     rows = await _mine(db, me)
     if len(rows) >= settings.saved_questions_max:
         raise HTTPException(
@@ -275,7 +268,12 @@ async def save_question(
                 "Delete one to add another.",
             },
         )
-    _ensure_unique(rows, question.text)
+    _ensure_unique(rows, text)
+    checked = await check_saved_question(
+        request, get_gateway(), me.user_id, settings, text, body.category
+    )
+    competencies = _competencies(body.category, body.competencies, checked.competencies)
+    question = _validated(text, body.category, competencies)
     row = SavedQuestion(
         org_id=me.org_id,
         user_id=me.user_id,
@@ -292,21 +290,34 @@ async def save_question(
 
 @router.patch("/questions/mine/{question_id}", responses=_SAVED_RESPONSES)
 async def edit_saved_question(
-    question_id: uuid.UUID, body: SavedQuestionPatch, db: Db, me: Me
+    question_id: uuid.UUID,
+    body: SavedQuestionPatch,
+    request: Request,
+    db: Db,
+    me: Me,
+    settings: Settings,
 ) -> SavedQuestionOut:
-    """CU-8: change the text, the category or the competencies. A new category needs
-    competencies of that category."""
+    """CU-8: change the text, the category or the competencies.
+
+    CU-5: a new text or category is checked on the server first (422 `question_refused`), and
+    the text is stored cleaned. When the competencies (given, or kept) do not fit the category,
+    the check's tags are stored. Changing only the competencies needs no check."""
     row = await _owned_saved(db, me, question_id)
+    text = clean_text(body.text) if body.text is not None else row.text
+    category = body.category if body.category is not None else row.category
     competencies = (
         [c.value for c in body.competencies] if body.competencies is not None else row.competencies
     )
-    question = _validated(
-        body.text if body.text is not None else row.text,
-        body.category if body.category is not None else row.category,
-        competencies,
-    )
-    if body.text is not None:
-        _ensure_unique(await _mine(db, me), question.text, skip=row.id)
+    if text != row.text or category != row.category:
+        if text != row.text:
+            _ensure_unique(await _mine(db, me), text, skip=row.id)
+        checked = await check_saved_question(
+            request, get_gateway(), me.user_id, settings, text, category
+        )
+        competencies = _competencies(
+            category, [Competency(c) for c in competencies], checked.competencies
+        )
+    question = _validated(text, category, competencies)
     row.text = question.text
     row.category = question.category
     row.competencies = [c.value for c in question.competencies]

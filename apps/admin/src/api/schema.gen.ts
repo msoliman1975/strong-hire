@@ -369,6 +369,9 @@ export interface paths {
         /**
          * Create Session
          * @description Create a session and queue its interviewer brief (IV-2, IV-4, IV-6, IV-8).
+         *
+         *     For a Custom session the own questions and focus chips are checked on the server (CU-5,
+         *     strong_api.custom.guard); a refusal answers 422 `question_refused` and nothing is stored.
          */
         post: operations["create_session_sessions_post"];
         delete?: never;
@@ -626,6 +629,9 @@ export interface paths {
         /**
          * Save Question
          * @description CU-8: save a question (typed, from a session, or from the bank with `bank_ref`).
+         *
+         *     CU-5: the text is checked on the server first (422 `question_refused`) and stored cleaned.
+         *     Without competencies, or with ones not of the category, the check's tags are stored.
          */
         post: operations["save_question_questions_mine_post"];
         delete?: never;
@@ -653,8 +659,11 @@ export interface paths {
         head?: never;
         /**
          * Edit Saved Question
-         * @description CU-8: change the text, the category or the competencies. A new category needs
-         *     competencies of that category.
+         * @description CU-8: change the text, the category or the competencies.
+         *
+         *     CU-5: a new text or category is checked on the server first (422 `question_refused`), and
+         *     the text is stored cleaned. When the competencies (given, or kept) do not fit the category,
+         *     the check's tags are stored. Changing only the competencies needs no check.
          */
         patch: operations["edit_saved_question_questions_mine__question_id__patch"];
         trace?: never;
@@ -5355,9 +5364,9 @@ export interface components {
             category: "behavioral" | "hiring_manager" | "technical_qa" | "case";
             /**
              * Competencies
-             * @description From COMPETENCIES_BY_TYPE for the category.
+             * @description From COMPETENCIES_BY_TYPE for the category. When empty, or when one does not belong to the category, the CU-5 check's tags are stored instead.
              */
-            competencies: components["schemas"]["Competency"][];
+            competencies?: components["schemas"]["Competency"][];
             /**
              * Bank Ref
              * @description Question bank id when added from the bank.
@@ -6667,14 +6676,26 @@ export interface operations {
                     "application/json": components["schemas"]["SessionRecord"];
                 };
             };
-            /** @description Validation Error */
+            /** @description A bad setup, or CU-5: detail.code is 'question_refused' with index, kind ('question' or 'focus'), category, refusal and reason. */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                content?: never;
+            };
+            /** @description CU-5 checks: detail.code is 'rate_limited'; see Retry-After. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
                 };
+                content?: never;
+            };
+            /** @description Sessions are paused (OC-2, OC-3), or CU-5: detail.code is 'check_unavailable'. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -7104,8 +7125,22 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description The competencies do not belong to the category, or a bad field. */
+            /** @description CU-5: detail.code is 'question_refused' (with refusal and reason) when the check refuses the text; else a bad field. */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited. detail.code is 'rate_limited'; see Retry-After. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The check could not run. detail.code is 'check_unavailable'. */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7173,8 +7208,22 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description The competencies do not belong to the category, or a bad field. */
+            /** @description CU-5: detail.code is 'question_refused' (with refusal and reason) when the check refuses the text; else a bad field. */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited. detail.code is 'rate_limited'; see Retry-After. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The check could not run. detail.code is 'check_unavailable'. */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

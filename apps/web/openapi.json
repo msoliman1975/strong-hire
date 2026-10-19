@@ -1110,7 +1110,7 @@
           "sessions"
         ],
         "summary": "Create Session",
-        "description": "Create a session and queue its interviewer brief (IV-2, IV-4, IV-6, IV-8).",
+        "description": "Create a session and queue its interviewer brief (IV-2, IV-4, IV-6, IV-8).\n\nFor a Custom session the own questions and focus chips are checked on the server (CU-5,\nstrong_api.custom.guard); a refusal answers 422 `question_refused` and nothing is stored.",
         "operationId": "create_session_sessions_post",
         "requestBody": {
           "content": {
@@ -1134,14 +1134,13 @@
             }
           },
           "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
+            "description": "A bad setup, or CU-5: detail.code is 'question_refused' with index, kind ('question' or 'focus'), category, refusal and reason."
+          },
+          "429": {
+            "description": "CU-5 checks: detail.code is 'rate_limited'; see Retry-After."
+          },
+          "503": {
+            "description": "Sessions are paused (OC-2, OC-3), or CU-5: detail.code is 'check_unavailable'."
           }
         }
       }
@@ -1759,7 +1758,7 @@
           "custom interview"
         ],
         "summary": "Save Question",
-        "description": "CU-8: save a question (typed, from a session, or from the bank with `bank_ref`).",
+        "description": "CU-8: save a question (typed, from a session, or from the bank with `bank_ref`).\n\nCU-5: the text is checked on the server first (422 `question_refused`) and stored cleaned.\nWithout competencies, or with ones not of the category, the check's tags are stored.",
         "operationId": "save_question_questions_mine_post",
         "requestBody": {
           "content": {
@@ -1786,7 +1785,13 @@
             "description": "detail.code is 'saved_questions_full' or 'duplicate_question'."
           },
           "422": {
-            "description": "The competencies do not belong to the category, or a bad field."
+            "description": "CU-5: detail.code is 'question_refused' (with refusal and reason) when the check refuses the text; else a bad field."
+          },
+          "429": {
+            "description": "Rate limited. detail.code is 'rate_limited'; see Retry-After."
+          },
+          "503": {
+            "description": "The check could not run. detail.code is 'check_unavailable'."
           }
         }
       }
@@ -1797,7 +1802,7 @@
           "custom interview"
         ],
         "summary": "Edit Saved Question",
-        "description": "CU-8: change the text, the category or the competencies. A new category needs\ncompetencies of that category.",
+        "description": "CU-8: change the text, the category or the competencies.\n\nCU-5: a new text or category is checked on the server first (422 `question_refused`), and\nthe text is stored cleaned. When the competencies (given, or kept) do not fit the category,\nthe check's tags are stored. Changing only the competencies needs no check.",
         "operationId": "edit_saved_question_questions_mine__question_id__patch",
         "parameters": [
           {
@@ -1836,7 +1841,13 @@
             "description": "detail.code is 'saved_questions_full' or 'duplicate_question'."
           },
           "422": {
-            "description": "The competencies do not belong to the category, or a bad field."
+            "description": "CU-5: detail.code is 'question_refused' (with refusal and reason) when the check refuses the text; else a bad field."
+          },
+          "429": {
+            "description": "Rate limited. detail.code is 'rate_limited'; see Retry-After."
+          },
+          "503": {
+            "description": "The check could not run. detail.code is 'check_unavailable'."
           }
         }
       },
@@ -14106,9 +14117,8 @@
             },
             "type": "array",
             "maxItems": 3,
-            "minItems": 1,
             "title": "Competencies",
-            "description": "From COMPETENCIES_BY_TYPE for the category."
+            "description": "From COMPETENCIES_BY_TYPE for the category. When empty, or when one does not belong to the category, the CU-5 check's tags are stored instead."
           },
           "bank_ref": {
             "anyOf": [
@@ -14128,8 +14138,7 @@
         "type": "object",
         "required": [
           "text",
-          "category",
-          "competencies"
+          "category"
         ],
         "title": "SavedQuestionIn"
       },

@@ -89,9 +89,10 @@ class SavedQuestionIn(_In):
     text: str = Field(min_length=1, max_length=CUSTOM_QUESTION_MAX_LEN)
     category: StandardType
     competencies: list[Competency] = Field(
-        min_length=1,
+        default_factory=list,
         max_length=CUSTOM_QUESTION_MAX_COMPETENCIES,
-        description="From COMPETENCIES_BY_TYPE for the category.",
+        description="From COMPETENCIES_BY_TYPE for the category. When empty, or when one does "
+        "not belong to the category, the CU-5 check's tags are stored instead.",
     )
     bank_ref: str | None = Field(
         default=None, max_length=200, description="Question bank id when added from the bank."

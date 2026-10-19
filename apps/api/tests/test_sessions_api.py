@@ -206,6 +206,42 @@ async def test_bl2_free_plan_allows_two_started_mini_interviews(
     assert count == 2
 
 
+async def test_bl2_free_interviews_are_counted_again_when_a_session_starts(
+    client: httpx.AsyncClient,
+    fake_fixtures: Path,
+    sessionmaker: async_sessionmaker[AsyncSession],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """BL-2: sessions created ahead cannot start past the free interviews. With 2 free
+    interviews, four sessions are created before any starts; the voice join or text open of
+    the third answers 402 and it does not start, while ending it first stays free."""
+
+    async def always(*_: Any) -> bool:
+        return True
+
+    monkeypatch.setattr(sessions_router, "_text_allowed", always)
+    job = await ready_job(client, fake_fixtures)
+    voice = [(await create(client, job["id"])).json()["id"] for _ in range(3)]
+    text_sid = (await create(client, job["id"], channel="text")).json()["id"]
+    assert (await client.post(f"/sessions/{voice[0]}/voice/join")).status_code == 200
+    assert (await client.post(f"/sessions/{voice[1]}/voice/join")).status_code == 200
+    blocked = await client.post(f"/sessions/{voice[2]}/voice/join")
+    assert blocked.status_code == 402, blocked.text
+    assert blocked.json()["detail"]["code"] == "upgrade_required"
+    opened = await client.post(f"/sessions/{text_sid}/text/open")
+    assert opened.status_code == 402
+    assert opened.json()["detail"]["code"] == "upgrade_required"
+    for sid in (voice[2], text_sid):
+        record = (await client.get(f"/sessions/{sid}")).json()
+        assert record["started_at"] is None and record["status"] == "created"
+    async with sessionmaker() as db:
+        org_id = await db.scalar(select(User.org_id).where(User.email == "dev@example.com"))
+        assert org_id is not None
+        assert await count_free_interviews_used(db, org_id) == 2
+    # A rejoin of a started session is not a new start, so it is never refused.
+    assert (await client.post(f"/sessions/{voice[0]}/voice/join")).status_code == 200
+
+
 @pytest.mark.parametrize("minutes", [30, 45])
 async def test_bl2_free_plan_cannot_create_a_full_interview(
     client: httpx.AsyncClient,
