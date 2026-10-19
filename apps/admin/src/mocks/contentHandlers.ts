@@ -23,7 +23,7 @@ import type {
 } from "../api/content";
 import { NEXT_STATUSES } from "../api/content";
 import type { MockDb, MockStore } from "./db";
-import { API, isMockAdmin } from "./handlers";
+import { API, currentAdmin } from "./handlers";
 
 interface MockVersion {
   version: number;
@@ -200,10 +200,7 @@ function invalid(message: string, problems: string[], code = "invalid_profile") 
 }
 
 export function contentHandlers(store: MockStore) {
-  const admin = () => {
-    const { auth } = store.db;
-    return auth.status === "signed_in" && auth.userEmail && isMockAdmin(auth.userEmail) ? auth.userEmail : null;
-  };
+  const admin = () => currentAdmin(store.db)?.email ?? null;
   const state = () => contentState(store.db);
   const company = (slug: unknown) => state().companies.find((c) => c.slug === slug);
   const write = (request: Request) => request.headers.get("X-Admin-Request") === "1";

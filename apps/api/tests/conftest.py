@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import AsyncIterator, Iterator
 from pathlib import Path
 from typing import Any
+from urllib.parse import parse_qs, urlparse
 
 import httpx
 import pytest
@@ -15,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.pool import StaticPool
 
 from strong_api.account.exports import MemoryExportStore
+from strong_api.admin.identity import ADMIN_LINK_SALT, AdminAuth, add_admin
 from strong_api.auth import get_db, install_auth
 from strong_api.auth.magic_links import MagicLinks, MemoryUsedTokenStore
 from strong_api.auth.passwords import MemoryLoginThrottle
@@ -164,6 +166,59 @@ async def sign_in(http: httpx.AsyncClient, email: str = "dev@example.com") -> di
         state = (await http.post("/auth/signup", json=body)).json()
     assert state["status"] == "signed_in", state
     return state
+
+
+# Admin sign-in (AA-2, AA-3). Admin routes need an admin session; a candidate session never
+# counts (AA-4). `sign_in_admin` makes the email an admin and signs in through the real email
+# link flow (POST /admin/auth/link, then /admin/auth/link/verify).
+
+ADMIN_EMAIL = "boss@example.com"
+
+
+def use_test_admin_auth(app: FastAPI) -> RecordingEmailSender:
+    """Swap the admin sign-in's email, link store and throttle for in-memory ones (no Redis,
+    no SMTP). Idempotent. Returns the email recorder."""
+    auth: AdminAuth = app.state.admin_auth
+    if not isinstance(auth.email_sender, RecordingEmailSender):
+        auth.email_sender = RecordingEmailSender()
+        auth.links = MagicLinks(
+            auth.settings.session_secret, 900, MemoryUsedTokenStore(), salt=ADMIN_LINK_SALT
+        )
+        auth.throttle = MemoryLoginThrottle()
+    return auth.email_sender
+
+
+async def make_admin(app: FastAPI, email: str = ADMIN_EMAIL) -> None:
+    """Add an active admin row (AA-1), as `strongctl admin add` would."""
+    async with app.state.sessionmaker() as db:
+        await add_admin(db, email, added_by="test")
+        await db.commit()
+
+
+async def sign_in_admin(
+    http: httpx.AsyncClient, app: FastAPI, email: str = ADMIN_EMAIL, *, make: bool = True
+) -> dict[str, Any]:
+    """Sign `http` in to the admin app as `email` and return GET /admin/me."""
+    if make:
+        await make_admin(app, email)
+    sender = use_test_admin_auth(app)
+    before = len(sender.sent)
+    assert (await http.post("/admin/auth/link", json={"email": email})).status_code == 202
+    assert len(sender.sent) == before + 1, f"no admin link was sent to {email}"
+    token = parse_qs(urlparse(sender.sent[-1][1]).query)["token"][0]
+    resp = await http.post("/admin/auth/link/verify", json={"token": token})
+    assert resp.status_code == 200, resp.text
+    me: dict[str, Any] = (await http.get("/admin/me")).json()
+    return me
+
+
+@pytest.fixture
+async def admin_client(app: FastAPI) -> AsyncIterator[httpx.AsyncClient]:
+    """A client signed in to the admin app as ADMIN_EMAIL (no candidate session)."""
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://test") as http:
+        await sign_in_admin(http, app)
+        yield http
 
 
 @pytest.fixture
