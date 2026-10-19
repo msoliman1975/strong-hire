@@ -11,6 +11,7 @@ from strong_api.admin.controls import router as controls_router
 from strong_api.admin.ops import router as ops_router
 from strong_api.admin.overview import router as overview_router
 from strong_api.admin.router import router
+from strong_api.admin.sim import router as sim_router
 from strong_api.admin.users import router as users_router
 from strong_api.auth.settings import AuthSettings, get_auth_settings
 
@@ -21,6 +22,7 @@ ROUTERS: list[APIRouter] = [
     users_router,
     overview_router,
     ops_router,
+    sim_router,
 ]
 
 
