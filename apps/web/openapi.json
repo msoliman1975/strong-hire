@@ -17151,6 +17151,17 @@
                 "type": "null"
               }
             ]
+          },
+          "inputs": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SimInputsOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "SM-20: the pasted job and CV the run used, if any"
           }
         },
         "type": "object",
@@ -17428,6 +17439,50 @@
         ],
         "title": "SimGateOut"
       },
+      "SimInputsOut": {
+        "properties": {
+          "job_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Text"
+          },
+          "cv_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cv Text"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Level"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "job_text",
+          "cv_text",
+          "level"
+        ],
+        "title": "SimInputsOut",
+        "description": "SM-20, SM-21: the pasted texts. Null after the run was deleted."
+      },
       "SimKeepIn": {
         "properties": {
           "keep": {
@@ -17645,6 +17700,41 @@
             ],
             "title": "Channel",
             "default": "voice"
+          },
+          "job_text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Text"
+          },
+          "cv_text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cv Text"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Level"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Required with job_text; ignored without it (persona's level)"
           }
         },
         "additionalProperties": false,
@@ -17653,7 +17743,7 @@
           "persona"
         ],
         "title": "SimRunIn",
-        "description": "SM-1: one interview. The posting and level follow the persona."
+        "description": "SM-1: one interview. The posting and level follow the persona, unless a job or CV is\npasted (SM-17): each replaces its own half; a pasted job needs `level` (SM-18)."
       },
       "SimRunList": {
         "properties": {
@@ -17903,6 +17993,17 @@
             "type": "boolean",
             "title": "Files",
             "description": "The run folder is on disk"
+          },
+          "inputs": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SimInputsOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "SM-21: the pasted texts, in single-run answers only (not in the list)"
           }
         },
         "type": "object",
@@ -17995,6 +18096,29 @@
               }
             ],
             "title": "Candidate Name"
+          },
+          "custom_job": {
+            "type": "boolean",
+            "title": "Custom Job",
+            "description": "SM-20: a job posting was pasted",
+            "default": false
+          },
+          "custom_cv": {
+            "type": "boolean",
+            "title": "Custom Cv",
+            "description": "SM-20: a CV was pasted",
+            "default": false
+          },
+          "level": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Level"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "SM-18: the level given with the job"
           }
         },
         "type": "object",

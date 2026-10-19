@@ -17,7 +17,7 @@ from dataclasses import dataclass, field
 from strong_core.gateway import Message, ModelGateway, Role
 from strong_core.prompts import load_prompt
 from strong_sim.cost import CostMeter
-from strong_sim.scenarios import FIXTURES_DIR, Scenario
+from strong_sim.scenarios import Scenario
 from strong_sim.transcript import Line
 
 log = logging.getLogger("strong_sim")
@@ -25,10 +25,6 @@ log = logging.getLogger("strong_sim")
 SILENCE = "[silence]"
 RATE_LIMIT_WAIT_S = 20.0
 _STAGE = re.compile(r"^\s*[\[(*][^\])*]{0,40}[\])*]\s*")  # a leading "(smiles)" or "*pauses*"
-
-
-def fixture_text(kind: str, name: str) -> str:
-    return (FIXTURES_DIR / kind / f"{name}.txt").read_text(encoding="utf-8").strip()
 
 
 def clean(text: str) -> str:
@@ -79,10 +75,10 @@ class Candidate:
         self.system = load_prompt("candidate", "persona").message(
             "system",
             name=s.candidate_name,
-            level=s.fixture.level.value,
+            level=s.run_level().value,
             interview_type=s.interview_type.value.replace("_", " "),
-            posting=fixture_text("postings", s.fixture.posting),
-            resume=fixture_text("resumes", s.resume),
+            posting=s.posting_text(),
+            resume=s.resume_text(),
             quality_guide=load_prompt("candidate", f"quality_{s.quality.value}").render(),
             behavior_guide=load_prompt("candidate", f"behavior_{s.behavior.value}").render(),
         )

@@ -80,8 +80,13 @@ class SimOptions(BaseModel):
     queue: SimQueueOut
 
 
+# The app's own limits for a pasted posting and CV (strong_api.inputs.schemas).
+MAX_PASTED_CHARS = 60_000
+
+
 class SimRunIn(BaseModel):
-    """SM-1: one interview. The posting and level follow the persona."""
+    """SM-1: one interview. The posting and level follow the persona, unless a job or CV is
+    pasted (SM-17): each replaces its own half; a pasted job needs `level` (SM-18)."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -93,6 +98,11 @@ class SimRunIn(BaseModel):
     quality: Quality = Quality.AVERAGE
     behavior: Behavior = Behavior.NORMAL
     channel: Channel = "voice"
+    job_text: str | None = Field(default=None, max_length=MAX_PASTED_CHARS)
+    cv_text: str | None = Field(default=None, max_length=MAX_PASTED_CHARS)
+    level: Level | None = Field(
+        default=None, description="Required with job_text; ignored without it (persona's level)"
+    )
 
     @model_validator(mode="after")
     def _check(self) -> SimRunIn:
@@ -100,6 +110,12 @@ class SimRunIn(BaseModel):
             raise ValueError(f"unknown persona {self.persona!r}")
         if self.behavior in VOICE_ONLY and self.channel != "voice":
             raise ValueError(f"behavior {self.behavior.value} needs the voice channel")
+        self.job_text = (self.job_text or "").strip() or None
+        self.cv_text = (self.cv_text or "").strip() or None
+        if self.job_text is None:
+            self.level = None
+        elif self.level is None:
+            raise ValueError("level is required when a job posting is pasted")
         return self
 
 
@@ -128,6 +144,17 @@ class SimScenarioOut(BaseModel):
     quality: str
     behavior: str
     candidate_name: str | None = None
+    custom_job: bool = Field(default=False, description="SM-20: a job posting was pasted")
+    custom_cv: bool = Field(default=False, description="SM-20: a CV was pasted")
+    level: Level | None = Field(default=None, description="SM-18: the level given with the job")
+
+
+class SimInputsOut(BaseModel):
+    """SM-20, SM-21: the pasted texts. Null after the run was deleted."""
+
+    job_text: str | None
+    cv_text: str | None
+    level: Level | None
 
 
 class SimRunOut(BaseModel):
@@ -157,6 +184,10 @@ class SimRunOut(BaseModel):
     deleted_by: str | None
     delete_reason: str | None
     files: bool = Field(description="The run folder is on disk")
+    inputs: SimInputsOut | None = Field(
+        default=None,
+        description="SM-21: the pasted texts, in single-run answers only (not in the list)",
+    )
 
 
 class SimRunList(BaseModel):
@@ -224,3 +255,6 @@ class SessionReplay(BaseModel):
     scorecard: Scorecard | None = Field(description="SM-11: as the candidate saw it")
     audio: ReplayAudio
     scenario: SimScenarioOut | None
+    inputs: SimInputsOut | None = Field(
+        default=None, description="SM-20: the pasted job and CV the run used, if any"
+    )

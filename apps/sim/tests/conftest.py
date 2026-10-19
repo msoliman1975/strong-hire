@@ -6,6 +6,7 @@ import json
 import uuid
 from pathlib import Path
 from typing import Any
+from urllib.parse import parse_qs
 
 import httpx
 import pytest
@@ -27,6 +28,9 @@ class FakeApi:
         self.candidate_texts: list[str] = []
         self.remaining_usd = 5.0
         self.reported_usd: list[float] = []
+        self.postings: list[str] = []
+        self.resume_texts: list[str] = []
+        self.reject_postings: str | None = None  # the extractor's reason, to fail every posting
 
     def __call__(self, request: httpx.Request) -> httpx.Response:
         path, method = request.url.path.removeprefix("/api"), request.method
@@ -47,15 +51,27 @@ class FakeApi:
         if path == "/job-targets" and method == "GET":
             return httpx.Response(200, json=self.targets)
         if path == "/job-targets" and method == "POST":
-            stage = json.loads(request.content)["stage"]
-            jt = {"id": str(uuid.uuid4()), "status": "extracted", "stage": stage}
-            self.targets.append({"job_target": jt, "gap_status": "ready"})
-            return httpx.Response(202, json={"job_target": jt, "job": None})
+            body = json.loads(request.content)
+            self.postings.append(body["text"])
+            status = "pending" if self.reject_postings else "extracted"
+            jt = {"id": str(uuid.uuid4()), "status": status, "stage": body["stage"]}
+            if not self.reject_postings:
+                self.targets.append({"job_target": jt, "gap_status": "ready"})
+            job = {"id": "extract-1", "status": "queued"}
+            return httpx.Response(202, json={"job_target": jt, "job": job})
+        if path.startswith("/job-targets/") and "/jobs/" in path:
+            failed = {"id": "extract-1", "status": "failed", "error": self.reject_postings}
+            return httpx.Response(
+                200, json=failed if self.reject_postings else {"status": "complete"}
+            )
         if path.startswith("/job-targets/") and path.endswith("/gap-analysis"):
             return httpx.Response(202 if method == "POST" else 200, json={"status": "ready"})
         if path.startswith("/job-targets/"):
-            return httpx.Response(200, json={"status": "extracted"})
+            return httpx.Response(
+                200, json={"status": "pending" if self.reject_postings else "extracted"}
+            )
         if path == "/resumes":
+            self.resume_texts.append(parse_qs(request.content.decode())["text"][0])
             return httpx.Response(202, json={"resume": {"id": str(uuid.uuid4())}, "job": None})
         if path.startswith("/resumes/"):
             return httpx.Response(200, json={"status": "extracted"})

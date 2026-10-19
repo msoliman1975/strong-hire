@@ -6547,6 +6547,8 @@ export interface components {
             scorecard: components["schemas"]["Scorecard"] | null;
             audio: components["schemas"]["ReplayAudio"];
             scenario: components["schemas"]["SimScenarioOut"] | null;
+            /** @description SM-20: the pasted job and CV the run used, if any */
+            inputs?: components["schemas"]["SimInputsOut"] | null;
         };
         /**
          * SessionSetup
@@ -6661,6 +6663,17 @@ export interface components {
             /** Reason */
             reason: string | null;
         };
+        /**
+         * SimInputsOut
+         * @description SM-20, SM-21: the pasted texts. Null after the run was deleted.
+         */
+        SimInputsOut: {
+            /** Job Text */
+            job_text: string | null;
+            /** Cv Text */
+            cv_text: string | null;
+            level: components["schemas"]["Level"] | null;
+        };
         /** SimKeepIn */
         SimKeepIn: {
             /** Keep */
@@ -6727,7 +6740,8 @@ export interface components {
         };
         /**
          * SimRunIn
-         * @description SM-1: one interview. The posting and level follow the persona.
+         * @description SM-1: one interview. The posting and level follow the persona, unless a job or CV is
+         *     pasted (SM-17): each replaces its own half; a pasted job needs `level` (SM-18).
          */
         SimRunIn: {
             /** Persona */
@@ -6754,6 +6768,12 @@ export interface components {
              * @enum {string}
              */
             channel: "text" | "voice";
+            /** Job Text */
+            job_text?: string | null;
+            /** Cv Text */
+            cv_text?: string | null;
+            /** @description Required with job_text; ignored without it (persona's level) */
+            level?: components["schemas"]["Level"] | null;
         };
         /** SimRunList */
         SimRunList: {
@@ -6841,6 +6861,8 @@ export interface components {
              * @description The run folder is on disk
              */
             files: boolean;
+            /** @description SM-21: the pasted texts, in single-run answers only (not in the list) */
+            inputs?: components["schemas"]["SimInputsOut"] | null;
         };
         /**
          * SimRunStatus
@@ -6868,6 +6890,20 @@ export interface components {
             behavior: string;
             /** Candidate Name */
             candidate_name?: string | null;
+            /**
+             * Custom Job
+             * @description SM-20: a job posting was pasted
+             * @default false
+             */
+            custom_job: boolean;
+            /**
+             * Custom Cv
+             * @description SM-20: a CV was pasted
+             * @default false
+             */
+            custom_cv: boolean;
+            /** @description SM-18: the level given with the job */
+            level?: components["schemas"]["Level"] | null;
         };
         /**
          * SiteBanner

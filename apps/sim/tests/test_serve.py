@@ -27,6 +27,7 @@ from strong_core.schemas.enums import (
     AuthProvider,
     Difficulty,
     InterviewType,
+    Level,
     Mode,
     SessionStatus,
     SimRunStatus,
@@ -117,10 +118,12 @@ async def _org(db: AsyncSession, email: str) -> uuid.UUID:
     return org.id
 
 
-async def _queue(sessionmaker: async_sessionmaker[AsyncSession], **fields: Any) -> uuid.UUID:
+async def _queue(
+    sessionmaker: async_sessionmaker[AsyncSession], scenario: Scenario | None = None, **fields: Any
+) -> uuid.UUID:
     async with sessionmaker() as db:
         org_id = await _org(db, f"{uuid.uuid4().hex[:6]}-{SIM_EMAIL}")
-        scenario = Scenario(id="admin", channel="text", candidate_name="Ada Venn")
+        scenario = scenario or Scenario(id="admin", channel="text", candidate_name="Ada Venn")
         run = SimRun(
             org_id=org_id,
             scenario_json=scenario.model_dump(mode="json"),
@@ -346,3 +349,92 @@ def test_delete_folder_refuses_paths_outside_the_runs_folder(tmp_path: Path) -> 
         retention.delete_folder(tmp_path, "../elsewhere")
     with pytest.raises(ValueError):
         retention.delete_folder(tmp_path, "")
+
+
+# --- pasted job and CV (SM-17..SM-20) ------------------------------------------------------
+
+JOB = "Senior Data Engineer at Fjord Freight. Build the shipment event pipeline in Kafka."
+CV = "Lena Ortiz. Data engineer, 7 years. Built streaming pipelines at a logistics firm."
+
+
+def test_a_pasted_job_needs_a_level_and_sets_the_session_level() -> None:
+    """SM-18: the level comes from the admin when a job is pasted, else from the persona."""
+    with pytest.raises(ValueError, match="needs a level"):
+        Scenario(id="a", job_text=JOB).check()
+    pasted = Scenario(id="a", job_text=JOB, level=Level.MID)
+    pasted.check()
+    assert pasted.session_config().level == Level.MID
+    assert Scenario(id="a").session_config().level == Level.SENIOR  # backend-senior
+    assert Scenario(id="a", cv_text=CV).session_config().level == Level.SENIOR
+    # Job targets are reused per inputs: the fixture, or a hash of the pasted texts.
+    assert Scenario(id="a").inputs_key() == "backend-senior"
+    assert pasted.inputs_key().startswith("custom-")
+    assert pasted.inputs_key() != Scenario(id="a", cv_text=CV).inputs_key()
+    assert (
+        pasted.inputs_key() == Scenario(id="b", job_text=f" {JOB} ", level=Level.MID).inputs_key()
+    )
+
+
+async def test_a_run_with_a_pasted_job_and_cv_uses_them_and_keeps_them(
+    settings: SimSettings,
+    sessionmaker: async_sessionmaker[AsyncSession],
+    fake_gateway: ModelGateway,
+    fake_api: Any,
+) -> None:
+    """SM-19: the app gets the pasted texts; the candidate's prompt has the CV; the folder too."""
+    api = fake_api(TOKEN)
+    service = _service(settings, sessionmaker, fake_gateway, api)
+    scenario = Scenario(
+        id="admin", channel="text", candidate_name="Lena Ortiz", job_text=JOB, cv_text=CV,
+        level=Level.SENIOR,
+    )  # fmt: skip
+    run_id = await _queue(sessionmaker, scenario)
+    assert await service.tick() is True
+    run = await _get(sessionmaker, run_id)
+    assert run.status == SimRunStatus.DONE, run.status_reason
+    assert api.postings == [JOB] and api.resume_texts == [CV]
+    assert api.targets[0]["job_target"]["stage"].startswith("sim:custom-")
+    assert run.run_dir
+    folder = settings.out_dir / run.run_dir
+    assert (folder / "job.txt").read_text("utf-8").strip() == JOB
+    assert (folder / "cv.txt").read_text("utf-8").strip() == CV
+    (sid,) = api.sessions
+    meta = json.loads((folder / sid / "meta.json").read_text("utf-8"))
+    assert meta["scenario"]["cv_text"] == CV and meta["scenario"]["level"] == "senior"
+
+    # Only the CV pasted: the persona's posting is used.
+    api2 = fake_api(TOKEN)
+    service2 = _service(settings, sessionmaker, fake_gateway, api2)
+    await _queue(sessionmaker, Scenario(id="admin", channel="text", cv_text=CV))
+    assert await service2.tick() is True
+    assert api2.resume_texts == [CV] and "Stripe" in api2.postings[0]
+
+
+async def test_a_pasted_job_the_app_rejects_fails_the_run_with_its_reason(
+    settings: SimSettings,
+    sessionmaker: async_sessionmaker[AsyncSession],
+    fake_gateway: ModelGateway,
+    fake_api: Any,
+) -> None:
+    """SM-19: the extractor's reason reaches the run's status."""
+    api = fake_api(TOKEN)
+    api.reject_postings = "This does not look like a job posting."
+    service = _service(settings, sessionmaker, fake_gateway, api)
+    scenario = Scenario(id="admin", channel="text", job_text="hello", level=Level.MID)
+    run_id = await _queue(sessionmaker, scenario)
+    assert await service.tick() is True
+    run = await _get(sessionmaker, run_id)
+    assert run.status == SimRunStatus.FAILED
+    assert run.status_reason and "does not look like a job posting" in run.status_reason
+    assert api.sessions == {}
+
+
+def test_forget_pasted_keeps_which_halves_were_pasted() -> None:
+    """SM-20: retention and Delete drop the texts, not the fact."""
+    from strong_sim.serve import forget_pasted
+
+    kept = Scenario(id="a", job_text=JOB, cv_text=CV, level=Level.MID).model_dump(mode="json")
+    gone = forget_pasted(kept)
+    assert gone["job_text"] == gone["cv_text"] == "" and gone["pasted_deleted"] == ["job", "cv"]
+    plain = Scenario(id="a").model_dump(mode="json")
+    assert forget_pasted(plain) == plain
