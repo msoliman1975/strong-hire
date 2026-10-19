@@ -6,7 +6,6 @@ the admin area (/admin). A6 adds the public /status (site banner, paused control
 from __future__ import annotations
 
 import asyncio
-import logging
 from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from typing import Any
@@ -26,37 +25,43 @@ from strong_api.devtools import router as dev_router
 from strong_api.gap.router import router as gap_router
 from strong_api.inputs import router as inputs_router
 from strong_api.inputs.queue import ArqJobQueue, JobQueue
+from strong_api.observability import RequestContextMiddleware
 from strong_api.reports import router as reports_router
 from strong_api.scoring import router as scoring_router
 from strong_api.sessions.router import router as sessions_router
 from strong_core import __version__
 from strong_core.config import get_settings
 from strong_core.db import get_engine, get_sessionmaker
+from strong_core.ops import logs as ops_logs
+from strong_core.ops.heartbeat import read_heartbeats
+from strong_core.ops.runtime import start_ops
 
 Check = Callable[[], Awaitable[None]]
-LOG_FORMAT = "%(asctime)s %(levelname)s %(name)s: %(message)s"
+WorkerCheck = Callable[[], Awaitable[int]]
 
 
 def configure_logging() -> None:
-    """Show INFO logs of the app's own packages (uvicorn sets up only its own loggers).
+    """Show INFO logs of the app's own packages (uvicorn sets up only its own loggers), as text
+    or as JSON lines (LOG_FORMAT, OB-7).
 
     Adds a handler to the root logger only when it has none, so a host that set up logging
     (or pytest) keeps its own. Other libraries stay at WARNING.
     """
-    root = logging.getLogger()
-    if not root.handlers:
-        handler = logging.StreamHandler()
-        handler.setFormatter(logging.Formatter(LOG_FORMAT))
-        root.addHandler(handler)
-    for name in ("strong_api", "strong_interview"):
-        logger = logging.getLogger(name)
-        if logger.level == logging.NOTSET:
-            logger.setLevel(logging.INFO)
+    ops_logs.configure_logging("api", app_loggers=("strong_api", "strong_interview"))
 
 
 async def check_database() -> None:
     async with get_engine().connect() as conn:
         await conn.execute(text("SELECT 1"))
+
+
+async def worker_heartbeats() -> int:
+    """AL-8: the number of live worker heartbeats (OB-1) in Redis."""
+    client = Redis.from_url(get_settings().redis_url)
+    try:
+        return len(await read_heartbeats(client, "worker"))
+    finally:
+        await client.aclose()
 
 
 async def check_redis() -> None:
@@ -72,13 +77,21 @@ def create_app(
     *,
     sessionmaker: async_sessionmaker[AsyncSession] | None = None,
     queue: JobQueue | None = None,
+    worker_check: WorkerCheck | None = None,
 ) -> FastAPI:
+    """`worker_check` counts live worker heartbeats for /health (AL-8). It defaults to Redis
+    when `checks` is not given either; with test checks and no worker check, it is skipped."""
     settings = get_settings()
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-        yield
-        await app.state.queue.close()
+        # OB-1 heartbeat, OB-2 usage sink, OB-4 error capture. Not run by the test clients.
+        ops = await start_ops("api", maker=app.state.sessionmaker)
+        try:
+            yield
+        finally:
+            await app.state.queue.close()
+            await ops.stop()
 
     app = FastAPI(title="Strong Hire API", version=__version__, lifespan=lifespan)
     app.add_middleware(
@@ -87,7 +100,9 @@ def create_app(
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    app.add_middleware(RequestContextMiddleware)  # OB-7 request ids, OB-4 unhandled errors
     app.state.checks = checks or {"database": check_database, "redis": check_redis}
+    app.state.worker_check = worker_check or (worker_heartbeats if checks is None else None)
     app.state.sessionmaker = sessionmaker or get_sessionmaker()
     app.state.queue = queue or ArqJobQueue(settings.redis_url)
     app.include_router(inputs_router)
@@ -112,6 +127,16 @@ def create_app(
             except Exception as exc:
                 results[name] = f"error: {type(exc).__name__}"
         healthy = all(v == "ok" for v in results.values())
+        # AL-8: the external uptime check on /health also covers the worker (and with it the
+        # alert engine): no live worker heartbeat means 503.
+        worker, workers = "skipped", None
+        if app.state.worker_check is not None:
+            try:
+                workers = await asyncio.wait_for(app.state.worker_check(), timeout=3)
+                worker = "ok" if workers else "missing"
+            except Exception as exc:
+                worker = f"error: {type(exc).__name__}"
+            healthy = healthy and worker == "ok"
         if not healthy:
             response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
         return {
@@ -119,6 +144,8 @@ def create_app(
             "version": __version__,
             "model_profile": settings.model_profile.value,
             "checks": results,
+            "worker": worker,
+            "worker_instances": workers,
         }
 
     return app

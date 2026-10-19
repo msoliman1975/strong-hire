@@ -24,7 +24,7 @@ from strong_api.main import create_app
 from strong_core.config import get_settings
 from strong_core.db.models import Base, Company
 from strong_core.db.seed import LAUNCH_COMPANIES
-from strong_core.gateway import ModelGateway
+from strong_core.gateway import ModelGateway, set_usage_sink
 from strong_core.gateway.registry import fake_models_config
 from strong_worker.account import jobs as account_jobs
 from strong_worker.account.jobs import AccountContext
@@ -48,6 +48,15 @@ def _fake_profile(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("MODEL_PROFILE", "fake")
     monkeypatch.setenv("ENV", "test")
     get_settings.cache_clear()
+
+
+@pytest.fixture(autouse=True)
+def _no_usage_sink() -> Iterator[None]:
+    """Jobs and text sessions set a usage context now (OB-2). No test writes those rows to a
+    real database; a test that checks them installs its own sink."""
+    previous = set_usage_sink(None)
+    yield
+    set_usage_sink(previous)
 
 
 WORKER_FUNCTIONS = {

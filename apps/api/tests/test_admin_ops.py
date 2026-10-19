@@ -850,3 +850,21 @@ async def test_ob14_spend_against_the_cap_and_hosted_equivalent(
     hosted = (await admin.get("/admin/ops/spend")).json()["hosted_equivalent"]
     assert (hosted["configured"], hosted["stt_usd"], hosted["total_usd"]) == (True, 0.06, 0.06)
     assert hosted["tts_usd"] is None
+
+
+def test_d12_shadow_prices_come_from_config_and_env_overrides(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """D-12: one source for shadow prices (config/litellm.<profile>.yaml); env overrides it."""
+    from strong_api.admin.ops import shadow_prices
+    from strong_core.config import get_settings
+
+    monkeypatch.delenv("SHADOW_STT_USD_PER_SECOND", raising=False)
+    monkeypatch.delenv("SHADOW_TTS_USD_PER_CHARACTER", raising=False)
+    monkeypatch.setenv("MODEL_PROFILE", "local")
+    get_settings.cache_clear()
+    assert shadow_prices() == (0.0001, 0.000015)
+    monkeypatch.setenv("SHADOW_STT_USD_PER_SECOND", "0.0002")
+    assert shadow_prices() == (0.0002, 0.000015)
+    monkeypatch.setenv("MODEL_PROFILE", "fake")
+    get_settings.cache_clear()

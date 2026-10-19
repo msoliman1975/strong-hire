@@ -9,17 +9,21 @@ candidate's speech stops the agent's audio. The real interviewer logic arrives i
 from __future__ import annotations
 
 import logging
+from contextlib import ExitStack
 
 from livekit.agents import Agent, AgentSession, JobContext, JobProcess, llm
 from livekit.agents.voice.events import ConversationItemAddedEvent
 from livekit.plugins import silero
 from livekit.plugins.turn_detector.english import EnglishModel
 
-from strong_core.gateway import Role, get_gateway
+from strong_core.db import get_sessionmaker
+from strong_core.gateway import Role, get_gateway, make_db_usage_sink, set_usage_sink, usage_context
+from strong_core.ops.logs import log_context
 from strong_core.prompts import load_prompt
 from strong_voice.interview_agent import run_session
 from strong_voice.latency import WARMUP_ROOM_PREFIX, LatencyRecorder
 from strong_voice.plugins import GatewayLLM, GatewaySTT, GatewayTTS
+from strong_voice.session_store import session_id_from_room, session_org
 from strong_voice.settings import get_voice_settings
 
 log = logging.getLogger("strong_voice")
@@ -69,17 +73,32 @@ def build_session(proc: JobProcess, recorder: LatencyRecorder) -> AgentSession[N
 
 
 async def entrypoint(ctx: JobContext) -> None:
+    room_name = ctx.job.room.name
+    session_id = session_id_from_room(room_name)
+    if session_id is None:
+        await spike_entrypoint(ctx)
+        return
+    # A room named session-<uuid> is a real interview (P7). Every gateway call it makes (the
+    # interviewer, stt, tts) writes a usage_events row for its org and session (OB-2): the
+    # usage context is set before the room connects, so every task the session starts has it.
+    maker = get_sessionmaker()
+    set_usage_sink(make_db_usage_sink(maker))
+    org_id = await session_org(maker, session_id)
+    with ExitStack() as stack:
+        stack.enter_context(log_context(session_id=session_id))
+        if org_id is not None:
+            stack.enter_context(usage_context(org_id, session_id=session_id))
+        await ctx.connect()
+        gateway = get_gateway()
+        recorder = LatencyRecorder(None, session=room_name, profile=gateway.profile)
+        await run_session(ctx, lambda: build_session(ctx.proc, recorder), recorder=recorder)
+
+
+async def spike_entrypoint(ctx: JobContext) -> None:
+    """Latency spike rooms: the hard-coded interview, timings to a CSV."""
     settings = get_voice_settings()
     gateway = get_gateway()
     await ctx.connect()
-
-    # A room named session-<uuid> is a real interview (P7). Other rooms are latency spike rooms.
-    def session_for_interview() -> AgentSession[None]:
-        recorder = LatencyRecorder(None, session=ctx.room.name, profile=gateway.profile)
-        return build_session(ctx.proc, recorder)
-
-    if await run_session(ctx, session_for_interview):
-        return
 
     label = settings.latency_label or gateway.profile
     warmup = ctx.room.name.startswith(WARMUP_ROOM_PREFIX)  # warm-up rooms are not counted
