@@ -1,9 +1,12 @@
-import { useId, useState, type ReactNode } from "react";
+import { useId, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router";
 
 import {
   ACTIVE_STATUSES,
   FINISHED_STATUSES,
+  MAX_PASTED_CHARS,
+  runAgainValues,
+  simApi,
   useCancelRun,
   useDeleteRun,
   useKeepRun,
@@ -11,6 +14,7 @@ import {
   useSimRuns,
   useStartRun,
   type SimBehavior,
+  type SimLevel,
   type SimOptions,
   type SimQuality,
   type SimRun,
@@ -25,6 +29,7 @@ import { clock, utc } from "../format";
 import {
   behaviorLabel,
   difficultyLabel,
+  levelLabel,
   interviewTypeLabel,
   modeLabel,
   qualityLabel,
@@ -74,9 +79,8 @@ function Select<T extends string | number>({
 }
 
 /** SM-1, SM-2, SM-3: one interview; the posting and level follow the persona. */
-function NewRunForm({ options }: { options: SimOptions }) {
-  const start = useStartRun();
-  const [run, setRun] = useState<Required<SimRunIn>>({
+function emptyRun(options: SimOptions): Required<SimRunIn> {
+  return {
     persona: options.personas[0]?.id ?? "",
     interview_type: "behavioral",
     difficulty: "realistic",
@@ -85,7 +89,44 @@ function NewRunForm({ options }: { options: SimOptions }) {
     quality: "average",
     behavior: "normal",
     channel: "voice",
-  });
+    job_text: null,
+    cv_text: null,
+    level: null,
+  };
+}
+
+function PastedText({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string | null;
+  onChange: (value: string | null) => void;
+}) {
+  const id = useId();
+  const length = value?.length ?? 0;
+  return (
+    <div className="field">
+      <label htmlFor={id}>{label} (optional)</label>
+      <textarea
+        id={id}
+        rows={6}
+        maxLength={MAX_PASTED_CHARS}
+        value={value ?? ""}
+        onChange={(e) => onChange(e.target.value === "" ? null : e.target.value)}
+      />
+      <span className="muted small">
+        {length.toLocaleString()} / {MAX_PASTED_CHARS.toLocaleString()} characters
+      </span>
+    </div>
+  );
+}
+
+/** SM-1..SM-3, SM-17, SM-18: one interview. A pasted job or CV replaces its half of the persona. */
+function NewRunForm({ options, initial }: { options: SimOptions; initial: Required<SimRunIn> }) {
+  const start = useStartRun();
+  const [run, setRun] = useState<Required<SimRunIn>>(initial);
   const set = <K extends keyof SimRunIn>(key: K, value: Required<SimRunIn>[K]) =>
     setRun((r) => ({ ...r, [key]: value }));
   const voiceOnly = new Set(options.behaviors.filter((b) => b.voice_only).map((b) => b.id));
@@ -93,6 +134,9 @@ function NewRunForm({ options }: { options: SimOptions }) {
   const estimate = options.estimates.find((e) => e.duration_min === run.duration_min);
   const queueFull = options.queue.waiting >= options.queue.max_waiting;
   const shortOfBudget = options.budget !== null && estimate !== undefined && options.budget.left_usd < estimate.total_usd;
+  const pastedJob = (run.job_text ?? "").trim() !== "";
+  const pastedCv = (run.cv_text ?? "").trim() !== "";
+  const needsLevel = pastedJob && !run.level;
 
   const changeChannel = (channel: Channel) =>
     setRun((r) => ({ ...r, channel, behavior: channel === "text" && voiceOnly.has(r.behavior) ? "normal" : r.behavior }));
@@ -103,7 +147,7 @@ function NewRunForm({ options }: { options: SimOptions }) {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          start.mutate(run);
+          start.mutate({ ...run, level: pastedJob ? run.level : null });
         }}
       >
         <div className="form-grid">
@@ -160,9 +204,33 @@ function NewRunForm({ options }: { options: SimOptions }) {
             onChange={(v) => set("behavior", v)}
           />
         </div>
+        <fieldset className="section">
+          <legend>Job and CV</legend>
+          <p className="muted small">
+            Each is optional and replaces only its half of the persona. Use synthetic or public texts; never a real
+            candidate&rsquo;s CV.
+          </p>
+          <div className="grid-2">
+            <PastedText label="Job posting" value={run.job_text} onChange={(v) => set("job_text", v)} />
+            <PastedText label="CV" value={run.cv_text} onChange={(v) => set("cv_text", v)} />
+          </div>
+          {pastedJob && (
+            <Select<SimLevel | "">
+              label="Level (required with a pasted job)"
+              value={run.level ?? ""}
+              options={[
+                { value: "", label: "Choose a level" },
+                ...(Object.keys(levelLabel) as SimLevel[]).map((l) => ({ value: l, label: levelLabel[l] })),
+              ]}
+              onChange={(v) => set("level", v || null)}
+            />
+          )}
+        </fieldset>
         {persona && (
           <p className="muted small">
-            Posting <code>{persona.posting}</code>, level {persona.level.replace(/_/g, " ")}.
+            {pastedJob ? "Pasted job" : <>Posting <code>{persona.posting}</code></>},{" "}
+            {pastedCv ? "pasted CV" : `CV of the ${persona.label.toLowerCase()} persona`}, level{" "}
+            {pastedJob ? (run.level ? levelLabel[run.level] : "not chosen") : persona.level.replace(/_/g, " ")}.
           </p>
         )}
         <dl className="dl">
@@ -198,7 +266,7 @@ function NewRunForm({ options }: { options: SimOptions }) {
         <button
           type="submit"
           className="btn btn--primary"
-          disabled={start.isPending || !options.gate.ok || queueFull || !run.persona}
+          disabled={start.isPending || !options.gate.ok || queueFull || !run.persona || needsLevel}
         >
           {start.isPending ? "Starting" : "Start run"}
         </button>
@@ -269,7 +337,9 @@ function summary(run: SimRun): string {
   const s = run.scenario;
   const type = interviewTypeLabel[s.interview_type as InterviewType] ?? s.interview_type;
   const behavior = behaviorLabel[s.behavior as SimBehavior] ?? s.behavior;
-  return `${s.persona} · ${type} · ${s.channel} · ${s.duration_min} min · ${s.quality} · ${behavior}`;
+  const custom = [s.custom_job && "custom job", s.custom_cv && "custom CV"].filter(Boolean).join(", ");
+  const base = `${s.persona} · ${type} · ${s.channel} · ${s.duration_min} min · ${s.quality} · ${behavior}`;
+  return custom ? `${base} · ${custom}` : base;
 }
 
 function Length({ run }: { run: SimRun }) {
@@ -286,7 +356,7 @@ function Length({ run }: { run: SimRun }) {
 type Pending = { kind: "cancel" | "delete"; run: SimRun };
 
 /** SM-12: admin runs and suite runs; SM-4: refreshed every 5 s while a run is not finished. */
-function RunsTable({ filters }: { filters: SimRunFilters }) {
+function RunsTable({ filters, onRunAgain }: { filters: SimRunFilters; onRunAgain: (run: SimRun) => void }) {
   const runs = useSimRuns(filters);
   const keep = useKeepRun();
   const cancel = useCancelRun();
@@ -377,6 +447,11 @@ function RunsTable({ filters }: { filters: SimRunFilters }) {
                         Replay
                       </Link>
                     )}
+                    {run.source === "admin" && (
+                      <button type="button" className="btn btn--small" onClick={() => onRunAgain(run)}>
+                        Run again
+                      </button>
+                    )}
                     {run.source === "admin" && !finished && (
                       <button
                         type="button"
@@ -447,6 +522,22 @@ function RunsTable({ filters }: { filters: SimRunFilters }) {
 export function SimulationsPage() {
   const options = useSimOptions();
   const [filters, setFilters] = useState<SimRunFilters>({});
+  const [prefill, setPrefill] = useState<{ key: number; values: Required<SimRunIn>; from: SimRun } | null>(null);
+  const [againError, setAgainError] = useState<unknown>(null);
+  const formRef = useRef<HTMLDivElement>(null);
+
+  /** SM-21: the run's settings and pasted texts (fetched: the list does not carry the texts). */
+  const runAgain = async (run: SimRun) => {
+    setAgainError(null);
+    try {
+      const full = await simApi.run(run.id);
+      setPrefill({ key: Date.now(), values: runAgainValues(full), from: full });
+      formRef.current?.scrollIntoView?.({ block: "start" });
+    } catch (err) {
+      setAgainError(err);
+    }
+  };
+  const textsGone = (run: SimRun) => run.deleted_at !== null && (run.scenario.custom_job || run.scenario.custom_cv);
   return (
     <>
       <PageHead title="Simulations">
@@ -457,11 +548,28 @@ export function SimulationsPage() {
       </PageHead>
       {options.isPending && <Loading label="Loading the form" />}
       {options.isError && <ErrorNotice error={options.error} />}
-      {options.data && <NewRunForm options={options.data} />}
+      <div ref={formRef}>
+        {againError !== null && <ErrorNotice error={againError} title="The run could not be loaded." />}
+        {prefill && (
+          <p className="notice" role="status">
+            Filled in from the run of {prefill.from.scenario.candidate_name ?? "the AI candidate"},{" "}
+            {utc(prefill.from.created_at)}.
+            {textsGone(prefill.from) && " Its pasted texts were deleted, so only its settings are filled in."} Change
+            anything before Start.
+          </p>
+        )}
+        {options.data && (
+          <NewRunForm
+            key={prefill?.key ?? 0}
+            options={options.data}
+            initial={prefill?.values ?? emptyRun(options.data)}
+          />
+        )}
+      </div>
       <section className="section" aria-labelledby="runs">
         <h2 id="runs">Runs</h2>
         <Filters filters={filters} onChange={setFilters} />
-        <RunsTable filters={filters} />
+        <RunsTable filters={filters} onRunAgain={(run) => void runAgain(run)} />
       </section>
     </>
   );

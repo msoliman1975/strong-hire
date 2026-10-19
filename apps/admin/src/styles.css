@@ -1610,3 +1610,34 @@ tbody tr:hover {
   flex: 1 1 260px;
   margin-bottom: 0;
 }
+
+/* Pasted job and CV (SM-17, SM-20) */
+fieldset.section {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-4) var(--space-5);
+}
+
+fieldset.section legend {
+  font-weight: 700;
+  padding: 0 var(--space-2);
+}
+
+.pasted {
+  margin-top: var(--space-3);
+}
+
+.pasted summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.pasted__text {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 360px;
+  overflow: auto;
+  margin: var(--space-3) 0 0;
+}
