@@ -138,3 +138,26 @@ async def test_gate_fails_when_the_budget_left_is_too_small(
     assert (await sim.check_sim_gate(db, 0.05, get_gateway())).ok
     gate = await sim.check_sim_gate(db, 0.25, get_gateway())
     assert not gate.ok and not gate.retry and gate.reason and "$0.10 left" in gate.reason
+
+
+def test_every_persona_has_its_resume_and_posting_fixture() -> None:
+    """SM-1: the form offers the 6 resume fixtures; each one's posting follows."""
+    from strong_core.config import find_repo_root
+
+    inputs = find_repo_root() / "evals" / "fixtures" / "inputs"
+    assert len(sim.PERSONAS) == 6
+    for key, persona in sim.PERSONAS.items():
+        assert (inputs / "resumes" / f"{key}.txt").exists(), key
+        assert (inputs / "postings" / f"{persona.posting}.txt").exists(), persona.posting
+
+
+def test_estimate_grows_with_length_and_counts_missing_prices_as_zero() -> None:
+    """SM-1, SM-3: the estimate the form shows and the budget gate checks."""
+    prices = {"sim-candidate": (1.5, 9.0), "sim-judge": (2.0, 10.0)}
+    short, long = sim.estimate_session(10, prices), sim.estimate_session(45, prices)
+    assert 0 < short.total_usd < long.total_usd
+    assert short.total_usd == pytest.approx(
+        short.candidate_usd + short.judge_usd + short.main_server_usd
+    )
+    free = sim.estimate_session(30, {})
+    assert free.candidate_usd == free.judge_usd == 0 and free.total_usd == free.main_server_usd
