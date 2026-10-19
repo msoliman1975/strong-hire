@@ -10,13 +10,15 @@ import type { components } from "./schema.gen";
 
 type S = components["schemas"];
 
-export type AdminUser = S["AdminUser"];
 export type AdminSession = S["AdminSession"];
 export type AdminSessionList = S["AdminSessionList"];
 export type AdminSessionDetail = S["AdminSessionDetail"];
 export type AdminTrace = S["AdminTrace"];
 export type AdminAuditEntry = S["AdminAuditEntry"];
 export type DailyCost = S["DailyCost"];
+export type AdminCostLine = S["AdminCostLine"];
+export type AdminTurnLatency = S["AdminTurnLatency"];
+export type AdminLatencyStat = S["AdminLatencyStat"];
 export type AuditScope = "admin" | "all";
 
 export interface AdminSessionFilters {
@@ -24,10 +26,13 @@ export interface AdminSessionFilters {
   day_from?: string;
   day_to?: string;
   interview_type?: S["InterviewType"];
+  /** AI-1: a session status, or "stuck". */
+  status?: "created" | "in_progress" | "interrupted" | "scoring" | "completed" | "failed" | "stuck";
 }
 
 export const adminApi = {
-  users: async () => unwrap(await apiClient.GET("/admin/users")),
+  /** The newest 200 users, for pickers. The Users page pages through all of them (AU-1). */
+  users: async () => unwrap(await apiClient.GET("/admin/users", { params: { query: { page_size: 200 } } })),
   sessions: async (filters: AdminSessionFilters = {}) =>
     unwrap(await apiClient.GET("/admin/sessions", { params: { query: filters } })),
   session: async (sessionId: string) =>
@@ -45,7 +50,7 @@ export const adminDownloads = {
 };
 
 export const adminKeys = {
-  users: ["admin", "users"] as const,
+  users: ["admin", "users", "picker"] as const,
   sessions: (filters: AdminSessionFilters) => ["admin", "sessions", filters] as const,
   session: (id: string) => ["admin", "session", id] as const,
   audit: (scope: AuditScope) => ["admin", "audit", scope] as const,

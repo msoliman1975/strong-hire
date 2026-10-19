@@ -54,11 +54,15 @@ def install_auth(
     )
     if google is None and settings.google_enabled:
         google = AuthlibGoogleClient(settings)
+    email_sender = email_sender or make_email_sender(settings)
+    # The admin app resends sign-in links with the same signer and sender (AU-9).
+    app.state.magic_links = magic_links
+    app.state.email_sender = email_sender
     app.include_router(
         build_router(
             settings,
             magic_links,
-            email_sender or make_email_sender(settings),
+            email_sender,
             google,
             confirm_links=confirm_links,
             reset_links=reset_links,

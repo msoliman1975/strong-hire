@@ -1,6 +1,14 @@
 import { Link, useParams } from "react-router";
 
-import { type AdminSession, type AdminTrace, adminDownloads, useAdminSession } from "../api/admin";
+import {
+  type AdminCostLine,
+  type AdminLatencyStat,
+  type AdminSession,
+  type AdminTrace,
+  type AdminTurnLatency,
+  adminDownloads,
+  useAdminSession,
+} from "../api/admin";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
 import { difficultyLabel, interviewTypeLabel, modeLabel, phaseLabel } from "../labels";
 import { clock, money, utc, words } from "../format";
@@ -25,7 +33,18 @@ function Metadata({ session: s }: { session: AdminSession }) {
       <dt>Minutes billed</dt>
       <dd>{s.minutes_billed}</dd>
       <dt>Status</dt>
-      <dd>{words(s.status)}</dd>
+      <dd>
+        {words(s.status)}
+        {s.stuck && <span className="tag"> stuck</span>}
+      </dd>
+      {s.failure_reason && (
+        <>
+          <dt>Failure</dt>
+          <dd>
+            {s.failure_reason} <span className="muted">({words(s.failure_kind ?? "")})</span>
+          </dd>
+        </>
+      )}
       <dt>Hire signal</dt>
       <dd>{s.hire_signal ?? "-"}</dd>
       <dt>Scores</dt>
@@ -135,6 +154,131 @@ function TraceItem({ trace: t }: { trace: AdminTrace }) {
   );
 }
 
+/** AI-2: every usage row of the session, by component and role. */
+function CostBreakdown({ lines, total }: { lines: AdminCostLine[]; total: number | null }) {
+  return (
+    <section className="section" aria-labelledby="cost-breakdown">
+      <h2 id="cost-breakdown">Cost breakdown</h2>
+      {lines.length === 0 ? (
+        <p className="muted">No usage rows for this interview.</p>
+      ) : (
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Component</th>
+                <th scope="col">Role</th>
+                <th scope="col" className="num">
+                  Units
+                </th>
+                <th scope="col" className="num">
+                  Rows
+                </th>
+                <th scope="col" className="num">
+                  Cost
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {lines.map((l) => (
+                <tr key={`${l.component}-${l.role}`}>
+                  <td>{l.component}</td>
+                  <td>{words(l.role)}</td>
+                  <td className="num">{Math.round(l.units).toLocaleString("en-US")}</td>
+                  <td className="num">{l.rows}</td>
+                  <td className="num">
+                    {money(l.cost_usd)}
+                    {!l.cost_known && <span className="muted"> (self-hosted, $0)</span>}
+                  </td>
+                </tr>
+              ))}
+              <tr>
+                <th scope="row" colSpan={4}>
+                  Total
+                </th>
+                <td className="num">{money(total)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+}
+
+const LATENCY_KEYS = ["e2e", "turn_detection", "stt", "llm_ttft", "tts_ttfb", "other"] as const;
+
+/** AI-3: per-turn voice latency with a p50/p95 summary. */
+function TurnLatency({ turns, summary }: { turns: AdminTurnLatency[]; summary: AdminLatencyStat[] }) {
+  if (turns.length === 0) return null;
+  return (
+    <section className="section" aria-labelledby="latency">
+      <h2 id="latency">Voice latency</h2>
+      <div className="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Summary</th>
+              {LATENCY_KEYS.map((k) => (
+                <th key={k} scope="col" className="num">
+                  {words(k)}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {(["p50_ms", "p95_ms"] as const).map((p) => (
+              <tr key={p}>
+                <th scope="row">{p === "p50_ms" ? "p50" : "p95"}</th>
+                {LATENCY_KEYS.map((k) => {
+                  const v = summary.find((x) => x.key === k)?.[p];
+                  return (
+                    <td key={k} className="num">
+                      {v === null || v === undefined ? "-" : `${Math.round(v)} ms`}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <details className="section">
+        <summary>Every turn ({turns.length})</summary>
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Turn</th>
+                {LATENCY_KEYS.map((k) => (
+                  <th key={k} scope="col" className="num">
+                    {words(k)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {turns.map((t) => (
+                <tr key={t.turn_index}>
+                  <td>{t.turn_index}</td>
+                  {LATENCY_KEYS.map((k) => {
+                    const v = t[`${k}_ms`];
+                    return (
+                      <td key={k} className="num">
+                        {v === null ? "-" : v}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+  );
+}
+
 /** One interview (R2). Transcript and traces only when the user's consent is on. */
 export function AdminSessionPage() {
   const { sessionId = "" } = useParams();
@@ -143,6 +287,7 @@ export function AdminSessionPage() {
   if (detail.isPending) return <Loading label="Loading the interview" />;
   if (detail.isError) return <ErrorNotice error={detail.error} title="The interview could not be loaded." />;
   const { session, content_visible, transcript, traces, trace_retention_days, audio_available } = detail.data;
+  const { cost_breakdown = [], cost_total_usd = null, turn_latency = [], latency_summary = [] } = detail.data;
 
   return (
     <>
@@ -152,6 +297,8 @@ export function AdminSessionPage() {
         </p>
       </PageHead>
       <Metadata session={session} />
+      <CostBreakdown lines={cost_breakdown} total={cost_total_usd} />
+      <TurnLatency turns={turn_latency} summary={latency_summary} />
 
       {!content_visible && (
         <div className="notice section" role="status">

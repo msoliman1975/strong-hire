@@ -29,7 +29,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from strong_api.auth.deps import SESSION_USER_KEY, DbSession, require_user
+from strong_api.auth.deps import DbSession, require_user, start_user_session
 from strong_api.auth.settings import AuthSettings, get_auth_settings
 from strong_api.auth.users import create_user, find_user, normalize_email
 from strong_core.config import get_settings
@@ -199,10 +199,9 @@ def build_sim_router(settings: AuthSettings, limiter: FailureLimiter | None = No
                     details_json={"training_consent_from": False, "training_consent_to": True},
                 )
             )
+        start_user_session(request, user)  # AU-7, AU-8
         user.last_sign_in_at = datetime.now(UTC)
         await db.commit()
-        request.session.clear()
-        request.session[SESSION_USER_KEY] = str(user.id)
         log.info("sim-login ok from %s", client)
 
     @router.get("/sim-budget")

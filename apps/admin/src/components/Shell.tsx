@@ -12,14 +12,21 @@ import { ErrorNotice, Loading, PageHead } from "./ui";
 
 /**
  * The sections of the admin app (Information architecture in docs/admin-spec.md). Only the ones
- * that exist are listed; later PRs add Overview, Content, Operations, Alerts and Settings here.
+ * that exist are listed; later PRs add Content, Alerts and Settings here. Entries with the same
+ * `group` are listed together under that heading (for example Operations).
  */
-const SECTIONS: { to: string; label: string; badge?: ComponentType }[] = [
+const SECTIONS: { to: string; label: string; group?: string; badge?: ComponentType }[] = [
+  { to: "/overview", label: "Overview" },
   { to: "/interviews", label: "Interviews" },
   { to: "/users", label: "Users" },
   { to: "/alerts", label: "Alerts", badge: FiringCount },
+  { to: "/ops/health", label: "Health", group: "Operations" },
+  { to: "/ops/performance", label: "Performance", group: "Operations" },
+  { to: "/ops/errors", label: "Errors", group: "Operations" },
+  { to: "/ops/jobs", label: "Jobs", group: "Operations" },
+  { to: "/ops/spend", label: "Spend", group: "Operations" },
+  { to: "/ops/controls", label: "Controls", group: "Operations" },
   { to: "/audit", label: "Audit log" },
-  { to: "/ops/controls", label: "Controls" },
 ];
 
 /**
@@ -36,6 +43,25 @@ function ControlsBanner() {
       <strong>Ops controls on:</strong> {active.join(" · ")}. <Link to="/ops/controls">Open Controls</Link>
     </div>
   );
+}
+
+type NavLeaf = { to: string; label: string; badge?: ComponentType };
+type NavGroup = { group: string; items: NavLeaf[] };
+
+/** SECTIONS with grouped entries folded under their group, in first-seen order. */
+function navItems(): (NavLeaf | NavGroup)[] {
+  const out: (NavLeaf | NavGroup)[] = [];
+  for (const s of SECTIONS) {
+    if (!s.group) {
+      out.push({ to: s.to, label: s.label, badge: s.badge });
+      continue;
+    }
+    const found = out.find((n): n is NavGroup => "group" in n && n.group === s.group);
+    const leaf = { to: s.to, label: s.label, badge: s.badge };
+    if (found) found.items.push(leaf);
+    else out.push({ group: s.group, items: [leaf] });
+  }
+  return out;
 }
 
 /** The server's model profile (from /api/health), so admins see which environment this is. */
@@ -124,14 +150,32 @@ export function Shell() {
         </div>
         <nav className="nav" aria-label="Admin">
           <ul>
-            {SECTIONS.map((s) => (
-              <li key={s.to}>
-                <NavLink to={s.to}>
-                  {s.label}
-                  {s.badge && <s.badge />}
-                </NavLink>
-              </li>
-            ))}
+            {navItems().map((n) =>
+              "group" in n ? (
+                <li key={n.group} className="nav__group">
+                  <span className="nav__heading" id={`nav-${n.group}`}>
+                    {n.group}
+                  </span>
+                  <ul aria-labelledby={`nav-${n.group}`}>
+                    {n.items.map((s) => (
+                      <li key={s.to}>
+                        <NavLink to={s.to}>
+                          {s.label}
+                          {s.badge && <s.badge />}
+                        </NavLink>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ) : (
+                <li key={n.to}>
+                  <NavLink to={n.to}>
+                    {n.label}
+                    {n.badge && <n.badge />}
+                  </NavLink>
+                </li>
+              ),
+            )}
           </ul>
         </nav>
         <div className="sidebar__end">
