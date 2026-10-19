@@ -6,7 +6,7 @@
  * interviewer brief. The first voice join starts the session ("in_progress"). The voice agent
  * ends it; the API then bills the minutes and scores it ("scoring", then "completed").
  */
-import { apiClient, unwrap } from "./client";
+import { ApiError, apiClient, unwrap } from "./client";
 import type { CreateSessionRequest, SessionRecord, VoiceJoin } from "./types";
 
 export type { CreateSessionRequest, SessionRecord, VoiceJoin };
@@ -40,3 +40,18 @@ export const sessionsApi = {
       }),
     ) as VoiceJoin,
 };
+
+/** The paywall reason for a locked Custom interview (CU-11). */
+export const CUSTOM_LOCKED_REASON = "custom_requires_plan";
+
+/**
+ * The paywall reason when the plan does not allow the session, else null. Creating a session and
+ * starting it (the first voice join re-checks the plan) answer 402 with the billing code, or 403
+ * `upgrade_required` when Custom became paid-only (CU-11).
+ */
+export function paywallReason(err: unknown, custom: boolean): string | null {
+  if (!(err instanceof ApiError)) return null;
+  if (err.status === 402) return err.code ?? "upgrade_required";
+  if (err.status === 403 && err.code === "upgrade_required") return custom ? CUSTOM_LOCKED_REASON : "upgrade_required";
+  return null;
+}

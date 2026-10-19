@@ -3,10 +3,10 @@
  * category, and the candidate's own questions. Focus selections are kept only once the candidate
  * changes them, so the API's preselected chips apply until then.
  */
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { ApiError } from "../api/client";
-import { customApi } from "../api/custom";
+import { customApi, questionRefusal } from "../api/custom";
 import { useFocusSuggestions } from "../api/hooks";
 import type {
   Competency,
@@ -41,6 +41,14 @@ export interface OwnQuestion {
   /** CU-5: the text of a near-duplicate question already in the setup. A warning only. */
   duplicateOf: string | null;
 }
+
+/**
+ * CU-5 on the server: the session start refused one own question (by key) or one focus chip.
+ * The screen shows the reason next to it until the candidate changes or removes it.
+ */
+export type ServerRefusal =
+  | { kind: "question"; key: string; reason: string }
+  | { kind: "focus"; category: StandardType; chip: string; reason: string };
 
 /** The result of a check that did not add anything, for the screen to show. */
 export interface CheckNotice {
@@ -88,7 +96,7 @@ export function useCustomSetup(opts: {
   const initialFocus: Partial<Record<StandardType, string[]>> = Object.fromEntries(
     (init?.spec?.categories ?? []).map((c) => [c.category, c.focus]),
   );
-  const [questions, setQuestions] = useState<OwnQuestion[]>(() =>
+  const [questions, setQuestionsState] = useState<OwnQuestion[]>(() =>
     (init?.spec?.questions ?? []).map((q) => ({
       key: newKey(),
       text: q.text,
@@ -101,9 +109,23 @@ export function useCustomSetup(opts: {
     })),
   );
 
+  // The latest list and cap, for code that runs after an await: an add that finishes after a
+  // check must see the questions added meanwhile (a saved one, another check), so the cap and
+  // the duplicate rule hold (CU-3, CU-5).
+  const latest = useRef(questions);
+  const setQuestions = (next: (prev: OwnQuestion[]) => OwnQuestion[]) => {
+    latest.current = next(latest.current);
+    setQuestionsState(latest.current);
+  };
+  const [refusal, setRefusal] = useState<ServerRefusal | null>(null);
+
   const focus = useFocusSuggestions(opts.jobId, opts.resumeId, opts.enabled);
   const chosen = shares.map((s) => s.category);
   const cap = QUESTION_CAP[duration];
+  const latestLimit = useRef({ cap, duration });
+  useEffect(() => {
+    latestLimit.current = { cap, duration };
+  }, [cap, duration]);
 
   const suggestionsFor = (c: StandardType): FocusSuggestions[StandardType] | undefined => focus.data?.[c];
 
@@ -129,6 +151,7 @@ export function useCustomSetup(opts: {
   };
 
   const toggleChip = (c: StandardType, chip: string) => {
+    if (refusal?.kind === "focus" && refusal.category === c && refusal.chip === chip) setRefusal(null);
     const current = selectedFocus(c);
     const next = current.includes(chip)
       ? current.filter((x) => x !== chip)
@@ -158,23 +181,31 @@ export function useCustomSetup(opts: {
       return { tone: "error", message: checkErrorMessage(err) };
     }
     if (!result.accepted) return { tone: "error", message: result.reason };
-    setExtraChips((prev) => ({ ...prev, [c]: [...(prev[c] ?? []), text] }));
-    setFocusSel((prev) => ({ ...prev, [c]: [...(prev[c] ?? selectedFocus(c)), text] }));
+    // The updaters skip a chip that is already there, so two checks of one text add it once.
+    const has = (list: string[]) => list.some((x) => normalize(x) === normalize(text));
+    setExtraChips((prev) => (has(prev[c] ?? []) ? prev : { ...prev, [c]: [...(prev[c] ?? []), text] }));
+    setFocusSel((prev) => {
+      const current = prev[c] ?? selectedFocus(c);
+      return has(current) || current.length >= MAX_FOCUS ? prev : { ...prev, [c]: [...current, text] };
+    });
     if (result.duplicate_of !== null && chips[result.duplicate_of]) {
       return { tone: "warning", message: `Added. It is close to “${chips[result.duplicate_of]}”.` };
     }
     return null;
   };
 
-  const exactDuplicate = (text: string) => questions.find((q) => normalize(q.text) === normalize(text));
+  const exactDuplicate = (text: string) => latest.current.find((q) => normalize(q.text) === normalize(text));
+  const atCap = () => latest.current.length >= latestLimit.current.cap;
+  const capNotice = (): CheckNotice => ({
+    tone: "error",
+    message: `A ${latestLimit.current.duration}-minute session takes up to ${latestLimit.current.cap} of your questions.`,
+  });
 
   /** CU-3, CU-5: check and tag one typed question, then add it. Returns a notice, or null when added cleanly. */
   const addQuestion = async (raw: string): Promise<CheckNotice | null> => {
     const text = raw.trim();
     if (!text) return { tone: "error", message: "Type a question first." };
-    if (questions.length >= cap) {
-      return { tone: "error", message: `A ${duration}-minute session takes up to ${cap} of your questions.` };
-    }
+    if (atCap()) return capNotice();
     if (exactDuplicate(text)) return { tone: "error", message: "You already added this question." };
     const existing = questions.map((q) => q.text).slice(0, CHECK_MAX_EXISTING);
     let result: QuestionCheckOut;
@@ -184,6 +215,9 @@ export function useCustomSetup(opts: {
       return { tone: "error", message: checkErrorMessage(err) };
     }
     if (!result.accepted || !result.category) return { tone: "error", message: result.reason };
+    // Again after the await: a saved question or another check may have been added meanwhile.
+    if (atCap()) return capNotice();
+    if (exactDuplicate(text)) return { tone: "error", message: "You already added this question." };
     const duplicateOf = result.duplicate_of !== null ? (existing[result.duplicate_of] ?? null) : null;
     setQuestions((prev) => [
       ...prev,
@@ -203,9 +237,7 @@ export function useCustomSetup(opts: {
 
   /** CU-8: add a saved question as it is (it was checked when it was saved). */
   const addSaved = (saved: SavedQuestion): CheckNotice | null => {
-    if (questions.length >= cap) {
-      return { tone: "error", message: `A ${duration}-minute session takes up to ${cap} of your questions.` };
-    }
+    if (atCap()) return capNotice();
     if (exactDuplicate(saved.text)) return { tone: "error", message: "This question is already in your interview." };
     setQuestions((prev) => [
       ...prev,
@@ -223,10 +255,49 @@ export function useCustomSetup(opts: {
     return null;
   };
 
-  const updateQuestion = (key: string, patch: Partial<OwnQuestion>) =>
-    setQuestions((prev) => prev.map((q) => (q.key === key ? { ...q, ...patch } : q)));
+  const clearRefusalOf = (key: string) => setRefusal((r) => (r?.kind === "question" && r.key === key ? null : r));
 
-  const removeQuestion = (key: string) => setQuestions((prev) => prev.filter((q) => q.key !== key));
+  const updateQuestion = (key: string, patch: Partial<OwnQuestion>) => {
+    if (patch.text !== undefined || patch.category !== undefined) clearRefusalOf(key);
+    setQuestions((prev) => prev.map((q) => (q.key === key ? { ...q, ...patch } : q)));
+  };
+
+  const removeQuestion = (key: string) => {
+    clearRefusalOf(key);
+    setQuestions((prev) => prev.filter((q) => q.key !== key));
+  };
+
+  /**
+   * CU-5 on the server: `POST /sessions` answered 422 `question_refused`. Marks the refused
+   * question or chip of the setup that was sent and returns true; false for any other error, or
+   * when the refused text is no longer in the setup (the page then shows the error itself).
+   */
+  const showRefusal = (err: unknown, sent: CustomSessionSpec | null | undefined): boolean => {
+    const r = questionRefusal(err);
+    if (!r) return false;
+    setRefusal(null);
+    if (r.kind === "question" && r.index !== null) {
+      const text = sent?.questions[r.index]?.text;
+      const q = text !== undefined ? latest.current.find((x) => x.text === text) : latest.current[r.index];
+      if (!q) return false;
+      setRefusal({ kind: "question", key: q.key, reason: r.reason });
+      return true;
+    }
+    if (r.kind === "focus" && r.index !== null) {
+      const sentCategory = sent?.categories.find((x) => x.category === r.category);
+      const category = (sentCategory?.category ?? r.category) as StandardType | null;
+      const chip = sentCategory ? sentCategory.focus[r.index] : category ? selectedFocus(category)[r.index] : undefined;
+      if (!category || chip === undefined) return false;
+      setRefusal({ kind: "focus", category, chip, reason: r.reason });
+      return true;
+    }
+    return false;
+  };
+
+  const refusalFor = (key: string): string | null =>
+    refusal?.kind === "question" && refusal.key === key ? refusal.reason : null;
+  const chipRefusal = (c: StandardType): { chip: string; reason: string } | null =>
+    refusal?.kind === "focus" && refusal.category === c ? { chip: refusal.chip, reason: refusal.reason } : null;
 
   /**
    * D-8: the candidate changes a question's category. The check tags it again with that category,
@@ -254,6 +325,13 @@ export function useCustomSetup(opts: {
         ? "One of your questions has a kind of question that is not in this interview. Add that kind, or pick another."
         : `${stray.length} of your questions have a kind of question that is not in this interview. Add that kind, or pick another.`,
     );
+  }
+  // CU-5: the start was refused; it stays blocked until the refused text is out of the setup.
+  if (refusal?.kind === "question" && questions.some((q) => q.key === refusal.key)) {
+    problems.push("One of your questions can't be used. Remove it, then start again.");
+  }
+  if (refusal?.kind === "focus" && chosen.includes(refusal.category) && selectedFocus(refusal.category).includes(refusal.chip)) {
+    problems.push("One of your focus topics can't be used. Turn it off, then start again.");
   }
 
   const spec = (): CustomSessionSpec => ({
@@ -290,6 +368,10 @@ export function useCustomSetup(opts: {
     updateQuestion,
     removeQuestion,
     recategorize,
+    showRefusal,
+    clearRefusal: () => setRefusal(null),
+    refusalFor,
+    chipRefusal,
     problems,
     spec,
   };

@@ -3,9 +3,11 @@
  * chip, the suggested focus chips (CU-2), saved questions (CU-8) and "Run this setup again" (CU-9).
  *
  * Errors carry detail.code: 403 `upgrade_required` (CU-11), 429 `rate_limited`, 503
- * `check_unavailable`, 409 `duplicate_question` and `saved_questions_full`.
+ * `check_unavailable`, 409 `duplicate_question` and `saved_questions_full`, and 422
+ * `question_refused` when the server-side check (CU-5) refuses text that is stored or starts a
+ * session (see `questionRefusal`).
  */
-import { apiClient, unwrap } from "./client";
+import { ApiError, apiClient, unwrap } from "./client";
 import type {
   FocusSuggestions,
   QuestionCheckOut,
@@ -15,6 +17,28 @@ import type {
   SavedQuestionPatch,
   SessionSetup,
 } from "./types";
+
+/** A 422 `question_refused`: the server's CU-5 check refused a question or focus chip. */
+export interface QuestionRefused {
+  reason: string;
+  refusal: string | null;
+  /** At session create: the index in `custom.questions`, or in the category's `focus` list. */
+  index: number | null;
+  kind: "question" | "focus" | null;
+  category: string | null;
+}
+
+export function questionRefusal(err: unknown): QuestionRefused | null {
+  if (!(err instanceof ApiError) || err.status !== 422 || err.code !== "question_refused") return null;
+  const d = err.detail ?? {};
+  return {
+    reason: typeof d.reason === "string" && d.reason ? d.reason : err.message,
+    refusal: typeof d.refusal === "string" ? d.refusal : null,
+    index: typeof d.index === "number" ? d.index : null,
+    kind: d.kind === "question" || d.kind === "focus" ? d.kind : null,
+    category: typeof d.category === "string" ? d.category : null,
+  };
+}
 
 export const customApi = {
   /** CU-5: refuse or tag one own question (kind "question") or free-text chip (kind "focus"). */

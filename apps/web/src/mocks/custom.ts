@@ -127,6 +127,33 @@ export function customProblem(config: CreateSessionRequest["config"]): string | 
   return null;
 }
 
+/** The 422 `question_refused` body of strong_api.custom.guard. */
+export function refusedBody(result: QuestionCheckOut, where: Record<string, unknown> = {}) {
+  return {
+    detail: { code: "question_refused", message: result.reason, refusal: result.refusal, reason: result.reason, ...where },
+  };
+}
+
+/**
+ * CU-5 on the server (strong_api.custom.guard.check_custom_spec): every focus chip and own
+ * question of a new Custom session is checked; the first refusal answers 422 with its index.
+ */
+export function customRefusal(
+  custom: NonNullable<CreateSessionRequest["config"]["custom"]>,
+): ReturnType<typeof refusedBody> | null {
+  for (const c of custom.categories) {
+    for (const [index, chip] of (c.focus ?? []).entries()) {
+      const result = mockCheck({ text: chip, kind: "focus", category: c.category });
+      if (!result.accepted) return refusedBody(result, { index, kind: "focus", category: c.category });
+    }
+  }
+  for (const [index, q] of (custom.questions ?? []).entries()) {
+    const result = mockCheck({ text: q.text, kind: "question", category: q.category });
+    if (!result.accepted) return refusedBody(result, { index, kind: "question", category: q.category });
+  }
+  return null;
+}
+
 const ownRef = (i: number) => `own-${i + 1}`;
 
 /** CU-6: a Custom scorecard: the planner's questions from the fixture, then the own questions. */
@@ -231,6 +258,9 @@ export function customHandlers(store: MockStore) {
       if (!text || text.length > 500) return invalid("text must be 1 to 500 characters");
       const problem = savedProblem(body.category, body.competencies);
       if (problem) return invalid(problem);
+      // CU-5: the server checks the text again before it stores it.
+      const check = mockCheck({ text, kind: "question", category: body.category });
+      if (!check.accepted) return HttpResponse.json(refusedBody(check), { status: 422 });
       if (db().savedQuestions.length >= SAVED_MAX) {
         return conflict("saved_questions_full", `You can keep ${SAVED_MAX} questions. Delete one to add another.`);
       }
@@ -261,6 +291,10 @@ export function customHandlers(store: MockStore) {
       if (!next.text || next.text.length > 500) return invalid("text must be 1 to 500 characters");
       const problem = savedProblem(next.category, next.competencies);
       if (problem) return invalid(problem);
+      if (next.text !== row.text || next.category !== row.category) {
+        const check = mockCheck({ text: next.text, kind: "question", category: next.category });
+        if (!check.accepted) return HttpResponse.json(refusedBody(check), { status: 422 });
+      }
       if (body.text !== undefined && body.text !== null && duplicate(next.text, row.id)) {
         return conflict("duplicate_question", "This question is already in your list.");
       }

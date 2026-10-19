@@ -49,7 +49,7 @@ import type {
   Usage,
 } from "../api/types";
 import { newId, type MockGap, type MockStore, type MockTask } from "./db";
-import { customDebriefQuestions, customProblem, customScorecard } from "./custom";
+import { customDebriefQuestions, customProblem, customRefusal, customScorecard } from "./custom";
 import { gapAnalysis, jobPosting, resume, scorecardFor, sessionPlan } from "./fixtures";
 
 /** CU-1: fill the defaults the API adds to a Custom setup. */
@@ -815,6 +815,9 @@ export function sessionHandlers(store: MockStore) {
         }
         const problem = customProblem(body.config);
         if (problem) return invalid(problem);
+        // CU-5: the server checks every chip and own question again (strong_api.custom.guard).
+        const refused = body.config.custom ? customRefusal(body.config.custom) : null;
+        if (refused) return HttpResponse.json(refused, { status: 422 });
       }
       // CU-11: while Custom is open to everyone, a free account may run a 30-minute Custom session.
       const freeFull =

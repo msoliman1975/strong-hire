@@ -4,7 +4,7 @@
  * Difficulty, mode and level stay on the setup page, as for the other types.
  */
 import { useQueryClient } from "@tanstack/react-query";
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { Link } from "react-router";
 
 import { ApiError } from "../api/client";
@@ -137,14 +137,21 @@ function CategorySection({ setup, category }: { setup: CustomSetupState; categor
   const chips = setup.chipsFor(category);
   const selected = setup.selectedFocus(category);
   const full = selected.length >= MAX_FOCUS;
+  const refused = setup.chipRefusal(category);
+  // One check at a time: a second Enter before the state updates must not start another.
+  const inFlight = useRef(false);
 
   const add = async () => {
+    if (inFlight.current || !draft.trim()) return;
+    inFlight.current = true;
+    const text = draft;
     setChecking(true);
     setNotice(null);
-    const result = await setup.addChip(category, draft);
+    const result = await setup.addChip(category, text);
+    inFlight.current = false;
     setChecking(false);
     setNotice(result);
-    if (!result || result.tone === "warning") setDraft("");
+    if (!result || result.tone === "warning") setDraft((d) => (d === text ? "" : d));
   };
 
   return (
@@ -184,12 +191,15 @@ function CategorySection({ setup, category }: { setup: CustomSetupState; categor
         <div className="chip-list">
           {chips.map((chip) => {
             const on = selected.includes(chip);
+            const bad = refused?.chip === chip;
             return (
               <button
                 key={chip}
                 type="button"
                 className="chip chip--toggle"
                 aria-pressed={on}
+                aria-invalid={bad || undefined}
+                aria-describedby={bad ? `${id}-refused` : undefined}
                 disabled={!on && full}
                 onClick={() => setup.toggleChip(category, chip)}
               >
@@ -198,6 +208,11 @@ function CategorySection({ setup, category }: { setup: CustomSetupState; categor
             );
           })}
         </div>
+        {refused && (
+          <p className="field-error" id={`${id}-refused`} role="alert" data-testid={`chip-refused-${category}`}>
+            “{refused.chip}”: {refused.reason} Turn it off, then start again.
+          </p>
+        )}
         <div className="field__row section">
           <label className="visually-hidden" htmlFor={`${id}-chip`}>
             Add a focus topic for {name}
@@ -208,6 +223,9 @@ function CategorySection({ setup, category }: { setup: CustomSetupState; categor
             maxLength={FOCUS_MAX_LEN}
             placeholder="Add a topic, for example conflict"
             value={draft}
+            // Read-only, not disabled, while the check runs, so the focus stays in the field.
+            readOnly={checking}
+            aria-busy={checking || undefined}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
@@ -235,14 +253,19 @@ function OwnQuestions({ setup }: { setup: CustomSetupState }) {
   const count = setup.questions.length;
   const atCap = count >= setup.cap;
   const nearCap = !atCap && count >= setup.cap - 1 && count > 0;
+  const inFlight = useRef(false);
 
   const add = async () => {
+    if (inFlight.current || !draft.trim()) return;
+    inFlight.current = true;
+    const text = draft;
     setChecking(true);
     setNotice(null);
-    const result = await setup.addQuestion(draft);
+    const result = await setup.addQuestion(text);
+    inFlight.current = false;
     setChecking(false);
     setNotice(result);
-    if (!result || result.tone === "warning") setDraft("");
+    if (!result || result.tone === "warning") setDraft((d) => (d === text ? "" : d));
   };
 
   const inSetup = new Set(setup.questions.map((q) => q.saved_question_id).filter(Boolean));
@@ -280,6 +303,7 @@ function OwnQuestions({ setup }: { setup: CustomSetupState }) {
             rows={3}
             maxLength={QUESTION_MAX_LEN}
             value={draft}
+            disabled={checking}
             onChange={(e) => setDraft(e.target.value)}
           />
           <div className="row">
@@ -312,7 +336,8 @@ function OwnQuestions({ setup }: { setup: CustomSetupState }) {
                 <button
                   type="button"
                   className="btn btn--quiet"
-                  disabled={atCap}
+                  // Not while a typed question is checked: both would count against the cap (CU-3).
+                  disabled={atCap || checking}
                   aria-label={`Add “${q.text}”`}
                   onClick={() => setNotice(setup.addSaved(q))}
                 >
@@ -337,6 +362,7 @@ function OwnQuestionItem({ setup, q }: { setup: CustomSetupState; q: OwnQuestion
   const [busy, setBusy] = useState(false);
   const offCategory = !setup.chosen.includes(q.category);
   const addBlock = offCategory ? categoryBlock(q.category, setup.chosen, setup.duration) : null;
+  const refused = setup.refusalFor(q.key);
 
   const recategorize = async (category: StandardType) => {
     setBusy(true);
@@ -366,6 +392,11 @@ function OwnQuestionItem({ setup, q }: { setup: CustomSetupState; q: OwnQuestion
   return (
     <li className="own-question" data-testid="own-question">
       <p className="own-question__text">{q.text}</p>
+      {refused && (
+        <p className="field-error" role="alert" data-testid="question-refused">
+          {refused} Remove it, then start again.
+        </p>
+      )}
       {q.duplicateOf && (
         <p className="hint" role="status">
           This looks a lot like “{q.duplicateOf}”.

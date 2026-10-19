@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link } from "react-router";
 
-import { customApi, savedQuestionsApi } from "../api/custom";
+import { customApi, questionRefusal, savedQuestionsApi } from "../api/custom";
 import { keys, useSavedQuestions } from "../api/hooks";
 import type { SavedQuestion, StandardType } from "../api/types";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
@@ -14,6 +14,25 @@ import { competencyLabel, formatDate, interviewTypeLabel } from "../labels";
  * Checks a question with the CU-5 check (optionally in a chosen category) and returns its tag,
  * or throws with the refusal reason.
  */
+/**
+ * The reason to show next to the question for a 422 `question_refused` from the server's own
+ * check of a saved question (CU-5), else null.
+ */
+function refusedReason(err: unknown): string | null {
+  return questionRefusal(err)?.reason ?? null;
+}
+
+function RefusalOrError({ error, id }: { error: unknown; id: string }) {
+  const reason = refusedReason(error);
+  return reason ? (
+    <p className="field-error" id={id} role="alert" data-testid="saved-refused">
+      {reason}
+    </p>
+  ) : (
+    <ErrorNotice error={error} />
+  );
+}
+
 async function checked(text: string, category?: StandardType) {
   let result;
   try {
@@ -71,12 +90,13 @@ export function MyQuestionsPage() {
               id="saved-new"
               rows={3}
               maxLength={QUESTION_MAX_LEN}
-              aria-describedby="saved-new-hint"
+              aria-describedby={refusedReason(add.error) ? "saved-new-hint saved-new-error" : "saved-new-hint"}
+              aria-invalid={refusedReason(add.error) ? true : undefined}
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
             />
           </div>
-          {add.isError && <ErrorNotice error={add.error} />}
+          {add.isError && <RefusalOrError error={add.error} id="saved-new-error" />}
           <button type="submit" className="btn" disabled={add.isPending || !draft.trim()}>
             {add.isPending ? "Checking the question" : "Check and save"}
           </button>
@@ -140,6 +160,8 @@ function SavedItem({ q, onChange }: { q: SavedQuestion; onChange: () => void }) 
               id={`edit-${q.id}`}
               rows={3}
               maxLength={QUESTION_MAX_LEN}
+              aria-invalid={refusedReason(update.error) ? true : undefined}
+              aria-describedby={refusedReason(update.error) ? `edit-${q.id}-error` : undefined}
               value={text}
               onChange={(e) => setText(e.target.value)}
             />
@@ -184,7 +206,7 @@ function SavedItem({ q, onChange }: { q: SavedQuestion; onChange: () => void }) 
           Scored on: {q.competencies.map(competencyLabel).join(", ")}. Saved {formatDate(q.created_at)}.
         </p>
       </div>
-      {update.isError && <ErrorNotice error={update.error} />}
+      {update.isError && <RefusalOrError error={update.error} id={`edit-${q.id}-error`} />}
       {remove.isError && <ErrorNotice error={remove.error} />}
       <div className="row">
         {!editing && (

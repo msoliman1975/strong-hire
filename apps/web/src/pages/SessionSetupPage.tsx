@@ -2,9 +2,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router";
 
-import { ApiError } from "../api/client";
 import { keys, useJob, useProfile, useUsage } from "../api/hooks";
-import { sessionsApi } from "../api/sessions";
+import { CUSTOM_LOCKED_REASON, paywallReason, sessionsApi } from "../api/sessions";
 import { isPausedError, SESSIONS_UNAVAILABLE, statusKey, useSiteStatus } from "../api/status";
 import type { Difficulty, InterviewType, Level, Mode, SessionConfig, SessionSetup } from "../api/types";
 import { Choices } from "../components/Choices";
@@ -31,8 +30,7 @@ type Duration = SessionConfig["duration_min"];
 const DURATIONS: Duration[] = [10, 30, 45];
 const MINI: Duration = 10;
 
-/** The paywall reason for a locked Custom interview (CU-11). */
-export const CUSTOM_LOCKED_REASON = "custom_requires_plan";
+export { CUSTOM_LOCKED_REASON };
 
 /** Router state that prefills the setup: "Run this setup again" (CU-9). */
 export interface SetupState {
@@ -78,6 +76,8 @@ export function SessionSetupPage() {
   // Coach first: the controls (pause, hint, redo) help a new candidate; Realistic is one click away.
   const [mode, setMode] = useState<Mode>(prefill?.config.mode ?? pick(params.get("mode"), MODES, "coach"));
   const [level, setLevel] = useState<Level | "">(prefill?.config.level ?? "");
+  // CU-5: the server refused a question or chip; it is shown next to it, not as a page error.
+  const [refusedInline, setRefusedInline] = useState(false);
 
   // Free accounts get mini interviews only (BL-2). Until the usage is known, assume the free plan.
   const fullAllowed = usage.data?.full_interviews_allowed ?? false;
@@ -103,16 +103,18 @@ export function SessionSetupPage() {
       void queryClient.invalidateQueries({ queryKey: keys.usage });
       navigate(`/sessions/${session.id}/live`);
     },
-    onError: (err) => {
+    onError: (err, config) => {
       if (isPausedError(err)) void queryClient.invalidateQueries({ queryKey: statusKey });
-      if (err instanceof ApiError && err.status === 402) {
-        void queryClient.invalidateQueries({ queryKey: keys.usage });
-        navigate(`/upgrade?reason=${encodeURIComponent(err.code ?? "upgrade_required")}`);
+      // CU-5 on the server: mark the refused question or chip next to it.
+      if (config.interview_type === "custom" && custom.showRefusal(err, config.custom)) {
+        setRefusedInline(true);
+        return;
       }
-      // CU-11: Custom was switched to paid plans only after the page loaded.
-      if (err instanceof ApiError && err.status === 403 && err.code === "upgrade_required") {
-        void queryClient.invalidateQueries({ queryKey: statusKey });
-        navigate(`/upgrade?reason=${CUSTOM_LOCKED_REASON}`);
+      const reason = paywallReason(err, config.interview_type === "custom");
+      if (reason) {
+        // A 403 means Custom was switched to paid plans only after the page loaded (CU-11).
+        void queryClient.invalidateQueries({ queryKey: reason === CUSTOM_LOCKED_REASON ? statusKey : keys.usage });
+        navigate(`/upgrade?reason=${encodeURIComponent(reason)}`);
       }
     },
   });
@@ -126,13 +128,13 @@ export function SessionSetupPage() {
   const chosenDuration: Duration = fullAllowed ? (duration ?? 30) : MINI;
   const sessionsClosed = siteStatus.data?.voice_sessions_open === false;
   const blocked = type === "custom" && (customLocked || custom.problems.length > 0);
-  const redirected =
-    start.error instanceof ApiError &&
-    (start.error.status === 402 || (start.error.status === 403 && start.error.code === "upgrade_required"));
+  const redirected = paywallReason(start.error, type === "custom") !== null;
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!chosenLevel || blocked) return;
+    custom.clearRefusal();
+    setRefusedInline(false);
     start.mutate({
       interview_type: type,
       difficulty,
@@ -239,7 +241,7 @@ export function SessionSetupPage() {
             <p>{isPausedError(start.error) ? start.error.message : SESSIONS_UNAVAILABLE}</p>
           </div>
         )}
-        {start.isError && !isPausedError(start.error) && !redirected && (
+        {start.isError && !isPausedError(start.error) && !redirected && !refusedInline && (
           <ErrorNotice error={start.error} title="The interview could not start" />
         )}
         <div className="row section">
