@@ -58,7 +58,7 @@ from strong_core.schemas import (
 )
 from strong_core.schemas.enums import ErrorGroupStatus
 
-from .conftest import InlineQueue, sign_in
+from .conftest import InlineQueue, sign_in, sign_in_admin
 
 Maker = async_sessionmaker[AsyncSession]
 ADMIN = "boss@example.com"
@@ -97,7 +97,6 @@ class FakeRedis:
 def app(
     sessionmaker: Maker, queue: InlineQueue, export_store: Any, monkeypatch: pytest.MonkeyPatch
 ) -> Iterator[FastAPI]:
-    monkeypatch.setenv("ADMIN_EMAILS", ADMIN)
     monkeypatch.delenv("INFRA_MONTHLY_USD", raising=False)
     monkeypatch.delenv("SHADOW_STT_USD_PER_SECOND", raising=False)
     monkeypatch.delenv("SHADOW_TTS_USD_PER_CHARACTER", raising=False)
@@ -124,7 +123,8 @@ def app(
 async def admin(app: FastAPI) -> AsyncIterator[httpx.AsyncClient]:
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as http:
-        await sign_in(http, ADMIN)
+        await sign_in(http, ADMIN)  # the admin's candidate account
+        await sign_in_admin(http, app, ADMIN)  # AA-4: the admin session
         yield http
 
 
@@ -850,3 +850,21 @@ async def test_ob14_spend_against_the_cap_and_hosted_equivalent(
     hosted = (await admin.get("/admin/ops/spend")).json()["hosted_equivalent"]
     assert (hosted["configured"], hosted["stt_usd"], hosted["total_usd"]) == (True, 0.06, 0.06)
     assert hosted["tts_usd"] is None
+
+
+def test_d12_shadow_prices_come_from_config_and_env_overrides(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """D-12: one source for shadow prices (config/litellm.<profile>.yaml); env overrides it."""
+    from strong_api.admin.ops import shadow_prices
+    from strong_core.config import get_settings
+
+    monkeypatch.delenv("SHADOW_STT_USD_PER_SECOND", raising=False)
+    monkeypatch.delenv("SHADOW_TTS_USD_PER_CHARACTER", raising=False)
+    monkeypatch.setenv("MODEL_PROFILE", "local")
+    get_settings.cache_clear()
+    assert shadow_prices() == (0.0001, 0.000015)
+    monkeypatch.setenv("SHADOW_STT_USD_PER_SECOND", "0.0002")
+    assert shadow_prices() == (0.0002, 0.000015)
+    monkeypatch.setenv("MODEL_PROFILE", "fake")
+    get_settings.cache_clear()

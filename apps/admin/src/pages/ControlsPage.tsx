@@ -1,4 +1,6 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
+import { Link } from "react-router";
 
 import {
   activeControls,
@@ -12,6 +14,7 @@ import {
   type OpsSettings,
   type SettingKey,
 } from "../api/controls";
+import { ACTIVE_STATUSES, simApi, simKeys, useSimRuns } from "../api/sim";
 import { ReasonDialog } from "../components/ReasonDialog";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
 import { utc } from "../format";
@@ -24,6 +27,8 @@ interface Change {
   confirmLabel: string;
   danger?: boolean;
   requireWord?: string;
+  /** Runs after the setting is saved, with the same reason (SM-15: stop the active run). */
+  after?: (reason: string) => Promise<unknown>;
 }
 
 const SEVERITIES: BannerSeverity[] = ["info", "warning", "critical"];
@@ -295,6 +300,120 @@ function BannerControl({ settings, ask }: { settings: OpsSettings; ask: (c: Chan
   );
 }
 
+const SIM_LIMIT_MAX = 20;
+
+/** SM-15: pause AI candidate runs, and the live-sessions limit they wait for (SM-3). */
+function SimControl({ settings, ask }: { settings: OpsSettings; ask: (c: Change) => void }) {
+  const paused = settings.values.sim_paused;
+  const limit = settings.values.sim_max_live_sessions;
+  const [draft, setDraft] = useState(String(limit));
+  const value = Number(draft);
+  const valid = draft.trim() !== "" && Number.isInteger(value) && value >= 0 && value <= SIM_LIMIT_MAX;
+  const runs = useSimRuns();
+  const active = runs.data?.runs.find((r) => r.source === "admin" && ACTIVE_STATUSES.includes(r.status));
+
+  const pause = (stop: boolean) =>
+    ask({
+      key: "sim_paused",
+      value: true,
+      title: stop ? "Pause sim runs and stop the active run" : "Pause sim runs",
+      summary: (
+        <>
+          <p>No AI candidate run starts while paused. Runs in the queue wait.</p>
+          {active && (
+            <p>
+              {stop
+                ? "The active run is cancelled too: it ends within a few seconds and is not judged."
+                : "The active run goes on to the end."}
+            </p>
+          )}
+        </>
+      ),
+      confirmLabel: stop ? "Pause and stop" : "Pause sim runs",
+      danger: true,
+      after: stop && active ? (reason) => simApi.cancel(active.id, reason) : undefined,
+    });
+
+  return (
+    <section className="panel control" aria-labelledby="ctl-sim">
+      <h2 id="ctl-sim">AI candidate runs (SM-15)</h2>
+      <p>
+        <State on={paused} onLabel="Paused" offLabel="Running" /> Runs started from{" "}
+        <Link to="/simulations">Simulations</Link>. {active ? "A run is in progress now." : "No run is in progress."}
+      </p>
+      <LastChanged settings={settings} keyName="sim_paused" />
+      <div className="row">
+        {paused ? (
+          <button
+            type="button"
+            className="btn btn--primary"
+            onClick={() =>
+              ask({
+                key: "sim_paused",
+                value: false,
+                title: "Resume sim runs",
+                summary: <p>Queued AI candidate runs can start again.</p>,
+                confirmLabel: "Resume sim runs",
+              })
+            }
+          >
+            Resume sim runs
+          </button>
+        ) : (
+          <>
+            <button type="button" className="btn btn--danger" onClick={() => pause(false)}>
+              Pause sim runs
+            </button>
+            {active && (
+              <button type="button" className="btn btn--danger" onClick={() => pause(true)}>
+                Pause and stop the active run
+              </button>
+            )}
+          </>
+        )}
+      </div>
+      <form
+        className="row"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!valid || value === limit) return;
+          ask({
+            key: "sim_max_live_sessions",
+            value,
+            title: "Change the live sessions limit for sim runs",
+            summary: (
+              <p>
+                A run starts only while fewer than <strong>{value === 0 ? "any number of" : value}</strong> real
+                interviews are live{value === 0 ? " (no limit)" : ""}. Was {limit}; default{" "}
+                {settings.defaults.sim_max_live_sessions}.
+              </p>
+            ),
+            confirmLabel: "Save limit",
+          });
+        }}
+      >
+        <div className="field">
+          <label htmlFor="sim-limit">Live sessions limit for sim runs (0 = no limit)</label>
+          <input
+            id="sim-limit"
+            type="number"
+            min={0}
+            max={SIM_LIMIT_MAX}
+            step={1}
+            inputMode="numeric"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+          />
+        </div>
+        <button type="submit" className="btn btn--primary" disabled={!valid || value === limit}>
+          Save limit
+        </button>
+      </form>
+      <LastChanged settings={settings} keyName="sim_max_live_sessions" />
+    </section>
+  );
+}
+
 function JobsControl({ settings, ask }: { settings: OpsSettings; ask: (c: Change) => void }) {
   const saved = settings.values.jobs_paused;
   const [draft, setDraft] = useState<JobKind[]>(saved);
@@ -444,10 +563,13 @@ function ModelProfilePanel() {
 export function ControlsPage() {
   const settings = useOpsSettings();
   const setSetting = useSetSetting();
+  const queryClient = useQueryClient();
+  const [afterError, setAfterError] = useState<unknown>(null);
   const [change, setChange] = useState<Change | null>(null);
 
   const ask = (c: Change) => {
     setSetting.reset();
+    setAfterError(null);
     setChange(c);
   };
   const close = () => setChange(null);
@@ -470,9 +592,15 @@ export function ControlsPage() {
             <SpendCapControl key={`cap-${settings.data.values.daily_spend_cap_usd}`} settings={settings.data} ask={ask} />
             <JobsControl key={`jobs-${settings.data.values.jobs_paused.join(",")}`} settings={settings.data} ask={ask} />
             <BannerControl settings={settings.data} ask={ask} />
+            <SimControl
+              key={`sim-${settings.data.values.sim_max_live_sessions}`}
+              settings={settings.data}
+              ask={ask}
+            />
           </div>
         </>
       )}
+      {afterError !== null && <ErrorNotice error={afterError} title="Sim runs are paused, but the active run did not stop." />}
       <ModelProfilePanel />
       {change && (
         <ReasonDialog
@@ -484,7 +612,22 @@ export function ControlsPage() {
           error={setSetting.isError ? setSetting.error : undefined}
           onCancel={close}
           onConfirm={(reason) =>
-            setSetting.mutate({ key: change.key, value: change.value, reason }, { onSuccess: close })
+            setSetting.mutate(
+              { key: change.key, value: change.value, reason },
+              {
+                onSuccess: async () => {
+                  if (change.after) {
+                    try {
+                      await change.after(reason);
+                    } catch (err) {
+                      setAfterError(err);
+                    }
+                    await queryClient.invalidateQueries({ queryKey: simKeys.all });
+                  }
+                  close();
+                },
+              },
+            )
           }
         >
           {change.summary}

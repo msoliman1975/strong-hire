@@ -54,10 +54,20 @@ Sign-in uses email and password (AC-4), with email links as a second way in. The
 
 ## Admin app
 
-The admin app is at `https://admin.$DOMAIN`. Only the emails in `ADMIN_EMAILS` get past its
-sign-in; anyone else sees "Page not found". It signs in with email and password, an email link,
-or Google. `ADMIN_BASE_URL` (set by `infra/compose.server.yaml` to `https://admin.$DOMAIN`) tells
-the API where email links and Google sign-in from the admin app return.
+The admin app is at `https://admin.$DOMAIN`. Only admins (rows in `admin_users`, AA-1) can sign
+in, with their own server-side session (cookie `sh_admin`, 2 h idle, 12 h at most). On the first
+start, while that table is empty, the API fills it from `ADMIN_EMAILS`; after that the variable is
+ignored. Manage admins in the admin app (Settings > Admins) or on the server:
+
+```bash
+docker exec strong-hire-api-1 strongctl admin list
+docker exec strong-hire-api-1 strongctl admin add someone@example.com
+docker exec strong-hire-api-1 strongctl admin remove someone@example.com   # also ends their sessions
+```
+
+Admins sign in with Google, an email link, or the password of their candidate account (the email
+must be confirmed). `ADMIN_BASE_URL` (set by `infra/compose.server.yaml` to
+`https://admin.$DOMAIN`) tells the API where email links and Google sign-in return.
 
 To add the admin host to a running server:
 
@@ -65,7 +75,7 @@ To add the admin host to a running server:
    answers with it.
 2. If Google sign-in is on (`GOOGLE_CLIENT_ID`), add this authorized redirect URI to the OAuth
    client in the Google Cloud console (APIs & Services > Credentials):
-   `https://admin.<domain>/api/auth/google/callback`. Until then, Google sign-in on the admin
+   `https://admin.<domain>/api/admin/auth/google/callback`. Until then, Google sign-in on the admin
    host fails with `redirect_uri_mismatch`; password and email links still work.
 3. Deploy (`./scripts/server-deploy.sh`). Caddy gets the certificate for the new host on its
    first request.

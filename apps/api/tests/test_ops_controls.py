@@ -24,7 +24,7 @@ from strong_core import runtime_settings as rs
 from strong_core.db.models import AuditLog, UsageEvent, User
 from strong_core.schemas import UsageComponent
 
-from .conftest import AuthHarness, InlineQueue, build_harness, sign_in
+from .conftest import AuthHarness, InlineQueue, build_harness, sign_in, sign_in_admin
 from .test_auth import ADULT, FakeGoogle
 from .test_sessions_api import create, ready_job
 
@@ -279,7 +279,6 @@ async def test_oc4_status_reports_the_spend_cap_as_sessions_closed(
 def admin_app(
     sessionmaker: Maker, queue: InlineQueue, monkeypatch: pytest.MonkeyPatch
 ) -> Iterator[FastAPI]:
-    monkeypatch.setenv("ADMIN_EMAILS", ADMIN)
     get_auth_settings.cache_clear()
 
     async def _ok() -> None:
@@ -293,7 +292,8 @@ def admin_app(
 async def admin(admin_app: FastAPI) -> AsyncIterator[httpx.AsyncClient]:
     transport = httpx.ASGITransport(app=admin_app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as http:
-        await sign_in(http, ADMIN)
+        await sign_in(http, ADMIN)  # the admin's candidate account
+        await sign_in_admin(http, admin_app, ADMIN)  # AA-4: the admin session
         yield http
 
 

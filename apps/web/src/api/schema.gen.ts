@@ -1110,6 +1110,224 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/auth/providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin Providers */
+        get: operations["admin_providers_admin_auth_providers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/auth/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Admin Password Sign In
+         * @description AA-2: the admin's user account password (AC-4). The account's email must be confirmed,
+         *     so a password set by someone who never proved the inbox cannot open the admin app.
+         */
+        post: operations["admin_password_sign_in_admin_auth_password_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/auth/link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Admin Send Link
+         * @description AA-2: a sign-in link goes only to an active admin. The reply is the same either way.
+         */
+        post: operations["admin_send_link_admin_auth_link_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/auth/link/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Admin Verify Link */
+        post: operations["admin_verify_link_admin_auth_link_verify_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/auth/google/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin Google Login */
+        get: operations["admin_google_login_admin_auth_google_login_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/auth/google/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin Google Callback */
+        get: operations["admin_google_callback_admin_auth_google_callback_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/auth/signout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Admin Sign Out */
+        post: operations["admin_sign_out_admin_auth_signout_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin Me */
+        get: operations["admin_me_admin_me_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/me/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Sessions
+         * @description AA-8: my live sessions, newest first.
+         */
+        get: operations["my_sessions_admin_me_sessions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/me/sessions/{session_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Revoke My Session
+         * @description AA-8: revoke one of my sessions (the current one too: that signs me out).
+         */
+        delete: operations["revoke_my_session_admin_me_sessions__session_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/admins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Admins */
+        get: operations["list_admins_admin_admins_get"];
+        put?: never;
+        /** Create Admin */
+        post: operations["create_admin_admin_admins_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/admins/{admin_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove Admin */
+        delete: operations["remove_admin_admin_admins__admin_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/admin/sessions": {
         parameters: {
             query?: never;
@@ -1183,7 +1401,9 @@ export interface paths {
          * @description The recording of an AI candidate voice interview, as stereo Ogg Opus.
          *
          *     The left channel is what the candidate heard, the right channel what it said. 404 for every
-         *     other session.
+         *     other session. A Range request gets 206 with that part (SM-7), so the replay player seeks
+         *     without downloading the file; only the request that starts at byte 0 is audited, not every
+         *     seek.
          */
         get: operations["download_audio_admin_sessions__session_id__audio_get"];
         put?: never;
@@ -1730,6 +1950,286 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/companies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Companies
+         * @description AT-1: every company with its active flag, versions and request count.
+         */
+        get: operations["list_companies_admin_companies_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/companies/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Set Company Active
+         * @description AT-1: turn a company on or off. Company matching (IN-5) only uses active companies.
+         */
+        patch: operations["set_company_active_admin_companies__slug__patch"];
+        trace?: never;
+    };
+    "/admin/companies/{slug}/profiles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Profile Versions
+         * @description AT-2: the stored versions of one company, oldest first.
+         */
+        get: operations["list_profile_versions_admin_companies__slug__profiles_get"];
+        put?: never;
+        /**
+         * Import Profile
+         * @description AT-3: validate a profile like `strongctl profiles validate` and store it as a Draft.
+         *
+         *     The slug in the URL must match the file's company_slug. With create_company, a new slug adds
+         *     the company, inactive, as `strongctl profiles import --create-company` does.
+         */
+        post: operations["import_profile_admin_companies__slug__profiles_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/companies/{slug}/profiles/diff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Diff Versions
+         * @description AT-2: what changed from version a to version b (profiles/diff.py, meta ignored).
+         */
+        get: operations["diff_versions_admin_companies__slug__profiles_diff_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/companies/{slug}/profiles/{version}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Profile Version
+         * @description AT-2: one version's stored JSON and its sources.
+         */
+        get: operations["get_profile_version_admin_companies__slug__profiles__version__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/companies/{slug}/profiles/{version}/transition": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Transition Profile
+         * @description AT-4: draft -> in_review -> published -> archived, in_review -> draft, and archived ->
+         *     published (rollback). Publishing records reviewed_by and archives the version published
+         *     before, in one transaction.
+         */
+        post: operations["transition_profile_admin_companies__slug__profiles__version__transition_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/company-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Company Requests
+         * @description AT-5: names users asked for that are not curated, grouped by normalized name. Triage
+         *     state 'new' when nobody has triaged the name yet.
+         */
+        get: operations["list_company_requests_admin_company_requests_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/company-requests/{normalized_name}/triage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Triage
+         * @description AT-5: set the triage state of a requested name. company_requests rows are not edited.
+         */
+        put: operations["set_triage_admin_company_requests__normalized_name__triage_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/sim/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Sim Options
+         * @description SM-1: the choices, an estimate per length, today's sim budget and the gate now.
+         */
+        get: operations["sim_options_admin_sim_options_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/sim/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Runs
+         * @description SM-12: admin runs and suite runs, newest first. SM-4: poll while any is unfinished.
+         */
+        get: operations["list_runs_admin_sim_runs_get"];
+        put?: never;
+        /**
+         * Start Run
+         * @description SM-2, SM-3: queue one run. 409 with the reason when a gate is closed or the line is full.
+         */
+        post: operations["start_run_admin_sim_runs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/sim/runs/{run_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Run */
+        get: operations["get_run_admin_sim_runs__run_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete Run
+         * @description SM-13: the row stays as a stub; the sim service deletes the folder within seconds.
+         */
+        delete: operations["delete_run_admin_sim_runs__run_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Keep Run
+         * @description SM-13: Keep, so retention never deletes the run's files.
+         */
+        patch: operations["keep_run_admin_sim_runs__run_id__patch"];
+        trace?: never;
+    };
+    "/admin/sim/runs/{run_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel Run
+         * @description SM-5: a run in line is cancelled now; an active one stops within a few seconds.
+         */
+        post: operations["cancel_run_admin_sim_runs__run_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/sessions/{session_id}/replay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Session Replay
+         * @description SM-7..SM-11: everything the replay page shows. AI candidate interviews only; same
+         *     consent rule as the transcript. Audited.
+         */
+        get: operations["session_replay_admin_sessions__session_id__replay_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -1781,6 +2281,40 @@ export interface components {
              */
             reason: string;
         };
+        /** AddAdminIn */
+        AddAdminIn: {
+            /**
+             * Reason
+             * @description Why, for the audit log
+             */
+            reason: string;
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+        };
+        /** AdminAccount */
+        AdminAccount: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Email */
+            email: string;
+            /** Added By */
+            added_by: string | null;
+            /**
+             * Added At
+             * Format: date-time
+             */
+            added_at: string;
+            /** Disabled At */
+            disabled_at: string | null;
+            /** Live Sessions */
+            live_sessions: number;
+        };
         /** AdminActionOut */
         AdminActionOut: {
             /** Action */
@@ -1819,6 +2353,35 @@ export interface components {
             details: {
                 [key: string]: unknown;
             } | null;
+        };
+        /** AdminCompany */
+        AdminCompany: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Slug */
+            slug: string;
+            /** Name */
+            name: string;
+            /** Active */
+            active: boolean;
+            /** Published Version */
+            published_version: number | null;
+            /** Latest Version */
+            latest_version: number | null;
+            /** Version Count */
+            version_count: number;
+            /** Draft Count */
+            draft_count: number;
+            /** In Review Count */
+            in_review_count: number;
+            /**
+             * Request Users
+             * @description Distinct users whose job setup matched the company
+             */
+            request_users: number;
         };
         /** AdminCostLine */
         AdminCostLine: {
@@ -1972,6 +2535,45 @@ export interface components {
             /** P95 Ms */
             p95_ms: number | null;
         };
+        /** AdminLinkIn */
+        AdminLinkIn: {
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+        };
+        /** AdminLinkSent */
+        AdminLinkSent: {
+            /**
+             * Sent
+             * @description Always true, so the reply does not say who is an admin.
+             */
+            sent: boolean;
+            /**
+             * Dev Link
+             * @description Only when APP_ENV=local and a link was sent.
+             */
+            dev_link?: string | null;
+        };
+        /** AdminLinkVerifyIn */
+        AdminLinkVerifyIn: {
+            /** Token */
+            token: string;
+        };
+        /** AdminMe */
+        AdminMe: {
+            /** Id */
+            id: string;
+            /** Email */
+            email: string;
+            /**
+             * Session Expires At
+             * Format: date-time
+             * @description When this session ends unless it is used again (idle 2 h, absolute 12 h).
+             */
+            session_expires_at: string;
+        };
         /** AdminMessage */
         AdminMessage: {
             /** Role */
@@ -2069,6 +2671,31 @@ export interface components {
             usage: components["schemas"]["OverviewUsage"];
             cost: components["schemas"]["OverviewCost"];
             quality: components["schemas"]["OverviewQuality"];
+        };
+        /** AdminPasswordIn */
+        AdminPasswordIn: {
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            /** Password */
+            password: string;
+        };
+        /** AdminProviders */
+        AdminProviders: {
+            /** Google */
+            google: boolean;
+            /**
+             * Email
+             * @default true
+             */
+            email: boolean;
+            /**
+             * Password
+             * @default true
+             */
+            password: boolean;
         };
         /**
          * AdminRefund
@@ -2219,6 +2846,12 @@ export interface components {
              */
             audio_available: boolean;
             /**
+             * Replay Available
+             * @description SM-16: an AI candidate interview with a run folder; open its replay page.
+             * @default false
+             */
+            replay_available: boolean;
+            /**
              * Cost Breakdown
              * @description AI-2: usage_events by component and role
              */
@@ -2252,6 +2885,45 @@ export interface components {
             total_cost_usd: number;
             /** Limit */
             limit: number;
+        };
+        /**
+         * AdminSignInSession
+         * @description AA-8: one of my admin sessions.
+         */
+        AdminSignInSession: {
+            /** Id */
+            id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Last Seen At
+             * Format: date-time
+             */
+            last_seen_at: string;
+            /**
+             * Expires At
+             * Format: date-time
+             * @description The absolute end, 12 h after sign-in.
+             */
+            expires_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             * @description When it ends unless it is used again.
+             */
+            ends_at: string;
+            /** Ip */
+            ip: string | null;
+            /** User Agent */
+            user_agent: string | null;
+            /**
+             * Current
+             * @description The session of this request.
+             */
+            current: boolean;
         };
         /** AdminSubscription */
         AdminSubscription: {
@@ -2817,12 +3489,6 @@ export interface components {
              */
             created_at: string;
             /**
-             * Is Admin
-             * @description True for ADMIN_EMAILS users: the web app shows Admin.
-             * @default false
-             */
-            is_admin: boolean;
-            /**
              * Full Name
              * @description AC-3 profile name.
              */
@@ -2849,6 +3515,11 @@ export interface components {
              */
             until: string;
         };
+        /**
+         * Behavior
+         * @enum {string}
+         */
+        Behavior: "normal" | "long_answers" | "one_line_answers" | "off_topic" | "asks_to_repeat" | "silent" | "interrupts" | "argues" | "many_questions_back" | "prompt_injection" | "drops_connection";
         /** Body_create_resume_resumes_post */
         Body_create_resume_resumes_post: {
             /** File */
@@ -2943,6 +3614,11 @@ export interface components {
              */
             notes: string | null;
         };
+        /**
+         * ChangeKind
+         * @enum {string}
+         */
+        ChangeKind: "added" | "removed" | "changed";
         /** CoachRequest */
         CoachRequest: {
             /**
@@ -2950,6 +3626,16 @@ export interface components {
              * @enum {string}
              */
             command: "pause" | "resume" | "hint" | "redo";
+        };
+        /** CompanyActiveIn */
+        CompanyActiveIn: {
+            /**
+             * Reason
+             * @description Why, for the audit log
+             */
+            reason: string;
+            /** Active */
+            active: boolean;
         };
         /** CompanyProfile */
         CompanyProfile: {
@@ -2999,6 +3685,39 @@ export interface components {
              * @description Fields or claims flagged for reviewer attention.
              */
             low_confidence_notes?: string[];
+        };
+        /** CompanyProfiles */
+        CompanyProfiles: {
+            company: components["schemas"]["AdminCompany"];
+            /** Versions */
+            versions: components["schemas"]["ProfileVersion"][];
+        };
+        /** CompanyRequestGroup */
+        CompanyRequestGroup: {
+            /** Normalized Name */
+            normalized_name: string;
+            /**
+             * Names
+             * @description The names users typed, most common first
+             */
+            names: string[];
+            /** Users */
+            users: number;
+            /** Requests */
+            requests: number;
+            /**
+             * First Requested
+             * Format: date-time
+             */
+            first_requested: string;
+            /**
+             * Last Requested
+             * Format: date-time
+             */
+            last_requested: string;
+            /** Source Hosts */
+            source_hosts: string[];
+            triage: components["schemas"]["TriageInfo"];
         };
         /**
          * Competency
@@ -3298,6 +4017,23 @@ export interface components {
         DevUsageIn: {
             /** Minutes */
             minutes: number;
+        };
+        /** DiffChange */
+        DiffChange: {
+            /** Path */
+            path: string;
+            kind: components["schemas"]["ChangeKind"];
+            /** Old */
+            old?: unknown;
+            /** New */
+            new?: unknown;
+        };
+        /** DiffField */
+        DiffField: {
+            /** Field */
+            field: string;
+            /** Changes */
+            changes: components["schemas"]["DiffChange"][];
         };
         /**
          * Difficulty
@@ -4645,12 +5381,71 @@ export interface components {
          * @enum {string}
          */
         ProbeTrigger: "own_role" | "measurable_result" | "concrete_example" | "tradeoff_reasoning" | "off_topic";
+        /** ProfileDiff */
+        ProfileDiff: {
+            /**
+             * A
+             * @description The old version. None means no old version
+             */
+            a: number | null;
+            /** B */
+            b: number;
+            /** Total */
+            total: number;
+            /**
+             * Fields
+             * @description Every top-level field, changed or not
+             */
+            fields: components["schemas"]["DiffField"][];
+        };
         /**
          * ProfileField
          * @description Top-level profile fields that carry sources and a confidence level.
          * @enum {string}
          */
         ProfileField: "values_framework" | "loop_structure" | "question_patterns" | "bar_by_level" | "persona" | "scoring_weights" | "case_style";
+        /**
+         * ProfileImportIn
+         * @description The file text (from a file picker or pasted) or the parsed JSON. Exactly one of them.
+         */
+        ProfileImportIn: {
+            /**
+             * Reason
+             * @description Why, for the audit log
+             */
+            reason: string;
+            /** Profile Text */
+            profile_text?: string | null;
+            /** Profile */
+            profile?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Create Company
+             * @description Add the company (inactive) when the slug is new
+             * @default false
+             */
+            create_company: boolean;
+            /**
+             * Force
+             * @description Store it even if nothing changed
+             * @default false
+             */
+            force: boolean;
+        };
+        /** ProfileImportOut */
+        ProfileImportOut: {
+            company: components["schemas"]["AdminCompany"];
+            version: components["schemas"]["ProfileVersion"];
+            /** Company Created */
+            company_created: boolean;
+            /** File Version */
+            file_version: number;
+            /** Summary */
+            summary: string[];
+            /** @description Against the published version, if there is one */
+            diff: components["schemas"]["ProfileDiff"];
+        };
         /**
          * ProfileIn
          * @description AC-3: the profile asked for at the first sign-in. No payment details.
@@ -4718,6 +5513,51 @@ export interface components {
          * @enum {string}
          */
         ProfileStatus: "draft" | "in_review" | "published" | "archived";
+        /** ProfileVersion */
+        ProfileVersion: {
+            /** Version */
+            version: number;
+            status: components["schemas"]["ProfileStatus"];
+            /**
+             * Imported At
+             * Format: date-time
+             */
+            imported_at: string;
+            /** Published At */
+            published_at: string | null;
+            /** Reviewed By */
+            reviewed_by: string | null;
+            /** Source Count */
+            source_count: number;
+        };
+        /** ProfileVersionDetail */
+        ProfileVersionDetail: {
+            /** Version */
+            version: number;
+            status: components["schemas"]["ProfileStatus"];
+            /**
+             * Imported At
+             * Format: date-time
+             */
+            imported_at: string;
+            /** Published At */
+            published_at: string | null;
+            /** Reviewed By */
+            reviewed_by: string | null;
+            /** Source Count */
+            source_count: number;
+            /** Profile */
+            profile: {
+                [key: string]: unknown;
+            };
+            /** Sources */
+            sources: unknown[];
+            /**
+             * Problems
+             * @description Empty when the stored JSON still matches the CompanyProfile schema
+             */
+            problems: string[];
+        };
         /**
          * ProgressSnapshot
          * @description One competency score from one Realistic session, for trend charts (PR-1).
@@ -4742,6 +5582,11 @@ export interface components {
              */
             at: string;
         };
+        /**
+         * Quality
+         * @enum {string}
+         */
+        Quality: "strong" | "average" | "weak";
         /**
          * QuestionPattern
          * @description A recurring theme, phrased as a pattern. Never a leaked or NDA-protected question.
@@ -4792,6 +5637,112 @@ export interface components {
         RedirectOut: {
             /** Url */
             url: string;
+        };
+        /** RemoveAdminIn */
+        RemoveAdminIn: {
+            /**
+             * Reason
+             * @description Why, for the audit log
+             */
+            reason: string;
+        };
+        /** ReplayAudio */
+        ReplayAudio: {
+            /** Available */
+            available: boolean;
+            /**
+             * Bytes
+             * @description GET /admin/sessions/{id}/audio answers Range (SM-7)
+             */
+            bytes: number | null;
+        };
+        /** ReplayJudge */
+        ReplayJudge: {
+            /** Rubric */
+            rubric: string | null;
+            /** Model */
+            model: string | null;
+            /** Rules */
+            rules: components["schemas"]["ReplayRule"][];
+            /** Problems */
+            problems: components["schemas"]["ReplayProblem"][];
+        };
+        /** ReplayLatency */
+        ReplayLatency: {
+            /** N */
+            n: number;
+            /** P50 Ms */
+            p50_ms: number | null;
+            /** P90 Ms */
+            p90_ms: number | null;
+            /**
+             * Slow Turns
+             * @description Turns over 1500 ms
+             */
+            slow_turns: number;
+            /**
+             * Ok Ms
+             * @default 800
+             */
+            ok_ms: number;
+            /**
+             * Slow Ms
+             * @default 1500
+             */
+            slow_ms: number;
+        };
+        /** ReplayLine */
+        ReplayLine: {
+            /**
+             * Speaker
+             * @enum {string}
+             */
+            speaker: "interviewer" | "candidate";
+            /** Text */
+            text: string;
+            /** Start Ms */
+            start_ms: number;
+            /** End Ms */
+            end_ms: number;
+            /** Phase */
+            phase: string | null;
+            /**
+             * Note
+             * @description What the harness did, e.g. 'silent for 6 s'
+             */
+            note: string | null;
+            /**
+             * Latency Ms
+             * @description SM-9, on the first interviewer line of a reply
+             */
+            latency_ms: number | null;
+        };
+        /** ReplayProblem */
+        ReplayProblem: {
+            /**
+             * At
+             * @description mm:ss
+             */
+            at: string;
+            /**
+             * At Ms
+             * @description `at` in ms, for the scrubber marker
+             */
+            at_ms: number | null;
+            /** Problem */
+            problem: string;
+        };
+        /** ReplayRule */
+        ReplayRule: {
+            /** Rule */
+            rule: string;
+            /**
+             * Verdict
+             * @description pass, fail or not_applicable
+             */
+            verdict: string;
+            /** Reason */
+            reason: string;
         };
         /**
          * ReportItem
@@ -5211,6 +6162,37 @@ export interface components {
              */
             failure_reason?: string | null;
         };
+        /** SessionReplay */
+        SessionReplay: {
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            /**
+             * Run Dir
+             * @description The run folder; None: from the database only
+             */
+            run_dir: string | null;
+            /** Sim Run Id */
+            sim_run_id: string | null;
+            /** Channel */
+            channel: string;
+            /**
+             * Timing
+             * @description SM-8: 'audio' when times are positions in the recording (SM-6)
+             * @enum {string}
+             */
+            timing: "audio" | "approximate";
+            /** Lines */
+            lines: components["schemas"]["ReplayLine"][];
+            latency: components["schemas"]["ReplayLatency"];
+            judge: components["schemas"]["ReplayJudge"] | null;
+            /** @description SM-11: as the candidate saw it */
+            scorecard: components["schemas"]["Scorecard"] | null;
+            audio: components["schemas"]["ReplayAudio"];
+            scenario: components["schemas"]["SimScenarioOut"] | null;
+        };
         /**
          * SessionStatus
          * @enum {string}
@@ -5254,6 +6236,267 @@ export interface components {
              * @default false
              */
             training_consent: boolean;
+        };
+        /** SimBehaviorOut */
+        SimBehaviorOut: {
+            id: components["schemas"]["Behavior"];
+            /** Voice Only */
+            voice_only: boolean;
+        };
+        /** SimBudgetOut */
+        SimBudgetOut: {
+            /** Limit Usd */
+            limit_usd: number;
+            /**
+             * Spent Usd
+             * @description Spend of the sim LiteLLM key in the current period
+             */
+            spent_usd: number;
+            /** Left Usd */
+            left_usd: number;
+            /** Resets At */
+            resets_at: string | null;
+        };
+        /** SimCancelIn */
+        SimCancelIn: {
+            /** Reason */
+            reason?: string | null;
+        };
+        /** SimEstimateOut */
+        SimEstimateOut: {
+            /** Duration Min */
+            duration_min: number;
+            /** Candidate Usd */
+            candidate_usd: number;
+            /** Judge Usd */
+            judge_usd: number;
+            /** Main Server Usd */
+            main_server_usd: number;
+            /** Total Usd */
+            total_usd: number;
+        };
+        /** SimGateOut */
+        SimGateOut: {
+            /**
+             * Ok
+             * @description SM-3 without the budget part: enabled, not paused, live limit
+             */
+            ok: boolean;
+            /**
+             * Retry
+             * @description Only the live-sessions limit is in the way
+             */
+            retry: boolean;
+            /** Reason */
+            reason: string | null;
+        };
+        /** SimKeepIn */
+        SimKeepIn: {
+            /** Keep */
+            keep: boolean;
+        };
+        /**
+         * SimOptions
+         * @description SM-1: everything the form offers, and whether a run could start now.
+         */
+        SimOptions: {
+            /** Personas */
+            personas: components["schemas"]["SimPersonaOut"][];
+            /** Interview Types */
+            interview_types: components["schemas"]["InterviewType"][];
+            /** Difficulties */
+            difficulties: components["schemas"]["Difficulty"][];
+            /** Modes */
+            modes: components["schemas"]["Mode"][];
+            /** Durations */
+            durations: number[];
+            /** Qualities */
+            qualities: components["schemas"]["Quality"][];
+            /** Behaviors */
+            behaviors: components["schemas"]["SimBehaviorOut"][];
+            /** Channels */
+            channels: ("text" | "voice")[];
+            /**
+             * Estimates
+             * @description One per duration
+             */
+            estimates: components["schemas"]["SimEstimateOut"][];
+            /** @description None when the sim key budget is unknown */
+            budget: components["schemas"]["SimBudgetOut"] | null;
+            gate: components["schemas"]["SimGateOut"];
+            queue: components["schemas"]["SimQueueOut"];
+        };
+        /** SimPersonaOut */
+        SimPersonaOut: {
+            /**
+             * Id
+             * @description Resume fixture id
+             */
+            id: string;
+            /** Label */
+            label: string;
+            /**
+             * Posting
+             * @description The posting fixture this resume is meant for
+             */
+            posting: string;
+            level: components["schemas"]["Level"];
+        };
+        /** SimQueueOut */
+        SimQueueOut: {
+            /** Active */
+            active: number;
+            /**
+             * Waiting
+             * @description queued and waiting runs
+             */
+            waiting: number;
+            /** Max Waiting */
+            max_waiting: number;
+        };
+        /**
+         * SimRunIn
+         * @description SM-1: one interview. The posting and level follow the persona.
+         */
+        SimRunIn: {
+            /** Persona */
+            persona: string;
+            /** @default behavioral */
+            interview_type: components["schemas"]["InterviewType"];
+            /** @default realistic */
+            difficulty: components["schemas"]["Difficulty"];
+            /** @default realistic */
+            mode: components["schemas"]["Mode"];
+            /**
+             * Duration Min
+             * @default 30
+             * @enum {integer}
+             */
+            duration_min: 10 | 30 | 45;
+            /** @default average */
+            quality: components["schemas"]["Quality"];
+            /** @default normal */
+            behavior: components["schemas"]["Behavior"];
+            /**
+             * Channel
+             * @default voice
+             * @enum {string}
+             */
+            channel: "text" | "voice";
+        };
+        /** SimRunList */
+        SimRunList: {
+            /** Runs */
+            runs: components["schemas"]["SimRunOut"][];
+            /**
+             * Any Unfinished
+             * @description SM-4: poll every 5 s while true
+             */
+            any_unfinished: boolean;
+        };
+        /** SimRunOut */
+        SimRunOut: {
+            /**
+             * Id
+             * @description The sim_runs id; for a suite run '<run folder>/<scenario id>'
+             */
+            id: string;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "admin" | "suite";
+            /**
+             * Suite
+             * @description Suite name for runs from sim-run.ps1
+             */
+            suite: string | null;
+            /** Run Dir */
+            run_dir: string | null;
+            /** Created By */
+            created_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Started At */
+            started_at: string | null;
+            /** Finished At */
+            finished_at: string | null;
+            status: components["schemas"]["SimRunStatus"];
+            /** Status Reason */
+            status_reason: string | null;
+            scenario: components["schemas"]["SimScenarioOut"];
+            /** Session Id */
+            session_id: string | null;
+            /**
+             * Progress S
+             * @description SM-4: interview time so far
+             */
+            progress_s: number;
+            /** Planned S */
+            planned_s: number;
+            /** Hire Signal */
+            hire_signal: string | null;
+            /** Failed Rules */
+            failed_rules: string[];
+            /** Problems */
+            problems: number;
+            /** Latency P50 Ms */
+            latency_p50_ms: number | null;
+            /**
+             * Cost Sim Usd
+             * @description Candidate and judge (the sim's meter)
+             */
+            cost_sim_usd: number | null;
+            /**
+             * Cost App Usd
+             * @description usage_events of the session
+             */
+            cost_app_usd: number | null;
+            /** Cost Total Usd */
+            cost_total_usd: number | null;
+            /** Keep */
+            keep: boolean;
+            /** Deleted At */
+            deleted_at: string | null;
+            /** Deleted By */
+            deleted_by: string | null;
+            /** Delete Reason */
+            delete_reason: string | null;
+            /**
+             * Files
+             * @description The run folder is on disk
+             */
+            files: boolean;
+        };
+        /**
+         * SimRunStatus
+         * @description SM-4: an admin-started AI candidate run (docs/admin-spec.md, Simulations).
+         * @enum {string}
+         */
+        SimRunStatus: "queued" | "waiting" | "starting" | "interviewing" | "judging" | "done" | "failed" | "cancelled";
+        /** SimScenarioOut */
+        SimScenarioOut: {
+            /** Channel */
+            channel: string;
+            /** Interview Type */
+            interview_type: string;
+            /** Difficulty */
+            difficulty: string;
+            /** Mode */
+            mode: string;
+            /** Duration Min */
+            duration_min: number;
+            /** Persona */
+            persona: string;
+            /** Quality */
+            quality: string;
+            /** Behavior */
+            behavior: string;
+            /** Candidate Name */
+            candidate_name?: string | null;
         };
         /**
          * SiteBanner
@@ -5364,6 +6607,65 @@ export interface components {
             /** Phase */
             phase: string;
         };
+        /** TransitionIn */
+        TransitionIn: {
+            /**
+             * Reason
+             * @description Why, for the audit log
+             */
+            reason: string;
+            /**
+             * To
+             * @enum {string}
+             */
+            to: "draft" | "in_review" | "published" | "archived";
+        };
+        /** TransitionOut */
+        TransitionOut: {
+            version: components["schemas"]["ProfileVersion"];
+            from_status: components["schemas"]["ProfileStatus"];
+            /**
+             * Archived Version
+             * @description On publish: the version published before, now archived
+             */
+            archived_version: number | null;
+        };
+        /** TriageIn */
+        TriageIn: {
+            /**
+             * Reason
+             * @description Why, for the audit log
+             */
+            reason: string;
+            state: components["schemas"]["TriageState"];
+            /**
+             * Company Id
+             * @description Required when state is added
+             */
+            company_id?: string | null;
+            /** Note */
+            note?: string | null;
+        };
+        /** TriageInfo */
+        TriageInfo: {
+            state: components["schemas"]["TriageState"];
+            /** Company Id */
+            company_id: string | null;
+            /** Company Slug */
+            company_slug: string | null;
+            /** Note */
+            note: string | null;
+            /** Updated By */
+            updated_by: string | null;
+            /** Updated At */
+            updated_at: string | null;
+        };
+        /**
+         * TriageState
+         * @description AT-5: admin triage of a requested company name.
+         * @enum {string}
+         */
+        TriageState: "new" | "planned" | "declined" | "added";
         /**
          * Turn
          * @description One utterance in the transcript. Text only; audio is never stored.
@@ -6707,9 +8009,7 @@ export interface operations {
     };
     send_magic_link_auth_magic_link_post: {
         parameters: {
-            query?: {
-                app?: "web" | "admin";
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -6744,7 +8044,6 @@ export interface operations {
         parameters: {
             query: {
                 token: string;
-                app?: "web" | "admin";
             };
             header?: never;
             path?: never;
@@ -6774,9 +8073,7 @@ export interface operations {
     };
     google_login_auth_google_login_get: {
         parameters: {
-            query?: {
-                app?: "web" | "admin";
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -6790,15 +8087,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -7466,6 +8754,353 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AccountDeletedOut"];
+                };
+            };
+        };
+    };
+    admin_providers_admin_auth_providers_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProviders"];
+                };
+            };
+        };
+    };
+    admin_password_sign_in_admin_auth_password_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminPasswordIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminMe"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_send_link_admin_auth_link_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminLinkIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminLinkSent"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_verify_link_admin_auth_link_verify_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminLinkVerifyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminMe"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_google_login_admin_auth_google_login_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    admin_google_callback_admin_auth_google_callback_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    admin_sign_out_admin_auth_signout_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    admin_me_admin_me_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminMe"];
+                };
+            };
+            /** @description No admin session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    my_sessions_admin_me_sessions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminSignInSession"][];
+                };
+            };
+        };
+    };
+    revoke_my_session_admin_me_sessions__session_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_admins_admin_admins_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAccount"][];
+                };
+            };
+        };
+    };
+    create_admin_admin_admins_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddAdminIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAccount"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_admin_admin_admins__admin_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                admin_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RemoveAdminIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAccount"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -8554,6 +10189,585 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OpsSpend"];
+                };
+            };
+        };
+    };
+    list_companies_admin_companies_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCompany"][];
+                };
+            };
+        };
+    };
+    set_company_active_admin_companies__slug__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompanyActiveIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCompany"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_profile_versions_admin_companies__slug__profiles_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyProfiles"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    import_profile_admin_companies__slug__profiles_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfileImportIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileImportOut"];
+                };
+            };
+            /** @description The company is new and create_company is off */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Same content as the latest version (detail.code 'unchanged') */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description detail.code 'invalid_profile' with detail.problems, or a bad body */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    diff_versions_admin_companies__slug__profiles_diff_get: {
+        parameters: {
+            query: {
+                /** @description Old version */
+                a: number;
+                /** @description New version */
+                b: number;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileDiff"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_profile_version_admin_companies__slug__profiles__version__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+                version: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    transition_profile_admin_companies__slug__profiles__version__transition_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                slug: string;
+                version: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TransitionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TransitionOut"];
+                };
+            };
+            /** @description The workflow does not allow it (detail.code) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_company_requests_admin_company_requests_get: {
+        parameters: {
+            query?: {
+                state?: components["schemas"]["TriageState"] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyRequestGroup"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_triage_admin_company_requests__normalized_name__triage_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                normalized_name: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TriageIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyRequestGroup"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sim_options_admin_sim_options_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimOptions"];
+                };
+            };
+        };
+    };
+    list_runs_admin_sim_runs_get: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["SimRunStatus"] | null;
+                channel?: ("text" | "voice") | null;
+                source?: ("admin" | "suite") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimRunList"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    start_run_admin_sim_runs_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SimRunIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimRunOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_run_admin_sim_runs__run_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimRunOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_run_admin_sim_runs__run_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimRunOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    keep_run_admin_sim_runs__run_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SimKeepIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimRunOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_run_admin_sim_runs__run_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SimCancelIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimRunOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    session_replay_admin_sessions__session_id__replay_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionReplay"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

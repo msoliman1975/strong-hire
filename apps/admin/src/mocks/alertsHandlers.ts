@@ -6,9 +6,8 @@
 import { http, HttpResponse } from "msw/http";
 
 import type { AlertEvent, AlertMetric, AlertRule, AlertRuleCreate, AlertRulePatch } from "../api/alerts";
-import type { AuthUser } from "../api/types";
 import { newId, type MockDb, type MockStore } from "./db";
-import { API, isMockAdmin } from "./handlers";
+import { API, currentAdmin } from "./handlers";
 
 export const mockAlertMetrics: AlertMetric[] = [
   { name: "heartbeat.up", description: "Service heartbeat present (1) or missing (0)", unit: "", labels: ["service"], derived: false, up: true, aggregation: null },
@@ -128,11 +127,7 @@ const notFound = () => HttpResponse.json({ detail: "Not Found" }, { status: 404 
 const order = { firing: 0, pending: 1, ok: 2 } as const;
 
 export function alertsHandlers(store: MockStore) {
-  const admin = (): AuthUser | null => {
-    const { auth, users } = store.db;
-    const user = auth.status === "signed_in" && auth.userEmail ? users[auth.userEmail] : undefined;
-    return user && isMockAdmin(user.email) ? user : null;
-  };
+  const admin = () => currentAdmin(store.db);
   const state = () => stateOf(store.db);
 
   /** null when the write is allowed, else the error response (AA-4, AA-5, AA-6). */

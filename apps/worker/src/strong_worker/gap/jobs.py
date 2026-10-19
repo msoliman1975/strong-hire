@@ -47,6 +47,7 @@ from strong_core.schemas import (
 from strong_core.sim import gateway_for_org
 from strong_worker.gap.analysis import GapAnalysisError, run_gap_analysis
 from strong_worker.gap.brief import BriefError, build_brief
+from strong_worker.ops.context import job_context
 from strong_worker.pause import wait_if_paused
 
 log = logging.getLogger(__name__)
@@ -92,6 +93,7 @@ def context_notes(target: JobTarget) -> str | None:
     return "\n".join(lines) or None
 
 
+@job_context()
 async def run_gap_analysis_job(
     ctx: dict[str, Any], gap_analysis_id: str, org_id: str
 ) -> dict[str, Any]:
@@ -195,6 +197,7 @@ async def latest_ready_gap(
     return await db.scalar(query.order_by(GapRow.created_at.desc(), GapRow.id.desc()).limit(1))
 
 
+@job_context(session_arg="session_id")
 async def build_interviewer_brief(
     ctx: dict[str, Any], session_id: str, org_id: str
 ) -> dict[str, Any]:

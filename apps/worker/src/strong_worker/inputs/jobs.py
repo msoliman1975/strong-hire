@@ -43,6 +43,7 @@ from strong_worker.inputs.matching import match_and_log
 from strong_worker.inputs.sanitize import sanitize_untrusted
 from strong_worker.inputs.settings import get_inputs_settings
 from strong_worker.inputs.storage import FileStore, build_file_store
+from strong_worker.ops.context import job_context
 
 log = logging.getLogger(__name__)
 
@@ -88,6 +89,7 @@ def _failed(reason: str) -> dict[str, Any]:
     return {"outcome": "failed", "reason": reason}
 
 
+@job_context()
 async def extract_job_target(
     ctx: dict[str, Any], job_target_id: str, org_id: str
 ) -> dict[str, Any]:
@@ -154,6 +156,7 @@ async def extract_job_target(
         }
 
 
+@job_context()
 async def match_job_target(ctx: dict[str, Any], job_target_id: str, org_id: str) -> dict[str, Any]:
     """Match again after the user edits the company name (IN-5)."""
     inputs = _inputs(ctx)
@@ -175,6 +178,7 @@ async def match_job_target(ctx: dict[str, Any], job_target_id: str, org_id: str)
         return {"outcome": "matched", "company": match.summary()}
 
 
+@job_context()
 async def parse_resume(
     ctx: dict[str, Any],
     resume_id: str,
