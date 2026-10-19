@@ -287,6 +287,7 @@ export function AdminSessionPage() {
   if (detail.isPending) return <Loading label="Loading the interview" />;
   if (detail.isError) return <ErrorNotice error={detail.error} title="The interview could not be loaded." />;
   const { session, content_visible, transcript, traces, trace_retention_days, audio_available } = detail.data;
+  const replayAvailable = detail.data.replay_available ?? false;
   const { cost_breakdown = [], cost_total_usd = null, turn_latency = [], latency_summary = [] } = detail.data;
 
   return (
@@ -294,6 +295,12 @@ export function AdminSessionPage() {
       <PageHead title="Interview">
         <p>
           <Link to="/interviews">Back to interviews</Link>
+          {replayAvailable && (
+            <>
+              {" · "}
+              <Link to={`/simulations/replay/${session.id}`}>Replay</Link>
+            </>
+          )}
         </p>
       </PageHead>
       <Metadata session={session} />

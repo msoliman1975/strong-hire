@@ -20,6 +20,7 @@ import type {
 import type { AuthUser, SessionRecord, Turn } from "../api/types";
 import { newId, type MockDb, type MockStore } from "./db";
 import { API, isMockAdmin } from "./handlers";
+import { simState } from "./simHandlers";
 
 const SESSION_LIMIT = 500;
 const MOCK_COST_USD = 0.0123;
@@ -323,6 +324,7 @@ export function adminHandlers(store: MockStore) {
         traces,
         trace_retention_days: 90,
         audio_available: false,
+        replay_available: visible && simState(db()).replays[session.id] !== undefined,
         ...mockSessionExtras(session),
       };
       return HttpResponse.json(body);
