@@ -145,7 +145,6 @@ export function authHandlers(store: MockStore) {
         auth_provider: "dev",
         training_consent: body.training_consent ?? false,
         created_at: new Date().toISOString(),
-        is_admin: false,
         full_name: null,
         profile_complete: false,
       };
@@ -173,7 +172,6 @@ export function authHandlers(store: MockStore) {
           auth_provider: "password",
           training_consent: false,
           created_at: new Date().toISOString(),
-          is_admin: false,
           full_name: body.full_name ?? null,
           profile_complete: false,
         };

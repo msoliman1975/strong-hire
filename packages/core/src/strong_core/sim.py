@@ -8,14 +8,19 @@ Nothing changes when SIM_ENABLED is false or SIM_LITELLM_KEY is empty.
 
 check_sim_gate() is the rule for starting an admin-started run (SM-3, docs/admin-spec.md). The api
 checks it when the admin clicks Start, and the sim service again when the run begins.
+
+The personas, the candidate's quality and behavior, and the cost estimate are here too, because
+the admin api offers them in the new-run form (SM-1) and does not ship apps/sim.
 """
 
 from __future__ import annotations
 
 import logging
 import uuid
+from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from enum import StrEnum
 
 import httpx
 from sqlalchemy import func, select
@@ -25,7 +30,7 @@ from strong_core import runtime_settings as rs
 from strong_core.config import get_settings
 from strong_core.db.models import InterviewSession, User
 from strong_core.gateway import ModelGateway
-from strong_core.schemas.enums import SessionStatus
+from strong_core.schemas.enums import Level, SessionStatus
 
 log = logging.getLogger("strong_core.sim")
 
@@ -169,3 +174,100 @@ async def check_sim_gate(db: AsyncSession, need_usd: float, base: ModelGateway) 
                 f"this run needs about ${need_usd:.2f}",
             )
     return SimGate(ok=True)
+
+
+# --- what an AI candidate can be (P13, SM-1) -------------------------------------------------
+
+
+class Quality(StrEnum):
+    STRONG = "strong"
+    AVERAGE = "average"
+    WEAK = "weak"
+
+
+class Behavior(StrEnum):
+    NORMAL = "normal"
+    LONG_ANSWERS = "long_answers"
+    ONE_LINE_ANSWERS = "one_line_answers"
+    OFF_TOPIC = "off_topic"
+    ASKS_TO_REPEAT = "asks_to_repeat"
+    SILENT = "silent"
+    INTERRUPTS = "interrupts"  # voice only
+    ARGUES = "argues"
+    MANY_QUESTIONS_BACK = "many_questions_back"
+    PROMPT_INJECTION = "prompt_injection"
+    DROPS_CONNECTION = "drops_connection"  # voice only
+
+
+VOICE_ONLY = frozenset({Behavior.INTERRUPTS, Behavior.DROPS_CONNECTION})
+
+
+@dataclass(frozen=True)
+class Persona:
+    """A resume fixture (evals/fixtures/inputs/resumes/<id>.txt), the posting it is meant for,
+    and the level it confirms at setup."""
+
+    label: str
+    posting: str
+    level: Level
+
+
+PERSONAS: dict[str, Persona] = {
+    "backend-senior": Persona("Senior backend engineer", "swe-stripe-backend", Level.SENIOR),
+    "ml-engineer-staff": Persona(
+        "Staff ML engineer", "data-databricks-ml-serving", Level.STAFF_PRINCIPAL
+    ),
+    "new-grad-swe": Persona("New grad software engineer", "swe-northwind-newgrad", Level.NEW_GRAD),
+    "product-manager-mid": Persona("Product manager", "pm-shopify-checkout", Level.MID),
+    "product-designer-senior": Persona(
+        "Senior product designer", "design-airbnb-product-designer", Level.SENIOR
+    ),
+    "tpm-career-changer": Persona("TPM, career changer", "tpm-harbor-robotics", Level.MID),
+}
+
+# Synthetic names only.
+NAMES = (
+    "Ada Venn", "Tomas Ruel", "Mira Ostrand", "Kofi Lindqvist", "Ben Halloway", "Ines Marrow",
+    "Joel Tamsin", "Priya Calder", "Cal Dunmore", "Nadia Fenwick", "Owen Strand", "Lila Burrows",
+    "Sami Okafor", "Rhea Duval", "Theo Marsh", "Yara Quint",
+)  # fmt: skip
+
+
+# --- cost estimate before a run (SM-1, SM-3) -------------------------------------------------
+
+# Rough per-session token counts, from the first runs.
+EST_CANDIDATE_IN_PER_TURN = 3_000
+EST_CANDIDATE_OUT_PER_TURN = 120
+EST_TURNS = {10: 12, 30: 30, 45: 40}
+EST_JUDGE_IN = 12_000
+EST_JUDGE_OUT = 1_200
+# Interviewer and scorer on the main server, per session (they bill the sim key too).
+EST_SERVER_USD = {10: 0.03, 30: 0.08, 45: 0.11}
+
+
+@dataclass(frozen=True)
+class RunEstimate:
+    candidate_usd: float
+    judge_usd: float
+    main_server_usd: float
+
+    @property
+    def total_usd(self) -> float:
+        return self.candidate_usd + self.judge_usd + self.main_server_usd
+
+
+def estimate_session(
+    duration_min: int, prices_per_mtok: Mapping[str, tuple[float, float]]
+) -> RunEstimate:
+    """The expected cost of one session. Prices: alias -> (input, output) USD per million tokens;
+    a missing alias costs nothing."""
+    c_in, c_out = prices_per_mtok.get("sim-candidate", (0.0, 0.0))
+    j_in, j_out = prices_per_mtok.get("sim-judge", (0.0, 0.0))
+    turns = EST_TURNS.get(duration_min, 30)
+    candidate = turns * (EST_CANDIDATE_IN_PER_TURN * c_in + EST_CANDIDATE_OUT_PER_TURN * c_out)
+    judge = EST_JUDGE_IN * j_in + EST_JUDGE_OUT * j_out
+    return RunEstimate(
+        candidate_usd=candidate / 1e6,
+        judge_usd=judge / 1e6,
+        main_server_usd=EST_SERVER_USD.get(duration_min, 0.08),
+    )

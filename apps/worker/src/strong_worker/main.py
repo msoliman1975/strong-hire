@@ -7,7 +7,9 @@ account export and file delete jobs (strong_worker.account.jobs). R1 adds the fi
 one saved CV (delete_resume_file). R2 adds a daily cron job that deletes interviewer traces older
 than 90 days (strong_worker.retention). A6 lets admins pause the gap analysis and scoring jobs
 (OC-5, strong_worker.pause). A5 adds the alert engine (strong_worker.alerts): a cron every
-minute, the optional daily digest, and seeding the default rules at startup.
+minute, the optional daily digest, and seeding the default rules at startup. A3 adds the ops
+plumbing (strong_core.ops: heartbeat, error capture, usage sink, JSON logs) and the metrics
+sampler cron (strong_worker.ops.sampler), and the retention job also cleans the ops tables.
 """
 
 from __future__ import annotations
@@ -18,11 +20,14 @@ from arq import cron, func
 from arq.connections import RedisSettings
 
 from strong_core.config import get_settings
+from strong_core.ops.logs import configure_logging
+from strong_core.ops.runtime import start_ops
 from strong_worker import retention
 from strong_worker.account import jobs as account_jobs
 from strong_worker.alerts import jobs as alert_jobs
 from strong_worker.gap import jobs as gap_jobs
 from strong_worker.inputs import jobs as inputs_jobs
+from strong_worker.ops import sampler
 from strong_worker.pause import PAUSED_MAX_TRIES
 from strong_worker.scoring import jobs as scoring_jobs
 
@@ -31,7 +36,14 @@ async def ping(ctx: dict[str, Any], value: str = "pong") -> str:
     return value
 
 
+OPS_KEY = "ops_runtime"
+
+
 async def startup(ctx: dict[str, Any]) -> None:
+    # OB-7 log lines; Arq's own handler is dropped so its lines are written once, by ours.
+    configure_logging("worker", app_loggers=("strong_worker", "arq"), drop_handlers=("arq",))
+    # OB-1 heartbeat (on Arq's Redis), OB-2 usage sink, OB-4 error capture.
+    ctx[OPS_KEY] = await start_ops("worker", redis=ctx.get("redis"))
     await inputs_jobs.startup(ctx)
     await gap_jobs.startup(ctx)
     await scoring_jobs.startup(ctx)
@@ -41,6 +53,9 @@ async def startup(ctx: dict[str, Any]) -> None:
 
 async def shutdown(ctx: dict[str, Any]) -> None:
     await inputs_jobs.shutdown(ctx)
+    ops = ctx.pop(OPS_KEY, None)
+    if ops is not None:
+        await ops.stop()
 
 
 class WorkerSettings:
@@ -108,6 +123,15 @@ class WorkerSettings:
             minute=0,
             run_at_startup=False,
             unique=True,
+        ),
+        # OB-5, OB-6: one ops_samples row per metric, every minute.
+        cron(
+            sampler.sample_metrics,
+            second=0,
+            run_at_startup=False,
+            unique=True,
+            timeout=50,
+            keep_result=0,
         ),
     ]
     on_startup = startup

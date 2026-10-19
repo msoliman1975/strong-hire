@@ -13,10 +13,13 @@ type DeepRequired<T> = T extends (infer U)[]
     ? { [K in keyof T]-?: DeepRequired<T[K]> }
     : T;
 
-export type AuthState = S["AuthState"];
+export type AdminMe = S["AdminMe"];
+export type AdminProviders = S["AdminProviders"];
+export type AdminLinkSent = S["AdminLinkSent"];
+export type AdminSignInSession = S["AdminSignInSession"];
+export type AdminAccount = S["AdminAccount"];
+/** A candidate account, as the mock store keeps it (the Users page lists them). */
 export type AuthUser = S["AuthUser"];
-export type AuthProviders = S["AuthProviders"];
-export type MagicLinkSent = S["MagicLinkSent"];
 
 export type Turn = DeepRequired<S["Turn"]>;
 export type Phase = S["Phase"];

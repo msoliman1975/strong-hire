@@ -4,7 +4,7 @@ text channel writes."""
 from __future__ import annotations
 
 import uuid
-from collections.abc import AsyncIterator, Iterator
+from collections.abc import AsyncIterator
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
@@ -16,7 +16,6 @@ from fastapi import FastAPI
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from strong_api.auth.settings import get_auth_settings
 from strong_api.main import create_app
 from strong_core.db.models import (
     AuditLog,
@@ -25,10 +24,11 @@ from strong_core.db.models import (
     UsageEvent,
     User,
 )
+from strong_core.gateway import UsageRecord, set_usage_sink
 from strong_core.schemas import InterviewType, Phase, UsageComponent
 
 from .accounts_support import add_session
-from .conftest import InlineQueue, sign_in
+from .conftest import InlineQueue, sign_in, sign_in_admin
 from .test_sessions_api import create, ready_job
 
 Maker = async_sessionmaker[AsyncSession]
@@ -41,26 +41,21 @@ async def _ok() -> None:
 
 
 @pytest.fixture
-def app(
-    sessionmaker: Maker,
-    queue: InlineQueue,
-    export_store: Any,
-    monkeypatch: pytest.MonkeyPatch,
-) -> Iterator[FastAPI]:
-    """The app with ADMIN_EMAILS set (mixed case and spaces, to check the parsing)."""
-    monkeypatch.setenv("ADMIN_EMAILS", " Boss@Example.com , other-admin@example.com")
-    get_auth_settings.cache_clear()
+def app(sessionmaker: Maker, queue: InlineQueue, export_store: Any) -> FastAPI:
     app = create_app({"database": _ok}, sessionmaker=sessionmaker, queue=queue)
     app.state.export_store = export_store
-    yield app
-    get_auth_settings.cache_clear()
+    return app
 
 
 @pytest.fixture
 async def admin(app: FastAPI) -> AsyncIterator[httpx.AsyncClient]:
+    """The admin: a candidate account (so it shows in the users list) and, in its own client,
+    an admin session."""
     transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://test") as candidate:
+        await sign_in(candidate, ADMIN)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as http:
-        await sign_in(http, ADMIN)
+        await sign_in_admin(http, app, ADMIN)
         yield http
 
 
@@ -71,16 +66,13 @@ async def _user(maker: Maker, email: str) -> User:
         return user
 
 
-async def test_r2_admin_routes_are_404_for_everyone_else(
+async def test_r2_aa4_admin_routes_are_404_for_everyone_else(
     anon_client: httpx.AsyncClient, client: httpx.AsyncClient, admin: httpx.AsyncClient
 ) -> None:
     for path in ROUTES:
         assert (await anon_client.get(path)).status_code == 404, path
         assert (await client.get(path)).status_code == 404, path
-    me = (await client.get("/auth/me")).json()
-    assert me["user"]["is_admin"] is False
-    boss = (await admin.get("/auth/me")).json()
-    assert boss["user"]["is_admin"] is True
+    assert "is_admin" not in (await client.get("/auth/me")).json()["user"]
     assert (await admin.get("/admin/users")).status_code == 200
 
 
@@ -108,6 +100,12 @@ async def test_r2_consent_gates_transcript_and_traces_and_views_are_audited(
     sessionmaker: Maker,
 ) -> None:
     """A whole text session writes traces; the admin sees them only while consent is on."""
+    usage: list[UsageRecord] = []
+
+    async def sink(record: UsageRecord) -> None:
+        usage.append(record)
+
+    set_usage_sink(sink)  # OB-2: the gateway reports each call (the autouse fixture restores)
     job = await ready_job(client, fake_fixtures)
     sid = (await create(client, job["id"], channel="text")).json()["id"]
     await client.post(f"/sessions/{sid}/text/open")
@@ -125,12 +123,6 @@ async def test_r2_consent_gates_transcript_and_traces_and_views_are_audited(
                 .order_by(InterviewerTrace.seq)
             )
         )
-        usage = await db.scalar(
-            select(UsageEvent).where(
-                UsageEvent.session_id == uuid.UUID(sid),
-                UsageEvent.component == UsageComponent.LLM,
-            )
-        )
     moves = [r.move for r in rows]
     # A mini skips small talk. The answer check (IV-12) is traced before the decision.
     assert moves[:5] == ["greet", "agenda", "ask", "check_answer", "decide"]
@@ -140,7 +132,10 @@ async def test_r2_consent_gates_transcript_and_traces_and_views_are_audited(
     probe = rows[moves.index("probe")]
     assert probe.reason_json is not None and probe.reason_json["why"] == ["model_chose_probe"]
     assert probe.phase == Phase.CORE and probe.messages_json and probe.raw_reply
-    assert usage is not None and usage.units > 0  # the text channel saves its tokens too
+    # The text channel's interviewer tokens: one usage row per gateway call (OB-2).
+    interviewer = [u for u in usage if u.role.value == "interviewer"]
+    assert interviewer and {u.session_id for u in interviewer} == {uuid.UUID(sid)}
+    assert sum(u.units for u in interviewer) > 0
 
     # Consent off (the default): metadata only, and no audit row.
     detail = (await admin.get(f"/admin/sessions/{sid}")).json()
@@ -189,7 +184,7 @@ async def test_r2_consent_gates_transcript_and_traces_and_views_are_audited(
     assert len(await admin_views()) == 2
 
 
-async def test_r2_session_cost_daily_totals_and_filters(
+async def test_r2_ob2_session_cost_daily_totals_and_filters(
     client: httpx.AsyncClient, admin: httpx.AsyncClient, sessionmaker: Maker
 ) -> None:
     dev = await _user(sessionmaker, "dev@example.com")
@@ -203,15 +198,26 @@ async def test_r2_session_cost_daily_totals_and_filters(
         assert row is not None
         row.created_at = datetime.now(UTC) - timedelta(days=3)
         row.type = InterviewType.CASE
-        db.add(
-            UsageEvent(
-                org_id=dev.org_id,
-                session_id=a.id,
-                component=UsageComponent.LLM,
-                units=Decimal(1000),
-                cost_usd=Decimal("0.0125"),
+        # OB-2: every component and role counts: the interviewer, the brief, scoring and
+        # self-hosted speech (cost 0, cost unknown).
+        for component, role, cost in (
+            (UsageComponent.LLM, "interviewer", "0.0100"),
+            (UsageComponent.LLM, "planner", "0.0015"),
+            (UsageComponent.LLM, "scorer", "0.0010"),
+            (UsageComponent.STT, "stt", "0"),
+            (UsageComponent.TTS, "tts", "0"),
+        ):
+            db.add(
+                UsageEvent(
+                    org_id=dev.org_id,
+                    session_id=a.id,
+                    component=component,
+                    role=role,
+                    units=Decimal(1000),
+                    cost_usd=Decimal(cost),
+                    cost_known=cost != "0",
+                )
             )
-        )
         for seq, cost in ((1, "0.001"), (2, "0.002")):
             db.add(
                 InterviewerTrace(
