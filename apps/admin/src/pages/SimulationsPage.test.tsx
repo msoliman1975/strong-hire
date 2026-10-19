@@ -156,6 +156,84 @@ describe("Simulations page", () => {
   });
 });
 
+const JOB = "Senior Data Engineer at Fjord Freight. Build the shipment event pipeline in Kafka.";
+const CV = "Lena Ortiz. Data engineer, 7 years. Built streaming pipelines at a logistics firm.";
+
+function newRunForm() {
+  return within(screen.getByRole("region", { name: "New run" }));
+}
+
+describe("Pasted job and CV (SM-17, SM-18, SM-20, SM-21)", () => {
+  it("SM-17, SM-18: a pasted job asks for a level before Start, and the run is tagged custom", async () => {
+    const user = await openSimulations();
+    const form = newRunForm();
+    expect(form.queryByLabelText(/^Level/)).not.toBeInTheDocument();
+    await user.click(form.getByLabelText("Job posting (optional)"));
+    await user.paste(JOB);
+    expect(form.getByText(/Pasted job/)).toBeInTheDocument();
+    const start = form.getByRole("button", { name: "Start run" });
+    expect(start).toBeDisabled();
+    await user.selectOptions(form.getByLabelText("Level (required with a pasted job)"), "mid");
+    await user.click(form.getByLabelText("CV (optional)"));
+    await user.paste(CV);
+    expect(form.getAllByText(`${CV.length} / 60,000 characters`)).toHaveLength(2); // both are 82 long
+    expect(start).toBeEnabled();
+    await user.click(start);
+    const row = await screen.findByRole("row", { name: /Mira Ostrand/ });
+    expect(row).toHaveTextContent("custom job, custom CV");
+    const stored = simState(mockStore.db).runs[0];
+    expect(stored.inputs).toEqual({ job_text: JOB, cv_text: CV, level: "mid" });
+    expect(stored.scenario.level).toBe("mid");
+  });
+
+  it("SM-18: clearing the pasted job hides the level and drops it", async () => {
+    const user = await openSimulations();
+    const form = newRunForm();
+    await user.click(form.getByLabelText("Job posting (optional)"));
+    await user.paste(JOB);
+    await user.selectOptions(form.getByLabelText("Level (required with a pasted job)"), "senior");
+    await user.clear(form.getByLabelText("Job posting (optional)"));
+    expect(form.queryByLabelText(/^Level/)).not.toBeInTheDocument();
+    await user.click(form.getByRole("button", { name: "Start run" }));
+    await screen.findByRole("row", { name: /Mira Ostrand/ });
+    expect(simState(mockStore.db).runs[0].scenario.level).toBeNull();
+    expect(simState(mockStore.db).runs[0].inputs).toBeNull();
+  });
+
+  it("SM-21: Run again fills the form with the run's settings and pasted texts", async () => {
+    const state = simState(mockStore.db);
+    state.runs[0] = {
+      ...state.runs[0],
+      scenario: { ...state.runs[0].scenario, quality: "weak", duration_min: 30, custom_job: true, level: "staff_principal" },
+      inputs: { job_text: JOB, cv_text: null, level: "staff_principal" },
+    };
+    const user = await openSimulations();
+    await user.click(within(rowOf("Ada Venn")).getByRole("button", { name: "Run again" }));
+    expect(await screen.findByText(/Filled in from the run of Ada Venn/)).toBeInTheDocument();
+    const form = newRunForm();
+    expect(form.getByLabelText<HTMLTextAreaElement>("Job posting (optional)").value).toBe(JOB);
+    expect(form.getByLabelText<HTMLTextAreaElement>("CV (optional)").value).toBe("");
+    expect(form.getByLabelText<HTMLSelectElement>("Level (required with a pasted job)").value).toBe("staff_principal");
+    expect(form.getByLabelText<HTMLSelectElement>("Candidate quality").value).toBe("weak");
+    expect(form.getByLabelText<HTMLSelectElement>("Length").value).toBe("30");
+  });
+
+  it("SM-21: a deleted run's texts are gone, so Run again keeps only its settings", async () => {
+    const state = simState(mockStore.db);
+    state.runs[0] = {
+      ...state.runs[0],
+      deleted_at: "2026-10-19T10:00:00Z",
+      deleted_by: "admin@example.com",
+      scenario: { ...state.runs[0].scenario, custom_cv: true },
+      inputs: null,
+    };
+    const user = await openSimulations();
+    await user.click(within(rowOf("Ada Venn")).getByRole("button", { name: "Run again" }));
+    expect(await screen.findByText(/Its pasted texts were deleted/)).toBeInTheDocument();
+    expect(newRunForm().getByLabelText<HTMLTextAreaElement>("CV (optional)").value).toBe("");
+  });
+});
+
 describe("Controls for sim runs (SM-15)", () => {
   it("pauses runs, and pausing can stop the active run", async () => {
     const state = simState(mockStore.db);

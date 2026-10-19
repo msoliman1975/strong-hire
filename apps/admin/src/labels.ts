@@ -1,5 +1,5 @@
 /** Display names for contract enum values (copied from apps/web). Display only: no rules here. */
-import type { SimBehavior, SimQuality, SimRunStatus } from "./api/sim";
+import type { SimBehavior, SimLevel, SimQuality, SimRunStatus } from "./api/sim";
 import type { Difficulty, InterviewType, Mode, Phase } from "./api/types";
 
 export const interviewTypeLabel: Record<InterviewType, string> = {
@@ -52,4 +52,11 @@ export const behaviorLabel: Record<SimBehavior, string> = {
   many_questions_back: "Many questions back",
   prompt_injection: "Prompt injection",
   drops_connection: "Drops the connection",
+};
+
+export const levelLabel: Record<SimLevel, string> = {
+  new_grad: "New grad",
+  mid: "Mid",
+  senior: "Senior",
+  staff_principal: "Staff / principal",
 };

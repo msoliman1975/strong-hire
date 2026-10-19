@@ -58,6 +58,9 @@ function scenario(overrides: Partial<SimRun["scenario"]> = {}): SimRun["scenario
     quality: "strong",
     behavior: "normal",
     candidate_name: "Ada Venn",
+    custom_job: false,
+    custom_cv: false,
+    level: null,
     ...overrides,
   };
 }
@@ -90,6 +93,7 @@ function run(overrides: Partial<SimRun> = {}): SimRun {
     deleted_by: null,
     delete_reason: null,
     files: false,
+    inputs: null,
     ...overrides,
   };
 }
@@ -133,6 +137,7 @@ export const mockReplay: SessionReplay = {
   },
   audio: { available: true, bytes: 48_000 },
   scenario: scenario(),
+  inputs: null,
 };
 
 const states = new WeakMap<MockDb, SimState>();
@@ -253,6 +258,7 @@ export function simHandlers(store: MockStore) {
       if (q.get("channel")) runs = runs.filter((r) => r.scenario.channel === q.get("channel"));
       if (q.get("source")) runs = runs.filter((r) => r.source === q.get("source"));
       runs.sort((a, b) => b.created_at.localeCompare(a.created_at));
+      runs = runs.map((r) => ({ ...r, inputs: null }));
       const anyUnfinished = state().runs.some((r) => r.source === "admin" && !FINISHED.includes(r.status));
       return HttpResponse.json({ runs, any_unfinished: anyUnfinished });
     }),
@@ -275,7 +281,17 @@ export function simHandlers(store: MockStore) {
       const g = gate();
       if (!g.ok) return conflict(g.reason ?? "AI candidate runs cannot start now");
       const minutes = body.duration_min ?? 30;
+      const jobText = body.job_text?.trim() || null;
+      const cvText = body.cv_text?.trim() || null;
+      if (jobText && !body.level) {
+        return HttpResponse.json(
+          { detail: [{ msg: "Value error, level is required when a job posting is pasted" }] },
+          { status: 422 },
+        );
+      }
+      const level = jobText ? (body.level ?? null) : null;
       const created = run({
+        inputs: jobText || cvText ? { job_text: jobText, cv_text: cvText, level } : null,
         created_by: who,
         planned_s: minutes * 60,
         scenario: scenario({
@@ -288,6 +304,9 @@ export function simHandlers(store: MockStore) {
           quality: body.quality ?? "average",
           behavior: body.behavior ?? "normal",
           candidate_name: "Mira Ostrand",
+          custom_job: jobText !== null,
+          custom_cv: cvText !== null,
+          level,
         }),
       });
       state().runs.unshift(created);
@@ -327,6 +346,7 @@ export function simHandlers(store: MockStore) {
         deleted_by: who,
         delete_reason: body.reason,
         files: false,
+        inputs: null,
       });
       return HttpResponse.json(found);
     }),
