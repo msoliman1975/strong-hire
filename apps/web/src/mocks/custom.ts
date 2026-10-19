@@ -219,10 +219,11 @@ export function customHandlers(store: MockStore) {
   const locked = () => db().siteStatus.custom_interview_access === "paid_only" && !db().usage.full_interviews_allowed;
   const conflict = (code: string, message: string) => HttpResponse.json({ detail: { code, message } }, { status: 409 });
   const invalid = (msg: string) => HttpResponse.json({ detail: [{ msg: `Value error, ${msg}` }] }, { status: 422 });
-  const savedProblem = (category: StandardType, competencies: Competency[]) =>
-    competencies.length < 1 || competencies.length > 3 || competencies.some((c) => !MOCK_COMPETENCIES[category].includes(c))
-      ? `competencies do not belong to ${category}`
-      : null;
+  /** Competencies that fit the category, else the check's tags (strong_api.custom.router). */
+  const fitting = (category: StandardType, given: Competency[] | null | undefined, tags: Competency[]) =>
+    given && given.length >= 1 && given.length <= 3 && given.every((c) => MOCK_COMPETENCIES[category].includes(c))
+      ? given
+      : tags;
   const duplicate = (text: string, skip?: string) =>
     db().savedQuestions.some((q) => q.id !== skip && normalize(q.text) === normalize(text));
 
@@ -256,9 +257,7 @@ export function customHandlers(store: MockStore) {
       const body = (await request.json()) as SavedQuestionIn;
       const text = body.text?.trim() ?? "";
       if (!text || text.length > 500) return invalid("text must be 1 to 500 characters");
-      const problem = savedProblem(body.category, body.competencies);
-      if (problem) return invalid(problem);
-      // CU-5: the server checks the text again before it stores it.
+      // CU-5: the server checks the text again before it stores it, and tags it.
       const check = mockCheck({ text, kind: "question", category: body.category });
       if (!check.accepted) return HttpResponse.json(refusedBody(check), { status: 422 });
       if (db().savedQuestions.length >= SAVED_MAX) {
@@ -270,7 +269,7 @@ export function customHandlers(store: MockStore) {
         id: newId(),
         text,
         category: body.category,
-        competencies: body.competencies,
+        competencies: fitting(body.category, body.competencies, check.competencies),
         bank_ref: body.bank_ref ?? null,
         created_at: now,
         updated_at: now,
@@ -289,12 +288,15 @@ export function customHandlers(store: MockStore) {
         competencies: body.competencies ?? row.competencies,
       };
       if (!next.text || next.text.length > 500) return invalid("text must be 1 to 500 characters");
-      const problem = savedProblem(next.category, next.competencies);
-      if (problem) return invalid(problem);
+      // CU-5: a new text or category is checked again and, when the competencies do not fit, re-tagged.
+      let tags = next.competencies;
       if (next.text !== row.text || next.category !== row.category) {
         const check = mockCheck({ text: next.text, kind: "question", category: next.category });
         if (!check.accepted) return HttpResponse.json(refusedBody(check), { status: 422 });
+        tags = check.competencies;
       }
+      next.competencies = fitting(next.category, next.competencies, tags);
+      if (next.competencies.length === 0) return invalid(`competencies do not belong to ${next.category}`);
       if (body.text !== undefined && body.text !== null && duplicate(next.text, row.id)) {
         return conflict("duplicate_question", "This question is already in your list.");
       }
