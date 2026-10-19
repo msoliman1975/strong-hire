@@ -16,6 +16,8 @@ export const MOCK_DEFAULTS: RuntimeSettings = {
   daily_spend_cap_usd: 25,
   site_banner: null,
   jobs_paused: [],
+  sim_paused: false,
+  sim_max_live_sessions: 3,
   custom_interview_access: "everyone",
 };
 
