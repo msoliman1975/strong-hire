@@ -13,7 +13,29 @@ from strong_core.db import get_sessionmaker
 from strong_core.db.models import User
 
 SESSION_USER_KEY = "uid"
+SESSION_EPOCH_KEY = "ep"
 SESSION_PENDING_KEY = "pending_signup"
+
+SUSPENDED_MESSAGE = "This account is not available. Contact support for help."
+"""AU-7: the same neutral reply for every request and sign-in of a suspended user."""
+
+
+class AccountSuspendedError(HTTPException):
+    """AU-7: the user is suspended. 403 with the neutral message."""
+
+    def __init__(self) -> None:
+        super().__init__(status.HTTP_403_FORBIDDEN, SUSPENDED_MESSAGE)
+
+
+def start_user_session(request: Request, user: User) -> None:
+    """Put the user in a fresh session cookie, with their session epoch (AU-8).
+
+    Refuses a suspended user (AU-7) and leaves them signed out."""
+    request.session.clear()
+    if user.suspended_at is not None:
+        raise AccountSuspendedError()
+    request.session[SESSION_USER_KEY] = str(user.id)
+    request.session[SESSION_EPOCH_KEY] = user.session_epoch or 0
 
 
 async def get_db(request: Request) -> AsyncIterator[AsyncSession]:
@@ -34,6 +56,16 @@ async def optional_user(request: Request, db: DbSession) -> User | None:
     user = await get_user(db, user_id)
     if user is None:
         request.session.clear()  # the account was deleted
+        return None
+    # AU-8: a cookie from before the last forced sign-out is stale. Cookies made before the
+    # epoch existed carry none and count as epoch 0, so nobody was signed out at deploy.
+    epoch = request.session.get(SESSION_EPOCH_KEY, 0)
+    if not isinstance(epoch, int) or epoch != (user.session_epoch or 0):
+        request.session.clear()
+        return None
+    if user.suspended_at is not None:  # AU-7
+        request.session.clear()
+        raise AccountSuspendedError()
     return user
 
 

@@ -77,7 +77,7 @@ describe("admin pages (R2, AI pages moved)", () => {
 
   it("lists interviews with cost and a daily total, under the admin nav", async () => {
     seed();
-    renderAt("/");
+    renderAt("/interviews");
     expect(await screen.findByRole("heading", { name: "Interviews" })).toBeInTheDocument();
     const nav = screen.getByRole("navigation", { name: "Admin" });
     expect(within(nav).getByRole("link", { name: "Interviews" })).toHaveAttribute("href", "/interviews");
@@ -132,7 +132,7 @@ describe("admin pages (R2, AI pages moved)", () => {
     expect(within(row).getByRole("cell", { name: "1" })).toBeInTheDocument();
     expect(within(row).getByRole("link", { name: "ana@example.com" })).toHaveAttribute(
       "href",
-      "/interviews?user=00000000-0000-4000-8000-0000000000a1",
+      "/users/00000000-0000-4000-8000-0000000000a1",
     );
   });
 });

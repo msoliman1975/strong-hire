@@ -1110,23 +1110,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/users": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List Users */
-        get: operations["list_users_admin_users_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/admin/sessions": {
         parameters: {
             query?: never;
@@ -1136,7 +1119,8 @@ export interface paths {
         };
         /**
          * List Sessions
-         * @description Interviews of all users, newest first, with the interviewer's model cost.
+         * @description Interviews of all users, newest first, with the interviewer's model cost and the derived
+         *     failure reason (AI-4).
          */
         get: operations["list_sessions_admin_sessions_get"];
         put?: never;
@@ -1404,6 +1388,348 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Users
+         * @description Users, newest first, that match every filter given (AU-1).
+         */
+        get: operations["list_users_admin_users_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get User Detail
+         * @description AU-2. Resumes and gap analyses are metadata only (D-8).
+         */
+        get: operations["get_user_detail_admin_users__user_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/{user_id}/grants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add Grant
+         * @description Add minutes (AU-3), free interviews (AU-4) or a comp plan (AU-5).
+         */
+        post: operations["add_grant_admin_users__user_id__grants_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/{user_id}/grants/{grant_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Revoke Grant
+         * @description Revoke a grant. The row stays in the ledger with revoked_at and revoked_by.
+         */
+        delete: operations["revoke_grant_admin_users__user_id__grants__grant_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/{user_id}/suspend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Suspend User
+         * @description AU-7: the user's requests and sign-ins get 403 with a neutral message. Sessions in
+         *     progress end cleanly.
+         */
+        post: operations["suspend_user_admin_users__user_id__suspend_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/{user_id}/unsuspend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Unsuspend User */
+        post: operations["unsuspend_user_admin_users__user_id__unsuspend_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/{user_id}/signout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Force Sign Out
+         * @description AU-8: every session cookie of the user stops working; they sign in again.
+         */
+        post: operations["force_sign_out_admin_users__user_id__signout_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/{user_id}/resend-link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Resend Sign In Link
+         * @description AU-9: email the user a sign-in link. At most RESEND_LIMIT per user per 15 minutes.
+         *
+         *     The link goes to the user's inbox only; the admin never sees it (no impersonation).
+         */
+        post: operations["resend_sign_in_link_admin_users__user_id__resend_link_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Overview
+         * @description AD-2: funnel, revenue, usage, cost and quality, each with the previous period.
+         */
+        get: operations["get_overview_admin_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/ops/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Health
+         * @description OB-10: one tile per service and dependency, plus host metrics with 24 h sparklines.
+         */
+        get: operations["get_health_admin_ops_health_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/ops/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Metric
+         * @description One ops_samples metric, averaged per bucket (1 min for 1 h up to 6 h for 30 days).
+         */
+        get: operations["get_metric_admin_ops_metrics_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/ops/performance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Performance
+         * @description OB-11: voice latency p50/p95 by component over time (OB-3) and interviewer LLM latency.
+         */
+        get: operations["get_performance_admin_ops_performance_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/ops/errors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Errors
+         * @description OB-12: error groups sorted by last seen, each with a sparkline of the last 24 hours.
+         */
+        get: operations["list_errors_admin_ops_errors_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/ops/errors/{group_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Error */
+        get: operations["get_error_admin_ops_errors__group_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Error
+         * @description OB-12: mark resolved, or reopen. A resolved group that happens again reopens (OB-4).
+         */
+        patch: operations["update_error_admin_ops_errors__group_id__patch"];
+        trace?: never;
+    };
+    "/admin/ops/jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Jobs
+         * @description OB-13: queue depth and the gap analyses and scorings that failed (7 days) or are stuck.
+         */
+        get: operations["get_jobs_admin_ops_jobs_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/ops/jobs/{kind}/{job_id}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Retry Job
+         * @description OB-13: re-enqueue the Arq job the normal path uses. 409 when the job is not failed or
+         *     stuck.
+         */
+        post: operations["retry_job_admin_ops_jobs__kind___job_id__retry_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/ops/spend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Spend
+         * @description OB-14: today's and this month's model cost against the daily cap (OC-3).
+         */
+        get: operations["get_spend_admin_ops_spend_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -1455,6 +1781,20 @@ export interface components {
              */
             reason: string;
         };
+        /** AdminActionOut */
+        AdminActionOut: {
+            /** Action */
+            action: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Details */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
         /** AdminAuditEntry */
         AdminAuditEntry: {
             /**
@@ -1480,6 +1820,158 @@ export interface components {
                 [key: string]: unknown;
             } | null;
         };
+        /** AdminCostLine */
+        AdminCostLine: {
+            /** Component */
+            component: string;
+            /** Role */
+            role: string;
+            /** Units */
+            units: number;
+            /** Cost Usd */
+            cost_usd: number;
+            /** Rows */
+            rows: number;
+            /**
+             * Cost Known
+             * @description False when a row had no price (self-hosted: $0)
+             */
+            cost_known: boolean;
+        };
+        /** AdminEntitlement */
+        AdminEntitlement: {
+            /**
+             * Plan
+             * @enum {string}
+             */
+            plan: "free" | "paid";
+            /** Minutes Used */
+            minutes_used: number;
+            /**
+             * Plan Minutes Cap
+             * @description From the subscription or the comp plan.
+             */
+            plan_minutes_cap: number;
+            /**
+             * Minutes Granted
+             * @description Active minute grants (0 on the free plan).
+             */
+            minutes_granted: number;
+            /** Minutes Cap */
+            minutes_cap: number;
+            /** Minutes Left */
+            minutes_left: number;
+            /** Free Interviews Total */
+            free_interviews_total: number;
+            /** Free Interviews Granted */
+            free_interviews_granted: number;
+            /** Free Interviews Used */
+            free_interviews_used: number;
+            /** Free Interviews Left */
+            free_interviews_left: number;
+            /** Comp Until */
+            comp_until: string | null;
+            /** Block Code */
+            block_code: string | null;
+        };
+        /**
+         * AdminGapMeta
+         * @description D-8: metadata only. Never the findings, the scores or the brief.
+         */
+        AdminGapMeta: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Job Target Id
+             * Format: uuid
+             */
+            job_target_id: string;
+            /**
+             * Resume Id
+             * Format: uuid
+             */
+            resume_id: string;
+            status: components["schemas"]["GapStatus"];
+            /** Has Error */
+            has_error: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Updated At */
+            updated_at: string | null;
+        };
+        /** AdminGrant */
+        AdminGrant: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            kind: components["schemas"]["GrantKind"];
+            /** Amount */
+            amount: number;
+            /** Expires At */
+            expires_at: string | null;
+            /** Reason */
+            reason: string;
+            /** Granted By */
+            granted_by: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Revoked At */
+            revoked_at: string | null;
+            /** Revoked By */
+            revoked_by: string | null;
+            /**
+             * Active
+             * @description Not revoked and not expired.
+             */
+            active: boolean;
+        };
+        /**
+         * AdminJobTarget
+         * @description Company, title and level only (AU-2). No posting text.
+         */
+        AdminJobTarget: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Company */
+            company: string | null;
+            /** Title */
+            title: string | null;
+            level: components["schemas"]["Level"] | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Archived At */
+            archived_at: string | null;
+            /** Deleted At */
+            deleted_at: string | null;
+        };
+        /** AdminLatencyStat */
+        AdminLatencyStat: {
+            /** Key */
+            key: string;
+            /** N */
+            n: number;
+            /** P50 Ms */
+            p50_ms: number | null;
+            /** P95 Ms */
+            p95_ms: number | null;
+        };
         /** AdminMessage */
         AdminMessage: {
             /** Role */
@@ -1488,6 +1980,142 @@ export interface components {
             content: string;
             /** Prompt Ref */
             prompt_ref?: string | null;
+        };
+        /**
+         * AdminMetric
+         * @description One number on an admin page. `previous` is the same metric over the previous period.
+         */
+        AdminMetric: {
+            /**
+             * Measured
+             * @default true
+             */
+            measured: boolean;
+            /** Value */
+            value?: number | null;
+            /** Previous */
+            previous?: number | null;
+            /**
+             * Unit
+             * @description pct values are fractions: 0.02 is 2%
+             * @default count
+             * @enum {string}
+             */
+            unit: "count" | "usd" | "pct" | "ms" | "minutes" | "ratio" | "rating" | "bytes";
+            /**
+             * Target
+             * @description Spec target, same unit
+             */
+            target?: number | null;
+            /**
+             * Reason
+             * @description AO-8: why it is not measured
+             */
+            reason?: string | null;
+            /**
+             * Note
+             * @description How the number is computed
+             */
+            note?: string | null;
+            /**
+             * Link
+             * @description AO-7: admin app path of the list behind it
+             */
+            link?: string | null;
+        };
+        /** AdminOrg */
+        AdminOrg: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            type: components["schemas"]["OrgType"];
+            /** Plan */
+            plan: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** AdminOverview */
+        AdminOverview: {
+            /**
+             * Range
+             * @enum {string}
+             */
+            range: "24h" | "7d" | "30d" | "90d";
+            /**
+             * Start
+             * Format: date-time
+             */
+            start: string;
+            /**
+             * End
+             * Format: date-time
+             */
+            end: string;
+            /**
+             * Previous Start
+             * Format: date-time
+             */
+            previous_start: string;
+            /** Funnel */
+            funnel: components["schemas"]["FunnelStep"][];
+            revenue: components["schemas"]["OverviewRevenue"];
+            usage: components["schemas"]["OverviewUsage"];
+            cost: components["schemas"]["OverviewCost"];
+            quality: components["schemas"]["OverviewQuality"];
+        };
+        /**
+         * AdminRefund
+         * @description AU-6: a refund made in the Stripe dashboard, from the charge.refunded webhook.
+         */
+        AdminRefund: {
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Charge Id */
+            charge_id: string | null;
+            /**
+             * Amount Refunded
+             * @description In the currency's smallest unit (cents).
+             */
+            amount_refunded: number | null;
+            /** Currency */
+            currency: string | null;
+            /** Livemode */
+            livemode: boolean;
+        };
+        /**
+         * AdminResumeMeta
+         * @description D-8: metadata only. Never the file, the text or the extracted fields.
+         */
+        AdminResumeMeta: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Uploaded At
+             * Format: date-time
+             */
+            uploaded_at: string;
+            /** Confirmed At */
+            confirmed_at: string | null;
+            /** Deleted At */
+            deleted_at: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "reading" | "to_confirm" | "confirmed" | "deleted";
         };
         /** AdminScore */
         AdminScore: {
@@ -1553,6 +2181,22 @@ export interface components {
              * @enum {string}
              */
             cost_source: "usage_events" | "traces" | "none";
+            /**
+             * Failure Kind
+             * @description AI-4: brief_failed, scoring_failed, stuck_scoring, ...
+             */
+            failure_kind?: string | null;
+            /**
+             * Failure Reason
+             * @description AI-4: the derived reason (sessions/failure.py and stuck rules)
+             */
+            failure_reason?: string | null;
+            /**
+             * Stuck
+             * @description AI-1: scoring or in progress for too long
+             * @default false
+             */
+            stuck: boolean;
         };
         /** AdminSessionDetail */
         AdminSessionDetail: {
@@ -1574,6 +2218,26 @@ export interface components {
              * @default false
              */
             audio_available: boolean;
+            /**
+             * Cost Breakdown
+             * @description AI-2: usage_events by component and role
+             */
+            cost_breakdown?: components["schemas"]["AdminCostLine"][];
+            /**
+             * Cost Total Usd
+             * @description AI-2: every component and role. None without usage rows.
+             */
+            cost_total_usd?: number | null;
+            /**
+             * Turn Latency
+             * @description AI-3: per-turn voice latency (OB-3)
+             */
+            turn_latency?: components["schemas"]["AdminTurnLatency"][];
+            /**
+             * Latency Summary
+             * @description AI-3: p50/p95 per component over the session's turns
+             */
+            latency_summary?: components["schemas"]["AdminLatencyStat"][];
         };
         /** AdminSessionList */
         AdminSessionList: {
@@ -1588,6 +2252,39 @@ export interface components {
             total_cost_usd: number;
             /** Limit */
             limit: number;
+        };
+        /** AdminSubscription */
+        AdminSubscription: {
+            status: components["schemas"]["SubscriptionStatus"];
+            /** Stripe Customer Id */
+            stripe_customer_id: string | null;
+            /** Stripe Subscription Id */
+            stripe_subscription_id: string | null;
+            /**
+             * Stripe Customer Url
+             * @description The customer in the Stripe dashboard (refunds are made there, D-7).
+             */
+            stripe_customer_url: string | null;
+            /**
+             * Stripe Mode
+             * @description From the API's Stripe key prefix.
+             */
+            stripe_mode: ("test" | "live") | null;
+            /** Period Start */
+            period_start: string | null;
+            /** Period End */
+            period_end: string | null;
+            /** Minutes Cap */
+            minutes_cap: number;
+            /** Minutes Used */
+            minutes_used: number;
+            /** Cancel At Period End */
+            cancel_at_period_end: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** AdminTrace */
         AdminTrace: {
@@ -1636,7 +2333,32 @@ export interface components {
              */
             created_at: string;
         };
-        /** AdminUser */
+        /** AdminTurnLatency */
+        AdminTurnLatency: {
+            /** Turn Index */
+            turn_index: number;
+            /** E2E Ms */
+            e2e_ms: number | null;
+            /** Turn Detection Ms */
+            turn_detection_ms: number | null;
+            /** Stt Ms */
+            stt_ms: number | null;
+            /** Llm Ttft Ms */
+            llm_ttft_ms: number | null;
+            /** Tts Ttfb Ms */
+            tts_ttfb_ms: number | null;
+            /** Other Ms */
+            other_ms: number | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * AdminUser
+         * @description One row of the Users list (AU-1).
+         */
         AdminUser: {
             /**
              * Id
@@ -1645,6 +2367,9 @@ export interface components {
             id: string;
             /** Email */
             email: string;
+            /** Full Name */
+            full_name: string | null;
+            auth_provider: components["schemas"]["AuthProvider"];
             /**
              * Created At
              * Format: date-time
@@ -1654,20 +2379,130 @@ export interface components {
             last_sign_in_at: string | null;
             /**
              * Plan
+             * @description paid: an active subscription or an active comp grant.
              * @enum {string}
              */
             plan: "free" | "paid";
             subscription_status: components["schemas"]["SubscriptionStatus"] | null;
+            /**
+             * Comp Until
+             * @description Set while a comp plan grant is active.
+             */
+            comp_until: string | null;
             /** Minutes Used */
             minutes_used: number;
-            /** Minutes Cap */
+            /**
+             * Minutes Cap
+             * @description Plan cap plus active minute grants. 0 on free.
+             */
             minutes_cap: number;
+            /** Minutes Left */
+            minutes_left: number;
+            /** Free Interviews Left */
+            free_interviews_left: number;
             /** Training Consent */
             training_consent: boolean;
             /** Interviews */
             interviews: number;
             /** Is Admin */
             is_admin: boolean;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "suspended";
+            /** Suspended At */
+            suspended_at: string | null;
+        };
+        /**
+         * AdminUserDetail
+         * @description AU-2: everything support needs about one user.
+         */
+        AdminUserDetail: {
+            user: components["schemas"]["AdminUser"];
+            profile: components["schemas"]["AdminUserProfile"];
+            org: components["schemas"]["AdminOrg"] | null;
+            /** Suspended Reason */
+            suspended_reason: string | null;
+            /** Session Epoch */
+            session_epoch: number;
+            subscription: components["schemas"]["AdminSubscription"] | null;
+            entitlement: components["schemas"]["AdminEntitlement"];
+            /** Grants */
+            grants: components["schemas"]["AdminGrant"][];
+            /** Sessions */
+            sessions: components["schemas"]["AdminSession"][];
+            /** Job Targets */
+            job_targets: components["schemas"]["AdminJobTarget"][];
+            /** Resume Count */
+            resume_count: number;
+            /** Resumes */
+            resumes: components["schemas"]["AdminResumeMeta"][];
+            /** Gap Analysis Count */
+            gap_analysis_count: number;
+            /** Gap Analyses */
+            gap_analyses: components["schemas"]["AdminGapMeta"][];
+            /**
+             * Cost To Date Usd
+             * @description All model usage of the account (usage_events).
+             */
+            cost_to_date_usd: number;
+            /**
+             * Cost Unknown Events
+             * @description Usage rows with no known price (D-12).
+             */
+            cost_unknown_events: number;
+            /** Refunds */
+            refunds: components["schemas"]["AdminRefund"][];
+            /**
+             * Privacy Actions
+             * @description AU-10: the user's own exports and deletes. Admins see them, never run them.
+             */
+            privacy_actions: components["schemas"]["AdminAuditEntry"][];
+            /**
+             * Audit
+             * @description Audit entries about this user, newest first.
+             */
+            audit: components["schemas"]["AdminAuditEntry"][];
+        };
+        /** AdminUserPage */
+        AdminUserPage: {
+            /** Users */
+            users: components["schemas"]["AdminUser"][];
+            /**
+             * Total
+             * @description Users that match the filters, on all pages.
+             */
+            total: number;
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+        };
+        /**
+         * AdminUserProfile
+         * @description The AC-3 profile. No resume data.
+         */
+        AdminUserProfile: {
+            /** Full Name */
+            full_name: string | null;
+            /** Current Title */
+            current_title: string | null;
+            /** Years Experience */
+            years_experience: number | null;
+            target_level: components["schemas"]["Level"] | null;
+            /** Country */
+            country: string | null;
+            /** Time Zone */
+            time_zone: string | null;
+            /** Linkedin Url */
+            linkedin_url: string | null;
+            /** Profile Completed At */
+            profile_completed_at: string | null;
+            /** Email Verified At */
+            email_verified_at: string | null;
+            /** Has Password */
+            has_password: boolean;
         };
         /**
          * AlertAggregation
@@ -2221,6 +3056,31 @@ export interface components {
             /** Training Consent */
             training_consent: boolean;
         };
+        /** CostDay */
+        CostDay: {
+            /**
+             * Day
+             * Format: date-time
+             */
+            day: string;
+            /** Llm Usd */
+            llm_usd: number;
+            /** Stt Usd */
+            stt_usd: number;
+            /** Tts Usd */
+            tts_usd: number;
+            /** Total Usd */
+            total_usd: number;
+        };
+        /** CostSlice */
+        CostSlice: {
+            /** Key */
+            key: string;
+            /** Cost Usd */
+            cost_usd: number;
+            /** Rows */
+            rows: number;
+        };
         /** CreateSessionRequest */
         CreateSessionRequest: {
             /**
@@ -2360,6 +3220,12 @@ export interface components {
             dev_link?: string | null;
         };
         /**
+         * ErrorGroupStatus
+         * @description OB-12: a resolved group that happens again reopens.
+         * @enum {string}
+         */
+        ErrorGroupStatus: "open" | "resolved";
+        /**
          * ExitSurveyIn
          * @description The cancellation exit survey: two questions. Both are required, the detail is not.
          */
@@ -2413,6 +3279,15 @@ export interface components {
             download_url: string | null;
             /** Error */
             error?: string | null;
+        };
+        /** FunnelStep */
+        FunnelStep: {
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            metric: components["schemas"]["AdminMetric"];
+            conversion?: components["schemas"]["AdminMetric"] | null;
         };
         /** Gap */
         Gap: {
@@ -2543,10 +3418,53 @@ export interface components {
          * @enum {string}
          */
         GapStatus: "running" | "ready" | "failed";
+        /**
+         * GrantIn
+         * @description AU-3 minutes (negative removes), AU-4 free interviews, AU-5 comp plan (cap + end date).
+         */
+        GrantIn: {
+            /**
+             * Reason
+             * @description Why, for the audit log
+             */
+            reason: string;
+            kind: components["schemas"]["GrantKind"];
+            /**
+             * Amount
+             * @description Minutes, free interviews, or the comp plan's minute cap.
+             */
+            amount: number;
+            /**
+             * Expires At
+             * @description Required for comp_plan.
+             */
+            expires_at?: string | null;
+        };
+        /**
+         * GrantKind
+         * @description AU-3..AU-5: what a minute_grants row gives the user.
+         * @enum {string}
+         */
+        GrantKind: "minutes" | "free_interviews" | "comp_plan";
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** Heartbeat */
+        Heartbeat: {
+            /** Service */
+            service: string;
+            /** Instance */
+            instance: string;
+            /** Version */
+            version?: string | null;
+            /** Model Profile */
+            model_profile?: string | null;
+            /** Started At */
+            started_at?: string | null;
+            /** At */
+            at?: string | null;
         };
         /**
          * HireSignal
@@ -2862,6 +3780,38 @@ export interface components {
             stage?: string | null;
             context?: components["schemas"]["JobContext"];
         };
+        /** LatencyPoint */
+        LatencyPoint: {
+            /**
+             * T
+             * Format: date-time
+             */
+            t: string;
+            /** N */
+            n: number;
+            /** P50 Ms */
+            p50_ms: number | null;
+            /** P95 Ms */
+            p95_ms: number | null;
+        };
+        /** LatencySeries */
+        LatencySeries: {
+            /** Key */
+            key: string;
+            /** Points */
+            points: components["schemas"]["LatencyPoint"][];
+        };
+        /** LatencyStat */
+        LatencyStat: {
+            /** Key */
+            key: string;
+            /** N */
+            n: number;
+            /** P50 Ms */
+            p50_ms: number | null;
+            /** P95 Ms */
+            p95_ms: number | null;
+        };
         /**
          * Level
          * @description Normalized seniority (IV-6). Company-specific labels such as L5 or E5 map to these.
@@ -2982,6 +3932,263 @@ export interface components {
             /** Rpm Limit */
             rpm_limit?: number | null;
         };
+        /** OpsErrorDetail */
+        OpsErrorDetail: {
+            group: components["schemas"]["OpsErrorGroup"];
+            /** Sample Stack */
+            sample_stack: string | null;
+            /**
+             * Daily
+             * @description Events per day over the last 14 days, oldest first
+             */
+            daily: number[];
+            /** Events */
+            events: components["schemas"]["OpsErrorEvent"][];
+        };
+        /** OpsErrorEvent */
+        OpsErrorEvent: {
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Service */
+            service: string;
+            /** Release */
+            release: string | null;
+            /** Request Id */
+            request_id: string | null;
+            /** Session Id */
+            session_id: string | null;
+        };
+        /** OpsErrorGroup */
+        OpsErrorGroup: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Fingerprint */
+            fingerprint: string;
+            /** Service */
+            service: string;
+            /** Exception Type */
+            exception_type: string;
+            /** Message */
+            message: string;
+            /**
+             * First Seen
+             * Format: date-time
+             */
+            first_seen: string;
+            /**
+             * Last Seen
+             * Format: date-time
+             */
+            last_seen: string;
+            /** Count */
+            count: number;
+            status: components["schemas"]["ErrorGroupStatus"];
+            /** Resolved At */
+            resolved_at: string | null;
+            /** Resolved By */
+            resolved_by: string | null;
+            /** Release */
+            release: string | null;
+            /** Events 24H */
+            events_24h: number;
+            /**
+             * Sparkline
+             * @description Events per hour over the last 24 hours, oldest first
+             */
+            sparkline: number[];
+        };
+        /** OpsErrorUpdate */
+        OpsErrorUpdate: {
+            /**
+             * Reason
+             * @description Why, for the audit log
+             */
+            reason: string;
+            status: components["schemas"]["ErrorGroupStatus"];
+        };
+        /** OpsHealth */
+        OpsHealth: {
+            /**
+             * Generated At
+             * Format: date-time
+             */
+            generated_at: string;
+            /** Tiles */
+            tiles: components["schemas"]["OpsTile"][];
+            /** Host */
+            host: components["schemas"]["OpsHostMetric"][];
+            /** Redis Error */
+            redis_error?: string | null;
+        };
+        /** OpsHostMetric */
+        OpsHostMetric: {
+            /** Metric */
+            metric: string;
+            /** Label */
+            label: string;
+            /**
+             * Unit
+             * @enum {string}
+             */
+            unit: "pct" | "ratio" | "bytes" | "count";
+            /** Labels */
+            labels: {
+                [key: string]: string;
+            };
+            /** Latest */
+            latest: number | null;
+            /** Latest At */
+            latest_at: string | null;
+            /** Points */
+            points: components["schemas"]["OpsPoint"][];
+        };
+        /** OpsHostedEquivalent */
+        OpsHostedEquivalent: {
+            /** Configured */
+            configured: boolean;
+            /** Reason */
+            reason?: string | null;
+            /** Stt Seconds */
+            stt_seconds: number;
+            /** Tts Characters */
+            tts_characters: number;
+            /** Stt Usd Per Second */
+            stt_usd_per_second?: number | null;
+            /** Tts Usd Per Character */
+            tts_usd_per_character?: number | null;
+            /** Stt Usd */
+            stt_usd?: number | null;
+            /** Tts Usd */
+            tts_usd?: number | null;
+            /** Total Usd */
+            total_usd?: number | null;
+        };
+        /** OpsJob */
+        OpsJob: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "gap_analysis" | "scoring";
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "failed" | "stuck";
+            /** Status */
+            status: string;
+            /** Reason */
+            reason: string | null;
+            /** User Email */
+            user_email: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * @description Last change: gap updated_at, session end
+             */
+            updated_at: string | null;
+            /** Retryable */
+            retryable: boolean;
+        };
+        /** OpsJobs */
+        OpsJobs: {
+            queue_depth: components["schemas"]["AdminMetric"];
+            /** Queue Series */
+            queue_series: components["schemas"]["OpsSeries"][];
+            /** Jobs Paused */
+            jobs_paused: string[];
+            /** Gap Analyses */
+            gap_analyses: components["schemas"]["OpsJob"][];
+            /** Scorings */
+            scorings: components["schemas"]["OpsJob"][];
+        };
+        /** OpsPerformance */
+        OpsPerformance: {
+            /**
+             * Range
+             * @enum {string}
+             */
+            range: "24h" | "7d" | "30d" | "90d";
+            /** Step S */
+            step_s: number;
+            /** Voice */
+            voice: components["schemas"]["LatencyStat"][];
+            /** Voice Series */
+            voice_series: components["schemas"]["LatencySeries"][];
+            /**
+             * Llm Role
+             * @default interviewer
+             */
+            llm_role: string;
+            /** Llm */
+            llm: components["schemas"]["LatencyStat"][];
+            /** Llm Series */
+            llm_series: components["schemas"]["LatencySeries"][];
+            llm_other_roles: components["schemas"]["AdminMetric"];
+            queue_wait: components["schemas"]["AdminMetric"];
+        };
+        /** OpsPoint */
+        OpsPoint: {
+            /**
+             * T
+             * Format: date-time
+             */
+            t: string;
+            /**
+             * Value
+             * @description Average in the bucket
+             */
+            value: number;
+            /** Min */
+            min: number;
+            /** Max */
+            max: number;
+            /** N */
+            n: number;
+        };
+        /** OpsRetryOut */
+        OpsRetryOut: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "gap_analysis" | "scoring";
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Job Id */
+            job_id: string;
+            /** Status */
+            status: string;
+        };
+        /** OpsSeries */
+        OpsSeries: {
+            /** Metric */
+            metric: string;
+            /** Labels */
+            labels: {
+                [key: string]: string;
+            };
+            /** Points */
+            points: components["schemas"]["OpsPoint"][];
+        };
         /** OpsSettingMeta */
         OpsSettingMeta: {
             key: components["schemas"]["SettingKey"];
@@ -3007,6 +4214,106 @@ export interface components {
              * @description OC-3: model cost since UTC midnight (30 s cache)
              */
             spend_today_usd: number;
+        };
+        /** OpsSpend */
+        OpsSpend: {
+            /**
+             * Generated At
+             * Format: date-time
+             */
+            generated_at: string;
+            /** Today Usd */
+            today_usd: number;
+            /** Month Usd */
+            month_usd: number;
+            /** Daily Cap Usd */
+            daily_cap_usd: number;
+            /**
+             * Cap Pct
+             * @description Today's cost / the cap, as a fraction
+             */
+            cap_pct: number | null;
+            /** By Component */
+            by_component: components["schemas"]["SpendSlice"][];
+            /** By Role */
+            by_role: components["schemas"]["SpendSlice"][];
+            /** Daily */
+            daily: components["schemas"]["OpsPoint"][];
+            litellm: components["schemas"]["ModelUsage"];
+            hosted_equivalent: components["schemas"]["OpsHostedEquivalent"];
+        };
+        /** OpsTile */
+        OpsTile: {
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "service" | "dependency";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "up" | "degraded" | "down" | "unknown";
+            /** Detail */
+            detail?: string | null;
+            /** Checked At */
+            checked_at?: string | null;
+            /** Latency Ms */
+            latency_ms?: number | null;
+            /** Version */
+            version?: string | null;
+            /** Instances */
+            instances?: components["schemas"]["Heartbeat"][];
+        };
+        /**
+         * OrgType
+         * @enum {string}
+         */
+        OrgType: "personal" | "business";
+        /** OverviewCost */
+        OverviewCost: {
+            total_usd: components["schemas"]["AdminMetric"];
+            per_completed_session_usd: components["schemas"]["AdminMetric"];
+            server_share_per_session_usd: components["schemas"]["AdminMetric"];
+            unmetered_rows: components["schemas"]["AdminMetric"];
+            /** By Day */
+            by_day: components["schemas"]["CostDay"][];
+            /** By Component */
+            by_component: components["schemas"]["CostSlice"][];
+            /** By Role */
+            by_role: components["schemas"]["CostSlice"][];
+        };
+        /** OverviewQuality */
+        OverviewQuality: {
+            failure_rate: components["schemas"]["AdminMetric"];
+            voice_p50_ms: components["schemas"]["AdminMetric"];
+            voice_p95_ms: components["schemas"]["AdminMetric"];
+            realism_rating: components["schemas"]["AdminMetric"];
+            scorer_agreement: components["schemas"]["AdminMetric"];
+            offer_reported: components["schemas"]["AdminMetric"];
+        };
+        /** OverviewRevenue */
+        OverviewRevenue: {
+            active_subscribers: components["schemas"]["AdminMetric"];
+            mrr_usd: components["schemas"]["AdminMetric"];
+            new_subscriptions: components["schemas"]["AdminMetric"];
+            cancellations: components["schemas"]["AdminMetric"];
+            monthly_churn: components["schemas"]["AdminMetric"];
+            refunds: components["schemas"]["AdminMetric"];
+        };
+        /** OverviewUsage */
+        OverviewUsage: {
+            sessions_started: components["schemas"]["AdminMetric"];
+            sessions_completed: components["schemas"]["AdminMetric"];
+            sessions_failed: components["schemas"]["AdminMetric"];
+            minutes: components["schemas"]["AdminMetric"];
+            sessions_per_paid_user: components["schemas"]["AdminMetric"];
+            voice_sessions: components["schemas"]["AdminMetric"];
+            text_sessions: components["schemas"]["AdminMetric"];
         };
         /** PasswordLoginRequest */
         PasswordLoginRequest: {
@@ -3833,6 +5140,15 @@ export interface components {
          * @enum {string}
          */
         Speaker: "interviewer" | "candidate";
+        /** SpendSlice */
+        SpendSlice: {
+            /** Key */
+            key: string;
+            /** Today Usd */
+            today_usd: number;
+            /** Month Usd */
+            month_usd: number;
+        };
         /** Strength */
         Strength: {
             /** Summary */
@@ -5972,26 +7288,6 @@ export interface operations {
             };
         };
     };
-    list_users_admin_users_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminUser"][];
-                };
-            };
-        };
-    };
     list_sessions_admin_sessions_get: {
         parameters: {
             query?: {
@@ -6001,6 +7297,8 @@ export interface operations {
                 /** @description Last day (UTC), inclusive. */
                 day_to?: string | null;
                 interview_type?: components["schemas"]["InterviewType"] | null;
+                /** @description AI-1: a status, or stuck */
+                status?: ("created" | "in_progress" | "interrupted" | "scoring" | "completed" | "failed" | "stuck") | null;
             };
             header?: never;
             path?: never;
@@ -6481,6 +7779,599 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_users_admin_users_get: {
+        parameters: {
+            query?: {
+                /** @description Email, name or user id. */
+                q?: string | null;
+                plan?: ("free" | "paid") | null;
+                status?: ("active" | "suspended") | null;
+                /** @description UTC day, inclusive. */
+                signed_up_from?: string | null;
+                /** @description UTC day, inclusive. */
+                signed_up_to?: string | null;
+                /** @description UTC day, inclusive. */
+                last_sign_in_from?: string | null;
+                /** @description UTC day, inclusive. */
+                last_sign_in_to?: string | null;
+                page?: number;
+                page_size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_user_detail_admin_users__user_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_grant_admin_users__user_id__grants_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GrantIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminGrant"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoke_grant_admin_users__user_id__grants__grant_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                user_id: string;
+                grant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminGrant"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    suspend_user_admin_users__user_id__suspend_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminActionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unsuspend_user_admin_users__user_id__unsuspend_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminActionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    force_sign_out_admin_users__user_id__signout_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminActionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resend_sign_in_link_admin_users__user_id__resend_link_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminActionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_overview_admin_overview_get: {
+        parameters: {
+            query?: {
+                /** @description AO-1: length of the period */
+                range?: "24h" | "7d" | "30d" | "90d";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminOverview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_health_admin_ops_health_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsHealth"];
+                };
+            };
+        };
+    };
+    get_metric_admin_ops_metrics_get: {
+        parameters: {
+            query: {
+                metric: string;
+                /** @description Label filter, for example dep:redis,mount:root */
+                labels?: string | null;
+                range?: "1h" | "24h" | "7d" | "30d";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsSeries"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_performance_admin_ops_performance_get: {
+        parameters: {
+            query?: {
+                range?: "24h" | "7d" | "30d" | "90d";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsPerformance"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_errors_admin_ops_errors_get: {
+        parameters: {
+            query?: {
+                status?: "open" | "resolved" | "all";
+                service?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsErrorGroup"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_error_admin_ops_errors__group_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsErrorDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_error_admin_ops_errors__group_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpsErrorUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsErrorDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_jobs_admin_ops_jobs_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsJobs"];
+                };
+            };
+        };
+    };
+    retry_job_admin_ops_jobs__kind___job_id__retry_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                kind: "gap_analysis" | "scoring";
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsRetryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_spend_admin_ops_spend_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsSpend"];
                 };
             };
         };
