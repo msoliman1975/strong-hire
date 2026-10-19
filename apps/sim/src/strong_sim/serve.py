@@ -31,7 +31,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from strong_core.db.models import SimRun
 from strong_core.gateway import ModelGateway, Role
 from strong_core.schemas.enums import SimRunStatus
-from strong_core.sim import check_sim_gate
+from strong_core.sim import NAMES, check_sim_gate
 from strong_sim import retention
 from strong_sim.candidate import Pacer
 from strong_sim.client import AppClient
@@ -148,6 +148,8 @@ class SimService:
                 self._finish(run, SimRunStatus.FAILED, f"invalid scenario: {exc}"[:500])
                 await db.commit()
                 return
+            if not scenario.candidate_name:
+                scenario.candidate_name = NAMES[run_id.int % len(NAMES)]
             need = estimate([scenario.duration_min], self.prices)["total_usd"]
             gate = await check_sim_gate(db, need, self.gateway)
             if not gate.ok:

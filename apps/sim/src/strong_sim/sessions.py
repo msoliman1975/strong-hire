@@ -13,10 +13,11 @@ from typing import Any
 from livekit import rtc
 
 from strong_core.gateway import ModelGateway
+from strong_core.sim import Behavior
 from strong_sim.audio import Ear, Mouth, Recorder
 from strong_sim.candidate import SILENCE, Candidate
 from strong_sim.client import AppClient
-from strong_sim.scenarios import Behavior, Scenario
+from strong_sim.scenarios import Scenario
 from strong_sim.settings import SimSettings
 from strong_sim.timing import align_voice, latencies, speech_spans
 from strong_sim.transcript import Line
