@@ -10,7 +10,7 @@ import type { AdminGrant, AdminUser, AdminUserDetail, AdminUserPage, GrantKind }
 import type { AuthUser } from "../api/types";
 import { auditLog } from "./adminHandlers";
 import { newId, type MockDb, type MockStore } from "./db";
-import { API, isMockAdmin } from "./handlers";
+import { activeAdmin, API, currentAdmin } from "./handlers";
 
 interface UserState {
   grants: AdminGrant[];
@@ -40,13 +40,9 @@ function active(g: AdminGrant): boolean {
 
 export function usersHandlers(store: MockStore) {
   const db = () => store.db;
-  const admin = (): AuthUser | null => {
-    const { auth, users } = db();
-    const user = auth.status === "signed_in" && auth.userEmail ? users[auth.userEmail] : undefined;
-    return user && isMockAdmin(user.email) ? user : null;
-  };
+  const admin = () => currentAdmin(db());
   const byId = (id: unknown) => Object.values(db().users).find((u) => u.id === id);
-  const sessionsOf = (u: AuthUser) => (isMockAdmin(u.email) ? 0 : db().sessions.length);
+  const sessionsOf = (u: AuthUser) => (activeAdmin(db(), u.email) !== null ? 0 : db().sessions.length);
 
   const entitlement = (u: AuthUser) => {
     const st = stateOf(db(), u.id);
@@ -97,13 +93,13 @@ export function usersHandlers(store: MockStore) {
       free_interviews_left: ent.free_interviews_left,
       training_consent: u.training_consent,
       interviews: sessionsOf(u),
-      is_admin: isMockAdmin(u.email),
+      is_admin: activeAdmin(db(), u.email) !== null,
       status: st.suspendedAt ? "suspended" : "active",
       suspended_at: st.suspendedAt,
     };
   };
 
-  const audit = (me: AuthUser, u: AuthUser, action: string, reason: string, extra: Record<string, unknown> = {}) => {
+  const audit = (me: { email: string }, u: AuthUser, action: string, reason: string, extra: Record<string, unknown> = {}) => {
     const entry: AdminAuditEntry = {
       id: newId(),
       at: new Date().toISOString(),
@@ -238,7 +234,7 @@ export function usersHandlers(store: MockStore) {
       if ("error" in w) return w.error;
       const st = stateOf(db(), w.user.id);
       if (st.suspendedAt) return json("The user is already suspended", 409);
-      if (isMockAdmin(w.user.email)) return json("Remove the admin access first", 409);
+      if (activeAdmin(db(), w.user.email) !== null) return json("Remove the admin access first", 409);
       st.suspendedAt = new Date().toISOString();
       st.suspendedReason = w.reason;
       audit(w.me, w.user, "user.suspended", w.reason);

@@ -12,7 +12,13 @@ import { authApi } from "../api/auth";
 import { controlsApi } from "../api/controls";
 import { usersApi } from "../api/users";
 import { opsApi } from "../api/ops";
+import { contentApi } from "../api/content";
+import { mockProfile } from "./contentHandlers";
+import { simApi } from "../api/sim";
+import { settingsApi } from "../api/settings";
+import { mockLinkToken, mockSignIn } from "./handlers";
 import { mockStore } from "./node";
+import { MOCK_SIM_SESSION } from "./simHandlers";
 
 const OPENAPI = JSON.parse(readFileSync(resolve(__dirname, "../../../web/openapi.json"), "utf8")) as object;
 
@@ -35,28 +41,39 @@ function user(email: string, n: number, consent: boolean) {
     auth_provider: "password" as const,
     training_consent: consent,
     created_at: "2026-10-01T10:00:00Z",
-    is_admin: false,
     full_name: null,
     profile_complete: true,
   };
 }
 
 describe("admin mocks match openapi.json", () => {
-  it("sign-in: providers, me, password login, magic link", async () => {
-    mockStore.db.users["admin@example.com"] = user("admin@example.com", 9, false);
+  it("sign-in: providers, me, password, email link, verify (AA-2)", async () => {
     mockStore.db.passwords["admin@example.com"] = "correct horse battery";
-    expectApiShape("AuthProviders", await authApi.providers());
-    expectApiShape("AuthState", await authApi.me());
-    const state = await authApi.passwordLogin({ email: "admin@example.com", password: "correct horse battery" });
-    expectApiShape("AuthState", state);
-    expect(state.user?.is_admin).toBe(true);
-    expectApiShape("MagicLinkSent", await authApi.sendMagicLink("admin@example.com"));
+    expectApiShape("AdminProviders", await authApi.providers());
+    expect(await authApi.me()).toBeNull();
+    const me = await authApi.passwordLogin({ email: "admin@example.com", password: "correct horse battery" });
+    expectApiShape("AdminMe", me);
+    expectApiShape("AdminMe", await authApi.me());
+    expectApiShape("AdminLinkSent", await authApi.sendMagicLink("admin@example.com"));
+    expectApiShape("AdminMe", await authApi.verifyLink(mockLinkToken("admin@example.com")));
+  });
+
+  it("settings: admins and my sessions (AA-1, AA-8)", async () => {
+    mockSignIn(mockStore, "admin@example.com");
+    const added = await settingsApi.addAdmin({ email: "ops@example.com", reason: "on-call" });
+    expectApiShape("AdminAccount", added);
+    for (const a of await settingsApi.admins()) expectApiShape("AdminAccount", a);
+    expectApiShape("AdminAccount", await settingsApi.removeAdmin({ id: added.id, reason: "left" }));
+    const sessions = await settingsApi.mySessions();
+    for (const s of sessions) expectApiShape("AdminSignInSession", s);
+    await settingsApi.revokeSession(sessions[0].id);
+    expect(await authApi.me()).toBeNull();
   });
 
   it("admin: users, interviews, detail with traces, audit (R2)", async () => {
     mockStore.db.users["ana@example.com"] = user("ana@example.com", 1, true);
     mockStore.db.users["admin@example.com"] = user("admin@example.com", 9, false);
-    await authApi.devLogin("admin@example.com");
+    mockSignIn(mockStore, "admin@example.com");
     mockStore.db.sessions.push({
       id: "00000000-0000-4000-8000-0000000000c1",
       job_target_id: "00000000-0000-4000-8000-0000000000d1",
@@ -80,7 +97,7 @@ describe("admin mocks match openapi.json", () => {
 
   it("controls: settings, a change, models (OC-1 to OC-6)", async () => {
     mockStore.db.users["admin@example.com"] = user("admin@example.com", 9, false);
-    await authApi.devLogin("admin@example.com");
+    mockSignIn(mockStore, "admin@example.com");
     expectApiShape("OpsSettings", await controlsApi.settings());
     const banner = { text: "Maintenance", severity: "info" as const, until: "2099-01-01T00:00:00Z" };
     expectApiShape("OpsSettings", await controlsApi.set("site_banner", banner, "planned work"));
@@ -90,7 +107,7 @@ describe("admin mocks match openapi.json", () => {
 
   it("alerts: metrics, rules, events, test (AL-1, AL-4, AL-6)", async () => {
     mockStore.db.users["admin@example.com"] = user("admin@example.com", 9, false);
-    await authApi.devLogin("admin@example.com");
+    mockSignIn(mockStore, "admin@example.com");
     for (const m of await alertsApi.metrics()) expectApiShape("AlertMetric", m);
     const rules = await alertsApi.rules();
     for (const r of rules) expectApiShape("AlertRuleOut", r);
@@ -101,7 +118,7 @@ describe("admin mocks match openapi.json", () => {
   it("users and support (AU-1..AU-9)", async () => {
     mockStore.db.users["ana@example.com"] = user("ana@example.com", 1, true);
     mockStore.db.users["admin@example.com"] = user("admin@example.com", 9, false);
-    await authApi.devLogin("admin@example.com");
+    mockSignIn(mockStore, "admin@example.com");
     const id = "00000000-0000-4000-8000-0000000000a1";
     expectApiShape("AdminUserPage", await usersApi.list({ q: "ana" }));
     const until = new Date(Date.now() + 86_400_000).toISOString();
@@ -117,7 +134,7 @@ describe("admin mocks match openapi.json", () => {
 
   it("overview and operations (AO, OB-10..OB-14, AI)", async () => {
     mockStore.db.users["admin@example.com"] = user("admin@example.com", 9, false);
-    await authApi.devLogin("admin@example.com");
+    mockSignIn(mockStore, "admin@example.com");
     for (const range of ["24h", "7d", "30d", "90d"] as const) expectApiShape("AdminOverview", await opsApi.overview(range));
     expectApiShape("OpsHealth", await opsApi.health());
     expectApiShape("OpsPerformance", await opsApi.performance("7d"));
@@ -144,5 +161,49 @@ describe("admin mocks match openapi.json", () => {
     });
     expectApiShape("AdminSessionList", await adminApi.sessions({ status: "failed" }));
     expectApiShape("AdminSessionDetail", await adminApi.session("00000000-0000-4000-8000-0000000000c2"));
+  });
+
+  it("content: companies, versions, diff, import, transition, requests (AT-1..AT-5)", async () => {
+    mockStore.db.users["admin@example.com"] = user("admin@example.com", 9, false);
+    mockSignIn(mockStore, "admin@example.com");
+    for (const c of await contentApi.companies()) expectApiShape("AdminCompany", c);
+    expectApiShape("AdminCompany", await contentApi.setActive("google", false, "testing"));
+    expectApiShape("CompanyProfiles", await contentApi.profiles("example-corp"));
+    expectApiShape("ProfileVersionDetail", await contentApi.version("example-corp", 2));
+    expectApiShape("ProfileDiff", await contentApi.diff("example-corp", 1, 2));
+    const imported = await contentApi.importProfile("acme", {
+      profile: mockProfile("acme", "Acme", "Calm"),
+      reason: "testing",
+      create_company: true,
+      force: false,
+    });
+    expectApiShape("ProfileImportOut", imported);
+    expectApiShape("TransitionOut", await contentApi.transition("example-corp", 2, "in_review", "testing"));
+    const groups = await contentApi.requests();
+    for (const g of groups) expectApiShape("CompanyRequestGroup", g);
+    expectApiShape("CompanyRequestGroup", await contentApi.triage("acme", { state: "declined", reason: "testing" }));
+  });
+
+  it("simulations: options, runs, start, keep, cancel, delete, replay (SM)", async () => {
+    mockStore.db.users["admin@example.com"] = user("admin@example.com", 9, false);
+    mockSignIn(mockStore, "admin@example.com");
+    expectApiShape("SimOptions", await simApi.options());
+    expectApiShape("SimRunList", await simApi.runs());
+    const started = await simApi.start({
+      persona: "new-grad-swe",
+      interview_type: "behavioral",
+      difficulty: "realistic",
+      mode: "realistic",
+      duration_min: 10,
+      quality: "average",
+      behavior: "normal",
+      channel: "text",
+    });
+    expectApiShape("SimRunOut", started);
+    expectApiShape("SimRunOut", await simApi.keep(started.id, true));
+    const cancelled = await simApi.cancel(started.id, "wrong persona");
+    expectApiShape("SimRunOut", cancelled);
+    expectApiShape("SimRunOut", await simApi.remove(started.id, "not needed"));
+    expectApiShape("SessionReplay", await simApi.replay(MOCK_SIM_SESSION));
   });
 });

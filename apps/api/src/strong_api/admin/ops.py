@@ -59,6 +59,8 @@ from strong_core.db.models import (
     User,
     VoiceTurnTiming,
 )
+from strong_core.gateway import Role
+from strong_core.ops.costs import shadow_price
 from strong_core.schemas import GapStatus, SessionStatus, UsageComponent
 from strong_core.schemas.enums import ErrorGroupStatus
 
@@ -976,7 +978,9 @@ class OpsSpend(BaseModel):
 def shadow_prices() -> tuple[float | None, float | None]:
     """D-12 shadow prices for self-hosted speech: what a hosted provider would charge.
 
-    SHADOW_STT_USD_PER_SECOND and SHADOW_TTS_USD_PER_CHARACTER. Unset: "not configured".
+    One source: `shadow_cost_per_second` / `shadow_cost_per_character` in the running
+    profile's config/litellm.<profile>.yaml (strong_core.ops.costs). SHADOW_STT_USD_PER_SECOND
+    and SHADOW_TTS_USD_PER_CHARACTER override them. Neither set: "not configured".
     """
 
     def read(name: str) -> float | None:
@@ -986,7 +990,14 @@ def shadow_prices() -> tuple[float | None, float | None]:
         except ValueError:
             return None
 
-    return read("SHADOW_STT_USD_PER_SECOND"), read("SHADOW_TTS_USD_PER_CHARACTER")
+    profile = get_settings().model_profile.value
+    stt = read("SHADOW_STT_USD_PER_SECOND")
+    tts = read("SHADOW_TTS_USD_PER_CHARACTER")
+    if stt is None:
+        stt = shadow_price(Role.STT, profile)
+    if tts is None:
+        tts = shadow_price(Role.TTS, profile)
+    return stt, tts
 
 
 async def hosted_equivalent(
@@ -1009,7 +1020,8 @@ async def hosted_equivalent(
     if stt_price is None and tts_price is None:
         return OpsHostedEquivalent(
             configured=False,
-            reason="Not configured: set SHADOW_STT_USD_PER_SECOND and "
+            reason="Not configured: add shadow_cost_per_second / shadow_cost_per_character "
+            "to config/litellm.<profile>.yaml, or set SHADOW_STT_USD_PER_SECOND and "
             "SHADOW_TTS_USD_PER_CHARACTER.",
             stt_seconds=stt,
             tts_characters=tts,

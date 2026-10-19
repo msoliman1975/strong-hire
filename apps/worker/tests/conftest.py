@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 import uuid
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Iterator
 from pathlib import Path
 from typing import Any
 
@@ -14,7 +14,7 @@ from sqlalchemy.pool import StaticPool
 from strong_core.config import get_settings
 from strong_core.db.models import Base, Company, Org, User
 from strong_core.db.seed import LAUNCH_COMPANIES
-from strong_core.gateway import ModelGateway
+from strong_core.gateway import ModelGateway, set_usage_sink
 from strong_core.gateway.registry import fake_models_config
 from strong_core.schemas import AuthProvider
 from strong_worker.inputs.jobs import CTX_KEY, InputsContext
@@ -35,6 +35,15 @@ def _fake_profile(monkeypatch: pytest.MonkeyPatch) -> None:
     if os.environ.get("STRONG_EVAL_INPUTS") != "1":
         monkeypatch.setenv("MODEL_PROFILE", "fake")
     get_settings.cache_clear()
+
+
+@pytest.fixture(autouse=True)
+def _no_usage_sink() -> Iterator[None]:
+    """Jobs and text sessions set a usage context now (OB-2). No test writes those rows to a
+    real database; a test that checks them installs its own sink."""
+    previous = set_usage_sink(None)
+    yield
+    set_usage_sink(previous)
 
 
 @pytest.fixture

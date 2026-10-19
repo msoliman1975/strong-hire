@@ -89,6 +89,14 @@ export function activeControls(settings: OpsSettings, now = Date.now()): string[
     out.push("Spend cap reached: new sessions refused");
   }
   if (bannerActive(v.site_banner, now)) out.push("Site banner shown");
+  if (v.sim_paused) out.push("AI candidate runs paused");
+  if (v.sim_max_live_sessions !== settings.defaults.sim_max_live_sessions) {
+    out.push(
+      v.sim_max_live_sessions === 0
+        ? "AI candidate runs ignore live interviews"
+        : `AI candidate runs wait at ${v.sim_max_live_sessions} live interviews (default ${settings.defaults.sim_max_live_sessions})`,
+    );
+  }
   for (const { kind, label } of JOB_KINDS) {
     if (v.jobs_paused.includes(kind)) out.push(`${label} jobs paused`);
   }

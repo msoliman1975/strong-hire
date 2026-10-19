@@ -3,6 +3,7 @@
     strong-sim suites                          list the suites
     strong-sim plan --suite text-smoke         show the scenarios and the cost estimate
     strong-sim run --suite text-smoke [--scenario ID ...] [--limit-usd 3] [--yes]
+    strong-sim serve                           the sim service: admin-started runs (SM)
 
 `run` prints the estimate and asks before it starts, unless --yes is given.
 """
@@ -55,6 +56,7 @@ def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="strong-sim", description=__doc__.splitlines()[0])
     sub = parser.add_subparsers(dest="cmd", required=True)
     sub.add_parser("suites", help="list the suites")
+    sub.add_parser("serve", help="run admin-started interviews, one at a time (the sim service)")
     for name in ("plan", "run"):
         p = sub.add_parser(name)
         p.add_argument("--suite", required=True)
@@ -74,6 +76,13 @@ def main(argv: list[str] | None = None) -> None:
     if args.cmd == "suites":
         for name in list_suites():
             print(name)
+        return
+    if args.cmd == "serve":
+        from strong_core.db.engine import get_sessionmaker
+        from strong_sim.serve import SimService
+
+        service = SimService(get_sim_settings(), get_sessionmaker(), get_gateway())
+        asyncio.run(service.serve())
         return
     suite = _select(load_suite(args.suite), args.scenario)
     _plan(suite)

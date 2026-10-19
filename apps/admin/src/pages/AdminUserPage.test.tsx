@@ -9,6 +9,7 @@ import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
 import { AppRoutes, createQueryClient } from "../App";
+import { mockSignIn } from "../mocks/handlers";
 import { mockStore } from "../mocks/node";
 
 const ANA = "00000000-0000-4000-8000-0000000000a1";
@@ -24,7 +25,6 @@ function addUser(email: string, n: number, name: string | null) {
     auth_provider: "password",
     training_consent: false,
     created_at: `2026-10-0${n}T10:00:00Z`,
-    is_admin: false,
     full_name: name,
     profile_complete: true,
   };
@@ -34,7 +34,7 @@ function seed() {
   addUser("ana@example.com", 1, "Ana Lopez");
   addUser("bo@example.com", 2, "Bo Chen");
   addUser("admin@example.com", 9, null);
-  mockStore.db.auth = { status: "signed_in", email: "admin@example.com", userEmail: "admin@example.com" };
+  mockSignIn(mockStore, "admin@example.com");
 }
 
 function renderAt(path: string) {
