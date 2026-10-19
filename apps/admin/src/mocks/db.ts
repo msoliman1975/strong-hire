@@ -4,16 +4,35 @@
  */
 import type { AuthUser, SessionRecord, Usage } from "../api/types";
 
-export interface MockAuth {
-  status: "signed_out" | "needs_signup" | "signed_in";
-  email: string | null;
-  userEmail: string | null;
+/** A row of admin_users (AA-1). */
+export interface MockAdmin {
+  id: string;
+  email: string;
+  added_by: string | null;
+  added_at: string;
+  disabled_at: string | null;
+}
+
+/** A row of admin_sessions (AA-3). */
+export interface MockAdminSession {
+  id: string;
+  email: string;
+  created_at: string;
+  last_seen_at: string;
+  expires_at: string;
+  ip: string | null;
+  user_agent: string | null;
+  revoked: boolean;
 }
 
 export interface MockDb {
-  auth: MockAuth;
+  /** The admin session of this browser (the sh_admin cookie), or null when signed out. */
+  signedIn: string | null;
+  admins: MockAdmin[];
+  adminSessions: MockAdminSession[];
+  /** Candidate accounts, listed on the Users page. */
   users: Record<string, AuthUser>;
-  /** Mock passwords by email (AC-4). */
+  /** Mock passwords by email (AC-4); admins sign in with their account's password. */
   passwords: Record<string, string>;
   sessions: SessionRecord[];
   usage: Usage;
@@ -37,9 +56,24 @@ export const FREE_USAGE: Usage = {
   has_billing_account: false,
 };
 
+/** The admin every mock database starts with, like an ADMIN_EMAILS seed. */
+export const MOCK_ADMIN_EMAIL = "admin@example.com";
+
+export function mockAdmin(email: string, n = 1, addedBy: string | null = "ADMIN_EMAILS"): MockAdmin {
+  return {
+    id: `00000000-0000-4000-8000-0000000000e${n}`,
+    email,
+    added_by: addedBy,
+    added_at: "2026-10-01T09:00:00Z",
+    disabled_at: null,
+  };
+}
+
 export function emptyDb(): MockDb {
   return {
-    auth: { status: "signed_out", email: null, userEmail: null },
+    signedIn: null,
+    admins: [mockAdmin(MOCK_ADMIN_EMAIL)],
+    adminSessions: [],
     users: {},
     passwords: {},
     sessions: [],
@@ -47,7 +81,7 @@ export function emptyDb(): MockDb {
   };
 }
 
-const STORAGE_KEY = "strong-hire-admin-mock-db-v1";
+const STORAGE_KEY = "strong-hire-admin-mock-db-v2";
 
 export interface MockStore {
   db: MockDb;

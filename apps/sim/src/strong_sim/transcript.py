@@ -1,4 +1,7 @@
-"""The transcript as the sim saw it, with times from the session start."""
+"""The transcript as the sim saw it, with times from the session start.
+
+In voice sessions the times are positions in audio.ogg (SM-6, strong_sim.timing).
+"""
 
 from __future__ import annotations
 
@@ -17,6 +20,11 @@ class Line(BaseModel):
     phase: str | None = None
     question_ref: str | None = None
     note: str | None = Field(default=None, description="What the harness did, e.g. 'silence'.")
+    latency_ms: int | None = Field(
+        default=None,
+        description="SM-9, on the first interviewer line of a reply: from the end of the "
+        "candidate's line before it to the start of this one.",
+    )
 
 
 def clock(ms: int) -> str:

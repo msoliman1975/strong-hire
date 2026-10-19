@@ -4,23 +4,25 @@ import { Navigate, useNavigate, useSearchParams } from "react-router";
 
 import { authApi } from "../api/auth";
 import { keys, useAuth, useProviders } from "../api/hooks";
-import type { AuthState, MagicLinkSent } from "../api/types";
+import type { AdminLinkSent, AdminMe } from "../api/types";
 import { Brand } from "../components/Brand";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
 
-const LINK_ERRORS: Record<string, string> = {
+export const LINK_ERRORS: Record<string, string> = {
   link_expired: "That link has expired. Ask for a new one.",
   link_used: "That link was already used. Ask for a new one.",
   link_invalid: "That link is not valid. Ask for a new one.",
   account_unavailable: "This account is not available. Contact support for help.",
   google: "Google sign-in did not finish. Try again, or use your email.",
+  not_admin: "That Google account may not use the admin app.",
 };
 
 type Method = "password" | "link";
 
 /**
- * Admin sign-in (first step of AA-2): email and password, an email link, or Google. For now it
- * uses the candidate sign-in routes on the admin host; the API decides who is an admin.
+ * Admin sign-in (AA-2): email and password, an email link, or Google, through the admin app's
+ * own /admin/auth routes. Only active admins get a session (AA-1); the link reply is the same for
+ * everyone, so the screen does not say who is an admin.
  */
 export function SignInPage() {
   const auth = useAuth();
@@ -31,17 +33,16 @@ export function SignInPage() {
   const [method, setMethod] = useState<Method>("password");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [sent, setSent] = useState<MagicLinkSent | null>(null);
+  const [sent, setSent] = useState<AdminLinkSent | null>(null);
 
-  const signedIn = (state: AuthState) => {
-    queryClient.setQueryData(keys.me, state);
+  const signedIn = (me: AdminMe) => {
+    queryClient.setQueryData(keys.me, me);
     navigate("/", { replace: true });
   };
   const login = useMutation({ mutationFn: authApi.passwordLogin, onSuccess: signedIn });
-  const devLogin = useMutation({ mutationFn: authApi.devLogin, onSuccess: signedIn });
   const magicLink = useMutation({ mutationFn: authApi.sendMagicLink, onSuccess: setSent });
 
-  if (auth.data && auth.data.status !== "signed_out") return <Navigate to="/" replace />;
+  if (auth.data) return <Navigate to="/" replace />;
 
   const linkError = params.get("error");
   const submit = (e: FormEvent) => {
@@ -126,23 +127,6 @@ export function SignInPage() {
               Sign in with Google
             </a>
           </p>
-        )}
-
-        {providers.data?.dev && (
-          <form
-            className="dev-login"
-            aria-label="Dev sign-in"
-            onSubmit={(e) => {
-              e.preventDefault();
-              devLogin.mutate(email.trim() || "admin@example.com");
-            }}
-          >
-            <p className="muted">Local development only: sign in as the email above, without a password.</p>
-            {devLogin.isError && <ErrorNotice error={devLogin.error} />}
-            <button type="submit" className="btn btn--small" disabled={devLogin.isPending}>
-              Dev sign-in
-            </button>
-          </form>
         )}
       </div>
     </main>

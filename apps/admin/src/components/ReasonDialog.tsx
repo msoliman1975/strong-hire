@@ -15,6 +15,7 @@ export function ReasonDialog({
   danger = false,
   requireWord,
   pending = false,
+  disabled = false,
   error,
   onConfirm,
   onCancel,
@@ -27,6 +28,8 @@ export function ReasonDialog({
   /** AA-7: the admin must type this word to confirm. */
   requireWord?: string;
   pending?: boolean;
+  /** The caller's own fields are not complete yet (for example a required choice). */
+  disabled?: boolean;
   error?: unknown;
   onConfirm: (reason: string) => void;
   onCancel: () => void;
@@ -63,7 +66,7 @@ export function ReasonDialog({
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            if (reasonOk && wordOk && !pending) onConfirm(reason.trim());
+            if (reasonOk && wordOk && !pending && !disabled) onConfirm(reason.trim());
           }}
         >
           <div className="field">
@@ -98,7 +101,7 @@ export function ReasonDialog({
             <button
               type="submit"
               className={danger ? "btn btn--danger" : "btn btn--primary"}
-              disabled={!reasonOk || !wordOk || pending}
+              disabled={!reasonOk || !wordOk || pending || disabled}
             >
               {pending ? "Saving" : confirmLabel}
             </button>

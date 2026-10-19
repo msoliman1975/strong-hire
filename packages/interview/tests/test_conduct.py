@@ -11,7 +11,7 @@ import pytest
 from strong_core.config import ModelProfile, Settings
 from strong_core.gateway import ModelGateway, build_gateway
 from strong_core.gateway.fake import DEFAULT_FIXTURES_DIR
-from strong_core.schemas import AnswerCheck, AnswerConduct, Phase, Speaker, Turn
+from strong_core.schemas import AnswerCheck, AnswerConduct, BriefQuestion, Phase, Speaker, Turn
 from strong_interview import Interviewer, InterviewRunner, ListTraceSink, SessionController
 from strong_interview.conduct import (
     MAX_CONDUCT_WARNINGS,
@@ -33,10 +33,14 @@ class ScriptedChecker(Interviewer):
     checked: list[str]
 
     async def check_answer(
-        self, answer: str, turns: Sequence[Turn], phase: Phase
+        self,
+        answer: str,
+        turns: Sequence[Turn],
+        phase: Phase,
+        question: BriefQuestion | None = None,
     ) -> tuple[AnswerCheck, ModelCall]:
         self.checked = [*getattr(self, "checked", []), answer]
-        result, call = await super().check_answer(answer, turns, phase)
+        result, call = await super().check_answer(answer, turns, phase, question)
         if "football" in answer:
             return AnswerCheck(conduct=AnswerConduct.OFF_SCOPE, reason="sports"), call
         return result, call

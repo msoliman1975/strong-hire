@@ -118,6 +118,10 @@ class AdminSessionDetail(BaseModel):
         default=False,
         description="True when a recording can be downloaded (AI candidate voice interviews).",
     )
+    replay_available: bool = Field(
+        default=False,
+        description="SM-16: an AI candidate interview with a run folder; open its replay page.",
+    )
     cost_breakdown: list[AdminCostLine] = Field(
         default_factory=list, description="AI-2: usage_events by component and role"
     )

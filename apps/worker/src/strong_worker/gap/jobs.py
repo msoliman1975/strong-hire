@@ -24,6 +24,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from arq import Retry
+from pydantic import ValidationError
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -35,8 +36,10 @@ from strong_core.db.models import Resume as ResumeRow
 from strong_core.gateway import ModelGateway, get_gateway
 from strong_core.profiles import resolve_profile, use_profile_for_session
 from strong_core.schemas import (
+    CustomSessionSpec,
     GapAnalysis,
     GapStatus,
+    InterviewType,
     JobPosting,
     Level,
     Resume,
@@ -47,6 +50,7 @@ from strong_core.schemas import (
 from strong_core.sim import gateway_for_org
 from strong_worker.gap.analysis import GapAnalysisError, run_gap_analysis
 from strong_worker.gap.brief import BriefError, build_brief
+from strong_worker.ops.context import job_context
 from strong_worker.pause import wait_if_paused
 
 log = logging.getLogger(__name__)
@@ -58,6 +62,7 @@ FAILED_REASON = "The analysis did not finish. Try again in a minute."
 # already makes 2 calls per try, so a short provider error gets 4 calls over about 20 seconds.
 BRIEF_MAX_TRIES = 2
 BRIEF_RETRY_DEFER_S = 15
+INVALID_SETUP_REASON = "The session setup is not valid."
 BRIEF_FAILED_REASON = "The interview plan did not finish."
 
 
@@ -92,6 +97,7 @@ def context_notes(target: JobTarget) -> str | None:
     return "\n".join(lines) or None
 
 
+@job_context()
 async def run_gap_analysis_job(
     ctx: dict[str, Any], gap_analysis_id: str, org_id: str
 ) -> dict[str, Any]:
@@ -195,6 +201,7 @@ async def latest_ready_gap(
     return await db.scalar(query.order_by(GapRow.created_at.desc(), GapRow.id.desc()).limit(1))
 
 
+@job_context(session_arg="session_id")
 async def build_interviewer_brief(
     ctx: dict[str, Any], session_id: str, org_id: str
 ) -> dict[str, Any]:
@@ -270,14 +277,26 @@ async def _build_interviewer_brief(
             resume_row = await db.get(ResumeRow, gap_row.resume_id)
             if resume_row is not None and resume_row.parsed_json is not None:
                 resume = Resume.model_validate(resume_row.parsed_json)
+        try:
+            config = SessionConfig(
+                interview_type=session.type,
+                difficulty=session.difficulty,
+                mode=session.mode,
+                duration_min=session_duration(session.duration_min),
+                level=target.level or posting.level or Level.MID,
+                custom=(
+                    CustomSessionSpec.model_validate(session.custom_json)
+                    if session.type == InterviewType.CUSTOM
+                    else None
+                ),
+            )
+        except ValidationError as exc:
+            # CU-1: the API checks the Custom setup; a row that still fails can never get a brief.
+            log.warning("session %s has an invalid setup: %s", session.id, exc)
+            session.status = SessionStatus.FAILED
+            await db.commit()
+            return {"outcome": "failed", "reason": INVALID_SETUP_REASON}
         profile = await use_profile_for_session(db, session)
-        config = SessionConfig(
-            interview_type=session.type,
-            difficulty=session.difficulty,
-            mode=session.mode,
-            duration_min=session_duration(session.duration_min),
-            level=target.level or posting.level or Level.MID,
-        )
         try:
             gateway = await gateway_for_org(db, session.org_id, gap.gateway)
             built = await build_brief(gateway, config, posting, resume, profile, gap=analysis)

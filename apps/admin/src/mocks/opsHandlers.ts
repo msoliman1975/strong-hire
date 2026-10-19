@@ -16,9 +16,8 @@ import type {
   OpsPerformance,
   OpsSpend,
 } from "../api/ops";
-import type { AuthUser } from "../api/types";
 import type { MockDb, MockStore } from "./db";
-import { API, isMockAdmin } from "./handlers";
+import { API, currentAdmin } from "./handlers";
 
 export const MOCK_NOW = "2026-10-15T12:00:00Z";
 const HOUR = 3_600_000;
@@ -298,11 +297,7 @@ export function mockSpend(): OpsSpend {
 }
 
 export function opsHandlers(store: MockStore) {
-  const admin = (): AuthUser | null => {
-    const { auth, users } = store.db;
-    const user = auth.status === "signed_in" && auth.userEmail ? users[auth.userEmail] : undefined;
-    return user && isMockAdmin(user.email) ? user : null;
-  };
+  const admin = () => currentAdmin(store.db);
   const notFound = () => HttpResponse.json({ detail: "Not Found" }, { status: 404 });
   const needsWrite = (request: Request) =>
     request.headers.get("X-Admin-Request") === "1"

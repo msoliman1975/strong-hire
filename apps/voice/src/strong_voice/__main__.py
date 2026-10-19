@@ -18,6 +18,8 @@ from livekit.agents import AgentServer
 from livekit.agents.plugin import Plugin
 
 from strong_core.gateway import ModelGateway, Role, get_gateway
+from strong_core.ops.logs import configure_logging
+from strong_core.ops.runtime import start_ops
 from strong_core.prompts import load_prompt
 from strong_voice.agent import entrypoint, prewarm
 from strong_voice.devserver import start_devserver
@@ -89,7 +91,8 @@ def build_server() -> AgentServer:
 
 def main(argv: list[str] | None = None) -> int:
     args = sys.argv[1:] if argv is None else argv
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
+    logging.getLogger().setLevel(logging.INFO)
+    configure_logging("voice")  # OB-7: JSON lines when LOG_FORMAT=json
     if args[:1] == ["download-files"]:
         return download_files()
     settings = get_voice_settings()
@@ -104,8 +107,21 @@ def main(argv: list[str] | None = None) -> int:
         settings.livekit_url,
         settings.voice_health_port,
     )
-    asyncio.run(build_server().run(devmode=settings.env == "dev"))
+    asyncio.run(serve(build_server(), devmode=settings.env == "dev"))
     return 0
+
+
+async def serve(server: AgentServer, *, devmode: bool) -> None:
+    """Run the LiveKit worker with the voice heartbeat (OB-1) and error capture (OB-4).
+
+    Job processes forward their log records to this process, so their errors are captured
+    here too (with the session id from the room name). Usage rows are written by the job
+    processes themselves (strong_voice.agent.entrypoint)."""
+    ops = await start_ops("voice", usage_sink=False)
+    try:
+        await server.run(devmode=devmode)
+    finally:
+        await ops.stop()
 
 
 if __name__ == "__main__":

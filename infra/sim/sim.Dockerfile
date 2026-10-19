@@ -1,5 +1,6 @@
-# The AI candidate (P13). Runs only on the short-lived sim server, never in the product stack.
-#   docker compose -f infra/sim/compose.sim.yaml build sim
+# The AI candidate (P13). Two uses, same image:
+#   - suites on the short-lived sim server:  docker compose -f infra/sim/compose.sim.yaml build sim
+#   - the sim service on the main server (`strong-sim serve`, --profile sim in compose.server.yaml)
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
