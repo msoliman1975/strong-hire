@@ -41,6 +41,10 @@ services:
       ADMIN_BASE_URL: https://admin.${DOMAIN}
       # Alerts page "Test" button (AL-6) sends to this address.
       ALERT_EMAIL: ${ALERT_EMAIL:-}
+      # Suspending a user (AU-7) removes them from a live voice room through LiveKit's internal API.
+      LIVEKIT_URL: http://livekit:7880
+      # Server share per session on the overview (OB-15, D-12): the Hetzner server's monthly price.
+      INFRA_MONTHLY_USD: ${INFRA_MONTHLY_USD:-18.49}
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_USERNAME: ${SMTP_USERNAME:-}
