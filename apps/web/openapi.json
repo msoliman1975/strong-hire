@@ -1010,7 +1010,7 @@
           "scoring"
         ],
         "summary": "Get Progress",
-        "description": "PR-1 (Realistic sessions only) and PR-2.",
+        "description": "PR-1 (Realistic sessions only, Custom ones included), PR-2 and CU-7.",
         "operationId": "get_progress_job_targets__job_target_id__progress_get",
         "parameters": [
           {
@@ -1022,6 +1022,18 @@
               "format": "uuid",
               "title": "Job Target Id"
             }
+          },
+          {
+            "name": "exclude_own_questions",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "CU-7: leave out the scores of Custom sessions' own questions.",
+              "default": false,
+              "title": "Exclude Own Questions"
+            },
+            "description": "CU-7: leave out the scores of Custom sessions' own questions."
           }
         ],
         "responses": {
@@ -1098,7 +1110,7 @@
           "sessions"
         ],
         "summary": "Create Session",
-        "description": "Create a session and queue its interviewer brief (IV-2, IV-4, IV-6, IV-8).",
+        "description": "Create a session and queue its interviewer brief (IV-2, IV-4, IV-6, IV-8).\n\nFor a Custom session the own questions and focus chips are checked on the server (CU-5,\nstrong_api.custom.guard); a refusal answers 422 `question_refused` and nothing is stored.",
         "operationId": "create_session_sessions_post",
         "requestBody": {
           "content": {
@@ -1122,14 +1134,13 @@
             }
           },
           "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
+            "description": "A bad setup, or CU-5: detail.code is 'question_refused' with index, kind ('question' or 'focus'), category, refusal and reason."
+          },
+          "429": {
+            "description": "CU-5 checks: detail.code is 'rate_limited'; see Retry-After."
+          },
+          "503": {
+            "description": "Sessions are paused (OC-2, OC-3), or CU-5: detail.code is 'check_unavailable'."
           }
         }
       }
@@ -1161,6 +1172,50 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SessionRecord"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessions/{session_id}/repeat": {
+      "post": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Repeat Session",
+        "description": "CU-9: the setup of an earlier session (type, difficulty, mode, length, level, and for a\nCustom session its categories, focus chips and own questions), shaped like the body of\nPOST /sessions so the web app can prefill the setup screen. Creates nothing.",
+        "operationId": "repeat_session_sessions__session_id__repeat_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionSetup"
                 }
               }
             }
@@ -1557,6 +1612,281 @@
         }
       }
     },
+    "/custom/questions/check": {
+      "post": {
+        "tags": [
+          "custom interview"
+        ],
+        "summary": "Check Custom Question",
+        "description": "CU-5: refuse text that is not an interview question (or topic), abuse, or instructions to\nthe interviewer; else tag it with a category and 1 to 3 competencies. Flags a near-duplicate\nof an entry of `existing`. Rate limited per user.",
+        "operationId": "check_custom_question_custom_questions_check_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionCheckRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionCheckOut"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "CU-11: Custom is locked. detail.code is 'upgrade_required'."
+          },
+          "429": {
+            "description": "Rate limited. detail.code is 'rate_limited'; see Retry-After."
+          },
+          "503": {
+            "description": "The check could not run. detail.code is 'check_unavailable'."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/custom/focus": {
+      "get": {
+        "tags": [
+          "custom interview"
+        ],
+        "summary": "Focus Suggestions",
+        "description": "CU-2: focus chips per category from the latest ready gap analysis for the job and CV\n(session plan topics, probe areas, gaps, weak competencies) and the job's must-have\nskills. The first chips of each category are pre-selected.",
+        "operationId": "focus_suggestions_custom_focus_get",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "The job target.",
+              "title": "Job Id"
+            },
+            "description": "The job target."
+          },
+          {
+            "name": "resume_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The CV. Default: the CV of the job's latest ready gap analysis.",
+              "title": "Resume Id"
+            },
+            "description": "The CV. Default: the CV of the job's latest ready gap analysis."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FocusSuggestions"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/questions/mine": {
+      "get": {
+        "tags": [
+          "custom interview"
+        ],
+        "summary": "List Saved Questions",
+        "description": "CU-8: the user's saved questions, newest first.",
+        "operationId": "list_saved_questions_questions_mine_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SavedQuestionOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Saved Questions Questions Mine Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "custom interview"
+        ],
+        "summary": "Save Question",
+        "description": "CU-8: save a question (typed, from a session, or from the bank with `bank_ref`).\n\nCU-5: the text is checked on the server first (422 `question_refused`) and stored cleaned.\nWithout competencies, or with ones not of the category, the check's tags are stored.",
+        "operationId": "save_question_questions_mine_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SavedQuestionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedQuestionOut"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "detail.code is 'saved_questions_full' or 'duplicate_question'."
+          },
+          "422": {
+            "description": "CU-5: detail.code is 'question_refused' (with refusal and reason) when the check refuses the text; else a bad field."
+          },
+          "429": {
+            "description": "Rate limited. detail.code is 'rate_limited'; see Retry-After."
+          },
+          "503": {
+            "description": "The check could not run. detail.code is 'check_unavailable'."
+          }
+        }
+      }
+    },
+    "/questions/mine/{question_id}": {
+      "patch": {
+        "tags": [
+          "custom interview"
+        ],
+        "summary": "Edit Saved Question",
+        "description": "CU-8: change the text, the category or the competencies.\n\nCU-5: a new text or category is checked on the server first (422 `question_refused`), and\nthe text is stored cleaned. When the competencies (given, or kept) do not fit the category,\nthe check's tags are stored. Changing only the competencies needs no check.",
+        "operationId": "edit_saved_question_questions_mine__question_id__patch",
+        "parameters": [
+          {
+            "name": "question_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Question Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SavedQuestionPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedQuestionOut"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "detail.code is 'saved_questions_full' or 'duplicate_question'."
+          },
+          "422": {
+            "description": "CU-5: detail.code is 'question_refused' (with refusal and reason) when the check refuses the text; else a bad field."
+          },
+          "429": {
+            "description": "Rate limited. detail.code is 'rate_limited'; see Retry-After."
+          },
+          "503": {
+            "description": "The check could not run. detail.code is 'check_unavailable'."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "custom interview"
+        ],
+        "summary": "Delete Saved Question",
+        "description": "CU-8: delete a saved question. Sessions that used it keep their copy.",
+        "operationId": "delete_saved_question_questions_mine__question_id__delete",
+        "parameters": [
+          {
+            "name": "question_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Question Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/dev/model-usage": {
       "get": {
         "tags": [
@@ -1585,7 +1915,7 @@
           "status"
         ],
         "summary": "Site Status",
-        "description": "Public: the active site banner and whether sign-ups and new sessions are open.",
+        "description": "Public: the active site banner, whether sign-ups and new sessions are open, and who may\nrun Custom interviews (CU-11).",
         "operationId": "site_status_status_get",
         "responses": {
           "200": {
@@ -9736,6 +10066,33 @@
         "title": "CaseStyle",
         "type": "object"
       },
+      "CategoryFocus": {
+        "properties": {
+          "suggested": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Suggested",
+            "description": "Every suggested chip, best first, at most 8."
+          },
+          "preselected": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Preselected",
+            "description": "The chips to select by default, a subset."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "suggested",
+          "preselected"
+        ],
+        "title": "CategoryFocus"
+      },
       "ChangeKind": {
         "type": "string",
         "enum": [
@@ -10590,6 +10947,14 @@
             ],
             "title": "Values Framework",
             "description": "Name of the company's values framework, for example 'Leadership Principles'."
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/DebriefQuestion"
+            },
+            "type": "array",
+            "title": "Questions",
+            "description": "CU-6: the planned questions with their source and category, in plan order. Empty when the session has no interview plan."
           }
         },
         "additionalProperties": false,
@@ -10604,6 +10969,60 @@
           "values_framework"
         ],
         "title": "Debrief"
+      },
+      "DebriefQuestion": {
+        "properties": {
+          "question_ref": {
+            "type": "string",
+            "title": "Question Ref",
+            "description": "The brief question id (Turn.question_ref)."
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "source": {
+            "$ref": "#/components/schemas/QuestionSource",
+            "description": "candidate for the candidate's own question."
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "behavioral",
+                  "hiring_manager",
+                  "technical_qa",
+                  "case"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Custom sessions: the category."
+          },
+          "must_ask": {
+            "type": "boolean",
+            "title": "Must Ask"
+          },
+          "verbatim": {
+            "type": "boolean",
+            "title": "Verbatim"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "question_ref",
+          "text",
+          "source",
+          "category",
+          "must_ask",
+          "verbatim"
+        ],
+        "title": "DebriefQuestion",
+        "description": "One question of the session's interview plan (CU-6). Join it to\n`scorecard.per_question[].question_ref` by `question_ref`."
       },
       "DebriefSession": {
         "properties": {
@@ -11070,6 +11489,52 @@
         ],
         "title": "ExportOut",
         "description": "AC-1 data export. The bundle is a zip: data.json plus the original resume files."
+      },
+      "FocusSuggestions": {
+        "properties": {
+          "job_target_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Job Target Id"
+          },
+          "gap_analysis_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gap Analysis Id",
+            "description": "The ready gap analysis the chips came from, null when there is none."
+          },
+          "behavioral": {
+            "$ref": "#/components/schemas/CategoryFocus"
+          },
+          "technical_qa": {
+            "$ref": "#/components/schemas/CategoryFocus"
+          },
+          "hiring_manager": {
+            "$ref": "#/components/schemas/CategoryFocus"
+          },
+          "case": {
+            "$ref": "#/components/schemas/CategoryFocus"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "job_target_id",
+          "gap_analysis_id",
+          "behavioral",
+          "technical_qa",
+          "hiring_manager",
+          "case"
+        ],
+        "title": "FocusSuggestions",
+        "description": "Suggested focus chips per standard category (CU-2)."
       },
       "FunnelStep": {
         "properties": {
@@ -11963,7 +12428,7 @@
             },
             "type": "array",
             "title": "Snapshots",
-            "description": "Realistic sessions only (PR-1)."
+            "description": "Realistic sessions only (PR-1), Custom ones included (CU-7)."
           },
           "trends": {
             "items": {
@@ -11983,6 +12448,20 @@
               }
             ],
             "description": "PR-2."
+          },
+          "own_question_points": {
+            "items": {
+              "$ref": "#/components/schemas/OwnQuestionPoint"
+            },
+            "type": "array",
+            "title": "Own Question Points",
+            "description": "CU-7: the snapshots that use scores of the candidate's own questions. Empty when own questions are excluded."
+          },
+          "own_questions_excluded": {
+            "type": "boolean",
+            "title": "Own Questions Excluded",
+            "description": "CU-7: true when the snapshots and trends leave out own questions' scores.",
+            "default": false
           }
         },
         "additionalProperties": false,
@@ -13885,6 +14364,40 @@
         ],
         "title": "OverviewUsage"
       },
+      "OwnQuestionPoint": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Id"
+          },
+          "competency": {
+            "$ref": "#/components/schemas/Competency"
+          },
+          "own_questions": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Own Questions",
+            "description": "Scores from the candidate's own questions."
+          },
+          "other_questions": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Other Questions",
+            "description": "Scores from the interviewer's questions."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "session_id",
+          "competency",
+          "own_questions",
+          "other_questions"
+        ],
+        "title": "OwnQuestionPoint",
+        "description": "CU-7: a snapshot of a Custom session that comes (partly) from the candidate's own\nquestions."
+      },
       "PasswordLoginRequest": {
         "properties": {
           "email": {
@@ -14812,6 +15325,130 @@
         ],
         "title": "Quality"
       },
+      "QuestionCheckOut": {
+        "properties": {
+          "accepted": {
+            "type": "boolean",
+            "title": "Accepted"
+          },
+          "refusal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/QuestionRefusal"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Set when not accepted."
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason",
+            "description": "Empty when accepted. Else a fixed sentence for the refusal, then the model's short reason when there is one."
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "behavioral",
+                  "hiring_manager",
+                  "technical_qa",
+                  "case"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Set when accepted."
+          },
+          "competencies": {
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "type": "array",
+            "title": "Competencies",
+            "description": "1 to 3 competencies of `category` when accepted, else empty."
+          },
+          "duplicate_of": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duplicate Of",
+            "description": "Index in `existing` of a near-duplicate (CU-5), else null. A flag only."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "accepted",
+          "refusal",
+          "reason",
+          "category",
+          "competencies",
+          "duplicate_of"
+        ],
+        "title": "QuestionCheckOut"
+      },
+      "QuestionCheckRequest": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 2000,
+            "title": "Text",
+            "description": "The question or focus chip."
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "question",
+              "focus"
+            ],
+            "title": "Kind",
+            "description": "An own question, or a free-text focus chip (CU-2).",
+            "default": "question"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "behavioral",
+                  "hiring_manager",
+                  "technical_qa",
+                  "case"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The category the candidate chose. When set, it wins over the model's tag."
+          },
+          "existing": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Existing",
+            "description": "The other questions (or chips) already in the session, for the duplicate flag."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "QuestionCheckRequest"
+      },
       "QuestionPattern": {
         "additionalProperties": false,
         "description": "A recurring theme, phrased as a pattern. Never a leaked or NDA-protected question.",
@@ -14860,14 +15497,14 @@
         "type": "object"
       },
       "QuestionRefusal": {
-        "description": "CU-5: why a candidate's own question or focus chip is refused.",
+        "type": "string",
         "enum": [
           "not_a_question",
           "inappropriate",
           "instructions"
         ],
         "title": "QuestionRefusal",
-        "type": "string"
+        "description": "CU-5: why a candidate's own question or focus chip is refused."
       },
       "QuestionScore": {
         "properties": {
@@ -14921,13 +15558,13 @@
         "title": "QuestionScore"
       },
       "QuestionSource": {
-        "description": "Who wrote a brief question: the planner, or the candidate in a Custom session (CU-3).",
+        "type": "string",
         "enum": [
           "planner",
           "candidate"
         ],
         "title": "QuestionSource",
-        "type": "string"
+        "description": "Who wrote a brief question: the planner, or the candidate in a Custom session (CU-3)."
       },
       "RedirectOut": {
         "properties": {
@@ -15894,6 +16531,168 @@
         "title": "SampleQuestion",
         "type": "object"
       },
+      "SavedQuestionIn": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Text"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "behavioral",
+              "hiring_manager",
+              "technical_qa",
+              "case"
+            ]
+          },
+          "competencies": {
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "title": "Competencies",
+            "description": "From COMPETENCIES_BY_TYPE for the category. When empty, or when one does not belong to the category, the CU-5 check's tags are stored instead."
+          },
+          "bank_ref": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bank Ref",
+            "description": "Question bank id when added from the bank."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text",
+          "category"
+        ],
+        "title": "SavedQuestionIn"
+      },
+      "SavedQuestionOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "behavioral",
+              "hiring_manager",
+              "technical_qa",
+              "case"
+            ]
+          },
+          "competencies": {
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "type": "array",
+            "title": "Competencies"
+          },
+          "bank_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bank Ref"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "text",
+          "category",
+          "competencies",
+          "bank_ref",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "SavedQuestionOut"
+      },
+      "SavedQuestionPatch": {
+        "properties": {
+          "text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "behavioral",
+                  "hiring_manager",
+                  "technical_qa",
+                  "case"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "competencies": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Competency"
+                },
+                "type": "array",
+                "maxItems": 3,
+                "minItems": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Competencies"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "SavedQuestionPatch"
+      },
       "Scorecard": {
         "properties": {
           "hire_signal": {
@@ -16116,7 +16915,8 @@
             "description": "PR-3: the CV used for the session. None for old sessions."
           },
           "config": {
-            "$ref": "#/components/schemas/SessionConfig"
+            "$ref": "#/components/schemas/SessionConfig",
+            "description": "The setup. For a Custom session, `custom` holds the categories, focus chips and own questions (CU-1)."
           },
           "channel": {
             "$ref": "#/components/schemas/SessionChannel"
@@ -16288,6 +17088,43 @@
           "scenario"
         ],
         "title": "SessionReplay"
+      },
+      "SessionSetup": {
+        "properties": {
+          "job_target_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Job Target Id"
+          },
+          "resume_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resume Id"
+          },
+          "config": {
+            "$ref": "#/components/schemas/SessionConfig",
+            "description": "For a Custom session, `custom` holds its setup."
+          },
+          "channel": {
+            "$ref": "#/components/schemas/SessionChannel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "job_target_id",
+          "resume_id",
+          "config",
+          "channel"
+        ],
+        "title": "SessionSetup",
+        "description": "CU-9: a setup to prefill, from an earlier session. Same fields as CreateSessionRequest."
       },
       "SessionStatus": {
         "type": "string",
@@ -17153,6 +17990,10 @@
             "type": "boolean",
             "title": "Text Sessions Open",
             "description": "OC-2, OC-3: new text sessions can start"
+          },
+          "custom_interview_access": {
+            "$ref": "#/components/schemas/CustomInterviewAccess",
+            "description": "CU-11: everyone, or paid_only (free accounts see Custom locked)"
           }
         },
         "type": "object",
@@ -17160,7 +18001,8 @@
           "banner",
           "signups_open",
           "voice_sessions_open",
-          "text_sessions_open"
+          "text_sessions_open",
+          "custom_interview_access"
         ],
         "title": "SiteStatus",
         "description": "What the candidate app shows: the site banner and what is paused (OC-1 to OC-4)."

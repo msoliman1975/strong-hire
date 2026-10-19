@@ -966,6 +966,7 @@ export function scoringHandlers(store: MockStore) {
         generic_mode: generic,
         company_name: job?.posting?.company_name ?? null,
         values_framework: generic ? null : "Company values",
+        questions: [],
       };
       return HttpResponse.json(debrief);
     }),
@@ -979,6 +980,8 @@ export function scoringHandlers(store: MockStore) {
         snapshots,
         trends: trendsFor(snapshots),
         next_session: db().gaps[jobId]?.analysis ? sessionPlan[snapshots.length ? 1 : 0] : null,
+        own_question_points: [],
+        own_questions_excluded: false,
       };
       return HttpResponse.json(progress);
     }),

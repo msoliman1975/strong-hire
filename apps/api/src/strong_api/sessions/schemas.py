@@ -29,13 +29,25 @@ class CreateSessionRequest(BaseModel):
     )
 
 
+class SessionSetup(BaseModel):
+    """CU-9: a setup to prefill, from an earlier session. Same fields as CreateSessionRequest."""
+
+    job_target_id: uuid.UUID
+    resume_id: uuid.UUID | None
+    config: SessionConfig = Field(description="For a Custom session, `custom` holds its setup.")
+    channel: SessionChannel
+
+
 class SessionRecord(BaseModel):
     id: uuid.UUID
     job_target_id: uuid.UUID
     resume_id: uuid.UUID | None = Field(
         default=None, description="PR-3: the CV used for the session. None for old sessions."
     )
-    config: SessionConfig
+    config: SessionConfig = Field(
+        description="The setup. For a Custom session, `custom` holds the categories, focus "
+        "chips and own questions (CU-1)."
+    )
     channel: SessionChannel
     status: SessionStatus
     brief_ready: bool = Field(description="True when the interviewer brief is built.")

@@ -247,6 +247,7 @@ async def test_oc4_status_shows_the_banner_until_it_ends(
         "signups_open": True,
         "voice_sessions_open": True,
         "text_sessions_open": True,
+        "custom_interview_access": "everyone",
     }
     until = datetime.now(UTC) + timedelta(hours=1)
     banner = {"text": "Scoring is slow today.", "severity": "warning", "until": until.isoformat()}

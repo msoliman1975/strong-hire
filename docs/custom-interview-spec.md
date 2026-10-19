@@ -30,7 +30,7 @@ Everything new lives inside Custom, so it cannot change their scoring, rubrics o
 | D-10 | Own questions are checked before the session: anything that is not an interview question, abuse, or instructions to the interviewer is refused with a reason (same pattern as IN-6, IN-7). Near-duplicates are flagged. |
 | D-11 | Saved questions: a "My questions" list on the Questions page, and "Add to my interview" from any bank question. |
 | D-12 | Realistic Custom sessions count toward PR-1 trends. Points that come from candidate-written questions are marked and can be filtered out. Coach sessions do not count (as today). |
-| D-13 | Custom is a paid feature at launch, but open to every user while we test. A runtime setting switches it (`everyone` now, `paid_only` when live), with no deploy. |
+| D-13 | Custom is a paid feature at launch, but open to every user while we test. A runtime setting switches it (`everyone` now, `paid_only` when live), with no deploy. While it is `everyone`, a free account may use one of its free interviews for a 30-minute Custom session (Custom has no mini, D-14); 45 minutes needs the plan. |
 | D-14 | Custom is not offered as a 10-minute mini interview. |
 
 ### Non-goals (v1)

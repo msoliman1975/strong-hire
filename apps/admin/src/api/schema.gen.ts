@@ -326,7 +326,7 @@ export interface paths {
         };
         /**
          * Get Progress
-         * @description PR-1 (Realistic sessions only) and PR-2.
+         * @description PR-1 (Realistic sessions only, Custom ones included), PR-2 and CU-7.
          */
         get: operations["get_progress_job_targets__job_target_id__progress_get"];
         put?: never;
@@ -369,6 +369,9 @@ export interface paths {
         /**
          * Create Session
          * @description Create a session and queue its interviewer brief (IV-2, IV-4, IV-6, IV-8).
+         *
+         *     For a Custom session the own questions and focus chips are checked on the server (CU-5,
+         *     strong_api.custom.guard); a refusal answers 422 `question_refused` and nothing is stored.
          */
         post: operations["create_session_sessions_post"];
         delete?: never;
@@ -392,6 +395,28 @@ export interface paths {
         get: operations["get_session_sessions__session_id__get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions/{session_id}/repeat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Repeat Session
+         * @description CU-9: the setup of an earlier session (type, difficulty, mode, length, level, and for a
+         *     Custom session its categories, focus chips and own questions), shaped like the body of
+         *     POST /sessions so the web app can prefill the setup screen. Creates nothing.
+         */
+        post: operations["repeat_session_sessions__session_id__repeat_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -544,6 +569,105 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/custom/questions/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Check Custom Question
+         * @description CU-5: refuse text that is not an interview question (or topic), abuse, or instructions to
+         *     the interviewer; else tag it with a category and 1 to 3 competencies. Flags a near-duplicate
+         *     of an entry of `existing`. Rate limited per user.
+         */
+        post: operations["check_custom_question_custom_questions_check_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/custom/focus": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Focus Suggestions
+         * @description CU-2: focus chips per category from the latest ready gap analysis for the job and CV
+         *     (session plan topics, probe areas, gaps, weak competencies) and the job's must-have
+         *     skills. The first chips of each category are pre-selected.
+         */
+        get: operations["focus_suggestions_custom_focus_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/questions/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Saved Questions
+         * @description CU-8: the user's saved questions, newest first.
+         */
+        get: operations["list_saved_questions_questions_mine_get"];
+        put?: never;
+        /**
+         * Save Question
+         * @description CU-8: save a question (typed, from a session, or from the bank with `bank_ref`).
+         *
+         *     CU-5: the text is checked on the server first (422 `question_refused`) and stored cleaned.
+         *     Without competencies, or with ones not of the category, the check's tags are stored.
+         */
+        post: operations["save_question_questions_mine_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/questions/mine/{question_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Saved Question
+         * @description CU-8: delete a saved question. Sessions that used it keep their copy.
+         */
+        delete: operations["delete_saved_question_questions_mine__question_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Edit Saved Question
+         * @description CU-8: change the text, the category or the competencies.
+         *
+         *     CU-5: a new text or category is checked on the server first (422 `question_refused`), and
+         *     the text is stored cleaned. When the competencies (given, or kept) do not fit the category,
+         *     the check's tags are stored. Changing only the competencies needs no check.
+         */
+        patch: operations["edit_saved_question_questions_mine__question_id__patch"];
+        trace?: never;
+    };
     "/dev/model-usage": {
         parameters: {
             query?: never;
@@ -575,7 +699,8 @@ export interface paths {
         };
         /**
          * Site Status
-         * @description Public: the active site banner and whether sign-ups and new sessions are open.
+         * @description Public: the active site banner, whether sign-ups and new sessions are open, and who may
+         *     run Custom interviews (CU-11).
          */
         get: operations["site_status_status_get"];
         put?: never;
@@ -3614,6 +3739,19 @@ export interface components {
              */
             notes: string | null;
         };
+        /** CategoryFocus */
+        CategoryFocus: {
+            /**
+             * Suggested
+             * @description Every suggested chip, best first, at most 8.
+             */
+            suggested: string[];
+            /**
+             * Preselected
+             * @description The chips to select by default, a subset.
+             */
+            preselected: string[];
+        };
         /**
          * ChangeKind
          * @enum {string}
@@ -3975,6 +4113,33 @@ export interface components {
              * @description Name of the company's values framework, for example 'Leadership Principles'.
              */
             values_framework: string | null;
+            /**
+             * Questions
+             * @description CU-6: the planned questions with their source and category, in plan order. Empty when the session has no interview plan.
+             */
+            questions?: components["schemas"]["DebriefQuestion"][];
+        };
+        /**
+         * DebriefQuestion
+         * @description One question of the session's interview plan (CU-6). Join it to
+         *     `scorecard.per_question[].question_ref` by `question_ref`.
+         */
+        DebriefQuestion: {
+            /**
+             * Question Ref
+             * @description The brief question id (Turn.question_ref).
+             */
+            question_ref: string;
+            /** Text */
+            text: string;
+            /** @description candidate for the candidate's own question. */
+            source: components["schemas"]["QuestionSource"];
+            /** @description Custom sessions: the category. */
+            category: ("behavioral" | "hiring_manager" | "technical_qa" | "case") | null;
+            /** Must Ask */
+            must_ask: boolean;
+            /** Verbatim */
+            verbatim: boolean;
         };
         /**
          * DebriefSession
@@ -4163,6 +4328,26 @@ export interface components {
             download_url: string | null;
             /** Error */
             error?: string | null;
+        };
+        /**
+         * FocusSuggestions
+         * @description Suggested focus chips per standard category (CU-2).
+         */
+        FocusSuggestions: {
+            /**
+             * Job Target Id
+             * Format: uuid
+             */
+            job_target_id: string;
+            /**
+             * Gap Analysis Id
+             * @description The ready gap analysis the chips came from, null when there is none.
+             */
+            gap_analysis_id: string | null;
+            behavioral: components["schemas"]["CategoryFocus"];
+            technical_qa: components["schemas"]["CategoryFocus"];
+            hiring_manager: components["schemas"]["CategoryFocus"];
+            case: components["schemas"]["CategoryFocus"];
         };
         /** FunnelStep */
         FunnelStep: {
@@ -4532,7 +4717,7 @@ export interface components {
             job_target_id: string;
             /**
              * Snapshots
-             * @description Realistic sessions only (PR-1).
+             * @description Realistic sessions only (PR-1), Custom ones included (CU-7).
              */
             snapshots: components["schemas"]["ProgressSnapshot"][];
             /**
@@ -4542,6 +4727,17 @@ export interface components {
             trends: components["schemas"]["CompetencyTrend"][];
             /** @description PR-2. */
             next_session: components["schemas"]["PlannedSession"] | null;
+            /**
+             * Own Question Points
+             * @description CU-7: the snapshots that use scores of the candidate's own questions. Empty when own questions are excluded.
+             */
+            own_question_points?: components["schemas"]["OwnQuestionPoint"][];
+            /**
+             * Own Questions Excluded
+             * @description CU-7: true when the snapshots and trends leave out own questions' scores.
+             * @default false
+             */
+            own_questions_excluded: boolean;
         };
         /** JobTargetAccepted */
         JobTargetAccepted: {
@@ -5203,6 +5399,29 @@ export interface components {
             voice_sessions: components["schemas"]["AdminMetric"];
             text_sessions: components["schemas"]["AdminMetric"];
         };
+        /**
+         * OwnQuestionPoint
+         * @description CU-7: a snapshot of a Custom session that comes (partly) from the candidate's own
+         *     questions.
+         */
+        OwnQuestionPoint: {
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            competency: components["schemas"]["Competency"];
+            /**
+             * Own Questions
+             * @description Scores from the candidate's own questions.
+             */
+            own_questions: number;
+            /**
+             * Other Questions
+             * @description Scores from the interviewer's questions.
+             */
+            other_questions: number;
+        };
         /** PasswordLoginRequest */
         PasswordLoginRequest: {
             /**
@@ -5587,6 +5806,52 @@ export interface components {
          * @enum {string}
          */
         Quality: "strong" | "average" | "weak";
+        /** QuestionCheckOut */
+        QuestionCheckOut: {
+            /** Accepted */
+            accepted: boolean;
+            /** @description Set when not accepted. */
+            refusal: components["schemas"]["QuestionRefusal"] | null;
+            /**
+             * Reason
+             * @description Empty when accepted. Else a fixed sentence for the refusal, then the model's short reason when there is one.
+             */
+            reason: string;
+            /** @description Set when accepted. */
+            category: ("behavioral" | "hiring_manager" | "technical_qa" | "case") | null;
+            /**
+             * Competencies
+             * @description 1 to 3 competencies of `category` when accepted, else empty.
+             */
+            competencies: components["schemas"]["Competency"][];
+            /**
+             * Duplicate Of
+             * @description Index in `existing` of a near-duplicate (CU-5), else null. A flag only.
+             */
+            duplicate_of: number | null;
+        };
+        /** QuestionCheckRequest */
+        QuestionCheckRequest: {
+            /**
+             * Text
+             * @description The question or focus chip.
+             */
+            text: string;
+            /**
+             * Kind
+             * @description An own question, or a free-text focus chip (CU-2).
+             * @default question
+             * @enum {string}
+             */
+            kind: "question" | "focus";
+            /** @description The category the candidate chose. When set, it wins over the model's tag. */
+            category?: ("behavioral" | "hiring_manager" | "technical_qa" | "case") | null;
+            /**
+             * Existing
+             * @description The other questions (or chips) already in the session, for the duplicate flag.
+             */
+            existing?: string[];
+        };
         /**
          * QuestionPattern
          * @description A recurring theme, phrased as a pattern. Never a leaked or NDA-protected question.
@@ -6042,6 +6307,57 @@ export interface components {
              */
             source_url: string;
         };
+        /** SavedQuestionIn */
+        SavedQuestionIn: {
+            /** Text */
+            text: string;
+            /** @enum {string} */
+            category: "behavioral" | "hiring_manager" | "technical_qa" | "case";
+            /**
+             * Competencies
+             * @description From COMPETENCIES_BY_TYPE for the category. When empty, or when one does not belong to the category, the CU-5 check's tags are stored instead.
+             */
+            competencies?: components["schemas"]["Competency"][];
+            /**
+             * Bank Ref
+             * @description Question bank id when added from the bank.
+             */
+            bank_ref?: string | null;
+        };
+        /** SavedQuestionOut */
+        SavedQuestionOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Text */
+            text: string;
+            /** @enum {string} */
+            category: "behavioral" | "hiring_manager" | "technical_qa" | "case";
+            /** Competencies */
+            competencies: components["schemas"]["Competency"][];
+            /** Bank Ref */
+            bank_ref: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** SavedQuestionPatch */
+        SavedQuestionPatch: {
+            /** Text */
+            text?: string | null;
+            category?: ("behavioral" | "hiring_manager" | "technical_qa" | "case") | null;
+            /** Competencies */
+            competencies?: components["schemas"]["Competency"][] | null;
+        };
         /** Scorecard */
         Scorecard: {
             hire_signal: components["schemas"]["HireSignal"];
@@ -6142,6 +6458,7 @@ export interface components {
              * @description PR-3: the CV used for the session. None for old sessions.
              */
             resume_id?: string | null;
+            /** @description The setup. For a Custom session, `custom` holds the categories, focus chips and own questions (CU-1). */
             config: components["schemas"]["SessionConfig"];
             channel: components["schemas"]["SessionChannel"];
             status: components["schemas"]["SessionStatus"];
@@ -6192,6 +6509,22 @@ export interface components {
             scorecard: components["schemas"]["Scorecard"] | null;
             audio: components["schemas"]["ReplayAudio"];
             scenario: components["schemas"]["SimScenarioOut"] | null;
+        };
+        /**
+         * SessionSetup
+         * @description CU-9: a setup to prefill, from an earlier session. Same fields as CreateSessionRequest.
+         */
+        SessionSetup: {
+            /**
+             * Job Target Id
+             * Format: uuid
+             */
+            job_target_id: string;
+            /** Resume Id */
+            resume_id: string | null;
+            /** @description For a Custom session, `custom` holds its setup. */
+            config: components["schemas"]["SessionConfig"];
+            channel: components["schemas"]["SessionChannel"];
         };
         /**
          * SessionStatus
@@ -6539,6 +6872,8 @@ export interface components {
              * @description OC-2, OC-3: new text sessions can start
              */
             text_sessions_open: boolean;
+            /** @description CU-11: everyone, or paid_only (free accounts see Custom locked) */
+            custom_interview_access: components["schemas"]["CustomInterviewAccess"];
         };
         /** Source */
         Source: {
@@ -7558,7 +7893,10 @@ export interface operations {
     };
     get_progress_job_targets__job_target_id__progress_get: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description CU-7: leave out the scores of Custom sessions' own questions. */
+                exclude_own_questions?: boolean;
+            };
             header?: never;
             path: {
                 job_target_id: string;
@@ -7640,14 +7978,26 @@ export interface operations {
                     "application/json": components["schemas"]["SessionRecord"];
                 };
             };
-            /** @description Validation Error */
+            /** @description A bad setup, or CU-5: detail.code is 'question_refused' with index, kind ('question' or 'focus'), category, refusal and reason. */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                content?: never;
+            };
+            /** @description CU-5 checks: detail.code is 'rate_limited'; see Retry-After. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
                 };
+                content?: never;
+            };
+            /** @description Sessions are paused (OC-2, OC-3), or CU-5: detail.code is 'check_unavailable'. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -7669,6 +8019,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SessionRecord"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    repeat_session_sessions__session_id__repeat_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionSetup"];
                 };
             };
             /** @description Validation Error */
@@ -7906,6 +8287,249 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
+            };
+        };
+    };
+    check_custom_question_custom_questions_check_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionCheckRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionCheckOut"];
+                };
+            };
+            /** @description CU-11: Custom is locked. detail.code is 'upgrade_required'. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Rate limited. detail.code is 'rate_limited'; see Retry-After. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The check could not run. detail.code is 'check_unavailable'. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    focus_suggestions_custom_focus_get: {
+        parameters: {
+            query: {
+                /** @description The job target. */
+                job_id: string;
+                /** @description The CV. Default: the CV of the job's latest ready gap analysis. */
+                resume_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FocusSuggestions"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_saved_questions_questions_mine_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SavedQuestionOut"][];
+                };
+            };
+        };
+    };
+    save_question_questions_mine_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SavedQuestionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SavedQuestionOut"];
+                };
+            };
+            /** @description detail.code is 'saved_questions_full' or 'duplicate_question'. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description CU-5: detail.code is 'question_refused' (with refusal and reason) when the check refuses the text; else a bad field. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited. detail.code is 'rate_limited'; see Retry-After. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The check could not run. detail.code is 'check_unavailable'. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    delete_saved_question_questions_mine__question_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                question_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_saved_question_questions_mine__question_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                question_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SavedQuestionPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SavedQuestionOut"];
+                };
+            };
+            /** @description detail.code is 'saved_questions_full' or 'duplicate_question'. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description CU-5: detail.code is 'question_refused' (with refusal and reason) when the check refuses the text; else a bad field. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited. detail.code is 'rate_limited'; see Retry-After. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The check could not run. detail.code is 'check_unavailable'. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
