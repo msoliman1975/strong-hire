@@ -163,6 +163,30 @@ describe("Controls page", () => {
     expect(screen.getByText("differs", { exact: false })).toBeInTheDocument();
   });
 
+  it("CU-11: limits Custom interviews to paid plans with a reason, and opens them again", async () => {
+    const user = await openControls();
+    const panel = screen.getByRole("region", { name: "Custom interviews (CU-11)" });
+    expect(within(panel).getByTestId("custom-access")).toHaveTextContent("Everyone");
+    await user.click(within(panel).getByRole("button", { name: "Limit to paid plans" }));
+    const dialog = screen.getByRole("dialog", { name: "Limit Custom to paid plans" });
+    expect(dialog).toHaveTextContent("Custom interviews: Everyone → Paid plans only");
+    const confirm = within(dialog).getByRole("button", { name: "Limit to paid plans" });
+    expect(confirm).toBeDisabled();
+    await user.type(within(dialog).getByLabelText(/Reason/), "launch: Custom is paid");
+    await user.click(confirm);
+    expect(await opsBanner()).toHaveTextContent("Custom interviews for paid plans only");
+    expect(opsState(mockStore.db).values.custom_interview_access).toBe("paid_only");
+    expect(within(panel).getByTestId("custom-access")).toHaveTextContent("Paid plans only");
+    expect(within(panel).getByText(/Last changed by admin@example.com/)).toBeInTheDocument();
+
+    await user.click(within(panel).getByRole("button", { name: "Open to everyone" }));
+    const back = screen.getByRole("dialog", { name: "Open Custom to everyone" });
+    await user.type(within(back).getByLabelText(/Reason/), "beta test again");
+    await user.click(within(back).getByRole("button", { name: "Open to everyone" }));
+    await screen.findByText("Every control is at its default.");
+    expect(opsState(mockStore.db).values.custom_interview_access).toBe("everyone");
+  });
+
   it("the Shell banner shows on other pages too", async () => {
     signInAdmin();
     opsState(mockStore.db).values = { ...MOCK_DEFAULTS, sessions_paused_text: true };

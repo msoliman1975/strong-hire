@@ -13,7 +13,7 @@ import { Navigate, useNavigate, useParams } from "react-router";
 
 import { ApiError } from "../api/client";
 import { keys, useSession } from "../api/hooks";
-import { sessionsApi } from "../api/sessions";
+import { paywallReason, sessionsApi } from "../api/sessions";
 import type { Phase, SessionRecord } from "../api/types";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
 import { difficultyLabel, interviewTypeLabel, modeLabel, phaseLabel } from "../labels";
@@ -130,6 +130,14 @@ function LiveView({ session }: { session: SessionRecord }) {
         onInterviewerVoice: setVoice,
       });
     } catch (err) {
+      // The first join starts the session and checks the plan again (BL-2, CU-11): 402 or 403
+      // goes to the paywall, as on the setup page.
+      const reason = paywallReason(err, config.interview_type === "custom");
+      if (reason) {
+        void queryClient.invalidateQueries({ queryKey: keys.usage });
+        navigate(`/upgrade?reason=${encodeURIComponent(reason)}`);
+        return;
+      }
       setStage("failed");
       setFailure(
         err instanceof ApiError
@@ -137,7 +145,7 @@ function LiveView({ session }: { session: SessionRecord }) {
           : "We could not connect to the interview. Check your internet connection, then try again.",
       );
     }
-  }, [queryClient, sessionId, toDebrief]);
+  }, [config.interview_type, navigate, queryClient, sessionId, toDebrief]);
 
   // The voice agent should join within seconds. If it does not, say so and offer a retry.
   useEffect(() => {
@@ -365,9 +373,10 @@ function NotStartedView({ session }: { session: SessionRecord }) {
       navigate(`/sessions/${created.id}/live`);
     },
     onError: (err) => {
-      if (err instanceof ApiError && err.status === 402) {
+      const reason = paywallReason(err, session.config.interview_type === "custom");
+      if (reason) {
         void queryClient.invalidateQueries({ queryKey: keys.usage });
-        navigate(`/upgrade?reason=${encodeURIComponent(err.code ?? "upgrade_required")}`);
+        navigate(`/upgrade?reason=${encodeURIComponent(reason)}`);
       }
     },
   });
@@ -382,7 +391,7 @@ function NotStartedView({ session }: { session: SessionRecord }) {
           </button>
         </div>
       </div>
-      {retry.isError && !(retry.error instanceof ApiError && retry.error.status === 402) && (
+      {retry.isError && paywallReason(retry.error, session.config.interview_type === "custom") === null && (
         <ErrorNotice error={retry.error} />
       )}
     </div>

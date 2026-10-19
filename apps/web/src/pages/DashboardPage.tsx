@@ -2,7 +2,7 @@ import { Link, useSearchParams } from "react-router";
 
 import { useJobs, useProgress } from "../api/hooks";
 import type { JobTargetSummary } from "../api/types";
-import { CompetencySparklines } from "../components/TrendChart";
+import { JobTrend } from "../components/TrendChart";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
 import { difficultyLabel, formatDate, interviewTypeLabel } from "../labels";
 import { newJobPath } from "../paths";
@@ -165,11 +165,12 @@ function TrendSide({ summary }: { summary: JobTargetSummary }) {
         <p className="muted small">
           {jobTitle(summary)}, {jobCompany(summary)}. Realistic sessions.
         </p>
-        {progress.data.snapshots.length === 0 ? (
-          <p className="muted small">Trends appear here after your first full Realistic session (30 or 45 minutes).</p>
-        ) : (
-          <CompetencySparklines snapshots={progress.data.snapshots} />
-        )}
+        <JobTrend
+          jobId={jobId}
+          empty={
+            <p className="muted small">Trends appear here after your first full Realistic session (30 or 45 minutes).</p>
+          }
+        />
       </section>
       {next && (
         <section className="next-card" aria-labelledby="next-side-heading">

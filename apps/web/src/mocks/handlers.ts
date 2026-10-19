@@ -45,9 +45,11 @@ import type {
   Resume,
   ResumeAccepted,
   ResumeOut,
+  SessionSetup,
   Usage,
 } from "../api/types";
 import { newId, type MockGap, type MockStore, type MockTask } from "./db";
+import { customDebriefQuestions, customProblem, customRefusal, customScorecard } from "./custom";
 import { gapAnalysis, jobPosting, resume, scorecardFor, sessionPlan } from "./fixtures";
 
 /** CU-1: fill the defaults the API adds to a Custom setup. */
@@ -756,7 +758,11 @@ export function inputHandlers(store: MockStore) {
             status: s.status === "completed" ? "ready" : s.status === "failed" ? "failed" : "scoring",
             at: s.ended_at ?? s.started_at,
             match_score: null,
-            hire_signal: s.status === "completed" ? scorecardFor(s.config.interview_type, generic).hire_signal : null,
+            hire_signal:
+              s.status === "completed"
+                ? (s.config.custom ? customScorecard(s.config.custom, generic) : scorecardFor(s.config.interview_type, generic))
+                    .hire_signal
+                : null,
             interview_type: s.config.interview_type,
             mode: s.config.mode,
             duration_min: s.config.duration_min,
@@ -790,10 +796,34 @@ export function sessionHandlers(store: MockStore) {
       const open = body.channel === "text" ? db().siteStatus.text_sessions_open : db().siteStatus.voice_sessions_open;
       if (!open) return paused("sessions_paused");
       const usage = db().usage;
+      const isCustom = body.config.interview_type === "custom";
+      if (isCustom) {
+        // CU-11 (strong_api.custom.access), then the SessionConfig rules (CU-1, CU-3).
+        if (db().siteStatus.custom_interview_access === "paid_only" && !usage.full_interviews_allowed) {
+          return HttpResponse.json(
+            {
+              detail: {
+                code: "upgrade_required",
+                message: "Custom interviews are part of the subscription. Subscribe to build your own interview.",
+                upgrade_url: "/upgrade",
+              },
+            },
+            { status: 403 },
+          );
+        }
+        const problem = customProblem(body.config);
+        if (problem) return invalid(problem);
+        // CU-5: the server checks every chip and own question again (strong_api.custom.guard).
+        const refused = body.config.custom ? customRefusal(body.config.custom) : null;
+        if (refused) return HttpResponse.json(refused, { status: 422 });
+      }
+      // CU-11: while Custom is open to everyone, a free account may run a 30-minute Custom session.
+      const freeFull =
+        isCustom && body.config.duration_min === 30 && db().siteStatus.custom_interview_access === "everyone";
       // Same answer as strong_api.billing.ensure_can_start_session.
       const code: string | null = !usage.can_start_session
         ? (usage.block_code ?? "upgrade_required")
-        : body.config.duration_min !== 10 && !usage.full_interviews_allowed
+        : body.config.duration_min !== 10 && !usage.full_interviews_allowed && !freeFull
           ? "full_interview_requires_plan"
           : null;
       if (code) {
@@ -834,6 +864,18 @@ export function sessionHandlers(store: MockStore) {
       advanceAll();
       const s = findSession(params.sessionId);
       return s ? HttpResponse.json(s) : notFound("Session");
+    }),
+    // CU-9: an earlier session's setup, shaped like the POST /sessions body.
+    http.post(`${API}/sessions/:sessionId/repeat`, ({ params }) => {
+      const s = findSession(params.sessionId);
+      if (!s) return notFound("Session");
+      const setup: SessionSetup = {
+        job_target_id: s.job_target_id,
+        resume_id: s.resume_id,
+        config: s.config,
+        channel: s.channel,
+      };
+      return HttpResponse.json(setup);
     }),
     // The voice room is mocked too: the live page sees the "mock:" URL and uses src/session/mockVoice.
     http.post(`${API}/sessions/:sessionId/voice/join`, ({ params }) => {
@@ -923,7 +965,7 @@ export function scoringHandlers(store: MockStore) {
         s.config.duration_min !== 10,
     );
     return realistic.flatMap((s, index) =>
-      scorecardFor(s.config.interview_type).competency_scores.map((c) => ({
+      (s.config.custom ? customScorecard(s.config.custom) : scorecardFor(s.config.interview_type)).competency_scores.map((c) => ({
         job_target_id: jobId,
         session_id: s.id,
         competency: c.competency,
@@ -941,7 +983,12 @@ export function scoringHandlers(store: MockStore) {
       const job = findJob(s.job_target_id);
       const generic = job?.generic_mode ?? true;
       const ready = s.status === "completed";
-      const scorecard = ready ? scorecardFor(s.config.interview_type, generic) : null;
+      const custom = s.config.custom;
+      const scorecard = ready
+        ? custom
+          ? customScorecard(custom, generic)
+          : scorecardFor(s.config.interview_type, generic)
+        : null;
       const debrief: Debrief = {
         // The debrief's session has no channel or brief_ready (DebriefSession in openapi.json).
         session: {
@@ -966,22 +1013,35 @@ export function scoringHandlers(store: MockStore) {
         generic_mode: generic,
         company_name: job?.posting?.company_name ?? null,
         values_framework: generic ? null : "Company values",
-        questions: [],
+        questions: custom ? customDebriefQuestions(custom) : [],
       };
       return HttpResponse.json(debrief);
     }),
-    http.get(`${API}/job-targets/:jobId/progress`, ({ params }) => {
+    http.get(`${API}/job-targets/:jobId/progress`, ({ params, request }) => {
       advanceAll();
       const jobId = String(params.jobId);
       if (!findJob(jobId)) return notFound("Job target");
-      const snapshots = progressFor(jobId);
+      // CU-7: own questions of Custom sessions are marked, or left out on request.
+      const exclude = new URL(request.url).searchParams.get("exclude_own_questions") === "true";
+      const ownSessions = new Set(
+        db()
+          .sessions.filter((s) => (s.config.custom?.questions.length ?? 0) > 0)
+          .map((s) => s.id),
+      );
+      const snapshots = progressFor(jobId).map((p) =>
+        exclude && ownSessions.has(p.session_id) ? { ...p, score: Math.max(1, p.score - 0.25) } : p,
+      );
       const progress: JobProgress = {
         job_target_id: jobId,
         snapshots,
         trends: trendsFor(snapshots),
         next_session: db().gaps[jobId]?.analysis ? sessionPlan[snapshots.length ? 1 : 0] : null,
-        own_question_points: [],
-        own_questions_excluded: false,
+        own_question_points: exclude
+          ? []
+          : snapshots
+              .filter((p) => ownSessions.has(p.session_id))
+              .map((p) => ({ session_id: p.session_id, competency: p.competency, own_questions: 1, other_questions: 2 })),
+        own_questions_excluded: exclude,
       };
       return HttpResponse.json(progress);
     }),

@@ -2198,3 +2198,130 @@ dialog::backdrop {
   border-left-color: var(--danger);
   background: var(--danger-soft);
 }
+
+/* ------------------------------------------------------------ Custom interview (CU-1 to CU-9) */
+
+.custom-setup {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.custom-category,
+.custom-questions {
+  border-top: 1px solid var(--line);
+  padding-top: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.custom-category h3,
+.custom-questions h3 {
+  margin: 0 0 var(--space-2);
+}
+
+.custom-category input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.chip--toggle {
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  min-height: 32px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.chip--toggle[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.chip--toggle:disabled {
+  cursor: not-allowed;
+  border-style: dashed;
+  color: var(--muted);
+}
+
+.chip--toggle:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.own-question-list {
+  display: grid;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.own-question {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface);
+}
+
+.own-question__text {
+  font-weight: 700;
+  margin: 0 0 var(--space-2);
+}
+
+.own-question .field {
+  margin-bottom: var(--space-2);
+}
+
+.own-question .check {
+  margin-bottom: 0;
+}
+
+.saved-pick li {
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.custom-summary {
+  border-top: 1px solid var(--line);
+  padding-top: var(--space-4);
+}
+
+.custom-summary ul {
+  padding-left: var(--space-5);
+}
+
+.badge-own {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 1px var(--space-2);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--ink);
+  border: 1px solid var(--accent);
+  white-space: nowrap;
+}
+
+.trend-own {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.question-group__title {
+  font-size: 1rem;
+  margin: var(--space-4) 0 var(--space-2);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.custom-category .field__row .btn {
+  white-space: nowrap;
+}
