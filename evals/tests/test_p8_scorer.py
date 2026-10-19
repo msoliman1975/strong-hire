@@ -125,7 +125,7 @@ async def test_goldset_suite_runs_the_p8_scorer() -> None:
     assert keys["scorer_within_one_band"].value is not None
     assert "2 company-mode transcripts" in keys["value_within_one_point"].detail
     assert keys["debrief_ready_s"].passed is True
-    assert "scorer/rubric.v1" in report.prompt_refs
+    assert "scorer/rubric.v2" in report.prompt_refs
     assert "scorer/rationale.v1" in report.prompt_refs
 
 

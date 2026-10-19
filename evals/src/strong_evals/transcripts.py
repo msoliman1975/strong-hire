@@ -14,7 +14,6 @@ from pathlib import Path
 from pydantic import Field, model_validator
 
 from strong_core.schemas import (
-    COMPETENCIES_BY_TYPE,
     BriefQuestion,
     Contract,
     InterviewerBrief,
@@ -23,6 +22,7 @@ from strong_core.schemas import (
     SessionConfig,
     Speaker,
     Turn,
+    session_competencies,
 )
 from strong_evals import EVALS_DIR
 
@@ -61,7 +61,7 @@ class ScriptedTranscript(Contract):
 
     @model_validator(mode="after")
     def _check(self) -> ScriptedTranscript:
-        allowed = set(COMPETENCIES_BY_TYPE[self.brief.session.interview_type])
+        allowed = set(session_competencies(self.brief.session))
         if not set(self.brief.target_competencies) <= allowed:
             raise ValueError("target_competencies must belong to the interview type")
         for q in self.brief.questions:
