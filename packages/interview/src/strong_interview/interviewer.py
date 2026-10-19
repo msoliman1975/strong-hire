@@ -18,16 +18,21 @@ Custom sessions (CU-4, CU-12, D-7, D-9): the prompts name the current question's
 the interview type, and the agenda names the categories. A question the candidate wrote goes
 into the prompts wrapped as quoted data (prompts/interviewer/question_candidate). It gets the
 same follow-up rules as the planner's. A verbatim question is enforced in code: the model writes
-only a short lead-in, and the spoken line is that lead-in plus the question text, unchanged.
+only a short lead-in, and the spoken line is that lead-in plus the question text, unchanged. The
+spoken line still passes the output guard. If the guard rejects the question text itself, the
+question is asked in the interviewer's own words instead, through the normal path. The trace
+marks the rejected line `verbatim: "rejected"` and the adapted calls `verbatim: "adapted"` (CU-5
+risk).
 """
 
 from __future__ import annotations
 
+import json
 import logging
 import re
 import time
 from collections.abc import AsyncIterator, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any
 
 from strong_core.gateway import ModelGateway, Role
@@ -73,6 +78,16 @@ def lead_in(text: str) -> str:
     if not first or "?" in first or len(first.split()) > LEAD_IN_MAX_WORDS:
         return ""
     return first
+
+
+def quote_untrusted(text: str) -> str:
+    """Text the candidate wrote, as one JSON-quoted line for a prompt (CU-5 risk).
+
+    JSON quoting escapes quote marks, so the text cannot end the string early, and angle
+    brackets are removed, so it cannot open or close a tag-delimited block.
+    """
+    flat = " ".join(text.replace("<", " ").replace(">", " ").split())
+    return json.dumps(flat, ensure_ascii=False)
 
 
 def say_names(names: Sequence[str]) -> str:
@@ -202,11 +217,11 @@ class Interviewer:
         return self.brief.session.interview_type.value.replace("_", " ")
 
     def question_text(self, question: BriefQuestion) -> str:
-        """The question for the prompts. The candidate's own text is wrapped as quoted data, so
-        it is never read as an instruction (CU-5 risk)."""
+        """The question for the prompts. The candidate's own text is JSON-quoted data with a
+        note, so it is never read as an instruction (CU-5 risk)."""
         if question.source == QuestionSource.CANDIDATE:
             prompt = load_prompt(Role.INTERVIEWER, "question_candidate")
-            return prompt.render(text=question.text).strip()
+            return prompt.render(text=quote_untrusted(question.text)).strip()
         return question.text
 
     def _system(self, question: BriefQuestion | None = None) -> Message:
@@ -230,13 +245,16 @@ class Interviewer:
             facts=self.facts.render(),
         )
 
-    def _move_note(self, move: Move) -> str:
-        """An extra instruction for a closing move (from prompts/interviewer/note_*)."""
+    def _move_note(self, move: Move, adapted: bool = False) -> str:
+        """An extra instruction for a closing move (from prompts/interviewer/note_*).
+
+        `adapted`: a verbatim question asked in the interviewer's own words, so no verbatim note.
+        """
         if move.closing:
             return load_prompt(Role.INTERVIEWER, "note_last_question").render().strip()
         if move.open_question:
             return load_prompt(Role.INTERVIEWER, "note_open_question").render().strip()
-        if self.verbatim(move):
+        if self.verbatim(move) and not adapted:
             return load_prompt(Role.INTERVIEWER, "note_verbatim").render().strip()
         return "none"
 
@@ -245,7 +263,9 @@ class Interviewer:
         """D-7: the move reads the question word for word."""
         return move.kind in VERBATIM_MOVES and move.question is not None and move.question.verbatim
 
-    def turn_messages(self, move: Move, turns: Sequence[Turn]) -> list[Message]:
+    def turn_messages(
+        self, move: Move, turns: Sequence[Turn], adapted: bool = False
+    ) -> list[Message]:
         user = load_prompt(Role.INTERVIEWER, "turn_input").message(
             "user",
             transcript=render_transcript(turns, self.window),
@@ -255,7 +275,7 @@ class Interviewer:
             pushback="on" if move.pushback else "off",
             duration_min=str(self.duration_min),
             plan=self.plan_text(),
-            note=self._move_note(move),
+            note=self._move_note(move, adapted),
         )
         return [self._system(move.question), user]
 
@@ -308,7 +328,12 @@ class Interviewer:
         )
 
     async def _say_once(
-        self, move: Move, messages: list[Message], previous: str | None, attempt: int
+        self,
+        move: Move,
+        messages: list[Message],
+        previous: str | None,
+        attempt: int,
+        flags: dict[str, Any] | None = None,
     ) -> GuardResult:
         started = time.perf_counter()
         done = await self.gateway.complete(Role.INTERVIEWER, messages)
@@ -324,7 +349,7 @@ class Interviewer:
                 ",".join(result.rules),
                 action,
             )
-        guard = {"attempt": attempt, "action": action, **result.as_dict()}
+        guard = {"attempt": attempt, "action": action, **result.as_dict(), **(flags or {})}
         self._note(done, messages, raw, started, guard)
         if self.last_call is not None:
             self.last_calls.append(self.last_call)
@@ -342,14 +367,32 @@ class Interviewer:
         self.last_call = None
         self.last_calls = []
         if self.verbatim(move):
-            return await self._say_verbatim(move, messages, previous)
-        result = await self._say_once(move, messages, previous, attempt=1)
+            spoken = await self._say_verbatim(move, messages, previous)
+            if spoken is not None:
+                return spoken
+            adapted = self.turn_messages(move, turns, adapted=True)
+            return await self._say_guarded(move, adapted, previous, {"verbatim": "adapted"})
+        return await self._say_guarded(move, messages, previous)
+
+    async def _say_guarded(
+        self,
+        move: Move,
+        messages: list[Message],
+        previous: str | None,
+        flags: dict[str, Any] | None = None,
+    ) -> str:
+        """The model's reply after the guard, one stricter retry, then the fixed line.
+
+        `flags` go into each call's guard record. With flags set (a verbatim question the guard
+        rejected), the fixed line never repeats the question text.
+        """
+        result = await self._say_once(move, messages, previous, attempt=1, flags=flags)
         if result.usable:
             return result.text
         retry = self.retry_messages(messages)
         started = time.perf_counter()
         try:
-            result = await self._say_once(move, retry, previous, attempt=2)
+            result = await self._say_once(move, retry, previous, attempt=2, flags=flags)
         except Exception as exc:
             log.warning("interviewer retry failed; saying the fixed line", exc_info=True)
             result = GuardResult("")
@@ -360,7 +403,13 @@ class Interviewer:
                 prompt_refs=tuple(m.prompt_ref for m in retry if m.prompt_ref),
                 latency_ms=_ms_since(started),
                 error=f"{type(exc).__name__}: {exc}"[:2000],
-                guard={"attempt": 2, "action": "fallback", "rules": [], "hits": []},
+                guard={
+                    "attempt": 2,
+                    "action": "fallback",
+                    "rules": [],
+                    "hits": [],
+                    **(flags or {}),
+                },
             )
             self.last_calls.append(self.last_call)
         if result.usable:
@@ -370,18 +419,27 @@ class Interviewer:
             name=self.name,
             duration_min=self.duration_min,
             mini=self.brief.session.is_mini,
-            question=move.question.text if move.question else None,
+            question=move.question.text if move.question and not flags else None,
             closing=move.closing,
             open_question=move.open_question,
         )
 
-    async def _say_verbatim(self, move: Move, messages: list[Message], previous: str | None) -> str:
+    async def _say_verbatim(
+        self, move: Move, messages: list[Message], previous: str | None
+    ) -> str | None:
         """D-7: the model's short lead-in, then the question text exactly as written.
 
         The model never says the question itself, so it cannot reword it. A lead-in the guard
         rejects, one that is long or asks something, or a failed call leaves only the question.
+
+        The whole spoken line then passes the output guard too, unchanged or not at all: the
+        guard may not edit the candidate's words. If the line with the lead-in breaks a rule,
+        the question alone is checked. If the question text itself breaks a rule, this returns
+        None and the caller asks it in the interviewer's own words (CU-5 risk); the trace
+        record of the lead-in call carries the flag and the guard's hits.
         """
         assert move.question is not None
+        question = move.question.text
         lead = ""
         try:
             result = await self._say_once(move, messages, previous, attempt=1)
@@ -389,7 +447,34 @@ class Interviewer:
                 lead = lead_in(result.text)
         except Exception:
             log.warning("verbatim lead-in failed; saying the question alone", exc_info=True)
-        return f"{lead} {move.question.text}".strip()
+        spoken = f"{lead} {question}".strip()
+        check = self._guard(spoken, move, previous)
+        if check.hits and lead:
+            spoken = question
+            check = self._guard(spoken, move, previous)
+        if not check.hits:
+            return spoken
+        log.warning(
+            "interviewer guard rejected a verbatim question: rules %s; asking it adapted",
+            ",".join(check.rules),
+        )
+        flag = {"verbatim": "rejected", "verbatim_guard": check.as_dict()}
+        if self.last_calls:
+            # The lead-in call's record carries the flag.
+            last = self.last_calls[-1]
+            self.last_calls[-1] = replace(last, guard={**(last.guard or {}), **flag})
+        else:
+            # The lead-in call failed and left no record: keep one for the trace.
+            self.last_calls.append(
+                ModelCall(
+                    messages=tuple(messages),
+                    raw_reply=None,
+                    model=None,
+                    prompt_refs=tuple(m.prompt_ref for m in messages if m.prompt_ref),
+                    guard={"attempt": 1, "action": "adapted", "rules": [], "hits": [], **flag},
+                )
+            )
+        return None
 
     async def say_stream(self, move: Move, turns: Sequence[Turn]) -> AsyncIterator[str]:
         """The same prompt as `say`, streamed, so speech could start before the reply is done.

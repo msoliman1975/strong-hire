@@ -27,7 +27,9 @@ and the agenda, 8 minutes of CORE, 1 minute of WRAP_UP. A mini also has no curve
 most MINI_MAX_PROBES follow-ups per question, whatever the difficulty.
 
 Custom sessions (CU-4, D-6): CORE runs category by category in the order the candidate set
-(`brief.session.custom.categories`), and by priority within a category. Must-ask questions are
+(`brief.session.custom.categories`), and in the brief's list order within a category: the
+planner interleaves own and planner questions there, and the must-ask priorities must not undo
+that (CU-12). Must-ask questions are
 guaranteed by this controller, never by the model. See the time-pressure rule above
 `_probe_fits`. The four standard types never take these paths.
 
@@ -238,14 +240,17 @@ class SessionController:
 
     def _order(self, questions: Sequence[BriefQuestion]) -> list[BriefQuestion]:
         """By priority. A Custom session runs its categories in the candidate's order (CU-4),
-        by priority within each category."""
+        and keeps the brief's list order within each category (a stable sort on the category
+        alone). The planner builds that list order to interleave own and planner questions, and
+        it numbers the must-ask questions first, so sorting by priority would ask all of the
+        candidate's questions before the interviewer's (CU-12)."""
         custom = self.brief.session.custom
         if custom is None:
             return sorted(questions, key=lambda q: q.priority)
         rank = {c.category: i for i, c in enumerate(custom.categories)}
 
-        def key(q: BriefQuestion) -> tuple[int, int]:
-            return (rank.get(q.category, len(rank)) if q.category else len(rank), q.priority)
+        def key(q: BriefQuestion) -> int:
+            return rank.get(q.category, len(rank)) if q.category else len(rank)
 
         return sorted(questions, key=key)
 
