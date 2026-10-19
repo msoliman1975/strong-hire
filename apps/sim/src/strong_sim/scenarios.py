@@ -22,7 +22,6 @@ from __future__ import annotations
 import itertools
 import random
 from collections.abc import Mapping, Sequence
-from enum import StrEnum
 from pathlib import Path
 from typing import Any, Literal
 
@@ -30,62 +29,17 @@ import yaml
 from pydantic import BaseModel, ConfigDict, Field
 
 from strong_core.config import find_repo_root
-from strong_core.schemas import Difficulty, InterviewType, Level, Mode, SessionConfig
+from strong_core.schemas import Difficulty, InterviewType, Mode, SessionConfig
+from strong_core.sim import NAMES, PERSONAS, VOICE_ONLY, Behavior, Persona, Quality
 
 SCENARIOS_DIR = find_repo_root() / "evals" / "scenarios"
 FIXTURES_DIR = find_repo_root() / "evals" / "fixtures" / "inputs"
 
 
-class Quality(StrEnum):
-    STRONG = "strong"
-    AVERAGE = "average"
-    WEAK = "weak"
-
-
-class Behavior(StrEnum):
-    NORMAL = "normal"
-    LONG_ANSWERS = "long_answers"
-    ONE_LINE_ANSWERS = "one_line_answers"
-    OFF_TOPIC = "off_topic"
-    ASKS_TO_REPEAT = "asks_to_repeat"
-    SILENT = "silent"
-    INTERRUPTS = "interrupts"  # voice only
-    ARGUES = "argues"
-    MANY_QUESTIONS_BACK = "many_questions_back"
-    PROMPT_INJECTION = "prompt_injection"
-    DROPS_CONNECTION = "drops_connection"  # voice only
-
-
-VOICE_ONLY = frozenset({Behavior.INTERRUPTS, Behavior.DROPS_CONNECTION})
+# The personas (resume fixtures), quality, behavior and names live in strong_core.sim: the admin
+# api offers them too.
 
 Channel = Literal["text", "voice"]
-
-
-class ResumeFixture(BaseModel):
-    posting: str
-    level: Level
-
-
-# The posting each resume fixture is meant for, and the level it confirms at setup.
-RESUMES: dict[str, ResumeFixture] = {
-    "backend-senior": ResumeFixture(posting="swe-stripe-backend", level=Level.SENIOR),
-    "ml-engineer-staff": ResumeFixture(
-        posting="data-databricks-ml-serving", level=Level.STAFF_PRINCIPAL
-    ),
-    "new-grad-swe": ResumeFixture(posting="swe-northwind-newgrad", level=Level.NEW_GRAD),
-    "product-manager-mid": ResumeFixture(posting="pm-shopify-checkout", level=Level.MID),
-    "product-designer-senior": ResumeFixture(
-        posting="design-airbnb-product-designer", level=Level.SENIOR
-    ),
-    "tpm-career-changer": ResumeFixture(posting="tpm-harbor-robotics", level=Level.MID),
-}
-
-# Synthetic names only. A scenario gets one by its position in the suite.
-NAMES = (
-    "Ada Venn", "Tomas Ruel", "Mira Ostrand", "Kofi Lindqvist", "Ben Halloway", "Ines Marrow",
-    "Joel Tamsin", "Priya Calder", "Cal Dunmore", "Nadia Fenwick", "Owen Strand", "Lila Burrows",
-    "Sami Okafor", "Rhea Duval", "Theo Marsh", "Yara Quint",
-)  # fmt: skip
 
 
 class Scenario(BaseModel):
@@ -103,8 +57,8 @@ class Scenario(BaseModel):
     candidate_name: str = ""
 
     @property
-    def fixture(self) -> ResumeFixture:
-        return RESUMES[self.resume]
+    def fixture(self) -> Persona:
+        return PERSONAS[self.resume]
 
     def session_config(self) -> SessionConfig:
         return SessionConfig(
@@ -116,7 +70,7 @@ class Scenario(BaseModel):
         )
 
     def check(self) -> None:
-        if self.resume not in RESUMES:
+        if self.resume not in PERSONAS:
             raise ValueError(f"{self.id}: unknown resume fixture {self.resume!r}")
         if self.behavior in VOICE_ONLY and self.channel != "voice":
             raise ValueError(f"{self.id}: behavior {self.behavior} needs the voice channel")

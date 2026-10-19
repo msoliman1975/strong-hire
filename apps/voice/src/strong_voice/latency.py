@@ -30,13 +30,16 @@ from __future__ import annotations
 
 import argparse
 import csv
+import logging
 import math
 import sys
 import time
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import asdict, dataclass, fields
 from pathlib import Path
 from typing import Any
+
+log = logging.getLogger(__name__)
 
 GATE_P50_MS = 1000.0
 # Rooms with this prefix are warm-up runs. The agent does not record their turns.
@@ -104,9 +107,19 @@ def build_turn(
 class LatencyRecorder:
     """Pairs each user turn with the agent reply that follows and appends a CSV row."""
 
-    def __init__(self, path: Path | None, *, session: str, profile: str) -> None:
-        """path=None keeps rows in memory only (used for warm-up rooms)."""
+    def __init__(
+        self,
+        path: Path | None,
+        *,
+        session: str,
+        profile: str,
+        on_turn: Callable[[TurnLatency], None] | None = None,
+    ) -> None:
+        """path=None keeps rows in memory only (warm-up rooms, real interviews). `on_turn`
+        gets each new row (real interviews save it to voice_turn_timings, OB-3); it must not
+        block, and an error in it is logged, never raised."""
         self.path = path
+        self.on_turn = on_turn
         self.session = session
         self.profile = profile
         self.turns: list[TurnLatency] = []
@@ -139,6 +152,11 @@ class LatencyRecorder:
             self.turns.append(row)
             if self.path is not None:
                 append_rows(self.path, [row])
+            if self.on_turn is not None:
+                try:
+                    self.on_turn(row)
+                except Exception:
+                    log.warning("could not keep the latency of turn %d", row.turn, exc_info=True)
 
     def summary(self) -> str:
         return format_report({self.profile: self.turns})

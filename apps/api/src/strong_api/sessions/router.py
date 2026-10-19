@@ -45,7 +45,6 @@ import logging
 import time
 import uuid
 from datetime import UTC, datetime, timedelta
-from decimal import Decimal
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
@@ -85,10 +84,10 @@ from strong_api.sessions.settings import (
     get_voice_session_settings,
 )
 from strong_core.db.models import GapAnalysis as GapRow
-from strong_core.db.models import InterviewSession, JobTarget, Org, UsageEvent
+from strong_core.db.models import InterviewSession, JobTarget, Org
 from strong_core.db.models import Turn as TurnRow
 from strong_core.db.turns import next_turn_seq
-from strong_core.gateway import Role, get_gateway
+from strong_core.gateway import Role, get_gateway, usage_context
 from strong_core.schemas import (
     GapStatus,
     InterviewType,
@@ -96,7 +95,6 @@ from strong_core.schemas import (
     SessionChannel,
     SessionStatus,
     Turn,
-    UsageComponent,
 )
 from strong_core.sim import gateway_for_org
 from strong_interview import (
@@ -321,19 +319,9 @@ async def _end(
         return
     if runner is not None:
         session.prompt_version = ",".join(sorted(runner.interviewer.prompt_refs))[:200] or None
+        # Usage: the gateway writes one usage_events row per interviewer call (OB-2), inside
+        # the usage context of each text request below.
         await _flush_traces(runner)
-        interviewer = runner.interviewer
-        if session.started_at is not None:
-            # The text channel's interviewer tokens and cost, like the voice agent saves them.
-            db.add(
-                UsageEvent(
-                    org_id=session.org_id,
-                    session_id=session.id,
-                    component=UsageComponent.LLM,
-                    units=Decimal(interviewer.input_tokens + interviewer.output_tokens),
-                    cost_usd=Decimal(f"{interviewer.cost_usd:.6f}"),
-                )
-            )
     if session.started_at is None:
         # Never started: no minutes, no scoring, and the free interview is not used.
         session.ended_at = datetime.now(UTC)
@@ -512,7 +500,8 @@ async def open_text_session(
     steps.step("session_started")
     try:
         async with asyncio.timeout(settings.text_turn_timeout_s):
-            turns = await runner.open()
+            with usage_context(session.org_id, session.id):  # OB-2
+                turns = await runner.open()
     except TimeoutError:
         log.error(
             "text/open %s: no greeting after %d ms (limit %.0f s); stopped after step %s",
@@ -571,7 +560,8 @@ async def text_turn(
         raise HTTPException(status.HTTP_409_CONFLICT, "The interviewer is still replying.")
     try:
         async with asyncio.timeout(settings.text_turn_timeout_s):
-            turns = await runner.respond(body.text, on_stage=steps.step)
+            with usage_context(session.org_id, session.id):  # OB-2
+                turns = await runner.respond(body.text, on_stage=steps.step)
     except TimeoutError:
         stage = runner.stage if steps.last != "received" else "waiting_for_runner_lock"
         log.error(
@@ -615,7 +605,8 @@ async def coach(
         elif body.command == "resume":
             runner.resume()
         else:
-            turns = await runner.coach(body.command)
+            with usage_context(session.org_id, session.id):  # OB-2
+                turns = await runner.coach(body.command)
             await _flush_traces(runner)  # the text channel answers after its traces are saved
     except CoachNotAllowedError as exc:
         raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc

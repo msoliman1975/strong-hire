@@ -17,29 +17,37 @@ Every route that changes something:
 
 from __future__ import annotations
 
-from typing import Annotated, Any
+from typing import Annotated, Any, Protocol
 
 from fastapi import Depends, Header, HTTPException, status
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from strong_api.admin.deps import require_admin
-from strong_core.db.models import AuditLog, User
+from strong_api.admin.identity import AdminPrincipal
+from strong_core.db.models import AuditLog
 
 ADMIN_REQUEST_HEADER = "X-Admin-Request"
 
 
 async def require_admin_write(
-    admin: Annotated[User, Depends(require_admin)],
+    admin: Annotated[AdminPrincipal, Depends(require_admin)],
     x_admin_request: Annotated[str | None, Header(alias=ADMIN_REQUEST_HEADER)] = None,
-) -> User:
+) -> AdminPrincipal:
     """The admin, for a write. The admin check runs first, so non-admins still get 404."""
     if x_admin_request != "1":
         raise HTTPException(status.HTTP_403_FORBIDDEN, f"{ADMIN_REQUEST_HEADER}: 1 is required")
     return admin
 
 
-AdminWrite = Annotated[User, Depends(require_admin_write)]
+AdminWrite = Annotated[AdminPrincipal, Depends(require_admin_write)]
+
+
+class Actor(Protocol):
+    """Anything with the admin's email: the AdminPrincipal of a request."""
+
+    @property
+    def email(self) -> str: ...
 
 
 class ActionIn(BaseModel):
@@ -52,7 +60,7 @@ class ActionIn(BaseModel):
 
 def audit_action(
     db: AsyncSession,
-    admin: User,
+    admin: Actor,
     action: str,
     entity: str,
     *,

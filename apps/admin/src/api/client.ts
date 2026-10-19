@@ -24,12 +24,15 @@ export const apiClient = createClient<paths>({
 export class ApiError extends Error {
   readonly status: number;
   readonly code: string | null;
+  /** The response's `detail`, for pages that show more than the message (import problems). */
+  readonly detail: unknown;
 
-  constructor(status: number, message: string, code: string | null = null) {
+  constructor(status: number, message: string, code: string | null = null, detail: unknown = null) {
     super(message);
     this.name = "ApiError";
     this.status = status;
     this.code = code;
+    this.detail = detail;
   }
 }
 
@@ -53,7 +56,10 @@ function errorMessage(body: unknown, status: number): { message: string; code: s
 export function unwrap<T>(result: { data?: T; error?: unknown; response: Response }): T {
   if (result.error !== undefined || !result.response.ok) {
     const { message, code } = errorMessage(result.error, result.response.status);
-    throw new ApiError(result.response.status, message, code);
+    const detail = result.error && typeof result.error === "object" && "detail" in result.error
+      ? (result.error as { detail: unknown }).detail
+      : null;
+    throw new ApiError(result.response.status, message, code, detail);
   }
   return result.data as T;
 }

@@ -14,17 +14,9 @@ import yaml
 
 from strong_core.config import find_repo_root
 from strong_core.gateway import Completion
+from strong_core.sim import estimate_session
 
 PRICES = find_repo_root() / "evals" / "config" / "prices.yaml"
-
-# Rough per-session token counts, from the first runs. Used only for the estimate.
-EST_CANDIDATE_IN_PER_TURN = 3_000
-EST_CANDIDATE_OUT_PER_TURN = 120
-EST_TURNS = {10: 12, 30: 30, 45: 40}
-EST_JUDGE_IN = 12_000
-EST_JUDGE_OUT = 1_200
-# Interviewer (Haiku) and scorer (Sonnet) on the main server, per session.
-EST_SERVER_USD = {10: 0.03, 30: 0.08, 45: 0.11}
 
 
 def load_prices(path: Path = PRICES) -> dict[str, tuple[float, float]]:
@@ -67,15 +59,11 @@ class CostMeter:
 
 
 def estimate(durations: list[int], prices: dict[str, tuple[float, float]]) -> dict[str, float]:
-    c_in, c_out = prices.get("sim-candidate", (0.0, 0.0))
-    j_in, j_out = prices.get("sim-judge", (0.0, 0.0))
-    candidate = judge = server = 0.0
-    for minutes in durations:
-        turns = EST_TURNS.get(minutes, 30)
-        candidate += turns * (EST_CANDIDATE_IN_PER_TURN * c_in + EST_CANDIDATE_OUT_PER_TURN * c_out)
-        judge += EST_JUDGE_IN * j_in + EST_JUDGE_OUT * j_out
-        server += EST_SERVER_USD.get(minutes, 0.08)
-    candidate, judge = candidate / 1e6, judge / 1e6
+    """The estimate for a list of sessions (strong_core.sim.estimate_session, summed)."""
+    parts = [estimate_session(minutes, prices) for minutes in durations]
+    candidate = sum(p.candidate_usd for p in parts)
+    judge = sum(p.judge_usd for p in parts)
+    server = sum(p.main_server_usd for p in parts)
     return {
         "candidate_usd": candidate,
         "judge_usd": judge,

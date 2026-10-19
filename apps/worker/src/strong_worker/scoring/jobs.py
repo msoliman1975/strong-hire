@@ -36,6 +36,7 @@ from strong_core.gateway import ModelGateway, get_gateway
 from strong_core.profiles import ProfileError, profile_for_session
 from strong_core.schemas import MINI_DURATION_MIN, InterviewerBrief, Mode, SessionStatus, Turn
 from strong_core.sim import gateway_for_org
+from strong_worker.ops.context import job_context
 from strong_worker.pause import wait_if_paused
 from strong_worker.scoring.scorer import ScoringError, ScoringOutcome, SessionScorer
 
@@ -84,6 +85,7 @@ async def load_turns(db: AsyncSession, session_id: uuid.UUID) -> list[Turn]:
     ]
 
 
+@job_context(session_arg="session_id")
 async def score_session(ctx: dict[str, Any], session_id: str, org_id: str) -> dict[str, Any]:
     scoring = _ctx(ctx)
     await wait_if_paused(ctx, scoring.sessionmaker, rs.JobKind.SCORING)  # OC-5
