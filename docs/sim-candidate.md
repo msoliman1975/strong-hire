@@ -123,8 +123,9 @@ Check the report for the real numbers.
    `SIM_EMAIL=sim@getstronghire.com`, and `SIM_LITELLM_KEY` (a LiteLLM key made with the master
    key: `POST /key/generate` with `key_alias` "sim", `max_budget` 5, `budget_duration` "1d").
    `infra/compose.server.yaml` passes them to the api, worker, voice and sim services. For
-   admin-started runs, also `GEMINI_API_KEY` (the main LiteLLM serves `sim-candidate`), then
-   start the service: add `--profile sim` to the compose command.
+   admin-started runs, also `GEMINI_API_KEY` (the main LiteLLM serves `sim-candidate`). The
+   deploy (`scripts/server-deploy.sh`, through `profile.ps1`) starts the `sim` service after the
+   migrations whenever `.env` has `SIM_ENABLED=true`.
 2. Upload user on the main server:
    `bash infra/sim/server-setup.sh "<contents of ~/.ssh/stronghire_simup.pub>"`.
 3. Your machine, user environment variables: `HCLOUD_TOKEN`, `GEMINI_KEY`, `ANTHROPIC_API_KEY`,
