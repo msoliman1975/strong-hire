@@ -17,7 +17,6 @@ import yaml
 from strong_core.gateway import Message, ModelGateway, Role
 from strong_core.prompts import load_prompt
 from strong_core.schemas import (
-    COMPETENCIES_BY_TYPE,
     BriefQuestion,
     Difficulty,
     InterviewerBrief,
@@ -27,6 +26,7 @@ from strong_core.schemas import (
     SessionConfig,
     Speaker,
     Turn,
+    session_competencies,
 )
 from strong_evals import EVALS_DIR
 from strong_evals.candidate import PROMPT_ROLE, Persona
@@ -35,6 +35,7 @@ from strong_evals.metrics import is_vague, missing_elements
 from strong_evals.transcripts import asked_question_refs
 
 QUESTION_BANK = EVALS_DIR / "config" / "question_bank.yaml"
+MAX_BRIEF_QUESTIONS = 10
 PROBES_BY_DIFFICULTY = {Difficulty.FRIENDLY: 2, Difficulty.REALISTIC: 3, Difficulty.TOUGH: 3}
 CURVEBALL = "Ask the candidate to defend the opposite of their last decision."
 
@@ -53,14 +54,24 @@ class StubPlanner:
         self.bank = yaml.safe_load(bank_file.read_text(encoding="utf-8"))
 
     async def brief(self, config: SessionConfig, persona: Persona) -> InterviewerBrief:
-        rows = self.bank[config.interview_type.value]
+        if config.custom is None:
+            rows = list(self.bank[config.interview_type.value])
+        else:
+            # A Custom session takes an equal slice of each category's bank questions (CU-1).
+            kinds = [c.category for c in config.custom.categories]
+            per_kind = MAX_BRIEF_QUESTIONS // len(kinds)
+            rows = [
+                {**row, "category": kind.value}
+                for kind in kinds
+                for row in self.bank[kind.value][:per_kind]
+            ]
         questions = [BriefQuestion(priority=i, **row) for i, row in enumerate(rows, start=1)]
         tough = config.difficulty == Difficulty.TOUGH
         return InterviewerBrief(
             session=config,
             company_name=None,
             generic_mode=True,
-            target_competencies=list(COMPETENCIES_BY_TYPE[config.interview_type])[:6],
+            target_competencies=list(session_competencies(config))[:6],
             questions=questions,
             probe_areas=[],
             persona=PersonaBrief(

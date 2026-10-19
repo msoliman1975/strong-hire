@@ -33,12 +33,14 @@ from strong_core.schemas import (
     InterviewerBrief,
     Phase,
     QuestionScore,
+    QuestionSource,
     Scorecard,
     Speaker,
     Turn,
     ValueScore,
     session_competencies,
 )
+from strong_worker.quoting import quote_untrusted
 from strong_worker.scoring.levels import level_expectations
 from strong_worker.scoring.quotes import QuoteChecker
 from strong_worker.scoring.signal import SignalResult, compute_hire_signal, rubric_point
@@ -226,13 +228,14 @@ class SessionScorer:
             competencies=", ".join(c.value for c in _scored_competencies(brief, asked)),
             values=_values_text(profile, allowed_values),
             questions="\n".join(
-                f"{q.id}{f' ({q.category.value})' if q.category else ''}: {q.text} "
+                f"{q.id}{f' ({q.category.value})' if q.category else ''}: "
+                f"{quote_untrusted(q.text)} "
                 f"[{', '.join(c.value for c in q.competencies)}] "
                 f"{{{', '.join(v for v in q.values if v in allowed_values)}}}"
                 for q in asked
             )
             or "(no question was asked)",
-            transcript=render_transcript(turns, budget),
+            transcript=render_transcript(turns, budget, quoted_refs=verbatim_refs(brief)),
         )
 
     async def _rationale(
@@ -274,13 +277,27 @@ class SessionScorer:
 # --- helpers ---------------------------------------------------------------------------------
 
 
-def render_transcript(turns: Sequence[Turn], max_chars: int | None = None) -> str:
-    """The transcript as lines. Over budget, intro and small talk go first, then wrap-up."""
+def render_transcript(
+    turns: Sequence[Turn],
+    max_chars: int | None = None,
+    quoted_refs: frozenset[str] = frozenset(),
+) -> str:
+    """The transcript as lines. Over budget, intro and small talk go first, then wrap-up.
+
+    Interviewer CORE lines for a question in `quoted_refs` read text the candidate wrote word
+    for word, so they are JSON-quoted as data (CU-5, CU-6)."""
 
     def line(t: Turn) -> str:
         who = "Interviewer" if t.speaker == Speaker.INTERVIEWER else "Candidate"
         ref = f" [{t.question_ref}]" if t.question_ref else ""
-        return f"{who}{ref}: {t.text.strip()}"
+        text = t.text.strip()
+        if (
+            t.speaker == Speaker.INTERVIEWER
+            and t.phase == Phase.CORE
+            and t.question_ref in quoted_refs
+        ):
+            text = quote_untrusted(text)
+        return f"{who}{ref}: {text}"
 
     kept = list(turns)
     text = "\n".join(line(t) for t in kept)
@@ -290,6 +307,13 @@ def render_transcript(turns: Sequence[Turn], max_chars: int | None = None) -> st
         kept = [t for t in kept if t.phase != phase]
         text = "\n".join(line(t) for t in kept)
     return text or "(empty transcript)"
+
+
+def verbatim_refs(brief: InterviewerBrief) -> frozenset[str]:
+    """Ids of the candidate's own questions the interviewer reads word for word (CU-4)."""
+    return frozenset(
+        q.id for q in brief.questions if q.source == QuestionSource.CANDIDATE and q.verbatim
+    )
 
 
 def interview_type_text(brief: InterviewerBrief) -> str:

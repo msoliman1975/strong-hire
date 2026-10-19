@@ -186,7 +186,7 @@ async def test_fb2_scorer_returns_quote_backed_per_question_scores() -> None:
         for s in q.scores:
             assert 1 <= s.score <= 4
             assert s.quotes and all(checker.is_valid(x) for x in s.quotes)
-    assert card.rubric_version == "scorer/rubric.v1"
+    assert card.rubric_version == "scorer/rubric.v2"
     assert card.scorer_model == "fake-scorer"
     assert outcome.model_calls == 2
     assert not outcome.reasked
@@ -314,7 +314,7 @@ async def test_iv6_level_expectations_reach_the_rubric_prompt() -> None:
     backend = ScriptedBackend([scorecard_reply(brief, turns, 3), RATIONALE])
     await SessionScorer(gateway(backend)).score(brief, turns, example_profile())
     first, _ = backend.calls[0]
-    assert first[0].prompt_ref == "scorer/rubric.v1"
+    assert first[0].prompt_ref == "scorer/rubric.v2"
     user = first[-1].content
     assert brief.session.level == Level.MID
     assert "Mid level: a 3 needs" in user

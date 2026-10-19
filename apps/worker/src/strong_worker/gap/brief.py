@@ -38,7 +38,6 @@ Custom sessions (docs/custom-interview-spec.md, CU-1, CU-2, CU-4, CU-12):
 
 from __future__ import annotations
 
-import json
 import logging
 import re
 from collections import Counter
@@ -74,6 +73,7 @@ from strong_core.schemas import (
 )
 from strong_core.schemas.session import FULL_MIN_COMPETENCIES
 from strong_worker.gap.text import posting_text, resume_text
+from strong_worker.quoting import quote_untrusted as _quote
 
 log = logging.getLogger(__name__)
 
@@ -583,13 +583,6 @@ def _custom_targets(
                 chosen[i] = Competency.SCOPE_AT_LEVEL
                 break
     return chosen
-
-
-def _quote(text: str) -> str:
-    """Candidate text as one quoted, escaped line. Angle brackets are removed, so the text
-    cannot close the untrusted block of the prompt."""
-    flat = " ".join(text.replace("<", " ").replace(">", " ").split())
-    return json.dumps(flat, ensure_ascii=False)
 
 
 def _neediest(
