@@ -81,6 +81,15 @@ async def model_usage(db: Db, me: Me, http: LiteLLM) -> ModelUsage:
     """
     if not await _may_see_spend(db, me):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found")
+    return await fetch_model_usage(http)
+
+
+async def fetch_model_usage(http: httpx.AsyncClient) -> ModelUsage:
+    """The app key's spend today and its team's spend this month, from LiteLLM.
+
+    Shared with the admin Spend page (OB-14). `tracked` is false when there is no app key or
+    LiteLLM does not answer.
+    """
     settings = get_settings()
     profile = str(settings.model_profile.value)
     key = settings.model_gateway_api_key

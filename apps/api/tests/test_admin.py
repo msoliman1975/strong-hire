@@ -90,7 +90,7 @@ async def test_r2_users_page_lists_plan_consent_interviews_and_last_sign_in(
     dev = await _user(sessionmaker, "dev@example.com")
     async with sessionmaker() as db:
         await add_session(db, dev.org_id, dev.id)
-    users = {u["email"]: u for u in (await admin.get("/admin/users")).json()}
+    users = {u["email"]: u for u in (await admin.get("/admin/users")).json()["users"]}
     row = users["dev@example.com"]
     assert row["plan"] == "free" and row["minutes_used"] == 0
     assert row["training_consent"] is False

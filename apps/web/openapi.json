@@ -2642,38 +2642,13 @@
         }
       }
     },
-    "/admin/users": {
-      "get": {
-        "tags": [
-          "admin"
-        ],
-        "summary": "List Users",
-        "operationId": "list_users_admin_users_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/AdminUser"
-                  },
-                  "type": "array",
-                  "title": "Response List Users Admin Users Get"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/admin/sessions": {
       "get": {
         "tags": [
           "admin"
         ],
         "summary": "List Sessions",
-        "description": "Interviews of all users, newest first, with the interviewer's model cost.",
+        "description": "Interviews of all users, newest first, with the interviewer's model cost and the derived\nfailure reason (AI-4).",
         "operationId": "list_sessions_admin_sessions_get",
         "parameters": [
           {
@@ -2746,6 +2721,33 @@
               ],
               "title": "Interview Type"
             }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "created",
+                    "in_progress",
+                    "interrupted",
+                    "scoring",
+                    "completed",
+                    "failed",
+                    "stuck"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "AI-1: a status, or stuck",
+              "title": "Status"
+            },
+            "description": "AI-1: a status, or stuck"
           }
         ],
         "responses": {
@@ -3559,6 +3561,1185 @@
         }
       }
     },
+    "/admin/users": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List Users",
+        "description": "Users, newest first, that match every filter given (AU-1).",
+        "operationId": "list_users_admin_users_get",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Email, name or user id.",
+              "title": "Q"
+            },
+            "description": "Email, name or user id."
+          },
+          {
+            "name": "plan",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "free",
+                    "paid"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Plan"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "active",
+                    "suspended"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "signed_up_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "UTC day, inclusive.",
+              "title": "Signed Up From"
+            },
+            "description": "UTC day, inclusive."
+          },
+          {
+            "name": "signed_up_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "UTC day, inclusive.",
+              "title": "Signed Up To"
+            },
+            "description": "UTC day, inclusive."
+          },
+          {
+            "name": "last_sign_in_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "UTC day, inclusive.",
+              "title": "Last Sign In From"
+            },
+            "description": "UTC day, inclusive."
+          },
+          {
+            "name": "last_sign_in_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "UTC day, inclusive.",
+              "title": "Last Sign In To"
+            },
+            "description": "UTC day, inclusive."
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Page Size"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUserPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/users/{user_id}": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get User Detail",
+        "description": "AU-2. Resumes and gap analyses are metadata only (D-8).",
+        "operationId": "get_user_detail_admin_users__user_id__get",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUserDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/users/{user_id}/grants": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Add Grant",
+        "description": "Add minutes (AU-3), free interviews (AU-4) or a comp plan (AU-5).",
+        "operationId": "add_grant_admin_users__user_id__grants_post",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GrantIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminGrant"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/users/{user_id}/grants/{grant_id}": {
+      "delete": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Revoke Grant",
+        "description": "Revoke a grant. The row stays in the ledger with revoked_at and revoked_by.",
+        "operationId": "revoke_grant_admin_users__user_id__grants__grant_id__delete",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "grant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Grant Id"
+            }
+          },
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActionIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminGrant"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/users/{user_id}/suspend": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Suspend User",
+        "description": "AU-7: the user's requests and sign-ins get 403 with a neutral message. Sessions in\nprogress end cleanly.",
+        "operationId": "suspend_user_admin_users__user_id__suspend_post",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActionIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminActionOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/users/{user_id}/unsuspend": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Unsuspend User",
+        "operationId": "unsuspend_user_admin_users__user_id__unsuspend_post",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActionIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminActionOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/users/{user_id}/signout": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Force Sign Out",
+        "description": "AU-8: every session cookie of the user stops working; they sign in again.",
+        "operationId": "force_sign_out_admin_users__user_id__signout_post",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActionIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminActionOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/users/{user_id}/resend-link": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Resend Sign In Link",
+        "description": "AU-9: email the user a sign-in link. At most RESEND_LIMIT per user per 15 minutes.\n\nThe link goes to the user's inbox only; the admin never sees it (no impersonation).",
+        "operationId": "resend_sign_in_link_admin_users__user_id__resend_link_post",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActionIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminActionOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/overview": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Overview",
+        "description": "AD-2: funnel, revenue, usage, cost and quality, each with the previous period.",
+        "operationId": "get_overview_admin_overview_get",
+        "parameters": [
+          {
+            "name": "range",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "24h",
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "type": "string",
+              "description": "AO-1: length of the period",
+              "default": "7d",
+              "title": "Range"
+            },
+            "description": "AO-1: length of the period"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOverview"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ops/health": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Health",
+        "description": "OB-10: one tile per service and dependency, plus host metrics with 24 h sparklines.",
+        "operationId": "get_health_admin_ops_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpsHealth"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ops/metrics": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Metric",
+        "description": "One ops_samples metric, averaged per bucket (1 min for 1 h up to 6 h for 30 days).",
+        "operationId": "get_metric_admin_ops_metrics_get",
+        "parameters": [
+          {
+            "name": "metric",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "title": "Metric"
+            }
+          },
+          {
+            "name": "labels",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Label filter, for example dep:redis,mount:root",
+              "title": "Labels"
+            },
+            "description": "Label filter, for example dep:redis,mount:root"
+          },
+          {
+            "name": "range",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "1h",
+                "24h",
+                "7d",
+                "30d"
+              ],
+              "type": "string",
+              "default": "24h",
+              "title": "Range"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OpsSeries"
+                  },
+                  "title": "Response Get Metric Admin Ops Metrics Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ops/performance": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Performance",
+        "description": "OB-11: voice latency p50/p95 by component over time (OB-3) and interviewer LLM latency.",
+        "operationId": "get_performance_admin_ops_performance_get",
+        "parameters": [
+          {
+            "name": "range",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "24h",
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "type": "string",
+              "default": "24h",
+              "title": "Range"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpsPerformance"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ops/errors": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List Errors",
+        "description": "OB-12: error groups sorted by last seen, each with a sparkline of the last 24 hours.",
+        "operationId": "list_errors_admin_ops_errors_get",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "open",
+                "resolved",
+                "all"
+              ],
+              "type": "string",
+              "default": "open",
+              "title": "Status"
+            }
+          },
+          {
+            "name": "service",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Service"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OpsErrorGroup"
+                  },
+                  "title": "Response List Errors Admin Ops Errors Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ops/errors/{group_id}": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Error",
+        "operationId": "get_error_admin_ops_errors__group_id__get",
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Group Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpsErrorDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Update Error",
+        "description": "OB-12: mark resolved, or reopen. A resolved group that happens again reopens (OB-4).",
+        "operationId": "update_error_admin_ops_errors__group_id__patch",
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Group Id"
+            }
+          },
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpsErrorUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpsErrorDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ops/jobs": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Jobs",
+        "description": "OB-13: queue depth and the gap analyses and scorings that failed (7 days) or are stuck.",
+        "operationId": "get_jobs_admin_ops_jobs_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpsJobs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ops/jobs/{kind}/{job_id}/retry": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Retry Job",
+        "description": "OB-13: re-enqueue the Arq job the normal path uses. 409 when the job is not failed or\nstuck.",
+        "operationId": "retry_job_admin_ops_jobs__kind___job_id__retry_post",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "gap_analysis",
+                "scoring"
+              ],
+              "type": "string",
+              "title": "Kind"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Id"
+            }
+          },
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActionIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpsRetryOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ops/spend": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Spend",
+        "description": "OB-14: today's and this month's model cost against the daily cap (OC-3).",
+        "operationId": "get_spend_admin_ops_spend_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpsSpend"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -3635,6 +4816,30 @@
         "title": "ActionIn",
         "description": "Base for admin write bodies: the reason is required and saved in the audit log."
       },
+      "AdminActionOut": {
+        "properties": {
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          },
+          "details": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Details"
+          }
+        },
+        "type": "object",
+        "required": [
+          "action",
+          "user_id"
+        ],
+        "title": "AdminActionOut"
+      },
       "AdminAuditEntry": {
         "properties": {
           "id": {
@@ -3696,6 +4901,396 @@
         ],
         "title": "AdminAuditEntry"
       },
+      "AdminCostLine": {
+        "properties": {
+          "component": {
+            "type": "string",
+            "title": "Component"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "units": {
+            "type": "number",
+            "title": "Units"
+          },
+          "cost_usd": {
+            "type": "number",
+            "title": "Cost Usd"
+          },
+          "rows": {
+            "type": "integer",
+            "title": "Rows"
+          },
+          "cost_known": {
+            "type": "boolean",
+            "title": "Cost Known",
+            "description": "False when a row had no price (self-hosted: $0)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "component",
+          "role",
+          "units",
+          "cost_usd",
+          "rows",
+          "cost_known"
+        ],
+        "title": "AdminCostLine"
+      },
+      "AdminEntitlement": {
+        "properties": {
+          "plan": {
+            "type": "string",
+            "enum": [
+              "free",
+              "paid"
+            ],
+            "title": "Plan"
+          },
+          "minutes_used": {
+            "type": "integer",
+            "title": "Minutes Used"
+          },
+          "plan_minutes_cap": {
+            "type": "integer",
+            "title": "Plan Minutes Cap",
+            "description": "From the subscription or the comp plan."
+          },
+          "minutes_granted": {
+            "type": "integer",
+            "title": "Minutes Granted",
+            "description": "Active minute grants (0 on the free plan)."
+          },
+          "minutes_cap": {
+            "type": "integer",
+            "title": "Minutes Cap"
+          },
+          "minutes_left": {
+            "type": "integer",
+            "title": "Minutes Left"
+          },
+          "free_interviews_total": {
+            "type": "integer",
+            "title": "Free Interviews Total"
+          },
+          "free_interviews_granted": {
+            "type": "integer",
+            "title": "Free Interviews Granted"
+          },
+          "free_interviews_used": {
+            "type": "integer",
+            "title": "Free Interviews Used"
+          },
+          "free_interviews_left": {
+            "type": "integer",
+            "title": "Free Interviews Left"
+          },
+          "comp_until": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comp Until"
+          },
+          "block_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Block Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "plan",
+          "minutes_used",
+          "plan_minutes_cap",
+          "minutes_granted",
+          "minutes_cap",
+          "minutes_left",
+          "free_interviews_total",
+          "free_interviews_granted",
+          "free_interviews_used",
+          "free_interviews_left",
+          "comp_until",
+          "block_code"
+        ],
+        "title": "AdminEntitlement"
+      },
+      "AdminGapMeta": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "job_target_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Job Target Id"
+          },
+          "resume_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Resume Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/GapStatus"
+          },
+          "has_error": {
+            "type": "boolean",
+            "title": "Has Error"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "job_target_id",
+          "resume_id",
+          "status",
+          "has_error",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "AdminGapMeta",
+        "description": "D-8: metadata only. Never the findings, the scores or the brief."
+      },
+      "AdminGrant": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/GrantKind"
+          },
+          "amount": {
+            "type": "integer",
+            "title": "Amount"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "granted_by": {
+            "type": "string",
+            "title": "Granted By"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "revoked_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revoked At"
+          },
+          "revoked_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revoked By"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active",
+            "description": "Not revoked and not expired."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "amount",
+          "expires_at",
+          "reason",
+          "granted_by",
+          "created_at",
+          "revoked_at",
+          "revoked_by",
+          "active"
+        ],
+        "title": "AdminGrant"
+      },
+      "AdminJobTarget": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "company": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Level"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "archived_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Archived At"
+          },
+          "deleted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deleted At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "company",
+          "title",
+          "level",
+          "created_at",
+          "archived_at",
+          "deleted_at"
+        ],
+        "title": "AdminJobTarget",
+        "description": "Company, title and level only (AU-2). No posting text."
+      },
+      "AdminLatencyStat": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "n": {
+            "type": "integer",
+            "title": "N"
+          },
+          "p50_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P50 Ms"
+          },
+          "p95_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P95 Ms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "n",
+          "p50_ms",
+          "p95_ms"
+        ],
+        "title": "AdminLatencyStat"
+      },
       "AdminMessage": {
         "properties": {
           "role": {
@@ -3724,6 +5319,314 @@
           "content"
         ],
         "title": "AdminMessage"
+      },
+      "AdminMetric": {
+        "properties": {
+          "measured": {
+            "type": "boolean",
+            "title": "Measured",
+            "default": true
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "previous": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous"
+          },
+          "unit": {
+            "type": "string",
+            "enum": [
+              "count",
+              "usd",
+              "pct",
+              "ms",
+              "minutes",
+              "ratio",
+              "rating",
+              "bytes"
+            ],
+            "title": "Unit",
+            "description": "pct values are fractions: 0.02 is 2%",
+            "default": "count"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target",
+            "description": "Spec target, same unit"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason",
+            "description": "AO-8: why it is not measured"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note",
+            "description": "How the number is computed"
+          },
+          "link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Link",
+            "description": "AO-7: admin app path of the list behind it"
+          }
+        },
+        "type": "object",
+        "title": "AdminMetric",
+        "description": "One number on an admin page. `previous` is the same metric over the previous period."
+      },
+      "AdminOrg": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "type": {
+            "$ref": "#/components/schemas/OrgType"
+          },
+          "plan": {
+            "type": "string",
+            "title": "Plan"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "type",
+          "plan",
+          "created_at"
+        ],
+        "title": "AdminOrg"
+      },
+      "AdminOverview": {
+        "properties": {
+          "range": {
+            "type": "string",
+            "enum": [
+              "24h",
+              "7d",
+              "30d",
+              "90d"
+            ],
+            "title": "Range"
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time",
+            "title": "End"
+          },
+          "previous_start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Previous Start"
+          },
+          "funnel": {
+            "items": {
+              "$ref": "#/components/schemas/FunnelStep"
+            },
+            "type": "array",
+            "title": "Funnel"
+          },
+          "revenue": {
+            "$ref": "#/components/schemas/OverviewRevenue"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/OverviewUsage"
+          },
+          "cost": {
+            "$ref": "#/components/schemas/OverviewCost"
+          },
+          "quality": {
+            "$ref": "#/components/schemas/OverviewQuality"
+          }
+        },
+        "type": "object",
+        "required": [
+          "range",
+          "start",
+          "end",
+          "previous_start",
+          "funnel",
+          "revenue",
+          "usage",
+          "cost",
+          "quality"
+        ],
+        "title": "AdminOverview"
+      },
+      "AdminRefund": {
+        "properties": {
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At"
+          },
+          "charge_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Charge Id"
+          },
+          "amount_refunded": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount Refunded",
+            "description": "In the currency's smallest unit (cents)."
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency"
+          },
+          "livemode": {
+            "type": "boolean",
+            "title": "Livemode"
+          }
+        },
+        "type": "object",
+        "required": [
+          "at",
+          "charge_id",
+          "amount_refunded",
+          "currency",
+          "livemode"
+        ],
+        "title": "AdminRefund",
+        "description": "AU-6: a refund made in the Stripe dashboard, from the charge.refunded webhook."
+      },
+      "AdminResumeMeta": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "uploaded_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Uploaded At"
+          },
+          "confirmed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmed At"
+          },
+          "deleted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deleted At"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "reading",
+              "to_confirm",
+              "confirmed",
+              "deleted"
+            ],
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "uploaded_at",
+          "confirmed_at",
+          "deleted_at",
+          "status"
+        ],
+        "title": "AdminResumeMeta",
+        "description": "D-8: metadata only. Never the file, the text or the extracted fields."
       },
       "AdminScore": {
         "properties": {
@@ -3910,6 +5813,36 @@
               "none"
             ],
             "title": "Cost Source"
+          },
+          "failure_kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Failure Kind",
+            "description": "AI-4: brief_failed, scoring_failed, stuck_scoring, ..."
+          },
+          "failure_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Failure Reason",
+            "description": "AI-4: the derived reason (sessions/failure.py and stuck rules)"
+          },
+          "stuck": {
+            "type": "boolean",
+            "title": "Stuck",
+            "description": "AI-1: scoring or in progress for too long",
+            "default": false
           }
         },
         "type": "object",
@@ -3987,6 +5920,42 @@
             "title": "Audio Available",
             "description": "True when a recording can be downloaded (AI candidate voice interviews).",
             "default": false
+          },
+          "cost_breakdown": {
+            "items": {
+              "$ref": "#/components/schemas/AdminCostLine"
+            },
+            "type": "array",
+            "title": "Cost Breakdown",
+            "description": "AI-2: usage_events by component and role"
+          },
+          "cost_total_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Total Usd",
+            "description": "AI-2: every component and role. None without usage rows."
+          },
+          "turn_latency": {
+            "items": {
+              "$ref": "#/components/schemas/AdminTurnLatency"
+            },
+            "type": "array",
+            "title": "Turn Latency",
+            "description": "AI-3: per-turn voice latency (OB-3)"
+          },
+          "latency_summary": {
+            "items": {
+              "$ref": "#/components/schemas/AdminLatencyStat"
+            },
+            "type": "array",
+            "title": "Latency Summary",
+            "description": "AI-3: p50/p95 per component over the session's turns"
           }
         },
         "type": "object",
@@ -4033,6 +6002,119 @@
           "limit"
         ],
         "title": "AdminSessionList"
+      },
+      "AdminSubscription": {
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/SubscriptionStatus"
+          },
+          "stripe_customer_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stripe Customer Id"
+          },
+          "stripe_subscription_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stripe Subscription Id"
+          },
+          "stripe_customer_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stripe Customer Url",
+            "description": "The customer in the Stripe dashboard (refunds are made there, D-7)."
+          },
+          "stripe_mode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "test",
+                  "live"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stripe Mode",
+            "description": "From the API's Stripe key prefix."
+          },
+          "period_start": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period Start"
+          },
+          "period_end": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period End"
+          },
+          "minutes_cap": {
+            "type": "integer",
+            "title": "Minutes Cap"
+          },
+          "minutes_used": {
+            "type": "integer",
+            "title": "Minutes Used"
+          },
+          "cancel_at_period_end": {
+            "type": "boolean",
+            "title": "Cancel At Period End"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "stripe_customer_id",
+          "stripe_subscription_id",
+          "stripe_customer_url",
+          "stripe_mode",
+          "period_start",
+          "period_end",
+          "minutes_cap",
+          "minutes_used",
+          "cancel_at_period_end",
+          "created_at"
+        ],
+        "title": "AdminSubscription"
       },
       "AdminTrace": {
         "properties": {
@@ -4223,6 +6305,97 @@
         ],
         "title": "AdminTrace"
       },
+      "AdminTurnLatency": {
+        "properties": {
+          "turn_index": {
+            "type": "integer",
+            "title": "Turn Index"
+          },
+          "e2e_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "E2E Ms"
+          },
+          "turn_detection_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Turn Detection Ms"
+          },
+          "stt_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stt Ms"
+          },
+          "llm_ttft_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Llm Ttft Ms"
+          },
+          "tts_ttfb_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tts Ttfb Ms"
+          },
+          "other_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Other Ms"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "turn_index",
+          "e2e_ms",
+          "turn_detection_ms",
+          "stt_ms",
+          "llm_ttft_ms",
+          "tts_ttfb_ms",
+          "other_ms",
+          "created_at"
+        ],
+        "title": "AdminTurnLatency"
+      },
       "AdminUser": {
         "properties": {
           "id": {
@@ -4233,6 +6406,20 @@
           "email": {
             "type": "string",
             "title": "Email"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "auth_provider": {
+            "$ref": "#/components/schemas/AuthProvider"
           },
           "created_at": {
             "type": "string",
@@ -4257,7 +6444,8 @@
               "free",
               "paid"
             ],
-            "title": "Plan"
+            "title": "Plan",
+            "description": "paid: an active subscription or an active comp grant."
           },
           "subscription_status": {
             "anyOf": [
@@ -4269,13 +6457,35 @@
               }
             ]
           },
+          "comp_until": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comp Until",
+            "description": "Set while a comp plan grant is active."
+          },
           "minutes_used": {
             "type": "integer",
             "title": "Minutes Used"
           },
           "minutes_cap": {
             "type": "integer",
-            "title": "Minutes Cap"
+            "title": "Minutes Cap",
+            "description": "Plan cap plus active minute grants. 0 on free."
+          },
+          "minutes_left": {
+            "type": "integer",
+            "title": "Minutes Left"
+          },
+          "free_interviews_left": {
+            "type": "integer",
+            "title": "Free Interviews Left"
           },
           "training_consent": {
             "type": "boolean",
@@ -4288,23 +6498,354 @@
           "is_admin": {
             "type": "boolean",
             "title": "Is Admin"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "suspended"
+            ],
+            "title": "Status"
+          },
+          "suspended_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suspended At"
           }
         },
         "type": "object",
         "required": [
           "id",
           "email",
+          "full_name",
+          "auth_provider",
           "created_at",
           "last_sign_in_at",
           "plan",
           "subscription_status",
+          "comp_until",
           "minutes_used",
           "minutes_cap",
+          "minutes_left",
+          "free_interviews_left",
           "training_consent",
           "interviews",
-          "is_admin"
+          "is_admin",
+          "status",
+          "suspended_at"
         ],
-        "title": "AdminUser"
+        "title": "AdminUser",
+        "description": "One row of the Users list (AU-1)."
+      },
+      "AdminUserDetail": {
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/AdminUser"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/AdminUserProfile"
+          },
+          "org": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdminOrg"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "suspended_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suspended Reason"
+          },
+          "session_epoch": {
+            "type": "integer",
+            "title": "Session Epoch"
+          },
+          "subscription": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdminSubscription"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "entitlement": {
+            "$ref": "#/components/schemas/AdminEntitlement"
+          },
+          "grants": {
+            "items": {
+              "$ref": "#/components/schemas/AdminGrant"
+            },
+            "type": "array",
+            "title": "Grants"
+          },
+          "sessions": {
+            "items": {
+              "$ref": "#/components/schemas/AdminSession"
+            },
+            "type": "array",
+            "title": "Sessions"
+          },
+          "job_targets": {
+            "items": {
+              "$ref": "#/components/schemas/AdminJobTarget"
+            },
+            "type": "array",
+            "title": "Job Targets"
+          },
+          "resume_count": {
+            "type": "integer",
+            "title": "Resume Count"
+          },
+          "resumes": {
+            "items": {
+              "$ref": "#/components/schemas/AdminResumeMeta"
+            },
+            "type": "array",
+            "title": "Resumes"
+          },
+          "gap_analysis_count": {
+            "type": "integer",
+            "title": "Gap Analysis Count"
+          },
+          "gap_analyses": {
+            "items": {
+              "$ref": "#/components/schemas/AdminGapMeta"
+            },
+            "type": "array",
+            "title": "Gap Analyses"
+          },
+          "cost_to_date_usd": {
+            "type": "number",
+            "title": "Cost To Date Usd",
+            "description": "All model usage of the account (usage_events)."
+          },
+          "cost_unknown_events": {
+            "type": "integer",
+            "title": "Cost Unknown Events",
+            "description": "Usage rows with no known price (D-12)."
+          },
+          "refunds": {
+            "items": {
+              "$ref": "#/components/schemas/AdminRefund"
+            },
+            "type": "array",
+            "title": "Refunds"
+          },
+          "privacy_actions": {
+            "items": {
+              "$ref": "#/components/schemas/AdminAuditEntry"
+            },
+            "type": "array",
+            "title": "Privacy Actions",
+            "description": "AU-10: the user's own exports and deletes. Admins see them, never run them."
+          },
+          "audit": {
+            "items": {
+              "$ref": "#/components/schemas/AdminAuditEntry"
+            },
+            "type": "array",
+            "title": "Audit",
+            "description": "Audit entries about this user, newest first."
+          }
+        },
+        "type": "object",
+        "required": [
+          "user",
+          "profile",
+          "org",
+          "suspended_reason",
+          "session_epoch",
+          "subscription",
+          "entitlement",
+          "grants",
+          "sessions",
+          "job_targets",
+          "resume_count",
+          "resumes",
+          "gap_analysis_count",
+          "gap_analyses",
+          "cost_to_date_usd",
+          "cost_unknown_events",
+          "refunds",
+          "privacy_actions",
+          "audit"
+        ],
+        "title": "AdminUserDetail",
+        "description": "AU-2: everything support needs about one user."
+      },
+      "AdminUserPage": {
+        "properties": {
+          "users": {
+            "items": {
+              "$ref": "#/components/schemas/AdminUser"
+            },
+            "type": "array",
+            "title": "Users"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Users that match the filters, on all pages."
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          }
+        },
+        "type": "object",
+        "required": [
+          "users",
+          "total",
+          "page",
+          "page_size"
+        ],
+        "title": "AdminUserPage"
+      },
+      "AdminUserProfile": {
+        "properties": {
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "current_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Title"
+          },
+          "years_experience": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Years Experience"
+          },
+          "target_level": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Level"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "time_zone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Zone"
+          },
+          "linkedin_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Linkedin Url"
+          },
+          "profile_completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile Completed At"
+          },
+          "email_verified_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email Verified At"
+          },
+          "has_password": {
+            "type": "boolean",
+            "title": "Has Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "full_name",
+          "current_title",
+          "years_experience",
+          "target_level",
+          "country",
+          "time_zone",
+          "linkedin_url",
+          "profile_completed_at",
+          "email_verified_at",
+          "has_password"
+        ],
+        "title": "AdminUserProfile",
+        "description": "The AC-3 profile. No resume data."
       },
       "AlertAggregation": {
         "type": "string",
@@ -5778,6 +8319,63 @@
         ],
         "title": "ConsentOut"
       },
+      "CostDay": {
+        "properties": {
+          "day": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Day"
+          },
+          "llm_usd": {
+            "type": "number",
+            "title": "Llm Usd"
+          },
+          "stt_usd": {
+            "type": "number",
+            "title": "Stt Usd"
+          },
+          "tts_usd": {
+            "type": "number",
+            "title": "Tts Usd"
+          },
+          "total_usd": {
+            "type": "number",
+            "title": "Total Usd"
+          }
+        },
+        "type": "object",
+        "required": [
+          "day",
+          "llm_usd",
+          "stt_usd",
+          "tts_usd",
+          "total_usd"
+        ],
+        "title": "CostDay"
+      },
+      "CostSlice": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "cost_usd": {
+            "type": "number",
+            "title": "Cost Usd"
+          },
+          "rows": {
+            "type": "integer",
+            "title": "Rows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "cost_usd",
+          "rows"
+        ],
+        "title": "CostSlice"
+      },
       "CreateSessionRequest": {
         "properties": {
           "job_target_id": {
@@ -6137,6 +8735,15 @@
         ],
         "title": "EmailSent"
       },
+      "ErrorGroupStatus": {
+        "type": "string",
+        "enum": [
+          "open",
+          "resolved"
+        ],
+        "title": "ErrorGroupStatus",
+        "description": "OB-12: a resolved group that happens again reopens."
+      },
       "ExitSurveyIn": {
         "properties": {
           "reason": {
@@ -6260,6 +8867,38 @@
         ],
         "title": "ExportOut",
         "description": "AC-1 data export. The bundle is a zip: data.json plus the original resume files."
+      },
+      "FunnelStep": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "metric": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "conversion": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdminMetric"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "metric"
+        ],
+        "title": "FunnelStep"
       },
       "Gap": {
         "properties": {
@@ -6573,6 +9212,57 @@
         "title": "GapStatus",
         "description": "State of one gap analysis run (GA-1 to GA-4)."
       },
+      "GrantIn": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason",
+            "description": "Why, for the audit log"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/GrantKind"
+          },
+          "amount": {
+            "type": "integer",
+            "title": "Amount",
+            "description": "Minutes, free interviews, or the comp plan's minute cap."
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At",
+            "description": "Required for comp_plan."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reason",
+          "kind",
+          "amount"
+        ],
+        "title": "GrantIn",
+        "description": "AU-3 minutes (negative removes), AU-4 free interviews, AU-5 comp plan (cap + end date)."
+      },
+      "GrantKind": {
+        "type": "string",
+        "enum": [
+          "minutes",
+          "free_interviews",
+          "comp_plan"
+        ],
+        "title": "GrantKind",
+        "description": "AU-3..AU-5: what a minute_grants row gives the user."
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -6585,6 +9275,70 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "Heartbeat": {
+        "properties": {
+          "service": {
+            "type": "string",
+            "title": "Service"
+          },
+          "instance": {
+            "type": "string",
+            "title": "Instance"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          },
+          "model_profile": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Profile"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "service",
+          "instance"
+        ],
+        "title": "Heartbeat"
       },
       "HireSignal": {
         "type": "string",
@@ -7402,6 +10156,112 @@
         "title": "JobTargetUpdate",
         "description": "The user confirms or edits the extracted posting (IN-2) and the context (IN-4)."
       },
+      "LatencyPoint": {
+        "properties": {
+          "t": {
+            "type": "string",
+            "format": "date-time",
+            "title": "T"
+          },
+          "n": {
+            "type": "integer",
+            "title": "N"
+          },
+          "p50_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P50 Ms"
+          },
+          "p95_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P95 Ms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "t",
+          "n",
+          "p50_ms",
+          "p95_ms"
+        ],
+        "title": "LatencyPoint"
+      },
+      "LatencySeries": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/LatencyPoint"
+            },
+            "type": "array",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "points"
+        ],
+        "title": "LatencySeries"
+      },
+      "LatencyStat": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "n": {
+            "type": "integer",
+            "title": "N"
+          },
+          "p50_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P50 Ms"
+          },
+          "p95_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P95 Ms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "n",
+          "p50_ms",
+          "p95_ms"
+        ],
+        "title": "LatencyStat"
+      },
       "Level": {
         "type": "string",
         "enum": [
@@ -7701,6 +10561,726 @@
         ],
         "title": "ModelUsage"
       },
+      "OpsErrorDetail": {
+        "properties": {
+          "group": {
+            "$ref": "#/components/schemas/OpsErrorGroup"
+          },
+          "sample_stack": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sample Stack"
+          },
+          "daily": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Daily",
+            "description": "Events per day over the last 14 days, oldest first"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/OpsErrorEvent"
+            },
+            "type": "array",
+            "title": "Events"
+          }
+        },
+        "type": "object",
+        "required": [
+          "group",
+          "sample_stack",
+          "daily",
+          "events"
+        ],
+        "title": "OpsErrorDetail"
+      },
+      "OpsErrorEvent": {
+        "properties": {
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At"
+          },
+          "service": {
+            "type": "string",
+            "title": "Service"
+          },
+          "release": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Release"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "at",
+          "service",
+          "release",
+          "request_id",
+          "session_id"
+        ],
+        "title": "OpsErrorEvent"
+      },
+      "OpsErrorGroup": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "fingerprint": {
+            "type": "string",
+            "title": "Fingerprint"
+          },
+          "service": {
+            "type": "string",
+            "title": "Service"
+          },
+          "exception_type": {
+            "type": "string",
+            "title": "Exception Type"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "first_seen": {
+            "type": "string",
+            "format": "date-time",
+            "title": "First Seen"
+          },
+          "last_seen": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Seen"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ErrorGroupStatus"
+          },
+          "resolved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved At"
+          },
+          "resolved_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved By"
+          },
+          "release": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Release"
+          },
+          "events_24h": {
+            "type": "integer",
+            "title": "Events 24H"
+          },
+          "sparkline": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Sparkline",
+            "description": "Events per hour over the last 24 hours, oldest first"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "fingerprint",
+          "service",
+          "exception_type",
+          "message",
+          "first_seen",
+          "last_seen",
+          "count",
+          "status",
+          "resolved_at",
+          "resolved_by",
+          "release",
+          "events_24h",
+          "sparkline"
+        ],
+        "title": "OpsErrorGroup"
+      },
+      "OpsErrorUpdate": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason",
+            "description": "Why, for the audit log"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ErrorGroupStatus"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reason",
+          "status"
+        ],
+        "title": "OpsErrorUpdate"
+      },
+      "OpsHealth": {
+        "properties": {
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generated At"
+          },
+          "tiles": {
+            "items": {
+              "$ref": "#/components/schemas/OpsTile"
+            },
+            "type": "array",
+            "title": "Tiles"
+          },
+          "host": {
+            "items": {
+              "$ref": "#/components/schemas/OpsHostMetric"
+            },
+            "type": "array",
+            "title": "Host"
+          },
+          "redis_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Redis Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "generated_at",
+          "tiles",
+          "host"
+        ],
+        "title": "OpsHealth"
+      },
+      "OpsHostMetric": {
+        "properties": {
+          "metric": {
+            "type": "string",
+            "title": "Metric"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "unit": {
+            "type": "string",
+            "enum": [
+              "pct",
+              "ratio",
+              "bytes",
+              "count"
+            ],
+            "title": "Unit"
+          },
+          "labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Labels"
+          },
+          "latest": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest"
+          },
+          "latest_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest At"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/OpsPoint"
+            },
+            "type": "array",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "metric",
+          "label",
+          "unit",
+          "labels",
+          "latest",
+          "latest_at",
+          "points"
+        ],
+        "title": "OpsHostMetric"
+      },
+      "OpsHostedEquivalent": {
+        "properties": {
+          "configured": {
+            "type": "boolean",
+            "title": "Configured"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "stt_seconds": {
+            "type": "number",
+            "title": "Stt Seconds"
+          },
+          "tts_characters": {
+            "type": "number",
+            "title": "Tts Characters"
+          },
+          "stt_usd_per_second": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stt Usd Per Second"
+          },
+          "tts_usd_per_character": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tts Usd Per Character"
+          },
+          "stt_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stt Usd"
+          },
+          "tts_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tts Usd"
+          },
+          "total_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Usd"
+          }
+        },
+        "type": "object",
+        "required": [
+          "configured",
+          "stt_seconds",
+          "tts_characters"
+        ],
+        "title": "OpsHostedEquivalent"
+      },
+      "OpsJob": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "gap_analysis",
+              "scoring"
+            ],
+            "title": "Kind"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "failed",
+              "stuck"
+            ],
+            "title": "State"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "user_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Email"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At",
+            "description": "Last change: gap updated_at, session end"
+          },
+          "retryable": {
+            "type": "boolean",
+            "title": "Retryable"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "id",
+          "state",
+          "status",
+          "reason",
+          "user_email",
+          "created_at",
+          "updated_at",
+          "retryable"
+        ],
+        "title": "OpsJob"
+      },
+      "OpsJobs": {
+        "properties": {
+          "queue_depth": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "queue_series": {
+            "items": {
+              "$ref": "#/components/schemas/OpsSeries"
+            },
+            "type": "array",
+            "title": "Queue Series"
+          },
+          "jobs_paused": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Jobs Paused"
+          },
+          "gap_analyses": {
+            "items": {
+              "$ref": "#/components/schemas/OpsJob"
+            },
+            "type": "array",
+            "title": "Gap Analyses"
+          },
+          "scorings": {
+            "items": {
+              "$ref": "#/components/schemas/OpsJob"
+            },
+            "type": "array",
+            "title": "Scorings"
+          }
+        },
+        "type": "object",
+        "required": [
+          "queue_depth",
+          "queue_series",
+          "jobs_paused",
+          "gap_analyses",
+          "scorings"
+        ],
+        "title": "OpsJobs"
+      },
+      "OpsPerformance": {
+        "properties": {
+          "range": {
+            "type": "string",
+            "enum": [
+              "24h",
+              "7d",
+              "30d",
+              "90d"
+            ],
+            "title": "Range"
+          },
+          "step_s": {
+            "type": "integer",
+            "title": "Step S"
+          },
+          "voice": {
+            "items": {
+              "$ref": "#/components/schemas/LatencyStat"
+            },
+            "type": "array",
+            "title": "Voice"
+          },
+          "voice_series": {
+            "items": {
+              "$ref": "#/components/schemas/LatencySeries"
+            },
+            "type": "array",
+            "title": "Voice Series"
+          },
+          "llm_role": {
+            "type": "string",
+            "title": "Llm Role",
+            "default": "interviewer"
+          },
+          "llm": {
+            "items": {
+              "$ref": "#/components/schemas/LatencyStat"
+            },
+            "type": "array",
+            "title": "Llm"
+          },
+          "llm_series": {
+            "items": {
+              "$ref": "#/components/schemas/LatencySeries"
+            },
+            "type": "array",
+            "title": "Llm Series"
+          },
+          "llm_other_roles": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "queue_wait": {
+            "$ref": "#/components/schemas/AdminMetric"
+          }
+        },
+        "type": "object",
+        "required": [
+          "range",
+          "step_s",
+          "voice",
+          "voice_series",
+          "llm",
+          "llm_series",
+          "llm_other_roles",
+          "queue_wait"
+        ],
+        "title": "OpsPerformance"
+      },
+      "OpsPoint": {
+        "properties": {
+          "t": {
+            "type": "string",
+            "format": "date-time",
+            "title": "T"
+          },
+          "value": {
+            "type": "number",
+            "title": "Value",
+            "description": "Average in the bucket"
+          },
+          "min": {
+            "type": "number",
+            "title": "Min"
+          },
+          "max": {
+            "type": "number",
+            "title": "Max"
+          },
+          "n": {
+            "type": "integer",
+            "title": "N"
+          }
+        },
+        "type": "object",
+        "required": [
+          "t",
+          "value",
+          "min",
+          "max",
+          "n"
+        ],
+        "title": "OpsPoint"
+      },
+      "OpsRetryOut": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "gap_analysis",
+              "scoring"
+            ],
+            "title": "Kind"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "job_id": {
+            "type": "string",
+            "title": "Job Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "id",
+          "job_id",
+          "status"
+        ],
+        "title": "OpsRetryOut"
+      },
+      "OpsSeries": {
+        "properties": {
+          "metric": {
+            "type": "string",
+            "title": "Metric"
+          },
+          "labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Labels"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/OpsPoint"
+            },
+            "type": "array",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "metric",
+          "labels",
+          "points"
+        ],
+        "title": "OpsSeries"
+      },
       "OpsSettingMeta": {
         "properties": {
           "key": {
@@ -7774,6 +11354,326 @@
           "spend_today_usd"
         ],
         "title": "OpsSettings"
+      },
+      "OpsSpend": {
+        "properties": {
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generated At"
+          },
+          "today_usd": {
+            "type": "number",
+            "title": "Today Usd"
+          },
+          "month_usd": {
+            "type": "number",
+            "title": "Month Usd"
+          },
+          "daily_cap_usd": {
+            "type": "number",
+            "title": "Daily Cap Usd"
+          },
+          "cap_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cap Pct",
+            "description": "Today's cost / the cap, as a fraction"
+          },
+          "by_component": {
+            "items": {
+              "$ref": "#/components/schemas/SpendSlice"
+            },
+            "type": "array",
+            "title": "By Component"
+          },
+          "by_role": {
+            "items": {
+              "$ref": "#/components/schemas/SpendSlice"
+            },
+            "type": "array",
+            "title": "By Role"
+          },
+          "daily": {
+            "items": {
+              "$ref": "#/components/schemas/OpsPoint"
+            },
+            "type": "array",
+            "title": "Daily"
+          },
+          "litellm": {
+            "$ref": "#/components/schemas/ModelUsage"
+          },
+          "hosted_equivalent": {
+            "$ref": "#/components/schemas/OpsHostedEquivalent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "generated_at",
+          "today_usd",
+          "month_usd",
+          "daily_cap_usd",
+          "cap_pct",
+          "by_component",
+          "by_role",
+          "daily",
+          "litellm",
+          "hosted_equivalent"
+        ],
+        "title": "OpsSpend"
+      },
+      "OpsTile": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "service",
+              "dependency"
+            ],
+            "title": "Kind"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "up",
+              "degraded",
+              "down",
+              "unknown"
+            ],
+            "title": "Status"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "checked_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked At"
+          },
+          "latency_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latency Ms"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          },
+          "instances": {
+            "items": {
+              "$ref": "#/components/schemas/Heartbeat"
+            },
+            "type": "array",
+            "title": "Instances"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "kind",
+          "status"
+        ],
+        "title": "OpsTile"
+      },
+      "OrgType": {
+        "type": "string",
+        "enum": [
+          "personal",
+          "business"
+        ],
+        "title": "OrgType"
+      },
+      "OverviewCost": {
+        "properties": {
+          "total_usd": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "per_completed_session_usd": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "server_share_per_session_usd": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "unmetered_rows": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "by_day": {
+            "items": {
+              "$ref": "#/components/schemas/CostDay"
+            },
+            "type": "array",
+            "title": "By Day"
+          },
+          "by_component": {
+            "items": {
+              "$ref": "#/components/schemas/CostSlice"
+            },
+            "type": "array",
+            "title": "By Component"
+          },
+          "by_role": {
+            "items": {
+              "$ref": "#/components/schemas/CostSlice"
+            },
+            "type": "array",
+            "title": "By Role"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_usd",
+          "per_completed_session_usd",
+          "server_share_per_session_usd",
+          "unmetered_rows",
+          "by_day",
+          "by_component",
+          "by_role"
+        ],
+        "title": "OverviewCost"
+      },
+      "OverviewQuality": {
+        "properties": {
+          "failure_rate": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "voice_p50_ms": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "voice_p95_ms": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "realism_rating": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "scorer_agreement": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "offer_reported": {
+            "$ref": "#/components/schemas/AdminMetric"
+          }
+        },
+        "type": "object",
+        "required": [
+          "failure_rate",
+          "voice_p50_ms",
+          "voice_p95_ms",
+          "realism_rating",
+          "scorer_agreement",
+          "offer_reported"
+        ],
+        "title": "OverviewQuality"
+      },
+      "OverviewRevenue": {
+        "properties": {
+          "active_subscribers": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "mrr_usd": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "new_subscriptions": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "cancellations": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "monthly_churn": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "refunds": {
+            "$ref": "#/components/schemas/AdminMetric"
+          }
+        },
+        "type": "object",
+        "required": [
+          "active_subscribers",
+          "mrr_usd",
+          "new_subscriptions",
+          "cancellations",
+          "monthly_churn",
+          "refunds"
+        ],
+        "title": "OverviewRevenue"
+      },
+      "OverviewUsage": {
+        "properties": {
+          "sessions_started": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "sessions_completed": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "sessions_failed": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "minutes": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "sessions_per_paid_user": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "voice_sessions": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "text_sessions": {
+            "$ref": "#/components/schemas/AdminMetric"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sessions_started",
+          "sessions_completed",
+          "sessions_failed",
+          "minutes",
+          "sessions_per_paid_user",
+          "voice_sessions",
+          "text_sessions"
+        ],
+        "title": "OverviewUsage"
       },
       "PasswordLoginRequest": {
         "properties": {
@@ -9688,6 +13588,29 @@
           "candidate"
         ],
         "title": "Speaker"
+      },
+      "SpendSlice": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "today_usd": {
+            "type": "number",
+            "title": "Today Usd"
+          },
+          "month_usd": {
+            "type": "number",
+            "title": "Month Usd"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "today_usd",
+          "month_usd"
+        ],
+        "title": "SpendSlice"
       },
       "Strength": {
         "properties": {

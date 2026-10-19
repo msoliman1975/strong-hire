@@ -10,8 +10,11 @@ import { AlertRuleEditPage } from "./pages/AlertRuleEditPage";
 import { AlertRulesPage } from "./pages/AlertRulesPage";
 import { AdminSessionPage } from "./pages/AdminSessionPage";
 import { AdminSessionsPage } from "./pages/AdminSessionsPage";
+import { AdminUserPage } from "./pages/AdminUserPage";
 import { AdminUsersPage } from "./pages/AdminUsersPage";
 import { ControlsPage } from "./pages/ControlsPage";
+import { OpsErrorsPage, OpsHealthPage, OpsJobsPage, OpsPerformancePage, OpsSpendPage } from "./pages/OpsPages";
+import { OverviewPage } from "./pages/OverviewPage";
 import { SignInPage } from "./pages/SignInPage";
 
 export function createQueryClient(): QueryClient {
@@ -32,17 +35,25 @@ export function AppRoutes() {
     <Routes>
       <Route path="/signin" element={<SignInPage />} />
       <Route element={<Shell />}>
-        <Route index element={<Navigate to="/interviews" replace />} />
+        <Route index element={<Navigate to="/overview" replace />} />
+        <Route path="/overview" element={<OverviewPage />} />
         <Route path="/interviews" element={<AdminSessionsPage />} />
         <Route path="/interviews/:sessionId" element={<AdminSessionPage />} />
         <Route path="/users" element={<AdminUsersPage />} />
+        <Route path="/users/:userId" element={<AdminUserPage />} />
         <Route path="/audit" element={<AdminAuditPage />} />
         <Route path="/ops/controls" element={<ControlsPage />} />
         <Route path="/alerts" element={<Navigate to="/alerts/rules" replace />} />
         <Route path="/alerts/rules" element={<AlertRulesPage />} />
         <Route path="/alerts/rules/:ruleId" element={<AlertRuleEditPage />} />
         <Route path="/alerts/history" element={<AlertHistoryPage />} />
-        <Route path="*" element={<Navigate to="/interviews" replace />} />
+        <Route path="/ops" element={<Navigate to="/ops/health" replace />} />
+        <Route path="/ops/health" element={<OpsHealthPage />} />
+        <Route path="/ops/performance" element={<OpsPerformancePage />} />
+        <Route path="/ops/errors" element={<OpsErrorsPage />} />
+        <Route path="/ops/jobs" element={<OpsJobsPage />} />
+        <Route path="/ops/spend" element={<OpsSpendPage />} />
+        <Route path="*" element={<Navigate to="/overview" replace />} />
       </Route>
     </Routes>
   );

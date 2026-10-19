@@ -27,8 +27,10 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from strong_api.auth.deps import (
     SESSION_PENDING_KEY,
     SESSION_USER_KEY,
+    AccountSuspendedError,
     DbSession,
     optional_user,
+    start_user_session,
 )
 from strong_api.auth.email import EmailSender
 from strong_api.auth.google import GoogleClient, GoogleSignInError
@@ -55,6 +57,9 @@ SignInApp = Literal["web", "admin"]
 host-only session cookie is set there, and the browser returns to that app."""
 
 _SESSION_APP_KEY = "sign_in_app"
+
+ACCOUNT_UNAVAILABLE = "account_unavailable"
+"""AU-7: the /signin error code for a suspended user (the apps show the neutral message)."""
 
 OptionalUser = Annotated[User | None, Depends(optional_user)]
 
@@ -176,8 +181,7 @@ def _state(request: Request, user: User | None, settings: AuthSettings) -> AuthS
 
 async def _sign_in_user(request: Request, db: DbSession, user: User) -> None:
     # Start a fresh session on every sign-in so an old cookie cannot carry over.
-    request.session.clear()
-    request.session[SESSION_USER_KEY] = str(user.id)
+    start_user_session(request, user)  # refuses a suspended user (AU-7)
     user.last_sign_in_at = datetime.now(UTC)
     await db.commit()
 
@@ -280,6 +284,8 @@ def build_router(
             state = await _finish_sign_in(request, db, email, AuthProvider.EMAIL, settings)
         except ControlRefusedError:
             return web_redirect("/signin", app, error=SIGNUPS_PAUSED)
+        except AccountSuspendedError:
+            return web_redirect("/signin", app, error=ACCOUNT_UNAVAILABLE)
         return after_sign_in(state, app)
 
     @router.get("/google/login")
@@ -305,6 +311,8 @@ def build_router(
             )
         except ControlRefusedError:
             return web_redirect("/signin", app, error=SIGNUPS_PAUSED)
+        except AccountSuspendedError:
+            return web_redirect("/signin", app, error=ACCOUNT_UNAVAILABLE)
         return after_sign_in(state, app)
 
     # ------------------------------------------------------------ email and password (AC-4)
@@ -372,7 +380,11 @@ def build_router(
             return web_redirect("/signin", error=f"link_{exc}")
         if user.email_verified_at is None:
             user.email_verified_at = datetime.now(UTC)
-        await _sign_in_user(request, db, user)
+        try:
+            await _sign_in_user(request, db, user)
+        except AccountSuspendedError:
+            await db.commit()  # the email is still confirmed
+            return web_redirect("/signin", error=ACCOUNT_UNAVAILABLE)
         return web_redirect("/")
 
     @router.post("/password/login")
@@ -464,10 +476,9 @@ def build_router(
                 terms_accepted=body.terms_accepted,
                 training_consent=body.training_consent,
             )
+        start_user_session(request, user)  # refuses a suspended user (AU-7)
         user.last_sign_in_at = datetime.now(UTC)
         await db.commit()
-        request.session.clear()
-        request.session[SESSION_USER_KEY] = str(user.id)
         return _state(request, user, settings)
 
     if settings.is_local:

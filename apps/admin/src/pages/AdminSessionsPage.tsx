@@ -7,6 +7,9 @@ import { difficultyLabel, interviewTypeLabel, modeLabel } from "../labels";
 import { clock, money, utc, words } from "../format";
 
 const TYPES = Object.keys(interviewTypeLabel) as InterviewType[];
+/** AI-1: every status, plus "stuck" (scoring, or in progress past its length, for 15+ minutes). */
+const STATUSES = ["created", "in_progress", "interrupted", "scoring", "completed", "failed", "stuck"] as const;
+type StatusFilter = (typeof STATUSES)[number];
 
 /** Interviews of all users (R2), with filters in the URL so a view can be shared. */
 export function AdminSessionsPage() {
@@ -16,6 +19,7 @@ export function AdminSessionsPage() {
     day_from: params.get("from") || undefined,
     day_to: params.get("to") || undefined,
     interview_type: (params.get("type") as InterviewType | null) || undefined,
+    status: STATUSES.includes(params.get("status") as StatusFilter) ? (params.get("status") as StatusFilter) : undefined,
   };
   const users = useAdminUsers();
   const sessions = useAdminSessions(filters);
@@ -38,7 +42,7 @@ export function AdminSessionsPage() {
           <label htmlFor="f-user">User</label>
           <select id="f-user" value={filters.user_id ?? ""} onChange={(e) => setFilter("user", e.target.value)}>
             <option value="">All users</option>
-            {users.data?.map((u) => (
+            {users.data?.users.map((u) => (
               <option key={u.id} value={u.id}>
                 {u.email}
               </option>
@@ -64,6 +68,17 @@ export function AdminSessionsPage() {
             {TYPES.map((t) => (
               <option key={t} value={t}>
                 {interviewTypeLabel[t]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="field">
+          <label htmlFor="f-status">Status</label>
+          <select id="f-status" value={filters.status ?? ""} onChange={(e) => setFilter("status", e.target.value)}>
+            <option value="">All statuses</option>
+            {STATUSES.map((st) => (
+              <option key={st} value={st}>
+                {words(st)}
               </option>
             ))}
           </select>
@@ -152,7 +167,11 @@ export function AdminSessionsPage() {
                         <td className="num">
                           {s.duration_s === null ? "-" : clock(s.duration_s * 1000)} of {s.duration_min} min
                         </td>
-                        <td>{words(s.status)}</td>
+                        <td>
+                          {words(s.status)}
+                          {s.stuck && <span className="tag"> stuck</span>}
+                          {s.failure_reason && <p className="kpi__note">{s.failure_reason}</p>}
+                        </td>
                         <td>{s.hire_signal ?? "-"}</td>
                         <td className="num">{money(s.cost_usd)}</td>
                       </tr>

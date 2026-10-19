@@ -1,6 +1,5 @@
 """Admin area (R2): review test interviews and the interviewer's reasoning.
 
-    GET /admin/users                 every user: plan, minutes, consent, interviews, last sign-in
     GET /admin/sessions              interviews of all users (filters: user, date, type), with
                                      model cost and a cost total per day
     GET /admin/sessions/{id}         one interview: metadata always; transcript and traces only
@@ -16,8 +15,10 @@ or download of a transcript, traces or audio writes an audit_logs row.
 
 Cost: per-session cost is the interviewer's model cost. Sessions save it as an LLM usage event
 when they end (tokens times the prices in config/litellm.<profile>.yaml); for a session without
-one, the sum of its trace costs is used. Scorer, speech-to-text and text-to-speech cost is not
-counted here.
+one, the sum of its trace costs is used. The detail page adds the full breakdown of every
+usage row by component and role (AI-2), the per-turn voice latency (AI-3), and the list and the
+detail show the derived failure reason (AI-4). The list filters by status, including "stuck"
+(AI-1).
 """
 
 from __future__ import annotations
@@ -32,26 +33,29 @@ from typing import Annotated, Any, Literal
 
 from fastapi import APIRouter, HTTPException, Query, Request, status
 from fastapi.responses import FileResponse, PlainTextResponse
-from sqlalchemy import func, select
+from sqlalchemy import case, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from strong_api.admin import metrics as m
 from strong_api.admin.deps import Admin, admin_settings
 from strong_api.admin.schemas import (
     AdminAuditEntry,
+    AdminCostLine,
+    AdminLatencyStat,
     AdminMessage,
     AdminScore,
     AdminSession,
     AdminSessionDetail,
     AdminSessionList,
     AdminTrace,
-    AdminUser,
+    AdminTurnLatency,
     CostSource,
     DailyCost,
 )
 from strong_api.auth.deps import DbSession
 from strong_api.auth.settings import AuthSettings
 from strong_api.auth.sim import is_sim_user
-from strong_api.billing.entitlements import as_utc, get_entitlement
+from strong_api.billing.entitlements import as_utc
 from strong_core.db.models import (
     TRACE_RETENTION_DAYS,
     AuditLog,
@@ -60,12 +64,17 @@ from strong_core.db.models import (
     Scorecard,
     UsageEvent,
     User,
+    VoiceTurnTiming,
 )
 from strong_core.db.models import Turn as TurnRow
 from strong_core.db.turns import TURN_ORDER
-from strong_core.schemas import InterviewType, Turn, UsageComponent
+from strong_core.schemas import InterviewType, SessionStatus, Turn, UsageComponent
 
 SESSION_LIMIT = 500
+# AI-1: the status filter, with "stuck" (scoring, or in progress past its length, + 15 min).
+StatusFilter = Literal[
+    "created", "in_progress", "interrupted", "scoring", "completed", "failed", "stuck"
+]
 AUDIT_LIMIT = 500
 
 
@@ -137,7 +146,9 @@ def _session_out(
     user: User | None,
     card: Scorecard | None,
     cost: tuple[float | None, CostSource],
+    now: datetime | None = None,
 ) -> AdminSession:
+    failure = m.failure_info(row, now or m.now_utc())
     return AdminSession(
         id=row.id,
         user_id=user.id if user else None,
@@ -161,43 +172,14 @@ def _session_out(
         prompt_version=row.prompt_version,
         cost_usd=cost[0],
         cost_source=cost[1],
+        failure_kind=failure.kind if failure else None,
+        failure_reason=failure.reason if failure else None,
+        stuck=failure is not None and failure.kind in ("stuck_scoring", "stuck_in_progress"),
     )
 
 
 def _day_start(day: date) -> datetime:
     return datetime.combine(day, time.min, tzinfo=UTC)
-
-
-@router.get("/users")
-async def list_users(db: DbSession, admin: Admin, request: Request) -> list[AdminUser]:
-    settings = admin_settings(request)
-    users = list(await db.scalars(select(User).order_by(User.created_at.desc())))
-    counts = _pairs(
-        await db.execute(
-            select(InterviewSession.org_id, func.count(InterviewSession.id)).group_by(
-                InterviewSession.org_id
-            )
-        )
-    )
-    out = []
-    for user in users:
-        ent = await get_entitlement(db, user.org_id)
-        out.append(
-            AdminUser(
-                id=user.id,
-                email=user.email,
-                created_at=user.created_at,
-                last_sign_in_at=user.last_sign_in_at,
-                plan=ent.plan,
-                subscription_status=ent.status,
-                minutes_used=ent.minutes_used,
-                minutes_cap=ent.minutes_cap,
-                training_consent=user.training_consent,
-                interviews=int(counts.get(user.org_id, 0)),
-                is_admin=settings.is_admin(user.email),
-            )
-        )
-    return out
 
 
 @router.get("/sessions")
@@ -208,8 +190,13 @@ async def list_sessions(
     day_from: Annotated[date | None, Query(description="First day (UTC), inclusive.")] = None,
     day_to: Annotated[date | None, Query(description="Last day (UTC), inclusive.")] = None,
     interview_type: InterviewType | None = None,
+    status_filter: Annotated[
+        StatusFilter | None, Query(alias="status", description="AI-1: a status, or stuck")
+    ] = None,
 ) -> AdminSessionList:
-    """Interviews of all users, newest first, with the interviewer's model cost."""
+    """Interviews of all users, newest first, with the interviewer's model cost and the derived
+    failure reason (AI-4)."""
+    now = m.now_utc()
     query = (
         select(InterviewSession, User, Scorecard)
         .outerjoin(User, User.org_id == InterviewSession.org_id)
@@ -225,9 +212,13 @@ async def list_sessions(
         query = query.where(InterviewSession.created_at < _day_start(day_to + timedelta(days=1)))
     if interview_type is not None:
         query = query.where(InterviewSession.type == interview_type)
+    if status_filter == "stuck":
+        query = query.where(m.stuck_clause(now))
+    elif status_filter is not None:
+        query = query.where(InterviewSession.status == SessionStatus(status_filter))
     rows = (await db.execute(query)).tuples().all()
     costs = await _costs(db, [r[0].id for r in rows])
-    sessions = [_session_out(s, u, c, costs[s.id]) for s, u, c in rows]
+    sessions = [_session_out(s, u, c, costs[s.id], now) for s, u, c in rows]
     per_day: dict[date, list[AdminSession]] = defaultdict(list)
     for item in sessions:
         created = as_utc(item.created_at)
@@ -385,6 +376,73 @@ def _transcript_text(row: InterviewSession, user: User, transcript: list[Turn]) 
     return "\n".join(lines)
 
 
+async def _cost_breakdown(db: AsyncSession, session_id: uuid.UUID) -> list[AdminCostLine]:
+    """AI-2: every usage row of the session, by component and role (OB-2)."""
+    rows = await db.execute(
+        select(
+            UsageEvent.component,
+            UsageEvent.role,
+            func.sum(UsageEvent.units),
+            func.sum(UsageEvent.cost_usd),
+            func.count(),
+            func.min(case((UsageEvent.cost_known.is_(False), 0), else_=1)),
+        )
+        .where(UsageEvent.session_id == session_id)
+        .group_by(UsageEvent.component, UsageEvent.role)
+        .order_by(UsageEvent.component, UsageEvent.role)
+    )
+    return [
+        AdminCostLine(
+            component=str(component),
+            role=role or "unknown",
+            units=float(units or 0),
+            cost_usd=round(float(cost or 0), 6),
+            rows=int(n),
+            cost_known=bool(known),
+        )
+        for component, role, units, cost, n, known in rows.tuples()
+    ]
+
+
+async def _latency(
+    db: AsyncSession, session_id: uuid.UUID
+) -> tuple[list[AdminTurnLatency], list[AdminLatencyStat]]:
+    """AI-3: per-turn voice latency (OB-3) and p50/p95 per component. Metadata, no content."""
+    turns = [
+        AdminTurnLatency(
+            turn_index=t.turn_index,
+            e2e_ms=t.e2e_ms,
+            turn_detection_ms=t.turn_detection_ms,
+            stt_ms=t.stt_ms,
+            llm_ttft_ms=t.llm_ttft_ms,
+            tts_ttfb_ms=t.tts_ttfb_ms,
+            other_ms=t.other_ms,
+            created_at=t.created_at,
+        )
+        for t in await db.scalars(
+            select(VoiceTurnTiming)
+            .where(VoiceTurnTiming.session_id == session_id)
+            .order_by(VoiceTurnTiming.turn_index, VoiceTurnTiming.created_at)
+        )
+    ]
+    summary = []
+    if turns:
+        for key in ("e2e", "turn_detection", "stt", "llm_ttft", "tts_ttfb", "other"):
+            column = getattr(VoiceTurnTiming, f"{key}_ms")
+            found = (
+                await m.percentiles(db, column, [VoiceTurnTiming.session_id == session_id])
+            ).get(None)
+            summary.append(
+                AdminLatencyStat(
+                    key=key,
+                    n=found.n if found else 0,
+                    p50_ms=found.p50 if found else None,
+                    p95_ms=found.p95 if found else None,
+                )
+            )
+    return turns, summary
+
+
 @router.get("/sessions/{session_id}")
 async def get_session(
     session_id: uuid.UUID, db: DbSession, admin: Admin, request: Request
@@ -393,6 +451,14 @@ async def get_session(
     row, user, card = await _find(db, session_id)
     cost = (await _costs(db, [row.id]))[row.id]
     meta = _session_out(row, user, card, cost)
+    breakdown = await _cost_breakdown(db, row.id)
+    turn_latency, latency_summary = await _latency(db, row.id)
+    extra: dict[str, Any] = {
+        "cost_breakdown": breakdown,
+        "cost_total_usd": round(sum(b.cost_usd for b in breakdown), 6) if breakdown else None,
+        "turn_latency": turn_latency,
+        "latency_summary": latency_summary,
+    }
     if user is None or not user.training_consent:
         return AdminSessionDetail(
             session=meta,
@@ -400,6 +466,7 @@ async def get_session(
             transcript=None,
             traces=None,
             trace_retention_days=TRACE_RETENTION_DAYS,
+            **extra,
         )
     transcript = await _transcript(db, row)
     trace_rows = await db.scalars(
@@ -420,6 +487,7 @@ async def get_session(
         traces=traces,
         trace_retention_days=TRACE_RETENTION_DAYS,
         audio_available=audio is not None,
+        **extra,
     )
 
 
