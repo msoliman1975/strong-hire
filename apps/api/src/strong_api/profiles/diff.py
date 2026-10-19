@@ -11,7 +11,10 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Any
 
+from strong_core.schemas import CompanyProfile
+
 IGNORED_KEYS = frozenset({"meta"})
+DIFF_FIELDS = [name for name in CompanyProfile.model_fields if name not in IGNORED_KEYS]
 MAX_VALUE_CHARS = 100
 
 
@@ -83,11 +86,18 @@ def format_change(change: FieldChange) -> str:
     return f"~ {change.path}: {_show(change.old)} -> {_show(change.new)}"
 
 
+def group_changes(
+    changes: list[FieldChange], top_fields: list[str]
+) -> list[tuple[str, list[FieldChange]]]:
+    """The changes under each top-level field, in `top_fields` order. Used by strongctl and the
+    admin diff view (AT-2), so both show the same grouping."""
+    return [(field, [c for c in changes if c.top_field == field]) for field in top_fields]
+
+
 def format_diff(changes: list[FieldChange], top_fields: list[str]) -> list[str]:
     """One summary line per top-level field, then the changed paths under it."""
     lines: list[str] = []
-    for field in top_fields:
-        mine = [c for c in changes if c.top_field == field]
+    for field, mine in group_changes(changes, top_fields):
         if not mine:
             lines.append(f"{field}: unchanged")
             continue

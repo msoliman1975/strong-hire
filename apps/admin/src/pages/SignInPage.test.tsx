@@ -67,6 +67,8 @@ describe("admin sign-in (D-1)", () => {
       "Jobs",
       "Spend",
       "Controls",
+      "Companies",
+      "Company requests",
       "Audit log",
     ]);
     expect(screen.getByText("admin@example.com")).toBeInTheDocument();
