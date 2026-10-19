@@ -14,7 +14,7 @@ from strong_core.config import ModelProfile, Settings
 from strong_core.gateway import UsageRecord, build_gateway, set_usage_sink, usage_context
 from strong_core.schemas import Difficulty, Mode, Phase, Speaker, Turn
 from strong_interview import CoachNotAllowedError, Interviewer, InterviewRunner, SessionController
-from strong_interview.testing import FakeClock, make_brief
+from strong_interview.testing import CUSTOM_MUST_ASK, FakeClock, make_brief, make_custom_brief
 from strong_voice import interview as interview_module
 from strong_voice.interview import RECONNECT_S, TAKE_YOUR_TIME, WELCOME_BACK, VoiceInterview
 from strong_voice.session_store import session_id_from_room
@@ -53,10 +53,16 @@ class Rig:
     wall: list[float]
 
 
-def make_rig(mode: Mode = Mode.REALISTIC, difficulty: Difficulty = Difficulty.FRIENDLY) -> Rig:
+def make_rig(
+    mode: Mode = Mode.REALISTIC, difficulty: Difficulty = Difficulty.FRIENDLY, custom: bool = False
+) -> Rig:
     clock = FakeClock()
     wall = [0.0]
-    brief = make_brief(mode=mode, difficulty=difficulty, questions=6)
+    brief = (
+        make_custom_brief(mode=mode, difficulty=difficulty)
+        if custom
+        else make_brief(mode=mode, difficulty=difficulty, questions=6)
+    )
     gateway = build_gateway(Settings(model_profile=ModelProfile.FAKE))
     runner = InterviewRunner(SessionController(brief, clock), Interviewer(gateway, brief))
     store, finisher = FakeStore(), FakeFinisher()
@@ -137,6 +143,34 @@ async def test_iv9_reconnect_in_time_goes_on_at_the_same_question() -> None:
     assert rig.voice.runner.controller.question is not None
     assert rig.voice.runner.controller.question.id == question.question_ref
     assert rig.finisher.calls == []
+
+
+async def test_cu4_iv9_custom_voice_session_keeps_must_ask_state_over_a_reconnect() -> None:
+    """CU-4, IV-9: a Custom voice session goes through the same controller. A reconnect keeps
+    the must-ask questions left, the verbatim question is spoken unchanged, and every must-ask
+    question is asked before the candidate's questions."""
+    rig = make_rig(custom=True)
+    await rig.voice.opening()
+    await rig.voice.on_candidate("Thanks.")
+    lines = await rig.voice.on_candidate("Sounds good.")  # agenda + own1 (verbatim)
+    assert lines is not None
+    own1 = next(q for q in rig.voice.runner.controller.brief.questions if q.id == "own1")
+    assert lines[-1].endswith(own1.text)
+    ctl = rig.voice.runner.controller
+    assert ctl.must_ask_left == ["own2", "own3"]
+    rig.voice.on_disconnect()
+    rig.clock.advance(minutes=1)
+    rig.wall[0] += 60
+    assert rig.voice.on_reconnect()[0] == WELCOME_BACK
+    assert ctl.must_ask_left == ["own2", "own3"]
+    rig.clock.advance(minutes=24)  # past the CORE time: the must-ask questions still come
+    for _ in range(20):
+        if ctl.phase != Phase.CORE:
+            break
+        await rig.voice.on_candidate("We shipped it on time.")
+    assert ctl.phase == Phase.CANDIDATE_QUESTIONS
+    refs = {t.question_ref for t in rig.store.turns if t.question_ref}
+    assert set(CUSTOM_MUST_ASK) <= refs
 
 
 async def test_iv9_no_reconnect_ends_the_session_as_interrupted() -> None:
