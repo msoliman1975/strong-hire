@@ -8,6 +8,11 @@ answers above weak ones.
 
 Runs are on demand only. Nothing runs on a schedule or in CI.
 
+There are two ways to start a run. Suites run from your machine with `sim-run.ps1` on a
+short-lived server (below). Single interviews run from the admin app (Simulations): they run on
+the main server in the `sim` service and can be replayed with audio and a synced transcript. See
+"Simulations (SM)" in `docs/admin-spec.md`.
+
 ## How it works
 
 ```
