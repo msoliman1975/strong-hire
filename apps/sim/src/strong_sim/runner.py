@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import time
 import uuid
+from collections.abc import Awaitable, Callable
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -25,6 +28,14 @@ from strong_sim.store import Uploader, save_session, write_json
 log = logging.getLogger("strong_sim")
 
 
+@dataclass
+class RunHooks:
+    """Called as one scenario moves on, so the sim service can show its status (SM-4)."""
+
+    on_session: Callable[[str], Awaitable[None]] | None = None
+    on_judging: Callable[[], Awaitable[None]] | None = None
+
+
 def new_run_id(suite: str) -> str:
     return f"{datetime.now(UTC):%Y%m%d-%H%M%S}-{suite}-{uuid.uuid4().hex[:4]}"
 
@@ -37,7 +48,11 @@ async def run_scenario(
     meter: CostMeter,
     run_dir: Path,
     pacer: Pacer | None = None,
+    hooks: RunHooks | None = None,
 ) -> SessionRow:
+    """One session, judged and saved. On cancel (SM-5) it ends the session, saves what it has
+    and re-raises CancelledError, without the judge."""
+    hooks = hooks or RunHooks()
     row = SessionRow(
         scenario_id=scenario.id,
         channel=scenario.channel,
@@ -61,6 +76,8 @@ async def run_scenario(
         folder = run_dir / sid
         folder.mkdir(parents=True, exist_ok=True)
         log.info("%s: session %s (%s)", scenario.id, sid, scenario.channel)
+        if hooks.on_session:
+            await hooks.on_session(sid)
         candidate = Candidate(scenario, gateway, meter, pacer or Pacer())
         if scenario.channel == "voice":
             await run_voice(
@@ -74,6 +91,8 @@ async def run_scenario(
         row.latency_p50_ms = percentile(conv.turn_latency_ms, 50)
         row.latency_p95_ms = percentile(conv.turn_latency_ms, 95)
         row.has_audio = bool(conv.audio_path and conv.audio_path.exists())
+        if hooks.on_judging:
+            await hooks.on_judging()
         verdict = await judge(
             scenario, conv.lines, gateway, meter, stopped_early=conv.stopped_early
         )
@@ -98,11 +117,26 @@ async def run_scenario(
                     "prompts": [*candidate.prompt_refs, verdict.rubric],
                     "notes": conv.notes,
                     "turn_latency_ms": conv.turn_latency_ms,
+                    "timing": conv.timing,
                     "sim_cost_usd": row.sim_cost_usd,
                     "row": row.model_dump(),
                 },
             },
         )
+    except asyncio.CancelledError:
+        log.info("%s: cancelled", scenario.id)
+        row.status, row.error = "cancelled", "cancelled by an admin"
+        if row.session_id:
+            try:
+                await client.end(row.session_id)
+            except Exception:
+                log.warning("could not end session %s", row.session_id)
+        row.session_s = time.perf_counter() - started
+        row.sim_cost_usd = meter.total_usd - before
+        if folder is not None:
+            meta = {"error": row.error, "timing": conv.timing, "row": row.model_dump()}
+            save_session(folder, conv.lines, {"meta.json": meta})
+        raise
     except CostLimitError:
         if row.session_id:  # end the session on the server before the run stops
             try:

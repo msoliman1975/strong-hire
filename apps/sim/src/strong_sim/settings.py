@@ -35,6 +35,15 @@ class SimSettings(BaseSettings):
         default=6.0, description="How long a '[silence]' turn stays quiet in a voice session."
     )
 
+    # strong-sim serve: admin-started runs on the main server (SM-2..SM-5, SM-14).
+    poll_s: float = Field(default=2.0, gt=0, description="How often serve looks for work.")
+    progress_every_s: float = Field(default=10.0, gt=0, description="SM-4: progress updates.")
+    wait_recheck_s: float = Field(default=60.0, gt=0, description="SM-3: a waiting run checks.")
+    wait_limit_s: float = Field(default=1800.0, ge=0, description="SM-3: then the run fails.")
+    keep_gb: float = Field(default=10.0, gt=0, description="SM-14: runs folder size limit.")
+    keep_days: int = Field(default=90, ge=1, description="SM-14: runs not marked Keep.")
+    retention_every_s: float = Field(default=3600.0, gt=0)
+
 
 @lru_cache
 def get_sim_settings() -> SimSettings:
