@@ -12,6 +12,8 @@ import { authApi } from "../api/auth";
 import { controlsApi } from "../api/controls";
 import { usersApi } from "../api/users";
 import { opsApi } from "../api/ops";
+import { contentApi } from "../api/content";
+import { mockProfile } from "./contentHandlers";
 import { mockStore } from "./node";
 
 const OPENAPI = JSON.parse(readFileSync(resolve(__dirname, "../../../web/openapi.json"), "utf8")) as object;
@@ -144,5 +146,26 @@ describe("admin mocks match openapi.json", () => {
     });
     expectApiShape("AdminSessionList", await adminApi.sessions({ status: "failed" }));
     expectApiShape("AdminSessionDetail", await adminApi.session("00000000-0000-4000-8000-0000000000c2"));
+  });
+
+  it("content: companies, versions, diff, import, transition, requests (AT-1..AT-5)", async () => {
+    mockStore.db.users["admin@example.com"] = user("admin@example.com", 9, false);
+    await authApi.devLogin("admin@example.com");
+    for (const c of await contentApi.companies()) expectApiShape("AdminCompany", c);
+    expectApiShape("AdminCompany", await contentApi.setActive("google", false, "testing"));
+    expectApiShape("CompanyProfiles", await contentApi.profiles("example-corp"));
+    expectApiShape("ProfileVersionDetail", await contentApi.version("example-corp", 2));
+    expectApiShape("ProfileDiff", await contentApi.diff("example-corp", 1, 2));
+    const imported = await contentApi.importProfile("acme", {
+      profile: mockProfile("acme", "Acme", "Calm"),
+      reason: "testing",
+      create_company: true,
+      force: false,
+    });
+    expectApiShape("ProfileImportOut", imported);
+    expectApiShape("TransitionOut", await contentApi.transition("example-corp", 2, "in_review", "testing"));
+    const groups = await contentApi.requests();
+    for (const g of groups) expectApiShape("CompanyRequestGroup", g);
+    expectApiShape("CompanyRequestGroup", await contentApi.triage("acme", { state: "declined", reason: "testing" }));
   });
 });

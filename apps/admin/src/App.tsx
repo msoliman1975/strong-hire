@@ -15,6 +15,9 @@ import { AdminUsersPage } from "./pages/AdminUsersPage";
 import { ControlsPage } from "./pages/ControlsPage";
 import { OpsErrorsPage, OpsHealthPage, OpsJobsPage, OpsPerformancePage, OpsSpendPage } from "./pages/OpsPages";
 import { OverviewPage } from "./pages/OverviewPage";
+import { CompaniesPage } from "./pages/CompaniesPage";
+import { CompanyPage } from "./pages/CompanyPage";
+import { CompanyRequestsPage } from "./pages/CompanyRequestsPage";
 import { SignInPage } from "./pages/SignInPage";
 
 export function createQueryClient(): QueryClient {
@@ -53,6 +56,9 @@ export function AppRoutes() {
         <Route path="/ops/errors" element={<OpsErrorsPage />} />
         <Route path="/ops/jobs" element={<OpsJobsPage />} />
         <Route path="/ops/spend" element={<OpsSpendPage />} />
+        <Route path="/content/companies" element={<CompaniesPage />} />
+        <Route path="/content/companies/:slug" element={<CompanyPage />} />
+        <Route path="/content/requests" element={<CompanyRequestsPage />} />
         <Route path="*" element={<Navigate to="/overview" replace />} />
       </Route>
     </Routes>

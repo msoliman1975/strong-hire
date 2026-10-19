@@ -4740,6 +4740,531 @@
         }
       }
     },
+    "/admin/companies": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List Companies",
+        "description": "AT-1: every company with its active flag, versions and request count.",
+        "operationId": "list_companies_admin_companies_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AdminCompany"
+                  },
+                  "type": "array",
+                  "title": "Response List Companies Admin Companies Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/companies/{slug}": {
+      "patch": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Set Company Active",
+        "description": "AT-1: turn a company on or off. Company matching (IN-5) only uses active companies.",
+        "operationId": "set_company_active_admin_companies__slug__patch",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Slug"
+            }
+          },
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanyActiveIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCompany"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/companies/{slug}/profiles": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List Profile Versions",
+        "description": "AT-2: the stored versions of one company, oldest first.",
+        "operationId": "list_profile_versions_admin_companies__slug__profiles_get",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Slug"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyProfiles"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Import Profile",
+        "description": "AT-3: validate a profile like `strongctl profiles validate` and store it as a Draft.\n\nThe slug in the URL must match the file's company_slug. With create_company, a new slug adds\nthe company, inactive, as `strongctl profiles import --create-company` does.",
+        "operationId": "import_profile_admin_companies__slug__profiles_post",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Slug"
+            }
+          },
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileImportIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileImportOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The company is new and create_company is off"
+          },
+          "409": {
+            "description": "Same content as the latest version (detail.code 'unchanged')"
+          },
+          "422": {
+            "description": "detail.code 'invalid_profile' with detail.problems, or a bad body"
+          }
+        }
+      }
+    },
+    "/admin/companies/{slug}/profiles/diff": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Diff Versions",
+        "description": "AT-2: what changed from version a to version b (profiles/diff.py, meta ignored).",
+        "operationId": "diff_versions_admin_companies__slug__profiles_diff_get",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Slug"
+            }
+          },
+          {
+            "name": "a",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "description": "Old version",
+              "title": "A"
+            },
+            "description": "Old version"
+          },
+          {
+            "name": "b",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "description": "New version",
+              "title": "B"
+            },
+            "description": "New version"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileDiff"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/companies/{slug}/profiles/{version}": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Profile Version",
+        "description": "AT-2: one version's stored JSON and its sources.",
+        "operationId": "get_profile_version_admin_companies__slug__profiles__version__get",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Slug"
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileVersionDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/companies/{slug}/profiles/{version}/transition": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Transition Profile",
+        "description": "AT-4: draft -> in_review -> published -> archived, in_review -> draft, and archived ->\npublished (rollback). Publishing records reviewed_by and archives the version published\nbefore, in one transaction.",
+        "operationId": "transition_profile_admin_companies__slug__profiles__version__transition_post",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Slug"
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Version"
+            }
+          },
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransitionIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransitionOut"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The workflow does not allow it (detail.code)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/company-requests": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List Company Requests",
+        "description": "AT-5: names users asked for that are not curated, grouped by normalized name. Triage\nstate 'new' when nobody has triaged the name yet.",
+        "operationId": "list_company_requests_admin_company_requests_get",
+        "parameters": [
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/TriageState"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "State"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CompanyRequestGroup"
+                  },
+                  "title": "Response List Company Requests Admin Company Requests Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/company-requests/{normalized_name}/triage": {
+      "put": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Set Triage",
+        "description": "AT-5: set the triage state of a requested name. company_requests rows are not edited.",
+        "operationId": "set_triage_admin_company_requests__normalized_name__triage_put",
+        "parameters": [
+          {
+            "name": "normalized_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Normalized Name"
+            }
+          },
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TriageIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyRequestGroup"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -4900,6 +5425,80 @@
           "details"
         ],
         "title": "AdminAuditEntry"
+      },
+      "AdminCompany": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active"
+          },
+          "published_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published Version"
+          },
+          "latest_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Version"
+          },
+          "version_count": {
+            "type": "integer",
+            "title": "Version Count"
+          },
+          "draft_count": {
+            "type": "integer",
+            "title": "Draft Count"
+          },
+          "in_review_count": {
+            "type": "integer",
+            "title": "In Review Count"
+          },
+          "request_users": {
+            "type": "integer",
+            "title": "Request Users",
+            "description": "Distinct users whose job setup matched the company"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "active",
+          "published_version",
+          "latest_version",
+          "version_count",
+          "draft_count",
+          "in_review_count",
+          "request_users"
+        ],
+        "title": "AdminCompany"
       },
       "AdminCostLine": {
         "properties": {
@@ -7954,6 +8553,15 @@
         "title": "CaseStyle",
         "type": "object"
       },
+      "ChangeKind": {
+        "type": "string",
+        "enum": [
+          "added",
+          "removed",
+          "changed"
+        ],
+        "title": "ChangeKind"
+      },
       "CoachRequest": {
         "properties": {
           "command": {
@@ -7973,6 +8581,28 @@
           "command"
         ],
         "title": "CoachRequest"
+      },
+      "CompanyActiveIn": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason",
+            "description": "Why, for the audit log"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reason",
+          "active"
+        ],
+        "title": "CompanyActiveIn"
       },
       "CompanyProfile": {
         "additionalProperties": false,
@@ -8095,6 +8725,82 @@
         ],
         "title": "CompanyProfile",
         "type": "object"
+      },
+      "CompanyProfiles": {
+        "properties": {
+          "company": {
+            "$ref": "#/components/schemas/AdminCompany"
+          },
+          "versions": {
+            "items": {
+              "$ref": "#/components/schemas/ProfileVersion"
+            },
+            "type": "array",
+            "title": "Versions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "company",
+          "versions"
+        ],
+        "title": "CompanyProfiles"
+      },
+      "CompanyRequestGroup": {
+        "properties": {
+          "normalized_name": {
+            "type": "string",
+            "title": "Normalized Name"
+          },
+          "names": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Names",
+            "description": "The names users typed, most common first"
+          },
+          "users": {
+            "type": "integer",
+            "title": "Users"
+          },
+          "requests": {
+            "type": "integer",
+            "title": "Requests"
+          },
+          "first_requested": {
+            "type": "string",
+            "format": "date-time",
+            "title": "First Requested"
+          },
+          "last_requested": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Requested"
+          },
+          "source_hosts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Source Hosts"
+          },
+          "triage": {
+            "$ref": "#/components/schemas/TriageInfo"
+          }
+        },
+        "type": "object",
+        "required": [
+          "normalized_name",
+          "names",
+          "users",
+          "requests",
+          "first_requested",
+          "last_requested",
+          "source_hosts",
+          "triage"
+        ],
+        "title": "CompanyRequestGroup"
       },
       "Competency": {
         "type": "string",
@@ -8617,6 +9323,50 @@
           "minutes"
         ],
         "title": "DevUsageIn"
+      },
+      "DiffChange": {
+        "properties": {
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ChangeKind"
+          },
+          "old": {
+            "title": "Old"
+          },
+          "new": {
+            "title": "New"
+          }
+        },
+        "type": "object",
+        "required": [
+          "path",
+          "kind"
+        ],
+        "title": "DiffChange"
+      },
+      "DiffField": {
+        "properties": {
+          "field": {
+            "type": "string",
+            "title": "Field"
+          },
+          "changes": {
+            "items": {
+              "$ref": "#/components/schemas/DiffChange"
+            },
+            "type": "array",
+            "title": "Changes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "field",
+          "changes"
+        ],
+        "title": "DiffField"
       },
       "Difficulty": {
         "type": "string",
@@ -12034,6 +12784,46 @@
         "title": "ProbeTrigger",
         "type": "string"
       },
+      "ProfileDiff": {
+        "properties": {
+          "a": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "A",
+            "description": "The old version. None means no old version"
+          },
+          "b": {
+            "type": "integer",
+            "title": "B"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "fields": {
+            "items": {
+              "$ref": "#/components/schemas/DiffField"
+            },
+            "type": "array",
+            "title": "Fields",
+            "description": "Every top-level field, changed or not"
+          }
+        },
+        "type": "object",
+        "required": [
+          "a",
+          "b",
+          "total",
+          "fields"
+        ],
+        "title": "ProfileDiff"
+      },
       "ProfileField": {
         "description": "Top-level profile fields that carry sources and a confidence level.",
         "enum": [
@@ -12047,6 +12837,99 @@
         ],
         "title": "ProfileField",
         "type": "string"
+      },
+      "ProfileImportIn": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason",
+            "description": "Why, for the audit log"
+          },
+          "profile_text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile Text"
+          },
+          "profile": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile"
+          },
+          "create_company": {
+            "type": "boolean",
+            "title": "Create Company",
+            "description": "Add the company (inactive) when the slug is new",
+            "default": false
+          },
+          "force": {
+            "type": "boolean",
+            "title": "Force",
+            "description": "Store it even if nothing changed",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "title": "ProfileImportIn",
+        "description": "The file text (from a file picker or pasted) or the parsed JSON. Exactly one of them."
+      },
+      "ProfileImportOut": {
+        "properties": {
+          "company": {
+            "$ref": "#/components/schemas/AdminCompany"
+          },
+          "version": {
+            "$ref": "#/components/schemas/ProfileVersion"
+          },
+          "company_created": {
+            "type": "boolean",
+            "title": "Company Created"
+          },
+          "file_version": {
+            "type": "integer",
+            "title": "File Version"
+          },
+          "summary": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Summary"
+          },
+          "diff": {
+            "$ref": "#/components/schemas/ProfileDiff",
+            "description": "Against the published version, if there is one"
+          }
+        },
+        "type": "object",
+        "required": [
+          "company",
+          "version",
+          "company_created",
+          "file_version",
+          "summary",
+          "diff"
+        ],
+        "title": "ProfileImportOut"
       },
       "ProfileIn": {
         "properties": {
@@ -12279,14 +13162,141 @@
         "description": "AC-3. complete is false until the user saves the profile once."
       },
       "ProfileStatus": {
+        "type": "string",
         "enum": [
           "draft",
           "in_review",
           "published",
           "archived"
         ],
-        "title": "ProfileStatus",
-        "type": "string"
+        "title": "ProfileStatus"
+      },
+      "ProfileVersion": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ProfileStatus"
+          },
+          "imported_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Imported At"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "reviewed_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed By"
+          },
+          "source_count": {
+            "type": "integer",
+            "title": "Source Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "status",
+          "imported_at",
+          "published_at",
+          "reviewed_by",
+          "source_count"
+        ],
+        "title": "ProfileVersion"
+      },
+      "ProfileVersionDetail": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ProfileStatus"
+          },
+          "imported_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Imported At"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "reviewed_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed By"
+          },
+          "source_count": {
+            "type": "integer",
+            "title": "Source Count"
+          },
+          "profile": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Profile"
+          },
+          "sources": {
+            "items": {},
+            "type": "array",
+            "title": "Sources"
+          },
+          "problems": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Problems",
+            "description": "Empty when the stored JSON still matches the CompanyProfile schema"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "status",
+          "imported_at",
+          "published_at",
+          "reviewed_by",
+          "source_count",
+          "profile",
+          "sources",
+          "problems"
+        ],
+        "title": "ProfileVersionDetail"
       },
       "ProgressSnapshot": {
         "properties": {
@@ -13673,6 +14683,194 @@
         ],
         "title": "TextTurns",
         "description": "The interviewer's new turns, and whether the session has ended."
+      },
+      "TransitionIn": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason",
+            "description": "Why, for the audit log"
+          },
+          "to": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "in_review",
+              "published",
+              "archived"
+            ],
+            "title": "To"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reason",
+          "to"
+        ],
+        "title": "TransitionIn"
+      },
+      "TransitionOut": {
+        "properties": {
+          "version": {
+            "$ref": "#/components/schemas/ProfileVersion"
+          },
+          "from_status": {
+            "$ref": "#/components/schemas/ProfileStatus"
+          },
+          "archived_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Archived Version",
+            "description": "On publish: the version published before, now archived"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "from_status",
+          "archived_version"
+        ],
+        "title": "TransitionOut"
+      },
+      "TriageIn": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason",
+            "description": "Why, for the audit log"
+          },
+          "state": {
+            "$ref": "#/components/schemas/TriageState"
+          },
+          "company_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company Id",
+            "description": "Required when state is added"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reason",
+          "state"
+        ],
+        "title": "TriageIn"
+      },
+      "TriageInfo": {
+        "properties": {
+          "state": {
+            "$ref": "#/components/schemas/TriageState"
+          },
+          "company_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company Id"
+          },
+          "company_slug": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company Slug"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "updated_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated By"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "state",
+          "company_id",
+          "company_slug",
+          "note",
+          "updated_by",
+          "updated_at"
+        ],
+        "title": "TriageInfo"
+      },
+      "TriageState": {
+        "type": "string",
+        "enum": [
+          "new",
+          "planned",
+          "declined",
+          "added"
+        ],
+        "title": "TriageState",
+        "description": "AT-5: admin triage of a requested company name."
       },
       "Turn": {
         "properties": {

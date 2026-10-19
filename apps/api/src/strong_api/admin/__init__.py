@@ -7,6 +7,7 @@ from __future__ import annotations
 from fastapi import APIRouter, FastAPI
 
 from strong_api.admin.alerts import router as alerts_router
+from strong_api.admin.content import router as content_router
 from strong_api.admin.controls import router as controls_router
 from strong_api.admin.ops import router as ops_router
 from strong_api.admin.overview import router as overview_router
@@ -21,6 +22,7 @@ ROUTERS: list[APIRouter] = [
     users_router,
     overview_router,
     ops_router,
+    content_router,
 ]
 
 
