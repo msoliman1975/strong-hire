@@ -203,14 +203,25 @@ async def _plan(db: AsyncSession, job_target_id: uuid.UUID) -> list[PlannedSessi
 
 
 async def _practiced(db: AsyncSession, job_target_id: uuid.UUID) -> list[InterviewType]:
-    rows = await db.scalars(
-        select(InterviewSession.type).where(
+    """Types with a completed full session. A Custom session also practices each of its
+    categories (CU-10), so the standard advice does not call them untried."""
+    rows = await db.execute(
+        select(InterviewSession.type, InterviewSession.custom_json).where(
             InterviewSession.job_target_id == job_target_id,
             InterviewSession.status == SessionStatus.COMPLETED,
             InterviewSession.duration_min != MINI_DURATION_MIN,
         )
     )
-    return list(rows)
+    out: list[InterviewType] = []
+    for itype, custom in rows:
+        out.append(itype)
+        if itype == InterviewType.CUSTOM and custom:
+            try:
+                spec = CustomSessionSpec.model_validate(custom)
+            except ValidationError:
+                continue
+            out.extend(c.category for c in spec.categories)
+    return out
 
 
 async def _snapshots(db: AsyncSession, job_target_id: uuid.UUID) -> list[ProgressSnapshot]:

@@ -1336,3 +1336,18 @@ async def test_cu10_progress_recommends_a_custom_session(
     await make_paid(sessionmaker)
     paid = (await client.get(f"/job-targets/{job_id}/progress")).json()
     assert paid["next_custom_session"] is not None
+
+
+async def test_cu10_a_custom_session_practices_its_categories(
+    client: httpx.AsyncClient, sessionmaker: Maker
+) -> None:
+    """CU-10, PR-2: a completed Custom session counts as practice for each of its categories,
+    so the standard advice does not call those types untried."""
+    from strong_api.scoring.router import _practiced
+
+    job_id, _ = await _job_with_gap(sessionmaker, gap=False)
+    await _weak_custom_progress(sessionmaker, job_id)
+    async with sessionmaker() as db:
+        done = set(await _practiced(db, job_id))
+    categories = {InterviewType(c["category"]) for c in spec()["categories"]}
+    assert done == {InterviewType.CUSTOM, *categories}
