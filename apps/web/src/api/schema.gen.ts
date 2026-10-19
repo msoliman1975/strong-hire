@@ -5605,6 +5605,17 @@ export interface components {
             site_banner?: components["schemas"]["SiteBanner"] | null;
             /** Jobs Paused */
             jobs_paused?: components["schemas"]["JobKind"][];
+            /**
+             * Sim Paused
+             * @default false
+             */
+            sim_paused: boolean;
+            /**
+             * Sim Max Live Sessions
+             * @description SM-3: a sim run does not start while this many real sessions are live. 0 turns the limit off.
+             * @default 3
+             */
+            sim_max_live_sessions: number;
         };
         /**
          * SampleQuestion
@@ -5776,7 +5787,7 @@ export interface components {
          * SettingKey
          * @enum {string}
          */
-        SettingKey: "signups_paused" | "sessions_paused_voice" | "sessions_paused_text" | "daily_spend_cap_usd" | "site_banner" | "jobs_paused";
+        SettingKey: "signups_paused" | "sessions_paused_voice" | "sessions_paused_text" | "daily_spend_cap_usd" | "site_banner" | "jobs_paused" | "sim_paused" | "sim_max_live_sessions";
         /**
          * Severity
          * @enum {string}
