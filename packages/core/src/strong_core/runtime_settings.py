@@ -1,4 +1,4 @@
-"""Ops controls that change without a redeploy (admin spec OC-1..OC-5).
+"""Ops controls that change without a redeploy (admin spec OC-1..OC-5, SM-15).
 
 Values live in the runtime_settings table (key, value_json). Every key has a type and a
 default here; a missing row means the default. Reads go through a 10 s in-process cache, so a
@@ -33,6 +33,7 @@ log = logging.getLogger(__name__)
 
 CACHE_TTL_S = 10.0
 DEFAULT_DAILY_SPEND_CAP_USD = 25.0  # D-6
+DEFAULT_SIM_MAX_LIVE_SESSIONS = 3  # D-17
 
 
 class SettingKey(StrEnum):
@@ -42,6 +43,8 @@ class SettingKey(StrEnum):
     DAILY_SPEND_CAP_USD = "daily_spend_cap_usd"  # OC-3
     SITE_BANNER = "site_banner"  # OC-4
     JOBS_PAUSED = "jobs_paused"  # OC-5
+    SIM_PAUSED = "sim_paused"  # SM-15
+    SIM_MAX_LIVE_SESSIONS = "sim_max_live_sessions"  # SM-3, SM-15
 
 
 class JobKind(StrEnum):
@@ -75,6 +78,14 @@ class RuntimeSettings(BaseModel):
     daily_spend_cap_usd: float = Field(default=DEFAULT_DAILY_SPEND_CAP_USD, ge=0)
     site_banner: SiteBanner | None = None
     jobs_paused: list[JobKind] = Field(default_factory=list)
+    sim_paused: bool = False
+    sim_max_live_sessions: int = Field(
+        default=DEFAULT_SIM_MAX_LIVE_SESSIONS,
+        ge=0,
+        le=20,
+        description="SM-3: a sim run does not start while this many real sessions are live. "
+        "0 turns the limit off.",
+    )
 
 
 KEYS: tuple[str, ...] = tuple(SettingKey)

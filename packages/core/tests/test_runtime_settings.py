@@ -126,3 +126,20 @@ async def test_invalid_stored_value_falls_back_to_default(db: AsyncSession) -> N
     db.add(RuntimeSetting(key="retired_key", value_json=1, updated_by="x"))
     await db.commit()
     assert await rs.get(db, "daily_spend_cap_usd") == 25.0
+
+
+async def test_sim_settings_defaults_and_bounds(db: AsyncSession) -> None:
+    """SM-15, SM-3 (D-17): sim runs are on by default and wait while 3 real sessions are live."""
+    current = await rs.get_all(db)
+    assert current.sim_paused is False
+    assert current.sim_max_live_sessions == 3
+
+    await rs.set(db, rs.SettingKey.SIM_PAUSED, True, actor="a@example.com")
+    await rs.set(db, rs.SettingKey.SIM_MAX_LIVE_SESSIONS, 0, actor="a@example.com")
+    await db.commit()
+    assert await rs.get(db, "sim_paused") is True
+    assert await rs.get(db, "sim_max_live_sessions") == 0
+
+    for bad in (-1, 21, "many"):
+        with pytest.raises(ValidationError):
+            await rs.set(db, rs.SettingKey.SIM_MAX_LIVE_SESSIONS, bad, actor="a@example.com")
