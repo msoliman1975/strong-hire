@@ -50,6 +50,7 @@ describe("admin sign-in (AA-2)", () => {
     expect(within(nav).getAllByRole("link").map((a) => a.firstChild?.textContent)).toEqual([
       "Overview",
       "Interviews",
+      "Simulations",
       "Users",
       "Alerts",
       "Health",

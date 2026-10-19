@@ -20,7 +20,9 @@ import { OverviewPage } from "./pages/OverviewPage";
 import { CompaniesPage } from "./pages/CompaniesPage";
 import { CompanyPage } from "./pages/CompanyPage";
 import { CompanyRequestsPage } from "./pages/CompanyRequestsPage";
+import { ReplayPage } from "./pages/ReplayPage";
 import { SignInPage } from "./pages/SignInPage";
+import { SimulationsPage } from "./pages/SimulationsPage";
 import { VerifyLinkPage } from "./pages/VerifyLinkPage";
 
 export function createQueryClient(): QueryClient {
@@ -46,6 +48,8 @@ export function AppRoutes() {
         <Route path="/overview" element={<OverviewPage />} />
         <Route path="/interviews" element={<AdminSessionsPage />} />
         <Route path="/interviews/:sessionId" element={<AdminSessionPage />} />
+        <Route path="/simulations" element={<SimulationsPage />} />
+        <Route path="/simulations/replay/:sessionId" element={<ReplayPage />} />
         <Route path="/users" element={<AdminUsersPage />} />
         <Route path="/users/:userId" element={<AdminUserPage />} />
         <Route path="/audit" element={<AdminAuditPage />} />

@@ -14,9 +14,11 @@ import { usersApi } from "../api/users";
 import { opsApi } from "../api/ops";
 import { contentApi } from "../api/content";
 import { mockProfile } from "./contentHandlers";
+import { simApi } from "../api/sim";
 import { settingsApi } from "../api/settings";
 import { mockLinkToken, mockSignIn } from "./handlers";
 import { mockStore } from "./node";
+import { MOCK_SIM_SESSION } from "./simHandlers";
 
 const OPENAPI = JSON.parse(readFileSync(resolve(__dirname, "../../../web/openapi.json"), "utf8")) as object;
 
@@ -180,5 +182,28 @@ describe("admin mocks match openapi.json", () => {
     const groups = await contentApi.requests();
     for (const g of groups) expectApiShape("CompanyRequestGroup", g);
     expectApiShape("CompanyRequestGroup", await contentApi.triage("acme", { state: "declined", reason: "testing" }));
+  });
+
+  it("simulations: options, runs, start, keep, cancel, delete, replay (SM)", async () => {
+    mockStore.db.users["admin@example.com"] = user("admin@example.com", 9, false);
+    mockSignIn(mockStore, "admin@example.com");
+    expectApiShape("SimOptions", await simApi.options());
+    expectApiShape("SimRunList", await simApi.runs());
+    const started = await simApi.start({
+      persona: "new-grad-swe",
+      interview_type: "behavioral",
+      difficulty: "realistic",
+      mode: "realistic",
+      duration_min: 10,
+      quality: "average",
+      behavior: "normal",
+      channel: "text",
+    });
+    expectApiShape("SimRunOut", started);
+    expectApiShape("SimRunOut", await simApi.keep(started.id, true));
+    const cancelled = await simApi.cancel(started.id, "wrong persona");
+    expectApiShape("SimRunOut", cancelled);
+    expectApiShape("SimRunOut", await simApi.remove(started.id, "not needed"));
+    expectApiShape("SessionReplay", await simApi.replay(MOCK_SIM_SESSION));
   });
 });

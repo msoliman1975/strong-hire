@@ -12,6 +12,7 @@ import { AppRoutes, createQueryClient } from "../App";
 import type { SessionRecord } from "../api/types";
 import { mockSignIn } from "../mocks/handlers";
 import { mockStore } from "../mocks/node";
+import { mockReplay, simState } from "../mocks/simHandlers";
 
 const SESSION_ID = "00000000-0000-4000-8000-0000000000c1";
 
@@ -134,5 +135,22 @@ describe("admin pages (R2, AI pages moved)", () => {
       "href",
       "/users/00000000-0000-4000-8000-0000000000a1",
     );
+  });
+
+  it("SM-16: an AI candidate interview with a run folder links to its replay", async () => {
+    seed({ consent: true });
+    simState(mockStore.db).replays[SESSION_ID] = { ...structuredClone(mockReplay), session_id: SESSION_ID };
+    const user = renderAt(`/interviews/${SESSION_ID}`);
+    const link = await screen.findByRole("link", { name: "Replay" });
+    expect(link).toHaveAttribute("href", `/simulations/replay/${SESSION_ID}`);
+    await user.click(link);
+    expect(await screen.findByRole("heading", { name: "Replay", level: 1 })).toBeInTheDocument();
+  });
+
+  it("SM-16: other interviews have no replay link", async () => {
+    seed({ consent: true });
+    renderAt(`/interviews/${SESSION_ID}`);
+    await screen.findByRole("heading", { name: "Transcript" });
+    expect(screen.queryByRole("link", { name: "Replay" })).not.toBeInTheDocument();
   });
 });

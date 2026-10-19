@@ -70,6 +70,41 @@ services:
       - /srv/stronghire/sim:/sim-results:ro
     restart: unless-stopped
 
+  # The sim service (docs/admin-spec.md, Simulations): runs admin-started AI candidate
+  # interviews one at a time, writes /srv/stronghire/sim and applies its retention (SM-14).
+  # Start it with --profile sim. It talks to the app through the public URL, like a browser,
+  # and to LiteLLM with the sim key, so the $5/day sim budget covers both sides.
+  # Capped so live users keep the CPU (D-17).
+  sim:
+    build:
+      context: ..
+      dockerfile: infra/sim/sim.Dockerfile
+    image: strong-sim:latest
+    profiles: [sim]
+    command: ["serve"]
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-strong}:${POSTGRES_PASSWORD:-strong}@postgres:5432/${POSTGRES_DB:-strong}
+      MODEL_PROFILE: sim
+      MODEL_GATEWAY_URL: http://litellm:4000/v1
+      MODEL_GATEWAY_API_KEY: ${SIM_LITELLM_KEY:-}
+      SIM_ENABLED: ${SIM_ENABLED:-false}
+      SIM_EMAIL: ${SIM_EMAIL:-sim@getstronghire.com}
+      SIM_LITELLM_KEY: ${SIM_LITELLM_KEY:-}
+      SIM_TOKEN: ${SIM_TOKEN:-}
+      SIM_BASE_URL: https://${DOMAIN}/api
+      SIM_OUT_DIR: /sim-results
+      SIM_KEEP_GB: ${SIM_KEEP_GB:-10}
+      SIM_KEEP_DAYS: ${SIM_KEEP_DAYS:-90}
+      REPO_ROOT: /app
+    volumes:
+      - /srv/stronghire/sim:/sim-results
+    depends_on:
+      postgres: { condition: service_healthy }
+      litellm: { condition: service_started }
+    cpus: 2
+    mem_limit: 2g
+    restart: unless-stopped
+
   worker:
     environment:
       APP_ENV: staging

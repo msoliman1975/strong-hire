@@ -3263,7 +3263,7 @@
           "admin"
         ],
         "summary": "Download Audio",
-        "description": "The recording of an AI candidate voice interview, as stereo Ogg Opus.\n\nThe left channel is what the candidate heard, the right channel what it said. 404 for every\nother session.",
+        "description": "The recording of an AI candidate voice interview, as stereo Ogg Opus.\n\nThe left channel is what the candidate heard, the right channel what it said. 404 for every\nother session. A Range request gets 206 with that part (SM-7), so the replay player seeks\nwithout downloading the file; only the request that starts at byte 0 is audited, not every\nseek.",
         "operationId": "download_audio_admin_sessions__session_id__audio_get",
         "parameters": [
           {
@@ -5660,6 +5660,469 @@
         }
       }
     },
+    "/admin/sim/options": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Sim Options",
+        "description": "SM-1: the choices, an estimate per length, today's sim budget and the gate now.",
+        "operationId": "sim_options_admin_sim_options_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimOptions"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/sim/runs": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Start Run",
+        "description": "SM-2, SM-3: queue one run. 409 with the reason when a gate is closed or the line is full.",
+        "operationId": "start_run_admin_sim_runs_post",
+        "parameters": [
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimRunIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimRunOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List Runs",
+        "description": "SM-12: admin runs and suite runs, newest first. SM-4: poll while any is unfinished.",
+        "operationId": "list_runs_admin_sim_runs_get",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/SimRunStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "channel",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "text",
+                    "voice"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Channel"
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "admin",
+                    "suite"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Source"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimRunList"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/sim/runs/{run_id}": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Run",
+        "operationId": "get_run_admin_sim_runs__run_id__get",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimRunOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Keep Run",
+        "description": "SM-13: Keep, so retention never deletes the run's files.",
+        "operationId": "keep_run_admin_sim_runs__run_id__patch",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Run Id"
+            }
+          },
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimKeepIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimRunOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Delete Run",
+        "description": "SM-13: the row stays as a stub; the sim service deletes the folder within seconds.",
+        "operationId": "delete_run_admin_sim_runs__run_id__delete",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Run Id"
+            }
+          },
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActionIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimRunOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/sim/runs/{run_id}/cancel": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Cancel Run",
+        "description": "SM-5: a run in line is cancelled now; an active one stops within a few seconds.",
+        "operationId": "cancel_run_admin_sim_runs__run_id__cancel_post",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Run Id"
+            }
+          },
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimCancelIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimRunOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/sessions/{session_id}/replay": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Session Replay",
+        "description": "SM-7..SM-11: everything the replay page shows. AI candidate interviews only; same\nconsent rule as the transcript. Audited.",
+        "operationId": "session_replay_admin_sessions__session_id__replay_get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionReplay"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -7116,6 +7579,12 @@
             "type": "boolean",
             "title": "Audio Available",
             "description": "True when a recording can be downloaded (AI candidate voice interviews).",
+            "default": false
+          },
+          "replay_available": {
+            "type": "boolean",
+            "title": "Replay Available",
+            "description": "SM-16: an AI candidate interview with a run folder; open its replay page.",
             "default": false
           },
           "cost_breakdown": {
@@ -9017,6 +9486,23 @@
           "until"
         ],
         "title": "BannerOut"
+      },
+      "Behavior": {
+        "type": "string",
+        "enum": [
+          "normal",
+          "long_answers",
+          "one_line_answers",
+          "off_topic",
+          "asks_to_repeat",
+          "silent",
+          "interrupts",
+          "argues",
+          "many_questions_back",
+          "prompt_injection",
+          "drops_connection"
+        ],
+        "title": "Behavior"
       },
       "Body_create_resume_resumes_post": {
         "properties": {
@@ -13999,6 +14485,15 @@
         "title": "ProgressSnapshot",
         "description": "One competency score from one Realistic session, for trend charts (PR-1)."
       },
+      "Quality": {
+        "type": "string",
+        "enum": [
+          "strong",
+          "average",
+          "weak"
+        ],
+        "title": "Quality"
+      },
       "QuestionPattern": {
         "additionalProperties": false,
         "description": "A recurring theme, phrased as a pattern. Never a leaked or NDA-protected question.",
@@ -14120,6 +14615,259 @@
           "reason"
         ],
         "title": "RemoveAdminIn"
+      },
+      "ReplayAudio": {
+        "properties": {
+          "available": {
+            "type": "boolean",
+            "title": "Available"
+          },
+          "bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bytes",
+            "description": "GET /admin/sessions/{id}/audio answers Range (SM-7)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "available",
+          "bytes"
+        ],
+        "title": "ReplayAudio"
+      },
+      "ReplayJudge": {
+        "properties": {
+          "rubric": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rubric"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "rules": {
+            "items": {
+              "$ref": "#/components/schemas/ReplayRule"
+            },
+            "type": "array",
+            "title": "Rules"
+          },
+          "problems": {
+            "items": {
+              "$ref": "#/components/schemas/ReplayProblem"
+            },
+            "type": "array",
+            "title": "Problems"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rubric",
+          "model",
+          "rules",
+          "problems"
+        ],
+        "title": "ReplayJudge"
+      },
+      "ReplayLatency": {
+        "properties": {
+          "n": {
+            "type": "integer",
+            "title": "N"
+          },
+          "p50_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P50 Ms"
+          },
+          "p90_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P90 Ms"
+          },
+          "slow_turns": {
+            "type": "integer",
+            "title": "Slow Turns",
+            "description": "Turns over 1500 ms"
+          },
+          "ok_ms": {
+            "type": "integer",
+            "title": "Ok Ms",
+            "default": 800
+          },
+          "slow_ms": {
+            "type": "integer",
+            "title": "Slow Ms",
+            "default": 1500
+          }
+        },
+        "type": "object",
+        "required": [
+          "n",
+          "p50_ms",
+          "p90_ms",
+          "slow_turns"
+        ],
+        "title": "ReplayLatency"
+      },
+      "ReplayLine": {
+        "properties": {
+          "speaker": {
+            "type": "string",
+            "enum": [
+              "interviewer",
+              "candidate"
+            ],
+            "title": "Speaker"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "start_ms": {
+            "type": "integer",
+            "title": "Start Ms"
+          },
+          "end_ms": {
+            "type": "integer",
+            "title": "End Ms"
+          },
+          "phase": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phase"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note",
+            "description": "What the harness did, e.g. 'silent for 6 s'"
+          },
+          "latency_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latency Ms",
+            "description": "SM-9, on the first interviewer line of a reply"
+          }
+        },
+        "type": "object",
+        "required": [
+          "speaker",
+          "text",
+          "start_ms",
+          "end_ms",
+          "phase",
+          "note",
+          "latency_ms"
+        ],
+        "title": "ReplayLine"
+      },
+      "ReplayProblem": {
+        "properties": {
+          "at": {
+            "type": "string",
+            "title": "At",
+            "description": "mm:ss"
+          },
+          "at_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "At Ms",
+            "description": "`at` in ms, for the scrubber marker"
+          },
+          "problem": {
+            "type": "string",
+            "title": "Problem"
+          }
+        },
+        "type": "object",
+        "required": [
+          "at",
+          "at_ms",
+          "problem"
+        ],
+        "title": "ReplayProblem"
+      },
+      "ReplayRule": {
+        "properties": {
+          "rule": {
+            "type": "string",
+            "title": "Rule"
+          },
+          "verdict": {
+            "type": "string",
+            "title": "Verdict",
+            "description": "pass, fail or not_applicable"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rule",
+          "verdict",
+          "reason"
+        ],
+        "title": "ReplayRule"
       },
       "ReportItem": {
         "properties": {
@@ -15072,6 +15820,111 @@
         ],
         "title": "SessionRecord"
       },
+      "SessionReplay": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Id"
+          },
+          "run_dir": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Dir",
+            "description": "The run folder; None: from the database only"
+          },
+          "sim_run_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sim Run Id"
+          },
+          "channel": {
+            "type": "string",
+            "title": "Channel"
+          },
+          "timing": {
+            "type": "string",
+            "enum": [
+              "audio",
+              "approximate"
+            ],
+            "title": "Timing",
+            "description": "SM-8: 'audio' when times are positions in the recording (SM-6)"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/ReplayLine"
+            },
+            "type": "array",
+            "title": "Lines"
+          },
+          "latency": {
+            "$ref": "#/components/schemas/ReplayLatency"
+          },
+          "judge": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReplayJudge"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scorecard": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Scorecard"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "SM-11: as the candidate saw it"
+          },
+          "audio": {
+            "$ref": "#/components/schemas/ReplayAudio"
+          },
+          "scenario": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SimScenarioOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "run_dir",
+          "sim_run_id",
+          "channel",
+          "timing",
+          "lines",
+          "latency",
+          "judge",
+          "scorecard",
+          "audio",
+          "scenario"
+        ],
+        "title": "SessionReplay"
+      },
       "SessionStatus": {
         "type": "string",
         "enum": [
@@ -15154,6 +16007,726 @@
           "terms_accepted"
         ],
         "title": "SignupRequest"
+      },
+      "SimBehaviorOut": {
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Behavior"
+          },
+          "voice_only": {
+            "type": "boolean",
+            "title": "Voice Only"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "voice_only"
+        ],
+        "title": "SimBehaviorOut"
+      },
+      "SimBudgetOut": {
+        "properties": {
+          "limit_usd": {
+            "type": "number",
+            "title": "Limit Usd"
+          },
+          "spent_usd": {
+            "type": "number",
+            "title": "Spent Usd",
+            "description": "Spend of the sim LiteLLM key in the current period"
+          },
+          "left_usd": {
+            "type": "number",
+            "title": "Left Usd"
+          },
+          "resets_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resets At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "limit_usd",
+          "spent_usd",
+          "left_usd",
+          "resets_at"
+        ],
+        "title": "SimBudgetOut"
+      },
+      "SimCancelIn": {
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "SimCancelIn"
+      },
+      "SimEstimateOut": {
+        "properties": {
+          "duration_min": {
+            "type": "integer",
+            "title": "Duration Min"
+          },
+          "candidate_usd": {
+            "type": "number",
+            "title": "Candidate Usd"
+          },
+          "judge_usd": {
+            "type": "number",
+            "title": "Judge Usd"
+          },
+          "main_server_usd": {
+            "type": "number",
+            "title": "Main Server Usd"
+          },
+          "total_usd": {
+            "type": "number",
+            "title": "Total Usd"
+          }
+        },
+        "type": "object",
+        "required": [
+          "duration_min",
+          "candidate_usd",
+          "judge_usd",
+          "main_server_usd",
+          "total_usd"
+        ],
+        "title": "SimEstimateOut"
+      },
+      "SimGateOut": {
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "title": "Ok",
+            "description": "SM-3 without the budget part: enabled, not paused, live limit"
+          },
+          "retry": {
+            "type": "boolean",
+            "title": "Retry",
+            "description": "Only the live-sessions limit is in the way"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ok",
+          "retry",
+          "reason"
+        ],
+        "title": "SimGateOut"
+      },
+      "SimKeepIn": {
+        "properties": {
+          "keep": {
+            "type": "boolean",
+            "title": "Keep"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "keep"
+        ],
+        "title": "SimKeepIn"
+      },
+      "SimOptions": {
+        "properties": {
+          "personas": {
+            "items": {
+              "$ref": "#/components/schemas/SimPersonaOut"
+            },
+            "type": "array",
+            "title": "Personas"
+          },
+          "interview_types": {
+            "items": {
+              "$ref": "#/components/schemas/InterviewType"
+            },
+            "type": "array",
+            "title": "Interview Types"
+          },
+          "difficulties": {
+            "items": {
+              "$ref": "#/components/schemas/Difficulty"
+            },
+            "type": "array",
+            "title": "Difficulties"
+          },
+          "modes": {
+            "items": {
+              "$ref": "#/components/schemas/Mode"
+            },
+            "type": "array",
+            "title": "Modes"
+          },
+          "durations": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Durations"
+          },
+          "qualities": {
+            "items": {
+              "$ref": "#/components/schemas/Quality"
+            },
+            "type": "array",
+            "title": "Qualities"
+          },
+          "behaviors": {
+            "items": {
+              "$ref": "#/components/schemas/SimBehaviorOut"
+            },
+            "type": "array",
+            "title": "Behaviors"
+          },
+          "channels": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "text",
+                "voice"
+              ]
+            },
+            "type": "array",
+            "title": "Channels"
+          },
+          "estimates": {
+            "items": {
+              "$ref": "#/components/schemas/SimEstimateOut"
+            },
+            "type": "array",
+            "title": "Estimates",
+            "description": "One per duration"
+          },
+          "budget": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SimBudgetOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "None when the sim key budget is unknown"
+          },
+          "gate": {
+            "$ref": "#/components/schemas/SimGateOut"
+          },
+          "queue": {
+            "$ref": "#/components/schemas/SimQueueOut"
+          }
+        },
+        "type": "object",
+        "required": [
+          "personas",
+          "interview_types",
+          "difficulties",
+          "modes",
+          "durations",
+          "qualities",
+          "behaviors",
+          "channels",
+          "estimates",
+          "budget",
+          "gate",
+          "queue"
+        ],
+        "title": "SimOptions",
+        "description": "SM-1: everything the form offers, and whether a run could start now."
+      },
+      "SimPersonaOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Resume fixture id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "posting": {
+            "type": "string",
+            "title": "Posting",
+            "description": "The posting fixture this resume is meant for"
+          },
+          "level": {
+            "$ref": "#/components/schemas/Level"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "posting",
+          "level"
+        ],
+        "title": "SimPersonaOut"
+      },
+      "SimQueueOut": {
+        "properties": {
+          "active": {
+            "type": "integer",
+            "title": "Active"
+          },
+          "waiting": {
+            "type": "integer",
+            "title": "Waiting",
+            "description": "queued and waiting runs"
+          },
+          "max_waiting": {
+            "type": "integer",
+            "title": "Max Waiting"
+          }
+        },
+        "type": "object",
+        "required": [
+          "active",
+          "waiting",
+          "max_waiting"
+        ],
+        "title": "SimQueueOut"
+      },
+      "SimRunIn": {
+        "properties": {
+          "persona": {
+            "type": "string",
+            "title": "Persona"
+          },
+          "interview_type": {
+            "$ref": "#/components/schemas/InterviewType",
+            "default": "behavioral"
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/Difficulty",
+            "default": "realistic"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/Mode",
+            "default": "realistic"
+          },
+          "duration_min": {
+            "type": "integer",
+            "enum": [
+              10,
+              30,
+              45
+            ],
+            "title": "Duration Min",
+            "default": 30
+          },
+          "quality": {
+            "$ref": "#/components/schemas/Quality",
+            "default": "average"
+          },
+          "behavior": {
+            "$ref": "#/components/schemas/Behavior",
+            "default": "normal"
+          },
+          "channel": {
+            "type": "string",
+            "enum": [
+              "text",
+              "voice"
+            ],
+            "title": "Channel",
+            "default": "voice"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "persona"
+        ],
+        "title": "SimRunIn",
+        "description": "SM-1: one interview. The posting and level follow the persona."
+      },
+      "SimRunList": {
+        "properties": {
+          "runs": {
+            "items": {
+              "$ref": "#/components/schemas/SimRunOut"
+            },
+            "type": "array",
+            "title": "Runs"
+          },
+          "any_unfinished": {
+            "type": "boolean",
+            "title": "Any Unfinished",
+            "description": "SM-4: poll every 5 s while true"
+          }
+        },
+        "type": "object",
+        "required": [
+          "runs",
+          "any_unfinished"
+        ],
+        "title": "SimRunList"
+      },
+      "SimRunOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "The sim_runs id; for a suite run '<run folder>/<scenario id>'"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "suite"
+            ],
+            "title": "Source"
+          },
+          "suite": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suite",
+            "description": "Suite name for runs from sim-run.ps1"
+          },
+          "run_dir": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Dir"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SimRunStatus"
+          },
+          "status_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status Reason"
+          },
+          "scenario": {
+            "$ref": "#/components/schemas/SimScenarioOut"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          },
+          "progress_s": {
+            "type": "integer",
+            "title": "Progress S",
+            "description": "SM-4: interview time so far"
+          },
+          "planned_s": {
+            "type": "integer",
+            "title": "Planned S"
+          },
+          "hire_signal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hire Signal"
+          },
+          "failed_rules": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Failed Rules"
+          },
+          "problems": {
+            "type": "integer",
+            "title": "Problems"
+          },
+          "latency_p50_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latency P50 Ms"
+          },
+          "cost_sim_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Sim Usd",
+            "description": "Candidate and judge (the sim's meter)"
+          },
+          "cost_app_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost App Usd",
+            "description": "usage_events of the session"
+          },
+          "cost_total_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Total Usd"
+          },
+          "keep": {
+            "type": "boolean",
+            "title": "Keep"
+          },
+          "deleted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deleted At"
+          },
+          "deleted_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deleted By"
+          },
+          "delete_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delete Reason"
+          },
+          "files": {
+            "type": "boolean",
+            "title": "Files",
+            "description": "The run folder is on disk"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "suite",
+          "run_dir",
+          "created_by",
+          "created_at",
+          "started_at",
+          "finished_at",
+          "status",
+          "status_reason",
+          "scenario",
+          "session_id",
+          "progress_s",
+          "planned_s",
+          "hire_signal",
+          "failed_rules",
+          "problems",
+          "latency_p50_ms",
+          "cost_sim_usd",
+          "cost_app_usd",
+          "cost_total_usd",
+          "keep",
+          "deleted_at",
+          "deleted_by",
+          "delete_reason",
+          "files"
+        ],
+        "title": "SimRunOut"
+      },
+      "SimRunStatus": {
+        "type": "string",
+        "enum": [
+          "queued",
+          "waiting",
+          "starting",
+          "interviewing",
+          "judging",
+          "done",
+          "failed",
+          "cancelled"
+        ],
+        "title": "SimRunStatus",
+        "description": "SM-4: an admin-started AI candidate run (docs/admin-spec.md, Simulations)."
+      },
+      "SimScenarioOut": {
+        "properties": {
+          "channel": {
+            "type": "string",
+            "title": "Channel"
+          },
+          "interview_type": {
+            "type": "string",
+            "title": "Interview Type"
+          },
+          "difficulty": {
+            "type": "string",
+            "title": "Difficulty"
+          },
+          "mode": {
+            "type": "string",
+            "title": "Mode"
+          },
+          "duration_min": {
+            "type": "integer",
+            "title": "Duration Min"
+          },
+          "persona": {
+            "type": "string",
+            "title": "Persona"
+          },
+          "quality": {
+            "type": "string",
+            "title": "Quality"
+          },
+          "behavior": {
+            "type": "string",
+            "title": "Behavior"
+          },
+          "candidate_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidate Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "channel",
+          "interview_type",
+          "difficulty",
+          "mode",
+          "duration_min",
+          "persona",
+          "quality",
+          "behavior"
+        ],
+        "title": "SimScenarioOut"
       },
       "SiteBanner": {
         "properties": {

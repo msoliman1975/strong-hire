@@ -6,7 +6,7 @@
                                      when the user's training consent is on now
     GET /admin/sessions/{id}/transcript.txt   the transcript as a text file (same consent rule)
     GET /admin/sessions/{id}/audio   the recording of an AI candidate (P13) voice interview, from
-                                     the saved sim runs (same consent rule)
+                                     the saved sim runs (same consent rule); answers Range (SM-7)
     GET /admin/audit                 the audit log (admin views by default)
 
 Only a signed-in admin (an admin session, AA-4) may call these routes. Everyone else gets 404.
@@ -348,6 +348,24 @@ def _find_recording(results_dir: str, session_id: uuid.UUID) -> tuple[Path, int]
     return newest, size
 
 
+def find_session_folder(results_dir: str, session_id: uuid.UUID) -> Path | None:
+    """The newest <run>/<session id>/ folder with a transcript or a recording (SM-8, SM-16).
+
+    Same path rule as _find_recording: built from the UUID, and inside the results folder.
+    """
+    root = Path(results_dir).resolve()
+    if not root.is_dir():
+        return None
+    found = []
+    for path in root.glob(f"*/{session_id}"):
+        resolved = path.resolve()
+        if not (resolved.is_relative_to(root) and resolved.is_dir()):
+            continue
+        if (resolved / "transcript.json").is_file() or (resolved / "audio.ogg").is_file():
+            found.append((resolved.stat().st_mtime, resolved))
+    return max(found)[1] if found else None
+
+
 async def _sim_audio(
     db: AsyncSession, user: User, row: InterviewSession, settings: AuthSettings
 ) -> tuple[Path, int] | None:
@@ -480,7 +498,13 @@ async def get_session(
     db.add(_audit(admin, "admin.transcript_viewed", row, {**who, "turns": len(transcript)}))
     db.add(_audit(admin, "admin.traces_viewed", row, {**who, "traces": len(traces)}))
     await db.commit()
-    audio = await _sim_audio(db, user, row, admin_settings(request))
+    settings = admin_settings(request)
+    audio = await _sim_audio(db, user, row, settings)
+    replay = (
+        await is_sim_user(db, user.id)
+        and (await asyncio.to_thread(find_session_folder, settings.sim_results_dir, row.id))
+        is not None
+    )
     return AdminSessionDetail(
         session=meta,
         content_visible=True,
@@ -488,6 +512,7 @@ async def get_session(
         traces=traces,
         trace_retention_days=TRACE_RETENTION_DAYS,
         audio_available=audio is not None,
+        replay_available=replay,
         **extra,
     )
 
@@ -516,7 +541,9 @@ async def download_audio(
     """The recording of an AI candidate voice interview, as stereo Ogg Opus.
 
     The left channel is what the candidate heard, the right channel what it said. 404 for every
-    other session.
+    other session. A Range request gets 206 with that part (SM-7), so the replay player seeks
+    without downloading the file; only the request that starts at byte 0 is audited, not every
+    seek.
     """
     row, found_user, _ = await _find(db, session_id)
     user = _content_user(found_user)
@@ -524,9 +551,11 @@ async def download_audio(
     if audio is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No recording for this interview")
     path, size = audio
-    details = {"user_id": str(user.id), "bytes": size}
-    db.add(_audit(admin, "admin.audio_downloaded", row, details))
-    await db.commit()
+    wanted = request.headers.get("range", "").replace(" ", "")
+    if not wanted or wanted.startswith("bytes=0-"):
+        details = {"user_id": str(user.id), "bytes": size}
+        db.add(_audit(admin, "admin.audio_downloaded", row, details))
+        await db.commit()
     return FileResponse(path, media_type="audio/ogg", filename=f"interview-{row.id}.ogg")
 
 

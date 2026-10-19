@@ -19,6 +19,7 @@ from strong_api.admin.identity import ADMIN_LINK_SALT, AdminAuth, seed_admins
 from strong_api.admin.ops import router as ops_router
 from strong_api.admin.overview import router as overview_router
 from strong_api.admin.router import router
+from strong_api.admin.sim import router as sim_router
 from strong_api.admin.users import router as users_router
 from strong_api.auth.email import EmailSender, make_email_sender
 from strong_api.auth.google import AuthlibGoogleClient, GoogleClient
@@ -39,6 +40,7 @@ ROUTERS: list[APIRouter] = [
     overview_router,
     ops_router,
     content_router,
+    sim_router,
 ]
 
 
