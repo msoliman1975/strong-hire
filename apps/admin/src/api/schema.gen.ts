@@ -3534,7 +3534,7 @@ export interface components {
          */
         BriefDraft: {
             /** Questions */
-            questions: components["schemas"]["BriefQuestion"][];
+            questions: components["schemas"]["DraftQuestion"][];
             /**
              * Curveball
              * @description Only asked for in Tough difficulty.
@@ -3565,6 +3565,28 @@ export interface components {
             priority: number;
             /** Probe Hints */
             probe_hints?: string[];
+            /**
+             * @description CU-3: candidate for the candidate's own.
+             * @default planner
+             */
+            source: components["schemas"]["QuestionSource"];
+            /**
+             * @description Custom sessions only: the question's category (CU-1).
+             * @default null
+             */
+            category: ("behavioral" | "hiring_manager" | "technical_qa" | "case") | null;
+            /**
+             * Must Ask
+             * @description CU-4: the session controller asks it before CANDIDATE_QUESTIONS.
+             * @default false
+             */
+            must_ask: boolean;
+            /**
+             * Verbatim
+             * @description CU-4: read the text word for word.
+             * @default false
+             */
+            verbatim: boolean;
         };
         /** Budget */
         Budget: {
@@ -3819,6 +3841,105 @@ export interface components {
              */
             channel: components["schemas"]["SessionChannel"];
         };
+        /**
+         * CustomCategory
+         * @description One question category in a Custom session (CU-1, CU-2).
+         */
+        CustomCategory: {
+            /** @enum {string} */
+            category: "behavioral" | "hiring_manager" | "technical_qa" | "case";
+            /**
+             * Share
+             * @description Share of the core time. Shares add up to 1.
+             */
+            share: number;
+            /**
+             * Focus
+             * @description Topics to focus on, for example 'conflict' or 'Kubernetes' (CU-2).
+             */
+            focus?: string[];
+        };
+        /**
+         * CustomInterviewAccess
+         * @description CU-11: who may run a Custom interview. Everyone while we test; paid plans when live.
+         * @enum {string}
+         */
+        CustomInterviewAccess: "everyone" | "paid_only";
+        /**
+         * CustomQuestion
+         * @description A question the candidate wrote or saved (CU-3, CU-4).
+         */
+        CustomQuestion: {
+            /** Text */
+            text: string;
+            /** @enum {string} */
+            category: "behavioral" | "hiring_manager" | "technical_qa" | "case";
+            /**
+             * Competencies
+             * @description From COMPETENCIES_BY_TYPE for the category. Tagged by the CU-5 check.
+             */
+            competencies: components["schemas"]["Competency"][];
+            /**
+             * Must Ask
+             * @description CU-4: the session controller asks it.
+             * @default true
+             */
+            must_ask: boolean;
+            /**
+             * Verbatim
+             * @description CU-4: read the text word for word.
+             * @default false
+             */
+            verbatim: boolean;
+            /**
+             * Saved Question Id
+             * @description CU-8: the saved_questions row it came from.
+             */
+            saved_question_id?: string | null;
+        };
+        /**
+         * CustomQuestionCheck
+         * @description CU-5: the check of one own question or focus chip before the session.
+         *
+         *     The worker refuses the text when `is_question` is false and shows the candidate a fixed
+         *     sentence for `refusal` with the short `reason`. Text that tries to instruct the interviewer
+         *     is refused, never forwarded.
+         */
+        CustomQuestionCheck: {
+            /**
+             * Is Question
+             * @description For a focus chip: whether it is a fair interview topic.
+             */
+            is_question: boolean;
+            /**
+             * @description Set when refused.
+             * @default null
+             */
+            refusal: components["schemas"]["QuestionRefusal"] | null;
+            /**
+             * Reason
+             * @description One short sentence the candidate sees.
+             * @default
+             */
+            reason: string;
+            /**
+             * @description Set when accepted.
+             * @default null
+             */
+            category: ("behavioral" | "hiring_manager" | "technical_qa" | "case") | null;
+            /** Competencies */
+            competencies?: components["schemas"]["Competency"][];
+        };
+        /**
+         * CustomSessionSpec
+         * @description What the candidate builds for a Custom session. Stored in sessions.custom_json.
+         */
+        CustomSessionSpec: {
+            /** Categories */
+            categories: components["schemas"]["CustomCategory"][];
+            /** Questions */
+            questions?: components["schemas"]["CustomQuestion"][];
+        };
         /** DailyCost */
         DailyCost: {
             /**
@@ -3926,6 +4047,33 @@ export interface components {
          * @enum {string}
          */
         DocumentKind: "job_posting" | "job_list" | "resume" | "cover_letter" | "company_page" | "article" | "error_page" | "other";
+        /**
+         * DraftQuestion
+         * @description One question as the planner model writes it. The worker turns it into a BriefQuestion;
+         *     only code sets the source, must-ask and verbatim fields.
+         */
+        DraftQuestion: {
+            /** Id */
+            id: string;
+            /** Text */
+            text: string;
+            /** Competencies */
+            competencies: components["schemas"]["Competency"][];
+            /** Values */
+            values?: string[];
+            /**
+             * Priority
+             * @description 1 is asked first.
+             */
+            priority: number;
+            /** Probe Hints */
+            probe_hints?: string[];
+            /**
+             * @description Custom sessions only: one of the session's categories.
+             * @default null
+             */
+            category: ("behavioral" | "hiring_manager" | "technical_qa" | "case") | null;
+        };
         /** Education */
         Education: {
             /** Institution */
@@ -4228,10 +4376,14 @@ export interface components {
         };
         /**
          * InterviewType
-         * @description The four v1 interview types (IV-2).
+         * @description The four v1 interview types (IV-2), plus Custom (CU-1).
+         *
+         *     A Custom session mixes 1 to 3 of the four standard types as question categories
+         *     (`SessionConfig.custom`). Custom is never a question category itself and has no entry in
+         *     COMPETENCIES_BY_TYPE; use `session_competencies(config)` for a session's competency pool.
          * @enum {string}
          */
-        InterviewType: "behavioral" | "hiring_manager" | "technical_qa" | "case";
+        InterviewType: "behavioral" | "hiring_manager" | "technical_qa" | "case" | "custom";
         /**
          * InterviewerBrief
          * @description Built by the planner before each session. The live interviewer reads only this.
@@ -4583,7 +4735,7 @@ export interface components {
              * @description None for rounds v1 does not simulate, such as live coding.
              * @default null
              */
-            interview_type: components["schemas"]["InterviewType"] | null;
+            interview_type: ("behavioral" | "hiring_manager" | "technical_qa" | "case") | null;
             /**
              * Duration Min
              * @default null
@@ -5163,7 +5315,8 @@ export interface components {
              * @description 1 is the first session to run.
              */
             priority: number;
-            interview_type: components["schemas"]["InterviewType"];
+            /** @enum {string} */
+            interview_type: "behavioral" | "hiring_manager" | "technical_qa" | "case";
             /** @default realistic */
             difficulty: components["schemas"]["Difficulty"];
             /** Focus Topics */
@@ -5439,7 +5592,8 @@ export interface components {
          * @description A recurring theme, phrased as a pattern. Never a leaked or NDA-protected question.
          */
         QuestionPattern: {
-            interview_type: components["schemas"]["InterviewType"];
+            /** @enum {string} */
+            interview_type: "behavioral" | "hiring_manager" | "technical_qa" | "case";
             /** Theme */
             theme: string;
             /** Pattern */
@@ -5452,6 +5606,12 @@ export interface components {
              */
             values?: string[];
         };
+        /**
+         * QuestionRefusal
+         * @description CU-5: why a candidate's own question or focus chip is refused.
+         * @enum {string}
+         */
+        QuestionRefusal: "not_a_question" | "inappropriate" | "instructions";
         /** QuestionScore */
         QuestionScore: {
             /** Question Ref */
@@ -5467,6 +5627,12 @@ export interface components {
             /** Misses */
             misses?: string[];
         };
+        /**
+         * QuestionSource
+         * @description Who wrote a brief question: the planner, or the candidate in a Custom session (CU-3).
+         * @enum {string}
+         */
+        QuestionSource: "planner" | "candidate";
         /** RedirectOut */
         RedirectOut: {
             /** Url */
@@ -5842,6 +6008,8 @@ export interface components {
              * @default 3
              */
             sim_max_live_sessions: number;
+            /** @default everyone */
+            custom_interview_access: components["schemas"]["CustomInterviewAccess"];
         };
         /**
          * SampleQuestion
@@ -5849,7 +6017,8 @@ export interface components {
          *     Never an NDA-protected question or copied paid content.
          */
         SampleQuestion: {
-            interview_type: components["schemas"]["InterviewType"];
+            /** @enum {string} */
+            interview_type: "behavioral" | "hiring_manager" | "technical_qa" | "case";
             /**
              * Question
              * @description Paraphrased, not copied.
@@ -5953,6 +6122,8 @@ export interface components {
              */
             duration_min: 10 | 30 | 45;
             level: components["schemas"]["Level"];
+            /** @description CU-1: required for the Custom type, absent for the others. */
+            custom?: components["schemas"]["CustomSessionSpec"] | null;
         };
         /** SessionRecord */
         SessionRecord: {
@@ -6044,7 +6215,7 @@ export interface components {
          * SettingKey
          * @enum {string}
          */
-        SettingKey: "signups_paused" | "sessions_paused_voice" | "sessions_paused_text" | "daily_spend_cap_usd" | "site_banner" | "jobs_paused" | "sim_paused" | "sim_max_live_sessions";
+        SettingKey: "signups_paused" | "sessions_paused_voice" | "sessions_paused_text" | "daily_spend_cap_usd" | "site_banner" | "jobs_paused" | "sim_paused" | "sim_max_live_sessions" | "custom_interview_access";
         /**
          * Severity
          * @enum {string}

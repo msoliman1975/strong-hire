@@ -103,17 +103,6 @@
       "title": "Gap",
       "type": "object"
     },
-    "InterviewType": {
-      "description": "The four v1 interview types (IV-2).",
-      "enum": [
-        "behavioral",
-        "hiring_manager",
-        "technical_qa",
-        "case"
-      ],
-      "title": "InterviewType",
-      "type": "string"
-    },
     "PlannedSession": {
       "additionalProperties": false,
       "description": "One recommended practice session (GA-3).",
@@ -131,7 +120,13 @@
           "type": "array"
         },
         "interview_type": {
-          "$ref": "#/$defs/InterviewType"
+          "enum": [
+            "behavioral",
+            "hiring_manager",
+            "technical_qa",
+            "case"
+          ],
+          "type": "string"
         },
         "priority": {
           "description": "1 is the first session to run.",

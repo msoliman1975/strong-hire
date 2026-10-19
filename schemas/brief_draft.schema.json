@@ -1,58 +1,5 @@
 {
   "$defs": {
-    "BriefQuestion": {
-      "additionalProperties": false,
-      "properties": {
-        "competencies": {
-          "items": {
-            "$ref": "#/$defs/Competency"
-          },
-          "minItems": 1,
-          "title": "Competencies",
-          "type": "array"
-        },
-        "id": {
-          "description": "Stable id, used as Turn.question_ref.",
-          "pattern": "^[a-z0-9_-]+$",
-          "title": "Id",
-          "type": "string"
-        },
-        "priority": {
-          "description": "1 is asked first.",
-          "minimum": 1,
-          "title": "Priority",
-          "type": "integer"
-        },
-        "probe_hints": {
-          "items": {
-            "type": "string"
-          },
-          "title": "Probe Hints",
-          "type": "array"
-        },
-        "text": {
-          "minLength": 1,
-          "title": "Text",
-          "type": "string"
-        },
-        "values": {
-          "description": "Company values this question probes (target_values).",
-          "items": {
-            "type": "string"
-          },
-          "title": "Values",
-          "type": "array"
-        }
-      },
-      "required": [
-        "id",
-        "text",
-        "competencies",
-        "priority"
-      ],
-      "title": "BriefQuestion",
-      "type": "object"
-    },
     "Competency": {
       "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.",
       "enum": [
@@ -82,6 +29,76 @@
       ],
       "title": "Competency",
       "type": "string"
+    },
+    "DraftQuestion": {
+      "additionalProperties": false,
+      "description": "One question as the planner model writes it. The worker turns it into a BriefQuestion;\nonly code sets the source, must-ask and verbatim fields.",
+      "properties": {
+        "category": {
+          "anyOf": [
+            {
+              "enum": [
+                "behavioral",
+                "hiring_manager",
+                "technical_qa",
+                "case"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Custom sessions only: one of the session's categories."
+        },
+        "competencies": {
+          "items": {
+            "$ref": "#/$defs/Competency"
+          },
+          "minItems": 1,
+          "title": "Competencies",
+          "type": "array"
+        },
+        "id": {
+          "pattern": "^[a-z0-9_-]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "priority": {
+          "description": "1 is asked first.",
+          "minimum": 1,
+          "title": "Priority",
+          "type": "integer"
+        },
+        "probe_hints": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Probe Hints",
+          "type": "array"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "values": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Values",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "text",
+        "competencies",
+        "priority"
+      ],
+      "title": "DraftQuestion",
+      "type": "object"
     }
   },
   "$id": "https://strong-hire.local/schemas/brief_draft.schema.json",
@@ -104,7 +121,7 @@
     },
     "questions": {
       "items": {
-        "$ref": "#/$defs/BriefQuestion"
+        "$ref": "#/$defs/DraftQuestion"
       },
       "maxItems": 12,
       "minItems": 6,

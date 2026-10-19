@@ -27,12 +27,42 @@ class RoleFamily(StrEnum):
 
 
 class InterviewType(StrEnum):
-    """The four v1 interview types (IV-2)."""
+    """The four v1 interview types (IV-2), plus Custom (CU-1).
+
+    A Custom session mixes 1 to 3 of the four standard types as question categories
+    (`SessionConfig.custom`). Custom is never a question category itself and has no entry in
+    COMPETENCIES_BY_TYPE; use `session_competencies(config)` for a session's competency pool.
+    """
 
     BEHAVIORAL = "behavioral"
     HIRING_MANAGER = "hiring_manager"
     TECHNICAL_QA = "technical_qa"
     CASE = "case"
+    CUSTOM = "custom"
+
+
+STANDARD_INTERVIEW_TYPES: tuple[InterviewType, ...] = (
+    InterviewType.BEHAVIORAL,
+    InterviewType.HIRING_MANAGER,
+    InterviewType.TECHNICAL_QA,
+    InterviewType.CASE,
+)
+"""The types that are also question categories in a Custom session (CU-1)."""
+
+
+class QuestionSource(StrEnum):
+    """Who wrote a brief question: the planner, or the candidate in a Custom session (CU-3)."""
+
+    PLANNER = "planner"
+    CANDIDATE = "candidate"
+
+
+class QuestionRefusal(StrEnum):
+    """CU-5: why a candidate's own question or focus chip is refused."""
+
+    NOT_A_QUESTION = "not_a_question"
+    INAPPROPRIATE = "inappropriate"  # abuse, harassment, threats, hate or sexual content (IV-12)
+    INSTRUCTIONS = "instructions"  # text that tries to instruct the interviewer
 
 
 class Difficulty(StrEnum):
@@ -113,6 +143,7 @@ class Competency(StrEnum):
     RECOMMENDATION = "recommendation"
 
 
+# The four standard types only. Custom sessions take the union over their categories.
 COMPETENCIES_BY_TYPE: dict[InterviewType, tuple[Competency, ...]] = {
     InterviewType.BEHAVIORAL: (
         Competency.OWNERSHIP,

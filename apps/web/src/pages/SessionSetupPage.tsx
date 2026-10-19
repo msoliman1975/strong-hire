@@ -18,7 +18,8 @@ import {
   modeLabel,
 } from "../labels";
 
-const TYPES = Object.keys(interviewTypeLabel) as InterviewType[];
+// Custom (CU-1) has its own setup screen.
+const TYPES = (Object.keys(interviewTypeLabel) as InterviewType[]).filter((t) => t !== "custom");
 const DIFFICULTIES = Object.keys(difficultyLabel) as Difficulty[];
 const MODES = Object.keys(modeLabel) as Mode[];
 const LEVELS = Object.keys(levelLabel) as Level[];
@@ -123,7 +124,14 @@ export function SessionSetupPage() {
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!chosenLevel) return;
-    start.mutate({ interview_type: type, difficulty, mode, duration_min: chosenDuration, level: chosenLevel });
+    start.mutate({
+      interview_type: type,
+      difficulty,
+      mode,
+      duration_min: chosenDuration,
+      level: chosenLevel,
+      custom: null,
+    });
   };
 
   return (

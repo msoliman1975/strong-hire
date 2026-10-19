@@ -119,6 +119,7 @@ USER_OWNED_TABLES = (
     "minute_grants",
     "voice_turn_timings",
     "sim_runs",
+    "saved_questions",
 )
 
 # Platform tables: no org_id, not owned by one user. A test checks that every table is in
@@ -405,6 +406,9 @@ class InterviewSession(Base):
     )
     profile_version: Mapped[int | None] = mapped_column(Integer, comment="NULL in generic mode")
     brief_json: Mapped[dict[str, Any] | None] = mapped_column(comment="schemas.InterviewerBrief")
+    custom_json: Mapped[dict[str, Any] | None] = mapped_column(
+        comment="CU-1: schemas.CustomSessionSpec. NULL for the four standard types"
+    )
     model_profile: Mapped[str | None] = mapped_column(
         String(20), comment="PL-6: MODEL_PROFILE the session ran on"
     )
@@ -665,6 +669,31 @@ class MinuteGrant(Base):
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     revoked_by: Mapped[str | None] = mapped_column(String(320), comment="Admin email")
     created_at: Mapped[datetime] = _created_at()
+
+
+class SavedQuestion(Base):
+    """CU-8: a candidate's own question, kept for later Custom sessions."""
+
+    __tablename__ = "saved_questions"
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    org_id: Mapped[uuid.UUID] = _org_fk()
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    text: Mapped[str] = mapped_column(Text, comment="schemas.CustomQuestion.text")
+    category: Mapped[InterviewType] = mapped_column(
+        str_enum(InterviewType, "saved_question_category"),
+        comment="One of the four standard types, never custom",
+    )
+    competencies: Mapped[list[Any]] = mapped_column(comment="list of schemas.Competency values")
+    bank_ref: Mapped[str | None] = mapped_column(
+        String(200), comment="Question bank id when added from the Questions page"
+    )
+    created_at: Mapped[datetime] = _created_at()
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
 
 
 class VoiceTurnTiming(Base):

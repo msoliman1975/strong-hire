@@ -3,6 +3,24 @@
     "BriefQuestion": {
       "additionalProperties": false,
       "properties": {
+        "category": {
+          "anyOf": [
+            {
+              "enum": [
+                "behavioral",
+                "hiring_manager",
+                "technical_qa",
+                "case"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Custom sessions only: the question's category (CU-1)."
+        },
         "competencies": {
           "items": {
             "$ref": "#/$defs/Competency"
@@ -17,6 +35,12 @@
           "title": "Id",
           "type": "string"
         },
+        "must_ask": {
+          "default": false,
+          "description": "CU-4: the session controller asks it before CANDIDATE_QUESTIONS.",
+          "title": "Must Ask",
+          "type": "boolean"
+        },
         "priority": {
           "description": "1 is asked first.",
           "minimum": 1,
@@ -30,6 +54,11 @@
           "title": "Probe Hints",
           "type": "array"
         },
+        "source": {
+          "$ref": "#/$defs/QuestionSource",
+          "default": "planner",
+          "description": "CU-3: candidate for the candidate's own."
+        },
         "text": {
           "minLength": 1,
           "title": "Text",
@@ -42,6 +71,12 @@
           },
           "title": "Values",
           "type": "array"
+        },
+        "verbatim": {
+          "default": false,
+          "description": "CU-4: read the text word for word.",
+          "title": "Verbatim",
+          "type": "boolean"
         }
       },
       "required": [
@@ -83,6 +118,137 @@
       "title": "Competency",
       "type": "string"
     },
+    "CustomCategory": {
+      "additionalProperties": false,
+      "description": "One question category in a Custom session (CU-1, CU-2).",
+      "properties": {
+        "category": {
+          "enum": [
+            "behavioral",
+            "hiring_manager",
+            "technical_qa",
+            "case"
+          ],
+          "type": "string"
+        },
+        "focus": {
+          "description": "Topics to focus on, for example 'conflict' or 'Kubernetes' (CU-2).",
+          "items": {
+            "maxLength": 60,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 8,
+          "title": "Focus",
+          "type": "array"
+        },
+        "share": {
+          "description": "Share of the core time. Shares add up to 1.",
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Share",
+          "type": "number"
+        }
+      },
+      "required": [
+        "category",
+        "share"
+      ],
+      "title": "CustomCategory",
+      "type": "object"
+    },
+    "CustomQuestion": {
+      "additionalProperties": false,
+      "description": "A question the candidate wrote or saved (CU-3, CU-4).",
+      "properties": {
+        "category": {
+          "enum": [
+            "behavioral",
+            "hiring_manager",
+            "technical_qa",
+            "case"
+          ],
+          "type": "string"
+        },
+        "competencies": {
+          "description": "From COMPETENCIES_BY_TYPE for the category. Tagged by the CU-5 check.",
+          "items": {
+            "$ref": "#/$defs/Competency"
+          },
+          "maxItems": 3,
+          "minItems": 1,
+          "title": "Competencies",
+          "type": "array"
+        },
+        "must_ask": {
+          "default": true,
+          "description": "CU-4: the session controller asks it.",
+          "title": "Must Ask",
+          "type": "boolean"
+        },
+        "saved_question_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "CU-8: the saved_questions row it came from.",
+          "title": "Saved Question Id"
+        },
+        "text": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "verbatim": {
+          "default": false,
+          "description": "CU-4: read the text word for word.",
+          "title": "Verbatim",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "text",
+        "category",
+        "competencies"
+      ],
+      "title": "CustomQuestion",
+      "type": "object"
+    },
+    "CustomSessionSpec": {
+      "additionalProperties": false,
+      "description": "What the candidate builds for a Custom session. Stored in sessions.custom_json.",
+      "properties": {
+        "categories": {
+          "items": {
+            "$ref": "#/$defs/CustomCategory"
+          },
+          "maxItems": 3,
+          "minItems": 1,
+          "title": "Categories",
+          "type": "array"
+        },
+        "questions": {
+          "items": {
+            "$ref": "#/$defs/CustomQuestion"
+          },
+          "maxItems": 8,
+          "title": "Questions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "categories"
+      ],
+      "title": "CustomSessionSpec",
+      "type": "object"
+    },
     "Difficulty": {
       "description": "IV-4.",
       "enum": [
@@ -94,12 +260,13 @@
       "type": "string"
     },
     "InterviewType": {
-      "description": "The four v1 interview types (IV-2).",
+      "description": "The four v1 interview types (IV-2), plus Custom (CU-1).\n\nA Custom session mixes 1 to 3 of the four standard types as question categories\n(`SessionConfig.custom`). Custom is never a question category itself and has no entry in\nCOMPETENCIES_BY_TYPE; use `session_competencies(config)` for a session's competency pool.",
       "enum": [
         "behavioral",
         "hiring_manager",
         "technical_qa",
-        "case"
+        "case",
+        "custom"
       ],
       "title": "InterviewType",
       "type": "string"
@@ -185,10 +352,31 @@
       "title": "PhaseTime",
       "type": "object"
     },
+    "QuestionSource": {
+      "description": "Who wrote a brief question: the planner, or the candidate in a Custom session (CU-3).",
+      "enum": [
+        "planner",
+        "candidate"
+      ],
+      "title": "QuestionSource",
+      "type": "string"
+    },
     "SessionConfig": {
       "additionalProperties": false,
       "description": "What the candidate picks before a session (journey 2, step 1).",
       "properties": {
+        "custom": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CustomSessionSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "CU-1: required for the Custom type, absent for the others."
+        },
         "difficulty": {
           "$ref": "#/$defs/Difficulty"
         },

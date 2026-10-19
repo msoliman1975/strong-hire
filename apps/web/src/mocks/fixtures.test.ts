@@ -81,14 +81,14 @@ describe("mock payloads match the packages/core schemas", () => {
     await expect(
       sessionsApi.create({
         job_target_id: job.id,
-        config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min: 30, level: "senior" },
+        config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min: 30, level: "senior", custom: null },
         channel: "voice",
       }),
     ).rejects.toMatchObject({ status: 402, code: "full_interview_requires_plan" });
     await billingApi.checkout(); // the mock turns the plan on at once
     const session = await sessionsApi.create({
       job_target_id: job.id,
-      config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min: 30, level: "senior" },
+      config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min: 30, level: "senior", custom: null },
       channel: "voice",
     });
     await sessionsApi.joinVoice(session.id);

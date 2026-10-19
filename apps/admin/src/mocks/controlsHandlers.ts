@@ -18,6 +18,7 @@ export const MOCK_DEFAULTS: RuntimeSettings = {
   jobs_paused: [],
   sim_paused: false,
   sim_max_live_sessions: 3,
+  custom_interview_access: "everyone",
 };
 
 const KEYS = Object.keys(MOCK_DEFAULTS) as SettingKey[];
