@@ -8,7 +8,7 @@ import { http, HttpResponse } from "msw/http";
 import type { SessionReplay, SimOptions, SimRun, SimRunIn, SimRunStatus } from "../api/sim";
 import { opsState } from "./controlsHandlers";
 import { newId, type MockDb, type MockStore } from "./db";
-import { API, isMockAdmin } from "./handlers";
+import { API, currentAdmin } from "./handlers";
 
 export const MOCK_SIM_SESSION = "00000000-0000-4000-8000-0000000005e1";
 const MAX_WAITING = 5;
@@ -201,10 +201,7 @@ function estimate(minutes: number) {
 }
 
 export function simHandlers(store: MockStore) {
-  const admin = () => {
-    const { auth } = store.db;
-    return auth.status === "signed_in" && auth.userEmail && isMockAdmin(auth.userEmail) ? auth.userEmail : null;
-  };
+  const admin = () => currentAdmin(store.db)?.email ?? null;
   const notFound = (detail = "Not Found") => HttpResponse.json({ detail }, { status: 404 });
   const forbidden = () => HttpResponse.json({ detail: "X-Admin-Request: 1 is required" }, { status: 403 });
   const conflict = (detail: string) => HttpResponse.json({ detail }, { status: 409 });

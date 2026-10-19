@@ -17,7 +17,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from strong_api.account import install_account
-from strong_api.admin import install_admin
+from strong_api.admin import install_admin, seed_admins_on_startup
 from strong_api.auth import install_auth
 from strong_api.billing import install_billing
 from strong_api.controls import router as status_router
@@ -85,6 +85,7 @@ def create_app(
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+        await seed_admins_on_startup(app)  # AA-1
         # OB-1 heartbeat, OB-2 usage sink, OB-4 error capture. Not run by the test clients.
         ops = await start_ops("api", maker=app.state.sessionmaker)
         try:

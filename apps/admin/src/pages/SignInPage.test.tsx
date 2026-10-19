@@ -1,6 +1,6 @@
 /**
- * Admin sign-in (D-1, first step of AA-2) and the AA-4 screen rule: only admins get past the
- * sign-in; anyone else sees "Page not found" and can sign out.
+ * Admin sign-in (AA-2) through the admin routes, and the AA-4 screen rule: without a live admin
+ * session the app shows sign-in. Only admins (db.admins) can get a session.
  */
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, within } from "@testing-library/react";
@@ -10,23 +10,10 @@ import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
 import { AppRoutes, createQueryClient } from "../App";
+import { mockLinkToken, mockSignIn } from "../mocks/handlers";
 import { mockStore, server } from "../mocks/node";
 
-function addUser(email: string, password: string) {
-  const n = Object.keys(mockStore.db.users).length + 1;
-  mockStore.db.users[email] = {
-    id: `00000000-0000-4000-8000-00000000000${n}`,
-    org_id: `00000000-0000-4000-8000-00000000001${n}`,
-    email,
-    auth_provider: "password",
-    training_consent: false,
-    created_at: "2026-10-01T10:00:00Z",
-    is_admin: false,
-    full_name: null,
-    profile_complete: true,
-  };
-  mockStore.db.passwords[email] = password;
-}
+const PASSWORD = "correct horse battery";
 
 function renderAt(path: string) {
   const user = userEvent.setup();
@@ -40,19 +27,23 @@ function renderAt(path: string) {
   return user;
 }
 
-describe("admin sign-in (D-1)", () => {
-  it("sends a signed-out visitor to sign-in", async () => {
+async function typeCredentials(user: ReturnType<typeof userEvent.setup>, email: string, password: string) {
+  await user.type(await screen.findByLabelText("Email address"), email);
+  await user.type(screen.getByLabelText("Password"), password);
+  await user.click(screen.getByRole("button", { name: "Sign in" }));
+}
+
+describe("admin sign-in (AA-2)", () => {
+  it("AA-4: sends a visitor without an admin session to sign-in", async () => {
     renderAt("/interviews");
     expect(await screen.findByRole("heading", { name: "Admin sign-in" })).toBeInTheDocument();
     expect(screen.queryByRole("navigation", { name: "Admin" })).not.toBeInTheDocument();
   });
 
   it("signs an admin in with email and password and opens the Overview", async () => {
-    addUser("admin@example.com", "correct horse battery");
+    mockStore.db.passwords["admin@example.com"] = PASSWORD;
     const user = renderAt("/signin");
-    await user.type(await screen.findByLabelText("Email address"), "admin@example.com");
-    await user.type(screen.getByLabelText("Password"), "correct horse battery");
-    await user.click(screen.getByRole("button", { name: "Sign in" }));
+    await typeCredentials(user, "admin@example.com", PASSWORD);
     expect(await screen.findByRole("heading", { name: "Overview", level: 1 })).toBeInTheDocument();
     const nav = screen.getByRole("navigation", { name: "Admin" });
     // The first text node is the section name; a count badge (Alerts) may follow it.
@@ -71,25 +62,31 @@ describe("admin sign-in (D-1)", () => {
       "Companies",
       "Company requests",
       "Audit log",
+      "Admins",
+      "My sessions",
     ]);
     expect(screen.getByText("admin@example.com")).toBeInTheDocument();
     expect(await screen.findByTitle("Model profile on this server")).toHaveTextContent("fake");
   });
 
-  it("shows the API's message for a wrong password", async () => {
-    addUser("admin@example.com", "correct horse battery");
+  it("shows the API's message for a wrong password, or for someone who is not an admin", async () => {
+    mockStore.db.passwords["admin@example.com"] = PASSWORD;
+    mockStore.db.passwords["ana@example.com"] = PASSWORD;
     const user = renderAt("/signin");
-    await user.type(await screen.findByLabelText("Email address"), "admin@example.com");
-    await user.type(screen.getByLabelText("Password"), "wrong");
-    await user.click(screen.getByRole("button", { name: "Sign in" }));
+    await typeCredentials(user, "admin@example.com", "wrong");
     expect(await screen.findByText("The email or password is wrong.")).toBeInTheDocument();
+    await user.clear(screen.getByLabelText("Email address"));
+    await user.clear(screen.getByLabelText("Password"));
+    await typeCredentials(user, "ana@example.com", PASSWORD);
+    expect(await screen.findByText("The email or password is wrong.")).toBeInTheDocument();
+    expect(mockStore.db.signedIn).toBeNull();
   });
 
-  it("asks for an email link that returns to the admin app", async () => {
+  it("asks the admin routes for an email link, with the same answer for everyone", async () => {
     let asked: string | null = null;
     server.use(
-      http.post("*/api/auth/magic-link", ({ request }) => {
-        asked = new URL(request.url).searchParams.get("app");
+      http.post("*/api/admin/auth/link", async ({ request }) => {
+        asked = ((await request.json()) as { email: string }).email;
         return HttpResponse.json({ sent: true, dev_link: null }, { status: 202 });
       }),
     );
@@ -99,46 +96,38 @@ describe("admin sign-in (D-1)", () => {
     await user.type(screen.getByLabelText("Email address"), "admin@example.com");
     await user.click(screen.getByRole("button", { name: "Email me a sign-in link" }));
     expect(await screen.findByText(/a sign-in link is on its way/)).toBeInTheDocument();
-    expect(asked).toBe("admin");
+    expect(asked).toBe("admin@example.com");
   });
 
-  it("offers Google sign-in that returns to the admin app", async () => {
+  it("signs in from the email link page", async () => {
+    renderAt(`/signin/verify?token=${encodeURIComponent(mockLinkToken("admin@example.com"))}`);
+    expect(await screen.findByRole("heading", { name: "Overview", level: 1 })).toBeInTheDocument();
+    expect(mockStore.db.signedIn).not.toBeNull();
+  });
+
+  it("explains an email link that did not work", async () => {
+    renderAt("/signin/verify?token=bad");
+    expect(await screen.findByText("That link is not valid. Ask for a new one.")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Back to sign-in" })).toHaveAttribute("href", "/signin");
+  });
+
+  it("offers Google sign-in through the admin routes", async () => {
     renderAt("/signin");
     const google = await screen.findByRole("link", { name: "Sign in with Google" });
-    expect(google).toHaveAttribute("href", expect.stringMatching(/\/api\/auth\/google\/login\?app=admin$/));
+    expect(google).toHaveAttribute("href", expect.stringMatching(/\/api\/admin\/auth\/google\/login$/));
   });
 
-  it("explains a link that did not work", async () => {
-    renderAt("/signin?error=link_expired");
-    expect(await screen.findByText("That link has expired. Ask for a new one.")).toBeInTheDocument();
-  });
-
-  it("AA-4: a signed-in candidate sees Page not found and can sign out", async () => {
-    addUser("ana@example.com", "candidate password");
-    const user = renderAt("/signin");
-    await user.type(await screen.findByLabelText("Email address"), "ana@example.com");
-    await user.type(screen.getByLabelText("Password"), "candidate password");
-    await user.click(screen.getByRole("button", { name: "Sign in" }));
-    expect(await screen.findByRole("heading", { name: "Page not found" })).toBeInTheDocument();
-    expect(screen.queryByRole("navigation", { name: "Admin" })).not.toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Sign out" }));
-    expect(await screen.findByRole("heading", { name: "Admin sign-in" })).toBeInTheDocument();
-    expect(mockStore.db.auth.status).toBe("signed_out");
-  });
-
-  it("AA-4: a pending candidate sign-up never reaches the admin pages", async () => {
-    mockStore.db.auth = { status: "needs_signup", email: "new@example.com", userEmail: null };
-    renderAt("/users");
-    expect(await screen.findByRole("heading", { name: "Page not found" })).toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: "Users" })).not.toBeInTheDocument();
+  it("explains a Google account that is not an admin", async () => {
+    renderAt("/signin?error=not_admin");
+    expect(await screen.findByText("That Google account may not use the admin app.")).toBeInTheDocument();
   });
 
   it("signs an admin out", async () => {
-    addUser("admin@example.com", "correct horse battery");
-    mockStore.db.auth = { status: "signed_in", email: "admin@example.com", userEmail: "admin@example.com" };
+    mockSignIn(mockStore, "admin@example.com");
     const user = renderAt("/audit");
     expect(await screen.findByRole("heading", { name: "Audit log" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Sign out" }));
     expect(await screen.findByRole("heading", { name: "Admin sign-in" })).toBeInTheDocument();
+    expect(mockStore.db.signedIn).toBeNull();
   });
 });

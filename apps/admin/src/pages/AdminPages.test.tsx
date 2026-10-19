@@ -10,6 +10,7 @@ import { describe, expect, it } from "vitest";
 
 import { AppRoutes, createQueryClient } from "../App";
 import type { SessionRecord } from "../api/types";
+import { mockSignIn } from "../mocks/handlers";
 import { mockStore } from "../mocks/node";
 import { mockReplay, simState } from "../mocks/simHandlers";
 
@@ -23,13 +24,12 @@ function addUser(email: string, isAdmin: boolean, consent = false) {
     auth_provider: "dev",
     training_consent: consent,
     created_at: "2026-10-01T10:00:00Z",
-    is_admin: isAdmin,
     full_name: "Ana Lopez",
     profile_complete: true,
   };
 }
 
-function seed({ consent = false, signedInAs = "admin@example.com" } = {}) {
+function seed({ consent = false, signedInAs = "admin@example.com" as string | null } = {}) {
   addUser("ana@example.com", false, consent);
   addUser("admin@example.com", true);
   const session: SessionRecord = {
@@ -52,7 +52,7 @@ function seed({ consent = false, signedInAs = "admin@example.com" } = {}) {
     failure_reason: null,
   };
   mockStore.db.sessions.push(session);
-  mockStore.db.auth = { status: "signed_in", email: signedInAs, userEmail: signedInAs };
+  if (signedInAs) mockSignIn(mockStore, signedInAs);
 }
 
 function renderAt(path: string) {
@@ -68,10 +68,10 @@ function renderAt(path: string) {
 }
 
 describe("admin pages (R2, AI pages moved)", () => {
-  it("AA-4: are hidden from users who are not admins", async () => {
-    seed({ signedInAs: "ana@example.com" });
+  it("AA-4: need an admin session; without one the app shows sign-in", async () => {
+    seed({ signedInAs: null });
     renderAt("/interviews");
-    expect(await screen.findByRole("heading", { name: "Page not found" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Admin sign-in" })).toBeInTheDocument();
     expect(screen.queryByRole("navigation", { name: "Admin" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Interviews" })).not.toBeInTheDocument();
   });

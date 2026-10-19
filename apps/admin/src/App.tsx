@@ -11,7 +11,9 @@ import { AlertRulesPage } from "./pages/AlertRulesPage";
 import { AdminSessionPage } from "./pages/AdminSessionPage";
 import { AdminSessionsPage } from "./pages/AdminSessionsPage";
 import { AdminUserPage } from "./pages/AdminUserPage";
+import { AdminsPage } from "./pages/AdminsPage";
 import { AdminUsersPage } from "./pages/AdminUsersPage";
+import { MySessionsPage } from "./pages/MySessionsPage";
 import { ControlsPage } from "./pages/ControlsPage";
 import { OpsErrorsPage, OpsHealthPage, OpsJobsPage, OpsPerformancePage, OpsSpendPage } from "./pages/OpsPages";
 import { OverviewPage } from "./pages/OverviewPage";
@@ -21,6 +23,7 @@ import { CompanyRequestsPage } from "./pages/CompanyRequestsPage";
 import { ReplayPage } from "./pages/ReplayPage";
 import { SignInPage } from "./pages/SignInPage";
 import { SimulationsPage } from "./pages/SimulationsPage";
+import { VerifyLinkPage } from "./pages/VerifyLinkPage";
 
 export function createQueryClient(): QueryClient {
   return new QueryClient({
@@ -39,6 +42,7 @@ export function AppRoutes() {
   return (
     <Routes>
       <Route path="/signin" element={<SignInPage />} />
+      <Route path="/signin/verify" element={<VerifyLinkPage />} />
       <Route element={<Shell />}>
         <Route index element={<Navigate to="/overview" replace />} />
         <Route path="/overview" element={<OverviewPage />} />
@@ -63,6 +67,9 @@ export function AppRoutes() {
         <Route path="/content/companies" element={<CompaniesPage />} />
         <Route path="/content/companies/:slug" element={<CompanyPage />} />
         <Route path="/content/requests" element={<CompanyRequestsPage />} />
+        <Route path="/settings" element={<Navigate to="/settings/admins" replace />} />
+        <Route path="/settings/admins" element={<AdminsPage />} />
+        <Route path="/settings/sessions" element={<MySessionsPage />} />
         <Route path="*" element={<Navigate to="/overview" replace />} />
       </Route>
     </Routes>

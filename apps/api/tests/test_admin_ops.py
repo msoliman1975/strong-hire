@@ -58,7 +58,7 @@ from strong_core.schemas import (
 )
 from strong_core.schemas.enums import ErrorGroupStatus
 
-from .conftest import InlineQueue, sign_in
+from .conftest import InlineQueue, sign_in, sign_in_admin
 
 Maker = async_sessionmaker[AsyncSession]
 ADMIN = "boss@example.com"
@@ -97,7 +97,6 @@ class FakeRedis:
 def app(
     sessionmaker: Maker, queue: InlineQueue, export_store: Any, monkeypatch: pytest.MonkeyPatch
 ) -> Iterator[FastAPI]:
-    monkeypatch.setenv("ADMIN_EMAILS", ADMIN)
     monkeypatch.delenv("INFRA_MONTHLY_USD", raising=False)
     monkeypatch.delenv("SHADOW_STT_USD_PER_SECOND", raising=False)
     monkeypatch.delenv("SHADOW_TTS_USD_PER_CHARACTER", raising=False)
@@ -124,7 +123,8 @@ def app(
 async def admin(app: FastAPI) -> AsyncIterator[httpx.AsyncClient]:
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as http:
-        await sign_in(http, ADMIN)
+        await sign_in(http, ADMIN)  # the admin's candidate account
+        await sign_in_admin(http, app, ADMIN)  # AA-4: the admin session
         yield http
 
 

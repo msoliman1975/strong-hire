@@ -9,7 +9,7 @@
                                      the saved sim runs (same consent rule); answers Range (SM-7)
     GET /admin/audit                 the audit log (admin views by default)
 
-Only ADMIN_EMAILS users may call these routes. Everyone else, signed in or not, gets 404.
+Only a signed-in admin (an admin session, AA-4) may call these routes. Everyone else gets 404.
 Consent is read at view time, so turning it off hides old transcripts and traces too. Each view
 or download of a transcript, traces or audio writes an audit_logs row.
 
@@ -38,6 +38,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from strong_api.admin import metrics as m
 from strong_api.admin.deps import Admin, admin_settings
+from strong_api.admin.identity import AdminPrincipal
 from strong_api.admin.schemas import (
     AdminAuditEntry,
     AdminCostLine,
@@ -274,7 +275,9 @@ def _trace_out(row: InterviewerTrace) -> AdminTrace:
     )
 
 
-def _audit(admin: User, action: str, row: InterviewSession, details: dict[str, Any]) -> AuditLog:
+def _audit(
+    admin: AdminPrincipal, action: str, row: InterviewSession, details: dict[str, Any]
+) -> AuditLog:
     return AuditLog(
         org_id=row.org_id,
         actor=admin.email,

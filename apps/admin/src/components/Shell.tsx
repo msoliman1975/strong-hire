@@ -8,7 +8,7 @@ import { useAuth, useSignOut } from "../api/hooks";
 import { FiringCount } from "./alerts";
 import { Brand } from "./Brand";
 import { applyTheme, savedTheme, systemTheme, type Theme } from "./theme";
-import { ErrorNotice, Loading, PageHead } from "./ui";
+import { ErrorNotice, Loading } from "./ui";
 
 /**
  * The sections of the admin app (Information architecture in docs/admin-spec.md). Only the ones
@@ -30,6 +30,8 @@ const SECTIONS: { to: string; label: string; group?: string; badge?: ComponentTy
   { to: "/content/companies", label: "Companies", group: "Content" },
   { to: "/content/requests", label: "Company requests", group: "Content" },
   { to: "/audit", label: "Audit log" },
+  { to: "/settings/admins", label: "Admins", group: "Settings" },
+  { to: "/settings/sessions", label: "My sessions", group: "Settings" },
 ];
 
 /**
@@ -111,9 +113,8 @@ function SignOutButton() {
 }
 
 /**
- * AA-4 on the screen: only admins see the app. Anyone else who is signed in (or a sign-in that
- * would need a candidate sign-up) gets "Page not found" and a way to sign out. The API answers 404
- * to them as well, so this check is for the screen only.
+ * AA-4 on the screen: without a live admin session (GET /admin/me answers 401) the app shows
+ * sign-in. Only admins can get a session, so there is no "not an admin" state here.
  */
 export function Shell() {
   const auth = useAuth();
@@ -125,21 +126,8 @@ export function Shell() {
       </main>
     );
   }
-  const state = auth.data;
-  if (state.status === "signed_out") return <Navigate to="/signin" replace />;
-  if (!state.user?.is_admin) {
-    return (
-      <main id="main" className="centered">
-        <div className="card">
-          <PageHead title="Page not found">
-            <p>This page does not exist.</p>
-          </PageHead>
-          <p className="muted">Signed in as {state.email}.</p>
-          <SignOutButton />
-        </div>
-      </main>
-    );
-  }
+  const me = auth.data;
+  if (!me) return <Navigate to="/signin" replace />;
 
   return (
     <div className="shell">
@@ -182,8 +170,8 @@ export function Shell() {
           </ul>
         </nav>
         <div className="sidebar__end">
-          <p className="who" title={state.email ?? undefined}>
-            {state.email}
+          <p className="who" title={me.email}>
+            {me.email}
           </p>
           <div className="row">
             <SignOutButton />

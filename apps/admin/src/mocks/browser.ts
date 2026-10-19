@@ -5,8 +5,8 @@
  * VITE_API_MOCKS:
  *   off (default)  no mocks: the admin app uses the real API (the Docker stack on port 8700)
  *   all            mock everything, with seeded data; no API needed. Sign in as
- *                  admin@example.com (password "admin-password") or ana@example.com
- *                  ("candidate-password", not an admin).
+ *                  admin@example.com (password "admin-password"). ana@example.com is a
+ *                  candidate, not an admin, so the admin sign-in refuses her.
  */
 import { setupWorker } from "msw/browser";
 
@@ -14,8 +14,9 @@ import { adminHandlers } from "./adminHandlers";
 import { alertsHandlers } from "./alertsHandlers";
 import { controlsHandlers } from "./controlsHandlers";
 import { contentHandlers } from "./contentHandlers";
-import { createStore, type MockDb } from "./db";
+import { createStore, mockAdmin, type MockDb } from "./db";
 import { authHandlers } from "./handlers";
+import { settingsHandlers } from "./settingsHandlers";
 import { usersHandlers } from "./usersHandlers";
 import { opsHandlers } from "./opsHandlers";
 import { simHandlers } from "./simHandlers";
@@ -34,7 +35,6 @@ function seed(db: MockDb): void {
     auth_provider: "password" as const,
     training_consent: consent,
     created_at: "2026-10-01T10:00:00Z",
-    is_admin: false,
     full_name: null,
     profile_complete: true,
   });
@@ -42,6 +42,7 @@ function seed(db: MockDb): void {
   db.users["admin@example.com"] = user("admin@example.com", 9, false);
   db.passwords["ana@example.com"] = "candidate-password";
   db.passwords["admin@example.com"] = "admin-password";
+  db.admins.push(mockAdmin("ops@example.com", 2, "admin@example.com"));
   db.sessions.push({
     id: "00000000-0000-4000-8000-0000000000c1",
     job_target_id: "00000000-0000-4000-8000-0000000000d1",
@@ -60,7 +61,7 @@ function seed(db: MockDb): void {
 export async function startMocks(mode: MockMode): Promise<void> {
   if (mode === "off") return;
   const store = createStore({ persist: true, seed });
-  await setupWorker(...authHandlers(store), ...adminHandlers(store), ...alertsHandlers(store), ...controlsHandlers(store), ...usersHandlers(store), ...opsHandlers(store), ...simHandlers(store), ...contentHandlers(store)).start({
+  await setupWorker(...authHandlers(store), ...adminHandlers(store), ...alertsHandlers(store), ...controlsHandlers(store), ...usersHandlers(store), ...opsHandlers(store), ...simHandlers(store), ...contentHandlers(store), ...settingsHandlers(store)).start({
     onUnhandledFrame: "bypass",
     quiet: true,
   });

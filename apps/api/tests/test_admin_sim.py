@@ -27,7 +27,7 @@ from strong_core.schemas import HireSignal, SessionStatus, UsageComponent
 from strong_core.schemas.enums import SimRunStatus
 
 from .accounts_support import add_session
-from .conftest import InlineQueue, sign_in
+from .conftest import InlineQueue, sign_in, sign_in_admin
 
 Maker = async_sessionmaker[AsyncSession]
 ADMIN = "boss@example.com"
@@ -66,7 +66,10 @@ def app(
 
 async def _client(app: FastAPI, email: str) -> httpx.AsyncClient:
     http = httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test")
-    await sign_in(http, email)
+    if email == ADMIN:
+        await sign_in_admin(http, app, ADMIN)
+    else:
+        await sign_in(http, email)
     return http
 
 

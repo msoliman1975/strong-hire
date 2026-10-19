@@ -1664,31 +1664,15 @@
         ],
         "summary": "Send Magic Link",
         "operationId": "send_magic_link_auth_magic_link_post",
-        "parameters": [
-          {
-            "name": "app",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "enum": [
-                "web",
-                "admin"
-              ],
-              "type": "string",
-              "default": "web",
-              "title": "App"
-            }
-          }
-        ],
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/MagicLinkRequest"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "202": {
@@ -1730,20 +1714,6 @@
               "type": "string",
               "title": "Token"
             }
-          },
-          {
-            "name": "app",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "enum": [
-                "web",
-                "admin"
-              ],
-              "type": "string",
-              "default": "web",
-              "title": "App"
-            }
           }
         ],
         "responses": {
@@ -1775,38 +1745,12 @@
         ],
         "summary": "Google Login",
         "operationId": "google_login_auth_google_login_get",
-        "parameters": [
-          {
-            "name": "app",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "enum": [
-                "web",
-                "admin"
-              ],
-              "type": "string",
-              "default": "web",
-              "title": "App"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
               }
             }
           }
@@ -2635,6 +2579,457 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AccountDeletedOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/auth/providers": {
+      "get": {
+        "tags": [
+          "admin-auth"
+        ],
+        "summary": "Admin Providers",
+        "operationId": "admin_providers_admin_auth_providers_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProviders"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/auth/password": {
+      "post": {
+        "tags": [
+          "admin-auth"
+        ],
+        "summary": "Admin Password Sign In",
+        "description": "AA-2: the admin's user account password (AC-4). The account's email must be confirmed,\nso a password set by someone who never proved the inbox cannot open the admin app.",
+        "operationId": "admin_password_sign_in_admin_auth_password_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminPasswordIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMe"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/auth/link": {
+      "post": {
+        "tags": [
+          "admin-auth"
+        ],
+        "summary": "Admin Send Link",
+        "description": "AA-2: a sign-in link goes only to an active admin. The reply is the same either way.",
+        "operationId": "admin_send_link_admin_auth_link_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminLinkIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminLinkSent"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/auth/link/verify": {
+      "post": {
+        "tags": [
+          "admin-auth"
+        ],
+        "summary": "Admin Verify Link",
+        "operationId": "admin_verify_link_admin_auth_link_verify_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminLinkVerifyIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMe"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/auth/google/login": {
+      "get": {
+        "tags": [
+          "admin-auth"
+        ],
+        "summary": "Admin Google Login",
+        "operationId": "admin_google_login_admin_auth_google_login_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/auth/google/callback": {
+      "get": {
+        "tags": [
+          "admin-auth"
+        ],
+        "summary": "Admin Google Callback",
+        "operationId": "admin_google_callback_admin_auth_google_callback_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/auth/signout": {
+      "post": {
+        "tags": [
+          "admin-auth"
+        ],
+        "summary": "Admin Sign Out",
+        "operationId": "admin_sign_out_admin_auth_signout_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        }
+      }
+    },
+    "/admin/me": {
+      "get": {
+        "tags": [
+          "admin-auth"
+        ],
+        "summary": "Admin Me",
+        "operationId": "admin_me_admin_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMe"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No admin session"
+          }
+        }
+      }
+    },
+    "/admin/me/sessions": {
+      "get": {
+        "tags": [
+          "admin-auth"
+        ],
+        "summary": "My Sessions",
+        "description": "AA-8: my live sessions, newest first.",
+        "operationId": "my_sessions_admin_me_sessions_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AdminSignInSession"
+                  },
+                  "type": "array",
+                  "title": "Response My Sessions Admin Me Sessions Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/me/sessions/{session_id}": {
+      "delete": {
+        "tags": [
+          "admin-auth"
+        ],
+        "summary": "Revoke My Session",
+        "description": "AA-8: revoke one of my sessions (the current one too: that signs me out).",
+        "operationId": "revoke_my_session_admin_me_sessions__session_id__delete",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/admins": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List Admins",
+        "operationId": "list_admins_admin_admins_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminAccount"
+                  },
+                  "title": "Response List Admins Admin Admins Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Create Admin",
+        "operationId": "create_admin_admin_admins_post",
+        "parameters": [
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddAdminIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAccount"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/admins/{admin_id}": {
+      "delete": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Remove Admin",
+        "operationId": "remove_admin_admin_admins__admin_id__delete",
+        "parameters": [
+          {
+            "name": "admin_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Admin Id"
+            }
+          },
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveAdminIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAccount"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -5804,6 +6199,84 @@
         "title": "ActionIn",
         "description": "Base for admin write bodies: the reason is required and saved in the audit log."
       },
+      "AddAdminIn": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason",
+            "description": "Why, for the audit log"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reason",
+          "email"
+        ],
+        "title": "AddAdminIn"
+      },
+      "AdminAccount": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "added_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Added By"
+          },
+          "added_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Added At"
+          },
+          "disabled_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Disabled At"
+          },
+          "live_sessions": {
+            "type": "integer",
+            "title": "Live Sessions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "added_by",
+          "added_at",
+          "disabled_at",
+          "live_sessions"
+        ],
+        "title": "AdminAccount"
+      },
       "AdminActionOut": {
         "properties": {
           "action": {
@@ -6353,6 +6826,87 @@
         ],
         "title": "AdminLatencyStat"
       },
+      "AdminLinkIn": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "AdminLinkIn"
+      },
+      "AdminLinkSent": {
+        "properties": {
+          "sent": {
+            "type": "boolean",
+            "title": "Sent",
+            "description": "Always true, so the reply does not say who is an admin."
+          },
+          "dev_link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dev Link",
+            "description": "Only when APP_ENV=local and a link was sent."
+          }
+        },
+        "type": "object",
+        "required": [
+          "sent"
+        ],
+        "title": "AdminLinkSent"
+      },
+      "AdminLinkVerifyIn": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "maxLength": 2000,
+            "title": "Token"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "title": "AdminLinkVerifyIn"
+      },
+      "AdminMe": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "session_expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Session Expires At",
+            "description": "When this session ends unless it is used again (idle 2 h, absolute 12 h)."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "session_expires_at"
+        ],
+        "title": "AdminMe"
+      },
       "AdminMessage": {
         "properties": {
           "role": {
@@ -6574,6 +7128,50 @@
           "quality"
         ],
         "title": "AdminOverview"
+      },
+      "AdminPasswordIn": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 128,
+            "title": "Password"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "AdminPasswordIn"
+      },
+      "AdminProviders": {
+        "properties": {
+          "google": {
+            "type": "boolean",
+            "title": "Google"
+          },
+          "email": {
+            "type": "boolean",
+            "title": "Email",
+            "default": true
+          },
+          "password": {
+            "type": "boolean",
+            "title": "Password",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "google"
+        ],
+        "title": "AdminProviders"
       },
       "AdminRefund": {
         "properties": {
@@ -7070,6 +7668,76 @@
           "limit"
         ],
         "title": "AdminSessionList"
+      },
+      "AdminSignInSession": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "last_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Seen At"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At",
+            "description": "The absolute end, 12 h after sign-in."
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At",
+            "description": "When it ends unless it is used again."
+          },
+          "ip": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ip"
+          },
+          "user_agent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Agent"
+          },
+          "current": {
+            "type": "boolean",
+            "title": "Current",
+            "description": "The session of this request."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "created_at",
+          "last_seen_at",
+          "expires_at",
+          "ends_at",
+          "ip",
+          "user_agent",
+          "current"
+        ],
+        "title": "AdminSignInSession",
+        "description": "AA-8: one of my admin sessions."
       },
       "AdminSubscription": {
         "properties": {
@@ -8759,12 +9427,6 @@
             "type": "string",
             "format": "date-time",
             "title": "Created At"
-          },
-          "is_admin": {
-            "type": "boolean",
-            "title": "Is Admin",
-            "description": "True for ADMIN_EMAILS users: the web app shows Admin.",
-            "default": false
           },
           "full_name": {
             "anyOf": [
@@ -13936,6 +14598,23 @@
           "url"
         ],
         "title": "RedirectOut"
+      },
+      "RemoveAdminIn": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason",
+            "description": "Why, for the audit log"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "title": "RemoveAdminIn"
       },
       "ReplayAudio": {
         "properties": {

@@ -7,7 +7,7 @@ import { http, HttpResponse } from "msw/http";
 
 import type { ModelProfile, OpsSettings, RuntimeSettings, SettingKey } from "../api/controls";
 import type { MockDb, MockStore } from "./db";
-import { API, isMockAdmin } from "./handlers";
+import { API, currentAdmin } from "./handlers";
 
 export const MOCK_DEFAULTS: RuntimeSettings = {
   signups_paused: false,
@@ -104,10 +104,7 @@ function check(key: SettingKey, value: unknown): string | null {
 }
 
 export function controlsHandlers(store: MockStore) {
-  const admin = () => {
-    const { auth } = store.db;
-    return auth.status === "signed_in" && auth.userEmail && isMockAdmin(auth.userEmail) ? auth.userEmail : null;
-  };
+  const admin = () => currentAdmin(store.db)?.email ?? null;
   const notFound = () => HttpResponse.json({ detail: "Not Found" }, { status: 404 });
 
   return [
