@@ -30,9 +30,6 @@ class NullStore:
     async def save_turn(self, session_id: uuid.UUID, turn: Any) -> None:
         return None
 
-    async def save_usage(self, *args: Any, **kwargs: Any) -> None:
-        return None
-
     async def save_provenance(self, session_id: uuid.UUID, prompt_version: str | None) -> None:
         return None
 

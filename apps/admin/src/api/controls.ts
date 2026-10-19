@@ -94,6 +94,14 @@ export function activeControls(settings: OpsSettings, now = Date.now()): string[
   if (v.custom_interview_access !== settings.defaults.custom_interview_access) {
     out.push(v.custom_interview_access === "paid_only" ? "Custom interviews for paid plans only" : "Custom interviews open to everyone");
   }
+  if (v.sim_paused) out.push("AI candidate runs paused");
+  if (v.sim_max_live_sessions !== settings.defaults.sim_max_live_sessions) {
+    out.push(
+      v.sim_max_live_sessions === 0
+        ? "AI candidate runs ignore live interviews"
+        : `AI candidate runs wait at ${v.sim_max_live_sessions} live interviews (default ${settings.defaults.sim_max_live_sessions})`,
+    );
+  }
   for (const { kind, label } of JOB_KINDS) {
     if (v.jobs_paused.includes(kind)) out.push(`${label} jobs paused`);
   }

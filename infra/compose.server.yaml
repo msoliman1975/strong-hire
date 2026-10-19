@@ -33,6 +33,7 @@ services:
     command: ["uvicorn", "strong_api.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--forwarded-allow-ips", "*"]
     environment:
       APP_ENV: staging
+      LOG_FORMAT: json   # OB-7: one JSON object per log line (service, request_id, session_id)
       SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET in .env}
       WEB_BASE_URL: https://${DOMAIN}
       API_PUBLIC_URL: https://${DOMAIN}/api
@@ -40,6 +41,10 @@ services:
       ADMIN_BASE_URL: https://admin.${DOMAIN}
       # Alerts page "Test" button (AL-6) sends to this address.
       ALERT_EMAIL: ${ALERT_EMAIL:-}
+      # Suspending a user (AU-7) removes them from a live voice room through LiveKit's internal API.
+      LIVEKIT_URL: http://livekit:7880
+      # Server share per session on the overview (OB-15, D-12): the Hetzner server's monthly price.
+      INFRA_MONTHLY_USD: ${INFRA_MONTHLY_USD:-18.49}
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_USERNAME: ${SMTP_USERNAME:-}
@@ -49,7 +54,7 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       # Emails that see the model spend meter (strong_api.devtools). Testers do not.
       MODEL_SPEND_VIEWERS: ${MODEL_SPEND_VIEWERS:-}
-      # Emails that may use the admin app (https://admin.$DOMAIN). Everyone else gets 404.
+      # AA-1: seeds the admins of https://admin.$DOMAIN on the first start (admin_users empty).
       ADMIN_EMAILS: ${ADMIN_EMAILS:-}
       LIVEKIT_PUBLIC_URL: wss://rtc.${DOMAIN}
       STRONG_INTERNAL_TOKEN: ${STRONG_INTERNAL_TOKEN:?set STRONG_INTERNAL_TOKEN in .env}
@@ -65,10 +70,46 @@ services:
       - /srv/stronghire/sim:/sim-results:ro
     restart: unless-stopped
 
+  # The sim service (docs/admin-spec.md, Simulations): runs admin-started AI candidate
+  # interviews one at a time, writes /srv/stronghire/sim and applies its retention (SM-14).
+  # Start it with --profile sim. It talks to the app through the public URL, like a browser,
+  # and to LiteLLM with the sim key, so the $5/day sim budget covers both sides.
+  # Capped so live users keep the CPU (D-17).
+  sim:
+    build:
+      context: ..
+      dockerfile: infra/sim/sim.Dockerfile
+    image: strong-sim:latest
+    profiles: [sim]
+    command: ["serve"]
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-strong}:${POSTGRES_PASSWORD:-strong}@postgres:5432/${POSTGRES_DB:-strong}
+      MODEL_PROFILE: sim
+      MODEL_GATEWAY_URL: http://litellm:4000/v1
+      MODEL_GATEWAY_API_KEY: ${SIM_LITELLM_KEY:-}
+      SIM_ENABLED: ${SIM_ENABLED:-false}
+      SIM_EMAIL: ${SIM_EMAIL:-sim@getstronghire.com}
+      SIM_LITELLM_KEY: ${SIM_LITELLM_KEY:-}
+      SIM_TOKEN: ${SIM_TOKEN:-}
+      SIM_BASE_URL: https://${DOMAIN}/api
+      SIM_OUT_DIR: /sim-results
+      SIM_KEEP_GB: ${SIM_KEEP_GB:-10}
+      SIM_KEEP_DAYS: ${SIM_KEEP_DAYS:-90}
+      REPO_ROOT: /app
+    volumes:
+      - /srv/stronghire/sim:/sim-results
+    depends_on:
+      postgres: { condition: service_healthy }
+      litellm: { condition: service_started }
+    cpus: 2
+    mem_limit: 2g
+    restart: unless-stopped
+
   worker:
     environment:
       APP_ENV: staging
       ENV: staging
+      LOG_FORMAT: json   # OB-7
       # Encrypted resume files, kept in a volume so they survive restarts.
       INPUTS_STORAGE_DIR: /data/uploads
       INPUTS_STORAGE_KEY: ${INPUTS_STORAGE_KEY:?set INPUTS_STORAGE_KEY in .env}
@@ -87,6 +128,8 @@ services:
       SMTP_FROM: ${SMTP_FROM:-}
     volumes:
       - uploads-data:/data/uploads
+      # OB-5: the metrics sampler reads the Postgres volume's disk use (host.disk_pct, pgdata).
+      - postgres-data:/mnt/pgdata:ro
     restart: unless-stopped
 
   # Caddy serves the built web app, so the Vite dev server is not needed.
@@ -115,6 +158,7 @@ services:
 
   voice:
     environment:
+      LOG_FORMAT: json   # OB-7
       LIVEKIT_PUBLIC_URL: wss://rtc.${DOMAIN}
       STRONG_INTERNAL_TOKEN: ${STRONG_INTERNAL_TOKEN}
       # The sim org's voice interviews use the sim key (P13).

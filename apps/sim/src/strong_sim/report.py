@@ -27,7 +27,7 @@ class SessionRow(BaseModel):
     resume: str
     quality: str
     behavior: str
-    status: str = Field(description="ok, or error")
+    status: str = Field(description="ok, error, or cancelled (SM-5)")
     error: str | None = None
     ended_by_server: bool = False
     stopped_early: bool = False

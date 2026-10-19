@@ -24,7 +24,7 @@ from strong_core.db.models import (
 from strong_core.db.models import CompanyProfile as ProfileRow
 from strong_core.db.models import GapAnalysis as GapRow
 from strong_core.db.models import Resume as ResumeRow
-from strong_core.gateway import ModelGateway
+from strong_core.gateway import ModelGateway, Role, UsageRecord, set_usage_sink
 from strong_core.gateway.registry import fake_models_config
 from strong_core.schemas import (
     Difficulty,
@@ -281,6 +281,44 @@ async def test_brief_job_stores_the_brief_and_profile_version(
         assert brief.profile_version == 2 and brief.curveball and brief.coach_help
         assert brief.session.duration_min == 45
         assert brief.probe_areas  # from the gap analysis
+
+
+async def test_ob2_gap_and_brief_jobs_report_planner_usage_for_their_org_and_session(
+    sessionmaker: async_sessionmaker[AsyncSession],
+    account: tuple[uuid.UUID, uuid.UUID],
+    gateway: ModelGateway,
+) -> None:
+    """OB-2: gap analysis has no session (session_id NULL); the brief belongs to its session."""
+    records: list[UsageRecord] = []
+
+    async def sink(record: UsageRecord) -> None:
+        records.append(record)
+
+    set_usage_sink(sink)  # the autouse fixture restores the previous sink
+    org_id, _ = account
+    target_id, _, gap_id = await _setup(sessionmaker, account)
+    ctx = _ctx(sessionmaker, gateway)
+    await jobs.run_gap_analysis_job(ctx, str(gap_id), str(org_id))
+    assert records and {(r.role, r.org_id, r.session_id) for r in records} == {
+        (Role.PLANNER, org_id, None)
+    }
+    async with sessionmaker() as db:
+        session = InterviewSession(
+            org_id=org_id,
+            job_target_id=target_id,
+            type=InterviewType.BEHAVIORAL,
+            difficulty=Difficulty.TOUGH,
+            mode=Mode.REALISTIC,
+            duration_min=30,
+        )
+        db.add(session)
+        await db.commit()
+        session_id = session.id
+    records.clear()
+    assert (await jobs.build_interviewer_brief(ctx, str(session_id), str(org_id)))["outcome"] == (
+        "ready"
+    )
+    assert records and {r.session_id for r in records} == {session_id}
 
 
 async def test_brief_job_keeps_a_10_minute_session_as_a_mini(

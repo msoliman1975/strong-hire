@@ -21,7 +21,7 @@ from strong_core.db.models import AlertEvent, AlertRule, AuditLog
 from strong_core.ops.alerts import seed_default_rules
 from strong_core.schemas.enums import AlertEventKind, AlertState
 
-from .conftest import InlineQueue, sign_in
+from .conftest import InlineQueue, sign_in, sign_in_admin
 
 Maker = async_sessionmaker[AsyncSession]
 ADMIN = "boss@example.com"
@@ -65,7 +65,6 @@ def sender() -> FakeSender:
 def app(
     sessionmaker: Maker, queue: InlineQueue, sender: FakeSender, monkeypatch: pytest.MonkeyPatch
 ) -> Iterator[FastAPI]:
-    monkeypatch.setenv("ADMIN_EMAILS", ADMIN)
     monkeypatch.setenv("ALERT_EMAIL", "ops@example.com")
     monkeypatch.setenv("ADMIN_BASE_URL", "https://admin.example.com")
     get_auth_settings.cache_clear()
@@ -81,7 +80,8 @@ def app(
 async def admin(app: FastAPI) -> AsyncIterator[httpx.AsyncClient]:
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as http:
-        await sign_in(http, ADMIN)
+        await sign_in(http, ADMIN)  # the admin's candidate account
+        await sign_in_admin(http, app, ADMIN)  # AA-4: the admin session
         yield http
 
 

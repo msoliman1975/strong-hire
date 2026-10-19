@@ -44,8 +44,14 @@ pnpm --dir apps/admin gen:api
 
 ## Sign-in
 
-For now the admin app uses the candidate sign-in routes, served on the admin host under `/api`,
-so the host-only `sh_session` cookie belongs to the admin host. The API's `is_admin` flag
-(`ADMIN_EMAILS`) decides who gets in; everyone else sees "Page not found" and a sign-out button.
-Email links and Google sign-in pass `app=admin`, so they come back to `ADMIN_BASE_URL`. A later
-PR replaces this with dedicated admin sessions (AA-1 to AA-3).
+The admin app has its own sign-in and sessions (AA-1 to AA-4, `strong_api.admin.auth`): email and
+password (the admin's account password, with a confirmed email), an email link, or Google, all
+under `/api/admin/auth`. Only active rows in `admin_users` get a session. The session is a row in
+`admin_sessions` and the host-only `sh_admin` cookie (HttpOnly, SameSite=Strict, Secure outside
+local); it ends after 2 h without use or 12 h after sign-in. The candidate `sh_session` never opens
+the admin app. Email links land on `/signin/verify`, which posts the token to the API.
+
+`GET /api/admin/me` answers 401 without an admin session, and the Shell then shows sign-in.
+Settings > Admins manages who is an admin; Settings > My sessions lists and revokes sessions.
+
+In mock mode (`VITE_API_MOCKS=all`) sign in as admin@example.com with `admin-password`.

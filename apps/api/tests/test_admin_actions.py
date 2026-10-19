@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import AsyncIterator, Iterator
+from collections.abc import AsyncIterator
 from typing import Any
 
 import httpx
@@ -13,11 +13,10 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from strong_api.admin.actions import ActionIn, AdminWrite, audit_action
 from strong_api.auth.deps import DbSession
-from strong_api.auth.settings import get_auth_settings
 from strong_api.main import create_app
 from strong_core.db.models import AuditLog
 
-from .conftest import InlineQueue, sign_in
+from .conftest import InlineQueue, sign_in_admin
 
 Maker = async_sessionmaker[AsyncSession]
 ADMIN = "boss@example.com"
@@ -50,22 +49,17 @@ async def _ok() -> None:
 
 
 @pytest.fixture
-def app(
-    sessionmaker: Maker, queue: InlineQueue, monkeypatch: pytest.MonkeyPatch
-) -> Iterator[FastAPI]:
-    monkeypatch.setenv("ADMIN_EMAILS", ADMIN)
-    get_auth_settings.cache_clear()
+def app(sessionmaker: Maker, queue: InlineQueue) -> FastAPI:
     app = create_app({"database": _ok}, sessionmaker=sessionmaker, queue=queue)
     app.include_router(probe)
-    yield app
-    get_auth_settings.cache_clear()
+    return app
 
 
 @pytest.fixture
 async def admin(app: FastAPI) -> AsyncIterator[httpx.AsyncClient]:
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as http:
-        await sign_in(http, ADMIN)
+        await sign_in_admin(http, app, ADMIN)
         yield http
 
 
