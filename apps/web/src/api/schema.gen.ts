@@ -1183,7 +1183,9 @@ export interface paths {
          * @description The recording of an AI candidate voice interview, as stereo Ogg Opus.
          *
          *     The left channel is what the candidate heard, the right channel what it said. 404 for every
-         *     other session.
+         *     other session. A Range request gets 206 with that part (SM-7), so the replay player seeks
+         *     without downloading the file; only the request that starts at byte 0 is audited, not every
+         *     seek.
          */
         get: operations["download_audio_admin_sessions__session_id__audio_get"];
         put?: never;
@@ -1900,6 +1902,116 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/sim/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Sim Options
+         * @description SM-1: the choices, an estimate per length, today's sim budget and the gate now.
+         */
+        get: operations["sim_options_admin_sim_options_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/sim/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Runs
+         * @description SM-12: admin runs and suite runs, newest first. SM-4: poll while any is unfinished.
+         */
+        get: operations["list_runs_admin_sim_runs_get"];
+        put?: never;
+        /**
+         * Start Run
+         * @description SM-2, SM-3: queue one run. 409 with the reason when a gate is closed or the line is full.
+         */
+        post: operations["start_run_admin_sim_runs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/sim/runs/{run_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Run */
+        get: operations["get_run_admin_sim_runs__run_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete Run
+         * @description SM-13: the row stays as a stub; the sim service deletes the folder within seconds.
+         */
+        delete: operations["delete_run_admin_sim_runs__run_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Keep Run
+         * @description SM-13: Keep, so retention never deletes the run's files.
+         */
+        patch: operations["keep_run_admin_sim_runs__run_id__patch"];
+        trace?: never;
+    };
+    "/admin/sim/runs/{run_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel Run
+         * @description SM-5: a run in line is cancelled now; an active one stops within a few seconds.
+         */
+        post: operations["cancel_run_admin_sim_runs__run_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/sessions/{session_id}/replay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Session Replay
+         * @description SM-7..SM-11: everything the replay page shows. AI candidate interviews only; same
+         *     consent rule as the transcript. Audited.
+         */
+        get: operations["session_replay_admin_sessions__session_id__replay_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -2417,6 +2529,12 @@ export interface components {
              * @default false
              */
             audio_available: boolean;
+            /**
+             * Replay Available
+             * @description SM-16: an AI candidate interview with a run folder; open its replay page.
+             * @default false
+             */
+            replay_available: boolean;
             /**
              * Cost Breakdown
              * @description AI-2: usage_events by component and role
@@ -3048,6 +3166,11 @@ export interface components {
              */
             until: string;
         };
+        /**
+         * Behavior
+         * @enum {string}
+         */
+        Behavior: "normal" | "long_answers" | "one_line_answers" | "off_topic" | "asks_to_repeat" | "silent" | "interrupts" | "argues" | "many_questions_back" | "prompt_injection" | "drops_connection";
         /** Body_create_resume_resumes_post */
         Body_create_resume_resumes_post: {
             /** File */
@@ -4958,6 +5081,11 @@ export interface components {
             at: string;
         };
         /**
+         * Quality
+         * @enum {string}
+         */
+        Quality: "strong" | "average" | "weak";
+        /**
          * QuestionPattern
          * @description A recurring theme, phrased as a pattern. Never a leaked or NDA-protected question.
          */
@@ -4994,6 +5122,104 @@ export interface components {
         RedirectOut: {
             /** Url */
             url: string;
+        };
+        /** ReplayAudio */
+        ReplayAudio: {
+            /** Available */
+            available: boolean;
+            /**
+             * Bytes
+             * @description GET /admin/sessions/{id}/audio answers Range (SM-7)
+             */
+            bytes: number | null;
+        };
+        /** ReplayJudge */
+        ReplayJudge: {
+            /** Rubric */
+            rubric: string | null;
+            /** Model */
+            model: string | null;
+            /** Rules */
+            rules: components["schemas"]["ReplayRule"][];
+            /** Problems */
+            problems: components["schemas"]["ReplayProblem"][];
+        };
+        /** ReplayLatency */
+        ReplayLatency: {
+            /** N */
+            n: number;
+            /** P50 Ms */
+            p50_ms: number | null;
+            /** P90 Ms */
+            p90_ms: number | null;
+            /**
+             * Slow Turns
+             * @description Turns over 1500 ms
+             */
+            slow_turns: number;
+            /**
+             * Ok Ms
+             * @default 800
+             */
+            ok_ms: number;
+            /**
+             * Slow Ms
+             * @default 1500
+             */
+            slow_ms: number;
+        };
+        /** ReplayLine */
+        ReplayLine: {
+            /**
+             * Speaker
+             * @enum {string}
+             */
+            speaker: "interviewer" | "candidate";
+            /** Text */
+            text: string;
+            /** Start Ms */
+            start_ms: number;
+            /** End Ms */
+            end_ms: number;
+            /** Phase */
+            phase: string | null;
+            /**
+             * Note
+             * @description What the harness did, e.g. 'silent for 6 s'
+             */
+            note: string | null;
+            /**
+             * Latency Ms
+             * @description SM-9, on the first interviewer line of a reply
+             */
+            latency_ms: number | null;
+        };
+        /** ReplayProblem */
+        ReplayProblem: {
+            /**
+             * At
+             * @description mm:ss
+             */
+            at: string;
+            /**
+             * At Ms
+             * @description `at` in ms, for the scrubber marker
+             */
+            at_ms: number | null;
+            /** Problem */
+            problem: string;
+        };
+        /** ReplayRule */
+        ReplayRule: {
+            /** Rule */
+            rule: string;
+            /**
+             * Verdict
+             * @description pass, fail or not_applicable
+             */
+            verdict: string;
+            /** Reason */
+            reason: string;
         };
         /**
          * ReportItem
@@ -5248,6 +5474,17 @@ export interface components {
             site_banner?: components["schemas"]["SiteBanner"] | null;
             /** Jobs Paused */
             jobs_paused?: components["schemas"]["JobKind"][];
+            /**
+             * Sim Paused
+             * @default false
+             */
+            sim_paused: boolean;
+            /**
+             * Sim Max Live Sessions
+             * @description SM-3: a sim run does not start while this many real sessions are live. 0 turns the limit off.
+             * @default 3
+             */
+            sim_max_live_sessions: number;
         };
         /**
          * SampleQuestion
@@ -5397,6 +5634,37 @@ export interface components {
              */
             failure_reason?: string | null;
         };
+        /** SessionReplay */
+        SessionReplay: {
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            /**
+             * Run Dir
+             * @description The run folder; None: from the database only
+             */
+            run_dir: string | null;
+            /** Sim Run Id */
+            sim_run_id: string | null;
+            /** Channel */
+            channel: string;
+            /**
+             * Timing
+             * @description SM-8: 'audio' when times are positions in the recording (SM-6)
+             * @enum {string}
+             */
+            timing: "audio" | "approximate";
+            /** Lines */
+            lines: components["schemas"]["ReplayLine"][];
+            latency: components["schemas"]["ReplayLatency"];
+            judge: components["schemas"]["ReplayJudge"] | null;
+            /** @description SM-11: as the candidate saw it */
+            scorecard: components["schemas"]["Scorecard"] | null;
+            audio: components["schemas"]["ReplayAudio"];
+            scenario: components["schemas"]["SimScenarioOut"] | null;
+        };
         /**
          * SessionStatus
          * @enum {string}
@@ -5419,7 +5687,7 @@ export interface components {
          * SettingKey
          * @enum {string}
          */
-        SettingKey: "signups_paused" | "sessions_paused_voice" | "sessions_paused_text" | "daily_spend_cap_usd" | "site_banner" | "jobs_paused";
+        SettingKey: "signups_paused" | "sessions_paused_voice" | "sessions_paused_text" | "daily_spend_cap_usd" | "site_banner" | "jobs_paused" | "sim_paused" | "sim_max_live_sessions";
         /**
          * Severity
          * @enum {string}
@@ -5440,6 +5708,267 @@ export interface components {
              * @default false
              */
             training_consent: boolean;
+        };
+        /** SimBehaviorOut */
+        SimBehaviorOut: {
+            id: components["schemas"]["Behavior"];
+            /** Voice Only */
+            voice_only: boolean;
+        };
+        /** SimBudgetOut */
+        SimBudgetOut: {
+            /** Limit Usd */
+            limit_usd: number;
+            /**
+             * Spent Usd
+             * @description Spend of the sim LiteLLM key in the current period
+             */
+            spent_usd: number;
+            /** Left Usd */
+            left_usd: number;
+            /** Resets At */
+            resets_at: string | null;
+        };
+        /** SimCancelIn */
+        SimCancelIn: {
+            /** Reason */
+            reason?: string | null;
+        };
+        /** SimEstimateOut */
+        SimEstimateOut: {
+            /** Duration Min */
+            duration_min: number;
+            /** Candidate Usd */
+            candidate_usd: number;
+            /** Judge Usd */
+            judge_usd: number;
+            /** Main Server Usd */
+            main_server_usd: number;
+            /** Total Usd */
+            total_usd: number;
+        };
+        /** SimGateOut */
+        SimGateOut: {
+            /**
+             * Ok
+             * @description SM-3 without the budget part: enabled, not paused, live limit
+             */
+            ok: boolean;
+            /**
+             * Retry
+             * @description Only the live-sessions limit is in the way
+             */
+            retry: boolean;
+            /** Reason */
+            reason: string | null;
+        };
+        /** SimKeepIn */
+        SimKeepIn: {
+            /** Keep */
+            keep: boolean;
+        };
+        /**
+         * SimOptions
+         * @description SM-1: everything the form offers, and whether a run could start now.
+         */
+        SimOptions: {
+            /** Personas */
+            personas: components["schemas"]["SimPersonaOut"][];
+            /** Interview Types */
+            interview_types: components["schemas"]["InterviewType"][];
+            /** Difficulties */
+            difficulties: components["schemas"]["Difficulty"][];
+            /** Modes */
+            modes: components["schemas"]["Mode"][];
+            /** Durations */
+            durations: number[];
+            /** Qualities */
+            qualities: components["schemas"]["Quality"][];
+            /** Behaviors */
+            behaviors: components["schemas"]["SimBehaviorOut"][];
+            /** Channels */
+            channels: ("text" | "voice")[];
+            /**
+             * Estimates
+             * @description One per duration
+             */
+            estimates: components["schemas"]["SimEstimateOut"][];
+            /** @description None when the sim key budget is unknown */
+            budget: components["schemas"]["SimBudgetOut"] | null;
+            gate: components["schemas"]["SimGateOut"];
+            queue: components["schemas"]["SimQueueOut"];
+        };
+        /** SimPersonaOut */
+        SimPersonaOut: {
+            /**
+             * Id
+             * @description Resume fixture id
+             */
+            id: string;
+            /** Label */
+            label: string;
+            /**
+             * Posting
+             * @description The posting fixture this resume is meant for
+             */
+            posting: string;
+            level: components["schemas"]["Level"];
+        };
+        /** SimQueueOut */
+        SimQueueOut: {
+            /** Active */
+            active: number;
+            /**
+             * Waiting
+             * @description queued and waiting runs
+             */
+            waiting: number;
+            /** Max Waiting */
+            max_waiting: number;
+        };
+        /**
+         * SimRunIn
+         * @description SM-1: one interview. The posting and level follow the persona.
+         */
+        SimRunIn: {
+            /** Persona */
+            persona: string;
+            /** @default behavioral */
+            interview_type: components["schemas"]["InterviewType"];
+            /** @default realistic */
+            difficulty: components["schemas"]["Difficulty"];
+            /** @default realistic */
+            mode: components["schemas"]["Mode"];
+            /**
+             * Duration Min
+             * @default 30
+             * @enum {integer}
+             */
+            duration_min: 10 | 30 | 45;
+            /** @default average */
+            quality: components["schemas"]["Quality"];
+            /** @default normal */
+            behavior: components["schemas"]["Behavior"];
+            /**
+             * Channel
+             * @default voice
+             * @enum {string}
+             */
+            channel: "text" | "voice";
+        };
+        /** SimRunList */
+        SimRunList: {
+            /** Runs */
+            runs: components["schemas"]["SimRunOut"][];
+            /**
+             * Any Unfinished
+             * @description SM-4: poll every 5 s while true
+             */
+            any_unfinished: boolean;
+        };
+        /** SimRunOut */
+        SimRunOut: {
+            /**
+             * Id
+             * @description The sim_runs id; for a suite run '<run folder>/<scenario id>'
+             */
+            id: string;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "admin" | "suite";
+            /**
+             * Suite
+             * @description Suite name for runs from sim-run.ps1
+             */
+            suite: string | null;
+            /** Run Dir */
+            run_dir: string | null;
+            /** Created By */
+            created_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Started At */
+            started_at: string | null;
+            /** Finished At */
+            finished_at: string | null;
+            status: components["schemas"]["SimRunStatus"];
+            /** Status Reason */
+            status_reason: string | null;
+            scenario: components["schemas"]["SimScenarioOut"];
+            /** Session Id */
+            session_id: string | null;
+            /**
+             * Progress S
+             * @description SM-4: interview time so far
+             */
+            progress_s: number;
+            /** Planned S */
+            planned_s: number;
+            /** Hire Signal */
+            hire_signal: string | null;
+            /** Failed Rules */
+            failed_rules: string[];
+            /** Problems */
+            problems: number;
+            /** Latency P50 Ms */
+            latency_p50_ms: number | null;
+            /**
+             * Cost Sim Usd
+             * @description Candidate and judge (the sim's meter)
+             */
+            cost_sim_usd: number | null;
+            /**
+             * Cost App Usd
+             * @description usage_events of the session
+             */
+            cost_app_usd: number | null;
+            /** Cost Total Usd */
+            cost_total_usd: number | null;
+            /** Keep */
+            keep: boolean;
+            /** Deleted At */
+            deleted_at: string | null;
+            /** Deleted By */
+            deleted_by: string | null;
+            /** Delete Reason */
+            delete_reason: string | null;
+            /**
+             * Files
+             * @description The run folder is on disk
+             */
+            files: boolean;
+        };
+        /**
+         * SimRunStatus
+         * @description SM-4: an admin-started AI candidate run (docs/admin-spec.md, Simulations).
+         * @enum {string}
+         */
+        SimRunStatus: "queued" | "waiting" | "starting" | "interviewing" | "judging" | "done" | "failed" | "cancelled";
+        /** SimScenarioOut */
+        SimScenarioOut: {
+            /** Channel */
+            channel: string;
+            /** Interview Type */
+            interview_type: string;
+            /** Difficulty */
+            difficulty: string;
+            /** Mode */
+            mode: string;
+            /** Duration Min */
+            duration_min: number;
+            /** Persona */
+            persona: string;
+            /** Quality */
+            quality: string;
+            /** Behavior */
+            behavior: string;
+            /** Candidate Name */
+            candidate_name?: string | null;
         };
         /**
          * SiteBanner
@@ -9108,6 +9637,267 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CompanyRequestGroup"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sim_options_admin_sim_options_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimOptions"];
+                };
+            };
+        };
+    };
+    list_runs_admin_sim_runs_get: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["SimRunStatus"] | null;
+                channel?: ("text" | "voice") | null;
+                source?: ("admin" | "suite") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimRunList"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    start_run_admin_sim_runs_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SimRunIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimRunOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_run_admin_sim_runs__run_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimRunOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_run_admin_sim_runs__run_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimRunOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    keep_run_admin_sim_runs__run_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SimKeepIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimRunOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_run_admin_sim_runs__run_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SimCancelIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimRunOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    session_replay_admin_sessions__session_id__replay_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionReplay"];
                 };
             };
             /** @description Validation Error */
