@@ -22,3 +22,17 @@ export const rehearsalPath = (jobId: string, resumeId: string) =>
 /** Where "Add a job description" returns: the Job descriptions page, or on to the resume step. */
 export type NewJobReturn = "library" | "rehearsal";
 export const newJobPath = (then: NewJobReturn) => (then === "library" ? "/jobs/new?then=library" : "/jobs/new");
+
+/** QB-1, QB-4: the Questions page with filters in the URL. */
+export function questionsPath(filter: {
+  company?: string | null;
+  interviewType?: string | null;
+  competencies?: string[];
+}): string {
+  const params = new URLSearchParams();
+  if (filter.company) params.set("company", filter.company);
+  if (filter.interviewType) params.set("type", filter.interviewType);
+  for (const c of filter.competencies ?? []) params.append("area", c);
+  const query = params.toString();
+  return query ? `/questions?${query}` : "/questions";
+}

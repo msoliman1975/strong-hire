@@ -15,6 +15,7 @@ import { billingApi } from "../api/billing";
 import { customApi, savedQuestionsApi } from "../api/custom";
 import { gapApi } from "../api/gap";
 import { jobTargetsApi, resumesApi, sha256Hex } from "../api/inputs";
+import { questionsApi } from "../api/questions";
 import { reportsApi } from "../api/reports";
 import { sessionsApi } from "../api/sessions";
 import { debriefApi } from "../api/scoring";
@@ -386,6 +387,15 @@ describe("mocks of the Custom interview endpoints match openapi.json", () => {
 
     await savedQuestionsApi.remove(saved.id);
     expect(await savedQuestionsApi.list()).toEqual([]);
+  });
+});
+
+describe("mocks of the Questions endpoints match openapi.json (QB-1)", () => {
+  it("companies and question lists", async () => {
+    for (const c of await questionsApi.companies()) expectApiShape("BankCompany", c);
+    expectApiShape("QuestionList", await questionsApi.list());
+    expectApiShape("QuestionList", await questionsApi.list({ company: "stripe", interviewType: "behavioral" }));
+    await expect(questionsApi.list({ company: "nope" })).rejects.toMatchObject({ status: 404 });
   });
 });
 

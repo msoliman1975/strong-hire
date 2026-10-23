@@ -20,6 +20,7 @@ import { ResumePage } from "./pages/onboarding/ResumePage";
 import { PaywallPage } from "./pages/PaywallPage";
 import { EditProfilePage, WelcomePage } from "./pages/ProfilePage";
 import { RehearsalPage } from "./pages/RehearsalPage";
+import { QuestionsPage } from "./pages/QuestionsPage";
 import { ReportsPage } from "./pages/ReportsPage";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { ResumesPage } from "./pages/ResumesPage";
@@ -74,6 +75,7 @@ export function AppRoutes() {
           <Route path="/sessions/:sessionId/live" element={<LiveSessionPage />} />
           <Route path="/sessions/:sessionId/debrief" element={<DebriefPage />} />
           <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/questions" element={<QuestionsPage />} />
           <Route path="/questions/mine" element={<MyQuestionsPage />} />
           <Route path="/account" element={<AccountPage />} />
           <Route path="/account/profile" element={<EditProfilePage />} />
