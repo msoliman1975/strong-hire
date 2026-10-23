@@ -112,12 +112,15 @@ class InterviewRunner:
 
     def _timer(self, phase: Phase) -> dict[str, Any]:
         ctl = self.controller
-        return {
+        timer: dict[str, Any] = {
             "probes_used": ctl.probes_used,
             "probe_limit": ctl.probe_limit,
             "time_left_in_phase_ms": ctl.deadline_ms(phase) - ctl.elapsed_ms,
             "time_left_in_session_ms": ctl.total_ms - ctl.elapsed_ms,
         }
+        if ctl.custom:  # CU-4: the must-ask questions still to come
+            timer["must_ask_left"] = ctl.must_ask_left
+        return timer
 
     def _emit(
         self,
@@ -371,7 +374,8 @@ class InterviewRunner:
         async def check_answer() -> tuple[AnswerCheck, ModelCall] | None:
             if not check:
                 return None
-            return await self.interviewer.check_answer(text, self.turns, phase)
+            question = ctl.question if phase == Phase.CORE else None
+            return await self.interviewer.check_answer(text, self.turns, phase, question)
 
         decided, checked = await asyncio.gather(decide(), check_answer())
         # Traced after both are done, in a fixed order: the check, then the decision.

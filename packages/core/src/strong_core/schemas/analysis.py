@@ -8,7 +8,8 @@ from typing import Annotated
 from pydantic import Field
 
 from strong_core.schemas.base import Contract
-from strong_core.schemas.enums import Competency, Difficulty, InterviewType, Severity
+from strong_core.schemas.custom import StandardType
+from strong_core.schemas.enums import Competency, Difficulty, Severity
 
 
 class RequirementKind(StrEnum):
@@ -44,7 +45,7 @@ class PlannedSession(Contract):
     """One recommended practice session (GA-3)."""
 
     priority: int = Field(ge=1, description="1 is the first session to run.")
-    interview_type: InterviewType
+    interview_type: StandardType
     difficulty: Difficulty = Difficulty.REALISTIC
     focus_topics: list[str] = Field(min_length=1)
     reason: str = Field(min_length=1)

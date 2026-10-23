@@ -14,6 +14,11 @@ class VoiceSessionSettings(BaseSettings):
     livekit_public_url: str = Field(
         default="ws://localhost:7880", description="LiveKit URL as the browser reaches it."
     )
+    livekit_url: str | None = Field(
+        default=None,
+        description="LiveKit server API as the API reaches it (AU-7: remove a suspended "
+        "user from a live room). Unset: removal is skipped.",
+    )
     livekit_api_key: str = "devkey"
     livekit_api_secret: SecretStr = SecretStr("secret")
     token_ttl_minutes: int = Field(default=90, ge=5, description="Join token lifetime.")

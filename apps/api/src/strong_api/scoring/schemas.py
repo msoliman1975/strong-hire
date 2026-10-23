@@ -14,11 +14,15 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from strong_core.schemas import (
     Competency,
+    CustomSessionSpec,
+    Difficulty,
     PlannedSession,
     ProgressSnapshot,
+    QuestionSource,
     Scorecard,
     SessionConfig,
     SessionStatus,
+    StandardType,
 )
 
 # "not_ended": the interview has not ended yet (created, in progress or interrupted), so nothing
@@ -48,6 +52,38 @@ class DebriefSession(_Out):
     )
 
 
+class DebriefQuestion(_Out):
+    """One question of the session's interview plan (CU-6). Join it to
+    `scorecard.per_question[].question_ref` by `question_ref`."""
+
+    question_ref: str = Field(description="The brief question id (Turn.question_ref).")
+    text: str
+    source: QuestionSource = Field(description="candidate for the candidate's own question.")
+    category: StandardType | None = Field(description="Custom sessions: the category.")
+    competencies: list[Competency] = Field(
+        default_factory=list,
+        description="The competencies the question targets. CU-9: the web app saves an "
+        "interviewer question to My questions with them.",
+    )
+    must_ask: bool
+    verbatim: bool
+
+
+class CustomRecommendation(_Out):
+    """CU-10: a Custom session to practice the open gaps of several interview types together.
+    `custom` is a ready setup (even shares, focus chips from the gaps, no own questions) that the
+    web app opens prefilled."""
+
+    interview_type: Literal["custom"] = "custom"
+    difficulty: Difficulty
+    duration_min: Literal[30, 45] = Field(description="45 when Case is a category (D-3).")
+    custom: CustomSessionSpec
+    focus_topics: list[str] = Field(
+        min_length=1, description="The lead focus chip of each category, for the title."
+    )
+    reason: str = Field(min_length=1)
+
+
 class Debrief(_Out):
     session: DebriefSession
     status: DebriefStatus
@@ -55,10 +91,20 @@ class Debrief(_Out):
     next_session: PlannedSession | None = Field(
         description="PR-2. Null until the debrief is ready."
     )
+    next_custom_session: CustomRecommendation | None = Field(
+        default=None,
+        description="CU-10: a Custom session that mixes the open gaps, when one fits and the "
+        "user may run Custom. Shown in place of `next_session` by the web app.",
+    )
     generic_mode: bool = Field(description="True when no company profile was used: no values.")
     company_name: str | None
     values_framework: str | None = Field(
         description="Name of the company's values framework, for example 'Leadership Principles'."
+    )
+    questions: list[DebriefQuestion] = Field(
+        default_factory=list,
+        description="CU-6: the planned questions with their source and category, in plan "
+        "order. Empty when the session has no interview plan.",
     )
 
 
@@ -74,11 +120,37 @@ class CompetencyTrend(_Out):
     direction: TrendDirection
 
 
+class OwnQuestionPoint(_Out):
+    """CU-7: a snapshot of a Custom session that comes (partly) from the candidate's own
+    questions."""
+
+    session_id: uuid.UUID
+    competency: Competency
+    own_questions: int = Field(ge=1, description="Scores from the candidate's own questions.")
+    other_questions: int = Field(ge=0, description="Scores from the interviewer's questions.")
+
+
 class JobProgress(_Out):
     job_target_id: uuid.UUID
-    snapshots: list[ProgressSnapshot] = Field(description="Realistic sessions only (PR-1).")
+    snapshots: list[ProgressSnapshot] = Field(
+        description="Realistic sessions only (PR-1), Custom ones included (CU-7)."
+    )
     trends: list[CompetencyTrend] = Field(description="Weakest latest score first.")
     next_session: PlannedSession | None = Field(description="PR-2.")
+    next_custom_session: CustomRecommendation | None = Field(
+        default=None,
+        description="CU-10: a Custom session that mixes the open gaps, when one fits and the "
+        "user may run Custom.",
+    )
+    own_question_points: list[OwnQuestionPoint] = Field(
+        default_factory=list,
+        description="CU-7: the snapshots that use scores of the candidate's own questions. "
+        "Empty when own questions are excluded.",
+    )
+    own_questions_excluded: bool = Field(
+        default=False,
+        description="CU-7: true when the snapshots and trends leave out own questions' scores.",
+    )
 
 
 class ScoringAccepted(_Out):

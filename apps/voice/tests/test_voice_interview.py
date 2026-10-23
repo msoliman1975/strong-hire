@@ -11,10 +11,10 @@ from pathlib import Path
 import pytest
 
 from strong_core.config import ModelProfile, Settings
-from strong_core.gateway import build_gateway
-from strong_core.schemas import Difficulty, Mode, Phase, Speaker, Turn, UsageComponent
+from strong_core.gateway import UsageRecord, build_gateway, set_usage_sink, usage_context
+from strong_core.schemas import Difficulty, Mode, Phase, Speaker, Turn
 from strong_interview import CoachNotAllowedError, Interviewer, InterviewRunner, SessionController
-from strong_interview.testing import FakeClock, make_brief
+from strong_interview.testing import CUSTOM_MUST_ASK, FakeClock, make_brief, make_custom_brief
 from strong_voice import interview as interview_module
 from strong_voice.interview import RECONNECT_S, TAKE_YOUR_TIME, WELCOME_BACK, VoiceInterview
 from strong_voice.session_store import session_id_from_room
@@ -26,17 +26,11 @@ WRITES = re.compile(r"open\([^)]*['\"]w|write_bytes|\.wav|wave\.open|AudioFrame\
 @dataclass
 class FakeStore:
     turns: list[Turn] = field(default_factory=list)
-    usage: dict[UsageComponent, float] = field(default_factory=dict)
     prompt_version: str | None = None
 
     async def save_turn(self, session_id: uuid.UUID, turn: Turn) -> None:
         assert session_id == SID
         self.turns.append(turn)
-
-    async def save_usage(
-        self, session_id: uuid.UUID, component: UsageComponent, units: float, cost_usd: float = 0.0
-    ) -> None:
-        self.usage[component] = units
 
     async def save_provenance(self, session_id: uuid.UUID, prompt_version: str | None) -> None:
         self.prompt_version = prompt_version
@@ -59,10 +53,16 @@ class Rig:
     wall: list[float]
 
 
-def make_rig(mode: Mode = Mode.REALISTIC, difficulty: Difficulty = Difficulty.FRIENDLY) -> Rig:
+def make_rig(
+    mode: Mode = Mode.REALISTIC, difficulty: Difficulty = Difficulty.FRIENDLY, custom: bool = False
+) -> Rig:
     clock = FakeClock()
     wall = [0.0]
-    brief = make_brief(mode=mode, difficulty=difficulty, questions=6)
+    brief = (
+        make_custom_brief(mode=mode, difficulty=difficulty)
+        if custom
+        else make_brief(mode=mode, difficulty=difficulty, questions=6)
+    )
     gateway = build_gateway(Settings(model_profile=ModelProfile.FAKE))
     runner = InterviewRunner(SessionController(brief, clock), Interviewer(gateway, brief))
     store, finisher = FakeStore(), FakeFinisher()
@@ -89,7 +89,7 @@ async def test_candidate_turn_is_saved_with_its_timing() -> None:
     assert await rig.voice.on_candidate("   ") == []  # silence is not a turn
 
 
-async def test_iv7_session_ends_once_with_usage_and_provenance() -> None:
+async def test_iv7_session_ends_once_with_provenance() -> None:
     """The controller ends the session; the agent then ends it in the API once (FB-3)."""
     rig = make_rig()
     await rig.voice.opening()
@@ -104,9 +104,6 @@ async def test_iv7_session_ends_once_with_usage_and_provenance() -> None:
     assert rig.finisher.calls == [False]
     await rig.voice.finish(interrupted=True)  # safe to call again
     assert rig.finisher.calls == [False]
-    assert rig.store.usage[UsageComponent.STT] > 0
-    assert rig.store.usage[UsageComponent.TTS] > 0
-    assert UsageComponent.LLM in rig.store.usage
     assert rig.store.prompt_version and "interviewer/turn" in rig.store.prompt_version
     assert rig.store.turns == rig.voice.runner.turns  # every turn saved
     assert rig.store.turns[-1].phase == Phase.WRAP_UP
@@ -146,6 +143,34 @@ async def test_iv9_reconnect_in_time_goes_on_at_the_same_question() -> None:
     assert rig.voice.runner.controller.question is not None
     assert rig.voice.runner.controller.question.id == question.question_ref
     assert rig.finisher.calls == []
+
+
+async def test_cu4_iv9_custom_voice_session_keeps_must_ask_state_over_a_reconnect() -> None:
+    """CU-4, IV-9: a Custom voice session goes through the same controller. A reconnect keeps
+    the must-ask questions left, the verbatim question is spoken unchanged, and every must-ask
+    question is asked before the candidate's questions."""
+    rig = make_rig(custom=True)
+    await rig.voice.opening()
+    await rig.voice.on_candidate("Thanks.")
+    lines = await rig.voice.on_candidate("Sounds good.")  # agenda + own1 (verbatim)
+    assert lines is not None
+    own1 = next(q for q in rig.voice.runner.controller.brief.questions if q.id == "own1")
+    assert lines[-1].endswith(own1.text)
+    ctl = rig.voice.runner.controller
+    assert ctl.must_ask_left == ["own2", "own3"]
+    rig.voice.on_disconnect()
+    rig.clock.advance(minutes=1)
+    rig.wall[0] += 60
+    assert rig.voice.on_reconnect()[0] == WELCOME_BACK
+    assert ctl.must_ask_left == ["own2", "own3"]
+    rig.clock.advance(minutes=24)  # past the CORE time: the must-ask questions still come
+    for _ in range(20):
+        if ctl.phase != Phase.CORE:
+            break
+        await rig.voice.on_candidate("We shipped it on time.")
+    assert ctl.phase == Phase.CANDIDATE_QUESTIONS
+    refs = {t.question_ref for t in rig.store.turns if t.question_ref}
+    assert set(CUSTOM_MUST_ASK) <= refs
 
 
 async def test_iv9_no_reconnect_ends_the_session_as_interrupted() -> None:
@@ -269,3 +294,27 @@ async def test_iv11_prep_is_capped_at_three_minutes_and_ends_once() -> None:
     assert await rig.voice.end_prep(say=False) == []
     assert await rig.voice.end_prep() == []  # not preparing any more
     assert not rig.voice.preparing
+
+
+async def test_ob2_voice_usage_comes_from_the_gateway_once_per_call() -> None:
+    """OB-2: inside the session's usage context every interviewer call reports a row with its
+    role; the end of the session writes no rows of its own (nothing is counted twice)."""
+    records: list[UsageRecord] = []
+
+    async def sink(record: UsageRecord) -> None:
+        records.append(record)
+
+    previous = set_usage_sink(sink)
+    org = uuid.uuid4()
+    try:
+        rig = make_rig()
+        with usage_context(org, session_id=SID):
+            await rig.voice.opening()
+            rig.clock.advance(ms=30_000)
+            await rig.voice.on_candidate("Happy to be here.", spoken_s=4.0)
+        calls = len(records)
+        await rig.voice.finish(interrupted=False)
+    finally:
+        set_usage_sink(previous)
+    assert calls > 0 and len(records) == calls
+    assert {(r.role.value, r.org_id, r.session_id) for r in records} == {("interviewer", org, SID)}

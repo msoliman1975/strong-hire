@@ -105,6 +105,38 @@ jobs:
           path: apps/web/playwright-report
           retention-days: 7
 
+  admin:
+    name: Admin (lint, typecheck, test, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/admin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: apps/admin/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: apps/admin/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+
+  caddy:
+    name: Caddy image builds both apps and the Caddyfile is valid
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f infra/docker/caddy.Dockerfile -t strong-caddy .
+      - run: docker run --rm -e DOMAIN=example.com strong-caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+      - name: Both SPAs are in the image
+        run: docker run --rm strong-caddy sh -c 'test -f /srv/index.html && test -f /srv-admin/index.html'
+
   compose:
     name: Docker stack (core profile) starts and /health is OK through the web page
     runs-on: ubuntu-latest

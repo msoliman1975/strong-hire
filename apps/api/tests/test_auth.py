@@ -127,6 +127,7 @@ def test_providers_in_local(auth: AuthHarness) -> None:
     assert auth.client.get("/auth/providers").json() == {
         "google": False,
         "email": True,
+        "password": True,
         "dev": True,
     }
 

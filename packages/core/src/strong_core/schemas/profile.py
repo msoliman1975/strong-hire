@@ -12,10 +12,10 @@ from enum import StrEnum
 from pydantic import Field, model_validator
 
 from strong_core.schemas.base import Contract
+from strong_core.schemas.custom import StandardType
 from strong_core.schemas.enums import (
     Competency,
     Confidence,
-    InterviewType,
     Level,
     ProfileStatus,
     RoleFamily,
@@ -56,7 +56,7 @@ class ValuesFramework(Contract):
 
 class LoopRound(Contract):
     name: str = Field(min_length=1)
-    interview_type: InterviewType | None = Field(
+    interview_type: StandardType | None = Field(
         default=None, description="None for rounds v1 does not simulate, such as live coding."
     )
     duration_min: int | None = Field(default=None, ge=5, le=240)
@@ -73,7 +73,7 @@ class LoopStructure(Contract):
 class QuestionPattern(Contract):
     """A recurring theme, phrased as a pattern. Never a leaked or NDA-protected question."""
 
-    interview_type: InterviewType
+    interview_type: StandardType
     theme: str = Field(min_length=1)
     pattern: str = Field(min_length=1)
     competencies: list[Competency] = Field(default_factory=list)
@@ -86,7 +86,7 @@ class SampleQuestion(Contract):
     """A question the company or candidates published, paraphrased, with its source.
     Never an NDA-protected question or copied paid content."""
 
-    interview_type: InterviewType
+    interview_type: StandardType
     question: str = Field(min_length=1, max_length=400, description="Paraphrased, not copied.")
     strong_answer: str = Field(
         min_length=1,

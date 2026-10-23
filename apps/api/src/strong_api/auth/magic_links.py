@@ -49,25 +49,39 @@ class MemoryUsedTokenStore:
 
 
 class MagicLinks:
-    def __init__(self, secret: str, max_age_s: int, store: UsedTokenStore) -> None:
-        self._serializer = URLSafeTimedSerializer(secret, salt=_SALT)
+    """Signed links for one purpose (the salt): sign-in, confirm email or reset password."""
+
+    def __init__(
+        self, secret: str, max_age_s: int, store: UsedTokenStore, *, salt: str = _SALT
+    ) -> None:
+        self._serializer = URLSafeTimedSerializer(secret, salt=salt)
         self._max_age_s = max_age_s
         self._store = store
 
-    def issue(self, email: str) -> str:
-        return self._serializer.dumps({"email": email, "jti": uuid.uuid4().hex})
+    def issue(self, email: str, **extra: str) -> str:
+        return self._serializer.dumps({**extra, "email": email, "jti": uuid.uuid4().hex})
 
-    async def redeem(self, token: str) -> str:
-        """Return the email the token was issued for, and burn the token."""
+    def peek(self, token: str) -> dict[str, str]:
+        """Check the signature and age without using the token up."""
         try:
             data = self._serializer.loads(token, max_age=self._max_age_s)
         except SignatureExpired as exc:
             raise InvalidMagicLinkError("expired") from exc
         except BadSignature as exc:
             raise InvalidMagicLinkError("invalid") from exc
-        email, jti = data.get("email"), data.get("jti")
-        if not isinstance(email, str) or not isinstance(jti, str):
+        if not isinstance(data, dict) or not all(isinstance(v, str) for v in data.values()):
             raise InvalidMagicLinkError("invalid")
-        if not await self._store.claim(jti, self._max_age_s):
+        if not isinstance(data.get("email"), str) or not isinstance(data.get("jti"), str):
+            raise InvalidMagicLinkError("invalid")
+        return data
+
+    async def redeem_data(self, token: str) -> dict[str, str]:
+        """Return the token's data, and burn the token."""
+        data = self.peek(token)
+        if not await self._store.claim(data["jti"], self._max_age_s):
             raise InvalidMagicLinkError("used")
-        return email
+        return data
+
+    async def redeem(self, token: str) -> str:
+        """Return the email the token was issued for, and burn the token."""
+        return (await self.redeem_data(token))["email"]

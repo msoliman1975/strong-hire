@@ -1,0 +1,165 @@
+{
+  "$defs": {
+    "Competency": {
+      "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.",
+      "enum": [
+        "ownership",
+        "impact",
+        "collaboration",
+        "conflict_handling",
+        "learning_from_failure",
+        "communication",
+        "role_fit",
+        "depth_of_experience",
+        "judgment",
+        "motivation",
+        "team_fit",
+        "scope_at_level",
+        "technical_depth",
+        "accuracy",
+        "reasoning",
+        "trade_offs",
+        "clarity_of_explanation",
+        "problem_framing",
+        "structure",
+        "user_and_business_sense",
+        "estimation_logic",
+        "prioritization",
+        "recommendation"
+      ],
+      "title": "Competency",
+      "type": "string"
+    },
+    "CustomCategory": {
+      "additionalProperties": false,
+      "description": "One question category in a Custom session (CU-1, CU-2).",
+      "properties": {
+        "category": {
+          "enum": [
+            "behavioral",
+            "hiring_manager",
+            "technical_qa",
+            "case"
+          ],
+          "type": "string"
+        },
+        "focus": {
+          "description": "Topics to focus on, for example 'conflict' or 'Kubernetes' (CU-2).",
+          "items": {
+            "maxLength": 60,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 8,
+          "title": "Focus",
+          "type": "array"
+        },
+        "share": {
+          "description": "Share of the core time. Shares add up to 1.",
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Share",
+          "type": "number"
+        }
+      },
+      "required": [
+        "category",
+        "share"
+      ],
+      "title": "CustomCategory",
+      "type": "object"
+    },
+    "CustomQuestion": {
+      "additionalProperties": false,
+      "description": "A question the candidate wrote or saved (CU-3, CU-4).",
+      "properties": {
+        "category": {
+          "enum": [
+            "behavioral",
+            "hiring_manager",
+            "technical_qa",
+            "case"
+          ],
+          "type": "string"
+        },
+        "competencies": {
+          "description": "From COMPETENCIES_BY_TYPE for the category. Tagged by the CU-5 check.",
+          "items": {
+            "$ref": "#/$defs/Competency"
+          },
+          "maxItems": 3,
+          "minItems": 1,
+          "title": "Competencies",
+          "type": "array"
+        },
+        "must_ask": {
+          "default": true,
+          "description": "CU-4: the session controller asks it.",
+          "title": "Must Ask",
+          "type": "boolean"
+        },
+        "saved_question_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "CU-8: the saved_questions row it came from.",
+          "title": "Saved Question Id"
+        },
+        "text": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "verbatim": {
+          "default": false,
+          "description": "CU-4: read the text word for word.",
+          "title": "Verbatim",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "text",
+        "category",
+        "competencies"
+      ],
+      "title": "CustomQuestion",
+      "type": "object"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/custom_session_spec.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "What the candidate builds for a Custom session. Stored in sessions.custom_json.",
+  "properties": {
+    "categories": {
+      "items": {
+        "$ref": "#/$defs/CustomCategory"
+      },
+      "maxItems": 3,
+      "minItems": 1,
+      "title": "Categories",
+      "type": "array"
+    },
+    "questions": {
+      "items": {
+        "$ref": "#/$defs/CustomQuestion"
+      },
+      "maxItems": 8,
+      "title": "Questions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "categories"
+  ],
+  "title": "CustomSessionSpec",
+  "type": "object"
+}

@@ -2,7 +2,10 @@
 
 The recorder keeps two mono 16-bit tracks on one clock: left = what the candidate heard (the
 interviewer), right = what the candidate said. save_ogg() writes one stereo Ogg Opus file with
-ffmpeg. Only sim sessions are recorded, on the sim server; the main server stores no audio.
+ffmpeg. Only sim sessions are recorded; product sessions store no audio.
+
+Both tracks are continuous streams of 10 ms frames (the mic sends silence between replies), so a
+track's length is its clock: the transcript times (SM-6) are sample positions in these tracks.
 """
 
 from __future__ import annotations
@@ -19,9 +22,11 @@ from pathlib import Path
 
 from livekit import rtc
 
+from strong_sim.timing import LOUD_RMS
+
 RATE = 24_000
 FRAME_MS = 10
-LOUD_RMS = 300.0
+GAP_S = 0.5  # a frame later than this is a real gap (start, reconnect); less is network jitter
 
 
 def rms(pcm: bytes) -> float:
@@ -32,7 +37,13 @@ def rms(pcm: bytes) -> float:
 
 
 class Recorder:
-    """Two mono tracks placed by wall-clock time since start()."""
+    """Two mono tracks on one clock that starts at start().
+
+    Frames are appended as they come. Wall-clock time is used only to place a track's first
+    frame and to fill a real gap (more than GAP_S of missing audio) with silence. Jitter of a
+    few frames is not padded: padding it would push the track ahead of real time a little more
+    on every late frame, and the transcript times would drift away from the audio.
+    """
 
     def __init__(self, rate: int = RATE) -> None:
         self.rate = rate
@@ -47,11 +58,18 @@ class Recorder:
             return
         track = self.tracks[channel]
         offset = int(((at or time.perf_counter()) - self.t0) * self.rate) * 2
-        if offset > len(track):
-            track.extend(b"\x00" * (offset - len(track)))
-            track.extend(pcm)
-        else:  # overlap or late frame: append, so no audio is lost
-            track.extend(pcm)
+        gap = offset - len(track)
+        if gap > 0 and (not track or gap > GAP_S * self.rate * 2):
+            track.extend(b"\x00" * gap)
+        track.extend(pcm)
+
+    def ms(self, channel: int) -> int:
+        """The length of one track in ms: where its next frame will go."""
+        return len(self.tracks[channel]) * 500 // self.rate
+
+    def now_ms(self) -> int:
+        """Wall-clock ms since start()."""
+        return int((time.perf_counter() - self.t0) * 1000) if self.t0 else 0
 
     def save_wav(self, path: Path) -> None:
         left, right = self.tracks
@@ -83,7 +101,10 @@ class Recorder:
 
 
 class Mouth:
-    """Publishes a microphone track. Sends silence between replies, as a real mic would."""
+    """Publishes a microphone track. Sends silence between replies, as a real mic would.
+
+    Every frame, silence too, goes to the recorder's right track, so that track keeps time.
+    """
 
     def __init__(self, recorder: Recorder, rate: int = RATE) -> None:
         self.rate = rate
@@ -93,6 +114,7 @@ class Mouth:
         self.samples = rate * FRAME_MS // 1000
         self.drained = asyncio.Event()
         self.speaking = False
+        self.span: tuple[int, int] | None = None  # the current reply in the right track, ms
         self._task: asyncio.Task[None] | None = None
 
     def start(self) -> None:
@@ -108,22 +130,27 @@ class Mouth:
                 data, self.speaking = silence, False
             frame = rtc.AudioFrame(data, self.rate, 1, len(data) // 2)
             await self.source.capture_frame(frame)
+            start = self.recorder.ms(1)
+            self.recorder.add(1, data)
             if self.speaking:
-                self.recorder.add(1, data)
+                self.span = (self.span[0] if self.span else start, self.recorder.ms(1))
                 if self.queue.empty():
                     self.drained.set()
             next_at += FRAME_MS / 1000
             await asyncio.sleep(max(0.0, next_at - time.perf_counter()))
 
-    async def say(self, pcm: bytes) -> None:
+    async def say(self, pcm: bytes) -> tuple[int, int] | None:
+        """Speak `pcm`. Returns where it sits in the recording (start, end ms), or None."""
         step = self.samples * 2
         pcm = pcm[: len(pcm) - len(pcm) % step]
         if not pcm:
-            return
+            return None
         self.drained.clear()
+        self.span = None
         for i in range(0, len(pcm), step):
             self.queue.put_nowait(pcm[i : i + step])
         await self.drained.wait()
+        return self.span
 
     async def stop(self) -> None:
         if self._task:
@@ -141,8 +168,6 @@ class Ear:
         self.recorder = recorder
         self.rate = rate
         self.last_loud = 0.0
-        self.loud_count = 0
-        self.loud_times: list[float] = []
         self.tasks: list[asyncio.Task[None]] = []
         self.streams: list[rtc.AudioStream] = []
 
@@ -157,9 +182,6 @@ class Ear:
             self.recorder.add(0, pcm)
             if rms(pcm) > LOUD_RMS:
                 self.last_loud = time.perf_counter()
-                self.loud_count += 1
-                if not self.loud_times or self.last_loud - self.loud_times[-1] > 0.5:
-                    self.loud_times.append(self.last_loud)  # start of each burst of speech
 
     async def wait_quiet(self, since: float, quiet_s: float = 1.2, timeout_s: float = 90.0) -> bool:
         """Wait until the interviewer spoke after `since` and then stayed quiet for quiet_s."""
@@ -170,18 +192,6 @@ class Ear:
                 return True
             await asyncio.sleep(0.05)
         return False
-
-    async def wait_first_loud(self, after: float, timeout_s: float = 30.0) -> float | None:
-        """Seconds from `after` to the interviewer's first loud frame, or None on timeout."""
-        deadline = after + timeout_s
-        while time.perf_counter() < deadline:
-            if self.last_loud > after:
-                return self.first_loud_since(after) - after
-            await asyncio.sleep(0.02)
-        return None
-
-    def first_loud_since(self, after: float) -> float:
-        return next((t for t in self.loud_times if t > after), self.last_loud)
 
     async def aclose(self) -> None:
         for task in self.tasks:

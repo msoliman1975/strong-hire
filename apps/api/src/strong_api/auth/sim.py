@@ -29,7 +29,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from strong_api.auth.deps import SESSION_USER_KEY, DbSession, require_user
+from strong_api.auth.deps import DbSession, require_user, start_user_session
 from strong_api.auth.settings import AuthSettings, get_auth_settings
 from strong_api.auth.users import create_user, find_user, normalize_email
 from strong_core.config import get_settings
@@ -155,6 +155,37 @@ async def _sim_user(db: DbSession, user: Annotated[User, Depends(require_user)])
 SimUser = Annotated[User, Depends(_sim_user)]
 
 
+async def ensure_sim_user(db: AsyncSession, settings: AuthSettings) -> User:
+    """The sim user, created on first use with training consent on. The caller commits.
+
+    Our own test user: its transcripts are always open to the admin area, so consent that is off
+    (a user made before P13) is turned on, with an audit row.
+    """
+    email = normalize_email(settings.sim_email)
+    user = await find_user(db, email)
+    if user is None:
+        user = await create_user(
+            db,
+            email=email,
+            provider=AuthProvider.DEV,
+            age_confirmed=True,
+            terms_accepted=True,
+            training_consent=True,
+        )
+    if not user.training_consent:
+        user.training_consent = True
+        db.add(
+            AuditLog(
+                org_id=user.org_id,
+                actor="sim-login",
+                action="account.consent_changed",
+                entity=f"user:{user.id}",
+                details_json={"training_consent_from": False, "training_consent_to": True},
+            )
+        )
+    return user
+
+
 def build_sim_router(settings: AuthSettings, limiter: FailureLimiter | None = None) -> APIRouter:
     router = APIRouter(prefix="/auth", tags=["auth"], include_in_schema=False)
     failures = limiter or FailureLimiter()
@@ -176,33 +207,10 @@ def build_sim_router(settings: AuthSettings, limiter: FailureLimiter | None = No
             failures.fail(client)
             log.warning("sim-login failed from %s", client)
             raise _not_found()
-        email = normalize_email(settings.sim_email)
-        user = await find_user(db, email)
-        if user is None:
-            user = await create_user(
-                db,
-                email=email,
-                provider=AuthProvider.DEV,
-                age_confirmed=True,
-                terms_accepted=True,
-                training_consent=True,
-            )
-        if not user.training_consent:
-            # Our own test user: its transcripts are always open to the admin area.
-            user.training_consent = True
-            db.add(
-                AuditLog(
-                    org_id=user.org_id,
-                    actor="sim-login",
-                    action="account.consent_changed",
-                    entity=f"user:{user.id}",
-                    details_json={"training_consent_from": False, "training_consent_to": True},
-                )
-            )
+        user = await ensure_sim_user(db, settings)
+        start_user_session(request, user)  # AU-7, AU-8
         user.last_sign_in_at = datetime.now(UTC)
         await db.commit()
-        request.session.clear()
-        request.session[SESSION_USER_KEY] = str(user.id)
         log.info("sim-login ok from %s", client)
 
     @router.get("/sim-budget")

@@ -40,7 +40,7 @@ v1 is deliberately narrow: tech roles, 20 curated companies plus a generic mode,
 | Business | B2C, one paid plan with monthly cap | Org accounts and seats (B2B) | |
 | Markets | US and Canada, English | Other languages (Arabic is a candidate) | |
 
-The 20 launch companies: Google, Amazon, Microsoft, Meta, Apple, Netflix, Nvidia, Salesforce, Uber, Stripe, OpenAI, Anthropic, Airbnb, Shopify, LinkedIn, Oracle, Adobe, Databricks, Snowflake, Atlassian. eBay was dropped from the list to avoid a conflict with your current employer; Atlassian is a placeholder for the 20th slot.
+The 21 launch companies: Google, Amazon, Microsoft, Meta, Apple, Netflix, Nvidia, Salesforce, Uber, Stripe, OpenAI, Anthropic, Airbnb, Shopify, LinkedIn, Oracle, Adobe, Databricks, Snowflake, Atlassian, Walmart. eBay was dropped from the list to avoid a conflict with your current employer; Atlassian is a placeholder for the 20th slot. Walmart was added later as the 21st.
 
 **Environments.** Development runs fully local on Docker for several weeks, using small open-weight models on your machine. Hosting on Hetzner starts only when the product works end to end locally. Moving between the two is a configuration change, not a code change.
 
@@ -117,6 +117,9 @@ IDs are referenced by the build plan and acceptance tests. Priority: P0 must shi
 | AC-1 | Self-service export and full delete of account and all data. | P0 |
 | AC-2 | Training-data consent toggle, off by default, changeable any time. | P0 |
 | AC-3 | At the first sign-in, ask for a short profile: full name, years of experience and target level, plus optional current title, country, time zone and LinkedIn URL. No payment details. The user edits it under Account, Profile. | P0 |
+| AC-4 | Sign up and sign in with email and password. Sign-up asks for the 18+ confirmation and the terms, signs the user in, and emails a link to confirm the address; password sign-in works before the link is opened. An email that already has an account cannot sign up again. Passwords have at least 8 characters and must not contain the email name. An email magic link stays as a second way to sign in. Google can be turned back on by config. | P0 |
+| AC-5 | Forgot password: the user asks for a reset link by email, and the link sets a new password and signs them in. The reply is the same whether or not the email has an account. | P0 |
+| AC-6 | Repeated wrong passwords for one email are refused for 15 minutes after 5 failures. | P0 |
 | LB-1 | A top-level Resumes page lists saved CVs. The user can add, rename and delete a CV there. | P0 |
 | LB-2 | A top-level Job descriptions page lists saved job postings. A job description with no gap report and no session can be deleted. One that has reports can be archived and restored; a "Show archived" switch shows archived ones. | P0 |
 | QB-1 | Questions page, opened from the main menu, for any signed-in user. It lists the question bank: the sample questions of the Published company profiles plus a general set. Filters: company (or General), interview type, question area (competency, narrowed to the chosen type), job category (role family), level, and text search. | P1 |
@@ -162,7 +165,7 @@ The interviewer and the scorer are separate components. The interviewer runs the
 
 ## Company profiles
 
-Each of the 20 companies gets a versioned profile, researched offline with Claude (Code or chat) against a fixed JSON schema, reviewed by you, then imported into the app. No research runs inside the app or during an interview. Profiles refresh quarterly, or on demand when a company changes its process.
+Each of the launch companies gets a versioned profile, researched offline with Claude (Code or chat) against a fixed JSON schema, reviewed by you, then imported into the app. No research runs inside the app or during an interview. Profiles refresh quarterly, or on demand when a company changes its process.
 
 **Profile structure (stored as versioned JSON).**
 
@@ -190,7 +193,7 @@ Each of the 20 companies gets a versioned profile, researched offline with Claud
 
 **Content rules.** Sample questions come only from public pages: company career and interview-prep pages, engineering blogs, and candidate reports posted publicly. Each is paraphrased and cites its source. The strong-answer note is our own guidance, not a copied answer. No NDA-protected questions, no copied paid content (for example paid question banks or courses), no claims about specific named interviewers. The interviewer adapts sample questions to the candidate rather than reading them out.
 
-**Companies outside the 20.**
+**Companies outside the launch list.**
 
 - **v1, generic mode:** the brief is built from the job posting and resume alone, with a default tech-industry persona and equal competency weights. The UI labels it clearly.
 - **v1, request this company:** requests are logged; the most-requested companies get promoted to curated profiles through the offline process.
@@ -249,7 +252,7 @@ The voice agent is the latency-critical path. Background workers do all slow wor
 | TTS | Kokoro-82M, streaming, on CPU in both environments | Near-zero cost, natural voices, open weights |
 | Jobs | Arq on Redis | Simple async Python job queue |
 | Scraping and parsing | httpx + trafilatura, Playwright fallback; pypdf and python-docx | Covers most job boards and resume formats |
-| Auth | Google OAuth + email magic links (Authlib); local dev login bypass | No passwords to store |
+| Auth | Email and password (Argon2id hashes), email magic links, Google OAuth (Authlib, off by config); local dev login bypass | Password is the familiar default; magic links stay for users who prefer no password |
 | Billing | Stripe Checkout, Customer Portal, webhooks (test mode until launch) | Fastest path to subscriptions with usage caps |
 | Deploy | Docker Compose locally (Docker Desktop with WSL2), same compose files on Hetzner later; Caddy for TLS; GitHub Actions | One stack definition for both environments |
 | Observability | Sentry, Prometheus + Grafana, PostHog, OpenTelemetry traces from Pydantic AI | Errors, latency, cost and product analytics |
@@ -329,11 +332,11 @@ Postgres is the single source of truth, with an `org_id` on every user-owned tab
 | Entity | Key fields | Notes |
 | --- | --- | --- |
 | Org | id, name, type (personal, business), plan | One personal org per user in v1 |
-| User | id, org_id, email, auth_provider, training_consent, created_at | Consent defaults to false |
+| User | id, org_id, email, auth_provider, password_hash, email_verified_at, training_consent, created_at | Consent defaults to false; password_hash is NULL for magic-link and Google users |
 | Subscription | user_id, stripe_customer_id, status, period_start, period_end, minutes_cap, minutes_used | Usage resets each period |
 | Resume | id, user_id, parsed_json, file_ref, uploaded_at | Original file encrypted in object storage |
 | JobTarget | id, user_id, company_id (nullable), source_url, raw_text, parsed_json, level, stage, context_notes | Null company_id means generic mode |
-| Company | id, name, slug, active | The 20 launch companies |
+| Company | id, name, slug, active | The launch companies |
 | CompanyProfile | id, company_id, version, status, profile_json, sources_json, reviewed_by, published_at | Only Published versions are used |
 | GapAnalysis | id, job_target_id, resume_id, match_score, breakdown_json, session_plan_json, model_profile, model_id, prompt_version | Recomputed when resume or job changes |
 | Session | id, job_target_id, type, difficulty, mode, channel (voice or text), duration_min, profile_version, brief_json, model_profile, interviewer_model_id, prompt_version, status, started_at, ended_at, minutes_billed | Coach and dev-profile sessions excluded from trends |
@@ -341,7 +344,7 @@ Postgres is the single source of truth, with an `org_id` on every user-owned tab
 | Scorecard | id, session_id, hire_signal, rationale, competency_scores_json, value_scores_json, per_question_json, model_profile, model_id, prompt_version, rubric_version | One per Realistic or Coach session. Value scores are empty in generic mode |
 | ProgressSnapshot | id, job_target_id, competency, score, session_id, at | Realistic sessions only |
 | UsageEvent | id, session_id, component (stt, llm, tts), units, cost_usd | Drives cost per session tracking |
-| CompanyRequest | id, org_id, user_id, job_target_id, company_name, normalized_name, matched_company_id, source_host, created_at | Every company name entered at job setup. Null matched_company_id means a request for a company outside the 20 |
+| CompanyRequest | id, org_id, user_id, job_target_id, company_name, normalized_name, matched_company_id, source_host, created_at | Every company name entered at job setup. Null matched_company_id means a request for a company outside the launch list |
 | AuditLog | id, actor, action, entity, at | Deletes, exports, consent changes, profile approvals |
 
 The model registry and runtime profiles live in config files, not the database. Provenance fields (PL-6) are written on every AI output so results from different models are never mixed silently.
@@ -362,7 +365,7 @@ The design rule is to keep as little as possible: audio never touches disk, and 
 
 **User rights (self-service in v1).** Export all data as JSON plus original resume files. Delete account removes all rows and files within 24 hours and purges backups on their normal rotation (30 days max), with the deletion recorded in the audit log.
 
-**Security basics.** Passwordless or OAuth login, rate limits on scraping and gap analysis, server-side prompt templates only (no user text can change system instructions), prompt-injection filtering on job postings and resumes, secrets in a vault, least-privilege admin roles, and an AuditLog for sensitive actions.
+**Security basics.** Email and password login with Argon2id hashes, a confirmed email and a lockout after repeated failures, plus magic links, rate limits on scraping and gap analysis, server-side prompt templates only (no user text can change system instructions), prompt-injection filtering on job postings and resumes, secrets in a vault, least-privilege admin roles, and an AuditLog for sensitive actions.
 
 **Age.** Users must be 18 or older; enforce at sign-up in the terms and a checkbox.
 

@@ -1,4 +1,4 @@
-"""IN-5 and spec 'Companies outside the 20': company name keys and the request log."""
+"""IN-5 and spec 'Companies outside the launch list': company name keys and the request log."""
 
 from __future__ import annotations
 

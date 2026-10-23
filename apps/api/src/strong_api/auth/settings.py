@@ -35,11 +35,18 @@ class AuthSettings(BaseSettings):
         default="http://localhost:5180/api",
         description="The API as the browser sees it (through the web proxy). Used for links.",
     )
+    admin_base_url: str = Field(
+        default="http://localhost:5181",
+        description="Where the admin app is served (D-1). Its API is at <this>/api. Sign-in "
+        "links and Google sign-in started from the admin app return here.",
+    )
 
     google_client_id: str | None = None
     google_client_secret: str | None = None
 
     magic_link_max_age_s: int = 15 * 60
+    confirm_link_max_age_s: int = Field(default=24 * 3600, description="AC-4 confirm email")
+    reset_link_max_age_s: int = Field(default=30 * 60, description="AC-5 reset password")
     smtp_host: str | None = None
     smtp_port: int = 587
     smtp_username: str | None = None
@@ -49,8 +56,8 @@ class AuthSettings(BaseSettings):
     # Staging only: comma-separated emails that see the model spend meter (strong_api.devtools).
     model_spend_viewers: str = ""
 
-    # Comma-separated emails that may open the admin area (strong_api.admin, R2). Case does not
-    # matter. Everyone else gets 404 from the admin routes.
+    # AA-1: comma-separated emails that seed admin_users on the first start, while that table
+    # is empty. After that it is ignored; use Settings > Admins or `strongctl admin`.
     admin_emails: str = ""
 
     # The AI candidate (P13). POST /auth/sim-login exists only when sim_enabled is true, and it
@@ -79,9 +86,6 @@ class AuthSettings(BaseSettings):
     @property
     def admins(self) -> set[str]:
         return {e.strip().lower() for e in self.admin_emails.split(",") if e.strip()}
-
-    def is_admin(self, email: str | None) -> bool:
-        return bool(email) and str(email).strip().lower() in self.admins
 
     @property
     def sim_active(self) -> bool:

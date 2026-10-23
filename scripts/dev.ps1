@@ -8,12 +8,13 @@
   ./scripts/dev.ps1 up -Profile all-in-one   # every service, for MODEL_PROFILE=tiny (PL-2)
   ./scripts/dev.ps1 logs -Service api
   ./scripts/dev.ps1 test
+  ./scripts/dev.ps1 admin               # the admin app dev server on http://localhost:5181
   ./scripts/dev.ps1 down -Volumes       # also delete the database and model volumes
 #>
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('up', 'down', 'logs', 'ps', 'test', 'lint', 'migrate', 'seed', 'schemas', 'help')]
+    [ValidateSet('up', 'down', 'logs', 'ps', 'test', 'lint', 'migrate', 'seed', 'schemas', 'admin', 'help')]
     [string]$Command = 'help',
 
     [Alias('Profile')]
@@ -81,9 +82,9 @@ function Invoke-Uv([string[]]$UvArgs) {
     }
 }
 
-function Invoke-Pnpm([string[]]$PnpmArgs) {
-    & pnpm --dir (Join-Path $Root 'apps/web') @PnpmArgs
-    Assert-LastExit "pnpm $($PnpmArgs -join ' ')"
+function Invoke-Pnpm([string[]]$PnpmArgs, [string]$App = 'web') {
+    & pnpm --dir (Join-Path $Root "apps/$App") @PnpmArgs
+    Assert-LastExit "pnpm ($App) $($PnpmArgs -join ' ')"
 }
 
 function Invoke-Migrate {
@@ -133,6 +134,8 @@ try {
             finally { $env:MODEL_PROFILE = $savedProfile }
             Write-Step 'Web tests'
             Invoke-Pnpm @('test')
+            Write-Step 'Admin tests'
+            Invoke-Pnpm @('test') -App 'admin'
         }
         'lint' {
             Write-Step 'ruff'
@@ -145,6 +148,9 @@ try {
             Write-Step 'Web lint and typecheck'
             Invoke-Pnpm @('lint')
             Invoke-Pnpm @('typecheck')
+            Write-Step 'Admin lint and typecheck'
+            Invoke-Pnpm @('lint') -App 'admin'
+            Invoke-Pnpm @('typecheck') -App 'admin'
         }
         'migrate' { Invoke-Migrate }
         'seed' {
@@ -154,6 +160,13 @@ try {
         'schemas' {
             Write-Step 'Regenerating schemas/ from the Pydantic models'
             Invoke-Uv @('run', 'python', '-m', 'strong_core.export_schemas')
+        }
+        'admin' {
+            # The admin app (D-1) with its /api proxy to the API on http://localhost:8700. Start the
+            # stack first (`up`), or set VITE_API_MOCKS=all to run without it.
+            Write-Step 'Admin app on http://localhost:5181'
+            Invoke-Pnpm @('install') -App 'admin'
+            Invoke-Pnpm @('dev') -App 'admin'
         }
         default { Get-Help $PSCommandPath -Detailed }
     }

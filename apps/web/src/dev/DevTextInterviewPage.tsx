@@ -167,7 +167,9 @@ export function DevTextInterviewPage() {
           <label>
             Interview type
             <select value={type} onChange={(e) => setType(e.target.value as InterviewType)}>
-              {(Object.keys(interviewTypeLabel) as InterviewType[]).map((t) => (
+              {(Object.keys(interviewTypeLabel) as InterviewType[])
+                .filter((t) => t !== "custom")
+                .map((t) => (
                 <option key={t} value={t}>
                   {interviewTypeLabel[t]}
                 </option>

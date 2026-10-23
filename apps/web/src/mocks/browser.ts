@@ -10,7 +10,7 @@
  */
 import { setupWorker } from "msw/browser";
 
-import { adminHandlers } from "./adminHandlers";
+import { customHandlers } from "./custom";
 import { createStore } from "./db";
 import { accountHandlers, authHandlers, inputHandlers, scoringHandlers, sessionHandlers } from "./handlers";
 
@@ -29,7 +29,7 @@ export async function startMocks(mode: MockMode): Promise<void> {
     ...scoringHandlers(store),
     ...authHandlers(store),
     ...accountHandlers(store),
-    ...adminHandlers(store),
+    ...customHandlers(store),
   ];
   await setupWorker(...handlers).start({
     onUnhandledFrame: "bypass",
