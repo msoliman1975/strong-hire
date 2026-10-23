@@ -262,7 +262,23 @@
       "strong_answer": "Set up who the person was, why they disagreed, and why it mattered. Show how you understood their constraints first, then used evidence such as a prototype, data or a user demo to persuade. Apple teams are deeply cross-functional, so naming partners like design or hardware helps. End with the result and the relationship afterwards. Pitfall: escalating to a manager as the main tactic.",
       "competencies": ["collaboration", "communication"],
       "values": ["Collaboration"],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/apple-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/apple-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you influence without authority",
+          "Whether you understand others' constraints first"
+        ],
+        "strong_signals": [
+          "Persuades with evidence such as a prototype or data",
+          "Shows the relationship afterwards"
+        ],
+        "watch_outs": [
+          "Escalating to a manager as the main tactic",
+          "No result"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -270,7 +286,24 @@
       "strong_answer": "Pick a real technical disagreement with stakes. Explain both positions fairly, the criteria you proposed to decide (performance, user impact, maintainability), and how you tested assumptions rather than arguing. Show you could accept being wrong. Interviewers look for respect, depth, and accountability. Pitfall: a story where the other person was simply incompetent.",
       "competencies": ["conflict_handling", "collaboration", "communication"],
       "values": ["Collaboration", "Expertise and craft"],
-      "source_url": "https://igotanoffer.com/en/advice/apple-behavioral-interview"
+      "source_url": "https://igotanoffer.com/en/advice/apple-behavioral-interview",
+      "hints": {
+        "looking_for": [
+          "How you resolve technical disagreements",
+          "Whether you test assumptions rather than argue"
+        ],
+        "strong_signals": [
+          "Explains both positions fairly",
+          "Proposes clear criteria to decide",
+          "Shows you could accept being wrong"
+        ],
+        "watch_outs": [
+          "Painting the other person as incompetent",
+          "A disagreement with no stakes"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -278,7 +311,23 @@
       "strong_answer": "Choose a real failure with consequences, ideally one where your own decision contributed. Explain what happened briefly, own your part without excuses, and spend most of the time on what you learned and what you changed in process or habits. A second example of applying the lesson is strong. Apple cares about quality, so failures involving a missed detail and the fix that prevented repeats work well. Pitfall: a fake failure.",
       "competencies": ["learning_from_failure", "ownership"],
       "values": ["Expertise and craft"],
-      "source_url": "https://igotanoffer.com/en/advice/apple-behavioral-interview"
+      "source_url": "https://igotanoffer.com/en/advice/apple-behavioral-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you own a real failure",
+          "What you learned and changed"
+        ],
+        "strong_signals": [
+          "Spends most time on lessons and changes",
+          "Shows the lesson applied again"
+        ],
+        "watch_outs": [
+          "A fake failure",
+          "Excuses or blaming others"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -286,7 +335,23 @@
       "strong_answer": "Describe the gap honestly and why it mattered. Show a deliberate learning plan: reading code or specs, building a small prototype, asking an expert specific questions. Quantify how fast you got productive and the result. Interviewers look for curiosity and humility plus speed. Pitfall: implying you never have gaps, or that someone else did the work.",
       "competencies": ["learning_from_failure", "impact"],
       "values": ["Curiosity"],
-      "source_url": "https://igotanoffer.com/en/advice/apple-behavioral-interview"
+      "source_url": "https://igotanoffer.com/en/advice/apple-behavioral-interview",
+      "hints": {
+        "looking_for": [
+          "How you close a knowledge gap quickly",
+          "Whether you show curiosity and humility"
+        ],
+        "strong_signals": [
+          "Describes a deliberate learning plan",
+          "Says how fast you got productive"
+        ],
+        "watch_outs": [
+          "Implying you never have gaps",
+          "Someone else did the work"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -294,7 +359,23 @@
       "strong_answer": "Cover your habits: design review, tests at the right levels, code review, profiling, and testing on real devices and edge cases. Then give a specific example where these caught a serious problem or where you raised the bar for the team. Apple's bar is craft, so mention user-visible details like performance, battery or accessibility. Pitfall: generic 'I write unit tests' with no story.",
       "competencies": ["ownership", "impact", "communication"],
       "values": ["Expertise and craft", "User focus and privacy"],
-      "source_url": "https://igotanoffer.com/en/advice/apple-behavioral-interview"
+      "source_url": "https://igotanoffer.com/en/advice/apple-behavioral-interview",
+      "hints": {
+        "looking_for": [
+          "Your habits for shipping quality code",
+          "Whether you raise the bar for the team"
+        ],
+        "strong_signals": [
+          "Gives a specific example where quality habits caught a problem",
+          "Mentions user-visible details like performance"
+        ],
+        "watch_outs": [
+          "Generic claims about unit tests",
+          "No real story"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -302,7 +383,23 @@
       "strong_answer": "State the decision, the deadline, and what was unknown. Explain how you reduced risk: the facts you could get quickly, the experts you consulted, and whether the decision was reversible. Make your reasoning explicit and say what you would have done if new data arrived. Close with the outcome and the lesson. Pitfall: waiting until information was complete, which avoids the question.",
       "competencies": ["ownership", "impact", "communication"],
       "values": ["Curiosity"],
-      "source_url": "https://igotanoffer.com/en/advice/apple-behavioral-interview"
+      "source_url": "https://igotanoffer.com/en/advice/apple-behavioral-interview",
+      "hints": {
+        "looking_for": [
+          "How you decide with incomplete information",
+          "How you reduce risk while deciding"
+        ],
+        "strong_signals": [
+          "Makes your reasoning explicit",
+          "Considers reversibility and what new data would change"
+        ],
+        "watch_outs": [
+          "Waiting until everything was known",
+          "No outcome or lesson"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -310,7 +407,23 @@
       "strong_answer": "Give a specific, personal reason tied to this team's products, not general prestige. Mention a product detail you admire and why it reflects good engineering or design. For the three words, pick ones you can defend with examples (for example simple, integrated, private). Show you understand that teams are secretive and product-focused. Pitfall: generic praise or focusing on perks.",
       "competencies": ["motivation", "team_fit"],
       "values": ["User focus and privacy"],
-      "source_url": "https://igotanoffer.com/en/advice/apple-behavioral-interview"
+      "source_url": "https://igotanoffer.com/en/advice/apple-behavioral-interview",
+      "hints": {
+        "looking_for": [
+          "Whether your motivation is specific and personal",
+          "Whether you appreciate product detail"
+        ],
+        "strong_signals": [
+          "Names a product detail you admire and why",
+          "Picks three words you can defend with examples"
+        ],
+        "watch_outs": [
+          "Generic praise",
+          "Focusing on perks"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -318,7 +431,23 @@
       "strong_answer": "Frame the problem and why it mattered to users or the business. Make your personal contribution explicit, describe one or two hard technical decisions and the trade-offs, and quantify the result. Be ready for deep follow-ups on any detail, because Apple managers probe for real hands-on depth. Mention collaboration with other functions. Pitfall: a project too broad to explain in detail.",
       "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
       "values": ["Expertise and craft"],
-      "source_url": "https://prachub.com/interview-experiences/apple-software-engineer-interview-experience-two-phone-screens-then-a-four-round-onsite"
+      "source_url": "https://prachub.com/interview-experiences/apple-software-engineer-interview-experience-two-phone-screens-then-a-four-round-onsite",
+      "hints": {
+        "looking_for": [
+          "The real depth of your hands-on contribution",
+          "How you make hard technical trade-offs"
+        ],
+        "strong_signals": [
+          "Makes your personal role explicit",
+          "Quantifies the result and mentions cross-team work"
+        ],
+        "watch_outs": [
+          "A project too broad to explain in detail",
+          "Not ready for deep follow-ups"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -326,7 +455,23 @@
       "strong_answer": "Show a clear method: understand the impact and deadline of each request, align with your manager on priorities, communicate trade-offs openly to both teams, and negotiate scope or dates. Give a real example and the result. Mention protecting quality rather than cutting corners silently. Pitfall: saying you just work longer hours.",
       "competencies": ["judgment", "role_fit", "team_fit"],
       "values": ["Collaboration"],
-      "source_url": "https://prachub.com/interview-experiences/apple-software-engineer-interview-experience-two-phone-screens-then-a-four-round-onsite"
+      "source_url": "https://prachub.com/interview-experiences/apple-software-engineer-interview-experience-two-phone-screens-then-a-four-round-onsite",
+      "hints": {
+        "looking_for": [
+          "How you prioritize between partner teams",
+          "Whether you communicate trade-offs openly"
+        ],
+        "strong_signals": [
+          "Aligns with your manager and negotiates scope or dates",
+          "Protects quality rather than cutting corners"
+        ],
+        "watch_outs": [
+          "Just working longer hours",
+          "Silently dropping one request"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -334,7 +479,23 @@
       "strong_answer": "Pick work where the details visibly mattered: performance, polish, reliability or accessibility. Describe specific details you cared about, how you found them (testing, user feedback, profiling), and the trade-offs you made to protect quality. Connect it to the user's experience. Pitfall: talking about scale or speed only, with no evidence of care for details.",
       "competencies": ["depth_of_experience", "role_fit"],
       "values": ["Expertise and craft", "User focus and privacy"],
-      "source_url": "https://codemia.io/guides/apple-software-engineer"
+      "source_url": "https://codemia.io/guides/apple-software-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you care about details users feel",
+          "How you find and protect those details"
+        ],
+        "strong_signals": [
+          "Names specific details and how you found them",
+          "Connects the work to the user's experience"
+        ],
+        "watch_outs": [
+          "Talking only about scale or speed",
+          "No evidence of care for detail"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -342,7 +503,24 @@
       "strong_answer": "Clarify scale and requirements: upload, download, multiple devices, edits, and shared albums. Separate metadata (database) from image blobs (object storage), cover deduplication, thumbnails and derived versions, and a sync protocol with change tokens so a new device converges. Discuss hot versus cold storage tiers, offline edits and conflict resolution, and end-to-end encryption options and their effect on server features. Apple values how it feels when a user restores a phone, so cover that path.",
       "competencies": ["technical_depth", "trade_offs", "reasoning", "clarity_of_explanation"],
       "values": ["User focus and privacy", "Expertise and craft"],
-      "source_url": "https://prachub.com/interview-experiences/apple-software-engineer-interview-experience-two-phone-screens-then-a-four-round-onsite"
+      "source_url": "https://prachub.com/interview-experiences/apple-software-engineer-interview-experience-two-phone-screens-then-a-four-round-onsite",
+      "hints": {
+        "looking_for": [
+          "How you separate metadata from large media",
+          "How you design sync across devices"
+        ],
+        "strong_signals": [
+          "Covers deduplication, thumbnails and storage tiers",
+          "Explains conflict handling and encryption trade-offs",
+          "Covers restoring a new device"
+        ],
+        "watch_outs": [
+          "Ignoring offline edits",
+          "No privacy considerations"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -350,7 +528,23 @@
       "strong_answer": "Explain the token bucket algorithm and parameters. Discuss where state lives (local, central store, or hybrid), atomic updates, and the latency added to each request. Cover accuracy versus availability: what happens when the store is unreachable (fail open or closed), clock skew, and hot keys. Mention per-user and per-API limits and how clients learn they were limited. Strong answers quantify request rates and defend the chosen consistency level.",
       "competencies": ["technical_depth", "trade_offs", "accuracy"],
       "values": ["Expertise and craft"],
-      "source_url": "https://prachub.com/interview-experiences/apple-software-engineer-interview-experience-two-phone-screens-then-a-four-round-onsite"
+      "source_url": "https://prachub.com/interview-experiences/apple-software-engineer-interview-experience-two-phone-screens-then-a-four-round-onsite",
+      "hints": {
+        "looking_for": [
+          "Whether you know the token bucket well",
+          "How you trade accuracy against availability"
+        ],
+        "strong_signals": [
+          "Explains where state lives and atomic updates",
+          "Decides fail open or closed and defends it"
+        ],
+        "watch_outs": [
+          "Ignoring latency added per request",
+          "No answer for hot keys or clock skew"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -358,7 +552,23 @@
       "strong_answer": "Cover identity and per-device keys, how a sender encrypts for each recipient device, and a server that stores encrypted messages it cannot read. Explain offline queues, push notifications, delivery and read receipts, and ordering. Discuss adding a new device, key rotation and what history the new device can see. Trade-offs: privacy versus server-side features like search, and fan-out cost for group chats. Privacy reasoning is a strong signal for Apple.",
       "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
       "values": ["User focus and privacy"],
-      "source_url": "https://codemia.io/guides/apple-software-engineer"
+      "source_url": "https://codemia.io/guides/apple-software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you design end-to-end encryption across devices",
+          "How you handle offline delivery and ordering"
+        ],
+        "strong_signals": [
+          "Covers per-device keys and new-device setup",
+          "Weighs privacy against server features"
+        ],
+        "watch_outs": [
+          "A server that can read messages",
+          "Ignoring group chat fan-out"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -366,7 +576,23 @@
       "strong_answer": "Start by measuring: energy and network profiling, wake-up counts, radio usage. Then explain common causes: frequent small requests, polling, keeping the radio awake, heavy CPU work. Propose fixes such as batching and coalescing, using system background scheduling and push instead of polling, deferring work to charging and Wi-Fi, and incremental sync. Discuss the trade-off with data freshness and how you would verify the improvement on real devices.",
       "competencies": ["technical_depth", "reasoning", "trade_offs"],
       "values": ["Expertise and craft", "User focus and privacy"],
-      "source_url": "https://codemia.io/guides/apple-software-engineer"
+      "source_url": "https://codemia.io/guides/apple-software-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you measure before fixing",
+          "How you reduce energy use on mobile"
+        ],
+        "strong_signals": [
+          "Names common causes like polling and radio wake-ups",
+          "Batches work and verifies on real devices"
+        ],
+        "watch_outs": [
+          "Guessing without profiling",
+          "Ignoring the trade-off with data freshness"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -374,7 +600,23 @@
       "strong_answer": "Lay out ingestion, durable storage or a log, processing (batch and or stream), serving storage, and monitoring. Explain when to choose batch versus streaming, how to handle late or duplicate data, schema evolution, and backfills. For a PM audience, connect each choice to product needs like freshness and cost. Strong answers keep a clear, layered explanation and name failure modes.",
       "competencies": ["clarity_of_explanation", "technical_depth", "trade_offs"],
       "values": [],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/apple-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/apple-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you lay out a data system in clear layers",
+          "When you choose batch versus streaming"
+        ],
+        "strong_signals": [
+          "Handles late and duplicate data and schema changes",
+          "Names failure modes"
+        ],
+        "watch_outs": [
+          "A jumble of tools with no structure",
+          "Ignoring backfills"
+        ]
+      },
+      "role_families": ["swe", "data_ml", "pm", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -382,7 +624,23 @@
       "strong_answer": "Clarify the age range and who the customers are (child user, parent buyer). Identify key needs: simple interaction, learning and fun, safety, parental controls and privacy. Prioritize a few core use cases, describe the experience and how it handles misunderstood speech. Address privacy explicitly, such as on-device processing and no ad tracking. Define success metrics for kids and parents. Pitfall: ignoring the parent or privacy.",
       "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
       "values": ["User focus and privacy", "Creativity"],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/apple-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/apple-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you identify both the child and the parent",
+          "How you handle safety and privacy"
+        ],
+        "strong_signals": [
+          "Prioritizes a few core use cases",
+          "Defines success for kids and parents"
+        ],
+        "watch_outs": [
+          "Ignoring the parent",
+          "Ignoring privacy"
+        ]
+      },
+      "role_families": ["pm", "design", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -390,7 +648,23 @@
       "strong_answer": "Start with the users' real routines and pain points, ideally by stating assumptions you would validate with blind users. Consider non-visual input and feedback (tactile controls, voice, haptics, sound), setting and checking alarms without sight, and failure cases like power loss. Prioritize a simple core and explain what you left out. Link to accessibility as a core value. Pitfall: just adding voice to a normal clock without thinking about setup and confirmation.",
       "competencies": ["problem_framing", "user_and_business_sense", "structure"],
       "values": ["Accessibility and inclusion", "User focus and privacy", "Creativity"],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/apple-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/apple-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you start from the users' real routines",
+          "How you design non-visual interaction"
+        ],
+        "strong_signals": [
+          "States assumptions to validate with blind users",
+          "Covers setup, confirmation and failure cases"
+        ],
+        "watch_outs": [
+          "Adding voice to a normal clock",
+          "Designing with no user input"
+        ]
+      },
+      "role_families": ["pm", "design", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -398,7 +672,23 @@
       "strong_answer": "Ask who it is for and the context (laptop or external, pro or casual). Segment users, pick one, and identify their needs: comfort, typing feel, portability, shortcuts, accessibility. Generate ideas, prioritize, and describe trade-offs like thinness versus key travel. Show taste and attention to detail typical of Apple products. Define how you would judge success. Pitfall: listing features without a target user.",
       "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
       "values": ["Expertise and craft", "Creativity"],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/apple-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/apple-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you ask who it is for first",
+          "How you weigh design trade-offs"
+        ],
+        "strong_signals": [
+          "Picks one user segment and its needs",
+          "Explains trade-offs and how to judge success"
+        ],
+        "watch_outs": [
+          "Listing features with no target user",
+          "No prioritization"
+        ]
+      },
+      "role_families": ["pm", "design", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -406,7 +696,23 @@
       "strong_answer": "Show a framework: user value, strategic fit with the ecosystem, overlap with other products, margin and growth. Pick one product and argue it with evidence, then cover the risks: loyal users, ecosystem dependencies, and how to migrate them. Apple is known for focus and saying no, so a clear, reasoned choice beats hedging. Pitfall: picking a product without considering its role in the ecosystem.",
       "competencies": ["user_and_business_sense", "prioritization", "recommendation"],
       "values": ["User focus and privacy"],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/apple-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/apple-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you use a clear framework to say no",
+          "How you weigh ecosystem effects"
+        ],
+        "strong_signals": [
+          "Makes a clear choice backed by evidence",
+          "Covers risks and how to migrate users"
+        ],
+        "watch_outs": [
+          "Hedging with no choice",
+          "Ignoring the product's role in the ecosystem"
+        ]
+      },
+      "role_families": ["pm", "design", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -414,7 +720,23 @@
       "strong_answer": "Choose a product you know well, define a user segment and a real pain point, and explain why it matters. Propose one or two improvements consistent with Apple's design style (simple, integrated, private), and explain what you would not do. Define success metrics and how to validate. Pitfall: suggesting features that conflict with privacy or simplicity.",
       "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
       "values": ["User focus and privacy", "Creativity"],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/apple-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/apple-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you find a real pain point for a user segment",
+          "Whether your ideas fit the product's style"
+        ],
+        "strong_signals": [
+          "Proposes focused improvements and says what you would not do",
+          "Defines metrics and validation"
+        ],
+        "watch_outs": [
+          "Features that conflict with privacy or simplicity",
+          "No clear user"
+        ]
+      },
+      "role_families": ["pm", "design", "tpm"],
+      "levels": []
     }
   ],
   "bar_by_level": [

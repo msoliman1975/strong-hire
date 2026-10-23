@@ -374,7 +374,23 @@
       "strong_answer": "Use STAR with most time on Action. Name the customer (internal or external) and the specific pain, with evidence. Explain what the candidate personally did beyond the normal process and what it cost. Quantify the result for the customer (time saved, tickets reduced, retention). Strong answers show working backwards from the need rather than a request. Expect follow-ups on how the need was confirmed and what the candidate would do differently. Pitfalls: a team story with no 'I', or no measurable outcome.",
       "competencies": ["impact", "ownership"],
       "values": ["Customer Obsession"],
-      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions"
+      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions",
+      "hints": {
+        "looking_for": [
+          "Whether you start from the customer's real need",
+          "What you personally did beyond the normal process"
+        ],
+        "strong_signals": [
+          "Most time spent on your own actions",
+          "Quantifies the result for the customer"
+        ],
+        "watch_outs": [
+          "A team story with no 'I'",
+          "No measurable outcome"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -382,7 +398,23 @@
       "strong_answer": "Show the two options clearly and why the long-term option was better for the customer or company. Explain how the candidate convinced others to accept the short-term cost, and how the risk was managed. Close with data showing the long-term payoff. Pitfalls: a sacrifice that was really no cost, or no evidence that the long term turned out better.",
       "competencies": ["ownership", "judgment"],
       "values": ["Ownership", "Think Big"],
-      "source_url": "https://www.aced.io/blog/how-to-nail-amazons-behavioral-interview-questions"
+      "source_url": "https://www.aced.io/blog/how-to-nail-amazons-behavioral-interview-questions",
+      "hints": {
+        "looking_for": [
+          "Whether you think long term as an owner",
+          "How you persuade others to accept a short-term cost"
+        ],
+        "strong_signals": [
+          "Lays out both options and why one was better",
+          "Shows data on the long-term payoff"
+        ],
+        "watch_outs": [
+          "A sacrifice that cost nothing",
+          "No evidence the long term turned out better"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -390,7 +422,23 @@
       "strong_answer": "Explain why nobody owned it and what would have happened if it stayed unowned. Show the candidate's own steps to fix it while keeping their main work on track, and how they involved the right owners. Quantify the outcome and mention a mechanism left behind so it stays fixed. Pitfalls: stepping on others without telling them, or dropping core responsibilities.",
       "competencies": ["ownership", "impact"],
       "values": ["Ownership"],
-      "source_url": "https://www.careerflow.ai/blog/amazon-behavioral-interview-questions"
+      "source_url": "https://www.careerflow.ai/blog/amazon-behavioral-interview-questions",
+      "hints": {
+        "looking_for": [
+          "Whether you take ownership beyond your role",
+          "How you involve the right owners"
+        ],
+        "strong_signals": [
+          "Keeps your main work on track",
+          "Leaves a mechanism so the fix lasts"
+        ],
+        "watch_outs": [
+          "Stepping on others without telling them",
+          "Dropping your core duties"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -398,7 +446,24 @@
       "strong_answer": "Show backbone: the candidate raised the disagreement directly, with data, to the right person and at the right time. Then show commitment: once decided, they backed the decision fully and helped it succeed, without 'I told you so'. Strong answers state what they learned about the other side's reasoning. Pitfalls: silently going along, continuing to resist after the decision, or a story with trivial stakes.",
       "competencies": ["conflict_handling", "communication", "collaboration"],
       "values": ["Have Backbone; Disagree and Commit", "Earn Trust"],
-      "source_url": "https://www.joinleland.com/library/a/amazon-product-manager-interview-process"
+      "source_url": "https://www.joinleland.com/library/a/amazon-product-manager-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you raise disagreement directly and with data",
+          "Whether you fully commit once it is decided"
+        ],
+        "strong_signals": [
+          "Raised it with the right person at the right time",
+          "Helped the decision succeed and learned their reasoning"
+        ],
+        "watch_outs": [
+          "Silently going along",
+          "Resisting after the decision",
+          "Trivial stakes"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -406,7 +471,23 @@
       "strong_answer": "Set up the deadline and why it mattered to customers. Describe how scope was cut or prioritized, how risks were tracked, and what the candidate did when something went wrong. Show quality was kept where it mattered. End with the delivered result in numbers and a lesson. Pitfalls: heroics with no planning, or hitting the date by shipping a broken product.",
       "competencies": ["impact", "ownership"],
       "values": ["Deliver Results", "Bias for Action"],
-      "source_url": "https://www.aced.io/blog/how-to-nail-amazons-behavioral-interview-questions"
+      "source_url": "https://www.aced.io/blog/how-to-nail-amazons-behavioral-interview-questions",
+      "hints": {
+        "looking_for": [
+          "How you plan and prioritize under deadline pressure",
+          "Whether you keep quality where it matters"
+        ],
+        "strong_signals": [
+          "Shows how scope was cut and risks tracked",
+          "Ends with the delivered result in numbers"
+        ],
+        "watch_outs": [
+          "Heroics with no planning",
+          "Hitting the date with a broken product"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -414,7 +495,23 @@
       "strong_answer": "Explain what data was missing and why waiting was costly. Show how the candidate judged whether the decision was reversible, what assumptions they made, and how they reduced risk (small rollout, monitoring, a fallback). Say how the decision turned out and what they would change. Pitfalls: claiming certainty, or never checking the outcome.",
       "competencies": ["judgment", "learning_from_failure"],
       "values": ["Are Right, A Lot", "Bias for Action"],
-      "source_url": "https://www.careerflow.ai/blog/amazon-behavioral-interview-questions"
+      "source_url": "https://www.careerflow.ai/blog/amazon-behavioral-interview-questions",
+      "hints": {
+        "looking_for": [
+          "How you decide when data is missing",
+          "Whether you judge reversibility and manage risk"
+        ],
+        "strong_signals": [
+          "States assumptions and how you reduced risk",
+          "Checks the outcome afterwards"
+        ],
+        "watch_outs": [
+          "Claiming certainty you did not have",
+          "Never looking back at the result"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -422,7 +519,23 @@
       "strong_answer": "Describe the complexity and its cost first (time, errors, operational load). Explain how the candidate found the simpler path, what they removed, and how they convinced others. Quantify the improvement. Strong answers mention trade-offs accepted for simplicity. Pitfalls: a simple solution to an already simple problem, or no measurable gain.",
       "competencies": ["impact", "ownership"],
       "values": ["Invent and Simplify"],
-      "source_url": "https://www.careerflow.ai/blog/amazon-behavioral-interview-questions"
+      "source_url": "https://www.careerflow.ai/blog/amazon-behavioral-interview-questions",
+      "hints": {
+        "looking_for": [
+          "Whether you can simplify a hard problem",
+          "How you persuade others to adopt a simpler path"
+        ],
+        "strong_signals": [
+          "Shows the cost of the complexity first",
+          "Quantifies the gain and names trade-offs accepted"
+        ],
+        "watch_outs": [
+          "A simple fix to an already simple problem",
+          "No measurable improvement"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -430,7 +543,23 @@
       "strong_answer": "Pick a real shortfall. Own the candidate's part honestly and specifically. Explain the root cause, the recovery, and the lasting change in how they work, with a later example. Amazon interviewers look for self-criticism without defensiveness. Pitfalls: blaming others or circumstances, or a project that actually went fine.",
       "competencies": ["learning_from_failure", "communication"],
       "values": ["Earn Trust", "Insist on the Highest Standards"],
-      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions"
+      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions",
+      "hints": {
+        "looking_for": [
+          "Whether you can criticize your own work honestly",
+          "What lasting change you made"
+        ],
+        "strong_signals": [
+          "Owns your part specifically",
+          "Shows the lesson applied in a later example"
+        ],
+        "watch_outs": [
+          "Blaming others or circumstances",
+          "A project that actually went fine"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -438,7 +567,23 @@
       "strong_answer": "Lay out the competing demands and stakeholders. Show the criteria used to prioritize (customer impact, deadlines, reversibility), how the trade-offs were communicated, and what was explicitly not done. Close with the outcome and how stakeholders reacted. At senior levels, show building a mechanism for prioritization rather than a one-off call. Pitfalls: doing everything by working longer, or no explicit trade-off.",
       "competencies": ["judgment", "scope_at_level", "depth_of_experience"],
       "values": ["Deliver Results", "Ownership"],
-      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions"
+      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions",
+      "hints": {
+        "looking_for": [
+          "How you prioritize between competing demands",
+          "How you communicate trade-offs to stakeholders"
+        ],
+        "strong_signals": [
+          "States clear criteria and what you chose not to do",
+          "At senior levels, builds a mechanism rather than a one-off call"
+        ],
+        "watch_outs": [
+          "Doing everything by working longer",
+          "No explicit trade-off"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -446,7 +591,23 @@
       "strong_answer": "Clarify scale (locations, lockers, sizes) and flows: delivery drop-off, customer pickup, expiry and return. Model the core entities (locker, compartment, package, reservation) and the allocation logic by size and availability. Cover code generation and security, concurrency when two packages compete for one slot, offline operation of a locker, and notifications. Discuss trade-offs between central and local state. Pitfalls: ignoring concurrency or failure of a locker unit.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": ["Customer Obsession"],
-      "source_url": "https://www.designgurus.io/blog/amazon-interview-guide"
+      "source_url": "https://www.designgurus.io/blog/amazon-interview-guide",
+      "hints": {
+        "looking_for": [
+          "How you model lockers, packages and reservations",
+          "How you handle concurrency and device failure"
+        ],
+        "strong_signals": [
+          "Clarifies scale and the main flows first",
+          "Covers secure pickup codes and expiry handling"
+        ],
+        "watch_outs": [
+          "Ignoring two packages competing for one slot",
+          "No plan for a locker going offline"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -454,7 +615,24 @@
       "strong_answer": "Clarify sources of events (warehouse, carriers, drivers), update frequency and read traffic. Propose event ingestion through a queue, an event store per shipment, and a read-optimized view for customers. Cover idempotency and out-of-order events, carrier integration failures, notifications, and caching hot lookups. Discuss consistency expectations and peak events such as holiday sales. Pitfalls: synchronous calls to carriers on every page view.",
       "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
       "values": ["Customer Obsession", "Insist on the Highest Standards"],
-      "source_url": "https://www.designgurus.io/blog/amazon-interview-guide"
+      "source_url": "https://www.designgurus.io/blog/amazon-interview-guide",
+      "hints": {
+        "looking_for": [
+          "How you ingest events from many sources",
+          "How you serve a high volume of customer reads"
+        ],
+        "strong_signals": [
+          "Handles duplicate and out-of-order events",
+          "Separates ingestion from a read-optimized view",
+          "Plans for peak events"
+        ],
+        "watch_outs": [
+          "Calling carriers on every page view",
+          "Ignoring carrier integration failures"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -462,7 +640,24 @@
       "strong_answer": "Clarify where recommendations appear and the latency budget. Separate offline work (candidate generation from co-purchase and browsing data, model training) from online serving (fetch candidates, rank, filter out-of-stock items). Cover cold start, freshness, caching, A/B testing and fallbacks when the service is slow. Tie metrics to customers (conversion, satisfaction). Pitfalls: computing everything on request, or no fallback.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": ["Customer Obsession"],
-      "source_url": "https://www.designgurus.io/blog/amazon-interview-guide"
+      "source_url": "https://www.designgurus.io/blog/amazon-interview-guide",
+      "hints": {
+        "looking_for": [
+          "How you split offline and online work",
+          "How you keep recommendations fast and useful"
+        ],
+        "strong_signals": [
+          "Covers candidate generation, ranking and filtering",
+          "Handles cold start and has a fallback",
+          "Ties metrics to customers"
+        ],
+        "watch_outs": [
+          "Computing everything on request",
+          "No fallback when the service is slow"
+        ]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -470,7 +665,23 @@
       "strong_answer": "Clarify goal: Prime sign-ups, retention, or gift-season sales. Identify customer segments who value gifting and estimate the cost (usage rate times unit cost) against the gain (retention lift, incremental orders). Consider alternatives such as a cheaper option or seasonal-only. Propose a test, the metrics to watch, and a decision rule. Pitfalls: deciding on intuition, or ignoring cost and operations.",
       "competencies": ["user_and_business_sense", "estimation_logic", "recommendation"],
       "values": ["Customer Obsession", "Frugality"],
-      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions"
+      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions",
+      "hints": {
+        "looking_for": [
+          "Whether you clarify the goal before deciding",
+          "How you weigh cost against customer value"
+        ],
+        "strong_signals": [
+          "Estimates cost from usage and unit cost",
+          "Proposes a test with a clear decision rule"
+        ],
+        "watch_outs": [
+          "Deciding on intuition",
+          "Ignoring cost and operations"
+        ]
+      },
+      "role_families": ["pm", "design", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -478,7 +689,23 @@
       "strong_answer": "First confirm the data (tracking or pipeline issue, comparison period). Segment the drop by region, platform, category, new versus returning customers, and funnel step. Check internal causes (release, pricing, outage) and external ones (seasonality, competitor, holiday). Form hypotheses, prioritize by likelihood, and say what data would confirm each. End with immediate actions and longer-term fixes. Pitfalls: jumping to a solution before locating the drop.",
       "competencies": ["problem_framing", "structure", "prioritization"],
       "values": ["Dive Deep"],
-      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions"
+      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions",
+      "hints": {
+        "looking_for": [
+          "Whether you confirm the data before acting",
+          "How you segment a drop to find its source"
+        ],
+        "strong_signals": [
+          "Checks internal and external causes",
+          "Ranks hypotheses and names the data to confirm each"
+        ],
+        "watch_outs": [
+          "Jumping to a solution before locating the drop",
+          "No segmentation"
+        ]
+      },
+      "role_families": ["pm", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -486,7 +713,23 @@
       "strong_answer": "Start with the product's goal in Amazon's strategy (engagement with Alexa, ecosystem lock-in, shopping) rather than device profit alone. Propose a north star such as weekly active devices, then supporting metrics (setup completion, interactions per day, skills used, retention at 30 and 90 days, returns) and guardrails (privacy complaints). Explain trade-offs between metrics. Pitfalls: listing many metrics without a primary one, or units sold only.",
       "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
       "values": ["Customer Obsession", "Dive Deep"],
-      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions"
+      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions",
+      "hints": {
+        "looking_for": [
+          "Whether you tie metrics to the product's strategic goal",
+          "How you choose one primary metric"
+        ],
+        "strong_signals": [
+          "Picks a north star with supporting metrics",
+          "Adds guardrails and explains trade-offs"
+        ],
+        "watch_outs": [
+          "Many metrics with no primary one",
+          "Units sold only"
+        ]
+      },
+      "role_families": ["pm", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -494,7 +737,23 @@
       "strong_answer": "Clarify the goal (order frequency, basket size, margin). Segment customers (busy families, older customers, urban singles) and pick one. Map the journey from browsing to delivery and find the biggest pain (slot availability, substitutions, freshness). Generate ideas, prioritize, and recommend one with success metrics and operational cost. Pitfalls: features without a customer segment, or ignoring the cost of delivery operations.",
       "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
       "values": ["Customer Obsession"],
-      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions"
+      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions",
+      "hints": {
+        "looking_for": [
+          "How you pick a customer segment and its biggest pain",
+          "Whether you weigh operating cost"
+        ],
+        "strong_signals": [
+          "Maps the journey from browsing to delivery",
+          "Recommends one idea with success metrics"
+        ],
+        "watch_outs": [
+          "Features with no customer segment",
+          "Ignoring the cost of delivery"
+        ]
+      },
+      "role_families": ["pm", "design", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -502,7 +761,23 @@
       "strong_answer": "Clarify how 'fake' is measured and its impact on customer trust and purchases. Break down sources (paid review rings, incentivized reviews, seller self-reviews). Propose layered solutions: detection models, verified-purchase weighting, seller penalties, and customer-facing signals. Prioritize by impact and false-positive risk, and define metrics such as trust surveys and return rates. Pitfalls: deleting reviews broadly and hurting honest sellers.",
       "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
       "values": ["Customer Obsession", "Success and Scale Bring Broad Responsibility"],
-      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions"
+      "source_url": "https://interviewkickstart.com/interview-questions/amazon-product-manager-interview-questions",
+      "hints": {
+        "looking_for": [
+          "How you define and break down a trust problem",
+          "How you balance detection against false positives"
+        ],
+        "strong_signals": [
+          "Proposes layered solutions",
+          "Prioritizes by impact and defines trust metrics"
+        ],
+        "watch_outs": [
+          "Broad deletion that hurts honest sellers",
+          "No clear definition of fake"
+        ]
+      },
+      "role_families": ["pm", "data_ml"],
+      "levels": []
     }
   ],
   "bar_by_level": [

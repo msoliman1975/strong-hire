@@ -251,7 +251,23 @@
       "strong_answer": "Pick a problem nobody owned. Describe how you noticed it, sized the cost, and acted without waiting. Explain how you got buy-in, what you changed, and the measurable result (time saved, incidents reduced). Show follow-through after the change. Pitfall: an improvement that was really your assigned task.",
       "competencies": ["ownership", "impact"],
       "values": ["Own the outcome"],
-      "source_url": "https://interviewing.io/adobe-interview-questions"
+      "source_url": "https://interviewing.io/adobe-interview-questions",
+      "hints": {
+        "looking_for": [
+          "Whether you act on problems nobody owns",
+          "How you size the cost of a problem before fixing it"
+        ],
+        "strong_signals": [
+          "Shows how you got buy-in from others",
+          "Ends with a measured result and follow-through"
+        ],
+        "watch_outs": [
+          "An improvement that was really your assigned work",
+          "No numbers on what changed"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -259,7 +275,23 @@
       "strong_answer": "Start by understanding, not judging: look at the feedback, talk to the manager and the team. Separate technical credibility from people leadership. Give direct, specific feedback, agree on a plan (coaching, delegation, 1:1 practice), and set check-in points with measures. Say what you would do if it does not improve. Show care for both the person and the team.",
       "competencies": ["communication", "conflict_handling"],
       "values": ["Be genuine"],
-      "source_url": "https://interviewing.io/adobe-interview-questions"
+      "source_url": "https://interviewing.io/adobe-interview-questions",
+      "hints": {
+        "looking_for": [
+          "How you coach a manager whose team is disengaged",
+          "Whether you seek to understand before you judge"
+        ],
+        "strong_signals": [
+          "Separates technical skill from people leadership",
+          "Sets a clear plan with check-ins and measures"
+        ],
+        "watch_outs": [
+          "Jumping straight to removing the manager",
+          "Ignoring how the team feels"
+        ]
+      },
+      "role_families": [],
+      "levels": ["senior", "staff_principal"]
     },
     {
       "interview_type": "behavioral",
@@ -267,7 +299,23 @@
       "strong_answer": "Choose a real disagreement with stakes. Show you understood the other view, argued with data, stayed respectful and direct, and helped the team reach a decision. Describe the outcome and the relationship afterwards. Pitfall: a story where you simply won.",
       "competencies": ["conflict_handling", "collaboration"],
       "values": ["Be genuine"],
-      "source_url": "https://www.aced.io/blog/adobe-interview-process"
+      "source_url": "https://www.aced.io/blog/adobe-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you handle real disagreement on a team",
+          "Whether you argue with data and stay respectful"
+        ],
+        "strong_signals": [
+          "Explains the other view fairly",
+          "Describes the decision and the relationship afterwards"
+        ],
+        "watch_outs": [
+          "A story where you simply won",
+          "A disagreement with no real stakes"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -275,7 +323,23 @@
       "strong_answer": "Clarify the real goal and the must-have outcome. Cut scope to an MVP, sequence by risk and value, and reuse existing components or buy where possible. Be explicit about what you drop and the quality bar you keep. Negotiate with stakeholders openly and set checkpoints. Show judgment, not heroics. Pitfall: promising everything by working nights.",
       "competencies": ["judgment", "scope_at_level"],
       "values": ["Own the outcome"],
-      "source_url": "https://interviewing.io/adobe-interview-questions"
+      "source_url": "https://interviewing.io/adobe-interview-questions",
+      "hints": {
+        "looking_for": [
+          "How you deliver under hard limits on people and time",
+          "Whether you cut scope with judgment, not heroics"
+        ],
+        "strong_signals": [
+          "Defines the must-have outcome and an MVP",
+          "Says openly what gets dropped and keeps a quality bar"
+        ],
+        "watch_outs": [
+          "Promising everything by working nights",
+          "Not involving stakeholders in the trade-offs"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -283,7 +347,23 @@
       "strong_answer": "Show real research: for example generative AI in creative and document products, cloud collaboration, and digital experience. Link one bet to the team you would join and to your concrete skills. Offer one thoughtful idea or question. Pitfall: generic praise of the brand.",
       "competencies": ["motivation", "role_fit"],
       "values": ["Create the future"],
-      "source_url": "https://interviewing.io/adobe-interview-questions"
+      "source_url": "https://interviewing.io/adobe-interview-questions",
+      "hints": {
+        "looking_for": [
+          "Whether you have researched where the company is heading",
+          "How you connect its bets to your own skills"
+        ],
+        "strong_signals": [
+          "Links one specific bet to the team you would join",
+          "Offers a thoughtful idea or question"
+        ],
+        "watch_outs": [
+          "Generic praise of the brand",
+          "Naming bets with no link to your role"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -291,7 +371,23 @@
       "strong_answer": "Pick a project at the scope of the target level. Explain the problem, your role, two key decisions with trade-offs, and measurable impact for users or the business. Be ready for deep technical follow-ups on the architecture. Say what you would do differently.",
       "competencies": ["depth_of_experience", "scope_at_level"],
       "values": ["Own the outcome"],
-      "source_url": "https://www.aced.io/blog/adobe-interview-process"
+      "source_url": "https://www.aced.io/blog/adobe-interview-process",
+      "hints": {
+        "looking_for": [
+          "The depth and scope of your past work",
+          "How you make and explain key decisions"
+        ],
+        "strong_signals": [
+          "Covers two decisions with their trade-offs",
+          "Gives measurable impact and what you would change"
+        ],
+        "watch_outs": [
+          "A project below the level you are applying for",
+          "Not being ready for deep technical follow-ups"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -299,7 +395,23 @@
       "strong_answer": "Give a short system overview with the main components and data flow. Pick one or two real obstacles (technical or organizational), what you did, and the outcome. Show you understand why the system is built as it is. Pitfall: blaming others for obstacles.",
       "competencies": ["depth_of_experience", "judgment"],
       "values": [],
-      "source_url": "https://leetcode.com/discuss/interview-experience/6177012/"
+      "source_url": "https://leetcode.com/discuss/interview-experience/6177012/",
+      "hints": {
+        "looking_for": [
+          "Whether you understand why your system is built as it is",
+          "How you deal with real obstacles"
+        ],
+        "strong_signals": [
+          "Gives a short, clear overview of components and data flow",
+          "Describes what you did about an obstacle and the result"
+        ],
+        "watch_outs": [
+          "Getting lost in detail before the big picture",
+          "Blaming others for obstacles"
+        ]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -307,7 +419,23 @@
       "strong_answer": "Connect a specific product or technology area to your experience and goals. Mention what you would bring in the first months. Be genuine; Adobe's own interview tips stress real interest in the products and curious questions.",
       "competencies": ["motivation", "role_fit"],
       "values": ["Be genuine"],
-      "source_url": "https://www.aced.io/blog/adobe-interview-process"
+      "source_url": "https://www.aced.io/blog/adobe-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether your interest in the company is genuine",
+          "How your experience fits a specific product area"
+        ],
+        "strong_signals": [
+          "Names a specific product or technology you care about",
+          "Says what you would bring in your first months"
+        ],
+        "watch_outs": [
+          "An answer that fits any company",
+          "Talking only about perks or prestige"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -315,7 +443,24 @@
       "strong_answer": "Clarify document sizes, users per document and offline needs. Model the document as a tree of components so changes are small deltas. Store large assets separately (object storage, content-addressed chunks). Version with an operation log plus periodic snapshots. Sync deltas, and choose a conflict strategy (OT, CRDT, or per-component locking) with reasons. Cover permissions, undo, and storage cost. Pitfall: re-uploading whole files on every change.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": [],
-      "source_url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-adobe-system-design-interview"
+      "source_url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-adobe-system-design-interview",
+      "hints": {
+        "looking_for": [
+          "How you model a complex document for sync and versioning",
+          "How you choose a conflict strategy for collaboration"
+        ],
+        "strong_signals": [
+          "Treats changes as small deltas, not whole files",
+          "Keeps large assets apart from document structure",
+          "Explains the trade-offs of the conflict approach"
+        ],
+        "watch_outs": [
+          "Re-uploading the whole file on every change",
+          "Skipping permissions, undo or storage cost"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -323,7 +468,24 @@
       "strong_answer": "Cover chunked, resumable uploads, content hashing and dedup, object storage with lifecycle tiers, metadata store, thumbnail and preview generation jobs, CDN delivery with cache keys and invalidation, and delta sync for edits. Discuss cost versus latency and regional replication. Strong answers quantify sizes and bandwidth.",
       "competencies": ["technical_depth", "trade_offs"],
       "values": [],
-      "source_url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-adobe-system-design-interview"
+      "source_url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-adobe-system-design-interview",
+      "hints": {
+        "looking_for": [
+          "How you move very large files reliably around the world",
+          "How you balance cost against latency"
+        ],
+        "strong_signals": [
+          "Covers resumable chunked uploads and deduplication",
+          "Puts numbers on file sizes and bandwidth",
+          "Plans CDN caching and invalidation"
+        ],
+        "watch_outs": [
+          "Treating huge files like small API payloads",
+          "No plan for edits or regional copies"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -331,7 +493,23 @@
       "strong_answer": "Clarify latency targets and request volume. Describe a request gateway, queueing, GPU inference pool with autoscaling and batching, result storage and delivery. Cover quotas and entitlement checks, content safety filtering, caching repeated prompts, and graceful degradation. The key trade-off is interactive latency versus GPU cost; state how you balance it and what you would measure.",
       "competencies": ["trade_offs", "reasoning", "technical_depth"],
       "values": ["Create the future"],
-      "source_url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-adobe-system-design-interview"
+      "source_url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-adobe-system-design-interview",
+      "hints": {
+        "looking_for": [
+          "How you serve an expensive model at large scale",
+          "How you trade interactive latency against GPU cost"
+        ],
+        "strong_signals": [
+          "Covers queueing, batching and autoscaling of inference",
+          "Includes quotas, safety filtering and graceful degradation"
+        ],
+        "watch_outs": [
+          "Ignoring cost or capacity limits",
+          "No content safety or entitlement checks"
+        ]
+      },
+      "role_families": ["swe", "data_ml", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -339,7 +517,23 @@
       "strong_answer": "Requirements: latency budget per keystroke, ranking by popularity, personalization, freshness. Data structure: prefix trie or precomputed top-k per prefix. Serving: in-memory shards, client debouncing, caching common prefixes. Offline pipeline to rebuild counts from logs. Discuss trade-offs of freshness versus cost and how to filter bad suggestions.",
       "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
       "values": [],
-      "source_url": "https://www.aced.io/blog/adobe-interview-process"
+      "source_url": "https://www.aced.io/blog/adobe-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you meet a tight latency budget per keystroke",
+          "Your choice of data structure for prefix lookups"
+        ],
+        "strong_signals": [
+          "Explains ranking, freshness and how counts get rebuilt",
+          "Uses caching and client debouncing to cut load"
+        ],
+        "watch_outs": [
+          "Querying a database on every keystroke",
+          "No plan to filter bad suggestions"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -347,7 +541,23 @@
       "strong_answer": "Clarify delivery guarantees (at-least-once, ordering per key), throughput and retention. Describe producers, partitioned append-only logs, consumer groups with offsets, replication and leader election, acknowledgments and retries, dead-letter handling. Discuss back-pressure and the trade-off between durability and latency.",
       "competencies": ["technical_depth", "accuracy", "trade_offs"],
       "values": [],
-      "source_url": "https://www.aced.io/blog/adobe-interview-process"
+      "source_url": "https://www.aced.io/blog/adobe-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you clarify delivery and ordering guarantees first",
+          "How you design for durability and throughput"
+        ],
+        "strong_signals": [
+          "Covers partitions, consumer offsets and replication",
+          "Handles retries, dead letters and back-pressure"
+        ],
+        "watch_outs": [
+          "Vague about at-least-once versus exactly-once",
+          "No answer for a node failure"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -355,7 +565,24 @@
       "strong_answer": "Cover consistent hashing for key placement, replication for hot keys, eviction policy, TTLs, and invalidation on writes (write-through, write-behind or cache-aside) with consistency trade-offs. Discuss node failure and rebalancing, thundering herd protection, and metrics such as hit rate.",
       "competencies": ["technical_depth", "trade_offs"],
       "values": [],
-      "source_url": "https://www.aced.io/blog/adobe-interview-process"
+      "source_url": "https://www.aced.io/blog/adobe-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you spread keys across nodes",
+          "How you keep the cache consistent with the source of truth"
+        ],
+        "strong_signals": [
+          "Explains consistent hashing and rebalancing",
+          "Chooses an invalidation strategy and states its trade-off",
+          "Protects against hot keys and thundering herds"
+        ],
+        "watch_outs": [
+          "Ignoring what happens when a node fails",
+          "No metrics such as hit rate"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -363,7 +590,23 @@
       "strong_answer": "Clarify entities (warehouse, space, firm, item, order) and the key operations. Model data and APIs, then the allocation strategy for spaces (fit, fragmentation) and order processing flow with concurrency control. Discuss scale, consistency for inventory counts, and extensibility. A reported pitfall is weak structure; break the problem into components early.",
       "competencies": ["reasoning", "technical_depth", "clarity_of_explanation"],
       "values": [],
-      "source_url": "https://leetcode.com/discuss/interview-experience/7376948"
+      "source_url": "https://leetcode.com/discuss/interview-experience/7376948",
+      "hints": {
+        "looking_for": [
+          "How you break an open-ended system into components",
+          "How you model entities and core operations"
+        ],
+        "strong_signals": [
+          "Defines the data model and APIs early",
+          "Handles concurrency on inventory and allocation"
+        ],
+        "watch_outs": [
+          "Weak structure that jumps between topics",
+          "Skipping consistency of stock counts"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -371,7 +614,23 @@
       "strong_answer": "Clarify goal (new subscribers, revenue). Segment small businesses by need (social content, print, web). Size the opportunity roughly. Identify barriers: price, skills, local payment, competition from simpler tools. Propose a focused offer (templates, simpler app, bundles, partners) and a go-to-market. Define metrics: trial starts, conversion, retention. Recommend one path with risks.",
       "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
       "values": ["Create the future"],
-      "source_url": "https://www.aced.io/blog/adobe-interview-process"
+      "source_url": "https://www.aced.io/blog/adobe-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you frame a go-to-market problem in a new market",
+          "Whether you segment customers by need"
+        ],
+        "strong_signals": [
+          "Sizes the opportunity roughly and names local barriers",
+          "Recommends one focused path with metrics and risks"
+        ],
+        "watch_outs": [
+          "A generic plan that ignores the local market",
+          "No clear goal or success metric"
+        ]
+      },
+      "role_families": ["pm", "design", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -379,7 +638,23 @@
       "strong_answer": "State the feature goal first. Pick a north star (for example time spent watching or creators posting weekly) and supporting metrics for creators, viewers and the business. Add guardrails such as impact on other surfaces. Explain how to attribute change (experiments, cohorts). Pitfall: a long list of metrics with no hierarchy.",
       "competencies": ["structure", "user_and_business_sense"],
       "values": [],
-      "source_url": "https://www.aced.io/blog/adobe-interview-process"
+      "source_url": "https://www.aced.io/blog/adobe-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you start from the feature's goal",
+          "How you build a hierarchy of metrics"
+        ],
+        "strong_signals": [
+          "Picks a clear north star with supporting metrics",
+          "Adds guardrails and a way to attribute change"
+        ],
+        "watch_outs": [
+          "A long list of metrics with no priority",
+          "Ignoring creators or the wider app"
+        ]
+      },
+      "role_families": ["pm", "data_ml"],
+      "levels": []
     }
   ],
   "bar_by_level": [

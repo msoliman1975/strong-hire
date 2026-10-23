@@ -252,7 +252,24 @@
       "strong_answer": "Pick a real case where authority was missing. Set the context briefly, then spend most of the time on own actions: how the need was spotted, how stakeholders were aligned (data, prototypes, one-on-ones), and how trade-offs were made. Use 'I' for own decisions. End with a measurable result and what the candidate would repeat. Strong answers also show stepping back when someone else was better placed. Pitfalls: a story where the candidate was the manager, or vague 'we' with no own action.",
       "competencies": ["ownership", "collaboration", "impact"],
       "values": ["Leadership"],
-      "source_url": "https://designgurus.io/answers/detail/what-questions-are-asked-in-a-google-behavioral-interview"
+      "source_url": "https://designgurus.io/answers/detail/what-questions-are-asked-in-a-google-behavioral-interview",
+      "hints": {
+        "looking_for": [
+          "How you lead without formal authority",
+          "Whether you know when to step back"
+        ],
+        "strong_signals": [
+          "Explains how you aligned people with data or prototypes",
+          "Uses 'I' for your own decisions",
+          "Ends with a measurable result"
+        ],
+        "watch_outs": [
+          "A story where you were actually the manager",
+          "A vague 'we' with no personal action"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -260,7 +277,24 @@
       "strong_answer": "Show respect for the other view: state their reasoning fairly before your own. Explain how the disagreement was made concrete (criteria, data, a quick experiment) rather than a battle of opinions. Show the outcome, including if the candidate was wrong and changed their mind. Mention the working relationship afterwards. Pitfalls: a villain story, escalating to a manager as the first step, or 'we never disagree'.",
       "competencies": ["conflict_handling", "communication", "collaboration"],
       "values": ["Googleyness"],
-      "source_url": "https://designgurus.io/answers/detail/what-questions-are-asked-in-a-google-behavioral-interview"
+      "source_url": "https://designgurus.io/answers/detail/what-questions-are-asked-in-a-google-behavioral-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you respect views different from yours",
+          "How you turn opinions into concrete criteria"
+        ],
+        "strong_signals": [
+          "States the other person's reasoning fairly",
+          "Uses data or a quick experiment to decide",
+          "Shows the relationship afterwards"
+        ],
+        "watch_outs": [
+          "A villain story",
+          "Escalating to a manager as the first step"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -268,7 +302,24 @@
       "strong_answer": "Choose a real failure with real stakes, not a disguised strength. Own the part that was the candidate's fault without blaming others. Explain the root cause, the immediate fix, and a lasting change in how they work, ideally with a later example where the lesson paid off. Intellectual humility and calm self-reflection are the signals. Pitfalls: trivial failures, blaming the team, or no concrete change.",
       "competencies": ["learning_from_failure", "communication"],
       "values": ["Googleyness"],
-      "source_url": "https://igotanoffer.com/blogs/tech/google-gca-interviews"
+      "source_url": "https://igotanoffer.com/blogs/tech/google-gca-interviews",
+      "hints": {
+        "looking_for": [
+          "Your humility and self-reflection",
+          "Whether the lesson changed how you work"
+        ],
+        "strong_signals": [
+          "Owns your part without blaming others",
+          "Explains the root cause and the fix",
+          "Shows a later time the lesson paid off"
+        ],
+        "watch_outs": [
+          "A disguised strength",
+          "A trivial failure with no stakes"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -276,7 +327,24 @@
       "strong_answer": "Name the user group and the harm they would have faced. Show how the candidate made the user case with evidence (feedback, data, a demo), proposed a workable compromise (scope cut, phased launch), and still respected the deadline where possible. Close with the user outcome and the stakeholder relationship. Pitfalls: 'I refused to ship' with no alternative, or no evidence for the user claim.",
       "competencies": ["ownership", "communication", "impact"],
       "values": ["Googleyness"],
-      "source_url": "https://designgurus.io/answers/detail/what-questions-are-asked-in-a-google-behavioral-interview"
+      "source_url": "https://designgurus.io/answers/detail/what-questions-are-asked-in-a-google-behavioral-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you advocate for users with evidence",
+          "How you find compromises under pressure"
+        ],
+        "strong_signals": [
+          "Names the users and the harm they would face",
+          "Proposes a workable option like a scope cut or phased launch",
+          "Keeps the stakeholder relationship intact"
+        ],
+        "watch_outs": [
+          "Refusing to ship with no alternative",
+          "Claiming user needs with no evidence"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -284,7 +352,24 @@
       "strong_answer": "Treat it as a structured hypothetical. First understand both visions and the goals behind them through one-on-ones. Make the decision criteria explicit (user impact, risk, time, cost) and agree on who decides. Suggest ways to reduce risk such as a spike or prototype. Communicate the decision and keep both people engaged. Strong answers mention escalation only as a last resort and checking back later. Pitfalls: picking a side immediately or ignoring the people side.",
       "competencies": ["conflict_handling", "collaboration", "communication"],
       "values": ["Leadership", "Googleyness"],
-      "source_url": "https://igotanoffer.com/blogs/tech/google-rrk-interview"
+      "source_url": "https://igotanoffer.com/blogs/tech/google-rrk-interview",
+      "hints": {
+        "looking_for": [
+          "How you mediate between strong opinions",
+          "Whether you make decision criteria explicit"
+        ],
+        "strong_signals": [
+          "Understands both visions through one-on-ones",
+          "Agrees who decides and on what criteria",
+          "Suggests a prototype or spike to reduce risk"
+        ],
+        "watch_outs": [
+          "Picking a side right away",
+          "Ignoring the people side of the conflict"
+        ]
+      },
+      "role_families": [],
+      "levels": ["senior", "staff_principal"]
     },
     {
       "interview_type": "hiring_manager",
@@ -292,7 +377,24 @@
       "strong_answer": "Give a 30-second summary (problem, users, own role, result), then go deep on two or three decisions the candidate made and why. Quantify impact. Be ready for follow-ups on alternatives, what broke, and what they would change. Scope should match the target level: at L5+ the project should involve design ownership and influence on other engineers. Pitfalls: listing technologies without decisions, or claiming team work as own work.",
       "competencies": ["depth_of_experience", "scope_at_level", "role_fit"],
       "values": ["Role-Related Knowledge"],
-      "source_url": "https://igotanoffer.com/blogs/tech/google-rrk-interview"
+      "source_url": "https://igotanoffer.com/blogs/tech/google-rrk-interview",
+      "hints": {
+        "looking_for": [
+          "How deeply you understand your own decisions",
+          "Whether the project scope fits your level"
+        ],
+        "strong_signals": [
+          "Opens with a short summary, then goes deep on key decisions",
+          "Quantifies impact",
+          "Handles follow-ups on alternatives and what broke"
+        ],
+        "watch_outs": [
+          "Listing technologies without decisions",
+          "Claiming team work as your own"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -300,7 +402,24 @@
       "strong_answer": "Connect specific facts about the team's product or problems to the candidate's past work and goals. Show what they would bring in the first months and what they want to learn. Strong answers are specific and honest about motivation. Pitfalls: generic praise of perks or brand, or no knowledge of what the team does.",
       "competencies": ["motivation", "team_fit"],
       "values": [],
-      "source_url": "https://designgurus.io/answers/detail/what-questions-are-asked-in-a-google-behavioral-interview"
+      "source_url": "https://designgurus.io/answers/detail/what-questions-are-asked-in-a-google-behavioral-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you know what the team does",
+          "How your past work connects to the team's problems"
+        ],
+        "strong_signals": [
+          "Links specific team problems to your experience",
+          "Says what you would bring early on",
+          "Is honest about what you want to learn"
+        ],
+        "watch_outs": [
+          "Generic praise of perks or brand",
+          "No knowledge of the team's work"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -308,7 +427,24 @@
       "strong_answer": "Clarify requirements: number of concurrent editors, latency target, offline support, version history. Cover the core concurrency approach (operational transformation or CRDTs) and why, the session server that orders operations per document, persistence as an operation log with periodic snapshots, presence and cursors, and access control. Discuss scaling by sharding documents, reconnect and conflict handling, and trade-offs between consistency and latency. Pitfalls: ignoring concurrent edits, or locking the whole document.",
       "competencies": ["technical_depth", "trade_offs", "reasoning", "clarity_of_explanation"],
       "values": ["Role-Related Knowledge", "General Cognitive Ability"],
-      "source_url": "https://www.designgurus.io/blog/google-system-design-interview-questions-ultimate-guide"
+      "source_url": "https://www.designgurus.io/blog/google-system-design-interview-questions-ultimate-guide",
+      "hints": {
+        "looking_for": [
+          "How you handle many people editing at once",
+          "Whether you weigh consistency against latency"
+        ],
+        "strong_signals": [
+          "Explains the concurrency approach and why",
+          "Stores edits as an operation log with snapshots",
+          "Handles reconnects, presence and access control"
+        ],
+        "watch_outs": [
+          "Locking the whole document",
+          "Ignoring concurrent edits"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -316,7 +452,24 @@
       "strong_answer": "Scope it: uploads per day, watch traffic, regions. Cover the upload path (chunked upload, object storage, async transcoding into several resolutions), metadata storage, the streaming path through CDNs with adaptive bitrate, and view counts at scale. Estimate storage and bandwidth roughly. Discuss hot versus long-tail content caching, failure handling, and what to keep strongly consistent versus eventually consistent. Pitfalls: serving video from the app server, or no numbers at all.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": ["Role-Related Knowledge"],
-      "source_url": "https://www.designgurus.io/blog/google-system-design-interview-questions-ultimate-guide"
+      "source_url": "https://www.designgurus.io/blog/google-system-design-interview-questions-ultimate-guide",
+      "hints": {
+        "looking_for": [
+          "How you design upload and streaming paths at global scale",
+          "Whether you estimate storage and bandwidth"
+        ],
+        "strong_signals": [
+          "Uses async transcoding and adaptive bitrate",
+          "Serves video through a CDN with sensible caching",
+          "Says what must be strongly versus eventually consistent"
+        ],
+        "watch_outs": [
+          "Serving video from the app server",
+          "No numbers at all"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -324,7 +477,24 @@
       "strong_answer": "Clarify latency target (tens of milliseconds), personalization and freshness. Cover a prefix structure (trie or precomputed top-k per prefix), offline aggregation of query logs, serving from memory with sharding by prefix, caching at the edge, and filtering of unsafe suggestions. Discuss update frequency trade-offs and how to handle trending queries. Pitfalls: querying the main database on every keystroke, or forgetting ranking.",
       "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
       "values": ["Role-Related Knowledge"],
-      "source_url": "https://www.designgurus.io/blog/google-system-design-interview-questions-ultimate-guide"
+      "source_url": "https://www.designgurus.io/blog/google-system-design-interview-questions-ultimate-guide",
+      "hints": {
+        "looking_for": [
+          "How you hit very low latency at scale",
+          "Whether you think about ranking and freshness"
+        ],
+        "strong_signals": [
+          "Uses a prefix structure with precomputed top suggestions",
+          "Serves from memory with sharding and caching",
+          "Mentions filtering unsafe suggestions"
+        ],
+        "watch_outs": [
+          "Querying the main database on every keystroke",
+          "Forgetting how suggestions are ranked"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -332,7 +502,24 @@
       "strong_answer": "Explain that load times are right-skewed with a long tail, so medians and high percentiles (p90, p99) matter more than the mean. Walk through the drivers: DNS, connection setup, server time, payload size, rendering, third-party scripts, device and network. Suggest how to measure (real-user monitoring versus lab tests) and which levers to pull first. Pitfalls: giving one number, or ignoring the tail.",
       "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
       "values": ["Role-Related Knowledge"],
-      "source_url": "https://igotanoffer.com/blogs/tech/google-rrk-interview"
+      "source_url": "https://igotanoffer.com/blogs/tech/google-rrk-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you understand how performance data is distributed",
+          "How well you know what drives page load time"
+        ],
+        "strong_signals": [
+          "Explains the long tail and why percentiles matter",
+          "Walks through network, server and rendering drivers",
+          "Suggests how to measure and which levers to pull first"
+        ],
+        "watch_outs": [
+          "Giving a single average number",
+          "Ignoring the slow tail"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -340,7 +527,24 @@
       "strong_answer": "Clarify scope (blind versus low-vision users, walking versus transit) and the goal. Map the journey: planning a route, navigating, finding the entrance, handling surprises. Pick the biggest pain point, such as the last 50 metres to a door, and generate options (precise audio cues, haptics, accessible entrance data from the community). Prioritize by impact and feasibility, define success metrics (completed trips, confidence surveys) and safety guardrails. Pitfalls: designing without the user's context, or no metric.",
       "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
       "values": ["General Cognitive Ability", "Googleyness"],
-      "source_url": "https://www.productleadership.com/blog/google-product-manager-interview-guide/"
+      "source_url": "https://www.productleadership.com/blog/google-product-manager-interview-guide/",
+      "hints": {
+        "looking_for": [
+          "Your empathy for users with different needs",
+          "How you prioritize one pain point in a journey"
+        ],
+        "strong_signals": [
+          "Clarifies which users and situations are in scope",
+          "Maps the journey before proposing ideas",
+          "Defines success metrics and safety guardrails"
+        ],
+        "watch_outs": [
+          "Designing without the user's context",
+          "No way to measure success"
+        ]
+      },
+      "role_families": ["pm", "design"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -348,7 +552,24 @@
       "strong_answer": "State the approach before numbers: internet users times share using Google times searches per user per day, possibly segmented by device or region. Use round, defensible assumptions and say them out loud. Compute clearly, then sanity-check against something known and give a range. Mention what would change the estimate (voice and AI answers, regions where Google is not dominant). Pitfalls: an unexplained number, or false precision.",
       "competencies": ["estimation_logic", "structure", "clarity_of_explanation"],
       "values": ["General Cognitive Ability"],
-      "source_url": "https://www.productleadership.com/blog/google-product-manager-interview-guide/"
+      "source_url": "https://www.productleadership.com/blog/google-product-manager-interview-guide/",
+      "hints": {
+        "looking_for": [
+          "How you structure an estimate from first principles",
+          "Whether you state assumptions clearly"
+        ],
+        "strong_signals": [
+          "States the approach before any numbers",
+          "Uses round, defensible assumptions",
+          "Sanity-checks the result and gives a range"
+        ],
+        "watch_outs": [
+          "An unexplained number",
+          "False precision"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -356,7 +577,24 @@
       "strong_answer": "Clarify the goal: watch time, satisfaction, or creator health. Segment users (new viewers, kids, power users, creators) and choose one. Identify pain points such as repetitive or low-quality recommendations. Propose solutions, including user controls and signals beyond clicks, and prioritize. Define metrics such as satisfaction surveys alongside watch time, and guardrails for harmful content. Pitfalls: optimizing only for watch time, or ignoring the creator side.",
       "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
       "values": ["General Cognitive Ability"],
-      "source_url": "https://www.aced.io/guides/google-product-manager-interview/questions"
+      "source_url": "https://www.aced.io/guides/google-product-manager-interview/questions",
+      "hints": {
+        "looking_for": [
+          "Whether you clarify the goal before solving",
+          "How you balance viewers, creators and the business"
+        ],
+        "strong_signals": [
+          "Picks one user segment and its pain points",
+          "Pairs watch time with satisfaction measures",
+          "Adds guardrails for harmful content"
+        ],
+        "watch_outs": [
+          "Optimizing only for watch time",
+          "Ignoring creators"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -364,7 +602,24 @@
       "strong_answer": "Start with the mission and market position, then segment target users and pick a focus. Look at Google's advantages (AI, software, services) versus competitors. Propose two or three strategic bets, prioritize, and sequence them over three years. Define success metrics such as share in a target segment, retention and satisfaction. Address risks like partner relationships with other Android makers. Pitfalls: a feature list with no strategy, or no metrics.",
       "competencies": ["user_and_business_sense", "prioritization", "recommendation", "structure"],
       "values": ["General Cognitive Ability"],
-      "source_url": "https://www.aced.io/guides/google-product-manager-interview/questions"
+      "source_url": "https://www.aced.io/guides/google-product-manager-interview/questions",
+      "hints": {
+        "looking_for": [
+          "How you build a multi-year product strategy",
+          "Whether you play to the company's strengths"
+        ],
+        "strong_signals": [
+          "Picks a target segment and a focus",
+          "Proposes a few sequenced bets",
+          "Defines success metrics and names risks"
+        ],
+        "watch_outs": [
+          "A feature list with no strategy",
+          "No metrics"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": ["senior", "staff_principal"]
     },
     {
       "interview_type": "case",
@@ -372,7 +627,24 @@
       "strong_answer": "Clarify the goal (recruiting, local community, press) and constraints (budget, size, date). Structure the work: audience, program, logistics, communications, risks. Prioritize what matters for the goal and define how success is measured, such as attendee numbers or applications. Close with a short plan and timeline. The signal is structured thinking on an unfamiliar problem. Pitfalls: listing ideas with no goal, or never stating assumptions.",
       "competencies": ["problem_framing", "structure", "recommendation"],
       "values": ["General Cognitive Ability"],
-      "source_url": "https://igotanoffer.com/blogs/tech/google-gca-interviews"
+      "source_url": "https://igotanoffer.com/blogs/tech/google-gca-interviews",
+      "hints": {
+        "looking_for": [
+          "How you structure an unfamiliar problem",
+          "Whether you start from the goal"
+        ],
+        "strong_signals": [
+          "Clarifies goal and constraints first",
+          "Organizes the work into clear areas",
+          "Defines how success is measured"
+        ],
+        "watch_outs": [
+          "Listing ideas with no goal",
+          "Never stating assumptions"
+        ]
+      },
+      "role_families": ["pm", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -380,7 +652,24 @@
       "strong_answer": "Clarify the definition and measurement of gridlock. Break down the causes (demand peaks, intersections, deliveries, incidents, parking). Use data to find the biggest contributors, then propose options across pricing, signal timing, enforcement and transit, with trade-offs and rough impact. Recommend a phased plan with pilots and metrics such as average travel time. Pitfalls: one silver-bullet idea, or no way to measure progress.",
       "competencies": ["problem_framing", "structure", "estimation_logic", "recommendation"],
       "values": ["General Cognitive Ability"],
-      "source_url": "https://igotanoffer.com/blogs/tech/google-gca-interviews"
+      "source_url": "https://igotanoffer.com/blogs/tech/google-gca-interviews",
+      "hints": {
+        "looking_for": [
+          "How you break down a messy real-world problem",
+          "Whether you use data to find the biggest causes"
+        ],
+        "strong_signals": [
+          "Defines how gridlock is measured",
+          "Compares options with trade-offs and rough impact",
+          "Recommends a phased plan with pilots and metrics"
+        ],
+        "watch_outs": [
+          "One silver-bullet idea",
+          "No way to measure progress"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -388,7 +677,24 @@
       "strong_answer": "Identify the customers (internal developer teams) and their jobs: build, evaluate, deploy, and run agents safely. Find the main friction and set a strategy that reduces it (paved road, shared evals, safety guardrails). Prioritize platform investments. For the single metric, pick something tied to value delivered, such as agents in production with active usage, and explain why vanity metrics like sign-ups fail. Pitfalls: no customer view, or a metric that can be gamed.",
       "competencies": ["user_and_business_sense", "prioritization", "recommendation"],
       "values": ["General Cognitive Ability", "Role-Related Knowledge"],
-      "source_url": "https://www.aced.io/guides/google-product-manager-interview/questions"
+      "source_url": "https://www.aced.io/guides/google-product-manager-interview/questions",
+      "hints": {
+        "looking_for": [
+          "Whether you treat internal teams as customers",
+          "How you choose one metric tied to real value"
+        ],
+        "strong_signals": [
+          "Names the main friction for teams building agents",
+          "Prioritizes platform investments",
+          "Explains why vanity metrics fail"
+        ],
+        "watch_outs": [
+          "No customer view",
+          "A metric that can be gamed"
+        ]
+      },
+      "role_families": ["pm", "tpm"],
+      "levels": ["senior", "staff_principal"]
     }
   ],
   "bar_by_level": [

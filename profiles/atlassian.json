@@ -261,7 +261,25 @@
       "strong_answer": "Clarify scope: tag CRUD, tag-to-entity mapping across products, popular-tags query, tenant isolation. Size it with rough numbers (tenants, entities, tag writes per second). Define APIs (add/remove tag, list by entity, list entities by tag, top-k). Pick storage with reasons: relational or wide-column for mappings keyed by tenant, with a separate counter path (stream plus aggregation, or approximate counts) for top-k. Cover sharding by tenant, caching hot tags, eventual consistency of counts, and failure handling. Expect follow-ups and defend trade-offs. Pitfall: skipping multi-tenancy or treating top-k as an exact global scan.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": ["Build with heart and balance"],
-      "source_url": "https://leetcode.com/discuss/interview-experience/2231218/"
+      "source_url": "https://leetcode.com/discuss/interview-experience/2231218/",
+      "hints": {
+        "looking_for": [
+          "How you scope a shared service used by several products",
+          "Whether you handle multi-tenancy and isolation from the start",
+          "How you reason about storage and counting trade-offs"
+        ],
+        "strong_signals": [
+          "Sizes the load with rough numbers before choosing storage",
+          "Separates the popular-tags path from the core tag mappings",
+          "Defends trade-offs calmly when follow-ups push back"
+        ],
+        "watch_outs": [
+          "Ignoring tenant isolation across products",
+          "Computing popular tags with an exact scan over everything"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -269,7 +287,24 @@
       "strong_answer": "Start with requirements: scale, politeness, freshness, content types. Components: URL frontier with per-host queues, fetchers, parser, dedup of URLs and content (hashes), storage. Address cycles and duplicate URLs early (normalization, seen-set or Bloom filter), robots.txt and rate limits per host, retries and timeouts. Scale horizontally by partitioning the frontier by host. Discuss failure recovery and monitoring. A reported pitfall is missing loop handling until prompted, so raise it yourself.",
       "competencies": ["technical_depth", "reasoning", "trade_offs"],
       "values": [],
-      "source_url": "https://leetcode.com/discuss/interview-experience/4133665/"
+      "source_url": "https://leetcode.com/discuss/interview-experience/4133665/",
+      "hints": {
+        "looking_for": [
+          "How you break a large system into clear components",
+          "Whether you spot loops and duplicate pages without being prompted"
+        ],
+        "strong_signals": [
+          "Covers politeness, robots rules and per-host rate limits",
+          "Explains how the URL frontier is split up to scale out",
+          "Mentions failure recovery and monitoring"
+        ],
+        "watch_outs": [
+          "Missing cycle handling until the interviewer raises it",
+          "Jumping into components before stating requirements"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -277,7 +312,24 @@
       "strong_answer": "Name the algorithm (token or leaky bucket, sliding window) and why. For one node, discuss concurrent maps and atomic updates. For many nodes: a shared store with atomic increments or scripts, or local buckets with periodic sync and the over-admission that causes. Cover clock skew, hot customers, failure mode when the store is down (fail open or closed and why), and how unused quota carry-over changes the state. Strong answers quantify latency added per request.",
       "competencies": ["technical_depth", "trade_offs", "accuracy"],
       "values": [],
-      "source_url": "https://leetcode.com/discuss/interview-experience/4133665/"
+      "source_url": "https://leetcode.com/discuss/interview-experience/4133665/",
+      "hints": {
+        "looking_for": [
+          "How well you understand concurrency on one machine and across many",
+          "Whether you reason about consistency versus latency"
+        ],
+        "strong_signals": [
+          "Names an algorithm and explains why it fits",
+          "States what happens when the shared store fails and why",
+          "Estimates the latency each check adds"
+        ],
+        "watch_outs": [
+          "Ignoring race conditions on shared counters",
+          "Assuming servers stay in sync for free"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -285,7 +337,24 @@
       "strong_answer": "Give context in one minute: users, scale, constraints. Draw the main components and data flow. Pick one hard problem and go deep: options considered, why you chose one, what it cost. Show what you owned versus the team. Quantify impact (latency, cost, incidents, adoption). Say what you would change now. Pitfall: staying at a buzzword level or being unable to answer 'why not X?'.",
       "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
       "values": ["Build with heart and balance"],
-      "source_url": "https://leetcode.com/discuss/interview-experience/4133665/"
+      "source_url": "https://leetcode.com/discuss/interview-experience/4133665/",
+      "hints": {
+        "looking_for": [
+          "How deeply you understand a system you actually built",
+          "How you explain trade-offs and your own part in them"
+        ],
+        "strong_signals": [
+          "Goes deep on one hard problem and the options considered",
+          "Separates what you owned from what the team did",
+          "Quantifies impact and says what you would change now"
+        ],
+        "watch_outs": [
+          "Staying at buzzword level",
+          "No answer to 'why not the other option?'"
+        ]
+      },
+      "role_families": ["swe", "data_ml", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -293,7 +362,24 @@
       "strong_answer": "Restate the new constraint and its impact before changing anything. Show which parts of the design are affected (replication, caching, storage tier, regions) and which are not. Compare at least two options with their cost and failure behavior. Ask clarifying questions instead of guessing. Atlassian says it uses laddered follow-ups to see learning agility, so adapting calmly matters more than a perfect first design.",
       "competencies": ["reasoning", "trade_offs", "clarity_of_explanation"],
       "values": ["Build with heart and balance"],
-      "source_url": "https://www.atlassian.com/company/careers/resources/interviewing/how-to-nail-your-engineering-interview"
+      "source_url": "https://www.atlassian.com/company/careers/resources/interviewing/how-to-nail-your-engineering-interview",
+      "hints": {
+        "looking_for": [
+          "How you adapt when requirements change mid-design",
+          "Whether you ask clarifying questions instead of guessing"
+        ],
+        "strong_signals": [
+          "Restates the new constraint and its impact before changing things",
+          "Shows which parts change and which stay the same",
+          "Compares options by cost and failure behavior"
+        ],
+        "watch_outs": [
+          "Starting over instead of adapting the design",
+          "Getting defensive about the first design"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -301,7 +387,24 @@
       "strong_answer": "Use a clear arc: problem and why it mattered, your specific role, how you broke the work down and sequenced it, risks and how you handled them, stakeholders, and measurable results. Mention a trade-off you made and its business reason. Match scope to the level you apply for. Pitfall: describing the team's work with no clear personal contribution.",
       "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
       "values": [],
-      "source_url": "https://leetcode.com/discuss/interview-experience/2231218/"
+      "source_url": "https://leetcode.com/discuss/interview-experience/2231218/",
+      "hints": {
+        "looking_for": [
+          "How you plan, sequence and de-risk work",
+          "What you personally owned versus the team"
+        ],
+        "strong_signals": [
+          "Shows a clear arc from problem to measured result",
+          "Names a trade-off and the business reason for it",
+          "Scope matches the level you are applying for"
+        ],
+        "watch_outs": [
+          "Describing the team's work with no clear 'I'",
+          "Results with no numbers or evidence"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -309,7 +412,24 @@
       "strong_answer": "Be specific: the kind of problems and scope you want, the skills you are building, and evidence you already work on them. Tie it to the team and Atlassian's products honestly. Show self-awareness about gaps. Pitfall: generic answers or answers only about title and pay.",
       "competencies": ["motivation", "role_fit", "team_fit"],
       "values": [],
-      "source_url": "https://www.atlassian.com/company/careers/resources/interviewing/how-to-nail-your-engineering-interview"
+      "source_url": "https://www.atlassian.com/company/careers/resources/interviewing/how-to-nail-your-engineering-interview",
+      "hints": {
+        "looking_for": [
+          "Whether your goals fit the role and team",
+          "How self-aware you are about your growth areas"
+        ],
+        "strong_signals": [
+          "Names specific problems and scope you want to take on",
+          "Shows evidence you are already building those skills",
+          "Links goals honestly to the team's products"
+        ],
+        "watch_outs": [
+          "Generic goals that could apply anywhere",
+          "Talking only about title or pay"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -317,7 +437,24 @@
       "strong_answer": "Pick an achievement at the right scope. State the constraint that forced the trade-off (time, people, quality, cost), the options, why you chose one, who you aligned with, and the outcome including what the trade-off cost later. Show judgment, not luck. Pitfall: an achievement with no real choice in it.",
       "competencies": ["judgment", "depth_of_experience", "scope_at_level"],
       "values": ["Build with heart and balance"],
-      "source_url": "https://leetcode.com/discuss/interview-experience/4133665/"
+      "source_url": "https://leetcode.com/discuss/interview-experience/4133665/",
+      "hints": {
+        "looking_for": [
+          "Your judgment when constraints force a choice",
+          "Whether the achievement fits your target level"
+        ],
+        "strong_signals": [
+          "States the constraint and the options you weighed",
+          "Explains who you aligned with before deciding",
+          "Admits what the trade-off cost later"
+        ],
+        "watch_outs": [
+          "An achievement with no real choice in it",
+          "Success that sounds like luck rather than judgment"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -325,7 +462,24 @@
       "strong_answer": "Describe the goal and why people were not aligned. Show how you built the case (data, customer evidence), listened to objections, adjusted the plan, and kept people moving together. Give credit with 'we' where the team did the work. End with the result and what you learned about influence. Pitfall: 'I escalated to my manager' as the main tactic.",
       "competencies": ["collaboration", "communication", "impact"],
       "values": ["Play, as a team"],
-      "source_url": "https://www.atlassian.com/company/careers/resources/interviewing/how-to-nail-your-product-interview"
+      "source_url": "https://www.atlassian.com/company/careers/resources/interviewing/how-to-nail-your-product-interview",
+      "hints": {
+        "looking_for": [
+          "How you influence people you do not manage",
+          "Whether you listen and adjust rather than push"
+        ],
+        "strong_signals": [
+          "Builds the case with data or customer evidence",
+          "Adapts the plan after hearing objections",
+          "Gives credit to the team where it is due"
+        ],
+        "watch_outs": [
+          "Escalating to your manager as the main tactic",
+          "No clear result or lesson about influence"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -333,7 +487,24 @@
       "strong_answer": "Lead with the customer problem and who had it. Separate output (what shipped) from outcome (behavior or metric that changed). Give before and after numbers and how you measured them. Say what did not work and what you did next. Atlassian's product handbook stresses impact over output, so make the metric concrete.",
       "competencies": ["impact", "ownership", "communication"],
       "values": ["Don't #@!% the customer"],
-      "source_url": "https://www.atlassian.com/company/careers/resources/interviewing/how-to-nail-your-product-interview"
+      "source_url": "https://www.atlassian.com/company/careers/resources/interviewing/how-to-nail-your-product-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you think in outcomes, not just shipped features",
+          "How you measure whether something worked"
+        ],
+        "strong_signals": [
+          "Leads with the customer problem and who had it",
+          "Gives before and after numbers and how they were measured",
+          "Says what did not work and the next step"
+        ],
+        "watch_outs": [
+          "Confusing output with outcome",
+          "Claiming success with no metric"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -341,7 +512,24 @@
       "strong_answer": "Pick real, specific feedback that stung. Show your first reaction honestly, how you checked whether it was true, and the concrete change you made. Show you later asked for feedback again. This maps to openness and growth. Pitfall: a disguised strength ('I work too hard').",
       "competencies": ["learning_from_failure", "communication"],
       "values": ["Open company, no bullshit", "Be the change you seek"],
-      "source_url": "https://www.joinleland.com/library/a/how-to-prepare-for-atlassian-product-management-case-interviews"
+      "source_url": "https://www.joinleland.com/library/a/how-to-prepare-for-atlassian-product-management-case-interviews",
+      "hints": {
+        "looking_for": [
+          "How open you are to hearing hard truths",
+          "Whether feedback leads to real change"
+        ],
+        "strong_signals": [
+          "Picks feedback that genuinely stung",
+          "Describes a concrete change you made",
+          "Shows you asked for feedback again later"
+        ],
+        "watch_outs": [
+          "A disguised strength like working too hard",
+          "Getting defensive or dismissing the feedback"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -349,7 +537,24 @@
       "strong_answer": "Give one real conflict with stakes (for example engineering versus design on scope). Show you sought to understand each side, moved the discussion to shared goals and data, proposed options, and reached a decision people committed to. Describe the relationship afterwards. Pitfall: a story where the other side was simply wrong.",
       "competencies": ["conflict_handling", "collaboration"],
       "values": ["Play, as a team", "Open company, no bullshit"],
-      "source_url": "https://www.joinleland.com/library/a/how-to-prepare-for-atlassian-product-management-case-interviews"
+      "source_url": "https://www.joinleland.com/library/a/how-to-prepare-for-atlassian-product-management-case-interviews",
+      "hints": {
+        "looking_for": [
+          "How you resolve conflict across disciplines",
+          "Whether you steer people toward shared goals"
+        ],
+        "strong_signals": [
+          "Seeks to understand each side before proposing options",
+          "Uses data to move past opinion",
+          "Reaches a decision people commit to and keeps the relationship"
+        ],
+        "watch_outs": [
+          "A story where the other side was simply wrong",
+          "A conflict with no real stakes"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -357,7 +562,24 @@
       "strong_answer": "Choose a real failure you owned, not a team failure you watched. Explain the cause honestly, the impact, how you communicated it, and the fix. Most important: the lasting change in how you or the team work. Atlassian values openness and improving the system, so show both.",
       "competencies": ["learning_from_failure", "ownership"],
       "values": ["Be the change you seek", "Open company, no bullshit"],
-      "source_url": "https://www.aced.io/guides/atlassian-pm-interview"
+      "source_url": "https://www.aced.io/guides/atlassian-pm-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you own your mistakes openly",
+          "How you improve the system after something goes wrong"
+        ],
+        "strong_signals": [
+          "Explains the cause and impact honestly",
+          "Shows how you communicated the failure",
+          "Names a lasting change in how you or the team work"
+        ],
+        "watch_outs": [
+          "A team failure you only watched",
+          "No change after the lesson"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -365,7 +587,23 @@
       "strong_answer": "Know Atlassian's five values and pick one that is genuinely yours. Tell a specific story that shows the value in action, with a cost you accepted for it. Avoid reciting the values list. Interviewers from outside the team use this to judge authenticity.",
       "competencies": ["communication", "ownership"],
       "values": ["Open company, no bullshit", "Play, as a team"],
-      "source_url": "https://www.joinleland.com/library/a/how-to-prepare-for-atlassian-product-management-case-interviews"
+      "source_url": "https://www.joinleland.com/library/a/how-to-prepare-for-atlassian-product-management-case-interviews",
+      "hints": {
+        "looking_for": [
+          "Whether your values are genuine and fit how the company works",
+          "How you act on a value when it costs something"
+        ],
+        "strong_signals": [
+          "Picks one value and tells a specific story",
+          "Names the cost you accepted for it"
+        ],
+        "watch_outs": [
+          "Reciting the values list",
+          "A story that does not actually show the value"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -373,7 +611,24 @@
       "strong_answer": "Frame the goal and constraints first. Show the candidate options and the criteria you used (customer impact, effort, strategic fit, risk). Explain how you used data and customer input, how you aligned stakeholders, and what you said no to. Close with the result and whether the call held up. Pitfall: listing features with no prioritization logic.",
       "competencies": ["prioritization", "structure", "recommendation"],
       "values": ["Don't #@!% the customer"],
-      "source_url": "https://www.joinleland.com/library/a/how-to-prepare-for-atlassian-product-management-case-interviews"
+      "source_url": "https://www.joinleland.com/library/a/how-to-prepare-for-atlassian-product-management-case-interviews",
+      "hints": {
+        "looking_for": [
+          "How you prioritize with clear criteria",
+          "Whether you can say no and explain why"
+        ],
+        "strong_signals": [
+          "Frames the goal and constraints first",
+          "Uses data and customer input to compare options",
+          "Says whether the decision held up afterwards"
+        ],
+        "watch_outs": [
+          "Listing features with no prioritization logic",
+          "Leaving out how stakeholders were aligned"
+        ]
+      },
+      "role_families": ["pm", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -381,7 +636,24 @@
       "strong_answer": "Pick a metric tied to value delivered (for example weekly active teams completing work), and explain why not vanity metrics. For a drop: confirm data and tracking first, then segment by time, platform, region, plan, new versus existing users, and recent releases or outages. Form hypotheses, check them in order of likelihood, and state the action you would take. Pitfall: jumping to a cause without segmenting.",
       "competencies": ["problem_framing", "structure", "user_and_business_sense"],
       "values": [],
-      "source_url": "https://www.aced.io/guides/atlassian-pm-interview"
+      "source_url": "https://www.aced.io/guides/atlassian-pm-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you pick a metric tied to real value",
+          "How you structure the investigation of a sudden drop"
+        ],
+        "strong_signals": [
+          "Explains why the metric beats vanity measures",
+          "Checks data and tracking before looking for causes",
+          "Segments by platform, cohort and recent releases"
+        ],
+        "watch_outs": [
+          "Jumping to a cause without segmenting",
+          "Choosing a metric like sign-ups that is easy to game"
+        ]
+      },
+      "role_families": ["pm", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -389,7 +661,24 @@
       "strong_answer": "Clarify the product and current base. Size the gap with simple estimation (segments times reachable users times adoption). Compare two or three growth levers (new segment, free tier, integrations, geography) by size, cost and fit. Recommend one with first steps and a metric. Name risks. Pitfall: listing ideas without choosing.",
       "competencies": ["estimation_logic", "user_and_business_sense", "recommendation"],
       "values": [],
-      "source_url": "https://www.aced.io/guides/atlassian-pm-interview"
+      "source_url": "https://www.aced.io/guides/atlassian-pm-interview",
+      "hints": {
+        "looking_for": [
+          "How you size a growth opportunity from simple estimates",
+          "Whether you can pick one direction and defend it"
+        ],
+        "strong_signals": [
+          "Compares a few growth levers by size, cost and fit",
+          "Recommends one with first steps and a metric",
+          "Names the main risks"
+        ],
+        "watch_outs": [
+          "Listing ideas without choosing",
+          "Numbers with no stated assumptions"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -397,7 +686,24 @@
       "strong_answer": "Choose a user segment and a real job to be done. Name two or three pain points from the user's view, prioritize one, and propose a solution with an MVP scope. Define a primary success metric and a guardrail. Mention how you would validate before building. Strong answers show customer empathy and clear trade-offs.",
       "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
       "values": ["Don't #@!% the customer"],
-      "source_url": "https://www.joinleland.com/library/a/how-to-prepare-for-atlassian-product-management-case-interviews"
+      "source_url": "https://www.joinleland.com/library/a/how-to-prepare-for-atlassian-product-management-case-interviews",
+      "hints": {
+        "looking_for": [
+          "Your empathy for a real user segment",
+          "How you prioritize pain points and scope a solution"
+        ],
+        "strong_signals": [
+          "Picks a segment and a real job to be done",
+          "Defines a success metric and a guardrail",
+          "Explains how you would validate before building"
+        ],
+        "watch_outs": [
+          "Proposing features before naming the user",
+          "No way to measure success"
+        ]
+      },
+      "role_families": ["pm", "design"],
+      "levels": []
     }
   ],
   "bar_by_level": [

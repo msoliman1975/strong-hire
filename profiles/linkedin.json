@@ -261,7 +261,24 @@
       "strong_answer": "Describes the metric at stake and the risk to users (spam, privacy, misleading UX), the data gathered, and how the candidate argued the case to stakeholders. States the decision, the measured effect on trust and long-term engagement, and any metric given up. Signals: member-first judgment backed by evidence, not just principle. Pitfall: a story with no real trade-off.",
       "competencies": ["ownership", "impact"],
       "values": ["We put members first"],
-      "source_url": "https://www.designgurus.io/answers/detail/top-linkedin-behavioral-interview-questions-and-how-to-answer-them"
+      "source_url": "https://www.designgurus.io/answers/detail/top-linkedin-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "Whether you put users ahead of short-term metrics",
+          "How you back your judgment with evidence"
+        ],
+        "strong_signals": [
+          "Names the metric at stake and the risk to users",
+          "Explains how you argued the case to stakeholders",
+          "Shows the measured effect, including what was given up"
+        ],
+        "watch_outs": [
+          "A story with no real trade-off",
+          "Principles with no data behind them"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -269,7 +286,24 @@
       "strong_answer": "Sets the context and why the feedback could not wait. Explains how the candidate prepared, delivered it privately and specifically, and listened. Shows the outcome for the person and the work, and how the relationship held. Signals: candor with care, structured communication. Pitfall: harsh feedback framed as honesty, or avoiding the conversation.",
       "competencies": ["communication", "conflict_handling"],
       "values": ["We are open, honest and constructive", "We trust and care about each other"],
-      "source_url": "https://www.designgurus.io/answers/detail/top-linkedin-behavioral-interview-questions-and-how-to-answer-them"
+      "source_url": "https://www.designgurus.io/answers/detail/top-linkedin-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "Whether you give candid feedback with care",
+          "How you prepare for a hard conversation"
+        ],
+        "strong_signals": [
+          "Explains why the feedback could not wait",
+          "Delivers it privately and specifically, then listens",
+          "Shows the relationship held"
+        ],
+        "watch_outs": [
+          "Harshness framed as honesty",
+          "Avoiding the conversation"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -277,7 +311,24 @@
       "strong_answer": "Owns the candidate's part in the failure, explains the cause honestly, and focuses on the quick next step: what was salvaged, how the team re-focused, what changed in the candidate's approach. Shows resilience and moving to the next play without dwelling. Pitfall: blaming leadership or presenting it as nobody's fault.",
       "competencies": ["learning_from_failure", "ownership"],
       "values": ["We are open, honest and constructive"],
-      "source_url": "https://www.designgurus.io/answers/detail/top-linkedin-behavioral-interview-questions-and-how-to-answer-them"
+      "source_url": "https://www.designgurus.io/answers/detail/top-linkedin-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "Your resilience after a setback",
+          "Whether you own your part honestly"
+        ],
+        "strong_signals": [
+          "Explains the cause honestly",
+          "Shows what was salvaged and how the team refocused",
+          "Names what changed in your approach"
+        ],
+        "watch_outs": [
+          "Blaming leadership",
+          "Presenting it as nobody's fault"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -285,7 +336,24 @@
       "strong_answer": "Explains the friction and its impact on work, the candidate's own contribution to the problem, and concrete steps: a direct conversation, understanding the other person's goals, agreeing on working norms. Shows a lasting improvement and a shared result. Pitfall: the other person changed and the candidate did nothing.",
       "competencies": ["collaboration", "conflict_handling"],
       "values": ["We trust and care about each other"],
-      "source_url": "https://www.designgurus.io/answers/detail/top-linkedin-behavioral-interview-questions-and-how-to-answer-them"
+      "source_url": "https://www.designgurus.io/answers/detail/top-linkedin-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "How you repair friction at work",
+          "Whether you see your own part in the problem"
+        ],
+        "strong_signals": [
+          "Names your own contribution to the friction",
+          "Describes a direct conversation and agreed working norms",
+          "Shows a lasting improvement"
+        ],
+        "watch_outs": [
+          "The other person changed and you did nothing",
+          "No impact on the work described"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -293,7 +361,24 @@
       "strong_answer": "Describes the opportunity and the downside, how the candidate estimated likelihood and impact, and how they limited exposure (experiment, flag, phased rollout). Gives the outcome and what they would size differently. Signals: calculated, not reckless, with excellence in execution. Pitfall: a risk with no analysis.",
       "competencies": ["ownership", "impact"],
       "values": [],
-      "source_url": "https://www.designgurus.io/answers/detail/top-linkedin-behavioral-interview-questions-and-how-to-answer-them"
+      "source_url": "https://www.designgurus.io/answers/detail/top-linkedin-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "How you weigh likelihood and impact",
+          "Whether you limit exposure before acting"
+        ],
+        "strong_signals": [
+          "Explains how you estimated the downside",
+          "Uses flags, experiments or phased rollouts",
+          "Says what you would size differently"
+        ],
+        "watch_outs": [
+          "A risk with no analysis",
+          "Reckless bets framed as bold"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -301,7 +386,24 @@
       "strong_answer": "Connects a concrete project or action to people's jobs, skills or income: a hiring tool, mentoring, a product that helped small businesses, open source used by others. Quantifies reach where possible and reflects on why it matters to the candidate. Ties to LinkedIn's mission without sounding scripted. Pitfall: vague claims with no people affected.",
       "competencies": ["impact", "communication"],
       "values": ["We put members first", "We embody diversity, inclusion and belonging"],
-      "source_url": "https://techinterview.org/linkedin-interview/"
+      "source_url": "https://techinterview.org/linkedin-interview/",
+      "hints": {
+        "looking_for": [
+          "Whether your work has helped people grow",
+          "How genuinely you connect to the mission"
+        ],
+        "strong_signals": [
+          "Links a concrete project to people's jobs, skills or income",
+          "Quantifies reach where possible",
+          "Explains why it matters to you"
+        ],
+        "watch_outs": [
+          "Vague claims with no people affected",
+          "Sounding scripted about the mission"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -309,7 +411,24 @@
       "strong_answer": "Keeps each role brief and structured: team mission and size, the candidate's own scope and one notable result, and a positive reason for moving on. Shows a clear growth arc toward this role. Is ready for deep follow-ups on any role. Pitfall: long rambling history or negative comments about past employers.",
       "competencies": ["depth_of_experience", "scope_at_level", "motivation"],
       "values": [],
-      "source_url": "https://www.glassdoor.com/Interview/LinkedIn-Interview-E34865-RVW21588665.htm"
+      "source_url": "https://www.glassdoor.com/Interview/LinkedIn-Interview-E34865-RVW21588665.htm",
+      "hints": {
+        "looking_for": [
+          "Your growth arc toward this role",
+          "Whether you can summarize each role clearly"
+        ],
+        "strong_signals": [
+          "Keeps each role brief: team, scope and one result",
+          "Gives a positive reason for each move",
+          "Handles deep follow-ups on any role"
+        ],
+        "watch_outs": [
+          "A long rambling history",
+          "Negative comments about past employers"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -317,7 +436,24 @@
       "strong_answer": "Explains the gap, why it mattered to the business or members, how the candidate built support across teams and delivered, and the measurable result. Shows judgment in choosing this over assigned work and that the work outlived the candidate's involvement. Pitfall: going rogue without alignment.",
       "competencies": ["judgment", "scope_at_level"],
       "values": ["We act as One LinkedIn"],
-      "source_url": "https://techinterview.org/linkedin-interview/"
+      "source_url": "https://techinterview.org/linkedin-interview/",
+      "hints": {
+        "looking_for": [
+          "Whether you spot gaps and act on them",
+          "Your judgment in choosing this over assigned work"
+        ],
+        "strong_signals": [
+          "Explains why the gap mattered",
+          "Builds support across teams before delivering",
+          "Shows the work lasted beyond your involvement"
+        ],
+        "watch_outs": [
+          "Going rogue without alignment",
+          "No measurable result"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -325,7 +461,23 @@
       "strong_answer": "Connects personal motivation to the mission of economic opportunity, shows knowledge of the product area and its members, and explains what the candidate would bring and want to learn. Specific and honest. Pitfall: generic praise or answers about compensation and brand only.",
       "competencies": ["motivation", "role_fit"],
       "values": ["We put members first"],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/linkedin-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/linkedin-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether your motivation connects to the mission",
+          "How well you know the product area and its users"
+        ],
+        "strong_signals": [
+          "Is specific about the product area",
+          "Says what you bring and want to learn"
+        ],
+        "watch_outs": [
+          "Generic praise",
+          "Talking only about compensation or brand"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -333,7 +485,24 @@
       "strong_answer": "Starts with the problem and why it mattered, then a high-level architecture before details. Covers two or three key decisions with alternatives and trade-offs, how the candidate validated them, and what they would change. Adjusts depth to the listener and answers follow-ups precisely. Pitfall: jargon-heavy detail without structure, or not knowing why decisions were made.",
       "competencies": ["clarity_of_explanation", "technical_depth", "trade_offs"],
       "values": ["We are open, honest and constructive"],
-      "source_url": "https://www.glassdoor.com/Interview/LinkedIn-Interview-E34865-RVW21588665.htm"
+      "source_url": "https://www.glassdoor.com/Interview/LinkedIn-Interview-E34865-RVW21588665.htm",
+      "hints": {
+        "looking_for": [
+          "How clearly you explain technical work to another engineer",
+          "Whether you know why decisions were made"
+        ],
+        "strong_signals": [
+          "Starts with the problem, then the high-level architecture",
+          "Covers key decisions with alternatives",
+          "Adjusts depth to the listener"
+        ],
+        "watch_outs": [
+          "Jargon-heavy detail with no structure",
+          "Unable to explain why a choice was made"
+        ]
+      },
+      "role_families": ["swe", "data_ml", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -341,7 +510,24 @@
       "strong_answer": "Clarifies requirements and scale, then covers fan-out on write versus read with a hybrid for high-follower accounts, candidate generation and ranking, caching, and freshness. Discusses member-first concerns like low-quality content and notification fatigue. Explains bottlenecks and failure handling, and ties choices to member and business impact. Pitfall: ignoring the celebrity fan-out problem.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": ["We put members first"],
-      "source_url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-linkedin-system-design-interview"
+      "source_url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-linkedin-system-design-interview",
+      "hints": {
+        "looking_for": [
+          "How you handle users with very different network sizes",
+          "Whether you tie design choices to user impact"
+        ],
+        "strong_signals": [
+          "Uses a hybrid of fan-out on write and on read",
+          "Separates candidate generation from ranking",
+          "Considers low-quality content and notification fatigue"
+        ],
+        "watch_outs": [
+          "Ignoring the high-follower fan-out problem",
+          "No caching or freshness plan"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -349,7 +535,24 @@
       "strong_answer": "Clarifies accuracy versus latency needs. Covers streaming ingestion, windowed counting (bucketed counters, count-min sketch for approximation), merging partial top-K across partitions, and storage of results. Discusses exactness trade-offs, late events, and scaling. Pitfall: recomputing everything from raw logs on each request.",
       "competencies": ["technical_depth", "accuracy", "trade_offs"],
       "values": [],
-      "source_url": "https://www.glassdoor.com/Interview/LinkedIn-Interview-E34865-RVW21588665.htm"
+      "source_url": "https://www.glassdoor.com/Interview/LinkedIn-Interview-E34865-RVW21588665.htm",
+      "hints": {
+        "looking_for": [
+          "How you count events over time windows at scale",
+          "Whether you weigh exactness against latency"
+        ],
+        "strong_signals": [
+          "Uses bucketed or approximate counters",
+          "Merges partial top-K results across partitions",
+          "Handles late events"
+        ],
+        "watch_outs": [
+          "Recomputing from raw logs on every request",
+          "Skipping the accuracy question"
+        ]
+      },
+      "role_families": ["data_ml", "swe"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -357,7 +560,24 @@
       "strong_answer": "Separates candidate generation (second-degree connections, shared schools or companies) from ranking with features and a model. Discusses offline precompute versus online serving, graph storage and partitioning, cold start for new members, and privacy limits. Defines how success is measured. Pitfall: a full graph traversal per request.",
       "competencies": ["technical_depth", "reasoning", "trade_offs"],
       "values": ["We put members first"],
-      "source_url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-linkedin-system-design-interview"
+      "source_url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-linkedin-system-design-interview",
+      "hints": {
+        "looking_for": [
+          "How you design recommendations on a huge graph",
+          "Whether you separate candidate generation from ranking"
+        ],
+        "strong_signals": [
+          "Discusses offline precompute versus online serving",
+          "Handles cold start for new members",
+          "Respects privacy limits and defines success"
+        ],
+        "watch_outs": [
+          "A full graph traversal per request",
+          "No way to measure quality"
+        ]
+      },
+      "role_families": ["data_ml", "swe"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -365,7 +585,24 @@
       "strong_answer": "Clarifies the goal of endorsements (trust signal for recruiters, engagement) and the users on both sides. Identifies problems such as low signal quality, then proposes and prioritizes improvements (context, verification, prompts). Defines success metrics and guardrails like spam. Pitfall: adding engagement prompts that make the signal worse.",
       "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
       "values": ["We put members first"],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/linkedin-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/linkedin-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you clarify the feature's goal",
+          "How you serve both sides of the feature"
+        ],
+        "strong_signals": [
+          "Names problems like low signal quality",
+          "Prioritizes improvements clearly",
+          "Defines success metrics and spam guardrails"
+        ],
+        "watch_outs": [
+          "Engagement prompts that weaken the signal",
+          "No metric"
+        ]
+      },
+      "role_families": ["pm", "design"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -373,7 +610,24 @@
       "strong_answer": "Picks a segment (job seekers, recruiters viewing profiles, students) and the job the profile does for them. Finds key pains, proposes a few changes, and prioritizes by impact on member outcomes. Considers both the profile owner and the viewer. Defines metrics such as profile completeness and recruiter contact rate. Pitfall: visual redesign with no user goal.",
       "competencies": ["problem_framing", "structure", "user_and_business_sense"],
       "values": ["We put members first"],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/linkedin-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/linkedin-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you start from a user goal",
+          "How you balance the profile owner and the viewer"
+        ],
+        "strong_signals": [
+          "Picks a segment and the job the profile does for them",
+          "Prioritizes changes by member outcomes",
+          "Defines metrics such as recruiter contact rate"
+        ],
+        "watch_outs": [
+          "A visual redesign with no user goal",
+          "Ignoring the viewer side"
+        ]
+      },
+      "role_families": ["pm", "design"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -381,7 +635,24 @@
       "strong_answer": "Starts from the feature's goal, then lists metrics by funnel: adoption, engagement, and value delivered (recruiter searches using skills, member outcomes). Picks one primary metric with guardrails and explains how to validate it with an experiment. Pitfall: listing every metric with no priority.",
       "competencies": ["problem_framing", "structure", "recommendation"],
       "values": [],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/linkedin-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/linkedin-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you tie metrics to a feature's goal",
+          "Whether you can choose one primary metric"
+        ],
+        "strong_signals": [
+          "Organizes metrics by funnel stage",
+          "Picks one primary metric with guardrails",
+          "Explains how to validate with an experiment"
+        ],
+        "watch_outs": [
+          "Listing every metric with no priority",
+          "Metrics with no link to the goal"
+        ]
+      },
+      "role_families": ["pm", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -389,7 +660,24 @@
       "strong_answer": "Checks data validity first, then segments by platform, region, cohort and acquisition channel, and compares with the change timeline. Forms hypotheses linked to the sign-up change, proposes analyses or a rollback test, and decides based on the trade-off with whatever the change improved. Pitfall: jumping to a single cause without checking the data.",
       "competencies": ["structure", "problem_framing", "recommendation"],
       "values": [],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/linkedin-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/linkedin-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you structure an investigation of a metric drop",
+          "Whether you check the data before looking for causes"
+        ],
+        "strong_signals": [
+          "Segments by platform, cohort and channel",
+          "Links hypotheses to the sign-up change",
+          "Weighs the drop against what the change improved"
+        ],
+        "watch_outs": [
+          "Jumping to a single cause",
+          "Skipping data validation"
+        ]
+      },
+      "role_families": ["pm", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -397,7 +685,24 @@
       "strong_answer": "States the hypothesis and primary metric (accepted invites, meaningful connections), guardrails (spam reports, invite declines), and the unit of randomization. Addresses network effects between test and control and how to handle them (cluster randomization). Covers sample size and duration. Pitfall: ignoring interference in a social graph.",
       "competencies": ["structure", "estimation_logic", "problem_framing"],
       "values": [],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/linkedin-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/linkedin-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you design a sound experiment",
+          "Whether you account for network effects"
+        ],
+        "strong_signals": [
+          "States the hypothesis, primary metric and guardrails",
+          "Picks the right unit of randomization",
+          "Covers sample size and duration"
+        ],
+        "watch_outs": [
+          "Ignoring interference between test and control",
+          "No guardrail metrics"
+        ]
+      },
+      "role_families": ["data_ml", "pm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -405,7 +710,24 @@
       "strong_answer": "Segments subscribers by reason for buying (job seekers, sales, recruiters) and diagnoses why each churns, for example after landing a job. Proposes targeted levers and prioritizes them, considering revenue and member value. Defines retention metrics and an experiment plan. Pitfall: one discount for everyone.",
       "competencies": ["user_and_business_sense", "prioritization", "recommendation"],
       "values": ["We put members first"],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/linkedin-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/linkedin-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you segment subscribers by need",
+          "Whether you diagnose churn before proposing fixes"
+        ],
+        "strong_signals": [
+          "Explains why each segment churns",
+          "Prioritizes targeted levers",
+          "Defines retention metrics and an experiment plan"
+        ],
+        "watch_outs": [
+          "One discount for everyone",
+          "Ignoring member value"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
     }
   ],
   "bar_by_level": [

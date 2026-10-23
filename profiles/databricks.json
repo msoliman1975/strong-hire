@@ -264,7 +264,24 @@
       "strong_answer": "Clarify scale, freshness and latency needs. Components: search API, distributor adapters, price cache, aggregation and ranking. Discuss fan-out with timeouts, partial results, rate limits per distributor, caching versus freshness of prices, and handling slow or failing providers. Show API and data model. Strong answers reason about consistency of prices at checkout and cost of calls.",
       "competencies": ["reasoning", "trade_offs", "clarity_of_explanation"],
       "values": ["Customer obsessed"],
-      "source_url": "https://interviewing.io/databricks-interview-questions"
+      "source_url": "https://interviewing.io/databricks-interview-questions",
+      "hints": {
+        "looking_for": [
+          "How you design fan-out to many slow or unreliable providers",
+          "Whether you balance price freshness against call cost"
+        ],
+        "strong_signals": [
+          "Uses timeouts and returns partial results",
+          "Discusses cached prices versus fresh prices at checkout",
+          "Handles rate limits per distributor"
+        ],
+        "watch_outs": [
+          "Assuming every distributor answers fast and correctly",
+          "Skipping the API and data model"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -272,7 +289,24 @@
       "strong_answer": "Clarify file sizes, read/write patterns and durability targets. Separate metadata (namespace service, possibly replicated with consensus) from data (chunks on storage nodes with replication or erasure coding). Cover writes and leases, reads with locality, failure detection and re-replication, consistency model, and hot spots. Explain trade-offs from first principles rather than naming products.",
       "competencies": ["technical_depth", "trade_offs", "accuracy"],
       "values": ["First principles"],
-      "source_url": "https://www.aced.io/blog/databricks-interview-process"
+      "source_url": "https://www.aced.io/blog/databricks-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you reason from first principles, not product names",
+          "How you handle durability, failures and consistency"
+        ],
+        "strong_signals": [
+          "Separates metadata from data storage",
+          "Explains replication and recovery when nodes fail",
+          "States the consistency model and its trade-offs"
+        ],
+        "watch_outs": [
+          "Naming existing products instead of explaining the design",
+          "Starting without asking about file sizes and access patterns"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -280,7 +314,24 @@
       "strong_answer": "Cover ingestion (stream and batch), storage on object storage in an open columnar format, a transaction log or table format for ACID and schema evolution, compaction of small files, partitioning, and serving to SQL and ML workloads. Discuss exactly-once ingestion, late data, governance and deletion requests. Show trade-offs between latency and cost.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": [],
-      "source_url": "https://www.aced.io/blog/databricks-interview-process"
+      "source_url": "https://www.aced.io/blog/databricks-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you handle streaming and batch data in one design",
+          "Whether you understand table formats, schemas and file layout"
+        ],
+        "strong_signals": [
+          "Covers transactions and schema changes on object storage",
+          "Addresses late data and exactly-once ingestion",
+          "Explains the latency versus cost trade-off"
+        ],
+        "watch_outs": [
+          "Ignoring small-file buildup and compaction",
+          "Forgetting governance and deletion requests"
+        ]
+      },
+      "role_families": ["data_ml", "swe"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -288,7 +339,24 @@
       "strong_answer": "Describe stages: data ingestion and validation, feature computation and store, distributed training, experiment tracking, model registry, deployment (batch or online serving), monitoring for drift and rollback. Discuss reproducibility, versioning of data and models, and cost of compute. Strong answers name failure modes and how to detect them.",
       "competencies": ["technical_depth", "trade_offs"],
       "values": [],
-      "source_url": "https://www.aced.io/blog/databricks-interview-process"
+      "source_url": "https://www.aced.io/blog/databricks-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you understand the full ML lifecycle",
+          "How you make training and deployment reproducible"
+        ],
+        "strong_signals": [
+          "Covers data validation, features, model registry and serving",
+          "Plans monitoring for drift and a rollback path",
+          "Names failure modes and how to detect them"
+        ],
+        "watch_outs": [
+          "Focusing only on model training",
+          "No versioning of data or models"
+        ]
+      },
+      "role_families": ["data_ml", "swe"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -296,7 +364,23 @@
       "strong_answer": "Lay out sources, ingestion, storage, compute engine, orchestration, serving and monitoring, and why each exists. Then map your real project onto that picture, naming the choices and the trade-offs you made. For a PM, show enough depth to discuss options with engineers without hand-waving.",
       "competencies": ["technical_depth", "clarity_of_explanation"],
       "values": [],
-      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you know why each part of a data system exists",
+          "How well you map a real project onto that picture"
+        ],
+        "strong_signals": [
+          "Explains each component and its purpose",
+          "Names real choices and trade-offs from your project"
+        ],
+        "watch_outs": [
+          "Hand-waving past components you do not understand",
+          "Listing tools without explaining choices"
+        ]
+      },
+      "role_families": ["swe", "data_ml", "pm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -304,7 +388,24 @@
       "strong_answer": "Explain the flow: chunk and embed documents, store vectors, retrieve relevant chunks for a query, and pass them with the prompt to the model. Say when it beats fine-tuning (fresh or private data, citations). Cover pitfalls: chunking, retrieval quality, latency, evaluation, and access control on retrieved data.",
       "competencies": ["accuracy", "clarity_of_explanation", "reasoning"],
       "values": [],
-      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you understand the retrieval flow end to end",
+          "When you would choose it over other approaches"
+        ],
+        "strong_signals": [
+          "Explains chunking, embedding, retrieval and prompting clearly",
+          "Says when it beats fine-tuning and why",
+          "Names pitfalls like retrieval quality and access control"
+        ],
+        "watch_outs": [
+          "Buzzwords without the actual flow",
+          "Ignoring evaluation and latency"
+        ]
+      },
+      "role_families": ["data_ml", "swe"],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -312,7 +413,24 @@
       "strong_answer": "Pick a project where you made the key calls. Give context briefly, then go deep: the problem, alternatives considered, why you chose one, what you measured, and what went wrong. Know the numbers. Databricks interviewers dig deep, so avoid projects you only observed. Show scope that matches the level.",
       "competencies": ["depth_of_experience", "judgment", "scope_at_level"],
       "values": ["First principles"],
-      "source_url": "https://interviewing.io/databricks-interview-questions"
+      "source_url": "https://interviewing.io/databricks-interview-questions",
+      "hints": {
+        "looking_for": [
+          "How much you owned the key decisions",
+          "Whether you hold up under detailed follow-ups"
+        ],
+        "strong_signals": [
+          "Knows the numbers and the alternatives considered",
+          "Admits what went wrong",
+          "Scope matches the target level"
+        ],
+        "watch_outs": [
+          "A project you only watched others drive",
+          "Losing detail when asked why"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -320,7 +438,24 @@
       "strong_answer": "Restate the goal and constraints, list the real options, and explain the reasoning from fundamentals (cost, latency, risk, team skill). Say what the choice cost you and whether you would choose it again. Pitfall: 'it was the standard choice' with no reasoning.",
       "competencies": ["judgment", "depth_of_experience"],
       "values": ["First principles", "Truth seeking"],
-      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you reason from fundamentals",
+          "How honestly you weigh what a choice cost"
+        ],
+        "strong_signals": [
+          "Lists the real options and constraints",
+          "Explains the choice in terms of cost, risk or latency",
+          "Says whether you would choose it again"
+        ],
+        "watch_outs": [
+          "Saying it was just the standard choice",
+          "No downside named for the chosen option"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -328,7 +463,24 @@
       "strong_answer": "Be specific about the platform (lakehouse, open formats, data and AI workloads) and how it connects to your experience. Show you understand the customer and the pace of the company. Mention what you would contribute. Pitfall: talking only about growth or compensation.",
       "competencies": ["motivation", "role_fit"],
       "values": [],
-      "source_url": "https://www.aced.io/blog/databricks-interview-process"
+      "source_url": "https://www.aced.io/blog/databricks-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you understand the platform and its customers",
+          "How your experience connects to the work"
+        ],
+        "strong_signals": [
+          "Is specific about the product and its users",
+          "Says what you would contribute",
+          "Shows you know the company's pace"
+        ],
+        "watch_outs": [
+          "Talking only about growth or pay",
+          "Generic praise that fits any company"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -336,7 +488,24 @@
       "strong_answer": "Pick a real technical or priority conflict. Show you sought the facts, used data or a quick experiment to settle it, and kept the relationship. Say who turned out to be right, even if it was the other person. Pitfall: a vague personality clash with no resolution.",
       "competencies": ["conflict_handling", "collaboration"],
       "values": ["Truth seeking"],
-      "source_url": "https://interviewing.io/databricks-interview-questions"
+      "source_url": "https://interviewing.io/databricks-interview-questions",
+      "hints": {
+        "looking_for": [
+          "Whether you settle disagreements with facts",
+          "How you keep the working relationship"
+        ],
+        "strong_signals": [
+          "Uses data or a quick test to decide",
+          "Admits when the other person was right",
+          "Shows a clear resolution"
+        ],
+        "watch_outs": [
+          "A vague personality clash",
+          "No resolution or outcome"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -344,7 +513,24 @@
       "strong_answer": "Own a real mistake with real impact. Explain how you found it, told stakeholders quickly, fixed the immediate problem, and changed the process so it would not recur. Show the lesson in a later project. Pitfall: blaming circumstances.",
       "competencies": ["learning_from_failure", "ownership"],
       "values": ["Raise the bar", "Truth seeking"],
-      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you own mistakes quickly and openly",
+          "How you fix the process, not only the symptom"
+        ],
+        "strong_signals": [
+          "Tells stakeholders early",
+          "Fixes the immediate issue and changes the process",
+          "Shows the lesson applied in a later project"
+        ],
+        "watch_outs": [
+          "Blaming circumstances or others",
+          "A mistake with no real impact"
+        ]
+      },
+      "role_families": [],
+      "levels": ["mid", "senior", "staff_principal"]
     },
     {
       "interview_type": "behavioral",
@@ -352,7 +538,24 @@
       "strong_answer": "Describe your case and the evidence. Show you listened to the counter-arguments, considered whether you were wrong, and then committed to the decision. Say what happened afterwards and what you would do differently in making the case. Strong answers show truth seeking over ego.",
       "competencies": ["communication", "conflict_handling"],
       "values": ["Truth seeking", "Company first"],
-      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you make a case with evidence",
+          "Whether you commit after losing the argument"
+        ],
+        "strong_signals": [
+          "Listens to counter-arguments and checks whether you were wrong",
+          "Commits fully once the decision is made",
+          "Reflects on how you would make the case differently"
+        ],
+        "watch_outs": [
+          "Sounding bitter about the outcome",
+          "No evidence behind your position"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -360,7 +563,24 @@
       "strong_answer": "Explain the opportunity, what could go wrong, and how you sized and limited the risk (experiment, rollback plan, staged rollout). Show you moved fast instead of waiting for certainty. Give the outcome and what you learned, even if the bet failed.",
       "competencies": ["ownership", "impact"],
       "values": ["Bias for action"],
-      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you size and limit risk",
+          "Whether you act without waiting for certainty"
+        ],
+        "strong_signals": [
+          "Explains how the downside was contained",
+          "Uses experiments, staged rollouts or rollback plans",
+          "Shares the outcome and lesson even if it failed"
+        ],
+        "watch_outs": [
+          "A reckless bet with no analysis",
+          "A risk so small it was not really a risk"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -368,7 +588,24 @@
       "strong_answer": "State your original view and why it was reasonable. Describe the data that contradicted it, how you checked it, and how quickly you changed course and told others. Show the result of the change. Pitfall: a trivial example with no cost to changing.",
       "competencies": ["learning_from_failure", "communication"],
       "values": ["Truth seeking"],
-      "source_url": "https://www.designgurus.io/answers/detail/top-databricks-behavioral-interview-questions-and-how-to-answer-them"
+      "source_url": "https://www.designgurus.io/answers/detail/top-databricks-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "Whether you follow data over ego",
+          "How quickly you change course and tell others"
+        ],
+        "strong_signals": [
+          "Explains why the first view was reasonable",
+          "Describes how you checked the new data",
+          "Shows the result of changing course"
+        ],
+        "watch_outs": [
+          "A trivial example with no cost to changing",
+          "Changing your mind without checking the data"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -376,7 +613,24 @@
       "strong_answer": "Explain why speed mattered, what you cut or deferred and why it was safe, how you communicated the trade-off, and whether you came back to pay the debt. Show urgency without carelessness.",
       "competencies": ["ownership", "impact"],
       "values": ["Bias for action", "Raise the bar"],
-      "source_url": "https://www.designgurus.io/answers/detail/top-databricks-behavioral-interview-questions-and-how-to-answer-them"
+      "source_url": "https://www.designgurus.io/answers/detail/top-databricks-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "Whether you balance speed with care",
+          "How you choose what to defer"
+        ],
+        "strong_signals": [
+          "Explains why speed mattered",
+          "Shows why the deferred work was safe to delay",
+          "Says whether you came back to pay the debt"
+        ],
+        "watch_outs": [
+          "Cutting corners with no plan to return",
+          "Not telling others about the trade-off"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -384,7 +638,24 @@
       "strong_answer": "Name the convention and the assumption behind it. Show how you broke the problem down, what evidence showed the assumption failed in your case, and how you validated your alternative. Give the measurable result. Pitfall: contrarian for its own sake.",
       "competencies": ["impact", "ownership"],
       "values": ["First principles"],
-      "source_url": "https://www.designgurus.io/answers/detail/top-databricks-behavioral-interview-questions-and-how-to-answer-them"
+      "source_url": "https://www.designgurus.io/answers/detail/top-databricks-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "Whether you question assumptions with evidence",
+          "How you validate an unconventional approach"
+        ],
+        "strong_signals": [
+          "Names the convention and the assumption behind it",
+          "Shows how the assumption failed in your case",
+          "Gives a measurable result"
+        ],
+        "watch_outs": [
+          "Being contrarian for its own sake",
+          "No validation of the alternative"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -392,7 +663,24 @@
       "strong_answer": "Pick a persona (data engineer, analyst, ML engineer, admin) and a real workflow pain. Prioritize one problem, propose a solution with MVP scope, and define success metrics (adoption, time saved, consumption). Address enterprise needs such as governance and cost. Recommend and name risks.",
       "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
       "values": ["Customer obsessed"],
-      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How well you understand data platform users",
+          "How you prioritize one problem and scope a solution"
+        ],
+        "strong_signals": [
+          "Picks a persona and a real workflow pain",
+          "Defines success metrics like adoption or time saved",
+          "Considers governance and cost for enterprise customers"
+        ],
+        "watch_outs": [
+          "A feature with no clear persona",
+          "Ignoring enterprise needs"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -400,7 +688,24 @@
       "strong_answer": "Clarify the pricing model (usage-based). Reason about price elasticity: lower unit price can grow workloads moved to the platform, new use cases and competitive wins. Build a simple estimate of volume needed to offset the price cut. Consider segments, cannibalization and margin. Recommend a targeted change and how to test it.",
       "competencies": ["estimation_logic", "user_and_business_sense", "recommendation"],
       "values": ["Company first"],
-      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you reason about price and demand",
+          "Whether you can build a simple break-even estimate"
+        ],
+        "strong_signals": [
+          "Clarifies the pricing model first",
+          "Estimates the volume needed to offset the cut",
+          "Recommends a targeted change and how to test it"
+        ],
+        "watch_outs": [
+          "Assuming a price cut always loses money",
+          "Ignoring cannibalization and margin"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -408,7 +713,24 @@
       "strong_answer": "Identify possible customers (teams, broadcasters, fans, betting) and their needs. Pick one segment with the clearest pain and willingness to pay. Define an MVP, how data will be sourced and processed, and the success metric. Explain why this beats the alternatives.",
       "competencies": ["problem_framing", "prioritization", "recommendation"],
       "values": [],
-      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview"
+      "source_url": "https://igotanoffer.com/en/advice/databricks-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you pick a customer and a problem worth solving",
+          "Whether you can scope a first product"
+        ],
+        "strong_signals": [
+          "Compares possible customer segments before choosing",
+          "Defines an MVP and a success metric",
+          "Explains why this beats the alternatives"
+        ],
+        "watch_outs": [
+          "Building for everyone at once",
+          "Ignoring how the data is sourced"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
     }
   ],
   "bar_by_level": [
