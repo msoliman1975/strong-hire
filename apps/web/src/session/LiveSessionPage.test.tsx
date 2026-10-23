@@ -3,7 +3,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
-import { MemoryRouter, Route, Routes } from "react-router";
+import { MemoryRouter, Route, Routes, useSearchParams } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { SessionRecord, VoiceJoin } from "../api/types";
@@ -61,7 +61,7 @@ function session(changes: Partial<SessionRecord> = {}): SessionRecord {
     id: "s1",
     job_target_id: "j1",
     resume_id: null,
-    config: { interview_type: "behavioral", difficulty: "realistic", mode: "coach", duration_min: 30, level: "senior" },
+    config: { interview_type: "behavioral", difficulty: "realistic", mode: "coach", duration_min: 30, level: "senior", custom: null },
     channel: "voice",
     status: "created",
     brief_ready: true,
@@ -71,6 +71,11 @@ function session(changes: Partial<SessionRecord> = {}): SessionRecord {
     failure_reason: null,
     ...changes,
   };
+}
+
+function UpgradeReason() {
+  const [params] = useSearchParams();
+  return <p data-testid="upgrade-reason">{params.get("reason")}</p>;
 }
 
 function renderLive(record: SessionRecord) {
@@ -91,6 +96,7 @@ function renderLive(record: SessionRecord) {
         <Routes>
           <Route path="/sessions/:sessionId/live" element={<LiveSessionPage />} />
           <Route path="/sessions/:sessionId/debrief" element={<h1>Debrief page</h1>} />
+          <Route path="/upgrade" element={<UpgradeReason />} />
         </Routes>
       </MemoryRouter>
     </QueryClientProvider>,
@@ -257,6 +263,53 @@ describe("live session page", () => {
     await user.click(dialog.querySelector(".btn--danger") as HTMLElement);
     expect(await screen.findByRole("heading", { name: "Debrief page" })).toBeInTheDocument();
     expect(voice.sent).toEqual(["end"]);
+  });
+});
+
+describe("plan re-check at the start (BL-2, CU-11)", () => {
+  const customSession = () =>
+    session({
+      config: {
+        ...session().config,
+        interview_type: "custom",
+        custom: { categories: [{ category: "behavioral", share: 1, focus: [] }], questions: [] },
+      },
+    });
+
+  async function joinRefused(record: SessionRecord, status: number, code: string) {
+    const { user } = renderLive(record);
+    server.use(
+      http.post("*/api/sessions/:sessionId/voice/join", () =>
+        HttpResponse.json({ detail: { code, message: "Subscribe to keep practicing.", upgrade_url: "/upgrade" } }, { status }),
+      ),
+    );
+    await user.click(await screen.findByRole("button", { name: "Check my microphone" }));
+    await screen.findByText("We can hear you.");
+    await user.click(screen.getByRole("button", { name: "Join the interview" }));
+  }
+
+  it("BL-2: a 402 at the voice join opens the paywall with the billing reason", async () => {
+    await joinRefused(session(), 402, "minutes_exhausted");
+    expect(await screen.findByTestId("upgrade-reason")).toHaveTextContent("minutes_exhausted");
+  });
+
+  it("CU-11: a 403 upgrade_required at the join of a Custom session opens the paywall with the Custom reason", async () => {
+    await joinRefused(customSession(), 403, "upgrade_required");
+    expect(await screen.findByTestId("upgrade-reason")).toHaveTextContent("custom_requires_plan");
+  });
+
+  it("BL-2: a 403 upgrade_required on 'Try again' after a failed plan opens the paywall too", async () => {
+    const { user } = renderLive(session({ status: "failed", brief_ready: false, failure_reason: null }));
+    server.use(
+      http.post("*/api/sessions", () =>
+        HttpResponse.json(
+          { detail: { code: "upgrade_required", message: "Custom interviews are part of the subscription." } },
+          { status: 403 },
+        ),
+      ),
+    );
+    await user.click(await screen.findByRole("button", { name: "Try again" }));
+    expect(await screen.findByTestId("upgrade-reason")).toHaveTextContent("upgrade_required");
   });
 });
 

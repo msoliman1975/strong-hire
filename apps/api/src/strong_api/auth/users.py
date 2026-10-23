@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import uuid
+from datetime import UTC, datetime
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -36,10 +37,15 @@ async def create_user(
     age_confirmed: bool,
     terms_accepted: bool,
     training_consent: bool,
+    email_verified: bool = True,
+    password_hash: str | None = None,
+    full_name: str | None = None,
 ) -> User:
     """Create the personal org and the user, and record the sign-up confirmations.
 
     There is no column for the 18+ confirmation, so it is kept in the audit log entry.
+    A magic link, Google and the dev login prove the email, so those users are verified at once.
+    A password sign-up (AC-4) is verified when the user opens the confirmation link.
     """
     if not (age_confirmed and terms_accepted):
         raise ValueError("sign-up needs the 18+ confirmation and accepted terms")
@@ -48,7 +54,13 @@ async def create_user(
     db.add(org)
     await db.flush()
     user = User(
-        org_id=org.id, email=email, auth_provider=provider, training_consent=training_consent
+        org_id=org.id,
+        email=email,
+        auth_provider=provider,
+        training_consent=training_consent,
+        email_verified_at=datetime.now(UTC) if email_verified else None,
+        password_hash=password_hash,
+        full_name=full_name,
     )
     db.add(user)
     await db.flush()

@@ -3,11 +3,12 @@ import { useSearchParams } from "react-router";
 
 import { useBankCompanies, useQuestions } from "../api/hooks";
 import { COMPETENCIES_BY_TYPE, GENERAL, type QuestionFilter } from "../api/questions";
-import type { BankQuestion, Competency, InterviewType, Level, RoleFamily } from "../api/types";
+import type { BankQuestion, Competency, InterviewType, Level, RoleFamily, StandardType } from "../api/types";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
 import { competencyLabel, interviewTypeLabel, levelLabel, roleFamilyLabel } from "../labels";
 
-const TYPES = Object.keys(interviewTypeLabel) as InterviewType[];
+/** The four question categories; Custom is a session type, not a category (CU-1). */
+const TYPES = (Object.keys(interviewTypeLabel) as InterviewType[]).filter((t): t is StandardType => t !== "custom");
 const ROLES = Object.keys(roleFamilyLabel) as RoleFamily[];
 const LEVELS = Object.keys(levelLabel) as Level[];
 const ALL_AREAS = new Set<string>(Object.values(COMPETENCIES_BY_TYPE).flat());
@@ -48,7 +49,7 @@ export function QuestionsPage() {
       if (value) next.set("type", value);
       else next.delete("type");
       // Areas belong to an interview type; keep only the ones the new type has.
-      const keep = value ? COMPETENCIES_BY_TYPE[value as InterviewType] : [];
+      const keep = value ? COMPETENCIES_BY_TYPE[value as StandardType] : [];
       const areas = next.getAll("area").filter((a) => keep.includes(a as Competency));
       next.delete("area");
       for (const a of areas) next.append("area", a);

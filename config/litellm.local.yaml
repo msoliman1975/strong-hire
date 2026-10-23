@@ -36,6 +36,9 @@ model_list:
       api_key: not-needed
     model_info:
       mode: audio_transcription
+      # D-12 shadow price: what a hosted STT would charge, for the Spend page's "hosted
+      # equivalent" only. PLACEHOLDER estimate ($0.006 per audio minute); edit to taste.
+      shadow_cost_per_second: 0.0001
 
   # Kokoro-82M on CPU (Kokoro-FastAPI image), streaming PCM at 24 kHz.
   - model_name: local-tts
@@ -45,6 +48,9 @@ model_list:
       api_key: not-needed
     model_info:
       mode: audio_speech
+      # D-12 shadow price: what a hosted TTS would charge, for the Spend page's "hosted
+      # equivalent" only. PLACEHOLDER estimate ($15 per million characters); edit to taste.
+      shadow_cost_per_character: 0.000015
 
 litellm_settings:
   drop_params: true

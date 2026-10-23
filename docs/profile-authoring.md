@@ -28,7 +28,7 @@ uv run strongctl profiles show acme --version 1         # read any version, also
 - The database assigns version numbers. `meta.version` in the file is for your own tracking.
 - `import` refuses a file whose content equals the latest stored version. Use `--force` to
   store it anyway.
-- `import` fails if the company is not in the companies table. The 20 launch companies come
+- `import` fails if the company is not in the companies table. The launch companies come
   from the seed (`./scripts/dev.ps1 seed`). For a test company, pass `--create-company`.
   It adds the company as inactive, so job matching (IN-5) does not use it.
 - `publish` asks for confirmation (`--yes` skips it) and records the reviewer
@@ -36,6 +36,12 @@ uv run strongctl profiles show acme --version 1         # read any version, also
   Archived. Archived versions stay readable, so old sessions keep their scores explainable.
 - Sessions store the version they used in `sessions.profile_version`. Generic mode stores NULL.
 - The commands use `DATABASE_URL`. The default is the local Docker Postgres on port 55432.
+
+The admin app does the same from a screen (Companies, AT-1 to AT-4): import a file or pasted
+JSON (same validation as `validate`), view any version with its sources, diff two versions, and
+move a version through draft → in_review → published → archived. An archived version can be
+published again to roll back. The admin app and `strongctl` share the code in
+`strong_api.profiles`; `strongctl profiles publish` may still publish a draft directly.
 
 ## Fields
 
@@ -93,7 +99,7 @@ Invalid profile file: profiles/acme.json
 ## Generic mode
 
 A company without a published profile runs in generic mode: a default tech-industry persona
-and equal competency weights (spec, "Companies outside the 20"). Code gets it from
+and equal competency weights (spec, "Companies outside the launch list"). Code gets it from
 `strong_core.profiles.resolve_profile(db, company_id)`. The result has `version = None` and
 `generic = True`.
 

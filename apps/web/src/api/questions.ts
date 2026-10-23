@@ -3,12 +3,12 @@
  * filtering; the page keeps the filters in the URL so the debrief can link to a filtered view.
  */
 import { apiClient, unwrap } from "./client";
-import type { BankCompany, Competency, InterviewType, Level, QuestionList, RoleFamily } from "./types";
+import type { BankCompany, Competency, Level, QuestionList, RoleFamily, StandardType } from "./types";
 
 /** `company` is a company slug, "general" for general questions only, or null for all. */
 export interface QuestionFilter {
   company?: string | null;
-  interviewType?: InterviewType | null;
+  interviewType?: StandardType | null;
   competencies?: Competency[];
   roleFamily?: RoleFamily | null;
   level?: Level | null;
@@ -40,7 +40,7 @@ export const questionsApi = {
  * Mirrors COMPETENCIES_BY_TYPE in strong_core.schemas.enums. Display only: it narrows the area
  * filter to the chosen interview type. A test checks it covers every Competency once.
  */
-export const COMPETENCIES_BY_TYPE: Record<InterviewType, Competency[]> = {
+export const COMPETENCIES_BY_TYPE: Record<StandardType, Competency[]> = {
   behavioral: ["ownership", "impact", "collaboration", "conflict_handling", "learning_from_failure", "communication"],
   hiring_manager: ["role_fit", "depth_of_experience", "judgment", "motivation", "team_fit", "scope_at_level"],
   technical_qa: ["technical_depth", "accuracy", "reasoning", "trade_offs", "clarity_of_explanation"],

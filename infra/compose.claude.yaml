@@ -6,6 +6,8 @@ services:
   litellm:
     environment:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?set ANTHROPIC_API_KEY in your environment}
+      # The AI candidate's model for admin-started runs (sim-candidate). Optional.
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       DATABASE_URL: postgresql://${POSTGRES_USER:-strong}:${POSTGRES_PASSWORD:-strong}@postgres:5432/litellm
       STORE_MODEL_IN_DB: "False"
     depends_on:

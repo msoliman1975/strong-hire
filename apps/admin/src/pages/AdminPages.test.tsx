@@ -1,0 +1,157 @@
+/**
+ * Admin pages (R2, moved from apps/web) against the admin mocks: only admins see them; transcript
+ * and traces need the user's consent; each view adds audit entries.
+ */
+import { QueryClientProvider } from "@tanstack/react-query";
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router";
+import { describe, expect, it } from "vitest";
+
+import { AppRoutes, createQueryClient } from "../App";
+import type { SessionRecord } from "../api/types";
+import { mockSignIn } from "../mocks/handlers";
+import { mockStore } from "../mocks/node";
+import { mockReplay, simState } from "../mocks/simHandlers";
+
+const SESSION_ID = "00000000-0000-4000-8000-0000000000c1";
+
+function addUser(email: string, isAdmin: boolean, consent = false) {
+  mockStore.db.users[email] = {
+    id: isAdmin ? "00000000-0000-4000-8000-0000000000a9" : "00000000-0000-4000-8000-0000000000a1",
+    org_id: isAdmin ? "00000000-0000-4000-8000-0000000000b9" : "00000000-0000-4000-8000-0000000000b1",
+    email,
+    auth_provider: "dev",
+    training_consent: consent,
+    created_at: "2026-10-01T10:00:00Z",
+    full_name: "Ana Lopez",
+    profile_complete: true,
+  };
+}
+
+function seed({ consent = false, signedInAs = "admin@example.com" as string | null } = {}) {
+  addUser("ana@example.com", false, consent);
+  addUser("admin@example.com", true);
+  const session: SessionRecord = {
+    id: SESSION_ID,
+    job_target_id: "00000000-0000-4000-8000-0000000000d1",
+    resume_id: null,
+    config: {
+      interview_type: "behavioral",
+      difficulty: "realistic",
+      mode: "realistic",
+      duration_min: 10,
+      level: "senior",
+      custom: null,
+    },
+    channel: "voice",
+    brief_ready: true,
+    status: "completed",
+    started_at: "2026-10-07T09:00:00Z",
+    ended_at: "2026-10-07T09:09:30Z",
+    minutes_billed: 10,
+    failure_reason: null,
+  };
+  mockStore.db.sessions.push(session);
+  if (signedInAs) mockSignIn(mockStore, signedInAs);
+}
+
+function renderAt(path: string) {
+  const user = userEvent.setup();
+  render(
+    <QueryClientProvider client={createQueryClient()}>
+      <MemoryRouter initialEntries={[path]}>
+        <AppRoutes />
+      </MemoryRouter>
+    </QueryClientProvider>,
+  );
+  return user;
+}
+
+describe("admin pages (R2, AI pages moved)", () => {
+  it("AA-4: need an admin session; without one the app shows sign-in", async () => {
+    seed({ signedInAs: null });
+    renderAt("/interviews");
+    expect(await screen.findByRole("heading", { name: "Admin sign-in" })).toBeInTheDocument();
+    expect(screen.queryByRole("navigation", { name: "Admin" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Interviews" })).not.toBeInTheDocument();
+  });
+
+  it("lists interviews with cost and a daily total, under the admin nav", async () => {
+    seed();
+    renderAt("/interviews");
+    expect(await screen.findByRole("heading", { name: "Interviews" })).toBeInTheDocument();
+    const nav = screen.getByRole("navigation", { name: "Admin" });
+    expect(within(nav).getByRole("link", { name: "Interviews" })).toHaveAttribute("href", "/interviews");
+    const daily = (await screen.findByRole("heading", { name: "Cost per day" })).closest("section");
+    expect(daily).not.toBeNull();
+    expect(within(daily as HTMLElement).getByRole("cell", { name: "2026-10-07" })).toBeInTheDocument();
+    expect(within(daily as HTMLElement).getAllByText("$0.0123")).toHaveLength(2); // the day and the total
+    expect(screen.getByRole("cell", { name: /^ana@example.com/ })).toBeInTheDocument();
+    expect(screen.getByText("(no consent)")).toBeInTheDocument();
+  });
+
+  it("shows metadata only when the user has no consent, and writes no audit entry", async () => {
+    seed({ consent: false });
+    const user = renderAt(`/interviews/${SESSION_ID}`);
+    expect(await screen.findByText("This user has not given consent. You can see the details above only.")).toBeInTheDocument();
+    expect(screen.getByText("Lean Hire")).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Transcript" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Download transcript" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Interviewer reasoning" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("link", { name: "Audit log" }));
+    expect(await screen.findByText("No entries yet.")).toBeInTheDocument();
+  });
+
+  it("shows the transcript and the traces with consent, and audits the view", async () => {
+    seed({ consent: true });
+    const user = renderAt(`/interviews/${SESSION_ID}`);
+    expect(await screen.findByRole("heading", { name: "Transcript" })).toBeInTheDocument();
+    expect(screen.getByText("Happy to be here.")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Download transcript" })).toHaveAttribute(
+      "href",
+      expect.stringMatching(new RegExp(`/api/admin/sessions/${SESSION_ID}/transcript\\.txt$`)),
+    );
+    expect(screen.queryByRole("link", { name: "Download audio" })).not.toBeInTheDocument();
+    const traces = screen.getByRole("heading", { name: "Interviewer reasoning" }).closest("section") as HTMLElement;
+    expect(within(traces).getByRole("heading", { name: "4. probe (say)" })).toBeInTheDocument();
+    expect(within(traces).getByText("model chose probe; model said probe (missing: measurable result)")).toBeInTheDocument();
+    expect(within(traces).getByRole("heading", { name: "5. take your time (line)" })).toBeInTheDocument();
+    await user.click(within(traces).getAllByText("Prompt (2 messages)")[0]);
+    expect(within(traces).getAllByText("You are Alex, a job interviewer.")[0]).toBeVisible();
+
+    await user.click(screen.getByRole("link", { name: "Audit log" }));
+    expect(await screen.findByRole("cell", { name: "admin.transcript_viewed" })).toBeInTheDocument();
+    expect(screen.getByRole("cell", { name: "admin.traces_viewed" })).toBeInTheDocument();
+    expect(screen.getAllByRole("cell", { name: "admin@example.com" })).toHaveLength(2);
+  });
+
+  it("lists users with plan, consent and interviews", async () => {
+    seed({ consent: true });
+    renderAt("/users");
+    const row = (await screen.findByRole("link", { name: "ana@example.com" })).closest("tr") as HTMLElement;
+    expect(within(row).getByRole("cell", { name: "Yes" })).toBeInTheDocument();
+    expect(within(row).getByRole("cell", { name: "1" })).toBeInTheDocument();
+    expect(within(row).getByRole("link", { name: "ana@example.com" })).toHaveAttribute(
+      "href",
+      "/users/00000000-0000-4000-8000-0000000000a1",
+    );
+  });
+
+  it("SM-16: an AI candidate interview with a run folder links to its replay", async () => {
+    seed({ consent: true });
+    simState(mockStore.db).replays[SESSION_ID] = { ...structuredClone(mockReplay), session_id: SESSION_ID };
+    const user = renderAt(`/interviews/${SESSION_ID}`);
+    const link = await screen.findByRole("link", { name: "Replay" });
+    expect(link).toHaveAttribute("href", `/simulations/replay/${SESSION_ID}`);
+    await user.click(link);
+    expect(await screen.findByRole("heading", { name: "Replay", level: 1 })).toBeInTheDocument();
+  });
+
+  it("SM-16: other interviews have no replay link", async () => {
+    seed({ consent: true });
+    renderAt(`/interviews/${SESSION_ID}`);
+    await screen.findByRole("heading", { name: "Transcript" });
+    expect(screen.queryByRole("link", { name: "Replay" })).not.toBeInTheDocument();
+  });
+});

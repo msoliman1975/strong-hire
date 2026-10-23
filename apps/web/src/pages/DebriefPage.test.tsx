@@ -1,14 +1,17 @@
-/** FB-1, FB-2, PR-2 and company values (IV-5) on the debrief page. */
+/** FB-1, FB-2, PR-2 and company values (IV-5) on the debrief page; CU-6, CU-8, CU-9 for Custom. */
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
-import { MemoryRouter, Route, Routes } from "react-router";
+import { MemoryRouter, Route, Routes, useLocation } from "react-router";
 import { describe, expect, it } from "vitest";
 
 import type { Debrief } from "../api/types";
 import { createQueryClient } from "../App";
+import type { SetupState } from "../custom/repeat";
+import { mockCustomRecommendation } from "../mocks/custom";
 import { scorecardFor, sessionPlan } from "../mocks/fixtures";
-import { server } from "../mocks/node";
+import { mockStore, server } from "../mocks/node";
 import { DebriefPage, weakestCompetencies } from "./DebriefPage";
 
 function debrief(generic: boolean, duration_min: 10 | 30 | 45 = 30): Debrief {
@@ -16,7 +19,7 @@ function debrief(generic: boolean, duration_min: 10 | 30 | 45 = 30): Debrief {
     session: {
       id: "s1",
       job_target_id: "j1",
-      config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min, level: "senior" },
+      config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min, level: "senior", custom: null },
       status: "completed",
       started_at: "2026-10-01T10:00:00Z",
       ended_at: "2026-10-01T10:30:00Z",
@@ -26,10 +29,12 @@ function debrief(generic: boolean, duration_min: 10 | 30 | 45 = 30): Debrief {
     status: "ready",
     scorecard: scorecardFor("behavioral", generic),
     next_session: sessionPlan[1],
+    next_custom_session: null,
     generic_mode: generic,
     company_name: generic ? null : "Example Corp",
     company_slug: generic ? null : "example-corp",
     values_framework: generic ? null : "Example Values",
+    questions: [],
   };
 }
 
@@ -158,5 +163,166 @@ describe("debrief page", () => {
     expect(weakestCompetencies(scored([4, 2, 3, 1]))).toEqual(["conflict_handling", "impact"]);
     expect(weakestCompetencies(scored([3, 1, 2, 2]))).toEqual(["impact", "collaboration", "conflict_handling"]);
     expect(weakestCompetencies(null)).toEqual([]);
+  });
+});
+
+/** CU-6, CU-8, CU-9: a Custom session's debrief. */
+function customDebrief(): Debrief {
+  const base = debrief(true);
+  const card = scorecardFor("behavioral", true);
+  return {
+    ...base,
+    session: {
+      ...base.session,
+      config: {
+        ...base.session.config,
+        interview_type: "custom",
+        custom: {
+          categories: [
+            { category: "technical_qa", share: 0.5, focus: ["Idempotency"] },
+            { category: "behavioral", share: 0.5, focus: [] },
+          ],
+          questions: [
+            {
+              text: "How would you make a payment API safe to retry?",
+              category: "technical_qa",
+              competencies: ["technical_depth"],
+              must_ask: true,
+              verbatim: false,
+              saved_question_id: null,
+            },
+            {
+              text: "Tell me about a project you owned end to end.",
+              category: "behavioral",
+              competencies: ["ownership"],
+              must_ask: true,
+              verbatim: true,
+              saved_question_id: "sq-already",
+            },
+          ],
+        },
+      },
+    },
+    scorecard: {
+      ...card,
+      per_question: [
+        ...card.per_question,
+        {
+          question_ref: "own-1",
+          question_text: "How would you make a payment API safe to retry?",
+          scores: [{ competency: "technical_depth", score: 3, justification: "Correct approach.", quotes: ["Use a key."] }],
+          value_scores: [],
+          strengths: ["Correct use of idempotency keys"],
+          misses: [],
+        },
+      ],
+    },
+    questions: [
+      { question_ref: "own-1", text: "How would you make a payment API safe to retry?", source: "candidate", category: "technical_qa", competencies: ["technical_depth"], must_ask: true, verbatim: false },
+      { question_ref: "q1", text: "Tell me about a project you owned end to end.", source: "planner", category: "behavioral", competencies: ["ownership", "impact"], must_ask: false, verbatim: false },
+      { question_ref: "q2", text: "Tell me about a time you disagreed with another team.", source: "planner", category: "behavioral", competencies: ["ownership", "impact"], must_ask: false, verbatim: false },
+    ],
+  };
+}
+
+function SetupProbe() {
+  const location = useLocation();
+  const state = location.state as SetupState | null;
+  const kind = state?.setup?.config.interview_type ?? (state?.recommended ? `recommended ${state.recommended.custom.categories.map((c) => c.category).join("+")}` : "none");
+  return <p data-testid="setup-probe">{`${location.pathname}${location.search} ${kind}`}</p>;
+}
+
+function renderCustomDebrief(body: Debrief) {
+  const repeats: string[] = [];
+  server.use(
+    http.get("*/api/sessions/:sessionId/debrief", () => HttpResponse.json(body)),
+    http.post("*/api/sessions/:sessionId/repeat", ({ params }) => {
+      repeats.push(String(params.sessionId));
+      return HttpResponse.json({ job_target_id: "j1", resume_id: "r1", config: body.session.config, channel: "voice" });
+    }),
+  );
+  const user = userEvent.setup();
+  render(
+    <QueryClientProvider client={createQueryClient()}>
+      <MemoryRouter initialEntries={["/sessions/s1/debrief"]}>
+        <Routes>
+          <Route path="/sessions/:sessionId/debrief" element={<DebriefPage />} />
+          <Route path="/jobs/:jobId/sessions/new" element={<SetupProbe />} />
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>,
+  );
+  return { user, repeats };
+}
+
+describe("Custom debrief", () => {
+  it("CU-6: groups the questions by kind in the candidate's order and marks own questions", async () => {
+    renderCustomDebrief(customDebrief());
+    await screen.findByTestId("hire-signal");
+    const groups = screen.getAllByRole("heading", { level: 3 }).filter((h) => h.className === "question-group__title");
+    expect(groups.map((g) => g.textContent)).toEqual(["Verbal technical Q&A", "Behavioral"]);
+    const technical = within(screen.getByTestId("group-technical_qa"));
+    expect(technical.getByText("Your question")).toBeInTheDocument();
+    expect(technical.getByRole("heading", { name: /How would you make a payment API safe to retry\?/ })).toBeInTheDocument();
+    const behavioral = within(screen.getByTestId("group-behavioral"));
+    expect(behavioral.getAllByRole("listitem").filter((li) => li.classList.contains("question-card"))).toHaveLength(2);
+    expect(behavioral.queryByText("Your question")).not.toBeInTheDocument();
+  });
+
+  it("QB-4: a Custom debrief links to practice questions by weak area, with no interview type", async () => {
+    renderCustomDebrief(customDebrief());
+    const link = await screen.findByRole("link", { name: "Practice questions for your weak areas" });
+    const url = new URL(link.getAttribute("href") ?? "", "http://x");
+    expect(url.pathname).toBe("/questions");
+    expect(url.searchParams.has("type")).toBe(false);
+  });
+
+  it("a standard debrief has no groups and no Custom buttons", async () => {
+    renderDebrief(debrief(true));
+    await screen.findByTestId("hire-signal");
+    expect(screen.queryByTestId("group-behavioral")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Run this setup again" })).not.toBeInTheDocument();
+  });
+
+  it("CU-9: 'Run this setup again' opens the setup prefilled", async () => {
+    const { user, repeats } = renderCustomDebrief(customDebrief());
+    await user.click(await screen.findByRole("button", { name: "Run this setup again" }));
+    expect(await screen.findByTestId("setup-probe")).toHaveTextContent("/jobs/j1/sessions/new?resume=r1 custom");
+    expect(repeats).toEqual(["s1"]);
+  });
+
+  it("CU-9: an interviewer question can be saved to My questions with its category and competencies", async () => {
+    const { user } = renderCustomDebrief(customDebrief());
+    await screen.findByTestId("hire-signal");
+    // Only the interviewer's questions get the button, not the candidate's own.
+    const buttons = screen.getAllByRole("button", { name: /^Save to My questions/ });
+    expect(buttons).toHaveLength(2);
+    const technical = within(screen.getByTestId("group-technical_qa"));
+    expect(technical.queryByRole("button", { name: /^Save to My questions/ })).not.toBeInTheDocument();
+
+    const text = "Tell me about a time you disagreed with another team.";
+    await user.click(screen.getByRole("button", { name: `Save to My questions: ${text}` }));
+    expect(await screen.findByText(/Saved to/)).toHaveTextContent("Saved to My questions.");
+    const saved = mockStore.db.savedQuestions.find((q) => q.text === text);
+    expect(saved).toMatchObject({ category: "behavioral", competencies: ["ownership", "impact"] });
+    expect(screen.queryByRole("button", { name: `Save to My questions: ${text}` })).not.toBeInTheDocument();
+  });
+
+  it("CU-10: a Custom recommendation reads 'Practice ...' and opens the Custom setup prefilled", async () => {
+    const { user } = renderCustomDebrief({ ...customDebrief(), next_custom_session: mockCustomRecommendation() });
+    const card = await screen.findByTestId("custom-next");
+    expect(card).toHaveTextContent("Practice trade offs and conflict handling");
+    await user.click(within(card).getByRole("link", { name: "Set up this Custom interview" }));
+    expect(await screen.findByTestId("setup-probe")).toHaveTextContent(
+      "/jobs/j1/sessions/new recommended technical_qa+behavioral",
+    );
+  });
+
+  it("CU-8: 'Save my questions' saves the own questions that are not saved yet", async () => {
+    const { user } = renderCustomDebrief(customDebrief());
+    await user.click(await screen.findByRole("button", { name: "Save my questions" }));
+    expect(await screen.findByTestId("saved-result")).toHaveTextContent("Saved 1 question to My questions.");
+    expect(mockStore.db.savedQuestions.map((q) => q.text)).toEqual(["How would you make a payment API safe to retry?"]);
+    expect(screen.getByRole("button", { name: "Save my questions" })).toBeDisabled();
   });
 });

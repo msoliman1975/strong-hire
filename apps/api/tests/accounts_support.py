@@ -27,6 +27,7 @@ from strong_core.db.models import (
     JobTarget,
     ProgressSnapshot,
     Resume,
+    SavedQuestion,
     Scorecard,
     Subscription,
     Turn,
@@ -270,6 +271,14 @@ async def fill_every_user_table(
                 output_tokens=10,
             ),
             AuditLog(org_id=org_id, actor="test", action="test.row", entity="test"),
+            SavedQuestion(  # CU-8: in the AC-1 export and delete
+                org_id=org_id,
+                user_id=user_id,
+                text="Tell me about a time you missed a deadline.",
+                category=InterviewType.BEHAVIORAL,
+                competencies=["ownership"],
+                bank_ref="bq-1",
+            ),
         ]
     )
     await db.commit()
@@ -287,6 +296,7 @@ async def fill_every_user_table(
         "company_requests",
         "exit_surveys",
         "interviewer_traces",
+        "saved_questions",
     }
 
 

@@ -12,10 +12,14 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from strong_core.db.models import (
     TRACE_RETENTION_DAYS,
+    ErrorEvent,
+    ErrorGroup,
     InterviewerTrace,
     InterviewSession,
     JobTarget,
+    OpsSample,
     Turn,
+    VoiceTurnTiming,
 )
 from strong_core.schemas import Difficulty, InterviewType, Mode, Phase, Speaker
 from strong_worker import retention
@@ -87,10 +91,65 @@ async def test_r2_old_traces_are_deleted_and_turns_stay(
 async def test_r2_retention_runs_as_a_daily_cron_job(
     sessionmaker: Maker, account: tuple[uuid.UUID, uuid.UUID]
 ) -> None:
-    jobs = [j for j in WorkerSettings.cron_jobs if isinstance(j, CronJob)]
-    assert [j.coroutine for j in jobs] == [retention.trace_retention]
+    jobs = [
+        j
+        for j in WorkerSettings.cron_jobs
+        if isinstance(j, CronJob) and j.coroutine is retention.trace_retention
+    ]
+    assert len(jobs) == 1
     job = jobs[0]
     assert job.hour == retention.RUN_AT_HOUR_UTC and job.minute == retention.RUN_AT_MINUTE
     await _fill(sessionmaker, *account, datetime.now(UTC))
     result = await retention.trace_retention({retention.CTX_KEY: sessionmaker})
-    assert result == {"deleted": 2}
+    assert result == {"deleted": 2, "voice_turn_timings": 0, "ops_samples": 0, "error_events": 0}
+
+
+async def test_ob3_ob4_ob5_ops_rows_past_retention_are_deleted_in_batches(
+    sessionmaker: Maker, account: tuple[uuid.UUID, uuid.UUID]
+) -> None:
+    """Voice timings after 90 days, ops samples and error events after 30; groups stay."""
+    org_id, user_id = account
+    now = datetime.now(UTC)
+    async with sessionmaker() as db:
+        job = JobTarget(org_id=org_id, user_id=user_id, raw_text="Engineer")
+        db.add(job)
+        await db.flush()
+        session = InterviewSession(
+            org_id=org_id,
+            job_target_id=job.id,
+            type=InterviewType.BEHAVIORAL,
+            difficulty=Difficulty.REALISTIC,
+            mode=Mode.REALISTIC,
+            duration_min=30,
+        )
+        group = ErrorGroup(
+            fingerprint="f" * 64,
+            service="api",
+            exception_type="ValueError",
+            message="x",
+            first_seen=now,
+            last_seen=now,
+        )
+        db.add_all([session, group])
+        await db.flush()
+        for i, age in enumerate((120, 91, 89, 1)):
+            db.add(
+                VoiceTurnTiming(
+                    org_id=org_id,
+                    session_id=session.id,
+                    turn_index=i,
+                    e2e_ms=900,
+                    created_at=now - timedelta(days=age),
+                )
+            )
+        for age in (45, 31, 29, 0):
+            db.add(OpsSample(ts=now - timedelta(days=age), metric="host.load1", value=0.5))
+            db.add(ErrorEvent(group_id=group.id, service="api", at=now - timedelta(days=age)))
+        await db.commit()
+    out = await retention.delete_old_ops_rows(sessionmaker, now=now, batch_size=1)
+    assert out == {"voice_turn_timings": 2, "ops_samples": 2, "error_events": 2}
+    async with sessionmaker() as db:
+        assert await db.scalar(select(func.count()).select_from(VoiceTurnTiming)) == 2
+        assert await db.scalar(select(func.count()).select_from(OpsSample)) == 2
+        assert await db.scalar(select(func.count()).select_from(ErrorEvent)) == 2
+        assert await db.scalar(select(func.count()).select_from(ErrorGroup)) == 1

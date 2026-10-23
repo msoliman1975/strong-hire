@@ -21,6 +21,7 @@ export type AuthState = S["AuthState"];
 export type AuthUser = S["AuthUser"];
 export type AuthProviders = S["AuthProviders"];
 export type MagicLinkSent = S["MagicLinkSent"];
+export type EmailSent = S["EmailSent"];
 
 // Job and resume inputs (real endpoints in apps/api inputs, P2).
 export type JobTargetCreate = S["JobTargetCreate"];
@@ -78,6 +79,8 @@ export type JobPosting = DeepRequired<S["JobPosting"]>;
 export type Resume = DeepRequired<S["Resume"]>;
 export type GapAnalysis = DeepRequired<S["GapAnalysis"]>;
 export type PlannedSession = DeepRequired<S["PlannedSession"]>;
+/** CU-10: a recommended Custom session with a ready setup. */
+export type CustomRecommendation = DeepRequired<S["CustomRecommendation"]>;
 export type SessionConfig = DeepRequired<S["SessionConfig"]>;
 export type Scorecard = DeepRequired<S["Scorecard"]>;
 export type CompetencyScore = DeepRequired<S["CompetencyScore"]>;
@@ -100,3 +103,21 @@ export type SessionRecord = DeepRequired<S["SessionRecord"]>;
 export type CreateSessionRequest = S["CreateSessionRequest"];
 export type VoiceJoin = S["VoiceJoin"];
 export type SubscriptionStatus = S["SubscriptionStatus"];
+
+// Custom interview (docs/custom-interview-spec.md, CU-1 to CU-11).
+export type StandardType = Exclude<InterviewType, "custom">;
+export type CustomSessionSpec = DeepRequired<S["CustomSessionSpec"]>;
+export type CustomCategory = DeepRequired<S["CustomCategory"]>;
+export type CustomQuestion = DeepRequired<S["CustomQuestion"]>;
+export type QuestionRefusal = S["QuestionRefusal"];
+export type QuestionCheckRequest = S["QuestionCheckRequest"];
+export type QuestionCheckOut = DeepRequired<S["QuestionCheckOut"]>;
+export type CategoryFocus = DeepRequired<S["CategoryFocus"]>;
+export type FocusSuggestions = DeepRequired<S["FocusSuggestions"]>;
+export type SavedQuestionIn = S["SavedQuestionIn"];
+export type SavedQuestionPatch = S["SavedQuestionPatch"];
+export type SavedQuestion = DeepRequired<S["SavedQuestionOut"]>;
+export type SessionSetup = DeepRequired<S["SessionSetup"]>;
+export type DebriefQuestion = DeepRequired<S["DebriefQuestion"]>;
+export type OwnQuestionPoint = DeepRequired<S["OwnQuestionPoint"]>;
+export type CustomInterviewAccess = S["CustomInterviewAccess"];
