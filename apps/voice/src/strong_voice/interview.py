@@ -31,7 +31,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Literal, Protocol
 
-from strong_core.schemas import Speaker, Turn, UsageComponent
+from strong_core.schemas import Speaker, Turn
 from strong_interview import InterviewRunner
 
 log = logging.getLogger(__name__)
@@ -57,10 +57,6 @@ class SessionStore(Protocol):
     """Where the voice interview keeps its text-only record."""
 
     async def save_turn(self, session_id: uuid.UUID, turn: Turn) -> None: ...
-
-    async def save_usage(
-        self, session_id: uuid.UUID, component: UsageComponent, units: float, cost_usd: float = 0.0
-    ) -> None: ...
 
     async def save_provenance(self, session_id: uuid.UUID, prompt_version: str | None) -> None: ...
 
@@ -112,7 +108,7 @@ class VoiceInterview:
     ) -> list[str] | None:
         """The candidate's final transcript of one turn. Returns what the interviewer says.
 
-        `spoken_s` is how long the candidate spoke; it sets the turn's timing and the STT usage.
+        `spoken_s` is how long the candidate spoke; it sets the turn's timing.
         If `superseded()` is true once the reply is ready, the candidate went on talking: the turn
         and the reply are taken back and None is returned. Nothing is saved for them.
         """
@@ -233,26 +229,15 @@ class VoiceInterview:
             log.warning("could not flush the traces of session %s", self.session_id, exc_info=True)
 
     async def finish(self, *, interrupted: bool) -> None:
-        """End once: save usage and provenance, then let the API bill and start scoring."""
+        """End once: save provenance, then let the API bill and start scoring.
+
+        Usage is already saved: the gateway writes a usage_events row for every interviewer,
+        stt and tts call of the session (OB-2)."""
         if self.finished:
             return
         self.finished = True
         await self._flush()
         interviewer = self.runner.interviewer
-        turns = self.runner.turns
-        heard_s = sum(
-            (t.end_ms - t.start_ms) / 1000 for t in turns if t.speaker == Speaker.CANDIDATE
-        )
-        spoken_chars = sum(len(t.text) for t in turns if t.speaker == Speaker.INTERVIEWER)
-        tokens = interviewer.input_tokens + interviewer.output_tokens
-        await self.store.save_usage(
-            self.session_id, UsageComponent.LLM, tokens, cost_usd=round(interviewer.cost_usd, 6)
-        )
-        for component, units in (
-            (UsageComponent.STT, round(heard_s, 2)),
-            (UsageComponent.TTS, spoken_chars),
-        ):
-            await self.store.save_usage(self.session_id, component, units)
         refs = ",".join(sorted(interviewer.prompt_refs))[:200] or None
         await self.store.save_provenance(self.session_id, refs)
         await self._flush_traces()

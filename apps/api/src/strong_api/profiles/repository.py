@@ -1,4 +1,6 @@
-"""Company profile storage (AD-1): import, publish and the company list for strongctl.
+"""Company profile storage (AD-1): import, publish, workflow transitions and the company list.
+strongctl (cli.py) and the admin Content routes (strong_api.admin.content, AT-1..AT-4) both call
+these functions, so the command line and the admin app behave the same.
 
 The read-side lookups (published profile, generic fallback, the profile of a session) are in
 strong_core.profiles, so the voice agent and the worker can use them without this app.
@@ -6,6 +8,13 @@ strong_core.profiles, so the voice agent and the worker can use them without thi
 Versions: each import stores the next version number for the company as a Draft. Publishing a
 version archives the version that was published before, so one version per company is active.
 Old versions stay in the table and remain readable with strong_core.profiles.get_profile_version().
+
+Workflow (AT-4): draft -> in_review -> published -> archived, in_review -> draft to send a version
+back, and archived -> published to roll back. `strongctl profiles publish` may publish any
+version directly; the admin app follows ALLOWED_TRANSITIONS.
+
+Audit: by default these functions write their own audit row. The admin routes pass audit=False
+and write one row with the admin's reason instead (AA-6).
 """
 
 from __future__ import annotations
@@ -49,7 +58,29 @@ class PublishResult:
 
 
 @dataclass(frozen=True)
+class TransitionResult:
+    company: Company
+    row: ProfileRow
+    from_status: ProfileStatus
+    previous_version: int | None = None
+    """For a publish: the version that was published before and is now Archived."""
+
+
+ALLOWED_TRANSITIONS: dict[ProfileStatus, frozenset[ProfileStatus]] = {
+    ProfileStatus.DRAFT: frozenset({ProfileStatus.IN_REVIEW}),
+    ProfileStatus.IN_REVIEW: frozenset({ProfileStatus.PUBLISHED, ProfileStatus.DRAFT}),
+    ProfileStatus.PUBLISHED: frozenset({ProfileStatus.ARCHIVED}),
+    ProfileStatus.ARCHIVED: frozenset({ProfileStatus.PUBLISHED}),
+}
+
+
+class TransitionError(ProfileError):
+    """The workflow does not allow this status change (AT-4)."""
+
+
+@dataclass(frozen=True)
 class CompanySummary:
+    id: uuid.UUID
     slug: str
     name: str
     active: bool
@@ -91,6 +122,7 @@ async def import_profile(
     actor: str,
     create_company: bool = False,
     force: bool = False,
+    audit: bool = True,
 ) -> ImportResult:
     """Store the profile as the next Draft version and diff it against the published version."""
     company = await get_company(db, profile.company_slug)
@@ -132,14 +164,15 @@ async def import_profile(
 
     published = await get_published_row(db, company.id)
     changes = diff_profiles(published.profile_json if published else None, data)
-    db.add(
-        AuditLog(
-            actor=actor,
-            action="profile.import",
-            entity=f"company_profile:{company.slug}:v{version}",
-            details_json={"changes": len(changes), "file_version": profile.meta.version},
+    if audit:
+        db.add(
+            AuditLog(
+                actor=actor,
+                action="profile.import",
+                entity=f"company_profile:{company.slug}:v{version}",
+                details_json={"changes": len(changes), "file_version": profile.meta.version},
+            )
         )
-    )
     await db.flush()
     return ImportResult(
         company=company,
@@ -151,18 +184,23 @@ async def import_profile(
     )
 
 
-async def publish_profile(
-    db: AsyncSession, slug: str, version: int, *, reviewer: str
-) -> PublishResult:
-    """Make `version` the active profile. The previously published version becomes Archived."""
-    company = await require_company(db, slug)
+async def require_version(db: AsyncSession, company: Company, version: int) -> ProfileRow:
     row = await get_profile_version(db, company.id, version)
     if row is None:
         known = [r.version for r in await list_versions(db, company.id)]
         raise ProfileError(
-            f"'{slug}' has no version {version}. Stored versions: "
+            f"'{company.slug}' has no version {version}. Stored versions: "
             + (", ".join(map(str, known)) if known else "none")
         )
+    return row
+
+
+async def publish_profile(
+    db: AsyncSession, slug: str, version: int, *, reviewer: str, audit: bool = True
+) -> PublishResult:
+    """Make `version` the active profile. The previously published version becomes Archived."""
+    company = await require_company(db, slug)
+    row = await require_version(db, company, version)
     row_profile(row)  # refuse to publish a stored profile that no longer validates
     previous = await get_published_row(db, company.id)
     if previous is not None and previous.id == row.id:
@@ -184,16 +222,40 @@ async def publish_profile(
         published_at=now.isoformat(),
         reviewed_by=reviewer,
     )
-    db.add(
-        AuditLog(
-            actor=reviewer,
-            action="profile.publish",
-            entity=f"company_profile:{slug}:v{version}",
-            details_json={"previous_version": previous.version if previous else None},
+    if audit:
+        db.add(
+            AuditLog(
+                actor=reviewer,
+                action="profile.publish",
+                entity=f"company_profile:{slug}:v{version}",
+                details_json={"previous_version": previous.version if previous else None},
+            )
         )
-    )
     await db.flush()
     return PublishResult(company, row, previous.version if previous else None)
+
+
+async def transition_profile(
+    db: AsyncSession, slug: str, version: int, to: ProfileStatus, *, actor: str
+) -> TransitionResult:
+    """Move a version along the workflow (AT-4). Publishing goes through publish_profile, so it
+    records the reviewer and archives the version published before in the same transaction.
+    The caller writes the audit row and commits."""
+    company = await require_company(db, slug)
+    row = await require_version(db, company, version)
+    current = row.status
+    if to not in ALLOWED_TRANSITIONS[current]:
+        allowed = ", ".join(sorted(s.value for s in ALLOWED_TRANSITIONS[current]))
+        raise TransitionError(
+            f"{slug} version {version} is {current.value}. It can move to: {allowed}."
+        )
+    if to is ProfileStatus.PUBLISHED:
+        result = await publish_profile(db, slug, version, reviewer=actor, audit=False)
+        return TransitionResult(company, result.row, current, result.previous_version)
+    row.status = to
+    row.profile_json = _with_meta(row.profile_json, status=to)
+    await db.flush()
+    return TransitionResult(company, row, current)
 
 
 def _with_meta(profile_json: dict[str, Any], **meta: Any) -> dict[str, Any]:
@@ -220,6 +282,7 @@ async def list_companies(db: AsyncSession) -> list[CompanySummary]:
         published = [v for v, s in statuses.items() if s is ProfileStatus.PUBLISHED]
         out.append(
             CompanySummary(
+                id=company.id,
                 slug=company.slug,
                 name=company.name,
                 active=company.active,

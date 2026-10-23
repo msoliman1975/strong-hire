@@ -254,6 +254,15 @@ export function AccountPage() {
       {usage.data && <PlanSection usage={usage.data} />}
       {usage.isError && <ErrorNotice error={usage.error} />}
 
+      {/* CU-8: until the Questions page lands, My questions is reached from here and the Custom setup. */}
+      <section className="panel" aria-labelledby="my-questions-heading">
+        <h2 id="my-questions-heading">My questions</h2>
+        <p>Questions you saved to practice in a Custom interview.</p>
+        <Link className="btn btn--secondary" to="/questions/mine">
+          Manage my questions
+        </Link>
+      </section>
+
       <section className="panel" aria-labelledby="privacy-heading">
         <h2 id="privacy-heading">Training data</h2>
         <ConsentSwitch checked={consentValue} onChange={(v) => consent.mutate(v)} disabled={consent.isPending} />

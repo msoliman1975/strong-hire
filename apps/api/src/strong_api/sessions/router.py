@@ -5,11 +5,26 @@
     GET  /sessions/{id}                    one session
     GET  /job-targets/{id}/sessions        a job's sessions, newest first
     POST /sessions/{id}/end                end it: bill minutes, start scoring
+    POST /sessions/{id}/repeat             CU-9: the setup of an earlier session, to prefill a
+                                           new one (nothing is created)
     POST /sessions/{id}/text/open          text channel: the interviewer greets (PL-7)
     POST /sessions/{id}/text/turn          text channel: a candidate turn and the reply
     POST /sessions/{id}/coach              pause, resume, hint, redo (Coach mode only, IV-8)
     POST /sessions/{id}/voice/join         voice channel: start, and a LiveKit token for the room
     POST /internal/sessions/{id}/end       the voice agent ends a session (shared token)
+
+Creating or starting a session (the first voice join, the text open) answers 503 while new
+sessions are paused or the daily spend cap is reached (OC-2, OC-3, strong_api.controls).
+Sessions in progress always go on. The plan (BL-1, BL-2) and Custom access (CU-11) rules are
+checked at create and again at the start, under a row lock on the org, so sessions created ahead
+cannot start past the free interviews or after Custom became paid only.
+
+A Custom session (CU-1, `config.interview_type == "custom"` with `config.custom`) stores its
+setup in `sessions.custom_json`; the worker builds the brief from it. Under the runtime setting
+`custom_interview_access=paid_only` a user without a paid plan gets 403 `upgrade_required`
+(CU-11, strong_api.custom.access). The plan rules apply as for any session: Custom has no mini
+interview (D-14), so while Custom is open to everyone a free account may run a 30-minute Custom
+session as one of its free interviews; under `paid_only` it is locked.
 
 Creating a session queues the interviewer brief job (P6). The text channel runs the same
 controller and interviewer as the voice agent (strong_interview), with typed input. It exists
@@ -30,7 +45,6 @@ import logging
 import time
 import uuid
 from datetime import UTC, datetime, timedelta
-from decimal import Decimal
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
@@ -41,6 +55,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from strong_api.auth.settings import AppEnv, get_auth_settings
 from strong_api.auth.sim import is_sim_user
 from strong_api.billing.entitlements import ensure_can_start_session, record_session_minutes
+from strong_api.controls import ensure_sessions_open
+from strong_api.custom.access import (
+    FREE_CUSTOM_DURATION,
+    custom_open_to_everyone,
+    ensure_custom_allowed,
+)
+from strong_api.custom.guard import check_custom_spec
+from strong_api.custom.limits import CustomSettings, get_custom_settings
 from strong_api.inputs.deps import CurrentUser, Db, Me, Queue
 from strong_api.inputs.queue import BUILD_INTERVIEWER_BRIEF, JobQueue
 from strong_api.scoring.router import _brief, _config, _owned_session, _owned_target, start_scoring
@@ -50,6 +72,7 @@ from strong_api.sessions.schemas import (
     CreateSessionRequest,
     InternalEndRequest,
     SessionRecord,
+    SessionSetup,
     TextTurnRequest,
     TextTurns,
     VoiceJoin,
@@ -61,17 +84,17 @@ from strong_api.sessions.settings import (
     get_voice_session_settings,
 )
 from strong_core.db.models import GapAnalysis as GapRow
-from strong_core.db.models import InterviewSession, JobTarget, UsageEvent
+from strong_core.db.models import InterviewSession, JobTarget, Org
 from strong_core.db.models import Turn as TurnRow
 from strong_core.db.turns import next_turn_seq
-from strong_core.gateway import Role, get_gateway
+from strong_core.gateway import Role, get_gateway, usage_context
 from strong_core.schemas import (
     GapStatus,
+    InterviewType,
     JobPosting,
     SessionChannel,
     SessionStatus,
     Turn,
-    UsageComponent,
 )
 from strong_core.sim import gateway_for_org
 from strong_interview import (
@@ -89,6 +112,7 @@ OPEN = {SessionStatus.CREATED, SessionStatus.IN_PROGRESS, SessionStatus.INTERRUP
 SESSION_ROOM_PREFIX = "session-"  # the voice agent runs the interview in rooms named like this
 VoiceSettings = Annotated[VoiceSessionSettings, Depends(get_voice_session_settings)]
 TextSettings = Annotated[TextSessionSettings, Depends(get_text_session_settings)]
+CustomSettingsDep = Annotated[CustomSettings, Depends(get_custom_settings)]
 FLUSH_TIMEOUT_S = 30.0  # the most a request waits for trace rows still being saved
 
 router = APIRouter(tags=["sessions"])
@@ -147,9 +171,67 @@ async def _session_resume(
     return gap.resume_id if gap is not None else None
 
 
-@router.post("/sessions", status_code=status.HTTP_201_CREATED)
-async def create_session(body: CreateSessionRequest, db: Db, me: Me, queue: Queue) -> SessionRecord:
-    """Create a session and queue its interviewer brief (IV-2, IV-4, IV-6, IV-8)."""
+async def _ensure_may_start(
+    db: AsyncSession, me: CurrentUser, *, custom: bool, duration_min: int
+) -> None:
+    """The plan (BL-1, BL-2) and Custom access (CU-11) rules for a session of this kind.
+
+    Checked when a session is created and again when it starts (the first voice join or the
+    text open): a free account could otherwise create several sessions while it has one free
+    interview left and start them all, and a session created while Custom was open to everyone
+    could still start after Custom became paid only. `free_full` (CU-11) is worked out from the
+    current access setting each time."""
+    free_full = False
+    if custom:
+        await ensure_custom_allowed(db, me)  # CU-11
+        free_full = duration_min == FREE_CUSTOM_DURATION and await custom_open_to_everyone(db)
+    if not await is_sim_user(db, me.user_id):  # the AI candidate has no plan (P13)
+        await ensure_can_start_session(db, me.org_id, duration_min, free_full=free_full)
+
+
+async def _ensure_may_start_now(
+    db: AsyncSession, me: CurrentUser, session: InterviewSession
+) -> None:
+    """Re-check the rules just before `started_at` is set. The org row is locked first (FOR
+    UPDATE; SQLite ignores it), so two starts of the same account at the same time cannot both
+    count the last free interview: the second waits until the first commits its started_at,
+    then counts it. The caller sets started_at and commits in the same transaction."""
+    await db.execute(select(Org.id).where(Org.id == session.org_id).with_for_update())
+    await _ensure_may_start(
+        db,
+        me,
+        custom=session.type == InterviewType.CUSTOM,
+        duration_min=session.duration_min,
+    )
+
+
+@router.post(
+    "/sessions",
+    status_code=status.HTTP_201_CREATED,
+    responses={
+        422: {
+            "description": "A bad setup, or CU-5: detail.code is 'question_refused' with "
+            "index, kind ('question' or 'focus'), category, refusal and reason."
+        },
+        429: {"description": "CU-5 checks: detail.code is 'rate_limited'; see Retry-After."},
+        503: {
+            "description": "Sessions are paused (OC-2, OC-3), or CU-5: detail.code is "
+            "'check_unavailable'."
+        },
+    },
+)
+async def create_session(
+    body: CreateSessionRequest,
+    request: Request,
+    db: Db,
+    me: Me,
+    queue: Queue,
+    custom_settings: CustomSettingsDep,
+) -> SessionRecord:
+    """Create a session and queue its interviewer brief (IV-2, IV-4, IV-6, IV-8).
+
+    For a Custom session the own questions and focus chips are checked on the server (CU-5,
+    strong_api.custom.guard); a refusal answers 422 `question_refused` and nothing is stored."""
     target = await _owned_target(db, me, body.job_target_id)
     if target.deleted_at is not None:  # R1: a deleted job cannot get new sessions
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Job target not found")
@@ -157,10 +239,15 @@ async def create_session(body: CreateSessionRequest, db: Db, me: Me, queue: Queu
         raise HTTPException(status.HTTP_409_CONFLICT, "The job posting is still being read.")
     if body.channel == SessionChannel.TEXT and not await _text_allowed(db, me):
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Text sessions are a dev feature.")
+    await ensure_sessions_open(db, body.channel)  # OC-2, OC-3
     config = body.config
-    if not await is_sim_user(db, me.user_id):  # the AI candidate has no plan (P13)
-        await ensure_can_start_session(db, me.org_id, config.duration_min)
+    await _ensure_may_start(db, me, custom=config.is_custom, duration_min=config.duration_min)
     resume_id = await _session_resume(db, me, target.id, body.resume_id)
+    if config.custom is not None:  # CU-5: unchecked text never reaches a session
+        custom = await check_custom_spec(
+            request, db, get_gateway(), me.org_id, me.user_id, custom_settings, config.custom
+        )
+        config = config.model_copy(update={"custom": custom})
     target.level = config.level  # the level confirmed at setup sets the bar (IV-6)
     session = InterviewSession(
         org_id=me.org_id,
@@ -172,6 +259,7 @@ async def create_session(body: CreateSessionRequest, db: Db, me: Me, queue: Queu
         duration_min=config.duration_min,
         channel=body.channel,
         model_profile=get_gateway().profile,
+        custom_json=config.custom.model_dump(mode="json") if config.custom else None,
     )
     db.add(session)
     await db.commit()
@@ -198,6 +286,21 @@ async def get_session(session_id: uuid.UUID, db: Db, me: Me) -> SessionRecord:
     return _record(session, await db.get(JobTarget, session.job_target_id))
 
 
+@router.post("/sessions/{session_id}/repeat")
+async def repeat_session(session_id: uuid.UUID, db: Db, me: Me) -> SessionSetup:
+    """CU-9: the setup of an earlier session (type, difficulty, mode, length, level, and for a
+    Custom session its categories, focus chips and own questions), shaped like the body of
+    POST /sessions so the web app can prefill the setup screen. Creates nothing."""
+    session = await _owned_session(db, me, session_id)
+    target = await db.get(JobTarget, session.job_target_id)
+    return SessionSetup(
+        job_target_id=session.job_target_id,
+        resume_id=session.resume_id,
+        config=_config(session, target),
+        channel=session.channel,
+    )
+
+
 @router.get("/job-targets/{job_target_id}/sessions")
 async def list_sessions(job_target_id: uuid.UUID, db: Db, me: Me) -> list[SessionRecord]:
     target = await _owned_target(db, me, job_target_id)
@@ -216,19 +319,9 @@ async def _end(
         return
     if runner is not None:
         session.prompt_version = ",".join(sorted(runner.interviewer.prompt_refs))[:200] or None
+        # Usage: the gateway writes one usage_events row per interviewer call (OB-2), inside
+        # the usage context of each text request below.
         await _flush_traces(runner)
-        interviewer = runner.interviewer
-        if session.started_at is not None:
-            # The text channel's interviewer tokens and cost, like the voice agent saves them.
-            db.add(
-                UsageEvent(
-                    org_id=session.org_id,
-                    session_id=session.id,
-                    component=UsageComponent.LLM,
-                    units=Decimal(interviewer.input_tokens + interviewer.output_tokens),
-                    cost_usd=Decimal(f"{interviewer.cost_usd:.6f}"),
-                )
-            )
     if session.started_at is None:
         # Never started: no minutes, no scoring, and the free interview is not used.
         session.ended_at = datetime.now(UTC)
@@ -383,6 +476,7 @@ async def open_text_session(
     brief = _brief(session)
     if brief is None:
         raise HTTPException(status.HTTP_409_CONFLICT, "The interview plan is not ready yet.")
+    await ensure_sessions_open(db, SessionChannel.TEXT)  # OC-2, OC-3: only before it starts
     gateway = await gateway_for_org(db, session.org_id, get_gateway())  # sim budget (P13)
     target = await db.get(JobTarget, session.job_target_id)
     interviewer = Interviewer(gateway, brief, facts=_facts(target, brief.company_name))
@@ -396,6 +490,7 @@ async def open_text_session(
         on_turn=_turn_saver(request, session, sink.lock, db_timeout),
         trace=sink,
     )
+    await _ensure_may_start_now(db, me, session)  # BL-2, CU-11: again at the start
     session.status = SessionStatus.IN_PROGRESS
     session.started_at = datetime.now(UTC)
     session.model_profile = gateway.profile
@@ -405,7 +500,8 @@ async def open_text_session(
     steps.step("session_started")
     try:
         async with asyncio.timeout(settings.text_turn_timeout_s):
-            turns = await runner.open()
+            with usage_context(session.org_id, session.id):  # OB-2
+                turns = await runner.open()
     except TimeoutError:
         log.error(
             "text/open %s: no greeting after %d ms (limit %.0f s); stopped after step %s",
@@ -464,7 +560,8 @@ async def text_turn(
         raise HTTPException(status.HTTP_409_CONFLICT, "The interviewer is still replying.")
     try:
         async with asyncio.timeout(settings.text_turn_timeout_s):
-            turns = await runner.respond(body.text, on_stage=steps.step)
+            with usage_context(session.org_id, session.id):  # OB-2
+                turns = await runner.respond(body.text, on_stage=steps.step)
     except TimeoutError:
         stage = runner.stage if steps.last != "received" else "waiting_for_runner_lock"
         log.error(
@@ -508,7 +605,8 @@ async def coach(
         elif body.command == "resume":
             runner.resume()
         else:
-            turns = await runner.coach(body.command)
+            with usage_context(session.org_id, session.id):  # OB-2
+                turns = await runner.coach(body.command)
             await _flush_traces(runner)  # the text channel answers after its traces are saved
     except CoachNotAllowedError as exc:
         raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc
@@ -535,6 +633,9 @@ async def join_voice_session(
     if _brief(session) is None:
         raise HTTPException(status.HTTP_409_CONFLICT, "The interview plan is not ready yet.")
     if session.started_at is None:
+        # OC-2, OC-3: a new session may not start; a rejoin (IV-9) of a started one always may.
+        await ensure_sessions_open(db, SessionChannel.VOICE)
+        await _ensure_may_start_now(db, me, session)  # BL-2, CU-11: again at the start
         gateway = get_gateway()
         session.status = SessionStatus.IN_PROGRESS
         session.started_at = datetime.now(UTC)

@@ -47,6 +47,7 @@ COMPANY_DOMAINS: dict[str, tuple[str, ...]] = {
     "databricks": ("databricks.com",),
     "snowflake": ("snowflake.com",),
     "atlassian": ("atlassian.com",),
+    "walmart": ("walmart.com", "walmartglobaltech.com", "samsclub.com"),
 }
 
 # Normalized names that mean a curated company.
@@ -65,6 +66,11 @@ NAME_ALIASES: dict[str, str] = {
     "salesforce com": "salesforce",
     "tableau": "salesforce",
     "slack": "salesforce",
+    "walmart global tech": "walmart",
+    "walmart labs": "walmart",
+    "walmartlabs": "walmart",
+    "sam s club": "walmart",
+    "sams club": "walmart",
 }
 
 _WORKDAY_HOST = re.compile(r"^(?P<tenant>[a-z0-9-]+)\.wd\d+\.myworkdayjobs\.com$")

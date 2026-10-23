@@ -9,6 +9,14 @@ Rules (numbers come from BillingSettings):
   per billing period. A session may start while at least one minute is left; `max_minutes`
   tells the session timer where to stop.
 - Usage resets when Stripe starts a new period (webhooks.py sets minutes_used to 0).
+- Support grants (AU-3..AU-5, `minute_grants`) count on top of the plan while active (not revoked,
+  not expired). They are never written into subscriptions:
+  * `minutes`: added to the paid cap, so minutes left = plan cap - used + granted minutes
+    (a negative amount removes minutes). They apply on a paid or comp plan only.
+  * `free_interviews`: added to the free-interview allowance.
+  * `comp_plan`: paid access without Stripe until `expires_at`, with `amount` as the minute cap,
+    like an active subscription. Minutes used under a comp are the minutes billed to sessions
+    started since the comp was granted. With an active subscription too, the larger cap wins.
 
 The session workstream (P7/P10) calls `ensure_can_start_session` in POST /sessions and
 `record_session_minutes` when a session ends.
@@ -27,8 +35,9 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from strong_api.billing.settings import BillingSettings, get_billing_settings
-from strong_core.db.models import InterviewSession, Subscription
+from strong_core.db.models import InterviewSession, MinuteGrant, Subscription
 from strong_core.schemas import MINI_DURATION_MIN, SessionStatus, SubscriptionStatus
+from strong_core.schemas.enums import GrantKind
 
 PAID_STATUSES = frozenset({SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING})
 UPGRADE_PATH = "/upgrade"
@@ -64,6 +73,10 @@ class Entitlement:
     free_interviews_total: int
     free_interviews_used: int
     block_code: BlockCode | None
+    plan_minutes_cap: int = 0
+    minutes_granted: int = 0
+    free_interviews_granted: int = 0
+    comp_until: datetime | None = None
 
     @property
     def minutes_left(self) -> int:
@@ -82,10 +95,16 @@ class Entitlement:
         """30 and 45 minute sessions need the paid plan. Free accounts get mini interviews."""
         return self.plan == "paid"
 
-    def start_block(self, duration_min: int) -> StartBlockCode | None:
-        """Why a session of `duration_min` minutes may not start now, or None."""
+    def start_block(self, duration_min: int, *, free_full: bool = False) -> StartBlockCode | None:
+        """Why a session of `duration_min` minutes may not start now, or None.
+
+        `free_full` lets a free account use a free interview for a longer session (CU-11: a
+        30-minute Custom session while Custom is open to everyone).
+        """
         if self.block_code is not None:
             return self.block_code
+        if free_full and self.plan == "free":
+            return None
         if duration_min != MINI_DURATION_MIN and not self.full_interviews_allowed:
             return "full_interview_requires_plan"
         return None
@@ -124,34 +143,91 @@ def is_paid(sub: Subscription | None) -> bool:
     return sub is not None and sub.status in PAID_STATUSES
 
 
+def grant_is_active(grant: MinuteGrant, now: datetime | None = None) -> bool:
+    """Not revoked and not expired (AU-3..AU-5)."""
+    now = now or datetime.now(UTC)
+    expires = as_utc(grant.expires_at)
+    return grant.revoked_at is None and (expires is None or expires > now)
+
+
+async def active_grants(
+    db: AsyncSession, org_id: uuid.UUID, now: datetime | None = None
+) -> list[MinuteGrant]:
+    now = now or datetime.now(UTC)
+    rows = await db.scalars(
+        select(MinuteGrant)
+        .where(MinuteGrant.org_id == org_id, MinuteGrant.revoked_at.is_(None))
+        .order_by(MinuteGrant.created_at)
+    )
+    return [g for g in rows if grant_is_active(g, now)]
+
+
+async def _comp_minutes_used(db: AsyncSession, org_id: uuid.UUID, since: datetime) -> int:
+    used = await db.scalar(
+        select(func.coalesce(func.sum(InterviewSession.minutes_billed), 0)).where(
+            InterviewSession.org_id == org_id,
+            InterviewSession.started_at.is_not(None),
+            InterviewSession.started_at >= since,
+        )
+    )
+    return int(used or 0)
+
+
 async def get_entitlement(
-    db: AsyncSession, org_id: uuid.UUID, settings: BillingSettings | None = None
+    db: AsyncSession,
+    org_id: uuid.UUID,
+    settings: BillingSettings | None = None,
+    now: datetime | None = None,
 ) -> Entitlement:
     settings = settings or get_billing_settings()
+    now = now or datetime.now(UTC)
     sub = await get_subscription(db, org_id)
     used_free = await count_free_interviews_used(db, org_id)
-    paid = is_paid(sub)
+    grants = await active_grants(db, org_id, now)
+    granted_minutes = sum(g.amount for g in grants if g.kind == GrantKind.MINUTES)
+    granted_free = sum(g.amount for g in grants if g.kind == GrantKind.FREE_INTERVIEWS)
+    comps = [g for g in grants if g.kind == GrantKind.COMP_PLAN]
+    comp = max(comps, key=lambda g: g.amount) if comps else None
+    sub_paid = is_paid(sub)
+    paid = sub_paid or comp is not None
+    free_total = max(0, settings.billing_free_interviews + granted_free)
     block: BlockCode | None = None
-    if paid:
+    used = 0
+    plan_cap = 0
+    if sub_paid:
         assert sub is not None
-        cap = sub.minutes_cap or settings.billing_minutes_cap
-        if sub.minutes_used >= cap:
+        plan_cap = sub.minutes_cap or settings.billing_minutes_cap
+        used = sub.minutes_used
+    if comp is not None and comp.amount > plan_cap:
+        plan_cap = comp.amount
+        if not sub_paid:
+            since = as_utc(comp.created_at) or now
+            used = await _comp_minutes_used(db, org_id, since)
+    if paid:
+        cap = max(0, plan_cap + granted_minutes)
+        if used >= cap:
             block = "minutes_exhausted"
     else:
         cap = 0
-        if used_free >= settings.billing_free_interviews:
+        granted_minutes = 0  # minute grants apply on a paid or comp plan only
+        if used_free >= free_total:
             block = "upgrade_required"
+    comp_until = as_utc(comp.expires_at) if comp is not None else None
     return Entitlement(
         plan="paid" if paid else "free",
         status=sub.status if sub else None,
-        minutes_used=sub.minutes_used if (sub and paid) else 0,
+        minutes_used=used,
         minutes_cap=cap,
         period_start=as_utc(sub.period_start) if sub else None,
-        period_end=as_utc(sub.period_end) if sub else None,
+        period_end=as_utc(sub.period_end) if (sub and (sub_paid or comp is None)) else comp_until,
         cancel_at_period_end=bool(sub and sub.cancel_at_period_end),
-        free_interviews_total=settings.billing_free_interviews,
+        free_interviews_total=free_total,
         free_interviews_used=used_free,
         block_code=block,
+        plan_minutes_cap=plan_cap,
+        minutes_granted=granted_minutes,
+        free_interviews_granted=granted_free,
+        comp_until=comp_until,
     )
 
 
@@ -160,6 +236,8 @@ async def ensure_can_start_session(
     org_id: uuid.UUID,
     duration_min: int,
     settings: BillingSettings | None = None,
+    *,
+    free_full: bool = False,
 ) -> Entitlement:
     """Raise HTTP 402 when the plan does not allow a new session of this length (BL-1, BL-2).
 
@@ -168,7 +246,7 @@ async def ensure_can_start_session(
     full_interview_requires_plan (a free account asked for 30 or 45 minutes).
     """
     ent = await get_entitlement(db, org_id, settings)
-    code = ent.start_block(duration_min)
+    code = ent.start_block(duration_min, free_full=free_full)
     if code is not None:
         raise HTTPException(
             status.HTTP_402_PAYMENT_REQUIRED,

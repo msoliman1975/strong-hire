@@ -28,10 +28,10 @@ from strong_core.question_bank import load_general_bank
 from strong_core.schemas import (
     CompanyProfile,
     Competency,
-    InterviewType,
     Level,
     ProfileStatus,
     RoleFamily,
+    StandardType,
 )
 
 router = APIRouter(tags=["questions"])
@@ -41,7 +41,7 @@ GENERAL = "general"
 
 @dataclass(frozen=True)
 class Filters:
-    interview_type: InterviewType | None
+    interview_type: StandardType | None
     competencies: frozenset[Competency]
     role_family: RoleFamily | None
     level: Level | None
@@ -140,7 +140,7 @@ async def list_questions(
     db: Db,
     me: Me,
     company: str | None = None,
-    interview_type: InterviewType | None = None,
+    interview_type: StandardType | None = None,
     competency: Annotated[list[Competency] | None, Query()] = None,
     role_family: RoleFamily | None = None,
     level: Level | None = None,

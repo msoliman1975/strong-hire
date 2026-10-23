@@ -1,5 +1,9 @@
-import type { Competency, CompetencyTrend, ProgressSnapshot } from "../api/types";
+import { useState, type ReactNode } from "react";
+
+import { useProgress } from "../api/hooks";
+import type { Competency, CompetencyTrend, OwnQuestionPoint, ProgressSnapshot } from "../api/types";
 import { competencyLabel, formatDate } from "../labels";
+import { ErrorNotice } from "./ui";
 
 const W = 220;
 const H = 110;
@@ -92,15 +96,22 @@ function byCompetency(snapshots: ProgressSnapshot[]): [Competency, ProgressSnaps
 const SW = 90;
 const SH = 26;
 
+/** The key of a (session, competency) point, to find the points that use own questions (CU-7). */
+const pointKey = (p: { session_id: string; competency: Competency }) => `${p.session_id}:${p.competency}`;
+
 /**
  * One small line per competency: ink line, dashed line at 3 (meets the bar), end point green at
- * 3.0 or more and amber below. The latest score is also written as a number next to it.
+ * 3.0 or more and amber below. The latest score is also written as a number next to it. CU-7:
+ * a point that includes scores of the candidate's own questions has a ring.
  */
-function Sparkline({ name, points }: { name: string; points: ProgressSnapshot[] }) {
+function Sparkline({ name, points, own }: { name: string; points: ProgressSnapshot[]; own: Set<string> }) {
   const pad = 4;
   const x = (i: number) => (points.length === 1 ? SW / 2 : pad + (i / (points.length - 1)) * (SW - 2 * pad));
   const y = (score: number) => pad + ((4 - score) / 3) * (SH - 2 * pad);
   const last = points[points.length - 1];
+  const label = points
+    .map((p) => `${p.score.toFixed(1)}${own.has(pointKey(p)) ? " (with your questions)" : ""}`)
+    .join(", ");
   return (
     <svg
       className="sparkline"
@@ -108,7 +119,7 @@ function Sparkline({ name, points }: { name: string; points: ProgressSnapshot[] 
       width={SW}
       height={SH}
       role="img"
-      aria-label={`${name}: ${points.map((p) => p.score.toFixed(1)).join(", ")}`}
+      aria-label={`${name}: ${label}`}
     >
       <line x1={0} x2={SW} y1={y(3)} y2={y(3)} stroke="var(--line-strong)" strokeDasharray="2 3" />
       {points.length > 1 && (
@@ -119,6 +130,20 @@ function Sparkline({ name, points }: { name: string; points: ProgressSnapshot[] 
           strokeWidth={1.6}
           strokeLinejoin="round"
         />
+      )}
+      {points.map((p, i) =>
+        own.has(pointKey(p)) ? (
+          <circle
+            key={p.session_id}
+            data-own="true"
+            cx={x(i)}
+            cy={y(p.score)}
+            r={4.6}
+            fill="none"
+            stroke="var(--accent)"
+            strokeWidth={1.2}
+          />
+        ) : null,
       )}
       <circle
         cx={x(points.length - 1)}
@@ -133,20 +158,67 @@ function Sparkline({ name, points }: { name: string; points: ProgressSnapshot[] 
 }
 
 /** PR-1, compact: one row per competency with a sparkline and the latest score. */
-export function CompetencySparklines({ snapshots }: { snapshots: ProgressSnapshot[] }) {
+export function CompetencySparklines({
+  snapshots,
+  ownPoints = [],
+}: {
+  snapshots: ProgressSnapshot[];
+  ownPoints?: OwnQuestionPoint[];
+}) {
+  const own = new Set(ownPoints.map(pointKey));
   return (
-    <ul className="sparklines">
-      {byCompetency(snapshots).map(([competency, points]) => {
-        const name = competencyLabel(competency);
-        return (
-          <li key={competency}>
-            <span>{name}</span>
-            <Sparkline name={name} points={points} />
-            <span className="sparklines__value">{points[points.length - 1].score.toFixed(1)}</span>
-          </li>
-        );
-      })}
-    </ul>
+    <>
+      <ul className="sparklines">
+        {byCompetency(snapshots).map(([competency, points]) => {
+          const name = competencyLabel(competency);
+          return (
+            <li key={competency}>
+              <span>{name}</span>
+              <Sparkline name={name} points={points} own={own} />
+              <span className="sparklines__value">{points[points.length - 1].score.toFixed(1)}</span>
+            </li>
+          );
+        })}
+      </ul>
+      {own.size > 0 && (
+        <p className="trend-own" data-testid="own-points-note">
+          A ringed point includes scores from questions you wrote.
+        </p>
+      )}
+    </>
+  );
+}
+
+/**
+ * PR-1 for one job with the CU-7 filter: Realistic sessions, own-question points marked, and a
+ * switch that leaves out the scores of the candidate's own questions (the API recomputes them).
+ */
+export function JobTrend({ jobId, empty }: { jobId: string; empty?: ReactNode }) {
+  const [hideOwn, setHideOwn] = useState(false);
+  const progress = useProgress(jobId, hideOwn);
+  // Keep the last answer on screen while the other view loads.
+  const data = progress.data;
+  if (!data) return progress.isError ? <ErrorNotice error={progress.error} /> : null;
+  const hasOwn = data.own_question_points.length > 0 || data.own_questions_excluded;
+  return (
+    <>
+      {data.snapshots.length === 0 ? (
+        (empty ?? null)
+      ) : (
+        <CompetencySparklines snapshots={data.snapshots} ownPoints={data.own_question_points} />
+      )}
+      {hasOwn && (
+        <label className="check small section">
+          <input
+            type="checkbox"
+            checked={hideOwn}
+            disabled={progress.isFetching}
+            onChange={(e) => setHideOwn(e.target.checked)}
+          />
+          Hide scores from my own questions
+        </label>
+      )}
+    </>
   );
 }
 

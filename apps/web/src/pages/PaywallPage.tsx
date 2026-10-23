@@ -10,6 +10,9 @@ const REASONS: Record<string, string> = {
   minutes_exhausted: "You have used this month's interview minutes.",
   full_interview_requires_plan:
     "Full interviews (30 and 45 minutes) are part of the subscription. Free accounts get mini interviews.",
+  // CU-11: Custom is for paid plans only (custom_interview_access=paid_only).
+  custom_requires_plan:
+    "Custom interviews, where you mix question types and add your own questions, are part of the subscription.",
 };
 
 /** BL-1 and BL-2: the monthly plan. Prices and caps come from the API. */

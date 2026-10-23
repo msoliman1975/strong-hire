@@ -15,11 +15,17 @@ export const debriefApi = {
         params: { path: { session_id: sessionId } },
       }),
     ) as Debrief,
-  /** PR-1 (Realistic sessions only) and PR-2. */
-  progress: async (jobId: string) =>
+  /**
+   * PR-1 (Realistic sessions only) and PR-2. CU-7: `excludeOwnQuestions` leaves out the scores
+   * of the candidate's own questions in Custom sessions.
+   */
+  progress: async (jobId: string, excludeOwnQuestions = false) =>
     unwrap(
       await apiClient.GET("/job-targets/{job_target_id}/progress", {
-        params: { path: { job_target_id: jobId } },
+        params: {
+          path: { job_target_id: jobId },
+          query: excludeOwnQuestions ? { exclude_own_questions: true } : undefined,
+        },
       }),
     ) as JobProgress,
 };

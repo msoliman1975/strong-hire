@@ -1,9 +1,23 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useParams } from "react-router";
 
-import { useDebrief, useJob, useProgress } from "../api/hooks";
-import type { Debrief, QuestionScore, Scorecard, ValueScore } from "../api/types";
-import { CompetencySparklines } from "../components/TrendChart";
+import { ApiError } from "../api/client";
+import { savedQuestionsApi } from "../api/custom";
+import { keys, useDebrief, useJob, useProgress } from "../api/hooks";
+import type {
+  CustomSessionSpec,
+  Debrief,
+  DebriefQuestion,
+  DebriefSession,
+  QuestionScore,
+  Scorecard,
+  StandardType,
+  ValueScore,
+} from "../api/types";
+import { JobTrend } from "../components/TrendChart";
 import { ErrorNotice, HireSignalScale, Loading, PageHead, Rubric } from "../components/ui";
+import { CustomNext } from "../custom/CustomNext";
+import { useRepeatSetup } from "../custom/repeat";
 import { competencyLabel, difficultyLabel, formatDate, interviewTypeLabel, modeLabel } from "../labels";
 import { setupLink } from "./GapAnalysisPage";
 
@@ -63,16 +77,21 @@ export function DebriefPage() {
               coach={config.mode === "coach"}
               mini={config.duration_min === 10}
               values={valuesInfo(debrief.data)}
+              questions={debrief.data.questions}
+              custom={config.custom}
             />
           ) : (
             <div />
           )}
           <aside className="side-column" aria-label="What to do next">
+            {config.custom && <CustomActions session={session} custom={config.custom} />}
             <section className="next-card" aria-labelledby="next-heading">
               <h2 id="next-heading" className="next-card__tag">
                 Next rehearsal
               </h2>
-              {next ? (
+              {debrief.data.next_custom_session ? (
+                <CustomNext jobId={session.job_target_id} rec={debrief.data.next_custom_session} />
+              ) : next ? (
                 <>
                   <p>
                     <strong>
@@ -95,6 +114,68 @@ export function DebriefPage() {
         </div>
       )}
     </>
+  );
+}
+
+/**
+ * CU-9: run the same Custom setup again (the setup screen opens prefilled), and CU-8: save the
+ * session's own questions that are not in "My questions" yet.
+ */
+function CustomActions({ session, custom }: { session: DebriefSession; custom: CustomSessionSpec }) {
+  const queryClient = useQueryClient();
+  const repeat = useRepeatSetup();
+  const unsaved = custom.questions.filter((q) => q.saved_question_id === null);
+  const save = useMutation({
+    mutationFn: async () => {
+      let saved = 0;
+      let already = 0;
+      for (const q of unsaved) {
+        try {
+          await savedQuestionsApi.create({ text: q.text, category: q.category, competencies: q.competencies });
+          saved += 1;
+        } catch (err) {
+          if (err instanceof ApiError && err.code === "duplicate_question") already += 1;
+          else throw err;
+        }
+      }
+      return { saved, already };
+    },
+    onSettled: () => void queryClient.invalidateQueries({ queryKey: keys.savedQuestions }),
+  });
+  const own = custom.questions.length;
+
+  return (
+    <section className="side-panel" aria-labelledby="custom-actions-heading">
+      <h2 id="custom-actions-heading">Your setup</h2>
+      <p className="muted small">
+        {custom.categories.map((c) => interviewTypeLabel[c.category]).join(", ")}.{" "}
+        {own === 1 ? "1 of your questions." : `${own} of your questions.`}
+      </p>
+      <div className="stack">
+        <button type="button" className="btn" disabled={repeat.isPending} onClick={() => repeat.mutate(session.id)}>
+          Run this setup again
+        </button>
+        {unsaved.length > 0 && (
+          <button
+            type="button"
+            className="btn btn--secondary"
+            disabled={save.isPending || save.isSuccess}
+            onClick={() => save.mutate()}
+          >
+            Save my questions
+          </button>
+        )}
+      </div>
+      {repeat.isError && <ErrorNotice error={repeat.error} />}
+      {save.isError && <ErrorNotice error={save.error} />}
+      {save.data && (
+        <p className="muted small" role="status" data-testid="saved-result">
+          {save.data.saved === 1 ? "Saved 1 question" : `Saved ${save.data.saved} questions`} to{" "}
+          <Link to="/questions/mine">My questions</Link>.
+          {save.data.already > 0 && ` ${save.data.already} ${save.data.already === 1 ? "was" : "were"} already there.`}
+        </p>
+      )}
+    </section>
   );
 }
 
@@ -124,7 +205,7 @@ function SideTrends({ jobId }: { jobId: string }) {
     <section className="side-panel" aria-labelledby="side-trends-heading">
       <h2 id="side-trends-heading">Competencies over time</h2>
       <p className="muted small">Realistic sessions for this job.</p>
-      <CompetencySparklines snapshots={progress.data.snapshots} />
+      <JobTrend jobId={jobId} />
     </section>
   );
 }
@@ -158,12 +239,17 @@ function ScorecardView({
   coach,
   mini,
   values,
+  questions: planned = [],
+  custom = null,
 }: {
   scorecard: Scorecard;
   coach: boolean;
   mini: boolean;
   values: ValuesInfo;
+  questions?: DebriefQuestion[];
+  custom?: CustomSessionSpec | null;
 }) {
+  const byRef = new Map(planned.map((q) => [q.question_ref, q]));
   const questions = scorecard.per_question.length;
   return (
     <div className="stack">
@@ -184,11 +270,26 @@ function ScorecardView({
 
       <section aria-labelledby="questions-heading">
         <h2 id="questions-heading">Question by question</h2>
-        <ol className="plain-list question-list">
-          {scorecard.per_question.map((q) => (
-            <QuestionCard key={q.question_ref} q={q} />
-          ))}
-        </ol>
+        {custom ? (
+          groupByCategory(scorecard.per_question, byRef, custom).map((group) => (
+            <section key={group.key} aria-labelledby={`group-${group.key}`} data-testid={`group-${group.key}`}>
+              <h3 id={`group-${group.key}`} className="question-group__title">
+                {group.title}
+              </h3>
+              <ol className="plain-list question-list">
+                {group.items.map((q) => (
+                  <QuestionCard key={q.question_ref} q={q} plan={byRef.get(q.question_ref)} canSave />
+                ))}
+              </ol>
+            </section>
+          ))
+        ) : (
+          <ol className="plain-list question-list">
+            {scorecard.per_question.map((q) => (
+              <QuestionCard key={q.question_ref} q={q} plan={byRef.get(q.question_ref)} />
+            ))}
+          </ol>
+        )}
       </section>
 
       <section className="panel" aria-labelledby="comp-heading">
@@ -227,15 +328,53 @@ function ScorecardView({
   );
 }
 
+interface QuestionGroup {
+  key: string;
+  title: string;
+  items: QuestionScore[];
+}
+
+/**
+ * CU-6: a Custom session's breakdown by kind of question, in the order the candidate set. A
+ * question the plan does not list (or with no category) goes under "Other questions".
+ */
+function groupByCategory(
+  scores: QuestionScore[],
+  byRef: Map<string, DebriefQuestion>,
+  custom: CustomSessionSpec,
+): QuestionGroup[] {
+  const order: StandardType[] = custom.categories.map((c) => c.category);
+  const groups: QuestionGroup[] = order.map((c) => ({ key: c, title: interviewTypeLabel[c], items: [] }));
+  const other: QuestionGroup = { key: "other", title: "Other questions", items: [] };
+  for (const q of scores) {
+    const category = byRef.get(q.question_ref)?.category ?? null;
+    const group = category ? groups.find((g) => g.key === category) : undefined;
+    (group ?? other).items.push(q);
+  }
+  return [...groups, other].filter((g) => g.items.length > 0);
+}
+
 /** FB-2: one question with its average score, what was strong, what was missing, and the scores behind it. */
-function QuestionCard({ q }: { q: QuestionScore }) {
+function QuestionCard({ q, plan, canSave = false }: { q: QuestionScore; plan?: DebriefQuestion; canSave?: boolean }) {
   const avg = questionAverage(q);
+  const own = plan?.source === "candidate";
+  // CU-9: an interviewer question of a Custom session can be kept for a later setup.
+  const savable = canSave && plan?.source === "planner" && plan.category !== null && plan.competencies.length > 0;
   return (
-    <li className="question-card">
+    <li className="question-card" data-own={own || undefined}>
       <div className="question-card__head">
-        <h3>{q.question_text}</h3>
+        <h3>
+          {q.question_text}
+          {own && (
+            <>
+              {" "}
+              <span className="badge-own">Your question</span>
+            </>
+          )}
+        </h3>
         {avg !== null && <span className="score-mono">{avg.toFixed(1)} / 4</span>}
       </div>
+      {savable && plan && <SaveQuestion plan={plan} />}
       {avg !== null && (
         <div className="score-bar" data-tone={scoreTone(avg)} aria-hidden="true">
           <span style={{ width: `${(avg / 4) * 100}%` }} />
@@ -285,6 +424,53 @@ function QuestionCard({ q }: { q: QuestionScore }) {
         </ul>
       </details>
     </li>
+  );
+}
+
+const MAX_SAVED_COMPETENCIES = 3;
+
+/**
+ * CU-9: "Save to My questions" for an interviewer question, with its category and competencies.
+ * The interviewer's questions are drawn fresh when a setup runs again, so this keeps a good one.
+ */
+function SaveQuestion({ plan }: { plan: DebriefQuestion }) {
+  const queryClient = useQueryClient();
+  const save = useMutation({
+    mutationFn: async () => {
+      try {
+        await savedQuestionsApi.create({
+          text: plan.text,
+          category: plan.category as StandardType,
+          competencies: plan.competencies.slice(0, MAX_SAVED_COMPETENCIES),
+        });
+        return "saved" as const;
+      } catch (err) {
+        if (err instanceof ApiError && err.code === "duplicate_question") return "already" as const;
+        throw err;
+      }
+    },
+    onSettled: () => void queryClient.invalidateQueries({ queryKey: keys.savedQuestions }),
+  });
+  return (
+    <div className="row">
+      {save.data ? (
+        <p className="muted small" role="status">
+          {save.data === "saved" ? "Saved to " : "Already in "}
+          <Link to="/questions/mine">My questions</Link>.
+        </p>
+      ) : (
+        <button
+          type="button"
+          className="btn btn--quiet"
+          disabled={save.isPending}
+          onClick={() => save.mutate()}
+          aria-label={`Save to My questions: ${plan.text}`}
+        >
+          Save to My questions
+        </button>
+      )}
+      {save.isError && <ErrorNotice error={save.error} />}
+    </div>
   );
 }
 

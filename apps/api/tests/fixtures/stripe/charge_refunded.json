@@ -1,0 +1,33 @@
+{
+  "id": "evt_TEST_charge_refunded",
+  "object": "event",
+  "api_version": "2026-09-30.endive",
+  "created": 1790600000,
+  "data": {
+    "object": {
+      "id": "ch_TEST789",
+      "object": "charge",
+      "amount": 2900,
+      "amount_captured": 2900,
+      "amount_refunded": 2900,
+      "currency": "usd",
+      "customer": "cus_TEST123",
+      "invoice": "in_TEST456",
+      "livemode": false,
+      "paid": true,
+      "refunded": true,
+      "status": "succeeded"
+    },
+    "previous_attributes": {
+      "amount_refunded": 0,
+      "refunded": false
+    }
+  },
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "charge.refunded"
+}

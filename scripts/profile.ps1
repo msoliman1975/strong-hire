@@ -93,6 +93,10 @@ function Get-ComposeArgs([string]$ModelProfile, [bool]$WithVoice) {
 # The test server (docs/hosting.md) sets STACK_TARGET=server in .env.
 function Test-Server { return (Get-EnvValues)['STACK_TARGET'] -eq 'server' }
 
+# Admin-started AI candidate runs (docs/admin-spec.md, SM): the sim service runs on the test server
+# when .env has SIM_ENABLED=true. It is started after the migrations, because it reads sim_runs.
+function Test-SimService { return (Test-Server) -and ((Get-EnvValues)['SIM_ENABLED'] -eq 'true') }
+
 function Test-VoiceRunning {
     $names = & docker ps --format '{{.Names}}' 2>$null
     return [bool]($names | Where-Object { $_ -match 'strong-hire-voice-1' })
@@ -254,6 +258,10 @@ try {
     # New code can bring new database migrations; apply them, as ./scripts/dev.ps1 up does.
     Write-Step 'Applying database migrations'
     Invoke-Docker ($compose + @('exec', '-T', 'api', 'alembic', '-c', 'packages/core/alembic.ini', 'upgrade', 'head'))
+    if (Test-SimService) {
+        Write-Step 'Rebuilding if needed and restarting the sim service (admin-started AI runs)'
+        Invoke-Docker ($compose + @('--profile', 'sim', 'up', '-d', '--build', '--force-recreate', 'sim'))
+    }
     Write-Step "API is up with model_profile=$($health.model_profile)"
     if ($Name -eq 'claude') { Show-Spend (Get-EnvValues) }
     if ($Name -in @('tiny', 'local')) {

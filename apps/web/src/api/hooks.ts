@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { accountApi } from "./account";
+import { customApi, savedQuestionsApi } from "./custom";
 import { authApi } from "./auth";
 import { billingApi } from "./billing";
 import { devApi } from "./dev";
@@ -30,7 +31,9 @@ export const keys = {
   reports: ["reports"] as const,
   reportList: (filter: ReportFilter) =>
     ["reports", filter.jobTargetId ?? "", filter.resumeId ?? "", filter.type ?? ""] as const,
-  progress: (id: string) => ["jobs", id, "progress"] as const,
+  progress: (id: string, excludeOwn = false) => ["jobs", id, "progress", excludeOwn] as const,
+  savedQuestions: ["questions", "mine"] as const,
+  focus: (jobId: string, resumeId: string | null) => ["custom", "focus", jobId, resumeId ?? ""] as const,
   resumes: ["resumes"] as const,
   resume: (id: string) => ["resumes", id] as const,
   resumeTask: (id: string, taskId: string) => ["resumes", id, "task", taskId] as const,
@@ -128,8 +131,27 @@ export const useReports = (filter: ReportFilter = {}) =>
 export const useJobSessions = (jobId: string) =>
   useQuery({ queryKey: keys.jobSessions(jobId), queryFn: () => sessionsApi.listForJob(jobId) });
 
-export const useProgress = (jobId: string) =>
-  useQuery({ queryKey: keys.progress(jobId), queryFn: () => debriefApi.progress(jobId) });
+/** PR-1, PR-2. CU-7: `excludeOwn` hides the scores of own questions in Custom sessions. */
+export const useProgress = (jobId: string, excludeOwn = false) =>
+  useQuery({
+    queryKey: keys.progress(jobId, excludeOwn),
+    queryFn: () => debriefApi.progress(jobId, excludeOwn),
+    // CU-7: the other view of the same job stays on screen while the filtered one loads.
+    placeholderData: (previous, query) => (query?.queryKey[1] === jobId ? previous : undefined),
+  });
+
+/** CU-8: the saved "My questions" list. */
+export const useSavedQuestions = (enabled = true) =>
+  useQuery({ queryKey: keys.savedQuestions, queryFn: savedQuestionsApi.list, enabled });
+
+/** CU-2: suggested focus chips for a job (and CV). */
+export const useFocusSuggestions = (jobId: string, resumeId: string | null, enabled = true) =>
+  useQuery({
+    queryKey: keys.focus(jobId, resumeId),
+    queryFn: () => customApi.focus(jobId, resumeId),
+    enabled,
+    staleTime: 60_000,
+  });
 
 export const useSession = (sessionId: string) =>
   useQuery({

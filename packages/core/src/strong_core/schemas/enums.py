@@ -27,12 +27,42 @@ class RoleFamily(StrEnum):
 
 
 class InterviewType(StrEnum):
-    """The four v1 interview types (IV-2)."""
+    """The four v1 interview types (IV-2), plus Custom (CU-1).
+
+    A Custom session mixes 1 to 3 of the four standard types as question categories
+    (`SessionConfig.custom`). Custom is never a question category itself and has no entry in
+    COMPETENCIES_BY_TYPE; use `session_competencies(config)` for a session's competency pool.
+    """
 
     BEHAVIORAL = "behavioral"
     HIRING_MANAGER = "hiring_manager"
     TECHNICAL_QA = "technical_qa"
     CASE = "case"
+    CUSTOM = "custom"
+
+
+STANDARD_INTERVIEW_TYPES: tuple[InterviewType, ...] = (
+    InterviewType.BEHAVIORAL,
+    InterviewType.HIRING_MANAGER,
+    InterviewType.TECHNICAL_QA,
+    InterviewType.CASE,
+)
+"""The types that are also question categories in a Custom session (CU-1)."""
+
+
+class QuestionSource(StrEnum):
+    """Who wrote a brief question: the planner, or the candidate in a Custom session (CU-3)."""
+
+    PLANNER = "planner"
+    CANDIDATE = "candidate"
+
+
+class QuestionRefusal(StrEnum):
+    """CU-5: why a candidate's own question or focus chip is refused."""
+
+    NOT_A_QUESTION = "not_a_question"
+    INAPPROPRIATE = "inappropriate"  # abuse, harassment, threats, hate or sexual content (IV-12)
+    INSTRUCTIONS = "instructions"  # text that tries to instruct the interviewer
 
 
 class Difficulty(StrEnum):
@@ -113,6 +143,7 @@ class Competency(StrEnum):
     RECOMMENDATION = "recommendation"
 
 
+# The four standard types only. Custom sessions take the union over their categories.
 COMPETENCIES_BY_TYPE: dict[InterviewType, tuple[Competency, ...]] = {
     InterviewType.BEHAVIORAL: (
         Competency.OWNERSHIP,
@@ -183,6 +214,7 @@ class OrgType(StrEnum):
 class AuthProvider(StrEnum):
     GOOGLE = "google"
     EMAIL = "email"
+    PASSWORD = "password"
     DEV = "dev"
 
 
@@ -253,3 +285,85 @@ class UsageComponent(StrEnum):
     STT = "stt"
     LLM = "llm"
     TTS = "tts"
+
+
+# --- Admin app (docs/admin-spec.md). Stored in the database only; no contract uses them. ---
+
+
+class GrantKind(StrEnum):
+    """AU-3..AU-5: what a minute_grants row gives the user."""
+
+    MINUTES = "minutes"
+    FREE_INTERVIEWS = "free_interviews"
+    COMP_PLAN = "comp_plan"
+
+
+class SimRunStatus(StrEnum):
+    """SM-4: an admin-started AI candidate run (docs/admin-spec.md, Simulations)."""
+
+    QUEUED = "queued"
+    WAITING = "waiting"  # SM-3: too many real sessions live; checked again every 60 s
+    STARTING = "starting"
+    INTERVIEWING = "interviewing"
+    JUDGING = "judging"
+    DONE = "done"
+    FAILED = "failed"
+    CANCELLED = "cancelled"
+
+    @property
+    def finished(self) -> bool:
+        return self in (SimRunStatus.DONE, SimRunStatus.FAILED, SimRunStatus.CANCELLED)
+
+
+class ErrorGroupStatus(StrEnum):
+    """OB-12: a resolved group that happens again reopens."""
+
+    OPEN = "open"
+    RESOLVED = "resolved"
+
+
+class AlertAggregation(StrEnum):
+    """AL-1: how an alert rule reduces the samples in its window to one value."""
+
+    LAST = "last"
+    AVG = "avg"
+    P95 = "p95"
+    RATE = "rate"
+    COUNT = "count"
+
+
+class AlertComparator(StrEnum):
+    GT = "gt"
+    GTE = "gte"
+    LT = "lt"
+    LTE = "lte"
+
+
+class AlertSeverity(StrEnum):
+    CRITICAL = "critical"
+    WARNING = "warning"
+
+
+class AlertState(StrEnum):
+    """AL-2: ok -> pending -> firing -> ok."""
+
+    OK = "ok"
+    PENDING = "pending"
+    FIRING = "firing"
+
+
+class AlertEventKind(StrEnum):
+    """AL-4, AL-6."""
+
+    FIRED = "fired"
+    RESOLVED = "resolved"
+    TEST = "test"
+
+
+class TriageState(StrEnum):
+    """AT-5: admin triage of a requested company name."""
+
+    NEW = "new"
+    PLANNED = "planned"
+    DECLINED = "declined"
+    ADDED = "added"

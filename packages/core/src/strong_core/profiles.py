@@ -4,7 +4,7 @@ This is the read side. The write side (file import, diff, publish, the strongctl
 is in apps/api `strong_api.profiles` and imports these lookups from here.
 
 A session works from a ResolvedProfile: the company's Published profile, or generic mode.
-Generic mode (spec, 'Companies outside the 20'): a default tech-industry persona, equal
+Generic mode (spec, 'Companies outside the launch list'): a default tech-industry persona, equal
 competency weights, and no company values. It has no version number, so sessions store NULL
 in profile_version.
 

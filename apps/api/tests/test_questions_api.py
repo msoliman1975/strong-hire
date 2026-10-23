@@ -188,6 +188,8 @@ async def test_qb1_filters(client: httpx.AsyncClient, bank: None) -> None:
     assert len(body["general_questions"]) == 1
 
     assert (await client.get("/questions", params={"level": "intern"})).status_code == 422
+    # Custom is a session type, not a question category (CU-1)
+    assert (await client.get("/questions", params={"interview_type": "custom"})).status_code == 422
 
 
 async def test_qb1_needs_sign_in(anon_client: httpx.AsyncClient) -> None:

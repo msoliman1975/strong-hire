@@ -1,8 +1,15 @@
-"""Sign-in routes: Google OAuth, email magic links, and a dev login that exists only locally.
+"""Sign-in routes: email and password, email magic links, Google OAuth, and a dev login that
+exists only locally.
 
-Flow: any sign-in method ends in `_finish_sign_in`. A known email is signed in. An unknown email
-becomes a pending sign-up, and the web app asks for the 18+ confirmation, the terms and the
-training-data consent (AC-2, default off) before POST /auth/signup creates the user.
+Link and OAuth flow: `_finish_sign_in`. A known email is signed in. An unknown email becomes a
+pending sign-up, and the web app asks for the 18+ confirmation, the terms and the training-data
+consent (AC-2, default off) before POST /auth/signup creates the user.
+
+Password flow (AC-4): POST /auth/password/signup takes the confirmations with the password,
+creates the user, signs them in and emails a link to confirm the address. Password sign-in works
+before the link is opened. A link or Google sign-in also proves the email; for an unconfirmed
+user it removes the password, because nobody proved that the person who chose it owns the
+email.
 """
 
 from __future__ import annotations
@@ -20,18 +27,33 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from strong_api.auth.deps import (
     SESSION_PENDING_KEY,
     SESSION_USER_KEY,
+    AccountSuspendedError,
     DbSession,
     optional_user,
+    start_user_session,
 )
 from strong_api.auth.email import EmailSender
 from strong_api.auth.google import GoogleClient, GoogleSignInError
 from strong_api.auth.magic_links import InvalidMagicLinkError, MagicLinks
+from strong_api.auth.passwords import (
+    MAX_LENGTH,
+    LoginThrottle,
+    fingerprint,
+    hash_password,
+    needs_rehash,
+    password_problem,
+    verify_password,
+)
 from strong_api.auth.settings import AuthSettings
 from strong_api.auth.users import create_user, find_user, normalize_email
-from strong_core.db.models import User
+from strong_api.controls import SIGNUPS_PAUSED, ControlRefusedError, ensure_signups_open
+from strong_core.db.models import AuditLog, User
 from strong_core.schemas import AuthProvider
 
 _DEV_EMAIL = re.compile(r"^[^@\s]+@[^@\s]+$")
+
+ACCOUNT_UNAVAILABLE = "account_unavailable"
+"""AU-7: the /signin error code for a suspended user (the apps show the neutral message)."""
 
 OptionalUser = Annotated[User | None, Depends(optional_user)]
 
@@ -47,16 +69,13 @@ class AuthUser(BaseModel):
     auth_provider: AuthProvider
     training_consent: bool
     created_at: datetime
-    is_admin: bool = Field(
-        default=False, description="True for ADMIN_EMAILS users: the web app shows Admin."
-    )
     full_name: str | None = Field(default=None, description="AC-3 profile name.")
     profile_complete: bool = Field(
         default=False, description="AC-3: false until the user saves the first sign-in profile."
     )
 
     @classmethod
-    def of(cls, user: User, *, is_admin: bool = False) -> AuthUser:
+    def of(cls, user: User) -> AuthUser:
         return cls(
             id=user.id,
             org_id=user.org_id,
@@ -64,7 +83,6 @@ class AuthUser(BaseModel):
             auth_provider=user.auth_provider,
             training_consent=user.training_consent,
             created_at=user.created_at,
-            is_admin=is_admin,
             full_name=user.full_name,
             profile_complete=user.profile_completed_at is not None,
         )
@@ -79,6 +97,7 @@ class AuthState(BaseModel):
 class AuthProviders(BaseModel):
     google: bool
     email: bool
+    password: bool = Field(default=True, description="AC-4 email and password sign-in")
     dev: bool
 
 
@@ -87,6 +106,36 @@ class MagicLinkRequest(_Body):
 
 
 class MagicLinkSent(BaseModel):
+    sent: bool
+    dev_link: str | None = Field(
+        default=None, description="Only when APP_ENV=local, so no email server is needed."
+    )
+
+
+class PasswordSignupRequest(_Body):
+    email: EmailStr
+    password: str = Field(max_length=MAX_LENGTH)
+    full_name: str | None = Field(default=None, max_length=120)
+    age_confirmed: bool = Field(description="The user confirmed they are 18 or older.")
+    terms_accepted: bool
+    training_consent: bool = Field(default=False, description="AC-2: off unless the user opts in.")
+
+
+class PasswordLoginRequest(_Body):
+    email: EmailStr
+    password: str = Field(max_length=MAX_LENGTH)
+
+
+class EmailOnlyRequest(_Body):
+    email: EmailStr
+
+
+class PasswordResetRequest(_Body):
+    token: str = Field(max_length=2000)
+    password: str = Field(max_length=MAX_LENGTH)
+
+
+class EmailSent(BaseModel):
     sent: bool
     dev_link: str | None = Field(
         default=None, description="Only when APP_ENV=local, so no email server is needed."
@@ -103,14 +152,27 @@ class SignupRequest(_Body):
     training_consent: bool = Field(default=False, description="AC-2: off unless the user opts in.")
 
 
+_RESET_ERRORS = {
+    "expired": "That reset link has expired. Ask for a new one.",
+    "used": "That reset link was already used. Ask for a new one.",
+    "invalid": "That reset link is not valid. Ask for a new one.",
+}
+
+
 def _state(request: Request, user: User | None, settings: AuthSettings) -> AuthState:
     if user is not None:
-        user_out = AuthUser.of(user, is_admin=settings.is_admin(user.email))
-        return AuthState(status="signed_in", email=user.email, user=user_out)
+        return AuthState(status="signed_in", email=user.email, user=AuthUser.of(user))
     pending = request.session.get(SESSION_PENDING_KEY)
     if isinstance(pending, dict) and isinstance(pending.get("email"), str):
         return AuthState(status="needs_signup", email=pending["email"])
     return AuthState(status="signed_out")
+
+
+async def _sign_in_user(request: Request, db: DbSession, user: User) -> None:
+    # Start a fresh session on every sign-in so an old cookie cannot carry over.
+    start_user_session(request, user)  # refuses a suspended user (AU-7)
+    user.last_sign_in_at = datetime.now(UTC)
+    await db.commit()
 
 
 async def _finish_sign_in(
@@ -118,13 +180,15 @@ async def _finish_sign_in(
 ) -> AuthState:
     email = normalize_email(email)
     user = await find_user(db, email)
-    # Start a fresh session on every sign-in so an old cookie cannot carry over.
-    request.session.clear()
     if user is not None:
-        request.session[SESSION_USER_KEY] = str(user.id)
-        user.last_sign_in_at = datetime.now(UTC)
-        await db.commit()
+        if user.email_verified_at is None:
+            # The link or Google proves the email. A password set before that is not trusted.
+            user.email_verified_at = datetime.now(UTC)
+            user.password_hash = None
+        await _sign_in_user(request, db, user)
     else:
+        await ensure_signups_open(db)  # OC-1: no new accounts while sign-ups are paused
+        request.session.clear()
         request.session[SESSION_PENDING_KEY] = {"email": email, "provider": provider.value}
     return _state(request, user, settings)
 
@@ -134,14 +198,28 @@ def build_router(
     magic_links: MagicLinks,
     email_sender: EmailSender,
     google: GoogleClient | None,
+    *,
+    confirm_links: MagicLinks,
+    reset_links: MagicLinks,
+    throttle: LoginThrottle,
 ) -> APIRouter:
     router = APIRouter(prefix="/auth", tags=["auth"])
 
-    def web_redirect(path: str, **query: str) -> RedirectResponse:
+    def api_link(path: str, token: str) -> str:
+        return f"{settings.api_public_url.rstrip('/')}{path}?token={quote(token)}"
+
+    def web_link(path: str, **query: str) -> str:
         url = settings.web_base_url.rstrip("/") + path
-        if query:
-            url += "?" + urlencode(query)
-        return RedirectResponse(url, status_code=status.HTTP_303_SEE_OTHER)
+        return url + ("?" + urlencode(query) if query else "")
+
+    async def send_confirmation(user: User) -> str:
+        token = confirm_links.issue(user.email, ph=fingerprint(user.password_hash))
+        link = api_link("/auth/password/confirm", token)
+        await email_sender.send_email_confirmation(user.email, link)
+        return link
+
+    def web_redirect(path: str, **query: str) -> RedirectResponse:
+        return RedirectResponse(web_link(path, **query), status_code=status.HTTP_303_SEE_OTHER)
 
     def after_sign_in(state: AuthState) -> RedirectResponse:
         return web_redirect("/" if state.status == "signed_in" else "/signup")
@@ -163,9 +241,7 @@ def build_router(
     async def send_magic_link(body: MagicLinkRequest) -> MagicLinkSent:
         email = normalize_email(str(body.email))
         token = magic_links.issue(email)
-        link = (
-            f"{settings.api_public_url.rstrip('/')}/auth/magic-link/callback?token={quote(token)}"
-        )
+        link = api_link("/auth/magic-link/callback", token)
         await email_sender.send_magic_link(email, link)
         # The reply is the same for known and unknown emails, so it does not reveal accounts.
         return MagicLinkSent(sent=True, dev_link=link if settings.is_local else None)
@@ -176,9 +252,13 @@ def build_router(
             email = await magic_links.redeem(token)
         except InvalidMagicLinkError as exc:
             return web_redirect("/signin", error=f"link_{exc}")
-        return after_sign_in(
-            await _finish_sign_in(request, db, email, AuthProvider.EMAIL, settings)
-        )
+        try:
+            state = await _finish_sign_in(request, db, email, AuthProvider.EMAIL, settings)
+        except ControlRefusedError:
+            return web_redirect("/signin", error=SIGNUPS_PAUSED)
+        except AccountSuspendedError:
+            return web_redirect("/signin", error=ACCOUNT_UNAVAILABLE)
+        return after_sign_in(state)
 
     @router.get("/google/login")
     async def google_login(request: Request) -> Response:
@@ -195,9 +275,154 @@ def build_router(
             identity = await google.fetch_identity(request)
         except GoogleSignInError:
             return web_redirect("/signin", error="google")
-        return after_sign_in(
-            await _finish_sign_in(request, db, identity.email, AuthProvider.GOOGLE, settings)
+        try:
+            state = await _finish_sign_in(
+                request, db, identity.email, AuthProvider.GOOGLE, settings
+            )
+        except ControlRefusedError:
+            return web_redirect("/signin", error=SIGNUPS_PAUSED)
+        except AccountSuspendedError:
+            return web_redirect("/signin", error=ACCOUNT_UNAVAILABLE)
+        return after_sign_in(state)
+
+    # ------------------------------------------------------------ email and password (AC-4)
+
+    @router.post("/password/signup")
+    async def password_signup(
+        request: Request, db: DbSession, body: PasswordSignupRequest
+    ) -> AuthState:
+        """AC-4: create an account with a password and sign in. The email is confirmed later,
+        from the link we send."""
+        if not body.age_confirmed:
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "You must be 18 or older")
+        if not body.terms_accepted:
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Accept the terms first")
+        email = normalize_email(str(body.email))
+        problem = password_problem(body.password, email)
+        if problem:
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, problem)
+        full_name = (body.full_name or "").strip() or None
+        if await find_user(db, email) is not None:
+            # Never replace the password of an existing account, confirmed or not.
+            raise HTTPException(
+                status.HTTP_409_CONFLICT,
+                "An account with this email already exists. Sign in, or reset your password.",
+            )
+        await ensure_signups_open(db)  # OC-1
+        user = await create_user(
+            db,
+            email=email,
+            provider=AuthProvider.PASSWORD,
+            age_confirmed=body.age_confirmed,
+            terms_accepted=body.terms_accepted,
+            training_consent=body.training_consent,
+            email_verified=False,
+            password_hash=hash_password(body.password),
+            full_name=full_name,
         )
+        await send_confirmation(user)
+        await _sign_in_user(request, db, user)
+        return _state(request, user, settings)
+
+    @router.post("/password/resend", status_code=status.HTTP_202_ACCEPTED)
+    async def resend_confirmation(db: DbSession, body: EmailOnlyRequest) -> EmailSent:
+        user = await find_user(db, str(body.email))
+        if user is None or user.email_verified_at is not None or not user.password_hash:
+            return EmailSent(sent=True)
+        link = await send_confirmation(user)
+        return EmailSent(sent=True, dev_link=link if settings.is_local else None)
+
+    @router.get("/password/confirm")
+    async def confirm_email(request: Request, db: DbSession, token: str) -> Response:
+        try:
+            data = confirm_links.peek(token)
+        except InvalidMagicLinkError as exc:
+            return web_redirect("/signin", error=f"link_{exc}")
+        user = await find_user(db, data["email"])
+        if user is None or data.get("ph") != fingerprint(user.password_hash):
+            return web_redirect("/signin", error="link_invalid")
+        try:
+            await confirm_links.redeem_data(token)
+        except InvalidMagicLinkError as exc:
+            if str(exc) == "used" and user.email_verified_at is not None:
+                # Opened twice: the account is confirmed, so send them to sign in.
+                return web_redirect("/signin", confirmed="1")
+            return web_redirect("/signin", error=f"link_{exc}")
+        if user.email_verified_at is None:
+            user.email_verified_at = datetime.now(UTC)
+        try:
+            await _sign_in_user(request, db, user)
+        except AccountSuspendedError:
+            await db.commit()  # the email is still confirmed
+            return web_redirect("/signin", error=ACCOUNT_UNAVAILABLE)
+        return web_redirect("/")
+
+    @router.post("/password/login")
+    async def password_login(
+        request: Request, db: DbSession, body: PasswordLoginRequest
+    ) -> AuthState:
+        email = normalize_email(str(body.email))
+        if await throttle.blocked(email):
+            raise HTTPException(
+                status.HTTP_429_TOO_MANY_REQUESTS,
+                "Too many wrong passwords. Wait 15 minutes, or reset your password.",
+            )
+        user = await find_user(db, email)
+        hashed = user.password_hash if user is not None else None
+        if user is None or not verify_password(hashed, body.password):
+            await throttle.fail(email)
+            raise HTTPException(status.HTTP_401_UNAUTHORIZED, "The email or password is wrong.")
+        await throttle.reset(email)
+        if hashed and needs_rehash(hashed):
+            user.password_hash = hash_password(body.password)
+        await _sign_in_user(request, db, user)
+        return _state(request, user, settings)
+
+    @router.post("/password/forgot", status_code=status.HTTP_202_ACCEPTED)
+    async def forgot_password(db: DbSession, body: EmailOnlyRequest) -> EmailSent:
+        """AC-5: email a reset link. Same reply whether or not the email has an account."""
+        user = await find_user(db, str(body.email))
+        if user is None:
+            return EmailSent(sent=True)
+        token = reset_links.issue(user.email, ph=fingerprint(user.password_hash))
+        link = web_link("/reset-password", token=token)
+        await email_sender.send_password_reset(user.email, link)
+        return EmailSent(sent=True, dev_link=link if settings.is_local else None)
+
+    @router.post("/password/reset")
+    async def reset_password(
+        request: Request, db: DbSession, body: PasswordResetRequest
+    ) -> AuthState:
+        """AC-5: set a new password from a reset link, and sign in."""
+        try:
+            data = reset_links.peek(body.token)
+        except InvalidMagicLinkError as exc:
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, _RESET_ERRORS[str(exc)]) from exc
+        user = await find_user(db, data["email"])
+        if user is None or data.get("ph") != fingerprint(user.password_hash):
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, _RESET_ERRORS["invalid"])
+        problem = password_problem(body.password, user.email)
+        if problem:
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, problem)
+        try:
+            await reset_links.redeem_data(body.token)
+        except InvalidMagicLinkError as exc:
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, _RESET_ERRORS[str(exc)]) from exc
+        user.password_hash = hash_password(body.password)
+        if user.email_verified_at is None:
+            user.email_verified_at = datetime.now(UTC)  # the link came to this inbox
+        db.add(
+            AuditLog(
+                org_id=user.org_id,
+                actor=user.email,
+                action="user.password_reset",
+                entity=f"user:{user.id}",
+                details_json={},
+            )
+        )
+        await throttle.reset(user.email)
+        await _sign_in_user(request, db, user)
+        return _state(request, user, settings)
 
     @router.post("/signup")
     async def signup(request: Request, db: DbSession, body: SignupRequest) -> AuthState:
@@ -212,6 +437,7 @@ def build_router(
             raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Accept the terms first")
         user = await find_user(db, pending["email"])
         if user is None:
+            await ensure_signups_open(db)  # OC-1: the pause may have started after the link
             user = await create_user(
                 db,
                 email=pending["email"],
@@ -220,10 +446,9 @@ def build_router(
                 terms_accepted=body.terms_accepted,
                 training_consent=body.training_consent,
             )
+        start_user_session(request, user)  # refuses a suspended user (AU-7)
         user.last_sign_in_at = datetime.now(UTC)
         await db.commit()
-        request.session.clear()
-        request.session[SESSION_USER_KEY] = str(user.id)
         return _state(request, user, settings)
 
     if settings.is_local:

@@ -8,6 +8,10 @@
   * an event about an older billing period than the stored one is ignored;
   * a new subscription id replaces the stored one only when the stored one is not active.
 - A new period start resets minutes_used to 0 (usage resets each period).
+- `charge.refunded` (AU-6, D-7): refunds are made in the Stripe dashboard. Each one is recorded
+  as an audit_logs row (action `billing.charge_refunded`, actor `stripe`) with the charge id and the
+  amount, so the admin user detail and the overview can show it. The plan is not changed here;
+  Stripe sends a subscription event when a refund also cancels it.
 """
 
 from __future__ import annotations
@@ -27,12 +31,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from strong_api.billing.entitlements import PAID_STATUSES, as_utc
 from strong_api.billing.settings import BillingSettings
 from strong_api.billing.stripe_gateway import StripeGateway
-from strong_core.db.models import Org, StripeEvent, Subscription
+from strong_core.db.models import AuditLog, Org, StripeEvent, Subscription
 from strong_core.schemas import SubscriptionStatus
 
 log = logging.getLogger(__name__)
 
 SIGNATURE_TOLERANCE_S = 300
+REFUND_ACTION = "billing.charge_refunded"
 
 # Stripe statuses we do not store map to the nearest one we act on.
 STATUS_MAP: dict[str, SubscriptionStatus] = {
@@ -215,6 +220,31 @@ async def _apply(
         return await sync_subscription(
             db, row, await gateway.retrieve_subscription(sub_id), settings
         )
+
+    if etype == "charge.refunded":
+        row = await _row_for_customer(db, _id(obj.get("customer")))
+        if row is None:
+            log.warning("charge.refunded for unknown customer %s", obj.get("customer"))
+            return False
+        refunded = obj.get("amount_refunded")
+        db.add(
+            AuditLog(
+                org_id=row.org_id,
+                actor="stripe",
+                action=REFUND_ACTION,
+                entity=f"user:{row.user_id}",
+                details_json={
+                    "event_id": str(event.get("id")),
+                    "charge_id": _id(obj.get("id")),
+                    "amount_refunded": int(refunded) if isinstance(refunded, int) else None,
+                    "amount": obj.get("amount") if isinstance(obj.get("amount"), int) else None,
+                    "currency": str(obj.get("currency") or "") or None,
+                    "fully_refunded": bool(obj.get("refunded")),
+                    "livemode": bool(obj.get("livemode")),
+                },
+            )
+        )
+        return True
 
     return False
 

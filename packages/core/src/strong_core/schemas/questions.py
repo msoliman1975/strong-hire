@@ -15,10 +15,10 @@ from typing import Annotated
 from pydantic import Field, model_validator
 
 from strong_core.schemas.base import Contract
+from strong_core.schemas.custom import StandardType
 from strong_core.schemas.enums import (
     COMPETENCIES_BY_TYPE,
     Competency,
-    InterviewType,
     Level,
     RoleFamily,
 )
@@ -48,7 +48,7 @@ class GeneralQuestion(Contract):
         max_length=80,
         description="Stable slug, unique in the bank.",
     )
-    interview_type: InterviewType
+    interview_type: StandardType
     question: str = Field(min_length=1, max_length=400)
     hints: QuestionHints
     competencies: list[Competency] = Field(min_length=1, max_length=3)

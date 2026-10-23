@@ -38,10 +38,12 @@ from strong_interview import (
 )
 from strong_interview.trace_store import SqlTraceSink
 from strong_voice.interview import VoiceInterview
+from strong_voice.latency import LatencyRecorder
 from strong_voice.session_store import (
     AgentApiSettings,
     ApiFinisher,
     SqlSessionStore,
+    SqlTimingStore,
     load_session,
     session_id_from_room,
 )
@@ -116,8 +118,13 @@ class InterviewAgent(Agent):
         raise StopResponse()
 
 
-async def run_session(ctx: JobContext, build_session: Any) -> bool:
-    """Run a real interview if the room is a session room. Returns False for other rooms."""
+async def run_session(
+    ctx: JobContext, build_session: Any, recorder: LatencyRecorder | None = None
+) -> bool:
+    """Run a real interview if the room is a session room. Returns False for other rooms.
+
+    `recorder` is the latency recorder the session's STT reports to: its per-turn rows are
+    saved to voice_turn_timings in the background (OB-3)."""
     session_id = session_id_from_room(ctx.room.name)
     if session_id is None:
         return False
@@ -143,10 +150,21 @@ async def run_session(ctx: JobContext, build_session: Any) -> bool:
         now=time.monotonic,
     )
     agent_session: AgentSession[None] = build_session()
+    timings = SqlTimingStore(maker, loaded.org_id, session_id)
+    ctx.add_shutdown_callback(timings.close)
+    if recorder is not None:
+        recorder.on_turn = timings.add
+
+        @agent_session.on("conversation_item_added")
+        def _on_item(event: Any) -> None:
+            item = event.item
+            if isinstance(item, llm.ChatMessage):
+                recorder.on_message(item.role, item.metrics, item.interrupted)
 
     async def ended() -> None:
         agent.turns.close()
         await interview.finish(interrupted=False)
+        await timings.close()
         payload = json.dumps({"type": "ended"}).encode()
         await ctx.room.local_participant.publish_data(payload, reliable=True, topic=SESSION_TOPIC)
         ctx.shutdown("interview ended")

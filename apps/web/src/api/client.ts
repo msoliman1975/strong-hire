@@ -21,22 +21,35 @@ export const apiClient = createClient<paths>({
 export class ApiError extends Error {
   readonly status: number;
   readonly code: string | null;
+  /** The error's detail object, for fields beyond code and message (for example CU-5's `index`). */
+  readonly detail: Record<string, unknown> | null;
 
-  constructor(status: number, message: string, code: string | null = null) {
+  constructor(status: number, message: string, code: string | null = null, detail: Record<string, unknown> | null = null) {
     super(message);
     this.name = "ApiError";
     this.status = status;
     this.code = code;
+    this.detail = detail;
   }
 }
 
-function errorMessage(body: unknown, status: number): { message: string; code: string | null } {
+interface ParsedError {
+  message: string;
+  code: string | null;
+  detail?: Record<string, unknown>;
+}
+
+function errorMessage(body: unknown, status: number): ParsedError {
   if (body && typeof body === "object" && "detail" in body) {
     const detail = (body as { detail: unknown }).detail;
     if (typeof detail === "string") return { message: detail, code: null };
-    if (detail && typeof detail === "object" && "message" in detail) {
-      const d = detail as { message: unknown; code?: unknown };
-      return { message: String(d.message), code: typeof d.code === "string" ? d.code : null };
+    if (detail && typeof detail === "object" && !Array.isArray(detail) && ("message" in detail || "reason" in detail)) {
+      const d = detail as { message?: unknown; reason?: unknown; code?: unknown };
+      return {
+        message: String(d.message ?? d.reason),
+        code: typeof d.code === "string" ? d.code : null,
+        detail: detail as Record<string, unknown>,
+      };
     }
     if (Array.isArray(detail) && detail.length > 0) {
       const first = detail[0] as { msg?: unknown };
@@ -49,8 +62,8 @@ function errorMessage(body: unknown, status: number): { message: string; code: s
 /** Turns an openapi-fetch result into data, or throws ApiError. */
 export function unwrap<T>(result: { data?: T; error?: unknown; response: Response }): T {
   if (result.error !== undefined || !result.response.ok) {
-    const { message, code } = errorMessage(result.error, result.response.status);
-    throw new ApiError(result.response.status, message, code);
+    const { message, code, detail } = errorMessage(result.error, result.response.status);
+    throw new ApiError(result.response.status, message, code, detail ?? null);
   }
   return result.data as T;
 }
@@ -75,8 +88,8 @@ export async function request<T>(
   const text = await resp.text();
   const data: unknown = text ? JSON.parse(text) : undefined;
   if (!resp.ok) {
-    const { message, code } = errorMessage(data, resp.status);
-    throw new ApiError(resp.status, message, code);
+    const { message, code, detail } = errorMessage(data, resp.status);
+    throw new ApiError(resp.status, message, code, detail ?? null);
   }
   return data as T;
 }

@@ -2,8 +2,9 @@ import { Link, useSearchParams } from "react-router";
 
 import { useJobs, useProgress } from "../api/hooks";
 import type { JobTargetSummary } from "../api/types";
-import { CompetencySparklines } from "../components/TrendChart";
+import { JobTrend } from "../components/TrendChart";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
+import { CustomNext } from "../custom/CustomNext";
 import { difficultyLabel, formatDate, interviewTypeLabel } from "../labels";
 import { newJobPath } from "../paths";
 
@@ -142,7 +143,7 @@ function JobCard({ summary }: { summary: JobTargetSummary }) {
 /** PR-3: rehearsing starts with the resume. A pair rehearsed before shows its earlier reports. */
 function RehearseButton({ jobId }: { jobId: string }) {
   const progress = useProgress(jobId);
-  const next = progress.data?.next_session ?? null;
+  const next = progress.data?.next_custom_session ?? progress.data?.next_session ?? null;
   return (
     <Link className="btn" to={`/jobs/${jobId}/resume`}>
       {next ? `Rehearse: ${interviewTypeLabel[next.interview_type]} next` : "Rehearse for this job"}
@@ -150,13 +151,19 @@ function RehearseButton({ jobId }: { jobId: string }) {
   );
 }
 
-/** PR-1 and PR-2 for the most recently practiced job: trend per competency and the next rehearsal. */
+/**
+ * PR-1 and PR-2 for the most recently practiced job: trend per competency and the next rehearsal,
+ * a Custom one when the API recommends it (CU-10).
+ */
 function TrendSide({ summary }: { summary: JobTargetSummary }) {
   const jobId = summary.job_target.id;
   const progress = useProgress(jobId);
   if (progress.isPending) return null;
   if (progress.isError) return <ErrorNotice error={progress.error} />;
   const next = progress.data.next_session;
+  // CU-10: a Custom session over gaps in several kinds of interview. The API leaves it out when
+  // Custom is locked for this account (CU-11).
+  const custom = progress.data.next_custom_session ?? null;
 
   return (
     <aside className="side-column" aria-label="Your trend">
@@ -165,13 +172,19 @@ function TrendSide({ summary }: { summary: JobTargetSummary }) {
         <p className="muted small">
           {jobTitle(summary)}, {jobCompany(summary)}. Realistic sessions.
         </p>
-        {progress.data.snapshots.length === 0 ? (
-          <p className="muted small">Trends appear here after your first full Realistic session (30 or 45 minutes).</p>
-        ) : (
-          <CompetencySparklines snapshots={progress.data.snapshots} />
-        )}
+        <JobTrend
+          jobId={jobId}
+          empty={
+            <p className="muted small">Trends appear here after your first full Realistic session (30 or 45 minutes).</p>
+          }
+        />
       </section>
-      {next && (
+      {custom ? (
+        <section className="next-card" aria-labelledby="next-side-heading">
+          <p className="next-card__tag">Next rehearsal</p>
+          <CustomNext jobId={jobId} rec={custom} headingId="next-side-heading" />
+        </section>
+      ) : next && (
         <section className="next-card" aria-labelledby="next-side-heading">
           <p className="next-card__tag">Next rehearsal</p>
           <h2 id="next-side-heading">
