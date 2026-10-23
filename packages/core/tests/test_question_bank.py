@@ -67,6 +67,12 @@ def test_qb1_general_question_competencies_match_its_interview_type() -> None:
         GeneralQuestion.model_validate(_question(competencies=["estimation_logic"]))
 
 
+def test_qb1_general_question_is_never_custom() -> None:
+    """QB-1: questions belong to one of the four standard types; Custom is not a category."""
+    with pytest.raises(ValidationError, match="custom is not a question category"):
+        GeneralQuestion.model_validate(_question(interview_type="custom"))
+
+
 def test_qb5_bank_rejects_duplicate_ids() -> None:
     """QB-5: ids are stable and unique."""
     with pytest.raises(ValidationError, match="duplicate question ids: disagree-with-manager"):

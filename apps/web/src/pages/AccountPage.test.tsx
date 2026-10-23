@@ -21,7 +21,6 @@ function signedIn(email = "ana@example.com") {
     auth_provider: "dev",
     training_consent: false,
     created_at: "2026-10-01T10:00:00Z",
-    is_admin: false,
     full_name: "Ana Lopez",
     profile_complete: true,
   };

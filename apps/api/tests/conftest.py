@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import AsyncIterator, Iterator
 from pathlib import Path
 from typing import Any
+from urllib.parse import parse_qs, urlparse
 
 import httpx
 import pytest
@@ -15,15 +16,17 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.pool import StaticPool
 
 from strong_api.account.exports import MemoryExportStore
+from strong_api.admin.identity import ADMIN_LINK_SALT, AdminAuth, add_admin
 from strong_api.auth import get_db, install_auth
 from strong_api.auth.magic_links import MagicLinks, MemoryUsedTokenStore
+from strong_api.auth.passwords import MemoryLoginThrottle
 from strong_api.auth.settings import AppEnv, AuthSettings
 from strong_api.inputs.queue import JobInfo
 from strong_api.main import create_app
 from strong_core.config import get_settings
 from strong_core.db.models import Base, Company
 from strong_core.db.seed import LAUNCH_COMPANIES
-from strong_core.gateway import ModelGateway
+from strong_core.gateway import ModelGateway, set_usage_sink
 from strong_core.gateway.registry import fake_models_config
 from strong_worker.account import jobs as account_jobs
 from strong_worker.account.jobs import AccountContext
@@ -47,6 +50,15 @@ def _fake_profile(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("MODEL_PROFILE", "fake")
     monkeypatch.setenv("ENV", "test")
     get_settings.cache_clear()
+
+
+@pytest.fixture(autouse=True)
+def _no_usage_sink() -> Iterator[None]:
+    """Jobs and text sessions set a usage context now (OB-2). No test writes those rows to a
+    real database; a test that checks them installs its own sink."""
+    previous = set_usage_sink(None)
+    yield
+    set_usage_sink(previous)
 
 
 WORKER_FUNCTIONS = {
@@ -156,6 +168,59 @@ async def sign_in(http: httpx.AsyncClient, email: str = "dev@example.com") -> di
     return state
 
 
+# Admin sign-in (AA-2, AA-3). Admin routes need an admin session; a candidate session never
+# counts (AA-4). `sign_in_admin` makes the email an admin and signs in through the real email
+# link flow (POST /admin/auth/link, then /admin/auth/link/verify).
+
+ADMIN_EMAIL = "boss@example.com"
+
+
+def use_test_admin_auth(app: FastAPI) -> RecordingEmailSender:
+    """Swap the admin sign-in's email, link store and throttle for in-memory ones (no Redis,
+    no SMTP). Idempotent. Returns the email recorder."""
+    auth: AdminAuth = app.state.admin_auth
+    if not isinstance(auth.email_sender, RecordingEmailSender):
+        auth.email_sender = RecordingEmailSender()
+        auth.links = MagicLinks(
+            auth.settings.session_secret, 900, MemoryUsedTokenStore(), salt=ADMIN_LINK_SALT
+        )
+        auth.throttle = MemoryLoginThrottle()
+    return auth.email_sender
+
+
+async def make_admin(app: FastAPI, email: str = ADMIN_EMAIL) -> None:
+    """Add an active admin row (AA-1), as `strongctl admin add` would."""
+    async with app.state.sessionmaker() as db:
+        await add_admin(db, email, added_by="test")
+        await db.commit()
+
+
+async def sign_in_admin(
+    http: httpx.AsyncClient, app: FastAPI, email: str = ADMIN_EMAIL, *, make: bool = True
+) -> dict[str, Any]:
+    """Sign `http` in to the admin app as `email` and return GET /admin/me."""
+    if make:
+        await make_admin(app, email)
+    sender = use_test_admin_auth(app)
+    before = len(sender.sent)
+    assert (await http.post("/admin/auth/link", json={"email": email})).status_code == 202
+    assert len(sender.sent) == before + 1, f"no admin link was sent to {email}"
+    token = parse_qs(urlparse(sender.sent[-1][1]).query)["token"][0]
+    resp = await http.post("/admin/auth/link/verify", json={"token": token})
+    assert resp.status_code == 200, resp.text
+    me: dict[str, Any] = (await http.get("/admin/me")).json()
+    return me
+
+
+@pytest.fixture
+async def admin_client(app: FastAPI) -> AsyncIterator[httpx.AsyncClient]:
+    """A client signed in to the admin app as ADMIN_EMAIL (no candidate session)."""
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://test") as http:
+        await sign_in_admin(http, app)
+        yield http
+
+
 @pytest.fixture
 async def anon_client(app: FastAPI) -> AsyncIterator[httpx.AsyncClient]:
     """A client with nobody signed in."""
@@ -177,11 +242,21 @@ async def client(app: FastAPI) -> AsyncIterator[httpx.AsyncClient]:
 
 
 class RecordingEmailSender:
+    """`sent` holds magic links; `mail` holds every email as (kind, to, link)."""
+
     def __init__(self) -> None:
         self.sent: list[tuple[str, str]] = []
+        self.mail: list[tuple[str, str, str]] = []
 
     async def send_magic_link(self, to: str, link: str) -> None:
         self.sent.append((to, link))
+        self.mail.append(("magic_link", to, link))
+
+    async def send_email_confirmation(self, to: str, link: str) -> None:
+        self.mail.append(("confirm", to, link))
+
+    async def send_password_reset(self, to: str, link: str) -> None:
+        self.mail.append(("reset", to, link))
 
 
 class AuthHarness:
@@ -216,15 +291,19 @@ def build_harness(app_env: AppEnv = AppEnv.LOCAL, google: Any = None) -> Iterato
         session_secret="x" * 40,
         web_base_url="http://web.test",
         api_public_url="http://web.test/api",
+        admin_base_url="http://admin.test",
     )
     email = RecordingEmailSender()
     app = FastAPI()
+    store = MemoryUsedTokenStore()
     install_auth(
         app,
         settings,
-        magic_links=MagicLinks(settings.session_secret, 900, MemoryUsedTokenStore()),
+        magic_links=MagicLinks(settings.session_secret, 900, store),
         email_sender=email,
         google=google,
+        token_store=store,
+        throttle=MemoryLoginThrottle(),
     )
     app.dependency_overrides[get_db] = _db
     with TestClient(app, base_url="http://web.test") as client:

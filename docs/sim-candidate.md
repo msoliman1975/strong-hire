@@ -8,6 +8,11 @@ answers above weak ones.
 
 Runs are on demand only. Nothing runs on a schedule or in CI.
 
+There are two ways to start a run. Suites run from your machine with `sim-run.ps1` on a
+short-lived server (below). Single interviews run from the admin app (Simulations): they run on
+the main server in the `sim` service and can be replayed with audio and a synced transcript. See
+"Simulations (SM)" in `docs/admin-spec.md`.
+
 ## How it works
 
 ```
@@ -35,8 +40,13 @@ Runs are on demand only. Nothing runs on a schedule or in CI.
 - Voice sessions: the candidate reads the interviewer's words from the room's data channel (the
   same captions the web page shows), so the sim server needs no speech-to-text. It speaks with
   Kokoro (voice `am_michael`). It records what it hears (left channel) and what it says (right
-  channel) into one stereo Ogg Opus file, about 11 MB for 30 minutes. The main server still
-  stores no audio for any session.
+  channel) into one stereo Ogg Opus file, about 11 MB for 30 minutes. Real users' sessions are
+  never recorded.
+- Voice transcript times are positions in that recording (SM-6): the candidate's lines from its
+  mic track, the interviewer's from the speech found in the left channel after the session
+  (`strong_sim.timing`). Each interviewer reply also gets `latency_ms`, from the end of the
+  candidate's line to the start of the reply. `meta.json` has `"timing": "audio"`; older runs
+  have caption times, which can be a few seconds off.
 
 ## Saved results
 
@@ -58,8 +68,9 @@ sim voice interviews, the recording. The api reads the recordings from this fold
 read-only at `/sim-results`. Each download writes an audit log row.
 
 Files are uploaded after each session, so a run that stops early keeps the sessions it finished.
-A cron job keeps the folder under 10 GB (`SIM_KEEP_GB`) and deletes the oldest runs first. It
-never deletes the newest run.
+The sim service (below) applies retention every hour: it deletes runs older than 90 days
+(`SIM_KEEP_DAYS`), then the oldest until the folder is under 10 GB (`SIM_KEEP_GB`). It never
+deletes the newest run, a run marked Keep in the admin app, or a run in progress.
 
 ```powershell
 ./infra/sim/sim-list.ps1                       # saved runs: sessions, errors, passes, cost, size
@@ -76,6 +87,17 @@ uv run --package strong-sim strong-sim plan --suite text-quality   # scenarios a
 
 Suites are in `evals/scenarios/` (see its README). Text sessions finish in about 2 to 4 minutes
 each. Voice sessions run in real time.
+
+## Admin-started runs (the sim service)
+
+The admin app's Simulations page starts one interview at a time (docs/admin-spec.md, SM). The
+`sim` service in `infra/compose.server.yaml` (`--profile sim`) runs them: `strong-sim serve`
+takes the oldest queued `sim_runs` row, checks the gate (SM-3: on, not paused, fewer than
+`sim_max_live_sessions` real interviews live, budget left), runs the session and writes the run
+folder `<UTC time>-admin-<id>` here. It is capped at 2 CPUs and 2 GB. Its model calls go through
+the main LiteLLM with `SIM_LITELLM_KEY` (aliases `sim-candidate`, `sim-judge`, `sim-tts` in
+`config/litellm.claude.yaml`), so the key's budget covers both sides and nothing is reported to
+`/auth/sim-spend`.
 
 ## Budget
 
@@ -100,7 +122,10 @@ Check the report for the real numbers.
 1. Main server `.env`: `SIM_ENABLED=true`, `SIM_TOKEN=<openssl rand -hex 32>`,
    `SIM_EMAIL=sim@getstronghire.com`, and `SIM_LITELLM_KEY` (a LiteLLM key made with the master
    key: `POST /key/generate` with `key_alias` "sim", `max_budget` 5, `budget_duration` "1d").
-   `infra/compose.server.yaml` passes them to the api, worker and voice services.
+   `infra/compose.server.yaml` passes them to the api, worker, voice and sim services. For
+   admin-started runs, also `GEMINI_API_KEY` (the main LiteLLM serves `sim-candidate`). The
+   deploy (`scripts/server-deploy.sh`, through `profile.ps1`) starts the `sim` service after the
+   migrations whenever `.env` has `SIM_ENABLED=true`.
 2. Upload user on the main server:
    `bash infra/sim/server-setup.sh "<contents of ~/.ssh/stronghire_simup.pub>"`.
 3. Your machine, user environment variables: `HCLOUD_TOKEN`, `GEMINI_KEY`, `ANTHROPIC_API_KEY`,

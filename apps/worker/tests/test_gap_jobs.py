@@ -24,7 +24,7 @@ from strong_core.db.models import (
 from strong_core.db.models import CompanyProfile as ProfileRow
 from strong_core.db.models import GapAnalysis as GapRow
 from strong_core.db.models import Resume as ResumeRow
-from strong_core.gateway import ModelGateway
+from strong_core.gateway import ModelGateway, Role, UsageRecord, set_usage_sink
 from strong_core.gateway.registry import fake_models_config
 from strong_core.schemas import (
     Difficulty,
@@ -34,6 +34,7 @@ from strong_core.schemas import (
     InterviewType,
     Mode,
     ProfileStatus,
+    QuestionSource,
     SessionStatus,
     SubscriptionStatus,
 )
@@ -282,6 +283,44 @@ async def test_brief_job_stores_the_brief_and_profile_version(
         assert brief.probe_areas  # from the gap analysis
 
 
+async def test_ob2_gap_and_brief_jobs_report_planner_usage_for_their_org_and_session(
+    sessionmaker: async_sessionmaker[AsyncSession],
+    account: tuple[uuid.UUID, uuid.UUID],
+    gateway: ModelGateway,
+) -> None:
+    """OB-2: gap analysis has no session (session_id NULL); the brief belongs to its session."""
+    records: list[UsageRecord] = []
+
+    async def sink(record: UsageRecord) -> None:
+        records.append(record)
+
+    set_usage_sink(sink)  # the autouse fixture restores the previous sink
+    org_id, _ = account
+    target_id, _, gap_id = await _setup(sessionmaker, account)
+    ctx = _ctx(sessionmaker, gateway)
+    await jobs.run_gap_analysis_job(ctx, str(gap_id), str(org_id))
+    assert records and {(r.role, r.org_id, r.session_id) for r in records} == {
+        (Role.PLANNER, org_id, None)
+    }
+    async with sessionmaker() as db:
+        session = InterviewSession(
+            org_id=org_id,
+            job_target_id=target_id,
+            type=InterviewType.BEHAVIORAL,
+            difficulty=Difficulty.TOUGH,
+            mode=Mode.REALISTIC,
+            duration_min=30,
+        )
+        db.add(session)
+        await db.commit()
+        session_id = session.id
+    records.clear()
+    assert (await jobs.build_interviewer_brief(ctx, str(session_id), str(org_id)))["outcome"] == (
+        "ready"
+    )
+    assert records and {r.session_id for r in records} == {session_id}
+
+
 async def test_brief_job_keeps_a_10_minute_session_as_a_mini(
     sessionmaker: async_sessionmaker[AsyncSession],
     account: tuple[uuid.UUID, uuid.UUID],
@@ -417,3 +456,95 @@ def test_context_notes_are_plain_lines() -> None:
     target = JobTarget(stage="Phone screen", context_notes=json.dumps({"interviewer_name": "Ana"}))
     assert context_notes(target) == "stage: Phone screen\ninterviewer name: Ana"
     assert context_notes(JobTarget()) is None
+
+
+CUSTOM_SPEC: dict[str, Any] = {
+    "categories": [
+        {"category": "technical_qa", "share": 0.5, "focus": ["Kubernetes", "trade-offs"]},
+        {"category": "behavioral", "share": 0.5, "focus": ["conflict"]},
+    ],
+    "questions": [
+        {
+            "text": "When would you not use Kubernetes?",
+            "category": "technical_qa",
+            "competencies": ["trade_offs"],
+            "verbatim": True,
+        },
+        {
+            "text": "Describe a time you had to push back on a deadline.",
+            "category": "behavioral",
+            "competencies": ["conflict_handling"],
+            "must_ask": False,
+        },
+    ],
+}
+
+
+async def _custom_session(
+    maker: async_sessionmaker[AsyncSession],
+    org_id: uuid.UUID,
+    target_id: uuid.UUID,
+    custom_json: dict[str, Any] | None,
+) -> uuid.UUID:
+    async with maker() as db:
+        session = InterviewSession(
+            org_id=org_id,
+            job_target_id=target_id,
+            type=InterviewType.CUSTOM,
+            difficulty=Difficulty.REALISTIC,
+            mode=Mode.REALISTIC,
+            duration_min=30,
+            custom_json=custom_json,
+        )
+        db.add(session)
+        await db.commit()
+        return session.id
+
+
+async def test_cu12_brief_job_builds_a_custom_brief_from_custom_json(
+    sessionmaker: async_sessionmaker[AsyncSession],
+    account: tuple[uuid.UUID, uuid.UUID],
+    gateway: ModelGateway,
+) -> None:
+    """CU-12, CU-4: the job reads sessions.custom_json; the brief keeps the own questions."""
+    org_id, _ = account
+    target_id, _, gap_id = await _setup(sessionmaker, account, company_slug="example-corp")
+    ctx = _ctx(sessionmaker, gateway)
+    await jobs.run_gap_analysis_job(ctx, str(gap_id), str(org_id))
+    session_id = await _custom_session(sessionmaker, org_id, target_id, CUSTOM_SPEC)
+    result = await jobs.build_interviewer_brief(ctx, str(session_id), str(org_id))
+    assert result["outcome"] == "ready", result
+    assert result["tokens"] <= 1500
+    async with sessionmaker() as db:
+        stored = await db.get(InterviewSession, session_id)
+        assert stored is not None and stored.brief_json is not None
+        brief = InterviewerBrief.model_validate(stored.brief_json)
+    assert brief.session.interview_type == InterviewType.CUSTOM
+    assert brief.session.custom is not None
+    own = [q for q in brief.questions if q.source == QuestionSource.CANDIDATE]
+    assert [q.text for q in own] == [q["text"] for q in CUSTOM_SPEC["questions"]]
+    assert own[0].verbatim and own[0].must_ask and not own[1].must_ask
+    assert {q.category for q in brief.questions} == {
+        InterviewType.TECHNICAL_QA,
+        InterviewType.BEHAVIORAL,
+    }
+
+
+@pytest.mark.parametrize("custom_json", [None, {"categories": []}])
+async def test_cu1_brief_job_fails_a_custom_session_without_a_valid_setup(
+    sessionmaker: async_sessionmaker[AsyncSession],
+    account: tuple[uuid.UUID, uuid.UUID],
+    gateway: ModelGateway,
+    custom_json: dict[str, Any] | None,
+) -> None:
+    """CU-1: a Custom session row without a valid custom_json fails cleanly, without a retry."""
+    org_id, _ = account
+    target_id, _, _ = await _setup(sessionmaker, account)
+    session_id = await _custom_session(sessionmaker, org_id, target_id, custom_json)
+    result = await jobs.build_interviewer_brief(
+        _ctx(sessionmaker, gateway), str(session_id), str(org_id)
+    )
+    assert result == {"outcome": "failed", "reason": jobs.INVALID_SETUP_REASON}
+    async with sessionmaker() as db:
+        stored = await db.get(InterviewSession, session_id)
+        assert stored is not None and stored.status == SessionStatus.FAILED

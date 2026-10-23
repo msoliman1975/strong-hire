@@ -54,7 +54,13 @@
           "type": "string"
         },
         "interview_type": {
-          "$ref": "#/$defs/InterviewType"
+          "enum": [
+            "behavioral",
+            "hiring_manager",
+            "technical_qa",
+            "case"
+          ],
+          "type": "string"
         },
         "levels": {
           "description": "Empty means all levels.",
@@ -88,17 +94,6 @@
       ],
       "title": "GeneralQuestion",
       "type": "object"
-    },
-    "InterviewType": {
-      "description": "The four v1 interview types (IV-2).",
-      "enum": [
-        "behavioral",
-        "hiring_manager",
-        "technical_qa",
-        "case"
-      ],
-      "title": "InterviewType",
-      "type": "string"
     },
     "Level": {
       "description": "Normalized seniority (IV-6). Company-specific labels such as L5 or E5 map to these.",

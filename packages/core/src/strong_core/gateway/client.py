@@ -11,7 +11,9 @@ model supports them, else native JSON mode, else a prompted JSON schema.
 
 from __future__ import annotations
 
+import io
 import os
+import wave
 from collections.abc import AsyncIterator, Callable, Sequence
 from typing import Any, TypeVar, overload
 
@@ -24,6 +26,7 @@ from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
 
 from strong_core.config import ModelProfile, Settings, get_settings
+from strong_core.gateway import prices
 from strong_core.gateway.fake import FakeBackend
 from strong_core.gateway.registry import (
     ModelCapabilities,
@@ -32,6 +35,7 @@ from strong_core.gateway.registry import (
     load_models_config,
 )
 from strong_core.gateway.types import CHAT_ROLES, Completion, Message, Role, TokenUsage
+from strong_core.gateway.usage import current_usage_context, report_usage
 
 OutputT = TypeVar("OutputT", bound=BaseModel)
 OUTPUT_RETRIES = 1
@@ -114,6 +118,7 @@ class ModelGateway:
 
         if self._fake is not None:
             output, usage = self._fake.complete(role, messages, output_type)
+            await self._report_chat(role, alias, usage)
             return Completion(output, role, alias, self.profile, refs, usage)
 
         instructions, history, prompt = _split(messages)
@@ -126,45 +131,55 @@ class ModelGateway:
         result = await agent.run(prompt, message_history=history)
         run_usage = result.usage
         usage = TokenUsage(run_usage.input_tokens or 0, run_usage.output_tokens or 0)
+        await self._report_chat(role, alias, usage)
         return Completion(result.output, role, alias, self.profile, refs, usage)
 
     async def stream(self, role: Role, messages: Sequence[Message]) -> AsyncIterator[str]:
         """Yield text deltas as they arrive. Used by the live interviewer loop."""
         _require_chat_role(role)
         _require_messages(messages)
+        alias = self.config.alias_for(role)
         if self._fake is not None:
             async for chunk in self._fake.stream(role, messages):
                 yield chunk
+            await self._report_chat(role, alias, TokenUsage())
             return
 
         instructions, history, prompt = _split(messages)
-        agent: Agent[None, str] = Agent(
-            self._model(self.config.alias_for(role)), instructions=instructions
-        )
+        agent: Agent[None, str] = Agent(self._model(alias), instructions=instructions)
         async with agent.run_stream(prompt, message_history=history) as result:
             async for delta in result.stream_text(delta=True):
                 yield delta
+            run_usage = result.usage
+        # A stream the caller stops early (barge-in) is not reported.
+        usage = TokenUsage(run_usage.input_tokens or 0, run_usage.output_tokens or 0)
+        await self._report_chat(role, alias, usage)
 
     # --- audio ------------------------------------------------------------------------------
 
     async def transcribe(self, audio: bytes, *, filename: str = "audio.wav") -> str:
         """Speech to text through the gateway's OpenAI-compatible /audio/transcriptions."""
-        if self._fake is not None:
-            return self._fake.transcribe(audio)
         alias = self.config.alias_for(Role.STT)
+        if self._fake is not None:
+            text = self._fake.transcribe(audio)
+            await self._report_speech(Role.STT, alias, seconds=_wav_seconds(audio))
+            return text
         data = {"model": alias, **self.capabilities(Role.STT).options}
         async with self._http() as http:
             resp = await http.post(
                 "/audio/transcriptions", data=data, files={"file": (filename, audio)}
             )
         _raise_for(resp, Role.STT)
+        await self._report_speech(Role.STT, alias, seconds=_wav_seconds(audio))
         return str(resp.json()["text"]).strip()
 
     async def synthesize(self, text: str) -> bytes:
         """Text to speech through the gateway's OpenAI-compatible /audio/speech. Returns WAV."""
-        if self._fake is not None:
-            return self._fake.synthesize(text)
         alias = self.config.alias_for(Role.TTS)
+        if self._fake is not None:
+            wav = self._fake.synthesize(text)
+            await self._report_speech(Role.TTS, alias, characters=len(text))
+            return wav
         # stream=False: a streamed WAV has no real length in its header.
         body: dict[str, Any] = {
             "model": alias,
@@ -176,6 +191,7 @@ class ModelGateway:
         async with self._http() as http:
             resp = await http.post("/audio/speech", json=body)
         _raise_for(resp, Role.TTS)
+        await self._report_speech(Role.TTS, alias, characters=len(text))
         return resp.content
 
     async def synthesize_stream(self, text: str) -> AsyncIterator[bytes]:
@@ -189,12 +205,14 @@ class ModelGateway:
         caps = self.capabilities(Role.TTS)
         if caps.sample_rate is None:
             raise GatewayError("tts model needs sample_rate in the capability registry")
+        alias = self.config.alias_for(Role.TTS)
         if self._fake is not None:
+            await self._report_speech(Role.TTS, alias, characters=len(text))
             for chunk in self._fake.synthesize_pcm(text, caps.sample_rate):
                 yield chunk
             return
         body: dict[str, Any] = {
-            "model": self.config.alias_for(Role.TTS),
+            "model": alias,
             "input": text,
             "response_format": "pcm",
             "stream": caps.streaming,
@@ -206,12 +224,40 @@ class ModelGateway:
             if resp.is_error:
                 await resp.aread()
                 _raise_for(resp, Role.TTS)
+            # TTS is billed by input characters, so the call counts once the provider accepts it.
+            await self._report_speech(Role.TTS, alias, characters=len(text))
             async for chunk in resp.aiter_bytes():
                 data = carry + wav.strip(chunk)
                 cut = len(data) - len(data) % 2  # never split a 16-bit sample
                 carry = data[cut:]
                 if cut:
                     yield data[:cut]
+
+    # --- usage (OB-2) ------------------------------------------------------------------------
+
+    async def _report_chat(self, role: Role, alias: str, usage: TokenUsage) -> None:
+        if current_usage_context() is None:
+            return
+        await report_usage(
+            role=role,
+            model=alias,
+            profile=self.profile,
+            units=usage.input_tokens + usage.output_tokens,
+            cost_usd=prices.cost_usd(self.profile, alias, usage),
+            input_tokens=usage.input_tokens,
+            output_tokens=usage.output_tokens,
+        )
+
+    async def _report_speech(
+        self, role: Role, alias: str, *, seconds: float | None = None, characters: int | None = None
+    ) -> None:
+        if current_usage_context() is None:
+            return
+        cost = prices.speech_cost_usd(self.profile, alias, seconds=seconds, characters=characters)
+        units = seconds if seconds is not None else characters
+        await report_usage(
+            role=role, model=alias, profile=self.profile, units=units or 0, cost_usd=cost
+        )
 
     # --- internals --------------------------------------------------------------------------
 
@@ -261,6 +307,16 @@ def _split(messages: Sequence[Message]) -> tuple[str | None, list[ModelMessage],
         else:
             history.append(ModelResponse(parts=[TextPart(content=m.content)]))
     return ("\n\n".join(system) or None), history, convo[-1].content
+
+
+def _wav_seconds(audio: bytes) -> float | None:
+    """Length of a WAV clip in seconds, or None when the bytes are not WAV."""
+    try:
+        with wave.open(io.BytesIO(audio), "rb") as w:
+            rate = w.getframerate()
+            return w.getnframes() / rate if rate else None
+    except (wave.Error, EOFError):
+        return None
 
 
 def _raise_for(resp: httpx.Response, role: Role) -> None:

@@ -45,11 +45,32 @@ import type {
   Resume,
   ResumeAccepted,
   ResumeOut,
+  SessionSetup,
   Usage,
 } from "../api/types";
-import { isMockAdmin } from "./adminHandlers";
 import { newId, type MockGap, type MockStore, type MockTask } from "./db";
+import {
+  customDebriefQuestions,
+  customProblem,
+  customRefusal,
+  customScorecard,
+  mockCustomRecommendation,
+} from "./custom";
 import { gapAnalysis, jobPosting, resume, scorecardFor, sessionPlan } from "./fixtures";
+
+/** CU-1: fill the defaults the API adds to a Custom setup. */
+function withCustomDefaults(custom: CreateSessionRequest["config"]["custom"]): SessionRecord["config"]["custom"] {
+  if (!custom) return null;
+  return {
+    categories: custom.categories.map((c) => ({ ...c, focus: c.focus ?? [] })),
+    questions: (custom.questions ?? []).map((q) => ({
+      ...q,
+      must_ask: q.must_ask ?? true,
+      verbatim: q.verbatim ?? false,
+      saved_question_id: q.saved_question_id ?? null,
+    })),
+  };
+}
 
 const API = "*/api";
 
@@ -64,9 +85,21 @@ function publicView<T extends { readyAt: number }>(record: T): Omit<T, "readyAt"
   return copy as Omit<T, "readyAt">;
 }
 
+/** The API's OC-1 to OC-3 refusal (strong_api.controls). */
+function paused(code: "signups_paused" | "sessions_paused" | "spend_cap_reached") {
+  const message =
+    code === "signups_paused"
+      ? "We are not taking new sign-ups right now. Write to support@getstronghire.com to join the waitlist, and we will email you when we open again."
+      : "New interviews are temporarily unavailable. Please try again in a little while.";
+  return HttpResponse.json({ detail: { code, message } }, { status: 503 });
+}
+
 function unauthorized() {
   return HttpResponse.json({ detail: "Sign in first" }, { status: 401 });
 }
+
+/** Mock passwords, by email (AC-4). A reset token in the mock is the email itself. */
+const mockPasswords = new Map<string, string>();
 
 export function authHandlers(store: MockStore) {
   const state = (): AuthState => {
@@ -88,7 +121,8 @@ export function authHandlers(store: MockStore) {
   };
 
   return [
-    http.get(`${API}/auth/providers`, () => HttpResponse.json({ google: false, email: true, dev: true })),
+    http.get(`${API}/status`, () => HttpResponse.json(store.db.siteStatus)),
+    http.get(`${API}/auth/providers`, () => HttpResponse.json({ google: false, email: true, password: true, dev: true })),
     http.get(`${API}/auth/me`, () => HttpResponse.json(state())),
     http.post(`${API}/auth/dev-login`, async ({ request }) => {
       const body = (await request.json()) as { email?: string };
@@ -111,6 +145,7 @@ export function authHandlers(store: MockStore) {
       if (auth.status !== "needs_signup" || !auth.email) return unauthorized();
       if (!body.age_confirmed) return HttpResponse.json({ detail: "You must be 18 or older" }, { status: 422 });
       if (!body.terms_accepted) return HttpResponse.json({ detail: "Accept the terms first" }, { status: 422 });
+      if (!store.db.siteStatus.signups_open) return paused("signups_paused");
       store.db.users[auth.email] = {
         id: newId(),
         org_id: newId(),
@@ -118,13 +153,59 @@ export function authHandlers(store: MockStore) {
         auth_provider: "dev",
         training_consent: body.training_consent ?? false,
         created_at: new Date().toISOString(),
-        is_admin: isMockAdmin(auth.email),
         full_name: null,
         profile_complete: false,
       };
       store.db.auth = { status: "signed_in", email: auth.email, userEmail: auth.email };
       store.save();
       return HttpResponse.json(state());
+    }),
+    // AC-4, AC-5. Sign-up signs in at once. The mock keeps passwords in memory only.
+    http.post(`${API}/auth/password/signup`, async ({ request }) => {
+      const body = (await request.json()) as { email: string; password: string; full_name?: string | null };
+      const email = body.email.trim().toLowerCase();
+      if (body.password.length < 8) return HttpResponse.json({ detail: "Use at least 8 characters." }, { status: 422 });
+      if (store.db.users[email]) {
+        return HttpResponse.json(
+          { detail: "An account with this email already exists. Sign in, or reset your password." },
+          { status: 409 },
+        );
+      }
+      if (!store.db.siteStatus.signups_open) return paused("signups_paused");
+      {
+        store.db.users[email] = {
+          id: newId(),
+          org_id: newId(),
+          email,
+          auth_provider: "password",
+          training_consent: false,
+          created_at: new Date().toISOString(),
+          full_name: body.full_name ?? null,
+          profile_complete: false,
+        };
+        mockPasswords.set(email, body.password);
+        store.save();
+      }
+      return HttpResponse.json(signInAs(email));
+    }),
+    http.post(`${API}/auth/password/login`, async ({ request }) => {
+      const body = (await request.json()) as { email: string; password: string };
+      const email = body.email.trim().toLowerCase();
+      if (!store.db.users[email] || mockPasswords.get(email) !== body.password) {
+        return HttpResponse.json({ detail: "The email or password is wrong." }, { status: 401 });
+      }
+      return HttpResponse.json(signInAs(email));
+    }),
+    http.post(`${API}/auth/password/resend`, () => HttpResponse.json({ sent: true, dev_link: null }, { status: 202 })),
+    http.post(`${API}/auth/password/forgot`, () => HttpResponse.json({ sent: true, dev_link: null }, { status: 202 })),
+    http.post(`${API}/auth/password/reset`, async ({ request }) => {
+      const body = (await request.json()) as { token: string; password: string };
+      const email = body.token.trim().toLowerCase();
+      if (!store.db.users[email]) {
+        return HttpResponse.json({ detail: "That reset link is not valid. Ask for a new one." }, { status: 400 });
+      }
+      mockPasswords.set(email, body.password);
+      return HttpResponse.json(signInAs(email));
     }),
     http.post(`${API}/auth/logout`, () => {
       store.db.auth = { status: "signed_out", email: null, userEmail: null };
@@ -683,7 +764,11 @@ export function inputHandlers(store: MockStore) {
             status: s.status === "completed" ? "ready" : s.status === "failed" ? "failed" : "scoring",
             at: s.ended_at ?? s.started_at,
             match_score: null,
-            hire_signal: s.status === "completed" ? scorecardFor(s.config.interview_type, generic).hire_signal : null,
+            hire_signal:
+              s.status === "completed"
+                ? (s.config.custom ? customScorecard(s.config.custom, generic) : scorecardFor(s.config.interview_type, generic))
+                    .hire_signal
+                : null,
             interview_type: s.config.interview_type,
             mode: s.config.mode,
             duration_min: s.config.duration_min,
@@ -714,11 +799,37 @@ export function sessionHandlers(store: MockStore) {
       const body = (await request.json()) as CreateSessionRequest;
       const target = findJob(body.job_target_id);
       if (!target || target.deleted) return notFound("Job target");
+      const open = body.channel === "text" ? db().siteStatus.text_sessions_open : db().siteStatus.voice_sessions_open;
+      if (!open) return paused("sessions_paused");
       const usage = db().usage;
+      const isCustom = body.config.interview_type === "custom";
+      if (isCustom) {
+        // CU-11 (strong_api.custom.access), then the SessionConfig rules (CU-1, CU-3).
+        if (db().siteStatus.custom_interview_access === "paid_only" && !usage.full_interviews_allowed) {
+          return HttpResponse.json(
+            {
+              detail: {
+                code: "upgrade_required",
+                message: "Custom interviews are part of the subscription. Subscribe to build your own interview.",
+                upgrade_url: "/upgrade",
+              },
+            },
+            { status: 403 },
+          );
+        }
+        const problem = customProblem(body.config);
+        if (problem) return invalid(problem);
+        // CU-5: the server checks every chip and own question again (strong_api.custom.guard).
+        const refused = body.config.custom ? customRefusal(body.config.custom) : null;
+        if (refused) return HttpResponse.json(refused, { status: 422 });
+      }
+      // CU-11: while Custom is open to everyone, a free account may run a 30-minute Custom session.
+      const freeFull =
+        isCustom && body.config.duration_min === 30 && db().siteStatus.custom_interview_access === "everyone";
       // Same answer as strong_api.billing.ensure_can_start_session.
       const code: string | null = !usage.can_start_session
         ? (usage.block_code ?? "upgrade_required")
-        : body.config.duration_min !== 10 && !usage.full_interviews_allowed
+        : body.config.duration_min !== 10 && !usage.full_interviews_allowed && !freeFull
           ? "full_interview_requires_plan"
           : null;
       if (code) {
@@ -742,7 +853,7 @@ export function sessionHandlers(store: MockStore) {
         id: newId(),
         job_target_id: body.job_target_id,
         resume_id: body.resume_id ?? readyCv,
-        config: body.config,
+        config: { ...body.config, custom: withCustomDefaults(body.config.custom) },
         channel: body.channel ?? "voice",
         brief_ready: true,
         status: "created",
@@ -759,6 +870,18 @@ export function sessionHandlers(store: MockStore) {
       advanceAll();
       const s = findSession(params.sessionId);
       return s ? HttpResponse.json(s) : notFound("Session");
+    }),
+    // CU-9: an earlier session's setup, shaped like the POST /sessions body.
+    http.post(`${API}/sessions/:sessionId/repeat`, ({ params }) => {
+      const s = findSession(params.sessionId);
+      if (!s) return notFound("Session");
+      const setup: SessionSetup = {
+        job_target_id: s.job_target_id,
+        resume_id: s.resume_id,
+        config: s.config,
+        channel: s.channel,
+      };
+      return HttpResponse.json(setup);
     }),
     // The voice room is mocked too: the live page sees the "mock:" URL and uses src/session/mockVoice.
     http.post(`${API}/sessions/:sessionId/voice/join`, ({ params }) => {
@@ -848,7 +971,7 @@ export function scoringHandlers(store: MockStore) {
         s.config.duration_min !== 10,
     );
     return realistic.flatMap((s, index) =>
-      scorecardFor(s.config.interview_type).competency_scores.map((c) => ({
+      (s.config.custom ? customScorecard(s.config.custom) : scorecardFor(s.config.interview_type)).competency_scores.map((c) => ({
         job_target_id: jobId,
         session_id: s.id,
         competency: c.competency,
@@ -856,6 +979,13 @@ export function scoringHandlers(store: MockStore) {
         at: s.ended_at ?? new Date().toISOString(),
       })),
     );
+  };
+
+  /** CU-10: a Custom next session once the job has two Realistic sessions, unless Custom is locked (CU-11). */
+  const customNext = (jobId: string) => {
+    const locked = db().siteStatus.custom_interview_access === "paid_only" && !db().usage.full_interviews_allowed;
+    const sessions = new Set(progressFor(jobId).map((p) => p.session_id));
+    return !locked && sessions.size >= 2 ? mockCustomRecommendation() : null;
   };
 
   return [
@@ -866,7 +996,12 @@ export function scoringHandlers(store: MockStore) {
       const job = findJob(s.job_target_id);
       const generic = job?.generic_mode ?? true;
       const ready = s.status === "completed";
-      const scorecard = ready ? scorecardFor(s.config.interview_type, generic) : null;
+      const custom = s.config.custom;
+      const scorecard = ready
+        ? custom
+          ? customScorecard(custom, generic)
+          : scorecardFor(s.config.interview_type, generic)
+        : null;
       const debrief: Debrief = {
         // The debrief's session has no channel or brief_ready (DebriefSession in openapi.json).
         session: {
@@ -888,22 +1023,40 @@ export function scoringHandlers(store: MockStore) {
             : "scoring",
         scorecard,
         next_session: ready ? sessionPlan[1] : null,
+        next_custom_session: ready ? customNext(s.job_target_id) : null,
         generic_mode: generic,
         company_name: job?.posting?.company_name ?? null,
         values_framework: generic ? null : "Company values",
+        questions: custom ? customDebriefQuestions(custom) : [],
       };
       return HttpResponse.json(debrief);
     }),
-    http.get(`${API}/job-targets/:jobId/progress`, ({ params }) => {
+    http.get(`${API}/job-targets/:jobId/progress`, ({ params, request }) => {
       advanceAll();
       const jobId = String(params.jobId);
       if (!findJob(jobId)) return notFound("Job target");
-      const snapshots = progressFor(jobId);
+      // CU-7: own questions of Custom sessions are marked, or left out on request.
+      const exclude = new URL(request.url).searchParams.get("exclude_own_questions") === "true";
+      const ownSessions = new Set(
+        db()
+          .sessions.filter((s) => (s.config.custom?.questions.length ?? 0) > 0)
+          .map((s) => s.id),
+      );
+      const snapshots = progressFor(jobId).map((p) =>
+        exclude && ownSessions.has(p.session_id) ? { ...p, score: Math.max(1, p.score - 0.25) } : p,
+      );
       const progress: JobProgress = {
         job_target_id: jobId,
         snapshots,
         trends: trendsFor(snapshots),
         next_session: db().gaps[jobId]?.analysis ? sessionPlan[snapshots.length ? 1 : 0] : null,
+        next_custom_session: customNext(jobId),
+        own_question_points: exclude
+          ? []
+          : snapshots
+              .filter((p) => ownSessions.has(p.session_id))
+              .map((p) => ({ session_id: p.session_id, competency: p.competency, own_questions: 1, other_questions: 2 })),
+        own_questions_excluded: exclude,
       };
       return HttpResponse.json(progress);
     }),

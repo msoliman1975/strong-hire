@@ -1,4 +1,4 @@
-"""Company name key and company request log (IN-5, spec: Companies outside the 20).
+"""Company name key and company request log (IN-5, spec: Companies outside the launch list).
 
 This module is the one place that turns a company name into a matching key. Company matching
 in apps/worker/inputs and the request report both use it, so their keys always agree.

@@ -7,7 +7,14 @@ from typing import Final, Literal
 from pydantic import Field, model_validator
 
 from strong_core.schemas.base import Contract
+from strong_core.schemas.custom import (
+    CUSTOM_CASE_MIN_DURATION,
+    CUSTOM_MAX_QUESTIONS,
+    CustomSessionSpec,
+    StandardType,
+)
 from strong_core.schemas.enums import (
+    COMPETENCIES_BY_TYPE,
     AnswerConduct,
     Competency,
     Difficulty,
@@ -16,6 +23,7 @@ from strong_core.schemas.enums import (
     Mode,
     Phase,
     ProbeTrigger,
+    QuestionSource,
     Speaker,
 )
 
@@ -45,10 +53,43 @@ class SessionConfig(Contract):
     mode: Mode
     duration_min: DurationMin = Field(description="10 is a mini interview.")
     level: Level
+    custom: CustomSessionSpec | None = Field(
+        default=None, description="CU-1: required for the Custom type, absent for the others."
+    )
 
     @property
     def is_mini(self) -> bool:
         return self.duration_min == MINI_DURATION_MIN
+
+    @property
+    def is_custom(self) -> bool:
+        return self.interview_type == InterviewType.CUSTOM
+
+    @model_validator(mode="after")
+    def _check(self) -> SessionConfig:
+        if not self.is_custom:
+            if self.custom is not None:
+                raise ValueError("only a custom session has a custom setup")
+            return self
+        if self.custom is None:
+            raise ValueError("a custom session needs a custom setup")
+        if self.is_mini:
+            raise ValueError("a custom session cannot be a mini interview")
+        cap = CUSTOM_MAX_QUESTIONS[self.duration_min]
+        if len(self.custom.questions) > cap:
+            raise ValueError(f"a {self.duration_min}-minute session allows {cap} own questions")
+        kinds = {c.category for c in self.custom.categories}
+        if InterviewType.CASE in kinds and self.duration_min < CUSTOM_CASE_MIN_DURATION:
+            raise ValueError(f"case needs a {CUSTOM_CASE_MIN_DURATION}-minute session")
+        return self
+
+
+def session_competencies(config: SessionConfig) -> tuple[Competency, ...]:
+    """The competencies a session can score: its type's, or the union over a Custom session's
+    categories."""
+    if config.custom is not None:
+        return config.custom.competencies()
+    return COMPETENCIES_BY_TYPE[config.interview_type]
 
 
 class BriefQuestion(Contract):
@@ -60,6 +101,23 @@ class BriefQuestion(Contract):
     )
     priority: int = Field(ge=1, description="1 is asked first.")
     probe_hints: list[str] = Field(default_factory=list)
+    source: QuestionSource = Field(
+        default=QuestionSource.PLANNER, description="CU-3: candidate for the candidate's own."
+    )
+    category: StandardType | None = Field(
+        default=None, description="Custom sessions only: the question's category (CU-1)."
+    )
+    must_ask: bool = Field(
+        default=False,
+        description="CU-4: the session controller asks it before CANDIDATE_QUESTIONS.",
+    )
+    verbatim: bool = Field(default=False, description="CU-4: read the text word for word.")
+
+    @model_validator(mode="after")
+    def _check(self) -> BriefQuestion:
+        if self.source != QuestionSource.CANDIDATE and (self.must_ask or self.verbatim):
+            raise ValueError("must_ask and verbatim are for the candidate's own questions")
+        return self
 
 
 class PersonaBrief(Contract):
@@ -125,6 +183,13 @@ class InterviewerBrief(Contract):
         ids = [q.id for q in self.questions]
         if len(ids) != len(set(ids)):
             raise ValueError("question ids must be unique")
+        if self.session.custom is not None:
+            kinds = {c.category for c in self.session.custom.categories}
+            for q in self.questions:
+                if q.category is None or q.category not in kinds:
+                    raise ValueError(f"question {q.id} needs a category of this custom session")
+        elif any(q.source == QuestionSource.CANDIDATE or q.category for q in self.questions):
+            raise ValueError("own questions and categories are for custom sessions only")
         if self.curveball and self.session.difficulty != Difficulty.TOUGH:
             raise ValueError("curveball is only allowed in Tough difficulty")
         if self.pushback and self.session.difficulty != Difficulty.TOUGH:
@@ -155,11 +220,26 @@ class InterviewerBrief(Contract):
         return self
 
 
+class DraftQuestion(Contract):
+    """One question as the planner model writes it. The worker turns it into a BriefQuestion;
+    only code sets the source, must-ask and verbatim fields."""
+
+    id: str = Field(pattern=r"^[a-z0-9_-]+$")
+    text: str = Field(min_length=1)
+    competencies: list[Competency] = Field(min_length=1)
+    values: list[str] = Field(default_factory=list)
+    priority: int = Field(ge=1, description="1 is asked first.")
+    probe_hints: list[str] = Field(default_factory=list)
+    category: StandardType | None = Field(
+        default=None, description="Custom sessions only: one of the session's categories."
+    )
+
+
 class BriefDraft(Contract):
     """What the planner model returns for an interviewer brief. Code adds the rest: persona,
     seniority bar, probe limits, time plan and the profile version."""
 
-    questions: list[BriefQuestion] = Field(min_length=6, max_length=12)
+    questions: list[DraftQuestion] = Field(min_length=6, max_length=12)
     curveball: str | None = Field(default=None, description="Only asked for in Tough difficulty.")
 
 
