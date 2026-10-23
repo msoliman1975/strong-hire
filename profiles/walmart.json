@@ -316,7 +316,23 @@
       "strong_answer": "Pick a real mistake with real consequences. Explain how the candidate noticed it, how quickly and openly they told the people affected, and what they did to limit the damage. Then show the root cause and the lasting change (a test, a checklist, a review step) with evidence it worked. Walmart interviewers listen for honesty and follow-through rather than a perfect record. Pitfalls: a disguised strength, blaming others, or no change afterwards.",
       "competencies": ["learning_from_failure", "communication"],
       "values": ["Act with Integrity"],
-      "source_url": "https://www.aced.io/blog/walmart-interview-process"
+      "source_url": "https://www.aced.io/blog/walmart-interview-process",
+      "hints": {
+        "looking_for": [
+          "How openly you own a real mistake",
+          "What lasting change you made afterwards"
+        ],
+        "strong_signals": [
+          "Tells the affected people quickly",
+          "Names the root cause and a fix that stuck"
+        ],
+        "watch_outs": [
+          "A strength disguised as a mistake",
+          "Blaming others"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -324,7 +340,23 @@
       "strong_answer": "Use a specific story, not a general philosophy. Describe the partner team and what each side wanted. Show the candidate listening to understand the other side's constraints, using data to frame options, and agreeing on a decision and an owner. Close with the outcome and how the relationship held up. Strong answers mention respect for the other team's goals. Pitfalls: winning by escalation, or a conflict with no real stakes.",
       "competencies": ["conflict_handling", "collaboration", "communication"],
       "values": ["Respect the Individual"],
-      "source_url": "https://www.aced.io/guides/walmart-product-manager-interview"
+      "source_url": "https://www.aced.io/guides/walmart-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you work through conflict with partner teams",
+          "Whether you respect the other side's goals"
+        ],
+        "strong_signals": [
+          "Uses data to frame the options",
+          "Ends with a clear decision and owner"
+        ],
+        "watch_outs": [
+          "Winning by escalation",
+          "A conflict with no real stakes"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -332,7 +364,23 @@
       "strong_answer": "Set the goal and why it mattered to customers or the business. Show what the candidate personally drove: framing the problem, getting buy-in, planning, and unblocking the team. Name one hard moment and how it was handled. Quantify the result and what was learned. At senior levels show influence across teams. Pitfalls: 'we' with no clear personal role, or a project with no measurable outcome.",
       "competencies": ["ownership", "impact"],
       "values": ["Strive for Excellence"],
-      "source_url": "https://www.aced.io/guides/walmart-product-manager-interview"
+      "source_url": "https://www.aced.io/guides/walmart-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "What you personally drove from start to finish",
+          "How you got buy-in and unblocked the team"
+        ],
+        "strong_signals": [
+          "Names one hard moment and how you handled it",
+          "Quantifies the result"
+        ],
+        "watch_outs": [
+          "'We' with no clear personal role",
+          "No measurable outcome"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -340,7 +388,23 @@
       "strong_answer": "Name the customer (external or internal) and the issue in concrete terms. Show the candidate taking ownership, finding the real cause rather than the symptom, and keeping the customer informed. Describe the fix and a step that stopped it happening again for other customers. Quantify the result where possible. Pitfalls: a story where the customer was simply wrong, or a fix that only helped one person.",
       "competencies": ["ownership", "impact", "communication"],
       "values": ["Serve Our Customers and Members"],
-      "source_url": "https://site.joinleland.com/library/a/how-to-become-a-walmart-product-manager-the-ultimate-guide"
+      "source_url": "https://site.joinleland.com/library/a/how-to-become-a-walmart-product-manager-the-ultimate-guide",
+      "hints": {
+        "looking_for": [
+          "Whether you own a customer problem end to end",
+          "How you find the real cause, not the symptom"
+        ],
+        "strong_signals": [
+          "Keeps the customer informed throughout",
+          "Adds a step so it doesn't happen to others"
+        ],
+        "watch_outs": [
+          "A story where the customer was simply wrong",
+          "A fix that only helped one person"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -348,7 +412,23 @@
       "strong_answer": "Describe the change (reorg, new priority, new technology) and its impact on the candidate's work. Show how they re-planned quickly, kept the team informed, and protected the most important commitments. Mention what they let go of and why. Close with the result and what they would repeat. Pitfalls: complaining about the change, or simply waiting for direction.",
       "competencies": ["collaboration", "learning_from_failure"],
       "values": ["Strive for Excellence", "Respect the Individual"],
-      "source_url": "https://site.joinleland.com/library/a/how-to-become-a-walmart-product-manager-the-ultimate-guide"
+      "source_url": "https://site.joinleland.com/library/a/how-to-become-a-walmart-product-manager-the-ultimate-guide",
+      "hints": {
+        "looking_for": [
+          "How quickly you re-plan when things change",
+          "What you protect and what you let go"
+        ],
+        "strong_signals": [
+          "Keeps the team informed",
+          "Explains what was dropped and why"
+        ],
+        "watch_outs": [
+          "Complaining about the change",
+          "Waiting for someone to give direction"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -356,7 +436,23 @@
       "strong_answer": "Give scale in numbers (requests, data volume, stores, users). Explain the architecture briefly, then the hardest problem (consistency, latency, peak load, migration) and the options considered. Be clear about the candidate's own decisions versus the team's. Close with results, an incident or lesson, and what they would change today. Pitfalls: listing technologies without trade-offs, or no clear personal contribution.",
       "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
       "values": ["Strive for Excellence"],
-      "source_url": "https://www.cleverprep.com/companies/walmart/software-engineer"
+      "source_url": "https://www.cleverprep.com/companies/walmart/software-engineer",
+      "hints": {
+        "looking_for": [
+          "Real experience with systems at large scale",
+          "Your own decisions versus the team's"
+        ],
+        "strong_signals": [
+          "Gives scale in numbers",
+          "Explains the hardest problem and the options weighed"
+        ],
+        "watch_outs": [
+          "Listing technologies with no trade-offs",
+          "No clear personal contribution"
+        ]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -364,7 +460,23 @@
       "strong_answer": "Explain what was unknown and why waiting was costly. Show how the candidate gathered the best available evidence, judged whether the decision was reversible, and reduced risk (feature flag, staged rollout, fallback). Say who they consulted and how they communicated the uncertainty honestly. Close with how it turned out and what they learned. Pitfalls: claiming certainty, or never revisiting the decision.",
       "competencies": ["judgment", "depth_of_experience"],
       "values": ["Act with Integrity", "Strive for Excellence"],
-      "source_url": "https://www.cleverprep.com/companies/walmart/software-engineer"
+      "source_url": "https://www.cleverprep.com/companies/walmart/software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you decide when facts are missing",
+          "How you reduce the risk of being wrong"
+        ],
+        "strong_signals": [
+          "Judges whether the decision is reversible",
+          "Uses flags, staged rollout or a fallback"
+        ],
+        "watch_outs": [
+          "Claiming certainty you didn't have",
+          "Never revisiting the decision"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -372,7 +484,23 @@
       "strong_answer": "Connect the candidate's interests to what is distinctive about Walmart: physical and digital commerce at huge scale, problems where software touches stores, supply chain and millions of customers, and a mission of saving people money. Mention a specific team area or public engineering topic. Tie it to the candidate's career goals. Pitfalls: generic praise, or only compensation and stability.",
       "competencies": ["motivation", "role_fit"],
       "values": ["Serve Our Customers and Members"],
-      "source_url": "https://www.cleverprep.com/companies/walmart/software-engineer"
+      "source_url": "https://www.cleverprep.com/companies/walmart/software-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you know what makes Walmart Global Tech different",
+          "How it fits your career goals"
+        ],
+        "strong_signals": [
+          "Mentions scale across stores, supply chain and online",
+          "Names a specific team or public engineering topic"
+        ],
+        "watch_outs": [
+          "Generic praise",
+          "Only pay and stability"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -380,7 +508,23 @@
       "strong_answer": "Lay out a clear method: the goal both requests serve, the impact on customers and the business, cost and effort, urgency, and reversibility. Show how the candidate would get data, involve the requesters, decide, and explain the trade-off openly. Mention what happens to the lower-priority request. Pitfalls: trying to do both, or deciding by who is most senior.",
       "competencies": ["judgment", "role_fit", "scope_at_level"],
       "values": ["Serve Our Customers and Members", "Act with Integrity"],
-      "source_url": "https://site.joinleland.com/library/a/how-to-become-a-walmart-product-manager-the-ultimate-guide"
+      "source_url": "https://site.joinleland.com/library/a/how-to-become-a-walmart-product-manager-the-ultimate-guide",
+      "hints": {
+        "looking_for": [
+          "A clear, repeatable way to prioritize",
+          "How you explain the trade-off to both requesters"
+        ],
+        "strong_signals": [
+          "Weighs customer impact, cost, urgency and reversibility",
+          "Says what happens to the lower-priority request"
+        ],
+        "watch_outs": [
+          "Trying to do both",
+          "Deciding by who is most senior"
+        ]
+      },
+      "role_families": ["pm", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -388,7 +532,23 @@
       "strong_answer": "Clarify scale (stores times SKUs), update sources (POS sales, receiving, returns, online orders) and freshness needs. Propose event-driven updates per store into a central availability service, with reservations for online and pickup orders. Discuss that store counts are physically uncertain, so promise from a buffered number and reconcile with scans. Cover partitioning by store, idempotent events, offline stores, and strong consistency at reservation versus eventual consistency for browse. Pitfalls: one global lock or ignoring shrink.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": ["Serve Our Customers and Members"],
-      "source_url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-walmart-global-tech-system-design-interview"
+      "source_url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-walmart-global-tech-system-design-interview",
+      "hints": {
+        "looking_for": [
+          "How you handle scale across stores and SKUs",
+          "Where you need strong versus eventual consistency"
+        ],
+        "strong_signals": [
+          "Event-driven updates partitioned by store",
+          "Promises from a buffered count and reconciles with scans"
+        ],
+        "watch_outs": [
+          "One global lock",
+          "Treating store counts as exact"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -396,7 +556,23 @@
       "strong_answer": "Estimate peak load and the hot items. Pre-scale for the known date and load test. Keep browse cacheable and checkout strongly consistent. Use a queue or waiting room with honest position updates, inventory reservations with timeouts for hot items, idempotent payment calls, and graceful degradation (turn off recommendations before checkout). Discuss monitoring, rollback and a game-day plan. Pitfalls: assuming autoscaling alone handles a doorbuster spike, or overselling.",
       "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
       "values": ["Strive for Excellence", "Serve Our Customers and Members"],
-      "source_url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-walmart-global-tech-system-design-interview"
+      "source_url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-walmart-global-tech-system-design-interview",
+      "hints": {
+        "looking_for": [
+          "How you plan for a known, extreme traffic spike",
+          "How you protect checkout above everything else"
+        ],
+        "strong_signals": [
+          "Waiting room plus reservations with timeouts",
+          "Idempotent payments and graceful degradation"
+        ],
+        "watch_outs": [
+          "Counting on autoscaling alone",
+          "Overselling hot items"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -404,7 +580,23 @@
       "strong_answer": "Cover the flow: order, slot booking, store picking, staging, customer arrival and handoff. Model slot capacity from associate labor and parking spots, not only from inventory. Handle substitutions when an item is missing, real-time arrival check-in, and associate devices that must work with poor store Wi-Fi. Discuss notifications, failure modes and metrics such as wait time and order accuracy. Pitfalls: ignoring the associate's workflow or store capacity.",
       "competencies": ["technical_depth", "reasoning", "trade_offs"],
       "values": ["Serve Our Customers and Members", "Respect the Individual"],
-      "source_url": "https://www.educative.io/blog/walmart-system-design-interview-questions"
+      "source_url": "https://www.educative.io/blog/walmart-system-design-interview-questions",
+      "hints": {
+        "looking_for": [
+          "Whether you design for the whole flow, store included",
+          "How you model slot capacity"
+        ],
+        "strong_signals": [
+          "Bases capacity on labor and parking, not just stock",
+          "Handles substitutions and poor store Wi-Fi"
+        ],
+        "watch_outs": [
+          "Ignoring the associate's workflow",
+          "Ignoring store capacity"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -412,7 +604,23 @@
       "strong_answer": "Separate price recommendation (models using demand, competitor and cost data) from price publication. Add business rules and guardrails (floors, price-match rules, legal limits), an approval workflow, and an audit trail. Explain how prices reach the site and thousands of store shelves consistently, with effective dates and rollback. Keep EDLP in mind: stable prices matter more than constant swings. Pitfalls: letting a model publish prices with no controls.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": ["Act with Integrity", "Serve Our Customers and Members"],
-      "source_url": "https://www.educative.io/blog/walmart-system-design-interview-questions"
+      "source_url": "https://www.educative.io/blog/walmart-system-design-interview-questions",
+      "hints": {
+        "looking_for": [
+          "How you separate recommending prices from publishing them",
+          "What controls you put around price changes"
+        ],
+        "strong_signals": [
+          "Guardrails, approval workflow and audit trail",
+          "Consistent rollout to site and shelves with rollback"
+        ],
+        "watch_outs": [
+          "Letting a model publish prices unchecked",
+          "Ignoring the value of stable prices"
+        ]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -420,7 +628,23 @@
       "strong_answer": "Define overfitting as a gap between training and validation performance. Cover proper splits (time-based for retail data), cross-validation, regularization, simpler models, more data and early stopping. For bias, check performance by segment, look at label and sampling bias, and pick fairness or calibration metrics that fit the use case. Mention monitoring for drift after launch. Pitfalls: only listing techniques without saying how to diagnose the problem.",
       "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
       "values": ["Act with Integrity"],
-      "source_url": "https://www.aced.io/blog/walmart-interview-process"
+      "source_url": "https://www.aced.io/blog/walmart-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you diagnose overfitting, not only fix it",
+          "How you check a model for bias"
+        ],
+        "strong_signals": [
+          "Uses time-based splits for retail data",
+          "Checks performance by segment and monitors drift"
+        ],
+        "watch_outs": [
+          "Listing techniques with no diagnosis",
+          "Treating fairness as one generic metric"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -428,7 +652,23 @@
       "strong_answer": "Start from the business decision the forecast drives (replenishment, staffing) and its cost of error. Cover data (sales history, promotions, holidays, weather, stockouts that hide true demand), feature design, a baseline model, then candidate models. Explain evaluation over time with backtesting, the right error metric, and how forecasts are served and monitored. Pitfalls: treating sales as demand when items were out of stock.",
       "competencies": ["technical_depth", "reasoning", "trade_offs"],
       "values": ["Serve Our Customers and Members"],
-      "source_url": "https://interviewkickstart.com/blogs/companies/walmart-data-scientist-interview-process"
+      "source_url": "https://interviewkickstart.com/blogs/companies/walmart-data-scientist-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you start from the decision the forecast drives",
+          "How you evaluate a forecast over time"
+        ],
+        "strong_signals": [
+          "Accounts for promotions, holidays and stockouts",
+          "Backtests against a simple baseline"
+        ],
+        "watch_outs": [
+          "Treating sales as demand during stockouts",
+          "Jumping to a complex model first"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -436,7 +676,23 @@
       "strong_answer": "Clarify what loyalty means (repeat purchase, Walmart+ retention, share of grocery spend). Pick a segment, for example busy families buying weekly groceries, and map their pain points. Generate options (smart reorder lists, pickup reminders, price tracking) and prioritize by impact and effort. Recommend one with a success metric, guardrails, and a test plan. Pitfalls: features with no segment, or ignoring cost to serve.",
       "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
       "values": ["Serve Our Customers and Members"],
-      "source_url": "https://site.joinleland.com/library/a/how-to-become-a-walmart-product-manager-the-ultimate-guide"
+      "source_url": "https://site.joinleland.com/library/a/how-to-become-a-walmart-product-manager-the-ultimate-guide",
+      "hints": {
+        "looking_for": [
+          "How you define loyalty for Walmart customers",
+          "Whether you pick a segment and its real pain"
+        ],
+        "strong_signals": [
+          "Prioritizes options by impact and effort",
+          "Recommends one with a metric and a test plan"
+        ],
+        "watch_outs": [
+          "Features with no target segment",
+          "Ignoring cost to serve"
+        ]
+      },
+      "role_families": ["pm", "design"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -444,7 +700,23 @@
       "strong_answer": "Clarify goals (adoption, frequency, margin) and target customers. Cover the customer journey and the store operations behind it: picking labor, staging space, slot capacity, substitutions. Propose a pilot in a few stores, launch criteria, and metrics (order accuracy, wait time, repeat rate, cost per order). Explain how to scale and what would stop the rollout. Pitfalls: treating it as only an app feature and ignoring store operations.",
       "competencies": ["structure", "user_and_business_sense", "prioritization"],
       "values": ["Serve Our Customers and Members", "Respect the Individual"],
-      "source_url": "https://site.joinleland.com/library/a/how-to-become-a-walmart-product-manager-the-ultimate-guide"
+      "source_url": "https://site.joinleland.com/library/a/how-to-become-a-walmart-product-manager-the-ultimate-guide",
+      "hints": {
+        "looking_for": [
+          "Whether you see the store operations behind the app",
+          "How you plan a safe launch"
+        ],
+        "strong_signals": [
+          "Proposes a small pilot with launch criteria",
+          "Tracks accuracy, wait time and cost per order"
+        ],
+        "watch_outs": [
+          "Treating it as only an app feature",
+          "No criteria to stop the rollout"
+        ]
+      },
+      "role_families": ["pm", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -452,7 +724,23 @@
       "strong_answer": "Ask for the goal and pick one customer segment. Walk through the journey (search, product page, cart, checkout, delivery) and find the biggest drop-off or pain with data. Propose two or three solutions, prioritize one, and define a primary metric (conversion, repeat purchase) and guardrails (returns, cost per order). Pitfalls: a list of features with no prioritization, or ignoring the low-price promise.",
       "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
       "values": ["Serve Our Customers and Members"],
-      "source_url": "https://www.aced.io/blog/walmart-interview-process"
+      "source_url": "https://www.aced.io/blog/walmart-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you find the biggest pain with data",
+          "Whether you focus on one customer segment"
+        ],
+        "strong_signals": [
+          "Walks the journey to find the main drop-off",
+          "Picks one solution with a metric and guardrails"
+        ],
+        "watch_outs": [
+          "A feature list with no priority",
+          "Ignoring the low-price promise"
+        ]
+      },
+      "role_families": ["pm", "design"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -460,7 +748,23 @@
       "strong_answer": "Start from the feature's goal and the customer behavior it should change. Choose one primary metric, supporting metrics along the funnel, and guardrails (cost, latency, cannibalization). Explain how to set targets and measure causally with an experiment. Show how the answer changes if the metric moves the wrong way. Pitfalls: long lists with no primary metric, or vanity metrics.",
       "competencies": ["problem_framing", "structure", "estimation_logic"],
       "values": ["Strive for Excellence"],
-      "source_url": "https://www.aced.io/guides/walmart-product-manager-interview"
+      "source_url": "https://www.aced.io/guides/walmart-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you tie metrics to the behavior you want to change",
+          "How you would measure cause, not correlation"
+        ],
+        "strong_signals": [
+          "One primary metric plus guardrails",
+          "Plans an experiment and a response to bad results"
+        ],
+        "watch_outs": [
+          "A long list with no primary metric",
+          "Vanity metrics"
+        ]
+      },
+      "role_families": ["pm", "data_ml"],
+      "levels": []
     }
   ],
   "bar_by_level": [

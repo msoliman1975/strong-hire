@@ -13,6 +13,7 @@ from strong_core.config import find_repo_root
 from strong_core.profiles import parse_profile
 from strong_core.question_bank import QuestionBankError, load_general_bank
 from strong_core.schemas import (
+    STANDARD_INTERVIEW_TYPES,
     GeneralQuestion,
     GeneralQuestionBank,
     InterviewType,
@@ -117,4 +118,4 @@ def test_qb2_every_checked_in_question_has_hints() -> None:
         missing = [q.question for q in profile.sample_questions if q.hints is None]
         assert not missing, f"{path.name}: no hints for {missing}"
     bank = load_general_bank(REPO / "questions" / "general.json")
-    assert {q.interview_type for q in bank.questions} == set(InterviewType)
+    assert {q.interview_type for q in bank.questions} == set(STANDARD_INTERVIEW_TYPES)
