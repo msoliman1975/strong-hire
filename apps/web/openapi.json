@@ -11949,6 +11949,94 @@
         "title": "GapStatus",
         "description": "State of one gap analysis run (GA-1 to GA-4)."
       },
+      "GeneralQuestion": {
+        "additionalProperties": false,
+        "description": "A question asked across many companies. Written in our own words (QB-5).",
+        "properties": {
+          "id": {
+            "description": "Stable slug, unique in the bank.",
+            "maxLength": 80,
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "title": "Id",
+            "type": "string"
+          },
+          "interview_type": {
+            "enum": [
+              "behavioral",
+              "hiring_manager",
+              "technical_qa",
+              "case"
+            ],
+            "type": "string"
+          },
+          "question": {
+            "maxLength": 400,
+            "minLength": 1,
+            "title": "Question",
+            "type": "string"
+          },
+          "hints": {
+            "$ref": "#/components/schemas/QuestionHints"
+          },
+          "competencies": {
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "maxItems": 3,
+            "minItems": 1,
+            "title": "Competencies",
+            "type": "array"
+          },
+          "role_families": {
+            "description": "Job categories it fits. Empty means all.",
+            "items": {
+              "$ref": "#/components/schemas/RoleFamily"
+            },
+            "title": "Role Families",
+            "type": "array"
+          },
+          "levels": {
+            "description": "Empty means all levels.",
+            "items": {
+              "$ref": "#/components/schemas/Level"
+            },
+            "title": "Levels",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "interview_type",
+          "question",
+          "hints",
+          "competencies"
+        ],
+        "title": "GeneralQuestion",
+        "type": "object"
+      },
+      "GeneralQuestionBank": {
+        "additionalProperties": false,
+        "description": "The file questions/general.json.",
+        "properties": {
+          "version": {
+            "minimum": 1,
+            "title": "Version",
+            "type": "integer"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/GeneralQuestion"
+            },
+            "title": "Questions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "version"
+        ],
+        "title": "GeneralQuestionBank",
+        "type": "object"
+      },
       "GrantIn": {
         "properties": {
           "reason": {
@@ -15529,6 +15617,55 @@
         ],
         "title": "QuestionCheckRequest"
       },
+      "QuestionHints": {
+        "additionalProperties": false,
+        "description": "QB-2: short bullets shown under a question on the Questions page.",
+        "properties": {
+          "looking_for": {
+            "description": "What the interviewer is assessing.",
+            "items": {
+              "maxLength": 200,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 4,
+            "minItems": 1,
+            "title": "Looking For",
+            "type": "array"
+          },
+          "strong_signals": {
+            "description": "What a strong answer shows.",
+            "items": {
+              "maxLength": 200,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 4,
+            "minItems": 1,
+            "title": "Strong Signals",
+            "type": "array"
+          },
+          "watch_outs": {
+            "description": "Common ways answers fall short.",
+            "items": {
+              "maxLength": 200,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 4,
+            "minItems": 1,
+            "title": "Watch Outs",
+            "type": "array"
+          }
+        },
+        "required": [
+          "looking_for",
+          "strong_signals",
+          "watch_outs"
+        ],
+        "title": "QuestionHints",
+        "type": "object"
+      },
       "QuestionPattern": {
         "additionalProperties": false,
         "description": "A recurring theme, phrased as a pattern. Never a leaked or NDA-protected question.",
@@ -16600,6 +16737,34 @@
             "minLength": 1,
             "title": "Source Url",
             "type": "string"
+          },
+          "hints": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/QuestionHints"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "QB-2: key hints for the Questions page, from strong_answer."
+          },
+          "role_families": {
+            "description": "QB-1: job categories it fits. Empty means all.",
+            "items": {
+              "$ref": "#/components/schemas/RoleFamily"
+            },
+            "title": "Role Families",
+            "type": "array"
+          },
+          "levels": {
+            "description": "QB-1: levels it fits. Empty means all.",
+            "items": {
+              "$ref": "#/components/schemas/Level"
+            },
+            "title": "Levels",
+            "type": "array"
           }
         },
         "required": [

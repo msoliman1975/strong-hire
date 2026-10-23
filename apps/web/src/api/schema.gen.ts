@@ -4524,6 +4524,44 @@ export interface components {
          */
         GapStatus: "running" | "ready" | "failed";
         /**
+         * GeneralQuestion
+         * @description A question asked across many companies. Written in our own words (QB-5).
+         */
+        GeneralQuestion: {
+            /**
+             * Id
+             * @description Stable slug, unique in the bank.
+             */
+            id: string;
+            /** @enum {string} */
+            interview_type: "behavioral" | "hiring_manager" | "technical_qa" | "case";
+            /** Question */
+            question: string;
+            hints: components["schemas"]["QuestionHints"];
+            /** Competencies */
+            competencies: components["schemas"]["Competency"][];
+            /**
+             * Role Families
+             * @description Job categories it fits. Empty means all.
+             */
+            role_families?: components["schemas"]["RoleFamily"][];
+            /**
+             * Levels
+             * @description Empty means all levels.
+             */
+            levels?: components["schemas"]["Level"][];
+        };
+        /**
+         * GeneralQuestionBank
+         * @description The file questions/general.json.
+         */
+        GeneralQuestionBank: {
+            /** Version */
+            version: number;
+            /** Questions */
+            questions?: components["schemas"]["GeneralQuestion"][];
+        };
+        /**
          * GrantIn
          * @description AU-3 minutes (negative removes), AU-4 free interviews, AU-5 comp plan (cap + end date).
          */
@@ -5891,6 +5929,27 @@ export interface components {
             existing?: string[];
         };
         /**
+         * QuestionHints
+         * @description QB-2: short bullets shown under a question on the Questions page.
+         */
+        QuestionHints: {
+            /**
+             * Looking For
+             * @description What the interviewer is assessing.
+             */
+            looking_for: string[];
+            /**
+             * Strong Signals
+             * @description What a strong answer shows.
+             */
+            strong_signals: string[];
+            /**
+             * Watch Outs
+             * @description Common ways answers fall short.
+             */
+            watch_outs: string[];
+        };
+        /**
          * QuestionPattern
          * @description A recurring theme, phrased as a pattern. Never a leaked or NDA-protected question.
          */
@@ -6344,6 +6403,21 @@ export interface components {
              * @description Public page that reports the question.
              */
             source_url: string;
+            /**
+             * @description QB-2: key hints for the Questions page, from strong_answer.
+             * @default null
+             */
+            hints: components["schemas"]["QuestionHints"] | null;
+            /**
+             * Role Families
+             * @description QB-1: job categories it fits. Empty means all.
+             */
+            role_families?: components["schemas"]["RoleFamily"][];
+            /**
+             * Levels
+             * @description QB-1: levels it fits. Empty means all.
+             */
+            levels?: components["schemas"]["Level"][];
         };
         /** SavedQuestionIn */
         SavedQuestionIn: {

@@ -20,6 +20,7 @@ from strong_core.schemas.enums import (
     ProfileStatus,
     RoleFamily,
 )
+from strong_core.schemas.questions import QuestionHints
 
 
 class ProfileField(StrEnum):
@@ -97,6 +98,15 @@ class SampleQuestion(Contract):
         default_factory=list, description="Principle names from values_framework this probes."
     )
     source_url: str = Field(min_length=1, description="Public page that reports the question.")
+    hints: QuestionHints | None = Field(
+        default=None, description="QB-2: key hints for the Questions page, from strong_answer."
+    )
+    role_families: list[RoleFamily] = Field(
+        default_factory=list, description="QB-1: job categories it fits. Empty means all."
+    )
+    levels: list[Level] = Field(
+        default_factory=list, description="QB-1: levels it fits. Empty means all."
+    )
 
 
 class LevelBar(Contract):

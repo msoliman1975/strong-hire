@@ -81,6 +81,7 @@ services:
       - ../packages/interview:/app/packages/interview
       - ../config:/app/config:ro
       - ../prompts:/app/prompts:ro
+      - ../questions:/app/questions:ro
     depends_on:
       postgres: { condition: service_healthy }
       redis: { condition: service_healthy }
@@ -101,6 +102,7 @@ services:
       - ../packages/core:/app/packages/core
       - ../config:/app/config:ro
       - ../prompts:/app/prompts:ro
+      - ../questions:/app/questions:ro
     depends_on:
       postgres: { condition: service_healthy }
       redis: { condition: service_healthy }
@@ -222,6 +224,7 @@ services:
       - ../packages/interview:/app/packages/interview
       - ../config:/app/config:ro
       - ../prompts:/app/prompts:ro
+      - ../questions:/app/questions:ro
       - ../var/latency:/app/var/latency
       - voice-models:/models
     depends_on:
