@@ -1,7 +1,8 @@
 """HTTP client for the Strong Hire API, used the way the web app uses it (P13).
 
-Job targets are reused across runs: each one is tagged with stage "sim:<resume fixture>", so a
-run creates the job, the resume and the gap analysis only once per fixture.
+Job targets are reused across runs: each one is tagged with stage "sim:<key>", so a run creates
+the job, the resume and the gap analysis only once per resume fixture, or once per pasted job and
+CV (key "custom-<hash>", SM-19).
 """
 
 from __future__ import annotations
@@ -13,7 +14,6 @@ from typing import Any
 
 import httpx
 
-from strong_sim.candidate import fixture_text
 from strong_sim.scenarios import Scenario
 from strong_sim.settings import SimSettings
 
@@ -87,8 +87,8 @@ class AppClient:
     # ------------------------------------------------------------------ job, resume, gap
 
     async def job_for(self, scenario: Scenario) -> str:
-        """The job target for the scenario's resume fixture, with a ready gap analysis."""
-        key = scenario.resume
+        """The job target for the scenario's inputs, with a ready gap analysis."""
+        key = scenario.inputs_key()
         if key in self._jobs:
             return self._jobs[key]
         stage = f"{STAGE_PREFIX}{key}"
@@ -105,20 +105,30 @@ class AppClient:
         return job_id
 
     async def _new_job(self, scenario: Scenario, stage: str) -> str:
-        posting = fixture_text("postings", scenario.fixture.posting)
+        posting = scenario.posting_text()
         accepted = await self._call("POST", "/job-targets", json={"text": posting, "stage": stage})
         job_id: str = accepted["job_target"]["id"]
-        resume_text = fixture_text("resumes", scenario.resume)
-        resume = await self._call("POST", "/resumes", data={"text": resume_text})
+        job_job = (accepted.get("job") or {}).get("id")
+        resume = await self._call("POST", "/resumes", data={"text": scenario.resume_text()})
         resume_id: str = resume["resume"]["id"]
+        resume_job = (resume.get("job") or {}).get("id")
+
+        async def extracted(kind: str, path: str, job: str | None) -> bool | None:
+            """True once read; the app's reason when its extraction job failed (SM-19)."""
+            row = await self._call("GET", path)
+            if row["status"] == "extracted":
+                return True
+            if job:
+                state = await self._call("GET", f"{path}/jobs/{job}")
+                if state.get("status") == "failed":
+                    raise ApiError(f"the {kind} was not accepted: {state.get('error') or 'failed'}")
+            return None
 
         async def job_ready() -> bool | None:
-            row = await self._call("GET", f"/job-targets/{job_id}")
-            return True if row["status"] == "extracted" else None
+            return await extracted("job posting", f"/job-targets/{job_id}", job_job)
 
         async def resume_ready() -> bool | None:
-            row = await self._call("GET", f"/resumes/{resume_id}")
-            return True if row["status"] == "extracted" else None
+            return await extracted("CV", f"/resumes/{resume_id}", resume_job)
 
         await self._wait("the job posting to be read", job_ready)
         await self._wait("the resume to be read", resume_ready)

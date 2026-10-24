@@ -58,6 +58,7 @@ from strong_api.admin.sim_schemas import (
     SimCancelIn,
     SimEstimateOut,
     SimGateOut,
+    SimInputsOut,
     SimKeepIn,
     SimOptions,
     SimPersonaOut,
@@ -224,7 +225,35 @@ def _scenario(data: dict[str, Any]) -> SimScenarioOut:
         quality=str(data.get("quality") or ""),
         behavior=str(data.get("behavior") or ""),
         candidate_name=data.get("candidate_name") or None,
+        custom_job=_pasted(data, "job"),
+        custom_cv=_pasted(data, "cv"),
+        level=data.get("level") or None,
     )
+
+
+def _pasted(data: dict[str, Any], kind: str) -> bool:
+    """SM-20: a text was pasted, even if Delete or retention removed it since."""
+    return bool(str(data.get(f"{kind}_text") or "").strip()) or kind in (
+        data.get("pasted_deleted") or []
+    )
+
+
+def _inputs(data: dict[str, Any]) -> SimInputsOut | None:
+    """SM-20, SM-21: the pasted texts, or None when there are none (anymore)."""
+    job = str(data.get("job_text") or "").strip() or None
+    cv = str(data.get("cv_text") or "").strip() or None
+    if job is None and cv is None:
+        return None
+    return SimInputsOut(job_text=job, cv_text=cv, level=data.get("level") or None)
+
+
+def forget_pasted(scenario: dict[str, Any]) -> dict[str, Any]:
+    """SM-20: a deleted run keeps that a job or CV was pasted, not the texts. The sim service
+    does the same in retention (strong_sim.serve.forget_pasted)."""
+    gone = [k for k in ("job", "cv") if str(scenario.get(f"{k}_text") or "").strip()]
+    if not gone:
+        return scenario
+    return {**scenario, "job_text": "", "cv_text": "", "pasted_deleted": gone}
 
 
 def _uuid(value: Any) -> uuid.UUID | None:
@@ -240,6 +269,7 @@ def _admin_out(
     files: bool,
     app_cost: float | None,
     hire_signal: str | None,
+    with_inputs: bool = False,
 ) -> SimRunOut:
     row = report.sessions[0] if report and report.sessions else {}
     scenario = _scenario(run.scenario_json or {})
@@ -272,6 +302,7 @@ def _admin_out(
         deleted_by=run.deleted_by,
         delete_reason=run.delete_reason,
         files=files,
+        inputs=_inputs(run.scenario_json or {}) if with_inputs else None,
     )
 
 
@@ -328,6 +359,7 @@ async def _one(db: AsyncSession, request: Request, run: SimRun) -> SimRunOut:
         bool(run.run_dir and run.run_dir in folders),
         app.get(sid) if sid else None,
         signals.get(sid) if sid else None,
+        with_inputs=True,
     )
 
 
@@ -423,6 +455,14 @@ async def start_run(
         "quality": body.quality.value,
         "behavior": body.behavior.value,
         "candidate_name": core_sim.NAMES[run_id.int % len(core_sim.NAMES)],
+        "job_text": body.job_text or "",
+        "cv_text": body.cv_text or "",
+        "level": body.level.value if body.level else None,
+    }
+    audited = {  # the texts are long and may be personal: their size only
+        **{k: v for k, v in scenario.items() if k not in ("job_text", "cv_text")},
+        "job_chars": len(body.job_text or ""),
+        "cv_chars": len(body.cv_text or ""),
     }
     run = SimRun(
         id=run_id,
@@ -439,7 +479,7 @@ async def start_run(
         f"sim_run:{run_id}",
         reason="start an AI candidate interview",
         org_id=sim_user.org_id,
-        after=scenario,
+        after=audited,
         details={"estimate_usd": round(need, 4)},
     )
     await db.commit()
@@ -540,6 +580,7 @@ async def delete_run(
     if run.deleted_at is not None:
         raise _conflict("The run is already deleted")
     run.deleted_at, run.deleted_by, run.delete_reason = _now(), admin.email, body.reason
+    run.scenario_json = forget_pasted(run.scenario_json)
     audit_action(
         db,
         admin,
@@ -709,4 +750,5 @@ async def session_replay(
             bytes=files.audio_bytes if files else None,
         ),
         scenario=_scenario(scenario) if isinstance(scenario, dict) else None,
+        inputs=_inputs(scenario) if isinstance(scenario, dict) else None,
     )
