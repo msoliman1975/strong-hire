@@ -55,8 +55,8 @@ from strong_api.scoring.schemas import (
     ScoringAccepted,
 )
 from strong_api.sessions.failure import failed_before_start, failure_reason
+from strong_core.db.models import Company, InterviewSession, JobTarget
 from strong_core.db.models import GapAnalysis as GapRow
-from strong_core.db.models import InterviewSession, JobTarget
 from strong_core.db.models import ProgressSnapshot as SnapshotRow
 from strong_core.db.models import Scorecard as ScorecardRow
 from strong_core.profiles import ProfileError, profile_for_session
@@ -327,9 +327,14 @@ async def get_debrief(session_id: uuid.UUID, db: Db, me: Me) -> Debrief:
     try:
         profile = await profile_for_session(db, session)
         generic, company = profile.generic, profile.company_name
+        # QB-4: the Questions page filters by the companies row slug.
+        company_row = (
+            None if profile.company_id is None else await db.get(Company, profile.company_id)
+        )
+        slug = None if profile.generic or company_row is None else company_row.slug
         framework = profile.values_framework.name if profile.values_framework else None
     except ProfileError:
-        generic, company, framework = session.profile_version is None, None, None
+        generic, company, slug, framework = session.profile_version is None, None, None, None
 
     next_session = None
     next_custom = None
@@ -360,6 +365,7 @@ async def get_debrief(session_id: uuid.UUID, db: Db, me: Me) -> Debrief:
         next_custom_session=next_custom,
         generic_mode=generic,
         company_name=company,
+        company_slug=slug,
         values_framework=framework,
         questions=_debrief_questions(_brief(session)),
     )

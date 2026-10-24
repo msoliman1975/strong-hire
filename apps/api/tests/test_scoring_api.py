@@ -226,6 +226,7 @@ async def test_fb1_fb2_fb3_debrief_after_scoring(
     assert card["value_scores"] == []
     assert debrief["generic_mode"] is True
     assert debrief["values_framework"] is None
+    assert debrief["company_slug"] is None  # QB-4: the Questions page opens on General
     assert debrief["session"]["config"]["interview_type"] == "behavioral"
     nxt = debrief["next_session"]  # PR-2
     assert nxt["interview_type"] == "behavioral"
@@ -284,6 +285,7 @@ async def test_company_debrief_shows_values(
     debrief = (await sclient.get(f"/sessions/{sid}/debrief")).json()
     assert debrief["generic_mode"] is False
     assert debrief["values_framework"] == "Example Values"
+    assert debrief["company_slug"] == "stripe"  # QB-4
     names = {v["value"] for v in debrief["scorecard"]["value_scores"]}
     assert names == {"Customer first", "Own the outcome"}
 

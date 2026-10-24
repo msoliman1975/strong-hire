@@ -32,6 +32,7 @@ function debrief(generic: boolean, duration_min: 10 | 30 | 45 = 30): Debrief {
     next_custom_session: null,
     generic_mode: generic,
     company_name: generic ? null : "Example Corp",
+    company_slug: generic ? null : "example-corp",
     values_framework: generic ? null : "Example Values",
     questions: [],
   };

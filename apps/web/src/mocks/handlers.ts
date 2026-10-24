@@ -1026,6 +1026,7 @@ export function scoringHandlers(store: MockStore) {
         next_custom_session: ready ? customNext(s.job_target_id) : null,
         generic_mode: generic,
         company_name: job?.posting?.company_name ?? null,
+        company_slug: generic ? null : (job?.posting?.company_name ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "-") || null,
         values_framework: generic ? null : "Company values",
         questions: custom ? customDebriefQuestions(custom) : [],
       };

@@ -98,6 +98,10 @@ class Debrief(_Out):
     )
     generic_mode: bool = Field(description="True when no company profile was used: no values.")
     company_name: str | None
+    company_slug: str | None = Field(
+        default=None,
+        description="QB-4: the company to filter the Questions page by. None in generic mode.",
+    )
     values_framework: str | None = Field(
         description="Name of the company's values framework, for example 'Leadership Principles'."
     )
