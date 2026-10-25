@@ -152,7 +152,7 @@ function Actions({ detail }: { detail: AdminUserDetail }) {
         ) : (
           <button
             type="button"
-            className="btn btn--small btn--danger"
+            className="btn btn--small btn--danger-outline"
             onClick={() => open({ kind: "suspend" })}
             disabled={u.is_admin}
             title={u.is_admin ? "Admins cannot be suspended" : undefined}
