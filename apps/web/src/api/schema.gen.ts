@@ -2396,6 +2396,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/waitlist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Waitlist */
+        get: operations["list_waitlist_admin_waitlist_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/waitlist.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export Waitlist */
+        get: operations["export_waitlist_admin_waitlist_csv_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/waitlist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Join Waitlist */
+        post: operations["join_waitlist_public_waitlist_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/waitlist/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirm Waitlist */
+        post: operations["confirm_waitlist_public_waitlist_confirm_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -3342,6 +3410,42 @@ export interface components {
             /** Has Password */
             has_password: boolean;
         };
+        /** AdminWaitlist */
+        AdminWaitlist: {
+            /** Total */
+            total: number;
+            /** Confirmed */
+            confirmed: number;
+            /** Marketing Consent */
+            marketing_consent: number;
+            /** Entries */
+            entries: components["schemas"]["AdminWaitlistEntry"][];
+        };
+        /** AdminWaitlistEntry */
+        AdminWaitlistEntry: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Email */
+            email: string;
+            interview_within: components["schemas"]["InterviewWithin"];
+            role_family: components["schemas"]["RoleFamily"] | null;
+            /** Marketing Consent */
+            marketing_consent: boolean;
+            /** Source */
+            source: string | null;
+            /** Confirmed At */
+            confirmed_at: string | null;
+            /** Invited At */
+            invited_at: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /**
          * AlertAggregation
          * @description AL-1: how an alert rule reduces the samples in its window to one value.
@@ -4029,6 +4133,20 @@ export interface components {
          * @enum {string}
          */
         Confidence: "low" | "medium" | "high";
+        /** ConfirmIn */
+        ConfirmIn: {
+            /** Token */
+            token: string;
+        };
+        /** ConfirmOut */
+        ConfirmOut: {
+            /**
+             * Status
+             * @default confirmed
+             * @constant
+             */
+            status: "confirmed";
+        };
         /** ConsentIn */
         ConsentIn: {
             /** Training Consent */
@@ -4752,6 +4870,12 @@ export interface components {
          * @enum {string}
          */
         InterviewType: "behavioral" | "hiring_manager" | "technical_qa" | "case" | "custom";
+        /**
+         * InterviewWithin
+         * @description L04 waitlist: when the person's real interview is, as they told us.
+         * @enum {string}
+         */
+        InterviewWithin: "two_weeks" | "month" | "later" | "not_yet";
         /**
          * InterviewerBrief
          * @description Built by the planner before each session. The live interviewer reads only this.
@@ -7398,6 +7522,40 @@ export interface components {
             token: string;
             /** Identity */
             identity: string;
+        };
+        /** WaitlistIn */
+        WaitlistIn: {
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            interview_within: components["schemas"]["InterviewWithin"];
+            role_family?: components["schemas"]["RoleFamily"] | null;
+            /**
+             * Marketing Consent
+             * @default false
+             */
+            marketing_consent: boolean;
+            /**
+             * Source
+             * @description utm_source, if any
+             */
+            source?: string | null;
+            /**
+             * Website
+             * @description Honeypot: hidden in the form, left empty
+             */
+            website?: string | null;
+        };
+        /** WaitlistOut */
+        WaitlistOut: {
+            /**
+             * Status
+             * @default check_email
+             * @constant
+             */
+            status: "check_email";
         };
         /** WebhookOut */
         WebhookOut: {
@@ -11709,6 +11867,110 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SessionReplay"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_waitlist_admin_waitlist_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminWaitlist"];
+                };
+            };
+        };
+    };
+    export_waitlist_admin_waitlist_csv_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    join_waitlist_public_waitlist_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WaitlistIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WaitlistOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    confirm_waitlist_public_waitlist_confirm_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConfirmIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConfirmOut"];
                 };
             };
             /** @description Validation Error */

@@ -14,6 +14,7 @@ import { customHandlers } from "./custom";
 import { createStore } from "./db";
 import { accountHandlers, authHandlers, inputHandlers, scoringHandlers, sessionHandlers } from "./handlers";
 import { questionHandlers } from "./questionHandlers";
+import { waitlistHandlers } from "./waitlistHandlers";
 
 export type MockMode = "all" | "off";
 
@@ -32,6 +33,7 @@ export async function startMocks(mode: MockMode): Promise<void> {
     ...accountHandlers(store),
     ...customHandlers(store),
     ...questionHandlers(),
+    ...waitlistHandlers(),
   ];
   await setupWorker(...handlers).start({
     onUnhandledFrame: "bypass",

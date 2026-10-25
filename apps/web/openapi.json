@@ -6619,6 +6619,123 @@
         }
       }
     },
+    "/admin/waitlist": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List Waitlist",
+        "operationId": "list_waitlist_admin_waitlist_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminWaitlist"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/waitlist.csv": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Export Waitlist",
+        "operationId": "export_waitlist_admin_waitlist_csv_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          }
+        }
+      }
+    },
+    "/public/waitlist": {
+      "post": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Join Waitlist",
+        "operationId": "join_waitlist_public_waitlist_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WaitlistIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WaitlistOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/waitlist/confirm": {
+      "post": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Confirm Waitlist",
+        "operationId": "confirm_waitlist_public_waitlist_confirm_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfirmOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -9079,6 +9196,120 @@
         "title": "AdminUserProfile",
         "description": "The AC-3 profile. No resume data."
       },
+      "AdminWaitlist": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "confirmed": {
+            "type": "integer",
+            "title": "Confirmed"
+          },
+          "marketing_consent": {
+            "type": "integer",
+            "title": "Marketing Consent"
+          },
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/AdminWaitlistEntry"
+            },
+            "type": "array",
+            "title": "Entries"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "confirmed",
+          "marketing_consent",
+          "entries"
+        ],
+        "title": "AdminWaitlist"
+      },
+      "AdminWaitlistEntry": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "interview_within": {
+            "$ref": "#/components/schemas/InterviewWithin"
+          },
+          "role_family": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RoleFamily"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "marketing_consent": {
+            "type": "boolean",
+            "title": "Marketing Consent"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "confirmed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmed At"
+          },
+          "invited_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Invited At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "interview_within",
+          "role_family",
+          "marketing_consent",
+          "source",
+          "confirmed_at",
+          "invited_at",
+          "created_at"
+        ],
+        "title": "AdminWaitlistEntry"
+      },
       "AlertAggregation": {
         "type": "string",
         "enum": [
@@ -10854,6 +11085,34 @@
         "title": "Confidence",
         "type": "string"
       },
+      "ConfirmIn": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Token"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "title": "ConfirmIn"
+      },
+      "ConfirmOut": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "confirmed",
+            "title": "Status",
+            "default": "confirmed"
+          }
+        },
+        "type": "object",
+        "title": "ConfirmOut"
+      },
       "ConsentIn": {
         "properties": {
           "training_consent": {
@@ -12542,6 +12801,17 @@
         ],
         "title": "InterviewType",
         "description": "The four v1 interview types (IV-2), plus Custom (CU-1).\n\nA Custom session mixes 1 to 3 of the four standard types as question categories\n(`SessionConfig.custom`). Custom is never a question category itself and has no entry in\nCOMPETENCIES_BY_TYPE; use `session_competencies(config)` for a session's competency pool."
+      },
+      "InterviewWithin": {
+        "type": "string",
+        "enum": [
+          "two_weeks",
+          "month",
+          "later",
+          "not_yet"
+        ],
+        "title": "InterviewWithin",
+        "description": "L04 waitlist: when the person's real interview is, as they told us."
       },
       "InterviewerBrief": {
         "additionalProperties": false,
@@ -19383,6 +19653,79 @@
         ],
         "title": "VoiceJoin",
         "description": "What the browser needs to join the interview room (P7, P10)."
+      },
+      "WaitlistIn": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 320,
+            "format": "email",
+            "title": "Email"
+          },
+          "interview_within": {
+            "$ref": "#/components/schemas/InterviewWithin"
+          },
+          "role_family": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RoleFamily"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "marketing_consent": {
+            "type": "boolean",
+            "title": "Marketing Consent",
+            "default": false
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source",
+            "description": "utm_source, if any"
+          },
+          "website": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website",
+            "description": "Honeypot: hidden in the form, left empty"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "email",
+          "interview_within"
+        ],
+        "title": "WaitlistIn"
+      },
+      "WaitlistOut": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "check_email",
+            "title": "Status",
+            "default": "check_email"
+          }
+        },
+        "type": "object",
+        "title": "WaitlistOut"
       },
       "WebhookOut": {
         "properties": {

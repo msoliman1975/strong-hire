@@ -20,6 +20,7 @@ const SECTIONS: { to: string; label: string; group?: string; badge?: ComponentTy
   { to: "/interviews", label: "Interviews" },
   { to: "/simulations", label: "Simulations" },
   { to: "/users", label: "Users" },
+  { to: "/waitlist", label: "Waitlist" },
   { to: "/alerts", label: "Alerts", badge: FiringCount },
   { to: "/ops/health", label: "Health", group: "Operations" },
   { to: "/ops/performance", label: "Performance", group: "Operations" },

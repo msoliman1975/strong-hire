@@ -18,6 +18,7 @@ import { createStore, mockAdmin, type MockDb } from "./db";
 import { authHandlers } from "./handlers";
 import { settingsHandlers } from "./settingsHandlers";
 import { usersHandlers } from "./usersHandlers";
+import { waitlistHandlers } from "./waitlistHandlers";
 import { opsHandlers } from "./opsHandlers";
 import { simHandlers } from "./simHandlers";
 
@@ -61,7 +62,7 @@ function seed(db: MockDb): void {
 export async function startMocks(mode: MockMode): Promise<void> {
   if (mode === "off") return;
   const store = createStore({ persist: true, seed });
-  await setupWorker(...authHandlers(store), ...adminHandlers(store), ...alertsHandlers(store), ...controlsHandlers(store), ...usersHandlers(store), ...opsHandlers(store), ...simHandlers(store), ...contentHandlers(store), ...settingsHandlers(store)).start({
+  await setupWorker(...authHandlers(store), ...adminHandlers(store), ...alertsHandlers(store), ...controlsHandlers(store), ...usersHandlers(store), ...opsHandlers(store), ...simHandlers(store), ...contentHandlers(store), ...settingsHandlers(store), ...waitlistHandlers(store)).start({
     onUnhandledFrame: "bypass",
     quiet: true,
   });

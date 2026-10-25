@@ -21,6 +21,7 @@ from strong_api.admin.overview import router as overview_router
 from strong_api.admin.router import router
 from strong_api.admin.sim import router as sim_router
 from strong_api.admin.users import router as users_router
+from strong_api.admin.waitlist import router as waitlist_router
 from strong_api.auth.email import EmailSender, make_email_sender
 from strong_api.auth.google import AuthlibGoogleClient, GoogleClient
 from strong_api.auth.magic_links import MagicLinks, RedisUsedTokenStore
@@ -41,6 +42,7 @@ ROUTERS: list[APIRouter] = [
     ops_router,
     content_router,
     sim_router,
+    waitlist_router,
 ]
 
 

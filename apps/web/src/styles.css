@@ -2326,3 +2326,24 @@ dialog::backdrop {
 .custom-category .field__row .btn {
   white-space: nowrap;
 }
+
+/* L04 waitlist: public page, no account. */
+.waitlist-steps {
+  margin: 0 0 var(--space-5);
+  padding-left: var(--space-5);
+  display: grid;
+  gap: var(--space-2);
+}
+
+.waitlist-form h2,
+.waitlist-sample h2 {
+  font-size: 1.125rem;
+  margin: 0 0 var(--space-4);
+}
+
+.waitlist-quote {
+  margin: var(--space-4) 0;
+  padding-left: var(--space-3);
+  border-left: 3px solid var(--line-strong);
+  color: var(--ink);
+}
