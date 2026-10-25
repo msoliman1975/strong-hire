@@ -37,6 +37,8 @@ SPEC_TABLES = {
     "sim_runs",  # SM-2..SM-5, SM-13, SM-14
     # Custom interview (docs/custom-interview-spec.md)
     "saved_questions",  # CU-8
+    # Launch (L04 marketing site)
+    "waitlist_entries",  # L04 step 1: waitlist with double opt-in
 }
 
 

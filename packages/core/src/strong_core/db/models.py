@@ -49,11 +49,13 @@ from strong_core.schemas.enums import (
     GrantKind,
     HireSignal,
     InterviewType,
+    InterviewWithin,
     Level,
     Mode,
     OrgType,
     Phase,
     ProfileStatus,
+    RoleFamily,
     SessionChannel,
     SessionStatus,
     SimRunStatus,
@@ -139,6 +141,8 @@ PLATFORM_TABLES = (
     "alert_events",
     "runtime_settings",
     "company_request_triage",
+    # No user exists yet, so no org_id. Deleted by email on request (AC-1 covers accounts only).
+    "waitlist_entries",
 )
 
 
@@ -937,3 +941,25 @@ class SimRun(Base):
         String(320), comment="Admin email, or 'retention'"
     )
     delete_reason: Mapped[str | None] = mapped_column(Text)
+
+
+class WaitlistEntry(Base):
+    """L04: someone who asked to hear when Strong Hire opens. Not a user; double opt-in."""
+
+    __tablename__ = "waitlist_entries"
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    email: Mapped[str] = mapped_column(String(320), unique=True, comment="Lowercased")
+    role_family: Mapped[RoleFamily | None] = mapped_column(str_enum(RoleFamily, "role_family"))
+    interview_within: Mapped[InterviewWithin] = mapped_column(
+        str_enum(InterviewWithin, "interview_within")
+    )
+    marketing_consent: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default="false", comment="CASL: express, unticked box"
+    )
+    source: Mapped[str | None] = mapped_column(String(100), comment="utm_source, if any")
+    confirmed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), comment="Set when the email link is opened"
+    )
+    invited_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = _created_at()
