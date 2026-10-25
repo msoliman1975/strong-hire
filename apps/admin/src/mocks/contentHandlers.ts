@@ -54,7 +54,39 @@ export function mockProfile(slug: string, name: string, pace: string): Record<st
   return {
     company_slug: slug,
     company_name: name,
-    values_framework: { name: `${name} values`, principles: [{ name: "Customers first", description: "Start with the user" }] },
+    values_framework: {
+      name: `${name} values`,
+      principles: [
+        {
+          name: "Customers first",
+          description: "Start with the user",
+          evidence_signals: ["Names a real customer and their problem"],
+          weight: 1.5,
+        },
+      ],
+    },
+    loop_structure: [
+      {
+        role_family: "swe",
+        levels: ["L4", "L5"],
+        rounds: [{ name: "Values round", interview_type: "behavioral", duration_min: 45, interviewer_role: "Senior engineer" }],
+      },
+    ],
+    question_patterns: [
+      { interview_type: "behavioral", theme: "Customer trade-offs", pattern: "A time you put the customer before the team", competencies: ["ownership"] },
+    ],
+    sample_questions: [
+      {
+        interview_type: "behavioral",
+        question: "Tell me about a time you changed a plan for a customer.",
+        strong_answer: "Names the customer, the cost to the team and the measured result.",
+        source_url: `https://${slug}.example.com/blog/interviews`,
+      },
+    ],
+    bar_by_level: [{ level_name: "L5", normalized_level: "senior", scope_expectation: "Owns a feature area end to end" }],
+    scoring_weights: { ownership: 1.2 },
+    field_confidence: { persona: "medium", values_framework: "high" },
+    low_confidence_notes: ["Persona pace comes from one source"],
     persona: { tone: "Direct", pace, pushback_style: "Asks for numbers", closing_style: "Leaves time" },
     sources: [
       { url: `https://${slug}.example.com/careers`, title: `${name} careers`, retrieved_at: "2026-10-01", fields: ["persona"] },

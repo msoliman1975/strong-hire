@@ -110,6 +110,40 @@ describe("Content: companies and profiles", { timeout: 20_000 }, () => {
     expect(screen.getByLabelText("Profile JSON of version 2")).toHaveTextContent('"pace": "Fast"');
   });
 
+  it("AT-7: the company page opens on the published profile as readable sections", async () => {
+    const user = renderAt("/content/companies");
+    await user.click(await screen.findByRole("link", { name: "Example Corp" }));
+    expect(await screen.findByRole("heading", { name: "Profile details: version 1" })).toBeInTheDocument();
+
+    expect(await screen.findByRole("heading", { name: "Example Corp values" })).toBeInTheDocument();
+    const values = screen.getByRole("table", { name: "Example Corp values" });
+    expect(within(values).getByText("Customers first")).toBeInTheDocument();
+    expect(within(values).getByText("Names a real customer and their problem")).toBeInTheDocument();
+
+    const loop = screen.getByRole("table", { name: "Loop for Software engineering" });
+    expect(within(loop).getByText("Values round")).toBeInTheDocument();
+    expect(within(loop).getByText("Behavioral")).toBeInTheDocument();
+
+    const levels = screen.getByRole("table", { name: "Bar by level" });
+    expect(within(levels).getByText("Owns a feature area end to end")).toBeInTheDocument();
+    expect(within(screen.getByRole("region", { name: "Interviewer persona" })).getByText("Moderate")).toBeInTheDocument();
+    expect(screen.getByText("Persona pace comes from one source")).toBeInTheDocument();
+    expect(screen.getByText("persona: medium")).toBeInTheDocument();
+
+    await user.click(screen.getByText("Tell me about a time you changed a plan for a customer."));
+    expect(screen.getByText("Names the customer, the cost to the team and the measured result.")).toBeVisible();
+
+    await user.click(screen.getByRole("button", { name: "View v2" }));
+    expect(await screen.findByRole("heading", { name: "Profile details: version 2" })).toBeInTheDocument();
+    expect(await within(screen.getByRole("region", { name: "Interviewer persona" })).findByText("Fast")).toBeInTheDocument();
+  });
+
+  it("AT-7: a company with no versions shows no profile details", async () => {
+    renderAt("/content/companies/google");
+    expect(await screen.findByText("No profile versions yet.")).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: /Profile details/ })).not.toBeInTheDocument();
+  });
+
   it("AT-4, AA-7: publishing asks to confirm with the company and version, then archives the old one", async () => {
     const user = renderAt("/content/companies/example-corp");
     await user.click(await screen.findByRole("button", { name: "Send to review v2" }));

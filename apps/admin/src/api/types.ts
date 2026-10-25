@@ -24,6 +24,7 @@ export type AuthUser = S["AuthUser"];
 export type Turn = DeepRequired<S["Turn"]>;
 export type Phase = S["Phase"];
 export type InterviewType = S["InterviewType"];
+export type RoleFamily = S["RoleFamily"];
 export type Difficulty = S["Difficulty"];
 export type Mode = S["Mode"];
 export type SessionRecord = DeepRequired<S["SessionRecord"]>;
