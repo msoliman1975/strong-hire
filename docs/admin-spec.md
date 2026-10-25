@@ -169,6 +169,7 @@ The pages and API move to `apps/admin` with the same behavior, plus:
 | AT-3 | **Import:** upload a profile JSON. It is validated against the schema (same code as `strongctl profiles validate`) and stored as a `draft` with sources and import date (AD-1). | P0 |
 | AT-4 | **Workflow:** draft → in_review → published → archived. Publishing asks for confirmation, records `reviewed_by`, archives the previous published version, and is audited. Rollback means re-publishing an archived version. | P0 |
 | AT-5 | **Company requests:** grouped by normalized name, with distinct users, first and last requested, and source hosts. Triage states: new, planned, declined, added (linked to a company). A new `company_request_triage` table holds them; request rows are not edited. | P1 |
+| AT-7 | **Profile details:** clicking a company opens its published profile (or the newest version when none is published) as readable sections: summary with confidence and reviewer flags, values with evidence signals and weights, interview loops, bar by level, persona, scoring weights and case style, question patterns, and sample questions with their strong answer and source. "View" on any version switches to it; the raw JSON stays one click away. | P1 |
 | AT-6 | **Question bank:** read-only browser over the file-based bank once `feat/qb-*` merges. Editing stays in git. | P2 |
 
 The CLI (`strongctl profiles ...`) stays, and both paths share the same repository code.

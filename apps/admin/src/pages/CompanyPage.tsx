@@ -12,6 +12,7 @@ import {
   type TransitionTo,
 } from "../api/content";
 import { DiffView, type DiffMode } from "../components/DiffView";
+import { ProfileDetails, type ProfileView } from "../components/ProfileDetails";
 import { ProfileImport } from "../components/ProfileImport";
 import { ReasonDialog } from "../components/ReasonDialog";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
@@ -64,6 +65,8 @@ export function CompanyPage() {
     : (numbers.at(-2) ?? null);
   const a = pair ? pair.a : fallbackA;
   const b = pair ? pair.b : latest;
+  // AT-7: open on the live profile, or the newest one when nothing is published.
+  const shown = viewing ?? company.published_version ?? latest;
 
   return (
     <>
@@ -77,6 +80,8 @@ export function CompanyPage() {
           {company.request_users} requesting users
         </p>
       </PageHead>
+
+      {shown !== null && <VersionViewer slug={company.slug} version={shown} status={versions.find((v) => v.version === shown)?.status} />}
 
       <section className="section" aria-labelledby="versions">
         <div className="row row--between">
@@ -106,7 +111,7 @@ export function CompanyPage() {
               </thead>
               <tbody>
                 {[...versions].reverse().map((v) => (
-                  <tr key={v.version} aria-current={viewing === v.version ? "true" : undefined}>
+                  <tr key={v.version} aria-current={shown === v.version ? "true" : undefined}>
                     <td>v{v.version}</td>
                     <td>
                       <span className="profile-status" data-status={v.status}>
@@ -119,7 +124,10 @@ export function CompanyPage() {
                     <td className="num">{v.source_count}</td>
                     <td>
                       <span className="row row--tight">
-                        <button type="button" className="btn btn--small" onClick={() => setViewing(v.version)}>
+                        <button type="button" className="btn btn--small" onClick={() => {
+                            setViewing(v.version);
+                            document.getElementById("viewer")?.scrollIntoView?.({ behavior: "smooth" });
+                          }}>
                           View v{v.version}
                         </button>
                         {NEXT_STATUSES[v.status].map((to) => (
@@ -167,8 +175,6 @@ export function CompanyPage() {
           <Diff slug={company.slug} a={a} b={b} mode={mode} />
         </section>
       )}
-
-      {viewing !== null && <VersionViewer slug={company.slug} version={viewing} onClose={() => setViewing(null)} />}
 
       {pending && (
         <ReasonDialog
@@ -234,16 +240,18 @@ interface SourceView {
   fields?: string[];
 }
 
-/** AT-2: one version's stored JSON and its sources. */
-function VersionViewer({ slug, version, onClose }: { slug: string; version: number; onClose: () => void }) {
+/** AT-2, AT-7: one version as readable sections, with its sources and the stored JSON. */
+function VersionViewer({ slug, version, status }: { slug: string; version: number; status?: ProfileVersion["status"] }) {
   const detail = useProfileVersion(slug, version);
   return (
     <section className="section" aria-labelledby="viewer">
-      <div className="row row--between">
-        <h2 id="viewer">Version {version}</h2>
-        <button type="button" className="btn btn--small" onClick={onClose}>
-          Close
-        </button>
+      <div className="row row--tight">
+        <h2 id="viewer">Profile details: version {version}</h2>
+        {status && (
+          <span className="profile-status" data-status={status}>
+            {words(status)}
+          </span>
+        )}
       </div>
       {detail.isPending && <Loading label="Loading version" />}
       {detail.isError && <ErrorNotice error={detail.error} />}
@@ -261,6 +269,7 @@ function VersionViewer({ slug, version, onClose }: { slug: string; version: numb
               </ul>
             </div>
           )}
+          <ProfileDetails profile={detail.data.profile as ProfileView} />
           <h3>Sources ({detail.data.sources.length})</h3>
           <ol className="sources">
             {(detail.data.sources as SourceView[]).map((s) => (
@@ -273,7 +282,7 @@ function VersionViewer({ slug, version, onClose }: { slug: string; version: numb
               </li>
             ))}
           </ol>
-          <details open>
+          <details>
             <summary>Profile JSON</summary>
             <pre className="json-view" aria-label={`Profile JSON of version ${version}`}>
               {JSON.stringify(detail.data.profile, null, 2)}

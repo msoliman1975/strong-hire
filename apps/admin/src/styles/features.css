@@ -231,6 +231,51 @@
   padding-left: var(--space-6);
 }
 
+/* Profile details (AT-7): readable sections of one profile version. */
+.profile {
+  display: grid;
+  gap: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.profile__part > h3 {
+  margin: 0 0 var(--space-3);
+}
+
+.profile__list {
+  margin: 0;
+  padding-left: var(--space-5);
+}
+
+.profile__list li + li {
+  margin-top: var(--space-2);
+}
+
+.profile__caption {
+  caption-side: top;
+  text-align: left;
+  font-weight: 600;
+  padding: var(--space-4) var(--space-5) 0;
+}
+
+.profile__questions {
+  margin: 0;
+  padding-left: var(--space-8);
+}
+
+.profile__questions li + li {
+  border-top: 1px solid var(--line);
+}
+
+.profile__questions summary {
+  cursor: pointer;
+  padding: var(--space-3) 0;
+}
+
+.profile__questions .dl {
+  padding: 0 0 var(--space-4);
+}
+
 /* ---------------------------------------------------------------- settings (AA-1, AA-8) */
 
 .add-admin {
