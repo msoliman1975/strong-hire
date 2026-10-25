@@ -23,6 +23,8 @@ export type SimRunList = DeepRequired<S["SimRunList"]>;
 export type SimRunStatus = S["SimRunStatus"];
 export type SimQuality = S["Quality"];
 export type SimBehavior = S["Behavior"];
+export type SimLevel = S["Level"];
+export type SimInputs = NonNullable<SimRun["inputs"]>;
 export type SessionReplay = DeepRequired<S["SessionReplay"]>;
 export type ReplayLine = SessionReplay["lines"][number];
 export type ReplayJudge = NonNullable<SessionReplay["judge"]>;
@@ -42,6 +44,8 @@ export const FINISHED_STATUSES: SimRunStatus[] = ["done", "failed", "cancelled"]
 
 export const simApi = {
   options: async () => unwrap(await apiClient.GET("/admin/sim/options")) as SimOptions,
+  run: async (runId: string) =>
+    unwrap(await apiClient.GET("/admin/sim/runs/{run_id}", { params: { path: { run_id: runId } } })) as SimRun,
   runs: async (filters: SimRunFilters = {}) =>
     unwrap(await apiClient.GET("/admin/sim/runs", { params: { query: filters } })) as SimRunList,
   start: async (body: SimRunIn) =>
@@ -114,6 +118,28 @@ export const useDeleteRun = () =>
   useSimWrite(({ id, reason }: { id: string; reason: string }) => simApi.remove(id, reason));
 export const useCancelRun = () =>
   useSimWrite(({ id, reason }: { id: string; reason?: string }) => simApi.cancel(id, reason));
+
+/** SM-17: the app's own limit for a pasted posting or CV. */
+export const MAX_PASTED_CHARS = 60_000;
+
+/** SM-21: the form values that start the same run again. Texts are null once deleted. */
+export function runAgainValues(run: SimRun): Required<SimRunIn> {
+  const s = run.scenario;
+  const inputs = run.inputs;
+  return {
+    persona: s.persona,
+    interview_type: s.interview_type as Required<SimRunIn>["interview_type"],
+    difficulty: s.difficulty as Required<SimRunIn>["difficulty"],
+    mode: s.mode as Required<SimRunIn>["mode"],
+    duration_min: s.duration_min as Required<SimRunIn>["duration_min"],
+    quality: s.quality as SimQuality,
+    behavior: s.behavior as SimBehavior,
+    channel: s.channel as Required<SimRunIn>["channel"],
+    job_text: inputs?.job_text ?? null,
+    cv_text: inputs?.cv_text ?? null,
+    level: inputs?.level ?? s.level ?? null,
+  };
+}
 
 /** SM-9: the color of a response time. */
 export type LatencyLevel = "ok" | "slow" | "bad";
