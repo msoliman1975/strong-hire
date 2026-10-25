@@ -367,3 +367,12 @@ class TriageState(StrEnum):
     PLANNED = "planned"
     DECLINED = "declined"
     ADDED = "added"
+
+
+class InterviewWithin(StrEnum):
+    """L04 waitlist: when the person's real interview is, as they told us."""
+
+    TWO_WEEKS = "two_weeks"
+    MONTH = "month"
+    LATER = "later"
+    NOT_YET = "not_yet"
