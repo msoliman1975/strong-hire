@@ -54,8 +54,21 @@ def _now() -> datetime:
     return datetime.now(UTC)
 
 
+def forget_pasted(scenario: dict[str, Any]) -> dict[str, Any]:
+    """SM-20: a deleted run keeps that a job or CV was pasted, not the texts. The admin api does
+    the same on Delete (strong_api.admin.sim.forget_pasted)."""
+    gone = [k for k in ("job", "cv") if str(scenario.get(f"{k}_text") or "").strip()]
+    if not gone:
+        return scenario
+    return {**scenario, "job_text": "", "cv_text": "", "pasted_deleted": gone}
+
+
 def _start_folder(run_dir: Path, scenario: Scenario) -> None:
     run_dir.mkdir(parents=True, exist_ok=True)
+    # SM-19: the pasted texts as given, next to the run's sessions.
+    for name, text in (("job.txt", scenario.job_text), ("cv.txt", scenario.cv_text)):
+        if text.strip():
+            (run_dir / name).write_text(text.strip() + "\n", encoding="utf-8")
     (run_dir / "scenarios.yaml").write_text(
         yaml.safe_dump(
             {"name": "admin", "scenarios": [scenario.model_dump(mode="json")]}, sort_keys=False
@@ -311,5 +324,6 @@ class SimService:
                 if run is not None and run.deleted_at is None:
                     run.deleted_at, run.deleted_by = _now(), "retention"
                     run.delete_reason = reason
+                    run.scenario_json = forget_pasted(run.scenario_json)
             await db.commit()
         return [name for name, _ in doomed]

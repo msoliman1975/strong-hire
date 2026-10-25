@@ -555,3 +555,94 @@ async def test_sm4_list_stops_polling_when_every_run_has_ended(
     body = (await admin.get("/admin/sim/runs")).json()
     assert body["any_unfinished"] is False
     assert body["runs"][0]["status_reason"] == "waited 30 min"
+
+
+# --- pasted job and CV (SM-17..SM-21) ----------------------------------------------------------
+
+JOB = "Senior Data Engineer at Fjord Freight. Build the shipment event pipeline in Kafka."
+CV = "Lena Ortiz. Data engineer, 7 years. Built streaming pipelines at a logistics firm."
+
+
+async def test_sm17_sm18_start_with_a_pasted_job_needs_a_level_and_keeps_the_texts(
+    admin: httpx.AsyncClient, sessionmaker: Maker
+) -> None:
+    """SM-17: each text optional; SM-18: a pasted job needs a level; SM-20: list shows flags."""
+    no_level = await _start(admin, job_text=JOB)
+    assert no_level.status_code == 422 and "level" in no_level.text
+    assert (await _start(admin, job_text="x" * 60_001, level="mid")).status_code == 422
+    blank = await _start(admin, job_text="   ", level="staff_principal")
+    assert blank.status_code == 201  # whitespace is not pasted; the level is then ignored
+    assert blank.json()["scenario"]["custom_job"] is False
+    assert blank.json()["scenario"]["level"] is None
+
+    resp = await _start(admin, job_text=f"  {JOB}\n", cv_text=CV, level="senior")
+    assert resp.status_code == 201, resp.text
+    run = resp.json()
+    assert run["scenario"]["custom_job"] is True and run["scenario"]["custom_cv"] is True
+    assert run["scenario"]["level"] == "senior"
+    assert run["inputs"] == {"job_text": JOB, "cv_text": CV, "level": "senior"}  # SM-21
+
+    async with sessionmaker() as db:
+        row = await db.get(SimRun, uuid.UUID(run["id"]))
+        assert row is not None
+        stored = row.scenario_json
+        audit = await db.scalar(select(AuditLog).where(AuditLog.entity == f"sim_run:{run['id']}"))
+    strong_sim = pytest.importorskip("strong_sim.scenarios")
+    parsed = strong_sim.Scenario.model_validate(stored)
+    parsed.check()
+    assert parsed.job_text == JOB and parsed.session_config().level == "senior"
+    assert audit is not None and JOB not in json.dumps(audit.details_json)  # sizes only
+    assert audit.details_json["after"]["job_chars"] == len(JOB)
+
+    listed = {r["id"]: r for r in (await admin.get("/admin/sim/runs")).json()["runs"]}
+    assert listed[run["id"]]["scenario"]["custom_cv"] is True
+    assert listed[run["id"]]["inputs"] is None  # the list does not carry the texts
+    one = (await admin.get(f"/admin/sim/runs/{run['id']}")).json()
+    assert one["inputs"]["cv_text"] == CV
+
+    only_cv = (await _start(admin, cv_text=CV, level="mid")).json()
+    assert only_cv["scenario"]["custom_job"] is False and only_cv["scenario"]["level"] is None
+
+
+async def test_sm20_delete_removes_the_pasted_texts_but_keeps_that_they_were_pasted(
+    admin: httpx.AsyncClient, sessionmaker: Maker
+) -> None:
+    """SM-20: Delete clears the texts; the row still says custom job / custom CV."""
+    run = (await _start(admin, job_text=JOB, cv_text=CV, level="mid")).json()
+    await _set(sessionmaker, run["id"], status=SimRunStatus.DONE)
+    gone = await admin.request(
+        "DELETE", f"/admin/sim/runs/{run['id']}", json={"reason": "done"}, headers=WRITE
+    )
+    assert gone.status_code == 200
+    body = gone.json()
+    assert body["inputs"] is None
+    assert body["scenario"]["custom_job"] is True and body["scenario"]["custom_cv"] is True
+    async with sessionmaker() as db:
+        row = await db.get(SimRun, uuid.UUID(run["id"]))
+        assert row is not None
+        assert JOB not in json.dumps(row.scenario_json) and CV not in json.dumps(row.scenario_json)
+
+
+async def test_sm20_replay_shows_the_pasted_texts_and_level(
+    app: FastAPI, admin: httpx.AsyncClient, sessionmaker: Maker, results: Path
+) -> None:
+    """SM-20: the replay page gets the job and CV the run used, from its meta.json."""
+    sid = await _sim_session(app, sessionmaker, results)
+    meta = results / "20261018-110000-admin-cccc" / str(sid) / "meta.json"
+    _write(
+        meta,
+        {
+            "timing": "audio",
+            "scenario": {
+                "channel": "voice",
+                "resume": "backend-senior",
+                "duration_min": 10,
+                "job_text": JOB,
+                "cv_text": "",
+                "level": "mid",
+            },
+        },
+    )
+    replay = (await admin.get(f"/admin/sessions/{sid}/replay")).json()
+    assert replay["inputs"] == {"job_text": JOB, "cv_text": None, "level": "mid"}
+    assert replay["scenario"]["custom_job"] is True and replay["scenario"]["custom_cv"] is False

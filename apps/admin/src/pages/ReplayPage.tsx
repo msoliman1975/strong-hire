@@ -14,7 +14,7 @@ import {
 } from "../api/sim";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
 import { clock, words } from "../format";
-import { phaseLabel } from "../labels";
+import { levelLabel, phaseLabel } from "../labels";
 import type { Phase } from "../api/types";
 
 const SKIP_MS = 10_000;
@@ -371,6 +371,18 @@ function ScorecardPanel({ card }: { card: ReplayScorecard | null }) {
   );
 }
 
+/** SM-20: a pasted text the run used, folded by default. */
+function PastedPanel({ title, text }: { title: string; text: string }) {
+  return (
+    <details className="panel pasted">
+      <summary>
+        {title} <span className="muted small">(pasted, {text.length.toLocaleString()} characters)</span>
+      </summary>
+      <pre className="pasted__text">{text}</pre>
+    </details>
+  );
+}
+
 function Summary({ replay }: { replay: SessionReplay }) {
   const { latency, scenario } = replay;
   const items: ReactNode[] = [];
@@ -379,6 +391,8 @@ function Summary({ replay }: { replay: SessionReplay }) {
       `${scenario.persona} · ${words(scenario.interview_type)} · ${scenario.channel} · ${scenario.duration_min} min · ${scenario.quality} · ${words(scenario.behavior)}`,
     );
   }
+  const { inputs } = replay;
+  const pasted = scenario && (scenario.custom_job || scenario.custom_cv);
   return (
     <section className="section" aria-label="Summary">
       {items.map((x, i) => (
@@ -393,7 +407,16 @@ function Summary({ replay }: { replay: SessionReplay }) {
         <dd>
           {latency.slow_turns} of {latency.n}
         </dd>
+        {scenario?.level && (
+          <>
+            <dt>Level</dt>
+            <dd>{levelLabel[scenario.level]} (given with the pasted job)</dd>
+          </>
+        )}
       </dl>
+      {inputs?.job_text && <PastedPanel title="Job posting" text={inputs.job_text} />}
+      {inputs?.cv_text && <PastedPanel title="CV" text={inputs.cv_text} />}
+      {pasted && !inputs && <p className="muted small">The pasted texts of this run were deleted.</p>}
     </section>
   );
 }
@@ -405,6 +428,8 @@ export function ReplayPage() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const graph = useRef<Graph | null>(null);
   const [current, setCurrent] = useState(0);
+  // The keys read the position from here: a render can lag behind the last seek or timeupdate.
+  const position = useRef(0);
   const [durationMs, setDurationMs] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [follow, setFollow] = useState(true);
@@ -419,7 +444,10 @@ export function ReplayPage() {
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    const time = () => setCurrent(Math.round(audio.currentTime * 1000));
+    const time = () => {
+      position.current = Math.round(audio.currentTime * 1000);
+      setCurrent(position.current);
+    };
     const meta = () => setDurationMs(Number.isFinite(audio.duration) ? Math.round(audio.duration * 1000) : 0);
     const play = () => setPlaying(true);
     const pause = () => setPlaying(false);
@@ -471,6 +499,7 @@ export function ReplayPage() {
     (ms, andPlay = false) => {
       const top = durationMs > 0 ? durationMs : Number.MAX_SAFE_INTEGER;
       const to = Math.max(0, Math.min(ms, top));
+      position.current = to;
       setCurrent(to);
       setFollow(true);
       const audio = audioRef.current;
@@ -489,25 +518,27 @@ export function ReplayPage() {
       if (e.ctrlKey || e.metaKey || e.altKey || typing(e.target)) return;
       const key = e.key.toLowerCase();
       const onButton = e.target instanceof HTMLButtonElement || e.target instanceof HTMLAnchorElement;
+      const now = position.current;
+      const at = lineAt(lines, now);
       if (key === " " && hasPlayer && !onButton) {
         e.preventDefault();
         toggle();
       } else if (key === "arrowleft" && hasPlayer) {
-        seek(current - SKIP_MS);
+        seek(now - SKIP_MS);
       } else if (key === "arrowright" && hasPlayer) {
-        seek(current + SKIP_MS);
-      } else if (key === "j" && active > 0) {
-        seek(lines[active - 1].start_ms);
-      } else if (key === "k" && active < lines.length - 1) {
-        seek(lines[active + 1].start_ms);
+        seek(now + SKIP_MS);
+      } else if (key === "j" && at > 0) {
+        seek(lines[at - 1].start_ms);
+      } else if (key === "k" && at < lines.length - 1) {
+        seek(lines[at + 1].start_ms);
       } else if (key === "n") {
-        const next = lines.find((l) => l.latency_ms !== null && l.latency_ms > data.latency.slow_ms && l.start_ms > current);
+        const next = lines.find((l) => l.latency_ms !== null && l.latency_ms > data.latency.slow_ms && l.start_ms > now);
         if (next) seek(next.start_ms);
       }
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [data, hasPlayer, toggle, seek, current, active, lines]);
+  }, [data, hasPlayer, toggle, seek, lines]);
 
   if (replay.isPending) return <Loading label="Loading the replay" />;
   if (replay.isError) return <ErrorNotice error={replay.error} title="The replay could not be loaded." />;

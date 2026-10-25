@@ -19,6 +19,7 @@ Any field left out takes its default from Scenario.
 
 from __future__ import annotations
 
+import hashlib
 import itertools
 import random
 from collections.abc import Mapping, Sequence
@@ -29,7 +30,7 @@ import yaml
 from pydantic import BaseModel, ConfigDict, Field
 
 from strong_core.config import find_repo_root
-from strong_core.schemas import Difficulty, InterviewType, Mode, SessionConfig
+from strong_core.schemas import Difficulty, InterviewType, Level, Mode, SessionConfig
 from strong_core.sim import NAMES, PERSONAS, VOICE_ONLY, Behavior, Persona, Quality
 
 SCENARIOS_DIR = find_repo_root() / "evals" / "scenarios"
@@ -40,6 +41,13 @@ FIXTURES_DIR = find_repo_root() / "evals" / "fixtures" / "inputs"
 # api offers them too.
 
 Channel = Literal["text", "voice"]
+
+# The app's own limits for a pasted posting and CV (apps/api inputs).
+MAX_PASTED_CHARS = 60_000
+
+
+def fixture_text(kind: str, name: str) -> str:
+    return (FIXTURES_DIR / kind / f"{name}.txt").read_text(encoding="utf-8").strip()
 
 
 class Scenario(BaseModel):
@@ -55,10 +63,36 @@ class Scenario(BaseModel):
     quality: Quality = Quality.AVERAGE
     behavior: Behavior = Behavior.NORMAL
     candidate_name: str = ""
+    # SM-17, SM-18: a pasted job or CV replaces its half of the persona; a pasted job needs a level.
+    job_text: str = Field(default="", max_length=MAX_PASTED_CHARS)
+    cv_text: str = Field(default="", max_length=MAX_PASTED_CHARS)
+    level: Level | None = None
 
     @property
     def fixture(self) -> Persona:
         return PERSONAS[self.resume]
+
+    @property
+    def custom(self) -> bool:
+        return bool(self.job_text.strip() or self.cv_text.strip())
+
+    def posting_text(self) -> str:
+        return self.job_text.strip() or fixture_text("postings", self.fixture.posting)
+
+    def resume_text(self) -> str:
+        return self.cv_text.strip() or fixture_text("resumes", self.resume)
+
+    def run_level(self) -> Level:
+        return self.level or self.fixture.level
+
+    def inputs_key(self) -> str:
+        """Job targets are reused per key: the fixture, or a hash of the pasted texts (SM-19)."""
+        if not self.custom:
+            return self.resume
+        digest = hashlib.sha256(
+            f"{self.resume}|{self.job_text.strip()}|{self.cv_text.strip()}".encode()
+        ).hexdigest()
+        return f"custom-{digest[:16]}"
 
     def session_config(self) -> SessionConfig:
         return SessionConfig(
@@ -66,7 +100,7 @@ class Scenario(BaseModel):
             difficulty=self.difficulty,
             mode=self.mode,
             duration_min=self.duration_min,
-            level=self.fixture.level,
+            level=self.run_level(),
         )
 
     def check(self) -> None:
@@ -74,6 +108,8 @@ class Scenario(BaseModel):
             raise ValueError(f"{self.id}: unknown resume fixture {self.resume!r}")
         if self.behavior in VOICE_ONLY and self.channel != "voice":
             raise ValueError(f"{self.id}: behavior {self.behavior} needs the voice channel")
+        if self.job_text.strip() and self.level is None:
+            raise ValueError(f"{self.id}: a pasted job needs a level")
 
 
 class Suite(BaseModel):

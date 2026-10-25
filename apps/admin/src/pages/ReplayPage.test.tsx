@@ -185,6 +185,35 @@ describe("Replay page", () => {
     expect(screen.getByText(/Not judged/)).toBeInTheDocument();
   });
 
+  it("SM-20: the pasted job and CV the run used are folded panels, with the level", async () => {
+    const state = simState(mockStore.db);
+    state.replays[MOCK_SIM_SESSION] = {
+      ...structuredClone(mockReplay),
+      scenario: { ...mockReplay.scenario!, custom_job: true, custom_cv: true, level: "mid" },
+      inputs: { job_text: "Data Engineer at Fjord Freight.", cv_text: "Lena Ortiz, data engineer.", level: "mid" },
+    };
+    const user = await openReplay();
+    const summary = screen.getByRole("region", { name: "Summary" });
+    expect(summary).toHaveTextContent("Mid (given with the pasted job)");
+    const job = within(summary).getByText("Job posting").closest("details") as HTMLDetailsElement;
+    expect(job.open).toBe(false);
+    await user.click(within(summary).getByText("Job posting"));
+    expect(job.open).toBe(true);
+    expect(job).toHaveTextContent("Data Engineer at Fjord Freight.");
+    expect(within(summary).getByText("CV").closest("details")).toHaveTextContent("Lena Ortiz");
+  });
+
+  it("SM-20: after Delete the replay says the texts are gone", async () => {
+    const state = simState(mockStore.db);
+    state.replays[MOCK_SIM_SESSION] = {
+      ...structuredClone(mockReplay),
+      scenario: { ...mockReplay.scenario!, custom_job: true },
+      inputs: null,
+    };
+    await openReplay();
+    expect(screen.getByText("The pasted texts of this run were deleted.")).toBeInTheDocument();
+  });
+
   it("SM-16: a replay that does not exist is an error, not a blank page", async () => {
     await openReplay("00000000-0000-4000-8000-000000000999").catch(() => undefined);
     expect(await screen.findByText("The replay could not be loaded.")).toBeInTheDocument();
