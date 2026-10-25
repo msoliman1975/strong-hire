@@ -3,7 +3,7 @@
  * and a stacked bar chart with a hover tooltip. Colors are CSS tokens (--series-N, light and
  * dark in styles.css); every multi-series chart has a legend and a table view.
  */
-import { useId, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 
 export interface Point {
   t: string;
@@ -16,7 +16,28 @@ export interface LineSeries {
   points: Point[];
 }
 
-const W = 640;
+const DEFAULT_W = 640;
+
+/**
+ * The plot's width in CSS pixels, so the SVG draws at 1:1 and tick labels stay 11 px at any
+ * width (a fixed viewBox scaled them up to about 22 px on wide screens). Falls back to
+ * DEFAULT_W where ResizeObserver does not exist (tests).
+ */
+function usePlotWidth() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(DEFAULT_W);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(([entry]) => {
+      const w = Math.round(entry.contentRect.width);
+      if (w > 0) setWidth(w);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  return [ref, width] as const;
+}
 const PAD = { top: 12, right: 12, bottom: 22, left: 48 };
 
 function niceMax(value: number): number {
@@ -125,6 +146,7 @@ export function LineChart({
 }) {
   const [hover, setHover] = useState<number | null>(null);
   const titleId = useId();
+  const [plotRef, W] = usePlotWidth();
   const times = [...new Set(series.flatMap((s) => s.points.map((p) => p.t)))].sort();
   const all = series.flatMap((s) => s.points.map((p) => p.v)).filter((v): v is number => v !== null);
   if (times.length === 0 || all.length === 0) return <p className="muted">No data in this range.</p>;
@@ -148,7 +170,7 @@ export function LineChart({
         {title}
       </figcaption>
       {series.length > 1 && <Legend items={series} />}
-      <div className="chart__plot">
+      <div className="chart__plot" ref={plotRef}>
         <svg
           viewBox={`0 0 ${W} ${height}`}
           role="img"
@@ -246,13 +268,14 @@ export function StackedBars({
 }) {
   const [hover, setHover] = useState<number | null>(null);
   const titleId = useId();
+  const [plotRef, W] = usePlotWidth();
   if (bars.length === 0) return <p className="muted">No data in this range.</p>;
   const totals = bars.map((b) => b.parts.reduce((a, v) => a + v, 0));
   const max = niceMax(Math.max(...totals));
   const innerW = W - PAD.left - PAD.right;
   const innerH = height - PAD.top - PAD.bottom;
   const slot = innerW / bars.length;
-  const bw = Math.max(4, Math.min(28, slot - 4));
+  const bw = Math.max(4, Math.min(48, slot * 0.6));
   const y = (v: number) => (v / max) * innerH;
   return (
     <figure className="chart">
@@ -260,7 +283,7 @@ export function StackedBars({
         {title}
       </figcaption>
       <Legend items={parts.map((p) => ({ key: p, label: p }))} />
-      <div className="chart__plot">
+      <div className="chart__plot" ref={plotRef}>
         <svg viewBox={`0 0 ${W} ${height}`} role="img" aria-labelledby={titleId} onMouseLeave={() => setHover(null)}>
           {[0, max / 2, max].map((t) => (
             <g key={t}>

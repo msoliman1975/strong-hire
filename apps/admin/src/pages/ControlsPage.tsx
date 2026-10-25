@@ -82,7 +82,7 @@ function SignupsControl({ settings, ask }: { settings: OpsSettings; ask: (c: Cha
       <LastChanged settings={settings} keyName="signups_paused" />
       <button
         type="button"
-        className={paused ? "btn btn--primary" : "btn btn--danger"}
+        className={paused ? "btn btn--primary" : "btn btn--danger-outline"}
         onClick={() =>
           ask({
             key: "signups_paused",
@@ -122,7 +122,7 @@ function SessionsControl({ settings, ask }: { settings: OpsSettings; ask: (c: Ch
             <State on={c.paused} onLabel="Paused" offLabel="Open" />
             <button
               type="button"
-              className={c.paused ? "btn btn--small btn--primary" : "btn btn--small btn--danger"}
+              className={c.paused ? "btn btn--small btn--primary" : "btn btn--small btn--danger-outline"}
               onClick={() =>
                 ask({
                   key: c.key,
@@ -362,11 +362,11 @@ function SimControl({ settings, ask }: { settings: OpsSettings; ask: (c: Change)
           </button>
         ) : (
           <>
-            <button type="button" className="btn btn--danger" onClick={() => pause(false)}>
+            <button type="button" className="btn btn--danger-outline" onClick={() => pause(false)}>
               Pause sim runs
             </button>
             {active && (
-              <button type="button" className="btn btn--danger" onClick={() => pause(true)}>
+              <button type="button" className="btn btn--danger-outline" onClick={() => pause(true)}>
                 Pause and stop the active run
               </button>
             )}
@@ -494,7 +494,7 @@ function CustomAccessControl({ settings, ask }: { settings: OpsSettings; ask: (c
             ) : (
               <button
                 type="button"
-                className={a.value === "paid_only" ? "btn btn--small btn--danger" : "btn btn--small btn--primary"}
+                className={a.value === "paid_only" ? "btn btn--small btn--danger-outline" : "btn btn--small btn--primary"}
                 onClick={() =>
                   ask({
                     key: "custom_interview_access",

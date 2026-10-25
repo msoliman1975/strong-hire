@@ -455,7 +455,7 @@ function RunsTable({ filters, onRunAgain }: { filters: SimRunFilters; onRunAgain
                     {run.source === "admin" && !finished && (
                       <button
                         type="button"
-                        className="btn btn--small btn--danger"
+                        className="btn btn--small btn--danger-outline"
                         onClick={() => {
                           cancel.reset();
                           setPending({ kind: "cancel", run });
@@ -467,7 +467,7 @@ function RunsTable({ filters, onRunAgain }: { filters: SimRunFilters; onRunAgain
                     {run.source === "admin" && finished && !deleted && (
                       <button
                         type="button"
-                        className="btn btn--small btn--danger"
+                        className="btn btn--small btn--danger-outline"
                         onClick={() => {
                           remove.reset();
                           setPending({ kind: "delete", run });

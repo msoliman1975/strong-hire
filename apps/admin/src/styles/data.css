@@ -1,0 +1,563 @@
+/* Data display: tables, key-value lists, KPI tiles, charts, status tiles (DESIGN.md "Data"). */
+
+/* ---------------------------------------------------------------- tables
+ * Every table sits in .table-wrap (a card that scrolls sideways). Text left, numbers right in
+ * tabular figures, header row 12 px uppercase.
+ */
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th,
+td {
+  text-align: left;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+thead th {
+  background: var(--surface-2);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  white-space: nowrap;
+  vertical-align: bottom;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+tbody tr:last-child > * {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background: var(--surface-2);
+}
+
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: var(--space-3) var(--space-4);
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+td .row {
+  gap: var(--space-2);
+}
+
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+}
+
+.table-wrap table {
+  min-width: 720px;
+}
+
+.panel .table-wrap {
+  box-shadow: none;
+}
+
+/* ---------------------------------------------------------------- key-value list */
+
+.dl {
+  display: grid;
+  grid-template-columns: minmax(140px, max-content) minmax(0, 1fr);
+  gap: var(--space-3) var(--space-6);
+  margin: 0;
+}
+
+.dl dt {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.dl dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (width <= 520px) {
+  .dl {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .dl dd {
+    margin-bottom: var(--space-3);
+  }
+}
+
+/* ---------------------------------------------------------------- KPI tiles */
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+  padding: var(--space-4) var(--space-5);
+}
+
+.kpi p {
+  margin: 0;
+}
+
+.kpi__label {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.kpi__value {
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  line-height: var(--leading-tight);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.kpi__value a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.kpi__value a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.kpi--unmeasured {
+  background: var(--surface-2);
+  box-shadow: none;
+  border-style: dashed;
+}
+
+.kpi--unmeasured .kpi__value {
+  font-size: var(--text-lg);
+  color: var(--muted);
+}
+
+.kpi__delta,
+.kpi__note {
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+/* ---------------------------------------------------------------- funnel */
+
+.funnel {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-5) var(--space-6);
+  display: grid;
+  gap: var(--space-5);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+}
+
+.funnel__head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  font-weight: 500;
+}
+
+.funnel__bar {
+  height: 8px;
+  background: var(--surface-3);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  margin: var(--space-3) 0 var(--space-2);
+}
+
+.funnel__bar span {
+  display: block;
+  height: 100%;
+  background: var(--series-1);
+  border-radius: var(--radius-pill);
+}
+
+.funnel .muted,
+.funnel small {
+  font-size: var(--text-xs);
+}
+
+/* ---------------------------------------------------------------- charts */
+
+.chart {
+  margin: 0;
+}
+
+.panel .chart + .chart {
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--line);
+}
+
+.chart__title {
+  font-weight: 600;
+  margin-bottom: var(--space-3);
+}
+
+.chart__plot {
+  position: relative;
+}
+
+.chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.chart__grid {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.chart__target {
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+
+.chart__cross {
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+
+.chart__tick {
+  fill: var(--muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart__tip {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-xs);
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: var(--shadow-2);
+  z-index: 2;
+}
+
+.chart__tip p {
+  margin: 0;
+}
+
+.chart-table {
+  margin-top: var(--space-3);
+}
+
+.chart-table summary {
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+.chart-table .table-wrap {
+  margin-top: var(--space-3);
+}
+
+.legend {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  font-size: var(--text-xs);
+  color: var(--ink-2);
+}
+
+.legend li {
+  display: inline-flex;
+  align-items: center;
+}
+
+.legend__swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: var(--space-3);
+}
+
+.spark {
+  display: block;
+}
+
+/* ---------------------------------------------------------------- status tiles (Health) */
+
+.tiles {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-4);
+}
+
+.tile {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+  padding: var(--space-4) var(--space-5);
+  font-size: var(--text-sm);
+}
+
+.tile[data-status="up"] {
+  border-left-color: var(--status-up);
+}
+
+.tile[data-status="degraded"] {
+  border-left-color: var(--status-degraded);
+}
+
+.tile[data-status="down"] {
+  border-left-color: var(--status-down);
+}
+
+.tile p {
+  margin: var(--space-2) 0 0;
+  color: var(--muted);
+}
+
+.tile__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-md);
+  font-weight: 600;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: capitalize;
+  color: var(--ink-2);
+}
+
+.status--up span {
+  color: var(--status-up);
+}
+
+.status--degraded span {
+  color: var(--status-degraded);
+}
+
+.status--down span {
+  color: var(--status-down);
+}
+
+/* ---------------------------------------------------------------- errors list */
+
+.error-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.error-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  align-items: flex-start;
+}
+
+.error-msg {
+  font-family: var(--mono);
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+
+.error-detail {
+  margin-top: var(--space-5);
+}
+
+@media (width <= 520px) {
+  .error-row {
+    flex-direction: column;
+  }
+
+  .funnel__head {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+/* ---------------------------------------------------------------- transcript and traces */
+
+.transcript {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.transcript.panel {
+  padding: var(--space-2) var(--space-6);
+}
+
+.transcript li {
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.transcript li:last-child {
+  border-bottom: none;
+}
+
+.transcript .who {
+  font-weight: 600;
+  margin-right: var(--space-3);
+}
+
+.trace-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.trace {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-3);
+}
+
+.trace[data-call="decide"] {
+  border-left-color: var(--warn);
+}
+
+.trace[data-call="say"] {
+  border-left-color: var(--accent);
+}
+
+.trace[data-error="true"] {
+  border-left-color: var(--danger);
+}
+
+.trace .dl {
+  font-size: var(--text-sm);
+}
+
+.trace details {
+  margin-top: var(--space-3);
+}
+
+.trace summary {
+  color: var(--accent);
+}
+
+/* Preformatted blocks: JSON, prompts, pasted texts. */
+.trace pre,
+.json-view,
+.pasted__text {
+  font-family: var(--mono);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  overflow: auto;
+}
+
+.trace pre {
+  max-height: 420px;
+}
+
+.json-view {
+  max-height: 560px;
+}
+
+.details-json {
+  font-family: var(--mono);
+  font-size: var(--text-xs);
+  overflow-wrap: anywhere;
+}
+
+/* ---------------------------------------------------------------- diff (profile versions) */
+
+.diff__field {
+  margin-top: var(--space-5);
+}
+
+.diff__table td {
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+
+.diff__table .diff__old,
+.diff__inline .diff__old {
+  background: var(--danger-bg);
+}
+
+.diff__table .diff__new,
+.diff__inline .diff__new {
+  background: var(--ok-bg);
+  text-decoration: none;
+}
+
+.diff__inline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.diff__inline li {
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--line);
+  overflow-wrap: anywhere;
+}
+
+.diff__sign {
+  font-family: var(--mono);
+  font-weight: 700;
+}
