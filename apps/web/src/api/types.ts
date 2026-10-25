@@ -44,6 +44,12 @@ export type ResumeMatch = DeepRequired<S["ResumeMatch"]>;
 export type ReportItem = DeepRequired<S["ReportItem"]>;
 export type ReportType = ReportItem["type"];
 
+// The Questions page (QB-1 to QB-4).
+export type BankCompany = DeepRequired<S["BankCompany"]>;
+export type BankQuestion = DeepRequired<S["BankQuestion"]>;
+export type QuestionList = DeepRequired<S["QuestionList"]>;
+export type QuestionHints = DeepRequired<S["QuestionHints"]>;
+
 // Gap analysis (real endpoints in apps/api gap, P6).
 export type GapAnalysisStart = S["GapAnalysisStart"];
 export type GapAnalysisOut = DeepRequired<S["GapAnalysisOut"]>;

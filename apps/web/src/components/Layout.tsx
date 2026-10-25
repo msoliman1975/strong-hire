@@ -200,6 +200,9 @@ export function AppLayout() {
                 <NavLink to="/reports">Reports</NavLink>
               </li>
               <li>
+                <NavLink to="/questions">Questions</NavLink>
+              </li>
+              <li>
                 <NavLink to="/account">Account</NavLink>
               </li>
               {import.meta.env.DEV && (
