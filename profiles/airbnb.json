@@ -279,7 +279,23 @@
       "strong_answer": "Picks a specific person and situation, not a generic claim of kindness. Explains what that person needed, what the candidate noticed, and the concrete actions taken (onboarding a new teammate, helping a stranger, hosting guests). Shows how the person felt afterward and what the candidate learned. Ties it back to caring and openness. Pitfall: describing a party or describing hospitality as a transaction.",
       "competencies": ["collaboration", "communication"],
       "values": ["Be a Host"],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you notice what other people need",
+          "How you make others feel welcome"
+        ],
+        "strong_signals": [
+          "Uses a specific person and situation",
+          "Describes concrete actions and how the person felt"
+        ],
+        "watch_outs": [
+          "A generic claim of being kind",
+          "Treating hospitality as a transaction"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -287,7 +303,24 @@
       "strong_answer": "Gives an honest, personal answer with a real situation and the emotions involved. Moves from the experience to what helped (or would have helped) and how it changed the way the candidate treats others. A strong answer links this to Airbnb's mission of belonging without sounding rehearsed. Pitfall: an abstract definition with no story, or a story with no reflection.",
       "competencies": ["communication", "learning_from_failure"],
       "values": ["Champion the Mission"],
-      "source_url": "https://www.designgurus.io/answers/detail/top-airbnb-behavioral-interview-questions-and-how-to-answer-them"
+      "source_url": "https://www.designgurus.io/answers/detail/top-airbnb-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "How honestly you reflect on belonging",
+          "How your experience shapes how you treat others"
+        ],
+        "strong_signals": [
+          "Shares a real situation and the feelings involved",
+          "Explains what helped and what you changed afterwards"
+        ],
+        "watch_outs": [
+          "An abstract definition with no story",
+          "A story with no reflection",
+          "Sounding rehearsed"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -295,7 +328,24 @@
       "strong_answer": "Sets the constraint clearly (time, people, budget, access), then the goal and why it mattered. Walks through the creative steps: reusing what existed, cutting scope, persuading helpers, doing unglamorous work personally. Gives a measurable result and what the candidate would repeat. Signals: resourcefulness, determination, bias to action. Pitfall: blaming the lack of resources or a story where someone else unblocked everything.",
       "competencies": ["ownership", "impact"],
       "values": ["Be a Cereal Entrepreneur"],
-      "source_url": "https://www.designgurus.io/answers/detail/top-airbnb-behavioral-interview-questions-and-how-to-answer-them"
+      "source_url": "https://www.designgurus.io/answers/detail/top-airbnb-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "How resourceful you are under tight constraints",
+          "Whether you bias toward action"
+        ],
+        "strong_signals": [
+          "States the constraint and why the goal mattered",
+          "Shows creative steps you took yourself",
+          "Gives a measurable result"
+        ],
+        "watch_outs": [
+          "Blaming the lack of resources",
+          "Someone else unblocked everything"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -303,7 +353,23 @@
       "strong_answer": "Describes a real decision with uncertainty (career change, bold project bet, moving country), the reasoning and how the downside was managed. Covers the result honestly, including what went wrong, and shows resilience and growth. Strong answers show the risk was deliberate, not reckless. Pitfall: a tiny risk dressed up as a big one, or no reflection on what was learned.",
       "competencies": ["learning_from_failure", "ownership"],
       "values": ["Embrace the Adventure"],
-      "source_url": "https://www.designgurus.io/answers/detail/top-airbnb-behavioral-interview-questions-and-how-to-answer-them"
+      "source_url": "https://www.designgurus.io/answers/detail/top-airbnb-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "How you weigh risk and manage the downside",
+          "Whether you learn and grow from outcomes"
+        ],
+        "strong_signals": [
+          "Shows the risk was deliberate, not reckless",
+          "Is honest about what went wrong"
+        ],
+        "watch_outs": [
+          "A small risk dressed up as a big one",
+          "No reflection on what you learned"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -311,7 +377,23 @@
       "strong_answer": "Explains the problem and why nothing existed, the candidate's own role, and the hard choices made along the way. Includes adoption or impact numbers and what happened after launch. Shows ambition plus follow-through. Use 'I' for own decisions. Pitfall: listing features instead of explaining decisions and outcomes.",
       "competencies": ["ownership", "impact"],
       "values": ["Be a Cereal Entrepreneur"],
-      "source_url": "https://www.designgurus.io/answers/detail/top-airbnb-behavioral-interview-questions-and-how-to-answer-them"
+      "source_url": "https://www.designgurus.io/answers/detail/top-airbnb-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "Whether you take ideas from nothing to something real",
+          "How you make hard choices as an owner"
+        ],
+        "strong_signals": [
+          "Explains your own decisions using 'I'",
+          "Includes adoption or impact after launch"
+        ],
+        "watch_outs": [
+          "Listing features instead of decisions",
+          "Stopping the story at launch"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -319,7 +401,23 @@
       "strong_answer": "States the disagreement neutrally and shows understanding of the other side's reasons. Describes how the candidate gathered data or user evidence, listened, and reached a decision (including disagree-and-commit). Shows the relationship stayed strong. Signals: empathy, openness, focus on users. Pitfall: a story where the candidate 'won' and the partner is the villain.",
       "competencies": ["conflict_handling", "collaboration"],
       "values": ["Be a Host"],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you handle disagreement with close partners",
+          "Whether you use user evidence to decide"
+        ],
+        "strong_signals": [
+          "States the other side's reasons fairly",
+          "Shows the relationship stayed strong"
+        ],
+        "watch_outs": [
+          "Casting the partner as the villain",
+          "A story where you simply won"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -327,7 +425,23 @@
       "strong_answer": "Names the community (open source, volunteer group, sports club, team guild) and the candidate's specific contribution, ideally something that helped others connect or grow. Shows sustained involvement rather than one event and the effect on members. Links to connection and belonging. Pitfall: just being a member with no contribution.",
       "competencies": ["collaboration", "impact"],
       "values": ["Champion the Mission", "Be a Host"],
-      "source_url": "https://www.designgurus.io/answers/detail/top-airbnb-behavioral-interview-questions-and-how-to-answer-them"
+      "source_url": "https://www.designgurus.io/answers/detail/top-airbnb-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "What you give to the groups you belong to",
+          "Whether you help others connect or grow"
+        ],
+        "strong_signals": [
+          "Names a specific contribution and its effect",
+          "Shows involvement over time"
+        ],
+        "watch_outs": [
+          "Just being a member",
+          "A one-off event with no lasting effect"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -335,7 +449,23 @@
       "strong_answer": "Connects a personal experience with travel, hosting or belonging to the mission, then to the specific team and role. Shows knowledge of the product and the two-sided marketplace, and what the candidate would bring. Signals genuine motivation. Pitfall: brand admiration only, or answers that would work for any company.",
       "competencies": ["motivation", "role_fit"],
       "values": ["Champion the Mission"],
-      "source_url": "https://www.aced.io/blog/airbnb-interview-process"
+      "source_url": "https://www.aced.io/blog/airbnb-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether your motivation is personal and genuine",
+          "How well you understand the product and marketplace"
+        ],
+        "strong_signals": [
+          "Ties a personal experience to the mission",
+          "Links to the specific team and what you bring"
+        ],
+        "watch_outs": [
+          "Brand admiration only",
+          "An answer that would fit any company"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -343,7 +473,23 @@
       "strong_answer": "Explains the gap nobody owned, why it mattered for users or the team, and what the candidate did beyond their role. Shows judgment about when to step in and how they brought others along. Gives the result and how ownership was handed off or kept. Pitfall: hero stories that ignore the team or that show poor prioritization of core work.",
       "competencies": ["scope_at_level", "judgment"],
       "values": ["Be a Cereal Entrepreneur"],
-      "source_url": "https://www.aced.io/blog/airbnb-interview-process"
+      "source_url": "https://www.aced.io/blog/airbnb-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you step in when nobody owns a gap",
+          "Your judgment about when to go beyond your role"
+        ],
+        "strong_signals": [
+          "Explains why the gap mattered and how you brought others in",
+          "Shows how ownership was handed off or kept"
+        ],
+        "watch_outs": [
+          "Hero stories that ignore the team",
+          "Neglecting your core work"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -351,7 +497,23 @@
       "strong_answer": "Shares something real and relevant that reveals character or values: a side project, a hobby with depth, a life experience. Connects it briefly to how the candidate works or what they care about. Keeps it short and authentic. Pitfall: repeating resume content or picking something with no insight.",
       "competencies": ["team_fit", "motivation"],
       "values": ["Embrace the Adventure"],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "What you care about beyond your work history",
+          "Whether you can be authentic and brief"
+        ],
+        "strong_signals": [
+          "Picks something real that reveals character",
+          "Briefly connects it to how you work"
+        ],
+        "watch_outs": [
+          "Repeating your resume",
+          "Picking something with no insight"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -359,7 +521,23 @@
       "strong_answer": "Clarifies scale and latency goals, then covers geo indexing (geohash, quadtree or a search engine), availability filtering by date, ranking and personalization, caching, and how listing updates reach the index. Discusses freshness versus speed and consistency between search results and actual availability. Signals: clear requirements, data model, bottlenecks, failure handling. Pitfall: jumping to boxes without requirements.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": [],
-      "source_url": "https://www.aced.io/blog/airbnb-interview-process"
+      "source_url": "https://www.aced.io/blog/airbnb-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you clarify scale and latency goals first",
+          "How you index by location and filter by dates"
+        ],
+        "strong_signals": [
+          "Covers geo indexing, ranking and caching",
+          "Keeps search results in line with true availability"
+        ],
+        "watch_outs": [
+          "Drawing boxes before requirements",
+          "Ignoring how listing updates reach the index"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -367,7 +545,23 @@
       "strong_answer": "Defines the availability data model, then explains the booking flow with a transaction and row locks or optimistic concurrency, holds with expiry during payment, and idempotent requests. Covers what happens with payment failure, retries and time zones, and how to scale reads separately from the strongly consistent booking path. Pitfall: ignoring race conditions or the payment step.",
       "competencies": ["accuracy", "trade_offs", "technical_depth"],
       "values": [],
-      "source_url": "https://techinterview.org/system-design-hotel-booking-airbnb/"
+      "source_url": "https://techinterview.org/system-design-hotel-booking-airbnb/",
+      "hints": {
+        "looking_for": [
+          "How you prevent double bookings under concurrency",
+          "How you handle the payment step safely"
+        ],
+        "strong_signals": [
+          "Uses transactions, locks or optimistic concurrency correctly",
+          "Covers holds with expiry and idempotent requests"
+        ],
+        "watch_outs": [
+          "Ignoring race conditions",
+          "Forgetting payment failures, retries or time zones"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -375,7 +569,23 @@
       "strong_answer": "Covers a double-entry ledger, idempotency keys, integration with payment processors, payout schedules, currency conversion, and reconciliation. Explains consistency guarantees and how failures and retries avoid double charges. Mentions auditing and fraud checks. Signals: correctness first, clear failure modes. Pitfall: treating money like ordinary eventual-consistency data.",
       "competencies": ["technical_depth", "accuracy", "trade_offs"],
       "values": [],
-      "source_url": "https://www.aced.io/blog/airbnb-interview-process"
+      "source_url": "https://www.aced.io/blog/airbnb-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you put correctness first for money",
+          "How you handle failures without double charges"
+        ],
+        "strong_signals": [
+          "Uses a double-entry ledger and idempotency keys",
+          "Covers reconciliation, currencies and auditing"
+        ],
+        "watch_outs": [
+          "Treating money as eventually consistent data",
+          "No plan for processor failures"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -383,7 +593,23 @@
       "strong_answer": "Clarifies use cases (host-guest chat, support bot), then covers message storage, delivery (websockets or push), ordering, read receipts, and moderation for trust and safety. For a bot, explains intent handling and hand-off to a human agent. Discusses scaling and offline delivery. Pitfall: no attention to safety or abuse in a marketplace context.",
       "competencies": ["technical_depth", "reasoning", "clarity_of_explanation"],
       "values": [],
-      "source_url": "https://www.aced.io/blog/airbnb-interview-process"
+      "source_url": "https://www.aced.io/blog/airbnb-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you deliver messages reliably and in order",
+          "Whether you design for trust and safety"
+        ],
+        "strong_signals": [
+          "Clarifies use cases before designing",
+          "Covers moderation and hand-off from bot to human"
+        ],
+        "watch_outs": [
+          "No attention to abuse or safety",
+          "Ignoring offline delivery"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -391,7 +617,24 @@
       "strong_answer": "Clarifies the goal (conversion, trust, guest satisfaction) and picks a user segment, such as first-time guests or families. Maps the booking journey, finds the biggest pain points, proposes two or three solutions and prioritizes one by impact and effort. Considers the host side too. Defines a primary metric and guardrails. Pitfall: a list of features with no user or no metric.",
       "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
       "values": ["Champion the Mission"],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you pick a goal and a user segment",
+          "How you prioritize pain points in a journey"
+        ],
+        "strong_signals": [
+          "Maps the booking journey and its biggest pains",
+          "Prioritizes one solution with a metric and guardrails",
+          "Considers the host side too"
+        ],
+        "watch_outs": [
+          "A list of features with no user",
+          "No success metric"
+        ]
+      },
+      "role_families": ["pm", "design", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -399,7 +642,23 @@
       "strong_answer": "Defines the target traveler and the jobs to be done (planning, coordinating with a group, itinerary, bookings). Prioritizes the most painful need, sketches the core flow, and explains how it connects to Airbnb stays and experiences. States a success metric and a V1 scope. Pitfall: building everything at once with no prioritization.",
       "competencies": ["problem_framing", "structure", "user_and_business_sense"],
       "values": ["Champion the Mission"],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you define the target traveler first",
+          "How you scope a first version"
+        ],
+        "strong_signals": [
+          "Prioritizes the most painful need",
+          "Sketches a core flow with a success metric"
+        ],
+        "watch_outs": [
+          "Building everything at once",
+          "No clear user or job to be done"
+        ]
+      },
+      "role_families": ["pm", "design", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -407,7 +666,23 @@
       "strong_answer": "Segments potential hosts and diagnoses the barrier (trust, regulation, effort, earnings). Uses rough numbers to size the gap between demand and supply. Proposes and prioritizes levers (onboarding, pricing tools, insurance, co-hosting) and notes regulatory risk. Defines metrics such as new active listings and booked nights. Pitfall: ignoring local regulation and quality of supply.",
       "competencies": ["structure", "user_and_business_sense", "estimation_logic"],
       "values": ["Be a Cereal Entrepreneur"],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you diagnose barriers to supply growth",
+          "Whether you size the gap with rough numbers"
+        ],
+        "strong_signals": [
+          "Segments potential hosts and prioritizes levers",
+          "Notes regulatory risk and quality of supply"
+        ],
+        "watch_outs": [
+          "Ignoring local regulation",
+          "Levers with no metric to track them"
+        ]
+      },
+      "role_families": ["pm", "design", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -415,7 +690,23 @@
       "strong_answer": "Defines what a satisfied host looks like and separates leading behavior metrics (listing stays active, calendar updates, response rate, repeat hosting) from survey metrics. Proposes a composite or north star plus guardrails and segments by host type. Explains how to spot problems and validate the metric. Pitfall: relying only on NPS or picking a metric guests control.",
       "competencies": ["problem_framing", "structure", "recommendation"],
       "values": ["Be a Host"],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you define and measure satisfaction for one side of a marketplace",
+          "Whether you mix behavior and survey data"
+        ],
+        "strong_signals": [
+          "Separates leading behavior metrics from survey scores",
+          "Segments by host type and validates the metric"
+        ],
+        "watch_outs": [
+          "Relying only on NPS",
+          "Picking a metric guests control"
+        ]
+      },
+      "role_families": ["pm", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -423,7 +714,23 @@
       "strong_answer": "Groups risks (regulation, trust and safety, competition from hotels, supply quality, macro travel demand), ranks them by likelihood and impact, and picks one to address with concrete product or policy moves. Shows understanding of both sides of the marketplace. Pitfall: a long list with no prioritization or recommendation.",
       "competencies": ["structure", "user_and_business_sense", "recommendation"],
       "values": [],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/airbnb-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you structure and rank business risks",
+          "Whether you understand both sides of the marketplace"
+        ],
+        "strong_signals": [
+          "Ranks risks by likelihood and impact",
+          "Picks one and proposes concrete moves"
+        ],
+        "watch_outs": [
+          "A long list with no priority",
+          "No recommendation"
+        ]
+      },
+      "role_families": ["pm", "design", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -431,7 +738,23 @@
       "strong_answer": "Proposes a metric that captures value for both guests and hosts, such as nights booked or successful stays, and explains why it beats alternatives like revenue or app visits. Lists input metrics and guardrails (cancellations, review scores, trust incidents). Pitfall: picking a vanity metric or ignoring marketplace balance.",
       "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
       "values": ["Champion the Mission"],
-      "source_url": "https://www.aced.io/blog/airbnb-interview-process"
+      "source_url": "https://www.aced.io/blog/airbnb-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you pick a metric that captures marketplace value",
+          "Whether you weigh alternatives"
+        ],
+        "strong_signals": [
+          "Explains why it beats revenue or traffic",
+          "Adds input metrics and guardrails"
+        ],
+        "watch_outs": [
+          "Choosing a vanity metric",
+          "Ignoring the balance of guests and hosts"
+        ]
+      },
+      "role_families": ["pm", "data_ml"],
+      "levels": []
     }
   ],
   "bar_by_level": [

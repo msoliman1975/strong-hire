@@ -304,7 +304,23 @@
       "strong_answer": "Pick a goal that was clearly a stretch at the time, with a number. Explain why it mattered, the plan, and the hardest moment (a setback, a no from leadership, a failed approach) and how you kept going. Own your decisions with 'I', credit others. End with the measured result and, if you missed, what you learned and did next. Interviewers listen for champion mindset on a bad day, not just success. Pitfall: a goal that was really a team target with no personal role.",
       "competencies": ["ownership", "impact"],
       "values": ["Go get it"],
-      "source_url": "https://www.designgurus.io/blog/uber-interview-guide"
+      "source_url": "https://www.designgurus.io/blog/uber-interview-guide",
+      "hints": {
+        "looking_for": [
+          "Whether you set real stretch goals",
+          "How you keep going after setbacks"
+        ],
+        "strong_signals": [
+          "States the goal with a number and the hardest moment",
+          "Owns decisions with 'I' and gives the measured result"
+        ],
+        "watch_outs": [
+          "A team target with no personal role",
+          "Only success, no struggle"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -312,7 +328,23 @@
       "strong_answer": "Name the two groups and the real conflict (for example ops wanting speed versus engineering wanting stability). Show you understood each side's goal and constraint, made the trade-off explicit with data, and found a decision both could commit to, or escalated cleanly. Describe how you communicated the outcome and kept relationships intact. Uber looks for doing what's best for the company over any one team and for balancing several sides like a marketplace. Pitfall: a story where you simply sided with whoever was more senior.",
       "competencies": ["conflict_handling", "collaboration", "communication"],
       "values": ["One Uber", "Trip obsessed"],
-      "source_url": "https://www.designgurus.io/blog/uber-interview-guide"
+      "source_url": "https://www.designgurus.io/blog/uber-interview-guide",
+      "hints": {
+        "looking_for": [
+          "How you balance competing groups",
+          "Whether you put company goals over one team's"
+        ],
+        "strong_signals": [
+          "Makes the trade-off explicit with data",
+          "Reaches a decision both sides commit to, or escalates cleanly"
+        ],
+        "watch_outs": [
+          "Siding with whoever is more senior",
+          "Leaving relationships damaged"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -320,7 +352,23 @@
       "strong_answer": "Be honest about a real incident or mistake caused by speed. Explain the context and why speed seemed right, the impact (users, money, safety), how you detected and fixed it, and the lasting change (tests, rollout gates, checklists). Show you still value urgency but now pair it with guardrails. Strong answers mention safety or reliability unprompted. Pitfall: blaming others or choosing a trivial example.",
       "competencies": ["learning_from_failure", "ownership"],
       "values": ["Stand for safety", "Go get it"],
-      "source_url": "https://www.designgurus.io/blog/uber-interview-guide"
+      "source_url": "https://www.designgurus.io/blog/uber-interview-guide",
+      "hints": {
+        "looking_for": [
+          "Whether you own a mistake caused by speed",
+          "How you add guardrails without losing urgency"
+        ],
+        "strong_signals": [
+          "Explains the impact, how it was detected and the fix",
+          "Names lasting changes like tests or rollout gates"
+        ],
+        "watch_outs": [
+          "Blaming others",
+          "A trivial example"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -328,7 +376,23 @@
       "strong_answer": "Use a STAR structure with a real failure where you had a clear role. Quantify the impact, take responsibility without self-flagellation, and spend most of the time on what you did to recover and what you changed in your process afterwards. Mention how you communicated the failure upward. Interviewers look for resilience and integrity. Pitfall: a 'failure' that is a disguised success.",
       "competencies": ["learning_from_failure", "ownership", "communication"],
       "values": ["Go get it", "Do the right thing"],
-      "source_url": "https://www.educative.io/blog/uber-interview-process-and-questions"
+      "source_url": "https://www.educative.io/blog/uber-interview-process-and-questions",
+      "hints": {
+        "looking_for": [
+          "How you recover from failure",
+          "Whether you communicate it upward with integrity"
+        ],
+        "strong_signals": [
+          "Quantifies the impact and takes responsibility",
+          "Spends most of the time on recovery and process changes"
+        ],
+        "watch_outs": [
+          "A disguised success",
+          "Lots of self-criticism, little action"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -336,7 +400,23 @@
       "strong_answer": "Pick a substantive disagreement (design, priority, ownership), not a personality clash. Show you listened first, separated facts from opinions, proposed a way to decide (data, prototype, escalation), and committed to the result even if you lost. Close with the outcome and the relationship afterwards. Uber values disagree-and-commit and seeking different views. Pitfall: presenting yourself as right and the other person as difficult.",
       "competencies": ["conflict_handling", "collaboration"],
       "values": ["One Uber", "Great minds don't think alike"],
-      "source_url": "https://www.educative.io/blog/uber-interview-process-and-questions"
+      "source_url": "https://www.educative.io/blog/uber-interview-process-and-questions",
+      "hints": {
+        "looking_for": [
+          "Whether you disagree and then commit",
+          "How you separate facts from opinions"
+        ],
+        "strong_signals": [
+          "Proposes a fair way to decide",
+          "Describes the outcome and the relationship afterwards"
+        ],
+        "watch_outs": [
+          "Presenting the other person as difficult",
+          "A personality clash with no real issue"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -344,7 +424,23 @@
       "strong_answer": "Describe the decision, both positions, and why you held yours, ideally grounded in user or marketplace data. Show how you invited their reasoning, what you learned from it, and how the decision was made. Strong answers show changing your mind when evidence warranted, or persuading with data rather than authority. End with the result and what the partnership looked like afterwards.",
       "competencies": ["conflict_handling", "collaboration", "communication"],
       "values": ["Great minds don't think alike", "One Uber"],
-      "source_url": "https://www.aced.io/guides/uber-product-manager-interview"
+      "source_url": "https://www.aced.io/guides/uber-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you persuade with data, not authority",
+          "Whether you change your mind when evidence says so"
+        ],
+        "strong_signals": [
+          "Explains both positions, grounded in user data",
+          "Shows what you learned from their reasoning"
+        ],
+        "watch_outs": [
+          "Pulling rank",
+          "No result or partnership afterwards"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -352,7 +448,23 @@
       "strong_answer": "Frame the problem and who it served, your exact role, key decisions and trade-offs, and the metrics: the primary success metric, guardrails, and the actual numbers. Explain how you knew the change caused the result (experiment, holdout). Mention a detail that changed the approach. Hiring managers calibrate level from scope and judgment here. Pitfall: vanity metrics or no numbers at all.",
       "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
       "values": ["See the forest and the trees"],
-      "source_url": "https://www.aced.io/guides/uber-product-manager-interview"
+      "source_url": "https://www.aced.io/guides/uber-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you define and measure success",
+          "Whether your scope and judgment fit the level"
+        ],
+        "strong_signals": [
+          "Names a primary metric, guardrails and actual numbers",
+          "Explains how you knew the change caused the result"
+        ],
+        "watch_outs": [
+          "Vanity metrics",
+          "No numbers at all"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -360,7 +472,23 @@
       "strong_answer": "Connect specifics: something about Uber's marketplace or a product you use and its real-world impact, the team's problem space, and how your past experience transfers. Show you know what is hard about the domain (real-time, multi-sided, physical world). Mention what you want to learn. Pitfall: generic praise or focusing only on the brand or pay.",
       "competencies": ["motivation", "role_fit"],
       "values": ["Build with heart"],
-      "source_url": "https://www.designgurus.io/blog/uber-interview-guide"
+      "source_url": "https://www.designgurus.io/blog/uber-interview-guide",
+      "hints": {
+        "looking_for": [
+          "Why this company and this team",
+          "Whether you understand what makes the domain hard"
+        ],
+        "strong_signals": [
+          "Connects your experience to the team's problems",
+          "Says what you want to learn"
+        ],
+        "watch_outs": [
+          "Generic praise",
+          "Focusing on brand or pay"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -368,7 +496,23 @@
       "strong_answer": "Lay out scope, team size and the deadline. Explain how you prioritized (impact versus effort, what you cut and why), how you communicated trade-offs to stakeholders, and how you protected quality and safety. Give the result and what you would do differently. At senior levels show influence beyond your team.",
       "competencies": ["scope_at_level", "judgment", "depth_of_experience"],
       "values": ["See the forest and the trees", "Go get it"],
-      "source_url": "https://www.educative.io/blog/uber-interview-process-and-questions"
+      "source_url": "https://www.educative.io/blog/uber-interview-process-and-questions",
+      "hints": {
+        "looking_for": [
+          "How you prioritize under a tight deadline",
+          "How you communicate trade-offs to stakeholders"
+        ],
+        "strong_signals": [
+          "Explains what you cut and why",
+          "Protects quality and safety and shares the result"
+        ],
+        "watch_outs": [
+          "Trying to do everything with no trade-offs",
+          "No reflection on what you would change"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -376,7 +520,23 @@
       "strong_answer": "Clarify scale (cities, concurrent drivers, location update rate) and latency goals. Cover location ingestion, a geospatial index (geohash, quadtree or H3 cells) sharded by region, a dispatch service that ranks candidates by ETA, the trip state machine, and handling disconnects. Discuss consistency (avoid double-assigning a driver), hot cells in dense areas, and failover. Uber interviewers push on defending choices and failure modes. Pitfall: drawing generic boxes without numbers or trade-offs.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": ["Trip obsessed", "See the forest and the trees"],
-      "source_url": "https://www.designgurus.io/answers/detail/what-are-the-top-system-design-interview-questions-for-uber-interview"
+      "source_url": "https://www.designgurus.io/answers/detail/what-are-the-top-system-design-interview-questions-for-uber-interview",
+      "hints": {
+        "looking_for": [
+          "How you design real-time geospatial matching",
+          "Whether you defend your choices"
+        ],
+        "strong_signals": [
+          "Uses a sharded geospatial index and a trip state machine",
+          "Prevents double assignment and handles hot cells and failover"
+        ],
+        "watch_outs": [
+          "Generic boxes with no numbers",
+          "Ignoring failure modes"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -384,7 +544,23 @@
       "strong_answer": "Define goals for both sides: restore balance, keep prices fair and predictable. Describe streaming supply and demand counts per area and time window, computing a multiplier, smoothing to avoid flapping, caps, and showing the price before confirmation. Cover data freshness versus cost, regional rules, experiment design, and safety cases (emergencies, price caps). Strong answers connect the system to rider and driver trust.",
       "competencies": ["technical_depth", "trade_offs", "reasoning"],
       "values": ["Trip obsessed", "Stand for safety"],
-      "source_url": "https://www.designgurus.io/answers/detail/what-are-the-top-system-design-interview-questions-for-uber-interview"
+      "source_url": "https://www.designgurus.io/answers/detail/what-are-the-top-system-design-interview-questions-for-uber-interview",
+      "hints": {
+        "looking_for": [
+          "How you balance supply, demand and fairness",
+          "Whether you design for stable, predictable prices"
+        ],
+        "strong_signals": [
+          "Uses streaming counts, smoothing and caps",
+          "Covers experiments and safety cases such as emergencies"
+        ],
+        "watch_outs": [
+          "Prices that swing wildly",
+          "Ignoring rider and driver trust"
+        ]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -392,7 +568,23 @@
       "strong_answer": "Estimate write rate (drivers times update frequency) and read patterns. Discuss ingestion via a gateway and stream, in-memory storage of latest position with TTL, partitioning by region, fan-out to riders watching a trip, and archiving history for ETA models. Cover mobile network flakiness, battery trade-offs on update frequency, and backpressure. Pitfall: writing every update to a relational database.",
       "competencies": ["technical_depth", "trade_offs", "accuracy"],
       "values": ["See the forest and the trees"],
-      "source_url": "https://www.designgurus.io/answers/detail/what-are-the-top-system-design-interview-questions-for-uber-interview"
+      "source_url": "https://www.designgurus.io/answers/detail/what-are-the-top-system-design-interview-questions-for-uber-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you estimate write load first",
+          "How you store and fan out fast-changing data"
+        ],
+        "strong_signals": [
+          "Keeps latest positions in memory with TTL, partitioned by region",
+          "Covers flaky networks, battery trade-offs and backpressure"
+        ],
+        "watch_outs": [
+          "Writing every update to a relational database",
+          "No numbers for the write rate"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -400,7 +592,23 @@
       "strong_answer": "Cover the trip-to-charge flow, authorization then capture, idempotency keys to avoid double charges, a ledger with double-entry records, async reconciliation with processors, and fraud checks. Discuss multi-currency, retries, and how partial failures are surfaced to users and support. Strong answers prioritize correctness and auditability over raw throughput.",
       "competencies": ["technical_depth", "accuracy", "trade_offs"],
       "values": ["Do the right thing", "Stand for safety"],
-      "source_url": "https://www.designgurus.io/answers/detail/what-are-the-top-system-design-interview-questions-for-uber-interview"
+      "source_url": "https://www.designgurus.io/answers/detail/what-are-the-top-system-design-interview-questions-for-uber-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you put correctness ahead of throughput",
+          "How you prevent double charges"
+        ],
+        "strong_signals": [
+          "Uses authorize then capture, idempotency keys and a double-entry ledger",
+          "Covers reconciliation, fraud checks and partial failures"
+        ],
+        "watch_outs": [
+          "Ignoring refunds, tips or promos",
+          "No audit trail"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -408,7 +616,23 @@
       "strong_answer": "Separate producers from a delivery pipeline: queue, templating, user preferences, rate limiting, per-channel providers, retries with backoff, and deduplication. Discuss priority lanes (safety and trip-critical messages first), delivery tracking, and provider failover. Explain trade-offs between at-least-once delivery and duplicate messages.",
       "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
       "values": ["Stand for safety"],
-      "source_url": "https://www.designgurus.io/answers/detail/what-are-the-top-system-design-interview-questions-for-uber-interview"
+      "source_url": "https://www.designgurus.io/answers/detail/what-are-the-top-system-design-interview-questions-for-uber-interview",
+      "hints": {
+        "looking_for": [
+          "How you separate producers from delivery",
+          "Whether you prioritize critical messages"
+        ],
+        "strong_signals": [
+          "Covers queues, preferences, rate limits, retries and deduplication",
+          "Adds priority lanes and provider failover"
+        ],
+        "watch_outs": [
+          "Treating all messages alike",
+          "Ignoring duplicate messages"
+        ]
+      },
+      "role_families": ["swe", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -416,7 +640,23 @@
       "strong_answer": "Explain at a conceptual level: candidate riders within a time and detour window, route compatibility, scoring by added detour and wait, and batching requests over a short window versus matching instantly. Discuss trade-offs between efficiency (fewer cars) and rider experience (detours, ETA accuracy) and how you would measure both. PMs are judged on clear explanation and trade-off reasoning, not code.",
       "competencies": ["clarity_of_explanation", "trade_offs", "reasoning"],
       "values": ["Trip obsessed"],
-      "source_url": "https://www.aced.io/guides/uber-product-manager-interview"
+      "source_url": "https://www.aced.io/guides/uber-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How clearly you explain a matching approach",
+          "Whether you weigh efficiency against rider experience"
+        ],
+        "strong_signals": [
+          "Explains detour windows, scoring and batching versus instant matching",
+          "Measures both efficiency and rider experience"
+        ],
+        "watch_outs": [
+          "Diving into code instead of concepts",
+          "Ignoring detours and ETA accuracy"
+        ]
+      },
+      "role_families": ["pm", "tpm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -424,7 +664,23 @@
       "strong_answer": "Clarify the goal metric and time frame. Segment users (current Eats users, riders who never ordered, lapsed grocery buyers) and map the funnel to find the biggest drop-off. Consider merchant supply and courier capacity as constraints, not just demand. Generate a few solutions, prioritize by impact and effort, pick one, and define success and guardrail metrics (basket size, substitutions, delivery time). Pitfall: only marketing ideas with no supply-side view.",
       "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
       "values": ["Trip obsessed"],
-      "source_url": "https://www.aced.io/guides/uber-product-manager-interview"
+      "source_url": "https://www.aced.io/guides/uber-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you segment users and find funnel drop-offs",
+          "Whether you treat supply as a constraint"
+        ],
+        "strong_signals": [
+          "Prioritizes solutions by impact and effort",
+          "Defines success and guardrail metrics"
+        ],
+        "watch_outs": [
+          "Marketing ideas only",
+          "Ignoring merchants and couriers"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -432,7 +688,23 @@
       "strong_answer": "Start from why long-tenured drivers matter (reliability, ratings, lower churn cost) and what they value (earnings, flexibility, respect, predictability). Segment drivers, propose options (earnings boosts, priority features, recognition, benefits), and weigh cost against retention lift. Consider fairness to new drivers and gaming risk. Define how you would test and measure retention.",
       "competencies": ["user_and_business_sense", "prioritization", "recommendation"],
       "values": ["Build with heart", "Trip obsessed"],
-      "source_url": "https://www.aced.io/guides/uber-product-manager-interview"
+      "source_url": "https://www.aced.io/guides/uber-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you understand what long-tenured drivers value",
+          "How you weigh cost against retention"
+        ],
+        "strong_signals": [
+          "Segments drivers and proposes testable options",
+          "Considers fairness to new drivers and gaming risk"
+        ],
+        "watch_outs": [
+          "Rewards with no way to measure retention",
+          "Ignoring cost"
+        ]
+      },
+      "role_families": ["pm", "design"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -440,7 +712,23 @@
       "strong_answer": "Clarify the size and timing of the drop and confirm it is real (data pipeline, definition changes). Decompose bookings into requests, conversion, completed trips and price per trip, then cut by city, platform, app version and rider segment. Check supply-side causes (driver availability, surge) and external events. Form hypotheses, prioritize, and say what you would do once the cause is found. Pitfall: listing causes without a structure.",
       "competencies": ["problem_framing", "structure", "recommendation"],
       "values": ["See the forest and the trees"],
-      "source_url": "https://www.aced.io/guides/uber-product-manager-interview"
+      "source_url": "https://www.aced.io/guides/uber-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you confirm the drop is real first",
+          "How you break a metric into parts"
+        ],
+        "strong_signals": [
+          "Decomposes bookings and cuts by city, platform and segment",
+          "Checks supply and external causes and ranks hypotheses"
+        ],
+        "watch_outs": [
+          "Listing causes with no structure",
+          "Skipping data or definition checks"
+        ]
+      },
+      "role_families": ["pm", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -448,7 +736,23 @@
       "strong_answer": "Separate rider cancellations from driver cancellations and by stage (before match, after match, at pickup). Find the largest segments and their causes (long ETA, wrong pickup spot, low fare for driver). Propose targeted fixes for each side, prioritize, and define metrics including guardrails like wait time and driver earnings. Good answers balance both sides of the marketplace.",
       "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
       "values": ["Trip obsessed"],
-      "source_url": "https://www.aced.io/guides/uber-product-manager-interview"
+      "source_url": "https://www.aced.io/guides/uber-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you split rider and driver cancellations",
+          "How you find the biggest causes by stage"
+        ],
+        "strong_signals": [
+          "Proposes targeted fixes for each side",
+          "Adds guardrails like wait time and driver earnings"
+        ],
+        "watch_outs": [
+          "Fixing only the rider side",
+          "No prioritization"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -456,7 +760,23 @@
       "strong_answer": "Pick a concrete place (an airport terminal or stadium) and state assumptions. Build from arrivals per hour, share who use ride-hailing, and average wait time (Little's law: waiting = arrival rate x wait). Sanity-check against capacity. Then say what the number means for product decisions (pickup zones, queueing). Speak assumptions aloud and round sensibly.",
       "competencies": ["estimation_logic", "structure"],
       "values": [],
-      "source_url": "https://www.aced.io/guides/uber-product-manager-interview"
+      "source_url": "https://www.aced.io/guides/uber-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you structure an estimate from stated assumptions",
+          "Whether you sanity-check the result"
+        ],
+        "strong_signals": [
+          "Builds from arrival rate and wait time",
+          "Explains what the number means for product decisions"
+        ],
+        "watch_outs": [
+          "Leaving assumptions unstated",
+          "False precision"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
     }
   ],
   "bar_by_level": [

@@ -342,7 +342,24 @@
       "values": [
         "Be direct and respect your colleagues"
       ],
-      "source_url": "https://igotanoffer.com/en/advice/meta-leadership-and-drive-interview"
+      "source_url": "https://igotanoffer.com/en/advice/meta-leadership-and-drive-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you are direct while staying respectful",
+          "How you use data to settle disagreements"
+        ],
+        "strong_signals": [
+          "Raises the issue early and states the other view fairly",
+          "Changes your mind if the data says so",
+          "Shows the relationship afterwards"
+        ],
+        "watch_outs": [
+          "Avoiding the conflict or escalating first",
+          "A story where the other person is simply wrong"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -355,7 +372,24 @@
       "values": [
         "Be direct and respect your colleagues"
       ],
-      "source_url": "https://igotanoffer.com/en/advice/meta-leadership-and-drive-interview"
+      "source_url": "https://igotanoffer.com/en/advice/meta-leadership-and-drive-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you seek out and act on feedback",
+          "How honestly you reflect on your first reaction"
+        ],
+        "strong_signals": [
+          "Describes the feedback in substance",
+          "Gives evidence the change stuck",
+          "Shows you look for feedback actively"
+        ],
+        "watch_outs": [
+          "Feedback that is really praise",
+          "No visible change"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -368,7 +402,24 @@
       "values": [
         "Move fast"
       ],
-      "source_url": "https://www.cleverprep.com/companies/meta/product-manager"
+      "source_url": "https://www.cleverprep.com/companies/meta/product-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you own failures and recover fast",
+          "What you do differently now"
+        ],
+        "strong_signals": [
+          "Explains why the plan seemed right at the time",
+          "Shows how fast the failure was spotted and addressed",
+          "Gives a later example of the lesson"
+        ],
+        "watch_outs": [
+          "A disguised success",
+          "Blaming others"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -383,7 +434,24 @@
         "Focus on long-term impact",
         "Move fast"
       ],
-      "source_url": "https://igotanoffer.com/en/advice/meta-leadership-and-drive-interview"
+      "source_url": "https://igotanoffer.com/en/advice/meta-leadership-and-drive-interview",
+      "hints": {
+        "looking_for": [
+          "How you prioritize competing work",
+          "Whether you communicate what gets dropped"
+        ],
+        "strong_signals": [
+          "Uses explicit criteria like impact and urgency",
+          "Names what was delayed or dropped",
+          "Shows the results"
+        ],
+        "watch_outs": [
+          "Doing everything by working longer hours",
+          "No clear trade-off"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -397,7 +465,24 @@
         "Move fast",
         "Meta, Metamates, me"
       ],
-      "source_url": "https://igotanoffer.com/en/advice/meta-leadership-and-drive-interview"
+      "source_url": "https://igotanoffer.com/en/advice/meta-leadership-and-drive-interview",
+      "hints": {
+        "looking_for": [
+          "How you handle surprises and still deliver",
+          "Whether you act on partial information"
+        ],
+        "strong_signals": [
+          "Re-plans quickly and keeps others informed",
+          "Makes decisions without full information",
+          "Quantifies the result"
+        ],
+        "watch_outs": [
+          "Waiting for direction",
+          "A story where nothing was really at risk"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "behavioral",
@@ -412,7 +497,24 @@
         "Move fast",
         "Live in the future"
       ],
-      "source_url": "https://www.cleverprep.com/companies/meta/product-manager"
+      "source_url": "https://www.cleverprep.com/companies/meta/product-manager",
+      "hints": {
+        "looking_for": [
+          "How comfortable you are with ambiguity",
+          "Whether you create clarity yourself"
+        ],
+        "strong_signals": [
+          "Explains why waiting was costly",
+          "Defines a small first step and how to measure it",
+          "Adjusts as you learn"
+        ],
+        "watch_outs": [
+          "Waiting for a manager to decide",
+          "Claiming certainty you did not have"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -426,7 +528,24 @@
       "values": [
         "Build awesome things"
       ],
-      "source_url": "https://site.joinleland.com/library/a/how-to-ace-your-facebook-product-manager-interview-a-step-by-step-guide"
+      "source_url": "https://site.joinleland.com/library/a/how-to-ace-your-facebook-product-manager-interview-a-step-by-step-guide",
+      "hints": {
+        "looking_for": [
+          "The scope of work you clearly drove",
+          "How you measure impact on users or the team"
+        ],
+        "strong_signals": [
+          "Explains the hard decisions and your own role",
+          "Quantifies impact",
+          "Scope fits the target level"
+        ],
+        "watch_outs": [
+          "A team win with unclear personal contribution",
+          "Impact without numbers"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "hiring_manager",
@@ -439,7 +558,23 @@
       "values": [
         "Meta, Metamates, me"
       ],
-      "source_url": "https://igotanoffer.com/en/advice/meta-leadership-and-drive-interview"
+      "source_url": "https://igotanoffer.com/en/advice/meta-leadership-and-drive-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you know what the company builds",
+          "How you like to work and what impact you want"
+        ],
+        "strong_signals": [
+          "Links products or scale to your past work",
+          "Says how you like to work"
+        ],
+        "watch_outs": [
+          "Generic praise",
+          "Talking only about compensation or brand"
+        ]
+      },
+      "role_families": [],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -454,7 +589,24 @@
       "values": [
         "Build awesome things"
       ],
-      "source_url": "https://www.designgurus.io/blog/meta-system-design-interview-questions"
+      "source_url": "https://www.designgurus.io/blog/meta-system-design-interview-questions",
+      "hints": {
+        "looking_for": [
+          "How you design a feed at very large scale",
+          "Whether you handle accounts with huge followings"
+        ],
+        "strong_signals": [
+          "Uses fan-out on write for most users and on read for celebrities",
+          "Keeps ranking as a separate service",
+          "Estimates load and discusses failure handling"
+        ],
+        "watch_outs": [
+          "Computing the whole feed on each request",
+          "Ignoring celebrity accounts"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -468,7 +620,24 @@
       "values": [
         "Build awesome things"
       ],
-      "source_url": "https://www.designgurus.io/blog/meta-system-design-interview-questions"
+      "source_url": "https://www.designgurus.io/blog/meta-system-design-interview-questions",
+      "hints": {
+        "looking_for": [
+          "How you deliver messages in real time and in order",
+          "Whether you plan for offline users and many devices"
+        ],
+        "strong_signals": [
+          "Uses persistent connections and a routing layer",
+          "Orders messages per conversation",
+          "Explains how encryption limits server features"
+        ],
+        "watch_outs": [
+          "Polling for new messages",
+          "No plan for offline users"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -483,7 +652,24 @@
         "Build awesome things",
         "Move fast"
       ],
-      "source_url": "https://www.designgurus.io/blog/meta-system-design-interview-questions"
+      "source_url": "https://www.designgurus.io/blog/meta-system-design-interview-questions",
+      "hints": {
+        "looking_for": [
+          "How you fan out to many viewers at once",
+          "Whether you plan for very popular streams"
+        ],
+        "strong_signals": [
+          "Uses pub/sub and persistent connections partitioned by video",
+          "Samples or rate-limits comments on hot streams",
+          "Handles reconnects and moderation"
+        ],
+        "watch_outs": [
+          "Viewers polling the database",
+          "No plan for hot streams"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
     },
     {
       "interview_type": "technical_qa",
@@ -497,7 +683,24 @@
       "values": [
         "Move fast"
       ],
-      "source_url": "https://www.designgurus.io/blog/meta-system-design-interview-questions"
+      "source_url": "https://www.designgurus.io/blog/meta-system-design-interview-questions",
+      "hints": {
+        "looking_for": [
+          "How you count at scale over time windows",
+          "Whether you weigh accuracy against memory"
+        ],
+        "strong_signals": [
+          "Uses approximate or windowed counters",
+          "Merges per-partition top-K results",
+          "Considers spam and manipulation"
+        ],
+        "watch_outs": [
+          "Exact counts over every event in a database",
+          "Ignoring windowing"
+        ]
+      },
+      "role_families": ["data_ml", "swe"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -512,7 +715,24 @@
       "values": [
         "Build awesome things"
       ],
-      "source_url": "https://site.joinleland.com/library/a/how-to-ace-your-facebook-product-manager-interview-a-step-by-step-guide"
+      "source_url": "https://site.joinleland.com/library/a/how-to-ace-your-facebook-product-manager-interview-a-step-by-step-guide",
+      "hints": {
+        "looking_for": [
+          "Whether you understand the user before proposing features",
+          "How you prioritize and recommend one idea"
+        ],
+        "strong_signals": [
+          "Picks one student segment and its pain points",
+          "Prioritizes by impact and effort",
+          "Defines a success metric and guardrails"
+        ],
+        "watch_outs": [
+          "Jumping to features before the user",
+          "Many ideas with no priority"
+        ]
+      },
+      "role_families": ["pm", "design"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -526,7 +746,24 @@
       "values": [
         "Build awesome things"
       ],
-      "source_url": "https://site.joinleland.com/library/a/how-to-ace-your-facebook-product-manager-interview-a-step-by-step-guide"
+      "source_url": "https://site.joinleland.com/library/a/how-to-ace-your-facebook-product-manager-interview-a-step-by-step-guide",
+      "hints": {
+        "looking_for": [
+          "Whether you consider both sides of a marketplace",
+          "How you find the main constraint"
+        ],
+        "strong_signals": [
+          "Defines engagement clearly",
+          "Maps the journey for the side with the biggest constraint",
+          "Sets guardrails like scam reports"
+        ],
+        "watch_outs": [
+          "Ignoring one side of the marketplace",
+          "A vague definition of engagement"
+        ]
+      },
+      "role_families": ["pm", "design"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -540,7 +777,24 @@
       "values": [
         "Move fast"
       ],
-      "source_url": "https://site.joinleland.com/library/a/how-to-ace-your-facebook-product-manager-interview-a-step-by-step-guide"
+      "source_url": "https://site.joinleland.com/library/a/how-to-ace-your-facebook-product-manager-interview-a-step-by-step-guide",
+      "hints": {
+        "looking_for": [
+          "How you structure an investigation of a metric shift",
+          "Whether you check for substitution before calling it bad"
+        ],
+        "strong_signals": [
+          "Confirms the data and time window first",
+          "Segments by platform, version, region and network",
+          "Ranks hypotheses and the data that tests each"
+        ],
+        "watch_outs": [
+          "Assuming the drop is bad without checking total calls",
+          "Random causes with no structure"
+        ]
+      },
+      "role_families": ["pm", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -554,7 +808,24 @@
       "values": [
         "Move fast"
       ],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/facebook-execution-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/facebook-execution-interview",
+      "hints": {
+        "looking_for": [
+          "How you diagnose a sudden or gradual drop",
+          "Whether you rule out data issues first"
+        ],
+        "strong_signals": [
+          "Clarifies the metric definition",
+          "Checks internal changes and external factors",
+          "Proposes next steps, including a rollback if needed"
+        ],
+        "watch_outs": [
+          "A list of random causes with no structure",
+          "Skipping segmentation"
+        ]
+      },
+      "role_families": ["pm", "data_ml"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -568,7 +839,24 @@
       "values": [
         "Focus on long-term impact"
       ],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/facebook-execution-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/facebook-execution-interview",
+      "hints": {
+        "looking_for": [
+          "How you turn a product mission into goals",
+          "Whether you pick one primary metric"
+        ],
+        "strong_signals": [
+          "Defines a north-star metric with supporting metrics",
+          "Adds guardrails like cannibalization of other surfaces",
+          "Explains trade-offs among metrics"
+        ],
+        "watch_outs": [
+          "Many metrics with no primary one",
+          "Ignoring creators"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
     },
     {
       "interview_type": "case",
@@ -583,7 +871,24 @@
       "values": [
         "Focus on long-term impact"
       ],
-      "source_url": "https://igotanoffer.com/blogs/product-manager/facebook-execution-interview"
+      "source_url": "https://igotanoffer.com/blogs/product-manager/facebook-execution-interview",
+      "hints": {
+        "looking_for": [
+          "How you weigh short-term revenue against long-term value",
+          "Whether you quantify both sides"
+        ],
+        "strong_signals": [
+          "Compares revenue gain with lifetime value lost",
+          "Looks for alternatives that capture part of the gain",
+          "Proposes an experiment and a decision rule"
+        ],
+        "watch_outs": [
+          "Choosing revenue without modeling retention",
+          "Refusing to quantify"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
     }
   ],
   "bar_by_level": [
