@@ -34,6 +34,10 @@ const ctaLabel = CTA === "signup" ? "Start free" : "Join the waitlist";
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL("/og.png", Astro.site).toString()} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#3a4f63" />
   </head>
   <body>
@@ -64,9 +68,10 @@ const ctaLabel = CTA === "signup" ? "Start free" : "Join the waitlist";
           <a href="/legal/privacy">Privacy</a>
           <a href="/legal/refunds">Refunds</a>
           <a href="/legal/privacy-officer">Privacy officer</a>
+          <a href="/legal/not-affiliated">Company names</a>
           <a href={`mailto:${SUPPORT_EMAIL}`}>Contact</a>
         </nav>
-        <p class="muted small">{NOT_AFFILIATED} Trademark or takedown requests: {SUPPORT_EMAIL}.</p>
+        <p class="muted small">{NOT_AFFILIATED} <a href="/legal/not-affiliated">Trademark or takedown requests</a>.</p>
         <p class="muted small">Privacy questions: {PRIVACY_EMAIL}. &copy; {new Date().getFullYear()} Strong Hire.</p>
       </div>
     </footer>

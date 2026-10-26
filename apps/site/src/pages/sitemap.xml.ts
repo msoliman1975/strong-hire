@@ -11,6 +11,7 @@ const PAGES = [
   "/legal/privacy",
   "/legal/refunds",
   "/legal/privacy-officer",
+  "/legal/not-affiliated",
 ];
 
 export const GET: APIRoute = ({ site }) => {

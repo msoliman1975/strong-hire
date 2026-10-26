@@ -2,8 +2,7 @@
  * Site-wide settings. Build-time environment variables switch the site at launch without code
  * changes (L04, docs/hosting.md "Marketing site"):
  *
- *   PUBLIC_APP_URL  where the app lives. https://getstronghire.com until the app moves to
- *                   https://app.getstronghire.com (Q9).
+ *   PUBLIC_APP_URL  where the app lives: https://app.getstronghire.com (Q9).
  *   PUBLIC_CTA      "waitlist" (before Dec 14, Q4) or "signup" (the main button goes to sign-up).
  */
 export const APP_URL = (import.meta.env.PUBLIC_APP_URL ?? "https://app.getstronghire.com").replace(/\/$/, "");
