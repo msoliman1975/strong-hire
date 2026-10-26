@@ -86,6 +86,14 @@ To add the admin host to a running server:
 cd /opt/stronghire/strong-hire && ./scripts/server-deploy.sh
 ```
 
+### Shell from the owner's PC
+
+The Hetzner web console turns a typed `_` into `-`. For a normal root shell, the admin key
+(`infra/server/admin-key.pub`, private half `~/.ssh/stronghire_admin` on the owner's PC) goes into
+root's `authorized_keys`. Run once from the console:
+`bash /opt/stronghire/strong-hire/infra/server/add-admin-key.sh`. Then, from PowerShell on the PC:
+`ssh stronghire` (a `Host stronghire` entry in `~/.ssh/config`).
+
 ### Deploy from the owner's PC
 
 The deploy key (`infra/server/deploy-key.pub`) can start a deploy and nothing else. Its private
