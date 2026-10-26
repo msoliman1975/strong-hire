@@ -35,8 +35,8 @@ services:
       APP_ENV: staging
       LOG_FORMAT: json   # OB-7: one JSON object per log line (service, request_id, session_id)
       SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET in .env}
-      WEB_BASE_URL: https://${DOMAIN}
-      API_PUBLIC_URL: https://${DOMAIN}/api
+      WEB_BASE_URL: https://app.${DOMAIN}
+      API_PUBLIC_URL: https://app.${DOMAIN}/api
       # The admin app (D-1). Its sign-in links and Google sign-in come back to this host.
       ADMIN_BASE_URL: https://admin.${DOMAIN}
       # Alerts page "Test" button (AL-6) sends to this address.
@@ -91,7 +91,7 @@ services:
       SIM_EMAIL: ${SIM_EMAIL:-sim@getstronghire.com}
       SIM_LITELLM_KEY: ${SIM_LITELLM_KEY:-}
       SIM_TOKEN: ${SIM_TOKEN:-}
-      SIM_BASE_URL: https://${DOMAIN}/api
+      SIM_BASE_URL: https://app.${DOMAIN}/api
       SIM_OUT_DIR: /sim-results
       SIM_KEEP_GB: ${SIM_KEEP_GB:-10}
       SIM_KEEP_DAYS: ${SIM_KEEP_DAYS:-90}

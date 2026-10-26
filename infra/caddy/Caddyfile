@@ -1,7 +1,9 @@
 # Test server (infra/compose.server.yaml). Caddy gets TLS certificates from Let's Encrypt.
 
 # The candidate app. The admin API routes are never reachable from this origin (D-1).
-{$DOMAIN} {
+# It answers on app. (where sign-in and email links now go) and, until the marketing site takes
+# the apex (docs/hosting.md "Marketing site"), on the apex too, so old links keep working.
+app.{$DOMAIN}, {$DOMAIN} {
 	encode gzip
 	handle_path /api/* {
 		@admin path /admin /admin/*
