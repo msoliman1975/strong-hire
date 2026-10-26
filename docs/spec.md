@@ -347,6 +347,7 @@ Postgres is the single source of truth, with an `org_id` on every user-owned tab
 | CompanyRequest | id, org_id, user_id, job_target_id, company_name, normalized_name, matched_company_id, source_host, created_at | Every company name entered at job setup. Null matched_company_id means a request for a company outside the launch list |
 | AuditLog | id, actor, action, entity, at | Deletes, exports, consent changes, profile approvals |
 | WaitlistEntry | id, email, role_family, interview_within, marketing_consent, source, confirmed_at, invited_at, created_at | L04: people waiting for sign-ups to open. Not a user, so no org_id; double opt-in sets confirmed_at; marketing_consent is a separate, unticked box (CASL). Deleted by email on request |
+| SessionFeedback | id, org_id, session_id, realism, comment, created_at | L05: the post-session rating, "felt like a real interview", 1 to 5. One per session; skippable. Feeds the perceived realism metric |
 
 The model registry and runtime profiles live in config files, not the database. Provenance fields (PL-6) are written on every AI output so results from different models are never mixed silently.
 
