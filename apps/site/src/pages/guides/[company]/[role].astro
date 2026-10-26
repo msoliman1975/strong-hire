@@ -1,0 +1,81 @@
+---
+/**
+ * Q13: one interview guide per company and role, built only from a reviewed, published profile
+ * (src/data/guides.ts). None are published yet, so this template builds no pages today.
+ */
+import Base from "../../../layouts/Base.astro";
+import { CTA, NOT_AFFILIATED, PRACTICE_NOTICE } from "../../../data/site";
+import { loadGuides, type Guide } from "../../../data/guides";
+
+export function getStaticPaths() {
+  return loadGuides().map((guide) => ({ params: { company: guide.slug, role: guide.role }, props: { guide } }));
+}
+
+const { guide } = Astro.props as { guide: Guide };
+const title = `${guide.company} ${guide.roleLabel} interview guide`;
+---
+
+<Base
+  title={`${title} | Strong Hire`}
+  description={`How the ${guide.company} ${guide.roleLabel} interview loop is usually structured, what each round looks for, and how to practice it.`}
+>
+  <section class="section">
+    <div class="wrap prose">
+      <p class="eyebrow">Interview guide</p>
+      <h1>{title}</h1>
+      <p class="notice">{NOT_AFFILIATED} This guide is our summary of public sources.</p>
+
+      <h2>The loop</h2>
+      <p>Levels: {guide.levels.join(", ")}.</p>
+      <ol>
+        {
+          guide.rounds.map((r) => (
+            <li>
+              <strong>{r.name}</strong>
+              {r.minutes ? `, about ${r.minutes} minutes` : ""}, with a {r.who.toLowerCase()}. {r.notes}
+            </li>
+          ))
+        }
+      </ol>
+
+      {
+        guide.values.length > 0 && (
+          <>
+            <h2>What they look for{guide.valuesName ? `: ${guide.valuesName}` : ""}</h2>
+            <ul>
+              {guide.values.map((v) => (
+                <li>
+                  <strong>{v.name}.</strong> {v.description}
+                </li>
+              ))}
+            </ul>
+          </>
+        )
+      }
+
+      <h2>Questions to practice</h2>
+      <p>The kinds of questions candidates report, as themes rather than exact questions.</p>
+      <ul>
+        {
+          guide.patterns.map((p) => (
+            <li>
+              <strong>
+                {p.type}, {p.theme.toLowerCase()}:
+              </strong>{" "}
+              {p.pattern}.
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="card">
+        <h2>Rehearse it by voice</h2>
+        <p>Strong Hire runs this loop with an AI interviewer and scores your answers against the bar for your level.</p>
+        <a class="btn" href={CTA === "signup" ? "/pricing" : "/#join"}>
+          {CTA === "signup" ? "Start free" : "Join the beta waitlist"}
+        </a>
+        <p class="small muted">{PRACTICE_NOTICE}</p>
+      </div>
+    </div>
+  </section>
+</Base>

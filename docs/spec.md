@@ -206,7 +206,7 @@ Python on the server end to end, a small TypeScript front end (browser audio nee
 ```mermaid
 flowchart TB
     browser["Candidate browser<br/>App UI, session screen, WebRTC audio"]
-    subgraph hetzner["Deployment target: laptop, single VM or cloud (default Hetzner US)"]
+    subgraph hetzner["Deployment target: laptop, single VM or cloud (default Hetzner Germany)"]
         api["API service (FastAPI)<br/>Auth, jobs, resumes, sessions, dashboards,<br/>billing webhooks, admin pages"]
         voice["Voice agent (LiveKit Agents)<br/>LiveKit server, VAD, turn detection,<br/>session controller, interviewer loop"]
         workers["Background workers (Arq)<br/>Scraping, parsing, gap analysis,<br/>planner and scorer (Pydantic AI)"]
@@ -265,7 +265,7 @@ The voice agent is the latency-critical path. Background workers do all slow wor
 | Speech-to-text on the final segment | 150 to 250 ms |
 | LLM first token | 200 to 300 ms |
 | TTS first audio chunk | 80 to 150 ms |
-| Network and buffering, voice hosted in Hetzner US | 50 to 100 ms |
+| Network and buffering, voice hosted in Hetzner Germany, North American users | 100 to 150 ms |
 
 The interviewer streams its reply sentence by sentence into TTS, so audio starts before the full reply is generated.
 
@@ -356,7 +356,7 @@ The model registry and runtime profiles live in config files, not the database. 
 
 The design rule is to keep as little as possible: audio never touches disk, and everything else can be deleted by the user in one click.
 
-**Regulations in scope.** US and Canada users only at launch. Design for CCPA/CPRA (California), PIPEDA (Canada federal) and Quebec Law 25, which is the strictest of the three and requires a privacy impact assessment before transferring personal data outside Quebec. Hosting in Hetzner's US region keeps US users' data in the US; Canadian users' data still crosses a border, so the privacy policy must disclose it plainly. Have a privacy lawyer review the policy and terms before launch; this spec is not legal advice.
+**Regulations in scope.** US and Canada users only at launch. Design for CCPA/CPRA (California), PIPEDA (Canada federal) and Quebec Law 25, which is the strictest of the three and requires a privacy impact assessment before transferring personal data outside Quebec. Hosting is in Hetzner's German region (decided Oct 26, 2026, for cost), so US and Canadian users' data crosses a border; the privacy policy must disclose it plainly, and GDPR applies to the host. Have a privacy lawyer review the policy and terms before launch; this spec is not legal advice.
 
 **Data handling.**
 
@@ -378,13 +378,13 @@ A 45-minute session should cost roughly $0.40 to $0.80 in AI usage, so the beta 
 
 During the local development period, infrastructure cost is close to zero: everything runs in Docker on your machine, and hosted model APIs are only called for latency and quality tests.
 
-**Beta infrastructure strategy.** Run the app, database and voice orchestration on Hetzner CPU cloud servers in the US region. Use pay-per-use hosted open-weight model APIs (for example Groq, Together, DeepInfra or Fireworks) for speech-to-text and the LLM, and run an open-source TTS model (Kokoro) on the Hetzner CPU box. Move the LLM to a dedicated GPU server only when monthly API spend clearly exceeds the server's fixed cost.
+**Beta infrastructure strategy.** Run the app, database and voice orchestration on Hetzner CPU cloud servers in the German region (decided Oct 26, 2026). Use pay-per-use hosted open-weight model APIs (for example Groq, Together, DeepInfra or Fireworks) for speech-to-text and the LLM, and run an open-source TTS model (Kokoro) on the Hetzner CPU box. Move the LLM to a dedicated GPU server only when monthly API spend clearly exceeds the server's fixed cost.
 
 **Monthly fixed costs (approximate).**
 
 | Item | Est. USD/month |
 | --- | --- |
-| App and API server (Hetzner cloud CCX, US region) | 40 |
+| App and API server (Hetzner cloud CCX, Germany) | 40 |
 | Postgres server with backups | 25 |
 | Voice worker running TTS and media | 40 |
 | Object storage, domain, email, monitoring | 15 |
@@ -430,7 +430,7 @@ Use PostHog (self-hosted on Hetzner, or its cloud) for product events, and the U
 
 ## Build plan with Claude Code
 
-Ten weeks, five two-week phases, built entirely with Claude Code on your personal GitHub. Phases 1 to 4 run locally in Docker; hosting on Hetzner US starts in phase 5. The plan front-loads the two things most likely to sink the product: voice latency in phase 1 and scoring credibility before beta. The ready-to-run prompts and which ones run in parallel are in the `prompts/` folder that comes with this spec.
+Ten weeks, five two-week phases, built entirely with Claude Code on your personal GitHub. Phases 1 to 4 run locally in Docker; hosting on Hetzner starts in phase 5. The plan front-loads the two things most likely to sink the product: voice latency in phase 1 and scoring credibility before beta. The ready-to-run prompts and which ones run in parallel are in the `prompts/` folder that comes with this spec.
 
 | Dates | Phase | Scope | Gate at the end |
 | --- | --- | --- | --- |
@@ -438,7 +438,7 @@ Ten weeks, five two-week phases, built entirely with Claude Code on your persona
 | Oct 19 to Nov 1 | 2. Inputs and gap analysis | Job scraping and parsing, resume parsing, company matching, generic mode; match score and session plan; profile import, first 5 profiles | |
 | Nov 2 to 15 | 3. The interviewer | Brief planner, state machine, four interview types, follow-up rules; difficulty levels, Coach and Realistic modes, persona, seniority, reconnect | |
 | Nov 16 to 29 | 4. Scoring, debrief and accounts | Scorer, hire signal, per-question rubric, progress dashboard, next-session plan; billing with minute cap, export and delete, consent, audit log, gold set calibration | Scorer within one band of human scores on 85% of the gold set |
-| Nov 30 to Dec 13 | 5. Private beta and hardening | Invite 30 to 50 beta users, fix top issues, publish the remaining 15 profiles; deploy the same images that ran locally to Hetzner US, load test 10 concurrent sessions, legal review, price test | |
+| Nov 30 to Dec 13 | 5. Private beta and hardening | Invite 30 to 50 beta users, fix top issues, publish the remaining 15 profiles; deploy the same images that ran locally to Hetzner, load test 10 concurrent sessions, legal review, price test | |
 | Dec 14 | Public launch | | |
 
 If a gate fails, the next phase does not start; the fallback is to swap models through the gateway or tighten prompts, not to cut the gate.
@@ -483,7 +483,7 @@ The biggest risk is not the tech: it's whether the hire signal feels credible en
 
 | Blocker | Resolution in this version |
 | --- | --- |
-| Hosting in Germany added 200 to 300 ms per voice turn | Voice and app move to Hetzner's US region |
+| Hosting in Germany added 200 to 300 ms per voice turn | Oct 26, 2026: hosting stays in Germany for cost; the load test measures the real p50 from North America, and a closer TURN or speech-to-text region is the fix if it misses 800 ms |
 | Model choice was deferred, but the latency gate and costs depend on it | Model shortlist in the week before phase 1; final picks at the phase 1 gate |
 | Zero-retention hosted providers not confirmed | Provider shortlist must meet zero retention, or the privacy section changes |
 | Gold set had no owner | Recruit 3 to 4 interviewers before phase 1 |

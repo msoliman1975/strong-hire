@@ -1,0 +1,14 @@
+---
+import Base from "../layouts/Base.astro";
+import { APP_URL } from "../data/site";
+---
+
+<Base title="Page not found | Strong Hire" description="This page doesn't exist.">
+  <section class="section">
+    <div class="wrap prose">
+      <h1>Page not found</h1>
+      <p>This page doesn't exist. Looking for your account? <a href={`${APP_URL}/signin`}>Sign in to the app</a>.</p>
+      <p><a href="/">Go to the home page</a></p>
+    </div>
+  </section>
+</Base>

@@ -8,14 +8,15 @@ text-to-speech (Kokoro) run on the server CPU.
 | --- | --- |
 | Server | `stronghire-test`, type cx43 (8 vCPU shared, 16 GB, 160 GB disk), Nuremberg (nbg1) |
 | Cost | $18.49 per month, billed by the hour while the server exists |
-| Address | `https://app.getstronghire.com` (web and `/api`; sign-in, Google and email links return here. `https://getstronghire.com` serves the same app until the marketing site takes it), `https://admin.getstronghire.com` (admin app and its own `/api`), `https://rtc.getstronghire.com` (LiveKit) |
+| Address | `https://app.getstronghire.com` (web and `/api`; sign-in, Google and email links return here. `https://getstronghire.com` serves the same app until the marketing site takes it), `https://admin.getstronghire.com` (admin app and its own `/api`), `https://rtc.getstronghire.com` (LiveKit), `https://www.getstronghire.com` (marketing site preview, L04) |
 | Firewall | Hetzner firewall `stronghire-fw`: 22, 80, 443/tcp, 443/udp, 7881/tcp, 7882/udp |
 | Repo on the server | `/opt/stronghire/strong-hire`, read-only deploy key |
 | Anthropic key | `/etc/stronghire/anthropic.key`, readable by root only, never in the repo or `.env` |
 
-Note: the spec puts hosting in Hetzner's US region. US servers cost about 3.5 times more, so the
-test release runs in Germany. Expect about 100 ms more network time per voice turn for North
-American users. Moving to the US region later is the same setup on a new server.
+Hosting stays in Germany (decided Oct 26, 2026). US servers cost about 3.5 times more. Expect about
+100 ms more network time per voice turn for North American users; the L08 load test checks that the
+median voice turn stays under 800 ms from a North American client. If it does not, the fix is a
+closer TURN or speech-to-text region, not moving the servers.
 
 ## How the stack runs
 
@@ -79,6 +80,32 @@ To add the admin host to a running server:
    host fails with `redirect_uri_mismatch`; password and email links still work.
 3. Deploy (`./scripts/server-deploy.sh`). Caddy gets the certificate for the new host on its
    first request.
+
+## Marketing site
+
+The marketing site (L04, `apps/site`, Astro) is built into the Caddy image as static files in
+`/srv-site`. Until the domain switch it runs as a preview on `https://www.getstronghire.com`, with
+`X-Robots-Tag: noindex`. Its waitlist form posts to `/api/public/waitlist` on the same host; Caddy
+proxies only `/api/public/*` there.
+
+Build settings (Docker build args of `infra/docker/caddy.Dockerfile`):
+
+| Arg | Default | Meaning |
+| --- | --- | --- |
+| `SITE_URL` | `https://www.getstronghire.com` | Canonical origin for links and the sitemap |
+| `PUBLIC_APP_URL` | `https://app.getstronghire.com` | Where "Sign in" and "Start free" go |
+| `PUBLIC_CTA` | `waitlist` | `signup` switches the main button to "Start free" (Dec 14) |
+
+Domain switch (Q9). Done on Oct 26: DNS `app`, the Google redirect URI
+`https://app.getstronghire.com/api/auth/google/callback`, and `WEB_BASE_URL` / `API_PUBLIC_URL`
+on `app.` (`infra/compose.server.yaml`). Left, when the pages are approved:
+
+1. Caddyfile: remove `X-Robots-Tag` from the `www` block. The apex block stops serving the app: app
+   paths (`/signin`, `/waitlist/*`, `/sessions/*`, `/jobs/*`, `/account` ...) redirect to `app.`,
+   `/api/*` is still proxied for a few weeks (old email links), and everything else redirects to
+   `www`.
+2. Stripe webhook endpoint on `app.` (already), then remove the old Google redirect URI.
+3. Deploy, then check that an old `/signin` link lands on `app.` and `/` lands on `www`.
 
 ## Update to the latest main
 

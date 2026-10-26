@@ -1,0 +1,33 @@
+---
+import Legal from "../../layouts/Legal.astro";
+import { COMPANIES, NOT_AFFILIATED, PRACTICE_NOTICE, SUPPORT_EMAIL } from "../../data/site";
+// Q3: company names as plain text, next to the notice. Adapted from #121.
+---
+
+<Legal
+  title="Company names and trademarks"
+  description="Strong Hire is not affiliated with any company it names. How we describe company interview styles, and how to reach us about a trademark."
+  updated="October 26, 2026"
+>
+  <p>
+    Strong Hire lets you practice for interviews at companies like {COMPANIES.join(", ")}. {NOT_AFFILIATED}
+  </p>
+  <h2>What the names mean</h2>
+  <p>
+    We name companies only to describe the interviews you can practice for. Each name belongs to its owner. No company
+    named on this site has reviewed, approved or sponsored Strong Hire, and our interviews are not any company's real
+    interview.
+  </p>
+  <p>{PRACTICE_NOTICE}</p>
+  <h2>How we describe interview styles</h2>
+  <p>
+    Our company profiles describe how a company's interviews usually run, in our own words, from public sources such as
+    company career pages and published articles. We don't use questions from interviews covered by a confidentiality
+    agreement, and we don't copy text from review sites.
+  </p>
+  <h2>Trademark and takedown requests</h2>
+  <p>
+    If you represent a company and have a concern about how we refer to it, write to
+    <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.
+  </p>
+</Legal>

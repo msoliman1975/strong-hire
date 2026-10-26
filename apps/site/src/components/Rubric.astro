@@ -1,0 +1,11 @@
+---
+/** A 1 to 4 rubric score (strong_core RubricScore): filled boxes, with the number for screen readers. */
+interface Props {
+  score: number;
+}
+const { score } = Astro.props;
+---
+
+<span class="rubric" role="img" aria-label={`${score} of 4`}>
+  {[1, 2, 3, 4].map((n) => <span class={n <= score ? "on" : undefined}></span>)}
+</span>

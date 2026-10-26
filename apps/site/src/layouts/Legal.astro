@@ -1,0 +1,33 @@
+---
+/**
+ * Q11: legal pages are plain-language drafts, clearly marked, until the lawyer's texts replace
+ * them (L10). Remove `draft` from a page when its reviewed text is in.
+ */
+import Base from "./Base.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  updated: string;
+  draft?: boolean;
+}
+const { title, description, updated, draft = true } = Astro.props;
+---
+
+<Base title={`${title} | Strong Hire`} description={description}>
+  <section class="section">
+    <div class="wrap prose">
+      <h1>{title}</h1>
+      {
+        draft && (
+          <p class="draft-banner">
+            <strong>Draft.</strong> This is a plain-language draft that a lawyer has not reviewed yet. It will be
+            replaced before paid plans open.
+          </p>
+        )
+      }
+      <p class="muted">Last updated {updated}.</p>
+      <slot />
+    </div>
+  </section>
+</Base>

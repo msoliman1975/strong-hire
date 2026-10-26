@@ -1,0 +1,114 @@
+---
+import Base from "../layouts/Base.astro";
+import SignalScale from "../components/SignalScale.astro";
+import WaitlistForm from "../components/WaitlistForm.astro";
+import { COMPANIES, COMPANY_COUNT, CTA, NOT_AFFILIATED, PRACTICE_NOTICE, signupUrl } from "../data/site";
+
+// Q1 A headline; Q2 written for anyone with a tech interview booked; Q3 names only in one line.
+const companiesLine =
+  COMPANIES.length > 0
+    ? `Practice for interviews at companies like ${COMPANIES.slice(0, 6).join(", ")} and ${COMPANY_COUNT - 6} more.`
+    : `Practice for interviews at ${COMPANY_COUNT} major tech companies.`;
+---
+
+<Base
+  title="Strong Hire: find out if you'd get the offer, before the interview"
+  description="A voice interviewer that rehearses the job you applied for, then gives you the hiring committee's verdict with quotes from your answers. For tech candidates in the US and Canada."
+  waitlist={CTA === "waitlist"}
+>
+  <section class="hero">
+    <div class="wrap hero__grid">
+      <div>
+        <p class="eyebrow">Interview practice by voice</p>
+        <h1>Find out if you'd get the offer, before the interview.</h1>
+        <p class="lede">
+          Paste the job posting and your CV. An AI interviewer that has read both runs the interview out loud, follows up
+          on vague answers, and then tells you what a hiring committee would likely decide, with quotes from what you said.
+        </p>
+        <div class="actions">
+          {
+            CTA === "signup" ? (
+              <a class="btn" href={signupUrl("site")}>Start free</a>
+            ) : (
+              <a class="btn" href="#join">Join the beta waitlist</a>
+            )
+          }
+          <a class="btn btn--ghost" href="/sample-debrief">See a sample debrief</a>
+        </div>
+        <p class="small muted">For engineers, product managers, data, design and TPM candidates.</p>
+      </div>
+      <div class="card verdict" aria-label="Example verdict">
+        <p class="eyebrow">Example verdict</p>
+        <SignalScale signal="Lean Hire" />
+        <blockquote>
+          "I owned the migration end to end and cut checkout errors by 40 percent."
+        </blockquote>
+        <p>
+          Strong ownership. The answer never says what you would do differently, which the bar for this level expects.
+        </p>
+        <p class="small muted">{PRACTICE_NOTICE}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <h2>Your interview is on Thursday. Rehearse it today.</h2>
+      <p class="lede">Strong Hire prepares you for the interview you actually have, not a generic one.</p>
+      <ol class="steps">
+        <li>
+          <h3>Paste the job and your CV</h3>
+          <p>You get a free gap analysis: where you match the posting, where you don't, and what to practice first.</p>
+        </li>
+        <li>
+          <h3>Practice by voice</h3>
+          <p>
+            The interviewer asks the questions this role is known for, probes vague answers and keeps time, like a real
+            one.
+          </p>
+        </li>
+        <li>
+          <h3>Get the verdict</h3>
+          <p>A hire signal, a score per question with the evidence, and the three things to fix before the real thing.</p>
+        </li>
+      </ol>
+      <p><a href="/how-it-works">How it works in detail</a></p>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="wrap grid-2">
+      <div>
+        <h2>Built around how each company interviews</h2>
+        <p class="companies">{companiesLine}</p>
+        <p class="notice">{NOT_AFFILIATED}</p>
+      </div>
+      <div>
+        <h2>Private by design</h2>
+        <p>
+          Audio is never stored. Your CV and transcripts stay yours: export or delete everything in one click. Nothing you
+          say is used for training unless you turn that on.
+        </p>
+        <p><a href="/legal/privacy">Read the privacy policy</a></p>
+      </div>
+    </div>
+  </section>
+
+  {
+    CTA === "waitlist" && (
+      <section class="section">
+        <div class="wrap grid-2">
+          <div>
+            <h2>The beta opens soon</h2>
+            <p>
+              We are inviting candidates in stages, soonest interviews first. Join the list and we'll email you when your
+              place is ready.
+            </p>
+            <p class="muted">Free accounts get unlimited gap analyses and two 10-minute mini interviews.</p>
+          </div>
+          <WaitlistForm />
+        </div>
+      </section>
+    )
+  }
+</Base>

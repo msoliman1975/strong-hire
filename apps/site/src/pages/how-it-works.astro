@@ -1,0 +1,59 @@
+---
+import Base from "../layouts/Base.astro";
+import { CTA, PRACTICE_NOTICE } from "../data/site";
+
+// Q8: a still walkthrough until the demo video exists. The screenshots come from the app with
+// its mock API (apps/site/scripts/screenshots.md); they show made-up data.
+const SHOTS = [
+  {
+    src: "/img/step-gap.jpg",
+    title: "1. Paste the job posting and your CV",
+    text: "Strong Hire reads both and shows where you match, where you don't, and the sessions to practice first. This part is free.",
+    alt: "The gap analysis page: a match score, the posting's requirements with evidence from the CV, and a suggested session plan.",
+  },
+  {
+    src: "/img/step-live.jpg",
+    title: "2. Rehearse out loud",
+    text: "The interviewer speaks, listens, and follows up when an answer is vague. Choose Realistic mode for a straight run, or Coach mode to pause, get a hint and redo an answer.",
+    alt: "A live interview: the interviewer's captions, a timer and the controls to end the interview.",
+  },
+  {
+    src: "/img/step-debrief.jpg",
+    title: "3. Read the debrief",
+    text: "A hire signal with the reasons, a 1 to 4 score per question with quotes from your answers, and what to practice next.",
+    alt: "The debrief: the hire signal scale, the rationale, and a score per question.",
+  },
+];
+---
+
+<Base
+  title="How it works | Strong Hire"
+  description="Paste a job posting and your CV, rehearse the interview by voice with an AI interviewer, then read a debrief with a hire signal and quoted evidence."
+>
+  <section class="section">
+    <div class="wrap">
+      <h1>How it works</h1>
+      <p class="lede">Three steps, about 40 minutes from the job posting to your first verdict.</p>
+      <div class="stack">
+        {
+          SHOTS.map((s) => (
+            <figure class="grid-2">
+              <img class="shot" src={s.src} alt={s.alt} width="1280" height="860" loading="lazy" decoding="async" />
+              <figcaption>
+                <h2>{s.title}</h2>
+                <p>{s.text}</p>
+              </figcaption>
+            </figure>
+          ))
+        }
+      </div>
+      <p class="small muted">Screenshots show made-up data. {PRACTICE_NOTICE}</p>
+      <div class="actions">
+        <a class="btn" href={CTA === "signup" ? "/pricing" : "/#join"}>
+          {CTA === "signup" ? "See plans" : "Join the beta waitlist"}
+        </a>
+        <a class="btn btn--ghost" href="/sample-debrief">See a sample debrief</a>
+      </div>
+    </div>
+  </section>
+</Base>

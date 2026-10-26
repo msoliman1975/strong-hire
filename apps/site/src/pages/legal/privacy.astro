@@ -1,0 +1,79 @@
+---
+import Legal from "../../layouts/Legal.astro";
+import { PRIVACY_EMAIL } from "../../data/site";
+// From docs/spec.md "Privacy, security and compliance" and Appendix A (Quebec Law 25).
+---
+
+<Legal
+  title="Privacy policy"
+  description="What Strong Hire collects, why, where it is stored, who processes it, and how to export or delete it."
+  updated="October 26, 2026"
+>
+  <h2>The short version</h2>
+  <ul>
+    <li>Interview audio is never stored. It streams through memory and is dropped when scoring ends.</li>
+    <li>You can export everything we hold about you, or delete your account and all your data, in one click.</li>
+    <li>Your transcripts are not used to improve the product unless you turn that on. It is off by default.</li>
+    <li>We don't sell your data and we don't show ads.</li>
+  </ul>
+
+  <h2>What we collect and why</h2>
+  <ul>
+    <li><strong>Account:</strong> your email, your name and the optional profile details you give (title, years of experience, target level, country, time zone). To run your account and set up interviews.</li>
+    <li><strong>Job postings and your CV:</strong> what you paste or upload. To compare them and prepare the interview.</li>
+    <li><strong>Interview transcripts and scores:</strong> the text of what you and the interviewer said, and the debrief. So you can read your debrief and see progress.</li>
+    <li><strong>Usage and billing:</strong> minutes used, plan and payment status. Card details are handled by our payment provider and never reach our servers.</li>
+    <li><strong>Waitlist:</strong> your email, when your interview is, your field if you give it, and whether you want product news.</li>
+  </ul>
+
+  <h2>Scoring is automated</h2>
+  <p>
+    Interviews are scored by AI. The hire signal is practice feedback, not a decision about you, and it is not a prediction
+    of any company's hiring decision. Each debrief shows the rubric and the quotes the score is based on. You start the
+    scoring yourself by starting an interview. You can ask us for the information used and the main reasons behind a
+    score, and to correct it, at {PRIVACY_EMAIL}.
+  </p>
+
+  <h2>Where your data is stored</h2>
+  <p>
+    Our servers are in Germany (European Union), at Hetzner. If you live in the US or Canada, your data leaves your
+    country to be stored there. During an interview, parts of it are sent to the service providers below.
+  </p>
+
+  <h2>Service providers</h2>
+  <ul>
+    <li><strong>Hetzner</strong> (Germany): hosting and backups.</li>
+    <li><strong>Anthropic</strong> (United States): AI models that run the interviewer, read postings and CVs, and score interviews. Inputs are not used to train their models.</li>
+    <li><strong>Brevo</strong> (European Union): sending email.</li>
+    <li><strong>Stripe</strong> (United States): payments, once paid plans open.</li>
+    <li><strong>Google</strong> (United States): only if you choose to sign in with Google.</li>
+  </ul>
+  <p>Speech-to-text and the interviewer's voice run on our own servers.</p>
+
+  <h2>How long we keep it</h2>
+  <ul>
+    <li>Audio: not kept.</li>
+    <li>Everything else: until you delete it or your account. Deleting your account removes your data within 24 hours; backups expire within 30 days.</li>
+    <li>Waitlist entries: until you ask us to remove them, or until you create an account.</li>
+  </ul>
+
+  <h2>Your rights</h2>
+  <p>
+    You can export your data (a JSON file and your original CV files) and delete your account from the Account page. You
+    can also write to {PRIVACY_EMAIL} to access, correct or delete your information, withdraw consent, or ask a question.
+    If you are in Quebec, you can also complain to the Commission d'accès à l'information du Québec. We will tell you and
+    the regulator promptly if a confidentiality incident puts your information at risk.
+  </p>
+
+  <h2>Security</h2>
+  <p>
+    Connections are encrypted, including interview audio. Passwords are stored as Argon2id hashes. CV files are
+    encrypted at rest. Access to production data is limited and logged.
+  </p>
+
+  <h2>Age</h2>
+  <p>Strong Hire is for people 18 and older.</p>
+
+  <h2>Contact</h2>
+  <p>Our privacy officer: <a href="/legal/privacy-officer">contact details</a>.</p>
+</Legal>

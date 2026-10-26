@@ -1,0 +1,86 @@
+---
+import Base from "../layouts/Base.astro";
+import Rubric from "../components/Rubric.astro";
+import SignalScale from "../components/SignalScale.astro";
+import { PRACTICE_NOTICE } from "../data/site";
+import { SAMPLE_IS_PLACEHOLDER, sample } from "../data/sample-debrief";
+---
+
+<Base
+  title="Sample debrief | Strong Hire"
+  description="What you get after a Strong Hire interview: a hire signal with the reasons, a score per question with quoted evidence, and what to fix first."
+>
+  <section class="section">
+    <div class="wrap">
+      <p class="eyebrow">Sample debrief</p>
+      <h1>{sample.interview}</h1>
+      {
+        SAMPLE_IS_PLACEHOLDER ? (
+          <p class="placeholder">
+            An illustration of the debrief format. The answers are made up; no real candidate is quoted.
+          </p>
+        ) : (
+          <p class="placeholder">
+            The real debrief of a simulated candidate, scored by Strong Hire. No real candidate is quoted.
+          </p>
+        )
+      }
+
+      <div class="card verdict">
+        <h2>Hire signal: {sample.hire_signal}</h2>
+        <SignalScale signal={sample.hire_signal} />
+        <p>{sample.rationale}</p>
+        <p class="small muted">{PRACTICE_NOTICE}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="wrap">
+      <h2>Competencies</h2>
+      <div class="table-scroll">
+        <table class="score-table">
+          <thead>
+            <tr><th scope="col">Competency</th><th scope="col">Score</th><th scope="col">Why</th></tr>
+          </thead>
+          <tbody>
+            {
+              sample.competencies.map((c) => (
+                <tr>
+                  <th scope="row">{c.name}</th>
+                  <td>
+                    <Rubric score={c.score} />
+                  </td>
+                  <td>{c.note}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted">Scores run from 1 (no evidence) to 4 (above the bar for the level).</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap stack">
+      <h2>Question by question</h2>
+      {
+        sample.questions.map((q) => (
+          <article class="card">
+            <h3>{q.question}</h3>
+            <p>
+              <Rubric score={q.score} /> {q.score} of 4
+            </p>
+            <blockquote>{q.evidence}</blockquote>
+            <p>{q.feedback}</p>
+          </article>
+        ))
+      }
+      <div class="card">
+        <h2>Fix these first</h2>
+        <ol>{sample.fix_first.map((f) => <li>{f}</li>)}</ol>
+      </div>
+    </div>
+  </section>
+</Base>
