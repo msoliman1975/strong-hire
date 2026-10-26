@@ -2346,6 +2346,7 @@ dialog::backdrop {
   padding-left: var(--space-3);
   border-left: 3px solid var(--line-strong);
   color: var(--ink);
+}
 
 /* L05: the post-session rating on the debrief */
 .rating {
