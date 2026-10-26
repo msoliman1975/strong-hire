@@ -10,7 +10,7 @@ Rules:
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 from enum import StrEnum
 from typing import Any
@@ -19,6 +19,7 @@ from sqlalchemy import (
     BigInteger,
     Boolean,
     CheckConstraint,
+    Date,
     DateTime,
     Double,
     Enum,
@@ -45,6 +46,7 @@ from strong_core.schemas.enums import (
     AuthProvider,
     Competency,
     Difficulty,
+    EmailKind,
     ErrorGroupStatus,
     GapStatus,
     GrantKind,
@@ -55,6 +57,7 @@ from strong_core.schemas.enums import (
     Mode,
     OrgType,
     Phase,
+    PlanCode,
     ProfileStatus,
     RoleFamily,
     SessionChannel,
@@ -124,6 +127,7 @@ USER_OWNED_TABLES = (
     "sim_runs",
     "saved_questions",
     "session_feedback",
+    "email_logs",
 )
 
 # Platform tables: no org_id, not owned by one user. A test checks that every table is in
@@ -206,6 +210,28 @@ class User(Base):
         server_default="0",
         comment="AU-8: carried in the session cookie; bumping it signs the user out everywhere",
     )
+    # L01: email preferences (L06) and analytics consent (L05).
+    product_email: Mapped[bool] = mapped_column(
+        Boolean,
+        default=True,
+        server_default="true",
+        comment="L06: debrief ready, reminders and nudges about the user's own jobs",
+    )
+    marketing_email: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+        server_default="false",
+        comment="L06: win-back and newsletters. Express consent (CASL), off by default",
+    )
+    email_unsubscribe_token: Mapped[str | None] = mapped_column(
+        String(64), unique=True, comment="L06: the one-click unsubscribe link"
+    )
+    analytics_consent: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+        server_default="false",
+        comment="L05: client-side analytics only when true",
+    )
 
 
 class Subscription(Base):
@@ -229,6 +255,20 @@ class Subscription(Base):
     minutes_used: Mapped[int] = mapped_column(Integer, default=0)
     cancel_at_period_end: Mapped[bool] = mapped_column(
         Boolean, default=False, server_default="false", comment="Canceled; ends at period_end"
+    )
+    # L01, L03: plans and the price test.
+    plan_code: Mapped[PlanCode | None] = mapped_column(
+        str_enum(PlanCode, "plan_code"), comment="L03: NULL for free and test-plan rows"
+    )
+    stripe_price_id: Mapped[str | None] = mapped_column(
+        String(100), comment="L03: the price the user bought"
+    )
+    price_variant: Mapped[str | None] = mapped_column(
+        String(40), comment="L03: the paywall price-test arm, for example p29"
+    )
+    allowance_start: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        comment="L03: start of the current monthly allowance; resets monthly inside a 3-month plan",
     )
     created_at: Mapped[datetime] = _created_at()
 
@@ -357,6 +397,9 @@ class JobTarget(Base):
     archived_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
         comment="LB-2: hidden from pickers but kept, for a job that has reports. NULL: active",
+    )
+    interview_date: Mapped[date | None] = mapped_column(
+        Date, comment="L01, L06: the candidate's real interview date, if they know it"
     )
     created_at: Mapped[datetime] = _created_at()
 
@@ -981,3 +1024,26 @@ class SessionFeedback(Base):
     realism: Mapped[int] = mapped_column(Integer, comment="1 to 5")
     comment: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = _created_at()
+
+
+class EmailLog(Base):
+    """L06: one row per lifecycle email sent, so a job never sends the same email twice."""
+
+    __tablename__ = "email_logs"
+    __table_args__ = (UniqueConstraint("user_id", "kind", "ref"),)
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    org_id: Mapped[uuid.UUID] = _org_fk()
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    kind: Mapped[EmailKind] = mapped_column(str_enum(EmailKind, "email_kind"))
+    ref: Mapped[str] = mapped_column(
+        String(64),
+        default="",
+        server_default="",
+        comment="A job or session id; empty for one-off emails (NULLs would defeat the unique key)",
+    )
+    sent_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )

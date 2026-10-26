@@ -40,6 +40,7 @@ SPEC_TABLES = {
     # Launch (L04 marketing site)
     "waitlist_entries",  # L04 step 1: waitlist with double opt-in
     "session_feedback",  # L05: post-session realism rating
+    "email_logs",  # L01, L06: lifecycle emails sent
 }
 
 
