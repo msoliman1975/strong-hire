@@ -546,6 +546,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/sessions/{session_id}/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Feedback */
+        get: operations["get_feedback_sessions__session_id__feedback_get"];
+        /** Put Feedback */
+        put: operations["put_feedback_sessions__session_id__feedback_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/reports": {
         parameters: {
             query?: never;
@@ -6799,6 +6817,28 @@ export interface components {
             /** @description CU-1: required for the Custom type, absent for the others. */
             custom?: components["schemas"]["CustomSessionSpec"] | null;
         };
+        /** SessionFeedbackIn */
+        SessionFeedbackIn: {
+            /**
+             * Realism
+             * @description "Felt like a real interview", 1 to 5
+             */
+            realism: number;
+            /** Comment */
+            comment?: string | null;
+        };
+        /** SessionFeedbackOut */
+        SessionFeedbackOut: {
+            /** Realism */
+            realism: number;
+            /** Comment */
+            comment: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /** SessionRecord */
         SessionRecord: {
             /**
@@ -8672,6 +8712,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["VoiceJoin"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_feedback_sessions__session_id__feedback_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionFeedbackOut"] | null;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_feedback_sessions__session_id__feedback_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SessionFeedbackIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionFeedbackOut"];
                 };
             };
             /** @description Validation Error */
