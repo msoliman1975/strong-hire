@@ -32,6 +32,7 @@ from strong_api.public import install_public
 from strong_api.questions import router as questions_router
 from strong_api.reports import router as reports_router
 from strong_api.scoring import router as scoring_router
+from strong_api.sessions.feedback import router as feedback_router
 from strong_api.sessions.router import router as sessions_router
 from strong_core import __version__
 from strong_core.config import get_settings
@@ -114,6 +115,7 @@ def create_app(
     app.include_router(gap_router)
     app.include_router(scoring_router)
     app.include_router(sessions_router)
+    app.include_router(feedback_router)
     app.include_router(reports_router)
     app.include_router(questions_router)
     app.include_router(custom_router)

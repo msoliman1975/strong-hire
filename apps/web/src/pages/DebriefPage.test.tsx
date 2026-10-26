@@ -326,3 +326,48 @@ describe("Custom debrief", () => {
     expect(screen.getByRole("button", { name: "Save my questions" })).toBeDisabled();
   });
 });
+
+describe("L05 realism rating", () => {
+  const rated = { realism: 3, comment: null, created_at: "2026-10-01T10:31:00Z" };
+
+  it("L05: the candidate rates the interview 1 to 5 with an optional comment", async () => {
+    let sent: unknown = null;
+    server.use(
+      http.get("*/api/sessions/:sessionId/feedback", () => HttpResponse.json(null)),
+      http.put("*/api/sessions/:sessionId/feedback", async ({ request }) => {
+        sent = await request.json();
+        return HttpResponse.json({ ...rated, realism: 4, comment: "Too polite" });
+      }),
+    );
+    renderDebrief(debrief(true));
+    const form = await screen.findByRole("form", { name: "How real did it feel?" });
+    const send = within(form).getByRole("button", { name: "Send rating" });
+    expect(send).toBeDisabled();
+    await userEvent.click(within(form).getByRole("radio", { name: "4" }));
+    await userEvent.type(within(form).getByLabelText("What felt off? (optional)"), "Too polite");
+    await userEvent.click(send);
+    expect(await screen.findByText("Thanks. You rated this interview 4 of 5.")).toBeInTheDocument();
+    expect(sent).toEqual({ realism: 4, comment: "Too polite" });
+  });
+
+  it("L05: a session already rated does not ask again", async () => {
+    server.use(http.get("*/api/sessions/:sessionId/feedback", () => HttpResponse.json(rated)));
+    renderDebrief(debrief(true));
+    expect(await screen.findByRole("heading", { name: "Next rehearsal" })).toBeInTheDocument();
+    expect(screen.queryByRole("form", { name: "How real did it feel?" })).not.toBeInTheDocument();
+  });
+
+  it("L05: Skip hides the question and it stays hidden on the next visit", async () => {
+    server.use(http.get("*/api/sessions/:sessionId/feedback", () => HttpResponse.json(null)));
+    const first = renderDebrief(debrief(true));
+    const form = await screen.findByRole("form", { name: "How real did it feel?" });
+    await userEvent.click(within(form).getByRole("button", { name: "Skip" }));
+    expect(screen.queryByRole("form", { name: "How real did it feel?" })).not.toBeInTheDocument();
+    first.unmount();
+
+    renderDebrief(debrief(true));
+    expect(await screen.findByRole("heading", { name: "Next rehearsal" })).toBeInTheDocument();
+    expect(screen.queryByRole("form", { name: "How real did it feel?" })).not.toBeInTheDocument();
+    localStorage.clear();
+  });
+});

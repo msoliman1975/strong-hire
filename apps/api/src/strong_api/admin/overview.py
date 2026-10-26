@@ -23,7 +23,8 @@ Definitions (docs/spec.md "Metrics and analytics"):
   range / their count. Self-hosted speech counts $0 (D-12). The server share (OB-15) is
   INFRA_MONTHLY_USD / sessions completed this calendar month, a separate line.
 - Quality (AO-6): failure rate = technical failures / sessions created (both without the ones the
-  candidate ended before the start); voice latency from voice_turn_timings (OB-3).
+  candidate ended before the start); voice latency from voice_turn_timings (OB-3); perceived
+  realism = the average post-session rating given in the range (L05, session_feedback).
 """
 
 from __future__ import annotations
@@ -47,6 +48,7 @@ from strong_core.db.models import (
     AuditLog,
     GapAnalysis,
     InterviewSession,
+    SessionFeedback,
     StripeEvent,
     Subscription,
     UsageEvent,
@@ -546,6 +548,36 @@ async def failure_rate(db: AsyncSession, a: datetime, b: datetime) -> tuple[int,
     return failed, total
 
 
+async def _realism(db: AsyncSession, start: datetime, end: datetime, prev: datetime) -> AdminMetric:
+    """L05: the average post-session rating given in the range, "felt like a real interview"."""
+
+    async def avg(a: datetime, b: datetime) -> tuple[float | None, int]:
+        f = SessionFeedback
+        row = (
+            await db.execute(
+                select(func.avg(f.realism), func.count()).where(_between(f.created_at, a, b))
+            )
+        ).one()
+        return (round(float(row[0]), 2) if row[0] is not None else None), int(row[1])
+
+    value, n = await avg(start, end)
+    previous, _ = await avg(prev, start)
+    if n == 0 and previous is None:
+        return AdminMetric(
+            measured=False,
+            unit="rating",
+            target=TARGET_REALISM,
+            reason="No post-session ratings in this range yet (L05).",
+        )
+    return AdminMetric(
+        value=value,
+        previous=previous,
+        unit="rating",
+        target=TARGET_REALISM,
+        note=f'Average of {n} ratings, "felt like a real interview", 1 to 5',
+    )
+
+
 async def _quality(
     db: AsyncSession, start: datetime, end: datetime, prev: datetime
 ) -> OverviewQuality:
@@ -579,12 +611,7 @@ async def _quality(
         ),
         voice_p50_ms=latency("p50", TARGET_P50_MS),
         voice_p95_ms=latency("p95", TARGET_P95_MS),
-        realism_rating=AdminMetric(
-            measured=False,
-            unit="rating",
-            target=TARGET_REALISM,
-            reason="The post-session rating (L05 SessionFeedback) is not built yet.",
-        ),
+        realism_rating=await _realism(db, start, end, prev),
         scorer_agreement=not_measured(
             "Measured by the eval harness against the human gold set (evals/), not in the app.",
             "pct",

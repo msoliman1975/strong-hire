@@ -3,6 +3,7 @@
  * add shows on the dashboard, the free interview is used once, and so on. In the browser it is
  * saved to localStorage so a page reload keeps it. This file is mock-only and never ships.
  */
+import type { SessionFeedback } from "../api/feedback";
 import type { SessionRecord } from "../api/sessions";
 import type { SiteStatus } from "../api/status";
 import type {
@@ -61,6 +62,8 @@ export interface MockDb {
   siteStatus: SiteStatus;
   /** CU-8: "My questions", newest first. */
   savedQuestions: SavedQuestion[];
+  /** L05: the post-session rating, by session id. */
+  feedback: Record<string, SessionFeedback>;
 }
 
 /** GET /status with every ops control at its default. */
@@ -108,6 +111,7 @@ export function emptyDb(): MockDb {
     exitSurveys: [],
     siteStatus: { ...OPEN_STATUS },
     savedQuestions: [],
+    feedback: {},
   };
 }
 

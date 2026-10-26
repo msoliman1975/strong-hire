@@ -15,6 +15,7 @@ import type {
   StandardType,
   ValueScore,
 } from "../api/types";
+import { RealismRating } from "../components/RealismRating";
 import { JobTrend } from "../components/TrendChart";
 import { ErrorNotice, HireSignalScale, Loading, PageHead, Rubric } from "../components/ui";
 import { CustomNext } from "../custom/CustomNext";
@@ -27,7 +28,7 @@ import { setupLink } from "./GapAnalysisPage";
  * FB-1, FB-2, PR-2: hire signal and rationale, per-question rubric, company values, next session.
  * In generic mode there are no company values; the page says so instead of showing an empty table.
  * A 10-minute mini interview says how many questions the signal rests on, and that it is not
- * counted in the progress trends.
+ * counted in the progress trends. L05: a one-question rating, "felt like a real interview".
  */
 export function DebriefPage() {
   const { sessionId = "" } = useParams();
@@ -86,6 +87,7 @@ export function DebriefPage() {
             <div />
           )}
           <aside className="side-column" aria-label="What to do next">
+            <RealismRating sessionId={session.id} />
             {config.custom && <CustomActions session={session} custom={config.custom} />}
             <section className="next-card" aria-labelledby="next-heading">
               <h2 id="next-heading" className="next-card__tag">

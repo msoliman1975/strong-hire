@@ -18,6 +18,7 @@
 import { delay } from "msw";
 import { http, HttpResponse } from "msw/http";
 
+import type { SessionFeedbackIn } from "../api/feedback";
 import type { CreateSessionRequest, SessionRecord, VoiceJoin } from "../api/sessions";
 import { MOCK_VOICE_URL } from "../session/voice";
 import type {
@@ -989,6 +990,21 @@ export function scoringHandlers(store: MockStore) {
   };
 
   return [
+    http.get(`${API}/sessions/:sessionId/feedback`, ({ params }) => {
+      const s = findSession(params.sessionId);
+      if (!s) return notFound("Session");
+      return HttpResponse.json((db().feedback ?? {})[s.id] ?? null);
+    }),
+    http.put(`${API}/sessions/:sessionId/feedback`, async ({ params, request }) => {
+      const s = findSession(params.sessionId);
+      if (!s) return notFound("Session");
+      if (!s.ended_at) return HttpResponse.json({ detail: "not_ended" }, { status: 409 });
+      const body = (await request.json()) as SessionFeedbackIn;
+      const row = { realism: body.realism, comment: body.comment?.trim() || null, created_at: new Date().toISOString() };
+      db().feedback = { ...(db().feedback ?? {}), [s.id]: row };
+      store.save();
+      return HttpResponse.json(row);
+    }),
     http.get(`${API}/sessions/:sessionId/debrief`, ({ params }) => {
       advanceAll();
       const s = findSession(params.sessionId);

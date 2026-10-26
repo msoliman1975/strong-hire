@@ -13,6 +13,7 @@ import { accountApi } from "../api/account";
 import { authApi } from "../api/auth";
 import { billingApi } from "../api/billing";
 import { customApi, savedQuestionsApi } from "../api/custom";
+import { feedbackApi } from "../api/feedback";
 import { gapApi } from "../api/gap";
 import { jobTargetsApi, resumesApi, sha256Hex } from "../api/inputs";
 import { questionsApi } from "../api/questions";
@@ -103,6 +104,10 @@ describe("mock payloads match the packages/core schemas", () => {
     const debrief = await debriefApi.get(session.id);
     expectValid("scorecard", debrief.scorecard);
     expectApiShape("Debrief", debrief);
+
+    // L05: the post-session rating.
+    expect(await feedbackApi.get(session.id)).toBeNull();
+    expectApiShape("SessionFeedbackOut", await feedbackApi.put(session.id, { realism: 4, comment: null }));
 
     const progress = await debriefApi.progress(job.id);
     expect(progress.snapshots.length).toBeGreaterThan(0);

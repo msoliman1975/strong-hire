@@ -38,6 +38,7 @@ from strong_core.db.models import (
     OpsSample,
     Org,
     Resume,
+    SessionFeedback,
     StripeEvent,
     Subscription,
     UsageEvent,
@@ -550,6 +551,23 @@ async def test_ao6_quality_and_ao8_not_measured(
         assert q[key]["measured"] is False
         assert q[key]["reason"]
     assert q["realism_rating"]["target"] == 4.2
+
+
+async def test_l05_realism_rating_averages_post_session_ratings(
+    admin: httpx.AsyncClient, sessionmaker: Maker
+) -> None:
+    """L05, AO-6: perceived realism is the average rating given in the range, with the previous."""
+    seed = await seed_all(sessionmaker)
+    async with sessionmaker() as db:
+        for key, realism, at in (("s1", 5, d(10, 11)), ("s2", 4, d(11, 11)), ("p1s", 3, d(3, 11))):
+            s = seed.sessions[key]
+            db.add(
+                SessionFeedback(org_id=s.org_id, session_id=s.id, realism=realism, created_at=at)
+            )
+        await db.commit()
+    r = (await admin.get("/admin/overview?range=7d")).json()["quality"]["realism_rating"]
+    assert (r["measured"], r["value"], r["previous"], r["target"]) == (True, 4.5, 3.0, 4.2)
+    assert "2 ratings" in r["note"]
 
 
 async def test_ao8_empty_database_marks_latency_not_measured(admin: httpx.AsyncClient) -> None:

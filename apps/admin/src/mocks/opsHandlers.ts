@@ -94,7 +94,7 @@ export function mockOverview(range: string): AdminOverview {
       failure_rate: metric(0.017241, 0.045455, "pct", { target: 0.02, link: `/interviews?status=failed&from=${from}` }),
       voice_p50_ms: metric(760, 820, "ms", { target: 800, link: "/ops/performance" }),
       voice_p95_ms: metric(1410, 1620, "ms", { target: 1500, link: "/ops/performance" }),
-      realism_rating: notMeasured("The post-session rating (L05 SessionFeedback) is not built yet.", "rating", { target: 4.2 }),
+      realism_rating: metric(4.3, 4.1, "rating", { target: 4.2, note: 'Average of 12 ratings, "felt like a real interview", 1 to 5' }),
       scorer_agreement: notMeasured("Measured by the eval harness against the human gold set (evals/), not in the app.", "pct"),
       offer_reported: notMeasured("The offer survey is not built yet."),
     },

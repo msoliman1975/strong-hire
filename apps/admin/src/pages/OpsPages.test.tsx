@@ -75,9 +75,12 @@ describe("overview (AD-2)", { timeout: 20_000 }, () => {
     // Deltas against the previous period.
     expect(screen.getAllByText("+50% vs previous (2)").length).toBeGreaterThan(0);
     // AO-8: never hidden.
+    const agreement = screen.getByText("Scorer agreement").closest(".kpi") as HTMLElement;
+    expect(within(agreement).getByText("Not measured")).toBeInTheDocument();
+    expect(within(agreement).getByText(/gold set/)).toBeInTheDocument();
+    // L05: the post-session rating is measured.
     const realism = screen.getByText("Realism rating").closest(".kpi") as HTMLElement;
-    expect(within(realism).getByText("Not measured")).toBeInTheDocument();
-    expect(within(realism).getByText(/SessionFeedback/)).toBeInTheDocument();
+    expect(within(realism).getByText("4.30")).toBeInTheDocument();
     expect(screen.getByText("Model cost per day (UTC) by component")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "24 hours" }));
