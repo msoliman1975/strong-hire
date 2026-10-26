@@ -106,16 +106,9 @@ rule for this exact command. To change the key, replace `deploy-key.pub` and run
 
 ## Test plans
 
-Stripe is not set up. `infra/server/grant-test-plans.sh` gives a test subscription (status active,
-`TEST_PLAN_MINUTES` minutes, one year) to `TEST_PLAN_OWNER` and to the first `TEST_PLAN_SLOTS`
-other people who sign up. Cron runs it every 5 minutes:
-
-```bash
-echo '*/5 * * * * root /opt/stronghire/strong-hire/infra/server/grant-test-plans.sh >> /var/log/stronghire-test-plans.log 2>&1' > /etc/cron.d/stronghire-test-plans
-```
-
-The rows have `stripe_customer_id` `test-plan:<user id>`. To remove them:
-`delete from subscriptions where stripe_customer_id like 'test-plan:%';`
+Stripe is set up in test mode (Oct 26), so the old test-plan script and its cron job are removed.
+To give someone paid access without paying, use a comp plan in the admin app (AU-5). Pay in
+checkout with the Stripe test card `4242 4242 4242 4242`.
 
 ## Costs
 

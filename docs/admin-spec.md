@@ -412,7 +412,7 @@ after beta users). The rest can land in December. `strongctl` covers content unt
 
 - **L05:** keeps events, consent, rating and the marketing-site counting. Its admin overview step moves to A4, and its Sentry step is replaced by OB-4.
 - **L08:** keeps the external uptime check (AL-8). It drops Grafana and the separate disk and memory alerts, which move to A3/A5.
-- **`infra/server/grant-test-plans.sh`:** is replaced by AU-5 comp plans and then removed.
+- **`infra/server/grant-test-plans.sh`:** is replaced by AU-5 comp plans and was removed on Oct 26, when Stripe test mode went live.
 
 ## Open questions
 
