@@ -1,9 +1,10 @@
 """launch contracts (L01)
 
 Plans and the price test on subscriptions (L03), the real interview date on job targets and
-the email log (L06), email preferences and analytics consent on users (L05, L06).
-The waitlist (0016) and session feedback (0017) tables already exist. Top-up minutes come in a
-later migration once their design is settled.
+the email log (L06), email preferences and analytics consent on users (L05, L06), and paid
+top-ups as minute_grants rows of kind top_up (L03), with minutes_used, the Stripe checkout
+session id and the amount paid. The waitlist (0016) and session feedback (0017) tables already
+exist.
 
 Backfill: active and trialing subscriptions that are not test-plan rows get plan_code monthly
 and allowance_start = period_start.
@@ -53,6 +54,13 @@ def upgrade() -> None:
     op.add_column('users', sa.Column('analytics_consent', sa.Boolean(), server_default='false', nullable=False, comment='L05: client-side analytics only when true'))
     op.create_unique_constraint(op.f('uq_users_email_unsubscribe_token'), 'users', ['email_unsubscribe_token'])
 
+    op.drop_constraint(op.f('ck_minute_grants_grant_kind'), 'minute_grants', type_='check')
+    op.create_check_constraint(op.f('ck_minute_grants_grant_kind'), 'minute_grants', "kind IN ('minutes', 'free_interviews', 'comp_plan', 'top_up')")
+    op.add_column('minute_grants', sa.Column('minutes_used', sa.Integer(), server_default='0', nullable=False, comment='L01: top_up only, minutes spent so far'))
+    op.add_column('minute_grants', sa.Column('stripe_checkout_session_id', sa.String(length=255), nullable=True, comment='L01: top_up only; one credit per checkout'))
+    op.add_column('minute_grants', sa.Column('amount_usd', sa.Numeric(precision=10, scale=2), nullable=True, comment='L01: top_up only, what the user paid'))
+    op.create_unique_constraint(op.f('uq_minute_grants_stripe_checkout_session_id'), 'minute_grants', ['stripe_checkout_session_id'])
+
     op.execute(
         "UPDATE subscriptions SET plan_code = 'monthly', allowance_start = period_start "
         "WHERE status IN ('active', 'trialing') "
@@ -61,6 +69,13 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    op.drop_constraint(op.f('uq_minute_grants_stripe_checkout_session_id'), 'minute_grants', type_='unique')
+    op.drop_column('minute_grants', 'amount_usd')
+    op.drop_column('minute_grants', 'stripe_checkout_session_id')
+    op.drop_column('minute_grants', 'minutes_used')
+    op.execute("DELETE FROM minute_grants WHERE kind = 'top_up'")
+    op.drop_constraint(op.f('ck_minute_grants_grant_kind'), 'minute_grants', type_='check')
+    op.create_check_constraint(op.f('ck_minute_grants_grant_kind'), 'minute_grants', "kind IN ('minutes', 'free_interviews', 'comp_plan')")
     op.drop_constraint(op.f('uq_users_email_unsubscribe_token'), 'users', type_='unique')
     op.drop_column('users', 'analytics_consent')
     op.drop_column('users', 'email_unsubscribe_token')

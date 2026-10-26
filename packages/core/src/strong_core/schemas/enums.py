@@ -291,11 +291,12 @@ class UsageComponent(StrEnum):
 
 
 class GrantKind(StrEnum):
-    """AU-3..AU-5: what a minute_grants row gives the user."""
+    """AU-3..AU-5: what a minute_grants row gives the user. L01: top_up is a paid top-up."""
 
     MINUTES = "minutes"
     FREE_INTERVIEWS = "free_interviews"
     COMP_PLAN = "comp_plan"
+    TOP_UP = "top_up"
 
 
 class SimRunStatus(StrEnum):

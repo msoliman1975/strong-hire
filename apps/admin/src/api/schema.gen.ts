@@ -4830,10 +4830,10 @@ export interface components {
         };
         /**
          * GrantKind
-         * @description AU-3..AU-5: what a minute_grants row gives the user.
+         * @description AU-3..AU-5: what a minute_grants row gives the user. L01: top_up is a paid top-up.
          * @enum {string}
          */
-        GrantKind: "minutes" | "free_interviews" | "comp_plan";
+        GrantKind: "minutes" | "free_interviews" | "comp_plan" | "top_up";
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */

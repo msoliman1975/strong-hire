@@ -695,6 +695,11 @@ class MinuteGrant(Base):
     """AU-3..AU-5: support grants on top of the plan. Never written into subscriptions.
 
     Removing a grant sets revoked_at; rows are not deleted, so the ledger keeps the history.
+
+    L01: paid top-ups are rows of kind top_up. Unlike a minutes grant, which raises the cap every
+    period, a top-up is a one-time pool: it never resets, is spent only after the monthly
+    allowance runs out, and `minutes_used` records how much of it is gone. The Stripe checkout
+    session id makes crediting idempotent.
     """
 
     __tablename__ = "minute_grants"
@@ -717,6 +722,15 @@ class MinuteGrant(Base):
     granted_by: Mapped[str] = mapped_column(String(320), comment="Admin email")
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     revoked_by: Mapped[str | None] = mapped_column(String(320), comment="Admin email")
+    minutes_used: Mapped[int] = mapped_column(
+        Integer, default=0, server_default="0", comment="L01: top_up only, minutes spent so far"
+    )
+    stripe_checkout_session_id: Mapped[str | None] = mapped_column(
+        String(255), unique=True, comment="L01: top_up only; one credit per checkout"
+    )
+    amount_usd: Mapped[Decimal | None] = mapped_column(
+        Numeric(10, 2), comment="L01: top_up only, what the user paid"
+    )
     created_at: Mapped[datetime] = _created_at()
 
 
