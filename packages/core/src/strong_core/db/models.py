@@ -18,6 +18,7 @@ from typing import Any
 from sqlalchemy import (
     BigInteger,
     Boolean,
+    CheckConstraint,
     DateTime,
     Double,
     Enum,
@@ -122,6 +123,7 @@ USER_OWNED_TABLES = (
     "voice_turn_timings",
     "sim_runs",
     "saved_questions",
+    "session_feedback",
 )
 
 # Platform tables: no org_id, not owned by one user. A test checks that every table is in
@@ -962,4 +964,20 @@ class WaitlistEntry(Base):
         DateTime(timezone=True), comment="Set when the email link is opened"
     )
     invited_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = _created_at()
+
+
+class SessionFeedback(Base):
+    """L05: the candidate's post-session rating, "felt like a real interview", 1 to 5."""
+
+    __tablename__ = "session_feedback"
+    __table_args__ = (CheckConstraint("realism BETWEEN 1 AND 5", name="realism_range"),)
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    org_id: Mapped[uuid.UUID] = _org_fk()
+    session_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("sessions.id", ondelete="CASCADE"), unique=True, comment="One per session"
+    )
+    realism: Mapped[int] = mapped_column(Integer, comment="1 to 5")
+    comment: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = _created_at()

@@ -39,6 +39,7 @@ SPEC_TABLES = {
     "saved_questions",  # CU-8
     # Launch (L04 marketing site)
     "waitlist_entries",  # L04 step 1: waitlist with double opt-in
+    "session_feedback",  # L05: post-session realism rating
 }
 
 
