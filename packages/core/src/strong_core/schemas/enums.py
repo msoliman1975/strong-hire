@@ -291,11 +291,12 @@ class UsageComponent(StrEnum):
 
 
 class GrantKind(StrEnum):
-    """AU-3..AU-5: what a minute_grants row gives the user."""
+    """AU-3..AU-5: what a minute_grants row gives the user. L01: top_up is a paid top-up."""
 
     MINUTES = "minutes"
     FREE_INTERVIEWS = "free_interviews"
     COMP_PLAN = "comp_plan"
+    TOP_UP = "top_up"
 
 
 class SimRunStatus(StrEnum):
@@ -376,3 +377,26 @@ class InterviewWithin(StrEnum):
     MONTH = "month"
     LATER = "later"
     NOT_YET = "not_yet"
+
+
+class PlanCode(StrEnum):
+    """L01, L03: the paid plan a subscription is on."""
+
+    MONTHLY = "monthly"
+    JOB_HUNT_3M = "job_hunt_3m"
+
+
+class EmailKind(StrEnum):
+    """L01, L06: the lifecycle emails. EmailLog keeps one row per user, kind and ref."""
+
+    WELCOME = "welcome"
+    FINISH_SETUP = "finish_setup"
+    FREE_INTERVIEW_NUDGE = "free_interview_nudge"
+    DEBRIEF_READY = "debrief_ready"
+    PAYWALL_FOLLOWUP = "paywall_followup"
+    INTERVIEW_COUNTDOWN_7 = "interview_countdown_7"
+    INTERVIEW_COUNTDOWN_2 = "interview_countdown_2"
+    INTERVIEW_DAY = "interview_day"
+    AFTER_INTERVIEW = "after_interview"
+    MINUTES_LOW = "minutes_low"
+    WINBACK = "winback"

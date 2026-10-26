@@ -204,6 +204,8 @@ class GrantIn(ActionIn):
 
     @model_validator(mode="after")
     def _check(self) -> GrantIn:
+        if self.kind == GrantKind.TOP_UP:
+            raise ValueError("top-ups come from a Stripe purchase, not an admin grant")
         if self.kind == GrantKind.MINUTES:
             if self.amount == 0 or abs(self.amount) > MAX_MINUTES:
                 raise ValueError(f"amount must be between -{MAX_MINUTES} and {MAX_MINUTES}, not 0")

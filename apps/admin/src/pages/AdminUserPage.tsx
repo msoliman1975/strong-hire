@@ -23,12 +23,14 @@ const GRANT_TITLES: Record<GrantKind, string> = {
   minutes: "Grant minutes",
   free_interviews: "Grant free interviews",
   comp_plan: "Give a comp plan",
+  top_up: "Top-up", // L01: bought through Stripe; the admin app never grants one
 };
 
 /** A grant in words, repeating the amount (AA-7). */
 export function grantText(kind: GrantKind, amount: number): string {
   if (kind === "minutes") return amount < 0 ? `remove ${-amount} minutes` : `${amount} extra minutes`;
   if (kind === "free_interviews") return `${amount} extra free ${amount === 1 ? "interview" : "interviews"}`;
+  if (kind === "top_up") return `a ${amount}-minute top-up`;
   return `a comp plan with ${amount} minutes`;
 }
 

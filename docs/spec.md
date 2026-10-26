@@ -332,10 +332,10 @@ Postgres is the single source of truth, with an `org_id` on every user-owned tab
 | Entity | Key fields | Notes |
 | --- | --- | --- |
 | Org | id, name, type (personal, business), plan | One personal org per user in v1 |
-| User | id, org_id, email, auth_provider, password_hash, email_verified_at, training_consent, created_at | Consent defaults to false; password_hash is NULL for magic-link and Google users |
-| Subscription | user_id, stripe_customer_id, status, period_start, period_end, minutes_cap, minutes_used | Usage resets each period |
+| User | id, org_id, email, auth_provider, password_hash, email_verified_at, training_consent, product_email, marketing_email, email_unsubscribe_token, analytics_consent, created_at | Consent defaults to false; password_hash is NULL for magic-link and Google users. L01: product_email defaults to true, marketing_email and analytics_consent to false (CASL express consent, privacy by default) |
+| Subscription | user_id, stripe_customer_id, status, period_start, period_end, minutes_cap, minutes_used, plan_code, stripe_price_id, price_variant, allowance_start | Usage resets each period. L01: plan_code is monthly or job_hunt_3m; allowance_start is the start of the current monthly allowance, which resets monthly inside the 3-month plan |
 | Resume | id, user_id, parsed_json, file_ref, uploaded_at | Original file encrypted in object storage |
-| JobTarget | id, user_id, company_id (nullable), source_url, raw_text, parsed_json, level, stage, context_notes | Null company_id means generic mode |
+| JobTarget | id, user_id, company_id (nullable), source_url, raw_text, parsed_json, level, stage, context_notes, interview_date | Null company_id means generic mode. interview_date (L01) is the candidate's real interview date, if known; L06 times emails to it |
 | Company | id, name, slug, active | The launch companies |
 | CompanyProfile | id, company_id, version, status, profile_json, sources_json, reviewed_by, published_at | Only Published versions are used |
 | GapAnalysis | id, job_target_id, resume_id, match_score, breakdown_json, session_plan_json, model_profile, model_id, prompt_version | Recomputed when resume or job changes |
@@ -348,6 +348,7 @@ Postgres is the single source of truth, with an `org_id` on every user-owned tab
 | AuditLog | id, actor, action, entity, at | Deletes, exports, consent changes, profile approvals |
 | WaitlistEntry | id, email, role_family, interview_within, marketing_consent, source, confirmed_at, invited_at, created_at | L04: people waiting for sign-ups to open. Not a user, so no org_id; double opt-in sets confirmed_at; marketing_consent is a separate, unticked box (CASL). Deleted by email on request |
 | SessionFeedback | id, org_id, session_id, realism, comment, created_at | L05: the post-session rating, "felt like a real interview", 1 to 5. One per session; skippable. Feeds the perceived realism metric |
+| EmailLog | id, org_id, user_id, kind, ref, sent_at | L06: one row per lifecycle email sent. Unique (user_id, kind, ref), so a job never sends the same email twice; ref is empty for one-off emails |
 
 The model registry and runtime profiles live in config files, not the database. Provenance fields (PL-6) are written on every AI output so results from different models are never mixed silently.
 

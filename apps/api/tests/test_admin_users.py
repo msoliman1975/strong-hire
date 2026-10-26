@@ -386,6 +386,8 @@ async def test_au5_comp_plan_is_paid_access_until_its_end_date(
     dev = await _user(sessionmaker)
     # A comp needs an end date in the future.
     assert (await _grant(admin, dev.id, kind="comp_plan", amount=120)).status_code == 422
+    # L01: top-ups come from Stripe only, never from an admin grant.
+    assert (await _grant(admin, dev.id, kind="top_up", amount=60)).status_code == 422
     past = (datetime.now(UTC) - timedelta(days=1)).isoformat()
     assert (
         await _grant(admin, dev.id, kind="comp_plan", amount=120, expires_at=past)

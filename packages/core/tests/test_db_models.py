@@ -40,6 +40,7 @@ SPEC_TABLES = {
     # Launch (L04 marketing site)
     "waitlist_entries",  # L04 step 1: waitlist with double opt-in
     "session_feedback",  # L05: post-session realism rating
+    "email_logs",  # L01, L06: lifecycle emails sent
 }
 
 
@@ -86,12 +87,14 @@ def test_admin_user_and_session_columns() -> None:
 
 
 def test_minute_grants_ledger() -> None:
-    """AU-3, AU-4, AU-5: one ledger for minutes, free interviews and comp plans."""
+    """AU-3, AU-4, AU-5: one ledger for minutes, free interviews and comp plans; L01: top-ups."""
     table = Base.metadata.tables["minute_grants"]
     kind = table.columns["kind"].type
-    assert set(getattr(kind, "enums", [])) == {"minutes", "free_interviews", "comp_plan"}
+    assert set(getattr(kind, "enums", [])) == {"minutes", "free_interviews", "comp_plan", "top_up"}
     assert table.columns["expires_at"].nullable and table.columns["revoked_at"].nullable
     assert not table.columns["reason"].nullable
+    assert table.columns["stripe_checkout_session_id"].unique
+    assert not table.columns["minutes_used"].nullable
 
 
 def test_usage_events_role_and_cost_known() -> None:
