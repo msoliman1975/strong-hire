@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="512" height="512">
+  <title>Strong Hire</title>
+  <rect x="18" y="1.5" width="12" height="5" rx="1.5" fill="#14202b"/>
+  <path d="M19.5 6.5 L28.5 6.5 L42 44 L6 44 Z" fill="#f0a92e"/>
+  <rect x="17" y="18" width="4.5" height="24" rx="1" fill="#ffffff"/>
+  <path d="M21.5 28.5 H26 A5.5 5.5 0 0 1 31.5 34 V42 H27 V34.5 A1.5 1.5 0 0 0 25.5 33 H21.5 Z" fill="#ffffff"/>
+  <circle cx="38" cy="38" r="9.5" fill="#ffffff"/>
+  <circle cx="38" cy="38" r="8" fill="#1a7d50"/>
+  <path d="M34 38.2 L36.8 41 L42 35.5" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
