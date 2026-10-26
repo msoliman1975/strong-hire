@@ -1,0 +1,54 @@
+---
+import Base from "../layouts/Base.astro";
+import { CTA, signupUrl } from "../data/site";
+
+// Q5: prices stay hidden until the price test; the minutes clause matches the app (BL-1, BL-2).
+// Q6: Custom interviews are listed as a paid-plan feature.
+---
+
+<Base
+  title="Pricing | Strong Hire"
+  description="Free gap analyses and two mini interviews. Paid plans come with a monthly allowance of interview minutes. Prices are announced at launch."
+>
+  <section class="section">
+    <div class="wrap prose">
+      <h1>Pricing at launch</h1>
+      <p class="lede">We'll publish prices when sign-ups open. Here is how plans work.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <h2>Free</h2>
+          <ul>
+            <li>Unlimited gap analyses of a job posting against your CV</li>
+            <li>Two 10-minute mini interviews, with a debrief</li>
+          </ul>
+          {
+            CTA === "signup" ? (
+              <a class="btn" href={signupUrl("pricing")}>Start free</a>
+            ) : (
+              <a class="btn" href="/#join">Join the waitlist</a>
+            )
+          }
+        </div>
+        <div class="card">
+          <h2>Paid plans</h2>
+          <ul>
+            <li>A monthly allowance of interview minutes</li>
+            <li>Full 30 and 45-minute interviews, Realistic and Coach modes</li>
+            <li>Company-specific interviews, and Custom interviews built from your own questions</li>
+            <li>Progress across sessions for each job</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>How minutes work</h2>
+      <ul>
+        <li>Minutes count only while an interview is running. Gap analyses and debriefs never use minutes.</li>
+        <li>Interviews last 10, 30 or 45 minutes.</li>
+        <li>Your monthly minutes reset at the end of each billing period. Unused minutes don't roll over.</li>
+        <li>Top-up minutes don't expire. They are used after your monthly minutes run out.</li>
+      </ul>
+      <p class="muted small">Prices will be shown in US dollars, plus tax where applicable.</p>
+    </div>
+  </section>
+</Base>

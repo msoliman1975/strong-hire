@@ -1,0 +1,22 @@
+---
+import Legal from "../../layouts/Legal.astro";
+import { PRIVACY_EMAIL } from "../../data/site";
+// Quebec Law 25: the title and contact of the person in charge of personal information (Q12: no
+// founder name until clearance).
+---
+
+<Legal
+  title="Privacy officer"
+  description="Contact Strong Hire's person in charge of the protection of personal information."
+  updated="October 26, 2026"
+>
+  <p>
+    The person in charge of the protection of personal information at Strong Hire is the <strong>Privacy Officer</strong>.
+  </p>
+  <p>Email: <a href={`mailto:${PRIVACY_EMAIL}`}>{PRIVACY_EMAIL}</a></p>
+  <p>
+    Write to the Privacy Officer to access, correct or delete your information, to ask how a score was made, to withdraw
+    consent, or to report a privacy concern. We answer within 30 days.
+  </p>
+  <p>See also the <a href="/legal/privacy">privacy policy</a>.</p>
+</Legal>

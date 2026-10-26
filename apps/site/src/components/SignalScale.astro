@@ -1,0 +1,12 @@
+---
+/** FB-1 hire signal scale, weakest to strongest, with the given signal marked. */
+const SIGNALS = ["No Hire", "Lean No Hire", "Lean Hire", "Hire", "Strong Hire"] as const;
+interface Props {
+  signal: (typeof SIGNALS)[number];
+}
+const { signal } = Astro.props;
+---
+
+<ol class="signal" aria-label={`Hire signal: ${signal}`}>
+  {SIGNALS.map((s) => <li aria-current={s === signal ? "true" : undefined}>{s}</li>)}
+</ol>

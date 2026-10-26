@@ -1,0 +1,75 @@
+---
+import "../styles/site.css";
+import BrandMark from "../components/BrandMark.astro";
+import { APP_URL, CTA, NOT_AFFILIATED, PRIVACY_EMAIL, SUPPORT_EMAIL, signupUrl } from "../data/site";
+
+interface Props {
+  title: string;
+  description: string;
+  /** Set on pages that use the waitlist form. */
+  waitlist?: boolean;
+}
+const { title, description, waitlist = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname.replace(/\.html$/, ""), Astro.site);
+const path = Astro.url.pathname.replace(/\.html$/, "");
+const NAV = [
+  ["/how-it-works", "How it works"],
+  ["/sample-debrief", "Sample debrief"],
+  ["/pricing", "Pricing"],
+] as const;
+const ctaHref = CTA === "signup" ? signupUrl("site") : "/#join";
+const ctaLabel = CTA === "signup" ? "Start free" : "Join the waitlist";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta name="theme-color" content="#3a4f63" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="/"><BrandMark />Strong Hire</a>
+        <nav class="site-nav" aria-label="Main">
+          {
+            NAV.map(([href, label]) => (
+              <a href={href} aria-current={path === href ? "page" : undefined}>
+                {label}
+              </a>
+            ))
+          }
+          <a href={`${APP_URL}/signin`}>Sign in</a>
+          <a class="btn" href={ctaHref}>{ctaLabel}</a>
+        </nav>
+      </div>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="wrap">
+        <nav aria-label="Legal">
+          <a href="/legal/terms">Terms</a>
+          <a href="/legal/privacy">Privacy</a>
+          <a href="/legal/refunds">Refunds</a>
+          <a href="/legal/privacy-officer">Privacy officer</a>
+          <a href={`mailto:${SUPPORT_EMAIL}`}>Contact</a>
+        </nav>
+        <p class="muted small">{NOT_AFFILIATED} Trademark or takedown requests: {SUPPORT_EMAIL}.</p>
+        <p class="muted small">Privacy questions: {PRIVACY_EMAIL}. &copy; {new Date().getFullYear()} Strong Hire.</p>
+      </div>
+    </footer>
+    {waitlist && <script is:inline src="/js/waitlist.js" defer></script>}
+  </body>
+</html>

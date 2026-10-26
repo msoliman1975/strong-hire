@@ -42,6 +42,38 @@ admin.{$DOMAIN} {
 	}
 }
 
+# The marketing site (L04, apps/site), static files built into /srv-site. Until the domain switch
+# it is a preview on www, kept out of search engines (docs/hosting.md "Marketing site"). Only the
+# public routes (the waitlist) are proxied to the API from this host. Strict headers: the site has
+# no inline scripts or styles.
+www.{$DOMAIN} {
+	encode gzip
+	header {
+		Content-Security-Policy "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self' https://app.{$DOMAIN}"
+		X-Frame-Options DENY
+		Referrer-Policy strict-origin-when-cross-origin
+		X-Content-Type-Options nosniff
+		Strict-Transport-Security "max-age=31536000"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+		X-Robots-Tag "noindex, nofollow"
+		-Server
+	}
+	handle /api/public/* {
+		uri strip_prefix /api
+		reverse_proxy api:8000
+	}
+	handle {
+		root * /srv-site
+		try_files {path} {path}.html
+		file_server
+	}
+	handle_errors 404 {
+		root * /srv-site
+		rewrite * /404.html
+		file_server
+	}
+}
+
 # LiveKit signaling (WebSocket). Media goes direct to 7881/tcp and 7882/udp.
 rtc.{$DOMAIN} {
 	reverse_proxy livekit:7880

@@ -127,6 +127,28 @@ jobs:
       - run: pnpm test
       - run: pnpm build
 
+  site:
+    name: Site (check, test, build, Lighthouse)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/site
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: apps/site/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: apps/site/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+      - run: pnpm build
+      # L04: the marketing site must stay fast, accessible and indexable (lighthouserc.json).
+      - run: npx --yes @lhci/cli@0.15.1 autorun
+
   caddy:
     name: Caddy image builds both apps and the Caddyfile is valid
     runs-on: ubuntu-latest
@@ -134,8 +156,8 @@ jobs:
       - uses: actions/checkout@v4
       - run: docker build -f infra/docker/caddy.Dockerfile -t strong-caddy .
       - run: docker run --rm -e DOMAIN=example.com strong-caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
-      - name: Both SPAs are in the image
-        run: docker run --rm strong-caddy sh -c 'test -f /srv/index.html && test -f /srv-admin/index.html'
+      - name: The two SPAs and the site are in the image
+        run: docker run --rm strong-caddy sh -c 'test -f /srv/index.html && test -f /srv-admin/index.html && test -f /srv-site/index.html'
 
   compose:
     name: Docker stack (core profile) starts and /health is OK through the web page

@@ -1,0 +1,51 @@
+import { expect, test, type Page } from "@playwright/test";
+
+// Run from apps/web (see apps/site/scripts/screenshots.md); writes into apps/site/public/img.
+const OUT = "../site/public/img";
+const clean = (page: Page) => page.evaluate(() => {
+  for (const a of Array.from(document.querySelectorAll("a"))) if (a.textContent?.includes("(dev)")) a.remove();
+  const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  for (let n = walk.nextNode(); n; n = walk.nextNode()) n.nodeValue = (n.nodeValue ?? "").replace(/Stripe/g, "Northwind");
+});
+const snap = async (page: Page, name: string) => { await clean(page); await page.screenshot({ path: `${OUT}/${name}.jpg`, type: "jpeg", quality: 82 }); };
+
+test("site screenshots", async ({ page }) => {
+  await page.goto("/");
+  await page.getByLabel("Email for dev login").fill("ana@example.com");
+  await page.getByRole("button", { name: "Sign in as dev user" }).click();
+  await page.getByLabel("I am 18 or older.").check();
+  await page.getByLabel("I accept the terms of service and the privacy policy.").check();
+  await page.getByRole("button", { name: "Create account" }).click();
+  await page.getByLabel("Full name").fill("Ana Lopez");
+  await page.getByLabel("Years of experience").fill("7");
+  await page.getByLabel("Level you are interviewing for").selectOption("senior");
+  await page.getByRole("button", { name: "Save and continue" }).click();
+  await page.getByRole("link", { name: "Add a job description" }).first().click();
+  await page.getByLabel("Job posting link").fill("https://example-board.test/jobs/1234");
+  await page.getByRole("button", { name: "Read job posting" }).click();
+  await expect(page.getByRole("heading", { name: "Check the job details" })).toBeVisible({ timeout: 10_000 });
+  await page.getByRole("button", { name: "Save and continue" }).click();
+  await page.getByLabel("Or paste your resume text").fill("Backend engineer, 7 years of Python and payments.");
+  await page.getByRole("button", { name: "Upload resume" }).click();
+  await expect(page.getByRole("heading", { name: "Roles" })).toBeVisible({ timeout: 10_000 });
+  await page.getByRole("button", { name: "Check and continue" }).click();
+  await expect(page.getByRole("heading", { name: "Check your CV" })).toBeVisible({ timeout: 10_000 });
+  await page.getByRole("button", { name: "Confirm and continue" }).click();
+  await page.getByRole("button", { name: "Save and see my gap analysis" }).click();
+  await expect(page.getByTestId("match-score")).toContainText("72", { timeout: 10_000 });
+  await page.waitForTimeout(500);
+  await snap(page, "step-gap");
+
+  await page.getByRole("link", { name: "Start the recommended session" }).click();
+  await page.getByRole("button", { name: "Start interview" }).click();
+  await page.getByRole("button", { name: "Check my microphone" }).click();
+  await page.getByRole("button", { name: "Join the interview" }).click();
+  await expect(page.getByTestId("captions")).toContainText("led a project without formal authority");
+  await page.waitForTimeout(1500);
+  await snap(page, "step-live");
+  await page.getByRole("button", { name: "End interview" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "End interview" }).click();
+  await expect(page.getByTestId("hire-signal")).toBeVisible({ timeout: 15_000 });
+  await page.waitForTimeout(500);
+  await snap(page, "step-debrief");
+});

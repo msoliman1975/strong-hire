@@ -1,4 +1,5 @@
-# Caddy with the production builds of the web app and the admin app (infra/compose.server.yaml).
+# Caddy with the production builds of the web app, the admin app and the marketing site (L04)
+# (infra/compose.server.yaml).
 # Build context: the repo root.
 FROM node:22-slim AS node-base
 # Trust extra CA certificates from infra/certs/*.crt (networks with TLS inspection).
@@ -21,7 +22,20 @@ RUN pnpm install --frozen-lockfile
 COPY apps/admin/ ./
 RUN pnpm build
 
+# The marketing site reads profiles/ at build time for the interview guides (Q13).
+FROM node-base AS site
+WORKDIR /repo/apps/site
+COPY apps/site/package.json apps/site/pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+COPY profiles/ /repo/profiles/
+COPY apps/site/ ./
+ARG SITE_URL=https://www.getstronghire.com
+ARG PUBLIC_APP_URL=https://app.getstronghire.com
+ARG PUBLIC_CTA=waitlist
+RUN SITE_URL=$SITE_URL PUBLIC_APP_URL=$PUBLIC_APP_URL PUBLIC_CTA=$PUBLIC_CTA pnpm build
+
 FROM caddy:2.10-alpine
 COPY --from=web /app/dist /srv
 COPY --from=admin /app/dist /srv-admin
+COPY --from=site /repo/apps/site/dist /srv-site
 COPY infra/caddy/Caddyfile /etc/caddy/Caddyfile
