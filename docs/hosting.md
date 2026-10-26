@@ -8,7 +8,7 @@ text-to-speech (Kokoro) run on the server CPU.
 | --- | --- |
 | Server | `stronghire-test`, type cx43 (8 vCPU shared, 16 GB, 160 GB disk), Nuremberg (nbg1) |
 | Cost | $18.49 per month, billed by the hour while the server exists |
-| Address | `https://getstronghire.com` (web and `/api`), `https://admin.getstronghire.com` (admin app and its own `/api`), `https://rtc.getstronghire.com` (LiveKit) |
+| Address | `https://app.getstronghire.com` (web and `/api`; sign-in, Google and email links return here. `https://getstronghire.com` serves the same app until the marketing site takes it), `https://admin.getstronghire.com` (admin app and its own `/api`), `https://rtc.getstronghire.com` (LiveKit) |
 | Firewall | Hetzner firewall `stronghire-fw`: 22, 80, 443/tcp, 443/udp, 7881/tcp, 7882/udp |
 | Repo on the server | `/opt/stronghire/strong-hire`, read-only deploy key |
 | Anthropic key | `/etc/stronghire/anthropic.key`, readable by root only, never in the repo or `.env` |
