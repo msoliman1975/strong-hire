@@ -9,7 +9,7 @@
         "http://localhost/pricing.html",
         "http://localhost/legal/privacy.html"
       ],
-      "numberOfRuns": 1
+      "numberOfRuns": 3
     },
     "assert": {
       "assertions": {
