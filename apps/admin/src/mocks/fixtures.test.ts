@@ -8,6 +8,7 @@ import { describe, expect, it } from "vitest";
 
 import { adminApi } from "../api/admin";
 import { alertsApi } from "../api/alerts";
+import { waitlistApi } from "../api/waitlist";
 import { authApi } from "../api/auth";
 import { controlsApi } from "../api/controls";
 import { usersApi } from "../api/users";
@@ -161,6 +162,12 @@ describe("admin mocks match openapi.json", () => {
     });
     expectApiShape("AdminSessionList", await adminApi.sessions({ status: "failed" }));
     expectApiShape("AdminSessionDetail", await adminApi.session("00000000-0000-4000-8000-0000000000c2"));
+  });
+
+  it("waitlist (L04)", async () => {
+    mockStore.db.users["admin@example.com"] = user("admin@example.com", 9, false);
+    mockSignIn(mockStore, "admin@example.com");
+    expectApiShape("AdminWaitlist", await waitlistApi.list());
   });
 
   it("content: companies, versions, diff, import, transition, requests (AT-1..AT-5)", async () => {

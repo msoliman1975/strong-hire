@@ -27,6 +27,7 @@ import { ResumesPage } from "./pages/ResumesPage";
 import { SessionSetupPage } from "./pages/SessionSetupPage";
 import { SignInPage } from "./pages/SignInPage";
 import { SignupPage } from "./pages/SignupPage";
+import { WaitlistConfirmPage, WaitlistPage } from "./pages/WaitlistPage";
 import { LiveSessionPage } from "./session/LiveSessionPage";
 
 // Dev builds only: a text interview against the real API (P7). Production builds drop it.
@@ -57,6 +58,8 @@ export function AppRoutes() {
         </Route>
         <Route element={<PublicLayout />}>
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/waitlist" element={<WaitlistPage />} />
+          <Route path="/waitlist/confirm" element={<WaitlistConfirmPage />} />
         </Route>
         <Route element={<AppLayout />}>
           <Route index element={<DashboardPage />} />

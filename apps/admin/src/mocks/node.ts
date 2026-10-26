@@ -11,6 +11,7 @@ import { opsHandlers } from "./opsHandlers";
 import { simHandlers } from "./simHandlers";
 import { settingsHandlers } from "./settingsHandlers";
 import { usersHandlers } from "./usersHandlers";
+import { waitlistHandlers } from "./waitlistHandlers";
 
 export const mockStore = createStore({ persist: false });
-export const server = setupServer(...authHandlers(mockStore), ...adminHandlers(mockStore), ...alertsHandlers(mockStore), ...controlsHandlers(mockStore), ...usersHandlers(mockStore), ...opsHandlers(mockStore), ...simHandlers(mockStore), ...contentHandlers(mockStore), ...settingsHandlers(mockStore));
+export const server = setupServer(...authHandlers(mockStore), ...adminHandlers(mockStore), ...alertsHandlers(mockStore), ...controlsHandlers(mockStore), ...usersHandlers(mockStore), ...opsHandlers(mockStore), ...simHandlers(mockStore), ...contentHandlers(mockStore), ...settingsHandlers(mockStore), ...waitlistHandlers(mockStore));

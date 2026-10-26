@@ -2,7 +2,7 @@
 the gap analysis routes; P8 adds the debrief and progress routes; P9 adds billing (/billing) and
 account self-service (/account). R1 adds the saved job and CV library and /reports. R2 adds
 the admin area (/admin). A6 adds the public /status (site banner, paused controls). C2 adds the
-Custom interview routes (/custom, /questions/mine)."""
+Custom interview routes (/custom, /questions/mine). L04 adds /public (the waitlist)."""
 
 from __future__ import annotations
 
@@ -28,6 +28,7 @@ from strong_api.gap.router import router as gap_router
 from strong_api.inputs import router as inputs_router
 from strong_api.inputs.queue import ArqJobQueue, JobQueue
 from strong_api.observability import RequestContextMiddleware
+from strong_api.public import install_public
 from strong_api.questions import router as questions_router
 from strong_api.reports import router as reports_router
 from strong_api.scoring import router as scoring_router
@@ -122,6 +123,7 @@ def create_app(
     install_billing(app)
     install_account(app)
     install_admin(app)
+    install_public(app)  # L04: waitlist
 
     @app.get("/health")
     async def health(response: Response) -> dict[str, Any]:

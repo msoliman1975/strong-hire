@@ -24,6 +24,7 @@ import { ReplayPage } from "./pages/ReplayPage";
 import { SignInPage } from "./pages/SignInPage";
 import { SimulationsPage } from "./pages/SimulationsPage";
 import { VerifyLinkPage } from "./pages/VerifyLinkPage";
+import { WaitlistPage } from "./pages/WaitlistPage";
 
 export function createQueryClient(): QueryClient {
   return new QueryClient({
@@ -51,6 +52,7 @@ export function AppRoutes() {
         <Route path="/simulations" element={<SimulationsPage />} />
         <Route path="/simulations/replay/:sessionId" element={<ReplayPage />} />
         <Route path="/users" element={<AdminUsersPage />} />
+        <Route path="/waitlist" element={<WaitlistPage />} />
         <Route path="/users/:userId" element={<AdminUserPage />} />
         <Route path="/audit" element={<AdminAuditPage />} />
         <Route path="/ops/controls" element={<ControlsPage />} />
