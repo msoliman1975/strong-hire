@@ -1,0 +1,19 @@
+---
+/**
+ * The Strong Hire logo, "the Approved h", same drawing as apps/web/src/components/BrandMark.tsx:
+ * a lamp, its light, the candidate's chair cut out of the light in the shape of an "h", and the
+ * green check of an earned verdict. Never remove the check, never color the light green.
+ */
+interface Props { size?: number; tone?: "stage" | "light"; label?: boolean }
+const { size = 30, tone = "light", label = true } = Astro.props;
+---
+<svg class="brand-mark" data-tone={tone} width={size} height={size} viewBox="0 0 48 48"
+  role={label ? "img" : undefined} aria-label={label ? "Strong Hire" : undefined} aria-hidden={label ? undefined : "true"}>
+  <rect x="18" y="1.5" width="12" height="5" rx="1.5" fill="var(--brand-main)" />
+  <path d="M19.5 6.5 L28.5 6.5 L42 44 L6 44 Z" fill="var(--light)" />
+  <rect x="17" y="18" width="4.5" height="24" rx="1" fill="var(--brand-bg)" />
+  <path d="M21.5 28.5 H26 A5.5 5.5 0 0 1 31.5 34 V42 H27 V34.5 A1.5 1.5 0 0 0 25.5 33 H21.5 Z" fill="var(--brand-bg)" />
+  <circle cx="38" cy="38" r="9.5" fill="var(--brand-bg)" />
+  <circle cx="38" cy="38" r="8" fill="var(--ok)" />
+  <path d="M34 38.2 L36.8 41 L42 35.5" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

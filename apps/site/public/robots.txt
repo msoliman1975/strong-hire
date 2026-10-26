@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://getstronghire.com/sitemap.xml

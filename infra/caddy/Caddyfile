@@ -1,7 +1,53 @@
 # Test server (infra/compose.server.yaml). Caddy gets TLS certificates from Let's Encrypt.
 
-# The candidate app. The admin API routes are never reachable from this origin (D-1).
+# The marketing site (L04, apps/site): static pages on the apex. The candidate app moved to
+# app.{$DOMAIN}; its old paths here redirect there, so old links and emails keep working.
 {$DOMAIN} {
+	encode gzip zstd
+	header {
+		Content-Security-Policy "default-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'"
+		X-Frame-Options DENY
+		Referrer-Policy strict-origin-when-cross-origin
+		X-Content-Type-Options nosniff
+		Strict-Transport-Security "max-age=31536000"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+		-Server
+	}
+
+	# The site's waitlist form posts here (POST /api/public/waitlist). Only /public is exposed.
+	@public path /api/public/*
+	handle @public {
+		uri strip_prefix /api
+		reverse_proxy api:8000
+	}
+
+	# Old app paths, and any other API call, move to the app host. 308 keeps the method.
+	@app path /api/* /signin /signup /welcome /upgrade /reset-password /account /account/* /jobs /jobs/* /resumes /resumes/* /reports /reports/* /questions /questions/* /sessions/* /waitlist/confirm /dev/*
+	handle @app {
+		redir https://app.{$DOMAIN}{uri} 308
+	}
+
+	handle {
+		root * /srv-site
+		@assets path /_astro/*
+		header @assets Cache-Control "public, max-age=31536000, immutable"
+		try_files {path} {path}.html {path}/index.html
+		file_server
+	}
+
+	handle_errors 404 {
+		root * /srv-site
+		rewrite * /404.html
+		file_server
+	}
+}
+
+www.{$DOMAIN} {
+	redir https://{$DOMAIN}{uri} 308
+}
+
+# The candidate app. The admin API routes are never reachable from this origin (D-1).
+app.{$DOMAIN} {
 	encode gzip
 	handle_path /api/* {
 		@admin path /admin /admin/*

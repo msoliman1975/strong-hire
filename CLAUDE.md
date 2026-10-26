@@ -12,6 +12,7 @@ spec is `docs/spec.md`. Read the sections that touch your task before you change
 | `apps/worker` | Arq background jobs (`strong_worker`) | Worker workstreams |
 | `apps/voice` | LiveKit Agents voice agent (`strong_voice`), stub until P1 | P1, P7 |
 | `apps/web` | React + Vite + TypeScript front end | P3 and UI workstreams |
+| `apps/site` | Astro marketing site for the apex domain (L04). Theme copied from `apps/web` | L04 |
 | `prompts/<role>/` | LLM prompt templates, `<name>.v<N>.txt` or `<name>.<tier>.v<N>.txt` | The workstream that owns the role |
 | `config/` | `models.<profile>.yaml` (role to model alias, capabilities), `litellm.<profile>.yaml` (real model ids) | P1 |
 | `schemas/` | JSON Schemas generated from `strong_core.schemas`. Never edit by hand. | Generated |

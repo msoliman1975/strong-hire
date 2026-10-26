@@ -1,0 +1,159 @@
+---
+/**
+ * Q7: the sample debrief. The content below is in the scorer's output shape (Scorecard).
+ * Before launch, replace it with the real debrief from a simulated "average quality" candidate
+ * (apps/sim), so visitors see genuine scorer output. Keep it free of real people's answers.
+ */
+import Base from "../layouts/Base.astro";
+import HireSignalScale from "../components/HireSignalScale.astro";
+import { cta, PRACTICE_ESTIMATE } from "../site.config";
+
+const competencies = [
+  { name: "Ownership", score: 3.5, tone: "strong", w: "w-88" },
+  { name: "Impact", score: 3.0, tone: "positive", w: "w-75" },
+  { name: "Communication", score: 3.0, tone: "positive", w: "w-75" },
+  { name: "Learning from failure", score: 2.5, tone: "neutral", w: "w-63" },
+  { name: "Collaboration", score: 2.5, tone: "neutral", w: "w-63" },
+  { name: "Conflict handling", score: 2.0, tone: "negative", w: "w-50" },
+];
+
+const questions = [
+  {
+    q: "Tell me about a project you owned end to end.",
+    score: "3.5",
+    tone: "strong",
+    w: "w-88",
+    quote: "I wrote the migration plan, ran the cutover on a Sunday, and checkout errors dropped by about 40 percent the next week.",
+    strong: ["Clear personal role, with \"I\" for your own decisions", "A measurable result tied to the business"],
+    missing: ["What you would do differently next time"],
+  },
+  {
+    q: "Describe a time you disagreed with a senior engineer about a design.",
+    score: "2.0",
+    tone: "negative",
+    w: "w-50",
+    quote: "In the end we just went with his approach because he'd been on the team longer.",
+    strong: ["Honest about the outcome"],
+    missing: ["How you made your case: data, a prototype, a written trade-off", "What you learned about influencing without authority"],
+  },
+  {
+    q: "Tell me about a time a launch went wrong.",
+    score: "2.5",
+    tone: "neutral",
+    w: "w-63",
+    quote: "We rolled back within an hour and I wrote the postmortem.",
+    strong: ["Fast, calm response", "Took ownership of the postmortem"],
+    missing: ["The root cause and the change that stopped it happening again"],
+  },
+  {
+    q: "How do you work with product managers when priorities change mid-sprint?",
+    score: "3.0",
+    tone: "positive",
+    w: "w-75",
+    quote: "I ask what we're dropping, not just what we're adding, and I write it in the ticket so the team sees the trade.",
+    strong: ["A concrete habit, explained simply", "Shows trade-off thinking"],
+    missing: ["An example of a time it changed the outcome"],
+  },
+];
+
+const rubricMarks = (n: number) => [1, 2, 3, 4].map((i) => i <= Math.round(n));
+---
+<Base
+  title="Sample debrief"
+  description="A full Strong Hire debrief: the hire signal and its rationale, scores by competency, every question scored with quotes as evidence, and what to fix first."
+>
+  <section class="stage">
+    <div class="wrap page-head">
+      <p class="eyebrow">Sample debrief</p>
+      <h1>What you get after every interview.</h1>
+      <p class="lede">This is an example for a fictional candidate. No real person's answers are used. Your own debrief arrives within a minute of your interview ending.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <p class="muted">Senior software engineer, payments · Behavioral interview · Realistic difficulty · Realistic mode · 30 minutes</p>
+      <div class="debrief">
+        <div class="form">
+          <section class="verdict" aria-labelledby="signal">
+            <span id="signal" class="visually-hidden">Hire signal</span>
+            <HireSignalScale signal="Lean Hire" headingLevel="h2" />
+            <p>The candidate showed clear ownership of the checkout migration and gave a measurable result. The disagreement story ended with deferring to seniority, with no evidence of making a case. At senior level we expect influence across people who don't report to you, which was not shown. Impact and communication meet the bar. The signal is Lean Hire.</p>
+            <p class="muted small">{PRACTICE_ESTIMATE}</p>
+          </section>
+
+          <section class="panel" aria-labelledby="comp-title">
+            <h2 id="comp-title" class="display">Scores by competency</h2>
+            <table class="comp-table">
+              <thead><tr><th scope="col">Competency</th><th scope="col">Score</th><th scope="col"><span class="visually-hidden">Bar</span></th></tr></thead>
+              <tbody>
+                {competencies.map((c) => (
+                  <tr>
+                    <th scope="row">{c.name}</th>
+                    <td class="score-mono">{c.score.toFixed(1)} / 4</td>
+                    <td><div class="score-bar" data-tone={c.tone}><span class={c.w}></span></div></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+
+          <h2 class="display">Question by question</h2>
+          {questions.map((item) => (
+            <article class="panel q-card">
+              <div class="q-card__head">
+                <h3>{item.q}</h3>
+                <span class="score-mono">{item.score} / 4</span>
+              </div>
+              <div class="score-bar" data-tone={item.tone}><span class={item.w}></span></div>
+              <p class="quote">"{item.quote}"</p>
+              <div class="q-card__cols">
+                <div>
+                  <p class="label-mono">What was strong</p>
+                  <ul>{item.strong.map((s) => <li>{s}</li>)}</ul>
+                </div>
+                <div>
+                  <p class="label-mono">What was missing</p>
+                  <ul>{item.missing.map((s) => <li>{s}</li>)}</ul>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <aside class="form" aria-label="What to do next">
+          <section class="panel side-next">
+            <p class="eyebrow">Fix first</p>
+            <ol>
+              <li>Rebuild your disagreement story around how you made your case, even if you lost.</li>
+              <li>Add the root cause and the lasting fix to your launch story.</li>
+              <li>End your two strongest stories with what you'd change next time.</li>
+            </ol>
+          </section>
+          <section class="panel side-next">
+            <p class="eyebrow">Next rehearsal</p>
+            <p><strong>Behavioral, Tough:</strong> conflict handling and influence. Tough mode pushes back, which is where this story broke down.</p>
+          </section>
+          <section class="panel">
+            <h3>How scores work</h3>
+            <p class="muted small">Each answer is scored 1 to 4 per competency: 1 no evidence, 2 weak, 3 meets the bar for this level, 4 above the bar.</p>
+            <div class="rubric" aria-label="Example: 3 out of 4">
+              <span class="rubric__marks" aria-hidden="true">{rubricMarks(3).map((on) => <span data-on={String(on)}></span>)}</span>
+              <span class="small">3, meets the bar</span>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="stage cta-band">
+    <div class="wrap">
+      <h2>Get your own debrief before the real one.</h2>
+      <div class="row">
+        <a class="btn btn--on-stage" href={cta.href} data-cta>{cta.label}</a>
+        <a class="btn btn--ghost-stage" href="/how-it-works">How it works</a>
+      </div>
+    </div>
+  </section>
+</Base>

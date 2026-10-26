@@ -1,0 +1,80 @@
+---
+/**
+ * The waitlist form (Q4). Posts to the same endpoint as the app's /waitlist page
+ * (POST /api/public/waitlist, PR #117). The apex proxies /api/public/* to the API.
+ * Copy and choices match apps/web/src/pages/WaitlistPage.tsx.
+ */
+import { CONTACT } from "../site.config";
+const WHEN = [
+  { value: "two_weeks", label: "In the next two weeks" },
+  { value: "month", label: "Within a month" },
+  { value: "later", label: "Later than that" },
+  { value: "not_yet", label: "No interview booked yet" },
+];
+const ROLES = [
+  { value: "swe", label: "Software engineering" },
+  { value: "data_ml", label: "Data and ML" },
+  { value: "pm", label: "Product management" },
+  { value: "design", label: "Design" },
+  { value: "tpm", label: "Technical program management" },
+  { value: "other", label: "Other" },
+];
+interface Props { id?: string }
+const { id = "waitlist-form" } = Astro.props;
+---
+<div class="panel" data-waitlist>
+  <form class="form" id={id} novalidate aria-labelledby={`${id}-title`}>
+    <h2 id={`${id}-title`} class="display">Join the beta waitlist</h2>
+    <p class="muted">People with interviews soonest get invited first.</p>
+    <div class="field">
+      <label for={`${id}-email`}>Email</label>
+      <input id={`${id}-email`} name="email" type="email" autocomplete="email" required aria-describedby={`${id}-email-error`} />
+      <p id={`${id}-email-error`} class="field-error" hidden>Enter an email address, for example name@example.com.</p>
+    </div>
+    <fieldset class="field" aria-describedby={`${id}-when-error`}>
+      <legend>When is your interview?</legend>
+      <div class="radio-grid">
+        {WHEN.map((w) => (
+          <div class="check">
+            <input id={`${id}-when-${w.value}`} type="radio" name="interview_within" value={w.value} />
+            <label for={`${id}-when-${w.value}`}>{w.label}</label>
+          </div>
+        ))}
+      </div>
+      <p id={`${id}-when-error`} class="field-error" hidden>Choose one, so we can invite people with interviews soonest first.</p>
+    </fieldset>
+    <div class="field">
+      <label for={`${id}-role`}>Your field (optional)</label>
+      <select id={`${id}-role`} name="role_family">
+        <option value="">Choose one</option>
+        {ROLES.map((r) => <option value={r.value}>{r.label}</option>)}
+      </select>
+    </div>
+    <div class="check">
+      <input id={`${id}-marketing`} type="checkbox" name="marketing_consent" />
+      <label for={`${id}-marketing`}>Also send me interview tips and product news. You can unsubscribe at any time.</label>
+    </div>
+    <div class="visually-hidden" aria-hidden="true">
+      <label for={`${id}-website`}>Website</label>
+      <input id={`${id}-website`} type="text" name="website" tabindex="-1" autocomplete="off" />
+    </div>
+    <div class="notice-box notice-box--error" role="alert" data-error hidden></div>
+    <div class="row">
+      <button type="submit" class="btn">Join the waitlist</button>
+    </div>
+    <p class="muted small">
+      Without the box above, we only email you to confirm this request and when sign-ups open. To be removed,
+      write to <a href={`mailto:${CONTACT.support}`}>{CONTACT.support}</a>. See the <a href="/legal/privacy">privacy policy</a>.
+    </p>
+  </form>
+  <div class="notice-box notice-box--ok" role="status" data-done hidden tabindex="-1">
+    <h2 class="display">Check your email</h2>
+    <p>We sent you a link to confirm your place. It works for 7 days.</p>
+    <p class="muted small">No email after a few minutes? Check your spam folder, or join again to get a new link.</p>
+  </div>
+</div>
+
+<script>
+  import { initWaitlistForms } from "../lib/waitlist";
+  initWaitlistForms();
+</script>

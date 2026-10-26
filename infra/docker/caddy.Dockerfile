@@ -1,4 +1,4 @@
-# Caddy with the production builds of the web app and the admin app (infra/compose.server.yaml).
+# Caddy with the production builds of the web app, the admin app and the marketing site (infra/compose.server.yaml).
 # Build context: the repo root.
 FROM node:22-slim AS node-base
 # Trust extra CA certificates from infra/certs/*.crt (networks with TLS inspection).
@@ -21,7 +21,17 @@ RUN pnpm install --frozen-lockfile
 COPY apps/admin/ ./
 RUN pnpm build
 
+# The marketing site (L04). Guides read /profiles at build time, so keep the repo layout.
+FROM node-base AS site
+WORKDIR /app/apps/site
+COPY apps/site/package.json apps/site/pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+COPY profiles/ /app/profiles/
+COPY apps/site/ ./
+RUN pnpm build
+
 FROM caddy:2.10-alpine
 COPY --from=web /app/dist /srv
 COPY --from=admin /app/dist /srv-admin
+COPY --from=site /app/apps/site/dist /srv-site
 COPY infra/caddy/Caddyfile /etc/caddy/Caddyfile

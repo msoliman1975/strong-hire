@@ -1,0 +1,9 @@
+---
+/** The green check alone, for earned verdicts (Hire and Strong Hire). Decorative. */
+interface Props { size?: number }
+const { size = 18 } = Astro.props;
+---
+<svg class="check-badge" width={size} height={size} viewBox="0 0 48 48" aria-hidden="true">
+  <circle cx="24" cy="24" r="22" fill="var(--ok)" />
+  <path d="M13 24.6 L20.6 32.2 L35 17" fill="none" stroke="#ffffff" stroke-width="6.4" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

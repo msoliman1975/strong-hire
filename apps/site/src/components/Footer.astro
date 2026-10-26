@@ -1,0 +1,50 @@
+---
+import BrandMark from "./BrandMark.astro";
+import { APP_URL, CONTACT, NOT_AFFILIATED, PRACTICE_ESTIMATE, cta } from "../site.config";
+const year = 2026;
+---
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="site-footer__grid">
+      <div class="site-footer__about">
+        <a class="brand" href="/" aria-label="Strong Hire, home">
+          <BrandMark label={false} />
+          <span class="brand__name">Strong Hire</span>
+        </a>
+        <p class="small">Voice interview practice for tech candidates, with the verdict a hiring committee would write.</p>
+      </div>
+      <div>
+        <h2>Product</h2>
+        <ul>
+          <li><a href="/how-it-works">How it works</a></li>
+          <li><a href="/sample-debrief">Sample debrief</a></li>
+          <li><a href="/pricing">Pricing</a></li>
+          <li><a href={cta.href}>{cta.label}</a></li>
+          <li><a href={`${APP_URL}/signin`}>Sign in</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Legal</h2>
+        <ul>
+          <li><a href="/legal/terms">Terms of service</a></li>
+          <li><a href="/legal/privacy">Privacy policy</a></li>
+          <li><a href="/legal/refunds">Refunds and cancellation</a></li>
+          <li><a href="/legal/not-affiliated">Company names and trademarks</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Contact</h2>
+        <ul>
+          <li><a href={`mailto:${CONTACT.support}`}>{CONTACT.support}</a></li>
+          <li><a href="/legal/privacy-officer">Privacy officer</a></li>
+          <li><a href={`mailto:${CONTACT.legal}`}>Trademark or takedown requests</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="site-footer__legal">
+      <p>{NOT_AFFILIATED}</p>
+      <p>{PRACTICE_ESTIMATE}</p>
+      <p>© {year} Strong Hire. For people 18 and older in the United States and Canada.</p>
+    </div>
+  </div>
+</footer>

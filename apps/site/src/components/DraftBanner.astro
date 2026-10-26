@@ -1,0 +1,12 @@
+---
+/** Q11: every legal page says it is a draft until the lawyer's text replaces it. */
+import { LEGAL_DRAFT, CONTACT } from "../site.config";
+interface Props { updated: string }
+const { updated } = Astro.props;
+---
+{LEGAL_DRAFT && (
+  <div class="draft-banner" role="note">
+    <span class="tag tag--draft">Draft</span>
+    <p>This is a plain-language draft, last changed {updated}. A lawyer is reviewing it, and the reviewed text will replace it before sign-ups open. Questions: <a href={`mailto:${CONTACT.legal}`}>{CONTACT.legal}</a>.</p>
+  </div>
+)}

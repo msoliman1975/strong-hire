@@ -1,0 +1,17 @@
+{
+  "name": "strong-hire-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "astro": "^5.14.0",
+    "@fontsource/atkinson-hyperlegible": "^5.3.0",
+    "@fontsource-variable/archivo": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0"
+  }
+}

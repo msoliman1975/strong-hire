@@ -1,0 +1,90 @@
+---
+import Base from "../layouts/Base.astro";
+import { cta, CONTACT } from "../site.config";
+---
+<Base
+  title="Pricing"
+  description="Strong Hire is free to start: unlimited gap analyses and two 10-minute mini interviews. Paid plans add full interviews, sold as a monthly allowance of interview minutes. Prices are announced at launch."
+>
+  <section class="stage">
+    <div class="wrap page-head">
+      <p class="eyebrow">Pricing</p>
+      <h1>Free to start. Pay for practice time.</h1>
+      <p class="lede">Gap analyses and debriefs are always free. Paid plans give you a monthly allowance of interview minutes. Prices are announced at launch.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="plans">
+        <article class="panel plan" aria-labelledby="plan-free">
+          <p class="plan__name" id="plan-free">Free</p>
+          <p class="plan__price">$0<small>No card needed.</small></p>
+          <ul class="ticks">
+            <li><span>Unlimited gap analyses for every job you add</span></li>
+            <li><span>Two 10-minute mini interviews, each with a debrief</span></li>
+            <li><span>One 30-minute custom interview while custom sessions are open to everyone</span></li>
+            <li><span>Data export and one-click delete</span></li>
+          </ul>
+          <a class="btn btn--secondary" href={cta.href} data-cta>{cta.label}</a>
+        </article>
+
+        <article class="panel plan plan--paid" aria-labelledby="plan-paid">
+          <p class="plan__name" id="plan-paid">Paid plans</p>
+          <p class="plan__price">At launch<small>Pricing is announced when sign-ups open.</small></p>
+          <ul class="ticks">
+            <li><span>Everything in Free</span></li>
+            <li><span>Full 30 and 45-minute interviews</span></li>
+            <li><span>All four interview types and three difficulty levels</span></li>
+            <li><span>Custom interviews: mix question types and add your own questions</span></li>
+            <li><span>Progress trends per competency across your Realistic sessions</span></li>
+          </ul>
+          <a class="btn" href={cta.href} data-cta>{cta.label}</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="wrap">
+      <div class="clause" id="minutes">
+        <h2>How minutes and time limits work</h2>
+        <p>Paid plans come with a monthly allowance of interview minutes, counted only while an interview is running. Gap analyses and debriefs never use minutes.</p>
+        <p>Interviews last 10, 30 or 45 minutes. You choose the length before you start, and the interviewer wraps up on time.</p>
+        <p>Unused minutes reset at the end of each billing period and don't roll over.</p>
+        <p>Free accounts get unlimited gap analyses and two 10-minute mini interviews.</p>
+        <p class="muted small">Prices are shown before you pay, plus tax where applicable.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--surface">
+    <div class="wrap">
+      <div class="section__head">
+        <h2>Questions</h2>
+      </div>
+      <div class="faq">
+        <details>
+          <summary>Why aren't prices shown yet?</summary>
+          <p>We're testing prices during the beta. We'd rather show the right price at launch than change it on you later. Everyone on the waitlist hears first.</p>
+        </details>
+        <details>
+          <summary>What counts as an interview minute?</summary>
+          <p>Only time while an interview is running, from when the interviewer starts to when the session ends. Reading your gap analysis or your debrief doesn't count.</p>
+        </details>
+        <details>
+          <summary>What is a mini interview?</summary>
+          <p>A 10-minute session with two or three questions and a full debrief. Its hire signal is a practice signal only and isn't counted in your progress trends.</p>
+        </details>
+        <details>
+          <summary>Can I cancel?</summary>
+          <p>Yes, at any time from your account. Your plan runs to the end of the period you paid for. See <a href="/legal/refunds">refunds and cancellation</a>.</p>
+        </details>
+        <details>
+          <summary>Do you offer plans for bootcamps, universities or career services?</summary>
+          <p>Not yet. Write to <a href={`mailto:${CONTACT.support}`}>{CONTACT.support}</a> and we'll tell you when team plans open.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+</Base>

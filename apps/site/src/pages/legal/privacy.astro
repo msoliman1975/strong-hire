@@ -1,0 +1,87 @@
+---
+import Base from "../../layouts/Base.astro";
+import DraftBanner from "../../components/DraftBanner.astro";
+import { CONTACT } from "../../site.config";
+---
+<Base title="Privacy policy" description="What Strong Hire collects, why, where it's stored, who processes it, and how to export or delete it.">
+  <section class="stage"><div class="wrap page-head"><p class="eyebrow">Legal</p><h1>Privacy policy</h1>
+    <p class="lede">We keep as little as we can. Your audio is never stored, and you can delete everything in one click.</p></div></section>
+  <section class="section"><div class="wrap prose">
+    <DraftBanner updated="October 25, 2026" />
+    <ul class="toc">
+      <li><a href="#collect">What we collect</a></li><li><a href="#use">How we use it</a></li><li><a href="#where">Where it's stored</a></li>
+      <li><a href="#who">Who processes it</a></li><li><a href="#keep">How long we keep it</a></li><li><a href="#rights">Your rights</a></li><li><a href="#contact">Contact</a></li>
+    </ul>
+
+    <p>Strong Hire ("we") runs a voice interview practice service at getstronghire.com for people 18 and older in the United States and Canada. This policy explains what personal information we handle and why. It is written to meet the California Consumer Privacy Act (as amended by the CPRA), Canada's PIPEDA, and Quebec's Law 25.</p>
+
+    <h2 id="collect">What we collect</h2>
+    <table>
+      <thead><tr><th>What</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>Email address, name, password (stored only as a hash), and how you signed in (email or Google)</td><td>To run your account and sign you in</td></tr>
+        <tr><td>Your profile: years of experience and the level you're interviewing for</td><td>To set the interview bar for your level</td></tr>
+        <tr><td>Job postings you add, your CV files and text, and any context you give (interview stage, notes)</td><td>To build your gap analysis and each interview</td></tr>
+        <tr><td>Your voice during an interview</td><td>To turn it into text in real time. Audio is never stored (see below)</td></tr>
+        <tr><td>Interview transcripts, scores and debriefs</td><td>To score your interview, show your debrief and track your progress</td></tr>
+        <tr><td>Interview minutes used and, once paid plans open, your subscription status</td><td>To apply your plan. Card details are handled by our payment provider, never by us</td></tr>
+        <tr><td>Waitlist details: email, when your interview is, your field, and whether you want tips</td><td>To invite you when sign-ups open, soonest interviews first</td></tr>
+        <tr><td>Basic technical data: IP address, browser type, error logs</td><td>Security, rate limits and fixing problems</td></tr>
+      </tbody>
+    </table>
+    <p>This website sets no advertising or analytics cookies. If a link brings tracking tags (like <code>utm_source</code>), we keep only the source name with your waitlist entry or account.</p>
+
+    <h2>Audio is never stored</h2>
+    <p>Your voice streams through server memory, is turned into text, and is dropped when your interview's scoring finishes. It is not written to disk, logs or backups. There is no recording to play back.</p>
+
+    <h2 id="use">How we use it</h2>
+    <ul>
+      <li>To provide the service: gap analyses, interviews, debriefs and progress tracking.</li>
+      <li>To send account emails: confirmation, sign-in links, password resets, and plan notices.</li>
+      <li>To send tips and product news, only if you ticked that box. You can unsubscribe at any time.</li>
+      <li>To keep the service secure and prevent abuse.</li>
+    </ul>
+    <p><strong>Training is opt-in and off by default.</strong> If you turn it on in your account, our team may read your transcripts to improve the product. Names, employers, emails and phone numbers are removed first. You can turn it off at any time.</p>
+    <p>We do not sell or share your personal information, as those words are defined in California law, and we don't use it for advertising.</p>
+
+    <h2 id="where">Where it's stored</h2>
+    <p>Our servers are in Germany (EU), with Hetzner Online GmbH. Transcripts, CVs and scores are encrypted at rest. All connections, including the live audio, are encrypted in transit.</p>
+    <p>This means your information leaves the United States or Canada when you use Strong Hire. Some processing also happens in the United States through the providers listed below. If you are in Quebec, we assessed these transfers before making them, as Law 25 requires.</p>
+
+    <h2 id="who">Who processes it</h2>
+    <table>
+      <thead><tr><th>Provider</th><th>What they do</th><th>Location</th></tr></thead>
+      <tbody>
+        <tr><td>Hetzner Online GmbH</td><td>Hosting: servers and storage</td><td>Germany</td></tr>
+        <tr><td>Anthropic, PBC</td><td>AI models that read job postings and CVs, run the interviewer and score the interview</td><td>United States</td></tr>
+        <tr><td>Brevo SAS</td><td>Sending account and waitlist emails</td><td>France</td></tr>
+        <tr><td>Google LLC</td><td>Sign in with Google, if you choose it</td><td>United States</td></tr>
+        <tr><td>Stripe, Inc.</td><td>Payments, once paid plans open</td><td>United States</td></tr>
+      </tbody>
+    </table>
+    <p>Speech-to-text and text-to-speech run on our own servers. We only use AI providers that agree not to train on your inputs. We'll update this list before adding a provider.</p>
+
+    <h2 id="keep">How long we keep it</h2>
+    <ul>
+      <li>Audio: not kept at all.</li>
+      <li>Account data, CVs, transcripts and debriefs: until you delete them or your account.</li>
+      <li>When you delete your account, everything is removed within 24 hours, and from backups within 30 days.</li>
+      <li>Waitlist entries: until you ask us to remove them, or until you create an account.</li>
+    </ul>
+
+    <h2 id="rights">Your rights</h2>
+    <p>You can do these yourself in your account:</p>
+    <ul>
+      <li><strong>Export</strong> everything as JSON, plus your original CV files.</li>
+      <li><strong>Delete</strong> your account and all its data in one click.</li>
+      <li><strong>Change</strong> your profile and turn training use on or off.</li>
+    </ul>
+    <p>You can also ask us to access, correct or delete your information, to stop a use you consented to, or to learn how a decision about you was made. Write to <a href={`mailto:${CONTACT.privacy}`}>{CONTACT.privacy}</a>. We answer within 30 days and won't treat you differently for asking. If you're not satisfied, you can complain to the Office of the Privacy Commissioner of Canada, the Commission d'accès à l'information du Québec, or the California Privacy Protection Agency.</p>
+
+    <h2>Children</h2>
+    <p>Strong Hire is for people 18 and older. We don't knowingly collect information from anyone younger.</p>
+
+    <h2 id="contact">Contact</h2>
+    <p>Our privacy officer is responsible for protecting personal information at Strong Hire. See <a href="/legal/privacy-officer">privacy officer</a>, or write to <a href={`mailto:${CONTACT.privacy}`}>{CONTACT.privacy}</a>.</p>
+  </div></section>
+</Base>

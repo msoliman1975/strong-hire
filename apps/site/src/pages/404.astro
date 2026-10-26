@@ -1,0 +1,14 @@
+---
+import Base from "../layouts/Base.astro";
+import { APP_URL } from "../site.config";
+---
+<Base title="Page not found" description="This page doesn't exist." noindex>
+  <section class="stage">
+    <div class="wrap page-head">
+      <p class="eyebrow">404</p>
+      <h1>We couldn't find that page.</h1>
+      <p class="lede">Looking for the app? It now lives at <a href={APP_URL}>{APP_URL.replace("https://", "")}</a>.</p>
+      <a class="btn btn--on-stage" href="/">Go to the home page</a>
+    </div>
+  </section>
+</Base>

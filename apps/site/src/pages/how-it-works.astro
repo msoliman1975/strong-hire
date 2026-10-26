@@ -1,0 +1,111 @@
+---
+import Base from "../layouts/Base.astro";
+import HireSignalScale from "../components/HireSignalScale.astro";
+import CompanyLine from "../components/CompanyLine.astro";
+import { cta, PRACTICE_ESTIMATE } from "../site.config";
+---
+<Base
+  title="How it works"
+  description="How Strong Hire works: a gap analysis from the job posting and your CV, a voice interview in the company's style, and a debrief scored by a separate model against a 1 to 4 rubric."
+>
+  <section class="stage">
+    <div class="wrap page-head">
+      <p class="eyebrow">How it works</p>
+      <h1>From job posting to verdict in under 40 minutes.</h1>
+      <p class="lede">Three steps: understand the gap, practice out loud, read what a hiring committee would decide.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap grid-2">
+      <div>
+        <p class="eyebrow">Step 1</p>
+        <h2>The gap analysis</h2>
+        <p class="muted">Paste a job posting link or its text. Strong Hire pulls out the company, title, level and requirements, and you confirm them. Then upload your CV as a PDF or Word file, or paste it.</p>
+        <p class="muted">You can add context: the interview stage, who's interviewing you, recruiter notes, and what worries you. The gap analysis then shows:</p>
+        <ul class="ticks">
+          <li><span>A match score: how well your CV shows what the job asks for</span></li>
+          <li><span>Your strengths, with the line from your CV that proves each one</span></li>
+          <li><span>Gaps, each marked high, medium or low severity</span></li>
+          <li><span>The areas an interviewer is likely to probe, and the session to practice first</span></li>
+        </ul>
+      </div>
+      <figure class="shot">
+        <img src="/shots/gap-analysis.webp" width="1072" height="712" loading="lazy"
+          alt="The gap analysis page with a match score of 72, strengths and gaps." />
+        <figcaption>Example data.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section section--surface">
+    <div class="wrap">
+      <div class="section__head">
+        <p class="eyebrow">Step 2</p>
+        <h2>The interview</h2>
+        <p>Before each session, Strong Hire writes a brief for the interviewer from the job, your CV, your gaps and the company's interview style. It picks four to six competencies and ranks the questions to ask.</p>
+      </div>
+      <div class="grid-3">
+        <div class="panel">
+          <h3>Choose the round</h3>
+          <dl class="kv">
+            <dt>Type</dt><dd>Behavioral, hiring manager deep dive, verbal technical Q&amp;A, or case</dd>
+            <dt>Difficulty</dt><dd>Friendly, Realistic or Tough</dd>
+            <dt>Length</dt><dd>10, 30 or 45 minutes</dd>
+            <dt>Mode</dt><dd>Coach or Realistic</dd>
+          </dl>
+        </div>
+        <div class="panel">
+          <h3>It runs like the real thing</h3>
+          <p class="muted">Intro, small talk, the agenda, core questions, your questions for them, wrap-up. A timer moves the phases, so the session ends on time.</p>
+          <p class="muted">The interviewer probes when an answer lacks your own role, a measurable result, a concrete example or your trade-off reasoning. Tough mode adds pushback and one curveball.</p>
+        </div>
+        <div class="panel">
+          <h3>Coach or Realistic</h3>
+          <p class="muted"><strong>Coach</strong> lets you pause, ask for a hint, take a minute to prepare, or redo an answer.</p>
+          <p class="muted"><strong>Realistic</strong> gives you none of that. Only Realistic sessions count toward your progress trends.</p>
+        </div>
+      </div>
+      <div class="section--tight">
+        <CompanyLine intro="Curated interview styles for companies like" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap grid-2">
+      <div>
+        <p class="eyebrow">Step 3</p>
+        <h2>The debrief</h2>
+        <p class="muted">Within a minute of the session ending, a separate scorer reads the whole transcript, the way a debrief panel reads interview notes. Keeping it apart from the live interviewer means the conversation never softens the judgment.</p>
+        <ul class="ticks">
+          <li><span>Every answer is scored 1 to 4 on each competency it touches: no evidence, weak, meets the bar for your level, or above it.</span></li>
+          <li><span>Each score quotes your own words as evidence.</span></li>
+          <li><span>A hire signal from No Hire to Strong Hire, with a short rationale like a debrief summary.</span></li>
+          <li><span>The next session to run, tied to the gaps still open.</span></li>
+        </ul>
+        <p class="muted small">{PRACTICE_ESTIMATE}</p>
+      </div>
+      <div class="verdict">
+        <p class="verdict__meta">How the hire signal is set</p>
+        <HireSignalScale signal="Strong Hire" />
+        <ul class="ticks">
+          <li><span>Strong Hire needs an average of 3.5 or more, with no competency below 3.</span></li>
+          <li><span>Any competency at 1 caps the result at Lean No Hire.</span></li>
+          <li><span>The level sets the bar, not the scale.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="stage cta-band">
+    <div class="wrap">
+      <h2>Try it on your next interview.</h2>
+      <p class="lede">Gap analyses are free, and so are your first two mini interviews.</p>
+      <div class="row">
+        <a class="btn btn--on-stage" href={cta.href} data-cta>{cta.label}</a>
+        <a class="btn btn--ghost-stage" href="/sample-debrief">See a sample debrief</a>
+      </div>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,197 @@
+---
+import Base from "../layouts/Base.astro";
+import HireSignalScale from "../components/HireSignalScale.astro";
+import CompanyLine from "../components/CompanyLine.astro";
+import WaitlistForm from "../components/WaitlistForm.astro";
+import { CTA_MODE, cta, PRACTICE_ESTIMATE } from "../site.config";
+---
+<Base
+  title="Strong Hire"
+  description="Rehearse your tech interview by voice with an interviewer who has read the job posting and your CV. Get the verdict a hiring committee would write, and what to fix first."
+>
+  <section class="stage" aria-labelledby="hero-title">
+    <div class="wrap hero">
+      <div>
+        <p class="eyebrow">Voice interview practice for tech roles</p>
+        <h1 id="hero-title">Find out if you'd get the offer, before the interview.</h1>
+        <p class="lede">
+          Paste the job posting and your CV. An AI interviewer runs the real round by voice, follows up when your
+          answers are vague, then writes the verdict a hiring committee would, with quotes from what you said.
+        </p>
+        <div class="row">
+          <a class="btn btn--on-stage" href={cta.href} data-cta>{cta.label}</a>
+          <a class="btn btn--ghost-stage" href="/sample-debrief">See a sample debrief</a>
+        </div>
+        <p class="hero__note">{cta.note}</p>
+      </div>
+
+      <section class="verdict verdict--float" aria-labelledby="hero-sample">
+        <p class="verdict__meta" id="hero-sample">Example debrief · Behavioral · Senior software engineer</p>
+        <HireSignalScale signal="Lean Hire" />
+        <blockquote>
+          <p class="said">"I owned the migration end to end and cut checkout errors by 40 percent."</p>
+          <p class="read">Strong ownership. The answer never says what you would do differently, which the bar for this level expects.</p>
+        </blockquote>
+        <p class="muted small">Fix first: add a short "what I'd change" to your two strongest stories.</p>
+      </section>
+    </div>
+  </section>
+
+  <section class="section section--tight section--surface" aria-label="Companies">
+    <div class="wrap">
+      <CompanyLine />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="how-title">
+    <div class="wrap">
+      <div class="section__head">
+        <p class="eyebrow">How it works</p>
+        <h2 id="how-title">Paste the job posting. Get grilled. Get the verdict.</h2>
+        <p>Your first gap analysis takes about five minutes. Your first practice interview takes ten.</p>
+      </div>
+      <ol class="steps grid-3">
+        <li class="step panel">
+          <span class="step__num" aria-hidden="true"></span>
+          <h3>Paste the job and your CV</h3>
+          <p>You get a free gap analysis: a match score, your strengths, the gaps an interviewer will probe, and the session to practice first.</p>
+        </li>
+        <li class="step panel">
+          <span class="step__num" aria-hidden="true"></span>
+          <h3>Practice out loud</h3>
+          <p>The interviewer runs the round by voice, in the company's style and at your level. It follows up when an answer has no result, no example or no trade-off.</p>
+        </li>
+        <li class="step panel">
+          <span class="step__num" aria-hidden="true"></span>
+          <h3>Read the verdict</h3>
+          <p>Within a minute you see a hire signal from No Hire to Strong Hire, a score for every question with your own words as evidence, and what to fix first.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--surface" aria-labelledby="walk-title">
+    <div class="wrap">
+      <div class="section__head">
+        <p class="eyebrow">Inside the app</p>
+        <h2 id="walk-title">Rehearse your hiring loop with an interviewer who's read your CV.</h2>
+      </div>
+      <div class="walk">
+        <div class="walk__item">
+          <div class="walk__text">
+            <h3>Know your gaps before you practice</h3>
+            <p>Strong Hire reads the posting's requirements against your CV. Each gap gets a severity, so you spend practice time where an interviewer will push.</p>
+          </div>
+          <figure class="shot">
+            <img src="/shots/gap-analysis.webp" width="1072" height="712" loading="lazy"
+              alt="The gap analysis page: a match score of 72, strengths with evidence from the CV, and gaps marked high, medium and low severity." />
+            <figcaption>Gap analysis for a senior engineering role. Example data.</figcaption>
+          </figure>
+        </div>
+        <div class="walk__item">
+          <div class="walk__text">
+            <h3>A real conversation, not a quiz</h3>
+            <p>Small talk, the agenda, core questions with follow-ups, then your questions for them. In Coach mode you can pause, ask for a hint or redo an answer. Realistic mode gives you none of that, like the real thing.</p>
+            <p>Your audio is never stored. Only the text of the interview is kept.</p>
+          </div>
+          <figure class="shot shot--narrow">
+            <img src="/shots/live-interview.webp" width="760" height="886" loading="lazy"
+              alt="A live interview: a timer at 9:57, the phases from Intro to Wrap-up, the animated interviewer speaking, and the caption 'Tell me about a time you led a project without formal authority.'" />
+            <figcaption>A 10-minute mini interview in Coach mode.</figcaption>
+          </figure>
+        </div>
+        <div class="walk__item">
+          <div class="walk__text">
+            <h3>The hiring committee's verdict, before the hiring committee.</h3>
+            <p>The scorer reads the whole transcript after the interview ends, the way a debrief panel reads notes. It is a separate model from the interviewer, so the live conversation never softens the judgment.</p>
+          </div>
+          <figure class="shot">
+            <img src="/shots/debrief.webp" width="1072" height="740" loading="lazy"
+              alt="A debrief: the hire signal Lean Hire on a five-step scale, a written rationale, and the first question scored 3.0 out of 4 with what was strong and what was missing." />
+            <figcaption>A debrief with its hire signal and question-by-question scores. Example data.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="who-title">
+    <div class="wrap grid-2">
+      <div>
+        <p class="eyebrow">Who it's for</p>
+        <h2 id="who-title">Anyone with a tech interview on the calendar.</h2>
+        <p class="muted">From new grad to staff and principal. The interviewer raises the bar with your level: a "meets the bar" answer for a staff role needs cross-team scope that a mid-level one doesn't.</p>
+        <ul class="chips" aria-label="Roles">
+          <li>Software engineering</li>
+          <li>Data and ML</li>
+          <li>Product management</li>
+          <li>Design</li>
+          <li>Technical program management</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Four interview types</h3>
+        <ul class="ticks">
+          <li><span><strong>Behavioral.</strong> Ownership, impact, collaboration, conflict, learning from failure.</span></li>
+          <li><span><strong>Hiring manager deep dive.</strong> Role fit, depth of experience, judgment, scope at your level.</span></li>
+          <li><span><strong>Verbal technical Q&amp;A.</strong> Depth, accuracy, reasoning and trade-offs, said out loud.</span></li>
+          <li><span><strong>Case.</strong> Product sense, estimation and system thinking.</span></li>
+        </ul>
+        <p class="muted small mt-4">Three difficulty levels: Friendly, Realistic and Tough. Live coding and whiteboard rounds are not part of v1.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight section--surface" aria-labelledby="privacy-title">
+    <div class="wrap">
+      <div class="section__head">
+        <p class="eyebrow">Your data</p>
+        <h2 id="privacy-title">Built to keep as little as possible.</h2>
+      </div>
+      <ul class="facts">
+        <li><strong>Audio is never stored</strong><span>It streams through memory and is dropped once your debrief is scored.</span></li>
+        <li><strong>Delete in one click</strong><span>Your account, CVs and transcripts are removed within 24 hours.</span></li>
+        <li><strong>Export anytime</strong><span>Download everything as JSON, plus your original CV files.</span></li>
+        <li><strong>Not used for training</strong><span>Unless you opt in. It's off by default.</span></li>
+      </ul>
+      <p class="muted small mt-5">Your data is stored in Germany (EU). Read the <a href="/legal/privacy">privacy policy</a>.</p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="price-title">
+    <div class="wrap grid-2">
+      <div>
+        <p class="eyebrow">Pricing</p>
+        <h2 id="price-title">Free to start.</h2>
+        <p class="muted">Free accounts get unlimited gap analyses and two 10-minute mini interviews, each with a full debrief. Paid plans add full 30 and 45-minute interviews. Prices are announced at launch.</p>
+        <a class="btn btn--secondary" href="/pricing">See how plans work</a>
+      </div>
+      <div class="panel">
+        <h3>What a debrief is, and isn't</h3>
+        <p class="muted">{PRACTICE_ESTIMATE} It tells you how your answers read against a hiring bar, so you know what to work on.</p>
+        <a href="/sample-debrief">Read a full sample debrief</a>
+      </div>
+    </div>
+  </section>
+
+  {CTA_MODE === "waitlist" ? (
+    <section class="section section--surface" id="waitlist" aria-label="Join the waitlist">
+      <div class="wrap waitlist">
+        <div>
+          <p class="eyebrow">Beta</p>
+          <h2>Got an interview coming up?</h2>
+          <p class="muted">Sign-ups open December 14. Join the waitlist and we'll invite people with the soonest interviews first.</p>
+        </div>
+        <WaitlistForm id="home-waitlist" />
+      </div>
+    </section>
+  ) : (
+    <section class="stage cta-band" aria-labelledby="cta-title">
+      <div class="wrap">
+        <h2 id="cta-title">Got an interview coming up?</h2>
+        <p class="lede">Your first gap analysis and two mini interviews are free.</p>
+        <a class="btn btn--on-stage" href={cta.href} data-cta>{cta.label}</a>
+      </div>
+    </section>
+  )}
+</Base>

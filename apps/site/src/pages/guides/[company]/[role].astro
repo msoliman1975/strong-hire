@@ -1,0 +1,86 @@
+---
+/**
+ * Q13: one guide per published profile and role. Uses only fields written in our own words
+ * (loop rounds, question themes, bar by level, persona). Never sample questions, sources' text,
+ * or anything that suggests an official or endorsed process.
+ */
+import Base from "../../../layouts/Base.astro";
+import { publishedGuides, ROLE_LABEL, INTERVIEW_TYPE_LABEL, type Guide } from "../../../lib/guides";
+import { NOT_AFFILIATED, PRACTICE_ESTIMATE, cta } from "../../../site.config";
+
+export function getStaticPaths() {
+  return publishedGuides().map((g) => ({ params: { company: g.companySlug, role: g.roleSlug }, props: { guide: g } }));
+}
+
+const { guide } = Astro.props as { guide: Guide };
+const { profile, role } = guide;
+const loop = profile.loop_structure.find((l) => l.role_family === role)!;
+const simulated = loop.rounds.filter((r) => r.interview_type);
+const bars = (profile.bar_by_level ?? []).filter((b) => b.role_family === role);
+const themes = (profile.question_patterns ?? []).filter((q) => simulated.some((r) => r.interview_type === q.interview_type)).slice(0, 8);
+const roleLabel = ROLE_LABEL[role];
+---
+<Base
+  title={`${profile.company_name} ${roleLabel.toLowerCase()} interview guide`}
+  description={`How the ${profile.company_name} ${roleLabel.toLowerCase()} interview loop usually runs, what each round tests, and the bar by level. Practice it by voice with Strong Hire.`}
+>
+  <section class="stage">
+    <div class="wrap page-head">
+      <p class="eyebrow">Interview guide</p>
+      <h1>{profile.company_name} {roleLabel.toLowerCase()} interview</h1>
+      <p class="lede">How the loop usually runs, what each round tests, and the bar at each level, from public sources in our own words.</p>
+      <p class="notice">{NOT_AFFILIATED}</p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="wrap prose">
+      <h2>The loop</h2>
+      <table>
+        <thead><tr><th>Round</th><th>Length</th><th>Interviewer</th><th>Practice it here</th></tr></thead>
+        <tbody>
+          {loop.rounds.map((r) => (
+            <tr>
+              <td><strong>{r.name}</strong>{r.notes && <><br /><span class="muted small">{r.notes}</span></>}</td>
+              <td>{r.duration_min ? `${r.duration_min} min` : ""}</td>
+              <td>{r.interviewer_role ?? ""}</td>
+              <td>{r.interview_type ? INTERVIEW_TYPE_LABEL[r.interview_type] ?? r.interview_type : "Not in v1"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {themes.length > 0 && (
+        <>
+          <h2>Themes you'll likely be asked about</h2>
+          <ul>{themes.map((t) => <li><strong>{t.theme}.</strong> {t.pattern}.</li>)}</ul>
+        </>
+      )}
+
+      {bars.length > 0 && (
+        <>
+          <h2>The bar by level</h2>
+          <table>
+            <thead><tr><th>Level</th><th>What's expected</th></tr></thead>
+            <tbody>{bars.map((b) => <tr><td>{b.level_name}</td><td>{b.scope_expectation}</td></tr>)}</tbody>
+          </table>
+        </>
+      )}
+
+      {profile.persona && (
+        <>
+          <h2>What the interviewers are like</h2>
+          <ul>
+            <li><strong>Tone:</strong> {profile.persona.tone}</li>
+            <li><strong>Pace:</strong> {profile.persona.pace}</li>
+            <li><strong>Pushback:</strong> {profile.persona.pushback_style}</li>
+          </ul>
+        </>
+      )}
+
+      <h2>Practice it out loud</h2>
+      <p>Paste the {profile.company_name} job posting and your CV. Strong Hire runs the round in this style, then gives you a hire signal and a score for every answer.</p>
+      <p class="muted small">{PRACTICE_ESTIMATE}</p>
+      <a class="btn" href={cta.href}>{cta.label}</a>
+    </div>
+  </section>
+</Base>

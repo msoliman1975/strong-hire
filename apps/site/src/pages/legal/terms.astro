@@ -1,0 +1,49 @@
+---
+import Base from "../../layouts/Base.astro";
+import DraftBanner from "../../components/DraftBanner.astro";
+import { CONTACT, NOT_AFFILIATED, PRACTICE_ESTIMATE } from "../../site.config";
+---
+<Base title="Terms of service" description="The terms for using Strong Hire, in plain language.">
+  <section class="stage"><div class="wrap page-head"><p class="eyebrow">Legal</p><h1>Terms of service</h1></div></section>
+  <section class="section"><div class="wrap prose">
+    <DraftBanner updated="October 25, 2026" />
+    <p>These terms are an agreement between you and Strong Hire for using getstronghire.com and the Strong Hire app. By creating an account, you accept them.</p>
+
+    <h2>Who can use Strong Hire</h2>
+    <p>You must be 18 or older and live in the United States or Canada. You need one account per person, and you're responsible for keeping your sign-in details safe.</p>
+
+    <h2>What Strong Hire is, and isn't</h2>
+    <p>Strong Hire is practice. It helps you prepare for interviews by simulating them and scoring your answers with AI.</p>
+    <ul>
+      <li>{PRACTICE_ESTIMATE}</li>
+      <li>We don't promise any interview result, offer or job.</li>
+      <li>AI can make mistakes. Use the feedback as one input, alongside your own judgment.</li>
+      <li>{NOT_AFFILIATED} Company interview styles are our own description, from public sources.</li>
+    </ul>
+
+    <h2>Your content</h2>
+    <p>You own what you upload and say: job postings, CVs, notes and your answers. You give us permission to use it only to run the service for you, and, if you opt in, to improve the product as the <a href="/legal/privacy">privacy policy</a> describes. Only upload a CV that is yours, or that you have permission to use.</p>
+
+    <h2>Fair use</h2>
+    <p>Please don't:</p>
+    <ul>
+      <li>try to change the AI's instructions, get around limits, or break the service;</li>
+      <li>scrape, copy or resell the service, its questions or its company profiles;</li>
+      <li>use it to harass anyone, or to break the law;</li>
+      <li>share your account.</li>
+    </ul>
+    <p>Gap analyses are unlimited, with rate limits to keep the service fast for everyone. We may suspend accounts that break these rules.</p>
+
+    <h2>Plans and payment</h2>
+    <p>Free accounts get unlimited gap analyses and two 10-minute mini interviews. Paid plans give a monthly allowance of interview minutes, counted only while an interview is running. Unused minutes reset at the end of each billing period. Prices are shown before you pay, plus tax where applicable. Plans renew automatically until you cancel. See <a href="/legal/refunds">refunds and cancellation</a>.</p>
+
+    <h2>Changes and ending</h2>
+    <p>We may change the service or these terms. For important changes, we'll email you at least 30 days ahead. You can delete your account at any time, and we may close accounts that break these terms.</p>
+
+    <h2>Liability</h2>
+    <p>The service is provided as it is. To the extent the law allows, we aren't liable for indirect losses, such as a missed job offer, and our total liability is limited to what you paid us in the 12 months before a claim. Nothing here limits rights you have under consumer protection laws where you live, including in Quebec.</p>
+
+    <h2>Contact</h2>
+    <p><a href={`mailto:${CONTACT.support}`}>{CONTACT.support}</a></p>
+  </div></section>
+</Base>

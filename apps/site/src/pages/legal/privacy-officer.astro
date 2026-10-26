@@ -1,0 +1,17 @@
+---
+import Base from "../../layouts/Base.astro";
+import DraftBanner from "../../components/DraftBanner.astro";
+import { CONTACT } from "../../site.config";
+---
+<Base title="Privacy officer" description="Contact the person in charge of protecting personal information at Strong Hire.">
+  <section class="stage"><div class="wrap page-head"><p class="eyebrow">Legal</p><h1>Privacy officer</h1></div></section>
+  <section class="section"><div class="wrap prose">
+    <DraftBanner updated="October 25, 2026" />
+    <p>Under Quebec's Law 25, the person in charge of the protection of personal information at Strong Hire is our <strong>Privacy Officer</strong>.</p>
+    <dl class="kv">
+      <dt>Title</dt><dd>Privacy Officer, Strong Hire</dd>
+      <dt>Email</dt><dd><a href={`mailto:${CONTACT.privacy}`}>{CONTACT.privacy}</a></dd>
+    </dl>
+    <p>Write to the Privacy Officer to access or correct your personal information, to withdraw consent, to ask a question about our <a href="/legal/privacy">privacy policy</a>, or to report a concern. We answer within 30 days.</p>
+  </div></section>
+</Base>

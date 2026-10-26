@@ -1,0 +1,45 @@
+---
+import Base from "../layouts/Base.astro";
+import WaitlistForm from "../components/WaitlistForm.astro";
+import HireSignalScale from "../components/HireSignalScale.astro";
+import { APP_URL, CTA_MODE, NOT_AFFILIATED } from "../site.config";
+---
+<Base title="Join the beta waitlist" description="Sign-ups for Strong Hire open December 14. Join the waitlist and people with the soonest interviews are invited first.">
+  <section class="stage">
+    <div class="wrap page-head">
+      <p class="eyebrow">Beta waitlist</p>
+      <h1>Find out if you'd get the offer, before the interview.</h1>
+      <p class="lede">
+        Strong Hire is a voice interviewer that rehearses your real job at your real company, then tells you what the
+        hiring committee would decide, with quotes from your answers. {CTA_MODE === "waitlist"
+          ? "Join the waitlist and we'll email you when sign-ups open."
+          : "Sign-ups are open."}
+      </p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="wrap waitlist">
+      <div class="form">
+        <ol class="steps form">
+          <li class="step"><span class="step__num" aria-hidden="true"></span><p><strong>Paste the job posting and your CV.</strong> You get a free gap analysis of where you match.</p></li>
+          <li class="step"><span class="step__num" aria-hidden="true"></span><p><strong>Practice by voice.</strong> The interviewer follows up on vague answers, like a real one.</p></li>
+          <li class="step"><span class="step__num" aria-hidden="true"></span><p><strong>Get the verdict.</strong> A hire signal, a rubric per question, and what to fix first.</p></li>
+        </ol>
+        <section class="verdict" aria-label="Example debrief">
+          <HireSignalScale signal="Lean Hire" />
+          <blockquote>
+            <p class="said">"I owned the migration end to end and cut checkout errors by 40 percent."</p>
+            <p class="read">Strong ownership. The answer never says what you would do differently, which the bar for this level expects.</p>
+          </blockquote>
+          <p class="muted small">An example debrief. {NOT_AFFILIATED}</p>
+        </section>
+      </div>
+      {CTA_MODE === "waitlist" ? <WaitlistForm id="page-waitlist" /> : (
+        <div class="panel">
+          <h2 class="display">Sign-ups are open</h2>
+          <a class="btn" href={`${APP_URL}/signup`}>Start free</a>
+        </div>
+      )}
+    </div>
+  </section>
+</Base>

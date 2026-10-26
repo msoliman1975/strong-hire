@@ -1,0 +1,21 @@
+---
+/** The five-step hire-signal ladder from the app's debrief (FB-1). Weakest on the left. */
+import CheckBadge from "./CheckBadge.astro";
+export type HireSignal = "No Hire" | "Lean No Hire" | "Lean Hire" | "Hire" | "Strong Hire";
+const ORDER: HireSignal[] = ["No Hire", "Lean No Hire", "Lean Hire", "Hire", "Strong Hire"];
+const TONE: Record<HireSignal, string> = {
+  "Strong Hire": "strong", Hire: "positive", "Lean Hire": "neutral", "Lean No Hire": "negative", "No Hire": "negative",
+};
+interface Props { signal: HireSignal; headingLevel?: "h2" | "h3" | "p" }
+const { signal, headingLevel = "p" } = Astro.props;
+const tone = TONE[signal];
+const earned = signal === "Hire" || signal === "Strong Hire";
+const Tag = headingLevel;
+---
+<div class="verdict__head">
+  <Tag class="verdict__title" data-tone={tone}>{signal}</Tag>
+  {earned && <CheckBadge size={28} />}
+</div>
+<ol class="ladder" data-tone={tone} aria-label="Hire signal, from No Hire to Strong Hire">
+  {ORDER.map((s) => <li aria-current={s === signal ? "true" : undefined}>{s}</li>)}
+</ol>

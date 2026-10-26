@@ -1,0 +1,21 @@
+---
+/**
+ * Q3: company names as plain text, with the not-affiliated notice right next to them.
+ * Switch SHOW_COMPANY_NAMES off in site.config.ts and this says "21 major tech companies".
+ */
+import { COMPANIES, NOT_AFFILIATED, SHOW_COMPANY_NAMES } from "../site.config";
+interface Props { intro?: string }
+const { intro = "Practice for interviews at companies like" } = Astro.props;
+---
+<div class="companies">
+  {SHOW_COMPANY_NAMES ? (
+    <>
+      <p class="muted">{intro}</p>
+      <p class="companies__names">{COMPANIES.map((c) => <span>{c}</span>)}</p>
+      <p class="muted small">Or any other tech company, with a general interview style.</p>
+    </>
+  ) : (
+    <p class="companies__names">Practice for interviews at 21 major tech companies, or any other tech company with a general interview style.</p>
+  )}
+  <p class="notice">{NOT_AFFILIATED}</p>
+</div>

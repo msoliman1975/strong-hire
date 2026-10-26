@@ -8,7 +8,7 @@ text-to-speech (Kokoro) run on the server CPU.
 | --- | --- |
 | Server | `stronghire-test`, type cx43 (8 vCPU shared, 16 GB, 160 GB disk), Nuremberg (nbg1) |
 | Cost | $18.49 per month, billed by the hour while the server exists |
-| Address | `https://getstronghire.com` (web and `/api`), `https://admin.getstronghire.com` (admin app and its own `/api`), `https://rtc.getstronghire.com` (LiveKit) |
+| Address | `https://getstronghire.com` (marketing site, L04), `https://app.getstronghire.com` (web app and `/api`), `https://admin.getstronghire.com` (admin app and its own `/api`), `https://rtc.getstronghire.com` (LiveKit) |
 | Firewall | Hetzner firewall `stronghire-fw`: 22, 80, 443/tcp, 443/udp, 7881/tcp, 7882/udp |
 | Repo on the server | `/opt/stronghire/strong-hire`, read-only deploy key |
 | Anthropic key | `/etc/stronghire/anthropic.key`, readable by root only, never in the repo or `.env` |
@@ -144,3 +144,18 @@ docker exec -it "$(docker ps -qf name=worker)" python -m strong_worker.inputs.re
 Other options: `--org <id>` and `--resume <id>` limit the run to one org or one CV. The command
 prints the number of CVs per outcome: `updated`, `unchanged`, `skipped_confirmed`,
 `unreadable`, `extraction_failed`, `error`.
+
+## Marketing site and the app move (L04)
+
+The marketing site (`apps/site`) is served on the apex. The candidate app moved to `app.$DOMAIN`.
+
+1. DNS: add an A record `app` to the server IP. Keep `@`, `admin` and `rtc`. Add `www` (A record or
+   CNAME to `@`); Caddy redirects it to the apex.
+2. Google Cloud console, OAuth client: add `https://app.getstronghire.com/api/auth/google/callback`
+   as an authorized redirect URI. Keep the old apex one until the move is done.
+3. Deploy. `compose.server.yaml` sets `WEB_BASE_URL`, `API_PUBLIC_URL` and `SIM_BASE_URL` to the
+   `app.` host, so email links point at the app.
+4. Old app paths on the apex (`/signin`, `/jobs/...`, `/sessions/...`, `/waitlist/confirm`, `/api/...`)
+   redirect to the same path on `app.` with a 308. Only `/api/public/*` (the waitlist) is still
+   answered on the apex.
+5. Sessions are host-only cookies, so people already signed in sign in once more on `app.`.

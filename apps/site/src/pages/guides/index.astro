@@ -1,0 +1,38 @@
+---
+import Base from "../../layouts/Base.astro";
+import { publishedGuides, ROLE_LABEL } from "../../lib/guides";
+import { NOT_AFFILIATED, cta } from "../../site.config";
+const guides = publishedGuides();
+const byCompany = new Map<string, typeof guides>();
+for (const g of guides) byCompany.set(g.profile.company_name, [...(byCompany.get(g.profile.company_name) ?? []), g]);
+---
+<Base title="Interview guides" description="How tech interview loops work, by company and role: the rounds, what each one tests, and the bar at each level." noindex={guides.length === 0}>
+  <section class="stage">
+    <div class="wrap page-head">
+      <p class="eyebrow">Interview guides</p>
+      <h1>How the loop works, by company and role.</h1>
+      <p class="lede">The rounds, what each one tests, and what the bar looks like at your level. Written in our own words from public sources.</p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="wrap">
+      {guides.length === 0 ? (
+        <div class="panel">
+          <h2 class="display">Guides are on the way</h2>
+          <p class="muted">We publish each guide once its company profile has been reviewed. Until then, you can practice for any tech company with a general interview style.</p>
+          <a class="btn" href={cta.href}>{cta.label}</a>
+        </div>
+      ) : (
+        <div class="grid-3">
+          {[...byCompany.entries()].map(([company, list]) => (
+            <section class="panel">
+              <h2 class="display">{company}</h2>
+              <ul>{list.map((g) => <li><a href={`/guides/${g.companySlug}/${g.roleSlug}`}>{ROLE_LABEL[g.role]} interview</a></li>)}</ul>
+            </section>
+          ))}
+        </div>
+      )}
+      <p class="notice mt-5">{NOT_AFFILIATED}</p>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,36 @@
+---
+import BrandMark from "./BrandMark.astro";
+import { APP_URL, cta } from "../site.config";
+import { publishedGuides } from "../lib/guides";
+
+const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+const links = [
+  { href: "/how-it-works", label: "How it works" },
+  { href: "/sample-debrief", label: "Sample debrief" },
+  { href: "/pricing", label: "Pricing" },
+  ...(publishedGuides().length > 0 ? [{ href: "/guides", label: "Interview guides" }] : []),
+];
+const current = (href: string) => (path === href || path.startsWith(`${href}/`) ? "page" : undefined);
+---
+<header class="site-header">
+  <div class="wrap site-header__inner">
+    <a class="brand" href="/" aria-label="Strong Hire, home">
+      <BrandMark tone="stage" label={false} />
+      <span class="brand__name">Strong Hire</span>
+    </a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-menu-toggle>
+      Menu
+    </button>
+    <nav class="site-nav" id="site-nav" aria-label="Main" data-open="false">
+      <ul>
+        {links.map((l) => <li><a href={l.href} aria-current={current(l.href)}>{l.label}</a></li>)}
+        <li class="nav-extra"><a href={`${APP_URL}/signin`}>Sign in</a></li>
+        <li class="nav-extra"><a href={cta.href}>{cta.label}</a></li>
+      </ul>
+    </nav>
+    <div class="site-header__end">
+      <a class="site-header__signin" href={`${APP_URL}/signin`}>Sign in</a>
+      <a class="btn btn--on-stage btn--sm" href={cta.href} data-cta>{cta.label}</a>
+    </div>
+  </div>
+</header>
