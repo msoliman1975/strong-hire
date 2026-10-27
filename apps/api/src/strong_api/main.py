@@ -34,6 +34,7 @@ from strong_api.reports import router as reports_router
 from strong_api.scoring import router as scoring_router
 from strong_api.sessions.feedback import router as feedback_router
 from strong_api.sessions.router import router as sessions_router
+from strong_api.stories import router as stories_router
 from strong_core import __version__
 from strong_core.config import get_settings
 from strong_core.db import get_engine, get_sessionmaker
@@ -119,6 +120,7 @@ def create_app(
     app.include_router(reports_router)
     app.include_router(questions_router)
     app.include_router(custom_router)
+    app.include_router(stories_router)
     app.include_router(dev_router)
     app.include_router(status_router)
     install_auth(app)

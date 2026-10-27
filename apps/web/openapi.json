@@ -2155,6 +2155,392 @@
         }
       }
     },
+    "/stories": {
+      "get": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "List Stories",
+        "description": "ST-1: the user's stories, newest first.",
+        "operationId": "list_stories_stories_get",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/StoryStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only drafts, or only proven.",
+              "title": "Status"
+            },
+            "description": "Only drafts, or only proven."
+          },
+          {
+            "name": "skill",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Competency"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only stories with this tag.",
+              "title": "Skill"
+            },
+            "description": "Only stories with this tag."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Story"
+                  },
+                  "title": "Response List Stories Stories Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "Create Story",
+        "description": "ST-1: create a draft story.",
+        "operationId": "create_story_stories_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoryIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Story"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/from-answer": {
+      "post": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "Story From Answer",
+        "description": "ST-2: \"Save as a story\" on a debrief answer. Creates a draft story with the candidate's\nanswer to that question, tagged with the competencies it was scored on and linked to the\nsession and question. The answer goes into `action` until a split into parts is known.",
+        "operationId": "story_from_answer_stories_from_answer_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoryFromAnswerIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Story"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The session is not the user's, or detail.code is 'scorecard_not_found' or 'question_not_found'."
+          },
+          "409": {
+            "description": "detail.code is 'story_exists'; detail.story_id is that story."
+          },
+          "422": {
+            "description": "detail.code is 'answer_empty' when the answer has no text."
+          }
+        }
+      }
+    },
+    "/stories/{story_id}": {
+      "get": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "Get Story",
+        "description": "ST-1: one story with its notes.",
+        "operationId": "get_story_stories__story_id__get",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Story"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "Edit Story",
+        "description": "ST-1: change the title, the skill tags or any of the five parts. Only the fields sent\nchange; a part sent as null or blank is cleared.",
+        "operationId": "edit_story_stories__story_id__patch",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoryPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Story"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "Delete Story",
+        "description": "ST-1: delete a story and its notes. Debriefs that used it keep their scores.",
+        "operationId": "delete_story_stories__story_id__delete",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{story_id}/notes": {
+      "get": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "List Story Notes",
+        "description": "ST-6: the story's fix notes, oldest first.",
+        "operationId": "list_story_notes_stories__story_id__notes_get",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StoryNote"
+                  },
+                  "title": "Response List Story Notes Stories  Story Id  Notes Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "Add Story Note",
+        "description": "ST-6: append a fix note (S22 sends the debrief's story fix here).",
+        "operationId": "add_story_note_stories__story_id__notes_post",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoryNoteIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryNote"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/dev/model-usage": {
       "get": {
         "tags": [
@@ -20219,19 +20605,17 @@
         "title": "SpendSlice"
       },
       "Story": {
-        "additionalProperties": false,
-        "description": "ST-1: one story in the user's library. The stories table holds org_id and user_id.",
         "properties": {
           "id": {
+            "type": "string",
             "format": "uuid",
-            "title": "Id",
-            "type": "string"
+            "title": "Id"
           },
           "title": {
+            "type": "string",
             "maxLength": 200,
             "minLength": 1,
-            "title": "Title",
-            "type": "string"
+            "title": "Title"
           },
           "context": {
             "anyOf": [
@@ -20242,7 +20626,6 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Context"
           },
           "stakes": {
@@ -20254,7 +20637,6 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Stakes"
           },
           "action": {
@@ -20266,7 +20648,6 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Action"
           },
           "result": {
@@ -20278,7 +20659,6 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Result"
           },
           "reflection": {
@@ -20290,16 +20670,15 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Reflection"
           },
           "skills": {
-            "description": "Skill tags.",
             "items": {
               "$ref": "#/components/schemas/Competency"
             },
+            "type": "array",
             "title": "Skills",
-            "type": "array"
+            "description": "Skill tags."
           },
           "status": {
             "$ref": "#/components/schemas/StoryStatus",
@@ -20311,16 +20690,15 @@
           "source_session_id": {
             "anyOf": [
               {
-                "format": "uuid",
-                "type": "string"
+                "type": "string",
+                "format": "uuid"
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "ST-2: the session of the debrief answer it came from.",
-            "title": "Source Session Id"
+            "title": "Source Session Id",
+            "description": "ST-2: the session of the debrief answer it came from."
           },
           "source_question_ref": {
             "anyOf": [
@@ -20331,28 +20709,29 @@
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "ST-2: QuestionScore.question_ref of that answer.",
-            "title": "Source Question Ref"
+            "title": "Source Question Ref",
+            "description": "ST-2: QuestionScore.question_ref of that answer."
           },
           "notes": {
             "items": {
               "$ref": "#/components/schemas/StoryNote"
             },
-            "title": "Notes",
-            "type": "array"
+            "type": "array",
+            "title": "Notes"
           },
           "created_at": {
+            "type": "string",
             "format": "date-time",
-            "title": "Created At",
-            "type": "string"
+            "title": "Created At"
           },
           "updated_at": {
+            "type": "string",
             "format": "date-time",
-            "title": "Updated At",
-            "type": "string"
+            "title": "Updated At"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "id",
           "title",
@@ -20361,7 +20740,7 @@
           "updated_at"
         ],
         "title": "Story",
-        "type": "object"
+        "description": "ST-1: one story in the user's library. The stories table holds org_id and user_id."
       },
       "StoryFit": {
         "additionalProperties": false,
@@ -20427,28 +20806,157 @@
         "title": "StoryFitStrength",
         "type": "string"
       },
-      "StoryNote": {
-        "additionalProperties": false,
-        "description": "ST-6: a fix note sent to the story from a debrief answer that used it.",
+      "StoryFromAnswerIn": {
         "properties": {
-          "text": {
-            "minLength": 1,
-            "title": "Text",
-            "type": "string"
-          },
           "session_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Id"
+          },
+          "question_ref": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Question Ref",
+            "description": "QuestionScore.question_ref."
+          },
+          "title": {
             "anyOf": [
               {
-                "format": "uuid",
-                "type": "string"
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "The debrief's session.",
-            "title": "Session Id"
+            "title": "Title",
+            "description": "Default: the question's text, cut to the title limit."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "session_id",
+          "question_ref"
+        ],
+        "title": "StoryFromAnswerIn",
+        "description": "ST-2: save one debrief answer as a draft story."
+      },
+      "StoryIn": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "context": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context"
+          },
+          "stakes": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stakes"
+          },
+          "action": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "reflection": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reflection"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "type": "array",
+            "title": "Skills",
+            "description": "Skill tags."
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "manual",
+              "coach"
+            ],
+            "title": "Source",
+            "description": "A debrief answer becomes a story through POST /stories/from-answer.",
+            "default": "manual"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "title": "StoryIn",
+        "description": "ST-1: a new story typed by the candidate (or built by the coach). It starts as a draft."
+      },
+      "StoryNote": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Text"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id",
+            "description": "The debrief's session."
           },
           "question_ref": {
             "anyOf": [
@@ -20459,22 +20967,64 @@
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "QuestionScore.question_ref.",
-            "title": "Question Ref"
+            "title": "Question Ref",
+            "description": "QuestionScore.question_ref."
           },
           "at": {
+            "type": "string",
             "format": "date-time",
-            "title": "At",
-            "type": "string"
+            "title": "At"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "text",
           "at"
         ],
         "title": "StoryNote",
-        "type": "object"
+        "description": "ST-6: a fix note sent to the story from a debrief answer that used it."
+      },
+      "StoryNoteIn": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Text"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          },
+          "question_ref": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Ref"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "StoryNoteIn",
+        "description": "ST-6: a fix note for the story, usually from a debrief answer that used it."
       },
       "StoryPart": {
         "description": "ST-1: the five parts of a story, in the order the workbench and prompts show them.",
@@ -20519,24 +21069,119 @@
         "title": "StoryPartUpdate",
         "type": "object"
       },
+      "StoryPatch": {
+        "properties": {
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "context": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context"
+          },
+          "stakes": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stakes"
+          },
+          "action": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "reflection": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reflection"
+          },
+          "skills": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Competency"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skills"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "StoryPatch",
+        "description": "ST-1: change the title, the skill tags or any part. Only the fields sent change; a part\nsent as null (or blank) is cleared. The status is never set by hand (ST-7)."
+      },
       "StorySource": {
-        "description": "ST-1: where a story came from.",
+        "type": "string",
         "enum": [
           "debrief_answer",
           "manual",
           "coach"
         ],
         "title": "StorySource",
-        "type": "string"
+        "description": "ST-1: where a story came from."
       },
       "StoryStatus": {
-        "description": "ST-1, ST-7: a story is a draft until a Realistic answer that used it scores 3 or more.",
+        "type": "string",
         "enum": [
           "draft",
           "proven"
         ],
         "title": "StoryStatus",
-        "type": "string"
+        "description": "ST-1, ST-7: a story is a draft until a Realistic answer that used it scores 3 or more."
       },
       "StoryVersion": {
         "additionalProperties": false,
