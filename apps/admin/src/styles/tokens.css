@@ -1,5 +1,5 @@
 /*
- * Design tokens for the admin app (DESIGN.md). Components use only these variables, never raw
+ * Design tokens for the admin app (DESIGN.md), in the Strong Hire v2 colors and type (UI-1). Components use only these variables, never raw
  * values, so light and dark themes and any later change stay in this file.
  *
  * Light is the default, dark follows the system unless the admin picked a theme
@@ -11,53 +11,53 @@
   color-scheme: light;
 
   /* Surfaces */
-  --bg: #f4f5f8;
+  --bg: #f4f3f8;
   --surface: #fff;
-  --surface-2: #f8f9fb;
-  --surface-3: #eef0f4;
-  --overlay: rgb(15 20 32 / 50%);
+  --surface-2: #f9f8fb;
+  --surface-3: #ecebf2;
+  --overlay: rgb(23 22 31 / 50%);
 
   /* Text */
-  --ink: #161b26;
-  --ink-2: #3d4556;
-  --muted: #5b6475;
+  --ink: #17161f;
+  --ink-2: #3a3846;
+  --muted: #5e5b6b;
 
   /* Lines */
-  --line: #e2e5eb;
-  --line-strong: #c5cad4;
+  --line: #e2e0ea;
+  --line-strong: #c9c5d6;
 
   /* Brand and semantic colors. Each has a solid color (text, borders, fills) and a subtle
      background for badges, notices and highlighted rows. */
-  --accent: #2f5fd0;
-  --accent-hover: #264fb0;
+  --accent: #5332e6;
+  --accent-hover: #3d22c4;
   --accent-ink: #fff;
-  --info-bg: #edf2fd;
-  --danger: #b4232c;
-  --danger-hover: #951c24;
-  --danger-bg: #fcefef;
-  --warn: #8a5a00;
-  --warn-bg: #fdf5e4;
-  --ok: #1b7543;
-  --ok-bg: #e8f5ed;
+  --info-bg: #eeeafe;
+  --danger: #b4321f;
+  --danger-hover: #9a2c1b;
+  --danger-bg: #fbe7e3;
+  --warn: #8a4200;
+  --warn-bg: #fdeedc;
+  --ok: #12775a;
+  --ok-bg: #e3f4ec;
 
   /* Admin identity: amber, so the admin app never looks like the candidate app */
   --admin: #e0a526;
-  --admin-ink: #1d2433;
-  --side-bg: #1b2130;
-  --side-ink: #d3d9e5;
-  --side-muted: #8c96aa;
-  --side-hover: #252c3d;
-  --side-active: #2c3548;
+  --admin-ink: #17161f;
+  --side-bg: #0e0d14;
+  --side-ink: #f2f0f7;
+  --side-muted: #a29fb0;
+  --side-hover: #1a1824;
+  --side-active: #2a2340;
 
   /* Focus ring: accent on light surfaces (3:1), amber on the sidebar */
-  --focus: #2f5fd0;
+  --focus: #5332e6;
 
   /* Alert states (AL) */
   --state-ok-bg: var(--ok-bg);
   --state-ok-ink: var(--ok);
   --state-pending-bg: var(--warn-bg);
   --state-pending-ink: var(--warn);
-  --state-firing-bg: #b4232c;
+  --state-firing-bg: #b4321f;
   --state-firing-ink: #fff;
 
   /* Charts: dataviz reference palette, first three slots, and service status */
@@ -82,9 +82,8 @@
   --space-8: 48px;
 
   /* Type scale (px): 12, 13, 14 base, 16, 20, 24 */
-  --font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, roboto, "Helvetica Neue", arial,
-    sans-serif;
-  --mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", menlo, consolas, monospace;
+  --font: "Geist Variable", "Geist", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, roboto, arial, sans-serif;
+  --mono: "Geist Mono Variable", "Geist Mono", ui-monospace, "Cascadia Mono", menlo, consolas, monospace;
   --text-xs: 0.75rem;
   --text-sm: 0.8125rem;
   --text-md: 0.875rem;
@@ -95,12 +94,12 @@
   --leading-tight: 1.25;
 
   /* Shape and depth */
-  --radius-sm: 4px;
-  --radius: 6px;
-  --radius-lg: 8px;
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-lg: 12px;
   --radius-pill: 999px;
-  --shadow-1: 0 1px 2px rgb(16 24 40 / 6%);
-  --shadow-2: 0 8px 24px rgb(16 24 40 / 16%);
+  --shadow-1: 0 1px 2px rgb(23 22 31 / 6%);
+  --shadow-2: 0 8px 24px rgb(23 22 31 / 16%);
 
   /* Controls: one height per size, so buttons, inputs and selects line up in a row.
      The small size stays above the WCAG 2.5.8 minimum target of 24 px. */
@@ -118,20 +117,20 @@
   :root:not([data-theme="light"]) {
     color-scheme: dark;
 
-    --bg: #11141b;
-    --surface: #191d26;
-    --surface-2: #1f242e;
-    --surface-3: #272d39;
+    --bg: #0e0d14;
+    --surface: #1a1824;
+    --surface-2: #211e2d;
+    --surface-3: #2c2938;
     --overlay: rgb(0 0 0 / 60%);
-    --ink: #e5e8ef;
-    --ink-2: #c2c8d4;
-    --muted: #9aa3b5;
-    --line: #2b313e;
-    --line-strong: #434c5e;
-    --accent: #7ea2ff;
-    --accent-hover: #9cb7ff;
-    --accent-ink: #0f1420;
-    --info-bg: #1b2640;
+    --ink: #f2f0f7;
+    --ink-2: #d8d5e3;
+    --muted: #a29fb0;
+    --line: #2c2938;
+    --line-strong: #45405a;
+    --accent: #a594ff;
+    --accent-hover: #c4b8ff;
+    --accent-ink: #0e0d14;
+    --info-bg: #2a2340;
     --danger: #ff8a8f;
     --danger-hover: #ffa6aa;
     --danger-bg: #3a1d21;
@@ -139,10 +138,10 @@
     --warn-bg: #3a2f17;
     --ok: #6fd39a;
     --ok-bg: #163224;
-    --side-bg: #0b0d12;
-    --side-hover: #161a24;
-    --side-active: #1e2330;
-    --focus: #7ea2ff;
+    --side-bg: #08070c;
+    --side-hover: #15131d;
+    --side-active: #2a2340;
+    --focus: #a594ff;
     --state-firing-bg: #ff8a8f;
     --state-firing-ink: #2a0d10;
     --series-1: #3987e5;
@@ -159,20 +158,20 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --bg: #11141b;
-  --surface: #191d26;
-  --surface-2: #1f242e;
-  --surface-3: #272d39;
+  --bg: #0e0d14;
+  --surface: #1a1824;
+  --surface-2: #211e2d;
+  --surface-3: #2c2938;
   --overlay: rgb(0 0 0 / 60%);
-  --ink: #e5e8ef;
-  --ink-2: #c2c8d4;
-  --muted: #9aa3b5;
-  --line: #2b313e;
-  --line-strong: #434c5e;
-  --accent: #7ea2ff;
-  --accent-hover: #9cb7ff;
-  --accent-ink: #0f1420;
-  --info-bg: #1b2640;
+  --ink: #f2f0f7;
+  --ink-2: #d8d5e3;
+  --muted: #a29fb0;
+  --line: #2c2938;
+  --line-strong: #45405a;
+  --accent: #a594ff;
+  --accent-hover: #c4b8ff;
+  --accent-ink: #0e0d14;
+  --info-bg: #2a2340;
   --danger: #ff8a8f;
   --danger-hover: #ffa6aa;
   --danger-bg: #3a1d21;
@@ -180,10 +179,10 @@
   --warn-bg: #3a2f17;
   --ok: #6fd39a;
   --ok-bg: #163224;
-  --side-bg: #0b0d12;
-  --side-hover: #161a24;
-  --side-active: #1e2330;
-  --focus: #7ea2ff;
+  --side-bg: #08070c;
+  --side-hover: #15131d;
+  --side-active: #2a2340;
+  --focus: #a594ff;
   --state-firing-bg: #ff8a8f;
   --state-firing-ink: #2a0d10;
   --series-1: #3987e5;

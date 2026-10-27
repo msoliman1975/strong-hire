@@ -1,31 +1,31 @@
 import type { CSSProperties } from "react";
 
 /**
- * The Strong Hire logo, "the Approved h": a lamp, its light, the candidate's chair cut out of
- * the light in the shape of an "h", and the green check of an earned verdict.
- * Rules: never remove the check, never color the light green, never draw the chair on top of the light.
+ * The Strong Hire mark (v2): an ink rounded square with a white check. On the dark live room the
+ * colors swap. The wordmark "Strong Hire" sits next to it in text, never inside the SVG.
+ * `tone="stage"` is the v1 name for the header tone and draws the same as `light`.
  */
-export function BrandMark({ size = 30, tone = "light" }: { size?: number; tone?: "stage" | "light" }) {
+export function BrandMark({ size = 26, tone = "light" }: { size?: number; tone?: "light" | "stage" | "dark" }) {
+  const t = tone === "stage" ? "light" : tone;
   return (
     <svg
       className="brand-mark"
-      data-tone={tone}
+      data-tone={t}
       width={size}
       height={size}
-      viewBox="0 0 48 48"
+      viewBox="0 0 26 26"
       role="img"
       aria-label="Strong Hire"
     >
-      <rect x={18} y={1.5} width={12} height={5} rx={1.5} fill="var(--brand-main)" />
-      <path d="M19.5 6.5 L28.5 6.5 L42 44 L6 44 Z" fill="var(--light)" />
-      <rect x={17} y={18} width={4.5} height={24} rx={1} fill="var(--brand-bg)" />
+      <rect x={1} y={1} width={24} height={24} rx={7} fill="var(--brand-main)" />
       <path
-        d="M21.5 28.5 H26 A5.5 5.5 0 0 1 31.5 34 V42 H27 V34.5 A1.5 1.5 0 0 0 25.5 33 H21.5 Z"
-        fill="var(--brand-bg)"
+        d="M7 13.5 L11 17.5 L19 9"
+        fill="none"
+        stroke="var(--brand-bg)"
+        strokeWidth={2.6}
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
-      <circle cx={38} cy={38} r={9.5} fill="var(--brand-bg)" />
-      <circle cx={38} cy={38} r={8} fill="var(--ok)" />
-      <CheckPath d="M34 38.2 L36.8 41 L42 35.5" width={2.4} />
     </svg>
   );
 }
@@ -35,11 +35,14 @@ export function CheckBadge({ size = 18, style }: { size?: number; style?: CSSPro
   return (
     <svg className="check-badge" width={size} height={size} viewBox="0 0 48 48" aria-hidden="true" style={style}>
       <circle cx={24} cy={24} r={22} fill="var(--ok)" />
-      <CheckPath d="M13 24.6 L20.6 32.2 L35 17" width={6.4} />
+      <path
+        d="M13 24.6 L20.6 32.2 L35 17"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth={6.4}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
-}
-
-function CheckPath({ d, width }: { d: string; width: number }) {
-  return <path d={d} fill="none" stroke="#ffffff" strokeWidth={width} strokeLinecap="round" strokeLinejoin="round" />;
 }

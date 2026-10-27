@@ -1,4 +1,4 @@
-/** The Approved h logo keeps its four parts, and the slogan stays hidden until it is agreed. */
+/** The v2 mark is an ink rounded square with a check (UI-1), and the slogan stays hidden until it is agreed. */
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
@@ -6,14 +6,18 @@ import { hasSlogan, SLOGAN } from "../labels";
 import { BrandMark, CheckBadge } from "./BrandMark";
 
 describe("BrandMark", () => {
-  it("draws the lamp, the amber light, the chair-h cut out of the light, and the green check", () => {
-    const { container } = render(<BrandMark tone="stage" />);
-    expect(screen.getByRole("img", { name: "Strong Hire" })).toHaveAttribute("data-tone", "stage");
-    const light = container.querySelector('path[fill="var(--light)"]');
-    expect(light).not.toBeNull();
-    // The chair is drawn in the background color, after the light: a cut-out, never on top in ink.
-    expect(container.querySelectorAll('[fill="var(--brand-bg)"]').length).toBeGreaterThanOrEqual(3);
-    expect(container.querySelector('circle[fill="var(--ok)"]')).not.toBeNull();
+  it("UI-1: draws a rounded square in the mark color with a check cut in the background color", () => {
+    const { container } = render(<BrandMark />);
+    expect(screen.getByRole("img", { name: "Strong Hire" })).toHaveAttribute("data-tone", "light");
+    expect(container.querySelector('rect[fill="var(--brand-main)"]')).toHaveAttribute("rx", "7");
+    expect(container.querySelector('path[stroke="var(--brand-bg)"]')).not.toBeNull();
+  });
+
+  it("the v1 stage tone draws as the light tone; the dark tone is for the live room", () => {
+    const { rerender } = render(<BrandMark tone="stage" />);
+    expect(screen.getByRole("img", { name: "Strong Hire" })).toHaveAttribute("data-tone", "light");
+    rerender(<BrandMark tone="dark" />);
+    expect(screen.getByRole("img", { name: "Strong Hire" })).toHaveAttribute("data-tone", "dark");
   });
 
   it("the check badge is decorative; the verdict word carries the meaning", () => {
