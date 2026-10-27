@@ -25,7 +25,8 @@
         "user_and_business_sense",
         "estimation_logic",
         "prioritization",
-        "recommendation"
+        "recommendation",
+        "logistics_and_expectations"
       ],
       "title": "Competency",
       "type": "string"
@@ -172,13 +173,14 @@
       "type": "string"
     },
     "InterviewType": {
-      "description": "The four v1 interview types (IV-2), plus Custom (CU-1).\n\nA Custom session mixes 1 to 3 of the four standard types as question categories\n(`SessionConfig.custom`). Custom is never a question category itself and has no entry in\nCOMPETENCIES_BY_TYPE; use `session_competencies(config)` for a session's competency pool.",
+      "description": "The four v1 interview types (IV-2), plus Custom (CU-1) and Recruiter screen (RS-1).\n\nA Custom session mixes 1 to 3 of the four standard types as question categories\n(`SessionConfig.custom`). Custom is never a question category itself and has no entry in\nCOMPETENCIES_BY_TYPE; use `session_competencies(config)` for a session's competency pool.",
       "enum": [
         "behavioral",
         "hiring_manager",
         "technical_qa",
         "case",
-        "custom"
+        "custom",
+        "recruiter_screen"
       ],
       "title": "InterviewType",
       "type": "string"

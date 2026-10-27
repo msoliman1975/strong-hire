@@ -44,6 +44,9 @@ SPEC_TABLES = {
     # v2
     "company_auto_profiles",  # AP-1
     "stories",  # ST-1
+    "coach_sessions",  # CO-2
+    "coach_turns",  # CO-2
+    "takes",  # CO-7
 }
 
 

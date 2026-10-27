@@ -18,6 +18,7 @@ roles:
   scorer: sim-judge
   stt: sim-stt
   tts: sim-tts
+  coach: sim-judge   # CO-1: the interviewer's alias until the coach gets its own
   candidate: sim-candidate
   judge: sim-judge
 

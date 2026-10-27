@@ -1,0 +1,26 @@
+{
+  "sixty_second": {
+    "text": "We were moving checkout to a new payments provider, two weeks late, with Black Friday a month away. I wrote the rollback plan and moved traffic over in 5% steps. We finished a week before Black Friday with no failed payments. Next time I would agree the rollback plan before the work starts.",
+    "quotes": [
+      "we were moving checkout to the new payments provider",
+      "the rollout was already two weeks late",
+      "Black Friday was a month out and checkout could not break",
+      "I wrote the rollback plan",
+      "we moved traffic in five percent steps",
+      "we were done a week before Black Friday and not one payment failed",
+      "next time I would get the rollback plan agreed up front"
+    ]
+  },
+  "full": {
+    "text": "Context: we were moving checkout to a new payments provider, and the rollout was already two weeks late. Stakes: Black Friday was a month away and checkout could not break. Action: I wrote the rollback plan and moved traffic over in 5% steps. Result: we finished a week before Black Friday and not one payment failed. Reflection: next time I would get the rollback plan agreed before the work starts.",
+    "quotes": [
+      "we were moving checkout to the new payments provider",
+      "the rollout was already two weeks late",
+      "Black Friday was a month out and checkout could not break",
+      "I wrote the rollback plan",
+      "we moved traffic in five percent steps",
+      "we were done a week before Black Friday and not one payment failed",
+      "next time I would get the rollback plan agreed up front"
+    ]
+  }
+}

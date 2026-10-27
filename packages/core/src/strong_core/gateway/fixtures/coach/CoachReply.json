@@ -1,0 +1,20 @@
+{
+  "message": "Thanks, that sets the scene. What did you do yourself to get the migration back on track?",
+  "parts": [
+    {
+      "part": "context",
+      "text": "The team was moving checkout to a new payments provider, and the rollout was two weeks late.",
+      "quotes": [
+        "we were moving checkout to the new payments provider",
+        "the rollout was already two weeks late"
+      ]
+    },
+    {
+      "part": "stakes",
+      "text": "Black Friday was a month away, so a broken checkout would have cost real sales.",
+      "quotes": ["Black Friday was a month out and checkout could not break"]
+    }
+  ],
+  "missing": ["action", "result", "reflection"],
+  "skills": ["ownership"]
+}

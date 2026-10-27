@@ -16,6 +16,7 @@ from strong_core.schemas.analysis import (
     Strength,
 )
 from strong_core.schemas.base import Contract
+from strong_core.schemas.coach import CoachReply, StoryPartUpdate, StoryVersion, StoryVersions
 from strong_core.schemas.custom import (
     CUSTOM_MAX_QUESTIONS,
     CustomCategory,
@@ -30,6 +31,9 @@ from strong_core.schemas.enums import (
     AnswerConduct,
     AuthProvider,
     AutoProfileStatus,
+    CoachSessionStatus,
+    CoachSpeaker,
+    CoachStyle,
     Competency,
     Confidence,
     Difficulty,
@@ -47,6 +51,7 @@ from strong_core.schemas.enums import (
     ProfileStatus,
     QuestionRefusal,
     QuestionSource,
+    ReadinessStatus,
     RoleFamily,
     SessionChannel,
     SessionStatus,
@@ -78,6 +83,7 @@ from strong_core.schemas.profile import (
     ValuesFramework,
 )
 from strong_core.schemas.questions import GeneralQuestion, GeneralQuestionBank, QuestionHints
+from strong_core.schemas.readiness import Readiness, SkillReadiness
 from strong_core.schemas.scoring import (
     CompetencyScore,
     DeliveryMetrics,
@@ -132,6 +138,9 @@ EXPORTED_SCHEMAS: dict[str, type[BaseModel]] = {
     "auto_profile_summary": AutoProfileSummary,
     "story": Story,
     "story_fit": StoryFit,
+    "coach_reply": CoachReply,
+    "story_versions": StoryVersions,
+    "readiness": Readiness,
 }
 
 __all__ = [
@@ -150,6 +159,10 @@ __all__ = [
     "BriefDraft",
     "BriefQuestion",
     "CaseStyle",
+    "CoachReply",
+    "CoachSessionStatus",
+    "CoachSpeaker",
+    "CoachStyle",
     "CompanyProfile",
     "Competency",
     "CompetencyMatch",
@@ -203,6 +216,8 @@ __all__ = [
     "QuestionScore",
     "QuestionSource",
     "Rating",
+    "Readiness",
+    "ReadinessStatus",
     "RequirementKind",
     "RequirementMatch",
     "RequirementRating",
@@ -215,6 +230,7 @@ __all__ = [
     "SessionConfig",
     "SessionStatus",
     "Severity",
+    "SkillReadiness",
     "Source",
     "Speaker",
     "StandardType",
@@ -224,8 +240,11 @@ __all__ = [
     "StoryFitStrength",
     "StoryNote",
     "StoryPart",
+    "StoryPartUpdate",
     "StorySource",
     "StoryStatus",
+    "StoryVersion",
+    "StoryVersions",
     "Strength",
     "SubscriptionStatus",
     "Tone",

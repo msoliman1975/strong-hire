@@ -8,6 +8,7 @@ export const interviewTypeLabel: Record<InterviewType, string> = {
   technical_qa: "Verbal technical Q&A",
   case: "Case",
   custom: "Custom",
+  recruiter_screen: "Recruiter screen",
 };
 
 export const difficultyLabel: Record<Difficulty, string> = {

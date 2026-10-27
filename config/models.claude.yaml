@@ -16,6 +16,7 @@ roles:
   scorer: claude-strong
   stt: claude-stt
   tts: claude-tts
+  coach: claude-fast   # CO-1: the interviewer's alias until the coach gets its own
   candidate: claude-fast   # P13 AI candidate; the sim profile overrides it
   judge: claude-strong
 

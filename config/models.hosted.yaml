@@ -16,6 +16,7 @@ roles:
   scorer: hosted-scorer
   stt: hosted-stt
   tts: hosted-tts
+  coach: hosted-interviewer   # CO-1: the interviewer's alias until the coach gets its own
   candidate: hosted-interviewer   # P13 AI candidate; the sim profile overrides it
   judge: hosted-scorer
 

@@ -4203,6 +4203,33 @@ export interface components {
          * @enum {string}
          */
         ChangeKind: "added" | "removed" | "changed";
+        /**
+         * CoachReply
+         * @description CO-3, CO-4: one coach turn. The coach updates only the parts the candidate's own words
+         *     support (CO-9) and asks for what is still missing.
+         */
+        CoachReply: {
+            /**
+             * Message
+             * @description What the coach says to the candidate.
+             */
+            message: string;
+            /**
+             * Parts
+             * @description Parts this turn updated. Empty when none changed.
+             */
+            parts?: components["schemas"]["StoryPartUpdate"][];
+            /**
+             * Missing
+             * @description Parts the candidate has not given yet.
+             */
+            missing?: components["schemas"]["StoryPart"][];
+            /**
+             * Skills
+             * @description Skills the story shows so far.
+             */
+            skills?: components["schemas"]["Competency"][];
+        };
         /** CoachRequest */
         CoachRequest: {
             /**
@@ -4308,7 +4335,7 @@ export interface components {
          * @description Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.
          * @enum {string}
          */
-        Competency: "ownership" | "impact" | "collaboration" | "conflict_handling" | "learning_from_failure" | "communication" | "role_fit" | "depth_of_experience" | "judgment" | "motivation" | "team_fit" | "scope_at_level" | "technical_depth" | "accuracy" | "reasoning" | "trade_offs" | "clarity_of_explanation" | "problem_framing" | "structure" | "user_and_business_sense" | "estimation_logic" | "prioritization" | "recommendation";
+        Competency: "ownership" | "impact" | "collaboration" | "conflict_handling" | "learning_from_failure" | "communication" | "role_fit" | "depth_of_experience" | "judgment" | "motivation" | "team_fit" | "scope_at_level" | "technical_depth" | "accuracy" | "reasoning" | "trade_offs" | "clarity_of_explanation" | "problem_framing" | "structure" | "user_and_business_sense" | "estimation_logic" | "prioritization" | "recommendation" | "logistics_and_expectations";
         /** CompetencyMatch */
         CompetencyMatch: {
             competency: components["schemas"]["Competency"];
@@ -5112,14 +5139,14 @@ export interface components {
         };
         /**
          * InterviewType
-         * @description The four v1 interview types (IV-2), plus Custom (CU-1).
+         * @description The four v1 interview types (IV-2), plus Custom (CU-1) and Recruiter screen (RS-1).
          *
          *     A Custom session mixes 1 to 3 of the four standard types as question categories
          *     (`SessionConfig.custom`). Custom is never a question category itself and has no entry in
          *     COMPETENCIES_BY_TYPE; use `session_competencies(config)` for a session's competency pool.
          * @enum {string}
          */
-        InterviewType: "behavioral" | "hiring_manager" | "technical_qa" | "case" | "custom";
+        InterviewType: "behavioral" | "hiring_manager" | "technical_qa" | "case" | "custom" | "recruiter_screen";
         /**
          * InterviewWithin
          * @description L04 waitlist: when the person's real interview is, as they told us.
@@ -6581,6 +6608,37 @@ export interface components {
          * @enum {string}
          */
         QuestionSource: "planner" | "candidate";
+        /**
+         * Readiness
+         * @description RD-1: practice readiness per skill for one job target's interview.
+         */
+        Readiness: {
+            /**
+             * Job Target Id
+             * Format: uuid
+             */
+            job_target_id: string;
+            /**
+             * Kind
+             * @description RD-3: every screen labels it this way.
+             * @default practice_estimate
+             * @constant
+             */
+            kind: "practice_estimate";
+            /**
+             * As Of
+             * Format: date
+             */
+            as_of: string;
+            /** Skills */
+            skills?: components["schemas"]["SkillReadiness"][];
+        };
+        /**
+         * ReadinessStatus
+         * @description RD-1: whether a skill has enough Realistic sessions for a readiness score.
+         * @enum {string}
+         */
+        ReadinessStatus: "scored" | "not_enough_data";
         /** RedirectOut */
         RedirectOut: {
             /** Url */
@@ -7647,6 +7705,24 @@ export interface components {
              */
             v2_enabled: boolean;
         };
+        /**
+         * SkillReadiness
+         * @description RD-1: readiness for one skill, from Realistic sessions only.
+         */
+        SkillReadiness: {
+            competency: components["schemas"]["Competency"];
+            status: components["schemas"]["ReadinessStatus"];
+            /**
+             * Score
+             * @description 0 to 100. Null exactly when status is not_enough_data.
+             */
+            score: number | null;
+            /**
+             * Sessions Counted
+             * @description Realistic sessions that scored this skill.
+             */
+            sessions_counted: number;
+        };
         /** Source */
         Source: {
             /** Url */
@@ -7809,6 +7885,29 @@ export interface components {
             at: string;
         };
         /**
+         * StoryPart
+         * @description ST-1: the five parts of a story, in the order the workbench and prompts show them.
+         * @enum {string}
+         */
+        StoryPart: "context" | "stakes" | "action" | "result" | "reflection";
+        /**
+         * StoryPartUpdate
+         * @description CO-3, CO-9: new text for one story part, backed by the candidate's own words.
+         */
+        StoryPartUpdate: {
+            part: components["schemas"]["StoryPart"];
+            /**
+             * Text
+             * @description The part, written from the candidate's words.
+             */
+            text: string;
+            /**
+             * Quotes
+             * @description The candidate's words this part came from, verbatim.
+             */
+            quotes: string[];
+        };
+        /**
          * StorySource
          * @description ST-1: where a story came from.
          * @enum {string}
@@ -7820,6 +7919,29 @@ export interface components {
          * @enum {string}
          */
         StoryStatus: "draft" | "proven";
+        /**
+         * StoryVersion
+         * @description CO-8: one telling of the story, built only from the candidate's words.
+         */
+        StoryVersion: {
+            /** Text */
+            text: string;
+            /**
+             * Quotes
+             * @description The candidate's words this version came from, verbatim.
+             */
+            quotes: string[];
+        };
+        /**
+         * StoryVersions
+         * @description CO-8: the coach's 60-second and full versions of a story.
+         */
+        StoryVersions: {
+            /** @description About 150 words, to say in 60 seconds. */
+            sixty_second: components["schemas"]["StoryVersion"];
+            /** @description All five parts, in order. */
+            full: components["schemas"]["StoryVersion"];
+        };
         /** Strength */
         Strength: {
             /** Summary */

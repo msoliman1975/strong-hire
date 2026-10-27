@@ -1,0 +1,50 @@
+{
+  "$defs": {
+    "StoryVersion": {
+      "additionalProperties": false,
+      "description": "CO-8: one telling of the story, built only from the candidate's words.",
+      "properties": {
+        "quotes": {
+          "description": "The candidate's words this version came from, verbatim.",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Quotes",
+          "type": "array"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "quotes"
+      ],
+      "title": "StoryVersion",
+      "type": "object"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/story_versions.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "CO-8: the coach's 60-second and full versions of a story.",
+  "properties": {
+    "full": {
+      "$ref": "#/$defs/StoryVersion",
+      "description": "All five parts, in order."
+    },
+    "sixty_second": {
+      "$ref": "#/$defs/StoryVersion",
+      "description": "About 150 words, to say in 60 seconds."
+    }
+  },
+  "required": [
+    "sixty_second",
+    "full"
+  ],
+  "title": "StoryVersions",
+  "type": "object"
+}

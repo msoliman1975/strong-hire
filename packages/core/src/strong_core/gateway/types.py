@@ -16,13 +16,22 @@ class Role(StrEnum):
     SCORER = "scorer"
     STT = "stt"
     TTS = "tts"
+    COACH = "coach"  # CO-1: builds stories with the candidate, writes story versions
     # Test-only roles for the AI candidate (P13). The product never calls them.
     CANDIDATE = "candidate"
     JUDGE = "judge"
 
 
 CHAT_ROLES = frozenset(
-    {Role.EXTRACTOR, Role.PLANNER, Role.INTERVIEWER, Role.SCORER, Role.CANDIDATE, Role.JUDGE}
+    {
+        Role.EXTRACTOR,
+        Role.PLANNER,
+        Role.INTERVIEWER,
+        Role.SCORER,
+        Role.COACH,
+        Role.CANDIDATE,
+        Role.JUDGE,
+    }
 )
 
 
