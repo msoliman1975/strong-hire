@@ -5,10 +5,14 @@
 
 The answer to a join never says whether the email was already on the list. A filled honeypot
 field is accepted and dropped. Joins are limited per client address.
+
+Each new entry is also emailed to every active admin, one email each so no admin sees the
+others' addresses. That email has no confirmation link: only the person who joined can confirm.
 """
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import time
 from collections import defaultdict, deque
@@ -24,7 +28,7 @@ from strong_api.auth.deps import DbSession
 from strong_api.auth.magic_links import InvalidMagicLinkError, MagicLinks, RedisUsedTokenStore
 from strong_api.auth.settings import AuthSettings, get_auth_settings
 from strong_core.config import get_settings
-from strong_core.db.models import WaitlistEntry
+from strong_core.db.models import AdminUser, WaitlistEntry
 from strong_core.email import EmailSender, make_email_sender
 from strong_core.schemas.enums import InterviewWithin, RoleFamily
 
@@ -87,6 +91,7 @@ class Waitlist:
     email_sender: EmailSender
     limiter: JoinLimiter
     web_base_url: str
+    admin_base_url: str = ""
 
 
 def _confirmation(link: str) -> tuple[str, str]:
@@ -96,6 +101,36 @@ def _confirmation(link: str) -> tuple[str, str]:
         "We'll write when sign-ups open. If you did not ask for this, ignore this email and "
         "we won't contact you."
     )
+
+
+def _admin_notice(entry: WaitlistEntry, admin_base_url: str) -> tuple[str, str]:
+    lines = [
+        f"{entry.email} joined the Strong Hire waitlist.",
+        "",
+        f"Interview: {entry.interview_within.value}",
+        f"Field: {entry.role_family.value if entry.role_family else '-'}",
+        f"Product news: {'yes' if entry.marketing_consent else 'no'}",
+        f"Source: {entry.source or '-'}",
+        "",
+        "Not confirmed yet: they were sent a link to confirm their email.",
+    ]
+    if admin_base_url:
+        lines += ["", f"The list: {admin_base_url.rstrip('/')}/waitlist"]
+    return f"Waitlist: {entry.email} joined", "\n".join(lines)
+
+
+async def _notify_admins(db: DbSession, waitlist: Waitlist, entry: WaitlistEntry) -> None:
+    admins = (
+        await db.scalars(select(AdminUser.email).where(AdminUser.disabled_at.is_(None)))
+    ).all()
+    subject, text = _admin_notice(entry, waitlist.admin_base_url)
+    results = await asyncio.gather(
+        *(waitlist.email_sender.send(admin, subject, text) for admin in admins),
+        return_exceptions=True,
+    )
+    for admin, result in zip(admins, results, strict=True):
+        if isinstance(result, BaseException):
+            log.error("waitlist notice to admin %s failed: %s", admin, result)
 
 
 router = APIRouter(prefix="/public", tags=["public"])
@@ -117,6 +152,7 @@ async def join_waitlist(body: WaitlistIn, request: Request, db: DbSession) -> Wa
 
     email = str(body.email).strip().lower()
     entry = await db.scalar(select(WaitlistEntry).where(WaitlistEntry.email == email))
+    new = entry is None
     if entry is None:
         entry = WaitlistEntry(email=email, source=body.source)
         db.add(entry)
@@ -125,6 +161,8 @@ async def join_waitlist(body: WaitlistIn, request: Request, db: DbSession) -> Wa
     entry.marketing_consent = body.marketing_consent
     await db.commit()
 
+    if new:  # a second join only updates the entry: no new notice
+        await _notify_admins(db, waitlist, entry)
     if entry.confirmed_at is None:
         token = waitlist.links.issue(email)
         link = f"{waitlist.web_base_url.rstrip('/')}/waitlist/confirm?token={token}"
@@ -172,5 +210,6 @@ def install_public(
         email_sender=email_sender or make_email_sender(),
         limiter=limiter or JoinLimiter(),
         web_base_url=settings.web_base_url,
+        admin_base_url=get_settings().admin_base_url,
     )
     app.include_router(router)
