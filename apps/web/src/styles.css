@@ -469,7 +469,7 @@ h1:focus {
 }
 
 .usage__value {
-  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
   font-weight: 600;
   color: var(--on-stage);
 }
@@ -605,7 +605,7 @@ a.usage:hover .usage__value {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--sh-radius-lg);
-  padding: var(--space-5) 28px;
+  padding: var(--space-5);
   /* Wide tables scroll inside the panel instead of widening the page on phones. */
   overflow-x: auto;
 }
@@ -1538,6 +1538,20 @@ th.num {
   min-height: 100vh;
   background: var(--sh-room);
   color: var(--sh-room-text);
+  /* v1 aliases, redefined for the dark room so v1 page styles stay readable. */
+  --ink: var(--sh-room-text);
+  --muted: var(--sh-room-muted);
+  --line: var(--sh-room-line);
+  --line-strong: var(--sh-room-line-strong);
+  --surface: var(--sh-room-raised);
+  --paper: var(--sh-room);
+  --danger: #ff8a7a;
+  --danger-soft: #3a1d1f;
+  --ok: #6fd3a8;
+  --ok-soft: #163224;
+  --accent: var(--sh-violet-light);
+  --accent-soft: #2a2340;
+  --focus: var(--sh-violet-light);
 }
 
 .room :focus-visible {
@@ -1589,6 +1603,29 @@ th.num {
 .room .btn:hover {
   background: #c4b8ff;
   border-color: #c4b8ff;
+}
+
+.room .btn--danger {
+  background: #c4352b;
+  border-color: #c4352b;
+  color: #ffffff;
+}
+
+.room .btn--danger:hover {
+  background: #a82c23;
+  border-color: #a82c23;
+  color: #ffffff;
+}
+
+.room .btn--quiet {
+  background: transparent;
+  border-color: transparent;
+  color: var(--sh-violet-light);
+}
+
+.room .btn--quiet:hover {
+  background: #2a2340;
+  color: #c4b8ff;
 }
 
 /* The interviewer avatar (session/avatar). The canvas is drawn by three.js on a clear background. */
@@ -1770,6 +1807,7 @@ dialog {
   padding: var(--space-5);
   max-width: 440px;
   color: var(--ink);
+  background: var(--surface);
 }
 
 dialog::backdrop {
@@ -2482,7 +2520,8 @@ dialog::backdrop {
 
 .rating__scores {
   display: flex;
-  gap: var(--space-2);
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .rating__score {
