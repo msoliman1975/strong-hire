@@ -1,29 +1,122 @@
 ---
 import Base from "../layouts/Base.astro";
-import SignalScale from "../components/SignalScale.astro";
 import WaitlistForm from "../components/WaitlistForm.astro";
 import { COMPANIES, COMPANY_COUNT, CTA, NOT_AFFILIATED, PRACTICE_NOTICE, signupUrl } from "../data/site";
 
-// Q1 A headline; Q2 written for anyone with a tech interview booked; Q3 names only in one line.
+// The homepage sells the interviewer's preparation and judgment: the brief it builds from the
+// company, the role and the resume (spec "Interviewer brief"), how it reads a story, the tone and
+// difficulty you set, and why the same story scores differently for a different job.
+// Q3: company names only in one plain line, next to the notice.
 const companiesLine =
   COMPANIES.length > 0
     ? `Practice for interviews at companies like ${COMPANIES.slice(0, 6).join(", ")} and ${COMPANY_COUNT - 6} more.`
     : `Practice for interviews at ${COMPANY_COUNT} major tech companies.`;
+
+const SOURCES = [
+  ["The company", "How they interview", "Their values framework, question style, the bar at each level, and how their interviewers push back."],
+  ["The role", "What the job demands", "Level, must-haves, the problems the team owns, and the scope a hire at that level is expected to show."],
+  ["You", "What your resume proves", "Your projects and scope, and the gaps between your experience and the role."],
+] as const;
+
+const BRIEF_COMPETENCIES = ["Ownership", "Cross-team influence", "Judgment", "Customer focus", "Impact at scale"];
+const BRIEF_PROBES = [
+  "The role asks for leading without authority. Your resume shows one team, not several.",
+  "Payments is new to you. Expect “why this domain, why now”.",
+  "Your launch numbers are strong. It will ask how you measured them.",
+];
+
+// The annotated answer: each span is a strength ("win") or a leak, with a numbered note.
+const STORY = [
+  { n: 1, kind: "win", text: "I led the checkout migration across three teams", end: ". " },
+  { n: 2, kind: "leak", text: "It was really challenging and we improved things a lot", end: ". " },
+  { n: 3, kind: "flow", text: "Before that, actually, we'd tried a vendor, which didn't work", end: ". " },
+  { n: 4, kind: "leak", text: "We decided to phase the rollout", end: ", " },
+  { n: 5, kind: "win", text: "and checkout errors dropped 40 percent in six weeks", end: "." },
+] as const;
+const STORY_NOTES = [
+  ["1", "win", "Relevant", "Matches the role's ask: leading without authority across teams."],
+  ["2", "leak", "Vague", "“A lot” isn't evidence. Name the problem and the number."],
+  ["3", "flow", "Coherence", "The timeline jumps back. Open with the failed vendor, then your plan."],
+  ["4", "leak", "Ownership", "“We decided.” What did you propose, and who signed off?"],
+  ["5", "win", "Evidence", "A clear result with a measure and a timeframe. Keep it."],
+  ["", "gap", "Missing", "No reflection. At senior level, say what you'd change."],
+] as const;
+const STORY_SCORES = [
+  ["Relevance", 4],
+  ["Coherence", 2],
+  ["Evidence", 3],
+  ["Ownership", 2],
+  ["Scope for the level", 3],
+] as const;
+
+// The tone and difficulty demo. public/js/tone-demo.js reads this table from the JSON block below.
+const TONES = [
+  ["warm", "Warm"],
+  ["neutral", "Neutral"],
+  ["direct", "Direct"],
+] as const;
+const LEVELS = [
+  ["friendly", "Friendly"],
+  ["realistic", "Realistic"],
+  ["tough", "Tough"],
+] as const;
+const DEMO = {
+  replies: {
+    warm: {
+      friendly: "That sounds like a tricky stretch. What did you suggest to get things moving?",
+      realistic: "I'd love to hear how it ended. What did you propose, and who made the call?",
+      tough: "Let's stay there a moment. What exactly did you propose, who disagreed, and what did resolving it cost?",
+    },
+    neutral: {
+      friendly: "What did you suggest to get things moving?",
+      realistic: "How was it resolved? What did you propose, and who made the final call?",
+      tough: "You moved on, but was it resolved? Walk me through your proposal, the objection and the decision.",
+    },
+    direct: {
+      friendly: "So what was your proposal?",
+      realistic: "That doesn't tell me how it was resolved. What did you propose?",
+      tough: "Moving on isn't a resolution. What did you propose, who said no, and what would you do differently?",
+    },
+  },
+  notes: {
+    friendly: "Friendly: one gentle follow-up, then it moves on. Good for a first run.",
+    realistic: "Realistic: it keeps probing until it has evidence, the way most real interviewers do.",
+    tough: "Tough: it presses on every gap in the story and asks for the trade-off you skipped.",
+  },
+  labels: Object.fromEntries([...TONES, ...LEVELS]),
+};
+const DEFAULT_TONE = "neutral";
+const DEFAULT_LEVEL = "realistic";
+
+const CONTEXTS = [
+  {
+    tag: "Context A",
+    title: "Senior PM, payments, a company that values customer obsession",
+    meets: true,
+    why: "Checkout errors are a customer metric in the team's own domain. The cross-team scope fits the level.",
+  },
+  {
+    tag: "Context B",
+    title: "Staff engineer, infrastructure, a company that values technical depth",
+    meets: false,
+    why: "No architecture decision or trade-off in the story. Three teams is small scope for staff.",
+  },
+];
 ---
 
 <Base
-  title="Strong Hire: find out if you'd get the offer, before the interview"
-  description="A voice interviewer that rehearses the job you applied for, then gives you the hiring committee's verdict with quotes from your answers. For tech candidates in the US and Canada."
+  title="Strong Hire: an AI interviewer that has done the homework"
+  description="A voice interview simulator that studies the company, the role and your resume, listens to your stories like a hiring panel, and tells you where they win and where they leak. For tech candidates in the US and Canada."
   waitlist={CTA === "waitlist"}
 >
-  <section class="hero">
-    <div class="wrap hero__grid">
-      <div>
-        <p class="eyebrow">Interview practice by voice</p>
-        <h1>Find out if you'd get the offer, before the interview.</h1>
+  <section class="home-hero">
+    <div class="wrap">
+      <div class="home-hero__intro">
+        <p class="pill"><span class="dot" aria-hidden="true"></span>AI interview simulation, by voice</p>
+        <h1>An interviewer who has done the homework.</h1>
         <p class="lede">
-          Paste the job posting and your CV. An AI interviewer that has read both runs the interview out loud, follows up
-          on vague answers, and then tells you what a hiring committee would likely decide, with quotes from what you said.
+          Before you say a word, it has studied how the company interviews, what the role demands at your level, and
+          what your resume can and can't prove. Then it listens to your stories the way a hiring panel would.
         </p>
         <div class="actions">
           {
@@ -33,82 +126,250 @@ const companiesLine =
               <a class="btn" href="#join">Join the beta waitlist</a>
             )
           }
-          <a class="btn btn--ghost" href="/sample-debrief">See a sample debrief</a>
+          <a class="btn btn--ghost" href="#how">See how it thinks</a>
         </div>
         <p class="small muted">For engineers, product managers, data, design and TPM candidates.</p>
       </div>
-      <div class="card verdict" aria-label="Example verdict">
-        <p class="eyebrow">Example verdict</p>
-        <SignalScale signal="Lean Hire" />
-        <blockquote>
-          "I owned the migration end to end and cut checkout errors by 40 percent."
-        </blockquote>
-        <p>
-          Strong ownership. The answer never says what you would do differently, which the bar for this level expects.
-        </p>
-        <p class="small muted">{PRACTICE_NOTICE}</p>
+
+      <div class="brief-flow">
+        <ul class="brief-sources">
+          {
+            SOURCES.map(([tag, title, body]) => (
+              <li class="card">
+                <p class="tag">{tag}</p>
+                <h2>{title}</h2>
+                <p class="small muted">{body}</p>
+              </li>
+            ))
+          }
+        </ul>
+        <svg class="brief-arrow" width="48" height="48" viewBox="0 0 48 48" aria-hidden="true">
+          <path d="M6 24 H40 M30 14 L40 24 L30 34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        <section class="brief" aria-labelledby="brief-title">
+          <div class="brief__head">
+            <h2 id="brief-title">Your interviewer's brief</h2>
+            <p class="tag">Example · Senior PM · Behavioral</p>
+          </div>
+          <h3 class="eyebrow">Competencies to test</h3>
+          <ul class="chips">{BRIEF_COMPETENCIES.map((c) => <li>{c}</li>)}</ul>
+          <h3 class="eyebrow">Where it will probe</h3>
+          <ul class="probes">{BRIEF_PROBES.map((p) => <li>{p}</li>)}</ul>
+          <dl class="brief__facts">
+            <div><dt>Questions, ranked</dt><dd>8</dd></div>
+            <div><dt>Persona tone</dt><dd>Direct</dd></div>
+            <div><dt>Bar it scores to</dt><dd>Senior</dd></div>
+          </dl>
+        </section>
       </div>
     </div>
   </section>
 
-  <section class="section">
+  <section class="section section--alt home-section" id="how" aria-labelledby="story-title">
     <div class="wrap">
-      <h2>Your interview is on Thursday. Rehearse it today.</h2>
-      <p class="lede">Strong Hire prepares you for the interview you actually have, not a generic one.</p>
-      <ol class="steps">
-        <li>
-          <h3>Paste the job and your CV</h3>
-          <p>You get a free gap analysis: where you match the posting, where you don't, and what to practice first.</p>
-        </li>
-        <li>
-          <h3>Practice by voice</h3>
-          <p>
-            The interviewer asks the questions this role is known for, probes vague answers and keeps time, like a real
-            one.
+      <p class="eyebrow">How it listens</p>
+      <h2 id="story-title">It hears what your story actually proves.</h2>
+      <p class="lede">
+        Relevance, coherence, evidence, ownership. Sentence by sentence, you see where a story wins and where it leaks.
+      </p>
+      <div class="story">
+        <figure class="story__answer">
+          <figcaption class="tag">Q · Tell me about a project you led across teams. Example answer.</figcaption>
+          <p class="story__text">
+            {
+              STORY.map((s) => (
+                <><mark class={`ann ann--${s.kind}`}>{s.text}</mark><sup class={`ann-n ann-n--${s.kind}`}>{s.n}</sup>{s.end}</>
+              ))
+            }
           </p>
-        </li>
-        <li>
-          <h3>Get the verdict</h3>
-          <p>A hire signal, a score per question with the evidence, and the three things to fix before the real thing.</p>
-        </li>
-      </ol>
-      <p><a href="/how-it-works">How it works in detail</a></p>
+          <ol class="story__notes">
+            {
+              STORY_NOTES.map(([n, kind, label, body]) => (
+                <li>
+                  <span class={`ann-label ann-n--${kind}`}>
+                    {n} {label}
+                  </span>
+                  {body}
+                </li>
+              ))
+            }
+          </ol>
+        </figure>
+        <aside class="story__scores card" aria-labelledby="scores-title">
+          <h3 id="scores-title" class="eyebrow">This story, scored for this role</h3>
+          <ul>
+            {
+              STORY_SCORES.map(([name, score]) => (
+                <li>
+                  <span class="score-row">
+                    <span>{name}</span>
+                    <span class="mono">{score}/4</span>
+                  </span>
+                  <span class="meter" role="img" aria-label={`${name}: ${score} out of 4`}>
+                    <span class={`meter__fill meter__fill--${score}`}></span>
+                  </span>
+                </li>
+              ))
+            }
+          </ul>
+          <div class="story__fix">
+            <h3 class="eyebrow">Fix first</h3>
+            <p>Lead with the failed vendor, say what you proposed, keep the 40 percent, and close with what you'd change.</p>
+          </div>
+        </aside>
+      </div>
     </div>
   </section>
 
-  <section class="section section--alt">
-    <div class="wrap grid-2">
+  <section class="section home-section" aria-labelledby="room-title">
+    <div class="wrap room">
       <div>
-        <h2>Built around how each company interviews</h2>
-        <p class="companies">{companiesLine}</p>
-        <p class="notice">{NOT_AFFILIATED}</p>
-      </div>
-      <div>
-        <h2>Private by design</h2>
-        <p>
-          Audio is never stored. Your CV and transcripts stay yours: export or delete everything in one click. Nothing you
-          say is used for training unless you turn that on.
+        <p class="eyebrow">Set the room</p>
+        <h2 id="room-title">Choose who you face.</h2>
+        <p class="lede">
+          Warm up with a friendly interviewer, then rehearse against the toughest one you might meet. Same answer,
+          different pressure.
         </p>
-        <p><a href="/legal/privacy">Read the privacy policy</a></p>
+        <div class="room__controls" data-tone-demo-controls hidden>
+          <fieldset>
+            <legend>Tone</legend>
+            <div class="segmented">
+              {
+                TONES.map(([id, label]) => (
+                  <button type="button" data-tone={id} aria-pressed={id === DEFAULT_TONE ? "true" : "false"}>
+                    {label}
+                  </button>
+                ))
+              }
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Difficulty</legend>
+            <div class="segmented">
+              {
+                LEVELS.map(([id, label]) => (
+                  <button type="button" data-level={id} aria-pressed={id === DEFAULT_LEVEL ? "true" : "false"}>
+                    {label}
+                  </button>
+                ))
+              }
+            </div>
+          </fieldset>
+        </div>
       </div>
+      <div class="room__demo">
+        <div class="card">
+          <p class="tag">You said</p>
+          <p class="room__said">
+            “We went back and forth with the platform team for a while, and then we moved on to the next milestone.”
+          </p>
+        </div>
+        <div class="room__reply" aria-live="polite">
+          <p class="tag tag--stage">
+            <span class="dot" aria-hidden="true"></span>Interviewer · <span data-tone-demo-label>
+              {DEMO.labels[DEFAULT_TONE]} · {DEMO.labels[DEFAULT_LEVEL]}
+            </span>
+          </p>
+          <p class="room__line">“<span data-tone-demo-reply>{DEMO.replies[DEFAULT_TONE][DEFAULT_LEVEL]}</span>”</p>
+        </div>
+        <p class="small muted" data-tone-demo-note>{DEMO.notes[DEFAULT_LEVEL]}</p>
+      </div>
+    </div>
+    <script is:inline type="application/json" id="tone-demo-data" set:html={JSON.stringify(DEMO)} />
+  </section>
+
+  <section class="section section--alt home-section" aria-labelledby="context-title">
+    <div class="wrap">
+      <h2 id="context-title">Same story. Different job. Different verdict.</h2>
+      <p class="lede">
+        A good answer depends on who's asking. Strong Hire weighs your story against the company's values, the role's
+        needs and the bar for your level.
+      </p>
+      <div class="grid-2">
+        {
+          CONTEXTS.map((c) => (
+            <div class="card">
+              <p class="tag">{c.tag}</p>
+              <h3>{c.title}</h3>
+              <p class={c.meets ? "badge badge--ok" : "badge badge--below"}>
+                {c.meets && (
+                  <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M3 8.5 L6.5 12 L13 4.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                )}
+                {c.meets ? "Meets the bar" : "Below the bar"}
+              </p>
+              <p class="muted">{c.why}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section home-section" aria-labelledby="minds-title">
+    <div class="wrap">
+      <h2 id="minds-title">One AI asks. A different one judges.</h2>
+      <div class="grid-2 minds">
+        <div class="minds__item minds__item--live">
+          <p class="tag">During · the interviewer</p>
+          <h3>Fast, in character, adaptive</h3>
+          <p class="muted">
+            Works from the brief, follows up when an answer is thin and moves on when it has the evidence. It replies at
+            conversation speed, like a person across the table.
+          </p>
+        </div>
+        <div class="minds__item minds__item--verdict">
+          <p class="tag">After · the scorer</p>
+          <h3>Slow, thorough, unswayed</h3>
+          <p class="muted">
+            Reads the full transcript afterward, the way a debrief panel reads notes. It wasn't in the conversation, so it
+            can't go easy on you.
+          </p>
+        </div>
+      </div>
+      <div class="trio">
+        <div class="card">
+          <h3>Private by design</h3>
+          <p class="muted">
+            Audio is never stored. Export or delete your resume and transcripts in one click. Nothing is used for training
+            unless you turn that on.
+          </p>
+          <p><a href="/legal/privacy">Read the privacy policy</a></p>
+        </div>
+        <div class="card">
+          <h3>Start free</h3>
+          <p class="muted">
+            Unlimited gap analyses and two 10-minute mini interviews, each with a debrief. Paid plans add full 30 and
+            45-minute interviews.
+          </p>
+          <p><a href="/pricing">How plans work</a></p>
+        </div>
+        <div class="card">
+          <h3>Profiles of how companies interview</h3>
+          <p class="muted">{companiesLine}</p>
+          <p class="notice">{NOT_AFFILIATED}</p>
+        </div>
+      </div>
+      <p class="small muted">{PRACTICE_NOTICE}</p>
     </div>
   </section>
 
   {
     CTA === "waitlist" && (
-      <section class="section">
+      <section class="section home-join">
         <div class="wrap grid-2">
           <div>
-            <h2>The beta opens soon</h2>
+            <h2>Meet your interviewer before theirs.</h2>
             <p>
-              We are inviting candidates in stages, soonest interviews first. Join the list and we'll email you when your
-              place is ready.
+              The beta opens in stages, soonest interviews first. Join and we'll email you when your place is ready.
             </p>
-            <p class="muted">Free accounts get unlimited gap analyses and two 10-minute mini interviews.</p>
+            <p class="home-join__note">Free accounts get unlimited gap analyses and two 10-minute mini interviews.</p>
           </div>
           <WaitlistForm />
         </div>
       </section>
     )
   }
+  <script is:inline src="/js/tone-demo.js" defer></script>
 </Base>
