@@ -1,0 +1,29 @@
+{
+  "message": "Thanks, that sets the scene. What did you do yourself?",
+  "parts": [
+    {
+      "part": "context",
+      "text": "I was the backend lead at Acme when we were moving checkout to a new payments provider, and the rollout was two weeks late.",
+      "quotes": [
+        "Last year at Acme I was the backend lead",
+        "we were moving checkout to the new payments provider",
+        "the rollout was already two weeks late"
+      ]
+    },
+    {
+      "part": "stakes",
+      "text": "Black Friday was a month out, and checkout could not break.",
+      "quotes": [
+        "Black Friday was a month out and checkout could not break"
+      ]
+    }
+  ],
+  "missing": [
+    "action",
+    "result",
+    "reflection"
+  ],
+  "skills": [
+    "ownership"
+  ]
+}

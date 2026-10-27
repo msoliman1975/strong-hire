@@ -1,0 +1,22 @@
+{
+  "message": "That shows your call clearly. What changed in the end?",
+  "parts": [
+    {
+      "part": "action",
+      "text": "I took over the cutover plan and split the rollout by country instead of one big switch, because a full switch could not be rolled back fast.",
+      "quotes": [
+        "I took over the cutover plan myself",
+        "I split the rollout by country instead of one big switch",
+        "a full switch could not be rolled back fast"
+      ]
+    }
+  ],
+  "missing": [
+    "result",
+    "reflection"
+  ],
+  "skills": [
+    "ownership",
+    "judgment"
+  ]
+}

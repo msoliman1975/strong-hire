@@ -1,0 +1,26 @@
+{
+  "message": "All five parts are there now. Do you want to sharpen anything, or are you done?",
+  "parts": [
+    {
+      "part": "result",
+      "text": "We shipped a week before Black Friday, and checkout errors dropped from 2% to 0.3%.",
+      "quotes": [
+        "We shipped a week before Black Friday",
+        "checkout errors dropped from 2% to 0.3%"
+      ]
+    },
+    {
+      "part": "reflection",
+      "text": "I learned to cut big launches into small reversible steps.",
+      "quotes": [
+        "I learned to cut big launches into small reversible steps"
+      ]
+    }
+  ],
+  "missing": [],
+  "skills": [
+    "ownership",
+    "judgment",
+    "impact"
+  ]
+}

@@ -1,0 +1,5 @@
+The coach's last turn:
+$asked
+
+The candidate's turn to check:
+$answer

@@ -2155,6 +2155,290 @@
         }
       }
     },
+    "/coach/sessions": {
+      "post": {
+        "tags": [
+          "coach"
+        ],
+        "summary": "Start Coach Session",
+        "description": "CO-2: start a coach session. The coach greets and asks for the first missing thing.",
+        "operationId": "start_coach_session_coach_sessions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartCoachRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoachSessionDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coach/sessions/{session_id}": {
+      "get": {
+        "tags": [
+          "coach"
+        ],
+        "summary": "Get Coach Session",
+        "operationId": "get_coach_session_coach_sessions__session_id__get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoachSessionDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coach/sessions/{session_id}/turns": {
+      "post": {
+        "tags": [
+          "coach"
+        ],
+        "summary": "Coach Turn",
+        "description": "CO-2, CO-3, CO-4: the candidate's turn; the story's parts update from their words.",
+        "operationId": "coach_turn_coach_sessions__session_id__turns_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoachTurnRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoachTurnResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coach/sessions/{session_id}/style": {
+      "post": {
+        "tags": [
+          "coach"
+        ],
+        "summary": "Set Coach Style",
+        "description": "CO-5: gentle or direct. Only the style section of the prompt changes.",
+        "operationId": "set_coach_style_coach_sessions__session_id__style_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StyleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoachSessionOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coach/sessions/{session_id}/end": {
+      "post": {
+        "tags": [
+          "coach"
+        ],
+        "summary": "End Coach Session",
+        "description": "End the session and record its minutes. Ending twice is harmless.",
+        "operationId": "end_coach_session_coach_sessions__session_id__end_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoachSessionDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{story_id}/coach-sessions": {
+      "get": {
+        "tags": [
+          "coach"
+        ],
+        "summary": "List Story Coach Sessions",
+        "operationId": "list_story_coach_sessions_stories__story_id__coach_sessions_get",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CoachSessionOut"
+                  },
+                  "title": "Response List Story Coach Sessions Stories  Story Id  Coach Sessions Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/dev/model-usage": {
       "get": {
         "tags": [
@@ -10687,14 +10971,28 @@
         "type": "object"
       },
       "AnswerConduct": {
-        "description": "IV-12: whether a candidate turn belongs in the interview.\n\n`off_scope` is not a weak or off-topic answer (IV-3 probes those). It is a turn about\nsomething outside the interview, such as an unrelated subject or a request for an unrelated\ntask. `inappropriate` is abuse, harassment, threats, hate or sexual content.",
+        "type": "string",
         "enum": [
           "ok",
           "off_scope",
           "inappropriate"
         ],
         "title": "AnswerConduct",
-        "type": "string"
+        "description": "IV-12: whether a candidate turn belongs in the interview.\n\n`off_scope` is not a weak or off-topic answer (IV-3 probes those). It is a turn about\nsomething outside the interview, such as an unrelated subject or a request for an unrelated\ntask. `inappropriate` is abuse, harassment, threats, hate or sexual content."
+      },
+      "AskFor": {
+        "type": "string",
+        "enum": [
+          "concrete_example",
+          "stakes",
+          "own_role",
+          "measurable_result",
+          "tradeoff_reasoning",
+          "reflection",
+          "nothing"
+        ],
+        "title": "AskFor",
+        "description": "CO-4: the one thing the coach asks for next, from the IV-3 follow-up rules."
       },
       "AuthProvider": {
         "type": "string",
@@ -11354,45 +11652,45 @@
         "title": "ChangeKind"
       },
       "CoachReply": {
-        "additionalProperties": false,
-        "description": "CO-3, CO-4: one coach turn. The coach updates only the parts the candidate's own words\nsupport (CO-9) and asks for what is still missing.",
         "properties": {
           "message": {
-            "description": "What the coach says to the candidate.",
+            "type": "string",
             "minLength": 1,
             "title": "Message",
-            "type": "string"
+            "description": "What the coach says to the candidate."
           },
           "parts": {
-            "description": "Parts this turn updated. Empty when none changed.",
             "items": {
               "$ref": "#/components/schemas/StoryPartUpdate"
             },
+            "type": "array",
             "title": "Parts",
-            "type": "array"
+            "description": "Parts this turn updated. Empty when none changed."
           },
           "missing": {
-            "description": "Parts the candidate has not given yet.",
             "items": {
               "$ref": "#/components/schemas/StoryPart"
             },
+            "type": "array",
             "title": "Missing",
-            "type": "array"
+            "description": "Parts the candidate has not given yet."
           },
           "skills": {
-            "description": "Skills the story shows so far.",
             "items": {
               "$ref": "#/components/schemas/Competency"
             },
+            "type": "array",
             "title": "Skills",
-            "type": "array"
+            "description": "Skills the story shows so far."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "message"
         ],
         "title": "CoachReply",
-        "type": "object"
+        "description": "CO-3, CO-4: one coach turn. The coach updates only the parts the candidate's own words\nsupport (CO-9) and asks for what is still missing."
       },
       "CoachRequest": {
         "properties": {
@@ -11413,6 +11711,243 @@
           "command"
         ],
         "title": "CoachRequest"
+      },
+      "CoachSessionDetail": {
+        "properties": {
+          "session": {
+            "$ref": "#/components/schemas/CoachSessionOut"
+          },
+          "story": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Story"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "turns": {
+            "items": {
+              "$ref": "#/components/schemas/CoachTurnOut"
+            },
+            "type": "array",
+            "title": "Turns"
+          },
+          "missing": {
+            "items": {
+              "$ref": "#/components/schemas/StoryPart"
+            },
+            "type": "array",
+            "title": "Missing",
+            "description": "CO-3: parts the story does not have yet"
+          },
+          "asking_for": {
+            "$ref": "#/components/schemas/AskFor",
+            "description": "CO-4: what the coach is asking for now"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session",
+          "story",
+          "turns",
+          "missing",
+          "asking_for"
+        ],
+        "title": "CoachSessionDetail"
+      },
+      "CoachSessionOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "story_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Story Id"
+          },
+          "style": {
+            "$ref": "#/components/schemas/CoachStyle"
+          },
+          "channel": {
+            "$ref": "#/components/schemas/SessionChannel"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CoachSessionStatus"
+          },
+          "minutes": {
+            "type": "integer",
+            "title": "Minutes"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "ended_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ended At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "story_id",
+          "style",
+          "channel",
+          "status",
+          "minutes",
+          "started_at",
+          "ended_at"
+        ],
+        "title": "CoachSessionOut"
+      },
+      "CoachSessionStatus": {
+        "type": "string",
+        "enum": [
+          "active",
+          "ended",
+          "failed"
+        ],
+        "title": "CoachSessionStatus",
+        "description": "CO-2: state of one coach session."
+      },
+      "CoachSpeaker": {
+        "type": "string",
+        "enum": [
+          "coach",
+          "candidate"
+        ],
+        "title": "CoachSpeaker",
+        "description": "CO-2: who said a coach turn."
+      },
+      "CoachStyle": {
+        "type": "string",
+        "enum": [
+          "gentle",
+          "direct"
+        ],
+        "title": "CoachStyle",
+        "description": "CO-5: how the coach talks, picked by the candidate."
+      },
+      "CoachTurnOut": {
+        "properties": {
+          "seq": {
+            "type": "integer",
+            "title": "Seq"
+          },
+          "speaker": {
+            "$ref": "#/components/schemas/CoachSpeaker"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "at_ms": {
+            "type": "integer",
+            "title": "At Ms",
+            "description": "Milliseconds from the start of the session"
+          }
+        },
+        "type": "object",
+        "required": [
+          "seq",
+          "speaker",
+          "text",
+          "at_ms"
+        ],
+        "title": "CoachTurnOut"
+      },
+      "CoachTurnRequest": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Text"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "CoachTurnRequest"
+      },
+      "CoachTurnResult": {
+        "properties": {
+          "reply": {
+            "$ref": "#/components/schemas/CoachReply",
+            "description": "CO-3: only the part updates the candidate's own words back"
+          },
+          "story": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Story"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "None when an empty new story was dropped at the end"
+          },
+          "turns": {
+            "items": {
+              "$ref": "#/components/schemas/CoachTurnOut"
+            },
+            "type": "array",
+            "title": "Turns",
+            "description": "The candidate's turn, then the coach's"
+          },
+          "asking_for": {
+            "$ref": "#/components/schemas/AskFor"
+          },
+          "conduct": {
+            "$ref": "#/components/schemas/AnswerConduct",
+            "description": "IV-12: ok, or why the turn got a warning"
+          },
+          "ended": {
+            "type": "boolean",
+            "title": "Ended",
+            "description": "True when the session ended on this turn"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reply",
+          "story",
+          "turns",
+          "asking_for",
+          "conduct",
+          "ended"
+        ],
+        "title": "CoachTurnResult",
+        "description": "One candidate turn and the coach's reply."
       },
       "CompanyActiveIn": {
         "properties": {
@@ -20218,20 +20753,71 @@
         ],
         "title": "SpendSlice"
       },
-      "Story": {
+      "StartCoachRequest": {
+        "properties": {
+          "story_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Story Id"
+          },
+          "style": {
+            "$ref": "#/components/schemas/CoachStyle",
+            "default": "gentle"
+          },
+          "channel": {
+            "$ref": "#/components/schemas/SessionChannel",
+            "description": "CO-6: voice sessions run through the voice agent",
+            "default": "text"
+          },
+          "target_skill": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Competency"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The skill the story should show; tags the story."
+          },
+          "job_target_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Target Id",
+            "description": "The plan page whose story-fit gap opened this session (with target_skill)."
+          }
+        },
         "additionalProperties": false,
-        "description": "ST-1: one story in the user's library. The stories table holds org_id and user_id.",
+        "type": "object",
+        "title": "StartCoachRequest",
+        "description": "Start a coach session on a new story (no story_id) or an existing one."
+      },
+      "Story": {
         "properties": {
           "id": {
+            "type": "string",
             "format": "uuid",
-            "title": "Id",
-            "type": "string"
+            "title": "Id"
           },
           "title": {
+            "type": "string",
             "maxLength": 200,
             "minLength": 1,
-            "title": "Title",
-            "type": "string"
+            "title": "Title"
           },
           "context": {
             "anyOf": [
@@ -20242,7 +20828,6 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Context"
           },
           "stakes": {
@@ -20254,7 +20839,6 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Stakes"
           },
           "action": {
@@ -20266,7 +20850,6 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Action"
           },
           "result": {
@@ -20278,7 +20861,6 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Result"
           },
           "reflection": {
@@ -20290,16 +20872,15 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Reflection"
           },
           "skills": {
-            "description": "Skill tags.",
             "items": {
               "$ref": "#/components/schemas/Competency"
             },
+            "type": "array",
             "title": "Skills",
-            "type": "array"
+            "description": "Skill tags."
           },
           "status": {
             "$ref": "#/components/schemas/StoryStatus",
@@ -20311,16 +20892,15 @@
           "source_session_id": {
             "anyOf": [
               {
-                "format": "uuid",
-                "type": "string"
+                "type": "string",
+                "format": "uuid"
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "ST-2: the session of the debrief answer it came from.",
-            "title": "Source Session Id"
+            "title": "Source Session Id",
+            "description": "ST-2: the session of the debrief answer it came from."
           },
           "source_question_ref": {
             "anyOf": [
@@ -20331,28 +20911,29 @@
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "ST-2: QuestionScore.question_ref of that answer.",
-            "title": "Source Question Ref"
+            "title": "Source Question Ref",
+            "description": "ST-2: QuestionScore.question_ref of that answer."
           },
           "notes": {
             "items": {
               "$ref": "#/components/schemas/StoryNote"
             },
-            "title": "Notes",
-            "type": "array"
+            "type": "array",
+            "title": "Notes"
           },
           "created_at": {
+            "type": "string",
             "format": "date-time",
-            "title": "Created At",
-            "type": "string"
+            "title": "Created At"
           },
           "updated_at": {
+            "type": "string",
             "format": "date-time",
-            "title": "Updated At",
-            "type": "string"
+            "title": "Updated At"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "id",
           "title",
@@ -20361,7 +20942,7 @@
           "updated_at"
         ],
         "title": "Story",
-        "type": "object"
+        "description": "ST-1: one story in the user's library. The stories table holds org_id and user_id."
       },
       "StoryFit": {
         "additionalProperties": false,
@@ -20428,27 +21009,24 @@
         "type": "string"
       },
       "StoryNote": {
-        "additionalProperties": false,
-        "description": "ST-6: a fix note sent to the story from a debrief answer that used it.",
         "properties": {
           "text": {
+            "type": "string",
             "minLength": 1,
-            "title": "Text",
-            "type": "string"
+            "title": "Text"
           },
           "session_id": {
             "anyOf": [
               {
-                "format": "uuid",
-                "type": "string"
+                "type": "string",
+                "format": "uuid"
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "The debrief's session.",
-            "title": "Session Id"
+            "title": "Session Id",
+            "description": "The debrief's session."
           },
           "question_ref": {
             "anyOf": [
@@ -20459,25 +21037,26 @@
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "QuestionScore.question_ref.",
-            "title": "Question Ref"
+            "title": "Question Ref",
+            "description": "QuestionScore.question_ref."
           },
           "at": {
+            "type": "string",
             "format": "date-time",
-            "title": "At",
-            "type": "string"
+            "title": "At"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "text",
           "at"
         ],
         "title": "StoryNote",
-        "type": "object"
+        "description": "ST-6: a fix note sent to the story from a debrief answer that used it."
       },
       "StoryPart": {
-        "description": "ST-1: the five parts of a story, in the order the workbench and prompts show them.",
+        "type": "string",
         "enum": [
           "context",
           "stakes",
@@ -20486,57 +21065,57 @@
           "reflection"
         ],
         "title": "StoryPart",
-        "type": "string"
+        "description": "ST-1: the five parts of a story, in the order the workbench and prompts show them."
       },
       "StoryPartUpdate": {
-        "additionalProperties": false,
-        "description": "CO-3, CO-9: new text for one story part, backed by the candidate's own words.",
         "properties": {
           "part": {
             "$ref": "#/components/schemas/StoryPart"
           },
           "text": {
-            "description": "The part, written from the candidate's words.",
+            "type": "string",
             "minLength": 1,
             "title": "Text",
-            "type": "string"
+            "description": "The part, written from the candidate's words."
           },
           "quotes": {
-            "description": "The candidate's words this part came from, verbatim.",
             "items": {
               "type": "string"
             },
+            "type": "array",
             "minItems": 1,
             "title": "Quotes",
-            "type": "array"
+            "description": "The candidate's words this part came from, verbatim."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "part",
           "text",
           "quotes"
         ],
         "title": "StoryPartUpdate",
-        "type": "object"
+        "description": "CO-3, CO-9: new text for one story part, backed by the candidate's own words."
       },
       "StorySource": {
-        "description": "ST-1: where a story came from.",
+        "type": "string",
         "enum": [
           "debrief_answer",
           "manual",
           "coach"
         ],
         "title": "StorySource",
-        "type": "string"
+        "description": "ST-1: where a story came from."
       },
       "StoryStatus": {
-        "description": "ST-1, ST-7: a story is a draft until a Realistic answer that used it scores 3 or more.",
+        "type": "string",
         "enum": [
           "draft",
           "proven"
         ],
         "title": "StoryStatus",
-        "type": "string"
+        "description": "ST-1, ST-7: a story is a draft until a Realistic answer that used it scores 3 or more."
       },
       "StoryVersion": {
         "additionalProperties": false,
@@ -20605,6 +21184,20 @@
           "evidence"
         ],
         "title": "Strength"
+      },
+      "StyleRequest": {
+        "properties": {
+          "style": {
+            "$ref": "#/components/schemas/CoachStyle"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "style"
+        ],
+        "title": "StyleRequest",
+        "description": "CO-5: switch the style mid-session; the next reply uses it."
       },
       "SubscriptionStatus": {
         "type": "string",
