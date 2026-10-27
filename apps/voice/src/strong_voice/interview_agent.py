@@ -39,6 +39,7 @@ from strong_interview import (
 from strong_interview.trace_store import SqlTraceSink
 from strong_voice.interview import VoiceInterview
 from strong_voice.latency import LatencyRecorder
+from strong_voice.plugins import GatewaySTT
 from strong_voice.session_store import (
     AgentApiSettings,
     ApiFinisher,
@@ -105,6 +106,8 @@ class InterviewAgent(Agent):
             await self._on_ended()
 
     async def on_enter(self) -> None:
+        if isinstance(self.session.stt, GatewaySTT):  # replies wait for a late transcript
+            self.turns.stt = self.session.stt
         await self.speak(await self.interview.opening())
 
     async def on_user_turn_completed(

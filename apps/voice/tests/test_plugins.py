@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import asyncio
+
 import pytest
 from livekit import rtc
 from livekit.agents import AgentSession, llm
@@ -44,6 +46,29 @@ async def test_stt_transcribes_the_final_segment(fake: ModelGateway) -> None:
     assert stt.capabilities.streaming is False
     ev = await stt.recognize(frame)
     assert "migration" in ev.alternatives[0].text
+
+
+async def test_iv1_stt_reports_busy_while_a_segment_is_transcribed(fake: ModelGateway) -> None:
+    """The reply waits for a late transcript (strong_voice.turns): GatewaySTT says when it is
+    still transcribing, and settles once the queue is empty."""
+    release = asyncio.Event()
+    stt = GatewaySTT(fake)
+    real = fake.transcribe
+
+    async def slow(wav: bytes) -> str:
+        await release.wait()
+        return await real(wav)
+
+    fake.transcribe = slow  # type: ignore[method-assign]
+    frame = rtc.AudioFrame(bytes(3200), 16000, 1, 1600)
+    task = asyncio.create_task(stt.recognize(frame))
+    await asyncio.sleep(0.01)
+    assert stt.busy
+    assert not await stt.settled(timeout_s=0.05)
+    release.set()
+    await task
+    assert not stt.busy
+    assert await stt.settled(quiet_s=0.01, timeout_s=1.0)
 
 
 async def test_llm_streams_interviewer_text(fake: ModelGateway) -> None:
