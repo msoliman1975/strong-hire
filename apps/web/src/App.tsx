@@ -18,6 +18,8 @@ import { NewJobPage } from "./pages/onboarding/NewJobPage";
 import { CheckResumePage } from "./pages/onboarding/CheckResumePage";
 import { ResumePage } from "./pages/onboarding/ResumePage";
 import { PaywallPage } from "./pages/PaywallPage";
+import { PlanPage } from "./pages/plan/PlanPage";
+import { V2Redirect } from "./pages/plan/V2Redirect";
 import { EditProfilePage, WelcomePage } from "./pages/ProfilePage";
 import { RehearsalPage } from "./pages/RehearsalPage";
 import { QuestionsPage } from "./pages/QuestionsPage";
@@ -71,10 +73,12 @@ export function AppRoutes() {
           <Route path="/jobs/:jobId/confirm" element={<ConfirmJobPage />} />
           <Route path="/jobs/:jobId/resume" element={<ResumePage />} />
           <Route path="/jobs/:jobId/resume/:resumeId/check" element={<CheckResumePage />} />
-          <Route path="/jobs/:jobId/rehearse/:resumeId" element={<RehearsalPage />} />
+          <Route path="/jobs/:jobId/rehearse/:resumeId" element={<V2Redirect><RehearsalPage /></V2Redirect>} />
           <Route path="/jobs/:jobId/context" element={<ContextPage />} />
-          <Route path="/jobs/:jobId/gap" element={<GapAnalysisPage />} />
-          <Route path="/jobs/:jobId/sessions/new" element={<SessionSetupPage />} />
+          <Route path="/jobs/:jobId/gap" element={<V2Redirect><GapAnalysisPage /></V2Redirect>} />
+          <Route path="/jobs/:jobId/sessions/new" element={<V2Redirect><SessionSetupPage /></V2Redirect>} />
+          {/* v2 S10: the interview plan page (PP-1). The three routes above open it when v2_enabled is on. */}
+          <Route path="/interviews/:jobId/:resumeId" element={<PlanPage />} />
           <Route path="/sessions/:sessionId/live" element={<LiveSessionPage />} />
           <Route path="/sessions/:sessionId/debrief" element={<DebriefPage />} />
           <Route path="/reports" element={<ReportsPage />} />

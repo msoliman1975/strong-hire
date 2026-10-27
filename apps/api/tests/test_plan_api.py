@@ -43,7 +43,11 @@ async def test_pp1_plan_view_aggregates_gap_reports_and_next_session(
 
     created = await client.post(
         "/sessions",
-        json={"job_target_id": job["id"], "resume_id": cv["id"], "config": {**SESSION_CONFIG, "duration_min": 10}},
+        json={
+            "job_target_id": job["id"],
+            "resume_id": cv["id"],
+            "config": {**SESSION_CONFIG, "duration_min": 10},
+        },
     )
     assert created.status_code == 201, created.text
     async with sessionmaker() as db:

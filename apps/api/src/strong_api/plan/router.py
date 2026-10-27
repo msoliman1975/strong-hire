@@ -93,9 +93,7 @@ async def set_interview_date(
     target = await _owned_job_target(db, me, job_target_id, live=True)
     left = service.days_left(body.interview_date)
     if left is not None and left < -PAST_DAYS_ALLOWED:
-        raise HTTPException(
-            status.HTTP_422_UNPROCESSABLE_CONTENT, "Choose today or a later date."
-        )
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Choose today or a later date.")
     target.interview_date = body.interview_date
     await db.commit()
     return InterviewDateOut(interview_date=target.interview_date, days_left=left)

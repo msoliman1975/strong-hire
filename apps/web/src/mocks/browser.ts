@@ -13,6 +13,7 @@ import { setupWorker } from "msw/browser";
 import { customHandlers } from "./custom";
 import { createStore } from "./db";
 import { accountHandlers, authHandlers, inputHandlers, scoringHandlers, sessionHandlers } from "./handlers";
+import { planHandlers } from "./planHandlers";
 import { questionHandlers } from "./questionHandlers";
 import { waitlistHandlers } from "./waitlistHandlers";
 
@@ -32,6 +33,7 @@ export async function startMocks(mode: MockMode): Promise<void> {
     ...authHandlers(store),
     ...accountHandlers(store),
     ...customHandlers(store),
+    ...planHandlers(store),
     ...questionHandlers(),
     ...waitlistHandlers(),
   ];
