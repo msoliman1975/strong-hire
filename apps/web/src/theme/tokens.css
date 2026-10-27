@@ -1,0 +1,119 @@
+/*
+ * Strong Hire v2 design tokens (UI-1). Values come from the App UX canvas.
+ * Violet is the action color, teal marks interview prep. The story-part colors always travel
+ * with a text label (StoryPartChip), never color alone.
+ */
+@import "@fontsource-variable/geist/wght.css";
+@import "@fontsource-variable/geist-mono/wght.css";
+
+:root {
+  /* Ground and text. */
+  --sh-ground: #f4f3f8;
+  --sh-surface: #ffffff;
+  --sh-sunken: #ecebf2;
+  --sh-ink: #17161f;
+  --sh-ink-hover: #2e2c3b;
+  --sh-muted: #5e5b6b;
+  --sh-line: #e2e0ea;
+  --sh-line-strong: #c9c5d6;
+
+  /* Action: violet. */
+  --sh-violet: #5332e6;
+  --sh-violet-hover: #3d22c4;
+  --sh-violet-soft: #eeeafe;
+  --sh-violet-ink: #3d22c4;
+  --sh-violet-light: #a594ff;
+
+  /* Interview prep: teal. */
+  --sh-teal: #0b6e8c;
+  --sh-teal-soft: #e0f2f7;
+
+  /* Status. */
+  --sh-ok: #12775a;
+  --sh-ok-ink: #0f5f48;
+  --sh-ok-soft: #e3f4ec;
+  --sh-warn: #a34d00;
+  --sh-warn-ink: #8a4200;
+  --sh-warn-soft: #fdeedc;
+  --sh-danger: #b4321f;
+  --sh-danger-ink: #9a2c1b;
+  --sh-danger-soft: #fbe7e3;
+  --sh-rec: #e5484d;
+
+  /* Story parts. */
+  --sh-part-context: #5e5b6b;
+  --sh-part-stakes: #a34d00;
+  --sh-part-action: #5332e6;
+  --sh-part-result: #12775a;
+  --sh-part-reflection: #0b6e8c;
+
+  /* Live room (dark). */
+  --sh-room: #0e0d14;
+  --sh-room-raised: #1a1824;
+  --sh-room-line: #2c2938;
+  --sh-room-line-strong: #45405a;
+  --sh-room-text: #f2f0f7;
+  --sh-room-muted: #a29fb0;
+  --sh-room-live: #ff6b5e;
+
+  /* Shape and type. */
+  --sh-radius-sm: 10px;
+  --sh-radius: 16px;
+  --sh-radius-lg: 20px;
+  --sh-radius-pill: 999px;
+  --sh-shadow-pop: 0 6px 24px rgb(23 22 31 / 14%);
+  --sh-font: "Geist Variable", "Geist", system-ui, sans-serif;
+  --sh-font-mono: "Geist Mono Variable", "Geist Mono", ui-monospace, Consolas, monospace;
+  --sh-rail-width: 232px;
+
+  /*
+   * v1 token names, kept as aliases so v1 pages render in the new look.
+   * New code uses the --sh-* names.
+   */
+  --paper: var(--sh-ground);
+  --surface: var(--sh-surface);
+  --ink: var(--sh-ink);
+  --ink-hover: var(--sh-ink-hover);
+  --muted: var(--sh-muted);
+  --line: var(--sh-line);
+  --line-strong: var(--sh-line-strong);
+  --accent: var(--sh-violet);
+  --accent-ink: #ffffff;
+  --accent-soft: var(--sh-violet-soft);
+  --focus: var(--sh-violet);
+  --danger: var(--sh-danger);
+  --danger-soft: var(--sh-danger-soft);
+  --ok: var(--sh-ok);
+  --ok-soft: var(--sh-ok-soft);
+
+  --signal-strong: var(--sh-ok);
+  --signal-positive: #2f7d55;
+  --signal-neutral: var(--sh-warn);
+  --signal-negative: var(--sh-danger);
+
+  /* The v1 "stage" header is now the light rail; practice amber becomes violet. */
+  --stage: var(--sh-surface);
+  --stage-line: var(--sh-line);
+  --on-stage: var(--sh-ink);
+  --on-stage-muted: var(--sh-muted);
+  --light: var(--sh-violet);
+  --light-soft: var(--sh-violet-soft);
+  --light-ink: var(--sh-violet-ink);
+
+  --brand-main: var(--sh-ink);
+  --brand-bg: var(--sh-surface);
+
+  --radius: var(--sh-radius-sm);
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  --font: var(--sh-font);
+  --font-display: var(--sh-font);
+  --font-mono: var(--sh-font-mono);
+  color-scheme: light;
+}

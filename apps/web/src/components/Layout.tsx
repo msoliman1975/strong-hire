@@ -5,16 +5,17 @@ import { Link, NavLink, Navigate, Outlet, useLocation, useMatch, useNavigate } f
 import { authApi } from "../api/auth";
 import { useAuth, useModelUsage, useUsage } from "../api/hooks";
 import { hasSlogan, SLOGAN } from "../labels";
+import { useFeature } from "../theme/features";
 import { BrandMark } from "./BrandMark";
 import { ModelUsageBadge } from "./ModelUsageBadge";
 import { ErrorNotice, Loading } from "./ui";
 import { UsageMeter } from "./UsageMeter";
 
 /** Logo, name and (once agreed) the slogan. A link on signed-in pages, plain text elsewhere. */
-function Brand({ link }: { link: boolean }) {
+function Brand({ link, tone = "light" }: { link: boolean; tone?: "light" | "dark" }) {
   const inner = (
     <>
-      <BrandMark size={30} tone="stage" />
+      <BrandMark size={26} tone={tone} />
       <span className="brand__name">Strong Hire</span>
       {hasSlogan(SLOGAN) && <span className="brand__slogan">{SLOGAN}</span>}
     </>
@@ -60,7 +61,10 @@ function AccountMenu({ email, onSignOut, busy }: { email: string; onSignOut: () 
         aria-label="Account menu"
         onClick={() => setOpen((o) => !o)}
       >
-        {initials}
+        <span className="account-menu__initials" aria-hidden="true">
+          {initials}
+        </span>
+        <span className="account-menu__email-short">{email}</span>
       </button>
       {open && (
         <ul className="account-menu__list">
@@ -81,7 +85,67 @@ function AccountMenu({ email, onSignOut, busy }: { email: string; onSignOut: () 
   );
 }
 
-/** Shell for signed-in pages: the stage header with the menu, usage meter and account menu. */
+type NavItem = { to: string; label: string; end?: boolean; match?: RegExp };
+
+/** The v1 menu, shown until launch: the same labels and targets, so v1 users find their pages. */
+const V1_NAV: NavItem[] = [
+  { to: "/", label: "Interview rehearsals", end: true },
+  { to: "/jobs", label: "Job descriptions", end: true },
+  { to: "/resumes", label: "Resumes" },
+  { to: "/reports", label: "Reports" },
+  { to: "/questions", label: "Questions" },
+  { to: "/account", label: "Account" },
+];
+
+/** UI-2: the v2 rail. Resumes and Reports stay reachable in the smaller list below it. */
+const V2_NAV: NavItem[] = [
+  { to: "/", label: "Home", end: true },
+  { to: "/stories", label: "Stories" },
+  { to: "/jobs", label: "Interviews", match: /^\/(jobs|interviews|sessions)(\/|$)/ },
+  { to: "/questions", label: "Questions" },
+  { to: "/account", label: "Account" },
+];
+
+const V2_MORE: NavItem[] = [
+  { to: "/resumes", label: "Resumes" },
+  { to: "/reports", label: "Reports" },
+];
+
+const DEV_NAV: NavItem = { to: "/dev/interview", label: "Text interview (dev)" };
+
+/** UI-2: the left rail menu. "Stories" and the v2 labels show only when `v2_enabled` is on. */
+export function RailNav() {
+  const v2 = useFeature("v2_enabled");
+  const { pathname } = useLocation();
+  const item = (it: NavItem) => {
+    // NavLink only marks exact routes; items with `match` cover several route trees.
+    const matched = it.match?.test(pathname) ?? false;
+    return (
+      <li key={it.to}>
+        {matched ? (
+          <Link to={it.to} aria-current="page">
+            {it.label}
+          </Link>
+        ) : (
+          <NavLink to={it.to} end={it.end}>
+            {it.label}
+          </NavLink>
+        )}
+      </li>
+    );
+  };
+  return (
+    <nav className="rail-nav" aria-label="Main">
+      <ul>
+        {(v2 ? V2_NAV : V1_NAV).map(item)}
+        {import.meta.env.DEV && item(DEV_NAV)}
+      </ul>
+      {v2 && <ul className="rail-nav__more">{V2_MORE.map(item)}</ul>}
+    </nav>
+  );
+}
+
+/** Shell for signed-in pages: the left rail (menu, usage meter, account menu) beside the page. */
 export function AppLayout() {
   const auth = useAuth();
   const location = useLocation();
@@ -154,88 +218,60 @@ export function AppLayout() {
   // During a live interview the menu is hidden, so nothing pulls the candidate away from the session.
   if (live) {
     return (
-      <>
-        <header className="app-header">
+      <div className="room">
+        <header className="app-header app-header--room">
           <div className="app-header__inner">
-            <Brand link={false} />
+            <Brand link={false} tone="dark" />
             <span className="live-bar__status">
               <span className="live-dot" aria-hidden="true" />
               Live interview
             </span>
           </div>
         </header>
-        <main id="main" className="page">
+        <main id="main" className="page page--room">
           <Outlet />
         </main>
-      </>
+      </div>
     );
   }
 
   const email = auth.data.email ?? auth.data.user?.email ?? "";
 
   return (
-    <>
+    <div className="shell">
       <a className="skip-link" href="#main">
         Skip to content
       </a>
-      <header className="app-header">
-        <div className="app-header__inner">
+      <aside className="rail">
+        <div className="rail__top">
           <Brand link />
-          <nav className="app-nav" aria-label="Main" id="main-menu" data-open={menuOpen}>
-            <ul>
-              <li>
-                <NavLink to="/" end>
-                  Interview rehearsals
-                </NavLink>
-              </li>
-              <li>
-                <NavLink to="/jobs" end>
-                  Job descriptions
-                </NavLink>
-              </li>
-              <li>
-                <NavLink to="/resumes">Resumes</NavLink>
-              </li>
-              <li>
-                <NavLink to="/reports">Reports</NavLink>
-              </li>
-              <li>
-                <NavLink to="/questions">Questions</NavLink>
-              </li>
-              <li>
-                <NavLink to="/account">Account</NavLink>
-              </li>
-              {import.meta.env.DEV && (
-                <li>
-                  <NavLink to="/dev/interview">Text interview (dev)</NavLink>
-                </li>
-              )}
-            </ul>
-          </nav>
-          <div className="app-header__end">
+          <button
+            type="button"
+            className="menu-toggle"
+            aria-expanded={menuOpen}
+            aria-controls="main-menu"
+            onClick={() => setMenuOpen((o) => !o)}
+          >
+            Menu
+          </button>
+        </div>
+        <div className="rail__body" id="main-menu" data-open={menuOpen}>
+          <RailNav />
+          <div className="rail__foot">
             <ModelUsageBadge usage={modelUsage.data} />
             {usage.data && <UsageMeter usage={usage.data} />}
-            <button
-              type="button"
-              className="menu-toggle"
-              aria-expanded={menuOpen}
-              aria-controls="main-menu"
-              onClick={() => setMenuOpen((o) => !o)}
-            >
-              Menu
-            </button>
             <AccountMenu email={email} onSignOut={() => logout.mutate()} busy={logout.isPending} />
           </div>
         </div>
-      </header>
-      <main id="main" className="page">
+      </aside>
+      <main id="main" className="page shell__main">
         <Outlet />
       </main>
-    </>
+    </div>
   );
 }
 
-/** Shell for the sign-in and sign-up pages: the same stage header, no menu. */
+/** Shell for the sign-in and sign-up pages: a slim header with the mark, no menu. */
 export function PublicLayout() {
   return (
     <>
