@@ -18,6 +18,10 @@ export function WaitlistPage() {
     <>
       <PageHead title="Waitlist">
         <p>People who joined from the public waitlist page. Only confirmed emails should get an invite.</p>
+        <p>
+          Nobody is emailed automatically when sign-ups open. That is a later launch email, sent to the confirmed
+          entries; product news goes only to those who ticked it. Each admin gets an email when someone new joins.
+        </p>
       </PageHead>
       <div className="row section-actions">
         <a className="btn" href={waitlistApi.csvUrl} download>

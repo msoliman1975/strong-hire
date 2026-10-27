@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from urllib.parse import parse_qs, urlparse
 
 import httpx
@@ -12,7 +13,9 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from strong_api.auth.magic_links import MagicLinks, MemoryUsedTokenStore
 from strong_api.public import WAITLIST_LINK_SALT, JoinLimiter, Waitlist
-from strong_core.db.models import WaitlistEntry
+from strong_core.db.models import AdminUser, WaitlistEntry
+
+from .conftest import make_admin
 
 
 class RecordingSender:
@@ -161,3 +164,34 @@ async def test_l04_waitlist_admin_routes_need_an_admin(
     """L04: the list and the CSV are admin-only (non-admins get 404, as for every admin route)."""
     assert (await anon_client.get("/admin/waitlist")).status_code == 404
     assert (await anon_client.get("/admin/waitlist.csv")).status_code == 404
+
+
+async def test_l04_each_active_admin_is_emailed_about_a_new_entry(
+    app: FastAPI,
+    anon_client: httpx.AsyncClient,
+    sender: RecordingSender,
+    sessionmaker: async_sessionmaker[AsyncSession],
+) -> None:
+    """L04: a new join emails every active admin, one email each and without the confirmation
+    link. A second join of the same email sends no new notice."""
+    await make_admin(app, "boss@example.com")
+    await make_admin(app, "ops@example.com")
+    await make_admin(app, "gone@example.com")
+    async with sessionmaker() as db:
+        gone = await db.scalar(select(AdminUser).where(AdminUser.email == "gone@example.com"))
+        assert gone is not None
+        gone.disabled_at = datetime.now(UTC)
+        await db.commit()
+
+    await anon_client.post("/public/waitlist", json={**JOIN, "source": "reddit"})
+    notices = [m for m in sender.mail if m[1].startswith("Waitlist: ")]
+    assert sorted(m[0] for m in notices) == ["boss@example.com", "ops@example.com"]
+    _, subject, text = notices[0]
+    assert subject == "Waitlist: ada@example.com joined"
+    assert "Interview: two_weeks" in text and "Source: reddit" in text
+    assert "token=" not in text  # only the person who joined can confirm
+    assert sender.mail[-1][0] == "ada@example.com"  # their confirmation still goes out
+
+    before = len(sender.mail)
+    await anon_client.post("/public/waitlist", json={**JOIN, "interview_within": "month"})
+    assert not [m for m in sender.mail[before:] if m[1].startswith("Waitlist: ")]
