@@ -759,7 +759,7 @@ export interface paths {
         /**
          * Site Status
          * @description Public: the active site banner, whether sign-ups and new sessions are open, and who may
-         *     run Custom interviews (CU-11).
+         *     run Custom interviews (CU-11), and whether the v2 screens are on (FL-1).
          */
         get: operations["site_status_status_get"];
         put?: never;
@@ -3805,6 +3805,34 @@ export interface components {
              */
             profile_complete: boolean;
         };
+        /**
+         * AutoProfileSummary
+         * @description AP-1: the extractor's short company summary, built from pages on the job posting's
+         *     domain when the company is not in the curated list. Briefs show it labeled
+         *     "auto-generated". It is far smaller than a CompanyProfile and never replaces one.
+         */
+        AutoProfileSummary: {
+            /**
+             * Summary
+             * @description A few sentences on the company and the role.
+             */
+            summary: string;
+            /**
+             * Values Mentioned
+             * @description Values or principles the pages name, in the company's words.
+             */
+            values_mentioned?: string[];
+            /**
+             * Interview Process Notes
+             * @description What the pages say about the hiring process. Empty when they say nothing.
+             */
+            interview_process_notes?: string[];
+            /**
+             * Sources
+             * @description URLs of the pages the summary is based on.
+             */
+            sources: string[];
+        };
         /** BankCompany */
         BankCompany: {
             /** Slug */
@@ -6681,6 +6709,12 @@ export interface components {
             sim_max_live_sessions: number;
             /** @default everyone */
             custom_interview_access: components["schemas"]["CustomInterviewAccess"];
+            /**
+             * V2 Enabled
+             * @description FL-1: show the v2 screens that replace v1 screens. Off until launch.
+             * @default false
+             */
+            v2_enabled: boolean;
         };
         /**
          * SampleQuestion
@@ -6861,6 +6895,11 @@ export interface components {
             level: components["schemas"]["Level"];
             /** @description CU-1: required for the Custom type, absent for the others. */
             custom?: components["schemas"]["CustomSessionSpec"] | null;
+            /**
+             * @description TN-1: the interviewer's tone. as_company uses the profile persona's tone.
+             * @default as_company
+             */
+            tone: components["schemas"]["Tone"];
         };
         /** SessionFeedbackIn */
         SessionFeedbackIn: {
@@ -6993,7 +7032,7 @@ export interface components {
          * SettingKey
          * @enum {string}
          */
-        SettingKey: "signups_paused" | "sessions_paused_voice" | "sessions_paused_text" | "daily_spend_cap_usd" | "site_banner" | "jobs_paused" | "sim_paused" | "sim_max_live_sessions" | "custom_interview_access";
+        SettingKey: "signups_paused" | "sessions_paused_voice" | "sessions_paused_text" | "daily_spend_cap_usd" | "site_banner" | "jobs_paused" | "sim_paused" | "sim_max_live_sessions" | "custom_interview_access" | "v2_enabled";
         /**
          * Severity
          * @enum {string}
@@ -7353,6 +7392,11 @@ export interface components {
             text_sessions_open: boolean;
             /** @description CU-11: everyone, or paid_only (free accounts see Custom locked) */
             custom_interview_access: components["schemas"]["CustomInterviewAccess"];
+            /**
+             * V2 Enabled
+             * @description FL-1: show the v2 screens that replace v1 screens
+             */
+            v2_enabled: boolean;
         };
         /** Source */
         Source: {
@@ -7421,6 +7465,13 @@ export interface components {
             /** Phase */
             phase: string;
         };
+        /**
+         * Tone
+         * @description TN-1: how the interviewer sounds. `as_company` uses the company profile's persona tone,
+         *     or a neutral tone in generic mode. Old sessions read as `as_company`.
+         * @enum {string}
+         */
+        Tone: "as_company" | "warm" | "neutral" | "direct";
         /** TransitionIn */
         TransitionIn: {
             /**

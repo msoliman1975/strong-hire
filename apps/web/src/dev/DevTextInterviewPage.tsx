@@ -84,6 +84,7 @@ export function DevTextInterviewPage() {
         mode,
         duration_min: duration,
         level,
+        tone: "as_company",
       });
       setSession(created);
       setStage("preparing");

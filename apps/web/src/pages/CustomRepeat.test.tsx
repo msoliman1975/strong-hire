@@ -34,6 +34,7 @@ const CUSTOM_CONFIG: SessionConfig = {
   mode: "realistic",
   duration_min: 30,
   level: "senior",
+  tone: "as_company",
   custom: {
     categories: [
       { category: "behavioral", share: 0.5, focus: ["Conflict with a peer"] },

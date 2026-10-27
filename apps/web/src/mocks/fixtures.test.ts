@@ -87,14 +87,14 @@ describe("mock payloads match the packages/core schemas", () => {
     await expect(
       sessionsApi.create({
         job_target_id: job.id,
-        config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min: 30, level: "senior", custom: null },
+        config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min: 30, level: "senior", custom: null, tone: "as_company" },
         channel: "voice",
       }),
     ).rejects.toMatchObject({ status: 402, code: "full_interview_requires_plan" });
     await billingApi.checkout(); // the mock turns the plan on at once
     const session = await sessionsApi.create({
       job_target_id: job.id,
-      config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min: 30, level: "senior", custom: null },
+      config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min: 30, level: "senior", custom: null, tone: "as_company" },
       channel: "voice",
     });
     await sessionsApi.joinVoice(session.id);
@@ -352,7 +352,7 @@ describe("mocks of the Custom interview endpoints match openapi.json", () => {
         },
       ],
     };
-    const config = { interview_type: "custom" as const, difficulty: "realistic" as const, mode: "realistic" as const, level: "senior" as const, custom };
+    const config = { interview_type: "custom" as const, difficulty: "realistic" as const, mode: "realistic" as const, level: "senior" as const, tone: "as_company" as const, custom };
     // CU-11: a free account may run a 30-minute Custom session while Custom is open to everyone.
     const session = await sessionsApi.create({ job_target_id: job.id, config: { ...config, duration_min: 30 }, channel: "voice" });
     expectApiShape("SessionRecord", session);

@@ -172,7 +172,7 @@ async def test_cu1_custom_session_stores_its_setup_and_cu9_repeat_returns_it(
     assert setup == {
         "job_target_id": job["id"],
         "resume_id": None,
-        "config": custom_config(),
+        "config": {**custom_config(), "tone": "as_company"},  # TN-1 default
         "channel": "voice",
     }
     # The setup can be posted again as is.

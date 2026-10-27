@@ -2183,7 +2183,7 @@
           "status"
         ],
         "summary": "Site Status",
-        "description": "Public: the active site banner, whether sign-ups and new sessions are open, and who may\nrun Custom interviews (CU-11).",
+        "description": "Public: the active site banner, whether sign-ups and new sessions are open, and who may\nrun Custom interviews (CU-11), and whether the v2 screens are on (FL-1).",
         "operationId": "site_status_status_get",
         "responses": {
           "200": {
@@ -10346,6 +10346,52 @@
         ],
         "title": "AuthUser"
       },
+      "AutoProfileSummary": {
+        "additionalProperties": false,
+        "description": "AP-1: the extractor's short company summary, built from pages on the job posting's\ndomain when the company is not in the curated list. Briefs show it labeled\n\"auto-generated\". It is far smaller than a CompanyProfile and never replaces one.",
+        "properties": {
+          "summary": {
+            "description": "A few sentences on the company and the role.",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Summary",
+            "type": "string"
+          },
+          "values_mentioned": {
+            "description": "Values or principles the pages name, in the company's words.",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 12,
+            "title": "Values Mentioned",
+            "type": "array"
+          },
+          "interview_process_notes": {
+            "description": "What the pages say about the hiring process. Empty when they say nothing.",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 12,
+            "title": "Interview Process Notes",
+            "type": "array"
+          },
+          "sources": {
+            "description": "URLs of the pages the summary is based on.",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Sources",
+            "type": "array"
+          }
+        },
+        "required": [
+          "summary",
+          "sources"
+        ],
+        "title": "AutoProfileSummary",
+        "type": "object"
+      },
       "BankCompany": {
         "properties": {
           "slug": {
@@ -17544,6 +17590,12 @@
           "custom_interview_access": {
             "$ref": "#/components/schemas/CustomInterviewAccess",
             "default": "everyone"
+          },
+          "v2_enabled": {
+            "type": "boolean",
+            "title": "V2 Enabled",
+            "description": "FL-1: show the v2 screens that replace v1 screens. Off until launch.",
+            "default": false
           }
         },
         "additionalProperties": false,
@@ -17981,6 +18033,11 @@
               }
             ],
             "description": "CU-1: required for the Custom type, absent for the others."
+          },
+          "tone": {
+            "$ref": "#/components/schemas/Tone",
+            "description": "TN-1: the interviewer's tone. as_company uses the profile persona's tone.",
+            "default": "as_company"
           }
         },
         "additionalProperties": false,
@@ -18348,7 +18405,8 @@
           "jobs_paused",
           "sim_paused",
           "sim_max_live_sessions",
-          "custom_interview_access"
+          "custom_interview_access",
+          "v2_enabled"
         ],
         "title": "SettingKey"
       },
@@ -19284,6 +19342,11 @@
           "custom_interview_access": {
             "$ref": "#/components/schemas/CustomInterviewAccess",
             "description": "CU-11: everyone, or paid_only (free accounts see Custom locked)"
+          },
+          "v2_enabled": {
+            "type": "boolean",
+            "title": "V2 Enabled",
+            "description": "FL-1: show the v2 screens that replace v1 screens"
           }
         },
         "type": "object",
@@ -19292,7 +19355,8 @@
           "signups_open",
           "voice_sessions_open",
           "text_sessions_open",
-          "custom_interview_access"
+          "custom_interview_access",
+          "v2_enabled"
         ],
         "title": "SiteStatus",
         "description": "What the candidate app shows: the site banner and what is paused (OC-1 to OC-4)."
@@ -19447,6 +19511,17 @@
         ],
         "title": "TextTurns",
         "description": "The interviewer's new turns, and whether the session has ended."
+      },
+      "Tone": {
+        "type": "string",
+        "enum": [
+          "as_company",
+          "warm",
+          "neutral",
+          "direct"
+        ],
+        "title": "Tone",
+        "description": "TN-1: how the interviewer sounds. `as_company` uses the company profile's persona tone,\nor a neutral tone in generic mode. Old sessions read as `as_company`."
       },
       "TransitionIn": {
         "properties": {
