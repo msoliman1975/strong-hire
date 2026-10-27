@@ -536,15 +536,25 @@ SCRIPT_REPLIES: tuple[dict[str, Any], ...] = (
 
 async def _record_script(client: httpx.AsyncClient, monkeypatch: pytest.MonkeyPatch) -> None:
     """Write SCRIPT_REPLIES as exact recordings for the scripted conversation's coach turns."""
-    from strong_core.gateway.fake import DEFAULT_FIXTURES_DIR, messages_hash
+    from strong_core.gateway.fake import DEFAULT_FIXTURES_DIR, Recording, messages_hash
 
     replies = iter(SCRIPT_REPLIES)
     real = engine.turn_messages
 
     def record(*args: Any, **kwargs: Any) -> Any:
         messages = real(*args, **kwargs)
+        recording = Recording(
+            role=Role.COACH,
+            profile="scripted",  # written by hand for this test, not by a model
+            model="scripted",
+            output_type="CoachReply",
+            messages=messages,
+            prompt_refs=[m.prompt_ref for m in messages if m.prompt_ref],
+            output=CoachReply.model_validate(next(replies)).model_dump(mode="json"),
+            recorded_at="2026-10-27T00:00:00+00:00",
+        )
         path = DEFAULT_FIXTURES_DIR / Role.COACH.value / f"{messages_hash(messages)}.json"
-        path.write_text(json.dumps(next(replies), indent=2) + "\n", encoding="utf-8")
+        path.write_text(recording.model_dump_json(indent=2) + "\n", encoding="utf-8")
         return messages
 
     monkeypatch.setattr(engine, "turn_messages", record)
