@@ -2465,6 +2465,123 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/part1/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Part1 Usage
+         * @description AD-3: the tone and difficulty mix by week, and plan page usage.
+         */
+        get: operations["get_part1_usage_admin_part1_usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/auto-profiles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Auto Profiles
+         * @description AP-3: the review queue. Pending rows by default, oldest first.
+         */
+        get: operations["list_auto_profiles_admin_auto_profiles_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/auto-profiles/{profile_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Auto Profile */
+        get: operations["get_auto_profile_admin_auto_profiles__profile_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/auto-profiles/{profile_id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve Auto Profile
+         * @description AP-3: an approved profile may reach a brief.
+         */
+        post: operations["approve_auto_profile_admin_auto_profiles__profile_id__approve_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/auto-profiles/{profile_id}/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Edit Auto Profile Summary
+         * @description AP-3: correct the summary text. The status stays as it is.
+         */
+        put: operations["edit_auto_profile_summary_admin_auto_profiles__profile_id__summary_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/auto-profiles/{profile_id}/retire": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Retire Auto Profile
+         * @description AP-3: a retired profile never reaches a brief again.
+         */
+        post: operations["retire_auto_profile_admin_auto_profiles__profile_id__retire_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/public/waitlist": {
         parameters: {
             query?: never;
@@ -2622,6 +2739,57 @@ export interface components {
             details: {
                 [key: string]: unknown;
             } | null;
+        };
+        /** AdminAutoProfile */
+        AdminAutoProfile: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Company Name */
+            company_name: string;
+            /** Normalized Name */
+            normalized_name: string;
+            /** Source Host */
+            source_host: string;
+            /** Summary */
+            summary: string;
+            /** Values Mentioned */
+            values_mentioned: string[];
+            /** Interview Process Notes */
+            interview_process_notes: string[];
+            /** Sources */
+            sources: string[];
+            status: components["schemas"]["AutoProfileStatus"];
+            /** Reviewed By */
+            reviewed_by: string | null;
+            /** Reviewed At */
+            reviewed_at: string | null;
+            /** Model Profile */
+            model_profile: string;
+            /** Prompt Version */
+            prompt_version: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** AdminAutoProfiles */
+        AdminAutoProfiles: {
+            /**
+             * Counts
+             * @description Rows per status; all present
+             */
+            counts: {
+                [key: string]: number;
+            };
+            /**
+             * Profiles
+             * @description Oldest first, so the queue is FIFO
+             */
+            profiles: components["schemas"]["AdminAutoProfile"][];
         };
         /** AdminCompany */
         AdminCompany: {
@@ -3805,6 +3973,13 @@ export interface components {
              */
             profile_complete: boolean;
         };
+        /**
+         * AutoProfileStatus
+         * @description AP-1, AP-3: review state of an auto-generated company profile. A pending one is already
+         *     used in briefs, labeled "auto-generated"; an admin approves or retires it.
+         * @enum {string}
+         */
+        AutoProfileStatus: "pending" | "approved" | "retired";
         /**
          * AutoProfileSummary
          * @description AP-1: the extractor's short company summary, built from pages on the job posting's
@@ -5377,6 +5552,31 @@ export interface components {
              */
             dev_link?: string | null;
         };
+        /** MixWeek */
+        MixWeek: {
+            /**
+             * Week Start
+             * Format: date-time
+             * @description Monday 00:00 UTC
+             */
+            week_start: string;
+            /** Sessions */
+            sessions: number;
+            /**
+             * Tone
+             * @description Sessions per tone; every tone is present
+             */
+            tone: {
+                [key: string]: number;
+            };
+            /**
+             * Difficulty
+             * @description Sessions per difficulty; all present
+             */
+            difficulty: {
+                [key: string]: number;
+            };
+        };
         /**
          * Mode
          * @description IV-8. Only Realistic sessions count toward progress trends (PR-1).
@@ -5821,6 +6021,31 @@ export interface components {
              * @description Scores from the interviewer's questions.
              */
             other_questions: number;
+        };
+        /** Part1Usage */
+        Part1Usage: {
+            /**
+             * Weeks
+             * @description Oldest first; the last one is the current week
+             */
+            weeks: components["schemas"]["MixWeek"][];
+            /**
+             * Tone
+             * @description Totals over the weeks shown
+             */
+            tone: {
+                [key: string]: number;
+            };
+            /**
+             * Difficulty
+             * @description Totals over the weeks shown
+             */
+            difficulty: {
+                [key: string]: number;
+            };
+            plan_page_views: components["schemas"]["AdminMetric"];
+            /** @description Sessions started from the plan page */
+            plan_sessions: components["schemas"]["AdminMetric"];
         };
         /** PasswordLoginRequest */
         PasswordLoginRequest: {
@@ -7448,6 +7673,19 @@ export interface components {
          * @enum {string}
          */
         SubscriptionStatus: "trialing" | "active" | "past_due" | "canceled" | "incomplete";
+        /** SummaryIn */
+        SummaryIn: {
+            /**
+             * Reason
+             * @description Why, for the audit log
+             */
+            reason: string;
+            /**
+             * Summary
+             * @description AutoProfileSummary.summary
+             */
+            summary: string;
+        };
         /** TextTurnRequest */
         TextTurnRequest: {
             /** Text */
@@ -12142,6 +12380,212 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["InviteOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_part1_usage_admin_part1_usage_get: {
+        parameters: {
+            query?: {
+                /** @description How many weeks, this one included */
+                weeks?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Part1Usage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_auto_profiles_admin_auto_profiles_get: {
+        parameters: {
+            query?: {
+                /** @description Which rows */
+                status?: components["schemas"]["AutoProfileStatus"] | "all";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAutoProfiles"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_auto_profile_admin_auto_profiles__profile_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                profile_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAutoProfile"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    approve_auto_profile_admin_auto_profiles__profile_id__approve_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                profile_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAutoProfile"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_auto_profile_summary_admin_auto_profiles__profile_id__summary_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                profile_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SummaryIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAutoProfile"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retire_auto_profile_admin_auto_profiles__profile_id__retire_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path: {
+                profile_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAutoProfile"];
                 };
             };
             /** @description Validation Error */

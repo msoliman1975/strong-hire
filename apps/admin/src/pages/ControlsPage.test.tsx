@@ -187,6 +187,30 @@ describe("Controls page", () => {
     expect(opsState(mockStore.db).values.custom_interview_access).toBe("everyone");
   });
 
+  it("FL-1, AA-6: turns the v2 screens on with a reason, and off again", async () => {
+    const user = await openControls();
+    const panel = screen.getByRole("region", { name: "v2 screens (FL-1)" });
+    expect(within(panel).getByTestId("v2-state")).toHaveTextContent("Off");
+    await user.click(within(panel).getByRole("button", { name: "Turn v2 on" }));
+    const dialog = screen.getByRole("dialog", { name: "Turn the v2 screens on" });
+    expect(dialog).toHaveTextContent("v2 screens: Off → On");
+    const confirm = within(dialog).getByRole("button", { name: "Turn v2 on" });
+    expect(confirm).toBeDisabled();
+    await user.type(within(dialog).getByLabelText(/Reason/), "launch v2.0");
+    await user.click(confirm);
+    expect(await opsBanner()).toHaveTextContent("v2 screens on");
+    expect(opsState(mockStore.db).values.v2_enabled).toBe(true);
+    expect(within(panel).getByTestId("v2-state")).toHaveTextContent("On");
+    expect(within(panel).getByText(/Last changed by admin@example.com/)).toBeInTheDocument();
+
+    await user.click(within(panel).getByRole("button", { name: "Turn v2 off" }));
+    const back = screen.getByRole("dialog", { name: "Turn the v2 screens off" });
+    await user.type(within(back).getByLabelText(/Reason/), "roll back");
+    await user.click(within(back).getByRole("button", { name: "Turn v2 off" }));
+    await screen.findByText("Every control is at its default.");
+    expect(opsState(mockStore.db).values.v2_enabled).toBe(false);
+  });
+
   it("the Shell banner shows on other pages too", async () => {
     signInAdmin();
     opsState(mockStore.db).values = { ...MOCK_DEFAULTS, sessions_paused_text: true };

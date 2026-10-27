@@ -521,6 +521,42 @@ function CustomAccessControl({ settings, ask }: { settings: OpsSettings; ask: (c
   );
 }
 
+/** FL-1: the v2.0 screens that replace v1 screens (plan page and the rest) are off until launch. */
+function V2Control({ settings, ask }: { settings: OpsSettings; ask: (c: Change) => void }) {
+  const on = settings.values.v2_enabled;
+  return (
+    <section className="panel control" aria-labelledby="ctl-v2">
+      <h2 id="ctl-v2">v2 screens (FL-1)</h2>
+      <p>
+        v2 screens: <strong data-testid="v2-state">{on ? "On" : "Off"}</strong>. When on, users see the v2 screens
+        that replace v1 screens, such as the interview plan page. When off, the v1 screens stay.
+      </p>
+      <button
+        type="button"
+        className={on ? "btn btn--small btn--danger-outline" : "btn btn--small btn--primary"}
+        onClick={() =>
+          ask({
+            key: "v2_enabled",
+            value: !on,
+            title: on ? "Turn the v2 screens off" : "Turn the v2 screens on",
+            summary: (
+              <p>
+                v2 screens: {on ? "On" : "Off"} → <strong>{on ? "Off" : "On"}</strong>.{" "}
+                {on ? "Every user goes back to the v1 screens." : "Every user sees the v2 screens."}
+              </p>
+            ),
+            confirmLabel: on ? "Turn v2 off" : "Turn v2 on",
+            danger: true,
+          })
+        }
+      >
+        {on ? "Turn v2 off" : "Turn v2 on"}
+      </button>
+      <LastChanged settings={settings} keyName="v2_enabled" />
+    </section>
+  );
+}
+
 function ModelProfilePanel() {
   const models = useOpsModels();
   return (
@@ -647,6 +683,7 @@ export function ControlsPage() {
             <JobsControl key={`jobs-${settings.data.values.jobs_paused.join(",")}`} settings={settings.data} ask={ask} />
             <BannerControl settings={settings.data} ask={ask} />
             <CustomAccessControl settings={settings.data} ask={ask} />
+            <V2Control settings={settings.data} ask={ask} />
             <SimControl
               key={`sim-${settings.data.values.sim_max_live_sessions}`}
               settings={settings.data}
