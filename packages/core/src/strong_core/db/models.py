@@ -44,6 +44,7 @@ from strong_core.schemas.enums import (
     AlertSeverity,
     AlertState,
     AuthProvider,
+    AutoProfileStatus,
     Competency,
     Difficulty,
     EmailKind,
@@ -65,6 +66,7 @@ from strong_core.schemas.enums import (
     SimRunStatus,
     Speaker,
     SubscriptionStatus,
+    Tone,
     TriageState,
     UsageComponent,
 )
@@ -147,6 +149,9 @@ PLATFORM_TABLES = (
     "alert_events",
     "runtime_settings",
     "company_request_triage",
+    # Shared per company across all users, like company_profiles: built from public pages on
+    # the company's domain, never from a user's CV or text (AP-1).
+    "company_auto_profiles",
     # No user exists yet, so no org_id. Deleted by email on request (AC-1 covers accounts only).
     "waitlist_entries",
 )
@@ -367,6 +372,57 @@ class CompanyProfile(Base):
     published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
+class CompanyAutoProfile(Base):
+    """AP-1: a short auto-generated profile for a company outside the curated list, built by a
+    background job from pages on the job posting's domain and cached per company.
+
+    Not user-owned, so no org_id: like company_profiles it describes a company from public
+    pages, is shared by every user who targets that company, and holds nothing from a user's
+    CV or text. At most one row per normalized name is not retired; a rebuild retires the old
+    row first. An admin approves or retires rows (AP-3).
+    """
+
+    __tablename__ = "company_auto_profiles"
+    __table_args__ = (
+        Index(
+            "uq_company_auto_profiles_one_live",
+            "normalized_name",
+            unique=True,
+            postgresql_where=text("status <> 'retired'"),
+            sqlite_where=text("status <> 'retired'"),
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    company_name: Mapped[str] = mapped_column(String(200), comment="As the job posting wrote it")
+    normalized_name: Mapped[str] = mapped_column(
+        String(200), index=True, comment="Lowercase, punctuation and legal suffixes removed"
+    )
+    source_host: Mapped[str] = mapped_column(
+        String(255), comment="The job posting's domain the pages came from"
+    )
+    summary: Mapped[str] = mapped_column(Text, comment="AutoProfileSummary.summary")
+    summary_json: Mapped[dict[str, Any]] = mapped_column(comment="schemas.AutoProfileSummary")
+    sources_json: Mapped[list[Any]] = mapped_column(comment="URLs of the pages used")
+    status: Mapped[AutoProfileStatus] = mapped_column(
+        str_enum(AutoProfileStatus, "auto_profile_status"),
+        default=AutoProfileStatus.PENDING,
+        server_default="pending",
+    )
+    reviewed_by: Mapped[str | None] = mapped_column(String(320), comment="Admin email")
+    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    model_profile: Mapped[str] = mapped_column(
+        String(20), comment="PL-6: MODEL_PROFILE the job ran on"
+    )
+    model_id: Mapped[str] = mapped_column(
+        String(200), comment="PL-6: gateway alias that served the extractor role"
+    )
+    prompt_version: Mapped[str] = mapped_column(
+        String(200), comment="PL-6: extractor prompt refs, comma separated"
+    )
+    created_at: Mapped[datetime] = _created_at()
+
+
 class JobTarget(Base):
     __tablename__ = "job_targets"
 
@@ -452,6 +508,12 @@ class InterviewSession(Base):
         default=SessionChannel.VOICE,
         server_default="voice",
         comment="PL-7: voice, or text behind a dev flag",
+    )
+    tone: Mapped[Tone] = mapped_column(
+        str_enum(Tone, "tone"),
+        default=Tone.AS_COMPANY,
+        server_default="as_company",
+        comment="TN-1: the tone the user picked; as_company uses the profile persona",
     )
     profile_version: Mapped[int | None] = mapped_column(Integer, comment="NULL in generic mode")
     brief_json: Mapped[dict[str, Any] | None] = mapped_column(comment="schemas.InterviewerBrief")

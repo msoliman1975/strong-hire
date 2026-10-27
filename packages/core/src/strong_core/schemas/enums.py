@@ -80,6 +80,16 @@ class Mode(StrEnum):
     REALISTIC = "realistic"
 
 
+class Tone(StrEnum):
+    """TN-1: how the interviewer sounds. `as_company` uses the company profile's persona tone,
+    or a neutral tone in generic mode. Old sessions read as `as_company`."""
+
+    AS_COMPANY = "as_company"
+    WARM = "warm"
+    NEUTRAL = "neutral"
+    DIRECT = "direct"
+
+
 class Phase(StrEnum):
     """Session state machine phases (IV-7). The session controller moves phases, not the LLM."""
 
@@ -204,6 +214,15 @@ class ProfileStatus(StrEnum):
     IN_REVIEW = "in_review"
     PUBLISHED = "published"
     ARCHIVED = "archived"
+
+
+class AutoProfileStatus(StrEnum):
+    """AP-1, AP-3: review state of an auto-generated company profile. A pending one is already
+    used in briefs, labeled "auto-generated"; an admin approves or retires it."""
+
+    PENDING = "pending"
+    APPROVED = "approved"
+    RETIRED = "retired"
 
 
 class OrgType(StrEnum):

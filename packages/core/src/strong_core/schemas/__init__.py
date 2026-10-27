@@ -29,6 +29,7 @@ from strong_core.schemas.enums import (
     STANDARD_INTERVIEW_TYPES,
     AnswerConduct,
     AuthProvider,
+    AutoProfileStatus,
     Competency,
     Confidence,
     Difficulty,
@@ -52,10 +53,12 @@ from strong_core.schemas.enums import (
     Severity,
     Speaker,
     SubscriptionStatus,
+    Tone,
     UsageComponent,
 )
 from strong_core.schemas.inputs import Education, InputCheck, JobPosting, Resume, ResumeRole
 from strong_core.schemas.profile import (
+    AutoProfileSummary,
     CaseStyle,
     CompanyProfile,
     LevelBar,
@@ -114,6 +117,7 @@ EXPORTED_SCHEMAS: dict[str, type[BaseModel]] = {
     "scorecard": Scorecard,
     "progress_snapshot": ProgressSnapshot,
     "general_question_bank": GeneralQuestionBank,
+    "auto_profile_summary": AutoProfileSummary,
 }
 
 __all__ = [
@@ -126,6 +130,8 @@ __all__ = [
     "AnswerCheck",
     "AnswerConduct",
     "AuthProvider",
+    "AutoProfileStatus",
+    "AutoProfileSummary",
     "BriefDraft",
     "BriefQuestion",
     "CaseStyle",
@@ -198,6 +204,7 @@ __all__ = [
     "StandardType",
     "Strength",
     "SubscriptionStatus",
+    "Tone",
     "Turn",
     "UsageComponent",
     "ValueScore",

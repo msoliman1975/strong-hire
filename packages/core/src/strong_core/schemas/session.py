@@ -25,6 +25,7 @@ from strong_core.schemas.enums import (
     ProbeTrigger,
     QuestionSource,
     Speaker,
+    Tone,
 )
 
 DurationMin = Literal[10, 30, 45]
@@ -55,6 +56,10 @@ class SessionConfig(Contract):
     level: Level
     custom: CustomSessionSpec | None = Field(
         default=None, description="CU-1: required for the Custom type, absent for the others."
+    )
+    tone: Tone = Field(
+        default=Tone.AS_COMPANY,
+        description="TN-1: the interviewer's tone. as_company uses the profile persona's tone.",
     )
 
     @property

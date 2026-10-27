@@ -48,7 +48,7 @@ function seed(db: MockDb): void {
     id: "00000000-0000-4000-8000-0000000000c1",
     job_target_id: "00000000-0000-4000-8000-0000000000d1",
     resume_id: null,
-    config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min: 10, level: "senior", custom: null },
+    config: { interview_type: "behavioral", difficulty: "realistic", mode: "realistic", duration_min: 10, level: "senior", custom: null, tone: "as_company" },
     channel: "voice",
     brief_ready: true,
     status: "completed",

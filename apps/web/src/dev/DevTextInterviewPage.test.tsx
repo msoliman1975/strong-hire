@@ -117,7 +117,7 @@ describe("DevTextInterviewPage", () => {
     expect(await screen.findByText("Hi, I am Alex.")).toBeInTheDocument();
     expect(calls[0]).toEqual({
       path: "create",
-      body: { job_target_id: "j1", config: { ...CONFIG }, channel: "text" },
+      body: { job_target_id: "j1", config: { ...CONFIG, tone: "as_company" }, channel: "text" },
     });
 
     await user.click(screen.getByRole("button", { name: "Hint" }));

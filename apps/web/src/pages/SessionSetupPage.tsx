@@ -152,6 +152,7 @@ export function SessionSetupPage() {
       duration_min: isCustom ? custom.duration : chosenDuration,
       level: chosenLevel,
       custom: isCustom ? custom.spec() : null,
+      tone: "as_company", // TN-1: S11 adds the tone picker
     });
   };
 
