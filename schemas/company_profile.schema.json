@@ -68,7 +68,8 @@
         "user_and_business_sense",
         "estimation_logic",
         "prioritization",
-        "recommendation"
+        "recommendation",
+        "logistics_and_expectations"
       ],
       "title": "Competency",
       "type": "string"

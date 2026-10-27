@@ -11353,6 +11353,47 @@
         ],
         "title": "ChangeKind"
       },
+      "CoachReply": {
+        "additionalProperties": false,
+        "description": "CO-3, CO-4: one coach turn. The coach updates only the parts the candidate's own words\nsupport (CO-9) and asks for what is still missing.",
+        "properties": {
+          "message": {
+            "description": "What the coach says to the candidate.",
+            "minLength": 1,
+            "title": "Message",
+            "type": "string"
+          },
+          "parts": {
+            "description": "Parts this turn updated. Empty when none changed.",
+            "items": {
+              "$ref": "#/components/schemas/StoryPartUpdate"
+            },
+            "title": "Parts",
+            "type": "array"
+          },
+          "missing": {
+            "description": "Parts the candidate has not given yet.",
+            "items": {
+              "$ref": "#/components/schemas/StoryPart"
+            },
+            "title": "Missing",
+            "type": "array"
+          },
+          "skills": {
+            "description": "Skills the story shows so far.",
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "title": "Skills",
+            "type": "array"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "CoachReply",
+        "type": "object"
+      },
       "CoachRequest": {
         "properties": {
           "command": {
@@ -11618,7 +11659,8 @@
           "user_and_business_sense",
           "estimation_logic",
           "prioritization",
-          "recommendation"
+          "recommendation",
+          "logistics_and_expectations"
         ],
         "title": "Competency",
         "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE."
@@ -13530,10 +13572,11 @@
           "hiring_manager",
           "technical_qa",
           "case",
-          "custom"
+          "custom",
+          "recruiter_screen"
         ],
         "title": "InterviewType",
-        "description": "The four v1 interview types (IV-2), plus Custom (CU-1).\n\nA Custom session mixes 1 to 3 of the four standard types as question categories\n(`SessionConfig.custom`). Custom is never a question category itself and has no entry in\nCOMPETENCIES_BY_TYPE; use `session_competencies(config)` for a session's competency pool."
+        "description": "The four v1 interview types (IV-2), plus Custom (CU-1) and Recruiter screen (RS-1).\n\nA Custom session mixes 1 to 3 of the four standard types as question categories\n(`SessionConfig.custom`). Custom is never a question category itself and has no entry in\nCOMPETENCIES_BY_TYPE; use `session_competencies(config)` for a session's competency pool."
       },
       "InterviewWithin": {
         "type": "string",
@@ -17345,6 +17388,51 @@
         "title": "QuestionSource",
         "description": "Who wrote a brief question: the planner, or the candidate in a Custom session (CU-3)."
       },
+      "Readiness": {
+        "additionalProperties": false,
+        "description": "RD-1: practice readiness per skill for one job target's interview.",
+        "properties": {
+          "job_target_id": {
+            "format": "uuid",
+            "title": "Job Target Id",
+            "type": "string"
+          },
+          "kind": {
+            "const": "practice_estimate",
+            "default": "practice_estimate",
+            "description": "RD-3: every screen labels it this way.",
+            "title": "Kind",
+            "type": "string"
+          },
+          "as_of": {
+            "format": "date",
+            "title": "As Of",
+            "type": "string"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/SkillReadiness"
+            },
+            "title": "Skills",
+            "type": "array"
+          }
+        },
+        "required": [
+          "job_target_id",
+          "as_of"
+        ],
+        "title": "Readiness",
+        "type": "object"
+      },
+      "ReadinessStatus": {
+        "description": "RD-1: whether a skill has enough Realistic sessions for a readiness score.",
+        "enum": [
+          "scored",
+          "not_enough_data"
+        ],
+        "title": "ReadinessStatus",
+        "type": "string"
+      },
       "RedirectOut": {
         "properties": {
           "url": {
@@ -20016,6 +20104,46 @@
         "title": "SiteStatus",
         "description": "What the candidate app shows: the site banner and what is paused (OC-1 to OC-4)."
       },
+      "SkillReadiness": {
+        "additionalProperties": false,
+        "description": "RD-1: readiness for one skill, from Realistic sessions only.",
+        "properties": {
+          "competency": {
+            "$ref": "#/components/schemas/Competency"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ReadinessStatus"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "maximum": 100,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "0 to 100. Null exactly when status is not_enough_data.",
+            "title": "Score"
+          },
+          "sessions_counted": {
+            "description": "Realistic sessions that scored this skill.",
+            "minimum": 0,
+            "title": "Sessions Counted",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "competency",
+          "status",
+          "score",
+          "sessions_counted"
+        ],
+        "title": "SkillReadiness",
+        "type": "object"
+      },
       "Source": {
         "additionalProperties": false,
         "properties": {
@@ -20348,6 +20476,49 @@
         "title": "StoryNote",
         "type": "object"
       },
+      "StoryPart": {
+        "description": "ST-1: the five parts of a story, in the order the workbench and prompts show them.",
+        "enum": [
+          "context",
+          "stakes",
+          "action",
+          "result",
+          "reflection"
+        ],
+        "title": "StoryPart",
+        "type": "string"
+      },
+      "StoryPartUpdate": {
+        "additionalProperties": false,
+        "description": "CO-3, CO-9: new text for one story part, backed by the candidate's own words.",
+        "properties": {
+          "part": {
+            "$ref": "#/components/schemas/StoryPart"
+          },
+          "text": {
+            "description": "The part, written from the candidate's words.",
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          },
+          "quotes": {
+            "description": "The candidate's words this part came from, verbatim.",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Quotes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "part",
+          "text",
+          "quotes"
+        ],
+        "title": "StoryPartUpdate",
+        "type": "object"
+      },
       "StorySource": {
         "description": "ST-1: where a story came from.",
         "enum": [
@@ -20366,6 +20537,52 @@
         ],
         "title": "StoryStatus",
         "type": "string"
+      },
+      "StoryVersion": {
+        "additionalProperties": false,
+        "description": "CO-8: one telling of the story, built only from the candidate's words.",
+        "properties": {
+          "text": {
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          },
+          "quotes": {
+            "description": "The candidate's words this version came from, verbatim.",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Quotes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "text",
+          "quotes"
+        ],
+        "title": "StoryVersion",
+        "type": "object"
+      },
+      "StoryVersions": {
+        "additionalProperties": false,
+        "description": "CO-8: the coach's 60-second and full versions of a story.",
+        "properties": {
+          "sixty_second": {
+            "$ref": "#/components/schemas/StoryVersion",
+            "description": "About 150 words, to say in 60 seconds."
+          },
+          "full": {
+            "$ref": "#/components/schemas/StoryVersion",
+            "description": "All five parts, in order."
+          }
+        },
+        "required": [
+          "sixty_second",
+          "full"
+        ],
+        "title": "StoryVersions",
+        "type": "object"
       },
       "Strength": {
         "properties": {

@@ -15,6 +15,7 @@ roles:
   scorer: local-mid
   stt: local-stt
   tts: local-tts
+  coach: local-small   # CO-1: the interviewer's alias until the coach gets its own
   candidate: local-small   # P13 AI candidate; the sim profile overrides it
   judge: local-mid
 

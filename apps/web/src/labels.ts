@@ -17,6 +17,7 @@ export const interviewTypeLabel: Record<InterviewType, string> = {
   technical_qa: "Verbal technical Q&A",
   case: "Case",
   custom: "Custom",
+  recruiter_screen: "Recruiter screen",
 };
 
 export const interviewTypeHint: Record<InterviewType, string> = {
@@ -25,6 +26,7 @@ export const interviewTypeHint: Record<InterviewType, string> = {
   technical_qa: "Spoken technical questions. No live coding.",
   case: "Product sense, estimation or system thinking.",
   custom: "Mix question types, pick focus topics and add your own questions.",
+  recruiter_screen: "Why this role, your background, and pay and timing.",
 };
 
 export const difficultyLabel: Record<Difficulty, string> = {

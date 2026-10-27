@@ -105,7 +105,7 @@ export type VoiceJoin = S["VoiceJoin"];
 export type SubscriptionStatus = S["SubscriptionStatus"];
 
 // Custom interview (docs/custom-interview-spec.md, CU-1 to CU-11).
-export type StandardType = Exclude<InterviewType, "custom">;
+export type StandardType = Exclude<InterviewType, "custom" | "recruiter_screen">;
 export type CustomSessionSpec = DeepRequired<S["CustomSessionSpec"]>;
 export type CustomCategory = DeepRequired<S["CustomCategory"]>;
 export type CustomQuestion = DeepRequired<S["CustomQuestion"]>;

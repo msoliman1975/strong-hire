@@ -8,7 +8,7 @@ import { ErrorNotice, Loading, PageHead } from "../components/ui";
 import { competencyLabel, interviewTypeLabel, levelLabel, roleFamilyLabel } from "../labels";
 
 /** The four question categories; Custom is a session type, not a category (CU-1). */
-const TYPES = (Object.keys(interviewTypeLabel) as InterviewType[]).filter((t): t is StandardType => t !== "custom");
+const TYPES = (Object.keys(interviewTypeLabel) as InterviewType[]).filter((t): t is StandardType => t !== "custom" && t !== "recruiter_screen");
 const ROLES = Object.keys(roleFamilyLabel) as RoleFamily[];
 const LEVELS = Object.keys(levelLabel) as Level[];
 const ALL_AREAS = new Set<string>(Object.values(COMPETENCIES_BY_TYPE).flat());

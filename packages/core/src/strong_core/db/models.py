@@ -45,6 +45,9 @@ from strong_core.schemas.enums import (
     AlertState,
     AuthProvider,
     AutoProfileStatus,
+    CoachSessionStatus,
+    CoachSpeaker,
+    CoachStyle,
     Competency,
     Difficulty,
     EmailKind,
@@ -133,6 +136,9 @@ USER_OWNED_TABLES = (
     "session_feedback",
     "email_logs",
     "stories",
+    "coach_sessions",
+    "coach_turns",
+    "takes",
 )
 
 # Platform tables: no org_id, not owned by one user. A test checks that every table is in
@@ -1168,3 +1174,98 @@ class Story(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )
+
+
+class CoachSession(Base):
+    """CO-2, CO-5, CO-6: one coach session that builds or practices one story."""
+
+    __tablename__ = "coach_sessions"
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    org_id: Mapped[uuid.UUID] = _org_fk()
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    story_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("stories.id", ondelete="SET NULL"),
+        index=True,
+        comment="The story it builds; NULL until the coach creates one",
+    )
+    style: Mapped[CoachStyle] = mapped_column(str_enum(CoachStyle, "coach_style"))
+    channel: Mapped[SessionChannel] = mapped_column(
+        str_enum(SessionChannel, "session_channel"), comment="CO-6: voice or text"
+    )
+    status: Mapped[CoachSessionStatus] = mapped_column(
+        str_enum(CoachSessionStatus, "coach_session_status"),
+        default=CoachSessionStatus.ACTIVE,
+        server_default="active",
+    )
+    minutes: Mapped[int] = mapped_column(
+        Integer, default=0, server_default="0", comment="Recorded like any session"
+    )
+    model_profile: Mapped[str | None] = mapped_column(
+        String(20), comment="PL-6: MODEL_PROFILE the session ran on"
+    )
+    model_id: Mapped[str | None] = mapped_column(
+        String(200), comment="PL-6: gateway alias that served the coach role"
+    )
+    prompt_version: Mapped[str | None] = mapped_column(
+        String(200), comment="PL-6: coach prompt refs, comma separated"
+    )
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = _created_at()
+
+
+class CoachTurn(Base):
+    """CO-2: one turn of a coach session. Transcript only, no audio, like Turn."""
+
+    __tablename__ = "coach_turns"
+    __table_args__ = (Index("ix_coach_turns_session_seq", "coach_session_id", "seq"),)
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    org_id: Mapped[uuid.UUID] = _org_fk()
+    coach_session_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("coach_sessions.id", ondelete="CASCADE")
+    )
+    seq: Mapped[int] = mapped_column(Integer, comment="Order of the turn in its session, from 1")
+    speaker: Mapped[CoachSpeaker] = mapped_column(str_enum(CoachSpeaker, "coach_speaker"))
+    text: Mapped[str] = mapped_column(Text)
+    start_ms: Mapped[int] = mapped_column(Integer)
+    end_ms: Mapped[int] = mapped_column(Integer)
+    created_at: Mapped[datetime] = _created_at()
+
+
+class Take(Base):
+    """CO-7: one spoken or typed telling of a story, scored 1 to 4 per skill by the scorer."""
+
+    __tablename__ = "takes"
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    org_id: Mapped[uuid.UUID] = _org_fk()
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    story_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("stories.id", ondelete="CASCADE"), index=True
+    )
+    channel: Mapped[SessionChannel] = mapped_column(
+        str_enum(SessionChannel, "session_channel"), comment="Spoken (voice) or typed (text)"
+    )
+    text: Mapped[str] = mapped_column(Text, comment="The telling, transcribed or typed")
+    duration_s: Mapped[float | None] = mapped_column(
+        Double, comment="Length of a spoken take; NULL for a typed one"
+    )
+    skill_scores_json: Mapped[list[Any] | None] = mapped_column(
+        comment="schemas.CompetencyScore list; NULL until scored"
+    )
+    model_profile: Mapped[str | None] = mapped_column(
+        String(20), comment="PL-6: MODEL_PROFILE the scorer ran on"
+    )
+    model_id: Mapped[str | None] = mapped_column(
+        String(200), comment="PL-6: gateway alias that served the scorer role"
+    )
+    prompt_version: Mapped[str | None] = mapped_column(
+        String(200), comment="PL-6: scorer prompt refs, comma separated"
+    )
+    created_at: Mapped[datetime] = _created_at()

@@ -1,0 +1,120 @@
+{
+  "$defs": {
+    "Competency": {
+      "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.",
+      "enum": [
+        "ownership",
+        "impact",
+        "collaboration",
+        "conflict_handling",
+        "learning_from_failure",
+        "communication",
+        "role_fit",
+        "depth_of_experience",
+        "judgment",
+        "motivation",
+        "team_fit",
+        "scope_at_level",
+        "technical_depth",
+        "accuracy",
+        "reasoning",
+        "trade_offs",
+        "clarity_of_explanation",
+        "problem_framing",
+        "structure",
+        "user_and_business_sense",
+        "estimation_logic",
+        "prioritization",
+        "recommendation",
+        "logistics_and_expectations"
+      ],
+      "title": "Competency",
+      "type": "string"
+    },
+    "ReadinessStatus": {
+      "description": "RD-1: whether a skill has enough Realistic sessions for a readiness score.",
+      "enum": [
+        "scored",
+        "not_enough_data"
+      ],
+      "title": "ReadinessStatus",
+      "type": "string"
+    },
+    "SkillReadiness": {
+      "additionalProperties": false,
+      "description": "RD-1: readiness for one skill, from Realistic sessions only.",
+      "properties": {
+        "competency": {
+          "$ref": "#/$defs/Competency"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "0 to 100. Null exactly when status is not_enough_data.",
+          "title": "Score"
+        },
+        "sessions_counted": {
+          "description": "Realistic sessions that scored this skill.",
+          "minimum": 0,
+          "title": "Sessions Counted",
+          "type": "integer"
+        },
+        "status": {
+          "$ref": "#/$defs/ReadinessStatus"
+        }
+      },
+      "required": [
+        "competency",
+        "status",
+        "score",
+        "sessions_counted"
+      ],
+      "title": "SkillReadiness",
+      "type": "object"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/readiness.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "RD-1: practice readiness per skill for one job target's interview.",
+  "properties": {
+    "as_of": {
+      "format": "date",
+      "title": "As Of",
+      "type": "string"
+    },
+    "job_target_id": {
+      "format": "uuid",
+      "title": "Job Target Id",
+      "type": "string"
+    },
+    "kind": {
+      "const": "practice_estimate",
+      "default": "practice_estimate",
+      "description": "RD-3: every screen labels it this way.",
+      "title": "Kind",
+      "type": "string"
+    },
+    "skills": {
+      "items": {
+        "$ref": "#/$defs/SkillReadiness"
+      },
+      "title": "Skills",
+      "type": "array"
+    }
+  },
+  "required": [
+    "job_target_id",
+    "as_of"
+  ],
+  "title": "Readiness",
+  "type": "object"
+}

@@ -27,7 +27,7 @@ class RoleFamily(StrEnum):
 
 
 class InterviewType(StrEnum):
-    """The four v1 interview types (IV-2), plus Custom (CU-1).
+    """The four v1 interview types (IV-2), plus Custom (CU-1) and Recruiter screen (RS-1).
 
     A Custom session mixes 1 to 3 of the four standard types as question categories
     (`SessionConfig.custom`). Custom is never a question category itself and has no entry in
@@ -39,6 +39,7 @@ class InterviewType(StrEnum):
     TECHNICAL_QA = "technical_qa"
     CASE = "case"
     CUSTOM = "custom"
+    RECRUITER_SCREEN = "recruiter_screen"
 
 
 STANDARD_INTERVIEW_TYPES: tuple[InterviewType, ...] = (
@@ -47,7 +48,8 @@ STANDARD_INTERVIEW_TYPES: tuple[InterviewType, ...] = (
     InterviewType.TECHNICAL_QA,
     InterviewType.CASE,
 )
-"""The types that are also question categories in a Custom session (CU-1)."""
+"""The types that are also question categories in a Custom session (CU-1). Recruiter screen
+(RS-1) is not one: it has its own brief, questions and rubric (RS-2)."""
 
 
 class QuestionSource(StrEnum):
@@ -151,9 +153,12 @@ class Competency(StrEnum):
     ESTIMATION_LOGIC = "estimation_logic"
     PRIORITIZATION = "prioritization"
     RECOMMENDATION = "recommendation"
+    # Recruiter screen (RS-1); it also scores motivation, role fit and communication
+    LOGISTICS_AND_EXPECTATIONS = "logistics_and_expectations"
 
 
-# The four standard types only. Custom sessions take the union over their categories.
+# The four standard types and Recruiter screen. Custom sessions take the union over their
+# categories.
 COMPETENCIES_BY_TYPE: dict[InterviewType, tuple[Competency, ...]] = {
     InterviewType.BEHAVIORAL: (
         Competency.OWNERSHIP,
@@ -185,6 +190,12 @@ COMPETENCIES_BY_TYPE: dict[InterviewType, tuple[Competency, ...]] = {
         Competency.ESTIMATION_LOGIC,
         Competency.PRIORITIZATION,
         Competency.RECOMMENDATION,
+    ),
+    InterviewType.RECRUITER_SCREEN: (
+        Competency.MOTIVATION,
+        Competency.ROLE_FIT,
+        Competency.COMMUNICATION,
+        Competency.LOGISTICS_AND_EXPECTATIONS,
     ),
 }
 
@@ -226,6 +237,35 @@ class StoryFitStrength(StrEnum):
     STRONG = "strong"
     THIN = "thin"
     MISSING = "missing"
+
+
+class CoachStyle(StrEnum):
+    """CO-5: how the coach talks, picked by the candidate."""
+
+    GENTLE = "gentle"
+    DIRECT = "direct"
+
+
+class CoachSessionStatus(StrEnum):
+    """CO-2: state of one coach session."""
+
+    ACTIVE = "active"
+    ENDED = "ended"
+    FAILED = "failed"
+
+
+class CoachSpeaker(StrEnum):
+    """CO-2: who said a coach turn."""
+
+    COACH = "coach"
+    CANDIDATE = "candidate"
+
+
+class ReadinessStatus(StrEnum):
+    """RD-1: whether a skill has enough Realistic sessions for a readiness score."""
+
+    SCORED = "scored"
+    NOT_ENOUGH_DATA = "not_enough_data"
 
 
 class GapStatus(StrEnum):

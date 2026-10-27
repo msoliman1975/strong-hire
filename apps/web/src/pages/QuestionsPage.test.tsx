@@ -116,6 +116,8 @@ describe("questions page", () => {
     };
     const listed = Object.values(COMPETENCIES_BY_TYPE).flat();
     expect(new Set(listed).size).toBe(listed.length);
-    expect([...listed].sort()).toEqual([...openapi.components.schemas.Competency.enum].sort());
+    // RS-1: Recruiter screen is not a question bank type; this competency is only its own.
+    const standard = openapi.components.schemas.Competency.enum.filter((c) => c !== "logistics_and_expectations");
+    expect([...listed].sort()).toEqual(standard.sort());
   });
 });
