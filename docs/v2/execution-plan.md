@@ -207,3 +207,6 @@ Read docs/v2/prompts/00-common.md, then docs/v2/prompts/<file>.md, and do that w
 
 Run each prompt once. To continue a stopped session, open the same branch and add:
 "Continue from the branch; read the open PR first."
+
+To run the whole build unattended, start one coordinating session instead and let it start the
+others: see `docs/v2/prompts/ORCHESTRATOR.md`.
