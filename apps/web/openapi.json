@@ -2199,6 +2199,113 @@
         }
       }
     },
+    "/plan/{job_target_id}/{resume_id}": {
+      "get": {
+        "tags": [
+          "interview plan"
+        ],
+        "summary": "Get Plan",
+        "description": "PP-1: the plan page for one job and CV pair. PP-2: days left to the interview date.",
+        "operationId": "get_plan_plan__job_target_id___resume_id__get",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          },
+          {
+            "name": "resume_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Resume Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanView"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The job target or the resume does not exist."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plan/{job_target_id}/interview-date": {
+      "put": {
+        "tags": [
+          "interview plan"
+        ],
+        "summary": "Set Interview Date",
+        "description": "PP-2: set the real interview date, or clear it with null.",
+        "operationId": "set_interview_date_plan__job_target_id__interview_date_put",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InterviewDateIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterviewDateOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The job target does not exist or was deleted."
+          },
+          "422": {
+            "description": "The date is in the past."
+          }
+        }
+      }
+    },
     "/auth/providers": {
       "get": {
         "tags": [
@@ -11822,6 +11929,32 @@
         "title": "CompetencyTrend",
         "description": "PR-1: one competency over the Realistic sessions of a job target."
       },
+      "CompetencyWeight": {
+        "properties": {
+          "competency": {
+            "$ref": "#/components/schemas/Competency"
+          },
+          "weight": {
+            "type": "number",
+            "title": "Weight",
+            "description": "The profile's scoring weight. 1.0 when it sets none."
+          },
+          "share": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Share",
+            "description": "The weight's share within its interview type."
+          }
+        },
+        "type": "object",
+        "required": [
+          "competency",
+          "weight",
+          "share"
+        ],
+        "title": "CompetencyWeight"
+      },
       "Confidence": {
         "enum": [
           "low",
@@ -13564,6 +13697,62 @@
         ],
         "title": "InputCheck",
         "type": "object"
+      },
+      "InterviewDateIn": {
+        "properties": {
+          "interview_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interview Date"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "interview_date"
+        ],
+        "title": "InterviewDateIn",
+        "description": "PP-2: the candidate's real interview date. null clears it."
+      },
+      "InterviewDateOut": {
+        "properties": {
+          "interview_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interview Date"
+          },
+          "days_left": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days Left"
+          }
+        },
+        "type": "object",
+        "required": [
+          "interview_date",
+          "days_left"
+        ],
+        "title": "InterviewDateOut"
       },
       "InterviewType": {
         "type": "string",
@@ -16319,6 +16508,192 @@
         ],
         "title": "PlanOut",
         "description": "The one paid plan. Every number comes from the API config."
+      },
+      "PlanSetupDefaults": {
+        "properties": {
+          "interview_type": {
+            "$ref": "#/components/schemas/InterviewType",
+            "description": "PR-2's next session, else GA-3's first."
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/Difficulty"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/Mode"
+          },
+          "duration_min": {
+            "type": "integer",
+            "enum": [
+              30,
+              45
+            ],
+            "title": "Duration Min",
+            "description": "The default full length. Free accounts get the mini interview instead."
+          },
+          "level": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Level"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The job's level, else the user's target level."
+          },
+          "tone": {
+            "$ref": "#/components/schemas/Tone",
+            "description": "TN-3: as_company with a curated profile, else neutral."
+          }
+        },
+        "type": "object",
+        "required": [
+          "interview_type",
+          "difficulty",
+          "mode",
+          "duration_min",
+          "level",
+          "tone"
+        ],
+        "title": "PlanSetupDefaults",
+        "description": "PP-4: what the setup on the plan page starts with. Every v1 option stays editable."
+      },
+      "PlanView": {
+        "properties": {
+          "job": {
+            "$ref": "#/components/schemas/JobTargetOut"
+          },
+          "resume": {
+            "$ref": "#/components/schemas/ResumeOut"
+          },
+          "company_mode": {
+            "type": "string",
+            "enum": [
+              "curated",
+              "generic"
+            ],
+            "title": "Company Mode"
+          },
+          "company_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company Name",
+            "description": "From the profile, else the posting."
+          },
+          "values_framework": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Values Framework",
+            "description": "The company's values framework name, for example 'Leadership Principles'."
+          },
+          "interview_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interview Date",
+            "description": "PP-2: the real interview date, if set."
+          },
+          "days_left": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days Left",
+            "description": "PP-2: days from today (UTC) to interview_date. 0 is today, negative is past."
+          },
+          "tested": {
+            "items": {
+              "$ref": "#/components/schemas/TypeWeights"
+            },
+            "type": "array",
+            "title": "Tested",
+            "description": "What they'll test: the loop's types first, then the other standard types."
+          },
+          "gap": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GapAnalysisOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The latest gap analysis of this pair (GA-1 to GA-3, probe areas and the session plan). None when the pair has none yet."
+          },
+          "reports": {
+            "items": {
+              "$ref": "#/components/schemas/ReportItem"
+            },
+            "type": "array",
+            "title": "Reports",
+            "description": "PR-3: this pair's reports, newest first."
+          },
+          "next_session": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlannedSession"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "PR-2."
+          },
+          "next_custom_session": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CustomRecommendation"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "CU-10."
+          },
+          "setup": {
+            "$ref": "#/components/schemas/PlanSetupDefaults"
+          }
+        },
+        "type": "object",
+        "required": [
+          "job",
+          "resume",
+          "company_mode",
+          "company_name",
+          "values_framework",
+          "interview_date",
+          "days_left",
+          "tested",
+          "gap",
+          "reports",
+          "next_session",
+          "next_custom_session",
+          "setup"
+        ],
+        "title": "PlanView",
+        "description": "PP-1: everything the plan page for one job and CV pair shows, in one read."
       },
       "PlannedSession": {
         "properties": {
@@ -20932,6 +21307,34 @@
         ],
         "title": "Turn",
         "description": "One utterance in the transcript. Text only; audio is never stored."
+      },
+      "TypeWeights": {
+        "properties": {
+          "interview_type": {
+            "$ref": "#/components/schemas/InterviewType"
+          },
+          "in_loop": {
+            "type": "boolean",
+            "title": "In Loop",
+            "description": "The company's loop for this role family has a round of this type. Always false in generic mode."
+          },
+          "competencies": {
+            "items": {
+              "$ref": "#/components/schemas/CompetencyWeight"
+            },
+            "type": "array",
+            "title": "Competencies",
+            "description": "Highest weight first."
+          }
+        },
+        "type": "object",
+        "required": [
+          "interview_type",
+          "in_loop",
+          "competencies"
+        ],
+        "title": "TypeWeights",
+        "description": "One interview type and the competencies it scores, with the company's weights."
       },
       "UsageOut": {
         "properties": {

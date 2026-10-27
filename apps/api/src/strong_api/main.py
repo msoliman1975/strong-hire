@@ -28,6 +28,7 @@ from strong_api.gap.router import router as gap_router
 from strong_api.inputs import router as inputs_router
 from strong_api.inputs.queue import ArqJobQueue, JobQueue
 from strong_api.observability import RequestContextMiddleware
+from strong_api.plan.router import router as plan_router
 from strong_api.public import install_public
 from strong_api.questions import router as questions_router
 from strong_api.reports import router as reports_router
@@ -121,6 +122,7 @@ def create_app(
     app.include_router(custom_router)
     app.include_router(dev_router)
     app.include_router(status_router)
+    app.include_router(plan_router)  # v2 S10: interview plan page
     install_auth(app)
     install_billing(app)
     install_account(app)

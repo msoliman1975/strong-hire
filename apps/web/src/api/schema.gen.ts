@@ -770,6 +770,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/plan/{job_target_id}/{resume_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Plan
+         * @description PP-1: the plan page for one job and CV pair. PP-2: days left to the interview date.
+         */
+        get: operations["get_plan_plan__job_target_id___resume_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/plan/{job_target_id}/interview-date": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Interview Date
+         * @description PP-2: set the real interview date, or clear it with null.
+         */
+        put: operations["set_interview_date_plan__job_target_id__interview_date_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/providers": {
         parameters: {
             query?: never;
@@ -4393,6 +4433,20 @@ export interface components {
              */
             direction: "up" | "down" | "flat" | "single";
         };
+        /** CompetencyWeight */
+        CompetencyWeight: {
+            competency: components["schemas"]["Competency"];
+            /**
+             * Weight
+             * @description The profile's scoring weight. 1.0 when it sets none.
+             */
+            weight: number;
+            /**
+             * Share
+             * @description The weight's share within its interview type.
+             */
+            share: number;
+        };
         /**
          * Confidence
          * @enum {string}
@@ -5136,6 +5190,21 @@ export interface components {
              * @default
              */
             reason: string;
+        };
+        /**
+         * InterviewDateIn
+         * @description PP-2: the candidate's real interview date. null clears it.
+         */
+        InterviewDateIn: {
+            /** Interview Date */
+            interview_date: string | null;
+        };
+        /** InterviewDateOut */
+        InterviewDateOut: {
+            /** Interview Date */
+            interview_date: string | null;
+            /** Days Left */
+            days_left: number | null;
         };
         /**
          * InterviewType
@@ -6187,6 +6256,76 @@ export interface components {
              * @description False until Stripe keys are set.
              */
             billing_enabled: boolean;
+        };
+        /**
+         * PlanSetupDefaults
+         * @description PP-4: what the setup on the plan page starts with. Every v1 option stays editable.
+         */
+        PlanSetupDefaults: {
+            /** @description PR-2's next session, else GA-3's first. */
+            interview_type: components["schemas"]["InterviewType"];
+            difficulty: components["schemas"]["Difficulty"];
+            mode: components["schemas"]["Mode"];
+            /**
+             * Duration Min
+             * @description The default full length. Free accounts get the mini interview instead.
+             * @enum {integer}
+             */
+            duration_min: 30 | 45;
+            /** @description The job's level, else the user's target level. */
+            level: components["schemas"]["Level"] | null;
+            /** @description TN-3: as_company with a curated profile, else neutral. */
+            tone: components["schemas"]["Tone"];
+        };
+        /**
+         * PlanView
+         * @description PP-1: everything the plan page for one job and CV pair shows, in one read.
+         */
+        PlanView: {
+            job: components["schemas"]["JobTargetOut"];
+            resume: components["schemas"]["ResumeOut"];
+            /**
+             * Company Mode
+             * @enum {string}
+             */
+            company_mode: "curated" | "generic";
+            /**
+             * Company Name
+             * @description From the profile, else the posting.
+             */
+            company_name: string | null;
+            /**
+             * Values Framework
+             * @description The company's values framework name, for example 'Leadership Principles'.
+             */
+            values_framework: string | null;
+            /**
+             * Interview Date
+             * @description PP-2: the real interview date, if set.
+             */
+            interview_date: string | null;
+            /**
+             * Days Left
+             * @description PP-2: days from today (UTC) to interview_date. 0 is today, negative is past.
+             */
+            days_left: number | null;
+            /**
+             * Tested
+             * @description What they'll test: the loop's types first, then the other standard types.
+             */
+            tested: components["schemas"]["TypeWeights"][];
+            /** @description The latest gap analysis of this pair (GA-1 to GA-3, probe areas and the session plan). None when the pair has none yet. */
+            gap: components["schemas"]["GapAnalysisOut"] | null;
+            /**
+             * Reports
+             * @description PR-3: this pair's reports, newest first.
+             */
+            reports: components["schemas"]["ReportItem"][];
+            /** @description PR-2. */
+            next_session: components["schemas"]["PlannedSession"] | null;
+            /** @description CU-10. */
+            next_custom_session: components["schemas"]["CustomRecommendation"] | null;
+            setup: components["schemas"]["PlanSetupDefaults"];
         };
         /**
          * PlannedSession
@@ -8077,6 +8216,23 @@ export interface components {
             question_ref?: string | null;
         };
         /**
+         * TypeWeights
+         * @description One interview type and the competencies it scores, with the company's weights.
+         */
+        TypeWeights: {
+            interview_type: components["schemas"]["InterviewType"];
+            /**
+             * In Loop
+             * @description The company's loop for this role family has a round of this type. Always false in generic mode.
+             */
+            in_loop: boolean;
+            /**
+             * Competencies
+             * @description Highest weight first.
+             */
+            competencies: components["schemas"]["CompetencyWeight"][];
+        };
+        /**
          * UsageOut
          * @description BL-1 usage meter and BL-2 free interview, as the API counts them.
          */
@@ -9779,6 +9935,85 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["SiteStatus"];
                 };
+            };
+        };
+    };
+    get_plan_plan__job_target_id___resume_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+                resume_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanView"];
+                };
+            };
+            /** @description The job target or the resume does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_interview_date_plan__job_target_id__interview_date_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InterviewDateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterviewDateOut"];
+                };
+            };
+            /** @description The job target does not exist or was deleted. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The date is in the past. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
