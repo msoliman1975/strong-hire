@@ -44,6 +44,7 @@ from strong_worker.inputs.sanitize import sanitize_untrusted
 from strong_worker.inputs.settings import get_inputs_settings
 from strong_worker.inputs.storage import FileStore, build_file_store
 from strong_worker.ops.context import job_context
+from strong_worker.profiles.queue import queue_auto_profile
 
 log = logging.getLogger(__name__)
 
@@ -148,6 +149,10 @@ async def extract_job_target(
         if target.name is None:  # R1: the default library name; a rename is kept
             target.name = default_job_name(target.parsed_json, target.source_url, target.created_at)
         await db.commit()
+        if match.generic_mode:  # AP-1
+            await queue_auto_profile(
+                ctx, company_name=posting.company_name, source_url=target.source_url, org_id=org_id
+            )
         return {
             "outcome": "extracted",
             "board": board,
@@ -175,6 +180,10 @@ async def match_job_target(ctx: dict[str, Any], job_target_id: str, org_id: str)
         )
         target.company_id = match.company.id if match.company else None
         await db.commit()
+        if match.generic_mode:  # AP-1
+            await queue_auto_profile(
+                ctx, company_name=posting.company_name, source_url=target.source_url, org_id=org_id
+            )
         return {"outcome": "matched", "company": match.summary()}
 
 

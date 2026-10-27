@@ -10,6 +10,7 @@ than 90 days (strong_worker.retention). A6 lets admins pause the gap analysis an
 minute, the optional daily digest, and seeding the default rules at startup. A3 adds the ops
 plumbing (strong_core.ops: heartbeat, error capture, usage sink, JSON logs) and the metrics
 sampler cron (strong_worker.ops.sampler), and the retention job also cleans the ops tables.
+v2 S14 adds the auto-profile job for companies outside the curated list (strong_worker.profiles).
 """
 
 from __future__ import annotations
@@ -29,6 +30,7 @@ from strong_worker.gap import jobs as gap_jobs
 from strong_worker.inputs import jobs as inputs_jobs
 from strong_worker.ops import sampler
 from strong_worker.pause import PAUSED_MAX_TRIES
+from strong_worker.profiles import jobs as profile_jobs
 from strong_worker.scoring import jobs as scoring_jobs
 
 
@@ -94,6 +96,11 @@ class WorkerSettings:
             for f in scoring_jobs.FUNCTIONS
         ),
         func(account_jobs.export_account, keep_result=account_jobs.RESULT_TTL_S, timeout=600),
+        # AP-1: auto-profiles for companies outside the curated list.
+        *(
+            func(f, keep_result=profile_jobs.RESULT_TTL_S, timeout=600)
+            for f in profile_jobs.FUNCTIONS
+        ),
         func(
             account_jobs.delete_account_files,
             keep_result=account_jobs.RESULT_TTL_S,
