@@ -17,6 +17,7 @@ import { ErrorNotice, Loading } from "./ui";
  */
 const SECTIONS: { to: string; label: string; group?: string; badge?: ComponentType }[] = [
   { to: "/overview", label: "Overview" },
+  { to: "/plan-usage", label: "Plan usage" },
   { to: "/interviews", label: "Interviews" },
   { to: "/simulations", label: "Simulations" },
   { to: "/users", label: "Users" },
@@ -30,6 +31,7 @@ const SECTIONS: { to: string; label: string; group?: string; badge?: ComponentTy
   { to: "/ops/controls", label: "Controls", group: "Operations" },
   { to: "/content/companies", label: "Companies", group: "Content" },
   { to: "/content/requests", label: "Company requests", group: "Content" },
+  { to: "/content/auto-profiles", label: "Auto-profiles", group: "Content" },
   { to: "/audit", label: "Audit log" },
   { to: "/settings/admins", label: "Admins", group: "Settings" },
   { to: "/settings/sessions", label: "My sessions", group: "Settings" },

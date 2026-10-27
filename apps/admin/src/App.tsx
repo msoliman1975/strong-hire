@@ -25,6 +25,8 @@ import { SignInPage } from "./pages/SignInPage";
 import { SimulationsPage } from "./pages/SimulationsPage";
 import { VerifyLinkPage } from "./pages/VerifyLinkPage";
 import { WaitlistPage } from "./pages/WaitlistPage";
+import { AutoProfilesPage } from "./pages/AutoProfilesPage";
+import { PlanUsagePage } from "./pages/PlanUsagePage";
 
 export function createQueryClient(): QueryClient {
   return new QueryClient({
@@ -69,6 +71,8 @@ export function AppRoutes() {
         <Route path="/content/companies" element={<CompaniesPage />} />
         <Route path="/content/companies/:slug" element={<CompanyPage />} />
         <Route path="/content/requests" element={<CompanyRequestsPage />} />
+        <Route path="/content/auto-profiles" element={<AutoProfilesPage />} />
+        <Route path="/plan-usage" element={<PlanUsagePage />} />
         <Route path="/settings" element={<Navigate to="/settings/admins" replace />} />
         <Route path="/settings/admins" element={<AdminsPage />} />
         <Route path="/settings/sessions" element={<MySessionsPage />} />

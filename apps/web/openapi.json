@@ -6815,6 +6815,361 @@
         }
       }
     },
+    "/admin/part1/usage": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Part1 Usage",
+        "description": "AD-3: the tone and difficulty mix by week, and plan page usage.",
+        "operationId": "get_part1_usage_admin_part1_usage_get",
+        "parameters": [
+          {
+            "name": "weeks",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 52,
+              "minimum": 1,
+              "description": "How many weeks, this one included",
+              "default": 8,
+              "title": "Weeks"
+            },
+            "description": "How many weeks, this one included"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Part1Usage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/auto-profiles": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List Auto Profiles",
+        "description": "AP-3: the review queue. Pending rows by default, oldest first.",
+        "operationId": "list_auto_profiles_admin_auto_profiles_get",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/AutoProfileStatus"
+                },
+                {
+                  "const": "all",
+                  "type": "string"
+                }
+              ],
+              "description": "Which rows",
+              "default": "pending",
+              "title": "Status"
+            },
+            "description": "Which rows"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAutoProfiles"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/auto-profiles/{profile_id}": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Auto Profile",
+        "operationId": "get_auto_profile_admin_auto_profiles__profile_id__get",
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAutoProfile"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/auto-profiles/{profile_id}/approve": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Approve Auto Profile",
+        "description": "AP-3: an approved profile may reach a brief.",
+        "operationId": "approve_auto_profile_admin_auto_profiles__profile_id__approve_post",
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          },
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActionIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAutoProfile"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/auto-profiles/{profile_id}/summary": {
+      "put": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Edit Auto Profile Summary",
+        "description": "AP-3: correct the summary text. The status stays as it is.",
+        "operationId": "edit_auto_profile_summary_admin_auto_profiles__profile_id__summary_put",
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          },
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SummaryIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAutoProfile"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/auto-profiles/{profile_id}/retire": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Retire Auto Profile",
+        "description": "AP-3: a retired profile never reaches a brief again.",
+        "operationId": "retire_auto_profile_admin_auto_profiles__profile_id__retire_post",
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          },
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActionIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAutoProfile"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/public/waitlist": {
       "post": {
         "tags": [
@@ -7135,6 +7490,138 @@
           "details"
         ],
         "title": "AdminAuditEntry"
+      },
+      "AdminAutoProfile": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "company_name": {
+            "type": "string",
+            "title": "Company Name"
+          },
+          "normalized_name": {
+            "type": "string",
+            "title": "Normalized Name"
+          },
+          "source_host": {
+            "type": "string",
+            "title": "Source Host"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "values_mentioned": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Values Mentioned"
+          },
+          "interview_process_notes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Interview Process Notes"
+          },
+          "sources": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Sources"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AutoProfileStatus"
+          },
+          "reviewed_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed By"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "model_profile": {
+            "type": "string",
+            "title": "Model Profile"
+          },
+          "prompt_version": {
+            "type": "string",
+            "title": "Prompt Version"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "company_name",
+          "normalized_name",
+          "source_host",
+          "summary",
+          "values_mentioned",
+          "interview_process_notes",
+          "sources",
+          "status",
+          "reviewed_by",
+          "reviewed_at",
+          "model_profile",
+          "prompt_version",
+          "created_at"
+        ],
+        "title": "AdminAutoProfile"
+      },
+      "AdminAutoProfiles": {
+        "properties": {
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/AutoProfileStatus"
+            },
+            "type": "object",
+            "title": "Counts",
+            "description": "Rows per status; all present"
+          },
+          "profiles": {
+            "items": {
+              "$ref": "#/components/schemas/AdminAutoProfile"
+            },
+            "type": "array",
+            "title": "Profiles",
+            "description": "Oldest first, so the queue is FIFO"
+          }
+        },
+        "type": "object",
+        "required": [
+          "counts",
+          "profiles"
+        ],
+        "title": "AdminAutoProfiles"
       },
       "AdminCompany": {
         "properties": {
@@ -10345,6 +10832,16 @@
           "created_at"
         ],
         "title": "AuthUser"
+      },
+      "AutoProfileStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "approved",
+          "retired"
+        ],
+        "title": "AutoProfileStatus",
+        "description": "AP-1, AP-3: review state of an auto-generated company profile. A pending one is already\nused in briefs, labeled \"auto-generated\"; an admin approves or retires it."
       },
       "AutoProfileSummary": {
         "additionalProperties": false,
@@ -14187,6 +14684,50 @@
         ],
         "title": "MagicLinkSent"
       },
+      "MixWeek": {
+        "properties": {
+          "week_start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Week Start",
+            "description": "Monday 00:00 UTC"
+          },
+          "sessions": {
+            "type": "integer",
+            "title": "Sessions"
+          },
+          "tone": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/Tone"
+            },
+            "type": "object",
+            "title": "Tone",
+            "description": "Sessions per tone; every tone is present"
+          },
+          "difficulty": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/Difficulty"
+            },
+            "type": "object",
+            "title": "Difficulty",
+            "description": "Sessions per difficulty; all present"
+          }
+        },
+        "type": "object",
+        "required": [
+          "week_start",
+          "sessions",
+          "tone",
+          "difficulty"
+        ],
+        "title": "MixWeek"
+      },
       "Mode": {
         "type": "string",
         "enum": [
@@ -15434,6 +15975,56 @@
         ],
         "title": "OwnQuestionPoint",
         "description": "CU-7: a snapshot of a Custom session that comes (partly) from the candidate's own\nquestions."
+      },
+      "Part1Usage": {
+        "properties": {
+          "weeks": {
+            "items": {
+              "$ref": "#/components/schemas/MixWeek"
+            },
+            "type": "array",
+            "title": "Weeks",
+            "description": "Oldest first; the last one is the current week"
+          },
+          "tone": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/Tone"
+            },
+            "type": "object",
+            "title": "Tone",
+            "description": "Totals over the weeks shown"
+          },
+          "difficulty": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/Difficulty"
+            },
+            "type": "object",
+            "title": "Difficulty",
+            "description": "Totals over the weeks shown"
+          },
+          "plan_page_views": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "plan_sessions": {
+            "$ref": "#/components/schemas/AdminMetric",
+            "description": "Sessions started from the plan page"
+          }
+        },
+        "type": "object",
+        "required": [
+          "weeks",
+          "tone",
+          "difficulty",
+          "plan_page_views",
+          "plan_sessions"
+        ],
+        "title": "Part1Usage"
       },
       "PasswordLoginRequest": {
         "properties": {
@@ -19468,6 +20059,31 @@
         ],
         "title": "SubscriptionStatus",
         "description": "Mirrors the Stripe subscription statuses we act on."
+      },
+      "SummaryIn": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason",
+            "description": "Why, for the audit log"
+          },
+          "summary": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Summary",
+            "description": "AutoProfileSummary.summary"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reason",
+          "summary"
+        ],
+        "title": "SummaryIn"
       },
       "TextTurnRequest": {
         "properties": {

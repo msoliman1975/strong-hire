@@ -9,6 +9,7 @@ import { describe, expect, it } from "vitest";
 import { adminApi } from "../api/admin";
 import { alertsApi } from "../api/alerts";
 import { waitlistApi } from "../api/waitlist";
+import { part1Api } from "../api/part1";
 import { authApi } from "../api/auth";
 import { controlsApi } from "../api/controls";
 import { usersApi } from "../api/users";
@@ -168,6 +169,17 @@ describe("admin mocks match openapi.json", () => {
     mockStore.db.users["admin@example.com"] = user("admin@example.com", 9, false);
     mockSignIn(mockStore, "admin@example.com");
     expectApiShape("AdminWaitlist", await waitlistApi.list());
+  });
+
+  it("v2 part 1: plan usage and auto-profiles (AD-3, AP-3)", async () => {
+    mockStore.db.users["admin@example.com"] = user("admin@example.com", 9, false);
+    mockSignIn(mockStore, "admin@example.com");
+    expectApiShape("Part1Usage", await part1Api.usage(8));
+    expectApiShape("AdminAutoProfiles", await part1Api.autoProfiles("all"));
+    const id = "00000000-0000-4000-8000-0000000000c1";
+    expectApiShape("AdminAutoProfile", await part1Api.editSummary({ id, reason: "check", summary: "New text" }));
+    expectApiShape("AdminAutoProfile", await part1Api.approve({ id, reason: "check" }));
+    expectApiShape("AdminAutoProfile", await part1Api.retire({ id, reason: "check" }));
   });
 
   it("content: companies, versions, diff, import, transition, requests (AT-1..AT-5)", async () => {

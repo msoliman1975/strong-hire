@@ -94,6 +94,7 @@ export function activeControls(settings: OpsSettings, now = Date.now()): string[
   if (v.custom_interview_access !== settings.defaults.custom_interview_access) {
     out.push(v.custom_interview_access === "paid_only" ? "Custom interviews for paid plans only" : "Custom interviews open to everyone");
   }
+  if (v.v2_enabled) out.push("v2 screens on");
   if (v.sim_paused) out.push("AI candidate runs paused");
   if (v.sim_max_live_sessions !== settings.defaults.sim_max_live_sessions) {
     out.push(

@@ -49,6 +49,7 @@ describe("admin sign-in (AA-2)", () => {
     // The first text node is the section name; a count badge (Alerts) may follow it.
     expect(within(nav).getAllByRole("link").map((a) => a.firstChild?.textContent)).toEqual([
       "Overview",
+      "Plan usage",
       "Interviews",
       "Simulations",
       "Users",
@@ -62,6 +63,7 @@ describe("admin sign-in (AA-2)", () => {
       "Controls",
       "Companies",
       "Company requests",
+      "Auto-profiles",
       "Audit log",
       "Admins",
       "My sessions",

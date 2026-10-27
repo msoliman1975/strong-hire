@@ -13,11 +13,13 @@ from fastapi import APIRouter, FastAPI
 from strong_api.admin.admins import router as admins_router
 from strong_api.admin.alerts import router as alerts_router
 from strong_api.admin.auth import router as auth_router
+from strong_api.admin.auto_profiles import router as auto_profiles_router
 from strong_api.admin.content import router as content_router
 from strong_api.admin.controls import router as controls_router
 from strong_api.admin.identity import ADMIN_LINK_SALT, AdminAuth, seed_admins
 from strong_api.admin.ops import router as ops_router
 from strong_api.admin.overview import router as overview_router
+from strong_api.admin.part1 import router as part1_router
 from strong_api.admin.router import router
 from strong_api.admin.sim import router as sim_router
 from strong_api.admin.users import router as users_router
@@ -43,6 +45,8 @@ ROUTERS: list[APIRouter] = [
     content_router,
     sim_router,
     waitlist_router,
+    part1_router,
+    auto_profiles_router,
 ]
 
 
