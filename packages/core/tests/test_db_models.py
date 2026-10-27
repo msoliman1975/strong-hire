@@ -43,6 +43,7 @@ SPEC_TABLES = {
     "email_logs",  # L01, L06: lifecycle emails sent
     # v2
     "company_auto_profiles",  # AP-1
+    "stories",  # ST-1
 }
 
 

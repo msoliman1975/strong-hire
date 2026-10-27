@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "competency": "ownership",
+      "story_id": "6f1c2a3e-1b2d-4c5e-8f90-a1b2c3d4e5f6",
+      "strength": "strong",
+      "reason": "The checkout migration story shows you owning the rollout end to end."
+    },
+    {
+      "competency": "conflict_handling",
+      "story_id": "0b7e9d41-2c3a-4f5b-9e6d-7a8b9c0d1e2f",
+      "strength": "thin",
+      "reason": "The roadmap story has the disagreement but not how it was resolved."
+    },
+    {
+      "competency": "learning_from_failure",
+      "story_id": null,
+      "strength": "missing",
+      "reason": "No story yet covers a failure and what you changed after it."
+    }
+  ]
+}

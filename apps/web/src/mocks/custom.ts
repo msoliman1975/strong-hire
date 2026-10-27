@@ -172,6 +172,9 @@ export function customScorecard(custom: CustomSessionSpec, generic = false): Sco
     value_scores: [],
     strengths: ["Specific example"],
     misses: ["Could have named the trade-off"],
+    story_id: null,
+    story_fix: null,
+    delivery: null,
   }));
   return { ...base, per_question: [...base.per_question, ...own] };
 }

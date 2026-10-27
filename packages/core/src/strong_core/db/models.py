@@ -65,6 +65,8 @@ from strong_core.schemas.enums import (
     SessionStatus,
     SimRunStatus,
     Speaker,
+    StorySource,
+    StoryStatus,
     SubscriptionStatus,
     Tone,
     TriageState,
@@ -130,6 +132,7 @@ USER_OWNED_TABLES = (
     "saved_questions",
     "session_feedback",
     "email_logs",
+    "stories",
 )
 
 # Platform tables: no org_id, not owned by one user. A test checks that every table is in
@@ -1122,4 +1125,46 @@ class EmailLog(Base):
     )
     sent_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+
+class Story(Base):
+    """ST-1: one story in the user's story library (schemas.Story)."""
+
+    __tablename__ = "stories"
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    org_id: Mapped[uuid.UUID] = _org_fk()
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    title: Mapped[str] = mapped_column(String(200))
+    context: Mapped[str | None] = mapped_column(Text)
+    stakes: Mapped[str | None] = mapped_column(Text)
+    action: Mapped[str | None] = mapped_column(Text)
+    result: Mapped[str | None] = mapped_column(Text)
+    reflection: Mapped[str | None] = mapped_column(Text)
+    skills: Mapped[list[Any]] = mapped_column(
+        server_default="[]", comment="list of schemas.Competency values"
+    )
+    status: Mapped[StoryStatus] = mapped_column(
+        str_enum(StoryStatus, "story_status"),
+        default=StoryStatus.DRAFT,
+        server_default="draft",
+    )
+    source: Mapped[StorySource] = mapped_column(str_enum(StorySource, "story_source"))
+    source_session_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("sessions.id", ondelete="SET NULL"),
+        index=True,
+        comment="ST-2: session of the debrief answer it came from",
+    )
+    source_question_ref: Mapped[str | None] = mapped_column(
+        String(200), comment="ST-2: QuestionScore.question_ref of that answer"
+    )
+    notes_json: Mapped[list[Any]] = mapped_column(
+        server_default="[]", comment="schemas.StoryNote list (ST-6 fix notes)"
+    )
+    created_at: Mapped[datetime] = _created_at()
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )

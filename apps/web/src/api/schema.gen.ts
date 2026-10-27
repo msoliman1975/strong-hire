@@ -4496,6 +4496,18 @@ export interface components {
              */
             failure_reason?: string | null;
         };
+        /**
+         * DeliveryMetrics
+         * @description DM-1: how one answer was delivered, from turn timestamps and text. No audio is used.
+         */
+        DeliveryMetrics: {
+            /** Words Per Minute */
+            words_per_minute: number;
+            /** Fillers Per Minute */
+            fillers_per_minute: number;
+            /** Duration Seconds */
+            duration_seconds: number;
+        };
         /** DevLoginRequest */
         DevLoginRequest: {
             /**
@@ -6325,6 +6337,18 @@ export interface components {
             strengths?: string[];
             /** Misses */
             misses?: string[];
+            /**
+             * Story Id
+             * @description ST-6: the library story this answer used, if any.
+             */
+            story_id?: string | null;
+            /**
+             * Story Fix
+             * @description ST-6: the fix for that story, sent to it as a note.
+             */
+            story_fix?: string | null;
+            /** @description DM-1: set by the worker after scoring, never by the model. */
+            delivery?: components["schemas"]["DeliveryMetrics"] | null;
         };
         /**
          * QuestionSource
@@ -7432,6 +7456,145 @@ export interface components {
             /** Month Usd */
             month_usd: number;
         };
+        /**
+         * Story
+         * @description ST-1: one story in the user's library. The stories table holds org_id and user_id.
+         */
+        Story: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /**
+             * Context
+             * @default null
+             */
+            context: string | null;
+            /**
+             * Stakes
+             * @default null
+             */
+            stakes: string | null;
+            /**
+             * Action
+             * @default null
+             */
+            action: string | null;
+            /**
+             * Result
+             * @default null
+             */
+            result: string | null;
+            /**
+             * Reflection
+             * @default null
+             */
+            reflection: string | null;
+            /**
+             * Skills
+             * @description Skill tags.
+             */
+            skills?: components["schemas"]["Competency"][];
+            /** @default draft */
+            status: components["schemas"]["StoryStatus"];
+            source: components["schemas"]["StorySource"];
+            /**
+             * Source Session Id
+             * @description ST-2: the session of the debrief answer it came from.
+             * @default null
+             */
+            source_session_id: string | null;
+            /**
+             * Source Question Ref
+             * @description ST-2: QuestionScore.question_ref of that answer.
+             * @default null
+             */
+            source_question_ref: string | null;
+            /** Notes */
+            notes?: components["schemas"]["StoryNote"][];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /**
+         * StoryFit
+         * @description ST-5: the planner's story fit table, one item per tested skill.
+         */
+        StoryFit: {
+            /** Items */
+            items?: components["schemas"]["StoryFitItem"][];
+        };
+        /**
+         * StoryFitItem
+         * @description ST-5: for one skill the interview will test, the best story and how well it fits.
+         */
+        StoryFitItem: {
+            competency: components["schemas"]["Competency"];
+            /**
+             * Story Id
+             * @description Null when no story fits (strength missing).
+             */
+            story_id: string | null;
+            strength: components["schemas"]["StoryFitStrength"];
+            /**
+             * Reason
+             * @description One sentence the plan page shows.
+             */
+            reason: string;
+        };
+        /**
+         * StoryFitStrength
+         * @description ST-5: how well the best story covers one skill the interview will test.
+         * @enum {string}
+         */
+        StoryFitStrength: "strong" | "thin" | "missing";
+        /**
+         * StoryNote
+         * @description ST-6: a fix note sent to the story from a debrief answer that used it.
+         */
+        StoryNote: {
+            /** Text */
+            text: string;
+            /**
+             * Session Id
+             * @description The debrief's session.
+             * @default null
+             */
+            session_id: string | null;
+            /**
+             * Question Ref
+             * @description QuestionScore.question_ref.
+             * @default null
+             */
+            question_ref: string | null;
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+        };
+        /**
+         * StorySource
+         * @description ST-1: where a story came from.
+         * @enum {string}
+         */
+        StorySource: "debrief_answer" | "manual" | "coach";
+        /**
+         * StoryStatus
+         * @description ST-1, ST-7: a story is a draft until a Realistic answer that used it scores 3 or more.
+         * @enum {string}
+         */
+        StoryStatus: "draft" | "proven";
         /** Strength */
         Strength: {
             /** Summary */

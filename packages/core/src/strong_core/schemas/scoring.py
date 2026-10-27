@@ -1,4 +1,4 @@
-"""Scorecard (FB-1, FB-2) and progress snapshots (PR-1)."""
+"""Scorecard (FB-1, FB-2), delivery metrics (DM-1) and progress snapshots (PR-1)."""
 
 from __future__ import annotations
 
@@ -27,6 +27,14 @@ class ValueScore(Contract):
     quotes: list[str] = Field(min_length=1, description="Transcript quotes backing the score.")
 
 
+class DeliveryMetrics(Contract):
+    """DM-1: how one answer was delivered, from turn timestamps and text. No audio is used."""
+
+    words_per_minute: float = Field(ge=0)
+    fillers_per_minute: float = Field(ge=0)
+    duration_seconds: float = Field(ge=0)
+
+
 class QuestionScore(Contract):
     question_ref: str = Field(min_length=1)
     question_text: str = Field(min_length=1)
@@ -34,6 +42,15 @@ class QuestionScore(Contract):
     value_scores: list[ValueScore] = Field(default_factory=list)
     strengths: list[str] = Field(default_factory=list)
     misses: list[str] = Field(default_factory=list)
+    story_id: UUID | None = Field(
+        default=None, description="ST-6: the library story this answer used, if any."
+    )
+    story_fix: str | None = Field(
+        default=None, description="ST-6: the fix for that story, sent to it as a note."
+    )
+    delivery: DeliveryMetrics | None = Field(
+        default=None, description="DM-1: set by the worker after scoring, never by the model."
+    )
 
 
 class Scorecard(Contract):

@@ -52,6 +52,10 @@ from strong_core.schemas.enums import (
     SessionStatus,
     Severity,
     Speaker,
+    StoryFitStrength,
+    StoryPart,
+    StorySource,
+    StoryStatus,
     SubscriptionStatus,
     Tone,
     UsageComponent,
@@ -76,6 +80,7 @@ from strong_core.schemas.profile import (
 from strong_core.schemas.questions import GeneralQuestion, GeneralQuestionBank, QuestionHints
 from strong_core.schemas.scoring import (
     CompetencyScore,
+    DeliveryMetrics,
     ProgressSnapshot,
     QuestionScore,
     Scorecard,
@@ -96,6 +101,13 @@ from strong_core.schemas.session import (
     Turn,
     session_competencies,
     session_duration,
+)
+from strong_core.schemas.stories import (
+    STORY_TITLE_MAX_CHARS,
+    Story,
+    StoryFit,
+    StoryFitItem,
+    StoryNote,
 )
 
 # Models exported to schemas/<name>.schema.json by `python -m strong_core.export_schemas`.
@@ -118,6 +130,8 @@ EXPORTED_SCHEMAS: dict[str, type[BaseModel]] = {
     "progress_snapshot": ProgressSnapshot,
     "general_question_bank": GeneralQuestionBank,
     "auto_profile_summary": AutoProfileSummary,
+    "story": Story,
+    "story_fit": StoryFit,
 }
 
 __all__ = [
@@ -127,6 +141,7 @@ __all__ = [
     "MINI_DURATION_MIN",
     "MINI_MAX_PROBES",
     "STANDARD_INTERVIEW_TYPES",
+    "STORY_TITLE_MAX_CHARS",
     "AnswerCheck",
     "AnswerConduct",
     "AuthProvider",
@@ -146,6 +161,7 @@ __all__ = [
     "CustomQuestion",
     "CustomQuestionCheck",
     "CustomSessionSpec",
+    "DeliveryMetrics",
     "Difficulty",
     "DocumentKind",
     "DraftQuestion",
@@ -202,6 +218,14 @@ __all__ = [
     "Source",
     "Speaker",
     "StandardType",
+    "Story",
+    "StoryFit",
+    "StoryFitItem",
+    "StoryFitStrength",
+    "StoryNote",
+    "StoryPart",
+    "StorySource",
+    "StoryStatus",
     "Strength",
     "SubscriptionStatus",
     "Tone",

@@ -1,0 +1,98 @@
+{
+  "$defs": {
+    "Competency": {
+      "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.",
+      "enum": [
+        "ownership",
+        "impact",
+        "collaboration",
+        "conflict_handling",
+        "learning_from_failure",
+        "communication",
+        "role_fit",
+        "depth_of_experience",
+        "judgment",
+        "motivation",
+        "team_fit",
+        "scope_at_level",
+        "technical_depth",
+        "accuracy",
+        "reasoning",
+        "trade_offs",
+        "clarity_of_explanation",
+        "problem_framing",
+        "structure",
+        "user_and_business_sense",
+        "estimation_logic",
+        "prioritization",
+        "recommendation"
+      ],
+      "title": "Competency",
+      "type": "string"
+    },
+    "StoryFitItem": {
+      "additionalProperties": false,
+      "description": "ST-5: for one skill the interview will test, the best story and how well it fits.",
+      "properties": {
+        "competency": {
+          "$ref": "#/$defs/Competency"
+        },
+        "reason": {
+          "description": "One sentence the plan page shows.",
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "story_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Null when no story fits (strength missing).",
+          "title": "Story Id"
+        },
+        "strength": {
+          "$ref": "#/$defs/StoryFitStrength"
+        }
+      },
+      "required": [
+        "competency",
+        "story_id",
+        "strength",
+        "reason"
+      ],
+      "title": "StoryFitItem",
+      "type": "object"
+    },
+    "StoryFitStrength": {
+      "description": "ST-5: how well the best story covers one skill the interview will test.",
+      "enum": [
+        "strong",
+        "thin",
+        "missing"
+      ],
+      "title": "StoryFitStrength",
+      "type": "string"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/story_fit.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "ST-5: the planner's story fit table, one item per tested skill.",
+  "properties": {
+    "items": {
+      "items": {
+        "$ref": "#/$defs/StoryFitItem"
+      },
+      "title": "Items",
+      "type": "array"
+    }
+  },
+  "title": "StoryFit",
+  "type": "object"
+}
