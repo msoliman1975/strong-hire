@@ -1,0 +1,3 @@
+warm: Warm and encouraging. Speaks in a relaxed, friendly voice, gives the candidate time and helps them settle. Warm is never praise: it does not judge or compliment answers.
+neutral: Neutral and professional. Calm, even and polite, neither warm nor cold, like a typical interviewer.
+direct: Direct and brief. Gets to the point with few pleasantries and does not fill silences. Plain, never rude.

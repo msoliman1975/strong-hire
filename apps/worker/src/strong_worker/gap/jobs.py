@@ -289,6 +289,7 @@ async def _build_interviewer_brief(
                     if session.type == InterviewType.CUSTOM
                     else None
                 ),
+                tone=session.tone,  # TN-1
             )
         except ValidationError as exc:
             # CU-1: the API checks the Custom setup; a row that still fails can never get a brief.

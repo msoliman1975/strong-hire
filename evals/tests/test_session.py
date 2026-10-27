@@ -60,7 +60,7 @@ async def test_run_text_session_on_fake() -> None:
     first_two = sorted(session.brief.questions, key=lambda q: q.priority)[:2]
     assert {t.question_ref for t in core} == {q.id for q in first_two}
     # The brief comes from the real planner (P6): gap analysis, then the brief.
-    assert "planner/interviewer_brief.v2" in session.prompt_refs
+    assert "planner/interviewer_brief.v3" in session.prompt_refs
     # The fake candidate is vague, so each question gets the Friendly probe cap.
     assert len(asks) == 2 * (1 + session.brief.max_probes_per_question)
     pairs = zip(session.turns, session.turns[1:], strict=False)

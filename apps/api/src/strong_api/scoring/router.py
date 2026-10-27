@@ -158,6 +158,7 @@ def _config(session: InterviewSession, target: JobTarget | None) -> SessionConfi
         "duration_min": session_duration(session.duration_min),
         "level": (target.level if target and target.level else Level.MID),
         "custom": _custom(session),  # CU-1: a Custom session's setup
+        "tone": session.tone,  # TN-1
     }
     try:
         return SessionConfig.model_validate(values)

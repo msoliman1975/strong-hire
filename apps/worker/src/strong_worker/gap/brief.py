@@ -10,6 +10,9 @@ brief follows the rules even with a weak model:
   company weight, then by the weakest gap analysis score
 - target values: the highest-weighted company values (none in generic mode)
 - persona: the profile persona (or the generic one), adjusted for difficulty
+- tone (TN-1 to TN-3): `as_company` keeps the persona's tone; Warm, Neutral and Direct (and
+  `as_company` in generic mode) use a fixed line from prompts/planner/interviewer_brief_tones.
+  The planner never sees the tone, so the questions and probes do not depend on it
 - seniority bar: the profile's bar for the level, else a generic bar (IV-6)
 - probe limit, pushback and curveball by difficulty (IV-3, IV-4); coach help by mode (IV-8)
 - time plan per phase (IV-7), and a size limit so the live loop stays fast
@@ -69,6 +72,7 @@ from strong_core.schemas import (
     Resume,
     SessionConfig,
     Severity,
+    Tone,
     session_competencies,
 )
 from strong_core.schemas.session import FULL_MIN_COMPETENCIES
@@ -81,6 +85,7 @@ PROMPT = "interviewer_brief"
 PROMPT_INPUT = "interviewer_brief_input"
 PROMPT_CUSTOM = "interviewer_brief_custom"
 PROMPT_CUSTOM_INPUT = "interviewer_brief_custom_input"
+PROMPT_TONES = "interviewer_brief_tones"
 ATTEMPTS = 2
 MAX_BRIEF_TOKENS = 1500
 CHARS_PER_TOKEN = 4  # rough and conservative for English JSON
@@ -238,7 +243,43 @@ def seniority_bar(config: SessionConfig, posting: JobPosting, profile: ResolvedP
     return GENERIC_BARS[config.level]
 
 
+def effective_tone(config: SessionConfig, profile: ResolvedProfile) -> Tone:
+    """The tone the interviewer uses (TN-1). `as_company` in generic mode is Neutral (TN-3)."""
+    if config.tone == Tone.AS_COMPANY and profile.generic:
+        return Tone.NEUTRAL
+    return config.tone
+
+
+def fixed_tones() -> tuple[dict[Tone, str], str]:
+    """The fixed tone lines (`<tone>: <description>`, one per line) and their prompt ref."""
+    prompt = load_prompt(Role.PLANNER, PROMPT_TONES, tier=None)
+    lines: dict[Tone, str] = {}
+    for line in prompt.render().splitlines():
+        key, sep, text = line.partition(":")
+        if sep and key.strip() in {t.value for t in Tone}:
+            lines[Tone(key.strip())] = text.strip()
+    missing = set(Tone) - {Tone.AS_COMPANY} - set(lines)
+    if missing:
+        raise BriefError(f"{prompt.ref} has no line for {sorted(t.value for t in missing)}")
+    return lines, prompt.ref
+
+
+def tone_line(config: SessionConfig, profile: ResolvedProfile) -> tuple[str, str | None]:
+    """The persona's tone line and, for a fixed tone, the prompt ref it came from.
+
+    `as_company` with a profile keeps the v1 line: the persona's tone and the difficulty's.
+    A fixed tone replaces the whole line, so difficulty does not change how it sounds (TN-2).
+    """
+    tone = effective_tone(config, profile)
+    if tone == Tone.AS_COMPANY:
+        return f"{profile.persona.tone}. {TONE_BY_DIFFICULTY[config.difficulty]}"[:300], None
+    lines, ref = fixed_tones()
+    return lines[tone][:300], ref
+
+
 def persona(config: SessionConfig, profile: ResolvedProfile) -> PersonaBrief:
+    """Tone from the chosen tone (TN-1); pushback by difficulty (IV-4, TN-2); the rest of the
+    persona from the profile."""
     notes = profile.persona
     pushback = {
         Difficulty.FRIENDLY: PUSHBACK_FRIENDLY,
@@ -246,7 +287,7 @@ def persona(config: SessionConfig, profile: ResolvedProfile) -> PersonaBrief:
         Difficulty.TOUGH: f"{notes.pushback_style} {PUSHBACK_TOUGH}",
     }[config.difficulty]
     return PersonaBrief(
-        tone=f"{notes.tone}. {TONE_BY_DIFFICULTY[config.difficulty]}"[:300],
+        tone=tone_line(config, profile)[0],
         pushback_style=pushback[:300],
         closing_style=notes.closing_style[:300],
     )
@@ -406,7 +447,9 @@ async def build_brief(
             errors.append(f"attempt {attempt}: {type(exc).__name__}: {exc}"[:300])
             log.warning("planner brief call failed (%s), attempt %d", type(exc).__name__, attempt)
             continue
-        version = f"{done.model} {' '.join(done.prompt_refs)}".strip()[:200]
+        tone_ref = tone_line(config, profile)[1]
+        refs = [*done.prompt_refs, *([tone_ref] if tone_ref else [])]
+        version = f"{done.model} {' '.join(refs)}".strip()[:200]
         return BuiltBrief(brief, version, brief_tokens(brief), flags)
     raise BriefError(f"Brief failed after {ATTEMPTS} attempts: " + " | ".join(errors))
 

@@ -369,7 +369,7 @@ async def test_cu12_build_brief_with_the_fake_planner(
     brief = built.brief
     check_common(brief)
     assert brief.coach_help and brief.profile_version == 3 and brief.company_name
-    assert built.model_version.startswith("fake-planner planner/interviewer_brief_custom.v1")
+    assert built.model_version.startswith("fake-planner planner/interviewer_brief_custom.v2")
     assert brief.probe_areas
 
 

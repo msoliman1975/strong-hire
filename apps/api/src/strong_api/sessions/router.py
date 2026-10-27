@@ -260,6 +260,7 @@ async def create_session(
         channel=body.channel,
         model_profile=get_gateway().profile,
         custom_json=config.custom.model_dump(mode="json") if config.custom else None,
+        tone=config.tone,  # TN-1: as_company when an old client sends none
     )
     db.add(session)
     await db.commit()

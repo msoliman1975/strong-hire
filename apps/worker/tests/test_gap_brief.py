@@ -95,7 +95,7 @@ async def test_brief_has_the_required_parts(gateway: ModelGateway, gap: GapAnaly
     assert brief.seniority_bar == GENERIC_BARS[Level.SENIOR]
     assert [p.phase for p in brief.time_plan] == list(Phase)
     assert sum(p.minutes for p in brief.time_plan) == 30
-    assert built.model_version.startswith("fake-planner planner/interviewer_brief.v2")
+    assert built.model_version.startswith("fake-planner planner/interviewer_brief.v3")
 
 
 def test_brief_stays_under_the_token_limit() -> None:
@@ -142,7 +142,13 @@ def test_briefs_differ_by_difficulty() -> None:
     assert (friendly.pushback, realistic.pushback, tough.pushback) == (False, False, True)
     assert friendly.curveball is None and realistic.curveball is None
     assert tough.curveball == draft().curveball
-    assert len({friendly.persona.tone, realistic.persona.tone, tough.persona.tone}) == 3
+    # With a company profile and "As the company", the tone line follows the difficulty. In
+    # generic mode it is Neutral at every difficulty (TN-3).
+    tones = {
+        assemble(draft(), config(difficulty=d), POSTING, company(), None)[0].persona.tone
+        for d in Difficulty
+    }
+    assert len(tones) == 3
     assert "simpler option" in tough.persona.pushback_style
     assert "does not challenge" in friendly.persona.pushback_style
     # The questions, competencies and time plan stay the same.
