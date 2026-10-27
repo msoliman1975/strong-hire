@@ -1714,6 +1714,50 @@
         }
       }
     },
+    "/sessions/{session_id}/transcript": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Get Transcript",
+        "description": "TR-1: the transcript of the signed-in user's finished session. 404 for anyone else.",
+        "operationId": "get_transcript_sessions__session_id__transcript_get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transcript"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/questions/companies": {
       "get": {
         "tags": [
@@ -20696,6 +20740,136 @@
         ],
         "title": "Tone",
         "description": "TN-1: how the interviewer sounds. `as_company` uses the company profile's persona tone,\nor a neutral tone in generic mode. Old sessions read as `as_company`."
+      },
+      "Transcript": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Id"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "ended_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ended At"
+          },
+          "groups": {
+            "items": {
+              "$ref": "#/components/schemas/TranscriptGroup"
+            },
+            "type": "array",
+            "title": "Groups"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "session_id",
+          "started_at",
+          "ended_at",
+          "groups"
+        ],
+        "title": "Transcript"
+      },
+      "TranscriptGroup": {
+        "properties": {
+          "question_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Ref",
+            "description": "The brief question id, None outside questions."
+          },
+          "question_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Text",
+            "description": "The question as planned, when known."
+          },
+          "phase": {
+            "$ref": "#/components/schemas/Phase",
+            "description": "The phase of the group's first turn."
+          },
+          "turns": {
+            "items": {
+              "$ref": "#/components/schemas/TranscriptTurn"
+            },
+            "type": "array",
+            "title": "Turns"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "question_ref",
+          "question_text",
+          "phase",
+          "turns"
+        ],
+        "title": "TranscriptGroup",
+        "description": "Consecutive turns about one question, or about one phase when there is no question."
+      },
+      "TranscriptTurn": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "speaker": {
+            "$ref": "#/components/schemas/Speaker"
+          },
+          "phase": {
+            "$ref": "#/components/schemas/Phase"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "start_ms": {
+            "type": "integer",
+            "title": "Start Ms",
+            "description": "Time offset from the session start, in milliseconds."
+          },
+          "end_ms": {
+            "type": "integer",
+            "title": "End Ms"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "speaker",
+          "phase",
+          "text",
+          "start_ms",
+          "end_ms"
+        ],
+        "title": "TranscriptTurn"
       },
       "TransitionIn": {
         "properties": {

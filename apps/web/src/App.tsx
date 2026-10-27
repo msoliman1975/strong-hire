@@ -28,6 +28,7 @@ import { SessionSetupPage } from "./pages/SessionSetupPage";
 import { SignInPage } from "./pages/SignInPage";
 import { SignupPage } from "./pages/SignupPage";
 import { WaitlistConfirmPage, WaitlistPage } from "./pages/WaitlistPage";
+import { TranscriptPage } from "./pages/transcript/TranscriptPage";
 import { LiveSessionPage } from "./session/LiveSessionPage";
 
 // Dev builds only: a text interview against the real API (P7). Production builds drop it.
@@ -77,6 +78,7 @@ export function AppRoutes() {
           <Route path="/jobs/:jobId/sessions/new" element={<SessionSetupPage />} />
           <Route path="/sessions/:sessionId/live" element={<LiveSessionPage />} />
           <Route path="/sessions/:sessionId/debrief" element={<DebriefPage />} />
+          <Route path="/sessions/:sessionId/transcript" element={<TranscriptPage />} />
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/questions" element={<QuestionsPage />} />
           <Route path="/questions/mine" element={<MyQuestionsPage />} />

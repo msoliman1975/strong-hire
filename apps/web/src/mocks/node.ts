@@ -5,6 +5,7 @@ import { customHandlers } from "./custom";
 import { createStore } from "./db";
 import { accountHandlers, authHandlers, inputHandlers, sessionHandlers, scoringHandlers } from "./handlers";
 import { questionHandlers } from "./questionHandlers";
+import { transcriptHandlers } from "./transcriptHandlers";
 import { waitlistHandlers } from "./waitlistHandlers";
 
 export const mockStore = createStore({ persist: false, delayMs: 0 });
@@ -17,4 +18,5 @@ export const server = setupServer(
   ...customHandlers(mockStore),
   ...questionHandlers(),
   ...waitlistHandlers(),
+  ...transcriptHandlers(),
 );
