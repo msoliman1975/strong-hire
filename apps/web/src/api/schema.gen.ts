@@ -2448,6 +2448,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/waitlist/invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Invite Waitlist */
+        post: operations["invite_waitlist_admin_waitlist_invite_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/public/waitlist": {
         parameters: {
             query?: never;
@@ -4965,6 +4982,34 @@ export interface components {
              * @description Minutes per phase. When set, the minutes add up to session.duration_min.
              */
             time_plan?: components["schemas"]["PhaseTime"][];
+        };
+        /** InviteIn */
+        InviteIn: {
+            /**
+             * Reason
+             * @description Why, for the audit log
+             */
+            reason: string;
+            /** Ids */
+            ids: string[];
+        };
+        /** InviteOut */
+        InviteOut: {
+            /**
+             * Sent
+             * @description Emails that got the invite
+             */
+            sent: string[];
+            /**
+             * Skipped
+             * @description Not confirmed yet, so not invited
+             */
+            skipped: string[];
+            /**
+             * Failed
+             * @description The email could not be sent; try again later
+             */
+            failed: string[];
         };
         /**
          * JobContext
@@ -12021,6 +12066,41 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    invite_waitlist_admin_waitlist_invite_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Admin-Request"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InviteIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InviteOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
             };
         };
     };

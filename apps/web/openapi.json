@@ -6756,6 +6756,65 @@
         }
       }
     },
+    "/admin/waitlist/invite": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Invite Waitlist",
+        "operationId": "invite_waitlist_admin_waitlist_invite_post",
+        "parameters": [
+          {
+            "name": "X-Admin-Request",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Request"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InviteOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/public/waitlist": {
       "post": {
         "tags": [
@@ -13056,6 +13115,69 @@
         ],
         "title": "InterviewerBrief",
         "type": "object"
+      },
+      "InviteIn": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason",
+            "description": "Why, for the audit log"
+          },
+          "ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "maxItems": 500,
+            "minItems": 1,
+            "title": "Ids"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reason",
+          "ids"
+        ],
+        "title": "InviteIn"
+      },
+      "InviteOut": {
+        "properties": {
+          "sent": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Sent",
+            "description": "Emails that got the invite"
+          },
+          "skipped": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Skipped",
+            "description": "Not confirmed yet, so not invited"
+          },
+          "failed": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Failed",
+            "description": "The email could not be sent; try again later"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sent",
+          "skipped",
+          "failed"
+        ],
+        "title": "InviteOut"
       },
       "JobContext": {
         "properties": {

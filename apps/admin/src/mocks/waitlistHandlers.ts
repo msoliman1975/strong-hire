@@ -1,10 +1,12 @@
-/** MSW handler for the admin Waitlist page (L04), with the shapes in openapi.json. */
+/**
+ * MSW handlers for the admin Waitlist page (L04), with the shapes in openapi.json. Invites need
+ * `X-Admin-Request: 1` and a reason, go only to confirmed entries and set `invited_at`.
+ */
 import { http, HttpResponse } from "msw/http";
 
-import type { AdminWaitlist } from "../api/waitlist";
+import type { AdminWaitlist, InviteResult } from "../api/waitlist";
 import { currentAdmin, API } from "./handlers";
 import type { MockStore } from "./db";
-
 export const MOCK_WAITLIST: AdminWaitlist = {
   total: 2,
   confirmed: 1,
@@ -36,9 +38,40 @@ export const MOCK_WAITLIST: AdminWaitlist = {
 };
 
 export function waitlistHandlers(store: MockStore) {
+  let waitlist: AdminWaitlist = structuredClone(MOCK_WAITLIST);
+  let seen = store.db;
+  /** A store reset gives a fresh database: start the waitlist over with it. */
+  const current = () => {
+    if (seen !== store.db) {
+      seen = store.db;
+      waitlist = structuredClone(MOCK_WAITLIST);
+    }
+    return waitlist;
+  };
+  const notFound = () => HttpResponse.json({ detail: "Not Found" }, { status: 404 });
+
   return [
-    http.get(`${API}/admin/waitlist`, () =>
-      currentAdmin(store.db) ? HttpResponse.json(MOCK_WAITLIST) : HttpResponse.json({ detail: "Not Found" }, { status: 404 }),
-    ),
+    http.get(`${API}/admin/waitlist`, () => (currentAdmin(store.db) ? HttpResponse.json(current()) : notFound())),
+    http.post(`${API}/admin/waitlist/invite`, async ({ request }) => {
+      if (!currentAdmin(store.db)) return notFound();
+      if (request.headers.get("X-Admin-Request") !== "1") {
+        return HttpResponse.json({ detail: "X-Admin-Request: 1 is required" }, { status: 403 });
+      }
+      const body = (await request.json()) as { ids: string[]; reason: string };
+      if (!body.reason || body.reason.trim().length < 3) {
+        return HttpResponse.json({ detail: "reason is required" }, { status: 422 });
+      }
+      const now = new Date().toISOString();
+      const result: InviteResult = { sent: [], skipped: [], failed: [] };
+      for (const e of current().entries.filter((x) => body.ids.includes(x.id))) {
+        if (e.confirmed_at) {
+          e.invited_at = now;
+          result.sent.push(e.email);
+        } else {
+          result.skipped.push(e.email);
+        }
+      }
+      return HttpResponse.json(result);
+    }),
   ];
 }
