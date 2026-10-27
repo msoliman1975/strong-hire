@@ -1,0 +1,7 @@
+Write the company summary from the company name and pages in the following block.
+
+<untrusted_input>
+Company: $company
+
+$pages
+</untrusted_input>
