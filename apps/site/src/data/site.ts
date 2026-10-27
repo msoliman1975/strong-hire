@@ -9,7 +9,7 @@ export const APP_URL = (import.meta.env.PUBLIC_APP_URL ?? "https://app.getstrong
 export const CTA: "waitlist" | "signup" = import.meta.env.PUBLIC_CTA === "signup" ? "signup" : "waitlist";
 
 export const SUPPORT_EMAIL = "support@getstronghire.com";
-export const PRIVACY_EMAIL = "privacy@getstronghire.com";
+export const PRIVACY_EMAIL = "management@getstronghire.com";
 
 /**
  * Q3: company names appear as plain text only, in this one list, always next to the notice.
