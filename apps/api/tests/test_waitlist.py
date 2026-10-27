@@ -13,7 +13,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from strong_api.auth.magic_links import MagicLinks, MemoryUsedTokenStore
 from strong_api.public import WAITLIST_LINK_SALT, JoinLimiter, Waitlist
-from strong_core.db.models import AdminUser, WaitlistEntry
+from strong_core import runtime_settings as rs
+from strong_core.db.models import AdminUser, AuditLog, WaitlistEntry
 
 from .conftest import make_admin
 
@@ -195,3 +196,76 @@ async def test_l04_each_active_admin_is_emailed_about_a_new_entry(
     before = len(sender.mail)
     await anon_client.post("/public/waitlist", json={**JOIN, "interview_within": "month"})
     assert not [m for m in sender.mail[before:] if m[1].startswith("Waitlist: ")]
+
+
+WRITE = {"X-Admin-Request": "1"}
+
+
+async def _ids(maker: async_sessionmaker[AsyncSession]) -> dict[str, str]:
+    async with maker() as db:
+        return {e.email: str(e.id) for e in await db.scalars(select(WaitlistEntry))}
+
+
+async def test_l04_admin_invites_the_chosen_confirmed_entries(
+    anon_client: httpx.AsyncClient,
+    admin_client: httpx.AsyncClient,
+    sender: RecordingSender,
+    sessionmaker: async_sessionmaker[AsyncSession],
+) -> None:
+    """L04: an admin picks entries and each confirmed one gets its own "ready for you" email
+    with the sign-in link; unconfirmed ones are skipped. invited_at and the audit log record it."""
+    await anon_client.post("/public/waitlist", json=JOIN)
+    await anon_client.post("/public/waitlist/confirm", json={"token": _token(sender)})
+    await anon_client.post(
+        "/public/waitlist", json={"email": "bo@example.com", "interview_within": "not_yet"}
+    )
+    await anon_client.post(
+        "/public/waitlist", json={"email": "cy@example.com", "interview_within": "month"}
+    )
+    ids = await _ids(sessionmaker)
+    body = {"ids": [ids["ada@example.com"], ids["bo@example.com"]], "reason": "first wave"}
+
+    assert (await admin_client.post("/admin/waitlist/invite", json=body)).status_code == 403
+    before = len(sender.mail)
+    r = await admin_client.post("/admin/waitlist/invite", json=body, headers=WRITE)
+    assert r.status_code == 200, r.text
+    assert r.json() == {"sent": ["ada@example.com"], "skipped": ["bo@example.com"], "failed": []}
+
+    invites = sender.mail[before:]
+    assert [m[0] for m in invites] == ["ada@example.com"]
+    _, subject, text = invites[0]
+    assert subject == "Strong Hire is ready for you"
+    assert "https://example.test/signin?utm_source=waitlist" in text
+
+    listed = {e["email"]: e for e in (await admin_client.get("/admin/waitlist")).json()["entries"]}
+    assert listed["ada@example.com"]["invited_at"] is not None
+    assert listed["bo@example.com"]["invited_at"] is None
+    assert listed["cy@example.com"]["invited_at"] is None
+
+    async with sessionmaker() as db:
+        row = await db.scalar(select(AuditLog).where(AuditLog.action == "waitlist.invite"))
+    assert row is not None and row.actor == "boss@example.com"
+    assert row.details_json["reason"] == "first wave"
+    assert row.details_json["sent"] == ["ada@example.com"]
+
+
+async def test_l04_invites_wait_for_open_sign_ups_and_need_an_admin(
+    anon_client: httpx.AsyncClient,
+    admin_client: httpx.AsyncClient,
+    sender: RecordingSender,
+    sessionmaker: async_sessionmaker[AsyncSession],
+) -> None:
+    """L04, OC-1: no invite goes out while sign-ups are paused; non-admins get 404."""
+    await anon_client.post("/public/waitlist", json=JOIN)
+    await anon_client.post("/public/waitlist/confirm", json={"token": _token(sender)})
+    body = {"ids": list((await _ids(sessionmaker)).values()), "reason": "first wave"}
+    async with sessionmaker() as db:
+        await rs.set(db, "signups_paused", True, actor="test@example.com")
+        await db.commit()
+
+    before = len(sender.mail)
+    r = await admin_client.post("/admin/waitlist/invite", json=body, headers=WRITE)
+    assert r.status_code == 409
+    assert len(sender.mail) == before
+    anon = await anon_client.post("/admin/waitlist/invite", json=body, headers=WRITE)
+    assert anon.status_code == 404

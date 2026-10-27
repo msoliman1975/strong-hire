@@ -1,8 +1,9 @@
 /** L04: the admin Waitlist page against the mock API. */
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { AppRoutes, createQueryClient } from "../App";
 import { mockSignIn } from "../mocks/handlers";
@@ -46,5 +47,28 @@ describe("Waitlist (L04)", () => {
       expect.stringMatching(/\/api\/admin\/waitlist\.csv$/),
     );
     expect(screen.getByRole("link", { name: "Waitlist" })).toHaveAttribute("href", "/waitlist");
+  });
+
+  it("L04: invites the chosen confirmed entries, with a reason", async () => {
+    const user = userEvent.setup();
+    renderAt("/waitlist");
+    const table = await screen.findByRole("table", { name: "Waitlist entries" });
+    expect(within(table).getByLabelText("Select bo@example.com")).toBeDisabled(); // not confirmed
+    const invite = screen.getByRole("button", { name: "Invite selected" });
+    expect(invite).toBeDisabled();
+
+    await user.click(within(table).getByLabelText("Select ada@example.com"));
+    await user.click(screen.getByRole("button", { name: "Invite 1 selected" }));
+    const dialog = screen.getByRole("dialog", { name: "Invite to sign up" });
+    expect(dialog).toHaveTextContent("ada@example.com");
+    const send = within(dialog).getByRole("button", { name: "Send 1 invite" });
+    expect(send).toBeDisabled();
+    await user.type(within(dialog).getByLabelText("Reason (saved in the audit log)"), "First wave");
+    await user.click(send);
+
+    expect(await screen.findByText("Sent 1 invite.")).toBeInTheDocument();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    const ada = (await screen.findByRole("table", { name: "Waitlist entries" })).querySelector("tbody tr")!;
+    await vi.waitFor(() => expect(ada.children[5]).not.toHaveTextContent("No"));
   });
 });
