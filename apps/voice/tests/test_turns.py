@@ -152,6 +152,74 @@ async def test_held_words_are_answered_when_no_next_turn_comes() -> None:
     assert said == ["reply to: I owned the rollout."]
 
 
+class FakeSTT:
+    """A transcriber that stays busy until `finish()` (a slow STT on the last segment)."""
+
+    def __init__(self, *, busy: bool) -> None:
+        self._idle = asyncio.Event()
+        if not busy:
+            self._idle.set()
+        self.settles = 0
+
+    @property
+    def busy(self) -> bool:
+        return not self._idle.is_set()
+
+    def finish(self) -> None:
+        self._idle.set()
+
+    async def settled(self, quiet_s: float = 0.25, timeout_s: float = 15.0) -> bool:
+        await self._idle.wait()
+        self.settles += 1
+        return True
+
+
+async def test_iv1_reply_waits_for_the_rest_of_the_answer_from_a_slow_stt() -> None:
+    """Session 5ff84450: the turn ended while the STT was still transcribing the rest of the
+    answer, so the interviewer replied to the first sentence and then to the rest as a new turn.
+    Now the reply waits, and the whole answer gets one reply."""
+    interview = FakeInterview()
+    stt = FakeSTT(busy=True)
+    turns, said = make_turns(interview)
+    turns.stt, turns.late_wait_s = stt, 0.05
+
+    await turns.on_turn("When we wrapped up the rollout, I had to present it to our VP.", 40.0)
+    await asyncio.sleep(0.02)
+    assert said == [] and interview.calls == [] and turns.waited_for_stt == 1
+
+    stt.finish()  # the rest arrives as the next turn
+    await turns.on_turn("I framed it around conversion lift, and we got approval to expand.", 0.0)
+    merged = (
+        "When we wrapped up the rollout, I had to present it to our VP. "
+        "I framed it around conversion lift, and we got approval to expand."
+    )
+    assert interview.calls == [merged]
+    await asyncio.sleep(0.1)
+    assert said == [f"reply to: {merged}"]  # one reply, not a second one from the timer
+
+
+async def test_iv1_held_words_are_answered_when_the_late_transcript_is_empty() -> None:
+    """The busy segment was noise (empty text, so no next turn): the words still get a reply."""
+    interview = FakeInterview()
+    stt = FakeSTT(busy=True)
+    turns, said = make_turns(interview)
+    turns.stt, turns.late_wait_s = stt, 0.01
+
+    await turns.on_turn("I owned the rollout.", 2.0)
+    assert said == []
+    stt.finish()
+    await asyncio.sleep(0.1)
+    assert said == ["reply to: I owned the rollout."] and stt.settles == 1
+
+
+async def test_iv1_no_wait_when_the_stt_is_idle() -> None:
+    interview = FakeInterview()
+    turns, said = make_turns(interview)
+    turns.stt = FakeSTT(busy=False)
+    await turns.on_turn("I led the migration.", 3.0)
+    assert said == ["reply to: I led the migration."] and turns.waited_for_stt == 0
+
+
 async def test_thinking_request_gets_one_line_then_one_check_in() -> None:
     interview = FakeInterview()
     turns, said = make_turns(interview, think=0.01)

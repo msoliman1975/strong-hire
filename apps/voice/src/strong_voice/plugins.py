@@ -4,7 +4,9 @@ The voice agent never talks to a model server directly. Each adapter asks the ga
 role (stt, interviewer, tts), so MODEL_PROFILE alone decides which models answer.
 
 - GatewaySTT is non-streaming. AgentSession wraps it in a StreamAdapter, so Silero VAD cuts the
-  audio and only the final speech segment goes to the gateway.
+  audio and each speech segment goes to the gateway, one after another. On a slow STT the last
+  segments of a long answer can still be in transcription when LiveKit ends the turn, so
+  GatewaySTT tells the agent when it is busy (`busy`, `settled`) and the reply waits for them.
 - GatewayLLM streams the interviewer role's text deltas.
 - GatewayTTS streams. It splits the text into phrases as it arrives (split_phrases) and renders
   them one after another, so the first phrase plays while the next ones render. The first phrase
@@ -82,6 +84,24 @@ class GatewaySTT(stt.STT[None]):
         super().__init__(capabilities=stt.STTCapabilities(streaming=False, interim_results=False))
         self._gw = gateway
         self._on_recognized = on_recognized
+        self._running = 0
+        self._idle_since = time.perf_counter()
+
+    @property
+    def busy(self) -> bool:
+        """True while a speech segment is being transcribed."""
+        return self._running > 0
+
+    async def settled(self, quiet_s: float = 0.25, timeout_s: float = 15.0) -> bool:
+        """Wait until no segment has been in transcription for `quiet_s`. The StreamAdapter
+        starts the next queued segment as soon as one ends, so a short quiet gap means the
+        queue is empty. False on timeout."""
+        deadline = time.perf_counter() + timeout_s
+        while self._running or time.perf_counter() - self._idle_since < quiet_s:
+            if time.perf_counter() >= deadline:
+                return False
+            await asyncio.sleep(0.05)
+        return True
 
     @property
     def model(self) -> str:
@@ -100,7 +120,12 @@ class GatewaySTT(stt.STT[None]):
     ) -> stt.SpeechEvent:
         wav = rtc.combine_audio_frames(buffer).to_wav_bytes()
         start = time.perf_counter()
-        text = await self._gw.transcribe(wav)
+        self._running += 1
+        try:
+            text = await self._gw.transcribe(wav)
+        finally:
+            self._running -= 1
+            self._idle_since = time.perf_counter()
         if self._on_recognized is not None:
             self._on_recognized(time.perf_counter() - start)
         lang = self._gw.capabilities(Role.STT).options.get("language", "en")

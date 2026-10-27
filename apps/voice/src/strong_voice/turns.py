@@ -97,6 +97,15 @@ class Interview(Protocol):
     async def end_prep(self, *, timed_out: bool = False, say: bool = True) -> list[str]: ...
 
 
+class Transcriber(Protocol):
+    """The part of GatewaySTT that CandidateTurns uses."""
+
+    @property
+    def busy(self) -> bool: ...
+
+    async def settled(self, quiet_s: float = 0.25, timeout_s: float = 15.0) -> bool: ...
+
+
 Speak = Callable[[list[str]], Awaitable[None]]
 
 
@@ -112,6 +121,9 @@ class CandidateTurns:
     - "Give me a moment" gets one short line. After `thinking_wait_s` of silence the interviewer
       checks in once.
     - "Give me 3 minutes" (or the prep button) starts prep time with its own timer (IV-11).
+    - When the turn ends while the STT is still transcribing the end of the answer, the reply
+      waits. The rest of the answer comes as the next turn and both parts are answered
+      together (session 5ff84450: the interviewer had heard one sentence of each answer).
     """
 
     def __init__(
@@ -122,9 +134,13 @@ class CandidateTurns:
         thinking_wait_s: float,
         resume_wait_s: float,
         minute_s: float = 60.0,
+        stt: Transcriber | None = None,
+        late_wait_s: float = 0.5,
     ) -> None:
         self.interview = interview
         self._speak = speak
+        self.stt = stt
+        self.late_wait_s = late_wait_s  # after the STT settles, for the late words' turn
         self.thinking_wait_s = thinking_wait_s
         self.resume_wait_s = resume_wait_s
         self.minute_s = minute_s  # tests make a prep minute short
@@ -136,19 +152,29 @@ class CandidateTurns:
         self._think_timer: asyncio.Task[None] | None = None
         self._resume_timer: asyncio.Task[None] | None = None
         self._prep_timer: asyncio.Task[None] | None = None
+        self._late_timer: asyncio.Task[None] | None = None
         self.taken_back = 0  # replies taken back, for logs and tests
+        self.waited_for_stt = 0  # replies held for a late transcript, for logs and tests
 
     async def on_turn(self, text: str, spoken_s: float | None = None) -> None:
         self._cancel_resume()
+        self._cancel_late()
         if text.strip():
             self.pending.append(text.strip())
             self._pending_s += spoken_s or 0.0
+        if self.stt is not None and self.stt.busy and self.pending:
+            # The end of the answer is still in transcription: it arrives as another turn.
+            self.waited_for_stt += 1
+            log.info("turn ended while the STT is busy; reply waits for the rest")
+            self._late_timer = asyncio.create_task(self._answer_after_stt())
+            return
         await self._reply()
 
     def on_user_state(self, state: str) -> None:
         if state == "speaking":
             self._cancel_think()
             self._cancel_resume()
+            self._cancel_late()
             if self._preparing:
                 self._spoke_again = True
         elif state == "listening" and self.pending and not self._preparing:
@@ -159,6 +185,7 @@ class CandidateTurns:
         self._cancel_think()
         self._cancel_resume()
         self._cancel_prep()
+        self._cancel_late()
 
     async def start_prep(
         self, minutes: int, text: str | None = None, spoken_s: float | None = None
@@ -236,6 +263,14 @@ class CandidateTurns:
             self._clear()
         await self._speak(result)
 
+    async def _answer_after_stt(self) -> None:
+        """No late turn came once the STT settled (its text was empty): answer what we have."""
+        assert self.stt is not None
+        if not await self.stt.settled():
+            log.warning("STT still busy after the wait; answering the words we have")
+        await asyncio.sleep(self.late_wait_s)
+        await self._reply()
+
     async def _answer_held(self) -> None:
         await asyncio.sleep(self.resume_wait_s)
         await self._reply()
@@ -269,6 +304,15 @@ class CandidateTurns:
         ):
             self._prep_timer.cancel()
         self._prep_timer = None
+
+    def _cancel_late(self) -> None:
+        if (
+            self._late_timer is not None
+            and not self._late_timer.done()
+            and self._late_timer is not asyncio.current_task()
+        ):
+            self._late_timer.cancel()
+        self._late_timer = None
 
     def _cancel_resume(self) -> None:
         if self._resume_timer is not None and not self._resume_timer.done():
