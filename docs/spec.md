@@ -1,6 +1,8 @@
-# Strong Hire: Product & Technical Spec v1
+# Strong Hire: Product & Technical Spec v1 and v2.0
 
-Updated Oct 5, 2026 · Mo Soliman
+Updated Oct 27, 2026 · Mo Soliman
+
+v1 launches on December 14, 2026. v2.0 follows as one release, planned for June 2027, built in three parts (Part 1: Journey B reshaped, Part 2: story library, Part 3: AI coach). Text marked "v2" describes v2.0; everything else describes v1 as it ships. The build plan for v2.0 is `docs/v2/execution-plan.md`; its decisions and risks are in the [v2 plan doc](https://claude.ai/artifact/BSjZFLreXzRgqapKdqz87V), and its UX in the [App UX canvas](https://claude.ai/artifact/VspB7PtbLJzFMkrEjaRrKj).
 
 ## Overview
 
@@ -31,7 +33,7 @@ v1 is deliberately narrow: tech roles, 20 curated companies plus a generic mode,
 | Area | v1 (Dec 2026) | Later releases | Out of scope |
 | --- | --- | --- | --- |
 | Platform | Desktop web app | Native iOS and Android | Mobile web as a primary target |
-| Modality | Real-time voice, with an animated 3D interviewer avatar drawn in the browser (IV-10) | Photo-real AI interviewer video avatar (v2) | Candidate video, posture or eye contact analysis |
+| Modality | Real-time voice, with an animated 3D interviewer avatar drawn in the browser (IV-10) | Photo-real AI interviewer video avatar (after v2.0) | Candidate video, posture or eye contact analysis |
 | Roles | Tech only: SWE, data/ML, PM, design, TPM | Adjacent corporate roles | Non-tech roles |
 | Companies | 20 curated profiles researched offline and imported, generic mode for others | Auto-profiles for other companies at job setup, more curated profiles, community interview reports | |
 | Interview types | Behavioral, hiring manager deep dive, verbal technical Q&A, case (product sense, estimation, system thinking) | Recruiter screen, panel with multiple personas | Live coding, whiteboard, written system design |
@@ -41,6 +43,25 @@ v1 is deliberately narrow: tech roles, 20 curated companies plus a generic mode,
 | Markets | US and Canada, English | Other languages (Arabic is a candidate) | |
 
 The 21 launch companies: Google, Amazon, Microsoft, Meta, Apple, Netflix, Nvidia, Salesforce, Uber, Stripe, OpenAI, Anthropic, Airbnb, Shopify, LinkedIn, Oracle, Adobe, Databricks, Snowflake, Atlassian, Walmart. eBay was dropped from the list to avoid a conflict with your current employer; Atlassian is a placeholder for the 20th slot. Walmart was added later as the 21st.
+
+**v2.0 scope.** v2.0 gives candidates a reason to stay between interviews. It has two journeys that share one story library and one AI coach: Journey A (build your stories) and Journey B (prep for an interview, the v1 flow reshaped around one plan page). The table shows what v2.0 adds to each area and what stays later.
+
+| Area | v2.0 (June 2027) | Still later (after v2.0) | Not planned |
+| --- | --- | --- | --- |
+| Platform | Desktop web app, new visual language (UI-1, UI-2) | Native iOS and Android | |
+| Modality | Real-time voice; the 3D avatar is off behind a flag, its components and tests kept (AV-1) | Photo-real AI interviewer video avatar | |
+| Companies | Auto-profiles for companies outside the curated list, reviewed by admins (AP-1 to AP-3); more curated profiles, ongoing | | Community interview reports (legal review first) |
+| Interview types | Recruiter screen as a fifth type (RS-1, RS-2) | Panel with multiple personas | |
+| Interviewer | Tone is a user choice, the profile persona is the default (TN-1 to TN-3) | | |
+| Feedback | Transcript view (TR-1, TR-2), delivery metrics (DM-1, DM-2), debrief deltas (DB-1, DB-2) | | Model answers (QB-2 rules them out; the story coach replaces them) |
+| Stories | Story library, from the v1 "story bank" item: save from debriefs, workbench, story fit, Proven status (ST-1 to ST-7) | | |
+| Coach | AI coach that builds stories by text and voice, takes, 60-second and full versions (CO-1 to CO-9) | | |
+| Planning | One interview plan page per job and resume pair (PP-1 to PP-4), practice readiness and a day-by-day plan (RD-1 to RD-3) | | |
+| Business | B2C, pricing unchanged until a separate pricing decision | Org accounts and seats (B2B) | |
+| Markets | US and Canada, English | Other languages (Arabic is the candidate) | |
+| Roles | Tech only | Adjacent corporate roles | |
+
+v2.0 ships once. Until launch, every new screen that replaces a v1 screen sits behind the runtime setting `v2_enabled` (FL-1), so `main` can still ship v1 fixes.
 
 **Environments.** Development runs fully local on Docker for several weeks, using small open-weight models on your machine. Hosting on Hetzner starts only when the product works end to end locally. Moving between the two is a configuration change, not a code change.
 
@@ -77,6 +98,28 @@ A new candidate reaches a match score in under 5 minutes and finishes a first fr
 2. Dashboard shows each target job, its match score, sessions run, and the trend of Realistic-mode scores per competency.
 3. Candidate can add a new job posting at any time; each job keeps its own gap analysis and history.
 
+### v2 journeys
+
+In v2 the journeys above become two. Journey B (prep for an interview) is journeys 1 to 4 reshaped around one plan page per interview. Journey A (build your stories) is new and can run at any time, with or without an interview booked. Both share one story library and one AI coach. Sign-up, inputs (journey 1, steps 1 to 4), the debrief's hire signal and rubric, and billing stay as in v1.
+
+**Journey A: build your stories (v2)**
+
+1. From Home or Stories, the candidate starts a coach session by text or voice and picks a coaching style, gentle or direct (CO-2, CO-5, CO-6).
+2. The coach asks about one experience. After each turn the story's five parts (context, stakes, action, result, reflection) fill in from the candidate's own words, and the screen shows which parts are filled (CO-3).
+3. The coach asks for what is missing: the candidate's own role, a measurable result, a concrete example, trade-offs (CO-4). It never adds facts the candidate did not say (CO-9).
+4. The story is saved as a Draft with skill tags (ST-1). The candidate edits it part by part in the story workbench (ST-3).
+5. The candidate practices the story in takes, spoken or typed; each take is scored 1 to 4 on the story's skills (CO-7). The coach gives a 60-second and a full version from the candidate's words (CO-8).
+6. Home shows the story library and a map of the skills the stories cover, with gaps marked (ST-4).
+
+**2. Interview session, reshaped around the plan page (v2, replaces journey 2 when `v2_enabled` is on)**
+
+1. Home shows one card per interview: company, role, match score and days left, with the next-session advice as one sentence from the coach (PP-3, PR-2).
+2. The card opens the interview plan page for that job and resume pair (PP-1). It shows what the company will test (profile weights), where they will probe (GA-2), the days left to the interview date or a prompt to add it (PP-2), earlier debriefs, the story fit table (ST-5), practice readiness per skill (RD-1, RD-3) and a day-by-day plan (RD-2).
+3. The plan page's setup picks interview type (including Custom and Recruiter screen), difficulty, tone, mode and duration (PP-4, TN-1, RS-1). Tone defaults to the company's persona, or Neutral in generic mode (TN-3).
+4. Mic check, then the live room as in v1, without the 3D avatar (AV-1). The room shows how long the current answer has run against a suggested length (LR-1).
+5. The debrief shows the hire signal, the change from the previous session for the same pair (DB-1), how many answers met the bar (DB-2), the story used for each answer with its fix sent back to the story (ST-6), delivery metrics (DM-2) and a link to the transcript (TR-1). Any answer can be saved as a story (ST-2). A Realistic answer that used a story and scores 3 or more makes the story Proven (ST-7).
+6. The candidate returns to the plan page, which now shows the new debrief and updated readiness.
+
 ## Functional requirements
 
 IDs are referenced by the build plan and acceptance tests. Priority: P0 must ship in v1, P1 ships if time allows.
@@ -92,7 +135,7 @@ IDs are referenced by the build plan and acceptance tests. Priority: P0 must shi
 | IN-7 | Refuse a CV input that is not a CV, for example a job posting, a cover letter or an article. Show the user the reason. | P0 |
 | GA-1 | Produce match score (0 to 100) with breakdown by competency and requirement. | P0 |
 | GA-2 | List strengths with resume evidence, gaps with severity, and likely probe areas. | P0 |
-| GA-3 | Generate a session plan: which interview types and topics to practice first. | P0 |
+| GA-3 | Generate a session plan: which interview types and topics to practice first. In v2 the gap analysis page is replaced by PP-1; the gap analysis itself stays and feeds the plan page. | P0 |
 | GA-4 | Gap analysis is free and does not consume plan minutes. | P0 |
 | IV-1 | Real-time voice interview with barge-in (candidate can interrupt) and turn detection. | P0 |
 | IV-2 | Four interview types: behavioral, hiring manager deep dive, verbal technical Q&A, case. | P0 |
@@ -101,9 +144,9 @@ IDs are referenced by the build plan and acceptance tests. Priority: P0 must shi
 | IV-5 | Company persona from the profile (values framework, question style, bar). | P0 |
 | IV-6 | Seniority calibration from the job level: new grad, mid, senior, staff/principal. | P0 |
 | IV-7 | Session structure: intro, small talk, core questions, candidate questions, wrap-up; 30 or 45 min timer. | P0 |
-| IV-8 | Mode chosen at start. Coach: pause, hint, redo. Realistic: no interruptions, counts toward scores. | P0 |
+| IV-8 | Mode chosen at start. Coach: pause, hint, redo. Realistic: no interruptions, counts toward scores. In v2 the session setup page is replaced by the setup on PP-1, which keeps every option (PP-4). | P0 |
 | IV-9 | Graceful recovery from dropped audio: resume the session where it stopped. | P0 |
-| IV-10 | Interviewer avatar: a 3D head on the live screen shows when the interviewer listens, thinks and speaks, and moves its lips with the interviewer's audio. It runs in the browser only: no extra service, no cost per minute, no audio sent anywhere. The face matches the voice: a woman for a female TTS voice, a man for a male one. Without WebGL a flat face shows the same states. Captions stay. | P1 |
+| IV-10 | Interviewer avatar: a 3D head on the live screen shows when the interviewer listens, thinks and speaks, and moves its lips with the interviewer's audio. It runs in the browser only: no extra service, no cost per minute, no audio sent anywhere. The face matches the voice: a woman for a female TTS voice, a man for a male one. Without WebGL a flat face shows the same states. Captions stay. In v2 the avatar is off behind a flag (AV-1). | P1 |
 | IV-11 | Prep time: in every mode the candidate can ask for 1 to 3 minutes to prepare an answer, by voice ("give me 3 minutes") or with a button. The interview clock stops and the live screen shows a prep timer. Prep ends when the time is up, when the candidate says or clicks that they are ready, or when they start to answer. | P1 |
 | IV-12 | Candidate turns that are outside the interview (an unrelated subject or task) or inappropriate (abuse, harassment, threats, hate, sexual content) get a polite warning. The second warning says the next one ends the interview; the third such turn closes it. A weak or off-topic answer is not a warning; IV-3 probes it. | P0 |
 | FB-1 | Overall hire signal (Strong Hire, Hire, Lean Hire, Lean No Hire, No Hire) with a short written rationale. | P0 |
@@ -111,7 +154,7 @@ IDs are referenced by the build plan and acceptance tests. Priority: P0 must shi
 | FB-3 | Debrief ready within 60 seconds of session end. | P0 |
 | PR-1 | Progress dashboard per target job: competency trends from Realistic sessions only. | P0 |
 | PR-2 | Recommended next session based on remaining gaps. | P0 |
-| PR-3 | Interview rehearsals: the user picks a job description and a CV, or adds one. For that pair, the app shows the earlier gap reports, debriefs and hire signals. | P0 |
+| PR-3 | Interview rehearsals: the user picks a job description and a CV, or adds one. For that pair, the app shows the earlier gap reports, debriefs and hire signals. In v2 the rehearsals page is replaced by PP-1. | P0 |
 | BL-1 | Stripe subscription, one plan, monthly minute cap, usage meter visible in the app. | P0 |
 | BL-2 | Free tier: unlimited gap analyses (rate limited) plus one free interview. | P0 |
 | AC-1 | Self-service export and full delete of account and all data. | P0 |
@@ -138,11 +181,83 @@ IDs are referenced by the build plan and acceptance tests. Priority: P0 must shi
 | PL-7 | Text-only session mode behind a dev flag, so the interviewer runs as text when local voice is too slow; the simulated-candidate tests reuse it. | P0 |
 | PL-8 | Cloud-portable deployment: only Postgres, Redis and S3-compatible storage (MinIO locally). Hetzner is the default target; only provisioning scripts are provider-specific. | P0 |
 
+Custom interviews (CU-1 to CU-12) are specified in `docs/custom-interview-spec.md`, and the admin app (AA, AO, AU, AT, OB, AL, OC, SM, AI) in `docs/admin-spec.md`.
+
+### v2.0 requirements
+
+These IDs are the acceptance tests for v2.0. They are grouped by build part; the sessions that build each one are in `docs/v2/execution-plan.md`. Priority: P0 must ship in v2.0, P1 ships if it passes its gate. AD-3 to AD-5 continue the AD series of AD-1 and AD-2.
+
+**Part 1: Journey B reshaped**
+
+| ID | Requirement | Priority |
+| --- | --- | --- |
+| UI-1 | The app uses the v2 visual language: Geist and Geist Mono, the violet action color, teal for interview prep, color-coded story parts that always carry a text label. Contrast meets WCAG AA. | P0 |
+| UI-2 | A left rail nav: Home, Stories, Interviews, Questions, Account. Stories shows only when `v2_enabled` is on. | P0 |
+| FL-1 | Runtime setting `v2_enabled` (default off) gates every v2 screen that replaces a v1 screen. | P0 |
+| PP-1 | One interview plan page per job and resume pair replaces the separate gap analysis, rehearsals (PR-3) and session setup pages. It shows what the company will test (profile weights), where they will probe (GA-2), earlier debriefs and the next rehearsal setup. | P0 |
+| PP-2 | The plan page and the interview card show the days left to `interview_date` when it is set, and ask for it when it is not. | P0 |
+| PP-3 | Home shows one card per interview (company, role, match score, days left) and the PR-2 next-session advice as one sentence from the coach. | P0 |
+| PP-4 | The plan page's setup keeps every v1 option: type, Custom, difficulty, tone, mode, 30 or 45 minutes. | P0 |
+| TN-1 | The user picks a tone: "As the company" (the default, from the profile persona), Warm, Neutral or Direct. Tone is stored on the session. | P0 |
+| TN-2 | The chosen tone reaches the brief and the live interviewer; difficulty still controls probes and pushback (IV-4). Tone never changes scoring. | P0 |
+| TN-3 | Generic mode uses Neutral as the default tone. | P0 |
+| DB-1 | The debrief shows the hire signal of the previous session for the same pair and the change. | P0 |
+| DB-2 | The debrief shows how many answers met the bar (a rubric score of 3 or more). | P0 |
+| LR-1 | The live room shows how long the current answer has run against a suggested length for the question type. | P0 |
+| AV-1 | The 3D avatar is off behind a flag; its components and tests stay. The live room shows the interviewer state without it. | P0 |
+| TR-1 | The candidate can read the transcript of any finished session from its debrief. | P0 |
+| TR-2 | The transcript is included in export and removed by delete (AC-1). | P0 |
+| AP-1 | When a job's company is outside the curated list, a background job builds a short auto-profile from the posting's domain pages, cached per company and labeled "auto-generated". | P0 |
+| AP-2 | An auto-profile adds a summary to the brief only. It never changes scoring weights and adds no interview latency. | P0 |
+| AP-3 | Admins review auto-profiles in a queue: approve, edit or retire. Only approved ones reach a brief. | P0 |
+| AD-3 | The admin portal shows plan page usage and the tone and difficulty mix across sessions. | P0 |
+
+**Part 2: Story library**
+
+| ID | Requirement | Priority |
+| --- | --- | --- |
+| ST-1 | A story has a title, five parts (context, stakes, action, result, reflection), skill tags, a status (Draft or Proven) and its source. Stories are user-owned, in export and delete. | P0 |
+| ST-2 | "Save as a story" on any debrief answer creates a Draft story from the answer, with skill tags from the scored competencies. | P0 |
+| ST-3 | The story workbench lists stories and edits a story part by part. | P0 |
+| ST-4 | Home shows the story library and a map of the skills the stories cover, with gaps marked. | P0 |
+| ST-5 | The plan page shows a story fit table: for each skill the interview will test, the best story and whether it is strong, thin or missing. | P0 |
+| ST-6 | The debrief shows the story used for each answer and sends that answer's fix to the story as a note. | P0 |
+| ST-7 | A story becomes Proven when a Realistic answer that used it scores 3 or more. | P0 |
+| DM-1 | Delivery metrics per answer from turn timestamps and text: speaking pace (words per minute) and filler words per minute. No audio is used or kept. | P0 |
+| DM-2 | The debrief shows the delivery metrics with a plain note when they are outside a normal range. | P0 |
+| AD-4 | The admin portal shows story save rate, stories per user, Draft to Proven rate and delivery metric trends, aggregate only, with no story text. | P0 |
+
+**Part 3: AI coach**
+
+| ID | Requirement | Priority |
+| --- | --- | --- |
+| CO-1 | `coach` is a gateway role, mapped in every `config/models.*.yaml`, with prompts, fake fixtures and a conformance suite. | P0 |
+| CO-2 | A text coach session helps the candidate build one story through conversation. | P0 |
+| CO-3 | After each candidate turn the story's parts update; the UI shows which parts are filled. | P0 |
+| CO-4 | The coach asks for what is missing using the IV-3 rules: the candidate's own role, a measurable result, a concrete example, trade-offs. | P0 |
+| CO-5 | The candidate picks a coaching style, gentle or direct. | P0 |
+| CO-6 | Coach sessions also run by voice on the existing voice loop. | P0 |
+| CO-7 | A take is one spoken or typed telling of a story, scored by the existing scorer on the story's skills (1 to 4). | P0 |
+| CO-8 | The coach produces a 60-second and a full version of a story from the candidate's own words. | P0 |
+| CO-9 | The coach never adds facts the candidate did not say; an eval suite checks this. | P0 |
+| RD-1 | Practice readiness per skill for an interview, from Realistic sessions only, labeled as a practice estimate. | P0 |
+| RD-2 | A day-by-day plan to `interview_date`, built from GA-3, PR-2 and the open gaps. | P0 |
+| RD-3 | The practice-estimate notice shows on every screen that shows readiness. | P0 |
+| RS-1 | Recruiter screen is a fifth interview type, with its own competencies. | P0 |
+| RS-2 | Recruiter screen has its own brief, questions and rubric variants. | P0 |
+| SR-1 | Optional. In Coach mode the live room shows which story part the candidate is on, computed off the interviewer's path; it ships only if p95 voice latency does not rise. | P1 |
+| AD-5 | The admin portal shows coach sessions and minutes, cost per coach session, coach eval results, readiness by skill, and the recruiter screen brief and rubric. | P0 |
+| UI-3 | The marketing site describes v2 and uses the v2 visual language. | P0 |
+
+Coach sessions record minutes like any other session; billing rules (BL-1, BL-2) do not change in v2.0 until the pricing decision is made.
+
 ## Interviewer and scoring design
 
 The interviewer and the scorer are separate components. The interviewer runs the conversation in real time; the scorer judges the full transcript afterward, the way a debrief panel reads interview notes. Keeping them apart stops the live model from softening its judgment mid-conversation and lets the scorer use a stronger, slower model.
 
 **Interviewer brief.** Before each session, a planner builds a brief from the job, resume, gap analysis, company profile, interview type, level, difficulty and mode. The brief lists 4 to 6 target competencies, 6 to 10 candidate questions ranked by priority, the probe areas from the gap analysis, and the persona's tone. The live interviewer works from the brief, not from raw documents, which keeps prompts short and latency low.
+
+**Tone (v2).** In v1 the persona's tone comes only from the company profile (IV-5). In v2 the user picks a tone at setup: "As the company" (the default, the profile persona's tone), Warm, Neutral or Direct (TN-1). Generic mode defaults to Neutral (TN-3). The chosen tone is stored on the session and written into the brief's tone, which the live interviewer reads (TN-2). Tone and difficulty are separate: tone sets how the interviewer sounds, difficulty (IV-4) still sets how many probes, how much pushback and whether there is a curveball. Tone never reaches the scorer and never changes scores.
 
 **Conversation state machine.** INTRO → SMALL_TALK → AGENDA → CORE (question → answer → follow-up loop) → CANDIDATE_QUESTIONS → WRAP_UP. A session controller owns the timer and moves phases; the LLM never decides when the session ends.
 
@@ -156,6 +271,9 @@ The interviewer and the scorer are separate components. The interviewer runs the
 | Hiring manager deep dive | Role fit, depth of relevant experience, judgment, motivation, team fit, scope at level |
 | Verbal technical Q&A | Technical depth, accuracy, reasoning, trade-offs, clarity of explanation |
 | Case | Problem framing, structure, user and business sense, estimation logic, prioritization, recommendation |
+| Recruiter screen (v2) | Motivation, role fit, communication, logistics and expectations (RS-1); its own brief, questions and rubric variants (RS-2) |
+
+**Stories in scoring (v2).** The scorer records, per question, which story from the candidate's library the answer used (or none) and one fix for that story (ST-6). A Realistic answer that used a story and scores 3 or more makes the story Proven (ST-7). Takes (CO-7) are scored by the same scorer, one answer at a time, on the story's skills.
 
 **Rubric.** Each answer is scored 1 to 4 per relevant competency (1 = no evidence, 2 = weak, 3 = meets the bar for this level, 4 = above the bar), with a quote-backed justification from the transcript. Level changes the bar, not the scale: a 3 for a staff candidate requires cross-team scope that a mid-level 3 does not.
 
@@ -197,7 +315,7 @@ Each of the launch companies gets a versioned profile, researched offline with C
 
 - **v1, generic mode:** the brief is built from the job posting and resume alone, with a default tech-industry persona and equal competency weights. The UI labels it clearly.
 - **v1, request this company:** requests are logged; the most-requested companies get promoted to curated profiles through the offline process.
-- **First post-launch release, auto-profile:** when a candidate adds a job, a background step reads the company's own careers and values pages from the posting's domain and adds a short summary to the brief. It's cached per company, labeled "auto-generated", never changes scoring weights, and adds nothing to interview latency.
+- **v2.0, auto-profile (AP-1 to AP-3):** when a candidate adds a job for a company outside the curated list, a background step reads the company's own careers and values pages from the posting's domain and builds a short summary. It's cached per company, labeled "auto-generated", never changes scoring weights, and adds nothing to interview latency. An admin approves, edits or retires each one in a review queue; only approved auto-profiles reach a brief.
 
 ## Architecture
 
@@ -350,6 +468,20 @@ Postgres is the single source of truth, with an `org_id` on every user-owned tab
 | SessionFeedback | id, org_id, session_id, realism, comment, created_at | L05: the post-session rating, "felt like a real interview", 1 to 5. One per session; skippable. Feeds the perceived realism metric |
 | EmailLog | id, org_id, user_id, kind, ref, sent_at | L06: one row per lifecycle email sent. Unique (user_id, kind, ref), so a job never sends the same email twice; ref is empty for one-off emails |
 
+**v2 additions.** The core sessions (C1, C2, C3 in `docs/v2/execution-plan.md`) own the exact columns and contracts; this table names what each one holds.
+
+| Entity | Key fields | Notes |
+| --- | --- | --- |
+| Session (v2 fields) | tone (as_company, warm, neutral, direct); type adds recruiter_screen | TN-1, RS-1. Old rows read as as_company |
+| Scorecard (v2 fields) | per question: story_id, story_fix, delivery metrics (words per minute, fillers per minute, duration) | ST-6, DM-1. Stored in per_question_json |
+| CompanyAutoProfile (v2) | id, company_name, normalized_name, source_host, summary, sources_json, status (pending, approved, retired), reviewed_by, reviewed_at, model_profile, model_id, prompt_version | AP-1 to AP-3. Shared per company, not user-owned, so no org_id |
+| Story (v2) | id, org_id, user_id, title, context, stakes, action, result, reflection, skill_tags, status (draft, proven), source (debrief_answer, manual, coach), source_session_id, source_question_ref, notes, created_at, updated_at | ST-1. User-owned; in export and delete. Notes hold debrief fixes with session ref and date |
+| CoachSession (v2) | id, org_id, user_id, story_id, style (gentle, direct), channel (voice or text), status, minutes, model_profile, model_id, prompt_version | CO-2, CO-5, CO-6. Minutes recorded like any session |
+| CoachTurn (v2) | id, coach_session_id, speaker, text, start_ms, end_ms | Transcript only, no audio, like Turn |
+| Take (v2) | id, org_id, user_id, story_id, channel, text, duration_s, skill_scores_json, model_profile, model_id, prompt_version | CO-7. One telling of a story, scored 1 to 4 per skill |
+
+Runtime setting `v2_enabled` (FL-1) sits with the other runtime settings, not in a new table.
+
 The model registry and runtime profiles live in config files, not the database. Provenance fields (PL-6) are written on every AI output so results from different models are never mixed silently.
 
 ## Privacy, security and compliance
@@ -425,6 +557,18 @@ Paying subscribers is the north star; every other metric explains why it moves. 
 | Session failure rate | Sessions ended by technical error | Under 2% |
 | Cost per session | Sum of UsageEvents per session | Under $0.80 |
 | Offer reported | Users who report an offer for a practiced job | Track from launch, survey-based |
+
+**v2 targets.** Hypotheses, to be set against the v1 beta baseline. They should hold for 8 weeks after the v2.0 launch.
+
+| Metric | v1 target | v2 target |
+| --- | --- | --- |
+| Monthly churn | Under 15% | Under 10% |
+| Sessions per paid user per month | 4 or more | 4 or more, plus 3 or more coach sessions |
+| Paid users with at least one saved story | None | 60% |
+| Perceived realism | 4.2 of 5 | 4.2 of 5, unchanged |
+| Free-to-paid conversion | 8 to 12% | 12% or more |
+
+**v2 launch gate.** A closed beta of the full v2 keeps perceived realism at 4.2 of 5 or more, the coach evals pass (CO-9), and 40% of beta users save a story within 30 days.
 
 Use PostHog (self-hosted on Hetzner, or its cloud) for product events, and the UsageEvent table for cost. Add a two-question exit survey on cancellation: why you're leaving, and whether you got the job.
 
