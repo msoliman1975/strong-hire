@@ -248,6 +248,7 @@ async def test_oc4_status_shows_the_banner_until_it_ends(
         "voice_sessions_open": True,
         "text_sessions_open": True,
         "custom_interview_access": "everyone",
+        "v2_enabled": False,
     }
     until = datetime.now(UTC) + timedelta(hours=1)
     banner = {"text": "Scoring is slow today.", "severity": "warning", "until": until.isoformat()}
@@ -430,3 +431,12 @@ async def test_oc6_models_survives_redis_being_down(
     admin_app.state.heartbeat_source = broken
     body = (await admin.get("/admin/ops/models")).json()
     assert body["heartbeats_available"] is False and body["services"] == []
+
+
+async def test_fl1_status_reports_v2_enabled(
+    anon_client: httpx.AsyncClient, sessionmaker: Maker
+) -> None:
+    """FL-1: the candidate app reads v2_enabled from /status; it is off until set."""
+    assert (await anon_client.get("/status")).json()["v2_enabled"] is False
+    await _set(sessionmaker, "v2_enabled", True)
+    assert (await anon_client.get("/status")).json()["v2_enabled"] is True

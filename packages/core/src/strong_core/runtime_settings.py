@@ -1,5 +1,5 @@
 """Ops controls that change without a redeploy (admin spec OC-1..OC-5, SM-15, custom
-spec CU-11).
+spec CU-11, v2 FL-1).
 
 Values live in the runtime_settings table (key, value_json). Every key has a type and a
 default here; a missing row means the default. Reads go through a 10 s in-process cache, so a
@@ -47,6 +47,7 @@ class SettingKey(StrEnum):
     SIM_PAUSED = "sim_paused"  # SM-15
     SIM_MAX_LIVE_SESSIONS = "sim_max_live_sessions"  # SM-3, SM-15
     CUSTOM_INTERVIEW_ACCESS = "custom_interview_access"  # CU-11
+    V2_ENABLED = "v2_enabled"  # FL-1
 
 
 class JobKind(StrEnum):
@@ -96,6 +97,10 @@ class RuntimeSettings(BaseModel):
         "0 turns the limit off.",
     )
     custom_interview_access: CustomInterviewAccess = CustomInterviewAccess.EVERYONE
+    v2_enabled: bool = Field(
+        default=False,
+        description="FL-1: show the v2 screens that replace v1 screens. Off until launch.",
+    )
 
 
 KEYS: tuple[str, ...] = tuple(SettingKey)

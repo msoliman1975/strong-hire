@@ -398,6 +398,11 @@
         },
         "mode": {
           "$ref": "#/$defs/Mode"
+        },
+        "tone": {
+          "$ref": "#/$defs/Tone",
+          "default": "as_company",
+          "description": "TN-1: the interviewer's tone. as_company uses the profile persona's tone."
         }
       },
       "required": [
@@ -409,6 +414,17 @@
       ],
       "title": "SessionConfig",
       "type": "object"
+    },
+    "Tone": {
+      "description": "TN-1: how the interviewer sounds. `as_company` uses the company profile's persona tone,\nor a neutral tone in generic mode. Old sessions read as `as_company`.",
+      "enum": [
+        "as_company",
+        "warm",
+        "neutral",
+        "direct"
+      ],
+      "title": "Tone",
+      "type": "string"
     }
   },
   "$id": "https://strong-hire.local/schemas/interviewer_brief.schema.json",

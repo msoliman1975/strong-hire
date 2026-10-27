@@ -207,3 +207,26 @@ class CompanyProfile(Contract):
     @property
     def value_names(self) -> list[str]:
         return [p.name for p in self.values_framework.principles]
+
+
+class AutoProfileSummary(Contract):
+    """AP-1: the extractor's short company summary, built from pages on the job posting's
+    domain when the company is not in the curated list. Briefs show it labeled
+    "auto-generated". It is far smaller than a CompanyProfile and never replaces one."""
+
+    summary: str = Field(
+        min_length=1, max_length=2000, description="A few sentences on the company and the role."
+    )
+    values_mentioned: list[str] = Field(
+        default_factory=list,
+        max_length=12,
+        description="Values or principles the pages name, in the company's words.",
+    )
+    interview_process_notes: list[str] = Field(
+        default_factory=list,
+        max_length=12,
+        description="What the pages say about the hiring process. Empty when they say nothing.",
+    )
+    sources: list[str] = Field(
+        min_length=1, description="URLs of the pages the summary is based on."
+    )

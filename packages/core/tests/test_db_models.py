@@ -41,6 +41,8 @@ SPEC_TABLES = {
     "waitlist_entries",  # L04 step 1: waitlist with double opt-in
     "session_feedback",  # L05: post-session realism rating
     "email_logs",  # L01, L06: lifecycle emails sent
+    # v2
+    "company_auto_profiles",  # AP-1
 }
 
 

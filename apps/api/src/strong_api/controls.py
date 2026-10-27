@@ -164,6 +164,7 @@ class SiteStatus(BaseModel):
     custom_interview_access: rs.CustomInterviewAccess = Field(
         description="CU-11: everyone, or paid_only (free accounts see Custom locked)"
     )
+    v2_enabled: bool = Field(description="FL-1: show the v2 screens that replace v1 screens")
 
 
 def active_banner(settings: rs.RuntimeSettings, now: datetime | None = None) -> BannerOut | None:
@@ -190,7 +191,7 @@ router = APIRouter(tags=["status"])
 @router.get("/status")
 async def site_status(db: Annotated[AsyncSession, Depends(_db)]) -> SiteStatus:
     """Public: the active site banner, whether sign-ups and new sessions are open, and who may
-    run Custom interviews (CU-11)."""
+    run Custom interviews (CU-11), and whether the v2 screens are on (FL-1)."""
     settings = await rs.get_all(db)
     capped = await spend_cap_reached(db, settings)
     return SiteStatus(
@@ -199,4 +200,5 @@ async def site_status(db: Annotated[AsyncSession, Depends(_db)]) -> SiteStatus:
         voice_sessions_open=not (settings.sessions_paused_voice or capped),
         text_sessions_open=not (settings.sessions_paused_text or capped),
         custom_interview_access=settings.custom_interview_access,
+        v2_enabled=settings.v2_enabled,
     )

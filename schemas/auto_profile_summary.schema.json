@@ -1,0 +1,48 @@
+{
+  "$id": "https://strong-hire.local/schemas/auto_profile_summary.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "AP-1: the extractor's short company summary, built from pages on the job posting's\ndomain when the company is not in the curated list. Briefs show it labeled\n\"auto-generated\". It is far smaller than a CompanyProfile and never replaces one.",
+  "properties": {
+    "interview_process_notes": {
+      "description": "What the pages say about the hiring process. Empty when they say nothing.",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 12,
+      "title": "Interview Process Notes",
+      "type": "array"
+    },
+    "sources": {
+      "description": "URLs of the pages the summary is based on.",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Sources",
+      "type": "array"
+    },
+    "summary": {
+      "description": "A few sentences on the company and the role.",
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Summary",
+      "type": "string"
+    },
+    "values_mentioned": {
+      "description": "Values or principles the pages name, in the company's words.",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 12,
+      "title": "Values Mentioned",
+      "type": "array"
+    }
+  },
+  "required": [
+    "summary",
+    "sources"
+  ],
+  "title": "AutoProfileSummary",
+  "type": "object"
+}

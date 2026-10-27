@@ -1,0 +1,9 @@
+{
+  "summary": "Example Corp builds payment infrastructure for online businesses. The careers pages describe small product teams that own their services end to end.",
+  "values_mentioned": ["Customers first", "Own the outcome", "Move with care"],
+  "interview_process_notes": [
+    "A recruiter call, then a technical screen, then a half-day onsite loop",
+    "The onsite includes a behavioral round with the hiring manager"
+  ],
+  "sources": ["https://example.com/careers", "https://example.com/about"]
+}
