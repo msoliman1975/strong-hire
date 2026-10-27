@@ -66,6 +66,34 @@
       "title": "CompetencyScore",
       "type": "object"
     },
+    "DeliveryMetrics": {
+      "additionalProperties": false,
+      "description": "DM-1: how one answer was delivered, from turn timestamps and text. No audio is used.",
+      "properties": {
+        "duration_seconds": {
+          "minimum": 0,
+          "title": "Duration Seconds",
+          "type": "number"
+        },
+        "fillers_per_minute": {
+          "minimum": 0,
+          "title": "Fillers Per Minute",
+          "type": "number"
+        },
+        "words_per_minute": {
+          "minimum": 0,
+          "title": "Words Per Minute",
+          "type": "number"
+        }
+      },
+      "required": [
+        "words_per_minute",
+        "fillers_per_minute",
+        "duration_seconds"
+      ],
+      "title": "DeliveryMetrics",
+      "type": "object"
+    },
     "HireSignal": {
       "description": "FB-1. Ordered from strongest to weakest.",
       "enum": [
@@ -81,6 +109,18 @@
     "QuestionScore": {
       "additionalProperties": false,
       "properties": {
+        "delivery": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DeliveryMetrics"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "DM-1: set by the worker after scoring, never by the model."
+        },
         "misses": {
           "items": {
             "type": "string"
@@ -105,6 +145,33 @@
           "minItems": 1,
           "title": "Scores",
           "type": "array"
+        },
+        "story_fix": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "ST-6: the fix for that story, sent to it as a note.",
+          "title": "Story Fix"
+        },
+        "story_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "ST-6: the library story this answer used, if any.",
+          "title": "Story Id"
         },
         "strengths": {
           "items": {

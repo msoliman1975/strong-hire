@@ -12457,6 +12457,34 @@
         "title": "DebriefSession",
         "description": "The session a debrief belongs to. Same shape as the web app's SessionRecord."
       },
+      "DeliveryMetrics": {
+        "properties": {
+          "words_per_minute": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Words Per Minute"
+          },
+          "fillers_per_minute": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Fillers Per Minute"
+          },
+          "duration_seconds": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Duration Seconds"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "words_per_minute",
+          "fillers_per_minute",
+          "duration_seconds"
+        ],
+        "title": "DeliveryMetrics",
+        "description": "DM-1: how one answer was delivered, from turn timestamps and text. No audio is used."
+      },
       "DevLoginRequest": {
         "properties": {
           "email": {
@@ -17261,6 +17289,42 @@
             },
             "type": "array",
             "title": "Misses"
+          },
+          "story_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Story Id",
+            "description": "ST-6: the library story this answer used, if any."
+          },
+          "story_fix": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Story Fix",
+            "description": "ST-6: the fix for that story, sent to it as a note."
+          },
+          "delivery": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DeliveryMetrics"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "DM-1: set by the worker after scoring, never by the model."
           }
         },
         "additionalProperties": false,
@@ -20025,6 +20089,283 @@
           "month_usd"
         ],
         "title": "SpendSlice"
+      },
+      "Story": {
+        "additionalProperties": false,
+        "description": "ST-1: one story in the user's library. The stories table holds org_id and user_id.",
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          },
+          "context": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Context"
+          },
+          "stakes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Stakes"
+          },
+          "action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Action"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Result"
+          },
+          "reflection": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reflection"
+          },
+          "skills": {
+            "description": "Skill tags.",
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "title": "Skills",
+            "type": "array"
+          },
+          "status": {
+            "$ref": "#/components/schemas/StoryStatus",
+            "default": "draft"
+          },
+          "source": {
+            "$ref": "#/components/schemas/StorySource"
+          },
+          "source_session_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "ST-2: the session of the debrief answer it came from.",
+            "title": "Source Session Id"
+          },
+          "source_question_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "ST-2: QuestionScore.question_ref of that answer.",
+            "title": "Source Question Ref"
+          },
+          "notes": {
+            "items": {
+              "$ref": "#/components/schemas/StoryNote"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "source",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "Story",
+        "type": "object"
+      },
+      "StoryFit": {
+        "additionalProperties": false,
+        "description": "ST-5: the planner's story fit table, one item per tested skill.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/StoryFitItem"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "title": "StoryFit",
+        "type": "object"
+      },
+      "StoryFitItem": {
+        "additionalProperties": false,
+        "description": "ST-5: for one skill the interview will test, the best story and how well it fits.",
+        "properties": {
+          "competency": {
+            "$ref": "#/components/schemas/Competency"
+          },
+          "story_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null when no story fits (strength missing).",
+            "title": "Story Id"
+          },
+          "strength": {
+            "$ref": "#/components/schemas/StoryFitStrength"
+          },
+          "reason": {
+            "description": "One sentence the plan page shows.",
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "competency",
+          "story_id",
+          "strength",
+          "reason"
+        ],
+        "title": "StoryFitItem",
+        "type": "object"
+      },
+      "StoryFitStrength": {
+        "description": "ST-5: how well the best story covers one skill the interview will test.",
+        "enum": [
+          "strong",
+          "thin",
+          "missing"
+        ],
+        "title": "StoryFitStrength",
+        "type": "string"
+      },
+      "StoryNote": {
+        "additionalProperties": false,
+        "description": "ST-6: a fix note sent to the story from a debrief answer that used it.",
+        "properties": {
+          "text": {
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The debrief's session.",
+            "title": "Session Id"
+          },
+          "question_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "QuestionScore.question_ref.",
+            "title": "Question Ref"
+          },
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "at"
+        ],
+        "title": "StoryNote",
+        "type": "object"
+      },
+      "StorySource": {
+        "description": "ST-1: where a story came from.",
+        "enum": [
+          "debrief_answer",
+          "manual",
+          "coach"
+        ],
+        "title": "StorySource",
+        "type": "string"
+      },
+      "StoryStatus": {
+        "description": "ST-1, ST-7: a story is a draft until a Realistic answer that used it scores 3 or more.",
+        "enum": [
+          "draft",
+          "proven"
+        ],
+        "title": "StoryStatus",
+        "type": "string"
       },
       "Strength": {
         "properties": {

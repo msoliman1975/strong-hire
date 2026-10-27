@@ -195,6 +195,39 @@ class Severity(StrEnum):
     HIGH = "high"
 
 
+class StoryPart(StrEnum):
+    """ST-1: the five parts of a story, in the order the workbench and prompts show them."""
+
+    CONTEXT = "context"
+    STAKES = "stakes"
+    ACTION = "action"
+    RESULT = "result"
+    REFLECTION = "reflection"
+
+
+class StoryStatus(StrEnum):
+    """ST-1, ST-7: a story is a draft until a Realistic answer that used it scores 3 or more."""
+
+    DRAFT = "draft"
+    PROVEN = "proven"
+
+
+class StorySource(StrEnum):
+    """ST-1: where a story came from."""
+
+    DEBRIEF_ANSWER = "debrief_answer"  # ST-2: "Save as a story" on a debrief answer
+    MANUAL = "manual"
+    COACH = "coach"
+
+
+class StoryFitStrength(StrEnum):
+    """ST-5: how well the best story covers one skill the interview will test."""
+
+    STRONG = "strong"
+    THIN = "thin"
+    MISSING = "missing"
+
+
 class GapStatus(StrEnum):
     """State of one gap analysis run (GA-1 to GA-4)."""
 
