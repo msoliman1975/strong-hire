@@ -342,6 +342,9 @@ class Resume(Base):
         DateTime(timezone=True),
         comment="When the user checked and saved the extracted CV. NULL: not confirmed",
     )
+    accepted_issues: Mapped[list[Any] | None] = mapped_column(
+        comment="schemas.AcceptedIssues: CV check issues the user accepted. NULL: none yet"
+    )
     uploaded_at: Mapped[datetime] = _created_at()
 
 
