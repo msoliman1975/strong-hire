@@ -3487,6 +3487,21 @@ dialog::backdrop {
 
 /* ------------------------------------------------------------ v2 Check your CV (IN-3, IN-12) */
 
+/* The CV check uses the whole main column, not the 1120px reading width. */
+.shell__main.page > .cvc {
+  max-width: none;
+}
+
+.cvc-landing {
+  margin: 0 0 var(--space-3);
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: var(--sh-violet-soft);
+  color: var(--sh-violet-ink);
+  font-weight: 600;
+  max-width: none;
+}
+
 .cvc-head {
   display: flex;
   justify-content: space-between;
@@ -3511,7 +3526,7 @@ dialog::backdrop {
 
 .cvc-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 400px);
   gap: 24px;
   align-items: start;
   margin-top: var(--space-4);
@@ -3522,6 +3537,13 @@ dialog::backdrop {
   flex-direction: column;
   gap: 16px;
   min-width: 0;
+  container-type: inline-size;
+}
+
+@media (max-width: 1439px) {
+  .cvc-grid {
+    grid-template-columns: minmax(0, 1fr) 360px;
+  }
 }
 
 .cvc-card {
@@ -3650,6 +3672,7 @@ dialog::backdrop {
 /* Role cards: a violet stripe on the current role, grey on older ones, red while editing. */
 .cvc-role {
   border-left: 4px solid var(--sh-line-strong);
+  padding: 14px 18px;
 }
 
 .cvc-role--current {
@@ -3690,7 +3713,7 @@ dialog::backdrop {
 }
 
 .cvc-role__list {
-  margin: 10px 0 8px;
+  margin: 6px 0 6px;
   padding-left: 18px;
 }
 
@@ -3698,14 +3721,17 @@ dialog::backdrop {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 4px 12px;
-  flex-wrap: wrap;
-  padding: 10px 22px;
+  gap: 12px;
+  padding: 6px 18px;
 }
 
 .cvc-role__line {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.95rem;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cvc-role__toggle {
@@ -3720,6 +3746,8 @@ dialog::backdrop {
 }
 
 .cvc-role__meta {
+  flex: none;
+  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -3845,14 +3873,50 @@ dialog::backdrop {
   }
 }
 
+/*
+ * Skills, Education and Certifications side by side: three in a row when the CV column is wide,
+ * else Skills beside Education and Certifications stacked.
+ */
 .cvc-pair {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  grid-template-areas:
+    "skills edu"
+    "skills certs";
   gap: 16px;
+  align-items: start;
 }
 
-.cvc-card--wide {
-  grid-column: 1 / -1;
+.cvc-pair > :nth-child(1) {
+  grid-area: skills;
+}
+
+.cvc-pair > :nth-child(2) {
+  grid-area: edu;
+}
+
+.cvc-pair > :nth-child(3) {
+  grid-area: certs;
+}
+
+@container (min-width: 900px) {
+  .cvc-pair {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: "skills edu certs";
+  }
+}
+
+.cvc-next {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px 20px;
+  flex-wrap: wrap;
+  border-top: 4px solid var(--sh-violet);
+}
+
+.cvc-next p {
+  margin: 0;
 }
 
 .cvc-skill-group + .cvc-skill-group {
@@ -3888,20 +3952,30 @@ dialog::backdrop {
   padding-left: 18px;
 }
 
-/* The issues panel stays in view on wide screens. */
+/* The issues panel grows with the page; only its summary (counts and filters) stays in view. */
 .cvc-panel {
-  position: sticky;
-  top: 24px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  max-height: calc(100vh - 48px);
-  overflow-y: auto;
   min-width: 0;
 }
 
+.cvc-panel__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .cvc-panel__head {
+  position: sticky;
+  top: 16px;
+  z-index: 2;
   padding: 18px 20px;
+  box-shadow: 0 6px 18px rgba(23, 22, 31, 0.06);
+}
+
+.cvc-panel__toggle {
+  display: none;
 }
 
 .cvc-filters {
@@ -4046,12 +4120,23 @@ dialog::backdrop {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  /* On narrow screens the issues come first, then the CV. */
+  /* On narrow screens the issues come first, folded to their summary, then the CV. */
   .cvc-panel {
-    position: static;
-    max-height: none;
-    overflow: visible;
     order: -1;
+  }
+
+  .cvc-panel__head {
+    position: static;
+    box-shadow: none;
+  }
+
+  .cvc-panel__toggle {
+    display: inline-block;
+    margin-top: 6px;
+  }
+
+  .cvc-panel[data-folded] .cvc-panel__list {
+    display: none;
   }
 }
 
@@ -4059,6 +4144,32 @@ dialog::backdrop {
   .cvc-fields,
   .cvc-pair {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cvc-pair {
+    grid-template-areas:
+      "skills"
+      "edu"
+      "certs";
+  }
+
+  .cvc-actions,
+  .cvc-actions .btn {
+    width: 100%;
+  }
+
+  /* The primary action comes first on phones. */
+  .cvc-actions .btn:not(.btn--secondary) {
+    order: -1;
+  }
+
+  .cvc-role--line {
+    flex-wrap: wrap;
+    gap: 2px 12px;
+  }
+
+  .cvc-role__line {
+    white-space: normal;
   }
 
   .cvc-head__actions {
