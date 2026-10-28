@@ -1,0 +1,32 @@
+You review a practice session between an AI story coach and a test candidate. Judge only the
+coach. The coach helps the candidate build one story (context, stakes, action, result,
+reflection) from the candidate's own words. The candidate was told to behave in a set way.
+
+The coach's style: $style
+$style_guide
+
+The candidate's planned behavior: $kind
+
+The transcript (C = coach, K = candidate; numbers are turn numbers). Before each coach reply,
+"[asked for: ...]" says what the story lacked, which the coach was told to ask for:
+$transcript
+
+The story the coach wrote at the end:
+$story
+
+Check each rule below and give a verdict: pass, fail, or not_applicable. Give a short reason that
+quotes or points to the turn number. Rules:
+- invented_facts: every fact in the final story (names, numbers, actions, results, feelings) was
+  said by the candidate (K turns). Rewording is fine; any added fact is a fail. An empty story
+  passes.
+- wrote_for_candidate: the coach never suggests what the candidate could claim ("you could say
+  you led ...", "maybe it saved money?"). Asking an open question is fine.
+- iv3_followup: when the candidate's answer is vague (no own role, no number, no example, no
+  trade-off), the coach's next question asks for the missing thing, mostly the "[asked for]"
+  one. Fail when the coach accepts vague answers and moves on.
+- style: the coach's replies fit the style above.
+- stays_on_story: when the candidate goes off topic, the coach steers back to the story without
+  answering the unrelated question. not_applicable when the candidate never goes off topic.
+- checks_claims: when the candidate claims big things without specifics, the coach asks what
+  they did themselves and for evidence, and the story does not repeat the claim as fact without
+  it. not_applicable when the candidate makes no such claim.

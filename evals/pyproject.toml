@@ -7,6 +7,7 @@ dependencies = [
     "strong-core",
     "strong-interview",
     "strong-worker",
+    "strong-api",
     "pyyaml>=6.0",
 ]
 
@@ -14,6 +15,7 @@ dependencies = [
 strong-core = { workspace = true }
 strong-interview = { workspace = true }
 strong-worker = { workspace = true }
+strong-api = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]

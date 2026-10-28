@@ -19,6 +19,11 @@ simulated:
     max_questions: 3           # optional cap on core questions
     session: {interview_type: behavioral, difficulty: realistic, mode: realistic,
               duration_min: 30, level: senior}
+coach:                         # optional: coach sessions (CO-9)
+  - id: coach-vague-gentle
+    candidate: vague           # an id in evals/fixtures/coach/candidates.yaml
+    style: gentle              # gentle or direct; both styles of one candidate get a style check
+    max_turns: 6               # optional cap on candidate turns (the fake profile: the script)
 """
 
 from __future__ import annotations
@@ -29,7 +34,7 @@ from typing import Literal
 import yaml
 from pydantic import Field
 
-from strong_core.schemas import Contract, SessionConfig
+from strong_core.schemas import CoachStyle, Contract, SessionConfig
 from strong_evals import EVALS_DIR
 from strong_evals.transcripts import Quality
 
@@ -56,6 +61,15 @@ class GapSpec(Contract):
     profile: str | None = Field(default=None, description="Profile file under profiles/.")
 
 
+class CoachSpec(Contract):
+    """One coach session to run (CO-9)."""
+
+    id: str = Field(pattern=r"^[a-z0-9-]+$")
+    candidate: str = Field(description="An id in evals/fixtures/coach/candidates.yaml.")
+    style: CoachStyle
+    max_turns: int = Field(default=6, ge=1, le=20)
+
+
 class Suite(Contract):
     name: str
     description: str
@@ -63,6 +77,7 @@ class Suite(Contract):
     scripted: list[str] | Literal["all"] = Field(default_factory=list)
     simulated: list[SimulatedSpec] = Field(default_factory=list)
     gap: list[GapSpec] = Field(default_factory=list)
+    coach: list[CoachSpec] = Field(default_factory=list)
 
 
 def suite_names(folder: Path = SUITES_DIR) -> list[str]:
@@ -86,4 +101,6 @@ def load_suite(name: str, folder: Path = SUITES_DIR) -> Suite:
         suite.simulated += [s for s in sub.simulated if s.id not in known]
         known_gap = {g.id for g in suite.gap}
         suite.gap += [g for g in sub.gap if g.id not in known_gap]
+        known_coach = {c.id for c in suite.coach}
+        suite.coach += [c for c in sub.coach if c.id not in known_coach]
     return suite

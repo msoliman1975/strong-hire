@@ -29,3 +29,25 @@ gap_cost_usd:
 debrief_ready_s:
   max: 60
   source: "Spec FB-3: debrief ready within 60 seconds of session end. Measured as the slowest scorer run"
+coach_invented_facts:
+  max: 0
+  source: "Spec CO-9: the coach never adds facts the candidate did not say. Code checks on every profile, the judge off the fake profile"
+coach_one_question:
+  min: 1.0
+  source: "Spec CO-4: one question at a time"
+coach_iv3_followup:
+  min: 0.80
+  source: "Harness default, same bar as follow_up_rate. IV-3 asks for follow-ups on vague answers but gives no number"
+coach_judge_pass:
+  min: 0.90
+  source: "Harness default. Share of applicable judge verdicts that pass, all coach rules"
+coach_style_distinct:
+  min: 0.75
+  source: "Harness default. CO-5: the judge tells direct from gentle in 3 of 4 candidate pairs"
+coach_versions_faithful:
+  min: 1.0
+  source: "Spec CO-8, CO-9: every version quotes only the candidate's words"
+coach_dropped_updates:
+  source: "Information. Part updates the engine dropped because the quotes did not match (CO-3)"
+coach_cost_per_session_usd:
+  source: "Information. Coach minutes are not priced yet"
