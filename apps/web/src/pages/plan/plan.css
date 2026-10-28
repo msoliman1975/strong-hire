@@ -72,3 +72,109 @@
 .plan-story-fit__reason {
   display: block;
 }
+
+/* ------------------------------------------------ U1: closer to the canvas board B1 Plan */
+
+/* What they'll test and where they'll probe, side by side on wide screens. */
+.plan-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.plan-tested__more {
+  margin-top: 12px;
+}
+
+/* The next rehearsal: the board's dark card, with pill choices. */
+.card.plan-next {
+  background: var(--sh-ink);
+  border-color: var(--sh-ink);
+  border-top: 0;
+  color: #ffffff;
+  --muted: #c9c5d6;
+  --sh-muted: #c9c5d6;
+}
+
+.plan-next h2,
+.plan-next .label,
+.plan-next label {
+  color: #ffffff;
+}
+
+.plan-next .muted,
+.plan-next .hint {
+  color: #c9c5d6;
+}
+
+.plan-next a {
+  color: var(--sh-violet-light);
+}
+
+.plan-next fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.plan-next .choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.plan-next .choice {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid #45405a;
+  border-radius: var(--sh-radius-pill);
+  background: transparent;
+  color: #ffffff;
+}
+
+.plan-next .choice__name {
+  font-weight: 600;
+}
+
+/* The hints stay for screen readers; the canvas shows the pills only. */
+.plan-next .choice__hint {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.plan-next .choice:has(input:checked) {
+  background: var(--sh-violet-light);
+  border-color: var(--sh-violet-light);
+  box-shadow: none;
+  color: var(--sh-ink);
+}
+
+.plan-next .choice:has(input:disabled) {
+  color: #8d889c;
+  border-style: dashed;
+}
+
+.plan-next select {
+  color: var(--sh-ink);
+}
+
+.plan-next .btn--block {
+  background: #ffffff;
+  color: var(--sh-ink);
+}
+
+.plan-next .btn--block:hover:not(:disabled) {
+  background: var(--sh-violet-soft);
+}
+
+.plan-next form > fieldset .label,
+.plan-next form > fieldset legend {
+  margin-bottom: 8px;
+}

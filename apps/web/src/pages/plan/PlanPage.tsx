@@ -4,6 +4,7 @@
  * header with the countdown (PP-2), what they'll test, where they'll probe, earlier rehearsals
  * and the next rehearsal setup (PP-4).
  */
+import { useState } from "react";
 import { Link, useParams } from "react-router";
 
 import type { ReportItem } from "../../api/types";
@@ -16,7 +17,7 @@ import { DayPlan } from "./DayPlan";
 import { InterviewDate } from "./InterviewDate";
 import { PlanSetup } from "./PlanSetup";
 import { StoryFitTable } from "./StoryFitTable";
-import { ReadinessPanel } from "./ReadinessPanel";
+import { ReadinessPanel, ReadinessRing } from "./ReadinessPanel";
 import "./plan.css";
 
 const isVerdict = (r: ReportItem) => r.type === "interview_debrief" && r.hire_signal !== null;
@@ -37,6 +38,13 @@ function PlanBody({ plan, jobId, resumeId }: { plan: PlanView; jobId: string; re
   const gap = plan.gap;
   const analysis = gap?.status === "ready" ? gap.analysis : null;
   const verdicts = plan.reports.filter(isVerdict);
+  // The rounds in the company's loop show; a generic plan shows the behavioral round. The other
+  // rounds open on request, so the card stays as short as the canvas's.
+  const [allTypes, setAllTypes] = useState(false);
+  const inLoop = plan.tested.filter((t) => t.in_loop);
+  const firstTypes = inLoop.length > 0 ? inLoop : plan.tested.filter((t) => t.interview_type === "behavioral");
+  const shownTypes = allTypes || firstTypes.length === 0 ? plan.tested : firstTypes;
+  const hiddenTypes = plan.tested.length - shownTypes.length;
 
   return (
     <div className="plan-page">
@@ -54,92 +62,100 @@ function PlanBody({ plan, jobId, resumeId }: { plan: PlanView; jobId: string; re
           daysLeft={plan.days_left}
           editable={!plan.job.deleted}
         />
+        <ReadinessRing jobId={jobId} resumeId={resumeId} />
       </PageHead>
 
       <div className="plan-grid">
         <div className="plan-main stack">
-          <section className="card" aria-labelledby="plan-test-heading">
-            <h2 id="plan-test-heading">What they'll test</h2>
-            <p className="muted">
-              {plan.company_mode === "curated"
-                ? `From ${company ?? "the company"}'s interview profile${plan.values_framework ? ` and its ${plan.values_framework}` : ""}.`
-                : "Equal weights for each competency, until this company has a profile."}
-            </p>
-            <div className="plan-tested">
-              {plan.tested.map((t) => (
-                <div key={t.interview_type} className="plan-tested__type" data-testid="tested-type">
-                  <h3>
-                    {interviewTypeLabel[t.interview_type]}{" "}
-                    {t.in_loop && <StatusBadge tone="prep">In their loop</StatusBadge>}
-                  </h3>
-                  <ul className="plain-list">
-                    {t.competencies.map((c) => {
-                      const pct = Math.round(c.share * 100);
-                      return (
-                        <li key={c.competency} className="plan-weight">
-                          <span>{competencyLabel(c.competency)}</span>
-                          <Bar value={pct} label={`${competencyLabel(c.competency)}: ${pct}% of this round`} />
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="card" aria-labelledby="plan-probe-heading">
-            <h2 id="plan-probe-heading">Where they'll probe</h2>
-            {analysis ? (
-              <>
-                <ul data-testid="probe-areas">
-                  {analysis.probe_areas.map((p) => (
-                    <li key={p}>{p}</li>
-                  ))}
-                </ul>
-                <p className="muted">
-                  Match score {analysis.match_score} of 100, from the gap analysis on {formatDate(gap!.created_at)}.
-                  {gap!.stale && " The job, your CV or the company profile changed since; run it again to update it."}{" "}
-                  <Link to={`/jobs/${jobId}/gap?report=${encodeURIComponent(gap!.id)}`}>See the full gap analysis</Link>
-                </p>
-                {analysis.session_plan.length > 0 && (
-                  <>
-                    <h3>Practice plan</h3>
-                    <ol className="plain-list" data-testid="session-plan">
-                      {[...analysis.session_plan]
-                        .sort((a, b) => a.priority - b.priority)
-                        .map((p) => (
-                          <li key={p.priority}>
-                            <strong>
-                              {interviewTypeLabel[p.interview_type]}, {difficultyLabel[p.difficulty]}
-                            </strong>
-                            <span className="muted">
-                              {" "}
-                              {p.focus_topics.join(", ")}. {p.reason}
-                            </span>
+          <div className="plan-pair">
+            <section className="card" aria-labelledby="plan-test-heading">
+              <h2 id="plan-test-heading">What they'll test</h2>
+              <p className="muted">
+                {plan.company_mode === "curated"
+                  ? `From ${company ?? "the company"}'s interview profile${plan.values_framework ? ` and its ${plan.values_framework}` : ""}.`
+                  : "Equal weights for each competency, until this company has a profile."}
+              </p>
+              <div className="plan-tested">
+                {shownTypes.map((t) => (
+                  <div key={t.interview_type} className="plan-tested__type" data-testid="tested-type">
+                    <h3>
+                      {interviewTypeLabel[t.interview_type]}{" "}
+                      {t.in_loop && <StatusBadge tone="prep">In their loop</StatusBadge>}
+                    </h3>
+                    <ul className="plain-list">
+                      {t.competencies.map((c) => {
+                        const pct = Math.round(c.share * 100);
+                        return (
+                          <li key={c.competency} className="plan-weight">
+                            <span>{competencyLabel(c.competency)}</span>
+                            <Bar value={pct} label={`${competencyLabel(c.competency)}: ${pct}% of this round`} />
                           </li>
-                        ))}
-                    </ol>
-                  </>
-                )}
-              </>
-            ) : gap?.status === "running" ? (
-              <Loading label="Comparing your resume with the job. This takes about a minute." />
-            ) : (
-              <div data-testid="no-gap">
-                <p>
-                  {gap?.status === "failed"
-                    ? (gap.error ?? "The gap analysis failed.")
-                    : "Run the free gap analysis to see where they'll probe and what to practice first."}
-                </p>
-                {!plan.job.deleted && !plan.resume.deleted && (
-                  <Link className="btn btn--secondary" to={contextPath(jobId, resumeId)}>
-                    {gap ? "Run the gap analysis again" : "Run the gap analysis"}
-                  </Link>
-                )}
+                        );
+                      })}
+                    </ul>
+                  </div>
+                ))}
               </div>
-            )}
-          </section>
+              {hiddenTypes > 0 && (
+                <button className="btn btn--quiet plan-tested__more" type="button" onClick={() => setAllTypes(true)}>
+                  Show the other {hiddenTypes === 1 ? "round" : `${hiddenTypes} rounds`}
+                </button>
+              )}
+            </section>
+
+            <section className="card" aria-labelledby="plan-probe-heading">
+              <h2 id="plan-probe-heading">Where they'll probe</h2>
+              {analysis ? (
+                <>
+                  <ul data-testid="probe-areas">
+                    {analysis.probe_areas.map((p) => (
+                      <li key={p}>{p}</li>
+                    ))}
+                  </ul>
+                  <p className="muted">
+                    Match score {analysis.match_score} of 100, from the gap analysis on {formatDate(gap!.created_at)}.
+                    {gap!.stale && " The job, your CV or the company profile changed since; run it again to update it."}{" "}
+                    <Link to={`/jobs/${jobId}/gap?report=${encodeURIComponent(gap!.id)}`}>See the full gap analysis</Link>
+                  </p>
+                  {analysis.session_plan.length > 0 && (
+                    <>
+                      <h3>Practice plan</h3>
+                      <ol className="plain-list" data-testid="session-plan">
+                        {[...analysis.session_plan]
+                          .sort((a, b) => a.priority - b.priority)
+                          .map((p) => (
+                            <li key={p.priority}>
+                              <strong>
+                                {interviewTypeLabel[p.interview_type]}, {difficultyLabel[p.difficulty]}
+                              </strong>
+                              <span className="muted">
+                                {" "}
+                                {p.focus_topics.join(", ")}. {p.reason}
+                              </span>
+                            </li>
+                          ))}
+                      </ol>
+                    </>
+                  )}
+                </>
+              ) : gap?.status === "running" ? (
+                <Loading label="Comparing your resume with the job. This takes about a minute." />
+              ) : (
+                <div data-testid="no-gap">
+                  <p>
+                    {gap?.status === "failed"
+                      ? (gap.error ?? "The gap analysis failed.")
+                      : "Run the free gap analysis to see where they'll probe and what to practice first."}
+                  </p>
+                  {!plan.job.deleted && !plan.resume.deleted && (
+                    <Link className="btn btn--secondary" to={contextPath(jobId, resumeId)}>
+                      {gap ? "Run the gap analysis again" : "Run the gap analysis"}
+                    </Link>
+                  )}
+                </div>
+              )}
+            </section>
+          </div>
 
           <StoryFitTable jobId={jobId} resumeId={resumeId} />
 

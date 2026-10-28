@@ -179,6 +179,19 @@ describe("live session page", () => {
     expect(screen.getByRole("button", { name: "Ask for a hint" })).toBeDisabled();
   });
 
+  it("TN-1: with v2 on the room names the session's tone and lays out the canvas room", async () => {
+    setFeatureOverrides({ v2_enabled: true });
+    const { user } = renderLive(session({ config: { ...session().config, tone: "direct" } }));
+    expect(await screen.findByText(/Coach mode, direct tone/)).toBeInTheDocument();
+    await joinRoom(user);
+    expect(screen.getByRole("region", { name: "Interview" })).toHaveAttribute("data-v2", "true");
+  });
+
+  it("FL-1: with v2 off the room keeps its v1 subtitle", async () => {
+    renderLive(session({ config: { ...session().config, tone: "direct" } }));
+    expect(await screen.findByText(/Coach mode$/)).toBeInTheDocument();
+  });
+
   it("AV-1: without the avatar flag the room shows the interviewer state, and no 3D avatar", async () => {
     const { user } = renderLive(session());
     await joinRoom(user);

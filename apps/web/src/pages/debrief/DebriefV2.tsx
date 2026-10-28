@@ -47,12 +47,18 @@ export function DebriefV2({
         <p className="muted">
           {modeLabel[config.mode]} mode{date && `, ${formatDate(date)}`}
         </p>
-        {/* TR-1 (S13). */}
-        {session.ended_at && (
-          <p>
-            <Link to={`/sessions/${session.id}/transcript`}>Read the transcript</Link>
-          </p>
-        )}
+        <p className="debrief-v2__head-links">
+          {/* The job's gap route opens its plan page with v2 on (V2Redirect, PP-1). */}
+          <Link className="text-link" to={`/jobs/${session.job_target_id}/gap`}>
+            {debrief.company_name ? `${debrief.company_name} plan` : "Your plan"}
+          </Link>
+          {/* TR-1 (S13). */}
+          {session.ended_at && (
+            <Link className="btn btn--secondary" to={`/sessions/${session.id}/transcript`}>
+              Read the transcript
+            </Link>
+          )}
+        </p>
       </PageHead>
 
       <section className="debrief-v2__verdict" aria-label="Verdict">

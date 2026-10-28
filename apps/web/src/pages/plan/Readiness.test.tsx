@@ -1,6 +1,6 @@
 /** RD-1, RD-2, RD-3: practice readiness per skill, the day plan and the practice-estimate notice. */
 import { QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import type { ReactNode } from "react";
 import { MemoryRouter } from "react-router";
@@ -11,7 +11,7 @@ import { server } from "../../mocks/node";
 import { DayPlan } from "./DayPlan";
 import { ReadinessBadge } from "./ReadinessBadge";
 import { READINESS_NOTICE, READINESS_NOTICE_SHORT, type DayPlan as DayPlanData, type DayPlanItem, type Readiness } from "./ReadinessApi";
-import { ReadinessPanel } from "./ReadinessPanel";
+import { ReadinessPanel, ReadinessRing } from "./ReadinessPanel";
 
 const READINESS: Readiness = {
   job_target_id: "j1",
@@ -102,6 +102,30 @@ describe("ReadinessPanel", () => {
     wrap(<ReadinessPanel jobId="j1" resumeId="r1" />);
     expect(await screen.findByText(/Run 2 Realistic rehearsals/)).toBeInTheDocument();
     expect(screen.getByTestId("readiness-notice")).toBeInTheDocument();
+  });
+});
+
+describe("ReadinessRing and folded rows (canvas B1)", () => {
+  it("RD-1, RD-3: the plan header ring shows the skills at the bar, in text, with the notice", async () => {
+    serve(READINESS);
+    wrap(<ReadinessRing jobId="j1" resumeId="r1" />);
+    const ring = await screen.findByTestId("readiness-ring");
+    expect(ring).toHaveTextContent("1 of 3 skills at the bar.");
+    expect(ring).toHaveTextContent("Practice estimate, not a prediction.");
+  });
+
+  it("RD-1: no ring before any skill is scored", async () => {
+    serve({ ...READINESS, skills: READINESS.skills.map((s) => ({ ...s, status: "not_enough_data", score: null })) });
+    wrap(<ReadinessRing jobId="j1" resumeId="r1" />);
+    await new Promise((r) => setTimeout(r, 50));
+    expect(screen.queryByTestId("readiness-ring")).toBeNull();
+  });
+
+  it("RD-1: before any skill is scored the per-skill rows fold away, one click from view", async () => {
+    serve({ ...READINESS, skills: READINESS.skills.map((s) => ({ ...s, status: "not_enough_data", score: null })) });
+    wrap(<ReadinessPanel jobId="j1" resumeId="r1" />);
+    fireEvent.click(await screen.findByRole("button", { name: "Show each skill (3)" }));
+    expect(screen.getAllByTestId("readiness-skill")).toHaveLength(3);
   });
 });
 

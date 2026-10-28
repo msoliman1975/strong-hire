@@ -46,6 +46,14 @@ const PHASES = Object.keys(phaseLabel) as Phase[];
 export const AGENT_WAIT_MS = 60_000;
 /** After this long, the page says that the wait is normal. */
 const SLOW_AGENT_MS = 10_000;
+
+/** TN-1 tones, as the room's subtitle says them. */
+const ROOM_TONE_LABEL: Record<string, string> = {
+  as_company: "company",
+  warm: "warm",
+  neutral: "neutral",
+  direct: "direct",
+};
 /** The voice agent keeps the session this long after a drop (IV-9). */
 const RECONNECT_MIN = 2;
 
@@ -199,6 +207,8 @@ function LiveView({ session }: { session: SessionRecord }) {
         <p>
           {interviewTypeLabel[config.interview_type]} interview, {difficultyLabel[config.difficulty]} difficulty,{" "}
           {modeLabel[config.mode]} mode
+          {/* TN-1: the tone stored on the session, as in the canvas room's header. */}
+          {v2 && config.tone && `, ${ROOM_TONE_LABEL[config.tone]} tone`}
         </p>
       </PageHead>
 
@@ -230,7 +240,8 @@ function LiveView({ session }: { session: SessionRecord }) {
       )}
 
       {inRoom && (
-        <section className="live" aria-label="Interview">
+        // v2 (canvas board B2 Room): the stage centered, the question as a quote, controls in a bar.
+        <section className="live" aria-label="Interview" data-v2={v2 || undefined}>
           <div className="row row--between">
             <div>
               <p className="muted">Time left</p>
@@ -292,59 +303,61 @@ function LiveView({ session }: { session: SessionRecord }) {
               </aside>
             )}
           </div>
-          <p className="muted">Your audio is never stored. Only the text of the interview is kept.</p>
-          <div className="row section" aria-label="Prep time">
-            {preparing ? (
-              <>
-                <p>
-                  Prep time left: <span data-testid="prep-timer">{clock(prepLeft)}</span>
-                </p>
-                <button type="button" className="btn" onClick={() => void send("ready")}>
-                  I am ready
-                </button>
-              </>
-            ) : (
-              PREP_MINUTES.map((minutes) => (
+          <p className="muted live__privacy">Your audio is never stored. Only the text of the interview is kept.</p>
+          <div className="live__controls">
+            <div className="row section" aria-label="Prep time">
+              {preparing ? (
+                <>
+                  <p>
+                    Prep time left: <span data-testid="prep-timer">{clock(prepLeft)}</span>
+                  </p>
+                  <button type="button" className="btn" onClick={() => void send("ready")}>
+                    I am ready
+                  </button>
+                </>
+              ) : (
+                PREP_MINUTES.map((minutes) => (
+                  <button
+                    key={minutes}
+                    type="button"
+                    className="btn btn--secondary"
+                    disabled={stage !== "live" || paused}
+                    onClick={() => void send({ prep: minutes })}
+                  >
+                    Take {minutes} {minutes === 1 ? "minute" : "minutes"} to prepare
+                  </button>
+                ))
+              )}
+            </div>
+            {config.mode === "coach" && (
+              <div className="row section">
                 <button
-                  key={minutes}
+                  type="button"
+                  className="btn btn--secondary"
+                  disabled={stage !== "live" || preparing}
+                  onClick={() => void send(paused ? "resume" : "pause")}
+                >
+                  {paused ? "Resume" : "Pause"}
+                </button>
+                <button
                   type="button"
                   className="btn btn--secondary"
                   disabled={stage !== "live" || paused}
-                  onClick={() => void send({ prep: minutes })}
+                  onClick={() => void send("hint")}
                 >
-                  Take {minutes} {minutes === 1 ? "minute" : "minutes"} to prepare
+                  Ask for a hint
                 </button>
-              ))
+                <button
+                  type="button"
+                  className="btn btn--secondary"
+                  disabled={stage !== "live" || paused}
+                  onClick={() => void send("redo")}
+                >
+                  Redo my answer
+                </button>
+              </div>
             )}
           </div>
-          {config.mode === "coach" && (
-            <div className="row section">
-              <button
-                type="button"
-                className="btn btn--secondary"
-                disabled={stage !== "live" || preparing}
-                onClick={() => void send(paused ? "resume" : "pause")}
-              >
-                {paused ? "Resume" : "Pause"}
-              </button>
-              <button
-                type="button"
-                className="btn btn--secondary"
-                disabled={stage !== "live" || paused}
-                onClick={() => void send("hint")}
-              >
-                Ask for a hint
-              </button>
-              <button
-                type="button"
-                className="btn btn--secondary"
-                disabled={stage !== "live" || paused}
-                onClick={() => void send("redo")}
-              >
-                Redo my answer
-              </button>
-            </div>
-          )}
         </section>
       )}
 

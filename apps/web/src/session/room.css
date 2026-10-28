@@ -143,3 +143,70 @@
   font-size: 0.8125rem;
   color: #f5b06b;
 }
+
+/* ------------------------------------------------ U1, v2 only: closer to the canvas board B2 Room */
+
+.live[data-v2] .phases {
+  justify-content: center;
+}
+
+.live[data-v2] .room-live__stage {
+  align-items: stretch;
+  text-align: center;
+}
+
+/* The question as a quote: the interviewer's latest line, large and centered. Earlier lines
+ * stay above it, smaller, so the captions keep the whole exchange. */
+.live[data-v2] .live__captions {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-size: 1rem;
+  color: var(--sh-room-muted);
+}
+
+.live[data-v2] .live__captions p:last-child {
+  margin-top: var(--space-3);
+  font-size: clamp(1.375rem, 2.6vw, 2rem);
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--sh-room-text);
+}
+
+.live[data-v2] .live__captions p:last-child::before {
+  content: "“";
+}
+
+.live[data-v2] .live__captions p:last-child::after {
+  content: "”";
+}
+
+.live[data-v2] .live__captions p.muted:last-child::before,
+.live[data-v2] .live__captions p.muted:last-child::after {
+  content: none;
+}
+
+.live[data-v2] .live__privacy {
+  text-align: center;
+  font-size: 0.8125rem;
+}
+
+/* The controls in one bar along the bottom, as on the canvas. */
+.live[data-v2] .live__controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--sh-room-line);
+}
+
+.live[data-v2] .live__controls .row.section {
+  margin: 0;
+  justify-content: center;
+}
+
+.live[data-v2] ~ .row.section {
+  justify-content: center;
+}

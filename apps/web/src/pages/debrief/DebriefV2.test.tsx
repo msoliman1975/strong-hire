@@ -101,6 +101,15 @@ describe("v2 debrief", () => {
     expect(screen.getByTestId("signal-change")).toHaveTextContent("Your first scored session");
   });
 
+  it("DB-1: the header links back to the plan and to the transcript, as on the canvas", async () => {
+    renderDebrief(debrief());
+    expect(await screen.findByRole("link", { name: "Example Corp plan" })).toHaveAttribute("href", "/jobs/j1/gap");
+    expect(screen.getByRole("link", { name: "Read the transcript" })).toHaveAttribute(
+      "href",
+      expect.stringMatching(/^\/sessions\/.+\/transcript$/),
+    );
+  });
+
   it("DB-2: says how many answers met the bar", async () => {
     renderDebrief(debrief());
     // The fixture: q1 averages 3 (met), q2 averages 2 (not met).
