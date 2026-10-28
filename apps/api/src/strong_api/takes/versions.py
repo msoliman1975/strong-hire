@@ -1,7 +1,10 @@
 """CO-8: the coach's 60-second and full versions of a story, from the candidate's own words.
 
-The coach role writes both versions with prompt coach/story_versions. Code then checks each one
-against what the candidate said (the story's parts and its takes):
+The coach role writes both versions with prompt coach/story_versions. It reads the story's parts
+only as an outline: in a coach story the coach wrote them, so they are not the candidate's words.
+Every quote must come from what the candidate said themself (`said`): their coach turns, the
+interview answer a story was saved from, and their takes (strong_api.takes.words). Code then
+checks each version against those words only:
 - every quote is the candidate's words (the coach engine's quote match, CO-3);
 - every number in the text is in the quotes, as digits or as a word ("5" and "five");
 - every sentence is backed by the quotes: at least SUPPORT_SHARE of its content words appear in
@@ -28,7 +31,7 @@ log = logging.getLogger(__name__)
 
 SUPPORT_SHARE = 0.5
 STEM_CHARS = 5
-TAKES_IN_PROMPT = 5  # the most recent takes the coach reads
+SAID_PROMPT_CHARS = 16000  # the candidate's most recent words the coach reads
 
 _NUMBER = re.compile(r"\d+(?:[.,]\d+)*")
 _SENTENCE_END = re.compile(r"(?<=[.!?])\s+")
@@ -55,12 +58,6 @@ class VersionsResult:
     problems: list[str] = field(default_factory=list)
     prompt_refs: tuple[str, ...] = ()
     calls: int = 0
-
-
-def sources(story: StoryRow, takes: Sequence[str]) -> list[str]:
-    """What the candidate said on this story: its filled parts, then its takes."""
-    parts = [t for p in PARTS if (t := part_text(story, p)) is not None]
-    return [*parts, *(t for t in takes if t.strip())]
 
 
 def said_text(texts: Sequence[str]) -> str:
@@ -129,24 +126,37 @@ def _render_story(story: StoryRow) -> str:
     return "\n".join(lines)
 
 
-def version_messages(story: StoryRow, takes: Sequence[str]) -> list[Message]:
-    recent = [t for t in takes if t.strip()][-TAKES_IN_PROMPT:]
+def recent_words(said: Sequence[str], budget: int = SAID_PROMPT_CHARS) -> list[str]:
+    """The newest of the candidate's texts that fit in `budget` characters, oldest first."""
+    out: list[str] = []
+    used = 0
+    for text in reversed([t.strip() for t in said if t.strip()]):
+        if out and used + len(text) > budget:
+            break
+        out.append(text)
+        used += len(text)
+    return out[::-1]
+
+
+def version_messages(story: StoryRow, said: Sequence[str]) -> list[Message]:
+    words = recent_words(said)
     return [
         load_prompt(Role.COACH, "story_versions").message("system"),
         load_prompt(Role.COACH, "story_versions_input").message(
             "user",
             story=_render_story(story),
-            takes="\n\n".join(f"Take {i}: {t}" for i, t in enumerate(recent, 1)) or "(none)",
+            said="\n\n".join(f"{i}. {t}" for i, t in enumerate(words, 1)) or "(nothing yet)",
         ),
     ]
 
 
 async def write_versions(
-    gateway: ModelGateway, story: StoryRow, takes: Sequence[str]
+    gateway: ModelGateway, story: StoryRow, said_texts: Sequence[str]
 ) -> VersionsResult:
-    """CO-8: both versions, checked against the candidate's words; None after a second miss."""
-    said = said_text(sources(story, takes))
-    messages = version_messages(story, takes)
+    """CO-8: both versions, checked against `said_texts`, the candidate's own words only (never
+    the story's parts); None after a second miss."""
+    said = said_text(said_texts)
+    messages = version_messages(story, said_texts)
     refs: list[str] = []
     problems: list[str] = []
     for attempt in (1, 2):
