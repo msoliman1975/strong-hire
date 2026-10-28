@@ -1215,7 +1215,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/strong_api__sessions__schemas__SessionSetup"
+                  "$ref": "#/components/schemas/SessionSetup"
                 }
               }
             }
@@ -10039,7 +10039,7 @@
           "setup": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/strong_api__admin__schemas__SessionSetup"
+                "$ref": "#/components/schemas/AdminSessionSetup"
               },
               {
                 "type": "null"
@@ -10108,6 +10108,40 @@
           "limit"
         ],
         "title": "AdminSessionList"
+      },
+      "AdminSessionSetup": {
+        "properties": {
+          "brief": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Brief",
+            "description": "Only under the transcript's consent rule; None before the brief is built"
+          },
+          "rubric": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdminRubric"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "brief",
+          "rubric"
+        ],
+        "title": "AdminSessionSetup",
+        "description": "RS-2, AD-5: the brief the interviewer worked from and the rubric the scorer used."
       },
       "AdminSignInSession": {
         "properties": {
@@ -12405,91 +12439,92 @@
         "type": "object"
       },
       "BriefQuestion": {
+        "additionalProperties": false,
         "properties": {
           "id": {
-            "type": "string",
+            "description": "Stable id, used as Turn.question_ref.",
             "pattern": "^[a-z0-9_-]+$",
             "title": "Id",
-            "description": "Stable id, used as Turn.question_ref."
+            "type": "string"
           },
           "text": {
-            "type": "string",
             "minLength": 1,
-            "title": "Text"
+            "title": "Text",
+            "type": "string"
           },
           "competencies": {
             "items": {
               "$ref": "#/components/schemas/Competency"
             },
-            "type": "array",
             "minItems": 1,
-            "title": "Competencies"
+            "title": "Competencies",
+            "type": "array"
           },
           "values": {
+            "description": "Company values this question probes (target_values).",
             "items": {
               "type": "string"
             },
-            "type": "array",
             "title": "Values",
-            "description": "Company values this question probes (target_values)."
+            "type": "array"
           },
           "priority": {
-            "type": "integer",
-            "minimum": 1.0,
+            "description": "1 is asked first.",
+            "minimum": 1,
             "title": "Priority",
-            "description": "1 is asked first."
+            "type": "integer"
           },
           "probe_hints": {
             "items": {
               "type": "string"
             },
-            "type": "array",
-            "title": "Probe Hints"
+            "title": "Probe Hints",
+            "type": "array"
           },
           "source": {
             "$ref": "#/components/schemas/QuestionSource",
-            "description": "CU-3: candidate for the candidate's own.",
-            "default": "planner"
+            "default": "planner",
+            "description": "CU-3: candidate for the candidate's own."
           },
           "category": {
             "anyOf": [
               {
-                "type": "string",
                 "enum": [
                   "behavioral",
                   "hiring_manager",
                   "technical_qa",
                   "case"
-                ]
+                ],
+                "type": "string"
               },
               {
                 "type": "null"
               }
             ],
+            "default": null,
             "description": "Custom sessions only: the question's category (CU-1)."
           },
           "must_ask": {
-            "type": "boolean",
-            "title": "Must Ask",
+            "default": false,
             "description": "CU-4: the session controller asks it before CANDIDATE_QUESTIONS.",
-            "default": false
+            "title": "Must Ask",
+            "type": "boolean"
           },
           "verbatim": {
-            "type": "boolean",
-            "title": "Verbatim",
+            "default": false,
             "description": "CU-4: read the text word for word.",
-            "default": false
+            "title": "Verbatim",
+            "type": "boolean"
           }
         },
-        "additionalProperties": false,
-        "type": "object",
         "required": [
           "id",
           "text",
           "competencies",
           "priority"
         ],
-        "title": "BriefQuestion"
+        "title": "BriefQuestion",
+        "type": "object"
       },
       "Budget": {
         "properties": {
@@ -15481,6 +15516,8 @@
         "description": "L04 waitlist: when the person's real interview is, as they told us."
       },
       "InterviewerBrief": {
+        "additionalProperties": false,
+        "description": "Built by the planner before each session. The live interviewer reads only this.",
         "properties": {
           "session": {
             "$ref": "#/components/schemas/SessionConfig"
@@ -15494,70 +15531,72 @@
                 "type": "null"
               }
             ],
-            "title": "Company Name",
-            "description": "None in generic mode."
+            "default": null,
+            "description": "None in generic mode.",
+            "title": "Company Name"
           },
           "generic_mode": {
-            "type": "boolean",
-            "title": "Generic Mode"
+            "title": "Generic Mode",
+            "type": "boolean"
           },
           "profile_version": {
             "anyOf": [
               {
-                "type": "integer",
-                "minimum": 1.0
+                "minimum": 1,
+                "type": "integer"
               },
               {
                 "type": "null"
               }
             ],
+            "default": null,
             "title": "Profile Version"
           },
           "target_competencies": {
+            "description": "4 to 6; a mini interview has 2.",
             "items": {
               "$ref": "#/components/schemas/Competency"
             },
-            "type": "array",
             "maxItems": 6,
             "minItems": 2,
             "title": "Target Competencies",
-            "description": "4 to 6; a mini interview has 2."
+            "type": "array"
           },
           "target_values": {
+            "description": "Company value names (Principle.name) to probe. Empty in generic mode.",
             "items": {
               "type": "string"
             },
-            "type": "array",
             "maxItems": 4,
             "title": "Target Values",
-            "description": "Company value names (Principle.name) to probe. Empty in generic mode."
+            "type": "array"
           },
           "questions": {
+            "description": "6 to 10; a mini interview has 3.",
             "items": {
               "$ref": "#/components/schemas/BriefQuestion"
             },
-            "type": "array",
             "maxItems": 10,
             "minItems": 3,
             "title": "Questions",
-            "description": "6 to 10; a mini interview has 3."
+            "type": "array"
           },
           "probe_areas": {
             "items": {
               "type": "string"
             },
-            "type": "array",
-            "title": "Probe Areas"
+            "title": "Probe Areas",
+            "type": "array"
           },
           "persona": {
             "$ref": "#/components/schemas/PersonaBrief"
           },
           "max_probes_per_question": {
-            "type": "integer",
-            "maximum": 3.0,
-            "minimum": 0.0,
+            "description": "IV-3.",
+            "maximum": 3,
+            "minimum": 0,
             "title": "Max Probes Per Question",
-            "description": "IV-3."
+            "type": "integer"
           },
           "curveball": {
             "anyOf": [
@@ -15568,8 +15607,9 @@
                 "type": "null"
               }
             ],
-            "title": "Curveball",
-            "description": "Tough difficulty only (IV-4)."
+            "default": null,
+            "description": "Tough difficulty only (IV-4).",
+            "title": "Curveball"
           },
           "seniority_bar": {
             "anyOf": [
@@ -15580,32 +15620,31 @@
                 "type": "null"
               }
             ],
-            "title": "Seniority Bar",
-            "description": "Scope expected at session.level (IV-6). Level changes the bar."
+            "default": null,
+            "description": "Scope expected at session.level (IV-6). Level changes the bar.",
+            "title": "Seniority Bar"
           },
           "pushback": {
-            "type": "boolean",
-            "title": "Pushback",
+            "default": false,
             "description": "Tough difficulty only: challenge assumptions (IV-4).",
-            "default": false
+            "title": "Pushback",
+            "type": "boolean"
           },
           "coach_help": {
-            "type": "boolean",
-            "title": "Coach Help",
+            "default": false,
             "description": "Coach mode only: pause, hint and redo are allowed (IV-8).",
-            "default": false
+            "title": "Coach Help",
+            "type": "boolean"
           },
           "time_plan": {
+            "description": "Minutes per phase. When set, the minutes add up to session.duration_min.",
             "items": {
               "$ref": "#/components/schemas/PhaseTime"
             },
-            "type": "array",
             "title": "Time Plan",
-            "description": "Minutes per phase. When set, the minutes add up to session.duration_min."
+            "type": "array"
           }
         },
-        "additionalProperties": false,
-        "type": "object",
         "required": [
           "session",
           "generic_mode",
@@ -15615,7 +15654,7 @@
           "max_probes_per_question"
         ],
         "title": "InterviewerBrief",
-        "description": "Built by the planner before each session. The live interviewer reads only this."
+        "type": "object"
       },
       "InviteIn": {
         "properties": {
@@ -18250,31 +18289,31 @@
         "title": "PasswordSignupRequest"
       },
       "PersonaBrief": {
+        "additionalProperties": false,
         "properties": {
           "tone": {
-            "type": "string",
             "minLength": 1,
-            "title": "Tone"
+            "title": "Tone",
+            "type": "string"
           },
           "pushback_style": {
-            "type": "string",
             "minLength": 1,
-            "title": "Pushback Style"
+            "title": "Pushback Style",
+            "type": "string"
           },
           "closing_style": {
-            "type": "string",
             "minLength": 1,
-            "title": "Closing Style"
+            "title": "Closing Style",
+            "type": "string"
           }
         },
-        "additionalProperties": false,
-        "type": "object",
         "required": [
           "tone",
           "pushback_style",
           "closing_style"
         ],
-        "title": "PersonaBrief"
+        "title": "PersonaBrief",
+        "type": "object"
       },
       "PersonaNotes": {
         "additionalProperties": false,
@@ -18323,25 +18362,25 @@
         "description": "Session state machine phases (IV-7). The session controller moves phases, not the LLM."
       },
       "PhaseTime": {
+        "additionalProperties": false,
+        "description": "Minutes planned for one phase of the session (IV-7).",
         "properties": {
           "phase": {
             "$ref": "#/components/schemas/Phase"
           },
           "minutes": {
-            "type": "integer",
-            "maximum": 45.0,
-            "minimum": 0.0,
-            "title": "Minutes"
+            "maximum": 45,
+            "minimum": 0,
+            "title": "Minutes",
+            "type": "integer"
           }
         },
-        "additionalProperties": false,
-        "type": "object",
         "required": [
           "phase",
           "minutes"
         ],
         "title": "PhaseTime",
-        "description": "Minutes planned for one phase of the session (IV-7)."
+        "type": "object"
       },
       "PlanOut": {
         "properties": {
@@ -21357,7 +21396,7 @@
           "setup": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/strong_api__admin__schemas__SessionSetup"
+                "$ref": "#/components/schemas/AdminSessionSetup"
               },
               {
                 "type": "null"
@@ -21381,6 +21420,43 @@
           "scenario"
         ],
         "title": "SessionReplay"
+      },
+      "SessionSetup": {
+        "properties": {
+          "job_target_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Job Target Id"
+          },
+          "resume_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resume Id"
+          },
+          "config": {
+            "$ref": "#/components/schemas/SessionConfig",
+            "description": "For a Custom session, `custom` holds its setup."
+          },
+          "channel": {
+            "$ref": "#/components/schemas/SessionChannel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "job_target_id",
+          "resume_id",
+          "config",
+          "channel"
+        ],
+        "title": "SessionSetup",
+        "description": "CU-9: a setup to prefill, from an earlier session. Same fields as CreateSessionRequest."
       },
       "SessionStatus": {
         "type": "string",
@@ -24266,75 +24342,6 @@
           "duplicate"
         ],
         "title": "WebhookOut"
-      },
-      "strong_api__admin__schemas__SessionSetup": {
-        "properties": {
-          "brief": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/InterviewerBrief"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Only under the transcript's consent rule; None before the brief is built"
-          },
-          "rubric": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/AdminRubric"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          }
-        },
-        "type": "object",
-        "required": [
-          "brief",
-          "rubric"
-        ],
-        "title": "SessionSetup",
-        "description": "RS-2, AD-5: the brief the interviewer worked from and the rubric the scorer used."
-      },
-      "strong_api__sessions__schemas__SessionSetup": {
-        "properties": {
-          "job_target_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Job Target Id"
-          },
-          "resume_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Resume Id"
-          },
-          "config": {
-            "$ref": "#/components/schemas/SessionConfig",
-            "description": "For a Custom session, `custom` holds its setup."
-          },
-          "channel": {
-            "$ref": "#/components/schemas/SessionChannel"
-          }
-        },
-        "type": "object",
-        "required": [
-          "job_target_id",
-          "resume_id",
-          "config",
-          "channel"
-        ],
-        "title": "SessionSetup",
-        "description": "CU-9: a setup to prefill, from an earlier session. Same fields as CreateSessionRequest."
       }
     }
   }

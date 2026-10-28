@@ -8,7 +8,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from strong_api.admin.schemas import SessionSetup
+from strong_api.admin.schemas import AdminSessionSetup
 from strong_core.schemas import Difficulty, InterviewType, Level, Mode, Scorecard
 from strong_core.schemas.enums import SimRunStatus
 from strong_core.schemas.session import DurationMin
@@ -259,6 +259,6 @@ class SessionReplay(BaseModel):
     inputs: SimInputsOut | None = Field(
         default=None, description="SM-20: the pasted job and CV the run used, if any"
     )
-    setup: SessionSetup | None = Field(
+    setup: AdminSessionSetup | None = Field(
         default=None, description="AD-5: the brief and the rubric, as on the session page"
     )

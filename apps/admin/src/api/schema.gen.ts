@@ -3710,7 +3710,7 @@ export interface components {
              */
             cost_total_usd?: number | null;
             /** @description AD-5: the brief (consent rule) and the rubric */
-            setup?: components["schemas"]["strong_api__admin__schemas__SessionSetup"] | null;
+            setup?: components["schemas"]["AdminSessionSetup"] | null;
             /**
              * Turn Latency
              * @description AI-3: per-turn voice latency (OB-3)
@@ -3735,6 +3735,20 @@ export interface components {
             total_cost_usd: number;
             /** Limit */
             limit: number;
+        };
+        /**
+         * AdminSessionSetup
+         * @description RS-2, AD-5: the brief the interviewer worked from and the rubric the scorer used.
+         */
+        AdminSessionSetup: {
+            /**
+             * Brief
+             * @description Only under the transcript's consent rule; None before the brief is built
+             */
+            brief: {
+                [key: string]: unknown;
+            } | null;
+            rubric: components["schemas"]["AdminRubric"] | null;
         };
         /**
          * AdminSignInSession
@@ -4585,8 +4599,11 @@ export interface components {
              * @default planner
              */
             source: components["schemas"]["QuestionSource"];
-            /** @description Custom sessions only: the question's category (CU-1). */
-            category?: ("behavioral" | "hiring_manager" | "technical_qa" | "case") | null;
+            /**
+             * @description Custom sessions only: the question's category (CU-1).
+             * @default null
+             */
+            category: ("behavioral" | "hiring_manager" | "technical_qa" | "case") | null;
             /**
              * Must Ask
              * @description CU-4: the session controller asks it before CANDIDATE_QUESTIONS.
@@ -5873,12 +5890,16 @@ export interface components {
             /**
              * Company Name
              * @description None in generic mode.
+             * @default null
              */
-            company_name?: string | null;
+            company_name: string | null;
             /** Generic Mode */
             generic_mode: boolean;
-            /** Profile Version */
-            profile_version?: number | null;
+            /**
+             * Profile Version
+             * @default null
+             */
+            profile_version: number | null;
             /**
              * Target Competencies
              * @description 4 to 6; a mini interview has 2.
@@ -5905,13 +5926,15 @@ export interface components {
             /**
              * Curveball
              * @description Tough difficulty only (IV-4).
+             * @default null
              */
-            curveball?: string | null;
+            curveball: string | null;
             /**
              * Seniority Bar
              * @description Scope expected at session.level (IV-6). Level changes the bar.
+             * @default null
              */
-            seniority_bar?: string | null;
+            seniority_bar: string | null;
             /**
              * Pushback
              * @description Tough difficulty only: challenge assumptions (IV-4).
@@ -8193,7 +8216,23 @@ export interface components {
             /** @description SM-20: the pasted job and CV the run used, if any */
             inputs?: components["schemas"]["SimInputsOut"] | null;
             /** @description AD-5: the brief and the rubric, as on the session page */
-            setup?: components["schemas"]["strong_api__admin__schemas__SessionSetup"] | null;
+            setup?: components["schemas"]["AdminSessionSetup"] | null;
+        };
+        /**
+         * SessionSetup
+         * @description CU-9: a setup to prefill, from an earlier session. Same fields as CreateSessionRequest.
+         */
+        SessionSetup: {
+            /**
+             * Job Target Id
+             * Format: uuid
+             */
+            job_target_id: string;
+            /** Resume Id */
+            resume_id: string | null;
+            /** @description For a Custom session, `custom` holds its setup. */
+            config: components["schemas"]["SessionConfig"];
+            channel: components["schemas"]["SessionChannel"];
         };
         /**
          * SessionStatus
@@ -9386,31 +9425,6 @@ export interface components {
             /** Duplicate */
             duplicate: boolean;
         };
-        /**
-         * SessionSetup
-         * @description RS-2, AD-5: the brief the interviewer worked from and the rubric the scorer used.
-         */
-        strong_api__admin__schemas__SessionSetup: {
-            /** @description Only under the transcript's consent rule; None before the brief is built */
-            brief: components["schemas"]["InterviewerBrief"] | null;
-            rubric: components["schemas"]["AdminRubric"] | null;
-        };
-        /**
-         * SessionSetup
-         * @description CU-9: a setup to prefill, from an earlier session. Same fields as CreateSessionRequest.
-         */
-        strong_api__sessions__schemas__SessionSetup: {
-            /**
-             * Job Target Id
-             * Format: uuid
-             */
-            job_target_id: string;
-            /** Resume Id */
-            resume_id: string | null;
-            /** @description For a Custom session, `custom` holds its setup. */
-            config: components["schemas"]["SessionConfig"];
-            channel: components["schemas"]["SessionChannel"];
-        };
     };
     responses: never;
     parameters: never;
@@ -10324,7 +10338,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["strong_api__sessions__schemas__SessionSetup"];
+                    "application/json": components["schemas"]["SessionSetup"];
                 };
             };
             /** @description Validation Error */

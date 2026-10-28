@@ -54,7 +54,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from strong_api.admin import metrics as m
 from strong_api.admin.deps import Admin
 from strong_api.admin.part1 import week_start
-from strong_api.admin.schemas import AdminRubric, SessionSetup
+from strong_api.admin.schemas import AdminRubric, AdminSessionSetup
 from strong_api.auth.deps import DbSession
 from strong_api.billing.entitlements import get_entitlement
 from strong_core.config import get_settings
@@ -495,11 +495,14 @@ def rubric_for(row: InterviewSession, card: Scorecard | None) -> AdminRubric | N
     return AdminRubric(ref=prompt.ref, text=prompt.text, scored=False)
 
 
-def session_setup(row: InterviewSession, card: Scorecard | None, consent: bool) -> SessionSetup:
-    brief: InterviewerBrief | None = None
+def session_setup(
+    row: InterviewSession, card: Scorecard | None, consent: bool
+) -> AdminSessionSetup:
+    """The brief as an InterviewerBrief (JSON), under the consent rule, and the rubric."""
+    brief: dict[str, Any] | None = None
     if consent and row.brief_json:
         try:
-            brief = InterviewerBrief.model_validate(row.brief_json)
+            brief = InterviewerBrief.model_validate(row.brief_json).model_dump(mode="json")
         except ValueError:
             log.warning("brief of session %s does not validate", row.id, exc_info=True)
-    return SessionSetup(brief=brief, rubric=rubric_for(row, card))
+    return AdminSessionSetup(brief=brief, rubric=rubric_for(row, card))
