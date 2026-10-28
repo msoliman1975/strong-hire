@@ -1,0 +1,8 @@
+Job: $job
+
+Skill: $skills
+
+<untrusted_input>
+STORIES (id: title [skill tags], then the parts)
+$stories
+</untrusted_input>

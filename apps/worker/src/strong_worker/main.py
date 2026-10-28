@@ -11,6 +11,7 @@ minute, the optional daily digest, and seeding the default rules at startup. A3 
 plumbing (strong_core.ops: heartbeat, error capture, usage sink, JSON logs) and the metrics
 sampler cron (strong_worker.ops.sampler), and the retention job also cleans the ops tables.
 v2 S14 adds the auto-profile job for companies outside the curated list (strong_worker.profiles).
+v2 S22 adds the story fit job for the plan page (strong_worker.gap.story_fit).
 """
 
 from __future__ import annotations
@@ -27,6 +28,7 @@ from strong_worker import retention
 from strong_worker.account import jobs as account_jobs
 from strong_worker.alerts import jobs as alert_jobs
 from strong_worker.gap import jobs as gap_jobs
+from strong_worker.gap import story_fit as story_fit_jobs
 from strong_worker.inputs import jobs as inputs_jobs
 from strong_worker.ops import sampler
 from strong_worker.pause import PAUSED_MAX_TRIES
@@ -106,6 +108,9 @@ class WorkerSettings:
             )
             for f in take_jobs.FUNCTIONS
         ),
+        # ST-5: the story fit table the plan page asks for (v2 S22). The result lives in its
+        # own Redis key; keep_result=0 frees the fixed job id as soon as a run ends.
+        *(func(f, keep_result=0, timeout=300) for f in story_fit_jobs.FUNCTIONS),
         func(account_jobs.export_account, keep_result=account_jobs.RESULT_TTL_S, timeout=600),
         # AP-1: auto-profiles for companies outside the curated list.
         *(

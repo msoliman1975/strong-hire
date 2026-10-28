@@ -1,0 +1,77 @@
+/* TR-1 transcript page. Uses the v2 tokens from theme/tokens.css. */
+
+.transcript,
+.transcript__turns {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.transcript__group {
+  background: var(--sh-surface);
+  border: 1px solid var(--sh-line);
+  border-radius: var(--sh-radius);
+  padding: var(--space-4) var(--space-5);
+}
+
+.transcript__group + .transcript__group {
+  margin-top: var(--space-4);
+}
+
+.transcript__heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0 0 var(--space-3);
+  font-size: 0.8125rem;
+  font-family: var(--sh-font-mono);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sh-teal);
+}
+
+.transcript__question {
+  font-family: var(--sh-font);
+  font-size: 1rem;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--sh-ink);
+}
+
+.transcript__turn {
+  border-left: 3px solid var(--sh-line-strong);
+  padding: var(--space-1) 0 var(--space-1) var(--space-3);
+}
+
+.transcript__turn + .transcript__turn {
+  margin-top: var(--space-3);
+}
+
+.transcript__turn[data-speaker="candidate"] {
+  border-left-color: var(--sh-violet);
+}
+
+.transcript__meta {
+  display: flex;
+  gap: var(--space-2);
+  align-items: baseline;
+  margin: 0;
+  font-size: 0.8125rem;
+}
+
+.transcript__speaker {
+  font-weight: 600;
+  color: var(--sh-ink);
+}
+
+.transcript__time {
+  font-family: var(--sh-font-mono);
+  color: var(--sh-muted);
+}
+
+.transcript__text {
+  margin: var(--space-1) 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
