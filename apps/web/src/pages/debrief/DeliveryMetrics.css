@@ -1,0 +1,41 @@
+/* DM-2 delivery section on the v2 debrief. Uses S01's --sh-* tokens only. */
+
+.debrief-delivery__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.debrief-delivery__question {
+  margin: 0 0 10px;
+  font-weight: 600;
+}
+
+.debrief-delivery__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin: 0;
+}
+
+.debrief-delivery__stats dt {
+  font-size: 0.8125rem;
+  color: var(--sh-muted);
+}
+
+.debrief-delivery__stats dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.debrief-delivery__stats [data-out="true"] dd {
+  color: var(--sh-warn-ink);
+}
+
+.debrief-delivery__note {
+  margin: 10px 0 0;
+  padding: 8px 12px;
+  border-radius: var(--sh-radius-sm);
+  background: var(--sh-warn-soft);
+  color: var(--sh-warn-ink);
+}
