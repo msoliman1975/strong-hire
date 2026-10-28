@@ -5,6 +5,7 @@
  */
 import { useState, type CSSProperties } from "react";
 
+import { EXPLAIN, Explain } from "../../components/Explain";
 import { Bar, ErrorNotice, Loading } from "../../components/ui";
 import { competencyLabel } from "../../labels";
 import {
@@ -61,7 +62,10 @@ export function ReadinessRing({ jobId, resumeId }: { jobId: string; resumeId: st
         {done}/{total}
       </span>
       <span>
-        <b>Practice readiness</b>
+        <span className="explain-head">
+          <b>Practice readiness</b>
+          <Explain topic="Readiness">{EXPLAIN.readiness}</Explain>
+        </span>
         <span className="small muted">
           {done} of {total} skills at the bar. {READINESS_NOTICE_SHORT}
         </span>
@@ -75,7 +79,10 @@ export function ReadinessPanel({ jobId, resumeId }: { jobId: string; resumeId: s
   const [open, setOpen] = useState(false);
   return (
     <section className="card" aria-labelledby="plan-readiness-heading" data-testid="readiness-panel">
-      <h2 id="plan-readiness-heading">Practice readiness</h2>
+      <div className="explain-head">
+        <h2 id="plan-readiness-heading">Practice readiness</h2>
+        <Explain topic="Readiness">{EXPLAIN.readiness}</Explain>
+      </div>
       <ReadinessNotice />
       {readiness.isPending ? (
         <Loading label="Loading your practice readiness" />

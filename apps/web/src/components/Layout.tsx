@@ -11,6 +11,7 @@ import { useFeature } from "../theme/features";
 import { BrandMark } from "./BrandMark";
 import { ModelUsageBadge } from "./ModelUsageBadge";
 import { AvatarMenu, PlanChip, UpdatesBell, useFirstVisitGreeting } from "./TopBar";
+import { Tour } from "./Tour";
 import { CoachMark, ErrorNotice, Loading } from "./ui";
 import { UsageMeter } from "./UsageMeter";
 
@@ -133,8 +134,8 @@ const ACCOUNT_LINK: NavItem = { to: "/account", label: "Account" };
 
 const DEV_NAV: NavItem = { to: "/dev/interview", label: "Text interview (dev)" };
 
-/** Dev builds only: the text interview, in the v2 avatar menu. */
-const V2_DEV_LINKS = import.meta.env.DEV ? [DEV_NAV] : [];
+/** The v2 avatar menu after Account, Plan and billing and Reports. The dev text interview shows in dev builds only. */
+const V2_AVATAR_EXTRA = [{ to: "/help", label: "Help and how it works" }, ...(import.meta.env.DEV ? [DEV_NAV] : [])];
 
 /** UI-2: the left rail menu. "Stories" and the v2 labels show only when `v2_enabled` is on. */
 export function RailNav() {
@@ -350,7 +351,7 @@ function V2Shell({
       <header className="topbar" aria-label="Top bar">
         <Brand link />
         {greeting && <p className="topbar__greet">{greeting}</p>}
-        <div className="topbar__right">
+        <div className="topbar__right" data-tour="topbar">
           <ModelUsageBadge usage={modelUsage} />
           {usage && <PlanChip usage={usage} />}
           {user && <UpdatesBell userId={user.id} />}
@@ -359,7 +360,7 @@ function V2Shell({
             email={email}
             onSignOut={onSignOut}
             busy={signingOut}
-            extraLinks={V2_DEV_LINKS}
+            extraLinks={V2_AVATAR_EXTRA}
           />
           <button
             type="button"
@@ -367,6 +368,7 @@ function V2Shell({
             aria-expanded={menuOpen}
             aria-controls="main-menu"
             onClick={onMenu}
+            data-tour="menu"
           >
             Menu
           </button>
@@ -375,9 +377,11 @@ function V2Shell({
       <div className="shell2__body">
         <aside className="rail rail--v2">
           <div className="rail__body" id="main-menu" data-open={menuOpen}>
-            <RailNav />
+            <div data-tour="menu">
+              <RailNav />
+            </div>
             <div className="rail__foot">
-              <Link className="rail__coach" to={newCoachPath()}>
+              <Link className="rail__coach" to={newCoachPath()} data-tour="coach">
                 <CoachMark size={20} tone="dark" />
                 Talk to your coach
               </Link>
@@ -394,6 +398,7 @@ function V2Shell({
           <Outlet />
         </main>
       </div>
+      {user && <Tour userId={user.id} />}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import type { HireSignal, PreviousSignal } from "../../api/types";
+import { EXPLAIN, Explain } from "../../components/Explain";
 import { formatDate, hireSignalTone } from "../../labels";
 
 /** Weakest first, as on the canvas: the scale reads left to right toward Strong Hire. */
@@ -22,9 +23,12 @@ export function SignalCard({ signal, previous }: { signal: HireSignal; previous:
   const label = `Hire signal scale: ${signal}${before ? `, previous ${before}` : ""}`;
   return (
     <section className="card debrief-signal" aria-labelledby="debrief-signal-heading">
-      <h2 id="debrief-signal-heading" className="debrief-signal__label">
-        Hire signal
-      </h2>
+      <div className="explain-head">
+        <h2 id="debrief-signal-heading" className="debrief-signal__label">
+          Hire signal
+        </h2>
+        <Explain topic="Hire signal">{EXPLAIN.hireSignal}</Explain>
+      </div>
       <p className="debrief-signal__value" data-tone={hireSignalTone[signal]} data-testid="hire-signal">
         {signal}
       </p>

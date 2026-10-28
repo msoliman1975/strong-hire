@@ -10,6 +10,7 @@ import { AccountPage } from "./pages/AccountPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { DebriefPage } from "./pages/DebriefPage";
 import { GapAnalysisPage } from "./pages/GapAnalysisPage";
+import { HelpPage } from "./pages/HelpPage";
 import { JobsPage } from "./pages/JobsPage";
 import { MyQuestionsPage } from "./pages/MyQuestionsPage";
 import { CoachSessionPage } from "./pages/coach/CoachSessionPage";
@@ -99,6 +100,8 @@ export function AppRoutes() {
           <Route path="/questions" element={<QuestionsPage />} />
           <Route path="/questions/mine" element={<MyQuestionsPage />} />
           <Route path="/account" element={<AccountPage />} />
+          {/* R3: How it works, from the v2 avatar menu. */}
+          <Route path="/help" element={<HelpPage />} />
           <Route path="/account/profile" element={<EditProfilePage />} />
           <Route path="/upgrade" element={<PaywallPage />} />
           {DevTextInterviewPage && (

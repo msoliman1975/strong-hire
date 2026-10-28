@@ -341,3 +341,90 @@
   margin: 0;
   font-size: 1rem;
 }
+
+/* R3: "Get started in 3 steps" (GetStarted.tsx). */
+.get-started {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 640px;
+}
+
+.get-started__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.get-started__head h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.get-started__count {
+  font-family: var(--sh-font-mono);
+  font-size: 0.8125rem;
+  color: var(--sh-muted);
+}
+
+.get-started__track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--sh-sunken);
+  overflow: hidden;
+}
+
+.get-started__fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--sh-violet);
+}
+
+.get-started__steps > li {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.get-started__steps > li + li {
+  margin-top: 12px;
+}
+
+.get-started__steps p {
+  margin: 4px 0 10px;
+}
+
+.get-started__mark {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid var(--sh-line-strong);
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--sh-muted);
+}
+
+.get-started__steps [data-current] .get-started__mark {
+  border-color: var(--sh-violet);
+  color: var(--sh-violet);
+}
+
+.get-started__steps [data-done] .get-started__mark {
+  border-color: var(--sh-ok);
+  background: var(--sh-ok);
+  color: #ffffff;
+}
+
+.get-started__steps [data-done] b {
+  color: var(--sh-muted);
+  text-decoration: line-through;
+}
+
+.get-started > p {
+  margin: 0;
+}

@@ -11,6 +11,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 
 import { competencyLabel, formatDate } from "../../labels";
+import { EXPLAIN, Explain } from "../../components/Explain";
 import { ErrorNotice, Loading } from "../../components/ui";
 import { PRACTICE_NOTICE, coachKeys, takesApi, useTakes, type TakeOut } from "../coach/api";
 import type { Story } from "./api";
@@ -83,7 +84,10 @@ export function StoryTakes({ story }: { story: Story }) {
   return (
     <section className="card story-takes" aria-labelledby="story-takes-heading" data-testid="story-takes">
       <div className="story-takes__head">
-        <h3 id="story-takes-heading">Takes</h3>
+        <div className="explain-head">
+          <h3 id="story-takes-heading">Takes</h3>
+          <Explain topic="Takes">{EXPLAIN.takes}</Explain>
+        </div>
         {canPractice && !recording && (
           <button className="btn btn--rec" type="button" onClick={() => setRecording(true)}>
             <span className="btn__dot" aria-hidden="true" />
