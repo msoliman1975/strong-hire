@@ -12,6 +12,8 @@ import { DebriefPage } from "./pages/DebriefPage";
 import { GapAnalysisPage } from "./pages/GapAnalysisPage";
 import { JobsPage } from "./pages/JobsPage";
 import { MyQuestionsPage } from "./pages/MyQuestionsPage";
+import { CoachSessionPage } from "./pages/coach/CoachSessionPage";
+import { CoachStartPage } from "./pages/coach/CoachStartPage";
 import { ConfirmJobPage } from "./pages/onboarding/ConfirmJobPage";
 import { ContextPage } from "./pages/onboarding/ContextPage";
 import { NewJobPage } from "./pages/onboarding/NewJobPage";
@@ -91,6 +93,9 @@ export function AppRoutes() {
           <Route path="/stories" element={<V2Only><StoriesPage /></V2Only>} />
           <Route path="/stories/new" element={<V2Only><NewStoryPage /></V2Only>} />
           <Route path="/stories/:storyId" element={<V2Only><StoryWorkbenchPage /></V2Only>} />
+          {/* v2 S31: coach sessions (CO-2). */}
+          <Route path="/coach/new" element={<V2Only><CoachStartPage /></V2Only>} />
+          <Route path="/coach/:sessionId" element={<V2Only><CoachSessionPage /></V2Only>} />
           <Route path="/questions" element={<QuestionsPage />} />
           <Route path="/questions/mine" element={<MyQuestionsPage />} />
           <Route path="/account" element={<AccountPage />} />

@@ -62,6 +62,9 @@ export function resetMockStories(next: Story[] = SEED) {
   stories = structuredClone(next);
 }
 
+/** The live mock library, for other mocks that write stories (coachHandlers.ts, S31). */
+export const mockStoryLibrary = () => stories;
+
 const clean = (text: string | null | undefined) => (text ?? "").trim() || null;
 
 function notFound() {
