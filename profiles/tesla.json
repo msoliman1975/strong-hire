@@ -1,0 +1,769 @@
+{
+  "company_name": "Tesla",
+  "company_slug": "tesla",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-28",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Tesla hiring principles (publicly stated)",
+    "principles": [
+      {
+        "name": "Evidence of exceptional ability",
+        "description": "Tesla job postings and Musk's public recruiting posts ask for evidence of exceptional ability rather than credentials; candidates are judged on what they have actually built or solved.",
+        "evidence_signals": [
+          "Names a concrete, hard achievement and what made it hard",
+          "Gives quantified impact that can be checked",
+          "Separates own contribution from the team's without being asked"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "Know the details",
+        "description": "People who really solved a problem can explain it at every level of detail. Interviewers drill down until the candidate either reaches the brass tacks or gets stuck.",
+        "evidence_signals": [
+          "Answers follow-ups two or three levels deep without drifting to generalities",
+          "Recalls specific numbers, failure modes and design constraints",
+          "Says 'I don't know' plainly instead of bluffing"
+        ],
+        "weight": 1.5
+      },
+      {
+        "name": "First principles thinking",
+        "description": "Question accepted assumptions, break a problem into its fundamental truths, and rebuild a solution from there instead of reasoning by analogy.",
+        "evidence_signals": [
+          "Challenged a requirement or 'industry standard' and showed why it was wrong",
+          "Breaks a cost, latency or physical limit into its components with rough numbers",
+          "Derives an answer from fundamentals when unsure rather than reciting"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "Move with urgency",
+        "description": "Tesla describes speed and execution as its advantage over larger rivals; it looks for people who are ambitious, quick-moving and find answers fast.",
+        "evidence_signals": [
+          "Shortened a timeline by removing steps or blockers",
+          "Shipped, tested and iterated quickly instead of waiting for a perfect plan",
+          "Handled a slipping schedule with a concrete recovery plan"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Shortest path communication",
+        "description": "Communicate directly with whoever can solve the problem, across departments and levels, without routing through the chain of command.",
+        "evidence_signals": [
+          "Went straight to the person or team that could fix a problem",
+          "Resolved a cross-team issue without escalating through managers first",
+          "Explains a technical point plainly to a non-specialist"
+        ],
+        "weight": 0.9
+      },
+      {
+        "name": "Act for the whole company",
+        "description": "Judge decisions by what is best for Tesla and its mission of accelerating the transition to sustainable energy, not by what is best for one team; avoid silos.",
+        "evidence_signals": [
+          "Gave up a local goal because it hurt the overall product or company",
+          "Connects own work to the mission or to the customer outcome",
+          "Explains why they want Tesla specifically, not just any large tech company"
+        ],
+        "weight": 0.9
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": [
+        "P1 Associate Engineer",
+        "P2 Engineer",
+        "P3 Senior Engineer",
+        "P4 Staff Engineer",
+        "P5 Senior Staff Engineer",
+        "P6 Principal Engineer"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, interest in Tesla's mission, logistics. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager call",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager",
+          "notes": "Often happens early, before technical rounds. Current work, past projects, team fit and behavioral questions. Hiring managers drive decisions."
+        },
+        {
+          "name": "Online assessment",
+          "interview_type": null,
+          "duration_min": 90,
+          "interviewer_role": null,
+          "notes": "Reported for some teams: timed coding test, two or three problems. Not simulated in v1."
+        },
+        {
+          "name": "Technical phone screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Senior software engineer",
+          "notes": "Live coding in a shared editor, language of choice, deep follow-ups. Not simulated in v1."
+        },
+        {
+          "name": "Onsite coding rounds",
+          "interview_type": null,
+          "duration_min": 45,
+          "interviewer_role": "Software engineer",
+          "notes": "Usually two problem-solving rounds at medium difficulty. Not simulated in v1."
+        },
+        {
+          "name": "System design and fundamentals",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Senior or staff engineer",
+          "notes": "Scoped to the team's domain (vehicle software, autonomy, firmware, energy, manufacturing systems) rather than a generic web service. Fundamentals such as memory, language internals and hardware limits; reasoning from first principles is valued. Staff candidates may get two design rounds. The verbal discussion is simulated; whiteboard drawing is not."
+        },
+        {
+          "name": "Past project deep dive and behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Senior manager or hiring manager",
+          "notes": "Hardest problem solved, ownership, pace and slipped deadlines. Interviewers drill into details. Some sources say there is no separate behavioral round and this happens inside the hiring manager conversations."
+        },
+        {
+          "name": "Evidence of excellence write-up",
+          "interview_type": null,
+          "duration_min": null,
+          "interviewer_role": null,
+          "notes": "Reported for some finalists: a short written summary of the most significant achievement, which panel members may question. Not simulated in v1."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": [
+        "Machine Learning Engineer",
+        "Senior Machine Learning Engineer",
+        "Staff Machine Learning Engineer"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "ML background, relevant projects, interest in autonomy or AI. Not simulated in v1."
+        },
+        {
+          "name": "Technical phone screen",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "ML engineer",
+          "notes": "ML fundamentals, deep learning architectures and own projects, usually followed by live coding. Only the verbal part is simulated."
+        },
+        {
+          "name": "Coding assessment",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "ML engineer",
+          "notes": "Timed or live coding, sometimes a small ML implementation task. Duration is an estimate. Not simulated in v1."
+        },
+        {
+          "name": "ML theory and perception",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Senior ML engineer",
+          "notes": "Computer vision and deep learning: architectures, training, evaluation metrics, real-time inference."
+        },
+        {
+          "name": "ML system design",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Senior or staff ML engineer",
+          "notes": "Large-scale training data pipelines, fleet data, latency and embedded constraints. Verbal discussion is simulated."
+        },
+        {
+          "name": "Project review and behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager",
+          "notes": "Most impactful ML project, a hard model bug, accuracy versus latency trade-offs, why Tesla."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": [
+        "Product Manager",
+        "Senior Product Manager",
+        "Staff Product Manager"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, knowledge of Tesla products, why Tesla. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager interview",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager",
+          "notes": "Past products, working with engineers, decisions owned. Duration is an estimate."
+        },
+        {
+          "name": "Take-home case and panel presentation",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Panel of product and engineering staff",
+          "notes": "Reported by some candidates: a case study submission, then a presentation defended under questioning. Not simulated in v1."
+        },
+        {
+          "name": "Panel interviews",
+          "interview_type": "case",
+          "duration_min": 30,
+          "interviewer_role": "Cross-functional panel member",
+          "notes": "Several back-to-back conversations of about 30 minutes: product sense, product execution and behavioral."
+        },
+        {
+          "name": "Director interview",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Director",
+          "notes": "Reported for some PM loops. Ownership, pace and judgment. Duration is an estimate."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Hardest problem",
+      "pattern": "The hardest problem the candidate worked on and exactly how they solved it, with follow-ups that drill down level by level",
+      "competencies": ["ownership", "impact", "communication"],
+      "values": ["Know the details", "Evidence of exceptional ability"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Exceptional achievement",
+      "pattern": "The single achievement the candidate is proudest of, why it was hard, their personal part and the measured result",
+      "competencies": ["impact", "ownership"],
+      "values": ["Evidence of exceptional ability"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Slipping schedule",
+      "pattern": "A project that fell behind or a missed deadline, and what the candidate did to recover",
+      "competencies": ["ownership", "learning_from_failure"],
+      "values": ["Move with urgency"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Cross-team problem",
+      "pattern": "A problem that needed another team, and how the candidate got it solved directly",
+      "competencies": ["collaboration", "conflict_handling", "communication"],
+      "values": ["Shortest path communication", "Act for the whole company"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Failure and learning",
+      "pattern": "Something that did not work as expected, what the candidate learned and what they changed",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Know the details"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Why Tesla",
+      "pattern": "Why Tesla and this team specifically, and how the candidate's work connects to the mission",
+      "competencies": ["motivation", "team_fit"],
+      "values": ["Act for the whole company"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Current work",
+      "pattern": "Walk through the candidate's current role and a recent project: scope, decisions and what they personally built",
+      "competencies": ["depth_of_experience", "scope_at_level", "role_fit"],
+      "values": ["Know the details"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Pace and pressure",
+      "pattern": "How the candidate works in a fast, high-pressure environment with changing priorities",
+      "competencies": ["judgment", "motivation", "team_fit"],
+      "values": ["Move with urgency"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Domain system design",
+      "pattern": "Design a system in the team's domain (vehicle software, charging network, energy, factory systems) with real-time and reliability constraints",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["First principles thinking"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Fundamentals from first principles",
+      "pattern": "Explain a low-level concept (memory, concurrency, language internals, hardware limits) and reason through an unfamiliar case",
+      "competencies": ["technical_depth", "accuracy", "reasoning"],
+      "values": ["First principles thinking", "Know the details"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Perception and ML depth",
+      "pattern": "Explain or design a perception model, training pipeline or evaluation for driving data, including latency limits",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["First principles thinking"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Debugging a hard failure",
+      "pattern": "Walk through how the candidate found the root cause of a hard bug or model failure",
+      "competencies": ["reasoning", "technical_depth", "accuracy"],
+      "values": ["Know the details"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Launch a vehicle or app feature",
+      "pattern": "Plan the launch of a new software feature for Tesla owners: users, success metrics, rollout and risks",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["Move with urgency", "Act for the whole company"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Market or cost reasoning",
+      "pattern": "Size a market or break down the cost of a product from its components, then make a recommendation",
+      "competencies": ["estimation_logic", "structure", "recommendation"],
+      "values": ["First principles thinking"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about some of the most difficult problems you have worked on and how you solved them.",
+      "strong_answer": "Pick a problem that was genuinely hard and where the candidate did the key work. State why it was hard (constraints, unknowns, failed first attempts), then walk through the solution step by step with real numbers and decisions. Expect follow-ups that go several levels deeper; a strong candidate keeps answering with specifics such as parameters, failure modes and measurements, and is honest about which parts others did. Pitfalls: a team story with no personal detail, staying at the summary level, or bluffing on a follow-up.",
+      "competencies": ["ownership", "impact", "communication"],
+      "values": ["Know the details", "Evidence of exceptional ability"],
+      "source_url": "https://www.cnbc.com/2017/02/13/how-to-get-hired-by-elon-musk-job-interview.html",
+      "hints": {
+        "looking_for": ["Whether you personally solved the problem", "How deep your knowledge goes under follow-ups"],
+        "strong_signals": ["Specific numbers, constraints and failed attempts", "Answers two or three levels deeper without drifting", "Clear line between your work and the team's"],
+        "watch_outs": ["Staying at summary level", "Bluffing on a detail you do not know"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me the story of your life and career: the decisions you made along the way and why you made them.",
+      "strong_answer": "Give a short, chronological story built around a few deliberate decisions, each with the reason behind it and what it taught. Show a pattern of seeking harder problems and building real ability, and connect it to why Tesla now. Keep it to a few minutes and invite follow-up. Pitfalls: reciting the resume line by line, decisions that just happened to the candidate, or no link to the role.",
+      "competencies": ["motivation", "communication"],
+      "values": ["Evidence of exceptional ability"],
+      "source_url": "https://www.cnbc.com/2017/02/13/how-to-get-hired-by-elon-musk-job-interview.html",
+      "hints": {
+        "looking_for": ["The reasoning behind your career choices", "A pattern of seeking hard problems"],
+        "strong_signals": ["A few clear decision points with reasons", "Links the story to why Tesla now"],
+        "watch_outs": ["Reading the resume aloud", "Choices with no reasoning"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Summarize your most significant technical achievement: the problem, why it was hard, your role, the impact, and one decision you got wrong.",
+      "strong_answer": "Structure it as problem, difficulty, personal role, quantified impact, and a mistake. Make the difficulty concrete (scale, physics, latency, cost). Be precise about what the candidate personally did. Give numbers for the impact. Name one wrong decision, how it was discovered and what was changed. Pitfalls: vague impact, inflated ownership, or a mistake that is really a strength.",
+      "competencies": ["impact", "ownership", "learning_from_failure"],
+      "values": ["Evidence of exceptional ability", "Know the details"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-is-the-tesla-interview-process-like-round-by-round",
+      "hints": {
+        "looking_for": ["The scale and difficulty of your best work", "Honesty about your own part and mistakes"],
+        "strong_signals": ["Quantified impact", "Concrete reason the problem was hard", "A real wrong decision and the fix"],
+        "watch_outs": ["Inflating your role", "A fake weakness"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a project that slipped behind schedule. What did you do?",
+      "strong_answer": "Explain the original plan and why it slipped, owning the candidate's part. Show how quickly the slip was spotted and raised, the options considered (cut scope, add people, change approach), the choice made and the result. Show urgency: removing steps or blockers rather than just extending the date. Close with what the candidate now does differently. Pitfalls: blaming other teams, hiding the slip, or no concrete recovery.",
+      "competencies": ["ownership", "learning_from_failure", "communication"],
+      "values": ["Move with urgency"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-is-the-tesla-interview-process-like-round-by-round",
+      "hints": {
+        "looking_for": ["Ownership when things go wrong", "Sense of urgency"],
+        "strong_signals": ["Raised the slip early", "Cut steps or scope to recover", "Clear lesson applied later"],
+        "watch_outs": ["Blaming others", "Just moving the date"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you raised the bar on your team.",
+      "strong_answer": "Describe a standard that was too low (quality, speed, testing, design), what the candidate did to raise it, and how others were brought along. Show the measurable effect and that the higher standard stuck. Strong answers show the candidate set the example through their own work, not only by asking others. Pitfalls: a vague claim of high standards, or raising the bar in a way that only slowed the team down.",
+      "competencies": ["impact", "ownership", "collaboration"],
+      "values": ["Evidence of exceptional ability", "Move with urgency"],
+      "source_url": "https://www.aced.io/blog/tesla-interview-process",
+      "hints": {
+        "looking_for": ["Whether you push quality and speed beyond the default", "How you bring others along"],
+        "strong_signals": ["A measured before and after", "The new standard lasted"],
+        "watch_outs": ["A general claim with no example", "Higher standards that just added process"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a scaling problem you ran into and how you handled it.",
+      "strong_answer": "State the system, the load or growth that broke it, and how the problem was detected. Walk through the diagnosis with numbers (throughput, latency, memory), the options considered and the fix chosen, with trade-offs. Give the result after the fix and what was done to prevent the next limit. Pitfalls: generic 'we added servers', no measurements, or unclear personal role.",
+      "competencies": ["ownership", "impact", "communication"],
+      "values": ["Know the details", "First principles thinking"],
+      "source_url": "https://www.interviewkickstart.com/interview-questions/tesla-software-engineer-interview-process",
+      "hints": {
+        "looking_for": ["How you diagnose a system under load", "Technical depth behind the story"],
+        "strong_signals": ["Real numbers before and after", "Options weighed with trade-offs"],
+        "watch_outs": ["Only 'we added more servers'", "No measurements"]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Teach me something new in five minutes.",
+      "strong_answer": "Pick a topic the candidate knows deeply but the listener likely does not. Start from what the listener already knows, build up from basic ideas, use one concrete example and check understanding. Keep it within time and invite questions. This tests depth and clarity together. Pitfalls: a topic too broad to cover, jargon without explanation, or a lecture with no check-ins.",
+      "competencies": ["communication"],
+      "values": ["Know the details", "Shortest path communication"],
+      "source_url": "https://www.interviewkickstart.com/interview-questions/tesla-software-engineer-interview-process",
+      "hints": {
+        "looking_for": ["Depth of understanding", "Ability to explain clearly"],
+        "strong_signals": ["Builds from basics", "One concrete example", "Checks understanding"],
+        "watch_outs": ["Unexplained jargon", "Topic too big for five minutes"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time a model or system you built did not work as expected. What did you learn?",
+      "strong_answer": "Explain the goal, why the approach looked right, and how the failure showed up. Own the candidate's part, describe the root cause found and how fast it was addressed, and the concrete change in practice afterwards, ideally with a later example where it helped. Pitfalls: a disguised success, blaming data or another team, or no specific lesson.",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Know the details"],
+      "source_url": "https://www.cleverprep.com/companies/tesla/autopilot-engineer",
+      "hints": {
+        "looking_for": ["Honest ownership of a failure", "A specific lesson you apply now"],
+        "strong_signals": ["Clear root cause", "Fast recovery", "Later example of the lesson"],
+        "watch_outs": ["A success in disguise", "Blaming the data or others"]
+      },
+      "role_families": ["data_ml", "swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why do you want to work at Tesla, and why this team specifically?",
+      "strong_answer": "Connect the candidate's experience and goals to the specific team's problems (autonomy, vehicle software, energy, manufacturing) and to the mission of accelerating sustainable energy. Show real knowledge of the products and what makes the work hard. Mention what the candidate would contribute early. Acknowledge the pace and intensity honestly. Pitfalls: generic admiration of Musk or the brand, or no link to the team.",
+      "competencies": ["motivation", "team_fit", "role_fit"],
+      "values": ["Act for the whole company"],
+      "source_url": "https://www.aced.io/blog/tesla-interview-process",
+      "hints": {
+        "looking_for": ["Real interest in this team's problems", "Fit with the pace"],
+        "strong_signals": ["Specific product or technical knowledge", "Clear first contribution"],
+        "watch_outs": ["Generic brand admiration", "Nothing about the team"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "How would you avoid burning out in an environment where priorities change constantly?",
+      "strong_answer": "Show the candidate has worked at high intensity before and knows what keeps them effective: ruthless prioritization, saying no to low-value work, quick re-planning when priorities move, and clear communication with the manager. Give a real example of a period of rapid change and how output stayed high. Pitfalls: claiming pressure never affects them, or signalling discomfort with any change.",
+      "competencies": ["judgment", "team_fit", "motivation"],
+      "values": ["Move with urgency"],
+      "source_url": "https://site.joinleland.com/library/a/how-to-become-a-tesla-product-manager-the-ultimate-guide",
+      "hints": {
+        "looking_for": ["How you stay effective at a fast pace", "Self-awareness"],
+        "strong_signals": ["A real high-intensity example", "Concrete prioritization habits"],
+        "watch_outs": ["Claiming pressure never matters", "Resisting all change"]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "How have you worked with software engineers on a product, and how do you prioritize requirements and measure success?",
+      "strong_answer": "Give a specific product where the candidate worked closely with engineers: how requirements were set, how trade-offs were made when engineers pushed back, and how success was measured with clear metrics. Show respect for technical constraints and the ability to cut scope to ship. Pitfalls: throwing specs over the wall, no metric, or priorities set by opinion only.",
+      "competencies": ["role_fit", "judgment", "depth_of_experience"],
+      "values": ["Shortest path communication"],
+      "source_url": "https://site.joinleland.com/library/a/how-to-become-a-tesla-product-manager-the-ultimate-guide",
+      "hints": {
+        "looking_for": ["Close partnership with engineering", "How you choose what to build"],
+        "strong_signals": ["Clear metric of success", "Cut scope to ship"],
+        "watch_outs": ["Specs thrown over the wall", "Priorities by opinion"]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a service that manages connections and operations (create, update, flush) across several Redis instances.",
+      "strong_answer": "Clarify the use case, data size, consistency needs and failure expectations. Propose an API and a routing scheme (consistent hashing or explicit sharding), connection pooling, retries with timeouts, and behavior when an instance is down. Discuss how flush and bulk updates avoid harming live traffic, how to monitor it, and the trade-offs between simplicity and availability. Pitfalls: jumping to components without requirements, or ignoring failure handling.",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["First principles thinking"],
+      "source_url": "https://www.interviewkickstart.com/interview-questions/tesla-software-engineer-interview-process",
+      "hints": {
+        "looking_for": ["Requirements before design", "Handling of failure and scale"],
+        "strong_signals": ["Clear sharding and pooling choices", "Plan for instance failure"],
+        "watch_outs": ["No requirements", "Ignoring failures"]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you plan routes for a vehicle across a network of charging stations?",
+      "strong_answer": "Frame it as a graph problem with stations as nodes and range limits as constraints. Discuss the objective (total time including charging), charging curves, battery state, live station availability and traffic. Propose a shortest-path variant with state for charge level, discuss precomputation versus real-time updates, and how to keep results fast on a large map. Pitfalls: plain shortest distance with no range constraint, or ignoring charging time.",
+      "competencies": ["reasoning", "technical_depth", "trade_offs"],
+      "values": ["First principles thinking"],
+      "source_url": "https://www.interviewkickstart.com/interview-questions/tesla-software-engineer-interview-process",
+      "hints": {
+        "looking_for": ["Problem modeling", "Handling real constraints"],
+        "strong_signals": ["Includes range and charging time in the model", "Explains speed at scale"],
+        "watch_outs": ["Plain shortest distance", "Ignoring live availability"]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a training pipeline for petabytes of driving data collected from a vehicle fleet.",
+      "strong_answer": "Cover data selection (triggers for rare or hard cases, not all data), labeling (auto-labeling plus human review), storage and versioning, distributed training, evaluation on curated scenario sets, and the loop back to the fleet. Discuss cost, throughput bottlenecks, and how to detect regressions before deployment. Pitfalls: ignoring data selection and labeling cost, or no evaluation strategy.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["First principles thinking", "Move with urgency"],
+      "source_url": "https://www.cleverprep.com/companies/tesla/autopilot-engineer",
+      "hints": {
+        "looking_for": ["End-to-end ML system thinking", "Awareness of data cost"],
+        "strong_signals": ["Smart data selection", "Clear evaluation and regression checks"],
+        "watch_outs": ["Train on everything", "No evaluation plan"]
+      },
+      "role_families": ["data_ml"],
+      "levels": ["senior", "staff_principal"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you optimize a neural network for real-time inference on a vehicle, and how do you trade accuracy against latency?",
+      "strong_answer": "Start from the latency budget and hardware. Cover profiling, quantization, pruning, distillation, architecture choices and batching or operator fusion. Explain how to measure the accuracy loss on the metrics that matter for safety, and how to decide which trade-off is acceptable. A strong answer gives a past example with numbers. Pitfalls: listing techniques without a budget, or ignoring safety-critical metrics.",
+      "competencies": ["technical_depth", "trade_offs", "accuracy"],
+      "values": ["First principles thinking", "Know the details"],
+      "source_url": "https://www.cleverprep.com/companies/tesla/autopilot-engineer",
+      "hints": {
+        "looking_for": ["Work from a latency budget", "Judgment on accuracy loss"],
+        "strong_signals": ["Profiles before optimizing", "Real numbers from past work"],
+        "watch_outs": ["Technique list with no budget", "Ignoring safety metrics"]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How do you handle class imbalance in driving datasets, and how would you evaluate a perception model?",
+      "strong_answer": "Explain why rare classes and scenarios matter most for safety. Cover targeted data collection, resampling, loss weighting and augmentation. For evaluation, use per-class precision and recall, scenario-based test sets and metrics tied to driving outcomes, not one global accuracy number. Pitfalls: relying on overall accuracy, or only reweighting without getting more data.",
+      "competencies": ["technical_depth", "reasoning", "clarity_of_explanation"],
+      "values": ["Know the details"],
+      "source_url": "https://www.cleverprep.com/companies/tesla/autopilot-engineer",
+      "hints": {
+        "looking_for": ["Understanding of rare cases", "Sound evaluation"],
+        "strong_signals": ["Targeted data collection", "Per-class and scenario metrics"],
+        "watch_outs": ["One global accuracy number", "Only reweighting the loss"]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you oversee the launch of a new feature that shows driving analytics to Tesla owners?",
+      "strong_answer": "Define the goal and the user (efficiency, safety, cost), what data is available and its privacy limits. Propose a minimal first version, success metrics and guardrails, and a staged over-the-air rollout with a feedback loop. Cover engineering dependencies, risks (wrong data, driver distraction) and how to iterate quickly. Pitfalls: a feature list without a user goal, ignoring privacy and safety, or no rollout plan.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["Move with urgency", "Act for the whole company"],
+      "source_url": "https://www.interviewquery.com/interview-guides/tesla-product-manager",
+      "hints": {
+        "looking_for": ["Clear user goal", "Practical launch plan"],
+        "strong_signals": ["Minimal first version", "Metrics and guardrails", "Staged rollout"],
+        "watch_outs": ["Feature list with no goal", "Ignoring privacy and safety"]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Battery packs are said to cost a fixed amount per kWh. How would you reason about whether they could be much cheaper?",
+      "strong_answer": "Question the accepted number, then break the pack into its components (cell materials, separator, casing, assembly) and estimate each from raw-material prices with stated assumptions. Compare the bottom-up cost with the market price, name where the gap comes from, and propose which levers to pursue first. A strong answer is explicit about assumptions and ranges. Pitfalls: accepting the industry figure, or false precision without assumptions.",
+      "competencies": ["estimation_logic", "structure", "problem_framing", "recommendation"],
+      "values": ["First principles thinking"],
+      "source_url": "https://cleantechnica.com/2019/10/12/elon-musk-borrowed-problem-solving-skill-aristotle/",
+      "hints": {
+        "looking_for": ["Reasoning from fundamentals", "Clear assumptions"],
+        "strong_signals": ["Bottom-up component breakdown", "Names the biggest levers"],
+        "watch_outs": ["Accepting the industry number", "Numbers with no assumptions"]
+      },
+      "role_families": [],
+      "levels": []
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "P1 Associate Engineer",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Delivers well-scoped tasks with guidance; strong fundamentals and evidence of exceptional ability from projects, internships or competitions."
+    },
+    {
+      "level_name": "P2 Engineer",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns features end to end within a team and moves fast with limited direction."
+    },
+    {
+      "level_name": "P3 Senior Engineer",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Owns a system or subsystem, designs within the team's domain constraints, and can defend design details under deep questioning."
+    },
+    {
+      "level_name": "P4 Staff Engineer",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Leads design across several components or teams; loop adds a second design round and a director conversation."
+    },
+    {
+      "level_name": "P6 Principal Engineer",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Sets technical direction for a major area such as a vehicle platform or autonomy stack."
+    },
+    {
+      "level_name": "Senior Machine Learning Engineer",
+      "normalized_level": "senior",
+      "role_family": "data_ml",
+      "scope_expectation": "Owns models and their data pipelines from training to deployment under real-time constraints."
+    },
+    {
+      "level_name": "Senior Product Manager",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns a product area, defends decisions under scrutiny and works directly with engineering leads."
+    }
+  ],
+  "persona": {
+    "tone": "Direct, intense and matter-of-fact; little small talk",
+    "pace": "Fast; moves on once a point is made and spends the time drilling into one or two stories",
+    "pushback_style": "Keeps asking 'how exactly?' and 'what did you personally do?' until the candidate reaches specific details or gets stuck; asks for numbers and for the reasoning from first principles",
+    "closing_style": "Short; leaves a few minutes for the candidate's questions"
+  },
+  "scoring_weights": {
+    "ownership": 1.4,
+    "impact": 1.4,
+    "communication": 1.1,
+    "learning_from_failure": 1.1,
+    "depth_of_experience": 1.4,
+    "scope_at_level": 1.2,
+    "motivation": 1.2,
+    "technical_depth": 1.5,
+    "accuracy": 1.3,
+    "reasoning": 1.4,
+    "trade_offs": 1.2,
+    "problem_framing": 1.2,
+    "estimation_logic": 1.2
+  },
+  "values_share": 0.2,
+  "case_style": {
+    "product_sense": 0.4,
+    "estimation": 0.25,
+    "system_thinking": 0.35,
+    "notes": "PM cases reported are feature launches for owners, market analysis (for example the EV market) and take-home cases defended in a panel. Cost and market reasoning from first principles fits Tesla's public style. Little public detail exists."
+  },
+  "sources": [
+    {
+      "url": "https://www.cnbc.com/2017/02/13/how-to-get-hired-by-elon-musk-job-interview.html",
+      "title": "How to get hired by Elon Musk (CNBC)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "question_patterns", "persona"]
+    },
+    {
+      "url": "https://www.aced.io/blog/tesla-interview-process",
+      "title": "Tesla interview process (Aced, formerly Exponent blog)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "loop_structure", "question_patterns", "bar_by_level", "persona"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/what-is-the-tesla-interview-process-like-round-by-round",
+      "title": "What is the Tesla interview process like, round by round (Design Gurus)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "scoring_weights", "persona"]
+    },
+    {
+      "url": "https://www.interviewkickstart.com/interview-questions/tesla-software-engineer-interview-process",
+      "title": "Tesla software engineer interview process (Interview Kickstart)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "bar_by_level"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/tesla/autopilot-engineer",
+      "title": "Tesla Autopilot engineer interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "bar_by_level", "scoring_weights"]
+    },
+    {
+      "url": "https://site.joinleland.com/library/a/how-to-become-a-tesla-product-manager-the-ultimate-guide",
+      "title": "How to become a Tesla product manager (Leland)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.interviewquery.com/interview-guides/tesla-product-manager",
+      "title": "Tesla product manager interview guide (Interview Query, public summary)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://cleantechnica.com/2019/10/12/elon-musk-borrowed-problem-solving-skill-aristotle/",
+      "title": "Elon Musk lifted a problem-solving skill from Aristotle (CleanTechnica)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.alexanderjarvis.com/memo-communication-within-tesla-by-elon-musk/",
+      "title": "Communication within Tesla, memo by Elon Musk (republished)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "persona"]
+    },
+    {
+      "url": "https://www.tesla.com/impact-report/2020",
+      "title": "Tesla Impact Report (mission statement)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "low",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "low"
+  },
+  "low_confidence_notes": [
+    "values_framework: Tesla publishes no formal values framework. The six principles are our synthesis of the mission statement, the 'evidence of exceptional ability' wording in job postings and Musk's recruiting posts, Musk's public interview question, his first-principles explanations and his 'Communication within Tesla' memo. tesla.com and its careers pages returned 403, so the mission wording comes from search results, not a direct read.",
+    "loop_structure: no official Tesla interview guide was found; rounds come from prep sites and candidate reports, which disagree (some say no separate behavioral round, some report an online assessment, some a take-home). Loops vary by team (vehicle software, Autopilot, energy, firmware, manufacturing).",
+    "loop_structure: data_ml coding duration and PM hiring manager and director durations are common-pattern estimates. The PM loop rests on a few self-reported accounts and is weak evidence.",
+    "loop_structure: data_ml and pm level names are generic titles, not confirmed Tesla labels.",
+    "bar_by_level: P1 to P6 engineering levels come from one prep site (Interview Kickstart); scope text is our estimate.",
+    "persona: inferred from Musk's description of drilling into details and prep-site descriptions of a fast, intense process; individual interviewers vary.",
+    "scoring_weights: no public source gives weights; technical depth and detail are weighted up because every source stresses depth and the hardest-problem drill-down.",
+    "case_style: PM case evidence is thin (a feature launch question, an EV market analysis report and a take-home case); the cost-breakdown case is modeled on Musk's public battery example, not a reported interview question."
+  ]
+}

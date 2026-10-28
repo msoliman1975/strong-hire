@@ -1,0 +1,860 @@
+{
+  "company_name": "IBM",
+  "company_slug": "ibm",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-28",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "IBM values and Growth Behaviors",
+    "principles": [
+      {
+        "name": "Dedication to every client's success",
+        "description": "Put the client's outcome first: understand the client's business, stay with the problem until it is solved, and measure success by what the client achieves.",
+        "evidence_signals": [
+          "Names a specific client or user and the business problem they had",
+          "Shows how the client's outcome was measured, not only what was delivered",
+          "Went beyond the contract or ticket to make the client successful"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "Innovation that matters",
+        "description": "Innovate for the company and for the world: apply new technology, such as AI and hybrid cloud, where it changes a real result, not for novelty.",
+        "evidence_signals": [
+          "Introduced a new approach or technology and shows the result it produced",
+          "Explains why the innovation mattered to users, clients or the business",
+          "Balances new ideas against enterprise reliability and risk"
+        ],
+        "weight": 1.1
+      },
+      {
+        "name": "Trust and personal responsibility",
+        "description": "Build trust in all relationships: keep commitments, be honest about problems and own mistakes personally.",
+        "evidence_signals": [
+          "Owned a mistake openly and explains what they did to fix it",
+          "Kept commitments or reset expectations early when they could not",
+          "Describes concrete actions that built trust with a colleague or client"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Growth minded",
+        "description": "Keep learning: seek feedback, pick up new skills quickly and treat setbacks as lessons.",
+        "evidence_signals": [
+          "Learned a new skill or domain quickly to meet a need",
+          "Acted on feedback and shows the change it produced",
+          "Gives a concrete lesson from a failure and a later use of it"
+        ],
+        "weight": 1.1
+      },
+      {
+        "name": "Team focused",
+        "description": "Work across teams and with partners; put shared success ahead of personal credit.",
+        "evidence_signals": [
+          "Worked with other functions or teams toward a shared goal",
+          "Helped a colleague or another team succeed",
+          "Uses 'we' for team results and 'I' for own decisions"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Courageous",
+        "description": "Speak up, challenge the status quo respectfully, and make decisions with incomplete information.",
+        "evidence_signals": [
+          "Raised a disagreement or risk with a senior person or client",
+          "Made a decision with incomplete information and explains the reasoning",
+          "Pushed for a change others resisted, and shows how"
+        ],
+        "weight": 0.8
+      },
+      {
+        "name": "Resourceful",
+        "description": "Find a way forward with limited time, data or resources; adapt quickly when plans change.",
+        "evidence_signals": [
+          "Adapted quickly to a major change in plan, scope or team",
+          "Found a creative workaround when resources were short",
+          "Created clarity in an ambiguous situation instead of waiting"
+        ],
+        "weight": 0.8
+      },
+      {
+        "name": "Outcome focused",
+        "description": "Drive to measurable results: define what success is, track it and deliver.",
+        "evidence_signals": [
+          "States what was achieved and how success was measured",
+          "Quantifies impact with numbers",
+          "Prioritized work by its effect on the outcome"
+        ],
+        "weight": 1.2
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": [
+        "Band 6",
+        "Band 7",
+        "Band 8",
+        "Band 9",
+        "Band 10"
+      ],
+      "rounds": [
+        {
+          "name": "Online coding assessment",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Automated (HackerRank)",
+          "notes": "IBM's application FAQ lists coding, video and English assessments depending on role. Prep guides report two easy-to-medium coding problems in about 30 to 60 minutes. Not simulated in v1."
+        },
+        {
+          "name": "Coding interview",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Live data structures and algorithms problems. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": null,
+          "duration_min": 45,
+          "interviewer_role": "Senior software engineer",
+          "notes": "Reported for mid and senior roles only. Whiteboard style; not simulated in v1."
+        },
+        {
+          "name": "Technical discussion",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Software engineer or technical lead",
+          "notes": "Verbal discussion of past projects, algorithms and design choices. IBM says it uses structured interviews about technical skills; the separate round and its length are a common-pattern estimate."
+        },
+        {
+          "name": "Behavioral and HR interview",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "HR partner or manager",
+          "notes": "IBM asks for specific examples with outcomes and how success was measured. Reported length 30 to 45 minutes."
+        },
+        {
+          "name": "Hiring manager interview",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager",
+          "notes": "Motivation, career goals (short, mid and long term, per IBM's FAQ) and team fit. Often combined with the behavioral round; separate round is an estimate."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": [
+        "Band 6",
+        "Band 7",
+        "Band 8",
+        "Band 9",
+        "Band 10"
+      ],
+      "rounds": [
+        {
+          "name": "Online assessment",
+          "interview_type": null,
+          "duration_min": 90,
+          "interviewer_role": "Automated (HackerRank)",
+          "notes": "Python and SQL problems, sometimes statistics and ML multiple choice; some candidates also get a recorded video assessment. Not simulated in v1."
+        },
+        {
+          "name": "Technical phone screen",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Data scientist",
+          "notes": "ML concepts, problem-solving approach and past projects."
+        },
+        {
+          "name": "Case study presentation",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Data science panel",
+          "notes": "Candidate presents an approach to a data science problem, sometimes shared 24 to 48 hours ahead, then Q&A on method and business recommendation."
+        },
+        {
+          "name": "Technical deep dive",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior data scientist",
+          "notes": "ML algorithms, statistics, feature engineering and production ML (drift, monitoring)."
+        },
+        {
+          "name": "HR and culture fit",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "HR partner or hiring manager",
+          "notes": "Career goals, culture fit and client-facing communication."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": [
+        "Associate Offering Manager",
+        "Band 7",
+        "Band 8",
+        "Band 9",
+        "Band 10"
+      ],
+      "rounds": [
+        {
+          "name": "Digital exercise",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Automated (recorded video)",
+          "notes": "Timed portal with behavioral and product prompts, some answered on video. Not simulated in v1."
+        },
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, interest in IBM and fit. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager interview",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Product hiring manager",
+          "notes": "Product approach, enterprise product experience and leadership style, with shipped products and their impact."
+        },
+        {
+          "name": "Product case",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Product manager",
+          "notes": "Product design or strategy on an enterprise scenario (prioritization, launch, pricing); sometimes a presentation prepared 24 to 48 hours ahead."
+        },
+        {
+          "name": "Cross-functional interviews",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineering, design or business stakeholder",
+          "notes": "Collaboration across functions. Entry-level candidates may instead get a group exercise at an assessment day."
+        },
+        {
+          "name": "Leadership interview",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Senior product leader",
+          "notes": "Strategic thinking, leadership approach and long-term goals at IBM."
+        }
+      ]
+    },
+    {
+      "role_family": "other",
+      "levels": [
+        "Band 6",
+        "Band 7",
+        "Band 8",
+        "Band 9"
+      ],
+      "rounds": [
+        {
+          "name": "Online and video assessment",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Automated",
+          "notes": "IBM Consulting: recorded video with 5 to 8 behavioral questions, sometimes an untimed trait-based assessment or numerical and logical tests. Not simulated in v1."
+        },
+        {
+          "name": "First round behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 40,
+          "interviewer_role": "Consultant",
+          "notes": "Back to back with the first case; 30 to 45 minutes each."
+        },
+        {
+          "name": "First round case",
+          "interview_type": "case",
+          "duration_min": 40,
+          "interviewer_role": "Consultant",
+          "notes": "Candidate-led case on a technology, cloud, AI or operations client scenario; focus on structure and communication."
+        },
+        {
+          "name": "Second round",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Senior consultant or hiring manager",
+          "notes": "Deeper behavioral questions and a case with implementation and change management."
+        },
+        {
+          "name": "Assessment centre",
+          "interview_type": null,
+          "duration_min": 180,
+          "interviewer_role": "Assessors",
+          "notes": "Mainly for graduate hiring: group exercise plus an in-person interview (IBM FAQ). Duration is an estimate from candidate reports of a half day. Not simulated in v1."
+        },
+        {
+          "name": "Final round",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Partner or practice lead",
+          "notes": "Open-ended strategic discussion; judgment, executive presence and motivation."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Client success",
+      "pattern": "A time the candidate went beyond the brief to make a client or user successful, and how the outcome was measured",
+      "competencies": ["ownership", "impact", "communication"],
+      "values": ["Dedication to every client's success", "Outcome focused"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Building trust",
+      "pattern": "How the candidate built or repaired trust with a colleague, stakeholder or client",
+      "competencies": ["collaboration", "communication"],
+      "values": ["Trust and personal responsibility"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Ambiguity and change",
+      "pattern": "Progress made when requirements were unclear or plans changed suddenly",
+      "competencies": ["ownership", "impact"],
+      "values": ["Resourceful", "Growth minded"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Failure and learning",
+      "pattern": "A project, model or decision that failed, the candidate's own part, and what they changed",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Growth minded", "Trust and personal responsibility"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Speaking up",
+      "pattern": "A disagreement with engineering, a manager or a client and how the candidate raised it and resolved it",
+      "competencies": ["conflict_handling", "communication", "collaboration"],
+      "values": ["Courageous", "Team focused"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Explaining to non-experts",
+      "pattern": "Explaining complex technical or data findings to non-technical stakeholders or clients so they could decide",
+      "competencies": ["communication", "impact"],
+      "values": ["Dedication to every client's success"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Why IBM and career goals",
+      "pattern": "Why IBM and this role, and the candidate's short, mid and long-term career goals",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["Growth minded"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Impact of past work",
+      "pattern": "Walk through a shipped product or project: own role, decisions, and measured business impact",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Outcome focused", "Innovation that matters"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Enterprise system design",
+      "pattern": "Explain the design of a distributed or data-heavy enterprise system, with reliability, scale and security trade-offs",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["Innovation that matters"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "ML fundamentals and production ML",
+      "pattern": "Explain an ML concept (overfitting, regularization, imbalance, drift) and how it is handled in a production model",
+      "competencies": ["technical_depth", "accuracy", "reasoning"],
+      "values": ["Trust and personal responsibility"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Past project deep dive",
+      "pattern": "A technical choice in a past project, the alternatives rejected and what the candidate would change",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Outcome focused"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Enterprise product prioritization",
+      "pattern": "Prioritize features or a roadmap for an enterprise product, such as an AI platform, for business buyers and users",
+      "competencies": ["prioritization", "user_and_business_sense", "recommendation"],
+      "values": ["Dedication to every client's success", "Innovation that matters"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Product launch in a constrained market",
+      "pattern": "Plan the launch or pricing of an enterprise product in a regulated or competitive market",
+      "competencies": ["problem_framing", "structure", "user_and_business_sense"],
+      "values": ["Trust and personal responsibility"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Client consulting case",
+      "pattern": "Structure an engagement for a client facing a technology, cloud, AI or operations problem, and recommend next steps with success metrics",
+      "competencies": ["problem_framing", "structure", "recommendation"],
+      "values": ["Dedication to every client's success", "Outcome focused"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to work through a lot of ambiguity.",
+      "strong_answer": "Describe what was unclear (goals, requirements, owner) and why waiting was costly. Show how the candidate created clarity: asking the client or stakeholders, proposing a direction, starting with a small step and checking it. End with the measured result and what they learned. Pitfalls: waiting for a manager to decide, or a story with no real uncertainty.",
+      "competencies": ["ownership", "impact"],
+      "values": ["Resourceful", "Growth minded"],
+      "source_url": "https://www.aced.io/blog/ibm-interview-process",
+      "hints": {
+        "looking_for": ["How you make progress without clear direction"],
+        "strong_signals": ["Explains why waiting was costly", "Creates clarity with stakeholders", "Shows a measured result"],
+        "watch_outs": ["Waiting for someone else to decide", "No real uncertainty in the story"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "How do you build trust with the people you work with?",
+      "strong_answer": "Answer with a concrete story, not a list of principles. Show specific actions: keeping commitments, flagging problems early, being honest about a mistake, giving credit. Show how the trust was tested and what it made possible later (a client renewal, a team taking a risk together). Pitfalls: generic statements like 'I am reliable' with no example.",
+      "competencies": ["collaboration", "communication"],
+      "values": ["Trust and personal responsibility", "Team focused"],
+      "source_url": "https://www.aced.io/blog/ibm-interview-process",
+      "hints": {
+        "looking_for": ["Concrete actions that build trust"],
+        "strong_signals": ["Keeps commitments and flags problems early", "Shows what the trust made possible"],
+        "watch_outs": ["Generic claims with no example"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you failed. What did you learn?",
+      "strong_answer": "Pick a real failure with stakes. Explain why the plan seemed right then, own the candidate's part without blaming others, and describe how they recovered or limited the damage. Give the lesson and a later situation where they applied it. Pitfalls: a disguised success, or blaming the team or client.",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Growth minded", "Trust and personal responsibility"],
+      "source_url": "https://site.joinleland.com/library/a/how-to-prepare-for-ibm-management-consulting-case-interviews",
+      "hints": {
+        "looking_for": ["Whether you own failures and learn from them"],
+        "strong_signals": ["Owns your part without blame", "Shows a later use of the lesson"],
+        "watch_outs": ["A disguised success", "Blaming the team or client"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you had to adapt quickly to a major change at work.",
+      "strong_answer": "Describe the change (new client priority, reorg, lost team member, technology shift) and its impact. Show how the candidate re-planned fast, communicated the new plan, and what they learned or picked up to cope. Quantify the result. Pitfalls: complaining about the change, or describing adaptation that others did.",
+      "competencies": ["ownership", "communication"],
+      "values": ["Resourceful", "Growth minded"],
+      "source_url": "https://site.joinleland.com/library/a/how-to-prepare-for-ibm-management-consulting-case-interviews",
+      "hints": {
+        "looking_for": ["How fast you adjust to change"],
+        "strong_signals": ["Re-plans quickly and tells others", "Quantifies the result"],
+        "watch_outs": ["Complaining about the change", "Credit for what others did"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a decision you made without having all the information you wanted.",
+      "strong_answer": "State the decision, what was unknown, and the cost of delay. Show how the candidate weighed risks, chose a reversible step where possible, set a checkpoint, and told stakeholders the assumptions. Close with the outcome and whether they would decide the same way. Pitfalls: a decision with no real risk, or stalling until certain.",
+      "competencies": ["ownership", "communication"],
+      "values": ["Courageous", "Outcome focused"],
+      "source_url": "https://site.joinleland.com/library/a/how-to-prepare-for-ibm-management-consulting-case-interviews",
+      "hints": {
+        "looking_for": ["Judgment under uncertainty"],
+        "strong_signals": ["Names the cost of delay", "States assumptions and sets a checkpoint"],
+        "watch_outs": ["No real risk", "Stalling until certain"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you explained complex analysis to people without a technical background.",
+      "strong_answer": "Name the audience (client executive, business team) and what decision they needed to make. Show how the candidate translated the findings: start from the decision, use plain words and one clear visual, state uncertainty honestly. Show the decision that followed and its impact. Pitfalls: describing the model instead of the message, or hiding uncertainty.",
+      "competencies": ["communication", "impact"],
+      "values": ["Dedication to every client's success", "Trust and personal responsibility"],
+      "source_url": "https://www.cleverprep.com/companies/ibm/data-scientist",
+      "hints": {
+        "looking_for": ["Whether non-experts can act on your findings"],
+        "strong_signals": ["Starts from the decision to be made", "States uncertainty honestly", "Shows the decision that followed"],
+        "watch_outs": ["Explaining the model instead of the message"]
+      },
+      "role_families": ["data_ml", "other"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a model that did not perform as you expected.",
+      "strong_answer": "Describe the model, the expectation and how the gap was detected (offline metric versus production, a stakeholder complaint). Walk through the diagnosis: data leakage, distribution shift, wrong metric, poor labels. Show how the candidate told stakeholders, what they fixed, and what they now check by default. Pitfalls: blaming the data without owning the process, or no change in practice.",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Trust and personal responsibility", "Growth minded"],
+      "source_url": "https://www.cleverprep.com/companies/ibm/data-scientist",
+      "hints": {
+        "looking_for": ["How you diagnose and own a model problem"],
+        "strong_signals": ["Explains how the gap was found", "Tells stakeholders openly", "Names a check you now run by default"],
+        "watch_outs": ["Blaming the data only"]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "How have you handled a disagreement with engineering about product direction?",
+      "strong_answer": "Describe the disagreement and what each side cared about. Show the candidate raising it directly, understanding engineering's constraints, and using customer evidence or data to decide. Show the agreed outcome, a compromise if one made sense, and the relationship afterwards. Pitfalls: overruling engineering by title, or a story where engineering was simply wrong.",
+      "competencies": ["conflict_handling", "collaboration", "communication"],
+      "values": ["Courageous", "Team focused"],
+      "source_url": "https://www.cleverprep.com/companies/ibm/product-manager",
+      "hints": {
+        "looking_for": ["How you resolve disagreement with partners"],
+        "strong_signals": ["Understands engineering's constraints", "Uses customer evidence to decide", "Keeps the relationship"],
+        "watch_outs": ["Overruling by title", "The other side was simply wrong"]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why do you want to work at IBM, and why this role?",
+      "strong_answer": "Be specific: link IBM's work (hybrid cloud, watsonx and AI, consulting for large clients, research) to the candidate's past work and goals. Explain what they bring to this team and what they want to learn. Pitfalls: generic praise of the brand, or only talking about stability or pay.",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["Innovation that matters"],
+      "source_url": "https://www.aced.io/blog/ibm-interview-process",
+      "hints": {
+        "looking_for": ["Whether you know what IBM does today"],
+        "strong_signals": ["Links IBM's work to your experience", "Says what you bring and want to learn"],
+        "watch_outs": ["Generic brand praise", "Only stability or pay"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Where do you see your career in the short, medium and long term?",
+      "strong_answer": "Give a realistic path: what the candidate wants to master in this role in the first year, the scope they want in a few years, and a longer direction. Tie the goals to skills the role builds and show they will invest in learning. Pitfalls: goals unrelated to the role, or aiming only at a promotion title.",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["Growth minded"],
+      "source_url": "https://www.ibm.com/careers/us-en/faq",
+      "hints": {
+        "looking_for": ["Whether the role fits your direction"],
+        "strong_signals": ["Concrete first-year goals", "Ties goals to skills the role builds"],
+        "watch_outs": ["Goals unrelated to the role", "Only a title"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Tell me about a product you launched and the impact it had.",
+      "strong_answer": "Summarize the product, the customer problem and the candidate's role. Walk through the key decisions (scope, trade-offs, go-to-market) and how they worked with engineering and sales. Quantify impact (adoption, revenue, client retention) and say what they would change. Pitfalls: a team launch with unclear personal contribution, or impact without numbers.",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Outcome focused", "Dedication to every client's success"],
+      "source_url": "https://www.cleverprep.com/companies/ibm/product-manager",
+      "hints": {
+        "looking_for": ["The scope you drove and its measured impact"],
+        "strong_signals": ["Explains your own key decisions", "Quantifies adoption or revenue"],
+        "watch_outs": ["Unclear personal contribution", "Impact without numbers"]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Tell me about a data science project that had significant business impact.",
+      "strong_answer": "State the business problem and who owned the decision. Explain the candidate's approach, the data and model choices, and how the work moved into production or into a decision. Quantify the business effect and how it was measured. Pitfalls: model accuracy with no business result, or a proof of concept that never shipped presented as impact.",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Outcome focused", "Innovation that matters"],
+      "source_url": "https://www.cleverprep.com/companies/ibm/data-scientist",
+      "hints": {
+        "looking_for": ["Whether your work changed a business result"],
+        "strong_signals": ["Starts from the business problem", "Shows how results were measured"],
+        "watch_outs": ["Accuracy with no business result"]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "What is overfitting, and how do you prevent it?",
+      "strong_answer": "Define overfitting as learning noise in the training data so the model generalizes poorly, seen as a gap between training and validation performance. Cover prevention: more or better data, simpler models, regularization (L1, L2, dropout), cross-validation, early stopping, feature selection and ensembling. Mention checking on a held-out set that matches production data. Pitfalls: only naming techniques without saying when each fits.",
+      "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
+      "values": [],
+      "source_url": "https://www.aced.io/blog/ibm-interview-process",
+      "hints": {
+        "looking_for": ["Clear ML fundamentals"],
+        "strong_signals": ["Defines it via the train and validation gap", "Says when each technique fits"],
+        "watch_outs": ["A list of techniques with no reasoning"]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you detect and handle model drift in a deployed model?",
+      "strong_answer": "Distinguish data drift (input distribution changes) from concept drift (the relationship to the target changes). Cover monitoring: input statistics and distance measures, prediction distribution, and performance once labels arrive. Explain alert thresholds, retraining policy, shadow or champion-challenger testing, and governance records for regulated clients. Pitfalls: retraining on a fixed schedule with no monitoring.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Trust and personal responsibility"],
+      "source_url": "https://www.cleverprep.com/companies/ibm/data-scientist",
+      "hints": {
+        "looking_for": ["Production ML judgment"],
+        "strong_signals": ["Separates data drift from concept drift", "Covers monitoring and retraining policy"],
+        "watch_outs": ["Retraining on a schedule with no monitoring"]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design a distributed LRU cache?",
+      "strong_answer": "Clarify size, read and write load, and consistency needs. Explain a single-node LRU (hash map plus doubly linked list), then distribution: partitioning keys with consistent hashing, replication for availability, eviction per node, and handling node failure and rebalancing. Discuss consistency with the backing store and hot keys. Pitfalls: a single node only, or no plan for node failure.",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": [],
+      "source_url": "https://www.aced.io/blog/ibm-interview-process",
+      "hints": {
+        "looking_for": ["Data structure and distribution knowledge"],
+        "strong_signals": ["Explains hash map plus linked list", "Uses consistent hashing and replication"],
+        "watch_outs": ["No plan for node failure"]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design a data pipeline for large volumes of enterprise data?",
+      "strong_answer": "Clarify sources, volume, latency (batch or streaming) and consumers. Cover ingestion, a landing zone, transformation with schema validation, storage in a lakehouse or warehouse, orchestration and lineage. Address data quality checks, idempotent reruns, security and access control, and compliance needs of enterprise clients. Pitfalls: ignoring data quality and failure recovery.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Dedication to every client's success"],
+      "source_url": "https://www.aced.io/blog/ibm-interview-process",
+      "hints": {
+        "looking_for": ["How you build reliable data systems"],
+        "strong_signals": ["Clarifies latency and consumers", "Adds quality checks and idempotent reruns", "Covers access control"],
+        "watch_outs": ["No data quality or recovery plan"]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you prioritize features for an enterprise AI platform?",
+      "strong_answer": "Start with the target customers (buyers, admins, developers, business users) and the platform's business goal. Gather inputs: client requests, deal blockers, usage data, competitive gaps. Score options on customer value, revenue impact, effort and risk such as governance or security. Recommend a short list, say what is deferred and why, and define success metrics. Pitfalls: prioritizing by the loudest client, or ignoring trust and governance needs.",
+      "competencies": ["prioritization", "user_and_business_sense", "recommendation"],
+      "values": ["Dedication to every client's success", "Innovation that matters"],
+      "source_url": "https://www.cleverprep.com/companies/ibm/product-manager",
+      "hints": {
+        "looking_for": ["Enterprise product judgment"],
+        "strong_signals": ["Separates buyers from users", "Scores on value, revenue, effort and risk", "Says what is deferred"],
+        "watch_outs": ["Prioritizing by the loudest client"]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you launch a new product in a regulated industry, such as banking or healthcare?",
+      "strong_answer": "Clarify the product, the industry and the rules that apply (data residency, privacy, audit). Pick a first segment and a pilot client, plan compliance work early with legal and risk teams, and define launch criteria. Cover go-to-market with sales and partners, pricing, and success and risk metrics. Pitfalls: treating compliance as a final checkbox, or launching broadly before a pilot.",
+      "competencies": ["problem_framing", "structure", "user_and_business_sense"],
+      "values": ["Trust and personal responsibility", "Dedication to every client's success"],
+      "source_url": "https://www.cleverprep.com/companies/ibm/product-manager",
+      "hints": {
+        "looking_for": ["Launch planning under constraints"],
+        "strong_signals": ["Plans compliance early", "Starts with a pilot client", "Defines launch criteria"],
+        "watch_outs": ["Compliance as a final checkbox"]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "A client wants to add AI to a legacy enterprise system. How would you structure the engagement?",
+      "strong_answer": "Clarify the client's goal and the business process involved. Structure the work: assess the current system and data, pick a few high-value use cases, check feasibility and risk (data quality, integration, governance), run a pilot, then plan scaling and change management. Define success metrics and a recommendation for the first phase. Pitfalls: starting from the technology instead of the business problem, or ignoring the people who must adopt it.",
+      "competencies": ["problem_framing", "structure", "recommendation"],
+      "values": ["Dedication to every client's success", "Innovation that matters"],
+      "source_url": "https://site.joinleland.com/library/a/how-to-prepare-for-ibm-management-consulting-case-interviews",
+      "hints": {
+        "looking_for": ["A clear structure from goal to pilot"],
+        "strong_signals": ["Starts from the business problem", "Checks data and governance risks", "Plans change management"],
+        "watch_outs": ["Leading with technology", "Ignoring adoption"]
+      },
+      "role_families": ["other"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "A financial services firm is considering a cloud migration. How would you assess success?",
+      "strong_answer": "Clarify why the firm wants to migrate (cost, speed, resilience, regulation). Define metrics in groups: cost (run cost, total cost of ownership), performance and reliability (latency, uptime, recovery time), delivery speed (release frequency), security and compliance (audit findings), and adoption. Set baselines, targets and checkpoints, and recommend a phased approach. Pitfalls: only cost metrics, or no baseline.",
+      "competencies": ["problem_framing", "structure", "user_and_business_sense"],
+      "values": ["Outcome focused", "Dedication to every client's success"],
+      "source_url": "https://site.joinleland.com/library/a/how-to-prepare-for-ibm-management-consulting-case-interviews",
+      "hints": {
+        "looking_for": ["How you define success for a client"],
+        "strong_signals": ["Links metrics to the firm's reasons", "Sets baselines and targets"],
+        "watch_outs": ["Only cost metrics", "No baseline"]
+      },
+      "role_families": ["other"],
+      "levels": []
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "Band 6",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Associate engineer; delivers well-defined tasks with guidance."
+    },
+    {
+      "level_name": "Band 7",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Staff engineer (IBM title); owns features within a team with limited guidance."
+    },
+    {
+      "level_name": "Band 8",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Advisory engineer; owns components end to end and guides less experienced engineers."
+    },
+    {
+      "level_name": "Band 9",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Senior engineer; leads the design of systems and influences adjacent teams and clients."
+    },
+    {
+      "level_name": "Band 10",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Sets technical direction across teams or a product; senior technical leadership."
+    },
+    {
+      "level_name": "Associate Offering Manager",
+      "normalized_level": "new_grad",
+      "role_family": "pm",
+      "scope_expectation": "Entry-level product role; supports an offering's features and customer research with guidance."
+    },
+    {
+      "level_name": "Band 9",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns an offering or product area, its roadmap and business results."
+    }
+  ],
+  "persona": {
+    "tone": "Polite, structured and conversational",
+    "pace": "Moderate; works through a set of structured questions and leaves room for follow-ups",
+    "pushback_style": "Asks for a specific example, then 'what did you achieve?' and 'how did you measure success?'; probes the candidate's own role and the client impact",
+    "closing_style": "Invites the candidate's questions, treating the interview as two-way"
+  },
+  "scoring_weights": {
+    "impact": 1.3,
+    "ownership": 1.2,
+    "collaboration": 1.2,
+    "communication": 1.3,
+    "learning_from_failure": 1.1,
+    "motivation": 1.2,
+    "role_fit": 1.2,
+    "clarity_of_explanation": 1.2,
+    "technical_depth": 1.1,
+    "structure": 1.2,
+    "user_and_business_sense": 1.3,
+    "recommendation": 1.2
+  },
+  "values_share": 0.25,
+  "case_style": {
+    "product_sense": 0.4,
+    "estimation": 0.15,
+    "system_thinking": 0.45,
+    "notes": "Cases are enterprise and client oriented: feature prioritization, launch and pricing for B2B and AI products, and consulting cases on technology, cloud, AI or operations problems. Consulting cases are candidate-led. Market sizing is occasional."
+  },
+  "sources": [
+    {
+      "url": "https://www.ibm.com/responsibility/talent/our-culture",
+      "title": "Our culture (IBM)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "persona"]
+    },
+    {
+      "url": "https://www.credly.com/org/ibm/badge/ibm-growth-behaviors",
+      "title": "IBM Growth Behaviors badge (Credly, issued by IBM)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://www.ibm.com/careers/us-en/faq",
+      "title": "Application steps and FAQs (IBM Careers)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://www.ibm.com/careers/career-guidance",
+      "title": "Career guidance (IBM Careers)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["persona", "loop_structure"]
+    },
+    {
+      "url": "https://www.aced.io/blog/ibm-interview-process",
+      "title": "IBM interview process (Aced, formerly Exponent)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.aced.io/guides/ibm-offering-manager-interview",
+      "title": "IBM offering manager interview guide (Aced, formerly Exponent)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "bar_by_level", "case_style", "scoring_weights"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/ibm/product-manager",
+      "title": "IBM product manager interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/ibm/data-scientist",
+      "title": "IBM data scientist interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://site.joinleland.com/library/a/how-to-prepare-for-ibm-management-consulting-case-interviews",
+      "title": "IBM Consulting interview guide (Leland)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.levels.fyi/companies/ibm/salaries/software-engineer",
+      "title": "IBM software engineer levels (Levels.fyi)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level", "loop_structure"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "medium"
+  },
+  "low_confidence_notes": [
+    "values_framework: the three values come from IBM's culture page and the six Growth Behaviors from IBM's Credly badge; IBM publishes no per-behavior descriptions, so descriptions and evidence signals are our summary. 'Trusted' is folded into 'Trust and personal responsibility' to avoid a duplicate. Weights are our estimate.",
+    "loop_structure: IBM's FAQ gives only the stages (application, screening, online assessment, interview, decision); round names, counts and durations come from third-party prep guides and vary by country and team. The separate SWE technical discussion and hiring manager rounds, and the consulting assessment centre duration, are common-pattern estimates.",
+    "loop_structure: the 'other' loop is IBM Consulting (consultant and associate roles) and is based on one prep guide plus candidate reports; consulting band labels are assumed to follow the company-wide band scheme.",
+    "bar_by_level: band titles (Band 6 Associate, Band 7 Staff, Band 8 Advisory, Band 9 Senior) come from self-reported Levels.fyi data, not IBM; Band 10 scope, the PM band mapping and all scope text are our estimate. Mapping Band 8 to mid rather than senior is a judgment call.",
+    "persona: inferred from IBM's interview tips (structured or behavioral interviews, focus on outcomes and measurement, a two-way conversation); no source describes interviewer style directly.",
+    "scoring_weights: no public source gives weights; estimated from IBM's emphasis on outcomes and measurement, client focus and the reported communication and ownership dimensions in PM feedback.",
+    "case_style: based on prep-site examples of PM and consulting cases; the product_sense versus system_thinking split is our estimate.",
+    "sample_questions: questions come from prep sites (Aced, CleverPrep, Leland) that aggregate candidate reports, plus IBM's own FAQ for the career-goals question; none are official IBM questions."
+  ]
+}
