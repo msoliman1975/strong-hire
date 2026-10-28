@@ -3,6 +3,7 @@ import { useState, type FormEvent, type KeyboardEvent, type ReactNode } from "re
 import { Navigate, useNavigate, useSearchParams } from "react-router";
 
 import { authApi } from "../api/auth";
+import { ApiError } from "../api/client";
 import { keys, useAuth, useProviders } from "../api/hooks";
 import { useSiteStatus } from "../api/status";
 import type { AuthState, EmailSent } from "../api/types";
@@ -110,6 +111,55 @@ function Sent({ children, onBack }: { children: ReactNode; onBack: () => void })
   );
 }
 
+/** AC-4: the API code for a password sign-in before the email is confirmed. */
+const EMAIL_NOT_CONFIRMED = "email_not_confirmed";
+
+type Confirm = { email: string; refused: boolean; reply: EmailSent | null };
+
+/** AC-4: after sign-up, or a sign-in refused until the email is confirmed. */
+function CheckInbox({
+  confirm,
+  onResent,
+  onDifferentEmail,
+  onBack,
+}: {
+  confirm: Confirm;
+  onResent: (reply: EmailSent) => void;
+  onDifferentEmail: () => void;
+  onBack: () => void;
+}) {
+  const resend = useMutation({ mutationFn: authApi.resendConfirmation, onSuccess: onResent });
+  return (
+    <div className="auth-card">
+      <AuthHeading title="Check your inbox" />
+      <div role="status">
+        {confirm.refused && <p>Confirm your email before you sign in.</p>}
+        <p>
+          We sent a link to <strong>{confirm.email}</strong>. Open it to confirm your address and sign in. It works once,
+          for 24 hours.
+        </p>
+        {resend.isSuccess && <p>We sent a new link. Check your spam folder too.</p>}
+        <DevLink sent={confirm.reply} label="open the confirmation link" />
+      </div>
+      {resend.isError && <ErrorNotice error={resend.error} />}
+      <button
+        type="button"
+        className="btn btn--block"
+        disabled={resend.isPending}
+        onClick={() => resend.mutate(confirm.email)}
+      >
+        Resend the link
+      </button>
+      <button type="button" className="btn btn--secondary btn--block" onClick={onDifferentEmail}>
+        Use a different email
+      </button>
+      <button type="button" className="btn btn--quiet auth-back" onClick={onBack}>
+        Back to sign in
+      </button>
+    </div>
+  );
+}
+
 type Errors = { email?: string; password?: string; agreed?: string };
 
 export function SignInPage() {
@@ -134,9 +184,26 @@ export function SignInPage() {
     navigate(state.status === "signed_in" ? "/" : "/signup");
   };
 
-  const login = useMutation({ mutationFn: authApi.passwordLogin, onSuccess: signedIn });
-  // AC-4: sign-up signs the user in at once; the confirmation email follows.
-  const signup = useMutation({ mutationFn: authApi.passwordSignup, onSuccess: signedIn });
+  const [confirm, setConfirm] = useState<Confirm | null>(null);
+
+  const login = useMutation({
+    mutationFn: authApi.passwordLogin,
+    onSuccess: signedIn,
+    onError: (error) => {
+      // AC-4: the right password, but the email is not confirmed yet.
+      if (error instanceof ApiError && error.code === EMAIL_NOT_CONFIRMED) {
+        setConfirm({ email: cleanEmail, refused: true, reply: null });
+      }
+    },
+  });
+  // AC-4: sign-up does not sign in. The confirmation link does, and it opens /welcome.
+  const signup = useMutation({
+    mutationFn: authApi.passwordSignup,
+    onSuccess: (state) => {
+      if (state.status !== "confirm_email") return signedIn(state);
+      setConfirm({ email: state.email ?? cleanEmail, refused: false, reply: { sent: true, dev_link: state.dev_link } });
+    },
+  });
   const magicLink = useMutation({
     mutationFn: authApi.sendMagicLink,
     onSuccess: (reply) => setSent({ kind: "link", reply }),
@@ -156,6 +223,7 @@ export function SignInPage() {
     setMode(next);
     setErrors({});
     setSent(null);
+    setConfirm(null);
     for (const m of [login, signup, magicLink, forgot]) m.reset();
   };
   const emailError = () => (EMAIL_RE.test(cleanEmail) ? undefined : EMAIL_ERROR);
@@ -193,6 +261,24 @@ export function SignInPage() {
     if (next.email) return;
     (mode === "link" ? magicLink : forgot).mutate(cleanEmail);
   };
+
+  if (confirm) {
+    return (
+      <CheckInbox
+        confirm={confirm}
+        onResent={(reply) => setConfirm({ ...confirm, reply })}
+        onDifferentEmail={() => {
+          switchMode("signup");
+          setEmail("");
+          setPassword("");
+        }}
+        onBack={() => {
+          switchMode("signin");
+          setPassword("");
+        }}
+      />
+    );
+  }
 
   if (sent) {
     const back = () => switchMode("signin");
@@ -315,7 +401,7 @@ export function SignInPage() {
             <button type="submit" className="btn btn--block" disabled={signup.isPending}>
               Create account
             </button>
-            <p className="auth-fine">We also email you a link to confirm your address.</p>
+            <p className="auth-fine">We email you a link to confirm your address. Open it to start.</p>
           </form>
         )}
 

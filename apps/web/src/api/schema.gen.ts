@@ -1339,8 +1339,8 @@ export interface paths {
         put?: never;
         /**
          * Password Signup
-         * @description AC-4: create an account with a password and sign in. The email is confirmed later,
-         *     from the link we send.
+         * @description AC-4: create an account with a password and email the confirmation link. The user is
+         *     not signed in: the reply is `confirm_email`, and the link signs them in.
          */
         post: operations["password_signup_auth_password_signup_post"];
         delete?: never;
@@ -1358,7 +1358,12 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Resend Confirmation */
+        /**
+         * Resend Confirmation
+         * @description AC-4: send the confirmation link again. Same reply whether or not the email has an
+         *     unconfirmed account. Limited per email, counted before the lookup so the limit reveals
+         *     nothing either.
+         */
         post: operations["resend_confirmation_auth_password_resend_post"];
         delete?: never;
         options?: never;
@@ -4493,13 +4498,18 @@ export interface components {
              * Status
              * @enum {string}
              */
-            status: "signed_out" | "needs_signup" | "signed_in";
+            status: "signed_out" | "needs_signup" | "signed_in" | "confirm_email";
             /**
              * Email
-             * @description Set for needs_signup and signed_in.
+             * @description Set for needs_signup, signed_in and confirm_email.
              */
             email?: string | null;
             user?: components["schemas"]["AuthUser"] | null;
+            /**
+             * Dev Link
+             * @description confirm_email only, and only when APP_ENV=local: the confirmation link.
+             */
+            dev_link?: string | null;
         };
         /** AuthUser */
         AuthUser: {

@@ -16,7 +16,7 @@ async function shot(page: Page, name: string) {
   if (SHOTS) await page.screenshot({ path: `${SHOTS}/${name}.png`, fullPage: true });
 }
 
-test("AC-4: create an account with email and password and go straight in", async ({ page }) => {
+test("AC-4: create an account with email and password, then check the inbox", async ({ page }) => {
   await page.goto("/signin");
   await shot(page, "00-signin-password");
   await page.getByRole("tab", { name: "Create account" }).click();
@@ -24,7 +24,13 @@ test("AC-4: create an account with email and password and go straight in", async
   await page.getByLabel("Password", { exact: true }).fill("correct horse battery");
   await page.getByLabel(/I am 18 or older, and I accept/).check();
   await page.getByRole("button", { name: "Create account" }).click();
-  // Signed in at once; the confirmation email does not block the password.
+  // Not signed in until the confirmation link is opened.
+  await expect(page.getByRole("heading", { name: "Check your inbox" })).toBeVisible();
+  await expect(page.getByRole("status")).toContainText("pw@example.com");
+  await shot(page, "00b-check-inbox");
+  // The confirmation link signs in and opens the profile step (mock token = the email).
+  await page.evaluate(() => fetch("/api/auth/password/confirm?token=pw@example.com"));
+  await page.goto("/welcome");
   await expect(page.getByRole("heading", { name: "Tell us about yourself" })).toBeVisible();
 });
 

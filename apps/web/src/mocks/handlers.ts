@@ -100,13 +100,15 @@ function unauthorized() {
   return HttpResponse.json({ detail: "Sign in first" }, { status: 401 });
 }
 
-/** Mock passwords, by email (AC-4). A reset token in the mock is the email itself. */
+/** Mock passwords, by email (AC-4). A reset or confirmation token in the mock is the email itself. */
 const mockPasswords = new Map<string, string>();
+/** AC-4: password accounts whose email is not confirmed yet. They cannot sign in. */
+const mockUnconfirmed = new Set<string>();
 
 export function authHandlers(store: MockStore) {
   const state = (): AuthState => {
     const { auth, users } = store.db;
-    if (auth.status === "signed_in" && auth.userEmail && users[auth.userEmail]) {
+    if (auth.status === "signed_in" && auth.userEmail && users[auth.userEmail] && !mockUnconfirmed.has(auth.userEmail)) {
       return { status: "signed_in", email: auth.userEmail, user: users[auth.userEmail] };
     }
     if (auth.status === "needs_signup") return { status: "needs_signup", email: auth.email, user: null };
@@ -115,6 +117,7 @@ export function authHandlers(store: MockStore) {
 
   const signInAs = (rawEmail: string): AuthState => {
     const email = rawEmail.trim().toLowerCase();
+    mockUnconfirmed.delete(email); // a link, dev login or reset proves the email
     store.db.auth = store.db.users[email]
       ? { status: "signed_in", email, userEmail: email }
       : { status: "needs_signup", email, userEmail: null };
@@ -162,7 +165,8 @@ export function authHandlers(store: MockStore) {
       store.save();
       return HttpResponse.json(state());
     }),
-    // AC-4, AC-5. Sign-up signs in at once. The mock keeps passwords in memory only.
+    // AC-4, AC-5. Sign-up does not sign in: it answers confirm_email until the link is opened.
+    // The mock keeps passwords in memory only.
     http.post(`${API}/auth/password/signup`, async ({ request }) => {
       const body = (await request.json()) as { email: string; password: string; full_name?: string | null };
       const email = body.email.trim().toLowerCase();
@@ -186,9 +190,11 @@ export function authHandlers(store: MockStore) {
           profile_complete: false,
         };
         mockPasswords.set(email, body.password);
+        mockUnconfirmed.add(email);
+        store.db.auth = { status: "signed_out", email: null, userEmail: null };
         store.save();
       }
-      return HttpResponse.json(signInAs(email));
+      return HttpResponse.json({ status: "confirm_email", email, user: null, dev_link: null } satisfies AuthState);
     }),
     http.post(`${API}/auth/password/login`, async ({ request }) => {
       const body = (await request.json()) as { email: string; password: string };
@@ -196,9 +202,19 @@ export function authHandlers(store: MockStore) {
       if (!store.db.users[email] || mockPasswords.get(email) !== body.password) {
         return HttpResponse.json({ detail: "The email or password is wrong." }, { status: 401 });
       }
+      if (mockUnconfirmed.has(email)) {
+        const message = "Confirm your email first. Open the link we sent, or ask for a new one.";
+        return HttpResponse.json({ detail: { code: "email_not_confirmed", message, email } }, { status: 403 });
+      }
       return HttpResponse.json(signInAs(email));
     }),
     http.post(`${API}/auth/password/resend`, () => HttpResponse.json({ sent: true, dev_link: null }, { status: 202 })),
+    // AC-4: the confirmation link. The real API redirects to /welcome; the mock answers the state.
+    http.get(`${API}/auth/password/confirm`, ({ request }) => {
+      const email = (new URL(request.url).searchParams.get("token") ?? "").trim().toLowerCase();
+      if (!store.db.users[email]) return HttpResponse.json({ detail: "link_invalid" }, { status: 400 });
+      return HttpResponse.json(signInAs(email));
+    }),
     http.post(`${API}/auth/password/forgot`, () => HttpResponse.json({ sent: true, dev_link: null }, { status: 202 })),
     http.post(`${API}/auth/password/reset`, async ({ request }) => {
       const body = (await request.json()) as { token: string; password: string };

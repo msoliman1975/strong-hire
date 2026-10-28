@@ -1,6 +1,7 @@
 /**
  * Sign-in page, against the MSW mock API. Requirement IDs: AC-4 (email and password sign-up and
- * sign-in, magic link kept as a second way), AC-5 (forgot password and reset).
+ * sign-in, refused until the email is confirmed; magic link kept as a second way), AC-5 (forgot
+ * password and reset).
  */
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
@@ -22,6 +23,22 @@ function renderAt(path: string) {
     </QueryClientProvider>,
   );
   return user;
+}
+
+/** AC-4: open the confirmation link (in the mock, its token is the email). */
+async function confirmEmail(email: string) {
+  await fetch(`${API_BASE}/auth/password/confirm?token=${encodeURIComponent(email)}`);
+}
+
+/** Sign up through the form; the page then asks the user to check their inbox. */
+async function signUp(email: string, password: string) {
+  const user = renderAt("/signin?mode=signup");
+  await user.type(await screen.findByLabelText("Email address"), email);
+  await user.type(screen.getByLabelText("Password"), password);
+  await user.click(screen.getByLabelText(/I am 18 or older, and I accept/));
+  await user.click(screen.getByRole("button", { name: "Create account" }));
+  await screen.findByRole("heading", { name: "Check your inbox" });
+  document.body.innerHTML = "";
 }
 
 function recordBodies(path: string): unknown[] {
@@ -55,7 +72,7 @@ describe("sign-in page", () => {
     expect(bodies).toEqual([]);
   });
 
-  it("AC-4: sign-up signs in at once, and the password works before the email is confirmed", async () => {
+  it("AC-4: sign-up does not sign in; it asks the user to check their inbox", async () => {
     const bodies = recordBodies("/api/auth/password/signup");
     const user = renderAt("/signin");
     await user.click(await screen.findByRole("tab", { name: "Create account" }));
@@ -65,7 +82,10 @@ describe("sign-in page", () => {
     await user.click(screen.getByLabelText(/I am 18 or older, and I accept/));
     await user.click(screen.getByRole("button", { name: "Create account" }));
 
-    expect(await screen.findByRole("heading", { name: "Tell us about yourself" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Check your inbox" })).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("We sent a link to ana@example.com.");
+    expect(screen.getByRole("button", { name: "Resend the link" })).toBeInTheDocument();
+    expect(await (await fetch(`${API_BASE}/auth/me`)).json()).toMatchObject({ status: "signed_out" });
     expect(bodies).toEqual([
       {
         email: "ana@example.com",
@@ -78,15 +98,47 @@ describe("sign-in page", () => {
     ]);
   });
 
+  it("AC-4: the resend and different-email buttons on the check-your-inbox screen", async () => {
+    const bodies = recordBodies("/api/auth/password/resend");
+    const user = renderAt("/signin?mode=signup");
+    await user.type(await screen.findByLabelText("Email address"), "flo@example.com");
+    await user.type(screen.getByLabelText("Password"), "correct horse battery");
+    await user.click(screen.getByLabelText(/I am 18 or older, and I accept/));
+    await user.click(screen.getByRole("button", { name: "Create account" }));
+    await user.click(await screen.findByRole("button", { name: "Resend the link" }));
+    expect(await screen.findByText(/We sent a new link/)).toBeInTheDocument();
+    expect(bodies).toEqual([{ email: "flo@example.com" }]);
+
+    await user.click(screen.getByRole("button", { name: "Use a different email" }));
+    expect(screen.getByRole("tab", { name: "Create account", selected: true })).toBeInTheDocument();
+    expect(screen.getByLabelText("Email address")).toHaveValue("");
+  });
+
+  it("AC-4: password sign-in is refused until the email is confirmed, with a way to resend", async () => {
+    await signUp("gus@example.com", "correct horse battery");
+    const bodies = recordBodies("/api/auth/password/resend");
+    const user = renderAt("/signin");
+    await user.type(await screen.findByLabelText("Email address"), "gus@example.com");
+    await user.type(screen.getByLabelText("Password"), "correct horse battery");
+    await user.click(screen.getByRole("button", { name: "Sign in" }));
+    expect(await screen.findByRole("heading", { name: "Check your inbox" })).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("Confirm your email before you sign in.");
+    await user.click(screen.getByRole("button", { name: "Resend the link" }));
+    await screen.findByText(/We sent a new link/);
+    expect(bodies).toEqual([{ email: "gus@example.com" }]);
+  });
+
+  it("AC-4: the confirmation link signs in and opens the profile step on /welcome", async () => {
+    await signUp("hal@example.com", "correct horse battery");
+    await confirmEmail("hal@example.com");
+    renderAt("/welcome");
+    expect(await screen.findByRole("heading", { name: "Tell us about yourself" })).toBeInTheDocument();
+  });
+
   it("AC-4: a wrong password is refused, the right one signs in", async () => {
-    const signup = renderAt("/signin?mode=signup");
-    await signup.type(await screen.findByLabelText("Email address"), "dee@example.com");
-    await signup.type(screen.getByLabelText("Password"), "correct horse battery");
-    await signup.click(screen.getByLabelText(/I am 18 or older, and I accept/));
-    await signup.click(screen.getByRole("button", { name: "Create account" }));
-    await screen.findByRole("heading", { name: "Tell us about yourself" });
+    await signUp("dee@example.com", "correct horse battery");
+    await confirmEmail("dee@example.com");
     await fetch(`${API_BASE}/auth/logout`, { method: "POST" });
-    document.body.innerHTML = "";
 
     const user = renderAt("/signin");
     await user.type(await screen.findByLabelText("Email address"), "dee@example.com");
@@ -101,14 +153,7 @@ describe("sign-in page", () => {
   });
 
   it("AC-4: an email that already has an account cannot sign up again", async () => {
-    const first = renderAt("/signin?mode=signup");
-    await first.type(await screen.findByLabelText("Email address"), "eve@example.com");
-    await first.type(screen.getByLabelText("Password"), "first password");
-    await first.click(screen.getByLabelText(/I am 18 or older, and I accept/));
-    await first.click(screen.getByRole("button", { name: "Create account" }));
-    await screen.findByRole("heading", { name: "Tell us about yourself" });
-    await fetch(`${API_BASE}/auth/logout`, { method: "POST" });
-    document.body.innerHTML = "";
+    await signUp("eve@example.com", "first password");
 
     const user = renderAt("/signin?mode=signup");
     await user.type(await screen.findByLabelText("Email address"), "eve@example.com");
@@ -156,14 +201,7 @@ describe("sign-in page", () => {
 
   it("AC-5: the reset page sets a new password", async () => {
     // Make an account first, through the mock sign-up.
-    const signup = renderAt("/signin?mode=signup");
-    await signup.type(await screen.findByLabelText("Email address"), "cy@example.com");
-    await signup.type(screen.getByLabelText("Password"), "first long secret");
-    await signup.click(screen.getByLabelText(/I am 18 or older, and I accept/));
-    await signup.click(screen.getByRole("button", { name: "Create account" }));
-    await screen.findByRole("heading", { name: "Tell us about yourself" });
-    await fetch(`${API_BASE}/auth/logout`, { method: "POST" });
-    document.body.innerHTML = "";
+    await signUp("cy@example.com", "first long secret");
 
     const bodies = recordBodies("/api/auth/password/reset");
     const user = renderAt("/reset-password?token=cy@example.com");

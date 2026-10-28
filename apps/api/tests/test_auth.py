@@ -41,7 +41,12 @@ def _sign_up(auth: AuthHarness, email: str = "ana@example.com", **extra: Any) ->
 
 def test_new_email_needs_signup_before_a_user_exists(auth: AuthHarness) -> None:
     resp = auth.client.post("/auth/dev-login", json={"email": "Ana@Example.com"})
-    assert resp.json() == {"status": "needs_signup", "email": "ana@example.com", "user": None}
+    assert resp.json() == {
+        "status": "needs_signup",
+        "email": "ana@example.com",
+        "user": None,
+        "dev_link": None,
+    }
     assert auth.client.get("/auth/me").json()["status"] == "needs_signup"
     assert _users(auth) == []
 
