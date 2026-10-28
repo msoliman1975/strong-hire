@@ -9,6 +9,7 @@ import { ErrorNotice, Loading, PageHead, Steps } from "../../components/ui";
 import { useOnboardingSteps } from "./steps";
 import { contextPath, rehearsalPath } from "../../paths";
 import { useFeature } from "../../theme/features";
+import { ResumeCheckV2 } from "./ResumeCheckV2";
 
 /** One role as the form edits it. Dates are text; an empty end means the current role. */
 export interface RoleDraft {
@@ -101,6 +102,14 @@ export function CheckResumePage() {
   const problem = jobProblem(task.data);
   const record = useResume(resumeId, problem === null);
   const parsed = record.data?.resume ?? null;
+  // v2 (IN-12): the CV as cards with the issues panel. v1 keeps the form below.
+  const v2 = useFeature("v2_enabled");
+
+  if (v2 && parsed && !record.data?.deleted) {
+    return (
+      <ResumeCheckV2 key={resumeId} jobId={jobId} resumeId={resumeId} name={record.data?.name ?? null} original={parsed} />
+    );
+  }
 
   return (
     <div className="page--narrow">
