@@ -24,12 +24,22 @@ export const RESUME_TOO_BIG = `This file is over ${MAX_RESUME_MB} MB. Save a sma
 export const RESUMES_FULL = `You have ${MAX_RESUMES} resumes on file, the most you can keep. Delete one on the Resumes page to add another.`;
 export const JD_TOO_LONG = `This job description is over ${fmt(JD_MAX_WORDS)} words. Trim the benefits and company boilerplate.`;
 
+/** strong_api.inputs.limits (A1, #173): the codes of its limit refusals. */
+const LIMIT_MESSAGES: Record<string, string> = {
+  file_too_large: RESUME_TOO_BIG, // 413
+  resume_limit: RESUMES_FULL, // 422
+  posting_too_long: JD_TOO_LONG, // 422
+};
+
 /**
- * A limit refusal from the API, in plain words; any other error as it came. 413 is a file over
- * the size limit. A 422 or 409 names the limit in its code or message (resumes or words).
+ * A limit refusal from the API, in plain words; any other error as it came. The API's codes come
+ * first (A1); a 413 without one is still a file over the size limit, and a 422 or 409 that names
+ * the limit in its message is matched by its words.
  */
 export function friendlyLimitError(error: unknown): unknown {
   if (!(error instanceof ApiError)) return error;
+  const known = error.code ? LIMIT_MESSAGES[error.code] : undefined;
+  if (known) return new Error(known);
   const said = `${error.code ?? ""} ${error.message}`.toLowerCase();
   if (error.status === 413) return new Error(RESUME_TOO_BIG);
   if (error.status === 422 || error.status === 409) {

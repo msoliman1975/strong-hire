@@ -132,6 +132,11 @@ describe("resume limits (v2)", () => {
   });
 
   it("LB-1: the API's 413 and 422 limit refusals read in plain words", () => {
+    // The codes of strong_api.inputs.limits (A1).
+    expect((friendlyLimitError(new ApiError(413, "x", "file_too_large")) as Error).message).toBe(RESUME_TOO_BIG);
+    expect((friendlyLimitError(new ApiError(422, "x", "resume_limit")) as Error).message).toBe(RESUMES_FULL);
+    expect((friendlyLimitError(new ApiError(422, "x", "posting_too_long")) as Error).message).toBe(JD_TOO_LONG);
+    // Without a code, by status and words.
     expect((friendlyLimitError(new ApiError(413, "Payload too large")) as Error).message).toBe(RESUME_TOO_BIG);
     expect((friendlyLimitError(new ApiError(422, "The job description is over 2500 words.")) as Error).message).toBe(JD_TOO_LONG);
     expect((friendlyLimitError(new ApiError(422, "Resume limit reached", "resume_limit")) as Error).message).toBe(RESUMES_FULL);
