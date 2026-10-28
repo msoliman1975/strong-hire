@@ -1,0 +1,252 @@
+/* CO-2: the coach session (canvas board A1 Coach session). Tokens from theme/tokens.css. */
+
+.coach__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+}
+
+.coach__title {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+.coach__title h1 {
+  margin: 0;
+  font-size: 1.375rem;
+  letter-spacing: -0.01em;
+}
+
+.coach__style {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.coach__body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.coach__chat {
+  flex: 1.25 1 520px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.coach__side {
+  flex: 1 1 340px;
+  min-width: 0;
+}
+
+.coach__turns {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.coach__turns > li + li {
+  margin-top: 0;
+}
+
+.coach-turn {
+  display: flex;
+  gap: 12px;
+  max-width: 86%;
+}
+
+.coach-turn p {
+  margin: 0;
+  padding: 12px 16px;
+  white-space: pre-wrap;
+}
+
+.coach-turn[data-speaker="coach"] p {
+  background: var(--sh-ground);
+  border-radius: 4px var(--sh-radius) var(--sh-radius) var(--sh-radius);
+}
+
+.coach-turn[data-speaker="candidate"] {
+  align-self: flex-end;
+  max-width: 80%;
+}
+
+.coach-turn[data-speaker="candidate"] p {
+  background: var(--sh-ink);
+  color: var(--sh-room-text);
+  border-radius: var(--sh-radius) 4px var(--sh-radius) var(--sh-radius);
+}
+
+.coach-turn .coach-mark {
+  flex: 0 0 32px;
+}
+
+.coach__pending {
+  min-height: 1.25em;
+  margin: 0;
+}
+
+.coach__input {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px 12px;
+  border-top: 1px solid var(--sh-line);
+  padding-top: 16px;
+}
+
+.coach__input textarea {
+  flex: 1 1 240px;
+  min-width: 0;
+  resize: vertical;
+}
+
+.coach__mic {
+  flex: 0 0 52px;
+  height: 52px;
+  border-radius: var(--sh-radius-pill);
+  border: 1px solid var(--sh-line-strong);
+  background: var(--sh-surface);
+  color: var(--sh-violet);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.coach__mic[data-live] {
+  background: var(--sh-rec);
+  border-color: var(--sh-rec);
+  color: #ffffff;
+}
+
+.coach__mic:disabled {
+  color: var(--sh-muted);
+  cursor: not-allowed;
+}
+
+.coach__mic-note {
+  flex: 1 1 100%;
+  margin: 0;
+}
+
+.coach__shape-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.coach__shape-head p {
+  margin: 0;
+}
+
+.coach__parts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 16px 0 12px;
+}
+
+.coach__parts > li + li {
+  margin-top: 0;
+}
+
+.coach-part {
+  border-left: 4px solid var(--part, var(--sh-line-strong));
+  padding: 6px 0 6px 14px;
+}
+
+.coach-part[data-part="context"] { --part: var(--sh-part-context); }
+.coach-part[data-part="stakes"] { --part: var(--sh-part-stakes); }
+.coach-part[data-part="action"] { --part: var(--sh-part-action); }
+.coach-part[data-part="result"] { --part: var(--sh-part-result); }
+.coach-part[data-part="reflection"] { --part: var(--sh-part-reflection); }
+
+.coach-part[data-state="next"] {
+  border-left-style: dashed;
+  border-left-color: var(--sh-line-strong);
+}
+
+.coach-part[data-state="now"] {
+  background: var(--sh-violet-soft);
+  border-radius: 0 var(--sh-radius-sm) var(--sh-radius-sm) 0;
+  padding-right: 12px;
+}
+
+.coach-part p {
+  margin: 0;
+}
+
+.coach-part__label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.coach__prove-heading {
+  margin: 0 0 10px;
+  font-weight: 400;
+}
+
+.coach .chip-list.plain-list > li + li {
+  margin-top: 0;
+}
+
+/* CO-7, CO-8: takes and versions on the workbench. */
+
+.story-takes__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 12px;
+}
+
+.story-takes__head h2 {
+  margin: 0;
+}
+
+.story-takes__list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.story-takes__list > li + li {
+  margin-top: 0;
+  border-top: 1px solid var(--sh-line);
+  padding-top: 14px;
+}
+
+.story-take p {
+  margin: 0;
+}
+
+.story-take__scores {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.story-take__scores > li + li {
+  margin-top: 0;
+}
+
+.story-take__form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.story-versions__text {
+  white-space: pre-wrap;
+  margin: 12px 0 0;
+}

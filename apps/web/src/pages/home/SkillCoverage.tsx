@@ -13,7 +13,7 @@ import { competencyLabel } from "../../labels";
 import { Pill } from "../../components/ui";
 import { planApi, planKey, type PlanView } from "../plan/api";
 import type { Competency, Story } from "../stories/api";
-import { newStoryPath } from "../stories/paths";
+import { newCoachPath } from "../coach/paths";
 import { isReady } from "./interviews";
 
 export type Coverage = "covered" | "thin" | "missing";
@@ -44,10 +44,8 @@ export function coverageOf(skill: Competency, stories: Pick<Story, "skills" | "s
   return tagged.length > 0 ? "thin" : "missing";
 }
 
-/**
- * Where a missing skill sends the candidate. S31 changes this to a coach session for the skill.
- */
-export const missingSkillPath = (skill: Competency) => newStoryPath(skill);
+/** Where a missing skill sends the candidate: a coach session for the skill (S31). */
+export const missingSkillPath = (skill: Competency) => newCoachPath({ skill });
 
 /** The plan pages of the user's ready interviews: job, then its latest gap analysis's CV, then the plan. */
 function usePlans() {
@@ -93,7 +91,7 @@ export function SkillCoverage({ stories }: { stories: Story[] }) {
                 <Link className="home-coverage__link" to={missingSkillPath(skill)}>
                   <Pill state="gap">
                     {competencyLabel(skill)} <span className="home-coverage__state">{coverageLabel[state]}</span>
-                    <span className="visually-hidden">. Write a story for it</span>
+                    <span className="visually-hidden">. Build a story for it with the coach</span>
                   </Pill>
                 </Link>
               ) : (

@@ -1,6 +1,7 @@
 /** MSW for Vitest. Every request is mocked, with no processing delay. */
 import { setupServer } from "msw/node";
 
+import { coachHandlers } from "./coachHandlers";
 import { coachVoiceHandlers } from "./coachVoiceHandlers";
 import { customHandlers } from "./custom";
 import { createStore } from "./db";
@@ -28,5 +29,6 @@ export const server = setupServer(
   ...storyHandlers(),
   ...waitlistHandlers(),
   ...coachVoiceHandlers(),
+  ...coachHandlers(),
   ...transcriptHandlers(),
 );

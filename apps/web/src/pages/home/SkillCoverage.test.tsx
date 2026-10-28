@@ -129,9 +129,9 @@ describe("Home story sections", () => {
     expect(skills.map((s) => [s.textContent, s.dataset.coverage])).toEqual([
       ["Ownership Covered", "covered"],
       ["Conflict handling Thin", "thin"],
-      ["Judgment Missing. Write a story for it", "missing"],
+      ["Judgment Missing. Build a story for it with the coach", "missing"],
     ]);
-    expect(within(skills[2]).getByRole("link")).toHaveAttribute("href", "/stories/new?skill=judgment");
+    expect(within(skills[2]).getByRole("link")).toHaveAttribute("href", "/coach/new?skill=judgment");
     expect(within(skills[0]).queryByRole("link")).toBeNull();
   });
 
@@ -148,5 +148,6 @@ describe("Home story sections", () => {
     const library = await screen.findByRole("region", { name: "Your story library" });
     expect(library).toHaveTextContent("Save an answer from a debrief");
     expect(within(library).getByRole("link", { name: "New story" })).toHaveAttribute("href", "/stories/new");
+    expect(within(library).getByRole("link", { name: "Build a story" })).toHaveAttribute("href", "/coach/new");
   });
 });

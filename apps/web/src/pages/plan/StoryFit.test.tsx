@@ -38,14 +38,14 @@ describe("story fit table", () => {
     expect(within(impact).getByText("The result has no number yet.")).toBeInTheDocument();
   });
 
-  it("ST-5: a missing story links to New story for that skill", async () => {
+  it("ST-5: a missing story opens a coach session for that skill and interview", async () => {
     renderTable(mockStoryFit);
     const table = await screen.findByTestId("story-fit");
     const conflict = within(table).getAllByRole("row")[3];
     expect(within(conflict).getByText("Missing")).toBeInTheDocument();
-    expect(within(conflict).getByRole("link", { name: "New story" })).toHaveAttribute(
+    expect(within(conflict).getByRole("link", { name: "Build it with the coach" })).toHaveAttribute(
       "href",
-      "/stories/new?skill=conflict_handling",
+      "/coach/new?skill=conflict_handling&job=j1",
     );
   });
 

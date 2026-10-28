@@ -129,7 +129,7 @@ describe("story workbench", () => {
       "href",
       "/sessions/5e551011-0000-4000-8000-000000000000/debrief",
     );
-    expect(screen.getByTestId("story-takes")).toHaveTextContent("Takes and versions");
+    expect(screen.getByTestId("story-takes")).toHaveTextContent("Work on it with the coach");
   });
 
   it("ST-3: edits a story part by part and saves only what changed", async () => {

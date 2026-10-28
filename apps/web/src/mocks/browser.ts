@@ -10,6 +10,7 @@
  */
 import { setupWorker } from "msw/browser";
 
+import { coachHandlers } from "./coachHandlers";
 import { coachVoiceHandlers } from "./coachVoiceHandlers";
 import { customHandlers } from "./custom";
 import { createStore } from "./db";
@@ -45,6 +46,7 @@ export async function startMocks(mode: MockMode): Promise<void> {
     ...storyHandlers(),
     ...waitlistHandlers(),
     ...coachVoiceHandlers(),
+    ...coachHandlers(),
     ...transcriptHandlers(),
   ];
   await setupWorker(...handlers).start({

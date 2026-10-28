@@ -1,8 +1,8 @@
 /**
  * ST-5: the story fit table on the plan page. For each skill the interview will test, the best
  * story and whether it is strong, thin or missing. The worker computes it; the page polls while
- * the API says `computing`. A missing story links to "New story" (S31 later changes that link to
- * a coach session).
+ * the API says `computing`. A missing story opens a coach session for that skill and this
+ * interview (S31).
  */
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
@@ -11,14 +11,14 @@ import { apiClient, unwrap } from "../../api/client";
 import type { components } from "../../api/schema.gen";
 import { Loading, Pill } from "../../components/ui";
 import { competencyLabel } from "../../labels";
+import { newCoachPath } from "../coach/paths";
 
 export type StoryFitView = components["schemas"]["StoryFitView"];
 export type StoryFitRow = components["schemas"]["StoryFitRow"];
 type Strength = StoryFitRow["strength"];
 
-/** The workbench (S21) and its "New story" form, prefilled with the skill. */
+/** The workbench (S21). */
 export const storyPath = (id: string) => `/stories/${encodeURIComponent(id)}`;
-export const newStoryPath = (skill: string) => `/stories/new?skill=${encodeURIComponent(skill)}`;
 
 const POLL_MS = 2000;
 
@@ -50,13 +50,13 @@ export function StoryFitTable({ jobId, resumeId }: { jobId: string; resumeId: st
       ) : fit.isError ? (
         <p className="muted">Story fit is not available right now.</p>
       ) : (
-        <StoryFitBody view={fit.data} />
+        <StoryFitBody view={fit.data} jobId={jobId} />
       )}
     </section>
   );
 }
 
-function StoryFitBody({ view }: { view: StoryFitView }) {
+function StoryFitBody({ view, jobId }: { view: StoryFitView; jobId: string }) {
   if (view.rows.length === 0) return <Loading label="Matching your stories to the skills" />;
   return (
     <>
@@ -76,7 +76,7 @@ function StoryFitBody({ view }: { view: StoryFitView }) {
                 {r.story ? (
                   <Link to={storyPath(r.story.id)}>{r.story.title}</Link>
                 ) : (
-                  <Link to={newStoryPath(r.competency)}>New story</Link>
+                  <Link to={newCoachPath({ skill: r.competency, job: jobId })}>Build it with the coach</Link>
                 )}
                 <span className="muted small plan-story-fit__reason">{r.reason}</span>
               </td>

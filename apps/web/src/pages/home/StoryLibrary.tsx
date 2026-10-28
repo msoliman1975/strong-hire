@@ -9,6 +9,7 @@ import { Link } from "react-router";
 import { competencyLabel } from "../../labels";
 import { ErrorNotice, Eyebrow } from "../../components/ui";
 import { filledParts, useStories, type Story } from "../stories/api";
+import { newCoachPath } from "../coach/paths";
 import { newStoryPath, storiesPath, storyPath } from "../stories/paths";
 import { PartsDone, StoryStatusBadge } from "../stories/StoriesPage";
 import { SkillCoverage } from "./SkillCoverage";
@@ -56,7 +57,10 @@ export function StoryLibrary() {
             ))}
           </ul>
         )}
-        <div>
+        <div className="stories__actions">
+          <Link className="btn" to={newCoachPath()}>
+            Build a story
+          </Link>
           <Link className="btn btn--secondary" to={newStoryPath()}>
             New story
           </Link>
