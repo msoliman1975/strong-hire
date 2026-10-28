@@ -30,7 +30,7 @@ from strong_core.db.models import Story as StoryRow
 from strong_core.gateway import ModelGateway, Role
 from strong_core.gateway.fake import FakeBackend
 from strong_core.gateway.registry import fake_models_config
-from strong_core.schemas import CoachReply, StoryPart, StoryPartUpdate
+from strong_core.schemas import CoachReply, CoachStyle, StoryPart, StoryPartUpdate
 
 from .conftest import sign_in
 
@@ -190,7 +190,7 @@ async def test_co2_records_minutes_and_coach_provenance(
         assert row.model_profile == "fake"
         assert row.model_id
         refs = set((row.prompt_version or "").split(","))
-        assert {"coach/turn.v1", "coach/turn_input.v1", "coach/style_gentle.v1"} <= refs
+        assert {"coach/turn.v2", "coach/turn_input.v2", "coach/style_gentle.v2"} <= refs
         turns = (
             await db.scalars(select(CoachTurn).where(CoachTurn.coach_session_id == row.id))
         ).all()
@@ -410,6 +410,85 @@ def test_co4_one_question_per_reply() -> None:
     assert engine.one_question("Tell me more.") == "Tell me more."
 
 
+def test_iv3_a_result_in_words_is_measurable() -> None:
+    """IV-3: a result counts as measured with a number in words; a vague one does not."""
+    full = {
+        "context": "At Acme checkout was late.",
+        "stakes": "Black Friday was close.",
+        "action": "I split the rollout by country instead of one switch.",
+        "reflection": "I learned to ship in small steps.",
+    }
+    for measured in (
+        "We finished a week before Black Friday, and not one payment failed.",
+        "Conversion rose five percent.",
+        "The backlog halved, then the queue doubled its throughput.",
+        "Zero orders were lost.",
+    ):
+        assert engine.asks(_story(**full, result=measured)) == [AskFor.NOTHING], measured
+    for vague in ("The backlog went down a lot.", "It was one of our best launches."):
+        assert engine.asks(_story(**full, result=vague))[0] == AskFor.MEASURABLE_RESULT, vague
+
+
+def test_iv3_the_turn_prompt_presses_before_moving_on() -> None:
+    """IV-3: the coach asks for a missing number once more before it moves on."""
+    from strong_core.gateway import Role
+    from strong_core.prompts import load_prompt
+
+    system = load_prompt(Role.COACH, "turn").render(style="", skills="")
+    assert "Press before you move on" in system
+    assert "said twice" in system
+    user = load_prompt(Role.COACH, "turn_input").render(
+        story="", target_skill="", transcript="", ask="a", then="b", answer=""
+    )
+    assert "Only after the candidate has said twice" in user
+
+
+def test_co5_direct_replies_are_the_question_alone() -> None:
+    """CO-5: the direct coach drops any acknowledgement before its question."""
+    for reply in (
+        "Got it, the stakes are clear. What did you do yourself?",
+        "Thanks, that gives the setting. What did you do yourself?",
+        "Good! What did you do yourself?",
+    ):
+        assert engine.styled(reply, CoachStyle.DIRECT) == "What did you do yourself?"
+    assert engine.styled("What was the number?", CoachStyle.DIRECT) == "What was the number?"
+    wrap = "Your story has all five parts. Read it back when you are ready."
+    assert engine.styled(wrap, CoachStyle.DIRECT) == wrap
+
+
+def test_co5_gentle_replies_never_praise_the_story() -> None:
+    """CO-5: a gentle acknowledgement that grades the story becomes a plain thank you."""
+    praise = (
+        "Thank you, finishing a week early is a meaningful outcome. "
+        "Could you tell me what you learned?"
+    )
+    assert engine.styled(praise, CoachStyle.GENTLE) == (
+        "Thank you. Could you tell me what you learned?"
+    )
+    plain = "Thank you, the Saturday cut-over. Could you tell me what changed afterwards?"
+    assert engine.styled(plain, CoachStyle.GENTLE) == plain
+
+
+async def test_co5_direct_session_reply_is_held_to_its_style(
+    client: httpx.AsyncClient, fake_fixtures: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """CO-5: the turn API returns the direct reply without its acknowledgement."""
+    use_fixtures(monkeypatch, fake_fixtures)
+    set_reply(
+        fake_fixtures,
+        {
+            "message": "Clear picture, with real stakes. What did you do yourself?",
+            "parts": [],
+            "missing": [],
+            "skills": [],
+        },
+    )
+    await sign_in(client)
+    sid = (await start(client, style="direct"))["session"]["id"]
+    out = await turn(client, sid, T1)
+    assert out["reply"]["message"] == "What did you do yourself?"
+
+
 async def test_co4_the_model_is_told_one_thing_to_ask(
     client: httpx.AsyncClient, fake_fixtures: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -558,7 +637,7 @@ SCRIPT_REPLIES: tuple[dict[str, Any], ...] = (
         "skills": ["ownership"],
     },
     {
-        "message": "That shows your call clearly. What changed in the end?",
+        "message": "Thank you. What changed in the end?",
         "parts": [
             {
                 "part": "action",

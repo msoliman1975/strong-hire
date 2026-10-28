@@ -14,8 +14,12 @@ One candidate turn:
    the part's text is in its quotes. The rest are dropped and logged. `missing` is recomputed
    from the story, not taken from the model.
 4. The reply's message keeps one question at most (CO-4): anything after the first "?" is cut.
+5. The style (CO-5) is a section of the system prompt (`prompts/coach/style_<style>`), and the
+   reply is held to it: a direct reply is the question alone; a gentle acknowledgement that
+   grades the story ("a meaningful outcome") becomes "Thank you.".
 
-The style (CO-5) is only a section of the system prompt (`prompts/coach/style_<style>`).
+IV-3 pressing (ask once more from another angle before moving on) is in the turn prompt: the
+model sees the conversation and knows whether the candidate already said no twice.
 """
 
 from __future__ import annotations
@@ -43,6 +47,7 @@ from strong_core.schemas import (
     CoachReply,
     CoachSessionStatus,
     CoachSpeaker,
+    CoachStyle,
     Competency,
     StoryPart,
     StoryPartUpdate,
@@ -72,8 +77,8 @@ _ASK_FOR_MODEL: dict[AskFor, str] = {
     "was going on (context)",
     AskFor.STAKES: "why it mattered and what could go wrong (stakes)",
     AskFor.OWN_ROLE: "the candidate's own role: what they did themselves, not the team (action)",
-    AskFor.MEASURABLE_RESULT: "a measurable result: what changed, with a number if they have "
-    "one (result)",
+    AskFor.MEASURABLE_RESULT: "a measurable result: what changed, with a number; if they have "
+    "none, a rough figure, a before and after, or how they knew it worked (result)",
     AskFor.TRADEOFF_REASONING: "the trade-offs: which options they weighed and why they chose "
     "theirs",
     AskFor.REFLECTION: "what they learned or would do differently (reflection)",
@@ -109,6 +114,23 @@ _TYPOGRAPHIC = str.maketrans(
     {0x2018: "'", 0x2019: "'", 0x201C: '"', 0x201D: '"', 0x2013: "-", 0x2014: "-"}
 )
 _NUMBER = re.compile(r"\d+(?:[.,]\d+)*")
+# A result is measurable with digits or with a number in words ("five percent", "not one
+# payment failed", "doubled"); IV-3 asks for a measure, not for digits.
+_MEASURE = re.compile(
+    r"\d|\b(zero|none|not (one|a single)|no \w+ (failed|lost|dropped)|two|three|four|five"
+    r"|six|seven|eight|nine|ten|eleven|twelve|twenty|thirty|forty|fifty|hundred|thousand"
+    r"|million|billion|dozen|half|twice|double[ds]?|triple[ds]?|percent|per cent)\b",
+    re.IGNORECASE,
+)
+# CO-5: words that grade the story. The gentle coach never uses them in its acknowledgement.
+_PRAISE = re.compile(
+    r"\b(good|great|clear|clearly|strong|solid|real|meaningful|helpful|useful|careful"
+    r"|thoughtful|impressive|excellent|nice|important|valuable|perfect|smart|wise|brilliant"
+    r"|fantastic|amazing|wonderful|sounds like|well done)\b",
+    re.IGNORECASE,
+)
+_SENTENCE_END = re.compile(r"(?<=[.!])\s+")
+GENTLE_LEAD = "Thank you."
 _TRADEOFF = re.compile(
     r"\b(instead|rather than|trade-?offs?|options?|alternatives?|chose|choose|decided|weigh"
     r"\w*|versus|vs\.?|downside|at the cost of)\b",
@@ -143,7 +165,7 @@ def asks(story: StoryRow) -> list[AskFor]:
         out.append(AskFor.STAKES)
     if action is None or (_WE.search(action) and not _I.search(action)):
         out.append(AskFor.OWN_ROLE)
-    if result is None or not _NUMBER.search(result):
+    if result is None or not _MEASURE.search(result):
         out.append(AskFor.MEASURABLE_RESULT)
     if action is not None and not _TRADEOFF.search(f"{action} {reflection or ''}"):
         out.append(AskFor.TRADEOFF_REASONING)
@@ -209,6 +231,24 @@ def one_question(message: str) -> str:
     """CO-4: one question per reply. Cut what follows the first question mark."""
     head, mark, _ = message.partition("?")
     return f"{head}{mark}".strip() if mark else message.strip()
+
+
+def styled(message: str, style: CoachStyle) -> str:
+    """CO-5: hold a one-question reply to its style guide.
+
+    Direct: the question alone, with no acknowledgement before it. Gentle: an acknowledgement
+    that grades the story ("a meaningful outcome") becomes "Thank you.". A reply with no
+    question (the wrap-up) is left as it is."""
+    if not message.endswith("?"):
+        return message
+    *lead, question = _SENTENCE_END.split(message)
+    if not lead:
+        return message
+    if style == CoachStyle.DIRECT:
+        return question
+    if _PRAISE.search(" ".join(lead)):
+        return f"{GENTLE_LEAD} {question}"
+    return message
 
 
 # --- conduct (IV-12 rules) -------------------------------------------------------------------
@@ -420,7 +460,11 @@ async def run_turn(
             setattr(story, update.part.value, update.text)
         story.skills = merge_skills(story.skills, raw.skills)
     next_order = asks(story)
-    message = one_question(raw.message) if raw is not None else ASK_LINES[next_order[0]]
+    message = (
+        styled(one_question(raw.message), session.style)
+        if raw is not None
+        else ASK_LINES[next_order[0]]
+    )
     if not message:
         message = ASK_LINES[next_order[0]]
     coach = add_turn(db, session, turns, CoachSpeaker.COACH, message)
