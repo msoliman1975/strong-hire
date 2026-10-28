@@ -51,6 +51,12 @@ log = logging.getLogger(__name__)
 CTX_KEY = "inputs"
 RESULT_TTL_S = 24 * 3600
 
+# IN-1: must match strong_api.inputs.limits (a test checks this). The worker cannot import it.
+MAX_POSTING_WORDS = 2_500
+POSTING_TOO_LONG_MESSAGE = (
+    "Job descriptions can be up to 2,500 words. Trim the benefits and company boilerplate."
+)
+
 
 @dataclass
 class InputsContext:
@@ -112,6 +118,12 @@ async def extract_job_target(
                     "outcome": "needs_paste",
                     "reason": fetched.paste_reason,
                     "detail": fetched.detail,
+                }
+            if len((fetched.text or "").split()) > MAX_POSTING_WORDS:
+                return {
+                    "outcome": "needs_paste",
+                    "reason": "too_long",
+                    "detail": POSTING_TOO_LONG_MESSAGE,
                 }
             target.raw_text = fetched.text
             target.text_hash = posting_text_hash(fetched.text)

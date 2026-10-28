@@ -34,6 +34,18 @@ from sqlalchemy import func, select, true
 from strong_api.gap import service as gap_service
 from strong_api.gap.settings import GapSettings, get_gap_settings
 from strong_api.inputs.deps import Db, Me, Queue
+from strong_api.inputs.limits import (
+    FILE_TOO_LARGE,
+    FILE_TOO_LARGE_MESSAGE,
+    MAX_POSTING_WORDS,
+    MAX_RESUME_FILE_BYTES,
+    MAX_RESUMES_PER_USER,
+    POSTING_TOO_LONG,
+    POSTING_TOO_LONG_MESSAGE,
+    RESUME_LIMIT,
+    RESUME_LIMIT_MESSAGE,
+    word_count,
+)
 from strong_api.inputs.queue import (
     DELETE_RESUME_FILE,
     EXTRACT_JOB_TARGET,
@@ -75,7 +87,6 @@ router = APIRouter(tags=["inputs"])
 
 GapLimits = Annotated[GapSettings, Depends(get_gap_settings)]
 
-MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 RESUME_EXTENSIONS = {".pdf", ".docx", ".txt", ".md"}
 PASTE_ONLY_HOSTS = ("linkedin.com", "lnkd.in")
 
@@ -182,6 +193,20 @@ async def _owned_resume(db: Db, me: Me, resume_id: uuid.UUID, *, live: bool = Fa
     return row
 
 
+async def _live_resume_count(db: Db, me: Me) -> int:
+    """Saved, not deleted resumes of the user. Rows over the limit from before it stay."""
+    count = await db.scalar(
+        select(func.count())
+        .select_from(ResumeRow)
+        .where(
+            ResumeRow.org_id == me.org_id,
+            ResumeRow.user_id == me.user_id,
+            ResumeRow.deleted_at.is_(None),
+        )
+    )
+    return count or 0
+
+
 def _audit(me: Me, action: str, entity: str) -> AuditLog:
     return AuditLog(org_id=me.org_id, actor=f"user:{me.user_id}", action=action, entity=entity)
 
@@ -197,6 +222,11 @@ async def create_job_target(
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_CONTENT,
             {"code": "paste_required", "reason": "linkedin", "message": "Paste the posting text."},
+        )
+    if body.text and word_count(body.text) > MAX_POSTING_WORDS:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT,
+            {"code": POSTING_TOO_LONG, "message": POSTING_TOO_LONG_MESSAGE},
         )
     target = JobTarget(
         org_id=me.org_id,
@@ -450,7 +480,11 @@ async def create_resume(
     file: Annotated[UploadFile | None, File()] = None,
     text: Annotated[str | None, Form(max_length=MAX_RESUME_TEXT_CHARS)] = None,
 ) -> ResumeAccepted:
-    """Upload a PDF or DOCX file, or send pasted text in the `text` form field (IN-3)."""
+    """Upload a PDF or DOCX file, or send pasted text in the `text` form field (IN-3).
+
+    A file over 1 MB gets 413 `file_too_large`. A user with 5 saved resumes gets 422
+    `resume_limit`; there is no replace endpoint, so the client deletes one, then adds.
+    """
     if (file is None) == (not text):
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_CONTENT, "Send either a file or the resume text."
@@ -461,14 +495,22 @@ async def create_resume(
             raise HTTPException(
                 status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, "Use a PDF, DOCX or text file."
             )
-        data = await file.read(MAX_UPLOAD_BYTES + 1)
-        if len(data) > MAX_UPLOAD_BYTES:
-            raise HTTPException(status.HTTP_413_CONTENT_TOO_LARGE, "The file is larger than 5 MB.")
+        data = await file.read(MAX_RESUME_FILE_BYTES + 1)
+        if len(data) > MAX_RESUME_FILE_BYTES:
+            raise HTTPException(
+                status.HTTP_413_CONTENT_TOO_LARGE,
+                {"code": FILE_TOO_LARGE, "message": FILE_TOO_LARGE_MESSAGE},
+            )
         if not data:
             raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "The file is empty.")
     else:
         assert text is not None
         filename, data = "pasted.txt", text.encode("utf-8")
+    if await _live_resume_count(db, me) >= MAX_RESUMES_PER_USER:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT,
+            {"code": RESUME_LIMIT, "message": RESUME_LIMIT_MESSAGE},
+        )
 
     row = ResumeRow(
         org_id=me.org_id,

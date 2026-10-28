@@ -10,11 +10,11 @@ from urllib.parse import urlparse
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from strong_api.inputs.limits import MAX_POSTING_CHARS
 from strong_api.inputs.queue import JobState
 from strong_core.library import NAME_MAX_CHARS, clean_name
 from strong_core.schemas import GapStatus, JobPosting, Level, Resume
 
-MAX_POSTING_CHARS = 60_000
 MAX_RESUME_TEXT_CHARS = 60_000
 
 

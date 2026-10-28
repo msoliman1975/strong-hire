@@ -487,7 +487,7 @@
           "inputs"
         ],
         "summary": "Create Resume",
-        "description": "Upload a PDF or DOCX file, or send pasted text in the `text` form field (IN-3).",
+        "description": "Upload a PDF or DOCX file, or send pasted text in the `text` form field (IN-3).\n\nA file over 1 MB gets 413 `file_too_large`. A user with 5 saved resumes gets 422\n`resume_limit`; there is no replace endpoint, so the client deletes one, then adds.",
         "operationId": "create_resume_resumes_post",
         "requestBody": {
           "content": {
@@ -16515,7 +16515,7 @@
             "anyOf": [
               {
                 "type": "string",
-                "maxLength": 60000
+                "maxLength": 20000
               },
               {
                 "type": "null"
@@ -16582,7 +16582,7 @@
             "anyOf": [
               {
                 "type": "string",
-                "maxLength": 60000
+                "maxLength": 20000
               },
               {
                 "type": "null"

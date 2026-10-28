@@ -43,7 +43,13 @@ PASTE_ONLY_HOSTS = ("linkedin.com", "lnkd.in")
 
 Board = Literal["greenhouse", "lever", "ashby", "workday", "generic", "browser"]
 PasteReason = Literal[
-    "linkedin", "invalid_url", "blocked_address", "blocked", "fetch_failed", "too_short"
+    "linkedin",
+    "invalid_url",
+    "blocked_address",
+    "blocked",
+    "fetch_failed",
+    "too_short",
+    "too_long",
 ]
 
 Resolver = Callable[[str], Awaitable[list[str]]]

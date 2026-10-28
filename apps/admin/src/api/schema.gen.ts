@@ -169,6 +169,9 @@ export interface paths {
         /**
          * Create Resume
          * @description Upload a PDF or DOCX file, or send pasted text in the `text` form field (IN-3).
+         *
+         *     A file over 1 MB gets 413 `file_too_large`. A user with 5 saved resumes gets 422
+         *     `resume_limit`; there is no replace endpoint, so the client deletes one, then adds.
          */
         post: operations["create_resume_resumes_post"];
         delete?: never;
