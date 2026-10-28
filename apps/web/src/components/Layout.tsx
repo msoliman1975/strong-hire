@@ -5,10 +5,11 @@ import { Link, NavLink, Navigate, Outlet, useLocation, useMatch, useNavigate } f
 import { authApi } from "../api/auth";
 import { useAuth, useModelUsage, useUsage } from "../api/hooks";
 import { hasSlogan, SLOGAN } from "../labels";
+import { newCoachPath } from "../pages/coach/paths";
 import { useFeature } from "../theme/features";
 import { BrandMark } from "./BrandMark";
 import { ModelUsageBadge } from "./ModelUsageBadge";
-import { ErrorNotice, Loading } from "./ui";
+import { CoachMark, ErrorNotice, Loading } from "./ui";
 import { UsageMeter } from "./UsageMeter";
 
 /** Logo, name and (once agreed) the slogan. A link on signed-in pages, plain text elsewhere. */
@@ -29,8 +30,21 @@ function Brand({ link, tone = "light" }: { link: boolean; tone?: "light" | "dark
   );
 }
 
-/** Initials button that opens a small menu with the account page and sign out. */
-function AccountMenu({ email, onSignOut, busy }: { email: string; onSignOut: () => void; busy: boolean }) {
+/**
+ * Initials button that opens a small menu with the account page and sign out. In v2 it also holds
+ * the pages that left the rail: Questions, Resumes and, in dev builds, the text interview.
+ */
+function AccountMenu({
+  email,
+  onSignOut,
+  busy,
+  links = [ACCOUNT_LINK],
+}: {
+  email: string;
+  onSignOut: () => void;
+  busy: boolean;
+  links?: NavItem[];
+}) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const initials = email.slice(0, 2).toUpperCase() || "ME";
@@ -69,11 +83,13 @@ function AccountMenu({ email, onSignOut, busy }: { email: string; onSignOut: () 
       {open && (
         <ul className="account-menu__list">
           {email && <li className="account-menu__email">{email}</li>}
-          <li>
-            <Link to="/account" onClick={() => setOpen(false)}>
-              Account
-            </Link>
-          </li>
+          {links.map((it) => (
+            <li key={it.to}>
+              <Link to={it.to} onClick={() => setOpen(false)}>
+                {it.label}
+              </Link>
+            </li>
+          ))}
           <li>
             <button type="button" onClick={onSignOut} disabled={busy}>
               Sign out
@@ -85,7 +101,7 @@ function AccountMenu({ email, onSignOut, busy }: { email: string; onSignOut: () 
   );
 }
 
-type NavItem = { to: string; label: string; end?: boolean; match?: RegExp };
+type NavItem = { to: string; label: string; end?: boolean; match?: RegExp; journey?: "A" | "B" };
 
 /** The v1 menu, shown until launch: the same labels and targets, so v1 users find their pages. */
 const V1_NAV: NavItem[] = [
@@ -97,21 +113,28 @@ const V1_NAV: NavItem[] = [
   { to: "/account", label: "Account" },
 ];
 
-/** UI-2: the v2 rail. Resumes and Reports stay reachable in the smaller list below it. */
+/**
+ * UI-2: the v2 rail, as on the canvas Home board: the two journeys, Stories (A) and Interviews
+ * (B), then Progress (the reports). Questions, Resumes and Account moved to the account menu.
+ */
 const V2_NAV: NavItem[] = [
   { to: "/", label: "Home", end: true },
-  { to: "/stories", label: "Stories" },
-  { to: "/jobs", label: "Interviews", match: /^\/(jobs|interviews|sessions)(\/|$)/ },
-  { to: "/questions", label: "Questions" },
-  { to: "/account", label: "Account" },
+  { to: "/stories", label: "Stories", journey: "A", match: /^\/(stories|coach)(\/|$)/ },
+  { to: "/jobs", label: "Interviews", journey: "B", match: /^\/(jobs|interviews|sessions)(\/|$)/ },
+  { to: "/reports", label: "Progress" },
 ];
 
-const V2_MORE: NavItem[] = [
-  { to: "/resumes", label: "Resumes" },
-  { to: "/reports", label: "Reports" },
-];
+const ACCOUNT_LINK: NavItem = { to: "/account", label: "Account" };
 
 const DEV_NAV: NavItem = { to: "/dev/interview", label: "Text interview (dev)" };
+
+/** The v2 account menu. The dev text interview shows in dev builds only. */
+const V2_ACCOUNT_LINKS: NavItem[] = [
+  { to: "/questions", label: "Questions" },
+  { to: "/resumes", label: "Resumes" },
+  ACCOUNT_LINK,
+  ...(import.meta.env.DEV ? [DEV_NAV] : []),
+];
 
 /** UI-2: the left rail menu. "Stories" and the v2 labels show only when `v2_enabled` is on. */
 export function RailNav() {
@@ -120,15 +143,26 @@ export function RailNav() {
   const item = (it: NavItem) => {
     // NavLink only marks exact routes; items with `match` cover several route trees.
     const matched = it.match?.test(pathname) ?? false;
+    // The journey letter is decoration; the link's name stays the label.
+    const label = it.journey ? (
+      <>
+        <span>{it.label}</span>
+        <span className="rail-nav__journey" aria-hidden="true">
+          {it.journey}
+        </span>
+      </>
+    ) : (
+      it.label
+    );
     return (
       <li key={it.to}>
         {matched ? (
           <Link to={it.to} aria-current="page">
-            {it.label}
+            {label}
           </Link>
         ) : (
           <NavLink to={it.to} end={it.end}>
-            {it.label}
+            {label}
           </NavLink>
         )}
       </li>
@@ -138,9 +172,8 @@ export function RailNav() {
     <nav className="rail-nav" aria-label="Main">
       <ul>
         {(v2 ? V2_NAV : V1_NAV).map(item)}
-        {import.meta.env.DEV && item(DEV_NAV)}
+        {!v2 && import.meta.env.DEV && item(DEV_NAV)}
       </ul>
-      {v2 && <ul className="rail-nav__more">{V2_MORE.map(item)}</ul>}
     </nav>
   );
 }
@@ -155,6 +188,7 @@ export function AppLayout() {
   const modelUsage = useModelUsage(signedIn);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const v2 = useFeature("v2_enabled");
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuPath, setMenuPath] = useState(location.pathname);
   const logout = useMutation({
@@ -258,9 +292,20 @@ export function AppLayout() {
         <div className="rail__body" id="main-menu" data-open={menuOpen}>
           <RailNav />
           <div className="rail__foot">
+            {v2 && (
+              <Link className="rail__coach" to={newCoachPath()}>
+                <CoachMark size={20} tone="dark" />
+                Talk to your coach
+              </Link>
+            )}
             <ModelUsageBadge usage={modelUsage.data} />
-            {usage.data && <UsageMeter usage={usage.data} />}
-            <AccountMenu email={email} onSignOut={() => logout.mutate()} busy={logout.isPending} />
+            {usage.data && <UsageMeter usage={usage.data} label={v2 ? "Interview minutes" : undefined} />}
+            <AccountMenu
+              email={email}
+              onSignOut={() => logout.mutate()}
+              busy={logout.isPending}
+              links={v2 ? V2_ACCOUNT_LINKS : undefined}
+            />
           </div>
         </div>
       </aside>

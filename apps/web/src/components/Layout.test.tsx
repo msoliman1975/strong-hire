@@ -1,11 +1,13 @@
 /** UI-2: the left rail nav. "Stories" and the v2 labels show only when `v2_enabled` is on. */
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { createQueryClient } from "../App";
+import { AppRoutes, createQueryClient } from "../App";
+import { refreshUsage } from "../mocks/handlers";
 import { mockStore, server } from "../mocks/node";
 import { setFeatureOverrides } from "../theme/features";
 import { RailNav } from "./Layout";
@@ -31,16 +33,24 @@ describe("UI-2 left rail nav", () => {
     expect(within(nav).getByRole("link", { name: "Resumes" })).toHaveAttribute("href", "/resumes");
   });
 
-  it("UI-2: shows Home, Stories, Interviews, Questions and Account when v2_enabled is on", () => {
+  it("UI-2: shows the canvas rail, Home, Stories (A), Interviews (B) and Progress, when v2_enabled is on", () => {
     setFeatureOverrides({ v2_enabled: true });
     const nav = renderNav();
-    const main = within(nav).getAllByRole("list")[0];
-    const labels = within(main)
+    const labels = within(nav)
       .getAllByRole("link")
-      .map((a) => a.textContent)
-      .filter((t) => !t?.includes("(dev)"));
-    expect(labels).toEqual(["Home", "Stories", "Interviews", "Questions", "Account"]);
+      .map((a) => a.textContent);
+    expect(labels).toEqual(["Home", "StoriesA", "InterviewsB", "Progress"]);
     expect(within(nav).getByRole("link", { name: "Stories" })).toHaveAttribute("href", "/stories");
+    expect(within(nav).getByRole("link", { name: "Interviews" })).toHaveAttribute("href", "/jobs");
+    expect(within(nav).getByRole("link", { name: "Progress" })).toHaveAttribute("href", "/reports");
+    // The dev text interview moved to the account menu.
+    expect(within(nav).queryByRole("link", { name: /Text interview/ })).not.toBeInTheDocument();
+  });
+
+  it("UI-2: marks Stories current on story and coach pages", () => {
+    setFeatureOverrides({ v2_enabled: true });
+    const nav = renderNav("/coach/abc");
+    expect(within(nav).getByRole("link", { name: "Stories" })).toHaveAttribute("aria-current", "page");
   });
 
   it("UI-2: marks Interviews current on interview pages", () => {
@@ -81,5 +91,56 @@ describe("FL-1 v2 flag from GET /status", () => {
     const nav = renderNav();
     await new Promise((r) => setTimeout(r, 50));
     expect(within(nav).queryByRole("link", { name: "Stories" })).not.toBeInTheDocument();
+  });
+});
+
+describe("UI-2 v2 rail footer and account menu", () => {
+  function signedIn() {
+    const email = "ana@example.com";
+    mockStore.db.users[email] = {
+      id: "u1",
+      org_id: "o1",
+      email,
+      auth_provider: "dev",
+      training_consent: false,
+      created_at: "2026-10-01T10:00:00Z",
+      full_name: "Ana Lopez",
+      profile_complete: true,
+    };
+    mockStore.db.auth = { status: "signed_in", email, userEmail: email };
+    mockStore.db.usage = refreshUsage({ ...mockStore.db.usage, plan: "paid", minutes_used: 42, minutes_cap: 120 });
+  }
+
+  function renderShell(v2: boolean) {
+    signedIn();
+    setFeatureOverrides({ v2_enabled: v2 });
+    const user = userEvent.setup();
+    render(
+      <QueryClientProvider client={createQueryClient()}>
+        <MemoryRouter initialEntries={["/reports"]}>
+          <AppRoutes />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+    return user;
+  }
+
+  it("UI-2: v2 has Talk to your coach, the interview minutes, and Questions, Resumes and Account in the account menu", async () => {
+    const user = renderShell(true);
+    expect(await screen.findByRole("link", { name: "Talk to your coach" })).toHaveAttribute("href", "/coach/new");
+    expect(await screen.findByText("Interview minutes")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Account menu" }));
+    expect(screen.getByRole("link", { name: "Questions" })).toHaveAttribute("href", "/questions");
+    expect(screen.getByRole("link", { name: "Resumes" })).toHaveAttribute("href", "/resumes");
+    expect(screen.getByRole("link", { name: "Account" })).toHaveAttribute("href", "/account");
+  });
+
+  it("FL-1: v1 keeps its rail footer, with no coach button", async () => {
+    const user = renderShell(false);
+    expect(await screen.findByText("Minutes")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Talk to your coach" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Account menu" }));
+    const menu = screen.getByRole("button", { name: "Account menu" }).nextElementSibling as HTMLElement;
+    expect(within(menu).getAllByRole("link").map((a) => a.textContent)).toEqual(["Account"]);
   });
 });

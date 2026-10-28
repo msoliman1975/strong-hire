@@ -8,7 +8,8 @@ function freeText(left: number): string {
 }
 
 /** BL-1: minutes used of the monthly cap. BL-2: free mini interviews left. Numbers come from the API. */
-export function UsageMeter({ usage }: { usage: Usage }) {
+/** `label` names the minutes line; v2 says "Interview minutes", as on the canvas. */
+export function UsageMeter({ usage, label = "Minutes" }: { usage: Usage; label?: string }) {
   if (usage.plan === "free") {
     return (
       <Link className="usage" to="/upgrade" data-testid="usage-meter">
@@ -25,7 +26,7 @@ export function UsageMeter({ usage }: { usage: Usage }) {
         {usage.minutes_used} of {cap} minutes used
       </span>
       <span className="usage__text" aria-hidden="true">
-        <span>Minutes</span>
+        <span>{label}</span>
         <span className="usage__value">
           {usage.minutes_used} of {cap}
         </span>

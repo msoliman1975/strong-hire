@@ -48,7 +48,7 @@ export function coverageOf(skill: Competency, stories: Pick<Story, "skills" | "s
 export const missingSkillPath = (skill: Competency) => newCoachPath({ skill });
 
 /** The plan pages of the user's ready interviews: job, then its latest gap analysis's CV, then the plan. */
-function usePlans() {
+export function usePlans() {
   const jobs = useJobs();
   const ready = (jobs.data ?? []).filter(isReady).map((s) => s.job_target.id);
   const gaps = useQueries({
@@ -67,7 +67,9 @@ function usePlans() {
     })),
   });
   const pending = jobs.isPending || gaps.some((g) => g.isPending) || plans.some((p) => p.isPending);
-  return { pending, plans: plans.flatMap((p) => (p.data ? [p.data] : [])) };
+  /** Each loaded plan with the job and CV it belongs to. */
+  const loaded = plans.flatMap((p, i) => (p.data ? [{ ...pairs[i], plan: p.data }] : []));
+  return { pending, plans: loaded.map((l) => l.plan), loaded };
 }
 
 export function SkillCoverage({ stories }: { stories: Story[] }) {

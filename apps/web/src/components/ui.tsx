@@ -14,9 +14,12 @@ export function PageHead({
   title,
   eyebrow,
   eyebrowTone,
+  hidden = false,
   children,
 }: {
   title: string;
+  /** Keep the h1 (page title, focus on navigation) but hide it visually, where the canvas shows none. */
+  hidden?: boolean;
   /** Optional mono line above the title, like "B · DEBRIEF". */
   eyebrow?: string;
   eyebrowTone?: "action" | "prep" | "muted";
@@ -28,7 +31,7 @@ export function PageHead({
     ref.current?.focus();
   }, [title]);
   return (
-    <header className="page-head">
+    <header className={hidden ? "page-head visually-hidden" : "page-head"}>
       {eyebrow && <Eyebrow tone={eyebrowTone}>{eyebrow}</Eyebrow>}
       <h1 ref={ref} tabIndex={-1}>
         {title}

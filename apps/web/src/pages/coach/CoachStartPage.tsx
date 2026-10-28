@@ -16,8 +16,17 @@ export function CoachStartPage() {
   const navigate = useNavigate();
   const started = useRef(false);
   const start = useMutation({
-    mutationFn: (body: StartCoachRequest) => coachApi.start(body),
-    onSuccess: (detail) => navigate(coachPath(detail.session.id), { replace: true }),
+    mutationFn: async (body: StartCoachRequest) => {
+      const detail = await coachApi.start(body);
+      // "Ask your coach" on Home: the question is the candidate's first message.
+      const ask = params.get("ask")?.trim();
+      if (ask) await coachApi.turn(detail.session.id, ask);
+      return detail;
+    },
+    onSuccess: (detail) => {
+      const voice = params.get("voice") === "1" ? "?voice=1" : "";
+      navigate(`${coachPath(detail.session.id)}${voice}`, { replace: true });
+    },
   });
 
   useEffect(() => {

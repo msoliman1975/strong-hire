@@ -1,10 +1,13 @@
 /** Display helpers for the v2 Home (PP-3, PR-2). */
-import type { JobTargetSummary, PlannedSession } from "../../api/types";
-import { difficultyLabel, interviewTypeLabel } from "../../labels";
+import type { Competency, JobTargetSummary, PlannedSession } from "../../api/types";
+import { competencyLabel, difficultyLabel, interviewTypeLabel } from "../../labels";
 
 export function jobRole(s: JobTargetSummary): string {
   const job = s.job_target;
-  return job.name ?? (job.posting ? job.posting.title : "Job posting");
+  const name = job.name ?? (job.posting ? job.posting.title : "Job posting");
+  // The default job name is "<title> at <company>"; the card shows the company after a dot.
+  const company = job.posting?.company_name;
+  return company && name.endsWith(` at ${company}`) ? name.slice(0, -` at ${company}`.length) : name;
 }
 
 export function jobCompany(s: JobTargetSummary): string {
@@ -52,18 +55,50 @@ export function coachAdvice(
   summary: JobTargetSummary | null,
   next: PlannedSession | null,
   today: Date = new Date(),
+  /** Days left from the plan page (PP-2), when Home has it; else the job's own date. */
+  daysLeft?: number | null,
 ): string {
   if (!summary) return "Add the job you are interviewing for, and I will plan your practice around it.";
   const company = jobCompany(summary);
   if (!isReady(summary)) return `Finish setting up ${company}, and I will plan your first rehearsal.`;
   const date = interviewDate(summary);
-  const days = date === null ? null : daysUntil(date, today);
-  const lead =
-    days !== null && days >= 0
-      ? `Your ${company} interview is ${days === 0 ? "today" : days === 1 ? "tomorrow" : `in ${days} days`}`
-      : `For ${company}`;
+  const days = daysLeft ?? (date === null ? null : daysUntil(date, today));
+  const when = whenText(days);
+  const lead = when ? `Your ${company} interview is ${when}` : `For ${company}`;
   if (!next) return `${lead}: run a rehearsal and I will tell you what to work on next.`;
   const focus = next.focus_topics.length > 0 ? `, on ${next.focus_topics.slice(0, 2).join(" and ")}` : "";
   const kind = `${interviewTypeLabel[next.interview_type]} at ${difficultyLabel[next.difficulty]} difficulty`;
   return `${lead}: practice ${kind} next${focus}.`;
+}
+
+/** "in 6 days", "tomorrow", "today"; null for a date that passed or is not set. */
+export function whenText(days: number | null): string | null {
+  if (days === null || days < 0) return null;
+  return days === 0 ? "today" : days === 1 ? "tomorrow" : `in ${days} days`;
+}
+
+/** A story gap the coach can help with: a tested skill with no story, or only Draft stories. */
+export interface StoryGap {
+  skill: Competency;
+  state: "missing" | "thin";
+}
+
+/**
+ * The canvas Home nudge: the interview in focus and its first story gap, as one sentence. With no
+ * gap it falls back to the PR-2 next-session advice.
+ */
+export function coachNudge(
+  summary: JobTargetSummary | null,
+  gap: StoryGap | null,
+  next: PlannedSession | null,
+  days: number | null,
+  today: Date = new Date(),
+): string {
+  if (!summary || !isReady(summary) || !gap) return coachAdvice(summary, next, today, days);
+  const when = whenText(days);
+  const lead = when ? `Your ${jobCompany(summary)} interview is ${when}` : `For your ${jobCompany(summary)} interview`;
+  const skill = competencyLabel(gap.skill).toLowerCase();
+  return gap.state === "missing"
+    ? `${lead}, and you don't have a ${skill} story yet. Want to build one now?`
+    : `${lead}, and your ${skill} story is not proven yet. Want to sharpen it now?`;
 }
