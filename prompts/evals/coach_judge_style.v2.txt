@@ -1,0 +1,20 @@
+Two practice sessions with an AI story coach follow, with the same candidate turns. One coach used
+the gentle style, the other the direct style.
+
+Gentle: $gentle_guide
+Direct: $direct_guide
+
+Session A (C = coach, K = candidate):
+$a
+
+Session B (C = coach, K = candidate):
+$b
+
+Label each session with the style its coach used.
+
+1. In "reason", first compare the two coaches in one or two short sentences that quote both
+   sessions. Say which session is gentle and which is direct.
+2. Then set "session_a" to the style of Session A and "session_b" to the style of Session B,
+   each "gentle" or "direct". They must agree with your reason.
+
+Give both sessions the same label only when the two coaches cannot be told apart.

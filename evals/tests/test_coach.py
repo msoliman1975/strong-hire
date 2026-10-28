@@ -22,7 +22,7 @@ from strong_evals.coach import (
     untraced_numbers,
     versions_unbacked,
 )
-from strong_evals.coach_judge import RULES
+from strong_evals.coach_judge import RULES, StyleVerdict
 from strong_evals.runner import run_suite
 from strong_evals.suites import CoachSpec, Suite, load_suite
 
@@ -124,8 +124,8 @@ def _model(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
     if "You review a practice session" in text:
         rules = [{"rule": r, "verdict": "pass", "reason": "ok"} for r in RULES]
         out: dict[str, object] = {"rules": rules}
-    elif "Which session used the direct style" in text:
-        out = {"direct": "A", "reason": "A is shorter"}
+    elif "Label each session with the style its coach used" in text:
+        out = {"reason": "A is shorter", "session_a": "direct", "session_b": "gentle"}
     elif "You check one candidate turn" in text:
         out = {"conduct": "ok", "reason": ""}
     elif "You write two versions" in text:
@@ -176,4 +176,16 @@ async def test_co9_judge_runs_off_the_fake_profile() -> None:
     assert metrics["coach_style_distinct"].value is not None
     assert metrics["coach_versions_faithful"].value == 1.0
     assert len(report.style_picks) == 1
+    pick = report.style_picks[0]
+    assert pick.picked == "A" and pick.rubric == "evals/coach_judge_style.v2"
+    assert pick.correct is (pick.direct_was == "A")
     assert any(r.startswith("evals/coach_judge") for r in report.prompt_refs)
+
+
+def test_co5_style_verdict_labels_each_session() -> None:
+    """CO-5: the reason comes first, and the pick follows from the two labels."""
+    assert next(iter(StyleVerdict.model_fields)) == "reason"
+    cases = {("direct", "gentle"): "A", ("gentle", "direct"): "B", ("gentle", "gentle"): "same"}
+    for (a, b), picked in cases.items():
+        verdict = StyleVerdict.model_validate({"reason": "r", "session_a": a, "session_b": b})
+        assert verdict.direct == picked
