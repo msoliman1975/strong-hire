@@ -1,0 +1,1198 @@
+{
+  "company_name": "Coinbase",
+  "company_slug": "coinbase",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-28",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Coinbase cultural tenets",
+    "principles": [
+      {
+        "name": "Clear communication",
+        "description": "Be direct and brief, share information openly and quickly, listen actively, and give candid, kind feedback.",
+        "evidence_signals": [
+          "Gives the headline first and keeps the answer short",
+          "Shared bad news or a disagreement early and in the open",
+          "Explained something complex to a non-expert so they could act on it"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Efficient execution",
+        "description": "Bias toward action, focus on the highest-impact work, ship quality work quickly and automate instead of repeating manual work.",
+        "evidence_signals": [
+          "Cut scope or work to hit the result that mattered most",
+          "Shipped a first version fast, then iterated",
+          "Automated a manual process and measured the time saved"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "Act like an owner",
+        "description": "Take full responsibility for outcomes, improve things beyond the job description, bring a solution with every problem, do not get stuck, and think long term.",
+        "evidence_signals": [
+          "Fixed a problem outside own scope without being asked",
+          "Raised a problem together with a proposed solution",
+          "Stayed persistent and found the root cause after hearing no"
+        ],
+        "weight": 1.5
+      },
+      {
+        "name": "Top talent",
+        "description": "Keep an exceptional person in every seat: raise the bar with each hire, hire for both skills and values, and help others grow.",
+        "evidence_signals": [
+          "Shows a clear area where the candidate raises the team's level",
+          "Recruited, mentored or raised the bar for teammates"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Championship team",
+        "description": "A winning team, not a family: sustained high performance, company goals before team or personal goals, and a default of trust in colleagues.",
+        "evidence_signals": [
+          "Put company or team success ahead of own credit",
+          "Held a high bar for self and others under pressure",
+          "Assumed good intent and resolved friction quickly"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Continuous learning",
+        "description": "Keep growing skills, seek feedback, learn from thoughtful failure and adapt quickly.",
+        "evidence_signals": [
+          "Asked for critical feedback and changed how they work",
+          "Learned a new domain quickly, such as crypto or finance",
+          "Separates a good experiment that failed from sloppy execution"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Customer focus",
+        "description": "Build trusted, secure, easy-to-use products that increase economic freedom; never profit at customers' expense and get security right the first time.",
+        "evidence_signals": [
+          "Names the customer and the risk to their funds or trust",
+          "Treated security, correctness or compliance as part of the product",
+          "Simplified a product so non-experts could use it"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Repeatable innovation",
+        "description": "Be builders who ship ideas instead of only discussing them: prototype quickly, make calculated bets and be willing to disrupt existing products.",
+        "evidence_signals": [
+          "Prototyped and shipped an idea rather than debating it",
+          "Made a calculated bet and explains how risk was limited"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Positive energy",
+        "description": "Bring optimism and energy to the work and the team, including through hard periods such as market downturns.",
+        "evidence_signals": [
+          "Kept the team motivated through a setback",
+          "Talks about hard work and change without blame or cynicism"
+        ],
+        "weight": 0.8
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": [
+        "IC3",
+        "IC4",
+        "IC5",
+        "IC6",
+        "IC7",
+        "IC8"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, motivation, why Coinbase and why crypto, mission fit. Not simulated in v1."
+        },
+        {
+          "name": "Online assessments",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "None (timed online test)",
+          "notes": "A timed general reasoning and workstyle assessment for all candidates, plus a progressive CodeSignal coding assessment for engineers. Not simulated in v1."
+        },
+        {
+          "name": "Technical screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "One live coding problem over video. Not simulated in v1."
+        },
+        {
+          "name": "Coding and tech execution",
+          "interview_type": null,
+          "duration_min": 90,
+          "interviewer_role": "Software engineer",
+          "notes": "Usually two rounds. Algorithms plus an applied build, for example a small order book or key-value store with clean, runnable code. Frontend loops use React instead. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior software engineer",
+          "notes": "Whiteboard design, often in a financial or crypto context: payments, ledgers, matching, price feeds, notifications. Correctness, idempotency and security matter."
+        },
+        {
+          "name": "Domain deep dive",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior engineer from the hiring team",
+          "notes": "Reported for some teams: schema and SQL design for backend, or blockchain, trading or custody topics. Not in every loop."
+        },
+        {
+          "name": "Behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 30,
+          "interviewer_role": "Hiring manager",
+          "notes": "Culture and values fit against the cultural tenets, high achievement, and an area where the candidate raises the team's average."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager",
+          "notes": "Reported by some guides as separate from the behavioral round: ownership, past impact, scope and team fit."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": [],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Not simulated in v1."
+        },
+        {
+          "name": "Online assessment",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "None (timed online test)",
+          "notes": "General reasoning and workstyle assessment. Not simulated in v1."
+        },
+        {
+          "name": "Execution",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Product manager",
+          "notes": "Data-driven decisions: metrics for a product, diagnosing a metric drop, trade-offs."
+        },
+        {
+          "name": "Product design",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Product manager",
+          "notes": "Favorite product, improving a Coinbase product, onboarding, trust and fraud flows; explicit trade-offs."
+        },
+        {
+          "name": "Strategy",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Product leader",
+          "notes": "Growth, new markets, pricing and regulation under uncertainty."
+        },
+        {
+          "name": "Behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 30,
+          "interviewer_role": "Hiring manager",
+          "notes": "Culture fit against the cultural tenets and track record of high achievement."
+        },
+        {
+          "name": "Work trial presentation",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Interview panel",
+          "notes": "Take-home business case presented to a panel: about 15 minutes of presentation, then questions. Not simulated in v1."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": [],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Not simulated in v1."
+        },
+        {
+          "name": "Online assessment and SQL screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Data scientist",
+          "notes": "Timed reasoning and workstyle assessment, then live SQL (retention, time windows, ranking). Not simulated in v1."
+        },
+        {
+          "name": "Data science or ML concepts",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Data scientist or ML engineer",
+          "notes": "Conversational: A/B testing, statistics, model development and deployment, ML system design often applied to fraud or anomaly detection."
+        },
+        {
+          "name": "Product and experimentation case",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Data scientist",
+          "notes": "Decide whether to launch a feature or campaign, design an experiment with guardrails, explain a metric change."
+        },
+        {
+          "name": "Behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 30,
+          "interviewer_role": "Hiring manager",
+          "notes": "Culture fit and a walk-through of a past project."
+        },
+        {
+          "name": "Work trial presentation",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Interview panel",
+          "notes": "Analyze a dataset for a business problem and present it. Not simulated in v1."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Ownership beyond scope",
+      "pattern": "A time the candidate fixed or improved something outside their job, and brought a solution rather than only the problem",
+      "competencies": [
+        "ownership",
+        "impact"
+      ],
+      "values": [
+        "Act like an owner"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Speed with limited resources",
+      "pattern": "Delivering a high-impact result fast with limited time, people or budget, and what was cut to get there",
+      "competencies": [
+        "impact",
+        "ownership"
+      ],
+      "values": [
+        "Efficient execution"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Incident with customer funds or trust at risk",
+      "pattern": "An outage, bug or security issue the candidate owned where customers' money or data was at risk, and what changed afterwards",
+      "competencies": [
+        "ownership",
+        "learning_from_failure",
+        "communication"
+      ],
+      "values": [
+        "Act like an owner",
+        "Customer focus"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Direct communication",
+      "pattern": "Explaining a complex technical or financial idea to a non-expert, or delivering hard news or feedback directly",
+      "competencies": [
+        "communication",
+        "collaboration"
+      ],
+      "values": [
+        "Clear communication"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Team before self",
+      "pattern": "A hard team situation where the candidate put the team or company goal ahead of their own, and kept a high bar",
+      "competencies": [
+        "collaboration",
+        "conflict_handling"
+      ],
+      "values": [
+        "Championship team"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Learning from failure and volatility",
+      "pattern": "A bet or project that failed, or a sudden change in conditions, and what the candidate learned and did next",
+      "competencies": [
+        "learning_from_failure",
+        "ownership"
+      ],
+      "values": [
+        "Continuous learning",
+        "Positive energy"
+      ]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Why Coinbase and why crypto",
+      "pattern": "Motivation for the mission of economic freedom, comfort with a mission-focused, intense culture and crypto market cycles",
+      "competencies": [
+        "motivation",
+        "team_fit"
+      ],
+      "values": [
+        "Customer focus",
+        "Championship team"
+      ]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Raising the bar",
+      "pattern": "The project with the most impact, the candidate's own role, and the area where they would raise the team's average",
+      "competencies": [
+        "depth_of_experience",
+        "scope_at_level",
+        "role_fit"
+      ],
+      "values": [
+        "Top talent",
+        "Act like an owner"
+      ]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Correct money movement",
+      "pattern": "Design a payment, ledger or transaction system that never loses or duplicates money under retries, failures and concurrency",
+      "competencies": [
+        "technical_depth",
+        "accuracy",
+        "trade_offs",
+        "reasoning"
+      ],
+      "values": [
+        "Customer focus"
+      ]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Trading systems",
+      "pattern": "Design order matching, order books, price feeds or market-data fan-out with low latency, fairness and spikes in traffic",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "clarity_of_explanation"
+      ],
+      "values": [
+        "Efficient execution",
+        "Customer focus"
+      ]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "On-chain integration and custody",
+      "pattern": "Design deposits, withdrawals or key management that handle blockchain reorgs, confirmations and security of private keys",
+      "competencies": [
+        "technical_depth",
+        "accuracy",
+        "reasoning"
+      ],
+      "values": [
+        "Customer focus",
+        "Act like an owner"
+      ]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Experimentation and ML for risk",
+      "pattern": "Explain experiment design, or a model for fraud or anomaly detection, including metrics, bias and deployment",
+      "competencies": [
+        "technical_depth",
+        "reasoning",
+        "clarity_of_explanation"
+      ],
+      "values": [
+        "Customer focus"
+      ]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Metric or revenue diagnosis",
+      "pattern": "A key metric such as users, card usage or net income dropped; find the cause and decide what to do",
+      "competencies": [
+        "problem_framing",
+        "structure",
+        "prioritization"
+      ],
+      "values": [
+        "Efficient execution"
+      ]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Trust, risk and regulation",
+      "pattern": "Design a crypto product or flow that protects users from fraud or launches in a regulated market, with clear trade-offs",
+      "competencies": [
+        "problem_framing",
+        "user_and_business_sense",
+        "recommendation"
+      ],
+      "values": [
+        "Customer focus"
+      ]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Growth and strategy",
+      "pattern": "Grow a Coinbase product in a new market or segment, or choose between retail and institutional customers",
+      "competencies": [
+        "user_and_business_sense",
+        "prioritization",
+        "recommendation"
+      ],
+      "values": [
+        "Repeatable innovation",
+        "Customer focus"
+      ]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a hard problem you solved when you had very few resources to work with.",
+      "strong_answer": "Set out the problem, the constraint (time, people, budget) and why it mattered. Show how the candidate picked the highest-impact part, cut or deferred the rest, and found a fast path such as reuse or automation. Quantify the result and what was learned. Coinbase stresses efficient execution and ownership, so the candidate's own decisions should be clear. Pitfalls: solving it by working longer hours only, or no clear trade-off.",
+      "competencies": [
+        "impact",
+        "ownership"
+      ],
+      "values": [
+        "Efficient execution",
+        "Act like an owner"
+      ],
+      "source_url": "https://prepfully.com/interview-guides/coinbase-software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you focus on the highest-impact work",
+          "Whether you own decisions under constraints"
+        ],
+        "strong_signals": [
+          "Names what was cut or deferred and why",
+          "Uses reuse or automation to move faster",
+          "Quantifies the result"
+        ],
+        "watch_outs": [
+          "Solving it only by working longer hours",
+          "No clear trade-off"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a difficult situation inside a team and how you worked through it with your teammates.",
+      "strong_answer": "Describe the tension (conflicting priorities, a missed deadline, a disagreement) and the stakes. Show the candidate assuming good intent, talking directly to the people involved, and steering toward the team or company goal rather than their own. Give the outcome and the relationship afterwards. Pitfalls: blaming a teammate, avoiding the conflict, or escalating first.",
+      "competencies": [
+        "collaboration",
+        "conflict_handling",
+        "communication"
+      ],
+      "values": [
+        "Championship team",
+        "Clear communication"
+      ],
+      "source_url": "https://prepfully.com/interview-guides/coinbase-software-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you put the team goal first",
+          "How directly you address friction"
+        ],
+        "strong_signals": [
+          "Assumes good intent and talks to people directly",
+          "Steers toward the shared goal",
+          "Shows the relationship afterwards"
+        ],
+        "watch_outs": [
+          "Blaming a teammate",
+          "Escalating before talking it through"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "How would you explain a technical concept to a teammate who is not technical? Give an example from your work.",
+      "strong_answer": "Pick a real case, for example explaining a system limit or a blockchain concept to a PM, lawyer or support lead. Start with what the listener needed to decide, use a plain analogy, skip jargon, and check understanding. Show the decision or action that followed. Coinbase values direct, brief communication and usable products for non-experts. Pitfalls: a lecture full of jargon, or no sign the listener could act.",
+      "competencies": [
+        "communication",
+        "collaboration"
+      ],
+      "values": [
+        "Clear communication",
+        "Customer focus"
+      ],
+      "source_url": "https://prepfully.com/interview-guides/coinbase-software-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you can make complex ideas simple",
+          "How you tailor the message to the listener"
+        ],
+        "strong_signals": [
+          "Starts from what the listener had to decide",
+          "Uses a plain analogy and checks understanding",
+          "Shows the action that followed"
+        ],
+        "watch_outs": [
+          "A jargon-heavy lecture",
+          "No sign the listener could act"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about an incident you owned where customer money or data was at risk.",
+      "strong_answer": "Explain the incident, the customer impact and how it was found. Show the candidate taking charge: containing the damage first, communicating clearly to stakeholders, then finding the root cause. Describe the lasting fix (tests, alerts, process) and how customers were made whole. Coinbase holds customer funds, so security and getting it right matter. Pitfalls: blaming another team, stopping at the quick fix, or downplaying the impact.",
+      "competencies": [
+        "ownership",
+        "learning_from_failure",
+        "communication"
+      ],
+      "values": [
+        "Act like an owner",
+        "Customer focus"
+      ],
+      "source_url": "https://www.techinterview.org/companies/coinbase/",
+      "hints": {
+        "looking_for": [
+          "Whether you take charge when customers are at risk",
+          "How you prevent the problem from recurring"
+        ],
+        "strong_signals": [
+          "Contains the damage before searching for the cause",
+          "Communicates clearly during the incident",
+          "Adds lasting fixes like tests and alerts"
+        ],
+        "watch_outs": [
+          "Blaming another team",
+          "Stopping at the quick fix"
+        ]
+      },
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why do you want to work at Coinbase, and why crypto now?",
+      "strong_answer": "Connect the candidate's own story to the mission of increasing economic freedom and to specific Coinbase products or problems. Show an informed view of crypto, including risks and market cycles, and comfort with a mission-focused, high-expectation culture. Link past work to what they would build. Pitfalls: talking only about token prices, generic praise, or no awareness of the intensity of the culture.",
+      "competencies": [
+        "motivation",
+        "team_fit"
+      ],
+      "values": [
+        "Customer focus",
+        "Championship team"
+      ],
+      "source_url": "https://www.techprep.app/blog/coinbase-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you believe in the mission",
+          "Whether you understand the culture and market cycles"
+        ],
+        "strong_signals": [
+          "Links your past work to specific products",
+          "Shows an informed view of crypto risks",
+          "Welcomes a high-expectation culture"
+        ],
+        "watch_outs": [
+          "Talking only about token prices",
+          "Generic praise"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Walk me through a past project you are proud of, from the problem to the result.",
+      "strong_answer": "Give a short summary first, then the problem, the candidate's own role, key decisions and the alternatives rejected. Quantify the impact and say what they would do differently. Coinbase interviewers look for at least one area where the candidate raises the team's average, so make that strength visible. Match scope to the target level. Pitfalls: a team win with an unclear personal role, or impact without numbers.",
+      "competencies": [
+        "depth_of_experience",
+        "scope_at_level",
+        "role_fit"
+      ],
+      "values": [
+        "Top talent",
+        "Act like an owner"
+      ],
+      "source_url": "https://www.aced.io/blog/coinbase-interview-process",
+      "hints": {
+        "looking_for": [
+          "Your own role and decisions",
+          "The area where you raise the team's level"
+        ],
+        "strong_signals": [
+          "Leads with a short summary",
+          "Explains alternatives that were rejected",
+          "Quantifies the impact"
+        ],
+        "watch_outs": [
+          "A team win with an unclear personal role",
+          "Impact without numbers"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a transaction processing system for a financial app with many concurrent users, so that no transaction is lost or applied twice.",
+      "strong_answer": "Clarify transaction types, volume and consistency needs. Use a double-entry ledger as the source of truth, idempotency keys on every request, and atomic writes with balance checks so funds cannot go negative. Cover a durable queue for async steps, retries with deduplication, reconciliation jobs against external systems, and audit logs. Discuss strong consistency for balances versus eventual consistency for reads. Pitfalls: updating balances without a ledger, or retries that double-charge.",
+      "competencies": [
+        "technical_depth",
+        "accuracy",
+        "trade_offs",
+        "reasoning"
+      ],
+      "values": [
+        "Customer focus"
+      ],
+      "source_url": "https://prepfully.com/interview-guides/coinbase-software-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether money is never lost or duplicated",
+          "How you handle retries and concurrency"
+        ],
+        "strong_signals": [
+          "Uses a double-entry ledger and idempotency keys",
+          "Prevents negative balances with atomic checks",
+          "Adds reconciliation and audit logs"
+        ],
+        "watch_outs": [
+          "Updating balances without a ledger",
+          "Retries that charge twice"
+        ]
+      },
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design a matching engine for limit orders on a crypto exchange, with price-time priority and partial fills?",
+      "strong_answer": "Clarify order types, throughput and latency targets. Keep one in-memory order book per trading pair, sorted by price then time, processed by a single-threaded matcher per pair for determinism. Cover partial fills, cancels, an append-only event log for recovery and replay, and publishing trades to settlement and market data. Discuss holding funds for open orders, risk checks like circuit breakers, and sharding by pair. Pitfalls: concurrent writes to one book, or no recovery plan.",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "reasoning",
+        "clarity_of_explanation"
+      ],
+      "values": [
+        "Customer focus",
+        "Efficient execution"
+      ],
+      "source_url": "https://www.techinterview.org/companies/coinbase/",
+      "hints": {
+        "looking_for": [
+          "How you keep matching fair and deterministic",
+          "Whether you can recover the book after a crash"
+        ],
+        "strong_signals": [
+          "Uses one sequenced matcher per trading pair",
+          "Logs every event for replay",
+          "Reserves funds for open orders"
+        ],
+        "watch_outs": [
+          "Many threads writing one order book",
+          "No recovery plan"
+        ]
+      },
+      "role_families": [
+        "swe"
+      ],
+      "levels": [
+        "mid",
+        "senior",
+        "staff_principal"
+      ]
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a service that credits customer crypto deposits safely, even when the blockchain reorganizes or a transaction fails.",
+      "strong_answer": "Clarify chains supported and how fast users expect credit. Watch the chain through nodes, track each deposit by transaction id and output, and credit only after a confirmation threshold set per chain and amount. Make crediting idempotent, handle reorgs by reversing unconfirmed credits, and reconcile wallet balances against the ledger. Discuss speed versus safety of confirmations and monitoring for stuck or orphaned transactions. Pitfalls: crediting at zero confirmations, or crediting twice.",
+      "competencies": [
+        "technical_depth",
+        "accuracy",
+        "reasoning"
+      ],
+      "values": [
+        "Customer focus",
+        "Act like an owner"
+      ],
+      "source_url": "https://www.techinterview.org/companies/coinbase/",
+      "hints": {
+        "looking_for": [
+          "Whether you understand reorgs and confirmations",
+          "How you keep crediting idempotent"
+        ],
+        "strong_signals": [
+          "Sets confirmation thresholds per chain and amount",
+          "Reverses credits that a reorg removes",
+          "Reconciles balances against the ledger"
+        ],
+        "watch_outs": [
+          "Crediting at zero confirmations",
+          "Crediting the same deposit twice"
+        ]
+      },
+      "role_families": [
+        "swe"
+      ],
+      "levels": [
+        "senior",
+        "staff_principal"
+      ]
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a real-time crypto price dashboard that aggregates prices from many exchanges and pushes updates to millions of users.",
+      "strong_answer": "Clarify update frequency, number of assets and acceptable staleness. Ingest feeds from exchanges, normalize them, and compute an aggregate price (for example volume-weighted) with outlier filtering for bad feeds. Publish through a pub/sub layer to WebSocket gateways partitioned by asset, with throttling or snapshots for slow clients. Cover caching for first load, failover when a feed dies, and traffic spikes during volatility. Pitfalls: clients polling a database, or trusting one bad feed.",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "clarity_of_explanation"
+      ],
+      "values": [
+        "Customer focus",
+        "Efficient execution"
+      ],
+      "source_url": "https://www.techprep.app/blog/coinbase-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you fan out live data at scale",
+          "Whether you guard against bad or missing feeds"
+        ],
+        "strong_signals": [
+          "Filters outliers before aggregating",
+          "Uses pub/sub and WebSocket gateways",
+          "Plans for spikes during volatility"
+        ],
+        "watch_outs": [
+          "Clients polling a database",
+          "Trusting a single feed"
+        ]
+      },
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Explain how you would run an A/B test, and how you would decide whether a marketing campaign should launch.",
+      "strong_answer": "Start with the decision and a primary metric tied to it, plus guardrails such as fraud rate or support tickets. Choose the unit of randomization, estimate sample size from the minimum effect worth detecting, and fix the run time in advance. Cover checks for sample ratio mismatch, novelty effects and segment differences, and how crypto price swings can confound results. End with a clear launch rule. Pitfalls: peeking and stopping early, or no guardrails.",
+      "competencies": [
+        "technical_depth",
+        "reasoning",
+        "clarity_of_explanation"
+      ],
+      "values": [
+        "Customer focus",
+        "Efficient execution"
+      ],
+      "source_url": "https://www.aced.io/blog/coinbase-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you design sound experiments",
+          "How you turn results into a launch decision"
+        ],
+        "strong_signals": [
+          "Sets a primary metric and guardrails",
+          "Sizes the sample before starting",
+          "Accounts for market swings as a confounder"
+        ],
+        "watch_outs": [
+          "Peeking and stopping early",
+          "No guardrail metrics"
+        ]
+      },
+      "role_families": [
+        "data_ml",
+        "pm"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Coinbase's net income fell 10% compared with last month. How would you investigate, and what would you do?",
+      "strong_answer": "Clarify how net income is defined and whether the drop is real. Split revenue (trading fees by retail and institutional, subscriptions, staking, interest) from costs. Check external drivers first, since crypto prices and volatility drive trading volume, then internal ones such as fee changes, launches, outages or marketing spend. Rank hypotheses, name the data that tests each, and propose actions only for what Coinbase controls. Pitfalls: ignoring the market, or random guesses.",
+      "competencies": [
+        "problem_framing",
+        "structure",
+        "prioritization"
+      ],
+      "values": [
+        "Efficient execution"
+      ],
+      "source_url": "https://www.aced.io/blog/coinbase-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you structure revenue and cost drivers",
+          "Whether you separate market effects from your own"
+        ],
+        "strong_signals": [
+          "Splits revenue lines from costs",
+          "Checks crypto prices and volatility first",
+          "Ranks hypotheses with the data to test each"
+        ],
+        "watch_outs": [
+          "Ignoring the market",
+          "Random causes with no structure"
+        ]
+      },
+      "role_families": [
+        "pm",
+        "data_ml"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "What metrics would you track for a crypto staking product?",
+      "strong_answer": "Start with the product goal: letting users earn rewards safely and simply. Pick a north-star metric such as assets staked by active users, with funnel metrics (eligible users who start, complete, keep staking), revenue from the commission, and guardrails (unstaking complaints, slashing events, support contacts, regulatory issues). Explain trade-offs and how price swings distort value-based metrics. Pitfalls: many metrics with no primary one, or ignoring risk and trust.",
+      "competencies": [
+        "problem_framing",
+        "user_and_business_sense",
+        "structure"
+      ],
+      "values": [
+        "Customer focus"
+      ],
+      "source_url": "https://www.joinleland.com/library/a/how-to-prepare-for-coinbase-product-management-case-interviews",
+      "hints": {
+        "looking_for": [
+          "How you connect metrics to the product goal",
+          "Whether you include risk and trust guardrails"
+        ],
+        "strong_signals": [
+          "Picks one north-star metric",
+          "Adds a funnel and revenue metrics",
+          "Notes how price swings distort value metrics"
+        ],
+        "watch_outs": [
+          "Many metrics with no primary one",
+          "Ignoring risk and trust"
+        ]
+      },
+      "role_families": [
+        "pm",
+        "data_ml"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you design a feature that helps Coinbase users avoid sending money in fraudulent transactions?",
+      "strong_answer": "Clarify fraud types (scams, account takeover, fake addresses) and which users are most hurt, such as new users. Map the send flow and the moments to intervene: address risk scoring, warnings for first-time or flagged addresses, delays or extra checks on large sends, and education. Weigh friction against protection, and define success (fraud losses, scam reports) with guardrails (completed sends, false positives). Pitfalls: blocking everything, or ignoring how scammers adapt.",
+      "competencies": [
+        "problem_framing",
+        "user_and_business_sense",
+        "prioritization",
+        "recommendation"
+      ],
+      "values": [
+        "Customer focus"
+      ],
+      "source_url": "https://www.joinleland.com/library/a/how-to-prepare-for-coinbase-product-management-case-interviews",
+      "hints": {
+        "looking_for": [
+          "How you balance safety against friction",
+          "Whether you know the main fraud types"
+        ],
+        "strong_signals": [
+          "Targets the users most at risk",
+          "Intervenes at specific points in the send flow",
+          "Tracks fraud losses and false positives"
+        ],
+        "watch_outs": [
+          "Blocking everything",
+          "Ignoring how scammers adapt"
+        ]
+      },
+      "role_families": [
+        "pm",
+        "design"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "You can serve institutional clients or retail users first with a new launch. How do you decide which features to prioritize?",
+      "strong_answer": "Clarify the launch goal and constraints. Compare the segments on size, revenue, needs (institutions want custody, APIs, compliance reporting; retail wants simplicity and trust), cost to build and risk. Use explicit criteria to rank features, check dependencies such as shared infrastructure, and recommend one sequence with a reason and a metric to judge it. Say what is deferred and how it is communicated. Pitfalls: trying to serve both fully, or no clear criteria.",
+      "competencies": [
+        "prioritization",
+        "user_and_business_sense",
+        "recommendation"
+      ],
+      "values": [
+        "Customer focus",
+        "Efficient execution"
+      ],
+      "source_url": "https://www.joinleland.com/library/a/how-to-prepare-for-coinbase-product-management-case-interviews",
+      "hints": {
+        "looking_for": [
+          "How you compare two customer segments",
+          "Whether you commit to one sequence"
+        ],
+        "strong_signals": [
+          "Uses explicit criteria to rank features",
+          "Names what is deferred",
+          "Gives a metric to judge the choice"
+        ],
+        "watch_outs": [
+          "Trying to serve both fully",
+          "No clear criteria"
+        ]
+      },
+      "role_families": [
+        "pm"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you build a growth strategy for Coinbase in a new region such as Latin America?",
+      "strong_answer": "Clarify the goal (users, volume, revenue) and time frame. Size the opportunity and segment users, for example people protecting savings from inflation, remittance senders and traders. Cover local constraints: regulation, payment rails and on-ramps, language, trust and competition. Pick one segment and a wedge product, propose how to acquire users, and define success metrics and risks. Pitfalls: copying the US playbook, or ignoring regulation and payments.",
+      "competencies": [
+        "problem_framing",
+        "user_and_business_sense",
+        "estimation_logic",
+        "recommendation"
+      ],
+      "values": [
+        "Repeatable innovation",
+        "Customer focus"
+      ],
+      "source_url": "https://www.joinleland.com/library/a/how-to-prepare-for-coinbase-product-management-case-interviews",
+      "hints": {
+        "looking_for": [
+          "How you adapt a product to a new market",
+          "Whether you weigh regulation and local payments"
+        ],
+        "strong_signals": [
+          "Segments users by need, such as savings or remittances",
+          "Picks one wedge product",
+          "Defines success metrics and risks"
+        ],
+        "watch_outs": [
+          "Copying the US playbook",
+          "Ignoring regulation and payment rails"
+        ]
+      },
+      "role_families": [
+        "pm"
+      ],
+      "levels": []
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "IC3",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Entry-level engineer; delivers well-defined tasks with guidance and learns the codebase and domain quickly."
+    },
+    {
+      "level_name": "IC4",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Software engineer; owns features end to end within one team and handles some ambiguity."
+    },
+    {
+      "level_name": "IC5",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Senior engineer; owns systems with loose requirements, leads designs and raises the bar for the team."
+    },
+    {
+      "level_name": "IC6",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Staff engineer; sets technical direction across several teams and leads cross-team efforts."
+    },
+    {
+      "level_name": "IC7",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Senior staff engineer; shapes technical strategy for an organization or a critical platform."
+    },
+    {
+      "level_name": "IC8",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Principal engineer; company-wide technical influence on the most critical systems."
+    }
+  ],
+  "persona": {
+    "tone": "Direct, concise and businesslike, friendly but with a high bar",
+    "pace": "Brisk; expects short, structured answers and moves on once a point is made",
+    "pushback_style": "Asks what the candidate personally did, for numbers, and what happens to customer funds when something fails; probes for the trade-off that was made",
+    "closing_style": "Leaves a few minutes for questions about the mission and the team"
+  },
+  "scoring_weights": {
+    "ownership": 1.5,
+    "impact": 1.4,
+    "communication": 1.3,
+    "collaboration": 1.1,
+    "learning_from_failure": 1.1,
+    "scope_at_level": 1.2,
+    "motivation": 1.2,
+    "accuracy": 1.3,
+    "technical_depth": 1.2,
+    "trade_offs": 1.3,
+    "problem_framing": 1.2,
+    "prioritization": 1.3,
+    "user_and_business_sense": 1.2
+  },
+  "values_share": 0.3,
+  "case_style": {
+    "product_sense": 0.5,
+    "estimation": 0.15,
+    "system_thinking": 0.35,
+    "notes": "PM cases cover execution (metrics and diagnosing drops), product design and strategy, with crypto-specific trust, fraud and regulation themes. Some PM candidates report a trading-system question. Market sizing appears inside strategy cases, rarely alone."
+  },
+  "sources": [
+    {
+      "url": "https://builtin.com/articles/coinbase-company-values-enable-change-tech-company-san-francisco",
+      "title": "At Coinbase, values are more than words on a wall (Built In)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "values_framework"
+      ]
+    },
+    {
+      "url": "https://builtin.com/company/coinbase/faq/culture-values",
+      "title": "Coinbase company culture and values (Built In)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "values_framework",
+        "persona"
+      ]
+    },
+    {
+      "url": "https://slab.com/library/coinbase-culture",
+      "title": "Coinbase culture doc, earlier public version (Slab library)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "values_framework",
+        "persona",
+        "scoring_weights"
+      ]
+    },
+    {
+      "url": "https://www.aced.io/blog/coinbase-interview-process",
+      "title": "Coinbase interview process (Exponent, now Aced)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns",
+        "persona",
+        "case_style"
+      ]
+    },
+    {
+      "url": "https://www.aced.io/guides/coinbase/swe-interview/interview-stages",
+      "title": "Coinbase SWE interview stages (Exponent, now Aced)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure"
+      ]
+    },
+    {
+      "url": "https://www.techprep.app/blog/coinbase-interview-process",
+      "title": "Coinbase's interview process 2026 (TechPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns",
+        "scoring_weights"
+      ]
+    },
+    {
+      "url": "https://www.techinterview.org/companies/coinbase/",
+      "title": "Coinbase interview guide 2026 (techinterview.org)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns",
+        "bar_by_level"
+      ]
+    },
+    {
+      "url": "https://prepfully.com/interview-guides/coinbase-software-engineer",
+      "title": "Coinbase software engineer interview guide (Prepfully)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "question_patterns"
+      ]
+    },
+    {
+      "url": "https://www.joinleland.com/library/a/how-to-prepare-for-coinbase-product-management-case-interviews",
+      "title": "How to prepare for Coinbase PM case interviews (Leland)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns",
+        "case_style"
+      ]
+    },
+    {
+      "url": "https://www.levels.fyi/companies/coinbase/salaries/software-engineer",
+      "title": "Coinbase software engineer levels (Levels.fyi)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "bar_by_level"
+      ]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "medium",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "medium"
+  },
+  "low_confidence_notes": [
+    "values_framework: the nine tenet names come from Built In's interview with Coinbase's chief people officer; Coinbase's own culture and mission pages blocked our fetches, so descriptions are paraphrased from Built In and an older public culture doc on Slab. Verify the current list on coinbase.com before publishing.",
+    "loop_structure: Coinbase's official 'How to interview at Coinbase' blog post (March 2024) could not be fetched; round names and durations come from third-party guides that disagree (two vs one coding rounds, 30-minute behavioral vs separate 45-minute hiring manager round). PM and data_ml loops have no level names.",
+    "question_patterns: crypto-specific system design prompts (matching engine, deposit reorgs) come from techinterview.org, a prep site whose content looks aggregated rather than first-hand.",
+    "bar_by_level: IC3 to IC8 labels and Senior/Staff titles for IC5/IC6 come from Levels.fyi search snippets (the page did not render for us); scope text is our summary, and IC7/IC8 titles are not confirmed by any official source.",
+    "persona: our estimate from the culture doc (direct, brief communication; high-performance, mission-focused) and prep guides; no source describes interviewer style.",
+    "scoring_weights: our estimate, mapping the emphasis on ownership, efficient execution, clear communication and customer funds security to our competencies; no public source gives weights.",
+    "values_share: set to 0.3 because guides say every candidate gets a values-fit screen and a workstyle assessment, and culture fit is stressed; this is our judgment."
+  ]
+}

@@ -1,0 +1,897 @@
+{
+  "company_name": "Pinterest",
+  "company_slug": "pinterest",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-28",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Pinterest values",
+    "principles": [
+      {
+        "name": "Put Pinners first",
+        "description": "Make product, business and policy decisions around the diverse needs and wellbeing of Pinners, and bring Pinners into the conversation to build with them.",
+        "evidence_signals": [
+          "Names a specific user group and the need or harm that drove the decision",
+          "Weighs user wellbeing, not only engagement, when choosing what to build",
+          "Used user research, feedback or data to check the result for users"
+        ],
+        "weight": 1.5
+      },
+      {
+        "name": "Aim for extraordinary",
+        "description": "Start from a high bar for products and push each other to bring the courage, craft and execution needed to win big.",
+        "evidence_signals": [
+          "Raised the quality bar beyond what was asked and explains why",
+          "Shows craft in the details of the work and measurable results",
+          "Took on an ambitious goal and executed against it"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Create belonging",
+        "description": "Help build an inclusive culture that values each person's perspective; treat diverse thinking, candid debate and fast feedback as drivers of innovation, and care for each other's wellbeing.",
+        "evidence_signals": [
+          "Made room for a quieter or different perspective and it changed the outcome",
+          "Gave or asked for candid feedback in a respectful way",
+          "Helped a teammate feel included or supported"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Act as one",
+        "description": "Help colleagues succeed and share team wins, break down silos, and commit fully to a direction once it is chosen.",
+        "evidence_signals": [
+          "Worked across teams or functions to remove a silo or shared blocker",
+          "Disagreed during the decision, then committed fully to the chosen direction",
+          "Credits the team and shows how they helped others succeed"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Win or learn",
+        "description": "Keep evolving in pursuit of the mission by taking bold bets and smart risks, and carry the lessons forward whether an effort succeeds or fails.",
+        "evidence_signals": [
+          "Describes a bold bet with the risk stated up front",
+          "Owns a failure and names a concrete change made afterwards",
+          "Shows the lesson applied in a later project"
+        ],
+        "weight": 1.1
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["IC13", "IC14", "IC15", "IC16", "IC17"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, motivation, level fit and the PinFlex work model. Not simulated in v1."
+        },
+        {
+          "name": "Online assessment or technical phone screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "CodeSignal assessment (often for new grads) or a live coding screen with one or two data structures and algorithms problems. Durations reported between 45 and 90 minutes. Not simulated in v1."
+        },
+        {
+          "name": "Coding interviews",
+          "interview_type": null,
+          "duration_min": 45,
+          "interviewer_role": "Software engineer",
+          "notes": "Usually two rounds of medium to hard problems, often framed around Pins, images or recommendations. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior software engineer",
+          "notes": "Open-ended design tied to a Pinterest product such as home feed, visual search, ranking or notifications. Linking technical choices to the Pinner experience earns credit."
+        },
+        {
+          "name": "Project deep dive",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Senior engineer or engineering manager",
+          "notes": "Presents one past project in depth and defends the decisions. Reported to influence the level offered. Not present in every loop."
+        },
+        {
+          "name": "Behavioral and hiring manager",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager or cross-functional partner",
+          "notes": "Values and collaboration: putting Pinners first, cross-functional work, disagreement, failure and feedback. Every final loop includes a hiring manager behavioral round."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": ["IC13", "IC14", "IC15", "IC16"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, ML experience, level fit and motivation. Not simulated in v1."
+        },
+        {
+          "name": "Technical screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Machine learning engineer",
+          "notes": "Rapid ML fundamentals plus one coding problem on CoderPad. Data science screens use SQL plus a short case instead. Not simulated in v1."
+        },
+        {
+          "name": "Coding interviews",
+          "interview_type": null,
+          "duration_min": 45,
+          "interviewer_role": "Software or ML engineer",
+          "notes": "Usually two rounds, graph problems emphasized. Not simulated in v1."
+        },
+        {
+          "name": "ML system design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior machine learning engineer",
+          "notes": "Recommendation or ranking system for a Pinterest surface: related Pins, home feed, search, ads or spam. Reported as one of the most heavily weighted rounds."
+        },
+        {
+          "name": "ML practitioner deep dive",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Machine learning engineer",
+          "notes": "Deep dive into a past ML project, then theory, debugging and tuning questions."
+        },
+        {
+          "name": "Analytical case (data science)",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Data scientist",
+          "notes": "Business case for data science candidates: frame a hypothesis, design an experiment, pick metrics, or diagnose a metric drop."
+        },
+        {
+          "name": "Hiring manager behavioral",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Engineering or data science manager",
+          "notes": "Past work, level fit, feedback, disagreement and cross-team projects."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": [],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Experience, motivation for the specific team and level fit. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager (product)",
+          "notes": "Mostly behavioral with at least one product prompt. Duration estimated; sources report 45 to 60 minutes for the PM screen."
+        },
+        {
+          "name": "Product sense",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product manager",
+          "notes": "Improve or design for a Pinterest surface or user group; scoping V1 and what goes on the cut list. Some loops include a prompt about another consumer product. Reported at 45 to 60 minutes."
+        },
+        {
+          "name": "Analytical and execution",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product manager or data scientist",
+          "notes": "Success metrics for a new format, diagnosing a metric drop, experiment design and revenue versus Pinner-experience trade-offs. Reported at 45 to 60 minutes."
+        },
+        {
+          "name": "Technical and cross-functional",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineering partner",
+          "notes": "Working with engineering, helping engineers prioritize, and fluency with ML ranking and personalization."
+        },
+        {
+          "name": "Leadership and closing",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Product leader or director",
+          "notes": "Holding a quality line, saying no to stakeholders, influence without authority, and long-term vision."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Putting users first",
+      "pattern": "A decision where the candidate chose what was right for users over an easier or more lucrative option, and how they knew",
+      "competencies": ["impact", "ownership", "communication"],
+      "values": ["Put Pinners first"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Cross-functional collaboration",
+      "pattern": "A project that needed several teams or functions to align, and how the candidate got them moving together",
+      "competencies": ["collaboration", "communication", "impact"],
+      "values": ["Act as one"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Technical or product disagreement",
+      "pattern": "A disagreement with an engineer, PM or manager, how it was debated, and how the candidate committed once a decision was made",
+      "competencies": ["conflict_handling", "collaboration", "communication"],
+      "values": ["Act as one", "Create belonging"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Failure and learning",
+      "pattern": "A bet or project that failed, the candidate's part in it, and what they changed afterwards",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Win or learn"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Inclusion and feedback",
+      "pattern": "A time the candidate made a team more inclusive, or gave or acted on candid feedback",
+      "competencies": ["collaboration", "communication", "learning_from_failure"],
+      "values": ["Create belonging"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Holding the quality bar",
+      "pattern": "A time the candidate held a quality line or said no to a stakeholder request, and the outcome",
+      "competencies": ["ownership", "conflict_handling", "impact"],
+      "values": ["Aim for extraordinary", "Put Pinners first"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Meaningful project",
+      "pattern": "Walk through the most meaningful or impactful project: own role, hard decisions, results and what the candidate would change",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Aim for extraordinary"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Why Pinterest",
+      "pattern": "Why Pinterest and this team, how the candidate uses the product, and what they want to do next",
+      "competencies": ["motivation", "team_fit", "role_fit"],
+      "values": ["Put Pinners first"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Decisions with incomplete data",
+      "pattern": "A decision made without full information: what was known, the risk taken, and how it played out",
+      "competencies": ["judgment", "scope_at_level"],
+      "values": ["Win or learn"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Pinterest product system design",
+      "pattern": "Design a Pinterest-scale product system such as home feed, notifications, image upload or caching for popular Pins, with storage, latency and scale trade-offs",
+      "competencies": ["technical_depth", "trade_offs", "reasoning", "clarity_of_explanation"],
+      "values": ["Put Pinners first"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Recommendation and ranking design",
+      "pattern": "Design candidate generation, ranking, training and serving for a Pinterest recommendation surface such as related Pins, home feed, search or ads",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Put Pinners first", "Aim for extraordinary"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "ML fundamentals and debugging",
+      "pattern": "Explain an ML concept or diagnose a model problem from a past project: overfitting, drift, loss behavior, metrics choice",
+      "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
+      "values": ["Win or learn"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Improve a Pinterest surface",
+      "pattern": "Improve or design a Pinterest surface for a chosen user segment: segment, pain points, V1 scope, cut list and success metric",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["Put Pinners first", "Aim for extraordinary"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Metrics and diagnosis",
+      "pattern": "Define success metrics for a feature or diagnose a sudden drop in an engagement metric, including experiment design",
+      "competencies": ["problem_framing", "structure", "prioritization"],
+      "values": ["Win or learn"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Ads versus Pinner experience",
+      "pattern": "Balance advertiser or revenue goals against the Pinner experience, with a decision rule and guardrails",
+      "competencies": ["user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["Put Pinners first"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a technical decision where you put the end user first.",
+      "strong_answer": "Name the users affected and the choice in front of the team (for example a faster shortcut versus a fix that protected user experience or safety). Show how the candidate learned what users needed, argued for it, and what it cost in time or scope. End with a measured result for users and what the team learned. Pitfalls: a vague 'users' with no specifics, or a story where the user benefit was never checked.",
+      "competencies": ["impact", "ownership", "communication"],
+      "values": ["Put Pinners first"],
+      "source_url": "https://www.cleverprep.com/companies/pinterest/software-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you design from the user's need, not only the system",
+          "How you argue for users when it costs time"
+        ],
+        "strong_signals": [
+          "Names a specific user group and its pain",
+          "States the trade-off and what it cost",
+          "Shows a measured result for users"
+        ],
+        "watch_outs": [
+          "Generic 'users' with no specifics",
+          "Never checking whether users actually benefited"
+        ]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you worked closely with partners from other functions to deliver something.",
+      "strong_answer": "Set up the project, the functions involved (design, product, data, other engineering teams) and where their goals pulled apart. Show the concrete mechanics the candidate used: shared goals, regular syncs, written decisions, unblocking another team. Show credit shared and the result. Strong answers include one moment where the candidate gave something up for the shared goal. Pitfalls: a list of meetings with no tension, or a story where partners were obstacles.",
+      "competencies": ["collaboration", "communication", "impact"],
+      "values": ["Act as one"],
+      "source_url": "https://www.cleverprep.com/companies/pinterest/software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you align people from different functions",
+          "Whether you share wins and remove silos"
+        ],
+        "strong_signals": [
+          "Names where goals pulled apart and how you aligned them",
+          "Gave something up for the shared goal",
+          "Credits partners by role"
+        ],
+        "watch_outs": [
+          "A list of meetings with no real tension",
+          "Treating partners as obstacles"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a technical disagreement with a teammate and how it was resolved.",
+      "strong_answer": "Describe both positions fairly and the stakes. Show how the candidate moved the debate to evidence: a prototype, data, a written comparison of options. Explain the decision, including if the candidate's view lost, and how they then committed fully and helped make the chosen path work. Mention the relationship afterwards. Pitfalls: winning by escalation, or continuing to resist after the decision.",
+      "competencies": ["conflict_handling", "collaboration", "communication"],
+      "values": ["Act as one", "Create belonging"],
+      "source_url": "https://www.cleverprep.com/companies/pinterest/software-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you debate candidly and with evidence",
+          "Whether you commit once a direction is chosen"
+        ],
+        "strong_signals": [
+          "States the other view fairly",
+          "Uses a prototype or data to decide",
+          "Commits fully even if your view lost"
+        ],
+        "watch_outs": [
+          "Winning by escalation",
+          "Still resisting after the decision"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a product or project that failed. What did you learn?",
+      "strong_answer": "Explain the bet and why it looked right at the time, including the risk. Own the candidate's part without blaming others. Show how the failure was spotted, how quickly the team responded, and the specific change in how the candidate works now, ideally with a later example where the lesson paid off. Pinterest frames this as win or learn, so the learning must be concrete. Pitfalls: a disguised success, or a lesson like 'communicate more' with no evidence.",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Win or learn"],
+      "source_url": "https://www.cleverprep.com/companies/pinterest/product-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you take smart risks and own the outcome",
+          "What you concretely changed afterwards"
+        ],
+        "strong_signals": [
+          "Explains why the bet looked right at the time",
+          "Owns your part without blame",
+          "Gives a later example where the lesson paid off"
+        ],
+        "watch_outs": [
+          "A disguised success",
+          "A vague lesson with no evidence"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you helped create a sense of belonging on your team.",
+      "strong_answer": "Describe a concrete situation: a new hire struggling to ramp, a quieter voice overlooked in design reviews, a remote teammate left out. Show what the candidate did (pairing, changing a meeting format, inviting written input, giving credit) and how it changed the team's work or the person's outcome. Strong answers tie inclusion to better decisions. Pitfalls: only organizing social events, or no visible effect.",
+      "competencies": ["collaboration", "communication"],
+      "values": ["Create belonging"],
+      "source_url": "https://www.cleverprep.com/companies/pinterest/software-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you actively include different perspectives",
+          "How inclusion changed the team's work"
+        ],
+        "strong_signals": [
+          "A specific person or situation, not a slogan",
+          "A concrete action like changing a meeting format",
+          "Ties inclusion to a better decision"
+        ],
+        "watch_outs": [
+          "Only organizing social events",
+          "No visible effect"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to say no to a stakeholder, perhaps a senior one, to protect quality or focus.",
+      "strong_answer": "Set up the request, who asked, and why saying yes would hurt quality, users or the roadmap. Show how the candidate made the case with data and user impact, offered an alternative or a later path, and kept the relationship. Give the outcome and what the candidate would do the same or differently. Pitfalls: a flat refusal with no alternative, or caving and calling it alignment.",
+      "competencies": ["conflict_handling", "ownership", "communication"],
+      "values": ["Aim for extraordinary", "Put Pinners first"],
+      "source_url": "https://www.cleverprep.com/companies/pinterest/product-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you hold a quality bar under pressure",
+          "How you push back while keeping trust"
+        ],
+        "strong_signals": [
+          "Makes the case with data and user impact",
+          "Offers an alternative or a later path",
+          "Keeps the relationship intact"
+        ],
+        "watch_outs": [
+          "A flat refusal with no alternative",
+          "Caving and calling it alignment"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why do you want to work at Pinterest, and on this team?",
+      "strong_answer": "Be specific: how the candidate uses Pinterest, what makes it different (intent-driven, inspiration rather than social comparison, visual discovery), and which team problem matches their past work. Connect to the mission of inspiring people to create a life they love. Say what they want to learn and contribute. Pitfalls: generic praise, only brand or compensation, or not having used the product.",
+      "competencies": ["motivation", "team_fit", "role_fit"],
+      "values": ["Put Pinners first"],
+      "source_url": "https://www.aced.io/blog/pinterest-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you know and use the product",
+          "How the team's problems connect to your experience"
+        ],
+        "strong_signals": [
+          "Explains what makes Pinterest different for users",
+          "Links a team problem to your past work",
+          "Connects to the mission"
+        ],
+        "watch_outs": [
+          "Generic praise",
+          "Not having used the product"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Walk me through a meaningful project you worked on end to end.",
+      "strong_answer": "Give a short summary of the goal and the candidate's role, then go deep on two or three hard decisions: options considered, why one won, and what went wrong. Quantify the result. Be ready for follow-ups that test whether the candidate truly owned the work. Match scope to the target level: a feature for mid level, a system or cross-team effort for senior. Pitfalls: team achievements with unclear personal role, or no numbers.",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Aim for extraordinary"],
+      "source_url": "https://www.aced.io/blog/pinterest-interview-process",
+      "hints": {
+        "looking_for": [
+          "Depth of your own contribution",
+          "Whether the scope matches the level"
+        ],
+        "strong_signals": [
+          "Goes deep on two or three hard decisions",
+          "Quantifies the result",
+          "Holds up under detailed follow-ups"
+        ],
+        "watch_outs": [
+          "Team achievements with unclear personal role",
+          "No numbers"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Describe a decision you made with incomplete data.",
+      "strong_answer": "State what was unknown and why waiting was costly. Show how the candidate bounded the risk: the data they could get quickly, a reversible first step, a clear signal that would change the plan. Give the result and what they learned about when to wait versus act. Pitfalls: pretending the data was complete, or a reckless bet with no plan to learn.",
+      "competencies": ["judgment", "scope_at_level"],
+      "values": ["Win or learn"],
+      "source_url": "https://www.cleverprep.com/companies/pinterest/product-manager",
+      "hints": {
+        "looking_for": [
+          "How you act when information is missing",
+          "Whether you bound the risk"
+        ],
+        "strong_signals": [
+          "Explains why waiting was costly",
+          "Chooses a reversible first step",
+          "Names the signal that would change the plan"
+        ],
+        "watch_outs": [
+          "Pretending the data was complete",
+          "A reckless bet with no way to learn"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design the personalized home feed for Pinterest?",
+      "strong_answer": "Clarify scale, freshness and goals (saves and long-term retention, not only clicks). Cover candidate generation from several sources (embedding-based retrieval, followed boards, fresh content), a lightweight pre-ranking stage, a heavier ranking model on engagement signals, and blending rules for diversity and freshness. Discuss real-time user actions as features, caching, latency budget, cold start, and feedback loops. Pitfalls: one giant model scoring everything, or optimizing clicks with no thought for Pinner wellbeing.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning", "clarity_of_explanation"],
+      "values": ["Put Pinners first"],
+      "source_url": "https://www.cleverprep.com/companies/pinterest/software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you structure a multi-stage recommendation system",
+          "Whether you connect design to the Pinner experience"
+        ],
+        "strong_signals": [
+          "Separates candidate generation, pre-ranking and ranking",
+          "Handles freshness, diversity and cold start",
+          "Picks objectives beyond clicks"
+        ],
+        "watch_outs": [
+          "One huge model scoring every Pin",
+          "Ignoring latency or feedback loops"
+        ]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a related Pins feature that recommends visually similar Pins to the one a user is viewing.",
+      "strong_answer": "Clarify scale (billions of Pins) and latency. Compute image (and text) embeddings offline, index them with approximate nearest neighbor search, and combine visual similarity with engagement signals such as co-saves on boards. Add a ranking stage, filters for safety and duplicates, and a plan for new Pins. Discuss index refresh, embedding model updates, evaluation offline and by A/B test. Pitfalls: exact nearest neighbor over all Pins, or ignoring duplicates and unsafe content.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Aim for extraordinary"],
+      "source_url": "https://www.cleverprep.com/companies/pinterest/software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you do similarity search at very large scale",
+          "Whether you blend content and engagement signals"
+        ],
+        "strong_signals": [
+          "Uses embeddings with approximate nearest neighbor search",
+          "Adds a ranking stage and safety and duplicate filters",
+          "Plans index refresh and evaluation"
+        ],
+        "watch_outs": [
+          "Exact search over every Pin",
+          "No plan for new Pins"
+        ]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design spam detection for Pinterest?",
+      "strong_answer": "Clarify the spam types (malicious links, fake accounts, repeated low-quality Pins) and the cost of false positives for real creators. Cover signals (account age, link reputation, posting velocity, content features), a mix of rules and ML models, real-time scoring at write time plus batch review, and actions graded by confidence. Discuss labels from user reports, adversarial adaptation, and an appeal path. Pitfalls: one static model, or ignoring false positives.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Put Pinners first"],
+      "source_url": "https://www.aced.io/blog/pinterest-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you balance catching spam against hurting real users",
+          "Whether you plan for adversaries who adapt"
+        ],
+        "strong_signals": [
+          "Combines rules and models with graded actions",
+          "Scores at write time plus batch review",
+          "Uses user reports as labels and offers an appeal path"
+        ],
+        "watch_outs": [
+          "One static model",
+          "Ignoring false positives"
+        ]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Your model's training loss oscillates and offline accuracy is poor. How would you diagnose it?",
+      "strong_answer": "Work in order: check the data first (label quality, leakage, distribution shift between train and evaluation), then the training setup (learning rate too high, batch size, bad normalization, exploding gradients), then model capacity. Describe the experiments to separate causes, such as lowering the learning rate or overfitting a tiny subset. Mention metrics suited to the task (AUPRC for imbalanced data). Pitfalls: jumping to a bigger model, or random tweaks without a sequence.",
+      "competencies": ["technical_depth", "accuracy", "reasoning", "clarity_of_explanation"],
+      "values": ["Win or learn"],
+      "source_url": "https://www.aced.io/guides/pinterest-machine-learning-engineer-interview-guide",
+      "hints": {
+        "looking_for": [
+          "A structured debugging sequence",
+          "Sound ML fundamentals"
+        ],
+        "strong_signals": [
+          "Checks data quality and leakage first",
+          "Tests learning rate and normalization with small experiments",
+          "Chooses a metric suited to the task"
+        ],
+        "watch_outs": [
+          "Jumping to a bigger model",
+          "Random tweaks with no order"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you improve the Pinterest home feed?",
+      "strong_answer": "Start with the home feed's job: inspiration that leads to saving and acting on ideas. Pick a segment (new users, returning planners, a specific interest group) and its main pain, such as repetitive content or feed that misses a new intent. Generate a few solutions, prioritize by impact and effort, and recommend one with a V1 scope and cut list. Define a success metric (for example saves per session or weekly retention) and guardrails (diversity, ad load, wellbeing). Pitfalls: listing features with no user, or metrics only on clicks.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["Put Pinners first", "Aim for extraordinary"],
+      "source_url": "https://www.cleverprep.com/companies/pinterest/product-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you start from a user segment and its pain",
+          "How you scope and prioritize a V1"
+        ],
+        "strong_signals": [
+          "States the home feed's job for Pinners",
+          "Recommends one solution with a cut list",
+          "Sets a success metric with guardrails"
+        ],
+        "watch_outs": [
+          "Features with no user in mind",
+          "Measuring only clicks"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Design the experience for a new Pinner whose only board has just a few Pins.",
+      "strong_answer": "Frame this as a cold-start and activation problem. Clarify what the user wants (one project or a broad interest) and why they stall. Propose ways to learn intent quickly (onboarding topics, signals from the few saves), seed recommendations, and prompts that help the board grow without spamming. Prioritize one, scope V1, and define success (users reaching a set number of saves in week one, second-week return) with guardrails such as notification opt-outs. Pitfalls: a full redesign, or more notifications as the only answer.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Put Pinners first"],
+      "source_url": "https://www.cleverprep.com/companies/pinterest/product-manager",
+      "hints": {
+        "looking_for": [
+          "How you handle cold start for a new user",
+          "Whether you scope a focused V1"
+        ],
+        "strong_signals": [
+          "Frames it as activation with a clear user intent",
+          "Uses early saves to seed recommendations",
+          "Defines week-one success and guardrails"
+        ],
+        "watch_outs": [
+          "A full redesign",
+          "More notifications as the only answer"
+        ]
+      },
+      "role_families": ["pm", "design"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "A key engagement metric dropped 10% overnight. How would you diagnose it?",
+      "strong_answer": "Confirm the metric definition and that the data pipeline is healthy. Check whether the drop is broad or concentrated by segmenting on platform, app version, country, surface and user cohort. Look at internal changes (releases, ranking or experiment launches, notification changes) and external ones (outages, holidays, competitor events). Rank hypotheses, name the data that tests each, and decide on action, including a rollback if a launch caused it. Pitfalls: a list of causes with no order, or skipping data validation.",
+      "competencies": ["problem_framing", "structure", "prioritization"],
+      "values": ["Win or learn"],
+      "source_url": "https://www.cleverprep.com/companies/pinterest/product-manager",
+      "hints": {
+        "looking_for": [
+          "A structured path from data check to cause",
+          "Whether you reach a decision"
+        ],
+        "strong_signals": [
+          "Validates the data first",
+          "Segments by platform, version, region and surface",
+          "Ranks hypotheses and proposes action, including rollback"
+        ],
+        "watch_outs": [
+          "Random causes with no order",
+          "Skipping the data check"
+        ]
+      },
+      "role_families": ["pm", "data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you balance advertiser needs with the Pinner experience when deciding ad load in the feed?",
+      "strong_answer": "Lay out both sides: advertiser goals (reach, conversions) and Pinner goals (inspiration, relevance, trust). Note that relevant ads can be content Pinners want, which is part of Pinterest's model. Propose a test of ad load and placement, with revenue as the primary metric and guardrails on retention, saves and hides or reports. Define a decision rule that favors long-term Pinner value, and segment results by user type. Pitfalls: maximizing revenue with no guardrail, or refusing ads entirely.",
+      "competencies": ["user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["Put Pinners first"],
+      "source_url": "https://www.cleverprep.com/companies/pinterest/product-manager",
+      "hints": {
+        "looking_for": [
+          "How you weigh revenue against the Pinner experience",
+          "Whether you set a clear decision rule"
+        ],
+        "strong_signals": [
+          "Treats relevant ads as possibly useful content",
+          "Sets guardrails on retention, saves and hides",
+          "Favors long-term Pinner value in the rule"
+        ],
+        "watch_outs": [
+          "Maximizing revenue with no guardrail",
+          "Refusing ads entirely"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "IC13",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Entry level; delivers well-defined tasks with guidance. Loop is coding-focused, often starting with an online assessment."
+    },
+    {
+      "level_name": "IC14",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns features within one team from design to launch with limited guidance; system design expected at a basic level."
+    },
+    {
+      "level_name": "IC15",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Senior Software Engineer; owns systems or large features, leads design for the team and works across functions."
+    },
+    {
+      "level_name": "IC16",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Staff-level (estimated); sets technical direction across several teams and leads cross-team efforts."
+    },
+    {
+      "level_name": "IC17",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Senior staff (estimated); shapes technical strategy for an organization."
+    },
+    {
+      "level_name": "IC14",
+      "normalized_level": "mid",
+      "role_family": "data_ml",
+      "scope_expectation": "Owns models or analyses for one product surface; two coding rounds plus ML design and practitioner rounds reported at mid and senior."
+    },
+    {
+      "level_name": "IC15",
+      "normalized_level": "senior",
+      "role_family": "data_ml",
+      "scope_expectation": "Owns an ML system end to end (data, training, serving, monitoring) and drives modeling direction for a surface (estimated)."
+    }
+  ],
+  "persona": {
+    "tone": "Warm, collaborative and curious about the user",
+    "pace": "Moderate; lets the candidate think, then asks follow-ups on decisions and trade-offs",
+    "pushback_style": "Asks 'how did this help Pinners?', 'what was your part?', 'what did you learn?' and 'why this option over the other?'; probes scoping and what was cut",
+    "closing_style": "Leaves about five minutes for the candidate's questions about the team and product"
+  },
+  "scoring_weights": {
+    "user_and_business_sense": 1.4,
+    "collaboration": 1.3,
+    "communication": 1.2,
+    "learning_from_failure": 1.2,
+    "impact": 1.2,
+    "conflict_handling": 1.1,
+    "trade_offs": 1.3,
+    "technical_depth": 1.2,
+    "reasoning": 1.2,
+    "scope_at_level": 1.2,
+    "problem_framing": 1.3,
+    "prioritization": 1.2
+  },
+  "values_share": 0.25,
+  "case_style": {
+    "product_sense": 0.55,
+    "estimation": 0.1,
+    "system_thinking": 0.35,
+    "notes": "PM cases center on Pinterest surfaces (home feed, onboarding, saves, ads) and on metrics: success metrics, metric-drop diagnosis and experiment design. Some loops add a prompt about another consumer product. Data science cases are experiment and metric driven. Market sizing is rarely reported."
+  },
+  "sources": [
+    {
+      "url": "https://www.pinterestcareers.com/life-at-pinterest-blog/pinterest-life/spotlight-on-our-values-one-year-of-reflection-on-pinterest-values-reimagined/",
+      "title": "Spotlight on our values (Pinterest Careers blog)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://www.pinterestcareers.com/our-life/",
+      "title": "Our life at Pinterest (Pinterest Careers)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "persona"]
+    },
+    {
+      "url": "https://www.aced.io/blog/pinterest-interview-process",
+      "title": "Pinterest interview process and top questions (Exponent / Aced)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/what-is-the-pinterest-interview-process-like-round-by-round",
+      "title": "What is the Pinterest interview process like, round by round (Design Gurus)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "persona"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/pinterest/software-engineer",
+      "title": "Pinterest software engineer interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "scoring_weights"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/pinterest/product-manager",
+      "title": "Pinterest product manager interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style", "persona"]
+    },
+    {
+      "url": "https://www.aced.io/guides/pinterest-product-manager-interview-guide",
+      "title": "Pinterest product manager interview guide (Exponent / Aced)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.aced.io/guides/pinterest-machine-learning-engineer-interview-guide",
+      "title": "Pinterest machine learning engineer interview guide (Exponent / Aced)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "bar_by_level", "scoring_weights"]
+    },
+    {
+      "url": "https://www.levels.fyi/companies/pinterest/salaries/software-engineer",
+      "title": "Pinterest software engineer levels (Levels.fyi)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level", "loop_structure"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "medium"
+  },
+  "low_confidence_notes": [
+    "loop_structure: no official Pinterest interview-prep page was found; rounds and durations come from prep sites that disagree (4 to 8 rounds, coding 45 to 60 minutes, system design 30 to 60 minutes). The project deep dive is reported by one source only. PM round durations are partly estimated.",
+    "loop_structure: PM levels are left empty because no public source gave Pinterest PM level labels.",
+    "bar_by_level: IC13 to IC17 labels come from Levels.fyi, which titles only IC15 (Senior). Staff for IC16 and senior staff for IC17, and all scope text, are our estimates. data_ml entries reuse the SWE ladder, which is not confirmed.",
+    "persona: no public description of Pinterest interviewer style; inferred from the values (collaboration, belonging) and prep-site reports of follow-up questions. Our estimate.",
+    "scoring_weights: our estimate, mapping the values and reported evaluation criteria (product sense, collaboration, trade-offs) to competencies; no source gives weights.",
+    "question_patterns: several sample questions come from CleverPrep and Exponent lists that aggregate candidate reports; they are paraphrased and may not match current loops."
+  ]
+}

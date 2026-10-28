@@ -1,0 +1,1188 @@
+{
+  "company_name": "Block",
+  "company_slug": "block",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-28",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Block purpose and working principles",
+    "principles": [
+      {
+        "name": "Economic empowerment",
+        "description": "Block's stated purpose: build tools that help sellers, consumers and artists take part in an economy that is open to everyone, including people the traditional financial system serves poorly.",
+        "evidence_signals": [
+          "Connects own work to access or financial outcomes for real users, such as small sellers or underbanked people",
+          "Shows genuine interest in fintech, small business or financial inclusion, not only the brand",
+          "Considers who is left out by a design (fees, eligibility, accessibility) and acts on it"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Simple, powerful tools",
+        "description": "Make complex financial products feel simple for the user, while the system underneath stays correct, secure and reliable.",
+        "evidence_signals": [
+          "Removed steps or complexity for users without giving up correctness",
+          "Prefers readable, working, well-structured solutions over clever ones",
+          "Explains the hidden complexity (failure modes, edge cases) behind a simple experience"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Customer empathy",
+        "description": "Understand sellers and consumers deeply, including their constraints (busy counters, flaky networks, tight cash flow), and measure success by their outcomes.",
+        "evidence_signals": [
+          "Names a specific seller or customer segment and their pain",
+          "Talked to users, used the product, or watched real usage before deciding",
+          "Measures impact as a change for the user, not only as shipped output"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Kind, curious collaboration",
+        "description": "Rooted in Square's pair-programming culture: work closely with others, ask good questions, stay humble and kind, and keep learning.",
+        "evidence_signals": [
+          "Thinks out loud and invites the other person into the problem",
+          "Disagrees on substance without being condescending",
+          "Shows a habit of learning new tools or domains quickly"
+        ],
+        "weight": 1.1
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": [
+        "L3",
+        "L4",
+        "L5",
+        "L6",
+        "L7"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, interest in fintech and Block's mission, logistics. Not simulated in v1."
+        },
+        {
+          "name": "Technical screen (pairing)",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Live pair-programming in a shared editor, often a multi-part problem where each part builds on the last. Some teams use a take-home plus an extension interview instead. Not simulated in v1."
+        },
+        {
+          "name": "Pair-programming coding rounds",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Usually two or three. Working, readable code and stated trade-offs matter more than the optimal algorithm. May include extending a partly built service. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior or staff software engineer",
+          "notes": "Often payments-flavored: point of sale, authorization, transaction pipelines, fraud. Correctness under failure (idempotency, retries, offline) is a frequent probe. Mid level and above."
+        },
+        {
+          "name": "Past project / technical experience",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Software engineer",
+          "notes": "Deep dive into a project the candidate built: decisions, trade-offs and results. Candidate reports call this the prior-experience or technical project review interview."
+        },
+        {
+          "name": "Behavioral / leadership",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager or senior engineer",
+          "notes": "Collaboration, disagreement, ownership, production incidents, customer impact."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager",
+          "notes": "Can come before or after the onsite. Scope, motivation, team fit."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": [
+        "Associate Product Manager",
+        "Product Manager",
+        "Senior Product Manager",
+        "Staff Product Manager"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, why Block, why now. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Product leader (hiring manager)",
+          "notes": "Several behavioral and experience questions, roadmap bets made or dropped."
+        },
+        {
+          "name": "Product sense",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product manager",
+          "notes": "Improve or design a product for Square sellers or Cash App customers."
+        },
+        {
+          "name": "Analytical / metrics",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product manager or data scientist",
+          "notes": "Choose metrics, diagnose a metric change such as payment success rate, prioritize."
+        },
+        {
+          "name": "Behavioral / cross-functional",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineering or design partner",
+          "notes": "Working with engineering, risk and compliance partners; decisions with incomplete data."
+        },
+        {
+          "name": "Presentation or take-home",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Panel of product leaders",
+          "notes": "Reported for some roles and the APM program; may involve AI tools. Not simulated in v1."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": [
+        "Data Scientist",
+        "Senior Data Scientist",
+        "Staff Data Scientist"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Not simulated in v1."
+        },
+        {
+          "name": "Technical screen (SQL and coding)",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Data scientist",
+          "notes": "Live SQL and Python. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Data science manager",
+          "notes": "Past projects with business impact, influence on product decisions."
+        },
+        {
+          "name": "Statistics, experimentation and ML",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Senior data scientist or ML engineer",
+          "notes": "A/B test design, fraud and risk modeling, model evaluation in production."
+        },
+        {
+          "name": "Product analytics case",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Data scientist or product manager",
+          "notes": "Metrics for Square or Cash App, metric diagnosis, growth questions."
+        },
+        {
+          "name": "Take-home presentation",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Panel",
+          "notes": "Reported by prep guides for some data roles. Not simulated in v1."
+        },
+        {
+          "name": "Behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Cross-functional partner",
+          "notes": "Explaining analysis to non-technical partners, messy data, stakeholder conflict."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Technical disagreement",
+      "pattern": "A technical or product decision the candidate disagreed with, how they made the case, and how it ended",
+      "competencies": [
+        "conflict_handling",
+        "communication",
+        "collaboration"
+      ],
+      "values": [
+        "Kind, curious collaboration"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Production incident",
+      "pattern": "A complex production problem the candidate debugged or owned, from detection to fix to prevention",
+      "competencies": [
+        "ownership",
+        "learning_from_failure",
+        "communication"
+      ],
+      "values": [
+        "Simple, powerful tools"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Customer impact",
+      "pattern": "Something the candidate built that measurably helped a specific user or seller group",
+      "competencies": [
+        "impact",
+        "ownership"
+      ],
+      "values": [
+        "Customer empathy",
+        "Economic empowerment"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Unpopular or uncertain decision",
+      "pattern": "A decision the candidate made that others disliked or that rested on incomplete data, and how they handled the fallout",
+      "competencies": [
+        "ownership",
+        "communication",
+        "conflict_handling"
+      ],
+      "values": []
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Failure and recovery",
+      "pattern": "A project or product that failed, the candidate's part in it, and what they do differently now",
+      "competencies": [
+        "learning_from_failure",
+        "ownership"
+      ],
+      "values": [
+        "Kind, curious collaboration"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Doing more with less",
+      "pattern": "How the candidate delivered with a small team or used automation or AI tools to raise output, and how they kept quality",
+      "competencies": [
+        "impact",
+        "ownership"
+      ],
+      "values": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Past project deep dive",
+      "pattern": "Walk through a significant past project: goal, own role, key decisions and trade-offs, measured result",
+      "competencies": [
+        "depth_of_experience",
+        "scope_at_level",
+        "judgment"
+      ],
+      "values": [
+        "Simple, powerful tools"
+      ]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Fintech motivation",
+      "pattern": "Why the candidate wants to work on payments, sellers or consumer finance, and what relevant experience they bring",
+      "competencies": [
+        "motivation",
+        "role_fit"
+      ],
+      "values": [
+        "Economic empowerment"
+      ]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Payment correctness",
+      "pattern": "Design a payment, authorization or ledger flow that stays correct under retries, timeouts and duplicates",
+      "competencies": [
+        "technical_depth",
+        "accuracy",
+        "trade_offs",
+        "reasoning"
+      ],
+      "values": [
+        "Simple, powerful tools"
+      ]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Resilient seller systems",
+      "pattern": "Design a seller-facing system, such as point of sale or inventory, that keeps working through outages and syncs safely later",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "clarity_of_explanation"
+      ],
+      "values": [
+        "Customer empathy",
+        "Simple, powerful tools"
+      ]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Fraud and risk modeling",
+      "pattern": "Detect fraud or risk in transaction streams: features, imbalance, latency, evaluation and the cost of false positives",
+      "competencies": [
+        "technical_depth",
+        "reasoning",
+        "trade_offs"
+      ],
+      "values": [
+        "Economic empowerment",
+        "Customer empathy"
+      ]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Experiment design",
+      "pattern": "Design and read an experiment on a checkout, onboarding or pricing change, including pitfalls like two-sided effects",
+      "competencies": [
+        "accuracy",
+        "reasoning",
+        "clarity_of_explanation"
+      ],
+      "values": [
+        "Customer empathy"
+      ]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Seller or customer product improvement",
+      "pattern": "Improve a Square seller or Cash App customer experience: segment, pain point, solution, success metric",
+      "competencies": [
+        "problem_framing",
+        "user_and_business_sense",
+        "prioritization",
+        "recommendation"
+      ],
+      "values": [
+        "Customer empathy",
+        "Economic empowerment"
+      ]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Metric diagnosis",
+      "pattern": "A payments or growth metric moved suddenly; structure the investigation and decide what to do first",
+      "competencies": [
+        "problem_framing",
+        "structure",
+        "prioritization"
+      ],
+      "values": []
+    },
+    {
+      "interview_type": "case",
+      "theme": "New product bet",
+      "pattern": "Choose and size the next bet for a Block brand (Bitkey, Afterpay, a new market) and how to measure it",
+      "competencies": [
+        "user_and_business_sense",
+        "estimation_logic",
+        "recommendation"
+      ],
+      "values": [
+        "Economic empowerment",
+        "Simple, powerful tools"
+      ]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a technical decision on your team that you disagreed with. What did you do?",
+      "strong_answer": "Describe the decision and why it mattered (risk, cost, user impact). Show the candidate raised the concern early, stated the other side fairly, and used evidence such as a prototype, data or a design doc. Explain how it was decided and whether they committed fully once it was. Strong answers include a moment of changing their own mind or a respectful outcome either way. Pitfalls: silent compliance, going around people, or a story where the other side was simply foolish.",
+      "competencies": [
+        "conflict_handling",
+        "communication",
+        "collaboration"
+      ],
+      "values": [
+        "Kind, curious collaboration"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/block/software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you disagree on substance while staying kind",
+          "Whether you commit once a decision is made"
+        ],
+        "strong_signals": [
+          "Raises the concern early with evidence",
+          "States the other view fairly",
+          "Shows the outcome and the relationship afterwards"
+        ],
+        "watch_outs": [
+          "Silent compliance or going around people",
+          "The other side was simply wrong"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Walk me through a hard production issue you debugged. How did you find the cause and what changed afterwards?",
+      "strong_answer": "Set the stakes: what broke and who was affected, ideally in money or users. Walk through detection, the debugging steps and the hypotheses ruled out, how the candidate communicated during the incident, and the fix. Then show prevention: tests, alerts, a runbook, a design change. For payments, mention customer remediation such as refunds or reconciliation. Pitfalls: luck as the method, blaming another team, or no follow-up.",
+      "competencies": [
+        "ownership",
+        "learning_from_failure",
+        "communication"
+      ],
+      "values": [
+        "Simple, powerful tools"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/block/software-engineer",
+      "hints": {
+        "looking_for": [
+          "How systematically you debug under pressure",
+          "Whether you prevent the problem from coming back"
+        ],
+        "strong_signals": [
+          "States who was affected and how much",
+          "Describes hypotheses tested and ruled out",
+          "Adds tests, alerts or design changes afterwards"
+        ],
+        "watch_outs": [
+          "Found the bug by luck with no method",
+          "Blaming another team"
+        ]
+      },
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about something you built that made a real difference for the people using it.",
+      "strong_answer": "Name a specific user group and the problem they had, and how the candidate learned about it (support tickets, user calls, using the product). Explain what was built and the choices made to keep it simple for the user. Show the measured change for users, and what was learned after launch. Tie it to access or financial outcomes where possible. Pitfalls: impact described only as features shipped, or no evidence users benefited.",
+      "competencies": [
+        "impact",
+        "ownership"
+      ],
+      "values": [
+        "Customer empathy",
+        "Economic empowerment"
+      ],
+      "source_url": "https://www.techprep.app/blog/block-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you understand your users deeply",
+          "How you measure impact for users"
+        ],
+        "strong_signals": [
+          "Names a specific user group and their pain",
+          "Explains how you learned about the problem",
+          "Shows a measured change for users"
+        ],
+        "watch_outs": [
+          "Impact described only as features shipped",
+          "No evidence users benefited"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a decision you made that was unpopular with your team or stakeholders. How did you handle it?",
+      "strong_answer": "Explain the decision, the alternatives and why it was unpopular. Show the reasoning was grounded in user or business outcomes, that the candidate listened to objections and adjusted what they could, and that they explained the decision clearly. Describe the result and whether the decision held up; admit it if it did not. Pitfalls: pulling rank, or a decision that was not really unpopular.",
+      "competencies": [
+        "ownership",
+        "communication",
+        "conflict_handling"
+      ],
+      "values": [],
+      "source_url": "https://interviewkickstart.com/blogs/interview-questions/square-product-manager-interview-questions",
+      "hints": {
+        "looking_for": [
+          "How you make and explain hard calls",
+          "Whether you listen to objections"
+        ],
+        "strong_signals": [
+          "Grounds the decision in user or business outcomes",
+          "Adjusts what can be adjusted after hearing objections",
+          "Says honestly whether the decision held up"
+        ],
+        "watch_outs": [
+          "Pulling rank",
+          "A decision that was not really unpopular"
+        ]
+      },
+      "role_families": [
+        "pm"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a product you worked on that failed. What did you learn?",
+      "strong_answer": "Give context and why the bet looked right at the time. Own the candidate's part without blame, explain what signals were missed or noticed late, and how the team responded (pivot, shut down, fix). End with a concrete change in how they work, ideally shown in a later project. Pitfalls: a disguised success, blaming leadership or the market, or a vague lesson.",
+      "competencies": [
+        "learning_from_failure",
+        "ownership"
+      ],
+      "values": [
+        "Kind, curious collaboration"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/block/product-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you own failures honestly",
+          "What you changed afterwards"
+        ],
+        "strong_signals": [
+          "Explains why the bet looked right at the time",
+          "Names the signals that were missed",
+          "Shows the lesson applied later"
+        ],
+        "watch_outs": [
+          "A disguised success",
+          "Blaming leadership or the market"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Pick a past project you are proud of and take me through it: what you built, the decisions you made and how it turned out.",
+      "strong_answer": "Choose a project with scope that fits the target level and a clear personal role. Give a short overview, then go deep on two or three decisions: options considered, trade-offs, and why. Quantify the result and say what the candidate would change. Expect follow-ups on details, so pick a project the candidate knows thoroughly. Pitfalls: a team project with no clear personal part, or staying at the surface when asked to go deeper.",
+      "competencies": [
+        "depth_of_experience",
+        "scope_at_level",
+        "judgment"
+      ],
+      "values": [
+        "Simple, powerful tools"
+      ],
+      "source_url": "https://www.jointaro.com/interviews/companies/block/experiences/software-engineer-united-states-july-22-2020-declined-offer-positive-4ac40996/",
+      "hints": {
+        "looking_for": [
+          "Your own role and the depth of your decisions",
+          "Whether the scope fits the target level"
+        ],
+        "strong_signals": [
+          "Goes deep on two or three key decisions",
+          "Explains options considered and trade-offs",
+          "Quantifies the result and what you would change"
+        ],
+        "watch_outs": [
+          "No clear personal part in a team project",
+          "Staying at the surface under follow-ups"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "What experience do you have with payments or financial systems, and why do you want to work on them at Block?",
+      "strong_answer": "Be concrete about relevant experience: money movement, ledgers, compliance, risk, or adjacent work with strict correctness needs. If there is none, show transferable skills and real curiosity about the domain. Link motivation to Block's purpose and products, such as helping small sellers or making money access easier, and to the kind of problems the candidate wants. Pitfalls: generic praise, crypto hype with no substance, or only compensation.",
+      "competencies": [
+        "motivation",
+        "role_fit"
+      ],
+      "values": [
+        "Economic empowerment"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/block/software-engineer",
+      "hints": {
+        "looking_for": [
+          "Relevant or transferable experience with money systems",
+          "Genuine interest in Block's purpose and products"
+        ],
+        "strong_signals": [
+          "Names concrete correctness or compliance work",
+          "Links motivation to sellers or money access",
+          "Shows curiosity about the domain if new to it"
+        ],
+        "watch_outs": [
+          "Generic praise or hype with no substance",
+          "Talking only about compensation"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a point-of-sale system for sellers that can keep taking payments during a short network outage.",
+      "strong_answer": "Clarify scale, payment types and acceptable risk. Cover local storage of pending payments with unique client-side ids, a risk limit for offline acceptance (amount caps, card checks), and a queue that forwards payments when the network returns. Make the server side idempotent so replays do not double-charge, and handle declines found after reconnecting. Discuss encryption of stored card data, clock and ordering issues, and how the seller sees status. Pitfalls: ignoring duplicates on reconnect, or ignoring the risk of accepting offline.",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "accuracy",
+        "clarity_of_explanation"
+      ],
+      "values": [
+        "Customer empathy",
+        "Simple, powerful tools"
+      ],
+      "source_url": "https://www.techprep.app/blog/block-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you keep sellers working through failures",
+          "Whether payments stay correct after reconnecting"
+        ],
+        "strong_signals": [
+          "Uses client-generated ids and idempotent server writes",
+          "Sets risk limits for offline acceptance",
+          "Handles declines discovered later"
+        ],
+        "watch_outs": [
+          "Duplicates on reconnect",
+          "Ignoring the risk of offline acceptance"
+        ]
+      },
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a card authorization service that answers within milliseconds and stays correct when the card network times out.",
+      "strong_answer": "Clarify latency targets, volume and the parties (merchant, processor, network, issuer). Cover the request path, a durable record written before calling the network, and timeouts with a clear state machine (pending, approved, declined, unknown). For timeouts, explain reversals or status checks so no customer is charged twice or left with a hanging hold. Discuss idempotency keys, retries with backoff, partitioning, and monitoring of unknown states. Pitfalls: blind retries, or treating a timeout as a decline without cleanup.",
+      "competencies": [
+        "technical_depth",
+        "accuracy",
+        "trade_offs",
+        "reasoning"
+      ],
+      "values": [
+        "Simple, powerful tools"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/block/software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you handle the unknown state after a timeout",
+          "Whether you design for low latency and correctness together"
+        ],
+        "strong_signals": [
+          "Writes a durable record before calling the network",
+          "Uses an explicit state machine with an unknown state",
+          "Uses reversals or status checks to resolve timeouts"
+        ],
+        "watch_outs": [
+          "Blind retries that can double-charge",
+          "Treating a timeout as a decline with no cleanup"
+        ]
+      },
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you make payment requests idempotent so that a retry never charges a customer twice?",
+      "strong_answer": "Explain why retries happen (client timeouts, network errors, user double taps). Propose a client-supplied idempotency key stored with the request and its result, with a unique constraint so concurrent duplicates collapse to one. Return the stored result on replay, and reject a reused key with different parameters. Cover key expiry, in-progress state and locking, and idempotency across downstream calls. Pitfalls: deduplicating by amount and time, or only checking in memory.",
+      "competencies": [
+        "technical_depth",
+        "accuracy",
+        "clarity_of_explanation"
+      ],
+      "values": [
+        "Simple, powerful tools"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/block/software-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you understand why duplicates happen",
+          "How you enforce one charge under concurrency"
+        ],
+        "strong_signals": [
+          "Stores a client key with the result under a unique constraint",
+          "Rejects a reused key with different parameters",
+          "Handles in-progress requests and key expiry"
+        ],
+        "watch_outs": [
+          "Deduplicating by amount and time",
+          "Only checking in memory"
+        ]
+      },
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a pipeline that reconciles daily settlement files from card networks against internal payment records.",
+      "strong_answer": "Clarify file formats, volumes, timing and what a mismatch costs. Cover ingestion with validation and raw-file archiving, normalization into a common schema, matching on stable ids with fallback rules, and buckets for matched, missing on either side, and amount mismatches. Make reruns safe and results auditable, and route exceptions to a review queue with alerts. Discuss late files, currency and fees. Pitfalls: overwriting data on rerun, or no plan for unmatched records.",
+      "competencies": [
+        "technical_depth",
+        "accuracy",
+        "reasoning"
+      ],
+      "values": [
+        "Simple, powerful tools"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/block/software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you match records and handle exceptions",
+          "Whether reruns are safe and auditable"
+        ],
+        "strong_signals": [
+          "Archives raw files and validates on ingest",
+          "Defines buckets for each kind of mismatch",
+          "Sends exceptions to a review queue with alerts"
+        ],
+        "watch_outs": [
+          "Overwriting data on rerun",
+          "No plan for unmatched records"
+        ]
+      },
+      "role_families": [
+        "swe",
+        "data_ml"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you build a model to detect fraud in payment transactions, given that fraud is rare?",
+      "strong_answer": "Define the fraud type and label source, and note label delay (chargebacks arrive weeks later). Discuss features: velocity, device, seller and buyer history, network features. Handle imbalance with sampling or class weights and evaluate with precision-recall, not accuracy, at a threshold chosen from the cost of fraud versus blocking good customers. Cover latency for real-time scoring, rules plus model, monitoring for drift, and adversarial adaptation. Pitfalls: accuracy as the metric, or ignoring harm to legitimate users.",
+      "competencies": [
+        "technical_depth",
+        "reasoning",
+        "trade_offs"
+      ],
+      "values": [
+        "Economic empowerment",
+        "Customer empathy"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/block/data-scientist",
+      "hints": {
+        "looking_for": [
+          "How you handle rare, delayed labels",
+          "Whether you weigh fraud loss against harm to good users"
+        ],
+        "strong_signals": [
+          "Notes label delay from chargebacks",
+          "Uses precision-recall and a cost-based threshold",
+          "Plans for drift and adversaries"
+        ],
+        "watch_outs": [
+          "Accuracy as the metric",
+          "Ignoring false positives on legitimate customers"
+        ]
+      },
+      "role_families": [
+        "data_ml",
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design an A/B test for a change meant to improve checkout conversion?",
+      "strong_answer": "State the hypothesis, the primary metric (completed payments per checkout start) and guardrails (refunds, fraud, seller revenue, latency). Choose the randomization unit carefully: buyer, seller or location, given network and seller-level effects. Size the test from baseline and minimum detectable effect, fix the duration in advance, and plan for novelty effects and multiple metrics. Describe how to read results and decide. Pitfalls: peeking and stopping early, or randomizing at a unit that leaks between groups.",
+      "competencies": [
+        "accuracy",
+        "reasoning",
+        "clarity_of_explanation"
+      ],
+      "values": [
+        "Customer empathy"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/block/data-scientist",
+      "hints": {
+        "looking_for": [
+          "How rigorously you design an experiment",
+          "Whether you pick the right randomization unit"
+        ],
+        "strong_signals": [
+          "Sets a primary metric and guardrails",
+          "Sizes the test from baseline and minimum effect",
+          "Fixes the duration in advance"
+        ],
+        "watch_outs": [
+          "Peeking and stopping early",
+          "A unit that leaks between groups"
+        ]
+      },
+      "role_families": [
+        "data_ml",
+        "pm"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you improve the Square point-of-sale checkout for small sellers?",
+      "strong_answer": "Clarify the goal (seller revenue, speed, retention) and pick a segment, such as a busy coffee counter or a solo service provider. Map the checkout journey for both seller and buyer and find the main pains: speed at peak, tipping, connectivity, reconciliation at close. Generate options, prioritize by impact and effort, and recommend one. Define a success metric such as checkout time or transactions per hour, plus guardrails like error rates and refunds. Pitfalls: forgetting the buyer side, or features with no seller pain behind them.",
+      "competencies": [
+        "problem_framing",
+        "user_and_business_sense",
+        "prioritization",
+        "recommendation"
+      ],
+      "values": [
+        "Customer empathy",
+        "Simple, powerful tools"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/block/product-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you start from a specific seller's pain",
+          "How you prioritize and recommend one idea"
+        ],
+        "strong_signals": [
+          "Picks one seller segment",
+          "Maps the journey for seller and buyer",
+          "Defines a success metric and guardrails"
+        ],
+        "watch_outs": [
+          "Forgetting the buyer side",
+          "Features with no seller pain behind them"
+        ]
+      },
+      "role_families": [
+        "pm",
+        "design"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Payment success rate dropped 5% overnight. What do you do on day one?",
+      "strong_answer": "First confirm the drop is real (data pipeline, metric definition) and assess impact in money and sellers affected. Segment fast: payment method, card network, region, device, app version, seller type. Check recent releases, partner or network incidents and fraud rule changes. Decide immediate action, such as rollback or failover, and who to inform, including affected sellers. Then root cause and prevention. Pitfalls: a long hypothesis list with no order, or analysis before stopping the bleeding.",
+      "competencies": [
+        "problem_framing",
+        "structure",
+        "prioritization"
+      ],
+      "values": [
+        "Customer empathy"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/block/product-manager",
+      "hints": {
+        "looking_for": [
+          "How you structure a fast investigation",
+          "Whether you act to limit harm early"
+        ],
+        "strong_signals": [
+          "Confirms the data and sizes the impact",
+          "Segments by method, network, region and version",
+          "Rolls back or fails over while finding the cause"
+        ],
+        "watch_outs": [
+          "A long hypothesis list with no order",
+          "Analysis before stopping the harm"
+        ]
+      },
+      "role_families": [
+        "pm",
+        "data_ml"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you get more Cash App customers to set up direct deposit?",
+      "strong_answer": "Clarify why it matters (primary-account relationship, engagement, revenue) and the current funnel. Segment customers, for example people paid by employers versus gig workers, and find where each drops off: awareness, trust, the setup steps, employer forms. Propose fixes such as pre-filled forms, early access to pay, or partial deposits to try it, and prioritize. Define the metric (share of actives with recurring deposits) and guardrails (trust, support contacts). Pitfalls: incentives only, or ignoring trust concerns about moving a paycheck.",
+      "competencies": [
+        "problem_framing",
+        "user_and_business_sense",
+        "prioritization",
+        "recommendation"
+      ],
+      "values": [
+        "Economic empowerment",
+        "Customer empathy"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/block/product-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you understand why direct deposit matters",
+          "How you find where customers drop off"
+        ],
+        "strong_signals": [
+          "Segments employees versus gig workers",
+          "Finds the funnel step with the biggest drop",
+          "Addresses trust in moving a paycheck"
+        ],
+        "watch_outs": [
+          "Incentives as the only lever",
+          "Ignoring trust concerns"
+        ]
+      },
+      "role_families": [
+        "pm"
+      ],
+      "levels": []
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "L3",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Delivers well-scoped tasks with guidance; loop is mostly pair-programming coding with light design."
+    },
+    {
+      "level_name": "L4",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns features end to end within a team and writes working, tested code independently."
+    },
+    {
+      "level_name": "L5",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Senior engineer; owns services or systems, designs for correctness and failure, and mentors others."
+    },
+    {
+      "level_name": "L6",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Staff engineer; leads technical direction across several teams and large cross-team projects."
+    },
+    {
+      "level_name": "L7",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Senior staff; shapes architecture and strategy for a business unit such as Square or Cash App."
+    },
+    {
+      "level_name": "Product Manager",
+      "normalized_level": "mid",
+      "role_family": "pm",
+      "scope_expectation": "Owns features within a product area with support from a senior PM."
+    },
+    {
+      "level_name": "Senior Product Manager",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns a product area, its metrics and roadmap, working with engineering, risk and compliance."
+    },
+    {
+      "level_name": "Senior Data Scientist",
+      "normalized_level": "senior",
+      "role_family": "data_ml",
+      "scope_expectation": "Leads analysis or modeling for a product or risk area and influences product decisions with data."
+    },
+    {
+      "level_name": "Staff Data Scientist",
+      "normalized_level": "staff_principal",
+      "role_family": "data_ml",
+      "scope_expectation": "Sets data and modeling direction across teams, for example for pricing or lending."
+    }
+  ],
+  "persona": {
+    "tone": "Friendly, collaborative and low-ego; treats the interview as working together, not a trick",
+    "pace": "Moderate; lets the candidate think out loud and builds the problem in steps",
+    "pushback_style": "Probes failure modes and correctness ('what if the network times out?', 'could this charge twice?') and asks how the user or seller actually benefited",
+    "closing_style": "Saves a few minutes at the end for the candidate's questions about the team and the work"
+  },
+  "scoring_weights": {
+    "ownership": 1.3,
+    "impact": 1.2,
+    "collaboration": 1.3,
+    "communication": 1.3,
+    "learning_from_failure": 1.1,
+    "depth_of_experience": 1.3,
+    "judgment": 1.2,
+    "technical_depth": 1.2,
+    "accuracy": 1.3,
+    "trade_offs": 1.3,
+    "problem_framing": 1.2,
+    "user_and_business_sense": 1.4,
+    "prioritization": 1.2
+  },
+  "values_share": 0.2,
+  "case_style": {
+    "product_sense": 0.5,
+    "estimation": 0.15,
+    "system_thinking": 0.35,
+    "notes": "PM and data cases start from Square sellers or Cash App customers: product improvement, metric choice and diagnosis (payment success, direct deposit, checkout conversion). Payments mechanics and risk often come up. Market sizing appears mainly for new-bet questions such as Bitkey or a new country."
+  },
+  "sources": [
+    {
+      "url": "https://block.xyz/careers",
+      "title": "Block careers",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "values_framework"
+      ]
+    },
+    {
+      "url": "https://block.xyz/csr/2023",
+      "title": "Block 2023 Corporate Social Responsibility Report",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "values_framework"
+      ]
+    },
+    {
+      "url": "https://developer.squareup.com/blog/ace-the-square-pairing-interview/",
+      "title": "Ace the Square pairing interview (Square Engineering blog, 2015)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "persona",
+        "values_framework"
+      ]
+    },
+    {
+      "url": "https://developer.squareup.com/blog/culture-fit/",
+      "title": "Culture Fit (Square Engineering blog, 2013)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "values_framework",
+        "loop_structure",
+        "persona"
+      ]
+    },
+    {
+      "url": "https://developer.squareup.com/blog/pair-programming-interviews-part-ii/",
+      "title": "Pair Programming Interviews, Part II (Square Engineering blog, 2013)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "persona"
+      ]
+    },
+    {
+      "url": "https://developer.squareup.com/blog/squares-updated-growth-framework-for-engineers-and-engineering-managers/",
+      "title": "Square's updated growth framework for engineers and engineering managers (2023)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "bar_by_level"
+      ]
+    },
+    {
+      "url": "https://siliconangle.com/2026/02/26/block-rallies-dorsey-slashes-40-workforce-ai-native-reset-earnings-top-estimates/",
+      "title": "Block cuts 40% of workforce in AI-native reset (SiliconANGLE, Feb 2026)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "values_framework"
+      ]
+    },
+    {
+      "url": "https://www.techprep.app/blog/block-interview-process",
+      "title": "Block's interview process (TechPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns",
+        "values_framework"
+      ]
+    },
+    {
+      "url": "https://www.jointaro.com/interviews/companies/block/experiences/software-engineer-united-states-july-22-2020-declined-offer-positive-4ac40996/",
+      "title": "Block software engineer interview experience (Taro)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns",
+        "persona"
+      ]
+    },
+    {
+      "url": "https://articles.shadecoder.com/block-software-engineer-interview-process-every-round-explained-2026",
+      "title": "Block software engineer interview process (ShadeCoder)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns"
+      ]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/block/software-engineer",
+      "title": "Block (Square) software engineer interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "question_patterns",
+        "bar_by_level",
+        "scoring_weights"
+      ]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/block/product-manager",
+      "title": "Block (Square) product manager interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns",
+        "case_style"
+      ]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/block/data-scientist",
+      "title": "Block (Square) data scientist interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns",
+        "bar_by_level"
+      ]
+    },
+    {
+      "url": "https://interviewkickstart.com/blogs/interview-questions/square-product-manager-interview-questions",
+      "title": "Square product manager interview questions (Interview Kickstart)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns",
+        "case_style"
+      ]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "low",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "low"
+  },
+  "low_confidence_notes": [
+    "values_framework: Block publishes no single values list for candidates. 'Economic empowerment' and 'Simple, powerful tools' come from block.xyz; 'Customer empathy' from prep guides; 'Kind, curious collaboration' from 2013-2015 Square engineering blog posts; A 'lean and accountable' value was considered from Feb 2026 restructuring coverage but left out, since it is not a Block-published value. values_share is set low at 0.2.",
+    "loop_structure: Cash App's official candidate hub pages now redirect to the jobs board and could not be read; round order and durations other than the one-hour pairing session come from prep sites and candidate reports, and vary by team. PM and data loops are thinly sourced.",
+    "bar_by_level: Block's numeric levels (L3-L7) come from levels.fyi URLs and forum posts; the mapping L5=senior, L6=staff, L7=senior staff is community opinion. The official career ladder PDF was not read. PM and data level names are titles from job postings, not an official ladder.",
+    "persona: inferred from Square's pairing-interview blog posts (2011-2015) and candidate reports; the process may have changed after the 2024-2026 layoffs and the move to smaller, AI-heavy teams.",
+    "scoring_weights: our estimate, weighted toward correctness, collaboration and user sense based on prep-guide themes; no public source gives weights.",
+    "case_style: no official PM or data case guidance found; the mix is our estimate from aggregated question lists.",
+    "sample_questions: most questions come from CleverPrep and TechPrep aggregations of candidate reports, not from Block itself."
+  ]
+}

@@ -1,0 +1,890 @@
+{
+  "company_name": "PayPal",
+  "company_slug": "paypal",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-28",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "PayPal core values and Leadership Principles",
+    "principles": [
+      {
+        "name": "Inclusion",
+        "description": "Respect different perspectives and backgrounds and welcome everyone, because diverse teams produce better ideas and execution.",
+        "evidence_signals": [
+          "Gives one concrete example of bringing in a quieter or different perspective",
+          "Designs for varied users, regions or accessibility needs",
+          "Changed a decision after hearing a view unlike their own"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Innovation",
+        "description": "Build great experiences for consumers, merchants and the wider community by thinking differently and looking at the whole journey from the customer's side.",
+        "evidence_signals": [
+          "Proposed a new approach instead of patching the old one",
+          "Looks at the end-to-end journey, not one screen or one service",
+          "Measured whether the new idea actually helped users"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Collaboration",
+        "description": "Work as one team: take ownership, make decisions and get results while building trust and integrity and breaking down silos.",
+        "evidence_signals": [
+          "Aligned another team, including risk, compliance or security, instead of working around them",
+          "Owns own part and decisions with 'I', credits the team with 'we'",
+          "Influenced a decision without formal authority"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "Wellness",
+        "description": "Look after each other's well-being and support a workplace with mental, physical and emotional balance.",
+        "evidence_signals": [
+          "Supported a struggling teammate in a concrete way",
+          "Delivered under pressure without burning out the team, and says how"
+        ],
+        "weight": 0.5
+      },
+      {
+        "name": "Put People First",
+        "description": "Develop future leaders, give and seek constructive feedback, and build a sense of belonging.",
+        "evidence_signals": [
+          "Mentored or grew someone, with a visible result",
+          "Asked for feedback and changed something because of it"
+        ],
+        "weight": 0.9
+      },
+      {
+        "name": "Work Customer Back",
+        "description": "Start from the customer's most pressing needs and solve them with technology and creative ideas so the experience feels simple and worthwhile.",
+        "evidence_signals": [
+          "Names the customer (consumer or merchant) and their pain before the solution",
+          "Chose customer trust, data integrity or reliability over the easy path",
+          "Measures results in customer terms such as failed payments or disputes"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "Win Together",
+        "description": "Move with velocity and an ownership mindset, operate as one PayPal, and deliver strong end-to-end results.",
+        "evidence_signals": [
+          "Drove a result end to end, including after launch",
+          "Moved fast while protecting correctness and risk controls",
+          "Quantifies the outcome"
+        ],
+        "weight": 1.2
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["T22", "T23", "T24", "T25", "T26", "T27"],
+      "rounds": [
+        {
+          "name": "Online assessment",
+          "interview_type": null,
+          "duration_min": 75,
+          "interviewer_role": "None (HackerRank)",
+          "notes": "Two or three easy-to-medium coding problems plus language and OOP basics. Not simulated in v1."
+        },
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, interest in PayPal and fintech, logistics. Not simulated in v1."
+        },
+        {
+          "name": "Technical screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Karat interviewer or PayPal engineer",
+          "notes": "Live coding while reasoning out loud. Not simulated in v1."
+        },
+        {
+          "name": "Coding and pair programming",
+          "interview_type": null,
+          "duration_min": 45,
+          "interviewer_role": "Software engineer",
+          "notes": "One or two onsite rounds; clean, tested code written together with the interviewer. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior software engineer",
+          "notes": "Payments-grade correctness: idempotency, ledgers, reconciliation, where fraud checks sit. Junior candidates get lighter product design; senior candidates get deeper distributed-systems design."
+        },
+        {
+          "name": "Project deep dive",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Senior engineer or engineering manager",
+          "notes": "About 20 minutes of follow-ups on one significant project: decisions, alternatives and own role. Mid and senior roles may get a techno-managerial angle (architecture, tech debt, cross-team dependencies)."
+        },
+        {
+          "name": "Behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineer or engineering manager",
+          "notes": "Accountability and collaboration recur across rounds; prep guides map questions to the core values."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager",
+          "notes": "Motivation, team fit and scope; mixes technical and behavioral questions."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": [],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager (product)",
+          "notes": "Product experience, decision making and payments domain knowledge; may walk through a product the candidate built."
+        },
+        {
+          "name": "Product strategy",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Senior product manager or product lead",
+          "notes": "Open-ended payments or fintech problem, for example improving checkout."
+        },
+        {
+          "name": "Analytics and metrics",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product manager or data scientist",
+          "notes": "Success metrics, A/B testing and diagnosing a metric drop such as checkout conversion."
+        },
+        {
+          "name": "Technical",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Engineer or engineering manager",
+          "notes": "No coding; system trade-offs, technical constraints and working with engineering."
+        },
+        {
+          "name": "Behavioral and cross-functional",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Designer, data scientist or another PM",
+          "notes": "STAR stories on conflict, influence without authority and data-driven decisions."
+        },
+        {
+          "name": "Executive",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Director or VP of Product",
+          "notes": "Long-term thinking, strategy and leadership."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": [],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 25,
+          "interviewer_role": "Recruiter",
+          "notes": "Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Data science or analytics manager",
+          "notes": "Past projects and how the candidate approaches business problems."
+        },
+        {
+          "name": "SQL and Python",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Data scientist",
+          "notes": "Live joins, aggregations, window functions and pandas work. Not simulated in v1."
+        },
+        {
+          "name": "Statistics and experimentation",
+          "interview_type": "technical_qa",
+          "duration_min": 50,
+          "interviewer_role": "Data scientist",
+          "notes": "A/B test design, hypothesis testing, confidence intervals; fraud-threshold trade-offs; ML fundamentals for risk roles."
+        },
+        {
+          "name": "Business and domain case",
+          "interview_type": "case",
+          "duration_min": 50,
+          "interviewer_role": "Senior data scientist",
+          "notes": "Verbal payments case, for example an authorization-rate drop or a fraud model for transactions."
+        },
+        {
+          "name": "Behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Data science leader",
+          "notes": "Conflict, ambiguity and influence without authority."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Owning a mistake",
+      "pattern": "A mistake that hurt customers or another team: detection, containment, communication, root cause and prevention",
+      "competencies": ["ownership", "learning_from_failure", "communication"],
+      "values": ["Win Together", "Collaboration"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Customer trust over convenience",
+      "pattern": "A time the candidate protected correctness, reliability or customer trust when an easier or faster path existed",
+      "competencies": ["ownership", "impact", "communication"],
+      "values": ["Work Customer Back"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Working with risk and compliance",
+      "pattern": "Working with compliance, risk, security or legal partners to ship something without weakening controls",
+      "competencies": ["collaboration", "conflict_handling"],
+      "values": ["Collaboration"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Incident under pressure",
+      "pattern": "Handling a production incident or hard deadline: first steps, communication and what was traded off",
+      "competencies": ["ownership", "communication", "impact"],
+      "values": ["Win Together"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Influence and inclusion",
+      "pattern": "Aligning a team or another group without authority while bringing in different perspectives",
+      "competencies": ["collaboration", "conflict_handling", "communication"],
+      "values": ["Collaboration", "Inclusion"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Growing people",
+      "pattern": "Helping a struggling teammate or acting on hard feedback, with a visible change",
+      "competencies": ["collaboration", "learning_from_failure"],
+      "values": ["Put People First", "Wellness"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Significant project",
+      "pattern": "Walk through the most significant project: decisions, alternatives considered, own role and outcome, under deep follow-up",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Win Together"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Why PayPal",
+      "pattern": "Motivation tied to PayPal's specific problems: two-sided consumer and merchant network, fraud at scale, reliable money movement",
+      "competencies": ["motivation", "role_fit", "team_fit"],
+      "values": ["Work Customer Back"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Payments correctness",
+      "pattern": "Design a payment, wallet or ledger flow that stays correct under retries, timeouts and partial failure",
+      "competencies": ["technical_depth", "accuracy", "trade_offs", "reasoning"],
+      "values": ["Work Customer Back"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Risk in the transaction path",
+      "pattern": "Place fraud and risk decisions in a real-time payment path while balancing latency, losses and customer friction",
+      "competencies": ["technical_depth", "trade_offs", "reasoning", "clarity_of_explanation"],
+      "values": ["Work Customer Back", "Innovation"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Fraud model evaluation",
+      "pattern": "Evaluate or design a fraud or risk model: labels, delays, class imbalance, metrics and thresholds",
+      "competencies": ["technical_depth", "accuracy", "trade_offs"],
+      "values": ["Innovation"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Checkout friction versus risk",
+      "pattern": "Improve a checkout or payment experience for a segment without raising fraud or compliance risk",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["Work Customer Back", "Innovation"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Payments metric diagnosis",
+      "pattern": "A payments metric such as checkout conversion or authorization rate dropped; find the cause and act",
+      "competencies": ["problem_framing", "structure", "prioritization"],
+      "values": ["Win Together"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "New payment product",
+      "pattern": "Design a payment product for an underserved user group or market, with success metrics",
+      "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
+      "values": ["Innovation", "Inclusion"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a mistake you made that affected customers or another team. What happened next?",
+      "strong_answer": "Own the error plainly with no blame on other teams. Tell it like an incident report: how it was detected (ideally by you), how fast it was contained, who was told and when, the honest root cause, and the structural fix that stops it recurring (a test, alert or process). Quantify impact in trust terms such as transactions affected or recovery time. Pitfalls: a trivial mistake, vague 'we' with no own role, or no prevention step.",
+      "competencies": ["ownership", "learning_from_failure", "communication"],
+      "values": ["Win Together", "Collaboration"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-paypal-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "Whether you own mistakes without blaming others",
+          "How you contain, communicate and prevent recurrence"
+        ],
+        "strong_signals": [
+          "You detected it and contained it fast",
+          "Told affected people early",
+          "Built a structural fix such as a test or alert"
+        ],
+        "watch_outs": [
+          "A trivial or disguised mistake",
+          "No prevention step"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you pushed back on shipping something you thought was risky, or chose the right thing for customers over the easy path.",
+      "strong_answer": "Name the risk concretely (data integrity, double charges, reliability, a missing control) and who would be hurt. Show the reasoning and evidence used to push back, the alternative proposed so the goal was still met, and how the disagreement was handled respectfully. End with the outcome and what it protected. Pitfalls: blocking without an alternative, or a risk that was only hypothetical.",
+      "competencies": ["ownership", "conflict_handling", "communication"],
+      "values": ["Work Customer Back"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-paypal-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "Whether you put customer trust ahead of convenience",
+          "How you push back constructively"
+        ],
+        "strong_signals": [
+          "Names a concrete risk and who it would hurt",
+          "Offers an alternative that still meets the goal",
+          "Shows what the decision protected"
+        ],
+        "watch_outs": [
+          "Blocking with no alternative",
+          "A purely hypothetical risk"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about working with a compliance, risk or security team on something you were building.",
+      "strong_answer": "Show the requirement the partner team brought and why it mattered, how the candidate learned their constraints early, and how they found a design that met the control and the product goal together. Mention trade-offs and how decisions were documented. Strong answers treat these teams as partners, not obstacles. Pitfalls: describing them as blockers, or finding a way around the control.",
+      "competencies": ["collaboration", "conflict_handling", "communication"],
+      "values": ["Collaboration"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-paypal-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "How you work with non-engineering control functions",
+          "Whether you meet controls and goals together"
+        ],
+        "strong_signals": [
+          "Learned their constraints early",
+          "Found a design that satisfied both sides",
+          "Treats them as partners"
+        ],
+        "watch_outs": [
+          "Calling them blockers",
+          "Working around a control"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Walk me through how you handled a production incident. What did you do in the first half hour?",
+      "strong_answer": "Order matters: contain the damage first (rollback, feature flag, failover), communicate status to stakeholders, then diagnose. Give the timeline, the candidate's own role, the impact in numbers, and the follow-up: postmortem, root cause and the fix that prevents a repeat. Pitfalls: debugging for an hour before mitigating, or no communication.",
+      "competencies": ["ownership", "communication", "impact"],
+      "values": ["Win Together"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-paypal-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "Whether you contain before you diagnose",
+          "How you communicate during an incident"
+        ],
+        "strong_signals": [
+          "Rolls back or flags off first",
+          "Keeps stakeholders updated",
+          "Follows up with a postmortem and fix"
+        ],
+        "watch_outs": [
+          "Debugging for a long time before mitigating",
+          "No communication"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you influenced a decision you did not own, or resolved a conflict with a teammate.",
+      "strong_answer": "Set out the decision, who owned it and why it mattered. Show how the candidate understood the other side, built the case with data, invited other views, and found shared goals. State the result, including if they were overruled and committed anyway. Pitfalls: winning by escalation, or a story where the other person was simply wrong.",
+      "competencies": ["collaboration", "conflict_handling", "communication"],
+      "values": ["Collaboration", "Inclusion"],
+      "source_url": "https://www.joinleland.com/library/a/paypal-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you influence without authority",
+          "Whether you listen to other views"
+        ],
+        "strong_signals": [
+          "Builds the case with data",
+          "States the other side fairly",
+          "Commits even when overruled"
+        ],
+        "watch_outs": [
+          "Winning by escalation",
+          "The other person was simply wrong"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you did not achieve as much as you had planned. What did you learn?",
+      "strong_answer": "Give the original goal and why it seemed achievable, then the honest reasons it fell short, including the candidate's own part. Show what they communicated when it became clear, what they salvaged, and what they do differently now, ideally with a later example. Pitfalls: blaming others, or a humble-brag where the shortfall was minor.",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Put People First"],
+      "source_url": "https://prepfully.com/interview-guides/paypal-software-engineer",
+      "hints": {
+        "looking_for": [
+          "How honestly you reflect on falling short",
+          "What you changed afterwards"
+        ],
+        "strong_signals": [
+          "Owns your part of the shortfall",
+          "Communicated early when it slipped",
+          "Gives a later example of the lesson"
+        ],
+        "watch_outs": [
+          "Blaming others",
+          "A humble-brag"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why do you want to work at PayPal?",
+      "strong_answer": "Tie the answer to PayPal's specific problems: fraud and risk at network scale, reliable money movement, and serving both consumers and merchants across products. Link those to the candidate's past work and what they want to learn or own next. Pitfalls: generic fintech enthusiasm, or only brand and compensation.",
+      "competencies": ["motivation", "role_fit", "team_fit"],
+      "values": ["Work Customer Back"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-paypal-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "Whether you know PayPal's actual problems",
+          "How your experience fits them"
+        ],
+        "strong_signals": [
+          "Names problems like fraud at scale or reliable money movement",
+          "Mentions both consumers and merchants",
+          "Links them to your past work"
+        ],
+        "watch_outs": [
+          "Generic fintech enthusiasm",
+          "Only brand or pay"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Walk me through your most significant project: the decisions you made, the alternatives you rejected, and your specific role.",
+      "strong_answer": "Give a short summary of the goal and scale, then the two or three hardest decisions with the options considered and why one won. Be clear about own role versus the team's. Quantify the outcome and say what you would change. Be ready for 20 minutes of follow-ups, so know the details (numbers, failure modes, design choices). Pitfalls: a tour of the architecture with no decisions, or unclear personal contribution.",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Win Together"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-is-the-paypal-interview-process-like-round-by-round",
+      "hints": {
+        "looking_for": [
+          "The depth of your real work",
+          "How you made and justified key decisions"
+        ],
+        "strong_signals": [
+          "Explains alternatives and why one won",
+          "Clear about your own role",
+          "Holds up under detailed follow-ups"
+        ],
+        "watch_outs": [
+          "An architecture tour with no decisions",
+          "Unclear personal contribution"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a payment processing flow that never charges a customer twice, even when clients retry after timeouts.",
+      "strong_answer": "Use client-supplied idempotency keys stored with the request hash and result, checked atomically before processing. Model the payment as a state machine (created, authorized, captured, failed) persisted before calling the processor. Handle unknown outcomes from the processor with status queries rather than blind retries. Discuss key expiry, concurrent duplicates (unique constraint or lock), and returning the stored result on replay. Pitfalls: relying on the client not to retry, or checking and writing the key non-atomically.",
+      "competencies": ["technical_depth", "accuracy", "trade_offs", "reasoning"],
+      "values": ["Work Customer Back"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-is-the-paypal-interview-process-like-round-by-round",
+      "hints": {
+        "looking_for": [
+          "How you prevent duplicate charges under retries",
+          "Whether you handle unknown processor outcomes"
+        ],
+        "strong_signals": [
+          "Uses idempotency keys checked atomically",
+          "Models payments as a persisted state machine",
+          "Queries status instead of retrying blindly"
+        ],
+        "watch_outs": [
+          "Assuming clients never retry",
+          "Non-atomic check and write of the key"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you keep a ledger correct and reconcile it with an external processor's records?",
+      "strong_answer": "Use a double-entry, append-only ledger where every movement is balanced debits and credits and corrections are new entries, never edits. Get exactly-once effects through idempotent writes keyed on a transaction id plus an outbox or transactional messaging, not distributed transactions. Reconcile on a schedule by matching internal entries to processor settlement files, classify mismatches (missing, duplicate, amount, timing), and route them to automated fixes or review. Pitfalls: mutable balances with no history, or assuming exactly-once delivery from a message queue.",
+      "competencies": ["technical_depth", "accuracy", "trade_offs"],
+      "values": ["Work Customer Back", "Win Together"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-is-the-paypal-interview-process-like-round-by-round",
+      "hints": {
+        "looking_for": [
+          "How you keep money records correct and auditable",
+          "Whether you know how reconciliation works"
+        ],
+        "strong_signals": [
+          "Double-entry, append-only ledger",
+          "Idempotent writes plus an outbox",
+          "Classifies reconciliation mismatches"
+        ],
+        "watch_outs": [
+          "Mutable balances with no history",
+          "Trusting exactly-once delivery from a queue"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": ["mid", "senior", "staff_principal"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Where would you put fraud checks in the path of a payment, and how do you keep them from slowing checkout down?",
+      "strong_answer": "Split checks by latency budget: cheap synchronous rules and a real-time model score before authorization, with features precomputed in a low-latency store; heavier analysis asynchronously after. Use tiered decisions (approve, step-up authentication, review, decline) instead of a binary block. Define fallback behaviour when the risk service is slow or down, and log decisions for labels and audit. Discuss the cost of false positives on good customers. Pitfalls: one big synchronous call with no timeout, or ignoring the customer cost of declines.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning", "clarity_of_explanation"],
+      "values": ["Work Customer Back", "Innovation"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-is-the-paypal-interview-process-like-round-by-round",
+      "hints": {
+        "looking_for": [
+          "How you fit risk checks into a latency budget",
+          "Whether you weigh fraud loss against customer friction"
+        ],
+        "strong_signals": [
+          "Synchronous fast checks, asynchronous heavy ones",
+          "Tiered decisions including step-up authentication",
+          "A fallback when the risk service fails"
+        ],
+        "watch_outs": [
+          "One slow synchronous call with no timeout",
+          "Ignoring false-positive cost"
+        ]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you evaluate a fraud detection model once it is in production?",
+      "strong_answer": "Define the positive class (confirmed fraud) and note labels arrive late through chargebacks and disputes, and first-party fraud labels are noisy. Use precision, recall, PR-AUC and calibration rather than accuracy given class imbalance, plus business metrics: fraud loss rate, dollars prevented, approval rate, false-positive cost and review queue volume. Validate on time-based splits that respect label maturity, monitor drift, and set thresholds by segment. Pitfalls: reporting accuracy, or ignoring label delay.",
+      "competencies": ["technical_depth", "accuracy", "trade_offs"],
+      "values": ["Innovation"],
+      "source_url": "https://prachub.com/interview-questions/explain-fraud-types-and-evaluate-a-fraud-model",
+      "hints": {
+        "looking_for": [
+          "Whether you handle class imbalance and late labels",
+          "How you link ML metrics to business loss"
+        ],
+        "strong_signals": [
+          "Uses precision, recall and PR-AUC, not accuracy",
+          "Adds fraud loss and approval rate",
+          "Time-based validation that respects label delay"
+        ],
+        "watch_outs": [
+          "Reporting accuracy",
+          "Ignoring chargeback delay"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you reduce friction in checkout without weakening fraud detection?",
+      "strong_answer": "Clarify the checkout (consumer wallet, guest, merchant integration) and the goal metric (conversion) with guardrails (fraud loss rate, chargebacks). Map the funnel and find where good users drop (login, step-up, declines). Propose risk-based friction: skip steps for low-risk trusted devices, step up only high-risk sessions, improve decline messaging. Prioritize, recommend one, and test with a holdout watching fraud loss. Pitfalls: removing checks across the board, or no guardrail metric.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["Work Customer Back", "Innovation"],
+      "source_url": "https://www.joinleland.com/library/a/paypal-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you balance conversion against fraud risk",
+          "Whether you set guardrail metrics"
+        ],
+        "strong_signals": [
+          "Finds where good users drop in the funnel",
+          "Uses risk-based friction",
+          "Tests with fraud loss as a guardrail"
+        ],
+        "watch_outs": [
+          "Removing checks for everyone",
+          "No guardrail metric"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Checkout conversion or card authorization rate dropped this week. How would you figure out why?",
+      "strong_answer": "Confirm the metric definition and that the data is right, and whether the drop is sudden or gradual. Segment by merchant, region, payment method, card network or issuer, device and app version. Check internal changes (releases, risk rules, model thresholds) and external ones (issuer outages, network changes, seasonality, fraud attacks). Rank hypotheses, name the data that tests each, and propose actions such as rolling back a rule. Pitfalls: listing causes with no structure, or skipping data checks.",
+      "competencies": ["problem_framing", "structure", "prioritization"],
+      "values": ["Win Together"],
+      "source_url": "https://prachub.com/interview-guide/paypal-data-scientist-interview-guide",
+      "hints": {
+        "looking_for": [
+          "How you structure a metric investigation",
+          "Whether you check risk-rule and issuer causes"
+        ],
+        "strong_signals": [
+          "Confirms data and definition first",
+          "Segments by issuer, region and method",
+          "Ranks hypotheses with the data to test each"
+        ],
+        "watch_outs": [
+          "Random causes with no structure",
+          "Skipping data checks"
+        ]
+      },
+      "role_families": ["pm", "data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Design a payment product for freelancers in Southeast Asia.",
+      "strong_answer": "Clarify the goal and pick a segment (for example freelancers paid by overseas clients). List their pains: slow cross-border payouts, fees, currency conversion, local bank access, invoicing and trust. Consider regulation and local payment methods. Generate options, prioritize by impact and feasibility, recommend one, and define success metrics (active payees, payout time, retention) with guardrails such as fraud and support contacts. Pitfalls: ignoring local constraints, or features before users.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["Innovation", "Inclusion"],
+      "source_url": "https://www.joinleland.com/library/a/paypal-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you understand the user and market first",
+          "How you account for local and regulatory constraints"
+        ],
+        "strong_signals": [
+          "Picks one freelancer segment and its pains",
+          "Considers local payment methods and regulation",
+          "Defines success and guardrail metrics"
+        ],
+        "watch_outs": [
+          "Ignoring local constraints",
+          "Features before users"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you choose the score threshold for blocking transactions when both fraud losses and false declines cost money?",
+      "strong_answer": "Frame expected cost: fraud loss from missed fraud versus lost margin, customer churn and support cost from declining good users. Estimate each with rough numbers, then pick the threshold that minimizes total cost, possibly with different thresholds by segment or amount. Use tiers (step-up or review between approve and decline) and account for review capacity. Validate with a test and monitor as fraud adapts. Pitfalls: maximizing accuracy, or valuing a false decline at zero.",
+      "competencies": ["problem_framing", "estimation_logic", "recommendation"],
+      "values": ["Work Customer Back"],
+      "source_url": "https://prachub.com/interview-guide/paypal-data-scientist-interview-guide",
+      "hints": {
+        "looking_for": [
+          "How you turn a threshold into a cost trade-off",
+          "Whether you value the cost of false declines"
+        ],
+        "strong_signals": [
+          "Frames total expected cost",
+          "Uses tiers and segment thresholds",
+          "Accounts for review capacity"
+        ],
+        "watch_outs": [
+          "Maximizing accuracy",
+          "Treating false declines as free"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "T22",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Software Engineer 1: delivers well-defined tasks with guidance; coding-heavy loop with light product design."
+    },
+    {
+      "level_name": "T23",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Software Engineer 2: owns features within a team and writes production-ready, tested code with little guidance."
+    },
+    {
+      "level_name": "T24",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Senior Software Engineer: owns services end to end, designs for payments-grade correctness, and handles cross-team dependencies and tech debt."
+    },
+    {
+      "level_name": "T25",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Staff Software Engineer 1: leads technical direction for a set of services or a domain across teams."
+    },
+    {
+      "level_name": "T26",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Staff Software Engineer 2: drives architecture across several teams and influences platform choices."
+    },
+    {
+      "level_name": "T27",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Senior Staff Software Engineer: sets technical strategy for an organization."
+    }
+  ],
+  "persona": {
+    "tone": "Professional, friendly and methodical",
+    "pace": "Moderate; spends time on follow-ups about one story or design rather than covering many",
+    "pushback_style": "Asks 'why that choice?', 'what if the call times out?', 'how many transactions were affected?' and 'what stops it happening again?'; probes correctness and risk",
+    "closing_style": "Leaves a few minutes for the candidate's questions"
+  },
+  "scoring_weights": {
+    "ownership": 1.3,
+    "collaboration": 1.3,
+    "communication": 1.2,
+    "learning_from_failure": 1.1,
+    "judgment": 1.2,
+    "depth_of_experience": 1.2,
+    "accuracy": 1.3,
+    "trade_offs": 1.3,
+    "technical_depth": 1.2,
+    "user_and_business_sense": 1.2,
+    "problem_framing": 1.2
+  },
+  "values_share": 0.25,
+  "case_style": {
+    "product_sense": 0.45,
+    "estimation": 0.15,
+    "system_thinking": 0.4,
+    "notes": "Cases are payments and fintech problems: checkout friction versus fraud risk, metric drops such as conversion or authorization rate, new payment products. Data cases add fraud-threshold cost trade-offs. Market sizing is rare."
+  },
+  "sources": [
+    {
+      "url": "https://about.pypl.com/who-we-are/mission-vision-values/default.aspx",
+      "title": "Mission, vision and values (PayPal)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "persona"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/what-is-the-paypal-interview-process-like-round-by-round",
+      "title": "What is the PayPal interview process like, round by round (Design Gurus)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/top-paypal-behavioral-interview-questions-and-how-to-answer-them",
+      "title": "Top PayPal behavioral interview questions (Design Gurus)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["question_patterns", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://www.techprep.app/blog/paypal-interview-process",
+      "title": "PayPal's interview process (TechPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "bar_by_level"]
+    },
+    {
+      "url": "https://prepfully.com/interview-guides/paypal-software-engineer",
+      "title": "PayPal software engineer interview guide (Prepfully)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "bar_by_level", "scoring_weights"]
+    },
+    {
+      "url": "https://www.joinleland.com/library/a/paypal-product-manager-interview",
+      "title": "PayPal product manager interview (Leland)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style", "scoring_weights"]
+    },
+    {
+      "url": "https://prachub.com/interview-guide/paypal-data-scientist-interview-guide",
+      "title": "PayPal data scientist interview guide (PracHub)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://prachub.com/interview-questions/explain-fraud-types-and-evaluate-a-fraud-model",
+      "title": "Explain fraud types and evaluate a fraud model (PracHub)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["question_patterns"]
+    },
+    {
+      "url": "https://www.thesalarynegotiator.com/paypal-software-engineer-salary",
+      "title": "PayPal software engineer levels and salary (The Salary Negotiator)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "medium"
+  },
+  "low_confidence_notes": [
+    "values_framework: the four core values and three Leadership Principles come from PayPal's official mission page; older filings list seven longer Leadership Principles, so wording may change again. Wellness is hard to probe in an interview and has a low weight.",
+    "loop_structure: rounds and durations come from prep sites and vary by team, level and location; PM and data_ml loops rest on one prep site each, and no official PayPal interview prep page was reachable.",
+    "bar_by_level: T22 to T27 titles come from one third-party salary site (levels.fyi pages did not load); scope text is our summary. No PM or data_ml level labels were sourced, so those loops list no levels.",
+    "persona: inferred from prep-guide advice about follow-ups; no public description of PayPal interviewer style.",
+    "scoring_weights: our estimate from recurring themes (accountability, collaboration, payments correctness); no source gives weights.",
+    "sample_questions: data_ml questions come from PracHub, a prep site that aggregates candidate reports; the checkout and freelancer cases come from Leland's PM guide."
+  ]
+}
