@@ -3,7 +3,7 @@
  *
  * - CO-7 (UI): the story's takes, newest first, each with its date, channel and per-skill scores
  *   (1 to 4). "Record a take" stores a typed take and the list polls until it is scored. Spoken
- *   takes come from the coach's voice room (CO-6) once its join endpoint is built.
+ *   takes come from the coach's voice room (CO-6).
  * - CO-8 (UI): the coach's 60-second and full versions, written on request from the candidate's
  *   own words, with a toggle between them. They are not stored.
  * - "Work on it with the coach" opens a coach session on this story.

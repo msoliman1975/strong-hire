@@ -6,6 +6,7 @@
     POST /coach/sessions/{id}/turns         a candidate turn and the coach's reply
     POST /coach/sessions/{id}/style         switch gentle or direct (CO-5)
     POST /coach/sessions/{id}/end           end it and record its minutes
+    POST /coach/sessions/{id}/voice/join    CO-6: a LiveKit token for the room coach-<id>
     GET  /stories/{id}/coach-sessions       a story's coach sessions, newest first
     POST /internal/coach/sessions/{id}/turns   the voice agent's turn (CO-6, shared token)
     POST /internal/coach/sessions/{id}/end     the voice agent ends a session (shared token)
@@ -15,9 +16,12 @@ place to live; it is deleted again when the session ends with no part filled. Th
 story parts only through the turn logic in `strong_api.coach.engine` (CO-3).
 
 Starting a session answers 503 while new sessions on its channel are paused or the daily spend
-cap is reached (OC-2, OC-3). Coach sessions record minutes on the coach session row and usage
-events with role `coach`, like any session; they do not use plan minutes (billing rules for coach
-time are undecided).
+cap is reached (OC-2, OC-3). The voice join (CO-6) moves a text session to voice, since the coach
+page starts in text and the mic switches to talking; that move is a new voice start and checks the
+voice controls. A rejoin of a session already on voice always may (as IV-9 for interviews).
+
+Coach sessions record minutes on the coach session row and usage events with role `coach`, like
+any session; they do not use plan minutes (billing rules for coach time are undecided).
 """
 
 from __future__ import annotations
@@ -26,10 +30,11 @@ import asyncio
 import hmac
 import logging
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header, HTTPException, status
+from livekit import api as livekit_api
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -46,6 +51,7 @@ from strong_api.coach.schemas import (
 )
 from strong_api.controls import ensure_sessions_open
 from strong_api.inputs.deps import Db, Me
+from strong_api.sessions.schemas import VoiceJoin
 from strong_api.sessions.settings import (
     TextSessionSettings,
     VoiceSessionSettings,
@@ -59,6 +65,7 @@ from strong_core.schemas import (
     CoachSessionStatus,
     CoachSpeaker,
     Competency,
+    SessionChannel,
     Story,
     StoryNote,
     StorySource,
@@ -69,6 +76,7 @@ from strong_core.sim import gateway_for_org
 log = logging.getLogger(__name__)
 
 NEW_STORY_TITLE = "Untitled story"
+COACH_ROOM_PREFIX = "coach-"  # the voice agent runs the coach in rooms named like this
 TextSettings = Annotated[TextSessionSettings, Depends(get_text_session_settings)]
 VoiceSettings = Annotated[VoiceSessionSettings, Depends(get_voice_session_settings)]
 
@@ -324,6 +332,39 @@ async def _end(db: AsyncSession, session: CoachSession) -> CoachSessionDetail:
 async def end_coach_session(session_id: uuid.UUID, db: Db, me: Me) -> CoachSessionDetail:
     """End the session and record its minutes. Ending twice is harmless."""
     return await _end(db, await _owned(db, me, session_id, lock=True))
+
+
+@router.post("/coach/sessions/{session_id}/voice/join")
+async def join_coach_voice(
+    session_id: uuid.UUID, db: Db, me: Me, settings: VoiceSettings
+) -> VoiceJoin:
+    """CO-6: a LiveKit token for the coach's voice room. Call it again after a dropped
+    connection: the room stays the same and the coach goes on from the last turn."""
+    session = await _owned(db, me, session_id, lock=True)
+    if session.status != CoachSessionStatus.ACTIVE:
+        raise HTTPException(status.HTTP_409_CONFLICT, "The coach session has ended.")
+    if session.channel != SessionChannel.VOICE:
+        await ensure_sessions_open(db, SessionChannel.VOICE)  # OC-2, OC-3: a new voice start
+        session.channel = SessionChannel.VOICE
+        await db.commit()
+    room = f"{COACH_ROOM_PREFIX}{session.id}"
+    identity = f"candidate-{me.user_id}"
+    grants = livekit_api.VideoGrants(
+        room_join=True, room=room, can_publish=True, can_subscribe=True, can_publish_data=True
+    )
+    token = (
+        livekit_api.AccessToken(
+            settings.livekit_api_key, settings.livekit_api_secret.get_secret_value()
+        )
+        .with_identity(identity)
+        .with_name("Candidate")
+        .with_grants(grants)
+        .with_ttl(timedelta(minutes=settings.token_ttl_minutes))
+        .to_jwt()
+    )
+    return VoiceJoin(
+        livekit_url=settings.livekit_public_url, room=room, token=token, identity=identity
+    )
 
 
 @router.get("/stories/{story_id}/coach-sessions", response_model=list[CoachSessionOut])

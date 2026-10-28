@@ -192,6 +192,17 @@ async def test_qb1_filters(client: httpx.AsyncClient, bank: None) -> None:
     assert (await client.get("/questions", params={"interview_type": "custom"})).status_code == 422
 
 
+async def test_rs1_recruiter_screen_filter_lists_no_bank_questions(
+    client: httpx.AsyncClient, bank: None
+) -> None:
+    """RS-1: recruiter_screen is a valid type filter. The bank holds no recruiter screen
+    questions yet (general.json and the profiles have the four standard types only)."""
+    resp = await client.get("/questions", params={"interview_type": "recruiter_screen"})
+    assert resp.status_code == 200, resp.text
+    body = resp.json()
+    assert body["company_questions"] == [] and body["general_questions"] == []
+
+
 async def test_qb1_needs_sign_in(anon_client: httpx.AsyncClient) -> None:
     """QB-1: signed-in users only."""
     assert (await anon_client.get("/questions")).status_code == 401

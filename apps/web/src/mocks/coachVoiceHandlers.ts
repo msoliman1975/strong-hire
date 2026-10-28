@@ -1,6 +1,7 @@
 /**
- * MSW handler for the coach room's voice join (CO-6, S32). The API endpoint is planned; until it
- * lands this answers with the "mock:" URL, and useCoachVoice then uses its scripted mock room.
+ * MSW handler for the coach room's voice join (CO-6), the shape of strong_api.coach's
+ * POST /coach/sessions/{id}/voice/join. Only the mocks (VITE_API_MOCKS=all and tests) use it: it
+ * answers with the "mock:" URL, so useCoachVoice uses its scripted room instead of LiveKit.
  */
 import { http, HttpResponse } from "msw/http";
 
