@@ -6,7 +6,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from strong_core.schemas import Competency, Level, QuestionHints, RoleFamily, StandardType
+from strong_core.schemas import BankType, Competency, Level, QuestionHints, RoleFamily
 
 QuestionSource = Literal["company", "general"]
 
@@ -28,7 +28,7 @@ class BankQuestion(_Out):
     source: QuestionSource
     company_slug: str | None = Field(description="None for general questions.")
     company_name: str | None
-    interview_type: StandardType
+    interview_type: BankType
     question: str
     competencies: list[Competency]
     values: list[str] = Field(description="Company values the question probes.")

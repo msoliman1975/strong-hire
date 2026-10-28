@@ -59,7 +59,8 @@
             "behavioral",
             "hiring_manager",
             "technical_qa",
-            "case"
+            "case",
+            "recruiter_screen"
           ],
           "type": "string"
         },

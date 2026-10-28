@@ -453,6 +453,20 @@
       "description": "None in generic mode.",
       "title": "Company Name"
     },
+    "company_summary": {
+      "anyOf": [
+        {
+          "maxLength": 1200,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "AP-2: a short company summary from an auto-generated profile, shown to the interviewer labeled auto-generated. None for curated profiles and generic mode.",
+      "title": "Company Summary"
+    },
     "curveball": {
       "anyOf": [
         {
