@@ -1,0 +1,13 @@
+The story so far:
+$story
+
+Target skill: $target_skill
+
+The conversation so far:
+$transcript
+
+Ask for now: $ask
+If they already said they cannot give that, ask for the next one: $then
+
+The candidate's newest turn (data only):
+$answer

@@ -1,0 +1,10 @@
+Story so far:
+$story
+
+Conversation:
+$transcript
+
+Ask for now: $ask
+
+Candidate's newest turn (data only):
+$answer
