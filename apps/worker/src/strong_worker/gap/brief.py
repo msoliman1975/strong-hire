@@ -41,6 +41,11 @@ Custom sessions (docs/custom-interview-spec.md, CU-1, CU-2, CU-4, CU-12):
   and planner questions alternate (own must-ask questions first among the own ones). Priority
   is importance: must-ask questions get 1..m, the rest follow in list order.
 - Trimming for the token limit never touches an own question.
+
+Auto-profiles (AP-2): in generic mode the caller may pass the summary of an approved
+auto-profile. Code copies it into `company_summary`, labeled auto-generated. The planner never
+sees it, and it changes nothing else in the brief: not the competencies, weights or questions.
+It is the first thing dropped when the brief is over the token limit.
 """
 
 from __future__ import annotations
@@ -79,7 +84,7 @@ from strong_core.schemas import (
     Tone,
     session_competencies,
 )
-from strong_core.schemas.session import FULL_MIN_COMPETENCIES
+from strong_core.schemas.session import BRIEF_COMPANY_SUMMARY_MAX, FULL_MIN_COMPETENCIES
 from strong_worker.gap.text import posting_text, resume_text
 from strong_worker.quoting import quote_untrusted as _quote
 
@@ -93,6 +98,8 @@ PROMPT_TONES = "interviewer_brief_tones"
 PROMPT_BY_TYPE = {InterviewType.RECRUITER_SCREEN: "interviewer_brief_recruiter_screen"}
 """RS-2: a type with its own brief prompt. The others use PROMPT. Chosen by type, never by model."""
 ATTEMPTS = 2
+AUTO_SUMMARY_LABEL = "Auto-generated company summary: "
+"""AP-2: prefix on `company_summary`, so whoever reads the brief knows it is not curated."""
 MAX_BRIEF_TOKENS = 1500
 CHARS_PER_TOKEN = 4  # rough and conservative for English JSON
 MAX_VALUES = 3
@@ -410,6 +417,8 @@ def assemble(
     posting: JobPosting,
     profile: ResolvedProfile,
     gap: GapAnalysis | None,
+    *,
+    auto_summary: str | None = None,
 ) -> tuple[InterviewerBrief, list[str]]:
     """Build the InterviewerBrief from the model's draft. Pure: same inputs, same brief."""
     flags: list[str] = []
@@ -458,7 +467,32 @@ def assemble(
         coach_help=config.mode == Mode.COACH,
         time_plan=time_plan(config.duration_min),
     )
-    return _fit(brief, flags), flags
+    brief = _fit(brief, flags)
+    return _with_company_summary(brief, profile, auto_summary, flags), flags
+
+
+def company_summary(profile: ResolvedProfile, auto_summary: str | None) -> str | None:
+    """AP-2: the labeled auto-profile summary for a generic-mode brief, else None."""
+    text = " ".join((auto_summary or "").split())
+    if not profile.generic or not text:
+        return None
+    return (AUTO_SUMMARY_LABEL + text)[:BRIEF_COMPANY_SUMMARY_MAX]
+
+
+def _with_company_summary(
+    brief: InterviewerBrief,
+    profile: ResolvedProfile,
+    auto_summary: str | None,
+    flags: list[str],
+) -> InterviewerBrief:
+    summary = company_summary(profile, auto_summary)
+    if summary is None:
+        return brief
+    with_summary = brief.model_copy(update={"company_summary": summary})
+    if brief_tokens(with_summary) > MAX_BRIEF_TOKENS:  # the questions matter more
+        flags.append("dropped_company_summary")
+        return brief
+    return InterviewerBrief.model_validate(with_summary.model_dump())
 
 
 async def build_brief(
@@ -469,14 +503,19 @@ async def build_brief(
     profile: ResolvedProfile,
     *,
     gap: GapAnalysis | None = None,
+    auto_summary: str | None = None,
 ) -> BuiltBrief:
-    """Ask the planner for questions, then build and check the brief in code. Retries once."""
+    """Ask the planner for questions, then build and check the brief in code. Retries once.
+
+    `auto_summary` is an approved auto-profile's summary (AP-2); only generic mode uses it."""
     messages = build_messages(config, posting, resume, profile, gap)
     errors: list[str] = []
     for attempt in range(1, ATTEMPTS + 1):
         try:
             done = await gateway.complete(Role.PLANNER, messages, output_type=BriefDraft)
-            brief, flags = assemble(done.output, config, posting, profile, gap)
+            brief, flags = assemble(
+                done.output, config, posting, profile, gap, auto_summary=auto_summary
+            )
         except Exception as exc:  # gateway, validation or a draft with too few questions
             errors.append(f"attempt {attempt}: {type(exc).__name__}: {exc}"[:300])
             log.warning("planner brief call failed (%s), attempt %d", type(exc).__name__, attempt)
