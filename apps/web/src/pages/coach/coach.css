@@ -60,6 +60,17 @@
   max-width: 86%;
 }
 
+.coach-turn__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.coach-turn[data-speaker="candidate"] .coach-turn__body {
+  align-items: flex-end;
+}
+
 .coach-turn p {
   margin: 0;
   padding: 12px 16px;
@@ -80,6 +91,23 @@
   background: var(--sh-ink);
   color: var(--sh-room-text);
   border-radius: var(--sh-radius) 4px var(--sh-radius) var(--sh-radius);
+}
+
+/* The canvas's "Tip: say I, not we" chip, and the "Spoken" label under a candidate turn. */
+.coach-turn[data-speaker] .coach-turn__tip {
+  align-self: flex-start;
+  padding: 4px 12px;
+  border-radius: var(--sh-radius-pill);
+  background: var(--sh-violet-soft);
+  color: var(--sh-violet-ink);
+  font-size: 0.8125rem;
+}
+
+.coach-turn[data-speaker] .coach-turn__meta {
+  padding: 0 4px;
+  background: none;
+  color: var(--sh-muted);
+  font-size: 0.75rem;
 }
 
 .coach-turn .coach-mark {
@@ -123,6 +151,43 @@
   background: var(--sh-rec);
   border-color: var(--sh-rec);
   color: #ffffff;
+}
+
+/* Voice-first: the big mic, what the coach is doing, and "Type instead". */
+.coach__voice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  border-top: 1px solid var(--sh-line);
+  padding-top: 16px;
+}
+
+.coach__voice .btn {
+  margin-left: auto;
+}
+
+.coach__voice .field-error {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+.coach__mic.coach__mic--big {
+  flex: 0 0 64px;
+  height: 64px;
+  border: 0;
+  background: var(--sh-violet);
+  color: #ffffff;
+}
+
+.coach__mic.coach__mic--big[data-live] {
+  background: var(--sh-rec);
+}
+
+.coach__voice-state {
+  margin: 0;
+  font-weight: 600;
+  color: var(--sh-violet-ink);
 }
 
 .coach__mic:disabled {

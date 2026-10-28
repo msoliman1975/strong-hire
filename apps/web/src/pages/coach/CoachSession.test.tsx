@@ -119,7 +119,7 @@ describe("coach session", () => {
     expect(styles).toEqual([{ style: "direct" }]);
   });
 
-  it("CO-2: Done saves the story's name, ends the session and opens the workbench", async () => {
+  it("CO-2: Save and exit saves the story's name, ends the session and opens the studio", async () => {
     const user = userEvent.setup();
     renderAt("/coach/new");
     await screen.findByRole("heading", { level: 1, name: "Build a story" });
@@ -127,9 +127,9 @@ describe("coach session", () => {
     await user.click(screen.getByRole("button", { name: "Send" }));
     await screen.findByText(/Why did it matter/);
     await user.type(screen.getByRole("textbox", { name: "Story name" }), "Pushback from platform");
-    await user.click(screen.getByRole("button", { name: "Done" }));
+    await user.click(screen.getByRole("button", { name: "Save and exit" }));
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Pushback from platform" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 2, name: "Pushback from platform" })).toBeInTheDocument();
     const saved = mockStoryLibrary().find((s) => s.title === "Pushback from platform");
     expect(saved?.context).toBe("We were losing checkouts every week.");
     expect(screen.getByTestId("where")).toHaveTextContent(`/stories/${saved?.id}`);
@@ -142,12 +142,12 @@ describe("coach session", () => {
     expect(parts()).toMatchObject({ context: "done", stakes: "now", action: "done", result: "next" });
   });
 
-  it("CO-2: Done on a new story with nothing in it drops the story and returns to the library", async () => {
+  it("CO-2: Save and exit on a new story with nothing in it drops the story and returns to the library", async () => {
     const user = userEvent.setup();
     renderAt("/coach/new");
     await screen.findByRole("heading", { level: 1, name: "Build a story" });
     expect(mockStoryLibrary()).toHaveLength(3);
-    await user.click(screen.getByRole("button", { name: "Done" }));
+    await user.click(screen.getByRole("button", { name: "Save and exit" }));
     expect(await screen.findByText("Stories")).toBeInTheDocument();
     expect(mockStoryLibrary()).toHaveLength(2);
   });
@@ -188,17 +188,78 @@ describe("coach session", () => {
   });
 });
 
+describe("voice-first coach (canvas A1)", () => {
+  // jsdom has no microphone; these tests give the page one.
+  beforeEach(() => {
+    Object.defineProperty(navigator, "mediaDevices", {
+      value: { getUserMedia: () => Promise.reject(new Error("not in tests")) },
+      configurable: true,
+    });
+  });
+  afterEach(() => {
+    Reflect.deleteProperty(navigator, "mediaDevices");
+  });
+
+  it("CO-6: with voice open and a microphone, the page leads with a big mic and Type instead", async () => {
+    const user = userEvent.setup();
+    renderAt("/coach/new");
+    expect(await screen.findByRole("button", { name: "Type instead" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Talk to the coach" })).toBeInTheDocument();
+    expect(screen.getByText("Tap to talk")).toBeInTheDocument();
+    expect(screen.queryByRole("textbox", { name: "Your reply" })).toBeNull();
+
+    await user.click(screen.getByRole("button", { name: "Type instead" }));
+    expect(screen.getByRole("textbox", { name: "Your reply" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Talk instead" }));
+    expect(screen.queryByRole("textbox", { name: "Your reply" })).toBeNull();
+  });
+
+  it("CO-6: the mic on Home (?voice=1) starts talking at once", async () => {
+    renderAt("/coach/new?voice=1");
+    expect(await screen.findByRole("button", { name: "Stop talking to the coach" })).toBeInTheDocument();
+    expect(await screen.findByText(/Tell me about one time you led a hard change/)).toBeInTheDocument();
+  });
+});
+
+describe("coach session details (canvas A1)", () => {
+  it("CO-2: while the coach asks what the candidate did, the tip says I, not we", async () => {
+    resetMockStories([
+      mockStory({ id: "s4", title: "Vendor", context: "We used a vendor.", stakes: "Launch at risk.", skills: ["judgment"] }),
+    ]);
+    renderAt("/coach/new?story=s4");
+    expect(await screen.findByText("Tip: say “I”, not “we”")).toBeInTheDocument();
+  });
+
+  it("CO-2: no tip while the coach asks for another part", async () => {
+    renderAt("/coach/new?story=s1");
+    await screen.findByRole("heading", { level: 1, name: "Checkout migration" });
+    expect(screen.queryByText("Tip: say “I”, not “we”")).toBeNull();
+  });
+
+  it("CO-2: the page title names the story", async () => {
+    renderAt("/coach/new?story=s1");
+    await screen.findByRole("heading", { level: 1, name: "Checkout migration" });
+    expect(document.title).toBe("Checkout migration | Strong Hire");
+  });
+
+  it("CO-2: a question asked on Home is the first message", async () => {
+    renderAt("/coach/new?ask=Which%20story%20for%20leadership%3F");
+    const turns = await screen.findAllByTestId("coach-turn");
+    await expect.poll(() => turns[0].ownerDocument.body.textContent).toContain("Which story for leadership?");
+  });
+});
+
 describe("workbench takes and versions", () => {
   it("CO-2: Work on it with the coach opens a coach session on the story", async () => {
     renderAt("/stories/s1");
-    const takes = await screen.findByTestId("story-takes");
-    expect(within(takes).getByRole("link", { name: "Work on it with the coach" })).toHaveAttribute(
+    const view = await screen.findByRole("article");
+    expect(within(view).getByRole("link", { name: "Work on it with the coach" })).toHaveAttribute(
       "href",
       "/coach/new?story=s1",
     );
   });
 
-  it("CO-7: takes list newest first with date, channel and per-skill scores, and the practice notice", async () => {
+  it("CO-7: takes show as a timeline, oldest first, with average, channel, per-skill scores and the practice notice", async () => {
     mockTakes([
       {
         id: "t1",
@@ -227,15 +288,21 @@ describe("workbench takes and versions", () => {
       },
     ]);
     renderAt("/stories/s1");
-    const list = await screen.findByRole("list", { name: "Takes, newest first" });
+    const list = await screen.findByRole("list", { name: "Takes, oldest first" });
     const takes = within(list).getAllByTestId("story-take");
     expect(takes).toHaveLength(2);
-    expect(takes[0]).toHaveTextContent("Take 2");
-    expect(takes[0]).toHaveTextContent("Spoken · 1:52");
-    expect(within(takes[0]).getByRole("list", { name: "Take 2 scores" })).toHaveTextContent("Ownership3 of 4");
-    expect(within(takes[0]).getByRole("list", { name: "Take 2 scores" })).toHaveTextContent("Impact4 of 4");
-    expect(takes[1]).toHaveTextContent("Take 1");
-    expect(takes[1]).toHaveTextContent("Typed");
+    expect(takes[0]).toHaveTextContent("Take 1");
+    expect(takes[0]).toHaveTextContent("2.0");
+    expect(takes[0]).toHaveTextContent("Typed");
+    expect(takes[1]).toHaveTextContent("Take 2");
+    expect(takes[1]).toHaveTextContent("3.5");
+    expect(takes[1]).toHaveTextContent("Spoken · 1:52");
+    expect(within(takes[1]).getByRole("list", { name: "Take 2 scores" })).toHaveTextContent("Ownership 3 of 4");
+    expect(within(takes[1]).getByRole("list", { name: "Take 2 scores" })).toHaveTextContent("Impact 4 of 4");
+    expect(screen.getByTestId("story-takes")).toHaveTextContent("Stronger each time.");
+    // The story's head shows the best take.
+    expect(screen.getByRole("article")).toHaveTextContent("Best take 3.5 of 4");
+    expect(screen.getByRole("article")).toHaveTextContent("Best take 1:52");
     expect(screen.getByTestId("practice-notice")).toHaveTextContent("not a prediction of any hiring decision");
     expect(screen.getByRole("button", { name: "Record take 3" })).toBeInTheDocument();
   });
@@ -254,7 +321,7 @@ describe("workbench takes and versions", () => {
     expect(sent).toEqual([{ text: "I wrote the migration plan.", channel: "text" }]);
     const take = await screen.findByTestId("story-take");
     expect(take).toHaveTextContent("Take 1");
-    expect(await within(take).findByRole("list", { name: "Take 1 scores" })).toHaveTextContent("Ownership3 of 4");
+    expect(await within(take).findByRole("list", { name: "Take 1 scores" })).toHaveTextContent("Ownership 3 of 4");
     expect(screen.getByTestId("practice-notice")).toBeInTheDocument();
   });
 
@@ -265,15 +332,15 @@ describe("workbench takes and versions", () => {
     expect(within(takes).queryByRole("button", { name: "Record a take" })).toBeNull();
   });
 
-  it("CO-8: the coach writes a 60-second and a full version, with a toggle between them", async () => {
+  it("CO-8: the length toggle shows the parts, or the coach's 60-second and full versions", async () => {
     const user = userEvent.setup();
     renderAt("/stories/s1");
     const versions = await screen.findByTestId("story-versions");
-    await user.click(within(versions).getByRole("button", { name: "Write the versions" }));
-
-    const length = await within(versions).findByRole("group", { name: "Story length" });
+    const length = within(versions).getByRole("group", { name: "Story length" });
+    expect(within(length).getByRole("button", { name: "Story parts" })).toHaveAttribute("aria-pressed", "true");
+    await user.click(within(length).getByRole("button", { name: "60-second version" }));
     expect(within(length).getByRole("button", { name: "60-second version" })).toHaveAttribute("aria-pressed", "true");
-    const text = within(versions).getByTestId("story-version-text");
+    const text = await within(versions).findByTestId("story-version-text");
     expect(text).toHaveTextContent("Payments service nobody owned. I wrote the migration plan.");
 
     await user.click(within(length).getByRole("button", { name: "Full version" }));
@@ -287,8 +354,10 @@ describe("workbench takes and versions", () => {
   it("CO-8: with no parts and no takes there is nothing to write from", async () => {
     resetMockStories([mockStory({ id: "s3", title: "Empty", skills: ["impact"] })]);
     renderAt("/stories/s3");
+    const user = userEvent.setup();
     const versions = await screen.findByTestId("story-versions");
-    expect(within(versions).getByRole("button", { name: "Write the versions" })).toBeDisabled();
+    await user.click(within(versions).getByRole("button", { name: "Full version" }));
     expect(versions).toHaveTextContent("Fill in a part or record a take");
+    expect(within(versions).queryByTestId("story-version-text")).toBeNull();
   });
 });

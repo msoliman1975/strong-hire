@@ -8,13 +8,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
 
-import { COMPETENCIES_BY_TYPE } from "../../api/questions";
 import { ErrorNotice, PageHead } from "../../components/ui";
 import { storiesApi, storyKeys, type Competency } from "./api";
 import { storiesPath, storyPath } from "./paths";
 import { SkillPicker } from "./SkillPicker";
-
-const SKILLS = Object.values(COMPETENCIES_BY_TYPE).flat() as Competency[];
+import { SKILLS } from "./StoriesPage";
 
 export function NewStoryPage() {
   const [params] = useSearchParams();
