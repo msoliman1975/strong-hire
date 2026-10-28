@@ -1,6 +1,6 @@
 /** UI-2: the left rail nav. "Stories" and the v2 labels show only when `v2_enabled` is on. */
 import { QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, within } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { MemoryRouter } from "react-router";
@@ -33,13 +33,14 @@ describe("UI-2 left rail nav", () => {
     expect(within(nav).getByRole("link", { name: "Resumes" })).toHaveAttribute("href", "/resumes");
   });
 
-  it("UI-2: shows Home, Resumes, Interviews, Stories and Progress, in that order and with no journey letters, when v2_enabled is on", () => {
+  it("UI-2: shows Home, Resumes, Interviews, Stories, Question bank and Progress, in that order, when v2_enabled is on", () => {
     setFeatureOverrides({ v2_enabled: true });
     const nav = renderNav();
     const labels = within(nav)
       .getAllByRole("link")
       .map((a) => a.textContent);
-    expect(labels).toEqual(["Home", "Resumes", "Interviews", "Stories", "Progress"]);
+    expect(labels).toEqual(["Home", "Resumes", "Interviews", "Stories", "Question bankNew", "Progress"]);
+    expect(within(nav).getByRole("link", { name: /Question bank/ })).toHaveAttribute("href", "/questions");
     expect(within(nav).getByRole("link", { name: "Resumes" })).toHaveAttribute("href", "/resumes");
     expect(within(nav).getByRole("link", { name: "Stories" })).toHaveAttribute("href", "/stories");
     expect(within(nav).getByRole("link", { name: "Interviews" })).toHaveAttribute("href", "/jobs");
@@ -126,15 +127,53 @@ describe("UI-2 v2 rail footer and account menu", () => {
     return user;
   }
 
-  it("UI-2: v2 has Talk to your coach, the interview minutes, and Questions, Resumes and Account in the account menu", async () => {
+  it("UI-2: v2 has a top bar (plan chip, updates, avatar menu); the rail keeps the menu and Talk to your coach", async () => {
     const user = renderShell(true);
-    expect(await screen.findByRole("link", { name: "Talk to your coach" })).toHaveAttribute("href", "/coach/new");
-    expect(await screen.findByText("Interview minutes")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Account menu" }));
-    expect(screen.getByRole("link", { name: "Questions" })).toHaveAttribute("href", "/questions");
-    const menu = screen.getByRole("button", { name: "Account menu" }).nextElementSibling as HTMLElement;
-    expect(within(menu).getByRole("link", { name: "Resumes" })).toHaveAttribute("href", "/resumes");
-    expect(screen.getByRole("link", { name: "Account" })).toHaveAttribute("href", "/account");
+    const bar = await screen.findByRole("banner", { name: "Top bar" });
+    expect(await within(bar).findByText(/Monthly plan · 78 of 120 minutes left/)).toBeInTheDocument();
+    expect(within(bar).getByRole("button", { name: /^Updates/ })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Talk to your coach" })).toHaveAttribute("href", "/coach/new");
+    // The old rail meter and rail account menu are gone.
+    expect(screen.queryByText("Interview minutes")).toBeNull();
+    await user.click(within(bar).getByRole("button", { name: "Account menu" }));
+    const menu = within(bar).getByRole("button", { name: "Account menu" }).nextElementSibling as HTMLElement;
+    const links = within(menu)
+      .getAllByRole("link")
+      .map((a) => [a.textContent, a.getAttribute("href")]);
+    expect(links.slice(0, 3)).toEqual([
+      ["Account", "/account"],
+      ["Plan and billing", "/account#plan"],
+      ["Reports", "/reports"],
+    ]);
+    expect(within(menu).queryByRole("link", { name: "Questions" })).toBeNull();
+    expect(within(menu).queryByRole("link", { name: "Resumes" })).toBeNull();
+    expect(within(menu).getByRole("button", { name: "Sign out" })).toBeInTheDocument();
+  });
+
+  it("UI-2: the greeting shows on the first visit only", async () => {
+    globalThis.localStorage?.clear();
+    renderShell(true);
+    expect(await screen.findByText("Welcome, Ana. Let's get you ready.")).toBeInTheDocument();
+    cleanup();
+    renderShell(true);
+    await screen.findByRole("banner", { name: "Top bar" });
+    expect(screen.queryByText(/Let's get you ready/)).toBeNull();
+  });
+
+  it("UI-2: the bell shows a dot until it is opened, with the site banner and what's new", async () => {
+    globalThis.localStorage?.clear();
+    mockStore.db.siteStatus = {
+      ...mockStore.db.siteStatus,
+      banner: { text: "Maintenance Sunday 02:00 UTC", severity: "info", until: "2099-01-01T00:00:00Z" },
+    };
+    const user = renderShell(true);
+    const bell = await screen.findByRole("button", { name: /^Updates, \d+ new$/ });
+    await user.click(bell);
+    const panel = screen.getByRole("region", { name: "Updates" });
+    expect(within(panel).getByText("Maintenance Sunday 02:00 UTC")).toBeInTheDocument();
+    expect(within(panel).getByText("New: Question bank")).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "Updates" })).toBeInTheDocument();
+    mockStore.db.siteStatus = { ...mockStore.db.siteStatus, banner: null };
   });
 
   it("FL-1: v1 keeps its rail footer, with no coach button", async () => {

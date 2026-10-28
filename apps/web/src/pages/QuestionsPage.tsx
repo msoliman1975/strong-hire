@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router";
 import { useBankCompanies, useQuestions } from "../api/hooks";
 import { COMPETENCIES_BY_TYPE, GENERAL, type BankType, type QuestionFilter } from "../api/questions";
 import type { BankQuestion, Competency, InterviewType, Level, RoleFamily, StandardType } from "../api/types";
+import { QuestionBankTabs, useQuestionBankTitle } from "../components/QuestionBankTabs";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
 import { competencyLabel, interviewTypeLabel, levelLabel, roleFamilyLabel } from "../labels";
 import { useFeature } from "../theme/features";
@@ -25,6 +26,7 @@ function pick<T extends string>(value: string | null, allowed: readonly T[]): T 
  * role, level, q), so the debrief can link to a filtered view (QB-4).
  */
 export function QuestionsPage() {
+  const title = useQuestionBankTitle("Questions");
   const [params, setParams] = useSearchParams();
   const types: readonly BankType[] = useFeature("v2_enabled") ? V2_TYPES : STANDARD_TYPES;
   const filter: QuestionFilter = {
@@ -71,9 +73,10 @@ export function QuestionsPage() {
 
   return (
     <>
-      <PageHead title="Questions">
+      <PageHead title={title}>
         <p>Interview questions with key hints on what each one is looking for.</p>
       </PageHead>
+      <QuestionBankTabs />
       <section className="panel section" aria-label="Filters">
         <div className="row">
           <div className="field">

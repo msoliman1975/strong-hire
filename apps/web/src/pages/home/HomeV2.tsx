@@ -116,7 +116,7 @@ function HomeCoach({
   const primary =
     summary === null ? (
       <Link className="btn" to={newJobPath("rehearsal")}>
-        Add your interview
+        Add a job description
       </Link>
     ) : !ready ? (
       <Link className="btn" to={summary.job_target.status === "pending" ? `/jobs/${jobId}/confirm` : `/jobs/${jobId}/gap`}>
@@ -274,7 +274,7 @@ function JourneyInterviews({
           </Link>
         )}
         <Link className="btn btn--secondary" to={newJobPath("rehearsal")}>
-          Add an interview
+          Add a job description
         </Link>
       </div>
     </section>

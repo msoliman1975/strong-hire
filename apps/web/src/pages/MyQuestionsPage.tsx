@@ -5,6 +5,7 @@ import { Link } from "react-router";
 import { customApi, questionRefusal, savedQuestionsApi } from "../api/custom";
 import { keys, useSavedQuestions } from "../api/hooks";
 import type { SavedQuestion, StandardType } from "../api/types";
+import { QuestionBankTabs, useQuestionBankTitle } from "../components/QuestionBankTabs";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
 import { CATEGORIES, QUESTION_MAX_LEN } from "../custom/rules";
 import { checkErrorMessage } from "../custom/useCustomSetup";
@@ -49,6 +50,7 @@ async function checked(text: string, category?: StandardType) {
  * the kind of question, delete. Each one can be added to a Custom interview from its setup.
  */
 export function MyQuestionsPage() {
+  const title = useQuestionBankTitle("My questions");
   const saved = useSavedQuestions();
   const queryClient = useQueryClient();
   const refresh = () => void queryClient.invalidateQueries({ queryKey: keys.savedQuestions });
@@ -67,12 +69,13 @@ export function MyQuestionsPage() {
 
   return (
     <div className="page--narrow">
-      <PageHead title="My questions">
+      <PageHead title={title}>
         <p>
           Questions you want to practice, for example ones a recruiter warned you about. Add them to a Custom interview
           when you set one up.
         </p>
       </PageHead>
+      <QuestionBankTabs />
       <section className="panel" aria-labelledby="add-saved-heading">
         <h2 id="add-saved-heading">Add a question</h2>
         <form

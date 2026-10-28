@@ -1,7 +1,7 @@
 /**
  * PP-3 (v2): the Interviews page behind the main menu. Every interview, the soonest first, each
  * with one primary button: "Open the plan" when it is ready, else "Get ready to rehearse" (the
- * setup step still open). "Add an interview" starts the job description flow, which ends on the
+ * setup step still open). "Add a job description" starts the job description flow, which ends on the
  * plan page, where "Start rehearsal" begins the interview. The saved job descriptions (LB-2:
  * delete, archive, restore) stay one click away.
  */
@@ -39,7 +39,7 @@ export function InterviewsV2() {
         <div className="page-head__row">
           <p className="muted">Each interview has a plan: what they'll test, your stories for it, and the next rehearsal.</p>
           <Link className="btn" to={newJobPath("rehearsal")}>
-            Add an interview
+            Add a job description
           </Link>
         </div>
       </PageHead>
@@ -52,7 +52,7 @@ export function InterviewsV2() {
             <p>Add the job description for the interview you have. You get a free match score and a plan for it.</p>
             <div>
               <Link className="btn" to={newJobPath("rehearsal")}>
-                Add an interview
+                Add a job description
               </Link>
             </div>
           </section>
