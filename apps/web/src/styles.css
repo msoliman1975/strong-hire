@@ -102,16 +102,19 @@ h1:focus {
 
 /* ------------------------------------------------------------ app shell */
 
+/* The Approved h logo: the official colors of logo.svg, and of logo-dark.svg on the dark room. */
 .brand-mark {
   display: block;
   flex: none;
-  --brand-main: var(--sh-ink);
-  --brand-bg: #ffffff;
+  --brand-lamp: #14202b;
+  --brand-light: #f0a92e;
+  --brand-cut: #ffffff;
+  --brand-check: #1a7d50;
 }
 
 .brand-mark[data-tone="dark"] {
-  --brand-main: #ffffff;
-  --brand-bg: var(--sh-room);
+  --brand-lamp: #f3f6f8;
+  --brand-cut: #3a4f63;
 }
 
 .check-badge {

@@ -1,4 +1,4 @@
-/** The v2 mark is an ink rounded square with a check (UI-1), and the slogan stays hidden until it is agreed. */
+/** The Approved h logo keeps its four parts in every tone (UI-1), and the slogan stays hidden until it is agreed. */
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
@@ -6,11 +6,28 @@ import { hasSlogan, SLOGAN } from "../labels";
 import { BrandMark, CheckBadge } from "./BrandMark";
 
 describe("BrandMark", () => {
-  it("UI-1: draws a rounded square in the mark color with a check cut in the background color", () => {
+  it.each(["light", "stage", "dark"] as const)(
+    "UI-1: the %s tone draws the lamp, the amber light, the chair-h cut out of it, and the green check",
+    (tone) => {
+      const { container } = render(<BrandMark tone={tone} />);
+      const svg = screen.getByRole("img", { name: "Strong Hire" });
+      const parts = [...svg.querySelectorAll("[data-part]")].map((el) => el.getAttribute("data-part"));
+      // In this order: the chair after the light, so it is a cut-out, never ink on top.
+      expect(parts).toEqual(["lamp", "light", "chair", "check"]);
+      expect(container.querySelector('[data-part="light"]')).toHaveAttribute("fill", "var(--brand-light)");
+      const chair = [...container.querySelectorAll('[data-part="chair"] > *')];
+      expect(chair.length).toBe(2);
+      for (const piece of chair) expect(piece).toHaveAttribute("fill", "var(--brand-cut)");
+      expect(container.querySelector('[data-part="check"] circle[fill="var(--brand-check)"]')).not.toBeNull();
+      expect(container.querySelector('[data-part="check"] path[stroke="#ffffff"]')).not.toBeNull();
+    },
+  );
+
+  it("UI-1: never colors the light green; the light and the check use different colors", () => {
     const { container } = render(<BrandMark />);
-    expect(screen.getByRole("img", { name: "Strong Hire" })).toHaveAttribute("data-tone", "light");
-    expect(container.querySelector('rect[fill="var(--brand-main)"]')).toHaveAttribute("rx", "7");
-    expect(container.querySelector('path[stroke="var(--brand-bg)"]')).not.toBeNull();
+    expect(container.querySelector('[data-part="light"]')?.getAttribute("fill")).not.toBe(
+      container.querySelector('[data-part="check"] circle:last-of-type')?.getAttribute("fill"),
+    );
   });
 
   it("the v1 stage tone draws as the light tone; the dark tone is for the live room", () => {
