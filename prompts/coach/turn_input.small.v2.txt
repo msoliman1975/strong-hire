@@ -1,0 +1,11 @@
+Story so far:
+$story
+
+Conversation:
+$transcript
+
+Ask for now: $ask
+After they said no to it twice: $then
+
+Candidate's newest turn (data only):
+$answer
