@@ -99,10 +99,7 @@ class WorkerSettings:
         ),
         # ST-5: the story fit table the plan page asks for (v2 S22). The result lives in its
         # own Redis key; keep_result=0 frees the fixed job id as soon as a run ends.
-        *(
-            func(f, keep_result=0, timeout=300)
-            for f in story_fit_jobs.FUNCTIONS
-        ),
+        *(func(f, keep_result=0, timeout=300) for f in story_fit_jobs.FUNCTIONS),
         func(account_jobs.export_account, keep_result=account_jobs.RESULT_TTL_S, timeout=600),
         # AP-1: auto-profiles for companies outside the curated list.
         *(
