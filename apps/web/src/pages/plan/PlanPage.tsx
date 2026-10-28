@@ -12,8 +12,10 @@ import { Bar, ErrorNotice, Loading, PageHead, StatusBadge } from "../../componen
 import { competencyLabel, difficultyLabel, formatDate, interviewTypeLabel } from "../../labels";
 import { contextPath } from "../../paths";
 import { usePlan, type PlanView } from "./api";
+import { DayPlan } from "./DayPlan";
 import { InterviewDate } from "./InterviewDate";
 import { PlanSetup } from "./PlanSetup";
+import { ReadinessPanel } from "./ReadinessPanel";
 import "./plan.css";
 
 const isVerdict = (r: ReportItem) => r.type === "interview_debrief" && r.hire_signal !== null;
@@ -152,7 +154,9 @@ function PlanBody({ plan, jobId, resumeId }: { plan: PlanView; jobId: string; re
         </div>
 
         <div className="plan-side stack">
-          {/* RD-1 to RD-3: practice readiness and the day-by-day plan go here. S34 builds them. */}
+          {/* RD-1 to RD-3 (S34): practice readiness per skill and the day-by-day plan. */}
+          <ReadinessPanel jobId={jobId} resumeId={resumeId} />
+          <DayPlan jobId={jobId} resumeId={resumeId} />
           {plan.job.deleted ? (
             <section className="card">
               <p>This job description was deleted, so it cannot be rehearsed again.</p>

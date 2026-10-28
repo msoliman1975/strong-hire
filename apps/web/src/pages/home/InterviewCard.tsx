@@ -2,6 +2,7 @@ import { Link } from "react-router";
 
 import type { JobTargetSummary } from "../../api/types";
 import { CountdownBadge } from "../../components/ui";
+import { ReadinessBadge } from "../plan/ReadinessBadge";
 import { daysUntil, interviewDate, isReady, jobCompany, jobRole } from "./interviews";
 
 /** Where an unfinished job setup continues. Display routing only. */
@@ -40,6 +41,7 @@ export function InterviewCard({ summary, today }: { summary: JobTargetSummary; t
           {summary.sessions_count} {summary.sessions_count === 1 ? "session" : "sessions"}
         </span>
       </p>
+      {ready && <ReadinessBadge jobId={job.id} />}
       <div className="home-interview__actions">
         {ready ? (
           <Link className="btn btn--ink" to={`/jobs/${job.id}/resume`}>
