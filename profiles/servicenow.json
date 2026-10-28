@@ -1,0 +1,1010 @@
+{
+  "company_name": "ServiceNow",
+  "company_slug": "servicenow",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-28",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "ServiceNow values",
+    "principles": [
+      {
+        "name": "Wow our customers",
+        "description": "Customers are the center of ServiceNow's world; aim for the best customer experience and innovation, which includes listening closely and building lasting relationships, not only shipping products.",
+        "evidence_signals": [
+          "Names a specific customer or internal user group, their pain, and how it was confirmed (feedback, tickets, data)",
+          "Went beyond the request to fix the underlying problem and can say what the customer gained",
+          "Measured the result in the customer's terms (time saved, tickets avoided, adoption, satisfaction)"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "Win as a team",
+        "description": "Share the same goals, keep clear roles, deliver results together across functions, and enjoy the journey.",
+        "evidence_signals": [
+          "Describes working across functions (product, engineering, sales, services) with a clear own role inside the team result",
+          "Shared credit and helped others succeed, not only their own piece",
+          "Resolved a disagreement so the team moved forward toward one goal"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Stay hungry and humble",
+        "description": "Do not take success for granted; stay ready to learn and evolve, bring fresh ideas, and keep ego out of the way.",
+        "evidence_signals": [
+          "Owns a failure or mistake openly and shows the concrete change it led to",
+          "Learned a new domain or tool quickly to deliver, and keeps raising their own bar",
+          "Credits others and asks for feedback instead of defending their first idea"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Create belonging",
+        "description": "Lead with empathy: listen, respect each person's perspective, and make everyone feel they belong.",
+        "evidence_signals": [
+          "Shows empathy in a story, for example understanding a colleague's or customer's position before acting",
+          "Made room for quieter or newer people and their ideas in a team",
+          "Helped a struggling colleague in a respectful, constructive way"
+        ],
+        "weight": 1.0
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["IC1", "IC2", "IC3 (Senior)", "IC4 (Staff)", "IC5 (Senior Staff)", "IC6 (Principal)"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter / Talent Acquisition",
+          "notes": "Background, projects, interest in ServiceNow and enterprise software, work persona and logistics. Not simulated in v1."
+        },
+        {
+          "name": "Online coding assessment",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Automated (HackerRank)",
+          "notes": "Reported as one or two coding problems plus multiple-choice CS fundamentals; more common for early-career roles. ServiceNow's hiring page confirms a coding assessment may be part of the process. Not simulated in v1."
+        },
+        {
+          "name": "Coding interviews",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "One or two live coding rounds (data structures and algorithms; Java or JavaScript common). Reported as 45 to 60 minutes. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior or staff engineer",
+          "notes": "Common for mid and senior roles: multi-tenant workflow, API, scheduler or notification design, plus build-versus-configure questions on the Now Platform. Some loops use low-level design instead. Duration is a common-pattern estimate."
+        },
+        {
+          "name": "Behavioral / values interview",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineer or manager from the hiring team",
+          "notes": "STAR stories on customer impact, cross-team collaboration, conflict, trade-offs and failure, mapped to the four values. ServiceNow says it uses standard evaluation guides. Duration is an estimate."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager",
+          "notes": "Past projects, ownership and level fit; sometimes includes a light technical or design question. Duration is an estimate."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": ["Product Manager", "Senior Product Manager", "Staff / Principal Product Manager"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Motivation and fit with ServiceNow's platform direction. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Product management leader",
+          "notes": "Background, product experience, inbound versus outbound product work, and why ServiceNow. Duration is an estimate."
+        },
+        {
+          "name": "Product sense / design",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Senior PM",
+          "notes": "Design or improve a Now Platform capability for admins, agents or employees, often balancing out-of-the-box features against custom configuration. Duration is an estimate."
+        },
+        {
+          "name": "Analytical / execution",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "PM or product analytics partner",
+          "notes": "Metrics for a feature (including GenAI features) and root-cause analysis of a metric drop. Duration is an estimate."
+        },
+        {
+          "name": "Strategy and trade-offs",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product leader",
+          "notes": "Competitive position in a market and roadmap trade-offs such as a large customer's custom request versus the core roadmap. Duration is an estimate."
+        },
+        {
+          "name": "Take-home and panel presentation",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Panel of PM, design, UX research and engineering",
+          "notes": "Some teams ask for a case study presented to a cross-functional panel, with questions on how one solution was prioritized over another. Team-dependent. Not simulated in v1."
+        },
+        {
+          "name": "Behavioral / values interview",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Cross-functional partner",
+          "notes": "Customer focus, collaboration with engineering and sales, and handling disagreement. Duration is an estimate."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": ["IC2", "IC3 (Senior)", "IC4 (Staff)", "IC5 (Senior Staff)"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Quantitative background, models taken to production, interest in enterprise AI. Not simulated in v1."
+        },
+        {
+          "name": "Technical screen",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Data scientist or ML engineer",
+          "notes": "Statistics and ML fundamentals plus Python for data work. Only the verbal concepts part is simulated; the coding part is not."
+        },
+        {
+          "name": "Coding interview",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "ML engineer",
+          "notes": "Candidates for ML engineering roles report coding-heavy loops (data structures and algorithms). Not simulated in v1."
+        },
+        {
+          "name": "ML deep dive",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Senior ML engineer or data scientist",
+          "notes": "Model selection, features, evaluation and production ML; for Now Assist and generative AI teams, LLM and retrieval topics."
+        },
+        {
+          "name": "ML case study",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Data scientist",
+          "notes": "A ServiceNow-style business problem such as incident routing, request volume forecasting or knowledge article recommendation, including evaluation design."
+        },
+        {
+          "name": "Past project presentation",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Panel from data science, product and engineering",
+          "notes": "Candidate presents a past project end to end. Not simulated in v1."
+        },
+        {
+          "name": "Behavioral interview",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Panel member or manager",
+          "notes": "Business impact of models, explaining results to non-technical stakeholders, failures and fairness trade-offs."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager",
+          "notes": "Team fit, roadmap, growth goals and mentoring."
+        }
+      ]
+    },
+    {
+      "role_family": "other",
+      "levels": [],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Solution consultant (pre-sales) track: pre-sales history, product areas, territory. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Solution consulting leader",
+          "notes": "How the candidate runs a sales cycle with an account executive and wins technical evaluations."
+        },
+        {
+          "name": "Demo / technical presentation",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Panel from sales, solution consulting and product",
+          "notes": "Prepared mock demo or solution presentation tailored to a fictional prospect, with discovery and objection handling. Reported as the hardest stage. Not simulated in v1."
+        },
+        {
+          "name": "Cross-functional panel",
+          "interview_type": "behavioral",
+          "duration_min": 90,
+          "interviewer_role": "Account executive, product manager and services lead",
+          "notes": "Three short back-to-back conversations on working with sales, feeding field input to product, and handing off to services. Reported by one prep site."
+        },
+        {
+          "name": "Executive final",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Regional or VP-level leader",
+          "notes": "Territory and vertical fit."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Going beyond for a customer",
+      "pattern": "A time the candidate went beyond what was asked for a customer or internal stakeholder, and how they knew it helped",
+      "competencies": ["impact", "ownership"],
+      "values": ["Wow our customers"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Hard customer conversation",
+      "pattern": "A difficult client or user situation, such as saying no or delivering bad news, while keeping the relationship",
+      "competencies": ["communication", "conflict_handling"],
+      "values": ["Wow our customers", "Create belonging"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Cross-team collaboration",
+      "pattern": "A complex problem solved by working across teams or functions, and the candidate's own role in the shared result",
+      "competencies": ["collaboration", "communication"],
+      "values": ["Win as a team"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Disagreement and difficult colleagues",
+      "pattern": "A disagreement with a manager or peer, or a difficult co-worker, and how the candidate got to a shared way forward",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["Win as a team", "Create belonging"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Failure and learning",
+      "pattern": "A project or decision that failed, what the candidate owned, and what they changed afterwards",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Stay hungry and humble"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Empathy and inclusion",
+      "pattern": "A time the candidate showed empathy, supported a struggling colleague, or made someone feel included",
+      "competencies": ["collaboration", "communication"],
+      "values": ["Create belonging"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Trade-off under pressure",
+      "pattern": "A difficult technical or product trade-off under time pressure, the options considered and how it turned out",
+      "competencies": ["impact", "communication"],
+      "values": ["Wow our customers", "Stay hungry and humble"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Project led end to end",
+      "pattern": "Walk through a technical or product project the candidate led: the goal, the hardest part, own decisions and the result",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Win as a team"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Why ServiceNow",
+      "pattern": "Why ServiceNow and this team, and how the candidate's experience and values fit the platform and its customers",
+      "competencies": ["motivation", "role_fit", "team_fit"],
+      "values": ["Wow our customers", "Stay hungry and humble"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Multi-tenant workflow platform design",
+      "pattern": "Design a workflow, scheduling or notification system that serves thousands of enterprise customers, covering isolation, scale and upgrades",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Wow our customers"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Build versus configure",
+      "pattern": "When to use an out-of-the-box platform capability or configuration and when to write custom code, and the long-term cost of each",
+      "competencies": ["trade_offs", "reasoning", "clarity_of_explanation"],
+      "values": ["Wow our customers"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "ML and AI for service operations",
+      "pattern": "Build and evaluate a model or AI feature for IT and service workflows, such as ticket routing, resolution prediction or an AI agent",
+      "competencies": ["technical_depth", "reasoning", "trade_offs"],
+      "values": ["Wow our customers"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Enterprise product design",
+      "pattern": "Design or improve a platform feature for a specific enterprise user (admin, service agent, employee), choosing between out-of-the-box and custom",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["Wow our customers"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Metrics and root cause",
+      "pattern": "Define success metrics for a feature, including AI features, or diagnose a drop in adoption or usage",
+      "competencies": ["problem_framing", "structure", "estimation_logic"],
+      "values": ["Wow our customers", "Stay hungry and humble"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Roadmap versus key customer",
+      "pattern": "Decide on a large customer's custom request that competes with the core roadmap, or respond to a competitor in a market",
+      "competencies": ["prioritization", "user_and_business_sense", "recommendation"],
+      "values": ["Wow our customers", "Win as a team"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you went above and beyond for a customer or a stakeholder.",
+      "strong_answer": "Use STAR with most time on Action. Name the customer or internal user and the specific pain, with evidence of it. Explain what the candidate personally did beyond the normal scope and what it cost them or the team. Close with a result in the customer's terms (hours saved, fewer tickets, renewal or adoption) and how the relationship changed. Pitfalls: a story where 'above and beyond' means only long hours, or a team story with no 'I'.",
+      "competencies": ["impact", "ownership"],
+      "values": ["Wow our customers"],
+      "source_url": "https://www.cleverprep.com/companies/servicenow",
+      "hints": {
+        "looking_for": [
+          "Whether you start from the customer's real problem",
+          "What you personally did beyond your normal scope"
+        ],
+        "strong_signals": [
+          "Evidence of the pain before acting",
+          "A result measured in the customer's terms"
+        ],
+        "watch_outs": [
+          "'Above and beyond' meaning only long hours",
+          "A team story with no 'I'"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you worked with other teams to solve a complex problem.",
+      "strong_answer": "Set up why one team could not solve it alone and which teams were involved. Show the candidate's own role: aligning goals, clarifying who owns what, and keeping communication flowing. Describe one point of friction and how it was settled. End with the shared result and what the candidate would repeat. Pitfalls: all 'we' with no own contribution, or a story where other teams are the villains.",
+      "competencies": ["collaboration", "communication"],
+      "values": ["Win as a team"],
+      "source_url": "https://www.cleverprep.com/companies/servicenow",
+      "hints": {
+        "looking_for": [
+          "How you align several teams on one goal",
+          "Your own role inside the shared result"
+        ],
+        "strong_signals": [
+          "Clear owners and goals set early",
+          "Handles one real point of friction well"
+        ],
+        "watch_outs": [
+          "All 'we' with no own contribution",
+          "Blaming other teams"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "What would you do if you had to tell a customer you cannot solve their problem?",
+      "strong_answer": "Show honesty early rather than stalling. Explain how the candidate confirms the request and the real need behind it, says clearly what is not possible and why, and offers the best alternative or workaround with a next step and owner. Add how they follow up and pass the feedback to product. A real past example makes this stronger. Pitfalls: overpromising, hiding behind policy, or ending the conversation without an alternative.",
+      "competencies": ["communication", "conflict_handling"],
+      "values": ["Wow our customers", "Create belonging"],
+      "source_url": "https://www.how2become.com/servicenow-interview-questions-h2b/",
+      "hints": {
+        "looking_for": [
+          "Whether you are honest early with the customer",
+          "Whether you still find a way to help"
+        ],
+        "strong_signals": [
+          "Confirms the real need behind the request",
+          "Offers an alternative with a clear next step"
+        ],
+        "watch_outs": [
+          "Overpromising",
+          "Hiding behind policy with no alternative"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to work with a difficult co-worker.",
+      "strong_answer": "Describe the behavior, not the person, and its effect on the work. Show the candidate tried to understand the other side first, then had a direct, private conversation and agreed on how to work together. Explain what changed and how the relationship looks now. Strong answers show some self-reflection on the candidate's own part. Pitfalls: venting about the colleague, escalating first, or a story with no resolution.",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["Create belonging", "Win as a team"],
+      "source_url": "https://www.how2become.com/servicenow-interview-questions-h2b/",
+      "hints": {
+        "looking_for": [
+          "Whether you try to understand the other person first",
+          "How you get the work back on track"
+        ],
+        "strong_signals": [
+          "Talks about behavior and impact, not character",
+          "Reflects on your own part in the friction"
+        ],
+        "watch_outs": [
+          "Venting about the colleague",
+          "Escalating before talking to them"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you failed.",
+      "strong_answer": "Pick a real failure with real stakes. State clearly what the candidate owned, without blaming others or circumstances. Explain how they found out, what they did to recover, and the root cause. Show the lasting change in how they work, ideally with a later example where it helped. This probes humility and appetite to learn. Pitfalls: a disguised strength, a failure with no consequences, or no change afterwards.",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Stay hungry and humble"],
+      "source_url": "https://www.how2become.com/servicenow-interview-questions-h2b/",
+      "hints": {
+        "looking_for": [
+          "Whether you own your part honestly",
+          "What you learned and changed"
+        ],
+        "strong_signals": [
+          "A real failure with real stakes",
+          "A later example where the lesson helped"
+        ],
+        "watch_outs": [
+          "A disguised strength",
+          "Blaming others or circumstances"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you showed empathy and understanding at work.",
+      "strong_answer": "Describe the other person's situation (a colleague, a new team member, a frustrated user) and how the candidate noticed it. Show listening and asking before acting, then a concrete action that helped, such as adjusting a plan, giving cover, or connecting them with support. End with the effect on the person and the work. Pitfalls: a vague story about being nice, or empathy that ignored the work's needs entirely.",
+      "competencies": ["collaboration", "communication"],
+      "values": ["Create belonging"],
+      "source_url": "https://www.how2become.com/servicenow-interview-questions-h2b/",
+      "hints": {
+        "looking_for": [
+          "Whether you notice and understand others' situations",
+          "What concrete action you took"
+        ],
+        "strong_signals": [
+          "Listens and asks before acting",
+          "Shows the effect on the person and the work"
+        ],
+        "watch_outs": [
+          "A vague story about being nice",
+          "Ignoring what the work needed"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a difficult technical trade-off you had to make.",
+      "strong_answer": "Lay out the options and the constraints (deadline, customer impact, maintainability, cost). Explain the criteria used, who was consulted, and why one option won. Be honest about what was given up and how that risk was managed later, for example with a follow-up task or monitoring. Close with how it turned out and what the candidate would decide now. Pitfalls: a trade-off with an obvious answer, or no mention of the cost of the chosen path.",
+      "competencies": ["impact", "communication"],
+      "values": ["Wow our customers", "Stay hungry and humble"],
+      "source_url": "https://www.techprep.app/blog/servicenow-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you weigh competing options",
+          "Whether you name what you gave up"
+        ],
+        "strong_signals": [
+          "Clear criteria and the people consulted",
+          "Managed the risk of the chosen path"
+        ],
+        "watch_outs": [
+          "A trade-off with an obvious answer",
+          "No cost to the chosen option"
+        ]
+      },
+      "role_families": ["swe", "data_ml", "tpm"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you explained complex analytical results to people without a technical background.",
+      "strong_answer": "Name the audience and the decision they had to make. Show how the candidate led with the answer and its business meaning, used a simple visual or analogy, and was honest about uncertainty. Explain how they checked understanding and what decision followed. Pitfalls: walking through methods instead of the conclusion, hiding uncertainty, or blaming the audience for not understanding.",
+      "competencies": ["communication", "impact"],
+      "values": ["Win as a team", "Wow our customers"],
+      "source_url": "https://www.cleverprep.com/companies/servicenow/data-scientist",
+      "hints": {
+        "looking_for": [
+          "Whether you lead with the decision and its meaning",
+          "How you handle uncertainty with a lay audience"
+        ],
+        "strong_signals": [
+          "Answer first, method later",
+          "Checks understanding and names the decision taken"
+        ],
+        "watch_outs": [
+          "Walking through methods instead of conclusions",
+          "Hiding uncertainty"
+        ]
+      },
+      "role_families": ["data_ml", "pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a presentation or demo that did not go well and what you learned from it.",
+      "strong_answer": "Describe the audience, the goal, and what went wrong (wrong focus, a failed demo, an objection the candidate could not answer). Own the preparation gap honestly. Explain how they recovered in the room or after, and what they now do differently, such as deeper discovery or rehearsing failure paths. A later success using the lesson makes it strong. Pitfalls: blaming the audience or the technology.",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Stay hungry and humble", "Wow our customers"],
+      "source_url": "https://www.cleverprep.com/companies/servicenow/solutions-consultant",
+      "hints": {
+        "looking_for": [
+          "Whether you own the preparation gap",
+          "What you changed in how you prepare"
+        ],
+        "strong_signals": [
+          "Honest account of what went wrong",
+          "A later success using the lesson"
+        ],
+        "watch_outs": [
+          "Blaming the audience or the technology",
+          "No concrete change afterwards"
+        ]
+      },
+      "role_families": ["other", "pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Walk me through a technical project you led. What was hardest, and how did you handle it?",
+      "strong_answer": "Give the goal, the team, and the candidate's exact role. Spend most time on the hardest part: the options, the decision, and how they brought others along. Include numbers for scale and outcome. Show level-appropriate scope: a component for mid-level, a system across teams for senior and above. End with what they would change. Pitfalls: listing tasks without decisions, or claiming the whole team's work.",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Win as a team"],
+      "source_url": "https://www.cleverprep.com/companies/servicenow",
+      "hints": {
+        "looking_for": [
+          "Your exact role and decisions",
+          "Whether the scope fits the level"
+        ],
+        "strong_signals": [
+          "Most time on the hardest part",
+          "Numbers for scale and outcome"
+        ],
+        "watch_outs": [
+          "Listing tasks without decisions",
+          "Claiming the whole team's work"
+        ]
+      },
+      "role_families": ["swe", "data_ml", "tpm"],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why does your background fit ServiceNow's move from a system of record to a platform that takes action with AI?",
+      "strong_answer": "Show real understanding of the platform: workflows across IT, employee and customer service, and the shift toward AI agents that act, not only record. Connect two or three concrete experiences (workflow products, enterprise customers, AI features) to that direction. Say what the candidate wants to learn and why this team. Pitfalls: generic praise, repeating marketing lines, or no link between own experience and the company's direction.",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["Stay hungry and humble", "Wow our customers"],
+      "source_url": "https://www.jobmentis.com/en/interviews/servicenow",
+      "hints": {
+        "looking_for": [
+          "Whether you understand the platform's direction",
+          "How your experience connects to it"
+        ],
+        "strong_signals": [
+          "Two or three concrete links to own experience",
+          "Says what you want to learn here"
+        ],
+        "watch_outs": [
+          "Generic praise or marketing lines",
+          "No link to your own experience"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a workflow automation service that runs millions of workflow executions a day for thousands of enterprise customers.",
+      "strong_answer": "Clarify workflow shape (steps, approvals, waits, external calls), volume, latency and tenancy. Propose a definition store, a durable execution engine with persisted state, queues and workers, and timers for long waits. Cover idempotent steps and retries, per-tenant fairness and quotas so one customer cannot starve others, versioning of running workflows, observability and audit. Discuss trade-offs between shared and isolated infrastructure. Pitfalls: in-memory state, or ignoring noisy tenants.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Wow our customers"],
+      "source_url": "https://www.cleverprep.com/companies/servicenow",
+      "hints": {
+        "looking_for": [
+          "How you keep long-running workflows durable",
+          "How you isolate and share capacity between tenants"
+        ],
+        "strong_signals": [
+          "Idempotent steps with retries and timers",
+          "Per-tenant quotas and workflow versioning"
+        ],
+        "watch_outs": [
+          "Keeping workflow state in memory",
+          "Ignoring noisy tenants"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": ["mid", "senior", "staff_principal"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Each customer has its own application layer and database. How would you scale, upgrade and isolate a fleet built that way?",
+      "strong_answer": "Name the benefits (strong isolation, per-customer upgrades and data residency) and costs (fleet size, operations, uneven load). Cover automated provisioning, placement and capacity planning, rolling upgrades with canaries and rollback, schema migration across many databases, backup and restore, and fleet-wide monitoring. Discuss when to consolidate small tenants and how to handle a very large one. Pitfalls: manual operations, or one big-bang upgrade.",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["Wow our customers"],
+      "source_url": "https://www.cleverprep.com/companies/servicenow",
+      "hints": {
+        "looking_for": [
+          "Whether you see both benefits and costs of per-customer stacks",
+          "How you upgrade a large fleet safely"
+        ],
+        "strong_signals": [
+          "Canary and staged upgrades with rollback",
+          "Automated provisioning and fleet-wide monitoring"
+        ],
+        "watch_outs": [
+          "Manual per-customer operations",
+          "One big-bang upgrade"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": ["senior", "staff_principal"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "When would you use a built-in platform feature or configuration, and when would you write custom code instead?",
+      "strong_answer": "Frame the decision around the customer's need and long-term cost. Prefer built-in features and configuration when they meet the need, because they upgrade cleanly and are easier for admins to own. Choose custom code when the need is truly unique or performance-critical, and contain it behind clear interfaces with tests. Mention upgrade risk, technical debt, governance and who maintains it. Give an example. Pitfalls: always custom for control, or forcing a built-in feature that does not fit.",
+      "competencies": ["trade_offs", "reasoning", "clarity_of_explanation"],
+      "values": ["Wow our customers"],
+      "source_url": "https://www.techprep.app/blog/servicenow-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you weigh fit today against upgrade cost later",
+          "Who will own and maintain the result"
+        ],
+        "strong_signals": [
+          "Defaults to configuration when it meets the need",
+          "Contains custom code behind clear interfaces"
+        ],
+        "watch_outs": [
+          "Always custom for control",
+          "Forcing a feature that does not fit"
+        ]
+      },
+      "role_families": ["swe", "pm", "other"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you build a model that predicts how long an IT incident will take to resolve?",
+      "strong_answer": "Clarify how the prediction is used (routing, SLA alerts, customer expectations). Define the target carefully, including reopened and still-open tickets. Propose features from ticket text, category, priority, assignment group, history and time, and a baseline before more complex models. Cover leakage from fields set later, skewed durations, evaluation by segment, drift, and how predictions are shown to agents. Pitfalls: a single accuracy number, or features not known at prediction time.",
+      "competencies": ["technical_depth", "reasoning", "trade_offs"],
+      "values": ["Wow our customers"],
+      "source_url": "https://www.cleverprep.com/companies/servicenow/data-scientist",
+      "hints": {
+        "looking_for": [
+          "How you define the target and its use",
+          "Whether you avoid leakage and skew"
+        ],
+        "strong_signals": [
+          "Starts with a baseline model",
+          "Evaluates by segment and plans for drift"
+        ],
+        "watch_outs": [
+          "Features not known at prediction time",
+          "One accuracy number as the only metric"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you evaluate, offline and online, an AI agent that resolves service requests end to end?",
+      "strong_answer": "Define success: correct resolution, safe actions, customer satisfaction and cost. Offline, build a labeled set of real requests, score task success and step correctness, and add checks for harmful or unauthorized actions; use human review or a calibrated model judge where labels are scarce. Online, start in shadow mode or with human approval, then A/B test on resolution rate, escalations, reopen rate, latency and cost, with guardrails and rollback. Pitfalls: judging only by fluent answers.",
+      "competencies": ["technical_depth", "reasoning", "trade_offs"],
+      "values": ["Wow our customers", "Stay hungry and humble"],
+      "source_url": "https://www.cleverprep.com/companies/servicenow/data-scientist",
+      "hints": {
+        "looking_for": [
+          "How you define success beyond fluent answers",
+          "How you roll out an agent safely"
+        ],
+        "strong_signals": [
+          "Offline set with checks for unsafe actions",
+          "Shadow mode before A/B test, with guardrails"
+        ],
+        "watch_outs": [
+          "Judging only by how good answers sound",
+          "No plan for unsafe actions"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": ["mid", "senior", "staff_principal"]
+    },
+    {
+      "interview_type": "case",
+      "question": "Design a platform feature that helps IT admins find and deal with unapproved software and services before they become a security risk.",
+      "strong_answer": "Clarify users (IT admin, security, the employee using the tool) and the goal (risk reduction without blocking work). Map how unapproved tools are found today and the main pains. Propose discovery from existing data (expense, network, single sign-on), a risk score, and workflows to approve, replace or retire, with employee-friendly messaging. Prioritize a first version, define metrics (time to detect, risky apps retired, employee friction) and say what stays out-of-the-box. Pitfalls: pure blocking.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["Wow our customers"],
+      "source_url": "https://www.jobmentis.com/en/interviews/servicenow",
+      "hints": {
+        "looking_for": [
+          "How you balance security with employee productivity",
+          "Which user you design for first"
+        ],
+        "strong_signals": [
+          "Uses data the platform already has",
+          "A scoped first version with clear metrics"
+        ],
+        "watch_outs": [
+          "Pure blocking that pushes people to hide tools",
+          "No prioritization"
+        ]
+      },
+      "role_families": ["pm", "design"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "What metrics would show that a generative AI incident-summary feature really saves agents time?",
+      "strong_answer": "Start with the goal: faster, better incident handling, not usage for its own sake. Propose a primary metric such as time to resolve or handle time for incidents with summaries versus without, measured through a controlled test. Add adoption, edits made to summaries, agent satisfaction, and quality guardrails (wrong summaries, escalations, reopen rate) plus cost per summary. Explain how to separate novelty effects. Pitfalls: counting summaries generated, or no comparison group.",
+      "competencies": ["problem_framing", "structure", "user_and_business_sense"],
+      "values": ["Wow our customers", "Stay hungry and humble"],
+      "source_url": "https://www.jobmentis.com/en/interviews/servicenow",
+      "hints": {
+        "looking_for": [
+          "Whether you measure value, not activity",
+          "How you prove the effect is real"
+        ],
+        "strong_signals": [
+          "One primary time metric with a comparison group",
+          "Quality and cost guardrails"
+        ],
+        "watch_outs": [
+          "Counting summaries generated",
+          "No control group"
+        ]
+      },
+      "role_families": ["pm", "data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Use of the mobile app by field technicians dropped 15% in a month. How do you find out why?",
+      "strong_answer": "Confirm the data first (tracking changes, definition of active user, seasonality). Segment by customer, region, device, app version and task type, and check the funnel from login to completed job. Look for internal causes (release, outage, login changes) and external ones (a large customer churned, fewer jobs, a competing tool). Rank hypotheses, say what data would confirm each, and give a short-term fix and longer-term action. Pitfalls: proposing features before locating the drop.",
+      "competencies": ["problem_framing", "structure", "prioritization"],
+      "values": ["Wow our customers"],
+      "source_url": "https://www.jobmentis.com/en/interviews/servicenow",
+      "hints": {
+        "looking_for": [
+          "Whether you validate the data first",
+          "How you segment to locate the drop"
+        ],
+        "strong_signals": [
+          "Checks internal and external causes",
+          "Ranks hypotheses with the data to test each"
+        ],
+        "watch_outs": [
+          "Proposing features before locating the drop",
+          "No segmentation"
+        ]
+      },
+      "role_families": ["pm", "data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "A Fortune 500 customer wants a valuable custom feature that would delay the core roadmap. How do you decide?",
+      "strong_answer": "Clarify the customer's underlying need and whether others share it. Weigh revenue and relationship value against the cost of delay to many customers, upgrade and maintenance burden, and precedent. Look for options: meet the need with configuration, generalize it into the roadmap, or partner and services. Make a clear recommendation, how to communicate it to the customer and sales, and the decision rule for future requests. Pitfalls: yes to the biggest customer by reflex.",
+      "competencies": ["prioritization", "user_and_business_sense", "recommendation"],
+      "values": ["Wow our customers", "Win as a team"],
+      "source_url": "https://www.jobmentis.com/en/interviews/servicenow",
+      "hints": {
+        "looking_for": [
+          "How you weigh one customer against many",
+          "Whether you find options beyond yes or no"
+        ],
+        "strong_signals": [
+          "Checks whether other customers share the need",
+          "A clear recommendation and a rule for next time"
+        ],
+        "watch_outs": [
+          "Saying yes to the biggest customer by reflex",
+          "Ignoring maintenance and upgrade cost"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": ["senior", "staff_principal"]
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "IC1",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Entry-level engineer who delivers well-defined tasks with guidance and writes tested code."
+    },
+    {
+      "level_name": "IC2",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns features within a team from design to release with limited guidance."
+    },
+    {
+      "level_name": "IC3 (Senior)",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Senior engineer who designs components or services, leads projects within a team and mentors others."
+    },
+    {
+      "level_name": "IC4 (Staff)",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Staff engineer who leads design across several teams and drives technical decisions for a product area."
+    },
+    {
+      "level_name": "IC5 (Senior Staff)",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Sets technical direction for a large area, often leading a small group while still coding."
+    },
+    {
+      "level_name": "IC6 (Principal)",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Principal engineer who shapes architecture across organizations and the platform."
+    },
+    {
+      "level_name": "Senior Product Manager",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns a product area on the platform and its metrics, working with engineering, design and field teams."
+    },
+    {
+      "level_name": "Staff / Principal Product Manager",
+      "normalized_level": "staff_principal",
+      "role_family": "pm",
+      "scope_expectation": "Sets strategy for a product line or workflow area and influences roadmaps across teams."
+    }
+  ],
+  "persona": {
+    "tone": "Warm, conversational and professional; interested in the person as well as the work",
+    "pace": "Moderate; two or three stories per behavioral round, with time to think before design answers",
+    "pushback_style": "Asks what the candidate did personally versus the team, how the customer benefited, and why one option beat the alternatives (including configure versus build); probes for what was learned",
+    "closing_style": "Leaves time for the candidate's questions; no feedback in the room, the recruiter follows up after the team debrief"
+  },
+  "scoring_weights": {
+    "collaboration": 1.4,
+    "user_and_business_sense": 1.4,
+    "impact": 1.3,
+    "trade_offs": 1.3,
+    "ownership": 1.2,
+    "learning_from_failure": 1.2,
+    "communication": 1.2,
+    "technical_depth": 1.2,
+    "prioritization": 1.2,
+    "team_fit": 1.2,
+    "clarity_of_explanation": 1.1,
+    "motivation": 1.1
+  },
+  "values_share": 0.3,
+  "case_style": {
+    "product_sense": 0.45,
+    "estimation": 0.15,
+    "system_thinking": 0.4,
+    "notes": "Cases are enterprise B2B: users are admins, service agents and employees inside large customers. Expect out-of-the-box versus custom configuration trade-offs, metrics for generative AI features, root-cause analysis of adoption drops, and roadmap trade-offs against large customer requests. Market sizing is rare."
+  },
+  "sources": [
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/1373715/000137371526000007/now-20251231.htm",
+      "title": "ServiceNow Form 10-K FY2025: Our Ambition, Values and Corporate Purpose",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "scoring_weights"]
+    },
+    {
+      "url": "https://careers.servicenow.com/how-we-hire/",
+      "title": "How we hire (ServiceNow careers)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "persona"]
+    },
+    {
+      "url": "https://www.techprep.app/blog/servicenow-interview-process",
+      "title": "ServiceNow's interview process (TechPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "scoring_weights"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/servicenow",
+      "title": "ServiceNow software engineer interview guide (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/servicenow/data-scientist",
+      "title": "ServiceNow data scientist interview guide (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/servicenow/solutions-consultant",
+      "title": "ServiceNow solutions consultant interview guide (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.jobmentis.com/en/interviews/servicenow",
+      "title": "ServiceNow product manager interview questions (JobMentis, public sample)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.how2become.com/servicenow-interview-questions-h2b/",
+      "title": "ServiceNow interview questions (How2Become)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["question_patterns", "persona"]
+    },
+    {
+      "url": "https://www.levels.fyi/companies/servicenow/salaries/software-engineer",
+      "title": "ServiceNow software engineer levels (Levels.fyi)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://www.teamblind.com/post/servicenow-ic5-vs-ic4-swe-fkub6peb",
+      "title": "ServiceNow IC5 vs IC4 SWE (Blind discussion)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "low"
+  },
+  "low_confidence_notes": [
+    "values_framework: the four value names come from ServiceNow's own blog series and FY2025 proxy and 10-K, and descriptions are paraphrased from the 10-K; the 2025 careers-page values graphic is an image we could not read, so check the current wording there. Weights are our estimate of interview emphasis.",
+    "loop_structure: ServiceNow's hiring page says only that rounds vary by role and may include a coding assessment or presentation; round lists come from prep sites and candidate reports. Most durations are common-pattern estimates. The PM rounds come mainly from one prep site, and the solution consultant (other) loop from one prep site.",
+    "question_patterns: sample questions come from prep sites that collect candidate reports (CleverPrep, JobMentis public sample, How2Become, TechPrep); no ServiceNow page lists interview questions.",
+    "bar_by_level: IC1 to IC6 and the IC3 Senior and IC4 Staff titles come from Levels.fyi; IC5 Senior Staff comes from a Blind thread, and Principal is reported as IC6 in postings but IC7 in one Blind post. PM level titles are unverified common titles, and scope text is our summary.",
+    "persona: no public source describes interviewer style beyond 'conversational' candidate reports and the official note on standard evaluation guides; tone and pushback are our estimate.",
+    "scoring_weights: derived from the values and from the signals prep sites list (collaboration, ownership, trade-offs, customer focus); no public source gives weights.",
+    "case_style: PM case themes come mostly from one prep site's public sample; the split between product sense and system thinking is our estimate."
+  ]
+}

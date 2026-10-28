@@ -1,0 +1,889 @@
+{
+  "company_name": "Cisco",
+  "company_slug": "cisco",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-28",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Cisco Guiding Principles",
+    "principles": [
+      {
+        "name": "Be curious, learn fearlessly",
+        "description": "Part of 'Think Really Big': stay curious, keep learning new technology and domains, and grow capabilities over time without fear of looking inexperienced.",
+        "evidence_signals": [
+          "Learned a new technology, protocol or domain quickly and applied it to real work",
+          "Shows how their capabilities grew over time, not a fixed skill set",
+          "Asks questions and seeks out unfamiliar problems instead of avoiding them"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Take smart risks and innovate",
+        "description": "Part of 'Think Really Big': take calculated risks, innovate, adapt when things change, and try again.",
+        "evidence_signals": [
+          "Started an improvement on their own initiative and explains why the risk was worth it",
+          "Limited the downside of a risk with a pilot, rollback plan or staged rollout",
+          "Adapted the approach after a setback and tried again"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Be real, be coachable",
+        "description": "Part of 'Play to Win': be authentic, own mistakes honestly, and seek and act on coaching and feedback.",
+        "evidence_signals": [
+          "Describes a mistake or failure honestly, without blaming others",
+          "Asked for feedback or coaching and shows what changed afterwards",
+          "Tells their own story in their own words rather than a polished script"
+        ],
+        "weight": 1.1
+      },
+      {
+        "name": "Speak up, debate, and commit",
+        "description": "Part of 'Play to Win': raise concerns openly, debate ideas with respect, then commit fully to the decision.",
+        "evidence_signals": [
+          "Raised a disagreement early and stated the other view fairly",
+          "Used data or a test to settle a debate",
+          "Committed to and supported a decision that went against their own view"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Execute with quality, urgency and accountability",
+        "description": "Part of 'Play to Win': deliver high-quality work with a sense of urgency and own the result, including what goes wrong.",
+        "evidence_signals": [
+          "Uses 'I' for own decisions and owns the outcome end to end",
+          "Delivered under time pressure without cutting quality on what matters",
+          "Kept or renegotiated commitments openly and followed through after launch"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "Drive customer outcomes",
+        "description": "Part of 'Drive Durable Growth': focus on outcomes for customers, with products and experiences they value, and favor reliability and customer needs over internal convenience.",
+        "evidence_signals": [
+          "Names a specific customer or user group and the result for them",
+          "Chose reliability or customer need over the easier engineering option",
+          "Measures success in customer terms such as uptime, adoption or resolved issues"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "Embrace One Cisco",
+        "description": "Part of 'Drive Durable Growth': work as one company across teams, regions and products, build on the platform, connect work to company priorities and purpose, and include and bring others along.",
+        "evidence_signals": [
+          "Collaborated across teams, time zones or business units to deliver a shared result",
+          "Helped a colleague or another team succeed and included different perspectives",
+          "Connects own work to broader company or platform goals"
+        ],
+        "weight": 1.2
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": [
+        "Software Engineer",
+        "Senior Software Engineer",
+        "Technical Leader",
+        "Principal Engineer",
+        "Distinguished Engineer"
+      ],
+      "rounds": [
+        {
+          "name": "Online assessment",
+          "interview_type": null,
+          "duration_min": 90,
+          "interviewer_role": "Automated test (HackerRank)",
+          "notes": "Two or three coding problems plus multiple-choice questions on networking, operating systems and databases, as reported by prep sites. Common for early-career hiring; not every team uses it. Not simulated in v1."
+        },
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, interest in Cisco, role fit and logistics. Held over Webex or phone. Not simulated in v1."
+        },
+        {
+          "name": "Technical screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Senior software engineer",
+          "notes": "Resume discussion plus one live coding problem and CS or networking fundamentals. Not simulated in v1."
+        },
+        {
+          "name": "Coding rounds",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "One or two live coding rounds in the final loop, often with graph or tree problems. Not simulated in v1."
+        },
+        {
+          "name": "Domain and fundamentals deep dive",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior software engineer from the hiring team",
+          "notes": "Verbal questions in the team's domain: networking protocols (TCP/IP, OSI, routing), operating systems and concurrency, or cloud and security, plus a past-project deep dive. Domain varies by team."
+        },
+        {
+          "name": "System design",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Senior engineer or architect",
+          "notes": "Mainly for experienced candidates. Whiteboard design with a networking angle: monitoring for many devices, load balancers, control planes, Webex-like real-time systems. Not simulated in v1 as a whiteboard round; verbal design questions appear under technical_qa patterns."
+        },
+        {
+          "name": "Behavioral and values",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager or senior engineer",
+          "notes": "STAR-style questions on failure, conflict, customer focus and working across global teams, tied to Cisco's culture. Prep sites report behavioral topics carry heavy weight."
+        },
+        {
+          "name": "Hiring manager conversation",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager",
+          "notes": "Past projects, motivation, scope and team fit. Sometimes merged with the behavioral round; duration is a common-pattern estimate."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": [
+        "Product Manager",
+        "Senior Product Manager",
+        "Principal Product Manager"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "PM background, B2B and enterprise experience, motivation. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager interview",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Director of product management",
+          "notes": "Product experience, approach to enterprise products, prioritization and stakeholder management."
+        },
+        {
+          "name": "Product case",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Senior product managers",
+          "notes": "An enterprise or networking product problem: strategy, roadmap prioritization or a market opportunity. Some teams ask for a prepared presentation."
+        },
+        {
+          "name": "Technical and platform discussion",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager",
+          "notes": "APIs, platform dependencies and how scale, reliability and security constraints shape product choices."
+        },
+        {
+          "name": "Cross-functional interviews",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineering, marketing and sales leaders",
+          "notes": "Several conversations on influence without authority, misalignment across teams and working with sales and channel partners."
+        },
+        {
+          "name": "Executive interview",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "VP of product management",
+          "notes": "Product vision, strategic thinking and fit with Cisco's direction. Mostly for senior roles."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": [
+        "Data Scientist",
+        "Senior Data Scientist",
+        "Machine Learning Engineer"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, ML experience and why Cisco. Not simulated in v1."
+        },
+        {
+          "name": "Online assessment",
+          "interview_type": null,
+          "duration_min": 90,
+          "interviewer_role": "Automated test (HackerRank)",
+          "notes": "Coding problems and multiple-choice questions, sometimes on networking fundamentals. Not used by every team. Not simulated in v1."
+        },
+        {
+          "name": "ML and statistics interview",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Data scientist or ML engineer",
+          "notes": "Statistics, modeling choices and evaluation, often framed around network telemetry, security or product data."
+        },
+        {
+          "name": "SQL and coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Data scientist",
+          "notes": "Live SQL and Python. Not simulated in v1."
+        },
+        {
+          "name": "Behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Team member or manager",
+          "notes": "STAR questions on ambiguous requirements, explaining results to non-technical people and teamwork."
+        },
+        {
+          "name": "Managerial final round",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager or senior leader",
+          "notes": "Past projects end to end and long-term goals. Some candidates present a case study."
+        }
+      ]
+    },
+    {
+      "role_family": "other",
+      "levels": [
+        "Network Engineer",
+        "Customer Experience Engineer"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Networking background and certifications (CCNA, CCNP, CCIE). Not simulated in v1."
+        },
+        {
+          "name": "Technical screen",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior network engineer",
+          "notes": "Routing (OSPF, BGP), switching (VLANs, STP) and troubleshooting method through spoken scenarios."
+        },
+        {
+          "name": "Technical onsite rounds",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Network engineers",
+          "notes": "Several rounds on routing, switching, data center, security and network design; some whiteboard scenarios."
+        },
+        {
+          "name": "Hands-on lab",
+          "interview_type": null,
+          "duration_min": 90,
+          "interviewer_role": "Network engineer",
+          "notes": "Configure and troubleshoot devices or a simulation. Not simulated in v1."
+        },
+        {
+          "name": "Behavioral and customer focus",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager",
+          "notes": "Outages under pressure, customer interactions and teamwork."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Owning a failure",
+      "pattern": "A failure or mistake the candidate caused, how they owned it, who it affected, and what changed afterwards",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Be real, be coachable", "Execute with quality, urgency and accountability"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Disagree, then commit",
+      "pattern": "A disagreement with a teammate or manager on a technical or product decision, how it was debated and how the candidate committed to the result",
+      "competencies": ["conflict_handling", "communication", "collaboration"],
+      "values": ["Speak up, debate, and commit"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Customer over convenience",
+      "pattern": "A time the candidate did more than required for a customer, or chose the customer's need over the easier engineering path",
+      "competencies": ["impact", "ownership"],
+      "values": ["Drive customer outcomes"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Working across global teams",
+      "pattern": "Delivering with a remote, cross-functional or very different team, and helping others succeed",
+      "competencies": ["collaboration", "communication"],
+      "values": ["Embrace One Cisco"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Initiative and smart risk",
+      "pattern": "An improvement to a process, tool or system the candidate started on their own, the risk involved and how it was managed",
+      "competencies": ["ownership", "impact"],
+      "values": ["Take smart risks and innovate", "Be curious, learn fearlessly"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Delivering under pressure",
+      "pattern": "An outage, deadline or escalation handled under pressure, with the trade-offs made between speed and quality",
+      "competencies": ["ownership", "impact", "communication"],
+      "values": ["Execute with quality, urgency and accountability", "Drive customer outcomes"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Project deep dive",
+      "pattern": "Walk through the most complex project on the resume: own role, technical decisions, scale and measurable result",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Execute with quality, urgency and accountability"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Why Cisco and which area",
+      "pattern": "Why Cisco, which product area (networking, security, observability, collaboration) and how past skills fit the role",
+      "competencies": ["motivation", "role_fit", "team_fit"],
+      "values": ["Embrace One Cisco", "Be curious, learn fearlessly"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Networking and systems fundamentals",
+      "pattern": "Explain a core protocol or OS concept (transport reliability, OSI layers, routing, concurrency) and when its trade-offs matter",
+      "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
+      "values": ["Be curious, learn fearlessly"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Systems for networks of devices",
+      "pattern": "Talk through a design for monitoring, configuring or controlling many network devices, including failure cases and rollback",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Drive customer outcomes", "Execute with quality, urgency and accountability"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Real-time and reliable services",
+      "pattern": "Talk through a real-time or high-availability service such as video conferencing or a load balancer: latency, redundancy and graceful degradation",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["Drive customer outcomes"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Structured troubleshooting",
+      "pattern": "A systematic approach to diagnosing a connectivity, latency or production issue, layer by layer",
+      "competencies": ["reasoning", "accuracy", "clarity_of_explanation"],
+      "values": ["Execute with quality, urgency and accountability"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "ML on network and security data",
+      "pattern": "Modeling and evaluation choices for telemetry or security data: imbalance, anomaly detection, error trade-offs",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Drive customer outcomes"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Enterprise roadmap prioritization",
+      "pattern": "Prioritize features or a roadmap for an enterprise networking, security or collaboration product with competing customers, sales and engineering needs",
+      "competencies": ["prioritization", "user_and_business_sense", "recommendation"],
+      "values": ["Drive customer outcomes", "Embrace One Cisco"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Improve an enterprise product",
+      "pattern": "Improve a Cisco-style product for a specific enterprise user (IT admin, end user, buyer), with a success metric",
+      "competencies": ["problem_framing", "user_and_business_sense", "structure"],
+      "values": ["Drive customer outcomes"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "B2B success metrics",
+      "pattern": "Define how to measure success for a B2B product where buyers, admins and end users differ",
+      "competencies": ["problem_framing", "user_and_business_sense", "structure"],
+      "values": ["Drive customer outcomes"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you failed. What did you do next?",
+      "strong_answer": "Pick a real failure the candidate caused or could have prevented. Explain why the plan seemed right then, how the problem was found, and how quickly they owned it and told the people affected. Describe the fix and a concrete change in how they work, ideally with a later example where it paid off. Pitfalls: a disguised success, blaming others or circumstances, or a lesson with no visible change.",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Be real, be coachable", "Execute with quality, urgency and accountability"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-cisco-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": ["Whether you own failures without blaming others", "What you changed afterwards"],
+        "strong_signals": ["Explains why the plan seemed right at the time", "Owned it quickly and told those affected", "Gives a later example of the lesson"],
+        "watch_outs": ["A disguised success", "Blaming others or circumstances"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you disagreed with a teammate about how to do something. How was it resolved?",
+      "strong_answer": "Show the disagreement had real stakes. State the other person's view fairly, explain how the candidate raised the concern openly and used data, a prototype or a test to decide. Describe the outcome, including committing to a decision they did not prefer, and how the working relationship held up. Pitfalls: a story where the other person is simply wrong, going to the manager first, or avoiding the conflict.",
+      "competencies": ["conflict_handling", "communication", "collaboration"],
+      "values": ["Speak up, debate, and commit"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-cisco-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": ["Whether you raise disagreement openly and respectfully", "Whether you commit once a decision is made"],
+        "strong_signals": ["States the other view fairly", "Uses data or a test to decide", "Shows the relationship afterwards"],
+        "watch_outs": ["The other person is simply wrong", "Escalating first or avoiding the conflict"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you went beyond what was asked to deliver for a customer or user.",
+      "strong_answer": "Name the customer or user group and what was at stake for them (for example an outage, a missed deadline, a migration). Explain what the requirement was and what extra the candidate did and why. Quantify the result for the customer, such as downtime avoided or adoption. Show judgment about scope: doing more without derailing other commitments. Pitfalls: heroics without customer impact, or an internal stakeholder dressed up as a customer.",
+      "competencies": ["impact", "ownership"],
+      "values": ["Drive customer outcomes"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-cisco-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": ["How you think about customer outcomes", "Whether you can show the result in numbers"],
+        "strong_signals": ["Names the customer and what was at stake", "Quantifies the customer result", "Keeps other commitments on track"],
+        "watch_outs": ["Heroics with no customer impact", "Vague results"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a decision where what the customer needed and what was easiest for engineering pulled in different directions.",
+      "strong_answer": "Lay out both options and their costs: the convenient path and the customer-preferred one (for example backward compatibility, reliability, a harder migration). Explain how the candidate gathered evidence of customer impact, how they made the case to the team, and what was chosen. Strong answers favor reliability and the customer while staying realistic about cost, and show the result. Pitfalls: always choosing the easy path, or ignoring the engineering cost entirely.",
+      "competencies": ["impact", "communication", "ownership"],
+      "values": ["Drive customer outcomes", "Speak up, debate, and commit"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-cisco-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": ["How you weigh customer needs against engineering cost", "How you make the case to the team"],
+        "strong_signals": ["Lays out both options and their costs", "Uses evidence of customer impact", "Favors reliability while staying realistic"],
+        "watch_outs": ["Always taking the easy path", "Ignoring engineering cost"]
+      },
+      "role_families": ["swe", "other"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a process or tool you improved on your own initiative.",
+      "strong_answer": "Describe the pain the candidate noticed (slow builds, manual testing, noisy alerts), why no one owned it, and what they did without being asked. Explain how they limited the risk, got buy-in, and measured the result (time saved, fewer incidents). Small improvements are fine if the impact is clear. Pitfalls: an assigned task presented as initiative, or a change with no measured effect.",
+      "competencies": ["ownership", "impact"],
+      "values": ["Take smart risks and innovate", "Be curious, learn fearlessly"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-cisco-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": ["Whether you improve things without being asked", "How you manage the risk of a change"],
+        "strong_signals": ["Names the pain and why no one owned it", "Gets buy-in and limits risk", "Measures the result"],
+        "watch_outs": ["An assigned task presented as initiative", "No measured effect"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you worked with a remote or distributed team to deliver something.",
+      "strong_answer": "Set the context: teams in different time zones, functions or business units, and what had to be delivered together. Explain the concrete practices the candidate used (clear owners, written decisions, overlap hours, shared dashboards) and how they handled a misunderstanding or dependency slip. Show the result and how the other team saw the collaboration. Pitfalls: only describing meetings, or blaming the other location.",
+      "competencies": ["collaboration", "communication"],
+      "values": ["Embrace One Cisco"],
+      "source_url": "https://www.cleverprep.com/companies/cisco/software-engineer",
+      "hints": {
+        "looking_for": ["How you collaborate across time zones and teams", "How you handle dependency problems"],
+        "strong_signals": ["Uses concrete practices like written decisions and clear owners", "Handles a misunderstanding constructively", "Shows the shared result"],
+        "watch_outs": ["Only describing meetings", "Blaming the other location"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to influence a team you had no authority over.",
+      "strong_answer": "Name the team and the goal they did not share at first (for example engineering capacity or a sales priority). Explain how the candidate understood their incentives, built the case with customer data, found allies, and offered something in return. Show the result and what they would do differently. At senior levels the influence should span several teams. Pitfalls: escalating to a manager as the main tactic, or an outcome that was never really in doubt.",
+      "competencies": ["collaboration", "communication", "impact"],
+      "values": ["Embrace One Cisco", "Drive customer outcomes"],
+      "source_url": "https://www.cleverprep.com/companies/cisco/product-manager",
+      "hints": {
+        "looking_for": ["How you influence without authority", "Whether you understand other teams' incentives"],
+        "strong_signals": ["Builds the case with customer data", "Finds allies and offers something in return", "Shows the result"],
+        "watch_outs": ["Escalation as the main tactic", "An outcome that was never in doubt"]
+      },
+      "role_families": ["pm", "tpm"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a network outage you handled under pressure.",
+      "strong_answer": "Describe the impact (users, sites, business) and the candidate's role. Walk through the triage: restoring service first, isolating the fault layer by layer, communicating status to the customer or stakeholders at a steady cadence. Then the root cause, the permanent fix and what was changed to prevent repeats (monitoring, change control). Pitfalls: guessing fixes without a method, silence toward stakeholders, or no follow-up after recovery.",
+      "competencies": ["ownership", "communication", "impact"],
+      "values": ["Execute with quality, urgency and accountability", "Drive customer outcomes"],
+      "source_url": "https://www.cleverprep.com/companies/cisco/network-engineer",
+      "hints": {
+        "looking_for": ["How you stay methodical under pressure", "How you keep stakeholders informed"],
+        "strong_signals": ["Restores service first, then finds root cause", "Communicates status on a steady cadence", "Adds prevention afterwards"],
+        "watch_outs": ["Guessing fixes without a method", "No follow-up after recovery"]
+      },
+      "role_families": ["other", "swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why do you want to work at Cisco, and which part of the business interests you?",
+      "strong_answer": "Name a specific area (networking, security, observability, collaboration such as Webex, AI infrastructure) and connect it to the candidate's past work and goals. Show understanding of what Cisco builds and who its customers are, and how the candidate likes to work. Pitfalls: generic praise of the brand, talking only about stability or pay, or no named product area.",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["Embrace One Cisco", "Be curious, learn fearlessly"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-cisco-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": ["Whether you know what Cisco builds", "How your skills match the role"],
+        "strong_signals": ["Names a specific product area", "Links it to your past work", "Shows who the customers are"],
+        "watch_outs": ["Generic brand praise", "Only stability or pay"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Walk me through a complex data science project you led from scoping to deployment.",
+      "strong_answer": "Start with the business or customer problem and how it was turned into a modeling question. Cover data sources and quality issues, the baseline, model choice and evaluation metric, and why. Explain deployment, monitoring and how stakeholders used the result, with measured impact. Make the candidate's own decisions clear. Pitfalls: only describing algorithms, no baseline, or a model that never reached users.",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Execute with quality, urgency and accountability", "Drive customer outcomes"],
+      "source_url": "https://prepfully.com/interview-guides/cisco-data-scientist",
+      "hints": {
+        "looking_for": ["How you go from business problem to deployed model", "Your own decisions in the project"],
+        "strong_signals": ["Frames the business problem first", "Compares against a baseline", "Shows deployment, monitoring and impact"],
+        "watch_outs": ["Only describing algorithms", "A model that never reached users"]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Which Cisco product would you most like to own, and what would success look like in your first 90 days?",
+      "strong_answer": "Pick one product and show real understanding of its users, buyers and competition. For the first 90 days, describe listening first (customers, sales, engineering, support), learning the metrics and roadmap, then one or two early wins and a point of view on direction. Show how success would be judged. Pitfalls: proposing a big rewrite before learning, or a product chosen without knowing its customers.",
+      "competencies": ["motivation", "judgment", "scope_at_level"],
+      "values": ["Drive customer outcomes", "Be curious, learn fearlessly"],
+      "source_url": "https://interview.norahq.com/interview-guides/cisco-product-manager-interview-guide-2026",
+      "hints": {
+        "looking_for": ["How well you know a Cisco product and its users", "How you would start in a new role"],
+        "strong_signals": ["Shows knowledge of users, buyers and competitors", "Listens first, then picks early wins", "Says how success is judged"],
+        "watch_outs": ["A big rewrite before learning", "Not knowing the product's customers"]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Explain the difference between TCP and UDP, and when you would choose each.",
+      "strong_answer": "TCP is connection-oriented: handshake, sequence numbers, acknowledgments and retransmission for reliable in-order delivery, plus flow and congestion control. UDP sends independent datagrams with no delivery or order guarantee and little overhead. Choose TCP for data that must arrive intact (web, file transfer, APIs) and UDP where latency matters more than completeness (voice, video, DNS, telemetry), often with reliability added in the application or via protocols like QUIC. Pitfalls: saying UDP is simply faster without explaining why, or forgetting head-of-line blocking.",
+      "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
+      "values": ["Be curious, learn fearlessly"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-is-the-cisco-interview-process-like-round-by-round",
+      "hints": {
+        "looking_for": ["How deeply you understand transport protocols", "Whether you can pick one for a real use case"],
+        "strong_signals": ["Explains handshake, acknowledgments and congestion control", "Gives use cases for each", "Mentions head-of-line blocking or QUIC"],
+        "watch_outs": ["Saying UDP is just faster", "Mixing up reliability and ordering"]
+      },
+      "role_families": ["swe", "other"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design a monitoring system for thousands of network devices?",
+      "strong_answer": "Clarify device count, metrics, freshness and alerting needs. Compare polling (SNMP) with push-based streaming telemetry, and use collectors close to devices feeding a message queue and a time-series store with retention and downsampling. Cover threshold and anomaly alerts with deduplication, dashboards, and scaling collectors by partitioning devices. Discuss failure cases: a collector losing reach during a network partition, buffering, and avoiding alert storms. Pitfalls: one central poller, or no plan for the monitoring path itself failing.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Drive customer outcomes", "Execute with quality, urgency and accountability"],
+      "source_url": "https://www.systemdesignhandbook.com/guides/cisco-system-design-interview/",
+      "hints": {
+        "looking_for": ["How you collect and store telemetry at scale", "Whether you plan for network failures"],
+        "strong_signals": ["Compares polling with push telemetry", "Partitions devices across collectors", "Handles partitions and alert storms"],
+        "watch_outs": ["One central poller", "Ignoring failure of the monitoring path"]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you push a security policy to thousands of switches, and roll it back safely if it turns out to be wrong?",
+      "strong_answer": "Describe a central control plane with a versioned policy store and a declarative desired state. Validate policies before rollout, then deploy in stages (canary devices, one site, then wider) with health checks between waves. Devices report applied version and status; handle offline devices with reconciliation. For rollback, keep the previous version on device or in the store, apply atomically where possible, and stop the rollout automatically on errors, without dropping traffic. Pitfalls: pushing to all devices at once, or no record of which version each device runs.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Execute with quality, urgency and accountability", "Take smart risks and innovate"],
+      "source_url": "https://www.cleverprep.com/companies/cisco/software-engineer",
+      "hints": {
+        "looking_for": ["How you roll out changes to many devices safely", "How you design for rollback"],
+        "strong_signals": ["Uses versioned, declarative policy", "Rolls out in waves with health checks", "Tracks applied versions and reconciles offline devices"],
+        "watch_outs": ["Pushing to all devices at once", "No record of versions per device"]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design a video conferencing service like Webex at large scale?",
+      "strong_answer": "Clarify meeting sizes, latency target and features (screen share, recording). Cover signaling separate from media, WebRTC-style media transport over UDP, media servers that forward streams (SFU) rather than mixing, regional placement close to users, and adaptive bitrate for poor networks. Discuss scaling large meetings, recording through a separate pipeline, encryption, and failover when a media server dies mid-meeting. Pitfalls: routing all media through one central region, or TCP-only media.",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["Drive customer outcomes"],
+      "source_url": "https://www.systemdesignhandbook.com/guides/cisco-system-design-interview/",
+      "hints": {
+        "looking_for": ["How you handle real-time media at scale", "Whether you plan for poor networks and failures"],
+        "strong_signals": ["Separates signaling from media", "Uses forwarding media servers near users", "Adapts bitrate and handles server failover"],
+        "watch_outs": ["All media through one region", "TCP-only media"]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you handle a heavily imbalanced dataset when building a security threat detection model?",
+      "strong_answer": "Start with the cost of errors: missed threats versus false alarms that tire analysts. Use metrics that fit imbalance (precision-recall curves, recall at a fixed false-positive rate) instead of accuracy. Options: resampling or class weights, anomaly detection for rare unseen attacks, better labels, and time-based splits to avoid leakage. Tune the threshold with the security team and monitor drift as attackers change. Pitfalls: reporting accuracy, random splits that leak future data, or ignoring analyst workload.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Drive customer outcomes"],
+      "source_url": "https://prepfully.com/interview-guides/cisco-data-scientist",
+      "hints": {
+        "looking_for": ["How you evaluate models on rare events", "Whether you weigh missed threats against false alarms"],
+        "strong_signals": ["Uses precision-recall instead of accuracy", "Splits by time to avoid leakage", "Tunes the threshold with users and watches drift"],
+        "watch_outs": ["Reporting accuracy", "Ignoring analyst workload"]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "A user reports they cannot reach an application. Walk me through how you would troubleshoot it.",
+      "strong_answer": "Clarify scope first: one user or many, one site or all, since when, what changed. Then work layer by layer: physical link and interface status, VLAN and switching, IP addressing and gateway, routing and reachability (ping, traceroute), DNS, firewall or ACL rules, and finally the application and server. Use logs and recent changes to narrow quickly, fix, confirm with the user and record the root cause. Pitfalls: random changes without a hypothesis, or skipping the question of what changed recently.",
+      "competencies": ["reasoning", "accuracy", "clarity_of_explanation"],
+      "values": ["Execute with quality, urgency and accountability"],
+      "source_url": "https://www.cleverprep.com/companies/cisco/network-engineer",
+      "hints": {
+        "looking_for": ["Whether you troubleshoot methodically", "How you narrow the scope first"],
+        "strong_signals": ["Asks about scope and recent changes first", "Works layer by layer", "Confirms the fix and records the cause"],
+        "watch_outs": ["Random changes with no hypothesis", "Skipping what changed recently"]
+      },
+      "role_families": ["other", "swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you prioritize features for an enterprise networking product?",
+      "strong_answer": "Clarify the product, its segment and the business goal (growth, retention, a competitive gap). Gather inputs from customers, sales, support and engineering, separating loud requests from broad needs. Score candidates on customer value, revenue or retention impact, strategic fit with the platform, and effort or risk, including hardware and backward-compatibility constraints. Recommend a short list, say what is cut and how it is communicated to sales and customers. Pitfalls: ranking by the largest customer's asks only, or ignoring engineering cost.",
+      "competencies": ["prioritization", "user_and_business_sense", "recommendation"],
+      "values": ["Drive customer outcomes", "Embrace One Cisco"],
+      "source_url": "https://www.cleverprep.com/companies/cisco/product-manager",
+      "hints": {
+        "looking_for": ["How you prioritize across customers, sales and engineering", "Whether you say what gets cut"],
+        "strong_signals": ["Separates loud requests from broad needs", "Scores by value, strategy and effort", "Explains how cuts are communicated"],
+        "watch_outs": ["Only the largest customer's asks", "Ignoring engineering cost"]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you improve Webex for large enterprises?",
+      "strong_answer": "Clarify the goal (adoption, retention, expansion) and separate the buyer (IT and procurement), admins and end users. Pick one segment, for example IT admins in very large deployments, and their pains (rollout, security policy, call quality visibility). Propose a few solutions, prioritize by impact and effort, recommend one, and define a success metric plus a guardrail such as meeting quality. Pitfalls: consumer-style feature ideas that ignore admins and buyers, or no metric.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["Drive customer outcomes"],
+      "source_url": "https://interview.norahq.com/interview-guides/cisco-product-manager-interview-guide-2026",
+      "hints": {
+        "looking_for": ["Whether you separate buyers, admins and end users", "How you pick one problem and measure it"],
+        "strong_signals": ["Picks one enterprise segment and its pains", "Prioritizes by impact and effort", "Defines a success metric and a guardrail"],
+        "watch_outs": ["Consumer-style ideas that ignore admins", "No success metric"]
+      },
+      "role_families": ["pm", "design"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you measure success for a B2B networking product?",
+      "strong_answer": "Start from the product's purpose and its customers. Separate business outcomes (bookings, renewals, expansion), adoption (devices or sites deployed, features in use), customer health (support cases, uptime, time to deploy) and satisfaction. Pick one primary metric tied to the goal, add leading indicators and guardrails, and note B2B issues: long sales cycles, few large accounts, and partner channels that hide usage data. Pitfalls: consumer metrics like daily active users without adaptation, or revenue only.",
+      "competencies": ["problem_framing", "user_and_business_sense", "structure"],
+      "values": ["Drive customer outcomes"],
+      "source_url": "https://www.cleverprep.com/companies/cisco/product-manager",
+      "hints": {
+        "looking_for": ["How you choose metrics for B2B products", "Whether you account for long sales cycles"],
+        "strong_signals": ["Separates business, adoption and health metrics", "Picks one primary metric with leading indicators", "Notes partner channels and few large accounts"],
+        "watch_outs": ["Copying consumer metrics", "Revenue only"]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "Software Engineer",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Delivers well-defined tasks under guidance; strong CS and networking fundamentals; coding-focused loop, often with an online assessment."
+    },
+    {
+      "level_name": "Senior Software Engineer",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns features independently within one team and may lead small projects; system design may be asked."
+    },
+    {
+      "level_name": "Technical Leader",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Leads design of a subsystem or product area, guides other engineers and works with adjacent teams; system design expected."
+    },
+    {
+      "level_name": "Principal Engineer",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Sets technical direction across several teams or a product line and links engineering with senior management."
+    },
+    {
+      "level_name": "Distinguished Engineer",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Shapes architecture and technology strategy for a business unit or across Cisco."
+    },
+    {
+      "level_name": "Product Manager",
+      "normalized_level": "mid",
+      "role_family": "pm",
+      "scope_expectation": "Owns features of an enterprise product with support; works with engineering, sales and support."
+    },
+    {
+      "level_name": "Senior Product Manager",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns a product area, its roadmap and metrics; aligns engineering, marketing, sales and channel partners."
+    },
+    {
+      "level_name": "Principal Product Manager",
+      "normalized_level": "staff_principal",
+      "role_family": "pm",
+      "scope_expectation": "Sets product strategy across a portfolio or platform and influences executive decisions."
+    }
+  ],
+  "persona": {
+    "tone": "Friendly, conversational and collaborative; wants to hear the candidate's own story",
+    "pace": "Moderate; works through resume and fundamentals before harder questions, with time to think",
+    "pushback_style": "Probes fundamentals ('why does that work at the protocol level?'), asks what the candidate personally did and for measurable results, and asks about failure cases and the customer impact",
+    "closing_style": "Leaves time for the candidate's questions about the team and role"
+  },
+  "scoring_weights": {
+    "ownership": 1.3,
+    "collaboration": 1.3,
+    "communication": 1.2,
+    "learning_from_failure": 1.2,
+    "impact": 1.2,
+    "technical_depth": 1.4,
+    "accuracy": 1.3,
+    "reasoning": 1.2,
+    "trade_offs": 1.2,
+    "team_fit": 1.1,
+    "user_and_business_sense": 1.3,
+    "prioritization": 1.2
+  },
+  "values_share": 0.25,
+  "case_style": {
+    "product_sense": 0.4,
+    "estimation": 0.15,
+    "system_thinking": 0.45,
+    "notes": "PM cases are enterprise and B2B: roadmap prioritization, improving products such as Webex for admins and buyers, B2B metrics, and market or licensing strategy. Technical and platform constraints (scale, reliability, security, hardware) matter more than in consumer cases. Market sizing appears in some product cases."
+  },
+  "sources": [
+    {
+      "url": "https://careers.cisco.com/global/en/how-we-hire",
+      "title": "How we hire (Cisco Careers)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "persona", "question_patterns", "values_framework"]
+    },
+    {
+      "url": "https://careers.cisco.com/global/en/why-work-here",
+      "title": "Why work here: Guiding Principles and Purpose (Cisco Careers)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://www.cisco.com/c/m/en_us/about/csr/esg-hub/people/employee-experience.html",
+      "title": "Employee experience: the three Guiding Principles (Cisco ESG hub)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/what-is-the-cisco-interview-process-like-round-by-round",
+      "title": "What is the Cisco interview process like, round by round (Design Gurus)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "scoring_weights"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/top-cisco-behavioral-interview-questions-and-how-to-answer-them",
+      "title": "Top Cisco behavioral interview questions (Design Gurus)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["question_patterns", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/cisco/software-engineer",
+      "title": "Cisco software engineer interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "bar_by_level"]
+    },
+    {
+      "url": "https://www.systemdesignhandbook.com/guides/cisco-system-design-interview/",
+      "title": "Cisco system design interview (System Design Handbook)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "persona"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/cisco/product-manager",
+      "title": "Cisco product manager interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style", "bar_by_level"]
+    },
+    {
+      "url": "https://interview.norahq.com/interview-guides/cisco-product-manager-interview-guide-2026",
+      "title": "Cisco product manager interview guide 2026 (Nora)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://prepfully.com/interview-guides/cisco-data-scientist",
+      "title": "Cisco data scientist interview guide (Prepfully)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/cisco/network-engineer",
+      "title": "Cisco network engineer interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/how-many-levels-are-in-cisco",
+      "title": "How many levels are in Cisco (Design Gurus)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "low"
+  },
+  "low_confidence_notes": [
+    "values_framework: the three Guiding Principles (Think Really Big, Play to Win, Drive Durable Growth, introduced FY2025) are official; we split them into seven principles using their published sub-points. Cisco does not say interviews score these principles, and prep sites still cite the older Conscious Culture (accountability, empathy, ethics).",
+    "loop_structure: Cisco's official page only says the process varies by team and role; round names, counts and durations come from prep sites and candidate reports. The hiring manager round duration and the network/customer experience engineer loop (role family other) are common-pattern estimates.",
+    "question_patterns: built from third-party prep sites and candidate reports, not from Cisco; topics vary widely between networking, security, Splunk observability and Webex teams.",
+    "bar_by_level: Cisco does not publish its ladder. Titles come from job postings and prep sites; numeric grades (reported roughly 4 to 12+ for engineers) are left out because sources disagree on the title-to-grade mapping. 'Senior Software Engineer' is mapped to mid because sources place it below Technical Leader. PM titles are our estimate.",
+    "persona: inferred from Cisco's recruiter tips ('tell us your story', measurable impact) and prep-site descriptions; no official description of interviewer style.",
+    "scoring_weights: our estimate from reported emphasis on fundamentals, accountability, collaboration and customer focus; prep sites claim behavioral topics carry about half the weight, which is unverified.",
+    "case_style: based on two PM prep guides; the split between product sense, estimation and system thinking is our estimate."
+  ]
+}

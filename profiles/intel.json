@@ -1,0 +1,1339 @@
+{
+  "company_name": "Intel",
+  "company_slug": "intel",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-28",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Intel values",
+    "principles": [
+      {
+        "name": "Customer First",
+        "description": "Listen to and learn from customers, anticipate their needs, and meet commitments with simple, clear and fast delivery while growing partner ecosystems.",
+        "evidence_signals": [
+          "Names the customer or downstream team (OEM, platform team, software developer) and what they needed",
+          "Describes meeting a committed date or spec, or telling the customer early when it was at risk",
+          "Shows a decision changed because of customer feedback or data"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Fearless Innovation",
+        "description": "Take informed risks as a team, learn and adjust quickly from mistakes, stay curious and bold, and anticipate change.",
+        "evidence_signals": [
+          "Describes trying a new approach, the risk it carried, and how the risk was bounded",
+          "Explains a mistake or failed experiment and the quick adjustment that followed",
+          "Shows curiosity beyond the assigned task, for example learning a new layer of the stack"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Results Driven",
+        "description": "Set priorities and execute with urgency, make data-driven decisions, debate constructively and commit once decided, and own long-term value.",
+        "evidence_signals": [
+          "Explains how priorities were set under a tight schedule and what was cut",
+          "Backs a decision with measurements, not opinion",
+          "Debated a decision openly and then committed fully once it was made"
+        ],
+        "weight": 1.5
+      },
+      {
+        "name": "One Intel",
+        "description": "Put team success first, do what is best for Intel, respect colleagues, build trust, and develop empowered teams.",
+        "evidence_signals": [
+          "Gives an example of working across hardware, software, validation or manufacturing groups",
+          "Chooses the outcome that is best for the wider organization over a local win",
+          "Shares credit and helps other teams succeed"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Inclusion",
+        "description": "Value differences, build teams where everyone can do their best work, and care for each other and the community.",
+        "evidence_signals": [
+          "Describes drawing in a quieter or newer team member's view",
+          "Adapts communication for colleagues from other disciplines, sites or cultures"
+        ],
+        "weight": 0.8
+      },
+      {
+        "name": "Quality",
+        "description": "Deliver products customers and partners can rely on, set and meet high quality and security standards, and do the right things right.",
+        "evidence_signals": [
+          "Describes a systematic debug or validation method: reproduce, isolate, root-cause, prevent",
+          "Mentions tests, coverage, security or reliability checks added so the bug cannot return",
+          "Refuses to ship a known defect without making the risk explicit"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "Integrity",
+        "description": "Be truthful and transparent with uncompromising integrity, keep the workplace safe, and shape technology as a force for good.",
+        "evidence_signals": [
+          "Reports bad news, a slip or own error early and plainly",
+          "Separates what was measured from what was assumed",
+          "Mentions safety, compliance or ethical limits where they applied"
+        ],
+        "weight": 1.0
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": [
+        "Grade 5",
+        "Grade 6",
+        "Grade 7",
+        "Grade 8",
+        "Grade 9",
+        "Grade 10"
+      ],
+      "rounds": [
+        {
+          "name": "Online assessment",
+          "interview_type": null,
+          "duration_min": 75,
+          "interviewer_role": "None (automated)",
+          "notes": "Interns and new grads only: two easy-to-medium coding problems in 60 to 90 minutes. Experienced hires usually skip it. Not simulated in v1."
+        },
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, motivation for Intel, level and location. Not simulated in v1."
+        },
+        {
+          "name": "Technical phone screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Senior software engineer or hiring manager",
+          "notes": "Live coding, often in C or C++, plus a deep dive into one resume project. Not simulated in v1."
+        },
+        {
+          "name": "Onsite coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Algorithms with a low-level flavor: bit manipulation, pointers, memory, concurrency. Panel loops are usually virtual over Microsoft Teams. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior engineer",
+          "notes": "Mid-level and senior candidates. Often low-level or platform design (allocator, driver interface, profiler, telemetry system) rather than web-scale design. Duration is a common-pattern estimate."
+        },
+        {
+          "name": "Domain deep dive",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Team engineer",
+          "notes": "Team-specific depth: computer architecture, compilers, drivers, graphics or AI software. Duration is a common-pattern estimate."
+        },
+        {
+          "name": "Behavioral interview",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager",
+          "notes": "STAR-style questions on conflict, deadlines, bugs and cross-team work. Duration is a common-pattern estimate."
+        },
+        {
+          "name": "Hiring manager round",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Hiring manager",
+          "notes": "Team fit, career goals and the candidate's questions; more of a two-way conversation."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": [
+        "Grade 5",
+        "Grade 6",
+        "Grade 7",
+        "Grade 8",
+        "Grade 9"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Data science background and interest in semiconductor and manufacturing work. Not simulated in v1."
+        },
+        {
+          "name": "Technical assessment",
+          "interview_type": null,
+          "duration_min": 90,
+          "interviewer_role": "None (take-home or online test)",
+          "notes": "ML fundamentals, statistics and coding, sometimes on a manufacturing-style dataset. Duration is an estimate. Not simulated in v1."
+        },
+        {
+          "name": "Technical phone screen",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Data scientist or ML engineer",
+          "notes": "ML fundamentals, statistics and model selection; may include a short coding question."
+        },
+        {
+          "name": "Project presentation",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager and team members",
+          "notes": "Present a past end-to-end ML project, then answer questions on choices and business impact. Duration is an estimate."
+        },
+        {
+          "name": "Manufacturing ML case",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Senior data scientist",
+          "notes": "Case study such as yield prediction, anomaly detection or process optimization on fab data. Duration is an estimate."
+        },
+        {
+          "name": "Technical and behavioral interviews",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Team members and business stakeholders",
+          "notes": "Teamwork, communicating findings to non-technical partners, and handling poor data. Usually mixed with more ML questions."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": [
+        "Product Manager",
+        "Senior Product Manager"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter or product manager",
+          "notes": "Resume walk-through and the role. Not simulated in v1."
+        },
+        {
+          "name": "Onsite 1: behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Two product managers",
+          "notes": "First half of a 90-minute two-on-one session: stories about past work, ambiguity, and working with engineering."
+        },
+        {
+          "name": "Onsite 1: technical",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Two product managers",
+          "notes": "Second half of the session: no coding, but CPU power and performance trade-offs, high-level system design and basic algorithm complexity."
+        },
+        {
+          "name": "Onsite 2: hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Senior PM (likely hiring manager) and engineering manager",
+          "notes": "Part of a two-hour session covering behavioral, strategic and analytical questions; the split into two rounds is ours."
+        },
+        {
+          "name": "Onsite 2: strategy and analytics case",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Senior PM and engineering manager",
+          "notes": "Market and competitor strategy scenarios, and reading a dataset to find trends and metrics for executives."
+        }
+      ]
+    },
+    {
+      "role_family": "other",
+      "levels": [
+        "Grade 5",
+        "Grade 6",
+        "Grade 7",
+        "Grade 8",
+        "Grade 9",
+        "Grade 10"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen (hardware validation)",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Validation and lab background and role fit. Not simulated in v1."
+        },
+        {
+          "name": "Technical phone screen",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior validation engineer",
+          "notes": "Computer architecture, hardware debug, test development and lab equipment, plus past validation work. Reported as 60 to 75 minutes."
+        },
+        {
+          "name": "Hardware fundamentals",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Validation or design engineer",
+          "notes": "Processor architecture, caches, buses and protocols; digital logic and Verilog for design roles. Duration is an estimate."
+        },
+        {
+          "name": "Silicon debug methodology",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior validation engineer",
+          "notes": "Talk through debugging a silicon failure end to end. Duration is an estimate."
+        },
+        {
+          "name": "Test development coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Validation engineer",
+          "notes": "C/C++ or scripting for test content. Not simulated in v1. Duration is an estimate."
+        },
+        {
+          "name": "Hiring manager behavioral",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Validation hiring manager",
+          "notes": "Bring-up pressure, schedule trade-offs and team fit. Some roles expect on-call work during silicon bring-up."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Hard bug across layers",
+      "pattern": "A difficult bug the candidate root-caused, especially one that crossed software, firmware and hardware layers, and what was done so it could not return",
+      "competencies": [
+        "ownership",
+        "impact",
+        "communication"
+      ],
+      "values": [
+        "Quality",
+        "Results Driven"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Disagree, then commit",
+      "pattern": "A time the candidate disagreed with a technical decision, the data they brought, and how they acted once the decision was made",
+      "competencies": [
+        "conflict_handling",
+        "collaboration",
+        "communication"
+      ],
+      "values": [
+        "Results Driven",
+        "One Intel"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Informed risk and failure",
+      "pattern": "A new approach or experiment the candidate tried that did not work as expected, how they told others, and how they adjusted",
+      "competencies": [
+        "learning_from_failure",
+        "ownership"
+      ],
+      "values": [
+        "Fearless Innovation",
+        "Integrity"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Priorities under schedule pressure",
+      "pattern": "Competing deadlines or a tight silicon or release schedule, what the candidate prioritized, and what they deliberately let slip",
+      "competencies": [
+        "ownership",
+        "impact"
+      ],
+      "values": [
+        "Results Driven",
+        "Quality"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Cross-group work for a customer",
+      "pattern": "Working with another group (hardware, software, manufacturing, a customer or partner) to deliver what a customer needed",
+      "competencies": [
+        "collaboration",
+        "communication",
+        "impact"
+      ],
+      "values": [
+        "One Intel",
+        "Customer First",
+        "Inclusion"
+      ]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Resume project in full depth",
+      "pattern": "Walk through one resume project: constraints, the candidate's own decisions, rejected alternatives, and measured results, defended at a low level of detail",
+      "competencies": [
+        "depth_of_experience",
+        "scope_at_level",
+        "judgment"
+      ],
+      "values": [
+        "Results Driven"
+      ]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Why Intel and this group",
+      "pattern": "Why Intel and why this business group, tied to specific Intel products or technologies and the candidate's goals",
+      "competencies": [
+        "motivation",
+        "role_fit",
+        "team_fit"
+      ],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Computer architecture fundamentals",
+      "pattern": "Explain a processor or memory concept (pipelines, caches, memory ordering, SIMD) and how it changes software performance",
+      "competencies": [
+        "technical_depth",
+        "accuracy",
+        "clarity_of_explanation"
+      ],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Low-level and platform design",
+      "pattern": "Design a low-level or platform component (allocator, driver interface, profiler, telemetry pipeline) and defend trade-offs in memory, power and bandwidth",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "reasoning"
+      ],
+      "values": [
+        "Quality"
+      ]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Silicon validation and debug",
+      "pattern": "Talk through validating a hardware block or debugging a silicon failure: reproduce, isolate, tell design bugs from defects",
+      "competencies": [
+        "reasoning",
+        "technical_depth",
+        "accuracy"
+      ],
+      "values": [
+        "Quality"
+      ]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "ML on manufacturing or Intel hardware",
+      "pattern": "Explain an ML or statistics method and how it applies to small, costly manufacturing data or to running models efficiently on Intel hardware",
+      "competencies": [
+        "technical_depth",
+        "reasoning",
+        "trade_offs"
+      ],
+      "values": [
+        "Integrity"
+      ]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Market and competitor strategy",
+      "pattern": "A competitive or market shift in the semiconductor industry and what Intel's product should do, starting from goals and ending with metrics",
+      "competencies": [
+        "problem_framing",
+        "user_and_business_sense",
+        "recommendation"
+      ],
+      "values": [
+        "Customer First"
+      ]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Feature priorities for a product generation",
+      "pattern": "Prioritize features for a new chip or platform generation under power, performance and cost limits",
+      "competencies": [
+        "prioritization",
+        "structure",
+        "recommendation"
+      ],
+      "values": [
+        "Results Driven",
+        "Customer First"
+      ]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Data-driven analysis",
+      "pattern": "Read a dataset or metric trend, form hypotheses, propose further analysis, and present the result and the metrics to watch to executives",
+      "competencies": [
+        "problem_framing",
+        "structure",
+        "estimation_logic"
+      ],
+      "values": [
+        "Results Driven"
+      ]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you disagreed with a technical decision on your team.",
+      "strong_answer": "Describe the decision, your position and the other side's in fair terms. Show you argued with data, such as a benchmark, prototype or failure analysis, and raised it directly. Then show what happened once the call was made: if it went against you, you committed fully and helped it succeed. Close with the result and what you learned. Intel's values ask for constructive debate followed by commitment. Pitfall: a story where you were simply right and others were wrong.",
+      "competencies": [
+        "conflict_handling",
+        "collaboration",
+        "communication"
+      ],
+      "values": [
+        "Results Driven",
+        "One Intel"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/intel/software-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you argue technical points with data",
+          "Whether you commit once a decision is made"
+        ],
+        "strong_signals": [
+          "States both positions fairly",
+          "Brings a benchmark, prototype or analysis",
+          "Commits and helps the chosen option succeed"
+        ],
+        "watch_outs": [
+          "A story about personalities with no technical content",
+          "Continuing to resist after the decision"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you had to dig into hardware behavior to solve a software problem.",
+      "strong_answer": "Pick a case where the software looked right but the behavior came from the platform, for example cache effects, memory ordering, a firmware setting or a device quirk. Walk through the symptoms, the hypotheses you ruled out, the tools you used (profilers, performance counters, traces, a logic analyzer), and how you worked with hardware engineers. Quantify the fix and say what you added so it would be caught next time. Pitfall: staying vague about the low-level cause.",
+      "competencies": [
+        "ownership",
+        "collaboration",
+        "impact"
+      ],
+      "values": [
+        "Quality",
+        "One Intel"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/intel/software-engineer",
+      "hints": {
+        "looking_for": [
+          "Comfort crossing the hardware and software boundary",
+          "A systematic debug method"
+        ],
+        "strong_signals": [
+          "Names the real low-level cause",
+          "Uses counters, traces or lab tools as evidence",
+          "Worked with hardware engineers to confirm it"
+        ],
+        "watch_outs": [
+          "Blaming the hardware without evidence",
+          "No measured result for the fix"
+        ]
+      },
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a tough production bug you resolved.",
+      "strong_answer": "Set the stakes: who was affected and how badly. Explain how you contained impact first, then reproduced and isolated the cause step by step. Be specific about the root cause and the fix, and about the test or monitoring you added so it could not return. Mention how you kept stakeholders informed. Pitfall: a hero story that skips the method, or a fix with no prevention step.",
+      "competencies": [
+        "ownership",
+        "impact",
+        "communication"
+      ],
+      "values": [
+        "Quality",
+        "Customer First"
+      ],
+      "source_url": "https://www.techprep.app/blog/intel-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you handle pressure and impact on users",
+          "Whether you prevent the bug from coming back"
+        ],
+        "strong_signals": [
+          "Contains impact before root-causing",
+          "Explains the root cause precisely",
+          "Adds a test, check or monitor afterwards"
+        ],
+        "watch_outs": [
+          "A hero story without a method",
+          "No prevention step"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a critical silicon or hardware bug you found and how you debugged it.",
+      "strong_answer": "Explain the failure signature and why it mattered to the schedule. Walk through a disciplined method: reproduce reliably, narrow the conditions (voltage, temperature, workload, configuration), use the right tools, and decide whether it was a design bug, a fab defect, a firmware issue or a test problem. Describe how you worked with design and firmware teams on the fix or workaround and what coverage you added. Pitfall: luck presented as method.",
+      "competencies": [
+        "ownership",
+        "impact",
+        "collaboration"
+      ],
+      "values": [
+        "Quality",
+        "One Intel"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/intel/validation-engineer",
+      "hints": {
+        "looking_for": [
+          "A systematic silicon debug approach",
+          "How you work with design and firmware teams"
+        ],
+        "strong_signals": [
+          "Reproduces before isolating",
+          "Separates design bug, defect and test issue",
+          "Adds coverage so it is caught earlier"
+        ],
+        "watch_outs": [
+          "Luck presented as method",
+          "No clear root cause"
+        ]
+      },
+      "role_families": [
+        "other"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time a model you built did not perform as expected.",
+      "strong_answer": "Describe the goal, the gap between expected and real results, and how you found out. Be honest about the cause, such as data leakage, drift, a bad split or too little data. Explain how you told stakeholders, what you changed, and how you validated the new version. In a manufacturing setting, say what the analysis could and could not establish. Pitfall: blaming the data without owning the modeling choices.",
+      "competencies": [
+        "learning_from_failure",
+        "communication",
+        "ownership"
+      ],
+      "values": [
+        "Integrity",
+        "Fearless Innovation"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/intel/data-scientist",
+      "hints": {
+        "looking_for": [
+          "Honesty about model failures",
+          "How you diagnose and recover"
+        ],
+        "strong_signals": [
+          "Names the real cause",
+          "Told stakeholders early",
+          "Validated the fix properly"
+        ],
+        "watch_outs": [
+          "Blaming the data only",
+          "Overstating what the model shows"
+        ]
+      },
+      "role_families": [
+        "data_ml"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you explained complex analytical findings to non-technical stakeholders.",
+      "strong_answer": "Name the audience, such as fab operations or business leaders, and the decision they had to make. Show how you led with the answer and its confidence, used one clear visual, and kept the method in reserve. Explain how you handled questions and pushback, and what decision followed. Pitfall: describing the model in detail instead of the decision it supported.",
+      "competencies": [
+        "communication",
+        "collaboration",
+        "impact"
+      ],
+      "values": [
+        "Customer First",
+        "Inclusion"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/intel/data-scientist",
+      "hints": {
+        "looking_for": [
+          "Whether you can turn analysis into a decision",
+          "How you adapt to your audience"
+        ],
+        "strong_signals": [
+          "Leads with the answer and its confidence",
+          "Ties the finding to a decision",
+          "Handles pushback calmly"
+        ],
+        "watch_outs": [
+          "Too much method detail",
+          "No decision or outcome"
+        ]
+      },
+      "role_families": [
+        "data_ml"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you made a difficult product trade-off and how you handled disagreement with engineering.",
+      "strong_answer": "Explain the trade-off, for example scope against schedule or performance against power, and who was affected. Show how you built a shared view of the facts with engineering, weighed customer impact, made or drove the decision, and kept the relationship strong. Give the outcome and what you would change. Pitfall: overruling engineers without understanding their constraints.",
+      "competencies": [
+        "conflict_handling",
+        "collaboration",
+        "communication"
+      ],
+      "values": [
+        "One Intel",
+        "Customer First"
+      ],
+      "source_url": "https://www.aced.io/guides/intel-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "How you work with engineering",
+          "How you make trade-offs"
+        ],
+        "strong_signals": [
+          "Understands the engineering constraints",
+          "Uses customer impact to decide",
+          "Keeps trust with the team"
+        ],
+        "watch_outs": [
+          "Overruling engineers by title",
+          "No clear decision"
+        ]
+      },
+      "role_families": [
+        "pm"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why do you want to work at Intel, and why this group?",
+      "strong_answer": "Be specific: name the group's area (for example client CPUs, data center, foundry, GPUs, AI software or validation) and the Intel products or technologies you know. Connect them to your experience and what you want to learn. Show you understand where the company is heading and why that interests you. Pitfall: a generic answer about a big brand.",
+      "competencies": [
+        "motivation",
+        "role_fit"
+      ],
+      "values": [],
+      "source_url": "https://www.designgurus.io/blog/intel-interview-guide",
+      "hints": {
+        "looking_for": [
+          "Real interest in this group's work",
+          "Knowledge of Intel's products"
+        ],
+        "strong_signals": [
+          "Names specific products or technologies",
+          "Connects your background to the team"
+        ],
+        "watch_outs": [
+          "A generic big-brand answer",
+          "No idea what the group does"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Pick one project on your resume and walk me through it in depth.",
+      "strong_answer": "State the goal and constraints, then your own role and decisions. Explain the design, the alternatives you rejected and why, and the measured results. Expect follow-ups on low-level details such as memory use, performance and failure handling, so choose a project you can defend line by line. Pitfall: a team summary where your part is unclear.",
+      "competencies": [
+        "depth_of_experience",
+        "scope_at_level",
+        "judgment"
+      ],
+      "values": [
+        "Results Driven"
+      ],
+      "source_url": "https://www.designgurus.io/blog/intel-interview-guide",
+      "hints": {
+        "looking_for": [
+          "How deeply you understand your own work",
+          "Your scope and decisions"
+        ],
+        "strong_signals": [
+          "Explains rejected alternatives",
+          "Gives measured results",
+          "Holds up under detailed follow-ups"
+        ],
+        "watch_outs": [
+          "Your own part is unclear",
+          "Cannot explain low-level details"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "How do you get productive in a very large, unfamiliar codebase?",
+      "strong_answer": "Describe a concrete method: start from a real task, build and run it, trace one path end to end with a debugger, read tests and design docs, and ask owners targeted questions. Mention how you record what you learn for others. Give an example of how fast you made a meaningful change. Pitfall: saying you read all the code first.",
+      "competencies": [
+        "depth_of_experience",
+        "judgment",
+        "team_fit"
+      ],
+      "values": [
+        "One Intel"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/intel/software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you ramp up quickly",
+          "How you use the team's knowledge"
+        ],
+        "strong_signals": [
+          "Starts from a real task",
+          "Traces code with tools",
+          "Shares what you learn"
+        ],
+        "watch_outs": [
+          "Reading everything first",
+          "Never asking for help"
+        ]
+      },
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "How do you balance technical debt against schedule pressure?",
+      "strong_answer": "Show a clear rule: you track debt explicitly, estimate its cost in bugs, slowdowns or risk, and make the trade-off visible to your manager instead of deciding silently. Give an example where you shipped on time with a planned cleanup, and one where you pushed back because quality or security was at stake. Pitfall: an absolute answer, either never taking debt or always shipping.",
+      "competencies": [
+        "judgment",
+        "scope_at_level"
+      ],
+      "values": [
+        "Results Driven",
+        "Quality"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/intel/software-engineer",
+      "hints": {
+        "looking_for": [
+          "Judgment on quality and speed",
+          "Whether you make trade-offs visible"
+        ],
+        "strong_signals": [
+          "Puts a cost on the debt",
+          "Plans the cleanup",
+          "Pushes back when quality or security is at risk"
+        ],
+        "watch_outs": [
+          "An absolute answer",
+          "Taking on debt silently"
+        ]
+      },
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Explain the difference between speculative execution and out-of-order execution.",
+      "strong_answer": "Out-of-order execution runs instructions as soon as their inputs are ready, not in program order, and retires them in order so results look sequential. Speculative execution goes further by running instructions before it is known they are needed, for example past a predicted branch, and discarding results on a misprediction. Mention the reorder buffer, branch prediction, the cost of mispredictions, and side-channel risks from speculation. Pitfall: treating the two as the same thing.",
+      "competencies": [
+        "technical_depth",
+        "accuracy",
+        "clarity_of_explanation"
+      ],
+      "values": [],
+      "source_url": "https://www.cleverprep.com/companies/intel/software-engineer",
+      "hints": {
+        "looking_for": [
+          "Accurate computer architecture knowledge",
+          "A clear explanation"
+        ],
+        "strong_signals": [
+          "Separates the two concepts correctly",
+          "Mentions in-order retirement and misprediction cost",
+          "Notes the security side effects"
+        ],
+        "watch_outs": [
+          "Treating them as the same",
+          "Buzzwords without mechanism"
+        ]
+      },
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design a fixed-size pool memory allocator, including thread safety and failure behavior?",
+      "strong_answer": "Clarify block size, pool size, alignment and threads first. Describe a free list stored inside free blocks for constant-time alloc and free. For threads, compare a single lock, per-thread caches, and a lock-free list with its ABA risk. Define failure: return null or fall back, and detect double free or out-of-pool pointers in debug builds. Discuss cache lines and false sharing. Pitfall: jumping to code without the requirements.",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "reasoning"
+      ],
+      "values": [
+        "Quality"
+      ],
+      "source_url": "https://www.designgurus.io/blog/intel-interview-guide",
+      "hints": {
+        "looking_for": [
+          "Low-level design skill",
+          "Awareness of concurrency and failure cases"
+        ],
+        "strong_signals": [
+          "Clarifies requirements first",
+          "Compares locking options with their costs",
+          "Defines failure and misuse behavior"
+        ],
+        "watch_outs": [
+          "Ignoring thread safety",
+          "No plan for exhaustion or misuse"
+        ]
+      },
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design a system that collects CPU temperature telemetry across a data center?",
+      "strong_answer": "Start with requirements: number of servers, sample rate, latency for alerts, and retention. Cover collection on each host (sensor access, low overhead), batching and transport, a time-series store, aggregation and downsampling, and alerting with thresholds and rate-of-change rules. Discuss overhead on the host, lost data, clock skew and scale estimates. Pitfall: designing storage without checking data volume.",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "reasoning"
+      ],
+      "values": [
+        "Quality"
+      ],
+      "source_url": "https://www.techprep.app/blog/intel-interview-process",
+      "hints": {
+        "looking_for": [
+          "System design with hardware awareness",
+          "Scale reasoning"
+        ],
+        "strong_signals": [
+          "Estimates data volume early",
+          "Keeps host overhead low",
+          "Plans alerting and failure handling"
+        ],
+        "watch_outs": [
+          "No volume estimate",
+          "Ignoring overhead on the hosts"
+        ]
+      },
+      "role_families": [
+        "swe"
+      ],
+      "levels": [
+        "mid",
+        "senior",
+        "staff_principal"
+      ]
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "A processor sometimes fails to boot. How would you debug it?",
+      "strong_answer": "First make it reproducible and measure the failure rate. Find where boot stops using post codes, logs or debug ports. Vary one factor at a time: power sequencing, voltage, temperature, clocks, firmware version, memory configuration and other units of the same part. Compare passing and failing units to separate a design bug, a manufacturing defect, a board issue or firmware. Explain the escalation path and what evidence you hand to design. Pitfall: changing several things at once.",
+      "competencies": [
+        "reasoning",
+        "technical_depth",
+        "accuracy"
+      ],
+      "values": [
+        "Quality"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/intel/validation-engineer",
+      "hints": {
+        "looking_for": [
+          "A disciplined debug method",
+          "Hardware and firmware knowledge"
+        ],
+        "strong_signals": [
+          "Measures the failure rate first",
+          "Changes one variable at a time",
+          "Separates design, defect, board and firmware causes"
+        ],
+        "watch_outs": [
+          "Changing several factors at once",
+          "Guessing a cause without evidence"
+        ]
+      },
+      "role_families": [
+        "other"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "What is the difference between pre-silicon and post-silicon validation?",
+      "strong_answer": "Pre-silicon validation tests the design in simulation, emulation or FPGA prototypes before tape-out: full visibility but slow, so coverage must be targeted. Post-silicon validation tests real chips in the lab at full speed with real workloads and electrical conditions, but with limited visibility into internal state. Explain how they complement each other, how post-silicon findings feed back into pre-silicon coverage, and the cost of finding a bug late. Pitfall: describing only one side.",
+      "competencies": [
+        "technical_depth",
+        "accuracy",
+        "clarity_of_explanation"
+      ],
+      "values": [
+        "Quality"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/intel/validation-engineer",
+      "hints": {
+        "looking_for": [
+          "Understanding of the validation flow",
+          "Trade-offs between speed and visibility"
+        ],
+        "strong_signals": [
+          "Contrasts visibility against speed",
+          "Explains how the two feed each other",
+          "Notes the cost of late bugs"
+        ],
+        "watch_outs": [
+          "Describing only one side",
+          "Confusing validation with manufacturing test"
+        ]
+      },
+      "role_families": [
+        "other"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you detect anomalies in semiconductor manufacturing process data?",
+      "strong_answer": "Clarify the data first: sensor time series per tool and wafer, labels if any, and the cost of false alarms versus missed faults. Start with simple baselines such as statistical process control limits, then consider multivariate methods or models on engineered features. Handle drift after maintenance, tool-to-tool differences and very few failure examples. Explain how you would validate with engineers and what the analysis cannot prove. Pitfall: a deep model with no baseline or validation plan.",
+      "competencies": [
+        "technical_depth",
+        "reasoning",
+        "trade_offs"
+      ],
+      "values": [
+        "Integrity",
+        "Quality"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/intel/data-scientist",
+      "hints": {
+        "looking_for": [
+          "Practical ML judgment on real fab data",
+          "Awareness of small, costly data"
+        ],
+        "strong_signals": [
+          "Starts with a simple baseline",
+          "Handles drift and tool differences",
+          "Validates with process engineers"
+        ],
+        "watch_outs": [
+          "A complex model with no baseline",
+          "Ignoring the cost of false alarms"
+        ]
+      },
+      "role_families": [
+        "data_ml"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you think about the trade-off between power and performance in a CPU?",
+      "strong_answer": "Explain that dynamic power grows with frequency and roughly with voltage squared, and that higher frequency usually needs more voltage, so the last few percent of performance costs a lot of power. Connect this to the segment: battery life and thermals for laptops, performance per watt and cost for data centers. Mention levers such as more cores, efficient cores, accelerators and power management. Tie it to what customers in the segment value. Pitfall: a purely technical answer with no customer view.",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "clarity_of_explanation"
+      ],
+      "values": [
+        "Customer First"
+      ],
+      "source_url": "https://www.aced.io/guides/intel-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Enough technical depth to make product calls",
+          "A link from trade-offs to customers"
+        ],
+        "strong_signals": [
+          "Explains the voltage and frequency link",
+          "Ties the trade-off to a segment",
+          "Names concrete design levers"
+        ],
+        "watch_outs": [
+          "No customer view",
+          "Technical claims that are wrong"
+        ]
+      },
+      "role_families": [
+        "pm"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "A competitor is taking share in one of Intel's markets. What would you do as the product manager?",
+      "strong_answer": "Start with the goal and the segment: which customers are moving and why (performance per watt, price, roadmap trust). Separate short-term moves (pricing, partner support, software tuning) from roadmap moves (features, process, packaging). Prioritize with a clear rationale, state risks, and define the metrics to watch, such as design wins, share and customer retention. Pitfall: a list of ideas with no prioritization or metrics.",
+      "competencies": [
+        "problem_framing",
+        "user_and_business_sense",
+        "recommendation"
+      ],
+      "values": [
+        "Customer First",
+        "Results Driven"
+      ],
+      "source_url": "https://www.aced.io/guides/intel-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Structured strategic thinking",
+          "Customer and market understanding"
+        ],
+        "strong_signals": [
+          "Diagnoses why customers are moving",
+          "Separates short-term and roadmap moves",
+          "Ends with a recommendation and metrics"
+        ],
+        "watch_outs": [
+          "A list of ideas with no priority",
+          "No metrics"
+        ]
+      },
+      "role_families": [
+        "pm"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Here is a dataset showing a product metric changing over several quarters. What trends do you see, and what would you tell executives?",
+      "strong_answer": "Describe the trend and check data quality first. Segment by customer, region or product to find where the change comes from, and form a few hypotheses. Propose the extra data or analysis that would separate them. For executives, lead with the conclusion, the confidence, the business impact and the decision you recommend, then name the metrics to keep watching. Pitfall: reading every number aloud without a conclusion.",
+      "competencies": [
+        "problem_framing",
+        "structure",
+        "recommendation"
+      ],
+      "values": [
+        "Results Driven"
+      ],
+      "source_url": "https://www.aced.io/guides/intel-product-manager-interview",
+      "hints": {
+        "looking_for": [
+          "Analytical structure",
+          "Executive communication"
+        ],
+        "strong_signals": [
+          "Checks the data before concluding",
+          "Segments to find the source",
+          "Leads with a recommendation"
+        ],
+        "watch_outs": [
+          "Reading numbers with no conclusion",
+          "Jumping to a cause without checking"
+        ]
+      },
+      "role_families": [
+        "pm"
+      ],
+      "levels": []
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "Grade 5",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Entry-level engineer (about 0 to 2 years): delivers well-defined tasks with review and guidance."
+    },
+    {
+      "level_name": "Grade 6",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Engineer with a master's degree or 1 to 3 years: owns features in one component with light review."
+    },
+    {
+      "level_name": "Grade 7",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Senior software engineer title: owns a component or small project end to end and debugs across module boundaries."
+    },
+    {
+      "level_name": "Grade 8",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Staff engineer: leads projects that span teams, often across the hardware and software boundary, and mentors others."
+    },
+    {
+      "level_name": "Grade 9",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Senior staff engineer: technical lead for a team or area, sets the plan and drives delivery across groups."
+    },
+    {
+      "level_name": "Grade 10",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Principal engineer: sets technical direction for a product area or business group; the highest grade usually hired from outside."
+    },
+    {
+      "level_name": "Grade 11",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Senior principal engineer: shapes architecture across several product lines; rarely an external hire."
+    }
+  ],
+  "persona": {
+    "tone": "Engineering-focused, practical and collegial; often two interviewers on the call",
+    "pace": "Moderate; settles on one topic and drills into low-level detail rather than covering many topics lightly",
+    "pushback_style": "Asks 'what does that cost in memory, power or bandwidth?', 'how did you verify it?' and asks you to defend specific resume details with data",
+    "closing_style": "Leaves time for the candidate's questions about the team and Intel's direction; expects several prepared questions"
+  },
+  "scoring_weights": {
+    "technical_depth": 1.5,
+    "accuracy": 1.3,
+    "reasoning": 1.3,
+    "trade_offs": 1.3,
+    "depth_of_experience": 1.3,
+    "ownership": 1.2,
+    "collaboration": 1.2,
+    "role_fit": 1.1,
+    "communication": 1.1
+  },
+  "values_share": 0.2,
+  "case_style": {
+    "product_sense": 0.3,
+    "estimation": 0.15,
+    "system_thinking": 0.55,
+    "notes": "PM cases lean on market and competitor strategy for silicon products and on power, performance and cost trade-offs; an analytical round reads a dataset. Data roles get manufacturing ML cases such as yield prediction or anomaly detection. Little pure market sizing is reported."
+  },
+  "sources": [
+    {
+      "url": "https://www.intel.com/content/www/us/en/corporate-responsibility/our-values.html",
+      "title": "Intel: Our values",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "values_framework",
+        "question_patterns"
+      ]
+    },
+    {
+      "url": "https://www.intc.com/intel-online-annual-report/our-capital/human-capital",
+      "title": "Intel online annual report: human capital (older value list)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "values_framework"
+      ]
+    },
+    {
+      "url": "https://www.intc.com/news-events/press-releases/detail/1738/lip-bu-tan-our-path-forward",
+      "title": "Lip-Bu Tan: Our path forward (message to employees, April 2025)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "values_framework",
+        "persona",
+        "scoring_weights"
+      ]
+    },
+    {
+      "url": "https://www.designgurus.io/blog/intel-interview-guide",
+      "title": "Intel interview guide (process, rounds and sample questions)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns",
+        "persona",
+        "scoring_weights"
+      ]
+    },
+    {
+      "url": "https://www.techprep.app/blog/intel-interview-process",
+      "title": "Intel's interview process (2026)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns"
+      ]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/intel/software-engineer",
+      "title": "Intel software engineer interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns",
+        "scoring_weights"
+      ]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/intel/validation-engineer",
+      "title": "Intel validation engineer interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns"
+      ]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/intel/data-scientist",
+      "title": "Intel data scientist interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns",
+        "case_style"
+      ]
+    },
+    {
+      "url": "https://www.aced.io/guides/intel-product-manager-interview",
+      "title": "Intel product manager interview guide",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns",
+        "case_style",
+        "persona"
+      ]
+    },
+    {
+      "url": "https://networkinterview.com/technical-hierarchy-job-grades-in-intel/",
+      "title": "Technical hierarchy and job grades in Intel",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "bar_by_level",
+        "loop_structure"
+      ]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "low"
+  },
+  "low_confidence_notes": [
+    "values_framework: the seven values and their behaviors come from the current intel.com values page; Intel's online annual report still lists an older set (fearless, inclusion, customer-obsessed, one Intel, truth and transparency, quality), and the 2025 CEO messages stress engineering focus, speed and accountability without renaming the values. Recheck before publishing. Weights are our estimate.",
+    "loop_structure: Intel's official interview-tips pages (jobs.intel.com/interview-tips and the intel.com hiring pages) now redirect to a 404; their STAR and 'bring questions' advice was seen only in search snippets. Rounds come from third-party prep guides built on candidate reports, and loops vary by business group.",
+    "loop_structure: most onsite round durations, the data_ml and hardware validation ('other') round splits, and PM level names are common-pattern estimates; the PM two-hour onsite session was split into two rounds by us.",
+    "bar_by_level: Intel does not publish its grade ladder; Grade 5 to Grade 11 titles and years come from one third-party article and levels.fyi listings. The normalized mapping (Grade 7 as mid despite the 'Senior' title) is our judgment.",
+    "persona: inferred from prep guides (two-on-one PM sessions, deep resume drill-downs, resource-awareness questions); no official description.",
+    "scoring_weights: estimated from what prep guides say interviewers grade; no public source gives weights.",
+    "case_style: based on one PM guide and one data science guide; pure estimation cases are rarely reported."
+  ]
+}
