@@ -21,6 +21,7 @@ from strong_api.account import install_account
 from strong_api.admin import install_admin, seed_admins_on_startup
 from strong_api.auth import install_auth
 from strong_api.billing import install_billing
+from strong_api.coach.router import router as coach_router
 from strong_api.controls import router as status_router
 from strong_api.custom.router import router as custom_router
 from strong_api.devtools import router as dev_router
@@ -119,6 +120,7 @@ def create_app(
     app.include_router(reports_router)
     app.include_router(questions_router)
     app.include_router(custom_router)
+    app.include_router(coach_router)
     app.include_router(dev_router)
     app.include_router(status_router)
     install_auth(app)
