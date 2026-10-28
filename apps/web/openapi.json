@@ -1714,6 +1714,50 @@
         }
       }
     },
+    "/sessions/{session_id}/transcript": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Get Transcript",
+        "description": "TR-1: the transcript of the signed-in user's finished session. 404 for anyone else.",
+        "operationId": "get_transcript_sessions__session_id__transcript_get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transcript"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/questions/companies": {
       "get": {
         "tags": [
@@ -2155,6 +2199,392 @@
         }
       }
     },
+    "/stories": {
+      "get": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "List Stories",
+        "description": "ST-1: the user's stories, newest first.",
+        "operationId": "list_stories_stories_get",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/StoryStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only drafts, or only proven.",
+              "title": "Status"
+            },
+            "description": "Only drafts, or only proven."
+          },
+          {
+            "name": "skill",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Competency"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only stories with this tag.",
+              "title": "Skill"
+            },
+            "description": "Only stories with this tag."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Story"
+                  },
+                  "title": "Response List Stories Stories Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "Create Story",
+        "description": "ST-1: create a draft story.",
+        "operationId": "create_story_stories_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoryIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Story"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/from-answer": {
+      "post": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "Story From Answer",
+        "description": "ST-2: \"Save as a story\" on a debrief answer. Creates a draft story with the candidate's\nanswer to that question, tagged with the competencies it was scored on and linked to the\nsession and question. The answer goes into `action` until a split into parts is known.",
+        "operationId": "story_from_answer_stories_from_answer_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoryFromAnswerIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Story"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The session is not the user's, or detail.code is 'scorecard_not_found' or 'question_not_found'."
+          },
+          "409": {
+            "description": "detail.code is 'story_exists'; detail.story_id is that story."
+          },
+          "422": {
+            "description": "detail.code is 'answer_empty' when the answer has no text."
+          }
+        }
+      }
+    },
+    "/stories/{story_id}": {
+      "get": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "Get Story",
+        "description": "ST-1: one story with its notes.",
+        "operationId": "get_story_stories__story_id__get",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Story"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "Edit Story",
+        "description": "ST-1: change the title, the skill tags or any of the five parts. Only the fields sent\nchange; a part sent as null or blank is cleared.",
+        "operationId": "edit_story_stories__story_id__patch",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoryPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Story"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "Delete Story",
+        "description": "ST-1: delete a story and its notes. Debriefs that used it keep their scores.",
+        "operationId": "delete_story_stories__story_id__delete",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{story_id}/notes": {
+      "get": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "List Story Notes",
+        "description": "ST-6: the story's fix notes, oldest first.",
+        "operationId": "list_story_notes_stories__story_id__notes_get",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StoryNote"
+                  },
+                  "title": "Response List Story Notes Stories  Story Id  Notes Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "Add Story Note",
+        "description": "ST-6: append a fix note (S22 sends the debrief's story fix here).",
+        "operationId": "add_story_note_stories__story_id__notes_post",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoryNoteIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryNote"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/coach/sessions": {
       "post": {
         "tags": [
@@ -2479,6 +2909,113 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/plan/{job_target_id}/{resume_id}": {
+      "get": {
+        "tags": [
+          "interview plan"
+        ],
+        "summary": "Get Plan",
+        "description": "PP-1: the plan page for one job and CV pair. PP-2: days left to the interview date.",
+        "operationId": "get_plan_plan__job_target_id___resume_id__get",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          },
+          {
+            "name": "resume_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Resume Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanView"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The job target or the resume does not exist."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plan/{job_target_id}/interview-date": {
+      "put": {
+        "tags": [
+          "interview plan"
+        ],
+        "summary": "Set Interview Date",
+        "description": "PP-2: set the real interview date, or clear it with null.",
+        "operationId": "set_interview_date_plan__job_target_id__interview_date_put",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InterviewDateIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterviewDateOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The job target does not exist or was deleted."
+          },
+          "422": {
+            "description": "The date is in the past."
           }
         }
       }
@@ -12357,6 +12894,32 @@
         "title": "CompetencyTrend",
         "description": "PR-1: one competency over the Realistic sessions of a job target."
       },
+      "CompetencyWeight": {
+        "properties": {
+          "competency": {
+            "$ref": "#/components/schemas/Competency"
+          },
+          "weight": {
+            "type": "number",
+            "title": "Weight",
+            "description": "The profile's scoring weight. 1.0 when it sets none."
+          },
+          "share": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Share",
+            "description": "The weight's share within its interview type."
+          }
+        },
+        "type": "object",
+        "required": [
+          "competency",
+          "weight",
+          "share"
+        ],
+        "title": "CompetencyWeight"
+      },
       "Confidence": {
         "enum": [
           "low",
@@ -14099,6 +14662,62 @@
         ],
         "title": "InputCheck",
         "type": "object"
+      },
+      "InterviewDateIn": {
+        "properties": {
+          "interview_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interview Date"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "interview_date"
+        ],
+        "title": "InterviewDateIn",
+        "description": "PP-2: the candidate's real interview date. null clears it."
+      },
+      "InterviewDateOut": {
+        "properties": {
+          "interview_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interview Date"
+          },
+          "days_left": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days Left"
+          }
+        },
+        "type": "object",
+        "required": [
+          "interview_date",
+          "days_left"
+        ],
+        "title": "InterviewDateOut"
       },
       "InterviewType": {
         "type": "string",
@@ -16854,6 +17473,192 @@
         ],
         "title": "PlanOut",
         "description": "The one paid plan. Every number comes from the API config."
+      },
+      "PlanSetupDefaults": {
+        "properties": {
+          "interview_type": {
+            "$ref": "#/components/schemas/InterviewType",
+            "description": "PR-2's next session, else GA-3's first."
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/Difficulty"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/Mode"
+          },
+          "duration_min": {
+            "type": "integer",
+            "enum": [
+              30,
+              45
+            ],
+            "title": "Duration Min",
+            "description": "The default full length. Free accounts get the mini interview instead."
+          },
+          "level": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Level"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The job's level, else the user's target level."
+          },
+          "tone": {
+            "$ref": "#/components/schemas/Tone",
+            "description": "TN-3: as_company with a curated profile, else neutral."
+          }
+        },
+        "type": "object",
+        "required": [
+          "interview_type",
+          "difficulty",
+          "mode",
+          "duration_min",
+          "level",
+          "tone"
+        ],
+        "title": "PlanSetupDefaults",
+        "description": "PP-4: what the setup on the plan page starts with. Every v1 option stays editable."
+      },
+      "PlanView": {
+        "properties": {
+          "job": {
+            "$ref": "#/components/schemas/JobTargetOut"
+          },
+          "resume": {
+            "$ref": "#/components/schemas/ResumeOut"
+          },
+          "company_mode": {
+            "type": "string",
+            "enum": [
+              "curated",
+              "generic"
+            ],
+            "title": "Company Mode"
+          },
+          "company_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company Name",
+            "description": "From the profile, else the posting."
+          },
+          "values_framework": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Values Framework",
+            "description": "The company's values framework name, for example 'Leadership Principles'."
+          },
+          "interview_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interview Date",
+            "description": "PP-2: the real interview date, if set."
+          },
+          "days_left": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days Left",
+            "description": "PP-2: days from today (UTC) to interview_date. 0 is today, negative is past."
+          },
+          "tested": {
+            "items": {
+              "$ref": "#/components/schemas/TypeWeights"
+            },
+            "type": "array",
+            "title": "Tested",
+            "description": "What they'll test: the loop's types first, then the other standard types."
+          },
+          "gap": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GapAnalysisOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The latest gap analysis of this pair (GA-1 to GA-3, probe areas and the session plan). None when the pair has none yet."
+          },
+          "reports": {
+            "items": {
+              "$ref": "#/components/schemas/ReportItem"
+            },
+            "type": "array",
+            "title": "Reports",
+            "description": "PR-3: this pair's reports, newest first."
+          },
+          "next_session": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlannedSession"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "PR-2."
+          },
+          "next_custom_session": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CustomRecommendation"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "CU-10."
+          },
+          "setup": {
+            "$ref": "#/components/schemas/PlanSetupDefaults"
+          }
+        },
+        "type": "object",
+        "required": [
+          "job",
+          "resume",
+          "company_mode",
+          "company_name",
+          "values_framework",
+          "interview_date",
+          "days_left",
+          "tested",
+          "gap",
+          "reports",
+          "next_session",
+          "next_custom_session",
+          "setup"
+        ],
+        "title": "PlanView",
+        "description": "PP-1: everything the plan page for one job and CV pair shows, in one read."
       },
       "PlannedSession": {
         "properties": {
@@ -21008,6 +21813,138 @@
         "title": "StoryFitStrength",
         "type": "string"
       },
+      "StoryFromAnswerIn": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Id"
+          },
+          "question_ref": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Question Ref",
+            "description": "QuestionScore.question_ref."
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title",
+            "description": "Default: the question's text, cut to the title limit."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "session_id",
+          "question_ref"
+        ],
+        "title": "StoryFromAnswerIn",
+        "description": "ST-2: save one debrief answer as a draft story."
+      },
+      "StoryIn": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "context": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context"
+          },
+          "stakes": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stakes"
+          },
+          "action": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "reflection": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reflection"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "type": "array",
+            "title": "Skills",
+            "description": "Skill tags."
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "manual",
+              "coach"
+            ],
+            "title": "Source",
+            "description": "A debrief answer becomes a story through POST /stories/from-answer.",
+            "default": "manual"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "title": "StoryIn",
+        "description": "ST-1: a new story typed by the candidate (or built by the coach). It starts as a draft."
+      },
       "StoryNote": {
         "properties": {
           "text": {
@@ -21055,6 +21992,47 @@
         "title": "StoryNote",
         "description": "ST-6: a fix note sent to the story from a debrief answer that used it."
       },
+      "StoryNoteIn": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Text"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          },
+          "question_ref": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Ref"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "StoryNoteIn",
+        "description": "ST-6: a fix note for the story, usually from a debrief answer that used it."
+      },
       "StoryPart": {
         "type": "string",
         "enum": [
@@ -21097,6 +22075,101 @@
         ],
         "title": "StoryPartUpdate",
         "description": "CO-3, CO-9: new text for one story part, backed by the candidate's own words."
+      },
+      "StoryPatch": {
+        "properties": {
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "context": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context"
+          },
+          "stakes": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stakes"
+          },
+          "action": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "reflection": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reflection"
+          },
+          "skills": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Competency"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skills"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "StoryPatch",
+        "description": "ST-1: change the title, the skill tags or any part. Only the fields sent change; a part\nsent as null (or blank) is cleared. The status is never set by hand (ST-7)."
       },
       "StorySource": {
         "type": "string",
@@ -21289,6 +22362,136 @@
         ],
         "title": "Tone",
         "description": "TN-1: how the interviewer sounds. `as_company` uses the company profile's persona tone,\nor a neutral tone in generic mode. Old sessions read as `as_company`."
+      },
+      "Transcript": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Id"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "ended_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ended At"
+          },
+          "groups": {
+            "items": {
+              "$ref": "#/components/schemas/TranscriptGroup"
+            },
+            "type": "array",
+            "title": "Groups"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "session_id",
+          "started_at",
+          "ended_at",
+          "groups"
+        ],
+        "title": "Transcript"
+      },
+      "TranscriptGroup": {
+        "properties": {
+          "question_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Ref",
+            "description": "The brief question id, None outside questions."
+          },
+          "question_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Text",
+            "description": "The question as planned, when known."
+          },
+          "phase": {
+            "$ref": "#/components/schemas/Phase",
+            "description": "The phase of the group's first turn."
+          },
+          "turns": {
+            "items": {
+              "$ref": "#/components/schemas/TranscriptTurn"
+            },
+            "type": "array",
+            "title": "Turns"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "question_ref",
+          "question_text",
+          "phase",
+          "turns"
+        ],
+        "title": "TranscriptGroup",
+        "description": "Consecutive turns about one question, or about one phase when there is no question."
+      },
+      "TranscriptTurn": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "speaker": {
+            "$ref": "#/components/schemas/Speaker"
+          },
+          "phase": {
+            "$ref": "#/components/schemas/Phase"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "start_ms": {
+            "type": "integer",
+            "title": "Start Ms",
+            "description": "Time offset from the session start, in milliseconds."
+          },
+          "end_ms": {
+            "type": "integer",
+            "title": "End Ms"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "speaker",
+          "phase",
+          "text",
+          "start_ms",
+          "end_ms"
+        ],
+        "title": "TranscriptTurn"
       },
       "TransitionIn": {
         "properties": {
@@ -21525,6 +22728,34 @@
         ],
         "title": "Turn",
         "description": "One utterance in the transcript. Text only; audio is never stored."
+      },
+      "TypeWeights": {
+        "properties": {
+          "interview_type": {
+            "$ref": "#/components/schemas/InterviewType"
+          },
+          "in_loop": {
+            "type": "boolean",
+            "title": "In Loop",
+            "description": "The company's loop for this role family has a round of this type. Always false in generic mode."
+          },
+          "competencies": {
+            "items": {
+              "$ref": "#/components/schemas/CompetencyWeight"
+            },
+            "type": "array",
+            "title": "Competencies",
+            "description": "Highest weight first."
+          }
+        },
+        "type": "object",
+        "required": [
+          "interview_type",
+          "in_loop",
+          "competencies"
+        ],
+        "title": "TypeWeights",
+        "description": "One interview type and the competencies it scores, with the company's weights."
       },
       "UsageOut": {
         "properties": {

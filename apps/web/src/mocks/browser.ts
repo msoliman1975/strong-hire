@@ -14,7 +14,9 @@ import { coachVoiceHandlers } from "./coachVoiceHandlers";
 import { customHandlers } from "./custom";
 import { createStore } from "./db";
 import { accountHandlers, authHandlers, inputHandlers, scoringHandlers, sessionHandlers } from "./handlers";
+import { planHandlers } from "./planHandlers";
 import { questionHandlers } from "./questionHandlers";
+import { transcriptHandlers } from "./transcriptHandlers";
 import { waitlistHandlers } from "./waitlistHandlers";
 
 export type MockMode = "all" | "off";
@@ -33,9 +35,11 @@ export async function startMocks(mode: MockMode): Promise<void> {
     ...authHandlers(store),
     ...accountHandlers(store),
     ...customHandlers(store),
+    ...planHandlers(store),
     ...questionHandlers(),
     ...waitlistHandlers(),
     ...coachVoiceHandlers(),
+    ...transcriptHandlers(),
   ];
   await setupWorker(...handlers).start({
     onUnhandledFrame: "bypass",
