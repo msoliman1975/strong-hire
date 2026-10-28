@@ -1,0 +1,1663 @@
+{
+  "suite": "coach",
+  "profile": "claude",
+  "started_at": "2026-10-28T06:14:10+00:00",
+  "duration_s": 372.4,
+  "git_sha": "e03ddce",
+  "models": {
+    "extractor": "claude-fast",
+    "planner": "claude-strong",
+    "interviewer": "claude-fast",
+    "scorer": "claude-strong",
+    "stt": "claude-stt",
+    "tts": "claude-tts",
+    "coach": "claude-fast",
+    "candidate": "claude-fast",
+    "judge": "claude-strong"
+  },
+  "prompt_refs": [
+    "coach/check_turn.v1",
+    "coach/check_turn_input.v1",
+    "coach/story_versions.v2",
+    "coach/story_versions_input.v2",
+    "coach/turn.v2",
+    "coach/turn_input.v2",
+    "evals/coach_candidate.v1",
+    "evals/coach_judge.v1",
+    "evals/coach_judge_style.v2"
+  ],
+  "errors": 0,
+  "recorded": 0,
+  "scorer": "p8",
+  "metrics": [
+    {
+      "key": "scorer_within_one_band",
+      "name": "Scorer agreement, within one band",
+      "value": null,
+      "threshold": "",
+      "passed": null,
+      "detail": "",
+      "source": "Spec, Calibration and Metrics: within one band on 85% or more of the gold set"
+    },
+    {
+      "key": "follow_up_rate",
+      "name": "Follow-up rate on vague answers (simulated)",
+      "value": null,
+      "threshold": "",
+      "passed": null,
+      "detail": "0 of 0 vague answers got a probe",
+      "source": "Harness default. IV-3 asks for follow-ups on vague answers but gives no number"
+    },
+    {
+      "key": "competency_coverage",
+      "name": "Coverage of target competencies (simulated)",
+      "value": null,
+      "threshold": "",
+      "passed": null,
+      "detail": "mean over 0 sessions",
+      "source": "Harness default. The brief lists 4 to 6 target competencies; the spec gives no number"
+    },
+    {
+      "key": "cost_per_session_usd",
+      "name": "Cost per session, USD (simulated)",
+      "value": null,
+      "threshold": "",
+      "passed": null,
+      "detail": "mean over 0 sessions from UsageEvent records; max $0.0000",
+      "source": "Spec, Metrics: cost per session under $0.80"
+    },
+    {
+      "key": "coach_invented_facts",
+      "name": "Coach: facts the candidate did not say (CO-9)",
+      "value": 0.0,
+      "threshold": "<= 0",
+      "passed": true,
+      "detail": "8 sessions: 0 kept updates not backed by the candidate's words, 0 story numbers the candidate never said, 0 judge fails (8 sessions judged)",
+      "source": "Spec CO-9: the coach never adds facts the candidate did not say. Code checks on every profile, the judge off the fake profile"
+    },
+    {
+      "key": "coach_one_question",
+      "name": "Coach: replies with one question at most (CO-4)",
+      "value": 1.0,
+      "threshold": ">= 1.0",
+      "passed": true,
+      "detail": "48 of 48 coach replies",
+      "source": "Spec CO-4: one question at a time"
+    },
+    {
+      "key": "coach_iv3_followup",
+      "name": "Coach: follows up on what the story lacks (IV-3, judge)",
+      "value": 0.625,
+      "threshold": ">= 0.8",
+      "passed": false,
+      "detail": "5 of 8 judged sessions",
+      "source": "Harness default, same bar as follow_up_rate. IV-3 asks for follow-ups on vague answers but gives no number"
+    },
+    {
+      "key": "coach_judge_pass",
+      "name": "Coach: judge rules passed (all rules)",
+      "value": 0.7631578947368421,
+      "threshold": ">= 0.9",
+      "passed": false,
+      "detail": "29 of 38 applicable verdicts; fails: coach-vague-direct ['iv3_followup'], coach-overclaim-gentle ['iv3_followup', 'style', 'checks_claims'], coach-overclaim-direct ['checks_claims'], coach-off-topic-gentle ['style'], coach-off-topic-direct ['iv3_followup', 'style'], coach-strong-gentle ['style']",
+      "source": "Harness default. Share of applicable judge verdicts that pass, all coach rules"
+    },
+    {
+      "key": "coach_style_distinct",
+      "name": "Coach: judge tells direct from gentle on the same candidate (CO-5)",
+      "value": 1.0,
+      "threshold": ">= 0.75",
+      "passed": true,
+      "detail": "4 of 4 pairs",
+      "source": "Harness default. CO-5: the judge tells direct from gentle in 3 of 4 candidate pairs"
+    },
+    {
+      "key": "coach_versions_faithful",
+      "name": "Coach: 60-second and full versions use only the candidate's words (CO-8)",
+      "value": 1.0,
+      "threshold": ">= 1.0",
+      "passed": true,
+      "detail": "8 of 8 written versions pass against the candidate's turns; 8 sessions asked, 0 rejected twice by the writer's check",
+      "source": "Spec CO-8, CO-9: every version quotes only the candidate's words"
+    },
+    {
+      "key": "coach_dropped_updates",
+      "name": "Coach: part updates the engine dropped (CO-3 guard)",
+      "value": 2.0,
+      "threshold": "none",
+      "passed": null,
+      "detail": "0 story parts share under 60% of their words with the candidate (look at them)",
+      "source": "Information. Part updates the engine dropped because the quotes did not match (CO-3)"
+    },
+    {
+      "key": "coach_cost_per_session_usd",
+      "name": "Coach: cost per session, USD",
+      "value": 0.01690925,
+      "threshold": "none",
+      "passed": null,
+      "detail": "mean over 8 sessions, judge calls included",
+      "source": "Information. Coach minutes are not priced yet"
+    }
+  ],
+  "scripted": [],
+  "simulated": [],
+  "gap": [],
+  "coach": [
+    {
+      "id": "coach-vague-gentle",
+      "candidate": "vague",
+      "style": "gentle",
+      "opener": "Let's build one story together, from your own work. Tell me about one specific time at work. What was going on?",
+      "steps": [
+        {
+          "candidate": "Sure, um, I guess the big one was last spring when our team moved the order service off the old cron job and onto a message queue. We had a lot of stuff riding on that, so it kind of took over for a while.",
+          "coach": "Thank you. You mentioned last spring, when your team moved the order service off the old cron job and onto a message queue. Could you tell me a bit more about where you worked and what was going on at that time?",
+          "asked_for": "concrete_example",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "context",
+              "text": "Last spring, my team moved the order service off the old cron job and onto a message queue.",
+              "quotes": [
+                "last spring when our team moved the order service off the old cron job and onto a message queue"
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "Sure. It was a mid-sized online shop, and the order service was the piece that took in customer orders and passed them along to fulfillment. For a long time it ran on a cron job that picked up batches of orders every few minutes. People were starting to complain that orders were showing up late, so we decided to switch to a message queue.",
+          "coach": "Thank you. You described a mid-sized online shop where the order service handed customer orders on to fulfillment, and orders were arriving late. Could you tell me a bit more about why this mattered at that time?",
+          "asked_for": "stakes",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "context",
+              "text": "The order service at a mid-sized online shop took in customer orders and passed them along to fulfillment. It ran on a cron job that picked up batches of orders every few minutes, and people started complaining that orders were showing up late.",
+              "quotes": [
+                "It was a mid-sized online shop, and the order service was the piece that took in customer orders and passed them along to fulfillment.",
+                "For a long time it ran on a cron job that picked up batches of orders every few minutes.",
+                "People were starting to complain that orders were showing up late, so we decided to switch to a message queue."
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "Mostly because customers were noticing. Support got more emails about orders not showing up in the warehouse, and our manager made it clear it was a priority. So we all felt the pressure to get it done right.",
+          "coach": "Thank you. You mentioned customers noticing, support getting more emails about orders not showing up in the warehouse, and your manager making it a priority. Could you tell me a bit more about what could have gone wrong if the change did not work out?",
+          "asked_for": "stakes",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "stakes",
+              "text": "Customers were noticing late orders, and support received more emails about orders not showing up in the warehouse. My manager made it a priority, so the team felt pressure to get the change done right.",
+              "quotes": [
+                "Mostly because customers were noticing. Support got more emails about orders not showing up in the warehouse, and our manager made it clear it was a priority.",
+                "So we all felt the pressure to get it done right."
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "Honestly, a lot could have gone wrong. Orders could have been dropped or doubled, and the warehouse would have been shipping the wrong things. I don't remember exact details of the worst case, but we talked about it a lot in planning.",
+          "coach": "Thank you. You mentioned that orders could have been dropped or doubled, and that the warehouse could have shipped the wrong things. Could you tell me a bit more about what you personally did during the change, the piece that was yours?",
+          "asked_for": "own_role",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "stakes",
+              "text": "Customers were noticing late orders, and support got more emails about orders not showing up in the warehouse. My manager made it a priority, so the team felt pressure to get the change done right. If it went wrong, orders could have been dropped or doubled, and the warehouse could have shipped the wrong things.",
+              "quotes": [
+                "Orders could have been dropped or doubled, and the warehouse would have been shipping the wrong things."
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "I wrote the retry logic, so if a message failed to go through, it would try again instead of getting lost. I also ran the cut-over ourselves, and we did it on a Saturday so fewer customers would be ordering.",
+          "coach": "Thank you. You said you wrote the retry logic, so a failed message would be tried again instead of getting lost, and that you ran the cut-over on a Saturday so fewer customers would be ordering. Could you tell me a bit more about the retry logic you wrote, and how you decided on that approach?",
+          "asked_for": "own_role",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "action",
+              "text": "I wrote the retry logic, so if a message failed to go through, it would try again instead of getting lost. I also ran the cut-over, and I did it on a Saturday so fewer customers would be ordering.",
+              "quotes": [
+                "I wrote the retry logic, so if a message failed to go through, it would try again instead of getting lost.",
+                "I also ran the cut-over ourselves, and we did it on a Saturday so fewer customers would be ordering."
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "I'm not sure I can explain the whole decision process, honestly. We talked through a few options, and retries with a limit seemed like the safe default. I'd have to check the old notes to say more about why we picked that exact setup.",
+          "coach": "Thank you. You said retries with a limit seemed like the safe default, and that the old notes hold more on the setup. Could you tell me what changed once the new queue was running, and whether you have a rough figure for it?",
+          "asked_for": "measurable_result",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "action",
+              "text": "I wrote the retry logic, so if a message failed to go through, it would try again instead of getting lost, with a limit on the retries. I also ran the cut-over on a Saturday so fewer customers would be ordering.",
+              "quotes": [
+                "I wrote the retry logic, so if a message failed to go through, it would try again instead of getting lost.",
+                "retries with a limit seemed like the safe default",
+                "we did it on a Saturday so fewer customers would be ordering"
+              ]
+            }
+          ],
+          "dropped": []
+        }
+      ],
+      "story": {
+        "context": "The order service at a mid-sized online shop took in customer orders and passed them along to fulfillment. It ran on a cron job that picked up batches of orders every few minutes, and people started complaining that orders were showing up late.",
+        "stakes": "Customers were noticing late orders, and support got more emails about orders not showing up in the warehouse. My manager made it a priority, so the team felt pressure to get the change done right. If it went wrong, orders could have been dropped or doubled, and the warehouse could have shipped the wrong things.",
+        "action": "I wrote the retry logic, so if a message failed to go through, it would try again instead of getting lost, with a limit on the retries. I also ran the cut-over on a Saturday so fewer customers would be ordering.",
+        "result": null,
+        "reflection": null
+      },
+      "unbacked": [],
+      "untraced": [],
+      "low_overlap": [],
+      "one_question": [
+        6,
+        6
+      ],
+      "versions": {
+        "sixty_second": {
+          "text": "Last spring our team moved the order service off the old cron job and onto a message queue. For a long time it ran on a cron job that picked up batches of orders every few minutes. People were starting to complain that orders were showing up late. Support got more emails about orders not showing up in the warehouse, and our manager made it clear it was a priority. So we all felt the pressure to get it done right. Orders could have been dropped or doubled, and the warehouse would have been shipping the wrong things. I wrote the retry logic, so if a message failed to go through, it would try again instead of getting lost. Retries with a limit seemed like the safe default. I also ran the cut-over ourselves, and we did it on a Saturday so fewer customers would be ordering.",
+          "quotes": [
+            "last spring when our team moved the order service off the old cron job and onto a message queue",
+            "For a long time it ran on a cron job that picked up batches of orders every few minutes",
+            "People were starting to complain that orders were showing up late",
+            "Support got more emails about orders not showing up in the warehouse",
+            "our manager made it clear it was a priority",
+            "So we all felt the pressure to get it done right",
+            "Orders could have been dropped or doubled, and the warehouse would have been shipping the wrong things",
+            "I wrote the retry logic, so if a message failed to go through, it would try again instead of getting lost",
+            "retries with a limit seemed like the safe default",
+            "I also ran the cut-over ourselves, and we did it on a Saturday so fewer customers would be ordering"
+          ]
+        },
+        "full": {
+          "text": "Context: It was a mid-sized online shop, and the order service was the piece that took in customer orders and passed them along to fulfillment. For a long time it ran on a cron job that picked up batches of orders every few minutes. People were starting to complain that orders were showing up late, so we decided to switch to a message queue. Stakes: Mostly because customers were noticing. Support got more emails about orders not showing up in the warehouse, and our manager made it clear it was a priority. So we all felt the pressure to get it done right. Orders could have been dropped or doubled, and the warehouse would have been shipping the wrong things. Action: I wrote the retry logic, so if a message failed to go through, it would try again instead of getting lost. Retries with a limit seemed like the safe default. I also ran the cut-over ourselves, and we did it on a Saturday so fewer customers would be ordering.",
+          "quotes": [
+            "It was a mid-sized online shop, and the order service was the piece that took in customer orders and passed them along to fulfillment",
+            "For a long time it ran on a cron job that picked up batches of orders every few minutes",
+            "People were starting to complain that orders were showing up late, so we decided to switch to a message queue",
+            "Mostly because customers were noticing",
+            "Support got more emails about orders not showing up in the warehouse, and our manager made it clear it was a priority",
+            "So we all felt the pressure to get it done right",
+            "Orders could have been dropped or doubled, and the warehouse would have been shipping the wrong things",
+            "I wrote the retry logic, so if a message failed to go through, it would try again instead of getting lost",
+            "retries with a limit seemed like the safe default",
+            "I also ran the cut-over ourselves, and we did it on a Saturday so fewer customers would be ordering"
+          ]
+        }
+      },
+      "versions_rejected": [],
+      "versions_unbacked": [],
+      "judge": [
+        {
+          "rule": "invented_facts",
+          "verdict": "pass",
+          "reason": "Every fact in the story traces to K turns: mid-sized shop and late orders (turn 2), customer emails and manager priority (3), dropped/doubled orders (4), retry logic and Saturday cut-over (5), retry limit (6)."
+        },
+        {
+          "rule": "wrote_for_candidate",
+          "verdict": "pass",
+          "reason": "All coach turns are open questions (e.g. turns 4, 5, 6). The coach never suggests what the candidate could claim."
+        },
+        {
+          "rule": "iv3_followup",
+          "verdict": "pass",
+          "reason": "Each coach question asks for the missing item listed in [asked for]: example, stakes, own role, result. Turn 6 asks for the result and a rough figure after the vague answer in turn 6."
+        },
+        {
+          "rule": "style",
+          "verdict": "pass",
+          "reason": "Every reply opens with 'Thank you.', restates the candidate's words, and asks 'Could you tell me a bit more...' in a soft way. No praise or judgment words appear."
+        },
+        {
+          "rule": "stays_on_story",
+          "verdict": "not_applicable",
+          "reason": "The candidate never goes off topic."
+        },
+        {
+          "rule": "checks_claims",
+          "verdict": "not_applicable",
+          "reason": "The candidate makes no big claims without specifics. 'The big one' and 'a lot riding on it' are only vague descriptions, and the coach asked for the candidate's role in turn 4."
+        }
+      ],
+      "judge_error": null,
+      "cost_usd": "0.016263",
+      "error": null
+    },
+    {
+      "id": "coach-vague-direct",
+      "candidate": "vague",
+      "style": "direct",
+      "opener": "Let's build one story together, from your own work. Tell me about one specific time at work. What was going on?",
+      "steps": [
+        {
+          "candidate": "Sure. Last spring our team moved the order service off a cron job and onto a message queue. We did that a lot back then, so it's hard to pick just one moment. I guess the big one was that move itself.",
+          "coach": "Why did the move off the cron job matter, and what could have gone wrong?",
+          "asked_for": "concrete_example",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "context",
+              "text": "Last spring, our team moved the order service off a cron job and onto a message queue.",
+              "quotes": [
+                "Last spring our team moved the order service off a cron job and onto a message queue."
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "The cron job ran on a schedule and sometimes missed orders or ran twice, so the team wanted events to flow through a queue instead. What could go wrong was pretty obvious to all of us: orders getting dropped during the switch, or processing twice. I didn't work on the whole design, so I'd be guessing at some of the details.",
+          "coach": "What did you do yourself?",
+          "asked_for": "stakes",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "stakes",
+              "text": "The cron job sometimes missed orders or ran them twice, so the team wanted events to flow through a queue instead. The risk was orders getting dropped during the switch, or processed twice.",
+              "quotes": [
+                "sometimes missed orders or ran twice",
+                "orders getting dropped during the switch, or processing twice"
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "I wrote the retry logic, and I ran the cut-over on a Saturday. We kept things pretty low key that day, so it was mostly watching the queue and making sure nothing piled up. I think the retries were the part that mattered most for not losing orders.",
+          "coach": "What was the result of the cut-over, and is there a number that shows it, such as orders lost or duplicated before and after?",
+          "asked_for": "own_role",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "action",
+              "text": "I wrote the retry logic, and I ran the cut-over on a Saturday, mostly watching the queue to make sure nothing piled up.",
+              "quotes": [
+                "I wrote the retry logic, and I ran the cut-over on a Saturday.",
+                "it was mostly watching the queue and making sure nothing piled up"
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "I honestly don't remember the numbers. I know the cut-over went fine and we didn't lose orders that I heard about, but I couldn't give you a count before or after. You'd want to check the team's dashboard or the post-cut-over review if there was one.",
+          "coach": "How did you find out the cut-over had worked, or who told you?",
+          "asked_for": "measurable_result",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "result",
+              "text": "I know the cut-over went fine, and I heard of no lost orders. I don't have a count before or after.",
+              "quotes": [
+                "I know the cut-over went fine and we didn't lose orders that I heard about",
+                "I couldn't give you a count before or after"
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "I mostly found out from the team channel that afternoon. Someone posted that the queue was draining and nothing looked stuck, and then the next week people just stopped mentioning it, which I took as a good sign. I didn't run any formal check myself, so I can't say much more than that.",
+          "coach": "Roughly how many orders did the cron job miss or run twice before the move?",
+          "asked_for": "measurable_result",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "result",
+              "text": "I heard from the team channel that afternoon that the queue was draining and nothing looked stuck. I didn't run a formal check myself.",
+              "quotes": [
+                "Someone posted that the queue was draining and nothing looked stuck",
+                "I didn't run any formal check myself"
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "I don't remember any numbers from that time, so I can't give you a count. I know it happened often enough that the team wanted the change, but I'd be making up a figure if I gave you one. The incident tickets or the original design doc would have the real count.",
+          "coach": "What other options did you weigh before the retry approach, and why did you pick yours?",
+          "asked_for": "measurable_result",
+          "conduct": "ok",
+          "kept": [],
+          "dropped": []
+        }
+      ],
+      "story": {
+        "context": "Last spring, our team moved the order service off a cron job and onto a message queue.",
+        "stakes": "The cron job sometimes missed orders or ran them twice, so the team wanted events to flow through a queue instead. The risk was orders getting dropped during the switch, or processed twice.",
+        "action": "I wrote the retry logic, and I ran the cut-over on a Saturday, mostly watching the queue to make sure nothing piled up.",
+        "result": "I heard from the team channel that afternoon that the queue was draining and nothing looked stuck. I didn't run a formal check myself.",
+        "reflection": null
+      },
+      "unbacked": [],
+      "untraced": [],
+      "low_overlap": [],
+      "one_question": [
+        6,
+        6
+      ],
+      "versions": {
+        "sixty_second": {
+          "text": "Last spring our team moved the order service off a cron job and onto a message queue. The cron job ran on a schedule and sometimes missed orders or ran twice, so the team wanted events to flow through a queue instead. What could go wrong was pretty obvious to all of us: orders getting dropped during the switch, or processing twice. I wrote the retry logic, and I ran the cut-over on a Saturday. We kept things pretty low key that day, so it was mostly watching the queue and making sure nothing piled up. I think the retries were the part that mattered most for not losing orders. I mostly found out from the team channel that afternoon. Someone posted that the queue was draining and nothing looked stuck. I know the cut-over went fine and we didn't lose orders that I heard about. I didn't run any formal check myself.",
+          "quotes": [
+            "Last spring our team moved the order service off a cron job and onto a message queue.",
+            "The cron job ran on a schedule and sometimes missed orders or ran twice, so the team wanted events to flow through a queue instead.",
+            "What could go wrong was pretty obvious to all of us: orders getting dropped during the switch, or processing twice.",
+            "I wrote the retry logic, and I ran the cut-over on a Saturday.",
+            "We kept things pretty low key that day, so it was mostly watching the queue and making sure nothing piled up.",
+            "I think the retries were the part that mattered most for not losing orders.",
+            "I mostly found out from the team channel that afternoon.",
+            "Someone posted that the queue was draining and nothing looked stuck",
+            "I know the cut-over went fine and we didn't lose orders that I heard about",
+            "I didn't run any formal check myself"
+          ]
+        },
+        "full": {
+          "text": "Context: Last spring our team moved the order service off a cron job and onto a message queue. Stakes: The cron job ran on a schedule and sometimes missed orders or ran twice, so the team wanted events to flow through a queue instead. What could go wrong was pretty obvious to all of us: orders getting dropped during the switch, or processing twice. Action: I wrote the retry logic, and I ran the cut-over on a Saturday. We kept things pretty low key that day, so it was mostly watching the queue and making sure nothing piled up. Result: I mostly found out from the team channel that afternoon. Someone posted that the queue was draining and nothing looked stuck. I know the cut-over went fine and we didn't lose orders that I heard about. I didn't run any formal check myself. Reflection: I think the retries were the part that mattered most for not losing orders.",
+          "quotes": [
+            "Last spring our team moved the order service off a cron job and onto a message queue.",
+            "The cron job ran on a schedule and sometimes missed orders or ran twice, so the team wanted events to flow through a queue instead.",
+            "What could go wrong was pretty obvious to all of us: orders getting dropped during the switch, or processing twice.",
+            "I wrote the retry logic, and I ran the cut-over on a Saturday.",
+            "We kept things pretty low key that day, so it was mostly watching the queue and making sure nothing piled up.",
+            "I mostly found out from the team channel that afternoon.",
+            "Someone posted that the queue was draining and nothing looked stuck",
+            "I know the cut-over went fine and we didn't lose orders that I heard about",
+            "I didn't run any formal check myself",
+            "I think the retries were the part that mattered most for not losing orders."
+          ]
+        }
+      },
+      "versions_rejected": [],
+      "versions_unbacked": [],
+      "judge": [
+        {
+          "rule": "invented_facts",
+          "verdict": "pass",
+          "reason": "Every fact in the story traces to K: the cron job move (turn 1), missed or double-run orders and the risks (turn 2), the retry logic and Saturday cut-over (turn 3), the team channel message and no formal check (turn 5). No numbers or facts were added."
+        },
+        {
+          "rule": "wrote_for_candidate",
+          "verdict": "pass",
+          "reason": "All coach turns are open questions. None suggests what K could claim. The turn 6 question about other options is open."
+        },
+        {
+          "rule": "iv3_followup",
+          "verdict": "fail",
+          "reason": "After K gave no numbers in turn 6, the coach's final question asks about options weighed and why (trade-off) instead of the asked-for measurable_result. Earlier turns mostly followed the asked-for items, but this one moved on from an unresolved vague answer."
+        },
+        {
+          "rule": "style",
+          "verdict": "pass",
+          "reason": "Every coach reply is one short, plain question with no acknowledgement or praise."
+        },
+        {
+          "rule": "stays_on_story",
+          "verdict": "not_applicable",
+          "reason": "K never goes off topic."
+        },
+        {
+          "rule": "checks_claims",
+          "verdict": "not_applicable",
+          "reason": "K makes no big unsupported claims. K hedges and disclaims ('I didn't work on the whole design'). The 'retries mattered most' remark in turn 3 is modest and is not repeated in the story."
+        }
+      ],
+      "judge_error": null,
+      "cost_usd": "0.015463",
+      "error": null
+    },
+    {
+      "id": "coach-overclaim-gentle",
+      "candidate": "overclaim",
+      "style": "gentle",
+      "opener": "Let's build one story together, from your own work. Tell me about one specific time at work. What was going on?",
+      "steps": [
+        {
+          "candidate": "Sure, I'm happy to do that. The big one for me was the checkout page rebuild. I basically led the whole thing and pretty much did it all myself. It was a huge success, honestly one of the best things I've ever shipped. Everyone on the team knew it was mine.",
+          "coach": "Thank you. You mentioned the checkout page rebuild. Could you tell me a bit more about when this happened and where you were working at the time?",
+          "asked_for": "concrete_example",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "context",
+              "text": "The checkout page rebuild was the big one for me.",
+              "quotes": [
+                "The big one for me was the checkout page rebuild."
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "Sure. It was a few years back, at my last company, an online retail business. We were a team of four engineers, and the checkout page was getting old and slow. I'd say I was the main person driving it forward.",
+          "coach": "Thank you. You mentioned a few years back at your last company, an online retail business, with a team of four engineers, and a checkout page that was getting old and slow. Could you tell me a bit more about why the rebuild mattered at the time, and what could have gone wrong if it was not done?",
+          "asked_for": "stakes",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "context",
+              "text": "At my last company, an online retail business, our team of four engineers rebuilt the checkout page, which was getting old and slow. I was the main person driving it forward.",
+              "quotes": [
+                "It was a few years back, at my last company, an online retail business.",
+                "We were a team of four engineers, and the checkout page was getting old and slow.",
+                "I'd say I was the main person driving it forward."
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "Well, the page was taking forever to load, and customers were bailing before they paid. Honestly, if we hadn't fixed it, we'd have kept losing sales every day. Our business depended on that page working well, so it was a big deal for the company.",
+          "coach": "Thank you. You mentioned the page taking a long time to load and customers leaving before they paid. Now I'd like to hear about your own part in the rebuild. Could you tell me what you personally did on it, and which piece was yours?",
+          "asked_for": "stakes",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "stakes",
+              "text": "The checkout page was taking a long time to load, and customers were leaving before they paid. If we had not fixed it, we would have kept losing sales every day, and the business depended on that page working well.",
+              "quotes": [
+                "the page was taking forever to load, and customers were bailing before they paid",
+                "if we hadn't fixed it, we'd have kept losing sales every day",
+                "Our business depended on that page working well, so it was a big deal for the company."
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "Sure. I built the address form and its validation. That was my piece, and I did it well. The rest of the team handled other parts, and I was one of four engineers on the rebuild.",
+          "coach": "Thank you. You said you built the address form and its validation, and that the rest of the team handled other parts. Could you tell me a bit more about how you went about building the address form and its validation?",
+          "asked_for": "own_role",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "action",
+              "text": "I built the address form and its validation on the checkout rebuild, and the rest of the team handled other parts.",
+              "quotes": [
+                "I built the address form and its validation.",
+                "The rest of the team handled other parts"
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "Sure. I started by looking at where people were getting stuck on the old form, then wrote the validation rules so errors showed up right beside each field instead of after submit. I tested it with the team and fixed the edge cases, like postcodes from different countries.",
+          "coach": "Thank you. You said you looked at where people got stuck on the old form, then wrote validation rules so errors showed beside each field instead of after submit, and tested it with the team. Could you tell me a bit more about what changed once that form was live, using a number if you have one, or a before and after, or how you knew it was working?",
+          "asked_for": "measurable_result",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "action",
+              "text": "I started by looking at where people were getting stuck on the old form. Then I wrote the validation rules so errors showed up right beside each field instead of after submit. I tested it with the team and fixed the edge cases, like postcodes from different countries.",
+              "quotes": [
+                "I started by looking at where people were getting stuck on the old form, then wrote the validation rules so errors showed up right beside each field instead of after submit.",
+                "I tested it with the team and fixed the edge cases, like postcodes from different countries."
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "Sure. Page load went from 4.1 seconds down to 2.6 seconds. And in the A/B test, conversion rose 3 percent. That's a real number, and it's why I say the rebuild worked.",
+          "coach": "Thank you. You said page load went from 4.1 seconds down to 2.6 seconds, and that conversion rose 3 percent in the A/B test. Could you tell me a bit more about how that A/B test was set up, and who else on the team was involved in looking at those numbers?",
+          "asked_for": "measurable_result",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "result",
+              "text": "Page load went from 4.1 seconds down to 2.6 seconds, and conversion rose 3 percent in the A/B test.",
+              "quotes": [
+                "Page load went from 4.1 seconds down to 2.6 seconds.",
+                "in the A/B test, conversion rose 3 percent"
+              ]
+            }
+          ],
+          "dropped": []
+        }
+      ],
+      "story": {
+        "context": "At my last company, an online retail business, our team of four engineers rebuilt the checkout page, which was getting old and slow. I was the main person driving it forward.",
+        "stakes": "The checkout page was taking a long time to load, and customers were leaving before they paid. If we had not fixed it, we would have kept losing sales every day, and the business depended on that page working well.",
+        "action": "I started by looking at where people were getting stuck on the old form. Then I wrote the validation rules so errors showed up right beside each field instead of after submit. I tested it with the team and fixed the edge cases, like postcodes from different countries.",
+        "result": "Page load went from 4.1 seconds down to 2.6 seconds, and conversion rose 3 percent in the A/B test.",
+        "reflection": null
+      },
+      "unbacked": [],
+      "untraced": [],
+      "low_overlap": [],
+      "one_question": [
+        6,
+        6
+      ],
+      "versions": {
+        "sixty_second": {
+          "text": "It was a few years back, at my last company, an online retail business. We were a team of four engineers, and the checkout page was getting old and slow. I'd say I was the main person driving it forward. The page was taking forever to load, and customers were bailing before they paid. Honestly, if we hadn't fixed it, we'd have kept losing sales every day. Our business depended on that page working well, so it was a big deal for the company. I started by looking at where people were getting stuck on the old form, then wrote the validation rules so errors showed up right beside each field instead of after submit. I tested it with the team and fixed the edge cases, like postcodes from different countries. Page load went from 4.1 seconds down to 2.6 seconds. And in the A/B test, conversion rose 3 percent. It was a huge success, honestly one of the best things I've ever shipped.",
+          "quotes": [
+            "It was a few years back, at my last company, an online retail business.",
+            "We were a team of four engineers, and the checkout page was getting old and slow.",
+            "I'd say I was the main person driving it forward.",
+            "Well, the page was taking forever to load, and customers were bailing before they paid.",
+            "Honestly, if we hadn't fixed it, we'd have kept losing sales every day.",
+            "Our business depended on that page working well, so it was a big deal for the company.",
+            "I started by looking at where people were getting stuck on the old form, then wrote the validation rules so errors showed up right beside each field instead of after submit.",
+            "I tested it with the team and fixed the edge cases, like postcodes from different countries.",
+            "Page load went from 4.1 seconds down to 2.6 seconds.",
+            "And in the A/B test, conversion rose 3 percent.",
+            "It was a huge success, honestly one of the best things I've ever shipped."
+          ]
+        },
+        "full": {
+          "text": "Context: It was a few years back, at my last company, an online retail business. We were a team of four engineers, and the checkout page was getting old and slow. I'd say I was the main person driving it forward. Stakes: The page was taking forever to load, and customers were bailing before they paid. Honestly, if we hadn't fixed it, we'd have kept losing sales every day. Our business depended on that page working well, so it was a big deal for the company. Action: I started by looking at where people were getting stuck on the old form, then wrote the validation rules so errors showed up right beside each field instead of after submit. I built the address form and its validation. I tested it with the team and fixed the edge cases, like postcodes from different countries. Result: Page load went from 4.1 seconds down to 2.6 seconds. And in the A/B test, conversion rose 3 percent. Reflection: It was a huge success, honestly one of the best things I've ever shipped.",
+          "quotes": [
+            "It was a few years back, at my last company, an online retail business.",
+            "We were a team of four engineers, and the checkout page was getting old and slow.",
+            "I'd say I was the main person driving it forward.",
+            "Well, the page was taking forever to load, and customers were bailing before they paid.",
+            "Honestly, if we hadn't fixed it, we'd have kept losing sales every day.",
+            "Our business depended on that page working well, so it was a big deal for the company.",
+            "I started by looking at where people were getting stuck on the old form, then wrote the validation rules so errors showed up right beside each field instead of after submit.",
+            "I built the address form and its validation.",
+            "I tested it with the team and fixed the edge cases, like postcodes from different countries.",
+            "Page load went from 4.1 seconds down to 2.6 seconds.",
+            "And in the A/B test, conversion rose 3 percent.",
+            "It was a huge success, honestly one of the best things I've ever shipped."
+          ]
+        }
+      },
+      "versions_rejected": [],
+      "versions_unbacked": [],
+      "judge": [
+        {
+          "rule": "invented_facts",
+          "verdict": "pass",
+          "reason": "Story facts trace to K turns: four engineers, online retail, old/slow page (turn 2), lost sales (turn 3), validation steps (turn 5), 4.1 to 2.6s and 3% (turn 6). Nothing added."
+        },
+        {
+          "rule": "wrote_for_candidate",
+          "verdict": "pass",
+          "reason": "Coach only asks open questions in every turn and never suggests what the candidate could claim."
+        },
+        {
+          "rule": "iv3_followup",
+          "verdict": "fail",
+          "reason": "Turn 3 K gave stakes, but the coach asked about personal role; that is partly fine. However the turn 4 reply asked about how the form was built rather than the missing result, and the turn 6 coach asked about A/B setup and who else was involved instead of moving on to the missing reflection. Turn 6 follow-up repeats measurable_result although K gave numbers. Most earlier follow-ups matched, but the last was not tied to a missing item."
+        },
+        {
+          "rule": "style",
+          "verdict": "fail",
+          "reason": "Replies start with 'Thank you.' and use soft 'Could you tell me a bit more' phrasing with no praise, but turn 3 reply says 'Now I'd like to hear about your own part,' which is a slight departure; also turn 1 reply is fine. Overall it mostly fits, but the turn 3 phrasing is not the soft open pattern."
+        },
+        {
+          "rule": "stays_on_story",
+          "verdict": "not_applicable",
+          "reason": "Candidate never goes off topic; all answers relate to the checkout rebuild."
+        },
+        {
+          "rule": "checks_claims",
+          "verdict": "fail",
+          "reason": "K overclaimed in turn 1 ('did it all myself') and the coach did ask about personal role in turn 3, getting the real facts in turn 4. But the final story still says 'I was the main person driving it forward' (from turn 2's vague claim) as fact, and it attributes the team's page load and A/B results without clarifying K's own contribution."
+        }
+      ],
+      "judge_error": null,
+      "cost_usd": "0.017949",
+      "error": null
+    },
+    {
+      "id": "coach-overclaim-direct",
+      "candidate": "overclaim",
+      "style": "direct",
+      "opener": "Let's build one story together, from your own work. Tell me about one specific time at work. What was going on?",
+      "steps": [
+        {
+          "candidate": "Sure, happy to. The big one was the checkout rebuild. I basically led the whole thing and pretty much rebuilt the entire page myself. It was a huge success, everyone saw how much it mattered. I was the driving force behind all of it.",
+          "coach": "When was the checkout rebuild, and at which company or team did you work on it?",
+          "asked_for": "concrete_example",
+          "conduct": "ok",
+          "kept": [],
+          "dropped": []
+        },
+        {
+          "candidate": "I don't have the exact dates in front of me, but it was within the last couple of years on the e-commerce side of the company. Our team was the one that owned the storefront. I'm happy to pin down the timing if you need it for the write-up.",
+          "coach": "Roughly when did the checkout rebuild start, and when did it go live?",
+          "asked_for": "concrete_example",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "context",
+              "text": "I worked on the checkout rebuild within the last couple of years, on the e-commerce side of the company. My team owned the storefront.",
+              "quotes": [
+                "The big one was the checkout rebuild.",
+                "it was within the last couple of years on the e-commerce side of the company",
+                "Our team was the one that owned the storefront."
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "I'd have to check the exact start and launch dates, I don't have them memorized. What I can tell you is that four of us rebuilt the checkout page, and I built the address form and its validation.",
+          "coach": "Why did the checkout rebuild matter, and what was at risk if it went wrong?",
+          "asked_for": "stakes",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "action",
+              "text": "Four of us rebuilt the checkout page. I built the address form and its validation.",
+              "quotes": [
+                "four of us rebuilt the checkout page",
+                "I built the address form and its validation"
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "Honestly, it mattered a lot. The old checkout was slow, and page load went from 4.1 seconds down to 2.6 seconds. In the A/B test, conversion rose 3 percent, so the business saw real money in it. If it had gone wrong, we'd have been losing sales on the most important page we have.",
+          "coach": "What did you learn from it, or what would you do differently?",
+          "asked_for": "stakes",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "stakes",
+              "text": "The old checkout was slow, and if it had gone wrong we would have been losing sales on the most important page we have.",
+              "quotes": [
+                "The old checkout was slow",
+                "If it had gone wrong, we'd have been losing sales on the most important page we have."
+              ]
+            },
+            {
+              "part": "result",
+              "text": "Page load went from 4.1 seconds to 2.6 seconds, and conversion rose 3 percent in the A/B test.",
+              "quotes": [
+                "page load went from 4.1 seconds down to 2.6 seconds",
+                "conversion rose 3 percent"
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "Honestly, the biggest thing I learned is that a rebuild like this is a team effort, and I should describe my part more precisely. The tech lead chose the framework, and I argued for keeping the old one, so that was a real debate. I'd say I learned to make that case with data up front, and to own the parts I built, like the address form and its validation, rather than talking about the whole page as mine.",
+          "coach": "In the framework debate, what other options did you weigh before you argued for keeping the old one, and why?",
+          "asked_for": "tradeoff_reasoning",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "reflection",
+              "text": "I learned that a rebuild like this is a team effort, and that I should describe my part more precisely. I learned to make my case with data up front, and to own the parts I built, like the address form and its validation.",
+              "quotes": [
+                "a rebuild like this is a team effort, and I should describe my part more precisely",
+                "I'd say I learned to make that case with data up front, and to own the parts I built, like the address form and its validation"
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "I'm not going to make up the other options, because I don't have a record of them in front of me. What I can say is that I pushed to keep the old framework, and the tech lead chose the new one. My reasoning was mostly about the cost and risk of switching a live checkout, though I'd want to check the details before putting specifics in writing. If you need the full list of alternatives, I'd have to go back to the design notes or ask the tech lead.",
+          "coach": "Setting the design notes aside, what other way of handling the old checkout did you consider at the time?",
+          "asked_for": "tradeoff_reasoning",
+          "conduct": "ok",
+          "kept": [],
+          "dropped": [
+            "action: quote not found: 'Four of us rebuilt the checkout page. I built the address form and its validatio'"
+          ]
+        }
+      ],
+      "story": {
+        "context": "I worked on the checkout rebuild within the last couple of years, on the e-commerce side of the company. My team owned the storefront.",
+        "stakes": "The old checkout was slow, and if it had gone wrong we would have been losing sales on the most important page we have.",
+        "action": "Four of us rebuilt the checkout page. I built the address form and its validation.",
+        "result": "Page load went from 4.1 seconds to 2.6 seconds, and conversion rose 3 percent in the A/B test.",
+        "reflection": "I learned that a rebuild like this is a team effort, and that I should describe my part more precisely. I learned to make my case with data up front, and to own the parts I built, like the address form and its validation."
+      },
+      "unbacked": [],
+      "untraced": [],
+      "low_overlap": [],
+      "one_question": [
+        6,
+        6
+      ],
+      "versions": {
+        "sixty_second": {
+          "text": "The checkout rebuild was within the last couple of years on the e-commerce side of the company. Our team was the one that owned the storefront. The old checkout was slow, and if it had gone wrong, we'd have been losing sales on the most important page we have. Four of us rebuilt the checkout page, and I built the address form and its validation. The tech lead chose the framework, and I argued for keeping the old one. Page load went from 4.1 seconds down to 2.6 seconds. In the A/B test, conversion rose 3 percent, so the business saw real money in it. The biggest thing I learned is that a rebuild like this is a team effort, and I should describe my part more precisely.",
+          "quotes": [
+            "within the last couple of years on the e-commerce side of the company",
+            "Our team was the one that owned the storefront.",
+            "The old checkout was slow",
+            "it had gone wrong, we'd have been losing sales on the most important page we have.",
+            "four of us rebuilt the checkout page",
+            "I built the address form and its validation",
+            "The tech lead chose the framework, and I argued for keeping the old one.",
+            "page load went from 4.1 seconds down to 2.6 seconds",
+            "In the A/B test, conversion rose 3 percent",
+            "the business saw real money in it",
+            "a rebuild like this is a team effort",
+            "I should describe my part more precisely"
+          ]
+        },
+        "full": {
+          "text": "Context: The checkout rebuild was within the last couple of years on the e-commerce side of the company. Our team was the one that owned the storefront. Stakes: The old checkout was slow, and if it had gone wrong, we'd have been losing sales on the most important page we have. Action: Four of us rebuilt the checkout page, and I built the address form and its validation. The tech lead chose the framework, and I argued for keeping the old one. Result: Page load went from 4.1 seconds down to 2.6 seconds. In the A/B test, conversion rose 3 percent, so the business saw real money in it. Reflection: The biggest thing I learned is that a rebuild like this is a team effort, and I should describe my part more precisely. I'd say I learned to make that case with data up front, and to own the parts I built, like the address form and its validation.",
+          "quotes": [
+            "within the last couple of years on the e-commerce side of the company",
+            "Our team was the one that owned the storefront.",
+            "The old checkout was slow",
+            "it had gone wrong, we'd have been losing sales on the most important page we have.",
+            "four of us rebuilt the checkout page",
+            "I built the address form and its validation",
+            "The tech lead chose the framework, and I argued for keeping the old one.",
+            "page load went from 4.1 seconds down to 2.6 seconds",
+            "In the A/B test, conversion rose 3 percent",
+            "the business saw real money in it",
+            "a rebuild like this is a team effort",
+            "I should describe my part more precisely",
+            "I'd say I learned to make that case with data up front",
+            "to own the parts I built, like the address form and its validation"
+          ]
+        }
+      },
+      "versions_rejected": [],
+      "versions_unbacked": [],
+      "judge": [
+        {
+          "rule": "invented_facts",
+          "verdict": "pass",
+          "reason": "Every fact traces to K: timeframe and team (turn 2), four people and address form (turn 3), stakes and numbers (turn 4), learnings (turn 5). Nothing added."
+        },
+        {
+          "rule": "wrote_for_candidate",
+          "verdict": "pass",
+          "reason": "All coach turns are open questions. Turn 6 asks what other way the candidate considered, without suggesting any option."
+        },
+        {
+          "rule": "iv3_followup",
+          "verdict": "pass",
+          "reason": "Coach asks for what's missing each time: concrete example (turns 1-2), stakes (turn 3), tradeoff (turns 5-6). Turn 4 was labeled stakes but asked about learning, though stakes had just been answered, so this is minor."
+        },
+        {
+          "rule": "style",
+          "verdict": "pass",
+          "reason": "Every coach reply is one short plain question with no acknowledgement or praise."
+        },
+        {
+          "rule": "stays_on_story",
+          "verdict": "not_applicable",
+          "reason": "Candidate never goes off topic."
+        },
+        {
+          "rule": "checks_claims",
+          "verdict": "fail",
+          "reason": "Turn 1 claims 'led the whole thing' and 'rebuilt the entire page myself'. The coach never asks what the candidate did personally; the real role came out unprompted in turn 3. The final story drops the overclaim, but the coach did not check it."
+        }
+      ],
+      "judge_error": null,
+      "cost_usd": "0.016735",
+      "error": null
+    },
+    {
+      "id": "coach-off-topic-gentle",
+      "candidate": "off-topic",
+      "style": "gentle",
+      "opener": "Let's build one story together, from your own work. Tell me about one specific time at work. What was going on?",
+      "steps": [
+        {
+          "candidate": "Sure. During my internship I built a weekly churn dashboard for the support team. They had no clear view of which customers were about to leave, so I put one together for them. Honestly, I'm also wondering if I should learn Python or R first. Which would you pick?",
+          "coach": "Thank you. You mentioned a weekly churn dashboard you built for the support team during your internship. Could you tell me a bit more about the setting, such as the company and when this happened, and what was going on for the support team that led them to need a clearer view of customers about to leave?",
+          "asked_for": "concrete_example",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "context",
+              "text": "During my internship I built a weekly churn dashboard for the support team. They had no clear view of which customers were about to leave.",
+              "quotes": [
+                "During my internship I built a weekly churn dashboard for the support team.",
+                "They had no clear view of which customers were about to leave, so I put one together for them."
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "It was my internship, and the support team had no clear way to see which customers were about to leave. They were reacting after people had already gone. I don't really want to get into the company name or exact dates right now, but I can tell you more about what the team needed.",
+          "coach": "Thank you. You said the support team was reacting after people had already gone, and that you'd rather hold off on the company name and dates for now, which is fine. Could you tell me what you did yourself on the dashboard, the piece that was your own?",
+          "asked_for": "stakes",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "stakes",
+              "text": "The support team was reacting after people had already gone.",
+              "quotes": [
+                "They were reacting after people had already gone."
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "Sure. I built the weekly churn view from the customer data, and I looked at the support tickets to see what was happening before people left. I noticed that one ticket category predicted churn pretty well. I showed that to the team, and they added a follow-up call for customers who filed that kind of ticket. Honestly, the Python or R question is still bugging me. Which one would you pick?",
+          "coach": "Thank you. You looked at the support tickets to see what came before people left, noticed one ticket category predicted churn, and showed that to the team, who added the follow-up calls. I can't help choose between Python and R here, but we can come back to that another time. Could you tell me what changed after the follow-up calls started, even a rough figure or how you knew it was working?",
+          "asked_for": "own_role",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "action",
+              "text": "I built the weekly churn view from the customer data and looked at the support tickets to see what came before people left. I noticed one ticket category predicted churn well and showed that to the team.",
+              "quotes": [
+                "I built the weekly churn view from the customer data",
+                "I looked at the support tickets to see what was happening before people left",
+                "I noticed that one ticket category predicted churn pretty well",
+                "I showed that to the team"
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "Honestly, I don't have a figure for that. The facts I have are that I found the ticket category that predicted churn and the team added the follow-up call. I don't know yet whether it changed anything, so I'd rather not guess a number. Is there something about the finding itself you'd like to dig into instead?",
+          "coach": "Thank you. You found the ticket category that predicted churn, and the team added the follow-up calls, and you'd rather not guess a number until you know more. Is there anyone on the team, or any way you could look, that might show whether those calls made a difference?",
+          "asked_for": "measurable_result",
+          "conduct": "ok",
+          "kept": [],
+          "dropped": []
+        },
+        {
+          "candidate": "Maybe. I could ask my manager on the support team whether they tracked churn for those customers after the calls started. I haven't asked yet, so I don't know if that data exists. Honestly, I'm also still stuck on Python or R, so if you have a quick take on that, I'd like to hear it.",
+          "coach": "Thank you. You could ask your manager on the support team whether they tracked churn for those customers after the calls started, and you don't know yet whether that data exists. I can't offer a take on Python or R here, so let's stay with this story. Could you tell me what you would want to find out from your manager about those customers once you ask?",
+          "asked_for": "measurable_result",
+          "conduct": "ok",
+          "kept": [],
+          "dropped": []
+        },
+        {
+          "candidate": "Mostly whether the customers who got the follow-up call stayed longer than the ones who didn't. I'd want to know how many had that ticket type, and whether the team kept any notes on the calls. I haven't asked yet, so I don't know what's been tracked.",
+          "coach": "Thank you. You'd want to compare customers who got the follow-up call with those who didn't, and to know how many had that ticket type and whether the team kept notes on the calls. Once you hear back from your manager, could you tell me what number or comparison would show you whether those calls made a difference?",
+          "asked_for": "measurable_result",
+          "conduct": "ok",
+          "kept": [],
+          "dropped": []
+        }
+      ],
+      "story": {
+        "context": "During my internship I built a weekly churn dashboard for the support team. They had no clear view of which customers were about to leave.",
+        "stakes": "The support team was reacting after people had already gone.",
+        "action": "I built the weekly churn view from the customer data and looked at the support tickets to see what came before people left. I noticed one ticket category predicted churn well and showed that to the team.",
+        "result": null,
+        "reflection": null
+      },
+      "unbacked": [],
+      "untraced": [],
+      "low_overlap": [],
+      "one_question": [
+        6,
+        6
+      ],
+      "versions": {
+        "sixty_second": {
+          "text": "During my internship I built a weekly churn dashboard for the support team. They had no clear view of which customers were about to leave. They were reacting after people had already gone. I built the weekly churn view from the customer data, and I looked at the support tickets to see what was happening before people left. I noticed that one ticket category predicted churn pretty well. I showed that to the team, and they added a follow-up call for customers who filed that kind of ticket. I don't know yet whether it changed anything. I haven't asked yet, so I don't know what's been tracked.",
+          "quotes": [
+            "During my internship I built a weekly churn dashboard for the support team.",
+            "They had no clear view of which customers were about to leave",
+            "They were reacting after people had already gone.",
+            "I built the weekly churn view from the customer data, and I looked at the support tickets to see what was happening before people left.",
+            "I noticed that one ticket category predicted churn pretty well.",
+            "I showed that to the team, and they added a follow-up call for customers who filed that kind of ticket.",
+            "I don't know yet whether it changed anything",
+            "I haven't asked yet, so I don't know what's been tracked."
+          ]
+        },
+        "full": {
+          "text": "Context: During my internship I built a weekly churn dashboard for the support team. Stakes: They had no clear view of which customers were about to leave. They were reacting after people had already gone. Action: I built the weekly churn view from the customer data, and I looked at the support tickets to see what was happening before people left. I noticed that one ticket category predicted churn pretty well. I showed that to the team, and they added a follow-up call for customers who filed that kind of ticket. Result: The facts I have are that I found the ticket category that predicted churn and the team added the follow-up call. Reflection: I don't know yet whether it changed anything. I haven't asked yet, so I don't know what's been tracked.",
+          "quotes": [
+            "During my internship I built a weekly churn dashboard for the support team.",
+            "They had no clear view of which customers were about to leave",
+            "They were reacting after people had already gone.",
+            "I built the weekly churn view from the customer data, and I looked at the support tickets to see what was happening before people left.",
+            "I noticed that one ticket category predicted churn pretty well.",
+            "I showed that to the team, and they added a follow-up call for customers who filed that kind of ticket.",
+            "The facts I have are that I found the ticket category that predicted churn and the team added the follow-up call.",
+            "I don't know yet whether it changed anything",
+            "I haven't asked yet, so I don't know what's been tracked."
+          ]
+        }
+      },
+      "versions_rejected": [],
+      "versions_unbacked": [],
+      "judge": [
+        {
+          "rule": "invented_facts",
+          "verdict": "pass",
+          "reason": "Every fact in the final story matches the candidate's words in turns 1-3: the internship, the weekly churn dashboard, the support team's lack of a clear view, the team reacting after customers left, the ticket review, and the ticket category that predicted churn. The word 'well' paraphrases 'pretty well'. Nothing was added."
+        },
+        {
+          "rule": "wrote_for_candidate",
+          "verdict": "pass",
+          "reason": "The coach only asks open questions, such as what changed, who could show the result, and what comparison would show it. It never proposes a claim or result for the candidate to use."
+        },
+        {
+          "rule": "iv3_followup",
+          "verdict": "pass",
+          "reason": "Each follow-up asks for the missing item. Turn 1 asks for the setting after the vague opener. Turn 3 asks for the result after the action. Turns 4-6 keep asking for a measurable result or evidence. The turn 2 question asked about own role although the candidate had only declined the company name and dates, but it did elicit the missing role."
+        },
+        {
+          "rule": "style",
+          "verdict": "fail",
+          "reason": "Turn 1 asks 'Could you tell me a bit more about...' and every reply opens with 'Thank you.' and restates the candidate's words, which fits the style. But turn 2 asks 'Could you tell me what you did yourself...' without softening, and turns 4 and 6 use 'Is there anyone...' and 'could you tell me what number...' in a somewhat pressing manner. More clearly, turn 2's 'which is fine' is a mild judgment, though minor. The bigger problem is the repeated requests for a number after the candidate declined to guess, so the tone stops being patient."
+        },
+        {
+          "rule": "stays_on_story",
+          "verdict": "pass",
+          "reason": "The candidate asks about Python or R in turns 1, 3, and 5. The coach does not answer the question. In turns 3 and 5 it says it can't help with that and steers back to the story. In turn 1 it ignores the question and asks about the story."
+        },
+        {
+          "rule": "checks_claims",
+          "verdict": "pass",
+          "reason": "The candidate claims the ticket category 'predicted churn pretty well' without evidence. The coach asks what changed after the calls and how the candidate knew it was working (turn 3), then keeps asking for evidence (turns 4-6). The final story leaves the result empty and only says the candidate 'noticed' the category predicted churn, without claiming the calls worked."
+        }
+      ],
+      "judge_error": null,
+      "cost_usd": "0.019887",
+      "error": null
+    },
+    {
+      "id": "coach-off-topic-direct",
+      "candidate": "off-topic",
+      "style": "direct",
+      "opener": "Let's build one story together, from your own work. Tell me about one specific time at work. What was going on?",
+      "steps": [
+        {
+          "candidate": "Sure, so during my internship I built a weekly churn dashboard for the support team. They had no clear view of which customers were about to leave. Honestly, I'm also wondering if I should pick up SQL or Python first, since everyone's asking for one of them.",
+          "coach": "Why did it matter that the support team had no clear view of which customers were about to leave?",
+          "asked_for": "concrete_example",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "context",
+              "text": "During my internship I built a weekly churn dashboard for the support team, which had no clear view of which customers were about to leave.",
+              "quotes": [
+                "during my internship I built a weekly churn dashboard for the support team",
+                "They had no clear view of which customers were about to leave."
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "Because they were reacting after customers already left, so they couldn't reach people in time. Without a weekly view, nobody knew which accounts were slipping. I'd guess that's why the dashboard was worth building, but I'm still not totally sure how much it changed for them.",
+          "coach": "What did you do yourself on the dashboard, as opposed to what the team did?",
+          "asked_for": "stakes",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "stakes",
+              "text": "Support was reacting after customers had already left, so they could not reach people in time, and nobody could see which accounts were slipping.",
+              "quotes": [
+                "they were reacting after customers already left, so they couldn't reach people in time",
+                "Without a weekly view, nobody knew which accounts were slipping"
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "I built the dashboard myself, pulling the weekly churn numbers and laying them out so the team could see them at a glance. The big thing I found was that one ticket category predicted churn. The team then decided to add a follow-up call for that category. Do you think SQL or Python would've helped more with the dashboard part?",
+          "coach": "Which pieces of the dashboard did you build yourself, from pulling the data to laying it out?",
+          "asked_for": "own_role",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "action",
+              "text": "I built the dashboard myself, pulling the weekly churn numbers and laying them out so the team could see them at a glance. I found that one ticket category predicted churn.",
+              "quotes": [
+                "I built the dashboard myself, pulling the weekly churn numbers and laying them out so the team could see them at a glance.",
+                "The big thing I found was that one ticket category predicted churn."
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "I pulled the weekly churn numbers and laid them out so the team could see them at a glance. The facts I have don't say which specific tools I used for pulling or for layout, so I can't tell you more than that. What I can say is that the main finding came from the dashboard: one ticket category predicted churn.",
+          "coach": "What changed after the team started using the dashboard, and what was the number?",
+          "asked_for": "measurable_result",
+          "conduct": "ok",
+          "kept": [],
+          "dropped": []
+        },
+        {
+          "candidate": "I don't have a number to give you. What I know is that after the dashboard, the team added a follow-up call for the ticket category that predicted churn. I don't have figures on how much churn changed after that, so I won't guess at one.",
+          "coach": "What other options did you consider for the dashboard, and why did you pick the one you did?",
+          "asked_for": "measurable_result",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "result",
+              "text": "After the dashboard, the team added a follow-up call for the ticket category that predicted churn. I don't have a figure for how much churn changed.",
+              "quotes": [
+                "the team added a follow-up call for the ticket category that predicted churn"
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "I don't have details on other options I looked at or why I chose this approach. What I know is that the team had no weekly view of churn, so I built a dashboard to show it. I'd rather not make up a reason that sounds good in an interview.",
+          "coach": "Did anyone on the team tell you whether the follow-up calls changed anything, or how you could tell the dashboard was working?",
+          "asked_for": "measurable_result",
+          "conduct": "ok",
+          "kept": [],
+          "dropped": []
+        }
+      ],
+      "story": {
+        "context": "During my internship I built a weekly churn dashboard for the support team, which had no clear view of which customers were about to leave.",
+        "stakes": "Support was reacting after customers had already left, so they could not reach people in time, and nobody could see which accounts were slipping.",
+        "action": "I built the dashboard myself, pulling the weekly churn numbers and laying them out so the team could see them at a glance. I found that one ticket category predicted churn.",
+        "result": "After the dashboard, the team added a follow-up call for the ticket category that predicted churn. I don't have a figure for how much churn changed.",
+        "reflection": null
+      },
+      "unbacked": [],
+      "untraced": [],
+      "low_overlap": [],
+      "one_question": [
+        6,
+        6
+      ],
+      "versions": {
+        "sixty_second": {
+          "text": "During my internship I built a weekly churn dashboard for the support team. They had no clear view of which customers were about to leave. They were reacting after customers already left, so they couldn't reach people in time. Without a weekly view, nobody knew which accounts were slipping. I built the dashboard myself, pulling the weekly churn numbers and laying them out so the team could see them at a glance. The big thing I found was that one ticket category predicted churn. The team then decided to add a follow-up call for that category. After the dashboard, the team added a follow-up call for the ticket category that predicted churn. I don't have figures on how much churn changed after that, so I won't guess at one. I'm still not totally sure how much it changed for them.",
+          "quotes": [
+            "Sure, so during my internship I built a weekly churn dashboard for the support team.",
+            "They had no clear view of which customers were about to leave.",
+            "Because they were reacting after customers already left, so they couldn't reach people in time.",
+            "Without a weekly view, nobody knew which accounts were slipping.",
+            "I built the dashboard myself, pulling the weekly churn numbers and laying them out so the team could see them at a glance.",
+            "The big thing I found was that one ticket category predicted churn.",
+            "The team then decided to add a follow-up call for that category.",
+            "after the dashboard, the team added a follow-up call for the ticket category that predicted churn.",
+            "I don't have figures on how much churn changed after that, so I won't guess at one.",
+            "I'm still not totally sure how much it changed for them."
+          ]
+        },
+        "full": {
+          "text": "Context: During my internship I built a weekly churn dashboard for the support team. They had no clear view of which customers were about to leave. Stakes: They were reacting after customers already left, so they couldn't reach people in time. Without a weekly view, nobody knew which accounts were slipping. Action: I built the dashboard myself, pulling the weekly churn numbers and laying them out so the team could see them at a glance. The big thing I found was that one ticket category predicted churn. Result: After the dashboard, the team added a follow-up call for the ticket category that predicted churn. I don't have figures on how much churn changed after that, so I won't guess at one. Reflection: I'm still not totally sure how much it changed for them.",
+          "quotes": [
+            "Sure, so during my internship I built a weekly churn dashboard for the support team.",
+            "They had no clear view of which customers were about to leave.",
+            "Because they were reacting after customers already left, so they couldn't reach people in time.",
+            "Without a weekly view, nobody knew which accounts were slipping.",
+            "I built the dashboard myself, pulling the weekly churn numbers and laying them out so the team could see them at a glance.",
+            "The big thing I found was that one ticket category predicted churn.",
+            "after the dashboard, the team added a follow-up call for the ticket category that predicted churn.",
+            "I don't have figures on how much churn changed after that, so I won't guess at one.",
+            "I'm still not totally sure how much it changed for them."
+          ]
+        }
+      },
+      "versions_rejected": [],
+      "versions_unbacked": [],
+      "judge": [
+        {
+          "rule": "invented_facts",
+          "verdict": "pass",
+          "reason": "Every fact in the story traces to K turns 1-5: the internship dashboard, the reactive support team, the ticket category predicting churn, the follow-up call, and no figure available. Nothing was added."
+        },
+        {
+          "rule": "wrote_for_candidate",
+          "verdict": "pass",
+          "reason": "All coach turns are open questions. None suggests what the candidate could claim."
+        },
+        {
+          "rule": "iv3_followup",
+          "verdict": "fail",
+          "reason": "Turn 5 C asked about other options considered although the asked-for item was measurable_result, and K had just said there was no number. Turn 3 C accepted the vague stakes answer and asked about role, which matches the asked-for item. Turn 2 C asked about role instead of the stakes the system flagged, though K's answer had given stakes. The turn 5 question missed the missing item."
+        },
+        {
+          "rule": "style",
+          "verdict": "fail",
+          "reason": "Replies are single plain questions with no acknowledgement or praise, but turn 3 C ('Which pieces of the dashboard did you build yourself, from pulling the data to laying it out?') is long, and turn 6 C ('Did anyone on the team tell you whether the follow-up calls changed anything, or how you could tell the dashboard was working?') is a long double question, not brief. Turn 1 C is also wordy."
+        },
+        {
+          "rule": "stays_on_story",
+          "verdict": "pass",
+          "reason": "K went off topic in turns 1 and 3 (SQL vs Python). The coach never answered it and the next questions (turns 1 C and 3 C) returned to the story."
+        },
+        {
+          "rule": "checks_claims",
+          "verdict": "pass",
+          "reason": "K claimed the dashboard's main finding (one ticket category predicted churn) without specifics. The coach asked what K did themselves (turn 2 C, turn 3 C) and for the number (turn 4 C), and the story states that no figure is available instead of claiming impact."
+        }
+      ],
+      "judge_error": null,
+      "cost_usd": "0.017161",
+      "error": null
+    },
+    {
+      "id": "coach-strong-gentle",
+      "candidate": "strong",
+      "style": "gentle",
+      "opener": "Let's build one story together, from your own work. Tell me about one specific time at work. What was going on?",
+      "steps": [
+        {
+          "candidate": "Sure. Our team was moving checkout over to a new payments provider, and we were two weeks behind plan. Black Friday was about a month away, and checkout simply could not break.",
+          "coach": "Thank you. You've described the move of checkout to a new payments provider, two weeks behind plan, with Black Friday a month away. Could you tell me a bit more about what you personally did in that work?",
+          "asked_for": "concrete_example",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "context",
+              "text": "Our team was moving checkout to a new payments provider, and we were two weeks behind plan. Black Friday was about a month away.",
+              "quotes": [
+                "Our team was moving checkout over to a new payments provider, and we were two weeks behind plan.",
+                "Black Friday was about a month away"
+              ]
+            },
+            {
+              "part": "stakes",
+              "text": "Checkout could not break, with Black Friday about a month away.",
+              "quotes": [
+                "checkout simply could not break."
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "I wrote the rollback plan, and I was the one who moved traffic over to the new provider. I did it in five percent steps and watched the error rates after each one before going further.",
+          "coach": "Thank you. You wrote the rollback plan and moved traffic to the new provider yourself, in five percent steps, watching error rates after each one. Could you tell me a bit more about what you did when you watched those error rates, and what you decided at each step?",
+          "asked_for": "own_role",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "action",
+              "text": "I wrote the rollback plan, and I was the one who moved traffic over to the new provider. I moved it in five percent steps and watched the error rates after each one before going further.",
+              "quotes": [
+                "I wrote the rollback plan, and I was the one who moved traffic over to the new provider.",
+                "I did it in five percent steps and watched the error rates after each one before going further."
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "At each step I looked at the error rates before moving on. If they stayed flat, I went up another five percent. If anything moved, I held the traffic where it was and looked into it first.",
+          "coach": "Thank you. You checked the error rates before each step, and held the traffic where it was if anything moved. Could you tell me what changed in the end, with a number if you have one, or a rough figure or a before and after?",
+          "asked_for": "measurable_result",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "action",
+              "text": "I wrote the rollback plan and moved traffic to the new provider myself. I moved it in five percent steps, and I looked at the error rates before each step. If they stayed flat, I went up another five percent. If anything moved, I held the traffic where it was and looked into it first.",
+              "quotes": [
+                "I wrote the rollback plan, and I was the one who moved traffic over to the new provider.",
+                "At each step I looked at the error rates before moving on. If they stayed flat, I went up another five percent. If anything moved, I held the traffic where it was and looked into it first."
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "We finished a week before Black Friday, and not one payment failed. I'll admit the slow rollout meant we ran both providers at once for longer, which had its own cost.",
+          "coach": "Thank you. You finished a week before Black Friday with no failed payments, and you also mentioned the cost of running both providers for longer. Could you tell me what you learned from this work, or what you would do differently next time?",
+          "asked_for": "measurable_result",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "result",
+              "text": "We finished a week before Black Friday, and not one payment failed.",
+              "quotes": [
+                "We finished a week before Black Friday, and not one payment failed."
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "Next time I would get the rollback plan agreed with the team up front, before we started moving traffic. I'd want everyone signed off on it so nobody is debating it during the rollout.",
+          "coach": "Thank you. You would get the rollback plan agreed with the team up front, before traffic moves. Could you tell me about the other options you weighed for the pace of the move, and why you chose the path you did?",
+          "asked_for": "tradeoff_reasoning",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "reflection",
+              "text": "Next time I would get the rollback plan agreed with the team up front, before we started moving traffic.",
+              "quotes": [
+                "Next time I would get the rollback plan agreed with the team up front, before we started moving traffic."
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "I could have switched all the traffic over in one big move, which would have been faster. I chose the slow five percent rollout instead, because checkout could not break with Black Friday a month away. The trade-off was running both providers for longer, and I accepted that cost.",
+          "coach": "Thank you. You could have moved all the traffic in one big step, which would have been faster, and you chose the slower five percent steps because checkout could not break with Black Friday a month away, accepting the cost of running both providers longer. Could you tell me what else you considered before settling on that pace?",
+          "asked_for": "tradeoff_reasoning",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "stakes",
+              "text": "Checkout could not break, with Black Friday a month away. I could have moved all the traffic in one big step, which would have been faster.",
+              "quotes": [
+                "Checkout could not break with Black Friday a month away.",
+                "I could have switched all the traffic over in one big move, which would have been faster."
+              ]
+            }
+          ],
+          "dropped": [
+            "action: quote not found: 'I wrote the rollback plan and moved traffic to the new provider myself. I moved '"
+          ]
+        }
+      ],
+      "story": {
+        "context": "Our team was moving checkout to a new payments provider, and we were two weeks behind plan. Black Friday was about a month away.",
+        "stakes": "Checkout could not break, with Black Friday a month away. I could have moved all the traffic in one big step, which would have been faster.",
+        "action": "I wrote the rollback plan and moved traffic to the new provider myself. I moved it in five percent steps, and I looked at the error rates before each step. If they stayed flat, I went up another five percent. If anything moved, I held the traffic where it was and looked into it first.",
+        "result": "We finished a week before Black Friday, and not one payment failed.",
+        "reflection": "Next time I would get the rollback plan agreed with the team up front, before we started moving traffic."
+      },
+      "unbacked": [],
+      "untraced": [],
+      "low_overlap": [],
+      "one_question": [
+        6,
+        6
+      ],
+      "versions": {
+        "sixty_second": {
+          "text": "Our team was moving checkout over to a new payments provider, and we were two weeks behind plan. Black Friday was about a month away, and checkout simply could not break. I could have switched all the traffic over in one big move, which would have been faster. I chose the slow five percent rollout instead. I wrote the rollback plan, and I was the one who moved traffic over to the new provider. I did it in five percent steps and watched the error rates after each one before going further. If they stayed flat, I went up another five percent. If anything moved, I held the traffic where it was and looked into it first. We finished a week before Black Friday, and not one payment failed. The trade-off was running both providers for longer, and I accepted that cost. Next time I would get the rollback plan agreed with the team up front, before we started moving traffic.",
+          "quotes": [
+            "Our team was moving checkout over to a new payments provider, and we were two weeks behind plan.",
+            "Black Friday was about a month away, and checkout simply could not break.",
+            "I could have switched all the traffic over in one big move, which would have been faster.",
+            "I chose the slow five percent rollout instead",
+            "I wrote the rollback plan, and I was the one who moved traffic over to the new provider.",
+            "I did it in five percent steps and watched the error rates after each one before going further.",
+            "If they stayed flat, I went up another five percent.",
+            "If anything moved, I held the traffic where it was and looked into it first.",
+            "We finished a week before Black Friday, and not one payment failed.",
+            "The trade-off was running both providers for longer, and I accepted that cost.",
+            "Next time I would get the rollback plan agreed with the team up front, before we started moving traffic."
+          ]
+        },
+        "full": {
+          "text": "Context: Our team was moving checkout over to a new payments provider, and we were two weeks behind plan. Stakes: Black Friday was about a month away, and checkout simply could not break. I could have switched all the traffic over in one big move, which would have been faster. Action: I chose the slow five percent rollout instead. I wrote the rollback plan, and I was the one who moved traffic over to the new provider. I did it in five percent steps and watched the error rates after each one before going further. If they stayed flat, I went up another five percent. If anything moved, I held the traffic where it was and looked into it first. Result: We finished a week before Black Friday, and not one payment failed. The trade-off was running both providers for longer, and I accepted that cost. Reflection: Next time I would get the rollback plan agreed with the team up front, before we started moving traffic.",
+          "quotes": [
+            "Our team was moving checkout over to a new payments provider, and we were two weeks behind plan.",
+            "Black Friday was about a month away, and checkout simply could not break.",
+            "I could have switched all the traffic over in one big move, which would have been faster.",
+            "I chose the slow five percent rollout instead",
+            "I wrote the rollback plan, and I was the one who moved traffic over to the new provider.",
+            "I did it in five percent steps and watched the error rates after each one before going further.",
+            "If they stayed flat, I went up another five percent.",
+            "If anything moved, I held the traffic where it was and looked into it first.",
+            "We finished a week before Black Friday, and not one payment failed.",
+            "The trade-off was running both providers for longer, and I accepted that cost.",
+            "Next time I would get the rollback plan agreed with the team up front, before we started moving traffic."
+          ]
+        }
+      },
+      "versions_rejected": [],
+      "versions_unbacked": [],
+      "judge": [
+        {
+          "rule": "invented_facts",
+          "verdict": "pass",
+          "reason": "Every fact in the story traces to K turns: the two weeks behind plan and Black Friday a month away (1), the rollback plan and five percent steps (2), the error-rate checks (3), finishing a week early with no failed payments (4), the reflection (5), and the all-at-once alternative (6)."
+        },
+        {
+          "rule": "wrote_for_candidate",
+          "verdict": "pass",
+          "reason": "The coach only asks open questions. It never suggests what the candidate could claim."
+        },
+        {
+          "rule": "iv3_followup",
+          "verdict": "pass",
+          "reason": "Turn 1 lacked a role, and the coach asked what K personally did. Turn 3 lacked a result, and the coach asked for a number or before and after. Turn 6 asked about trade-offs. K's answers were specific, so the coach did not accept vague ones and move on. The turn 4 question asked about learning, not the flagged measurable result, but K had already given a result."
+        },
+        {
+          "rule": "style",
+          "verdict": "fail",
+          "reason": "The replies start with \"Thank you.\" and ask softly, but several break the gentle pattern. In turn 2, the follow-up \"what you decided at each step\" is a pushy, narrow question. The coach also asks a repeat question in turn 6 about \"what else you considered,\" which does not fit the open-question style of \"Could you tell me a bit more about...\". More importantly, the coach's recaps often run long and are not a few neutral words. The final line is a repeated question after K already answered."
+        },
+        {
+          "rule": "stays_on_story",
+          "verdict": "not_applicable",
+          "reason": "K never goes off topic."
+        },
+        {
+          "rule": "checks_claims",
+          "verdict": "not_applicable",
+          "reason": "K makes no big claims without specifics. Every claim comes with facts."
+        }
+      ],
+      "judge_error": null,
+      "cost_usd": "0.017306",
+      "error": null
+    },
+    {
+      "id": "coach-strong-direct",
+      "candidate": "strong",
+      "style": "direct",
+      "opener": "Let's build one story together, from your own work. Tell me about one specific time at work. What was going on?",
+      "steps": [
+        {
+          "candidate": "Sure. Our team was moving checkout over to a new payments provider, and we were about two weeks behind plan. Black Friday was a month away, and checkout couldn't break during it.",
+          "coach": "What did you do yourself?",
+          "asked_for": "concrete_example",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "context",
+              "text": "Our team was moving checkout to a new payments provider and was about two weeks behind plan. Black Friday was a month away.",
+              "quotes": [
+                "Our team was moving checkout over to a new payments provider, and we were about two weeks behind plan.",
+                "Black Friday was a month away"
+              ]
+            },
+            {
+              "part": "stakes",
+              "text": "Checkout could not break during Black Friday.",
+              "quotes": [
+                "checkout couldn't break during it."
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "I wrote the rollback plan, and then I moved traffic to the new provider in five percent steps. After each step I watched the error rates before I went any further.",
+          "coach": "What did you change or decide in the rollout yourself, beyond those steps?",
+          "asked_for": "own_role",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "action",
+              "text": "I wrote the rollback plan, then moved traffic to the new provider in five percent steps, watching the error rates after each step before going further.",
+              "quotes": [
+                "I wrote the rollback plan, and then I moved traffic to the new provider in five percent steps. After each step I watched the error rates before I went any further."
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "I chose a slow rollout over a big-bang switch. The cost was that we had to run both providers at the same time for longer, which wasn't free.",
+          "coach": "What changed by the end of the rollout, and do you have a number for it?",
+          "asked_for": "measurable_result",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "action",
+              "text": "I chose a slow rollout over a big-bang switch, and I accepted running both providers at the same time for longer. I wrote the rollback plan, then moved traffic to the new provider in five percent steps, watching the error rates after each step before going further.",
+              "quotes": [
+                "I chose a slow rollout over a big-bang switch.",
+                "The cost was that we had to run both providers at the same time for longer, which wasn't free.",
+                "I wrote the rollback plan, and then I moved traffic to the new provider in five percent steps. After each step I watched the error rates before I went any further."
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "We finished a week before Black Friday, and not one payment failed. That's the number I'd point to.",
+          "coach": "What was the error rate or payment failure count across the rollout, compared with before the switch?",
+          "asked_for": "measurable_result",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "result",
+              "text": "We finished a week before Black Friday, and not one payment failed.",
+              "quotes": [
+                "We finished a week before Black Friday, and not one payment failed."
+              ]
+            }
+          ],
+          "dropped": []
+        },
+        {
+          "candidate": "I don't have a before-and-after error rate to give you. What I have is that not one payment failed during the rollout. I didn't pull a comparison figure, so I won't make one up.",
+          "coach": "What did you learn from this, or what would you do differently next time?",
+          "asked_for": "reflection",
+          "conduct": "ok",
+          "kept": [],
+          "dropped": []
+        },
+        {
+          "candidate": "Next time I'd get the rollback plan agreed with the team up front. I wrote it myself, and I'd want everyone signed off on it before we started moving traffic.",
+          "coach": "Is there anything you want to add or change in any part of the story?",
+          "asked_for": "reflection",
+          "conduct": "ok",
+          "kept": [
+            {
+              "part": "reflection",
+              "text": "Next time I would get the rollback plan agreed with the team up front, and have everyone sign off on it before we started moving traffic.",
+              "quotes": [
+                "Next time I'd get the rollback plan agreed with the team up front.",
+                "I'd want everyone signed off on it before we started moving traffic."
+              ]
+            }
+          ],
+          "dropped": []
+        }
+      ],
+      "story": {
+        "context": "Our team was moving checkout to a new payments provider and was about two weeks behind plan. Black Friday was a month away.",
+        "stakes": "Checkout could not break during Black Friday.",
+        "action": "I chose a slow rollout over a big-bang switch, and I accepted running both providers at the same time for longer. I wrote the rollback plan, then moved traffic to the new provider in five percent steps, watching the error rates after each step before going further.",
+        "result": "We finished a week before Black Friday, and not one payment failed.",
+        "reflection": "Next time I would get the rollback plan agreed with the team up front, and have everyone sign off on it before we started moving traffic."
+      },
+      "unbacked": [],
+      "untraced": [],
+      "low_overlap": [],
+      "one_question": [
+        6,
+        6
+      ],
+      "versions": {
+        "sixty_second": {
+          "text": "Our team was moving checkout over to a new payments provider, and we were about two weeks behind plan. Black Friday was a month away, and checkout couldn't break during it. I chose a slow rollout over a big-bang switch. The cost was that we had to run both providers at the same time for longer, which wasn't free. I wrote the rollback plan, and then I moved traffic to the new provider in five percent steps. After each step I watched the error rates before I went any further. We finished a week before Black Friday, and not one payment failed. That's the number I'd point to. Next time I'd get the rollback plan agreed with the team up front, and I'd want everyone signed off on it before we started moving traffic.",
+          "quotes": [
+            "Our team was moving checkout over to a new payments provider, and we were about two weeks behind plan.",
+            "Black Friday was a month away, and checkout couldn't break during it.",
+            "I chose a slow rollout over a big-bang switch.",
+            "The cost was that we had to run both providers at the same time for longer, which wasn't free.",
+            "I wrote the rollback plan, and then I moved traffic to the new provider in five percent steps.",
+            "After each step I watched the error rates before I went any further.",
+            "We finished a week before Black Friday, and not one payment failed.",
+            "That's the number I'd point to.",
+            "Next time I'd get the rollback plan agreed with the team up front.",
+            "I'd want everyone signed off on it before we started moving traffic."
+          ]
+        },
+        "full": {
+          "text": "Context: Our team was moving checkout over to a new payments provider, and we were about two weeks behind plan. Stakes: Black Friday was a month away, and checkout couldn't break during it. Action: I chose a slow rollout over a big-bang switch. The cost was that we had to run both providers at the same time for longer, which wasn't free. I wrote the rollback plan, and then I moved traffic to the new provider in five percent steps. After each step I watched the error rates before I went any further. Result: We finished a week before Black Friday, and not one payment failed. That's the number I'd point to. Reflection: Next time I'd get the rollback plan agreed with the team up front. I wrote it myself, and I'd want everyone signed off on it before we started moving traffic.",
+          "quotes": [
+            "Our team was moving checkout over to a new payments provider, and we were about two weeks behind plan.",
+            "Black Friday was a month away, and checkout couldn't break during it.",
+            "I chose a slow rollout over a big-bang switch.",
+            "The cost was that we had to run both providers at the same time for longer, which wasn't free.",
+            "I wrote the rollback plan, and then I moved traffic to the new provider in five percent steps.",
+            "After each step I watched the error rates before I went any further.",
+            "We finished a week before Black Friday, and not one payment failed.",
+            "That's the number I'd point to.",
+            "Next time I'd get the rollback plan agreed with the team up front.",
+            "I wrote it myself, and I'd want everyone signed off on it before we started moving traffic."
+          ]
+        }
+      },
+      "versions_rejected": [],
+      "versions_unbacked": [],
+      "judge": [
+        {
+          "rule": "invented_facts",
+          "verdict": "pass",
+          "reason": "Every fact in the final story traces to a K turn: delay and Black Friday (1), rollback plan and 5% steps (2), slow rollout trade-off (3), finish a week early with no failures (4), reflection (6). No additions."
+        },
+        {
+          "rule": "wrote_for_candidate",
+          "verdict": "pass",
+          "reason": "All coach questions are open (turns 1-6) and none suggests what the candidate could claim."
+        },
+        {
+          "rule": "iv3_followup",
+          "verdict": "pass",
+          "reason": "The candidate's answers were mostly specific. Where something was missing, the coach asked for it: own role (turn 2), result number (turns 3-4), reflection (turn 5). Turn 4 pressed for a comparison figure after the candidate gave 'not one payment failed'. This is reasonable, and the candidate declined in turn 5."
+        },
+        {
+          "rule": "style",
+          "verdict": "pass",
+          "reason": "Every reply is a single short, plain question with no acknowledgement or praise. The final turn 6 question ('Is there anything you want to add or change...') is also a plain short question."
+        },
+        {
+          "rule": "stays_on_story",
+          "verdict": "not_applicable",
+          "reason": "The candidate never went off topic."
+        },
+        {
+          "rule": "checks_claims",
+          "verdict": "not_applicable",
+          "reason": "The candidate made no big unsupported claims; the 'not one payment failed' claim came with context, and the candidate refused to invent a comparison figure."
+        }
+      ],
+      "judge_error": null,
+      "cost_usd": "0.014510",
+      "error": null
+    }
+  ],
+  "style_picks": [
+    {
+      "direct_was": "A",
+      "picked": "A",
+      "reason": "Session A's coach asks bare, one-line questions with no acknowledgement, such as \"What did you do yourself?\" and \"How did you find out the cut-over had worked, or who told you?\", which is direct. Session B's coach opens every turn with \"Thank you.\", repeats what the candidate said, and asks \"Could you tell me a bit more about...?\", which is gentle. So A is direct and B is gentle."
+    },
+    {
+      "direct_was": "A",
+      "picked": "A",
+      "reason": "Session A's coach asks bare, one-line questions with no acknowledgement, such as \"When was the checkout rebuild, and at which company or team did you work on it?\" and \"Roughly when did the checkout rebuild start, and when did it go live?\", which is the direct style. Session B's coach opens each turn with \"Thank you.\", repeats the candidate's words, and asks softly, \"Could you tell me a bit more about...?\", which is the gentle style. So Session A is direct and Session B is gentle."
+    },
+    {
+      "direct_was": "B",
+      "picked": "B",
+      "reason": "Session A's coach opens every turn with \"Thank you.\", restates what the candidate said, and asks softly (\"Could you tell me a bit more about the setting...?\"), so it is gentle. Session B's coach gives no acknowledgement and asks one short plain question each turn (\"What did you do yourself on the dashboard, as opposed to what the team did?\", \"What changed after the team started using the dashboard, and what was the number?\"), so it is direct."
+    },
+    {
+      "direct_was": "A",
+      "picked": "A",
+      "reason": "Session A's coach uses bare one-line questions with no acknowledgement, such as \"What did you do yourself?\" and \"What was the number?\"-style prompts, which is the direct style. Session B's coach opens every turn with \"Thank you.\", restates the candidate's words, and asks \"Could you tell me a bit more about...?\", which is the gentle style. So Session A is direct and Session B is gentle."
+    }
+  ]
+}
