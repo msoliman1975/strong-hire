@@ -747,6 +747,60 @@
         }
       }
     },
+    "/resumes/{resume_id}/accepted-issues": {
+      "put": {
+        "tags": [
+          "inputs"
+        ],
+        "summary": "Set Accepted Issue",
+        "description": "IN-12: accept a CV check issue (accepted true) or clear it (false). Safe to repeat.\n\nThe key is opaque here; the web builds it from the issue type and fields. A CV keeps at most\n100 accepted issues: one more answers 422 with code accepted_issues_limit.",
+        "operationId": "set_accepted_issue_resumes__resume_id__accepted_issues_put",
+        "parameters": [
+          {
+            "name": "resume_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Resume Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptedIssueUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/resumes/{resume_id}/jobs/{job_id}": {
       "get": {
         "tags": [
@@ -8667,6 +8721,51 @@
   },
   "components": {
     "schemas": {
+      "AcceptedIssue": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Key"
+          },
+          "accepted_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Accepted At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "accepted_at"
+        ],
+        "title": "AcceptedIssue",
+        "description": "A CV check issue the user marked as fine, stored in resumes.accepted_issues.\n\nThe web computes `key` from the issue, for example\n'overlap:2019-06:2022-03:northwind:lumen-pay'. Core treats it as opaque."
+      },
+      "AcceptedIssueUpdate": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Key"
+          },
+          "accepted": {
+            "type": "boolean",
+            "title": "Accepted"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "accepted"
+        ],
+        "title": "AcceptedIssueUpdate",
+        "description": "IN-12: accept a CV check issue, or clear an accepted one. The web builds the key."
+      },
       "AccountDeletedOut": {
         "properties": {
           "status": {
@@ -20949,6 +21048,14 @@
             "type": "string",
             "format": "date-time",
             "title": "Uploaded At"
+          },
+          "accepted_issues": {
+            "items": {
+              "$ref": "#/components/schemas/AcceptedIssue"
+            },
+            "type": "array",
+            "title": "Accepted Issues",
+            "description": "IN-12: CV check issues the user accepted, oldest first. At most 100."
           }
         },
         "type": "object",

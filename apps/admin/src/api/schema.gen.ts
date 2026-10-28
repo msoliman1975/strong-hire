@@ -239,6 +239,29 @@ export interface paths {
         patch: operations["rename_resume_resumes__resume_id__patch"];
         trace?: never;
     };
+    "/resumes/{resume_id}/accepted-issues": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Accepted Issue
+         * @description IN-12: accept a CV check issue (accepted true) or clear it (false). Safe to repeat.
+         *
+         *     The key is opaque here; the web builds it from the issue type and fields. A CV keeps at most
+         *     100 accepted issues: one more answers 422 with code accepted_issues_limit.
+         */
+        put: operations["set_accepted_issue_resumes__resume_id__accepted_issues_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/resumes/{resume_id}/jobs/{job_id}": {
         parameters: {
             query?: never;
@@ -3142,6 +3165,32 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * AcceptedIssue
+         * @description A CV check issue the user marked as fine, stored in resumes.accepted_issues.
+         *
+         *     The web computes `key` from the issue, for example
+         *     'overlap:2019-06:2022-03:northwind:lumen-pay'. Core treats it as opaque.
+         */
+        AcceptedIssue: {
+            /** Key */
+            key: string;
+            /**
+             * Accepted At
+             * Format: date-time
+             */
+            accepted_at: string;
+        };
+        /**
+         * AcceptedIssueUpdate
+         * @description IN-12: accept a CV check issue, or clear an accepted one. The web builds the key.
+         */
+        AcceptedIssueUpdate: {
+            /** Key */
+            key: string;
+            /** Accepted */
+            accepted: boolean;
+        };
         /**
          * AccountDeletedOut
          * @description AC-1 account delete. Rows are gone now; resume files go within the deadline.
@@ -8034,6 +8083,11 @@ export interface components {
              * Format: date-time
              */
             uploaded_at: string;
+            /**
+             * Accepted Issues
+             * @description IN-12: CV check issues the user accepted, oldest first. At most 100.
+             */
+            accepted_issues?: components["schemas"]["AcceptedIssue"][];
         };
         /** ResumeRole */
         ResumeRole: {
@@ -10190,6 +10244,41 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["LibraryRename"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_accepted_issue_resumes__resume_id__accepted_issues_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                resume_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AcceptedIssueUpdate"];
             };
         };
         responses: {

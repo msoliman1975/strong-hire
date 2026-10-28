@@ -537,7 +537,21 @@ export function checkResume(resume: Resume, options: CheckOptions): ResumeIssue[
   }
 
   // Most serious first; the sort is stable, so ties keep the order above.
-  return issues.sort((a, b) => SEVERITY[a.severity] - SEVERITY[b.severity]);
+  return issues
+    .sort((a, b) => SEVERITY[a.severity] - SEVERITY[b.severity])
+    .map((i) => (i.key.length > KEY_MAX ? { ...i, key: fitKey(i.key) } : i));
+}
+
+/** The API stores keys of up to 200 characters. */
+export const KEY_MAX = 200;
+
+/** A key cut to KEY_MAX, ending in a hash of the whole key so it stays unique and stable. */
+export function fitKey(key: string): string {
+  if (key.length <= KEY_MAX) return key;
+  let h = 0x811c9dc5;
+  for (let i = 0; i < key.length; i++) h = Math.imul(h ^ key.charCodeAt(i), 0x01000193) >>> 0;
+  const hash = h.toString(16).padStart(8, "0");
+  return `${key.slice(0, KEY_MAX - hash.length - 1)}~${hash}`;
 }
 
 const SEVERITY: Record<ResumeIssue["severity"], number> = { high: 0, medium: 1, low: 2 };

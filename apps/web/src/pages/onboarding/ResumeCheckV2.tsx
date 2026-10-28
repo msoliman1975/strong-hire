@@ -156,11 +156,14 @@ export function ResumeCheckV2({
   resumeId,
   name,
   original,
+  accepted: acceptedInitial = [],
 }: {
   jobId: string;
   resumeId: string;
   name: string | null;
   original: Resume;
+  /** Issues the user accepted before (IN-12). */
+  accepted?: readonly { key: string }[];
 }) {
   const steps = useOnboardingSteps();
   const navigate = useNavigate();
@@ -168,7 +171,7 @@ export function ResumeCheckV2({
   const job = useJob(jobId, false);
   const posting = jobId ? (job.data?.posting ?? null) : null;
   const [today] = useState(thisMonth);
-  const accepted = useAcceptedIssues();
+  const accepted = useAcceptedIssues(resumeId, acceptedInitial);
 
   const [draft, setDraft] = useState<CvDraft>(() => toCvDraft(original));
   /** Roles open for editing, by role key: the edited copy. */
@@ -1135,6 +1138,7 @@ function IssuesPanel({
         </div>
       </section>
 
+      {accepted.error != null && <ErrorNotice error={accepted.error} title="We could not save that." />}
       {shown.length === 0 && filter !== "accepted" && (
         <p className="cvc-card cvc-clear">
           {filter === "all" ? "Nothing to fix. Your CV reads well." : `No ${filter === "dates" ? "date" : "detail"} issues.`}

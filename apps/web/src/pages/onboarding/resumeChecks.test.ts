@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import type { Resume } from "../../api/types";
 import {
   checkResume,
+  fitKey,
   formatSpan,
   groupSkills,
   newestFirst,
@@ -225,6 +226,15 @@ describe("IN-12 stable keys", () => {
       checkResume(cv([{ ...b, achievements: [...b.achievements, "Hired 3 PMs"] }, a]), { today: TODAY }),
     );
     expect(after.sort()).toEqual(before.sort());
+  });
+
+  it("IN-12: long keys are cut to 200 characters and stay unique", () => {
+    const skills = Array.from({ length: 30 }, (_, n) => `Skill number ${n}`);
+    const issues = checkResume(cv([role({ end: null, skills })]), { today: TODAY });
+    const key = find(issues, "consistency.skills-missing:")!.key;
+    expect(key.length).toBe(200);
+    expect(fitKey(key)).toBe(key);
+    expect(fitKey("x".repeat(300))).not.toBe(fitKey(`${"x".repeat(299)}y`));
   });
 
   it("IN-12: the same company and title twice get distinct ids", () => {

@@ -107,7 +107,10 @@ export function CheckResumePage() {
 
   if (v2 && parsed && !record.data?.deleted) {
     return (
-      <ResumeCheckV2 key={resumeId} jobId={jobId} resumeId={resumeId} name={record.data?.name ?? null} original={parsed} />
+      <ResumeCheckV2 key={resumeId} jobId={jobId} resumeId={resumeId} name={record.data?.name ?? null}
+        original={parsed}
+        accepted={record.data?.accepted_issues ?? []}
+      />
     );
   }
 

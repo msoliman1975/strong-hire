@@ -602,6 +602,7 @@ export function inputHandlers(store: MockStore) {
         resume: null,
         confirmed_at: null,
         uploaded_at: new Date().toISOString(),
+        accepted_issues: [],
       };
       db().resumes.push(record);
       db().resumeHashes[record.id] = await sha256Of(hasFile ? await file.arrayBuffer() : String(text));

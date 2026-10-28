@@ -3,7 +3,7 @@
  * found" panel, Fix and Accept. Runs against the MSW mock of PUT /resumes/{id}.
  */
 import { QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -142,8 +142,13 @@ describe("v2 Check your CV", () => {
     expect(within(panel()).queryByText("✓ Accepted: A skill missing from Skills")).not.toBeInTheDocument();
     expect(within(panel()).getByText("One achievement on Invoicely")).toBeInTheDocument();
 
+    // Part 2: the key is stored on the resume.
+    const stored = () => (mockStore.db.resumes[0].accepted_issues ?? []).map((i) => i.key);
+    expect(stored()).toEqual(["consistency.skills-missing:celery"]);
+
     await user.click(within(panel()).getByRole("button", { name: "Accepted 1" }));
     await user.click(within(panel()).getByRole("button", { name: "Undo accepting A skill missing from Skills" }));
+    await waitFor(() => expect(stored()).toEqual([]));
     await user.click(within(panel()).getByRole("button", { name: "All" }));
     expect(within(panel()).getByText("A skill missing from Skills")).toBeInTheDocument();
   });
@@ -204,6 +209,17 @@ describe("v2 Check your CV", () => {
     await user.click(screen.getByRole("button", { name: "Looks right, continue" }));
     expect(await screen.findByRole("heading", { name: "Resumes" })).toBeInTheDocument();
     expect(puts[0].resume.roles.map((r) => r.company)).toEqual(["Northwind Labs", "Invoicely"]);
+  });
+
+  it("IN-12: issues accepted earlier stay accepted when the page opens again", async () => {
+    const { resume } = await seed();
+    mockStore.db.resumes[0].accepted_issues = [
+      { key: "consistency.skills-missing:celery", accepted_at: "2026-10-28T10:00:00Z" },
+    ];
+    renderAt(`/resumes/${resume.id}/check`);
+    await screen.findByRole("complementary", { name: "What we found" });
+    expect(within(panel()).getByText("✓ Accepted: A skill missing from Skills")).toBeInTheDocument();
+    expect(within(panel()).getByText(/1 accepted/)).toBeInTheDocument();
   });
 
   it("IN-3: keeps the v1 form when v2_enabled is off", async () => {
