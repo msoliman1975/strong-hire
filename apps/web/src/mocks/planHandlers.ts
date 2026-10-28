@@ -2,7 +2,7 @@
  * MSW handlers for the interview plan page (PP-1, PP-2), with the shapes in openapi.json. Like
  * the API, the view is put together from the other endpoints: the job, the CV, the gap
  * analysis, the reports and the progress, which are mocked in handlers.ts. The interview date
- * lives here, per mock database, so a store reset clears it.
+ * lives in the mock database, so a store reset clears it.
  */
 import { http, HttpResponse } from "msw/http";
 
@@ -16,7 +16,7 @@ import type {
   ResumeOut,
 } from "../api/types";
 import type { PlanView, TypeWeights } from "../pages/plan/api";
-import type { MockDb, MockStore } from "./db";
+import type { MockStore } from "./db";
 
 const API = "*/api";
 
@@ -43,12 +43,8 @@ function daysLeft(date: string | null): number | null {
 }
 
 export function planHandlers(store: MockStore) {
-  const dates = new WeakMap<MockDb, Record<string, string | null>>();
-  const datesOf = () => {
-    let map = dates.get(store.db);
-    if (!map) dates.set(store.db, (map = {}));
-    return map;
-  };
+  // Saved in the mock database, so a page reload keeps the date and a store reset clears it.
+  const datesOf = (): Record<string, string | null> => (store.db.interviewDates ??= {});
 
   return [
     http.get(`${API}/plan/:jobId/:resumeId`, async ({ params, request }) => {
@@ -103,6 +99,7 @@ export function planHandlers(store: MockStore) {
         return HttpResponse.json({ detail: "Choose today or a later date." }, { status: 422 });
       }
       datesOf()[String(params.jobId)] = interview_date;
+      store.save();
       return HttpResponse.json({ interview_date, days_left: left });
     }),
   ];

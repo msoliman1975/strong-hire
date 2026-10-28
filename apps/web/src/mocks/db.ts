@@ -64,6 +64,8 @@ export interface MockDb {
   savedQuestions: SavedQuestion[];
   /** L05: the post-session rating, by session id. */
   feedback: Record<string, SessionFeedback>;
+  /** PP-2: the interview date per job target id (planHandlers.ts). */
+  interviewDates?: Record<string, string | null>;
 }
 
 /** GET /status with every ops control at its default. */

@@ -203,6 +203,37 @@ h1:focus {
   font-weight: 600;
 }
 
+/* v2: the journey letter (A, B) at the right of Stories and Interviews. */
+.rail-nav a:has(.rail-nav__journey) {
+  justify-content: space-between;
+}
+
+.rail-nav__journey {
+  font-family: var(--sh-font-mono);
+  font-size: 0.75rem;
+  color: var(--sh-muted);
+}
+
+/* v2: "Talk to your coach", the dark button above the minutes meter. */
+.rail__coach {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 14px;
+  margin: 0 calc(-1 * var(--space-2));
+  border-radius: 12px;
+  background: var(--sh-ink);
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.rail__coach:hover {
+  color: #ffffff;
+  background: var(--sh-ink-hover);
+}
+
 .rail__foot {
   margin-top: auto;
   display: flex;

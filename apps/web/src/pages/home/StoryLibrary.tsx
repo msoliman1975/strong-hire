@@ -1,13 +1,13 @@
 /**
- * ST-4 on Home (canvas board Home): the story library, with counts and the newest stories, and
- * the skill coverage map below it. HomeV2 renders this below the interview cards.
+ * ST-4 on Home (canvas board Home): the newest stories as cards, and the skill coverage map below
+ * them. The counts sit on the journey A card above (HomeV2).
  */
 import "./StoryLibrary.css";
 
 import { Link } from "react-router";
 
 import { competencyLabel } from "../../labels";
-import { ErrorNotice, Eyebrow } from "../../components/ui";
+import { ErrorNotice } from "../../components/ui";
 import { filledParts, useStories, type Story } from "../stories/api";
 import { newCoachPath } from "../coach/paths";
 import { newStoryPath, storiesPath, storyPath } from "../stories/paths";
@@ -21,11 +21,9 @@ export function StoryLibrary() {
   if (stories.isPending) return null;
   if (stories.isError) return <ErrorNotice error={stories.error} title="Your stories did not load" />;
   const all = stories.data;
-  const proven = all.filter((s) => s.status === "proven").length;
   return (
     <>
-      <section className="card card--action home-stories" aria-labelledby="home-stories-heading">
-        <Eyebrow>A · Build your stories</Eyebrow>
+      <section className="home-stories" aria-labelledby="home-stories-heading">
         <div className="home-section__head">
           <h2 id="home-stories-heading">Your story library</h2>
           {all.length > 0 && (
@@ -34,22 +32,18 @@ export function StoryLibrary() {
             </Link>
           )}
         </div>
-        <dl className="home-stories__counts">
-          <div>
-            <dt>Stories</dt>
-            <dd>{all.length}</dd>
-          </div>
-          <div>
-            <dt>Proven</dt>
-            <dd data-tone="ok">{proven}</dd>
-          </div>
-          <div>
-            <dt>Drafts</dt>
-            <dd>{all.length - proven}</dd>
-          </div>
-        </dl>
         {all.length === 0 ? (
-          <p className="muted">Save an answer from a debrief, or write a story about work you are proud of.</p>
+          <div className="card home-stories__empty">
+            <p className="muted">Save an answer from a debrief, or tell your coach about work you are proud of.</p>
+            <div className="stories__actions">
+              <Link className="btn" to={newCoachPath()}>
+                Build a story
+              </Link>
+              <Link className="btn btn--secondary" to={newStoryPath()}>
+                Write one yourself
+              </Link>
+            </div>
+          </div>
         ) : (
           <ul className="plain-list home-stories__list" aria-label="Newest stories">
             {all.slice(0, SHOWN).map((s) => (
@@ -57,14 +51,6 @@ export function StoryLibrary() {
             ))}
           </ul>
         )}
-        <div className="stories__actions">
-          <Link className="btn" to={newCoachPath()}>
-            Build a story
-          </Link>
-          <Link className="btn btn--secondary" to={newStoryPath()}>
-            New story
-          </Link>
-        </div>
       </section>
       <SkillCoverage stories={all} />
     </>
@@ -73,7 +59,7 @@ export function StoryLibrary() {
 
 function StoryCard({ story }: { story: Story }) {
   return (
-    <li className="card card--soft home-story" data-testid="home-story">
+    <li className="card home-story" data-testid="home-story">
       <div className="home-story__top">
         <Link className="home-story__title" to={storyPath(story.id)}>
           {story.title}

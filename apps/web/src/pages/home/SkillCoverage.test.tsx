@@ -113,10 +113,12 @@ describe("Home story sections", () => {
   it("ST-4: Home shows the story library with counts and the newest stories", async () => {
     renderHome([summary("j1")]);
     const library = await screen.findByRole("region", { name: "Your story library" });
-    const count = (label: string) => within(library).getAllByText(label).find((el) => el.tagName === "DT")?.nextSibling;
+    // The counts sit on the journey A card, as on the canvas.
+    const journey = screen.getByRole("region", { name: "Turn your career into stories that win interviews." });
+    const count = (label: string) => within(journey).getAllByText(label).find((el) => el.tagName === "DT")?.nextSibling;
     expect(count("Stories")).toHaveTextContent("2");
     expect(count("Proven")).toHaveTextContent("1");
-    expect(count("Drafts")).toHaveTextContent("1");
+    expect(count("Need work")).toHaveTextContent("1");
     expect(within(library).getAllByTestId("home-story")).toHaveLength(2);
     expect(within(library).getByRole("link", { name: "All 2 stories" })).toHaveAttribute("href", "/stories");
     expect(within(library).getByRole("link", { name: "Checkout migration" })).toHaveAttribute("href", "/stories/s1");
@@ -147,7 +149,7 @@ describe("Home story sections", () => {
     renderHome([]);
     const library = await screen.findByRole("region", { name: "Your story library" });
     expect(library).toHaveTextContent("Save an answer from a debrief");
-    expect(within(library).getByRole("link", { name: "New story" })).toHaveAttribute("href", "/stories/new");
+    expect(within(library).getByRole("link", { name: "Write one yourself" })).toHaveAttribute("href", "/stories/new");
     expect(within(library).getByRole("link", { name: "Build a story" })).toHaveAttribute("href", "/coach/new");
   });
 });
