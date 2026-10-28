@@ -1,0 +1,11 @@
+name: coach
+description: Coach evals (CO-9). Four simulated candidates (vague, overclaim, off topic, strong), each in the gentle and the direct style.
+coach:
+  - {id: coach-vague-gentle, candidate: vague, style: gentle}
+  - {id: coach-vague-direct, candidate: vague, style: direct}
+  - {id: coach-overclaim-gentle, candidate: overclaim, style: gentle}
+  - {id: coach-overclaim-direct, candidate: overclaim, style: direct}
+  - {id: coach-off-topic-gentle, candidate: off-topic, style: gentle}
+  - {id: coach-off-topic-direct, candidate: off-topic, style: direct}
+  - {id: coach-strong-gentle, candidate: strong, style: gentle}
+  - {id: coach-strong-direct, candidate: strong, style: direct}

@@ -1,0 +1,14 @@
+Two practice sessions with an AI story coach follow, with the same candidate turns. One coach used
+the gentle style, the other the direct style.
+
+Gentle: $gentle_guide
+Direct: $direct_guide
+
+Session A (C = coach, K = candidate):
+$a
+
+Session B (C = coach, K = candidate):
+$b
+
+Which session used the direct style? Answer A or B, and say why in one short sentence that quotes
+both sessions. Answer "same" only when the two coaches cannot be told apart.

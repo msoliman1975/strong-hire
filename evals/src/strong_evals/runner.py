@@ -39,9 +39,19 @@ from strong_core.db.models import UsageEvent
 from strong_core.gateway import ModelGateway, Role, build_gateway
 from strong_core.gateway.fake import DEFAULT_FIXTURES_DIR
 from strong_core.gateway.recorder import RecordingGateway
-from strong_core.schemas import HireSignal, Scorecard
+from strong_core.schemas import CoachStyle, HireSignal, Scorecard
 from strong_evals import EVALS_DIR
 from strong_evals.candidate import Persona
+from strong_evals.coach import (
+    CoachRun,
+    load_candidates,
+    low_overlap_parts,
+    one_question_count,
+    run_coach_session,
+    unbacked_updates,
+    untraced_numbers,
+)
+from strong_evals.coach_judge import CoachJudgeResult, StylePick, judge_session, judge_styles
 from strong_evals.gap import GapResult, fit_order, run_gap_item
 from strong_evals.goldset import GoldLabel, load_goldset
 from strong_evals.interfaces import Interviewer, Scorer
@@ -60,7 +70,14 @@ from strong_evals.metrics import (
 )
 from strong_evals.session import run_text_session
 from strong_evals.stubs import GatewayScorer, StubInterviewer
-from strong_evals.suites import GapSpec, SimulatedSpec, Suite, load_suite, suite_names
+from strong_evals.suites import (
+    CoachSpec,
+    GapSpec,
+    SimulatedSpec,
+    Suite,
+    load_suite,
+    suite_names,
+)
 from strong_evals.transcripts import ScriptedTranscript, load_transcripts
 from strong_evals.usage import MeteredGateway, Prices, load_prices
 from strong_interview.harness import HarnessInterviewer
@@ -119,6 +136,22 @@ class SimulatedResult:
 
 
 @dataclass
+class CoachResult:
+    """One coach session (CO-9): the run, the code checks and, off the fake profile, the judge."""
+
+    spec: CoachSpec
+    run: CoachRun | None
+    cost_usd: Decimal
+    unbacked: list[str] = field(default_factory=list)  # kept updates the words do not back
+    untraced: list[str] = field(default_factory=list)  # story numbers the candidate never said
+    low_overlap: list[str] = field(default_factory=list)  # parts to look at, information only
+    one_question: tuple[int, int] = (0, 0)
+    judge: CoachJudgeResult | None = None
+    judge_error: str | None = None
+    error: str | None = None
+
+
+@dataclass
 class MetricResult:
     key: str
     name: str
@@ -142,6 +175,8 @@ class RunReport:
     scripted: list[ScriptedResult] = field(default_factory=list)
     simulated: list[SimulatedResult] = field(default_factory=list)
     gap: list[GapResult] = field(default_factory=list)
+    coach: list[CoachResult] = field(default_factory=list)
+    style_picks: list[StylePick] = field(default_factory=list)
     metrics: list[MetricResult] = field(default_factory=list)
     recorded: int = 0
     scorer: str = "stub"
@@ -149,10 +184,11 @@ class RunReport:
 
     @property
     def errors(self) -> int:
-        items: list[ScriptedResult | SimulatedResult | GapResult] = [
+        items: list[ScriptedResult | SimulatedResult | GapResult | CoachResult] = [
             *self.scripted,
             *self.simulated,
             *self.gap,
+            *self.coach,
         ]
         return sum(r.error is not None for r in items)
 
@@ -278,6 +314,68 @@ async def run_gap(
     result.cost_usd = _cost(gw.events, sid)
     refs.update(gw.prompt_refs)
     return result
+
+
+async def run_coach(
+    spec: CoachSpec, base: ModelGateway, prices: Prices, suite: str, refs: dict[str, None]
+) -> CoachResult:
+    """One coach session through the real engine, its code checks and, off the fake profile
+    (which has no judge fixtures), the judge."""
+    sid = _session_id(suite, spec.id)
+    gw = MeteredGateway(base, prices, sid)
+    candidates = load_candidates()
+    if spec.candidate not in candidates:
+        error = f"no coach candidate {spec.candidate!r}; known: {', '.join(sorted(candidates))}"
+        return CoachResult(spec, None, Decimal(0), error=error)
+    try:
+        run = await run_coach_session(
+            candidates[spec.candidate], spec.style, gw, max_turns=spec.max_turns
+        )
+    except Exception as e:
+        refs.update(gw.prompt_refs)
+        return CoachResult(
+            spec, None, _cost(gw.events, sid), error=f"{type(e).__name__}: {e}"[:300]
+        )
+    result = CoachResult(
+        spec,
+        run,
+        Decimal(0),
+        unbacked=unbacked_updates(run),
+        untraced=untraced_numbers(run),
+        low_overlap=low_overlap_parts(run),
+        one_question=one_question_count(run),
+    )
+    if not gw.is_fake:
+        try:
+            result.judge = await judge_session(run, gw)
+        except Exception as e:
+            result.judge_error = f"{type(e).__name__}: {e}"[:300]
+    result.cost_usd = _cost(gw.events, sid)
+    refs.update(gw.prompt_refs)
+    return result
+
+
+async def run_style_pairs(
+    results: list[CoachResult], base: ModelGateway, refs: dict[str, None]
+) -> list[StylePick]:
+    """CO-5: for each candidate run in both styles, ask the judge which coach was direct."""
+    if base.is_fake:
+        return []
+    by_candidate: dict[str, dict[CoachStyle, CoachRun]] = {}
+    for r in results:
+        if r.run is not None:
+            by_candidate.setdefault(r.spec.candidate, {})[r.spec.style] = r.run
+    picks: list[StylePick] = []
+    for runs in by_candidate.values():
+        if len(runs) == 2:
+            try:
+                picks.append(
+                    await judge_styles(runs[CoachStyle.GENTLE], runs[CoachStyle.DIRECT], base)
+                )
+            except Exception as e:
+                print(f"  style judge failed: {type(e).__name__}: {e}"[:300])
+    refs.update({p.rubric: None for p in picks})
+    return picks
 
 
 def _check(value: float, rule: dict[str, Any]) -> tuple[str, bool | None]:
@@ -419,6 +517,9 @@ def compute_metrics(report: RunReport, thresholds: dict[str, dict[str, Any]]) ->
             f"mean over {len(costs)} pairs",
         )
 
+    if report.coach:
+        _coach_metrics(report, add)
+
     # Reference numbers from the human-written transcripts (not the system under test).
     s_probed = sum(r.follow_ups.probed for r in report.scripted)
     s_eligible = sum(r.follow_ups.eligible for r in report.scripted)
@@ -478,6 +579,93 @@ def compute_metrics(report: RunReport, thresholds: dict[str, dict[str, Any]]) ->
             )
         )
     return out
+
+
+def _coach_metrics(report: RunReport, add: Any) -> None:
+    """CO-9 and the coach checks. Judge metrics are not measured on the fake profile."""
+    runs = [r for r in report.coach if r.run is not None]
+    judged = [r.judge for r in runs if r.judge is not None]
+    unbacked = sum(len(r.unbacked) for r in runs)
+    untraced = sum(len(r.untraced) for r in runs)
+    judge_invented = sum(j.verdict("invented_facts") == "fail" for j in judged)
+    add(
+        "coach_invented_facts",
+        "Coach: facts the candidate did not say (CO-9)",
+        float(unbacked + untraced + judge_invented) if runs else None,
+        str(unbacked + untraced + judge_invented),
+        f"{len(runs)} sessions: {unbacked} kept updates not backed by the candidate's words, "
+        f"{untraced} story numbers the candidate never said, {judge_invented} judge fails "
+        f"({len(judged)} sessions judged)",
+    )
+    ok = sum(r.one_question[0] for r in runs)
+    total = sum(r.one_question[1] for r in runs)
+    add(
+        "coach_one_question",
+        "Coach: replies with one question at most (CO-4)",
+        ok / total if total else None,
+        f"{ok / total:.0%}" if total else "",
+        f"{ok} of {total} coach replies",
+    )
+
+    def rule_rate(rule: str) -> tuple[float | None, str]:
+        verdicts = [j.verdict(rule) for j in judged]
+        counted = [v for v in verdicts if v in ("pass", "fail")]
+        passed = sum(v == "pass" for v in counted)
+        if not counted:
+            return None, "the judge does not run on the fake profile" if not judged else ""
+        return passed / len(counted), f"{passed} of {len(counted)} judged sessions"
+
+    rate, detail = rule_rate("iv3_followup")
+    add(
+        "coach_iv3_followup",
+        "Coach: follows up on what the story lacks (IV-3, judge)",
+        rate,
+        f"{rate:.0%}" if rate is not None else "",
+        detail,
+    )
+    verdicts = [r.verdict for j in judged for r in j.rules if r.verdict != "not_applicable"]
+    passed = sum(v == "pass" for v in verdicts)
+    fails = [f"{r.spec.id} {r.judge.failed}" for r in runs if r.judge and r.judge.failed]
+    add(
+        "coach_judge_pass",
+        "Coach: judge rules passed (all rules)",
+        passed / len(verdicts) if verdicts else None,
+        f"{passed / len(verdicts):.0%}" if verdicts else "",
+        f"{passed} of {len(verdicts)} applicable verdicts; fails: {', '.join(fails) or 'none'}",
+    )
+    picks = report.style_picks
+    right = sum(p.correct for p in picks)
+    add(
+        "coach_style_distinct",
+        "Coach: judge tells direct from gentle on the same candidate (CO-5)",
+        right / len(picks) if picks else None,
+        f"{right / len(picks):.0%}" if picks else "",
+        f"{right} of {len(picks)} pairs" if picks else "needs the judge and both styles",
+    )
+    add(
+        "coach_versions_faithful",
+        "Coach: 60-second and full versions use only the candidate's words (CO-8)",
+        None,
+        "",
+        "not run: no story-versions writer on main yet (S33)",
+    )
+    dropped = sum(len(s.dropped) for r in runs if r.run for s in r.run.steps)
+    low = sum(len(r.low_overlap) for r in runs)
+    add(
+        "coach_dropped_updates",
+        "Coach: part updates the engine dropped (CO-3 guard)",
+        float(dropped) if runs else None,
+        str(dropped),
+        f"{low} story parts share under 60% of their words with the candidate (look at them)",
+    )
+    costs = [float(r.cost_usd) for r in runs]
+    add(
+        "coach_cost_per_session_usd",
+        "Coach: cost per session, USD",
+        mean(costs) if costs else None,
+        f"${mean(costs):.4f}" if costs else "",
+        f"mean over {len(costs)} sessions, judge calls included",
+    )
 
 
 def _git_sha() -> str:
@@ -542,6 +730,12 @@ async def run_suite(
         report.gap.append(await run_gap(gap_spec, base, prices, suite.name, refs))
         g = report.gap[-1]
         print(f"  gap {gap_spec.id}: scores {g.scores} {g.error or ''}")
+    for coach_spec in suite.coach:
+        report.coach.append(await run_coach(coach_spec, base, prices, suite.name, refs))
+        c = report.coach[-1]
+        steps = len(c.run.steps) if c.run else 0
+        print(f"  coach {coach_spec.id}: {steps} turns {c.error or c.judge_error or ''}")
+    report.style_picks = await run_style_pairs(report.coach, base, refs)
     report.prompt_refs = sorted(refs)
     report.recorded = len(recorder.saved) if recorder else 0
     thresholds = yaml.safe_load(THRESHOLDS_FILE.read_text(encoding="utf-8"))

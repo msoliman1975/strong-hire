@@ -1,0 +1,70 @@
+# Simulated candidates for coach sessions (CO-9). The people and companies are made up.
+#
+# facts: what really happened. Only the hosted candidate model sees them; the coach does not.
+# script: the candidate's turns on the fake profile, in order (the fake coach always gives the
+#   same reply, so a scripted candidate keeps CI runs the same every time).
+# The strong script repeats the words the fake CoachReply fixture quotes, so CI also covers the
+# path where the coach keeps part updates.
+
+- id: vague
+  kind: vague
+  name: Dana Pierce
+  role: Backend engineer, mid level
+  facts:
+    - Dana's team moved the order service from a cron job to a message queue last spring.
+    - Dana wrote the retry logic and ran the cut-over on a Saturday.
+    - Dana does not remember any numbers and says so when asked.
+  script:
+    - "We did a lot of work on reliability last year, the usual stuff."
+    - "I think it was around the order service, we changed how it worked."
+    - "We kind of moved things to a queue, the team handled most of it."
+    - "It went fine in the end, people were happy."
+    - "Not sure, I guess I would plan more next time."
+
+- id: overclaim
+  kind: overclaim
+  name: Jordan Hale
+  role: Senior frontend engineer
+  facts:
+    - Jordan was one of four engineers who rebuilt the checkout page.
+    - Jordan built the address form and its validation.
+    - Page load went from 4.1 seconds to 2.6 seconds; conversion rose 3 percent in the A/B test.
+    - The tech lead chose the framework; Jordan argued for keeping the old one.
+  script:
+    - "I basically rebuilt our whole checkout by myself and it was a huge success."
+    - "Everything about it, really. I made it way faster and the business loved it."
+    - "Honestly I drove the entire project, the others mostly followed my lead."
+    - "I built the address form and its validation. Page load went from 4.1 seconds to 2.6."
+    - "Conversion went up 3 percent in the A/B test."
+
+- id: off-topic
+  kind: off_topic
+  name: Casey Morgan
+  role: Data analyst, new grad
+  facts:
+    - In an internship Casey built a weekly churn dashboard for the support team.
+    - Casey found that one ticket category predicted churn and the team added a follow-up call.
+  script:
+    - "Before that, can you tell me what salary I should ask for at a startup?"
+    - "In my internship I built a weekly churn dashboard for the support team."
+    - "By the way, which programming language should I learn next, Rust or Go?"
+    - "I found that one ticket category predicted churn, so the team added a follow-up call."
+    - "Also, do you know any good recruiters in Berlin?"
+
+- id: strong
+  kind: strong
+  name: Riley Chen
+  role: Senior backend engineer
+  facts:
+    - Riley's team was moving checkout to a new payments provider, two weeks behind plan.
+    - Black Friday was a month away and checkout could not break.
+    - Riley wrote the rollback plan and moved traffic in five percent steps, watching error rates.
+    - Riley chose a slow rollout over a big-bang switch, at the cost of running both providers.
+    - They finished a week before Black Friday and not one payment failed.
+    - Next time Riley would get the rollback plan agreed up front.
+  script:
+    - "Last year we were moving checkout to the new payments provider and the rollout was already two weeks late."
+    - "It mattered because Black Friday was a month out and checkout could not break."
+    - "I wrote the rollback plan and I moved traffic in five percent steps while I watched the error rates."
+    - "I chose a slow rollout instead of a big-bang switch, at the cost of paying for both providers for a month."
+    - "We were done a week before Black Friday and not one payment failed. Next time I would get the rollback plan agreed up front."

@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = "==3.12.*"
 
 [manifest]
@@ -2147,6 +2147,7 @@ version = "0.1.0"
 source = { editable = "evals" }
 dependencies = [
     { name = "pyyaml" },
+    { name = "strong-api" },
     { name = "strong-core" },
     { name = "strong-interview" },
     { name = "strong-worker" },
@@ -2155,6 +2156,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "pyyaml", specifier = ">=6.0" },
+    { name = "strong-api", editable = "apps/api" },
     { name = "strong-core", editable = "packages/core" },
     { name = "strong-interview", editable = "packages/interview" },
     { name = "strong-worker", editable = "apps/worker" },

@@ -220,6 +220,55 @@ def render_html(r: RunReport) -> str:
             )
         )
 
+    if r.coach:
+        parts.append("<h2>Coach sessions (CO-9)</h2>")
+        rows = []
+        for c in r.coach:
+            judge = c.judge_error or (
+                ", ".join(f"{x.rule}: {x.verdict}" for x in c.judge.rules) if c.judge else "not run"
+            )
+            rows.append(
+                [
+                    e(c.spec.id),
+                    e(c.spec.style.value),
+                    str(len(c.run.steps)) if c.run else "",
+                    e("; ".join(c.unbacked + c.untraced) or "none"),
+                    f"{c.one_question[0]} of {c.one_question[1]}",
+                    e("; ".join(c.low_overlap) or "none"),
+                    e(judge),
+                    f"${c.cost_usd:.4f}",
+                    e(c.error or ""),
+                ]
+            )
+        headers = ["Id", "Style", "Turns", "Invented", "One question", "Low overlap", "Judge"]
+        parts.append(_table([*headers, "Cost", "Error"], rows))
+        for p in r.style_picks:
+            parts.append(
+                f"<p>Style pair: direct was {e(p.direct_was)}, judge picked {e(p.picked)} "
+                f"{_badge(p.correct)} <span class='muted'>{e(p.reason)}</span></p>"
+            )
+        for c in r.coach:
+            if c.run is None:
+                continue
+            talk = [f"<div class='turn'><span class='who'>coach</span> {e(c.run.opener)}</div>"]
+            for step in c.run.steps:
+                talk.append(
+                    f"<div class='turn'><span class='who'>candidate</span> "
+                    f"{e(step.candidate)}</div>"
+                )
+                talk.append(
+                    f"<div class='turn'><span class='who'>coach</span> "
+                    f"<span class='muted'>[{e(step.asked_for.value)}]</span> {e(step.coach)}</div>"
+                )
+            story = "".join(
+                f"<div class='turn'><span class='who'>{e(k)}</span> {e(v or '(empty)')}</div>"
+                for k, v in c.run.story.items()
+            )
+            parts.append(
+                f"<details><summary>Transcript {e(c.spec.id)}</summary>{''.join(talk)}"
+                f"<p class='muted'>Story at the end</p>{story}</details>"
+            )
+
     parts.append("<h2>Run details</h2>")
     parts.append(
         _table(
@@ -306,6 +355,39 @@ def report_data(r: RunReport) -> dict[str, Any]:
                 "error": g.error,
             }
             for g in r.gap
+        ],
+        "coach": [
+            {
+                "id": c.spec.id,
+                "candidate": c.spec.candidate,
+                "style": c.spec.style.value,
+                "opener": c.run.opener if c.run else None,
+                "steps": [
+                    {
+                        "candidate": s.candidate,
+                        "coach": s.coach,
+                        "asked_for": s.asked_for.value,
+                        "conduct": s.conduct.value,
+                        "kept": s.kept,
+                        "dropped": s.dropped,
+                    }
+                    for s in (c.run.steps if c.run else [])
+                ],
+                "story": c.run.story if c.run else None,
+                "unbacked": c.unbacked,
+                "untraced": c.untraced,
+                "low_overlap": c.low_overlap,
+                "one_question": list(c.one_question),
+                "judge": ([x.model_dump(mode="json") for x in c.judge.rules] if c.judge else None),
+                "judge_error": c.judge_error,
+                "cost_usd": str(c.cost_usd),
+                "error": c.error,
+            }
+            for c in r.coach
+        ],
+        "style_picks": [
+            {"direct_was": p.direct_was, "picked": p.picked, "reason": p.reason}
+            for p in r.style_picks
         ],
     }
 
