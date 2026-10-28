@@ -20,6 +20,7 @@ from strong_core.db import get_sessionmaker
 from strong_core.gateway import Role, get_gateway, make_db_usage_sink, set_usage_sink, usage_context
 from strong_core.ops.logs import log_context
 from strong_core.prompts import load_prompt
+from strong_voice.coach_agent import coach_entrypoint
 from strong_voice.interview_agent import run_session
 from strong_voice.latency import WARMUP_ROOM_PREFIX, LatencyRecorder
 from strong_voice.plugins import GatewayLLM, GatewaySTT, GatewayTTS
@@ -74,6 +75,15 @@ def build_session(proc: JobProcess, recorder: LatencyRecorder) -> AgentSession[N
 
 async def entrypoint(ctx: JobContext) -> None:
     room_name = ctx.job.room.name
+
+    # A room named coach-<uuid> is a voice coach session (CO-6) on the same voice loop. Its LLM
+    # is never called (the API's coach decides what is said), so the session is built as is.
+    def coach_session() -> AgentSession[None]:
+        recorder = LatencyRecorder(None, session=room_name, profile=get_gateway().profile)
+        return build_session(ctx.proc, recorder)
+
+    if await coach_entrypoint(ctx, coach_session):
+        return
     session_id = session_id_from_room(room_name)
     if session_id is None:
         await spike_entrypoint(ctx)
