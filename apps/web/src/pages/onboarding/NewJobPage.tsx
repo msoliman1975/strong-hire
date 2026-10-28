@@ -6,7 +6,10 @@ import { ApiError } from "../../api/client";
 import { useJobs } from "../../api/hooks";
 import { jobTargetsApi } from "../../api/inputs";
 import type { JobTargetCreate, JobTargetOut } from "../../api/types";
-import { ErrorNotice, ONBOARDING_STEPS, PageHead, Steps } from "../../components/ui";
+import { ErrorNotice, PageHead, Steps } from "../../components/ui";
+import { countWords, fmt, friendlyLimitError, JD_MAX_WORDS, JD_TOO_LONG, JD_WARN_WORDS } from "../../limits";
+import { useFeature } from "../../theme/features";
+import { useOnboardingSteps } from "./steps";
 import { formatDate } from "../../labels";
 import type { NewJobReturn } from "../../paths";
 
@@ -56,6 +59,7 @@ export function savedJobPath(job: JobTargetOut, then: NewJobReturn = "rehearsal"
 }
 
 export function NewJobPage() {
+  const steps = useOnboardingSteps();
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const then = newJobReturn(params.get("then"));
@@ -63,6 +67,10 @@ export function NewJobPage() {
   const [url, setUrl] = useState("");
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
+  // v2 (R3): a live word count; amber from 2,000 words, Next blocked past 2,500, as the API enforces.
+  const v2 = useFeature("v2_enabled");
+  const words = countWords(text);
+  const tooLong = v2 && words > JD_MAX_WORDS;
   const [offer, setOffer] = useState<{ job: JobTargetOut; body: JobTargetCreate } | null>(null);
   const create = useMutation({
     mutationFn: (body: JobTargetCreate) => jobTargetsApi.create(body),
@@ -84,7 +92,11 @@ export function NewJobPage() {
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    const problem = pasteRequired && !text.trim() ? "Paste the job posting text." : validateJobInput(url, text);
+    const problem = tooLong
+      ? JD_TOO_LONG
+      : pasteRequired && !text.trim()
+        ? "Paste the job posting text."
+        : validateJobInput(url, text);
     setError(problem);
     if (problem) return;
     // With both, the API reads the text and uses the link to match the company.
@@ -94,7 +106,7 @@ export function NewJobPage() {
 
   return (
     <div className="page--narrow">
-      {then === "rehearsal" && <Steps current={0} steps={ONBOARDING_STEPS} />}
+      {then === "rehearsal" && <Steps current={0} steps={steps} />}
       <PageHead title="Add a job description">
         <p>
           A job description is the job posting for the real job you are interviewing for. Paste its link or its text.
@@ -138,7 +150,24 @@ export function NewJobPage() {
         </div>
         <div className="field">
           <label htmlFor="job-text">Or paste the job posting text</label>
-          <textarea id="job-text" value={text} onChange={(e) => setText(e.target.value)} rows={8} />
+          <textarea
+            id="job-text"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            rows={8}
+            aria-describedby={v2 ? "job-text-count" : undefined}
+          />
+          {v2 && (
+            <p
+              className="word-count"
+              id="job-text-count"
+              data-level={tooLong ? "over" : words >= JD_WARN_WORDS ? "warn" : undefined}
+              aria-live="polite"
+            >
+              {fmt(words)} / {fmt(JD_MAX_WORDS)} words
+              {tooLong && <span> · Trim the benefits and company boilerplate.</span>}
+            </p>
+          )}
         </div>
         {error && (
           <p className="field-error" role="alert">
@@ -171,11 +200,11 @@ export function NewJobPage() {
             <p>This site does not allow automatic reading. Paste the job posting text above. We keep the link.</p>
           </div>
         ) : (
-          create.isError && <ErrorNotice error={create.error} />
+          create.isError && <ErrorNotice error={friendlyLimitError(create.error)} />
         )}
         <div className="row section">
-          <button type="submit" className="btn" disabled={create.isPending || check.isPending}>
-            Read job posting
+          <button type="submit" className="btn" disabled={create.isPending || check.isPending || tooLong}>
+            {v2 && then === "rehearsal" ? "Next: pick your resume" : "Read job posting"}
           </button>
         </div>
       </form>

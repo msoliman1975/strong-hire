@@ -324,3 +324,20 @@
 .home-resumes__latest dd .small {
   font-weight: 400;
 }
+
+.home-resumes__limit {
+  margin: 0;
+  font-family: var(--sh-font-mono);
+}
+
+/* R3: an unfinished setup on the Interviews page, shown as a draft. */
+.interviews-v2__list .home-interview--draft {
+  border-top-color: var(--sh-line-strong);
+  border-style: dashed;
+  border-top-style: solid;
+}
+
+.home-interview--draft h3 {
+  margin: 0;
+  font-size: 1rem;
+}

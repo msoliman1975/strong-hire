@@ -7,6 +7,7 @@ import { Link } from "react-router";
 import { useResumes } from "../../api/hooks";
 import type { ResumeOut } from "../../api/types";
 import { formatDate } from "../../labels";
+import { MAX_RESUME_MB, MAX_RESUMES } from "../../limits";
 import { resumeCheckPath } from "../../paths";
 
 /** The newest CV first. */
@@ -26,6 +27,8 @@ export function ResumesCard() {
   const live = (resumes.data ?? []).filter((r) => !r.deleted);
   const latest = latestResume(resumes.data ?? []);
   const needsCheck = latest !== null && latest.status === "extracted" && !latest.confirmed_at;
+  // R3: at the limit, adding means replacing one (delete one on the Resumes page first).
+  const addLabel = live.length >= MAX_RESUMES ? "Replace one" : "Add a resume";
 
   return (
     <section className="card home-journey" data-journey="resumes" aria-labelledby="home-resumes">
@@ -54,6 +57,9 @@ export function ResumesCard() {
           </dl>
         </>
       )}
+      <p className="muted small home-resumes__limit">
+        {live.length} of {MAX_RESUMES} · up to {MAX_RESUME_MB} MB each
+      </p>
       <div className="home-journey__actions">
         {needsCheck && latest ? (
           <>
@@ -61,13 +67,13 @@ export function ResumesCard() {
               Check a resume
             </Link>
             <Link className="btn btn--secondary" to="/resumes">
-              Add a resume
+              {addLabel}
             </Link>
           </>
         ) : (
           <>
             <Link className="btn btn--ink" to="/resumes">
-              Add a resume
+              {addLabel}
             </Link>
             {latest && latest.status === "extracted" && (
               <Link className="btn btn--secondary" to={resumeCheckPath(latest.id)}>

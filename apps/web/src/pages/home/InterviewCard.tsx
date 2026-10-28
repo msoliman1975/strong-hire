@@ -18,6 +18,14 @@ export function setupStep(s: JobTargetSummary): string {
   return s.gap_status === null ? `/jobs/${id}/resume` : `/jobs/${id}/gap`;
 }
 
+/** What an unfinished setup needs next, in words (the same steps as setupStep). */
+export function draftNext(s: JobTargetSummary): string {
+  if (s.job_target.status === "pending") return "Job description added. Next: check the job details.";
+  if (s.gap_status === null) return "Job description added. Next: pick the resume you sent them.";
+  if (s.gap_status === "running") return "Comparing your resume with the job. Next: your plan.";
+  return "Job description and resume added. Next: your plan.";
+}
+
 /**
  * PP-3: one interview with company, role, match score and the days left (PP-2), as the block on
  * the canvas Home's journey B card. The title opens the plan page, or the setup step still open.
@@ -42,6 +50,22 @@ export function InterviewCard({
   const ready = isReady(summary);
   // A ready job without a loaded plan opens it through the gap route, which redirects to the plan.
   const to = !ready ? setupStep(summary) : entry ? planPath(job.id, entry.resumeId) : `/jobs/${job.id}/gap`;
+  // R3: on the Interviews page an unfinished setup is a draft that says what comes next.
+  if (action && !ready) {
+    return (
+      <li className="home-interview home-interview--draft" data-testid="interview-card" data-draft="true">
+        <h3>
+          Draft · {jobRole(summary)} · {jobCompany(summary)}
+        </h3>
+        <p className="muted small">{draftNext(summary)}</p>
+        <div className="home-interview__actions">
+          <Link className="btn btn--secondary" to={to}>
+            Continue setup →
+          </Link>
+        </div>
+      </li>
+    );
+  }
   return (
     <li className="home-interview" data-testid="interview-card">
       <div className="home-interview__top">

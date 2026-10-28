@@ -3168,3 +3168,51 @@ dialog::backdrop {
   border-bottom-color: var(--sh-violet);
   color: var(--sh-ink);
 }
+
+/* v2 (R3): the job description's live word count. Amber near the limit, red past it. */
+.word-count {
+  justify-self: end;
+  margin: 6px 0 0;
+  font-family: var(--sh-font-mono);
+  font-size: 0.8125rem;
+  color: var(--sh-muted);
+  text-align: right;
+}
+
+.word-count[data-level="warn"] {
+  color: var(--sh-warn-ink);
+}
+
+.word-count[data-level="over"] {
+  color: var(--sh-danger-ink);
+  font-weight: 600;
+}
+
+/* R3 (v2): Account in two columns, one on phones. The head spans both columns. */
+.account-v2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.account-v2 > .page-head {
+  grid-column: 1 / -1;
+}
+
+.account-v2 > .panel {
+  margin: 0;
+}
+
+.account-v2 > [data-order="1"] { order: 1; }
+.account-v2 > [data-order="2"] { order: 2; }
+.account-v2 > [data-order="3"] { order: 3; }
+.account-v2 > [data-order="4"] { order: 4; }
+.account-v2 > [data-order="5"] { order: 5; }
+.account-v2 > [data-order="6"] { order: 6; }
+
+@media (max-width: 899px) {
+  .account-v2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

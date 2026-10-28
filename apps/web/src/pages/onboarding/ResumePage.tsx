@@ -5,26 +5,30 @@ import { useNavigate, useParams } from "react-router";
 import { useResume, useResumes, useResumeTask } from "../../api/hooks";
 import { jobProblem, resumesApi, sha256Hex } from "../../api/inputs";
 import type { ResumeAccepted, ResumeOut } from "../../api/types";
-import { ErrorNotice, Loading, ONBOARDING_STEPS, PageHead, Steps } from "../../components/ui";
+import { ErrorNotice, Loading, PageHead, Steps } from "../../components/ui";
 import { formatDate } from "../../labels";
+import { friendlyLimitError, MAX_RESUME_BYTES_V2, MAX_RESUME_MB, MAX_RESUMES, RESUME_TOO_BIG, RESUMES_FULL } from "../../limits";
 import { checkPath, rehearsalPath } from "../../paths";
+import { useFeature } from "../../theme/features";
+import { useOnboardingSteps } from "./steps";
 
 /** The API accepts files up to 5 MB. */
 export const MAX_RESUME_BYTES = 5 * 1024 * 1024;
 const ACCEPTED = [".pdf", ".docx"];
 
-/** Form validation only: a PDF or DOCX up to 5 MB, or pasted text. */
-export function validateResumeInput(file: File | null, text: string): string | null {
+/** Form validation only: a PDF or DOCX up to 5 MB (v2: 1 MB), or pasted text. */
+export function validateResumeInput(file: File | null, text: string, maxBytes = MAX_RESUME_BYTES): string | null {
   if (!file && !text.trim()) return "Choose a PDF or DOCX file, or paste your resume text.";
   if (file) {
     const name = file.name.toLowerCase();
     if (!ACCEPTED.some((ext) => name.endsWith(ext))) return "The file must be a PDF or DOCX.";
-    if (file.size > MAX_RESUME_BYTES) return "The file is larger than 5 MB.";
+    if (file.size > maxBytes) return maxBytes === MAX_RESUME_BYTES ? "The file is larger than 5 MB." : RESUME_TOO_BIG;
   }
   return null;
 }
 
 export function ResumePage() {
+  const steps = useOnboardingSteps();
   const { jobId = "" } = useParams();
   const navigate = useNavigate();
   const existing = useResumes();
@@ -41,7 +45,7 @@ export function ResumePage() {
 
   return (
     <div className="page--narrow">
-      <Steps current={1} steps={ONBOARDING_STEPS} />
+      <Steps current={1} steps={steps} />
       <PageHead title="Choose a resume">
         <p>Pick a resume you saved, or upload a new one. We save it for next time. We compare it with the job to find your strengths and gaps.</p>
       </PageHead>
@@ -109,6 +113,11 @@ export function UploadForm({
   onUploaded: (r: ResumeAccepted) => void;
   onUseSaved: (saved: ResumeOut) => void;
 }) {
+  // v2 (R3): 1 MB per file and 5 resumes on file, as the API enforces them.
+  const v2 = useFeature("v2_enabled");
+  const resumes = useResumes();
+  const onFile = (resumes.data ?? []).filter((r) => !r.deleted).length;
+  const full = v2 && onFile >= MAX_RESUMES;
   const [file, setFile] = useState<File | null>(null);
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -131,7 +140,7 @@ export function UploadForm({
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    const problem = validateResumeInput(file, text);
+    const problem = full ? RESUMES_FULL : validateResumeInput(file, text, v2 ? MAX_RESUME_BYTES_V2 : MAX_RESUME_BYTES);
     setError(problem);
     if (problem) return;
     const form = new FormData();
@@ -147,14 +156,22 @@ export function UploadForm({
       <div className="field">
         <label htmlFor="resume-file">Resume file</label>
         <p className="hint" id="resume-file-hint">
-          PDF or DOCX, up to 5 MB. We store the file encrypted, and you can delete it at any time.
+          {v2
+            ? `PDF or DOCX, up to ${MAX_RESUME_MB} MB. You can keep ${MAX_RESUMES} resumes; you have ${onFile}.`
+            : "PDF or DOCX, up to 5 MB."}{" "}
+          We store the file encrypted, and you can delete it at any time.
         </p>
         <input
           id="resume-file"
           type="file"
           accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
           aria-describedby="resume-file-hint"
-          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+          onChange={(e) => {
+            const picked = e.target.files?.[0] ?? null;
+            setFile(picked);
+            // v2: say it at once when the file is too big, before any upload.
+            setError(v2 && picked && picked.size > MAX_RESUME_BYTES_V2 ? RESUME_TOO_BIG : null);
+          }}
         />
       </div>
       <div className="field">
@@ -166,7 +183,7 @@ export function UploadForm({
           {error}
         </p>
       )}
-      {upload.isError && <ErrorNotice error={upload.error} />}
+      {upload.isError && <ErrorNotice error={friendlyLimitError(upload.error)} />}
       {offer && (
         <div className="notice" role="status">
           <p>You saved this CV before as {offer.saved.name ?? "a saved CV"}. Use it?</p>
@@ -188,7 +205,12 @@ export function UploadForm({
           </div>
         </div>
       )}
-      <button type="submit" className="btn" disabled={upload.isPending || check.isPending}>
+      {full && (
+        <p className="notice" role="status" data-testid="resumes-full">
+          {RESUMES_FULL}
+        </p>
+      )}
+      <button type="submit" className="btn" disabled={upload.isPending || check.isPending || full}>
         Upload resume
       </button>
     </form>

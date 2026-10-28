@@ -155,6 +155,7 @@ export function PlanSetup({ plan, jobId, resumeId }: { plan: PlanView; jobId: st
   // A gap analysis of this pair is needed to build the interviewer brief (PR-3).
   const gapReady = plan.gap?.status === "ready";
   const gapRunning = plan.gap?.status === "running";
+  const firstRehearsal = !plan.reports.some((r) => r.type === "interview_debrief");
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -268,7 +269,7 @@ export function PlanSetup({ plan, jobId, resumeId }: { plan: PlanView; jobId: st
         {!gapReady && (
           <p className="hint" data-testid="needs-gap">
             {gapRunning
-              ? "Comparing your CV with the job. Start rehearsal unlocks when it is done, in about a minute."
+              ? "Comparing your CV with the job. The rehearsal unlocks when it is done, in about a minute."
               : "The rehearsal starts once the gap analysis for this job and CV is ready."}
           </p>
         )}
@@ -291,7 +292,8 @@ export function PlanSetup({ plan, jobId, resumeId }: { plan: PlanView; jobId: st
             className="btn btn--block"
             disabled={start.isPending || !chosenLevel || sessionsClosed || blocked || !gapReady}
           >
-            Start rehearsal
+            {/* R3: the add flow ends on its first rehearsal. */}
+            {firstRehearsal ? "Start your first rehearsal" : "Start rehearsal"}
           </button>
         )}
       </form>
