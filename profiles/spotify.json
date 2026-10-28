@@ -1,0 +1,996 @@
+{
+  "company_name": "Spotify",
+  "company_slug": "spotify",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-28",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Spotify values (The Bassline)",
+    "principles": [
+      {
+        "name": "One Team",
+        "description": "Work in alignment: break down silos, share context openly and aim at shared goals. Success is shared, and people show up for each other.",
+        "evidence_signals": [
+          "Shared context with another squad or team without being asked",
+          "Resolved a cross-team disagreement through alignment rather than escalation",
+          "Credits the team for wins and names own part clearly"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Human Judgment",
+        "description": "Make well-considered decisions and take thoughtful risks. People are trusted to decide what to build, own the results, learn from mistakes and grow.",
+        "evidence_signals": [
+          "Made a call without a manager directing them and explains the reasoning",
+          "Names the risk taken and how it was limited",
+          "Owns a mistake and shows what changed afterwards"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Make It Happen",
+        "description": "Bias toward action. Do not wait for ideal conditions; create them, and focus on execution, urgency and results that matter.",
+        "evidence_signals": [
+          "Started work before everything was clear and adjusted along the way",
+          "Removed a blocker or created the conditions a project needed",
+          "Delivered a concrete result under time pressure"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Impact over activity",
+        "description": "From Spotify's culture pages: growth comes from the difference you make and the problems you solve, not hours worked. Outcomes, risks taken and value created count.",
+        "evidence_signals": [
+          "Measures success by user or business outcomes, not effort",
+          "Quantifies the result of a project",
+          "Chose a harder problem because it mattered more"
+        ],
+        "weight": 1.1
+      },
+      {
+        "name": "Stay curious",
+        "description": "From Spotify's culture pages: stay curious, experiment, learn continuously and use new tools, including AI, to improve the work.",
+        "evidence_signals": [
+          "Ran an experiment to learn rather than argue",
+          "Picked up a new tool or skill and applied it to real work",
+          "Seeks feedback and shows how it changed their approach"
+        ],
+        "weight": 0.8
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": [
+        "Associate Engineer",
+        "Engineer I",
+        "Engineer II",
+        "Senior Engineer",
+        "Staff Engineer",
+        "Senior Staff Engineer"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, why Spotify, and logistics. Not simulated in v1."
+        },
+        {
+          "name": "Technical screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer or engineering manager",
+          "notes": "Coding in CoderPad, sometimes with domain questions and a recent-project discussion. Not simulated in v1."
+        },
+        {
+          "name": "Coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Practical coding; readable, testable code and explaining it matter. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior engineer",
+          "notes": "Often audio streaming, playlists, catalog or recommendations at global scale. More weight above mid level."
+        },
+        {
+          "name": "Case study",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Engineers from the hiring team",
+          "notes": "A real problem from the team, such as debugging a past production incident or an on-call scenario. Some teams run it as pair programming, which v1 does not simulate; v1 runs the verbal walkthrough."
+        },
+        {
+          "name": "Values interview",
+          "interview_type": "behavioral",
+          "duration_min": 60,
+          "interviewer_role": "Engineering manager or senior engineer",
+          "notes": "Values alignment, ownership and pride in work, adaptability, collaboration and drive. STAR-style stories. Often the last round."
+        },
+        {
+          "name": "Hiring manager conversation",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager",
+          "notes": "Reported as a screen for some roles and as an optional team meeting for others. Experience, scope and team fit."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": [
+        "Product Manager",
+        "Senior Product Manager"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "PM experience and why Spotify. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Hiring manager",
+          "notes": "Conversational behavioral and domain questions about past PM work."
+        },
+        {
+          "name": "Analytics and product sense",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Product manager",
+          "notes": "Metric reasoning plus an open-ended product design prompt. Mention trade-offs."
+        },
+        {
+          "name": "Execution",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Product manager",
+          "notes": "Goals and metrics, debugging a metric drop, trade-offs between user groups."
+        },
+        {
+          "name": "Product strategy",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Product leader",
+          "notes": "Where a product should go next under uncertainty, using data and product judgment."
+        },
+        {
+          "name": "Leadership and values",
+          "interview_type": "behavioral",
+          "duration_min": 60,
+          "interviewer_role": "Engineering manager or product leader",
+          "notes": "Initiative, self-awareness, failure, conflict, leading and supporting a team."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": [
+        "Data Scientist",
+        "Senior Data Scientist",
+        "Machine Learning Engineer",
+        "Senior Machine Learning Engineer"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Products measured and metrics owned. Not simulated in v1."
+        },
+        {
+          "name": "Technical screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Data scientist",
+          "notes": "SQL, Python and statistics problems. Not simulated in v1."
+        },
+        {
+          "name": "ML or analytics deep dive",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior data scientist or ML engineer",
+          "notes": "Fundamentals and applied work: recommendations, experimentation, evaluation."
+        },
+        {
+          "name": "Product case",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Data scientist or product manager",
+          "notes": "Define metrics, design an A/B test, or reason about engagement for a Spotify feature."
+        },
+        {
+          "name": "Coding and SQL",
+          "interview_type": null,
+          "duration_min": 45,
+          "interviewer_role": "Data scientist",
+          "notes": "Not simulated in v1."
+        },
+        {
+          "name": "Values interview",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Manager from the team",
+          "notes": "Collaboration with product and engineering, handling ambiguity, influencing decisions with data."
+        },
+        {
+          "name": "Technical presentation",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Panel from across the business",
+          "notes": "Present past work; expect questions on method and trade-offs. Reported for some teams only."
+        }
+      ]
+    },
+    {
+      "role_family": "design",
+      "levels": [
+        "Product Designer",
+        "Senior Product Designer"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background and role; the portfolio is often open during the call. Not simulated in v1."
+        },
+        {
+          "name": "Portfolio deep dive",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Design manager or senior designers",
+          "notes": "Two or three projects: the reasoning behind decisions and what shipped."
+        },
+        {
+          "name": "Design exercise",
+          "interview_type": "case",
+          "duration_min": 75,
+          "interviewer_role": "Product designers",
+          "notes": "A conversational working session on a listening, creator or advertiser problem. Interviewers give feedback during it."
+        },
+        {
+          "name": "Cross-functional interviews",
+          "interview_type": "behavioral",
+          "duration_min": 60,
+          "interviewer_role": "Product manager, engineer, researcher or data scientist",
+          "notes": "Several 1:1s on working across disciplines. One interviewer leads when others observe."
+        },
+        {
+          "name": "Values and leadership",
+          "interview_type": "behavioral",
+          "duration_min": 60,
+          "interviewer_role": "Design leader",
+          "notes": "Ownership, adaptability, collaboration and drive."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Deciding without direction",
+      "pattern": "A decision the candidate drove in an autonomous team without a manager telling them what to do",
+      "competencies": ["ownership", "impact"],
+      "values": ["Human Judgment", "Make It Happen"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Cross-team alignment",
+      "pattern": "A disagreement with another team or with stakeholders who wanted different things, settled by alignment rather than escalation",
+      "competencies": ["conflict_handling", "collaboration", "communication"],
+      "values": ["One Team"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Failure and feedback",
+      "pattern": "A failure, mistake or piece of hard feedback, and what the candidate changed afterwards",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Human Judgment", "Stay curious"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Delivering under pressure",
+      "pattern": "A tight deadline or blocked project the candidate still moved to a result",
+      "competencies": ["impact", "ownership"],
+      "values": ["Make It Happen"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Low ego teamwork",
+      "pattern": "How the candidate helps teammates, shares credit and keeps ego out of team decisions",
+      "competencies": ["collaboration", "communication"],
+      "values": ["One Team"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Project end to end",
+      "pattern": "A project the candidate is proud of, delivered from start to finish: own role, decisions and measured result",
+      "competencies": ["depth_of_experience", "scope_at_level"],
+      "values": ["Impact over activity"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Why Spotify",
+      "pattern": "Why Spotify, how the candidate uses the product, and how they like to work",
+      "competencies": ["motivation", "team_fit", "role_fit"],
+      "values": ["One Team"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Audio and catalog at scale",
+      "pattern": "Design a streaming, playlist, catalog or search system for hundreds of millions of listeners, with caching, CDN and latency trade-offs",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Recommendations and personalization",
+      "pattern": "Design or improve a recommendation surface such as a weekly personalized playlist: candidate retrieval, ranking, cold start and evaluation",
+      "competencies": ["technical_depth", "reasoning", "trade_offs"],
+      "values": ["Stay curious"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Incident and on-call case",
+      "pattern": "Walk through debugging a production incident or slow service after a release: triage, data to check, escalation and follow-up",
+      "competencies": ["reasoning", "accuracy", "clarity_of_explanation"],
+      "values": ["Make It Happen", "One Team"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Measure a feature",
+      "pattern": "Define goals, a primary metric and guardrails for a Spotify feature such as a personalized playlist or podcast surface",
+      "competencies": ["problem_framing", "user_and_business_sense", "structure"],
+      "values": ["Impact over activity"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Metric drop",
+      "pattern": "A key metric such as installs or streams fell; find the cause and decide what to do",
+      "competencies": ["problem_framing", "structure", "prioritization"],
+      "values": ["Make It Happen"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Improve or design a listening experience",
+      "pattern": "Improve Spotify or design a new feature for one listener or creator group, prioritize, and test it with an experiment",
+      "competencies": ["user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["Stay curious", "Impact over activity"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to make a product decision when stakeholders wanted different things. What did you do?",
+      "strong_answer": "Name the stakeholders and what each wanted, and why both views were reasonable. Show how the candidate shared context, found the shared goal, and used data or a small test to decide. Make the final call and its owner clear, and how the others were brought along. End with the result and the relationship afterwards. Pitfalls: escalating straight away, or a story where one side was simply wrong.",
+      "competencies": ["conflict_handling", "collaboration", "communication"],
+      "values": ["One Team", "Human Judgment"],
+      "source_url": "https://www.aced.io/guides/spotify-software-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "How you align people who want different things",
+          "Who made the call and why"
+        ],
+        "strong_signals": [
+          "States each side fairly",
+          "Uses data or a small test to decide",
+          "Shows the result and the relationship afterwards"
+        ],
+        "watch_outs": [
+          "Escalating first",
+          "A story where the other side was simply wrong"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you drove an important decision without a manager telling you what to do.",
+      "strong_answer": "Set the scene: an autonomous team, an open question, and why waiting was costly. Show how the candidate gathered input, weighed options and the risks, made the call, and told others. Say what they personally decided, using 'I' for their own actions. Give the outcome and what they would do differently. Pitfalls: vague 'we decided' answers, or waiting for permission.",
+      "competencies": ["ownership", "impact", "communication"],
+      "values": ["Human Judgment", "Make It Happen"],
+      "source_url": "https://www.techinterview.org/companies/spotify/",
+      "hints": {
+        "looking_for": [
+          "Whether you act with autonomy",
+          "How you weigh risk before deciding"
+        ],
+        "strong_signals": [
+          "Explains why waiting was costly",
+          "Says clearly what you decided yourself",
+          "Names the risk and how you limited it"
+        ],
+        "watch_outs": [
+          "Vague 'we decided' answers",
+          "Waiting for permission"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you failed.",
+      "strong_answer": "Pick a real failure with stakes. Explain why the plan seemed right at the time, the candidate's own part in what went wrong, and how quickly they noticed and responded. Show the concrete lesson and a later example where they applied it. Spotify says it trusts people to take thoughtful risks and learn from mistakes, so own it without blame. Pitfalls: a disguised success, or blaming others.",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Human Judgment"],
+      "source_url": "https://www.aced.io/blog/spotify-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you own mistakes",
+          "What you learned and applied later"
+        ],
+        "strong_signals": [
+          "Explains why the plan seemed right at the time",
+          "Owns your part without blame",
+          "Gives a later example of the lesson"
+        ],
+        "watch_outs": [
+          "A disguised success",
+          "Blaming others"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about some difficult feedback you received and what you did with it.",
+      "strong_answer": "Describe the feedback in substance and who gave it. Be honest about the first reaction, then show the steps taken to change. Give evidence the change lasted, such as a later result or the person noticing. Strong answers show the candidate asks for feedback, not only receives it. Pitfalls: feedback that is really praise, or no visible change.",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Stay curious", "Human Judgment"],
+      "source_url": "https://www.aced.io/blog/spotify-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you take and act on hard feedback",
+          "Whether you seek feedback yourself"
+        ],
+        "strong_signals": [
+          "Describes the feedback in substance",
+          "Shows evidence the change stuck"
+        ],
+        "watch_outs": [
+          "Feedback that is really praise",
+          "No visible change"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you worked to a tight deadline. How did you manage it?",
+      "strong_answer": "Give the deadline, why it mattered and what made it hard. Show how the candidate cut scope, set priorities, and told stakeholders early about risks. Show action: what they started before everything was clear and which blockers they removed. Quantify the result and what was traded off. Pitfalls: only working longer hours, or hiding a slip until the end.",
+      "competencies": ["impact", "ownership", "communication"],
+      "values": ["Make It Happen"],
+      "source_url": "https://prepfully.com/interview-guides/spotify-software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you deliver under time pressure",
+          "Whether you cut scope and communicate early"
+        ],
+        "strong_signals": [
+          "Names what was cut and why",
+          "Flags risk to stakeholders early",
+          "Quantifies the result"
+        ],
+        "watch_outs": [
+          "Only working longer hours",
+          "Hiding a slip until the end"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "What do you do to keep your ego in check when working in a team?",
+      "strong_answer": "Answer with a real example, not a slogan. Show the candidate changing their mind when a teammate had a better idea, sharing credit, or helping another person succeed at a cost to their own work. Explain habits such as asking for review early and sharing context openly. Pitfalls: claiming to have no ego, or an example where the candidate was right all along.",
+      "competencies": ["collaboration", "communication"],
+      "values": ["One Team"],
+      "source_url": "https://www.aced.io/guides/spotify-software-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you put the team ahead of being right",
+          "How you share credit and context"
+        ],
+        "strong_signals": [
+          "Gives a real example of changing your mind",
+          "Names habits like asking for review early"
+        ],
+        "watch_outs": [
+          "Claiming to have no ego",
+          "An example where you were right all along"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why Spotify, and why are you looking to leave your current role?",
+      "strong_answer": "Be specific: link a Spotify product, technical problem or mission (connecting creators and listeners) to the candidate's past work and goals. Show they use the product and have a view on it. Explain the move in positive terms, about what they want next, not what they dislike now. Pitfalls: generic praise, only brand or pay, or criticizing the current employer.",
+      "competencies": ["motivation", "role_fit", "team_fit"],
+      "values": ["One Team"],
+      "source_url": "https://www.aced.io/guides/spotify-software-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you know what Spotify builds",
+          "What you want next in your career"
+        ],
+        "strong_signals": [
+          "Links a Spotify product or problem to your past work",
+          "Has a view on the product as a user"
+        ],
+        "watch_outs": [
+          "Generic praise",
+          "Criticizing your current employer"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Tell me about a project you are proud of. How did you deliver it from start to finish?",
+      "strong_answer": "Pick a project with scope that fits the target level and that the candidate clearly drove. Cover the goal, their own role, the hardest decisions and trade-offs, and how it shipped. Quantify the outcome for users or the business, and say what they would change. Spotify says it looks at the thinking behind the result, so explain the reasoning. Pitfalls: a team win with unclear personal part, or effort with no outcome.",
+      "competencies": ["depth_of_experience", "scope_at_level", "motivation"],
+      "values": ["Impact over activity", "Human Judgment"],
+      "source_url": "https://www.aced.io/blog/spotify-interview-process",
+      "hints": {
+        "looking_for": [
+          "The scope of work you clearly drove",
+          "The thinking behind your result"
+        ],
+        "strong_signals": [
+          "Explains the hardest decisions and trade-offs",
+          "Quantifies the outcome",
+          "Scope fits the target level"
+        ],
+        "watch_outs": [
+          "Unclear personal contribution",
+          "Effort with no outcome"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design an audio streaming service for about 100 million users.",
+      "strong_answer": "Clarify scope: on-demand tracks, offline, regions, start-up latency target. Split the catalog and metadata service from audio delivery. Store encoded files in object storage and serve them through a CDN, with several bitrates and adaptive switching. Cover prefetching the next track, licensing checks at play time, and logging play events through a stream for royalties and recommendations. Estimate load roughly and discuss hot tracks and failures. Pitfalls: serving audio from app servers, or ignoring start-up latency.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning", "clarity_of_explanation"],
+      "values": [],
+      "source_url": "https://www.techinterview.org/companies/spotify/",
+      "hints": {
+        "looking_for": [
+          "How you separate metadata from audio delivery",
+          "Whether you plan for start-up latency and scale"
+        ],
+        "strong_signals": [
+          "Uses a CDN with several bitrates",
+          "Prefetches the next track",
+          "Logs play events through a stream"
+        ],
+        "watch_outs": [
+          "Serving audio from app servers",
+          "Ignoring start-up latency"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design a weekly personalized playlist like Discover Weekly?",
+      "strong_answer": "Clarify the goal (discovery of new tracks the user will like) and the refresh cadence. Describe offline batch generation: candidate retrieval from listening history and similar users or tracks, filtering already-heard and blocked items, ranking, and diversity rules. Store results per user and serve them cheaply. Cover cold start for new users and new tracks, and evaluation with saves, skips and repeat listens plus A/B tests. Pitfalls: computing it on each request, or no evaluation plan.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Stay curious"],
+      "source_url": "https://www.aced.io/blog/spotify-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you split offline generation from serving",
+          "How you judge if recommendations are good"
+        ],
+        "strong_signals": [
+          "Separates retrieval, filtering and ranking",
+          "Handles cold start",
+          "Evaluates with saves, skips and A/B tests"
+        ],
+        "watch_outs": [
+          "Computing the playlist on each request",
+          "No evaluation plan"
+        ]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a feature that lets a user add a custom picture to a playlist. Anyone can view it, but only the owner can change it.",
+      "strong_answer": "Clarify size limits, moderation and how many playlists. Upload through a signed URL to object storage, process into several sizes, and store a reference in the playlist metadata. Enforce ownership on the write API, not the client. Serve images through a CDN with cache keys that change when the image changes. Cover content moderation, failed uploads and abuse. Pitfalls: storing images in the database, or checking permissions only in the app.",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": [],
+      "source_url": "https://www.aced.io/guides/spotify-software-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "How you handle uploads and permissions",
+          "Whether you think about caching and moderation"
+        ],
+        "strong_signals": [
+          "Uses object storage and a CDN",
+          "Enforces ownership on the server",
+          "Changes cache keys when the image changes"
+        ],
+        "watch_outs": [
+          "Storing images in the database",
+          "Permission checks only in the client"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "You are on call and a critical service goes down. Walk me through how you troubleshoot it and when you escalate.",
+      "strong_answer": "Start with impact: who is affected and how badly. Stabilize first (roll back a recent deploy, shift traffic, turn off a feature flag) before deep diagnosis. Use dashboards, logs and recent changes to form and test hypotheses. Communicate status on a regular rhythm and escalate early when impact is large or the cause is outside one's area. Afterwards, run a blameless review with follow-up actions. Pitfalls: debugging silently for an hour, or no rollback plan.",
+      "competencies": ["reasoning", "accuracy", "clarity_of_explanation", "trade_offs"],
+      "values": ["Make It Happen", "One Team"],
+      "source_url": "https://prepfully.com/interview-guides/spotify-software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you triage and stabilize under pressure",
+          "When and how you escalate"
+        ],
+        "strong_signals": [
+          "Mitigates first, for example with a rollback",
+          "Tests hypotheses with logs and recent changes",
+          "Runs a blameless review afterwards"
+        ],
+        "watch_outs": [
+          "Debugging silently for a long time",
+          "No rollback plan"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you use machine learning to find duplicate songs in a large catalog?",
+      "strong_answer": "Define duplicate first: the same recording uploaded twice, remasters, live versions or covers. Combine metadata signals (title, artist, duration, ISRC codes) with audio fingerprints or embeddings. Use blocking or approximate nearest neighbor search to avoid comparing every pair, then a classifier on pair features. Build labels from known matches and human review, and measure precision and recall, with a high precision bar before merging. Pitfalls: comparing all pairs, or treating covers as duplicates.",
+      "competencies": ["technical_depth", "reasoning", "trade_offs"],
+      "values": ["Stay curious"],
+      "source_url": "https://www.aced.io/blog/spotify-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you define the problem before modeling",
+          "How you scale matching and measure it"
+        ],
+        "strong_signals": [
+          "Defines what counts as a duplicate",
+          "Combines metadata and audio signals",
+          "Uses blocking or nearest neighbor search"
+        ],
+        "watch_outs": [
+          "Comparing every pair",
+          "No precision and recall plan"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you handle the cold-start problem for brand-new users in a music recommendation system?",
+      "strong_answer": "Use what is known at sign-up: country, device, language, and a short taste picker. Start with popular and regional content, then learn fast from early plays, skips and saves, with more exploration at first. Use content-based features so new tracks and artists can also be recommended. Measure early retention and satisfaction for new users separately. Pitfalls: only showing global top charts, or waiting weeks for enough data.",
+      "competencies": ["technical_depth", "reasoning", "trade_offs"],
+      "values": ["Stay curious"],
+      "source_url": "https://www.cleverprep.com/companies/spotify/data-scientist",
+      "hints": {
+        "looking_for": [
+          "How you recommend with little data",
+          "How fast you learn from early signals"
+        ],
+        "strong_signals": [
+          "Uses sign-up context and a taste picker",
+          "Explores more at first, then exploits",
+          "Measures new-user retention separately"
+        ],
+        "watch_outs": [
+          "Only global top charts",
+          "Waiting weeks for data"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you measure the success of Discover Weekly?",
+      "strong_answer": "Start from its goal: help listeners find new music they love. Pick a primary metric such as the share of users who save or repeatedly play a newly discovered track, with supporting metrics (weekly reach, tracks played per playlist, skip rate) and guardrails (overall listening time, artist diversity). Explain how to read changes through A/B tests and cohorts. Pitfalls: only counting playlist opens, or many metrics with no primary one.",
+      "competencies": ["problem_framing", "user_and_business_sense", "structure"],
+      "values": ["Impact over activity"],
+      "source_url": "https://www.aced.io/blog/spotify-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you turn a product goal into metrics",
+          "Whether you choose one primary metric"
+        ],
+        "strong_signals": [
+          "Ties the metric to real discovery, like saves",
+          "Adds guardrails such as total listening",
+          "Explains how A/B tests read the change"
+        ],
+        "watch_outs": [
+          "Only counting playlist opens",
+          "Many metrics with no primary one"
+        ]
+      },
+      "role_families": ["pm", "data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Spotify app installs dropped 25%. What happened, and what would you do?",
+      "strong_answer": "Clarify the metric, the time window and whether the drop is sudden or gradual. Rule out tracking or data bugs. Segment by platform, app store, country, acquisition channel and device. Check internal changes (store listing, a release, marketing spend) and external ones (store policy, competitor launch, seasonality). Rank hypotheses, name the data that tests each, and propose actions, including fixing a broken channel. Pitfalls: guessing causes without structure, or skipping the data check.",
+      "competencies": ["problem_framing", "structure", "prioritization"],
+      "values": ["Make It Happen"],
+      "source_url": "https://www.aced.io/blog/spotify-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you structure a metric investigation",
+          "Whether you rule out data issues first"
+        ],
+        "strong_signals": [
+          "Segments by platform, store, country and channel",
+          "Checks internal and external changes",
+          "Ranks hypotheses with the data to test each"
+        ],
+        "watch_outs": [
+          "Random causes with no structure",
+          "Skipping the data check"
+        ]
+      },
+      "role_families": ["pm", "data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you design an experiment to test a new shuffle algorithm?",
+      "strong_answer": "State the hypothesis: users find the new shuffle more satisfying. Choose the unit (user, not session) and a primary metric such as skip rate or listening time in shuffle sessions, plus guardrails like overall listening and complaints. Size the test with power analysis, run it long enough to cover weekly patterns and novelty effects, and check segments such as playlist length. Say how the result decides the launch. Pitfalls: randomizing by session, or stopping as soon as it looks good.",
+      "competencies": ["problem_framing", "structure", "estimation_logic", "recommendation"],
+      "values": ["Stay curious"],
+      "source_url": "https://www.cleverprep.com/companies/spotify/data-scientist",
+      "hints": {
+        "looking_for": [
+          "How you design a clean A/B test",
+          "How the result turns into a decision"
+        ],
+        "strong_signals": [
+          "Picks the user as the unit",
+          "Sets a primary metric and guardrails",
+          "Accounts for novelty and weekly patterns"
+        ],
+        "watch_outs": [
+          "Randomizing by session",
+          "Stopping early when it looks good"
+        ]
+      },
+      "role_families": ["data_ml", "pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Design a collaborative listening feature, where friends listen together.",
+      "strong_answer": "Pick one user group and situation (friends far apart, a party, a car trip) and their main pain. Explore a few solutions, then choose one and walk through the key flows: inviting, joining, who controls the queue, and what happens when someone leaves. Name the constraints (latency, licensing, free versus premium). Define success (sessions started and repeated) and guardrails. Pitfalls: jumping to screens before the user, or ignoring control conflicts in a group.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["One Team", "Stay curious"],
+      "source_url": "https://www.cleverprep.com/companies/spotify/product-designer",
+      "hints": {
+        "looking_for": [
+          "Whether you start from a real user situation",
+          "How you handle group control and constraints"
+        ],
+        "strong_signals": [
+          "Picks one group and its main pain",
+          "Walks through invite, join and queue control",
+          "Defines success and guardrails"
+        ],
+        "watch_outs": [
+          "Jumping to screens before the user",
+          "Ignoring conflicts over who controls the music"
+        ]
+      },
+      "role_families": ["design", "pm"],
+      "levels": []
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "Associate Engineer",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Entry level. Delivers well-defined tasks inside one squad with guidance."
+    },
+    {
+      "level_name": "Engineer I",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Early career. Delivers features in one squad with less guidance and writes readable, tested code."
+    },
+    {
+      "level_name": "Engineer II",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns features within a squad from design to launch and works independently."
+    },
+    {
+      "level_name": "Senior Engineer",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Owns systems for a squad, leads design work and mentors others. Loop leans more on system design."
+    },
+    {
+      "level_name": "Staff Engineer",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Shapes architecture across several squads and influences technical decisions beyond own team."
+    },
+    {
+      "level_name": "Senior Staff Engineer",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Leads technical strategy across studios or a whole mission, unifies fragmented systems and brings other senior engineers along."
+    },
+    {
+      "level_name": "Senior Product Manager",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns a product area, its strategy and metrics, and leads a cross-functional team."
+    },
+    {
+      "level_name": "Senior Data Scientist",
+      "normalized_level": "senior",
+      "role_family": "data_ml",
+      "scope_expectation": "Owns analysis or models for a product area and uses data to change product decisions."
+    },
+    {
+      "level_name": "Senior Product Designer",
+      "normalized_level": "senior",
+      "role_family": "design",
+      "scope_expectation": "Leads design for a product area end to end and builds alignment across disciplines."
+    }
+  ],
+  "persona": {
+    "tone": "Friendly, relaxed and conversational; treats the interview as a two-way exchange",
+    "pace": "Moderate; one story or problem at a time, with room to think out loud",
+    "pushback_style": "Asks for the thinking behind a result, what the candidate personally decided, and what they would do differently; pushes on vague 'we' answers and on trade-offs",
+    "closing_style": "Leaves time for the candidate's questions and may end with a light question, such as what music they are listening to"
+  },
+  "scoring_weights": {
+    "collaboration": 1.4,
+    "ownership": 1.3,
+    "impact": 1.2,
+    "communication": 1.2,
+    "conflict_handling": 1.2,
+    "learning_from_failure": 1.1,
+    "judgment": 1.2,
+    "team_fit": 1.2,
+    "reasoning": 1.3,
+    "trade_offs": 1.2,
+    "clarity_of_explanation": 1.2,
+    "user_and_business_sense": 1.2,
+    "problem_framing": 1.2
+  },
+  "values_share": 0.3,
+  "case_style": {
+    "product_sense": 0.5,
+    "estimation": 0.1,
+    "system_thinking": 0.4,
+    "notes": "PM and data cases center on Spotify features: improving the product, measuring personalized playlists, diagnosing metric drops and designing A/B tests. Engineering case studies are real team problems such as incidents. Market sizing is rarely reported."
+  },
+  "sources": [
+    {
+      "url": "https://www.lifeatspotify.com/culture",
+      "title": "Our 3 values, The Bassline, and culture (Life at Spotify)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "persona"]
+    },
+    {
+      "url": "https://lifeatspotify.com/how-we-hire",
+      "title": "How we hire (Life at Spotify)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "values_framework", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://www.aced.io/blog/spotify-interview-process",
+      "title": "Spotify interview process and top questions (Exponent, now aced.io)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style", "scoring_weights"]
+    },
+    {
+      "url": "https://www.aced.io/guides/spotify-software-engineer-interview",
+      "title": "Spotify software engineer interview guide (Exponent, now aced.io)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "bar_by_level", "persona"]
+    },
+    {
+      "url": "https://www.aced.io/guides/spotify-product-manager-interview",
+      "title": "Spotify product manager interview guide (Exponent, now aced.io)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://prepfully.com/interview-guides/spotify-software-engineer",
+      "title": "Spotify software engineer interview (Prepfully)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.techinterview.org/companies/spotify/",
+      "title": "Spotify interview guide 2026 (techinterview.org)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/spotify/data-scientist",
+      "title": "Spotify data scientist interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/spotify/product-designer",
+      "title": "Spotify product designer interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.levels.fyi/companies/spotify/salaries/software-engineer/levels/senior-engineer",
+      "title": "Spotify software engineer levels (Levels.fyi)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level", "loop_structure"]
+    },
+    {
+      "url": "https://www.lifeatspotify.com/jobs/senior-staff-engineer-platform-partner-experience",
+      "title": "Senior Staff Engineer, Platform and Partner Experience (Life at Spotify job posting)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "medium",
+    "scoring_weights": "low",
+    "case_style": "medium"
+  },
+  "low_confidence_notes": [
+    "values_framework: the three values (One Team, Human Judgment, Make It Happen) are from Spotify's current careers pages. 'Impact over activity' and 'Stay curious' are drawn from the same culture pages but are not among the three named values. The older five band values (Innovative, Collaborative, Sincere, Passionate, Playful) no longer appear on lifeatspotify.com; some prep guides still cite them.",
+    "loop_structure: Spotify's official page gives only recruiter screen, team interview and final round. Round names, durations and the PM, data and design loops come from prep sites, and the data and design loops mostly from CleverPrep, which may be partly generated. Loops vary by team.",
+    "bar_by_level: SWE level names (Associate Engineer to Staff Engineer) come from Levels.fyi URLs; Senior Staff Engineer from a Spotify job posting. Spotify has no public career ladder, so scope text is our summary. PM, data and design level names are generic job titles, not confirmed internal levels.",
+    "persona: inferred from Spotify's 'two-way exchange' wording and prep-site reports; no official description of interviewer style.",
+    "scoring_weights: our estimate from the qualities Spotify says it looks for (ownership, adaptability, collaboration, drive, the thinking behind results); no public source gives weights.",
+    "sample_questions: questions come from prep sites (Exponent/aced.io, Prepfully, techinterview.org, CleverPrep) that aggregate candidate reports; none are from Spotify itself."
+  ]
+}

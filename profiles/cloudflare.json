@@ -1,0 +1,912 @@
+{
+  "company_name": "Cloudflare",
+  "company_slug": "cloudflare",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-28",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Cloudflare Capabilities",
+    "principles": [
+      {
+        "name": "Be curious to learn and grow",
+        "description": "Tackle the Internet's hardest problems with a drive to learn. Ask what, how and why, and challenge the status quo.",
+        "evidence_signals": [
+          "Dug into how something works below what the job required, and has an artifact to show for it",
+          "Learned a new domain or tool quickly to solve a real problem",
+          "Describes feedback that changed how they work"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Communicate clearly and transparently",
+        "description": "Share information openly, do not hold back what others need, and be accountable in public, including for mistakes.",
+        "evidence_signals": [
+          "Tells the unflattering version of a story: what broke, who was hit, and their own part",
+          "Explains a complex technical idea in plain words without jargon",
+          "Kept stakeholders informed early when a plan changed"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Do the right thing",
+        "description": "Act with integrity and make principled decisions, even when the easy option is tempting or the cost is real.",
+        "evidence_signals": [
+          "Chose the right call over the easy one and names what it cost",
+          "Reasons about right and wrong out loud, not only about metrics",
+          "Raised a concern even though it was awkward"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Embrace diversity",
+        "description": "Seek out different backgrounds and points of view, and build for a global user base.",
+        "evidence_signals": [
+          "Describes a different perspective that actually changed a decision",
+          "Considered users in other regions, languages or with fewer resources"
+        ],
+        "weight": 0.9
+      },
+      {
+        "name": "Get your work across the finish line",
+        "description": "Own the result end to end. Ship early, iterate, and see the work through to a real outcome.",
+        "evidence_signals": [
+          "Shows how they knew the work was really done, with a measured result",
+          "Shipped a small first version and iterated on real usage",
+          "Pushed through blockers instead of handing the problem off"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Lead with empathy",
+        "description": "Understand customers and colleagues and act with care for them.",
+        "evidence_signals": [
+          "Names a specific customer or teammate and what they needed",
+          "Handled a disagreement while respecting the other person's view",
+          "Helped or mentored someone with a visible result"
+        ],
+        "weight": 1.0
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["Intern", "Systems Engineer", "Senior Systems Engineer", "Principal Systems Engineer"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, motivation, why Cloudflare, and logistics. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager",
+          "notes": "Often early in the process. Resume, past projects, interest in the team, and the reasons behind past architecture choices."
+        },
+        {
+          "name": "Technical phone screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Live coding, usually one medium problem or a practical task such as a rate limiter or log parser. Some teams use a take-home instead. Not simulated in v1."
+        },
+        {
+          "name": "Coding and debugging",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Practical coding or finding a defect in unfamiliar code. Some loops allow an AI coding assistant. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior or principal engineer",
+          "notes": "Distributed systems at the edge: global key-value store, rate limiter in a proxy, log collection from data centers. Often without managed cloud services. Follow-ups on 100x traffic and data center failure. Networking basics (DNS, TLS, anycast) may come up."
+        },
+        {
+          "name": "Orange Cloud interview",
+          "interview_type": "behavioral",
+          "duration_min": 30,
+          "interviewer_role": "Senior leader outside the team",
+          "notes": "Values round on the Cloudflare Capabilities: mistakes, disagreements, learning, and motivation. Short and tightly timed."
+        },
+        {
+          "name": "Executive call",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Senior leadership",
+          "notes": "Vision, values and long-term goals. Reported to happen for most candidates."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": ["Product Manager", "Senior Product Manager"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "PM background and interest in Cloudflare. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager interview",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Product leader for the area",
+          "notes": "Deep dive into product experience, process and strategic thinking. Technical depth and B2B or security experience help."
+        },
+        {
+          "name": "Take-home case and panel presentation",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Panel of product managers and engineers",
+          "notes": "A product case or strategy exercise done at home, then presented and defended in front of a panel."
+        },
+        {
+          "name": "Cross-functional interviews",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager, designer or peer PM",
+          "notes": "Working with engineering, scoping, and handling conflicting requests."
+        },
+        {
+          "name": "Orange Cloud interview",
+          "interview_type": "behavioral",
+          "duration_min": 30,
+          "interviewer_role": "Senior leader outside the team",
+          "notes": "Values round on the Cloudflare Capabilities."
+        },
+        {
+          "name": "Executive interview",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Product leadership",
+          "notes": "Vision and fit."
+        }
+      ]
+    },
+    {
+      "role_family": "other",
+      "levels": ["Solutions Engineer", "Senior Solutions Engineer"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Solutions engineering (pre-sales). Motivation, background and what the candidate knows about Cloudflare. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Solutions engineering manager",
+          "notes": "Sales engineering experience, customer-facing skills and technical depth."
+        },
+        {
+          "name": "Technical interview",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Solutions engineer peer",
+          "notes": "Rapid networking and security questions: DNS, TLS, BGP, HTTP, proxies, latency, DDoS, WAF and Zero Trust."
+        },
+        {
+          "name": "Take-home setup task",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "None (done alone)",
+          "notes": "Hands-on setup such as putting a domain behind Cloudflare and enforcing HTTPS, over about a week. Duration is a placeholder. Not simulated in v1."
+        },
+        {
+          "name": "Panel demo",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Panel of sales, customer success, support and solutions engineers",
+          "notes": "Present a Cloudflare product or customer case and handle questions as if from a customer. Tie features to customer outcomes."
+        },
+        {
+          "name": "Orange Cloud interview",
+          "interview_type": "behavioral",
+          "duration_min": 30,
+          "interviewer_role": "Senior leader outside the team",
+          "notes": "Values round on the Cloudflare Capabilities."
+        },
+        {
+          "name": "Director and executive calls",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Head of solutions engineering or a VP",
+          "notes": "Situational fit and motivation."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Owning a mistake",
+      "pattern": "A mistake that hurt production or customers, told honestly: what broke, own part, the response, and what stops it from happening again",
+      "competencies": ["learning_from_failure", "communication", "ownership"],
+      "values": ["Communicate clearly and transparently", "Do the right thing"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Disagreement on a technical decision",
+      "pattern": "A disagreement with a peer or manager about a technical or product decision, how it was raised, and how it ended",
+      "competencies": ["conflict_handling", "collaboration", "communication"],
+      "values": ["Lead with empathy", "Embrace diversity"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Curiosity beyond the job",
+      "pattern": "Something the candidate investigated deeply because it bothered them, and what they found",
+      "competencies": ["impact", "communication"],
+      "values": ["Be curious to learn and grow"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Easy call versus right call",
+      "pattern": "A choice between the convenient option and the principled one, and the cost of choosing",
+      "competencies": ["ownership", "conflict_handling"],
+      "values": ["Do the right thing"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Explaining to a non-expert",
+      "pattern": "Explain a complex technical concept to a non-technical person, often live in the interview",
+      "competencies": ["communication"],
+      "values": ["Communicate clearly and transparently", "Lead with empathy"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Shipping under ambiguity",
+      "pattern": "A decision made or a project finished with incomplete information or unclear requirements, and how the result was confirmed",
+      "competencies": ["ownership", "impact"],
+      "values": ["Get your work across the finish line"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Why Cloudflare",
+      "pattern": "Motivation for Cloudflare and the team, including which Cloudflare products the candidate has used",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["Be curious to learn and grow"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Past architecture decisions",
+      "pattern": "Walk through a past project and the reasons behind its main architecture or product choices",
+      "competencies": ["depth_of_experience", "judgment", "scope_at_level"],
+      "values": ["Get your work across the finish line"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Edge-scale system design",
+      "pattern": "Design a globally distributed service that runs across many data centers, then handle much more traffic and a data center failure",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Internet fundamentals",
+      "pattern": "Explain how a core Internet protocol or request path works, step by step, at the depth the role needs",
+      "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
+      "values": ["Be curious to learn and grow"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Troubleshooting",
+      "pattern": "Diagnose a failing request or service: state a hypothesis, test it, and narrow the cause",
+      "competencies": ["reasoning", "accuracy", "clarity_of_explanation"],
+      "values": []
+    },
+    {
+      "interview_type": "case",
+      "theme": "Prioritize a security product",
+      "pattern": "Prioritize features or design a product for a security or performance product, for a named customer segment, with success metrics",
+      "competencies": ["problem_framing", "prioritization", "user_and_business_sense"],
+      "values": ["Lead with empathy"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Customer solution pitch",
+      "pattern": "Present a Cloudflare solution to a customer with a specific problem and handle their technical and business objections",
+      "competencies": ["structure", "user_and_business_sense", "recommendation"],
+      "values": ["Lead with empathy", "Communicate clearly and transparently"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a mistake you made that affected production. What happened and how did you handle it?",
+      "strong_answer": "Give the honest version first: what broke, who was affected, for how long, and the candidate's own part without softening it. Then the response: how it was detected, who was told and when, and how it was fixed. Close with the lasting change (a test, alert, rollout step or runbook) and what the candidate does differently now. The tone should match a good public post-mortem: factual, no blame on others. Pitfalls: a trivial mistake, hiding the candidate's role, or no prevention step.",
+      "competencies": ["learning_from_failure", "communication", "ownership"],
+      "values": ["Communicate clearly and transparently", "Do the right thing"],
+      "source_url": "https://www.techprep.app/blog/cloudflare-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you tell the honest version of a mistake",
+          "How you respond and stop it from happening again"
+        ],
+        "strong_signals": [
+          "States your own part plainly",
+          "Names the lasting fix, such as a test or alert"
+        ],
+        "watch_outs": [
+          "A trivial or disguised mistake",
+          "Blaming others or no prevention step"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you disagreed with a technical decision. What did you do?",
+      "strong_answer": "Set out the decision, the candidate's concern, and why the concern was credible, with data. Show how they raised it: directly, to the right person, early enough to matter. Show that they listened to the other side and say what they learned from it. Give the outcome either way: they changed the decision, or they committed to it and helped it work. Pitfalls: a story where the candidate was simply right and others were wrong, or going quiet and complaining later.",
+      "competencies": ["conflict_handling", "collaboration", "communication"],
+      "values": ["Lead with empathy", "Communicate clearly and transparently"],
+      "source_url": "https://www.techprep.app/blog/cloudflare-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you raise a concern and back it with evidence",
+          "Whether you listen to the other side"
+        ],
+        "strong_signals": [
+          "Raises the issue early with data",
+          "Commits and helps once the decision is made"
+        ],
+        "watch_outs": [
+          "You were right and everyone else was wrong",
+          "Complaining later instead of speaking up"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Explain a complex technical concept you know well to someone with no technical background.",
+      "strong_answer": "Pick one concept the candidate knows deeply, such as DNS or caching. Start with why it matters to the listener, then use one simple analogy and build up in two or three steps. Avoid jargon or define it at once. Check understanding and adjust. Keep it to about two minutes. Pitfalls: a lecture full of acronyms, an analogy that breaks on the first follow-up, or picking a topic the candidate cannot go deeper on.",
+      "competencies": ["communication"],
+      "values": ["Communicate clearly and transparently", "Lead with empathy"],
+      "source_url": "https://www.techprep.app/blog/cloudflare-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you can make a hard idea simple",
+          "Whether you adjust to the listener"
+        ],
+        "strong_signals": [
+          "Starts with why it matters to the listener",
+          "One clear analogy, about two minutes"
+        ],
+        "watch_outs": [
+          "Acronyms and jargon",
+          "An analogy that breaks on the first follow-up"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why Cloudflare? Which of our products have you actually used?",
+      "strong_answer": "Connect to the mission of helping build a better Internet with a specific, personal reason. Name Cloudflare products the candidate has really used, even on the free plan (DNS, Workers, Tunnel, Pages), what they built, and what they liked or would change. Tie this to the team and role. Strong answers show the candidate has looked under the hood. Pitfalls: generic praise, only reading the website, or naming products they cannot discuss.",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["Be curious to learn and grow"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-cloudflare-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "Real interest in the mission and products",
+          "Whether you have tried the products yourself"
+        ],
+        "strong_signals": [
+          "Names a product you used and what you built",
+          "Says what you would change"
+        ],
+        "watch_outs": [
+          "Generic praise of the company",
+          "Naming products you cannot discuss"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about something you investigated deeply just because it bothered you.",
+      "strong_answer": "Describe a real puzzle, such as odd latency, a strange protocol behavior or a flaky test, and why the candidate could not let it go. Walk through how they dug in: tools, experiments, what they read. Share what they found and any artifact (a write-up, a fix, a side project). Close with what it taught them and how it helped the team. Pitfalls: claiming curiosity without evidence, or a story that ends without a finding.",
+      "competencies": ["impact", "communication"],
+      "values": ["Be curious to learn and grow"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-cloudflare-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "Real curiosity about how things work",
+          "How you investigate a puzzle"
+        ],
+        "strong_signals": [
+          "Shows the tools and experiments you used",
+          "Has an artifact such as a write-up or fix"
+        ],
+        "watch_outs": [
+          "Claiming curiosity with no evidence",
+          "No finding at the end"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to choose between the easy call and the right call.",
+      "strong_answer": "Lay out both options and what made the easy one tempting (deadline, pressure, a metric). Explain why the candidate saw the other option as right, reasoning out loud about users, trust or integrity, not only numbers. Show what the choice cost and how they got others on board. Give the outcome and whether they would choose the same again. Pitfalls: an option that cost nothing, or a choice that was really just a preference.",
+      "competencies": ["ownership", "conflict_handling"],
+      "values": ["Do the right thing"],
+      "source_url": "https://www.designgurus.io/answers/detail/top-cloudflare-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "Whether you act on principle under pressure",
+          "How you reason about right and wrong"
+        ],
+        "strong_signals": [
+          "Names the real cost of the right call",
+          "Explains how you brought others along"
+        ],
+        "watch_outs": [
+          "A choice that cost nothing",
+          "Only talking about metrics"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a decision you had to make with incomplete information.",
+      "strong_answer": "State what was unknown and why waiting was not an option. Show how the candidate reduced the risk: what they checked quickly, which assumptions they wrote down, and whether the decision was easy to reverse. Explain how they told others about the uncertainty. Give the result and what they learned when the missing facts arrived. Pitfalls: a decision with no real uncertainty, or no plan for being wrong.",
+      "competencies": ["ownership", "impact", "communication"],
+      "values": ["Get your work across the finish line", "Communicate clearly and transparently"],
+      "source_url": "https://www.designgurus.io/blog/cloudflare-interview-guide",
+      "hints": {
+        "looking_for": [
+          "How you act when facts are missing",
+          "How you manage the risk of being wrong"
+        ],
+        "strong_signals": [
+          "Writes down assumptions and checks them",
+          "Tells others about the uncertainty"
+        ],
+        "watch_outs": [
+          "No real uncertainty in the story",
+          "No plan for being wrong"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a rate limiting service that runs inside an HTTP proxy deployed in data centers around the world.",
+      "strong_answer": "Clarify limits (per IP, per API key, per path), accuracy needs and latency budget. Pick an algorithm (token bucket or sliding window) and explain why. Discuss where counters live: local per server, shared per data center, or synced globally, and the accuracy versus latency trade-off. Cover hot keys, memory limits, clock skew, and failing open or closed when the store is down. Explain behavior at 100x traffic. Pitfalls: a single central counter for the whole world, or ignoring failure modes.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": [],
+      "source_url": "https://www.techprep.app/blog/cloudflare-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you choose and justify a limiting algorithm",
+          "Where counters live and why"
+        ],
+        "strong_signals": [
+          "Weighs accuracy against latency across data centers",
+          "Decides fail open or closed and explains it"
+        ],
+        "watch_outs": [
+          "One central counter for the whole world",
+          "No plan for store failure"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a system that collects logs from servers in hundreds of data centers and makes them searchable, without managed cloud services.",
+      "strong_answer": "Clarify volume, retention, query patterns and how fresh data must be. Cover collection on each server, buffering and batching, transport over unreliable links, and a queue such as Kafka before storage. Choose a store for fast queries (for example a column store such as ClickHouse) and explain partitioning by time and customer. Handle back pressure, data center outages, duplicates and sampling at peak load. Pitfalls: assuming a managed service does the hard parts, or ignoring cost of storage.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": [],
+      "source_url": "https://www.techprep.app/blog/cloudflare-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you move data reliably across a global network",
+          "How you pick storage for the query patterns"
+        ],
+        "strong_signals": [
+          "Handles back pressure and data center outages",
+          "Partitions by time and customer"
+        ],
+        "watch_outs": [
+          "Relying on a managed service for the hard parts",
+          "Ignoring storage cost"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": ["mid", "senior", "staff_principal"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a globally distributed key-value store for configuration that must reach every data center quickly.",
+      "strong_answer": "Clarify read and write rates, value size, and how fast and how consistent updates must be. Explain a central source of truth with replication out to the edge, versus fully distributed writes, and the consistency model each gives. Cover caching at the edge, versioning, rollbacks of bad config, partial outages and network partitions. Strong answers connect the design to safety: a bad config pushed everywhere at once is a global outage, so discuss staged rollout. Pitfalls: claiming strong consistency and low latency everywhere for free.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": [],
+      "source_url": "https://www.techprep.app/blog/cloudflare-interview-process",
+      "hints": {
+        "looking_for": [
+          "Your consistency model and why",
+          "How updates reach the edge safely"
+        ],
+        "strong_signals": [
+          "Discusses staged rollout and rollback of bad data",
+          "Handles partitions and partial outages"
+        ],
+        "watch_outs": [
+          "Strong consistency and low latency for free",
+          "No plan for a bad config push"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": ["senior", "staff_principal"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Walk me through what happens when a user types a web address into a browser and presses Enter.",
+      "strong_answer": "Go in order: DNS resolution (cache, resolver, root, TLD, authoritative), TCP or QUIC connection, the TLS handshake and certificate check, the HTTP request, and the response. Add where a proxy or CDN sits: anycast routing to a nearby data center, cache hit or miss, and a request to the origin. Mention where it can fail or be slow. Go deeper where the interviewer asks. Pitfalls: skipping TLS or DNS steps, or naming terms without explaining what they do.",
+      "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
+      "values": ["Be curious to learn and grow"],
+      "source_url": "https://www.designgurus.io/blog/cloudflare-interview-guide",
+      "hints": {
+        "looking_for": [
+          "Accurate knowledge of the request path",
+          "Where a CDN or proxy fits in"
+        ],
+        "strong_signals": [
+          "Covers DNS, connection, TLS and HTTP in order",
+          "Explains anycast and cache hit or miss"
+        ],
+        "watch_outs": [
+          "Skipping DNS or TLS steps",
+          "Naming terms without explaining them"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Can a request from London to Sydney ever take under 5 milliseconds? Explain.",
+      "strong_answer": "Estimate the distance (about 17,000 km) and the speed of light in fiber (about 200,000 km per second). One way takes about 85 ms, so a round trip is well over 150 ms. Under 5 ms is impossible for a real round trip. Then explain how it can look possible: the request is answered by a nearby data center through anycast and caching, so the user in London never reaches Sydney. Pitfalls: guessing without numbers, or missing the edge caching point.",
+      "competencies": ["reasoning", "accuracy", "clarity_of_explanation"],
+      "values": [],
+      "source_url": "https://interview.norahq.com/interview-guides/cloudflare-solutions-engineer-interview-guide-2026",
+      "hints": {
+        "looking_for": [
+          "Whether you reason from physics with rough numbers",
+          "Whether you see how the edge changes the answer"
+        ],
+        "strong_signals": [
+          "Estimates distance and speed of light in fiber",
+          "Explains answering from a nearby data center"
+        ],
+        "watch_outs": [
+          "Guessing without numbers",
+          "Missing caching and anycast"
+        ]
+      },
+      "role_families": ["other", "swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "A user gets a 500 error from a site behind a proxy. How would you find the cause?",
+      "strong_answer": "Start by scoping: one user or all, one path or all, since when, and what changed. Separate whether the error comes from the proxy or the origin, using response headers and logs. Check the origin directly, then recent deploys, config, certificates and resource limits. State a hypothesis, test it, and narrow down. Explain what to tell the customer while it is open. Pitfalls: jumping to a fix without evidence, or not checking what changed.",
+      "competencies": ["reasoning", "accuracy", "clarity_of_explanation"],
+      "values": ["Lead with empathy"],
+      "source_url": "https://interview.norahq.com/interview-guides/cloudflare-solutions-engineer-interview-guide-2026",
+      "hints": {
+        "looking_for": [
+          "A systematic way to narrow down a failure",
+          "Whether you split proxy from origin"
+        ],
+        "strong_signals": [
+          "Scopes the problem and asks what changed",
+          "States and tests a hypothesis"
+        ],
+        "watch_outs": [
+          "Jumping to a fix without evidence",
+          "Forgetting to update the customer"
+        ]
+      },
+      "role_families": ["other", "swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "A customer is under repeated DDoS attacks. Walk me through the solution you would propose.",
+      "strong_answer": "Ask discovery questions first: what is attacked (website, API, network), attack size and type, current setup, and business impact. Propose a layered answer: network-level protection, proxying the web layer, WAF and rate limiting, bot management, and hiding the origin. Explain onboarding steps and risks such as DNS changes. Tie each part to the customer's outcome (uptime, cost, staff time) and state how success is measured. Pitfalls: listing products without discovery, or ignoring latency and onboarding concerns.",
+      "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
+      "values": ["Lead with empathy", "Communicate clearly and transparently"],
+      "source_url": "https://www.cleverprep.com/companies/cloudflare/solutions-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you ask discovery questions first",
+          "How you link the solution to business outcomes"
+        ],
+        "strong_signals": [
+          "Proposes layered protection by attack type",
+          "Covers onboarding steps and risks"
+        ],
+        "watch_outs": [
+          "Listing products with no discovery",
+          "Ignoring latency or onboarding concerns"
+        ]
+      },
+      "role_families": ["other"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you explain Zero Trust security to a non-technical executive who must approve the budget?",
+      "strong_answer": "Start from the executive's concern: breaches, remote work, cost of VPNs. Explain the idea in one sentence: every request is checked for who and what, not trusted because it is inside the network. Use a simple analogy, give one concrete example from their business, and end with the outcome, risk reduced and a rough path to roll out. Invite questions. Pitfalls: acronyms, a feature list, or no link to business risk.",
+      "competencies": ["structure", "user_and_business_sense", "recommendation"],
+      "values": ["Communicate clearly and transparently", "Lead with empathy"],
+      "source_url": "https://www.cleverprep.com/companies/cloudflare/solutions-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you speak to the executive's concerns",
+          "Whether you make the idea simple and concrete"
+        ],
+        "strong_signals": [
+          "One-sentence idea plus one business example",
+          "Ends with risk reduced and a rollout path"
+        ],
+        "watch_outs": [
+          "Acronyms and feature lists",
+          "No link to business risk"
+        ]
+      },
+      "role_families": ["other"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you prioritize features for a web application firewall product?",
+      "strong_answer": "Pick the customer segment first (self-serve small sites or large enterprises) and their top pains, such as false positives, setup effort or new attack types. List candidate features and judge each by customer impact, reach, effort, and fit with the platform. Use data a network operator trusts: blocked attacks, false positive rate, time to set up. Make a clear call, say what is cut and why, and define success metrics. Pitfalls: no segment, a framework with no decision, or ignoring the free plan.",
+      "competencies": ["problem_framing", "prioritization", "user_and_business_sense"],
+      "values": ["Lead with empathy"],
+      "source_url": "https://www.cleverprep.com/companies/cloudflare/product-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you start from a customer segment",
+          "How you make and defend a clear call"
+        ],
+        "strong_signals": [
+          "Uses metrics such as false positive rate",
+          "Says what is cut and why"
+        ],
+        "watch_outs": [
+          "No segment chosen",
+          "A framework with no decision"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Design a new product that helps small businesses protect themselves from bots.",
+      "strong_answer": "Define the user: a small business owner with little security knowledge and a tight budget. Name the bot problems that hurt them most (fake sign-ups, scraping, card testing) and pick one to focus on. Propose a simple, mostly automatic solution with safe defaults, and say what is free and what is paid. Cover how to avoid blocking real customers. Define success metrics such as bad traffic blocked and false positives, and a first small launch. Pitfalls: an enterprise-style product with many settings, or no focus.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Lead with empathy", "Get your work across the finish line"],
+      "source_url": "https://www.cleverprep.com/companies/cloudflare/product-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you understand the small business user",
+          "How you focus on one problem"
+        ],
+        "strong_signals": [
+          "Safe defaults with little setup",
+          "Clear metrics including false positives"
+        ],
+        "watch_outs": [
+          "Many settings a small owner cannot use",
+          "Trying to solve every bot problem at once"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time sales and engineering wanted different things from your product. How did you handle it?",
+      "strong_answer": "Describe both requests and what was behind each: a deal at risk, or technical debt and capacity. Show how the candidate got the facts (customer demand, revenue, effort, risk) and brought both sides together. Explain the decision, how it was communicated, and what each side gave up. Close with the result and what the candidate changed in their process. Pitfalls: siding with whoever is louder, or a compromise that pleased no one.",
+      "competencies": ["conflict_handling", "collaboration", "communication"],
+      "values": ["Lead with empathy", "Communicate clearly and transparently"],
+      "source_url": "https://www.cleverprep.com/companies/cloudflare/product-manager",
+      "hints": {
+        "looking_for": [
+          "How you balance competing internal requests",
+          "Whether you decide with facts"
+        ],
+        "strong_signals": [
+          "Understands what is behind each request",
+          "Explains the decision openly to both sides"
+        ],
+        "watch_outs": [
+          "Siding with the louder team",
+          "A compromise that pleased no one"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "Intern",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Embedded in a team with a mentor; ships a concrete deliverable that solves a real customer or internal problem."
+    },
+    {
+      "level_name": "Systems Engineer",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Builds and ships features within a team, writes production code with good error handling, and explains design choices."
+    },
+    {
+      "level_name": "Senior Systems Engineer",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Owns systems and their architecture, handles failure at global scale, and guides other engineers."
+    },
+    {
+      "level_name": "Principal Systems Engineer",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Sets long-term technical direction for critical systems, leads architecture across teams, and mentors engineers. Postings ask for about 8 to 10 or more years."
+    },
+    {
+      "level_name": "Product Manager",
+      "normalized_level": "mid",
+      "role_family": "pm",
+      "scope_expectation": "Owns features in a technical B2B product, works closely with engineering, and decides with data."
+    },
+    {
+      "level_name": "Senior Product Manager",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns a product area, its strategy and metrics, and influences without authority across engineering, sales and support."
+    },
+    {
+      "level_name": "Solutions Engineer",
+      "normalized_level": "mid",
+      "role_family": "other",
+      "scope_expectation": "Runs technical discovery, demos and proofs of concept for customers, with strong networking and security basics."
+    },
+    {
+      "level_name": "Senior Solutions Engineer",
+      "normalized_level": "senior",
+      "role_family": "other",
+      "scope_expectation": "Leads technical work on large or complex accounts, designs customer architectures, and feeds customer needs back to product."
+    }
+  ],
+  "persona": {
+    "tone": "Friendly, curious and direct; values plain honesty over polish",
+    "pace": "Brisk; the values round is short and tightly timed, so answers should be about 90 seconds to two minutes",
+    "pushback_style": "Asks 'what did you personally do?', 'what broke and what did you change?', and in technical rounds 'what happens at 100 times the traffic or when a data center fails?'; flags rehearsed-sounding answers",
+    "closing_style": "Leaves a few minutes for the candidate's questions and expects curious questions about the product or team"
+  },
+  "scoring_weights": {
+    "communication": 1.3,
+    "learning_from_failure": 1.3,
+    "ownership": 1.2,
+    "collaboration": 1.1,
+    "motivation": 1.2,
+    "judgment": 1.1,
+    "technical_depth": 1.3,
+    "trade_offs": 1.2,
+    "clarity_of_explanation": 1.3,
+    "user_and_business_sense": 1.2,
+    "problem_framing": 1.2
+  },
+  "values_share": 0.25,
+  "case_style": {
+    "product_sense": 0.35,
+    "estimation": 0.1,
+    "system_thinking": 0.55,
+    "notes": "PM cases are technical B2B: prioritizing or designing security, performance or developer products for a named customer segment, with metrics a network operator trusts. Solutions engineer cases are customer pitches and demos. Market sizing is rarely reported."
+  },
+  "sources": [
+    {
+      "url": "https://www.cloudflare.com/careers/",
+      "title": "Cloudflare careers: values, Capabilities and hiring process",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://blog.cloudflare.com/the-secret-to-cloudflare-pace-of-innovation/",
+      "title": "The secret to Cloudflare's pace of innovation (Cloudflare blog)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "persona", "case_style"]
+    },
+    {
+      "url": "https://blog.cloudflare.com/cloudflare-1111-intern-program/",
+      "title": "Cloudflare's goal to hire 1,111 interns in 2026 (Cloudflare blog)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "bar_by_level"]
+    },
+    {
+      "url": "https://www.techprep.app/blog/cloudflare-interview-process",
+      "title": "Cloudflare's interview process (TechPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://www.designgurus.io/blog/cloudflare-interview-guide",
+      "title": "Cloudflare interview guide (Design Gurus)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/top-cloudflare-behavioral-interview-questions-and-how-to-answer-them",
+      "title": "Top Cloudflare behavioral interview questions (Design Gurus)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["question_patterns", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/cloudflare/product-manager",
+      "title": "Cloudflare product manager interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "bar_by_level", "case_style"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/cloudflare/solutions-engineer",
+      "title": "Cloudflare solutions engineer interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "bar_by_level", "case_style"]
+    },
+    {
+      "url": "https://interview.norahq.com/interview-guides/cloudflare-solutions-engineer-interview-guide-2026",
+      "title": "Cloudflare solutions engineer interview guide 2026 (Nora)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "low"
+  },
+  "low_confidence_notes": [
+    "values_framework: the six Capabilities and the three values (Principled, Curious, Transparent) come from the official careers page; descriptions are our paraphrase, and principle weights are our estimate.",
+    "loop_structure: the official page gives only the stages (recruiter, team panel, executive calls with the Orange Cloud interview); round names, durations and interviewer roles come from prep sites and candidate reports that vary by team and region. The solutions engineer take-home duration is a placeholder.",
+    "bar_by_level: Cloudflare does not publish a level ladder. Levels.fyi shows crowdsourced L1 to L5 codes with no public title mapping, so we use public job titles (Systems Engineer, Senior, Principal; Product Manager, Senior PM; Solutions Engineer, Senior). Scope text is our summary from job postings and the intern blog post.",
+    "persona: inferred from prep-site advice (short timed values round, rehearsed answers flagged, follow-ups on scale and failure); there is no official description of interviewer style.",
+    "scoring_weights: estimated from the Capabilities and prep-site evaluation criteria; no public source gives weights.",
+    "case_style: based on a small number of reported PM and solutions engineer questions from CleverPrep; PM loops are reported inconsistently (four to six rounds, with or without a take-home).",
+    "sample_questions: PM and solutions engineer questions come from CleverPrep and Nora, prep sites that aggregate candidate reports; system design questions come from TechPrep."
+  ]
+}
