@@ -1,0 +1,12 @@
+Question: $question
+
+Misses the scorer noted:
+$misses
+
+<untrusted_input>
+ANSWER
+$answer
+
+STORY LIBRARY (id: title, then the parts)
+$stories
+</untrusted_input>

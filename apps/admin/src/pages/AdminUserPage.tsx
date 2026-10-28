@@ -554,6 +554,15 @@ function Lists({ detail }: { detail: AdminUserDetail }) {
         )}
       </Section>
 
+      <Section id="stories" title="Story library">
+        <p className="muted">Counts only. Admins never see a story's title or text (AD-4).</p>
+        <p>
+          {detail.stories.total} {detail.stories.total === 1 ? "story" : "stories"}: {detail.stories.draft} draft,{" "}
+          {detail.stories.proven} proven.
+          {detail.stories.last_saved_at && ` Last saved ${utc(detail.stories.last_saved_at)}.`}
+        </p>
+      </Section>
+
       <Section id="privacy" title="Privacy requests">
         <p className="muted">The user runs exports and deletes in the candidate app (D-5).</p>
         {detail.privacy_actions.length === 0 ? (

@@ -38,6 +38,7 @@ from uuid import UUID
 from strong_api.scoring.schemas import CompetencyTrend, CustomRecommendation, OwnQuestionPoint
 from strong_core.schemas import (
     COMPETENCIES_BY_TYPE,
+    STANDARD_INTERVIEW_TYPES,
     Competency,
     CustomCategory,
     CustomSessionSpec,
@@ -59,6 +60,9 @@ FLAT_WITHIN = 0.25
 PLAN_POINTS = {1: 1.0, 2: 0.75, 3: 0.5}
 MAX_TOPICS = 4
 CUSTOM_MAX_CHIPS = 3
+# The types the plan recommends. Recruiter screen (RS-1) shares its competencies with the others,
+# so it is left out: it would win ties and is never a Custom category.
+PLAN_TYPES = {t: COMPETENCIES_BY_TYPE[t] for t in STANDARD_INTERVIEW_TYPES}
 
 TYPE_NAMES = {
     InterviewType.BEHAVIORAL: "behavioral",
@@ -183,7 +187,7 @@ def _options(
         first_plan.setdefault(p.interview_type, p)
 
     options: list[_Option] = []
-    for itype, comps in COMPETENCIES_BY_TYPE.items():
+    for itype, comps in PLAN_TYPES.items():
         weak = sorted(
             ((c, scores[c]) for c in comps if c in scores and scores[c] < BAR),
             key=lambda x: (x[1], x[0].value),
@@ -319,12 +323,14 @@ def _advice(option: _Option, done: set[InterviewType]) -> PlannedSession:
     )
 
 
-def _raise_the_bar(scores: Mapping[Competency, float]) -> PlannedSession:
+def _raise_the_bar(scores: Mapping[Competency, float]) -> PlannedSession | None:
     averages = []
-    for itype, comps in COMPETENCIES_BY_TYPE.items():
+    for itype, comps in PLAN_TYPES.items():
         mine = [scores[c] for c in comps if c in scores]
         if mine:
             averages.append((sum(mine) / len(mine), itype))
+    if not averages:  # only recruiter screen scores (RS-1)
+        return None
     avg, itype = min(averages, key=lambda x: (x[0], x[1].value))
     lowest = sorted(
         (c for c in COMPETENCIES_BY_TYPE[itype] if c in scores), key=lambda c: scores[c]

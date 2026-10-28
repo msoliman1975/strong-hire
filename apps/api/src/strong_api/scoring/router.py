@@ -46,12 +46,14 @@ from strong_api.scoring.progress import (
     without_own_questions,
 )
 from strong_api.scoring.schemas import (
+    AnswersAtBar,
     CustomRecommendation,
     Debrief,
     DebriefQuestion,
     DebriefSession,
     DebriefStatus,
     JobProgress,
+    PreviousSignal,
     ScoringAccepted,
 )
 from strong_api.sessions.failure import failed_before_start, failure_reason
@@ -65,6 +67,7 @@ from strong_core.schemas import (
     Competency,
     CustomSessionSpec,
     GapAnalysis,
+    HireSignal,
     InterviewerBrief,
     InterviewType,
     Level,
@@ -308,7 +311,8 @@ async def _own_question_splits(
 
 @router.get("/sessions/{session_id}/debrief")
 async def get_debrief(session_id: uuid.UUID, db: Db, me: Me) -> Debrief:
-    """FB-1, FB-2, PR-2. Poll while status is "scoring" (FB-3: ready within 60 seconds)."""
+    """FB-1, FB-2, PR-2, DB-1, DB-2. Poll while status is "scoring" (FB-3: ready within 60
+    seconds)."""
     session = await _owned_session(db, me, session_id)
     target = await db.get(JobTarget, session.job_target_id)
     row = await db.scalar(select(ScorecardRow).where(ScorecardRow.session_id == session.id))
@@ -369,6 +373,50 @@ async def get_debrief(session_id: uuid.UUID, db: Db, me: Me) -> Debrief:
         company_slug=slug,
         values_framework=framework,
         questions=_debrief_questions(_brief(session)),
+        previous_signal=None if card is None else await _previous_signal(db, session, card),
+        answers_at_bar=None if card is None else answers_at_bar(card),
+    )
+
+
+# DB-2: an answer meets the bar when its average rubric score is 3 or more.
+BAR_SCORE = 3
+
+
+def answers_at_bar(card: Scorecard) -> AnswersAtBar:
+    """DB-2: how many scored answers met the bar."""
+    averages = [sum(s.score for s in q.scores) / len(q.scores) for q in card.per_question]
+    return AnswersAtBar(met=sum(1 for a in averages if a >= BAR_SCORE), scored=len(averages))
+
+
+async def _previous_signal(
+    db: AsyncSession, session: InterviewSession, card: Scorecard
+) -> PreviousSignal | None:
+    """DB-1: the latest scored session of the same job target that started before this one."""
+    if session.started_at is None:
+        return None
+    row = (
+        await db.execute(
+            select(InterviewSession.id, InterviewSession.ended_at, ScorecardRow.hire_signal)
+            .join(ScorecardRow, ScorecardRow.session_id == InterviewSession.id)
+            .where(
+                InterviewSession.job_target_id == session.job_target_id,
+                InterviewSession.id != session.id,
+                InterviewSession.started_at < session.started_at,
+            )
+            .order_by(InterviewSession.started_at.desc())
+            .limit(1)
+        )
+    ).first()
+    if row is None:
+        return None
+    previous_id, ended_at, raw = row
+    signal = HireSignal(raw)
+    # HireSignal.rank is 0 for Strong Hire, so a drop in rank is a step up.
+    return PreviousSignal(
+        session_id=previous_id,
+        hire_signal=signal,
+        ended_at=ended_at,
+        change=signal.rank - card.hire_signal.rank,
     )
 
 

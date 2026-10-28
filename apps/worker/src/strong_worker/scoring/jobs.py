@@ -6,7 +6,9 @@ The API (strong_api.scoring.start_scoring) sets the session to SCORING and enque
 - runs the scorer and stores one Scorecard row;
 - writes one ProgressSnapshot per competency, for Realistic sessions only (PR-1). A 10-minute
   mini interview gets a debrief but no snapshots: 3 questions are a practice signal, not a trend;
-- sets the session to COMPLETED, or FAILED with a reason when scoring is not possible.
+- sets the session to COMPLETED, or FAILED with a reason when scoring is not possible;
+- then, as a separate step, matches each answer to the user's stories (ST-6, ST-7,
+  strong_worker.scoring.stories). That step never changes or fails the stored scorecard.
 
 FB-3 asks for the debrief within 60 seconds of the session end. The job measures the time from
 `sessions.ended_at` to the stored scorecard, returns it as `ready_after_s`, and logs a warning
@@ -39,6 +41,7 @@ from strong_core.sim import gateway_for_org
 from strong_worker.ops.context import job_context
 from strong_worker.pause import wait_if_paused
 from strong_worker.scoring.scorer import ScoringError, ScoringOutcome, SessionScorer
+from strong_worker.scoring.stories import run_story_step
 
 log = logging.getLogger(__name__)
 
@@ -155,6 +158,7 @@ async def score_session(ctx: dict[str, Any], session_id: str, org_id: str) -> di
             ready_after,
             DEBRIEF_BUDGET_S,
         )
+    stories = await run_story_step(scoring.sessionmaker, gateway, session.id, session.org_id)
     return {
         "outcome": "scored",
         "hire_signal": card.hire_signal.value,
@@ -168,6 +172,7 @@ async def score_session(ctx: dict[str, Any], session_id: str, org_id: str) -> di
         "scoring_s": outcome.seconds,
         "ready_after_s": round(ready_after, 3),
         "within_budget": ready_after <= DEBRIEF_BUDGET_S,
+        **stories,
     }
 
 

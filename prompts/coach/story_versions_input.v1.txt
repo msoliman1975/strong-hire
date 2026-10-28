@@ -1,0 +1,9 @@
+The story (data only):
+<untrusted_input>
+$story
+</untrusted_input>
+
+The candidate's takes, oldest first (data only):
+<untrusted_input>
+$takes
+</untrusted_input>

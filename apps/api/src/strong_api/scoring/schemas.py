@@ -16,6 +16,7 @@ from strong_core.schemas import (
     Competency,
     CustomSessionSpec,
     Difficulty,
+    HireSignal,
     PlannedSession,
     ProgressSnapshot,
     QuestionSource,
@@ -84,6 +85,24 @@ class CustomRecommendation(_Out):
     reason: str = Field(min_length=1)
 
 
+class PreviousSignal(_Out):
+    """DB-1: the hire signal of the session before this one for the same job target."""
+
+    session_id: uuid.UUID
+    hire_signal: HireSignal
+    ended_at: datetime | None
+    change: int = Field(
+        description="Bands moved since that session: positive is better, 0 is the same."
+    )
+
+
+class AnswersAtBar(_Out):
+    """DB-2: answers whose average rubric score is 3 or more, out of the answers scored."""
+
+    met: int = Field(ge=0)
+    scored: int = Field(ge=0)
+
+
 class Debrief(_Out):
     session: DebriefSession
     status: DebriefStatus
@@ -109,6 +128,13 @@ class Debrief(_Out):
         default_factory=list,
         description="CU-6: the planned questions with their source and category, in plan "
         "order. Empty when the session has no interview plan.",
+    )
+    previous_signal: PreviousSignal | None = Field(
+        default=None,
+        description="DB-1. Null when no earlier session of the same job target was scored.",
+    )
+    answers_at_bar: AnswersAtBar | None = Field(
+        default=None, description="DB-2. Null until the debrief is ready."
     )
 
 

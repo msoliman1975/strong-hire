@@ -306,7 +306,8 @@ export interface paths {
         };
         /**
          * Get Debrief
-         * @description FB-1, FB-2, PR-2. Poll while status is "scoring" (FB-3: ready within 60 seconds).
+         * @description FB-1, FB-2, PR-2, DB-1, DB-2. Poll while status is "scoring" (FB-3: ready within 60
+         *     seconds).
          */
         get: operations["get_debrief_sessions__session_id__debrief_get"];
         put?: never;
@@ -587,6 +588,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/sessions/{session_id}/transcript": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Transcript
+         * @description TR-1: the transcript of the signed-in user's finished session. 404 for anyone else.
+         */
+        get: operations["get_transcript_sessions__session_id__transcript_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/questions/companies": {
         parameters: {
             query?: never;
@@ -727,6 +748,105 @@ export interface paths {
         patch: operations["edit_saved_question_questions_mine__question_id__patch"];
         trace?: never;
     };
+    "/stories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Stories
+         * @description ST-1: the user's stories, newest first.
+         */
+        get: operations["list_stories_stories_get"];
+        put?: never;
+        /**
+         * Create Story
+         * @description ST-1: create a draft story.
+         */
+        post: operations["create_story_stories_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/from-answer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Story From Answer
+         * @description ST-2: "Save as a story" on a debrief answer. Creates a draft story with the candidate's
+         *     answer to that question, tagged with the competencies it was scored on and linked to the
+         *     session and question. The answer goes into `action` until a split into parts is known.
+         */
+        post: operations["story_from_answer_stories_from_answer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Story
+         * @description ST-1: one story with its notes.
+         */
+        get: operations["get_story_stories__story_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete Story
+         * @description ST-1: delete a story and its notes. Debriefs that used it keep their scores.
+         */
+        delete: operations["delete_story_stories__story_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Edit Story
+         * @description ST-1: change the title, the skill tags or any of the five parts. Only the fields sent
+         *     change; a part sent as null or blank is cleared.
+         */
+        patch: operations["edit_story_stories__story_id__patch"];
+        trace?: never;
+    };
+    "/stories/{story_id}/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Story Notes
+         * @description ST-6: the story's fix notes, oldest first.
+         */
+        get: operations["list_story_notes_stories__story_id__notes_get"];
+        put?: never;
+        /**
+         * Add Story Note
+         * @description ST-6: append a fix note (S22 sends the debrief's story fix here).
+         */
+        post: operations["add_story_note_stories__story_id__notes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/coach/sessions": {
         parameters: {
             query?: never;
@@ -841,6 +961,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/stories/{story_id}/takes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Takes */
+        get: operations["list_takes_stories__story_id__takes_get"];
+        put?: never;
+        /**
+         * Create Take
+         * @description CO-7: store a take and queue its scoring on the story's skills.
+         */
+        post: operations["create_take_stories__story_id__takes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/takes/{take_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Take */
+        get: operations["get_take_stories__story_id__takes__take_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Versions
+         * @description CO-8: a 60-second and a full version, every sentence from the story's parts or takes.
+         */
+        post: operations["create_versions_stories__story_id__versions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/dev/model-usage": {
         parameters: {
             query?: never;
@@ -877,6 +1055,46 @@ export interface paths {
          */
         get: operations["site_status_status_get"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/plan/{job_target_id}/{resume_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Plan
+         * @description PP-1: the plan page for one job and CV pair. PP-2: days left to the interview date.
+         */
+        get: operations["get_plan_plan__job_target_id___resume_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/plan/{job_target_id}/interview-date": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Interview Date
+         * @description PP-2: set the real interview date, or clear it with null.
+         */
+        put: operations["set_interview_date_plan__job_target_id__interview_date_put"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2696,6 +2914,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/part2/stories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Part2 Stories
+         * @description AD-4: story save rate, stories per user, Draft to Proven rate, delivery trends.
+         */
+        get: operations["get_part2_stories_admin_part2_stories_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/public/waitlist": {
         parameters: {
             query?: never;
@@ -3476,6 +3714,20 @@ export interface components {
              */
             current: boolean;
         };
+        /**
+         * AdminStoryMeta
+         * @description AD-4: counts only. Never a story's title, text, notes or skills.
+         */
+        AdminStoryMeta: {
+            /** Total */
+            total: number;
+            /** Draft */
+            draft: number;
+            /** Proven */
+            proven: number;
+            /** Last Saved At */
+            last_saved_at: string | null;
+        };
         /** AdminSubscription */
         AdminSubscription: {
             status: components["schemas"]["SubscriptionStatus"];
@@ -3665,6 +3917,7 @@ export interface components {
             gap_analysis_count: number;
             /** Gap Analyses */
             gap_analyses: components["schemas"]["AdminGapMeta"][];
+            stories: components["schemas"]["AdminStoryMeta"];
             /**
              * Cost To Date Usd
              * @description All model usage of the account (usage_events).
@@ -4019,6 +4272,16 @@ export interface components {
          * @enum {string}
          */
         AnswerConduct: "ok" | "off_scope" | "inappropriate";
+        /**
+         * AnswersAtBar
+         * @description DB-2: answers whose average rubric score is 3 or more, out of the answers scored.
+         */
+        AnswersAtBar: {
+            /** Met */
+            met: number;
+            /** Scored */
+            scored: number;
+        };
         /**
          * AskFor
          * @description CO-4: the one thing the coach asks for next, from the IV-3 follow-up rules.
@@ -4605,6 +4868,20 @@ export interface components {
              */
             direction: "up" | "down" | "flat" | "single";
         };
+        /** CompetencyWeight */
+        CompetencyWeight: {
+            competency: components["schemas"]["Competency"];
+            /**
+             * Weight
+             * @description The profile's scoring weight. 1.0 when it sets none.
+             */
+            weight: number;
+            /**
+             * Share
+             * @description The weight's share within its interview type.
+             */
+            share: number;
+        };
         /**
          * Confidence
          * @enum {string}
@@ -4853,6 +5130,10 @@ export interface components {
              * @description CU-6: the planned questions with their source and category, in plan order. Empty when the session has no interview plan.
              */
             questions?: components["schemas"]["DebriefQuestion"][];
+            /** @description DB-1. Null when no earlier session of the same job target was scored. */
+            previous_signal?: components["schemas"]["PreviousSignal"] | null;
+            /** @description DB-2. Null until the debrief is ready. */
+            answers_at_bar?: components["schemas"]["AnswersAtBar"] | null;
         };
         /**
          * DebriefQuestion
@@ -4921,6 +5202,29 @@ export interface components {
             fillers_per_minute: number;
             /** Duration Seconds */
             duration_seconds: number;
+        };
+        /** DeliveryWeek */
+        DeliveryWeek: {
+            /**
+             * Week Start
+             * Format: date-time
+             * @description Monday 00:00 UTC
+             */
+            week_start: string;
+            /**
+             * Answers
+             * @description Scored answers with delivery metrics
+             */
+            answers: number;
+            /**
+             * Words Per Minute
+             * @description Mean over those answers
+             */
+            words_per_minute: number | null;
+            /** Fillers Per Minute */
+            fillers_per_minute: number | null;
+            /** Duration Seconds */
+            duration_seconds: number | null;
         };
         /** DevLoginRequest */
         DevLoginRequest: {
@@ -5348,6 +5652,21 @@ export interface components {
              * @default
              */
             reason: string;
+        };
+        /**
+         * InterviewDateIn
+         * @description PP-2: the candidate's real interview date. null clears it.
+         */
+        InterviewDateIn: {
+            /** Interview Date */
+            interview_date: string | null;
+        };
+        /** InterviewDateOut */
+        InterviewDateOut: {
+            /** Interview Date */
+            interview_date: string | null;
+            /** Days Left */
+            days_left: number | null;
         };
         /**
          * InterviewType
@@ -6298,6 +6617,24 @@ export interface components {
             /** @description Sessions started from the plan page */
             plan_sessions: components["schemas"]["AdminMetric"];
         };
+        /** Part2Stories */
+        Part2Stories: {
+            story_save_rate: components["schemas"]["AdminMetric"];
+            stories_per_user: components["schemas"]["AdminMetric"];
+            draft_to_proven_rate: components["schemas"]["AdminMetric"];
+            save_cohort: components["schemas"]["SaveCohort"];
+            counts: components["schemas"]["StoryCounts"];
+            /**
+             * Stories By Week
+             * @description Oldest first; the last is this week
+             */
+            stories_by_week: components["schemas"]["StoryWeek"][];
+            /**
+             * Delivery
+             * @description Oldest first; the last is this week
+             */
+            delivery: components["schemas"]["DeliveryWeek"][];
+        };
         /** PasswordLoginRequest */
         PasswordLoginRequest: {
             /**
@@ -6401,6 +6738,76 @@ export interface components {
             billing_enabled: boolean;
         };
         /**
+         * PlanSetupDefaults
+         * @description PP-4: what the setup on the plan page starts with. Every v1 option stays editable.
+         */
+        PlanSetupDefaults: {
+            /** @description PR-2's next session, else GA-3's first. */
+            interview_type: components["schemas"]["InterviewType"];
+            difficulty: components["schemas"]["Difficulty"];
+            mode: components["schemas"]["Mode"];
+            /**
+             * Duration Min
+             * @description The default full length. Free accounts get the mini interview instead.
+             * @enum {integer}
+             */
+            duration_min: 30 | 45;
+            /** @description The job's level, else the user's target level. */
+            level: components["schemas"]["Level"] | null;
+            /** @description TN-3: as_company with a curated profile, else neutral. */
+            tone: components["schemas"]["Tone"];
+        };
+        /**
+         * PlanView
+         * @description PP-1: everything the plan page for one job and CV pair shows, in one read.
+         */
+        PlanView: {
+            job: components["schemas"]["JobTargetOut"];
+            resume: components["schemas"]["ResumeOut"];
+            /**
+             * Company Mode
+             * @enum {string}
+             */
+            company_mode: "curated" | "generic";
+            /**
+             * Company Name
+             * @description From the profile, else the posting.
+             */
+            company_name: string | null;
+            /**
+             * Values Framework
+             * @description The company's values framework name, for example 'Leadership Principles'.
+             */
+            values_framework: string | null;
+            /**
+             * Interview Date
+             * @description PP-2: the real interview date, if set.
+             */
+            interview_date: string | null;
+            /**
+             * Days Left
+             * @description PP-2: days from today (UTC) to interview_date. 0 is today, negative is past.
+             */
+            days_left: number | null;
+            /**
+             * Tested
+             * @description What they'll test: the loop's types first, then the other standard types.
+             */
+            tested: components["schemas"]["TypeWeights"][];
+            /** @description The latest gap analysis of this pair (GA-1 to GA-3, probe areas and the session plan). None when the pair has none yet. */
+            gap: components["schemas"]["GapAnalysisOut"] | null;
+            /**
+             * Reports
+             * @description PR-3: this pair's reports, newest first.
+             */
+            reports: components["schemas"]["ReportItem"][];
+            /** @description PR-2. */
+            next_session: components["schemas"]["PlannedSession"] | null;
+            /** @description CU-10. */
+            next_custom_session: components["schemas"]["CustomRecommendation"] | null;
+            setup: components["schemas"]["PlanSetupDefaults"];
+        };
+        /**
          * PlannedSession
          * @description One recommended practice session (GA-3).
          */
@@ -6428,6 +6835,25 @@ export interface components {
              * @enum {string}
              */
             flow: "manage" | "cancel";
+        };
+        /**
+         * PreviousSignal
+         * @description DB-1: the hire signal of the session before this one for the same job target.
+         */
+        PreviousSignal: {
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            hire_signal: components["schemas"]["HireSignal"];
+            /** Ended At */
+            ended_at: string | null;
+            /**
+             * Change
+             * @description Bands moved since that session: positive is better, 0 is the same.
+             */
+            change: number;
         };
         /**
          * Principle
@@ -7281,6 +7707,19 @@ export interface components {
              */
             levels?: components["schemas"]["Level"][];
         };
+        /** SaveCohort */
+        SaveCohort: {
+            /**
+             * Users
+             * @description Users whose first debrief is 30 or more days old
+             */
+            users: number;
+            /**
+             * Saved
+             * @description Of them, users who saved a story within the 30 days
+             */
+            saved: number;
+        };
         /** SavedQuestionIn */
         SavedQuestionIn: {
             /** Text */
@@ -8044,6 +8483,24 @@ export interface components {
              */
             updated_at: string;
         };
+        /** StoryCounts */
+        StoryCounts: {
+            /** Total */
+            total: number;
+            /** Draft */
+            draft: number;
+            /** Proven */
+            proven: number;
+            /**
+             * By Source
+             * @description Stories per source; every source
+             */
+            by_source: {
+                [key: string]: number;
+            };
+            /** Users With Stories */
+            users_with_stories: number;
+        };
         /**
          * StoryFit
          * @description ST-5: the planner's story fit table, one item per tested skill.
@@ -8077,6 +8534,57 @@ export interface components {
          */
         StoryFitStrength: "strong" | "thin" | "missing";
         /**
+         * StoryFromAnswerIn
+         * @description ST-2: save one debrief answer as a draft story.
+         */
+        StoryFromAnswerIn: {
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            /**
+             * Question Ref
+             * @description QuestionScore.question_ref.
+             */
+            question_ref: string;
+            /**
+             * Title
+             * @description Default: the question's text, cut to the title limit.
+             */
+            title?: string | null;
+        };
+        /**
+         * StoryIn
+         * @description ST-1: a new story typed by the candidate (or built by the coach). It starts as a draft.
+         */
+        StoryIn: {
+            /** Title */
+            title: string;
+            /** Context */
+            context?: string | null;
+            /** Stakes */
+            stakes?: string | null;
+            /** Action */
+            action?: string | null;
+            /** Result */
+            result?: string | null;
+            /** Reflection */
+            reflection?: string | null;
+            /**
+             * Skills
+             * @description Skill tags.
+             */
+            skills?: components["schemas"]["Competency"][];
+            /**
+             * Source
+             * @description A debrief answer becomes a story through POST /stories/from-answer.
+             * @default manual
+             * @enum {string}
+             */
+            source: "manual" | "coach";
+        };
+        /**
          * StoryNote
          * @description ST-6: a fix note sent to the story from a debrief answer that used it.
          */
@@ -8100,6 +8608,18 @@ export interface components {
             at: string;
         };
         /**
+         * StoryNoteIn
+         * @description ST-6: a fix note for the story, usually from a debrief answer that used it.
+         */
+        StoryNoteIn: {
+            /** Text */
+            text: string;
+            /** Session Id */
+            session_id?: string | null;
+            /** Question Ref */
+            question_ref?: string | null;
+        };
+        /**
          * StoryPart
          * @description ST-1: the five parts of a story, in the order the workbench and prompts show them.
          * @enum {string}
@@ -8121,6 +8641,27 @@ export interface components {
              * @description The candidate's words this part came from, verbatim.
              */
             quotes: string[];
+        };
+        /**
+         * StoryPatch
+         * @description ST-1: change the title, the skill tags or any part. Only the fields sent change; a part
+         *     sent as null (or blank) is cleared. The status is never set by hand (ST-7).
+         */
+        StoryPatch: {
+            /** Title */
+            title?: string | null;
+            /** Context */
+            context?: string | null;
+            /** Stakes */
+            stakes?: string | null;
+            /** Action */
+            action?: string | null;
+            /** Result */
+            result?: string | null;
+            /** Reflection */
+            reflection?: string | null;
+            /** Skills */
+            skills?: components["schemas"]["Competency"][] | null;
         };
         /**
          * StorySource
@@ -8156,6 +8697,20 @@ export interface components {
             sixty_second: components["schemas"]["StoryVersion"];
             /** @description All five parts, in order. */
             full: components["schemas"]["StoryVersion"];
+        };
+        /** StoryWeek */
+        StoryWeek: {
+            /**
+             * Week Start
+             * Format: date-time
+             * @description Monday 00:00 UTC
+             */
+            week_start: string;
+            /**
+             * Saved
+             * @description Stories created that week
+             */
+            saved: number;
         };
         /** Strength */
         Strength: {
@@ -8193,6 +8748,63 @@ export interface components {
              */
             summary: string;
         };
+        /** TakeOut */
+        TakeOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Story Id
+             * Format: uuid
+             */
+            story_id: string;
+            channel: components["schemas"]["SessionChannel"];
+            /** Text */
+            text: string;
+            /** Duration S */
+            duration_s: number | null;
+            status: components["schemas"]["TakeStatus"];
+            /**
+             * Scores
+             * @description Per skill, 1 to 4, with the take's words as quotes
+             */
+            scores?: components["schemas"]["CompetencyScore"][];
+            /**
+             * Reason
+             * @description Why scoring failed, in plain words
+             */
+            reason?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * TakeRequest
+         * @description CO-7: one telling of a story, typed or a voice transcript (S32).
+         */
+        TakeRequest: {
+            /** Text */
+            text: string;
+            /**
+             * @description voice when the text is a spoken transcript
+             * @default text
+             */
+            channel: components["schemas"]["SessionChannel"];
+            /**
+             * Duration S
+             * @description Length of a spoken take; leave out for a typed one
+             */
+            duration_s?: number | null;
+        };
+        /**
+         * TakeStatus
+         * @enum {string}
+         */
+        TakeStatus: "scoring" | "scored" | "failed";
         /** TextTurnRequest */
         TextTurnRequest: {
             /** Text */
@@ -8217,6 +8829,62 @@ export interface components {
          * @enum {string}
          */
         Tone: "as_company" | "warm" | "neutral" | "direct";
+        /** Transcript */
+        Transcript: {
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            /** Started At */
+            started_at: string | null;
+            /**
+             * Ended At
+             * Format: date-time
+             */
+            ended_at: string;
+            /** Groups */
+            groups: components["schemas"]["TranscriptGroup"][];
+        };
+        /**
+         * TranscriptGroup
+         * @description Consecutive turns about one question, or about one phase when there is no question.
+         */
+        TranscriptGroup: {
+            /**
+             * Question Ref
+             * @description The brief question id, None outside questions.
+             */
+            question_ref: string | null;
+            /**
+             * Question Text
+             * @description The question as planned, when known.
+             */
+            question_text: string | null;
+            /** @description The phase of the group's first turn. */
+            phase: components["schemas"]["Phase"];
+            /** Turns */
+            turns: components["schemas"]["TranscriptTurn"][];
+        };
+        /** TranscriptTurn */
+        TranscriptTurn: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            speaker: components["schemas"]["Speaker"];
+            phase: components["schemas"]["Phase"];
+            /** Text */
+            text: string;
+            /**
+             * Start Ms
+             * @description Time offset from the session start, in milliseconds.
+             */
+            start_ms: number;
+            /** End Ms */
+            end_ms: number;
+        };
         /** TransitionIn */
         TransitionIn: {
             /**
@@ -8297,6 +8965,23 @@ export interface components {
              * @description BriefQuestion.id, in CORE only.
              */
             question_ref?: string | null;
+        };
+        /**
+         * TypeWeights
+         * @description One interview type and the competencies it scores, with the company's weights.
+         */
+        TypeWeights: {
+            interview_type: components["schemas"]["InterviewType"];
+            /**
+             * In Loop
+             * @description The company's loop for this role family has a round of this type. Always false in generic mode.
+             */
+            in_loop: boolean;
+            /**
+             * Competencies
+             * @description Highest weight first.
+             */
+            competencies: components["schemas"]["CompetencyWeight"][];
         };
         /**
          * UsageOut
@@ -9665,6 +10350,37 @@ export interface operations {
             };
         };
     };
+    get_transcript_sessions__session_id__transcript_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Transcript"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_bank_companies_questions_companies_get: {
         parameters: {
             query?: never;
@@ -9964,6 +10680,279 @@ export interface operations {
             };
         };
     };
+    list_stories_stories_get: {
+        parameters: {
+            query?: {
+                /** @description Only drafts, or only proven. */
+                status?: components["schemas"]["StoryStatus"] | null;
+                /** @description Only stories with this tag. */
+                skill?: components["schemas"]["Competency"] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Story"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_story_stories_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoryIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Story"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    story_from_answer_stories_from_answer_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoryFromAnswerIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Story"];
+                };
+            };
+            /** @description The session is not the user's, or detail.code is 'scorecard_not_found' or 'question_not_found'. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description detail.code is 'story_exists'; detail.story_id is that story. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description detail.code is 'answer_empty' when the answer has no text. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    get_story_stories__story_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Story"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_story_stories__story_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_story_stories__story_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoryPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Story"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_story_notes_stories__story_id__notes_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryNote"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_story_note_stories__story_id__notes_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoryNoteIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryNote"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     start_coach_session_coach_sessions_post: {
         parameters: {
             query?: never;
@@ -10160,6 +11149,135 @@ export interface operations {
             };
         };
     };
+    list_takes_stories__story_id__takes_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TakeOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_take_stories__story_id__takes_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TakeRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TakeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_take_stories__story_id__takes__take_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+                take_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TakeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_versions_stories__story_id__versions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryVersions"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     model_usage_dev_model_usage_get: {
         parameters: {
             query?: never;
@@ -10197,6 +11315,85 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["SiteStatus"];
                 };
+            };
+        };
+    };
+    get_plan_plan__job_target_id___resume_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+                resume_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanView"];
+                };
+            };
+            /** @description The job target or the resume does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_interview_date_plan__job_target_id__interview_date_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InterviewDateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterviewDateOut"];
+                };
+            };
+            /** @description The job target does not exist or was deleted. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The date is in the past. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -13289,6 +14486,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AdminAutoProfile"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_part2_stories_admin_part2_stories_get: {
+        parameters: {
+            query?: {
+                /** @description How many weeks, this one included */
+                weeks?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Part2Stories"];
                 };
             };
             /** @description Validation Error */

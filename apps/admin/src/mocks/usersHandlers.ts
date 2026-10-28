@@ -182,6 +182,7 @@ export function usersHandlers(store: MockStore) {
         resumes: [],
         gap_analysis_count: 0,
         gap_analyses: [],
+        stories: { total: 0, draft: 0, proven: 0, last_saved_at: null },
         cost_to_date_usd: 0,
         cost_unknown_events: 0,
         refunds: [],

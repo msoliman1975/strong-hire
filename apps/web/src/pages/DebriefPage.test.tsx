@@ -35,6 +35,8 @@ function debrief(generic: boolean, duration_min: 10 | 30 | 45 = 30): Debrief {
     company_slug: generic ? null : "example-corp",
     values_framework: generic ? null : "Example Values",
     questions: [],
+    previous_signal: null,
+    answers_at_bar: null,
   };
 }
 

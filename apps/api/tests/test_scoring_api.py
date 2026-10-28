@@ -236,6 +236,39 @@ async def test_fb1_fb2_fb3_debrief_after_scoring(
     assert again.status_code == 409
 
 
+async def test_db1_db2_previous_signal_and_answers_at_bar(
+    sclient: httpx.AsyncClient, sessionmaker: async_sessionmaker[AsyncSession], squeue: ScoringQueue
+) -> None:
+    """DB-1: the debrief shows the previous signal for the same job and the change.
+    DB-2: it counts the answers that met the bar (average rubric score 3 or more)."""
+    target = await make_target(sessionmaker)
+    other = await make_target(sessionmaker)
+    first = await make_session(sessionmaker, target, ended_minutes_ago=60)
+    elsewhere = await make_session(sessionmaker, other, ended_minutes_ago=30)
+    second = await make_session(sessionmaker, target)
+    for sid, score in ((first, 2), (elsewhere, 4), (second, 4)):
+        squeue.replies = replies(scores=score)
+        assert (await sclient.post(f"/sessions/{sid}/scoring")).status_code == 202
+
+    early = (await sclient.get(f"/sessions/{first}/debrief")).json()
+    assert early["previous_signal"] is None  # the first session of the job
+    assert early["answers_at_bar"]["met"] == 0
+    scored = early["answers_at_bar"]["scored"]
+    assert scored == len(early["scorecard"]["per_question"]) > 0
+
+    late = (await sclient.get(f"/sessions/{second}/debrief")).json()
+    prev = late["previous_signal"]
+    assert prev["session_id"] == str(first)  # not the other job's session
+    assert prev["hire_signal"] == early["scorecard"]["hire_signal"]
+    ranks = ["Strong Hire", "Hire", "Lean Hire", "Lean No Hire", "No Hire"]
+    expected = ranks.index(prev["hire_signal"]) - ranks.index(late["scorecard"]["hire_signal"])
+    assert prev["change"] == expected > 0
+    assert late["answers_at_bar"] == {"met": scored, "scored": scored}
+
+    pending = await make_session(sessionmaker, target)
+    assert (await sclient.get(f"/sessions/{pending}/debrief")).json()["answers_at_bar"] is None
+
+
 async def test_debrief_states_scoring_and_failed(
     sclient: httpx.AsyncClient, sessionmaker: async_sessionmaker[AsyncSession], squeue: ScoringQueue
 ) -> None:
@@ -455,3 +488,15 @@ def test_pr2_all_at_the_bar_moves_to_tough() -> None:
 
 def test_pr2_nothing_to_go_on() -> None:
     assert recommend_next_session({}, [], []) is None
+
+
+def test_rs1_plan_never_recommends_recruiter_screen() -> None:
+    """RS-1: recruiter screen shares competencies with the other types. The plan recommends only
+    the four standard types, and recruiter-only scores give no recommendation."""
+    at_bar = {C.LOGISTICS_AND_EXPECTATIONS: 3.0, C.MOTIVATION: 3.2, C.OWNERSHIP: 3.6}
+    nxt = recommend_next_session(at_bar, [], [])
+    assert nxt is not None and nxt.interview_type == InterviewType.HIRING_MANAGER
+    weak = {C.LOGISTICS_AND_EXPECTATIONS: 1.5, C.OWNERSHIP: 3.5}
+    nxt = recommend_next_session(weak, [], [])
+    assert nxt is not None and nxt.interview_type == InterviewType.BEHAVIORAL
+    assert recommend_next_session({C.LOGISTICS_AND_EXPECTATIONS: 2.0}, [], []) is None

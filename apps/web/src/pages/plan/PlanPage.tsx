@@ -1,0 +1,167 @@
+/**
+ * PP-1: the interview plan page for one job and CV pair (canvas board B1 Plan). With
+ * `v2_enabled` on it replaces the gap analysis, rehearsals (PR-3) and session setup pages:
+ * header with the countdown (PP-2), what they'll test, where they'll probe, earlier rehearsals
+ * and the next rehearsal setup (PP-4).
+ */
+import { Link, useParams } from "react-router";
+
+import type { ReportItem } from "../../api/types";
+import { CV_DELETED, ReportList } from "../../components/ReportList";
+import { Bar, ErrorNotice, Loading, PageHead, StatusBadge } from "../../components/ui";
+import { competencyLabel, difficultyLabel, formatDate, interviewTypeLabel } from "../../labels";
+import { contextPath } from "../../paths";
+import { usePlan, type PlanView } from "./api";
+import { InterviewDate } from "./InterviewDate";
+import { PlanSetup } from "./PlanSetup";
+import "./plan.css";
+
+const isVerdict = (r: ReportItem) => r.type === "interview_debrief" && r.hire_signal !== null;
+
+export function PlanPage() {
+  const { jobId = "", resumeId = "" } = useParams();
+  const plan = usePlan(jobId, resumeId);
+  if (plan.isPending) return <Loading label="Loading your interview plan" />;
+  if (plan.isError) return <ErrorNotice error={plan.error} />;
+  return <PlanBody plan={plan.data} jobId={jobId} resumeId={resumeId} />;
+}
+
+function PlanBody({ plan, jobId, resumeId }: { plan: PlanView; jobId: string; resumeId: string }) {
+  const posting = plan.job.posting;
+  const company = plan.company_name ?? posting?.company_name ?? null;
+  const title = posting ? `${posting.title}${company ? ` · ${company}` : ""}` : (plan.job.name ?? "Your interview");
+  const cvName = plan.resume.deleted ? CV_DELETED : (plan.resume.name ?? "your CV");
+  const gap = plan.gap;
+  const analysis = gap?.status === "ready" ? gap.analysis : null;
+  const verdicts = plan.reports.filter(isVerdict);
+
+  return (
+    <div className="plan-page">
+      <PageHead title={title} eyebrow="B · INTERVIEW PREP" eyebrowTone="prep">
+        <p className="muted">
+          With {cvName}.{" "}
+          {plan.company_mode === "curated"
+            ? `Company profile and job details loaded.`
+            : "No curated profile for this company yet, so the plan uses a general tech interview style."}
+        </p>
+        <InterviewDate
+          jobId={jobId}
+          resumeId={resumeId}
+          date={plan.interview_date}
+          daysLeft={plan.days_left}
+          editable={!plan.job.deleted}
+        />
+      </PageHead>
+
+      <div className="plan-grid">
+        <div className="plan-main stack">
+          <section className="card" aria-labelledby="plan-test-heading">
+            <h2 id="plan-test-heading">What they'll test</h2>
+            <p className="muted">
+              {plan.company_mode === "curated"
+                ? `From ${company ?? "the company"}'s interview profile${plan.values_framework ? ` and its ${plan.values_framework}` : ""}.`
+                : "Equal weights for each competency, until this company has a profile."}
+            </p>
+            <div className="plan-tested">
+              {plan.tested.map((t) => (
+                <div key={t.interview_type} className="plan-tested__type" data-testid="tested-type">
+                  <h3>
+                    {interviewTypeLabel[t.interview_type]}{" "}
+                    {t.in_loop && <StatusBadge tone="prep">In their loop</StatusBadge>}
+                  </h3>
+                  <ul className="plain-list">
+                    {t.competencies.map((c) => {
+                      const pct = Math.round(c.share * 100);
+                      return (
+                        <li key={c.competency} className="plan-weight">
+                          <span>{competencyLabel(c.competency)}</span>
+                          <Bar value={pct} label={`${competencyLabel(c.competency)}: ${pct}% of this round`} />
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="card" aria-labelledby="plan-probe-heading">
+            <h2 id="plan-probe-heading">Where they'll probe</h2>
+            {analysis ? (
+              <>
+                <ul data-testid="probe-areas">
+                  {analysis.probe_areas.map((p) => (
+                    <li key={p}>{p}</li>
+                  ))}
+                </ul>
+                <p className="muted">
+                  Match score {analysis.match_score} of 100, from the gap analysis on {formatDate(gap!.created_at)}.
+                  {gap!.stale && " The job, your CV or the company profile changed since; run it again to update it."}{" "}
+                  <Link to={`/jobs/${jobId}/gap?report=${encodeURIComponent(gap!.id)}`}>See the full gap analysis</Link>
+                </p>
+                {analysis.session_plan.length > 0 && (
+                  <>
+                    <h3>Practice plan</h3>
+                    <ol className="plain-list" data-testid="session-plan">
+                      {[...analysis.session_plan]
+                        .sort((a, b) => a.priority - b.priority)
+                        .map((p) => (
+                          <li key={p.priority}>
+                            <strong>
+                              {interviewTypeLabel[p.interview_type]}, {difficultyLabel[p.difficulty]}
+                            </strong>
+                            <span className="muted">
+                              {" "}
+                              {p.focus_topics.join(", ")}. {p.reason}
+                            </span>
+                          </li>
+                        ))}
+                    </ol>
+                  </>
+                )}
+              </>
+            ) : gap?.status === "running" ? (
+              <Loading label="Comparing your resume with the job. This takes about a minute." />
+            ) : (
+              <div data-testid="no-gap">
+                <p>
+                  {gap?.status === "failed"
+                    ? (gap.error ?? "The gap analysis failed.")
+                    : "Run the free gap analysis to see where they'll probe and what to practice first."}
+                </p>
+                {!plan.job.deleted && !plan.resume.deleted && (
+                  <Link className="btn btn--secondary" to={contextPath(jobId, resumeId)}>
+                    {gap ? "Run the gap analysis again" : "Run the gap analysis"}
+                  </Link>
+                )}
+              </div>
+            )}
+          </section>
+
+          {/* ST-5: the story fit table goes here. S23 builds it (StoryFit* in this folder). */}
+
+          <section className="card" aria-labelledby="plan-earlier-heading">
+            <h2 id="plan-earlier-heading">Earlier rehearsals</h2>
+            <p className="muted">
+              {verdicts.length === 0
+                ? "No scored interview yet for this job and CV."
+                : `${verdicts.length} scored ${verdicts.length === 1 ? "interview" : "interviews"}. Latest hire signal: ${verdicts[0].hire_signal}.`}
+            </p>
+            {plan.reports.length > 0 && <ReportList reports={plan.reports} showJob={false} />}
+          </section>
+        </div>
+
+        <div className="plan-side stack">
+          {/* RD-1 to RD-3: practice readiness and the day-by-day plan go here. S34 builds them. */}
+          {plan.job.deleted ? (
+            <section className="card">
+              <p>This job description was deleted, so it cannot be rehearsed again.</p>
+            </section>
+          ) : (
+            <PlanSetup plan={plan} jobId={jobId} resumeId={resumeId} />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

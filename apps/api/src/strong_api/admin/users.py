@@ -42,6 +42,7 @@ from strong_api.admin.users_schemas import (
     AdminOrg,
     AdminRefund,
     AdminResumeMeta,
+    AdminStoryMeta,
     AdminSubscription,
     AdminUser,
     AdminUserDetail,
@@ -75,12 +76,13 @@ from strong_core.db.models import (
     Org,
     Resume,
     Scorecard,
+    Story,
     Subscription,
     UsageEvent,
     User,
 )
 from strong_core.schemas import SessionChannel, SessionStatus
-from strong_core.schemas.enums import GrantKind
+from strong_core.schemas.enums import GrantKind, StoryStatus
 
 log = logging.getLogger(__name__)
 
@@ -419,6 +421,17 @@ async def _detail(db: AsyncSession, request: Request, user: User) -> AdminUserDe
         for gid, jid, rid, gstatus, has_error, created, updated in gap_rows
     ]
 
+    # AD-4: story counts only; the library's text never leaves the user's own app.
+    story_total, story_proven, story_last = (
+        await db.execute(
+            select(
+                func.count(),
+                func.count().filter(Story.status == StoryStatus.PROVEN),
+                func.max(Story.created_at),
+            ).where(Story.org_id == org_id)
+        )
+    ).one()
+
     cost, unknown = (
         await db.execute(
             select(
@@ -495,6 +508,12 @@ async def _detail(db: AsyncSession, request: Request, user: User) -> AdminUserDe
         resumes=resumes,
         gap_analysis_count=len(gaps),
         gap_analyses=gaps,
+        stories=AdminStoryMeta(
+            total=int(story_total or 0),
+            draft=int(story_total or 0) - int(story_proven or 0),
+            proven=int(story_proven or 0),
+            last_saved_at=story_last,
+        ),
         cost_to_date_usd=round(float(Decimal(cost or 0)), 6),
         cost_unknown_events=int(unknown or 0),
         refunds=refunds,
