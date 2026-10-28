@@ -49,8 +49,19 @@ class CoachJudgeVerdict(Contract):
 
 
 class StyleVerdict(Contract):
-    direct: Literal["A", "B", "same"]
-    reason: str
+    """The reason comes first and each session gets its own label. With one "direct: A|B" field
+    before the reason, the judge picked a letter and then argued for the other one (first
+    real-model run, 2026-10-28, 2 of 4 picks)."""
+
+    reason: str = Field(description="Compare the coaches first, quoting both sessions.")
+    session_a: CoachStyle
+    session_b: CoachStyle
+
+    @property
+    def direct(self) -> Literal["A", "B", "same"]:
+        if self.session_a == self.session_b:
+            return "same"
+        return "A" if self.session_a == CoachStyle.DIRECT else "B"
 
 
 @dataclass
