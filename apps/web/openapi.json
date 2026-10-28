@@ -3020,6 +3020,167 @@
         }
       }
     },
+    "/plan/{job_target_id}/{resume_id}/readiness": {
+      "get": {
+        "tags": [
+          "interview plan"
+        ],
+        "summary": "Get Readiness",
+        "description": "RD-1: practice readiness per tested skill for this pair. RD-3: a practice estimate.",
+        "operationId": "get_readiness_plan__job_target_id___resume_id__readiness_get",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          },
+          {
+            "name": "resume_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Resume Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Readiness"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The job target or the resume does not exist."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/readiness/{job_target_id}": {
+      "get": {
+        "tags": [
+          "interview plan"
+        ],
+        "summary": "Get Job Readiness",
+        "description": "RD-1 for the Home card: the pair of the job's newest session. No session yet: every\ntested skill is not_enough_data.",
+        "operationId": "get_job_readiness_readiness__job_target_id__get",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Readiness"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The job target does not exist."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plan/{job_target_id}/{resume_id}/day-plan": {
+      "get": {
+        "tags": [
+          "interview plan"
+        ],
+        "summary": "Get Day Plan",
+        "description": "RD-2: the day-by-day plan to the interview date, or the next three steps without one.",
+        "operationId": "get_day_plan_plan__job_target_id___resume_id__day_plan_get",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          },
+          {
+            "name": "resume_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Resume Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DayPlan"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The job target or the resume does not exist."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/providers": {
       "get": {
         "tags": [
@@ -13463,6 +13624,217 @@
         ],
         "title": "DailyCost"
       },
+      "DayPlan": {
+        "properties": {
+          "job_target_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Job Target Id"
+          },
+          "resume_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Resume Id"
+          },
+          "interview_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interview Date"
+          },
+          "days_left": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days Left"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "by_day",
+              "next_steps"
+            ],
+            "title": "Kind",
+            "description": "by_day with an interview date today or ahead, else next_steps."
+          },
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/DayPlanDay"
+            },
+            "type": "array",
+            "title": "Days",
+            "description": "by_day: one entry per day from today."
+          },
+          "days_not_shown": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Days Not Shown",
+            "description": "by_day: days after the last one listed."
+          },
+          "next_steps": {
+            "items": {
+              "$ref": "#/components/schemas/DayPlanItem"
+            },
+            "type": "array",
+            "title": "Next Steps",
+            "description": "next_steps: up to three items."
+          }
+        },
+        "type": "object",
+        "required": [
+          "job_target_id",
+          "resume_id",
+          "interview_date",
+          "days_left",
+          "kind",
+          "days",
+          "days_not_shown",
+          "next_steps"
+        ],
+        "title": "DayPlan",
+        "description": "RD-2: what to do each day until the interview, or the next three steps."
+      },
+      "DayPlanDay": {
+        "properties": {
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DayPlanItem"
+            },
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 1,
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "day",
+          "items"
+        ],
+        "title": "DayPlanDay"
+      },
+      "DayPlanItem": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "rehearsal",
+              "story"
+            ],
+            "title": "Kind"
+          },
+          "interview_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/InterviewType"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Rehearsals only."
+          },
+          "difficulty": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Difficulty"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Rehearsals only."
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Mode"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Rehearsals only."
+          },
+          "focus_topics": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Focus Topics",
+            "description": "Rehearsals only; empty for story items."
+          },
+          "competency": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Competency"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Story items: the skill to cover."
+          },
+          "story_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Story Id",
+            "description": "Story items: the thin story to improve."
+          },
+          "strength": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoryFitStrength"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Story items: thin or missing."
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "interview_type",
+          "difficulty",
+          "mode",
+          "focus_topics",
+          "competency",
+          "story_id",
+          "strength",
+          "reason"
+        ],
+        "title": "DayPlanItem",
+        "description": "One thing to do: a rehearsal (type, difficulty, mode) or work on one story."
+      },
       "Debrief": {
         "properties": {
           "session": {
@@ -19005,49 +19377,49 @@
         "description": "Who wrote a brief question: the planner, or the candidate in a Custom session (CU-3)."
       },
       "Readiness": {
-        "additionalProperties": false,
-        "description": "RD-1: practice readiness per skill for one job target's interview.",
         "properties": {
           "job_target_id": {
+            "type": "string",
             "format": "uuid",
-            "title": "Job Target Id",
-            "type": "string"
+            "title": "Job Target Id"
           },
           "kind": {
+            "type": "string",
             "const": "practice_estimate",
-            "default": "practice_estimate",
-            "description": "RD-3: every screen labels it this way.",
             "title": "Kind",
-            "type": "string"
+            "description": "RD-3: every screen labels it this way.",
+            "default": "practice_estimate"
           },
           "as_of": {
+            "type": "string",
             "format": "date",
-            "title": "As Of",
-            "type": "string"
+            "title": "As Of"
           },
           "skills": {
             "items": {
               "$ref": "#/components/schemas/SkillReadiness"
             },
-            "title": "Skills",
-            "type": "array"
+            "type": "array",
+            "title": "Skills"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "job_target_id",
           "as_of"
         ],
         "title": "Readiness",
-        "type": "object"
+        "description": "RD-1: practice readiness per skill for one job target's interview."
       },
       "ReadinessStatus": {
-        "description": "RD-1: whether a skill has enough Realistic sessions for a readiness score.",
+        "type": "string",
         "enum": [
           "scored",
           "not_enough_data"
         ],
         "title": "ReadinessStatus",
-        "type": "string"
+        "description": "RD-1: whether a skill has enough Realistic sessions for a readiness score."
       },
       "RedirectOut": {
         "properties": {
@@ -21741,8 +22113,6 @@
         "description": "What the candidate app shows: the site banner and what is paused (OC-1 to OC-4)."
       },
       "SkillReadiness": {
-        "additionalProperties": false,
-        "description": "RD-1: readiness for one skill, from Realistic sessions only.",
         "properties": {
           "competency": {
             "$ref": "#/components/schemas/Competency"
@@ -21753,24 +22123,26 @@
           "score": {
             "anyOf": [
               {
-                "maximum": 100,
-                "minimum": 0,
-                "type": "integer"
+                "type": "integer",
+                "maximum": 100.0,
+                "minimum": 0.0
               },
               {
                 "type": "null"
               }
             ],
-            "description": "0 to 100. Null exactly when status is not_enough_data.",
-            "title": "Score"
+            "title": "Score",
+            "description": "0 to 100. Null exactly when status is not_enough_data."
           },
           "sessions_counted": {
-            "description": "Realistic sessions that scored this skill.",
-            "minimum": 0,
+            "type": "integer",
+            "minimum": 0.0,
             "title": "Sessions Counted",
-            "type": "integer"
+            "description": "Realistic sessions that scored this skill."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "competency",
           "status",
@@ -21778,7 +22150,7 @@
           "sessions_counted"
         ],
         "title": "SkillReadiness",
-        "type": "object"
+        "description": "RD-1: readiness for one skill, from Realistic sessions only."
       },
       "Source": {
         "additionalProperties": false,
@@ -22140,14 +22512,14 @@
         "type": "object"
       },
       "StoryFitStrength": {
-        "description": "ST-5: how well the best story covers one skill the interview will test.",
+        "type": "string",
         "enum": [
           "strong",
           "thin",
           "missing"
         ],
         "title": "StoryFitStrength",
-        "type": "string"
+        "description": "ST-5: how well the best story covers one skill the interview will test."
       },
       "StoryFromAnswerIn": {
         "properties": {
