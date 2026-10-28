@@ -215,7 +215,19 @@ describe("interview plan page", () => {
       "href",
       "/jobs/j1/context?resume=r1",
     );
-    expect(screen.getByRole("button", { name: "Start rehearsal" })).toBeDisabled();
+    // The next rehearsal card's one primary action runs it too: never a disabled dead end.
+    const next = screen.getByRole("region", { name: "Next rehearsal" });
+    expect(within(next).getByRole("link", { name: "Run the gap analysis" })).toHaveAttribute(
+      "href",
+      "/jobs/j1/context?resume=r1",
+    );
+    expect(screen.queryByRole("button", { name: "Start rehearsal" })).toBeNull();
+  });
+
+  it("PP-1: while the gap analysis runs, Start rehearsal waits and says why", async () => {
+    renderPlan(planView({ gap: { ...planView().gap!, status: "running", analysis: null }, reports: [] }));
+    expect(await screen.findByRole("button", { name: "Start rehearsal" })).toBeDisabled();
+    expect(screen.getByTestId("needs-gap")).toHaveTextContent("Start rehearsal unlocks when it is done");
   });
 
   it("PP-2: asks for the interview date, then shows the days left", async () => {

@@ -1,0 +1,50 @@
+/* The v2 Progress page: the stories that need work (StoriesToWorkOn). */
+
+.progress-stories {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.progress-stories h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.progress-stories__list > li + li {
+  margin-top: 0;
+  border-top: 1px solid var(--sh-line);
+}
+
+.progress-story {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 12px 0;
+}
+
+.progress-story__main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  min-width: 0;
+}
+
+.progress-story__main p {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+.progress-story__title {
+  font-weight: 700;
+  color: var(--sh-ink);
+}
+
+.progress-reports__heading {
+  font-size: 1.25rem;
+  margin: 0 0 12px;
+}

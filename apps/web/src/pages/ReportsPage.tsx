@@ -4,11 +4,19 @@ import { useJobs, useReports } from "../api/hooks";
 import type { ReportType } from "../api/types";
 import { ReportList, reportTypeLabel } from "../components/ReportList";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
+import { useFeature } from "../theme/features";
+import "./home/StoryLibrary.css";
+import { StoriesToWorkOn } from "./progress/StoriesToWorkOn";
+import "./progress/progress.css";
 
 const TYPES = Object.keys(reportTypeLabel) as ReportType[];
 
-/** R1: every gap report and interview debrief, newest first, filtered by job and by type. */
+/**
+ * R1: every gap report and interview debrief, newest first, filtered by job and by type. With
+ * `v2_enabled` on it is the Progress page: the stories that need work come first.
+ */
 export function ReportsPage() {
+  const v2 = useFeature("v2_enabled");
   const [params, setParams] = useSearchParams();
   const jobId = params.get("job") || null;
   const rawType = params.get("type");
@@ -28,9 +36,17 @@ export function ReportsPage() {
 
   return (
     <>
-      <PageHead title="Reports">
-        <p>Your gap reports and interview debriefs, newest first.</p>
-      </PageHead>
+      {v2 ? (
+        <PageHead title="Progress">
+          <p>The stories to work on next, then your gap reports and interview debriefs, newest first.</p>
+        </PageHead>
+      ) : (
+        <PageHead title="Reports">
+          <p>Your gap reports and interview debriefs, newest first.</p>
+        </PageHead>
+      )}
+      {v2 && <StoriesToWorkOn />}
+      {v2 && <h2 className="progress-reports__heading">Reports</h2>}
       <div className="row section" role="group" aria-label="Filters">
         <div className="field">
           <label htmlFor="report-job">Job</label>

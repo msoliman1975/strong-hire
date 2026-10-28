@@ -49,7 +49,7 @@ export function StoriesPage() {
 
   return (
     <div className="stories studio" data-selected={storyId ? "true" : "false"}>
-      <PageHead title="Your stories" eyebrow="A · Story studio">
+      <PageHead title="Your stories" eyebrow="Story studio">
         <div className="stories__actions">
           <Link className="btn btn--secondary" to={newCoachPath()}>
             New story with the coach

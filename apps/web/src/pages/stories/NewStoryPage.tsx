@@ -42,7 +42,7 @@ export function NewStoryPage() {
 
   return (
     <div className="stories stack">
-      <PageHead title="New story" eyebrow="A · Story studio" />
+      <PageHead title="New story" eyebrow="Story studio" />
       <form className="card stack" onSubmit={submit} noValidate>
         <div className="field">
           <label htmlFor="new-story-title">Title</label>

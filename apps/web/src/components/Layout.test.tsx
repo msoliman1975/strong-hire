@@ -33,13 +33,14 @@ describe("UI-2 left rail nav", () => {
     expect(within(nav).getByRole("link", { name: "Resumes" })).toHaveAttribute("href", "/resumes");
   });
 
-  it("UI-2: shows the canvas rail, Home, Stories (A), Interviews (B) and Progress, when v2_enabled is on", () => {
+  it("UI-2: shows Home, Resumes, Interviews, Stories and Progress, in that order and with no journey letters, when v2_enabled is on", () => {
     setFeatureOverrides({ v2_enabled: true });
     const nav = renderNav();
     const labels = within(nav)
       .getAllByRole("link")
       .map((a) => a.textContent);
-    expect(labels).toEqual(["Home", "StoriesA", "InterviewsB", "Progress"]);
+    expect(labels).toEqual(["Home", "Resumes", "Interviews", "Stories", "Progress"]);
+    expect(within(nav).getByRole("link", { name: "Resumes" })).toHaveAttribute("href", "/resumes");
     expect(within(nav).getByRole("link", { name: "Stories" })).toHaveAttribute("href", "/stories");
     expect(within(nav).getByRole("link", { name: "Interviews" })).toHaveAttribute("href", "/jobs");
     expect(within(nav).getByRole("link", { name: "Progress" })).toHaveAttribute("href", "/reports");
@@ -131,7 +132,8 @@ describe("UI-2 v2 rail footer and account menu", () => {
     expect(await screen.findByText("Interview minutes")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Account menu" }));
     expect(screen.getByRole("link", { name: "Questions" })).toHaveAttribute("href", "/questions");
-    expect(screen.getByRole("link", { name: "Resumes" })).toHaveAttribute("href", "/resumes");
+    const menu = screen.getByRole("button", { name: "Account menu" }).nextElementSibling as HTMLElement;
+    expect(within(menu).getByRole("link", { name: "Resumes" })).toHaveAttribute("href", "/resumes");
     expect(screen.getByRole("link", { name: "Account" })).toHaveAttribute("href", "/account");
   });
 

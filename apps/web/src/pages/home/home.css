@@ -269,3 +269,58 @@
     font-size: 1.375rem;
   }
 }
+
+/* The Interviews page (InterviewsV2): the interview blocks as cards, with their own button. */
+.interviews-v2__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 16px;
+}
+
+.interviews-v2__list > li + li {
+  margin-top: 0;
+}
+
+.interviews-v2__list .home-interview {
+  background: var(--sh-surface);
+  border: 1px solid var(--sh-line);
+  border-top: 4px solid var(--sh-teal);
+}
+
+.home-interview__actions {
+  margin-top: 4px;
+}
+
+/* Three cards, in the menu's order: Resumes, Interviews, Stories. */
+.home-journeys {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+}
+
+.home-journey[data-journey="resumes"] {
+  border-top-color: var(--sh-ink);
+}
+
+.home-journey[data-journey="resumes"] .home-journey__eyebrow {
+  color: var(--sh-ink);
+}
+
+.home-resumes__counts {
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px 24px;
+}
+
+.home-resumes__latest dd {
+  display: grid;
+  gap: 2px;
+  font-family: var(--sh-font);
+  font-size: 1rem;
+}
+
+.home-resumes__name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.home-resumes__latest dd .small {
+  font-weight: 400;
+}

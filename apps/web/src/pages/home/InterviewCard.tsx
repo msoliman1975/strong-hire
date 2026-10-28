@@ -8,9 +8,14 @@ import { atBar, MIN_SESSIONS, scored, useJobReadiness } from "../plan/ReadinessA
 import { ReadinessNotice } from "../plan/ReadinessNotice";
 import { daysUntil, interviewDate, isReady, jobCompany, jobRole } from "./interviews";
 
-/** Where an unfinished job setup continues. Display routing only. */
-function setupStep(s: JobTargetSummary): string {
-  return s.job_target.status === "pending" ? `/jobs/${s.job_target.id}/confirm` : `/jobs/${s.job_target.id}/gap`;
+/**
+ * Where an unfinished job setup continues: confirm the posting, then pick a CV, then the gap
+ * analysis (which opens the plan page once it has a CV). Display routing only.
+ */
+export function setupStep(s: JobTargetSummary): string {
+  const id = s.job_target.id;
+  if (s.job_target.status === "pending") return `/jobs/${id}/confirm`;
+  return s.gap_status === null ? `/jobs/${id}/resume` : `/jobs/${id}/gap`;
 }
 
 /**
@@ -21,18 +26,22 @@ export function InterviewCard({
   summary,
   entry,
   today,
+  action = false,
 }: {
   summary: JobTargetSummary;
   /** The interview's plan page, when Home loaded it (PP-2 date, and the link). */
   entry?: { resumeId: string; plan: Pick<PlanView, "interview_date" | "days_left"> };
   today?: Date;
+  /** The Interviews page gives each card its own primary button; Home has one for the focus. */
+  action?: boolean;
 }) {
   const plan = entry?.plan;
   const job = summary.job_target;
   const date = plan?.interview_date ?? interviewDate(summary);
   const days = plan?.days_left ?? (date !== null ? daysUntil(date, today) : null);
   const ready = isReady(summary);
-  const to = !ready ? setupStep(summary) : entry ? planPath(job.id, entry.resumeId) : `/jobs/${job.id}/resume`;
+  // A ready job without a loaded plan opens it through the gap route, which redirects to the plan.
+  const to = !ready ? setupStep(summary) : entry ? planPath(job.id, entry.resumeId) : `/jobs/${job.id}/gap`;
   return (
     <li className="home-interview" data-testid="interview-card">
       <div className="home-interview__top">
@@ -57,14 +66,21 @@ export function InterviewCard({
           {summary.sessions_count} {summary.sessions_count === 1 ? "session" : "sessions"}
         </span>
       </p>
-      {ready ? (
-        <ReadinessMeter jobId={job.id} />
-      ) : (
-        <p className="small">
-          <Link className="text-link" to={to}>
-            Get ready to rehearse
+      {ready && <ReadinessMeter jobId={job.id} />}
+      {action ? (
+        <div className="home-interview__actions">
+          <Link className="btn" to={to}>
+            {ready ? "Open the plan" : "Get ready to rehearse"}
           </Link>
-        </p>
+        </div>
+      ) : (
+        !ready && (
+          <p className="small">
+            <Link className="text-link" to={to}>
+              Get ready to rehearse
+            </Link>
+          </p>
+        )
       )}
     </li>
   );

@@ -214,7 +214,7 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
           {story && story.title !== NEW_STORY_TITLE ? "Back to the story" : "Stories"}
         </Link>
         <div className="coach__title">
-          <Eyebrow>A · Coach session</Eyebrow>
+          <Eyebrow>Coach session</Eyebrow>
           <h1>{heading}</h1>
         </div>
         <div className="coach__style">

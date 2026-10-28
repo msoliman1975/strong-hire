@@ -16,13 +16,14 @@ import { planPath } from "../plan/paths";
 import { useStories, type Story } from "../stories/api";
 import { storiesPath } from "../stories/paths";
 import { InterviewCard } from "./InterviewCard";
+import { ResumesCard } from "./ResumesCard";
 import { coachNudge, focusInterview, interviewDate, daysUntil, isReady, type StoryGap } from "./interviews";
 import { coverageOf, planSkills, usePlans } from "./SkillCoverage";
 import { StoryLibrary } from "./StoryLibrary";
 
 /**
  * The v2 Home (canvas board Home), shown when `v2_enabled` is on: the coach's nudge (PR-2, with
- * the first story gap), the two journeys side by side (A: stories, B: interviews, PP-3), then the
+ * the first story gap), the resumes, interviews (PP-3) and stories cards side by side, then the
  * story library and the skill coverage map (ST-4).
  */
 export function HomeV2({ today }: { today?: Date }) {
@@ -45,9 +46,11 @@ export function HomeV2({ today }: { today?: Date }) {
       {!plansPending && (
         <HomeCoach summary={focus} planLink={entry ? planPath(entry.jobId, entry.resumeId) : null} gap={gap} days={days} today={today} />
       )}
+      {/* In the main menu's order: Resumes, Interviews, Stories. */}
       <div className="home-journeys">
-        <JourneyStories stories={stories.data} />
+        <ResumesCard />
         <JourneyInterviews jobs={jobs.data} focus={focus} loaded={loaded} today={today} />
+        <JourneyStories stories={stories.data} />
       </div>
       <StoryLibrary />
     </div>
@@ -203,7 +206,7 @@ function JourneyStories({ stories }: { stories: Story[] | undefined }) {
   const proven = all.filter((s) => s.status === "proven").length;
   return (
     <section className="card home-journey" data-journey="a" aria-labelledby="home-a">
-      <p className="home-journey__eyebrow">A · Build your stories</p>
+      <p className="home-journey__eyebrow">Build your stories</p>
       <h2 id="home-a">Turn your career into stories that win interviews.</h2>
       <p className="muted">
         Talk with your coach, shape each story, and sharpen it take by take. Works with or without an interview booked.
@@ -249,7 +252,7 @@ function JourneyInterviews({
   const focusEntry = focus ? entryOf(focus) : undefined;
   return (
     <section className="card home-journey" data-journey="b" aria-labelledby="home-b">
-      <p className="home-journey__eyebrow">B · Prep for an interview</p>
+      <p className="home-journey__eyebrow">Prep for an interview</p>
       <h2 id="home-b">Get ready for the interview you have.</h2>
       {jobs.length === 0 ? (
         <p className="muted">Add the job description for the interview you have, and get a free match score.</p>

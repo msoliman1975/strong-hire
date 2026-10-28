@@ -6,7 +6,8 @@ import { keys, useResume, useResumeTask } from "../../api/hooks";
 import { jobProblem, resumesApi } from "../../api/inputs";
 import type { Resume } from "../../api/types";
 import { ErrorNotice, Loading, ONBOARDING_STEPS, PageHead, Steps } from "../../components/ui";
-import { rehearsalPath } from "../../paths";
+import { contextPath, rehearsalPath } from "../../paths";
+import { useFeature } from "../../theme/features";
 
 /** One role as the form edits it. Dates are text; an empty end means the current role. */
 export interface RoleDraft {
@@ -128,6 +129,8 @@ export function CheckResumePage() {
 
 function ResumeEditor({ jobId, resumeId, original }: { jobId: string; resumeId: string; original: Resume }) {
   const navigate = useNavigate();
+  // v2: the next step is the context and gap analysis, which then open the plan (PP-1).
+  const v2 = useFeature("v2_enabled");
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState<ResumeDraft>(() => toDraft(original));
   const [errors, setErrors] = useState<DraftErrors>({});
@@ -136,7 +139,7 @@ function ResumeEditor({ jobId, resumeId, original }: { jobId: string; resumeId: 
     onSuccess: (saved) => {
       queryClient.setQueryData(keys.resume(resumeId), saved);
       void queryClient.invalidateQueries({ queryKey: keys.resumes, exact: true });
-      navigate(jobId ? rehearsalPath(jobId, resumeId) : "/resumes");
+      navigate(jobId ? (v2 ? contextPath(jobId, resumeId) : rehearsalPath(jobId, resumeId)) : "/resumes");
     },
   });
 

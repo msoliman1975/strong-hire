@@ -85,11 +85,13 @@ describe("v2 Home", () => {
     expect(first.getByRole("heading")).toHaveTextContent("Senior Software Engineer, Payments Reliability · Stripe");
     expect(cards[0]).toHaveTextContent("Match 72/100");
     expect(first.getByText(/days left|Today|Interview passed/)).toBeInTheDocument();
-    expect(first.getByRole("link", { name: /Payments Reliability · Stripe/ })).toHaveAttribute("href", "/jobs/j1/resume");
+    // A ready interview opens its plan (the gap route redirects there with v2 on).
+    expect(first.getByRole("link", { name: /Payments Reliability · Stripe/ })).toHaveAttribute("href", "/jobs/j1/gap");
     expect(screen.getByRole("link", { name: "Continue prep" })).toHaveAttribute("href", "/jobs/j1/resume");
     expect(cards[1]).toHaveTextContent("No match score yet");
     expect(cards[1]).toHaveTextContent("No interview date yet");
-    expect(within(cards[1]).getByRole("link", { name: "Get ready to rehearse" })).toHaveAttribute("href", "/jobs/j2/gap");
+    // No gap analysis yet: the next step is to pick a CV.
+    expect(within(cards[1]).getByRole("link", { name: "Get ready to rehearse" })).toHaveAttribute("href", "/jobs/j2/resume");
   });
 
   it("PR-2: the coach gives the next-session advice as one sentence", async () => {
@@ -149,12 +151,16 @@ describe("v2 Home", () => {
     expect(within(coach).getByRole("textbox", { name: "Ask your coach" })).toBeInTheDocument();
   });
 
-  it("ST-4: the journeys sit side by side, A (stories, with counts) then B (interviews)", async () => {
+  it("ST-4: the cards sit side by side in the menu's order: resumes, interviews, then stories (with counts)", async () => {
     resetMockStories();
     renderHome([job("j1")]);
     const a = await screen.findByRole("region", { name: "Turn your career into stories that win interviews." });
     const b = screen.getByRole("region", { name: "Get ready for the interview you have." });
-    expect(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const r = screen.getByRole("region", { name: "The CV your interviews are measured against." });
+    expect(r.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(b.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // No journey letters.
+    expect(document.body.textContent).not.toMatch(/\b[AB] · /);
     expect(await within(a).findByText("Stories")).toBeInTheDocument();
     const counts = within(a).getAllByRole("definition").map((d) => d.textContent);
     expect(counts).toEqual(["2", "1", "1"]);

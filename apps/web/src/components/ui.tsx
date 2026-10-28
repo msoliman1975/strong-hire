@@ -20,7 +20,7 @@ export function PageHead({
   title: string;
   /** Keep the h1 (page title, focus on navigation) but hide it visually, where the canvas shows none. */
   hidden?: boolean;
-  /** Optional mono line above the title, like "B · DEBRIEF". */
+  /** Optional mono line above the title, like "Interview prep". */
   eyebrow?: string;
   eyebrowTone?: "action" | "prep" | "muted";
   children?: ReactNode;
