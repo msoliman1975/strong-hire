@@ -2,10 +2,10 @@
   "company_name": "Nvidia",
   "company_slug": "nvidia",
   "meta": {
-    "version": 1,
+    "version": 2,
     "status": "draft",
     "reviewed_by": null,
-    "researched_at": "2026-10-10",
+    "researched_at": "2026-10-28",
     "published_at": null
   },
   "values_framework": {
@@ -13,10 +13,11 @@
     "principles": [
       {
         "name": "Innovation",
-        "description": "Invent things the world does not yet know it needs, guided by first principles rather than consensus.",
+        "description": "Invent what the world does not yet have: dream big, start small, take risks and learn fast, reasoning from first principles rather than copying existing models.",
         "evidence_signals": [
           "Reasons from first principles (hardware limits, physics, math) instead of copying what others do",
-          "Describes a new approach the candidate originated and how it was proven"
+          "Describes a new approach the candidate originated and how it was proven",
+          "Starts with a small, cheap experiment to test a bold idea before scaling it"
         ],
         "weight": 1.2
       },
@@ -41,7 +42,7 @@
       },
       {
         "name": "Excellence and Determination",
-        "description": "Hold the highest standards and measure against what is theoretically possible (the speed-of-light test), not against competitors.",
+        "description": "Hold the highest standards and measure work against what is physically possible (the 'speed of light' benchmark for both performance and schedules), not against competitors.",
         "evidence_signals": [
           "Compares achieved performance with the theoretical limit, for example bandwidth or compute peak",
           "Persists through a very hard technical problem and explains the steps",
@@ -51,10 +52,11 @@
       },
       {
         "name": "One Team",
-        "description": "Share information openly and work as one integrated team across hardware, software and research.",
+        "description": "Share information openly and work as one integrated team across hardware, software and research; project teams form around skills, not reporting lines or politics.",
         "evidence_signals": [
           "Gives an example of working across the hardware and software boundary or with another org",
-          "Shares knowledge and credit and helps other teams succeed"
+          "Shares knowledge and credit and helps other teams succeed",
+          "Influences people they do not manage by sharing data and context openly"
         ],
         "weight": 1.0
       }
@@ -63,7 +65,7 @@
   "loop_structure": [
     {
       "role_family": "swe",
-      "levels": ["IC1", "IC2", "IC3", "IC4", "IC5", "IC6"],
+      "levels": ["IC1", "IC2", "IC3", "IC4", "IC5", "IC6", "IC7"],
       "rounds": [
         {
           "name": "Recruiter call",
@@ -77,7 +79,7 @@
           "interview_type": null,
           "duration_min": 60,
           "interviewer_role": "Software engineer",
-          "notes": "Coding, often in C or C++, under time pressure. Not simulated in v1."
+          "notes": "Coding, often in C or C++ (NVIDIA says technical candidates may get a coding exercise, usually on HackerRank), under time pressure. Not simulated in v1."
         },
         {
           "name": "Hiring manager call",
@@ -91,7 +93,7 @@
           "interview_type": null,
           "duration_min": 60,
           "interviewer_role": "Software engineer",
-          "notes": "Usually two coding rounds, often systems-flavored (memory, concurrency, bit manipulation). Not simulated in v1."
+          "notes": "Usually two coding rounds, often systems-flavored (memory, concurrency, bit manipulation) or debugging existing code. NVIDIA requires an onsite, in-person interview before an offer; interviews are 30 to 60 minutes, one-on-one, small group or panel. Not simulated in v1."
         },
         {
           "name": "System design",
@@ -112,7 +114,55 @@
           "interview_type": "hiring_manager",
           "duration_min": 60,
           "interviewer_role": "Engineering manager",
-          "notes": "Behavioral and project deep dive; disagreements, feedback, and motivation."
+          "notes": "Behavioral and project deep dive; disagreements, feedback, and motivation. Each panelist scores the candidate and a weak round usually ends the process."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": ["Deep Learning Engineer", "Senior Deep Learning Engineer", "Principal Deep Learning Engineer", "Distinguished Engineer"],
+      "rounds": [
+        {
+          "name": "Recruiter call",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "ML background, projects or publications, and which team the candidate matches into. Not simulated in v1."
+        },
+        {
+          "name": "Technical phone screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Deep learning engineer",
+          "notes": "Python or PyTorch coding; for LLM teams it can be fully LLM-focused (decoding, KV cache, beam search). Not simulated in v1."
+        },
+        {
+          "name": "Deep learning fundamentals",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Senior deep learning engineer or researcher",
+          "notes": "Transformers, training optimization, parallel training, quantization, and how models map onto GPU compute and memory."
+        },
+        {
+          "name": "ML coding from first principles",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Deep learning engineer",
+          "notes": "Implement layers or algorithms such as softmax, attention, dropout or batch norm without library shortcuts. Not simulated in v1."
+        },
+        {
+          "name": "ML systems design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior or principal engineer",
+          "notes": "Inference serving, batching, distributed training or GPU cluster design, with throughput and latency targets."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Engineering manager",
+          "notes": "Project deep dive, recent model trends, bridging research and engineering, and team fit."
         }
       ]
     },
@@ -139,7 +189,14 @@
           "interview_type": "technical_qa",
           "duration_min": 45,
           "interviewer_role": "Engineer or researcher",
-          "notes": "GPU, CUDA and AI concepts; depth depends on the team."
+          "notes": "GPU, CUDA and AI concepts and hardware/software trade-offs; depth depends on the team."
+        },
+        {
+          "name": "Product case presentation",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Panel of PMs and engineering leaders",
+          "notes": "Reported by some candidates: a product challenge sent ahead, presented in about 30 minutes, then questions. Not in every loop."
         },
         {
           "name": "Onsite product and strategy",
@@ -154,6 +211,95 @@
           "duration_min": 45,
           "interviewer_role": "Hiring manager",
           "notes": "Products led end to end and cross-functional challenges."
+        }
+      ]
+    },
+    {
+      "role_family": "tpm",
+      "levels": ["Technical Program Manager", "Senior Technical Program Manager", "Principal Technical Program Manager"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Program background, technical depth and product-area interest. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager",
+          "notes": "Mostly behavioral and program mechanics: prioritization, KPIs, conflict, with light technical probing."
+        },
+        {
+          "name": "Technical program depth",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Senior TPM or engineering lead",
+          "notes": "Hardware and software development lifecycle, chip or software release milestones, and the team's domain (AI software, silicon, data center)."
+        },
+        {
+          "name": "Program case study",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Senior TPM",
+          "notes": "A program at risk or a hardware/software co-development schedule; some loops ask for a presentation of a past program."
+        },
+        {
+          "name": "Cross-functional and behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "TPM peer or partner engineering manager",
+          "notes": "Influence without authority, unblocking teams across geographies, and decisions that were not well received."
+        },
+        {
+          "name": "Director or VP",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Director or VP",
+          "notes": "Reported for senior roles: strategic thinking, leadership approach and fit."
+        }
+      ]
+    },
+    {
+      "role_family": "other",
+      "levels": ["Solutions Architect", "Senior Solutions Architect", "Principal Solutions Architect"],
+      "rounds": [
+        {
+          "name": "Recruiter or hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Recruiter or hiring manager",
+          "notes": "Solutions architect loop. Resume walkthrough, customer-facing and technical background, and motivation."
+        },
+        {
+          "name": "Technical screen",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Solutions architect",
+          "notes": "Deep learning, GPU computing and system architecture; parallel programming or inference optimization questions are reported."
+        },
+        {
+          "name": "Customer scenario presentation",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Panel of solutions architects and sales leaders",
+          "notes": "About 30 minutes presenting an AI infrastructure design for a given customer scenario, then questions."
+        },
+        {
+          "name": "NVIDIA platform deep dive",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior solutions architect",
+          "notes": "DGX and HGX systems, NVLink versus InfiniBand, cluster design and troubleshooting low GPU utilization."
+        },
+        {
+          "name": "Customer engagement and behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager or sales partner",
+          "notes": "Difficult customers, saying no, influencing product teams with customer feedback. Even leadership conversations are technical."
         }
       ]
     }
@@ -249,6 +395,41 @@
       "pattern": "Choose between competing product investments with limited resources and explain the trade-offs",
       "competencies": ["prioritization", "structure", "recommendation"],
       "values": []
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Influence without authority",
+      "pattern": "A time the candidate aligned teams they did not manage, often across hardware, software or geographies, to keep work moving",
+      "competencies": ["collaboration", "communication", "impact"],
+      "values": ["One Team"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Deep learning from first principles",
+      "pattern": "Explain how a model component or training technique works step by step, then what limits its speed or memory on a GPU",
+      "competencies": ["technical_depth", "accuracy", "reasoning"],
+      "values": ["Excellence and Determination"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Inference and serving performance",
+      "pattern": "Design or tune a model serving path for a throughput and latency target and explain each optimization",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Excellence and Determination", "Speed and Agility"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Program at risk",
+      "pattern": "A hardware or software program is slipping a milestone; diagnose the cause, choose trade-offs and decide what to tell leadership",
+      "competencies": ["problem_framing", "prioritization", "recommendation"],
+      "values": ["Intellectual Honesty", "Speed and Agility"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Customer AI infrastructure design",
+      "pattern": "Propose GPU infrastructure for a customer's AI workload, sizing it and justifying system and network choices",
+      "competencies": ["problem_framing", "estimation_logic", "recommendation"],
+      "values": ["One Team"]
     }
   ],
   "sample_questions": [
@@ -750,6 +931,456 @@
       },
       "role_families": ["pm", "tpm"],
       "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Walk me through autoregressive decoding in an LLM. What does the KV cache store, and what does it cost?",
+      "strong_answer": "Explain that the model generates one token at a time, and each step attends to all earlier tokens. The KV cache keeps the key and value tensors of past tokens per layer and head, so each step only computes projections for the new token. Size it: layers x heads x head dimension x sequence length x batch x 2 x bytes per element. Then name the costs: memory grows with context and batch, decode becomes memory-bandwidth bound, and fragmentation limits batch size. Mention fixes such as paged allocation, grouped-query attention, and quantized caches.",
+      "competencies": ["technical_depth", "accuracy", "reasoning"],
+      "values": ["Excellence and Determination"],
+      "source_url": "https://interviewing.io/nvidia-interview-questions",
+      "hints": {
+        "looking_for": [
+          "Whether you understand token-by-token generation",
+          "Whether you can size the cache and name its bottleneck"
+        ],
+        "strong_signals": [
+          "Explains what is cached and why it avoids recomputation",
+          "Gives a size formula and a rough number",
+          "Says decode is memory-bandwidth bound and names fixes"
+        ],
+        "watch_outs": [
+          "Describing the cache without its memory cost",
+          "Ignoring batch size and context length"
+        ]
+      },
+      "role_families": ["data_ml", "swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Explain beam search for LLM inference and the time and memory cost of each step.",
+      "strong_answer": "Describe keeping the k best partial sequences, expanding each with the next-token distribution, scoring by summed log probability (often length-normalized), and keeping the top k. Give the cost per step: k forward passes or one batched pass, a top-k over k x vocabulary candidates, and k copies of the KV cache, which can share prefixes. Compare with greedy and sampling, and say when beam search helps (translation) or hurts (open-ended chat). Strong answers mention batching the beams on the GPU.",
+      "competencies": ["technical_depth", "reasoning", "trade_offs"],
+      "values": [],
+      "source_url": "https://interviewing.io/nvidia-interview-questions",
+      "hints": {
+        "looking_for": [
+          "Whether you know how beam search works step by step",
+          "How you reason about its cost on a GPU"
+        ],
+        "strong_signals": [
+          "Explains expansion, scoring and pruning to k beams",
+          "Gives per-step compute and KV cache cost",
+          "Compares with greedy decoding and sampling"
+        ],
+        "watch_outs": [
+          "No complexity analysis",
+          "Forgetting the extra KV cache memory per beam"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "What is LoRA, and why does it make fine-tuning a large model cheaper?",
+      "strong_answer": "Explain that LoRA freezes the pretrained weights and learns a low-rank update for chosen layers: two small matrices whose product has the shape of the original weight. Only those small matrices get gradients and optimizer state, so training memory and checkpoint size drop sharply. Discuss the choice of rank and target layers, merging the update into the weights for inference at no extra latency, and serving many adapters on one base model. Mention limits: lower capacity than full fine-tuning for large domain shifts.",
+      "competencies": ["technical_depth", "clarity_of_explanation", "trade_offs"],
+      "values": [],
+      "source_url": "https://interviewing.io/nvidia-interview-questions",
+      "hints": {
+        "looking_for": [
+          "Whether you understand parameter-efficient fine-tuning",
+          "How you connect the method to memory and serving costs"
+        ],
+        "strong_signals": [
+          "Explains the frozen base and low-rank update",
+          "Says where the memory savings come from",
+          "Mentions merging and multi-adapter serving"
+        ],
+        "watch_outs": [
+          "Only reciting the acronym",
+          "Claiming it is always as good as full fine-tuning"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Compare quantization approaches for inference. When would you choose each?",
+      "strong_answer": "Cover post-training quantization (weight-only or weights and activations, INT8, FP8 or 4-bit) versus quantization-aware training. Explain the trade-offs: memory and bandwidth savings, speedups only when the hardware has fast kernels for that format, and accuracy loss from outliers in activations. Mention calibration data, per-channel or per-group scales, and keeping sensitive layers at higher precision. Say how you would validate: accuracy on a task suite plus measured latency and throughput.",
+      "competencies": ["technical_depth", "trade_offs", "accuracy"],
+      "values": ["Excellence and Determination"],
+      "source_url": "https://www.cleverprep.com/companies/nvidia/machine-learning-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you know the main quantization options",
+          "How you weigh accuracy against speed and memory"
+        ],
+        "strong_signals": [
+          "Contrasts post-training and quantization-aware training",
+          "Ties speedups to hardware support for the format",
+          "Validates with both accuracy and measured performance"
+        ],
+        "watch_outs": [
+          "Assuming lower precision is always faster",
+          "No plan to check accuracy"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design an inference serving system for a large model that must handle about 10,000 requests per second.",
+      "strong_answer": "Start with targets: latency per request (time to first token and per token), throughput, model size and traffic shape. Then cover the request path, a router and load balancer, dynamic or continuous batching, model replicas and how the model is split across GPUs, KV cache management, autoscaling and admission control. Estimate GPUs needed from measured tokens per second per GPU. Discuss trade-offs between batch size and latency, and monitoring of GPU utilization and tail latency.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Excellence and Determination"],
+      "source_url": "https://www.cleverprep.com/companies/nvidia/machine-learning-engineer",
+      "hints": {
+        "looking_for": [
+          "How you design for a throughput and latency target",
+          "Whether you size the system with numbers"
+        ],
+        "strong_signals": [
+          "Clarifies latency, throughput and model size first",
+          "Uses dynamic batching and explains its latency cost",
+          "Estimates GPU count from per-GPU throughput"
+        ],
+        "watch_outs": [
+          "Generic web-service design with no GPU specifics",
+          "No numbers behind the capacity plan"
+        ]
+      },
+      "role_families": ["data_ml", "swe"],
+      "levels": ["senior", "staff_principal"]
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to bridge the gap between research and engineering.",
+      "strong_answer": "Pick a case where a research result had to become production code or a product feature. Explain what was hard: reproducibility, performance, scale or different priorities. Show your own actions, such as building a benchmark both sides trusted, simplifying the method, or setting a shared definition of done. Quantify the result, for example speedup or accuracy kept. NVIDIA values one team across research and engineering, so show shared credit. Pitfall: blaming the other side.",
+      "competencies": ["collaboration", "communication", "impact"],
+      "values": ["One Team", "Intellectual Honesty"],
+      "source_url": "https://www.cleverprep.com/companies/nvidia/machine-learning-engineer",
+      "hints": {
+        "looking_for": [
+          "How you turn research into working systems",
+          "Whether you work well across research and engineering"
+        ],
+        "strong_signals": [
+          "Names the concrete gap, such as speed or reproducibility",
+          "Shows your own actions and a shared measure of success",
+          "Quantifies the outcome"
+        ],
+        "watch_outs": [
+          "Blaming researchers or engineers",
+          "No measurable result"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you build the schedule for a program where new hardware and its software stack are developed at the same time?",
+      "strong_answer": "Lay out the hardware milestones (architecture, tape-out, first silicon, bring-up, production) and map software work to each: work on simulators and emulation before silicon, then bring-up and validation. Identify the critical path and dependencies in both directions, add buffers where hardware dates are uncertain, and define exit criteria per milestone. Explain how you track risk and what you would cut or move if silicon slips. Close with how you report status to leadership.",
+      "competencies": ["structure", "prioritization", "problem_framing"],
+      "values": ["One Team", "Speed and Agility"],
+      "source_url": "https://www.cleverprep.com/companies/nvidia/technical-program-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you understand hardware and software milestones",
+          "How you manage dependencies and schedule risk"
+        ],
+        "strong_signals": [
+          "Maps software work to pre-silicon and post-silicon phases",
+          "Names the critical path and where buffers go",
+          "Has a plan for a silicon slip"
+        ],
+        "watch_outs": [
+          "Treating it like a pure software release",
+          "No exit criteria for milestones"
+        ]
+      },
+      "role_families": ["tpm"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time a program you ran was at risk of missing a critical milestone.",
+      "strong_answer": "Describe the program, the milestone and why it mattered. Explain how you spotted the risk early (metrics, dependency tracking), what options you laid out, the trade-off you drove, and how you told stakeholders, including bad news. Give the result in dates or scope and what you changed in your process. NVIDIA prizes intellectual honesty, so raise risk early and plainly. Pitfall: a story where you only reported status and others solved it.",
+      "competencies": ["ownership", "impact", "communication"],
+      "values": ["Intellectual Honesty", "Speed and Agility"],
+      "source_url": "https://www.cleverprep.com/companies/nvidia/technical-program-manager",
+      "hints": {
+        "looking_for": [
+          "How early you detect and raise risk",
+          "How you drive trade-offs to recover"
+        ],
+        "strong_signals": [
+          "Shows the early warning signal you used",
+          "Lays out options and the trade-off chosen",
+          "Reports bad news openly and on time"
+        ],
+        "watch_outs": [
+          "Only reporting status while others acted",
+          "Hiding the risk until it was too late"
+        ]
+      },
+      "role_families": ["tpm", "pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a decision you made that was not well received. How did you build buy-in afterwards?",
+      "strong_answer": "Explain the decision, why you made it and who disagreed. Show you listened to the objections, shared the data and reasoning openly, and changed parts of the plan where the critics were right. Describe concrete steps such as a review with affected teams or a checkpoint to revisit. End with the outcome and the relationships. Pitfall: forcing the decision through on authority alone.",
+      "competencies": ["conflict_handling", "communication", "collaboration"],
+      "values": ["One Team", "Intellectual Honesty"],
+      "source_url": "https://www.aced.io/experiences/nvidia-senior-technical-program-manager-interview-a29707",
+      "hints": {
+        "looking_for": [
+          "How you handle pushback on your decisions",
+          "Whether you build alignment instead of forcing it"
+        ],
+        "strong_signals": [
+          "Listens to objections and shares the reasoning",
+          "Adjusts where the critics were right",
+          "Ends with the outcome and the relationship"
+        ],
+        "watch_outs": [
+          "Relying on authority alone",
+          "Dismissing the people who disagreed"
+        ]
+      },
+      "role_families": ["tpm", "pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Walk me through a large program you ran end to end. Which KPIs did you use to judge its success?",
+      "strong_answer": "Give the goal, scope, teams involved and your role. Name a few KPIs tied to outcomes (delivery dates met, quality, adoption, performance) plus leading indicators you tracked weekly. Explain how a KPI changed a decision during the program. Close with the measured result and what you would change. Pitfall: listing activity metrics like meetings held or tickets closed.",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Excellence and Determination"],
+      "source_url": "https://www.aced.io/experiences/nvidia-senior-technical-program-manager-interview-a29707",
+      "hints": {
+        "looking_for": [
+          "The scale of programs you have run",
+          "Whether you measure outcomes, not activity"
+        ],
+        "strong_signals": [
+          "Clear scope, teams and your own role",
+          "Outcome KPIs plus leading indicators",
+          "A decision the data changed"
+        ],
+        "watch_outs": [
+          "Activity metrics only",
+          "No measured result"
+        ]
+      },
+      "role_families": ["tpm"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Compare NVLink and InfiniBand. When does each matter for a customer's AI cluster?",
+      "strong_answer": "Explain that NVLink connects GPUs within a node (or a rack-scale domain) with very high bandwidth, used for tensor and pipeline parallel traffic, while InfiniBand (or high-speed Ethernet) connects nodes across the cluster for data-parallel gradient exchange and storage. Discuss bandwidth and latency differences, topology, and how the parallelism strategy decides which link is the bottleneck. Tie it to sizing a customer cluster and to collective communication libraries.",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": [],
+      "source_url": "https://www.cleverprep.com/companies/nvidia/solutions-architect",
+      "hints": {
+        "looking_for": [
+          "Whether you understand GPU cluster networking",
+          "How you match interconnects to workloads"
+        ],
+        "strong_signals": [
+          "Separates scale-up inside a node from scale-out across nodes",
+          "Links each parallelism type to the network it stresses",
+          "Ties the answer to a customer sizing decision"
+        ],
+        "watch_outs": [
+          "Treating the two as interchangeable",
+          "No link to the customer's workload"
+        ]
+      },
+      "role_families": ["other"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "A customer says their GPUs are badly underused during training. How would you troubleshoot it?",
+      "strong_answer": "Start by measuring: GPU utilization over time, memory use, and a profiler timeline. Check the usual causes in order: the input pipeline (data loading, preprocessing on CPU, storage throughput), small batch sizes, host-device copies, communication stalls between GPUs or nodes, and kernels with low occupancy or no mixed precision. Propose a fix for each finding and verify with numbers. Explain how you would report results to the customer clearly.",
+      "competencies": ["reasoning", "technical_depth", "clarity_of_explanation"],
+      "values": ["Excellence and Determination"],
+      "source_url": "https://www.cleverprep.com/companies/nvidia/solutions-architect",
+      "hints": {
+        "looking_for": [
+          "How you diagnose performance problems systematically",
+          "Whether you measure before fixing"
+        ],
+        "strong_signals": [
+          "Starts with profiling data, not guesses",
+          "Checks input pipeline, batch size, copies and communication",
+          "Verifies each fix with numbers"
+        ],
+        "watch_outs": [
+          "Jumping straight to buying more hardware",
+          "A list of causes with no order or method"
+        ]
+      },
+      "role_families": ["other", "data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Design data center infrastructure for a customer who wants to train large language models.",
+      "strong_answer": "Clarify the model sizes, training timeline, budget, and whether they also need inference. Estimate compute from model size and tokens, then the GPU count for the timeline. Cover node choice, intra-node and inter-node networking, storage throughput for data and checkpoints, power and cooling, and the software stack and scheduler. Discuss build versus cloud options and phased rollout. Recommend one design with its risks.",
+      "competencies": ["problem_framing", "estimation_logic", "recommendation"],
+      "values": ["One Team"],
+      "source_url": "https://www.cleverprep.com/companies/nvidia/solutions-architect",
+      "hints": {
+        "looking_for": [
+          "How you turn customer needs into a system design",
+          "Whether you size compute with clear assumptions"
+        ],
+        "strong_signals": [
+          "Clarifies goals, timeline and budget first",
+          "Estimates GPU count from compute needed",
+          "Covers network, storage, power and software, then recommends"
+        ],
+        "watch_outs": [
+          "Listing products with no sizing",
+          "Ignoring storage, power or operations"
+        ]
+      },
+      "role_families": ["other"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to say no to a customer request.",
+      "strong_answer": "Describe the request, why it was not right (technical limits, cost, roadmap or risk to the customer), and how you said no with data and an alternative. Show that you kept the relationship and, if relevant, passed the need to the product team. End with what happened to the customer's goal. Pitfall: saying no without explaining or offering a path.",
+      "competencies": ["communication", "conflict_handling", "collaboration"],
+      "values": ["Intellectual Honesty"],
+      "source_url": "https://www.cleverprep.com/companies/nvidia/solutions-architect",
+      "hints": {
+        "looking_for": [
+          "Whether you can be honest with customers",
+          "How you protect the relationship while saying no"
+        ],
+        "strong_signals": [
+          "Explains the reason with data",
+          "Offers an alternative path",
+          "Passes the need on to the product team"
+        ],
+        "watch_outs": [
+          "A flat no with no explanation",
+          "Saying yes to everything"
+        ]
+      },
+      "role_families": ["other"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you prioritize features for the next generation of a GPU product?",
+      "strong_answer": "Segment customers, such as cloud providers, enterprises, researchers, gamers and developers, and name the workloads each cares about. Translate those into needs: compute, memory capacity and bandwidth, power, interconnect, and software support. Weigh each candidate feature by customer value, competitive position, cost and schedule risk. Make a clear call and say what you would give up. Strong answers treat the software ecosystem as part of the product.",
+      "competencies": ["prioritization", "user_and_business_sense", "recommendation"],
+      "values": ["Innovation"],
+      "source_url": "https://www.cleverprep.com/companies/nvidia/product-manager",
+      "hints": {
+        "looking_for": [
+          "How you connect customer workloads to hardware features",
+          "Whether you make a clear prioritization call"
+        ],
+        "strong_signals": [
+          "Segments customers and their workloads",
+          "Weighs value, competition, cost and schedule risk",
+          "Treats software support as part of the product"
+        ],
+        "watch_outs": [
+          "Picking specs with no customer link",
+          "Refusing to trade anything off"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you measure success for an AI developer platform?",
+      "strong_answer": "Define the platform's goal and its users first. Build a metric chain: reach (sign-ups, downloads), activation (time to first working result), engagement and retention (weekly active developers, projects in production), and business impact (paid usage, GPU demand it drives). Pick one primary metric, add guardrails such as performance and support load, and say how you would break metrics down by segment. Pitfall: counting downloads only.",
+      "competencies": ["problem_framing", "user_and_business_sense", "structure"],
+      "values": [],
+      "source_url": "https://www.cleverprep.com/companies/nvidia/product-manager",
+      "hints": {
+        "looking_for": [
+          "How you choose metrics tied to the platform's goal",
+          "Whether you think about developers as users"
+        ],
+        "strong_signals": [
+          "Builds a chain from reach to activation to retention to business",
+          "Picks a primary metric and guardrails",
+          "Segments metrics by user type"
+        ],
+        "watch_outs": [
+          "Vanity metrics such as downloads only",
+          "No link to business outcomes"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "One of your product lines is losing market share. What do you do?",
+      "strong_answer": "First confirm the size and where the loss is: segments, regions, price points. Look for causes outside (a competitor's new product, price changes, a market shift) and inside (performance gaps, supply, software issues, pricing). Form hypotheses and the data to test each. Then propose responses with trade-offs, such as pricing, a software update, repositioning or speeding up the next product, and recommend one with success metrics. Pitfall: cutting price as the only answer.",
+      "competencies": ["problem_framing", "structure", "recommendation"],
+      "values": ["Intellectual Honesty", "Speed and Agility"],
+      "source_url": "https://www.joinleland.com/library/a/nvidia-product-manager-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you diagnose a competitive decline",
+          "Whether you recommend a response with trade-offs"
+        ],
+        "strong_signals": [
+          "Locates the loss before explaining it",
+          "Considers outside and inside causes",
+          "Recommends one response with metrics"
+        ],
+        "watch_outs": [
+          "Price cuts as the only lever",
+          "No data to test the hypotheses"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Explain how a cache coherence protocol such as MESI keeps multiple cores' caches consistent.",
+      "strong_answer": "Name the four states (Modified, Exclusive, Shared, Invalid) and walk through transitions: a read miss, a write to a shared line that invalidates other copies, and a write-back on eviction of a modified line. Explain snooping versus directory-based approaches and why directories scale better. Discuss the performance costs: coherence traffic and false sharing, with how to avoid it through data layout. Clear state diagrams and a concrete example are the main signal.",
+      "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
+      "values": [],
+      "source_url": "https://prepfully.com/interview-guides/nvidia-design-verification-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you understand cache coherence",
+          "How clearly you explain state transitions"
+        ],
+        "strong_signals": [
+          "Names the states and walks through key transitions",
+          "Contrasts snooping and directory protocols",
+          "Explains false sharing and how to avoid it"
+        ],
+        "watch_outs": [
+          "Listing states without transitions",
+          "No link to performance"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
     }
   ],
   "bar_by_level": [
@@ -757,44 +1388,80 @@
       "level_name": "IC1",
       "normalized_level": "new_grad",
       "role_family": "swe",
-      "scope_expectation": "Works on defined tasks with review from a more senior engineer."
+      "scope_expectation": "New college grad (posting pay band 'Level 1'; a BS or MS, sometimes a PhD, and no years required). Works on defined tasks with review from a more senior engineer and ramps up quickly on the hardware and CUDA."
     },
     {
       "level_name": "IC2",
       "normalized_level": "mid",
       "role_family": "swe",
-      "scope_expectation": "Owns small features end to end with light review; work is still scoped by others."
+      "scope_expectation": "Engineer with about 2 to 5 years (posting band 'Level 2'; untitled 'System Software Engineer' postings ask for 3+ years). Owns small features end to end with light review; work is still scoped by others."
     },
     {
       "level_name": "IC3",
       "normalized_level": "senior",
       "role_family": "swe",
-      "scope_expectation": "Owns a component and delivers against goals without close supervision; reviews code and debugs across module boundaries."
+      "scope_expectation": "Senior engineer (posting band 'Level 3'; Senior postings ask for 3 to 5+ years). Owns a component, drives complex work across teams without close supervision, reviews code and debugs across module boundaries."
     },
     {
       "level_name": "IC4",
       "normalized_level": "senior",
       "role_family": "swe",
-      "scope_expectation": "Sets the plan for an area and carries projects that depend on two or more teams, often across hardware and software."
+      "scope_expectation": "Senior engineer at the upper band (posting band 'Level 4'; some Senior postings ask for 8 to 10+ years). Sets the plan for an area, writes architecture specs, and carries projects that depend on two or more teams, often across hardware and software."
     },
     {
       "level_name": "IC5",
       "normalized_level": "staff_principal",
       "role_family": "swe",
-      "scope_expectation": "Owns a large product area and sets its technical direction; other teams consult them before building."
+      "scope_expectation": "Senior staff or tech lead (posting band 'Level 5'). Owns a large product area and sets its technical direction; other teams consult them before building."
     },
     {
       "level_name": "IC6",
       "normalized_level": "staff_principal",
       "role_family": "swe",
-      "scope_expectation": "Principal engineer: sets technical direction across several teams or a whole area of NVIDIA software."
+      "scope_expectation": "Principal engineer (Principal postings ask for about 12+ years). Sets technical direction across several teams or a whole area of NVIDIA software, such as a compiler stack or inference runtime, and settles the hardest technical disagreements."
+    },
+    {
+      "level_name": "IC7",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Distinguished engineer (postings ask for 15 to 18+ years). Defines multi-generation strategy across hardware, software and systems, aligns architects from many teams on shared metrics, presents to senior technical and business leaders, and mentors senior engineers."
+    },
+    {
+      "level_name": "Senior Deep Learning Engineer",
+      "normalized_level": "senior",
+      "role_family": "data_ml",
+      "scope_expectation": "Owns model training or inference work for a product area, tunes performance on NVIDIA GPUs, and works with research and product teams."
+    },
+    {
+      "level_name": "Principal Deep Learning Engineer",
+      "normalized_level": "staff_principal",
+      "role_family": "data_ml",
+      "scope_expectation": "About 12+ years. Leads model performance or algorithm direction across architectures and accelerator types, contributes to public frameworks such as TensorRT, and partners with several product groups."
+    },
+    {
+      "level_name": "Senior Technical Program Manager",
+      "normalized_level": "senior",
+      "role_family": "tpm",
+      "scope_expectation": "Often 8 to 10+ years. Runs several concurrent cross-functional programs, aligns software with hardware timelines, builds risk metrics, and reports status to executives."
+    },
+    {
+      "level_name": "Product Manager",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Postings use pay bands Level 4 and 5. Owns a product or platform area, works deep in engineering trade-offs, and drives go-to-market with sales and partners."
+    },
+    {
+      "level_name": "Senior Solutions Architect",
+      "normalized_level": "senior",
+      "role_family": "other",
+      "scope_expectation": "Leads technical engagements with major customers, designs GPU infrastructure and AI solutions, and feeds customer needs back to product teams."
     }
   ],
   "persona": {
-    "tone": "Technical, direct and no-nonsense; respectful but not chatty",
-    "pace": "Fast, with several questions per session and quick drills into low-level detail",
-    "pushback_style": "Asks 'how close is that to the theoretical limit?' and 'what does the hardware actually do?'; challenges hand-wavy answers and asks for numbers",
-    "closing_style": "Short closing with a few minutes for questions about the team's technical work"
+    "tone": "Technical, direct and conversational; a future teammate talking shop rather than reading from a script",
+    "pace": "Fast; checks fundamentals early, then drills quickly into low-level detail of the candidate's own projects",
+    "pushback_style": "Asks 'how close is that to the theoretical limit?', 'what does the hardware actually do?' and 'how did you measure it?'; challenges hand-wavy answers, removes shortcuts (no library call, no built-in), and gives a hint if the candidate is stuck and says so",
+    "closing_style": "Leaves about 5 to 10 minutes for questions about the team's technical work; no feedback given in the room"
   },
   "scoring_weights": {
     "technical_depth": 1.6,
@@ -804,15 +1471,16 @@
     "depth_of_experience": 1.3,
     "role_fit": 1.2,
     "learning_from_failure": 1.1,
-    "collaboration": 1.1,
+    "collaboration": 1.2,
+    "communication": 1.1,
     "estimation_logic": 1.1
   },
   "values_share": 0.2,
   "case_style": {
-    "product_sense": 0.35,
-    "estimation": 0.25,
-    "system_thinking": 0.4,
-    "notes": "PM cases mix product improvement for NVIDIA products, market sizing and expansion, and prioritization with technical constraints. Technical depth expectations rise for AI infrastructure and CUDA teams."
+    "product_sense": 0.4,
+    "estimation": 0.15,
+    "system_thinking": 0.45,
+    "notes": "PM cases are product strategy and prioritization for NVIDIA platforms (GPUs, developer platforms, cloud gaming), go-to-market and competitive positioning, always tied to hardware/software trade-offs. Market sizing appears in one guide only. Some loops use a prepared case presentation. TPM cases are programs at risk and hardware/software schedules; solutions architect cases are customer AI infrastructure designs."
   },
   "sources": [
     {
@@ -824,7 +1492,19 @@
     {
       "url": "https://www.kirstinferguson.com/nvidia-built-its-culture-around-1-principle-and-it-saved-the-company/",
       "title": "NVIDIA built its culture around one principle (intellectual honesty)",
-      "retrieved_at": "2026-10-10",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "persona"]
+    },
+    {
+      "url": "https://www.nvidia.com/en-gb/about-nvidia/careers/how-we-hire/",
+      "title": "Want to Be an NVIDIAN? (NVIDIA official hiring process page)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "persona"]
+    },
+    {
+      "url": "https://fortune.com/2024/06/26/nvidia-vp-simona-jankowski-salutes-jensen-huang-leadership-3-key-principles",
+      "title": "Departing NVIDIA VP on first principles and speed-of-light execution",
+      "retrieved_at": "2026-10-28",
       "fields": ["values_framework", "persona"]
     },
     {
@@ -836,8 +1516,8 @@
     {
       "url": "https://interviewing.io/nvidia-interview-questions",
       "title": "NVIDIA interview process and questions",
-      "retrieved_at": "2026-10-10",
-      "fields": ["loop_structure", "question_patterns"]
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "persona", "scoring_weights"]
     },
     {
       "url": "https://igotanoffer.com/en/advice/nvidia-product-manager-interview",
@@ -848,26 +1528,117 @@
     {
       "url": "https://www.designgurus.io/blog/nvidia-software-engineer-levels",
       "title": "NVIDIA software engineer levels",
-      "retrieved_at": "2026-10-10",
+      "retrieved_at": "2026-10-28",
       "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://builtin.com/job/software-engineer-dl-libraries-infrastructure-new-college-grad-2026/8292922",
+      "title": "NVIDIA job posting: Software Engineer, DL Libraries Infrastructure - New College Grad 2026 (pay bands Level 1 and 2)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://jobs.anitab.org/companies/nvidia/jobs/43327936-system-software-engineer",
+      "title": "NVIDIA job posting: System Software Engineer (3+ years)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://jobs.anitab.org/companies/nvidia/jobs/55130503-senior-software-engineer-gpu",
+      "title": "NVIDIA job posting: Senior Software Engineer - GPU (pay bands Level 3 and 4)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level", "scoring_weights"]
+    },
+    {
+      "url": "https://jobs.anitab.org/companies/nvidia/jobs/40228456-senior-system-software-engineer",
+      "title": "NVIDIA job posting: Senior System Software Engineer, CUDA driver (5+ years)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level", "scoring_weights"]
+    },
+    {
+      "url": "https://builtin.com/job/principal-deep-learning-software-engineer-llm-performance/6233580",
+      "title": "NVIDIA job posting: Principal Deep Learning Software Engineer, LLM Performance (12+ years)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level", "loop_structure", "scoring_weights"]
+    },
+    {
+      "url": "https://jobs.anitab.org/companies/nvidia/jobs/87968325-distinguished-engineer-end-to-end-scaling-performance-architecture",
+      "title": "NVIDIA job posting: Distinguished Engineer, End-to-End Scaling Performance Architecture (18+ years)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://jobs.anitab.org/companies/nvidia/jobs/65064065-distinguished-engineer-jax",
+      "title": "NVIDIA job posting: Distinguished Engineer, JAX (18+ years)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://remowork.life/jobs/6adbf7f4d14075bef1e4915f/senior-technical-program-manager-ai-inference",
+      "title": "NVIDIA job posting: Senior Technical Program Manager, AI Inference",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level", "loop_structure"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/nvidia/machine-learning-engineer",
+      "title": "NVIDIA machine learning engineer interview guide",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/nvidia/technical-program-manager",
+      "title": "NVIDIA technical program manager interview guide",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.aced.io/experiences/nvidia-senior-technical-program-manager-interview-a29707",
+      "title": "NVIDIA senior TPM interview experience (candidate report)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "persona"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/nvidia/solutions-architect",
+      "title": "NVIDIA solutions architect interview guide",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style", "persona"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/nvidia/product-manager",
+      "title": "NVIDIA product manager interview guide",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style", "bar_by_level"]
+    },
+    {
+      "url": "https://www.joinleland.com/library/a/nvidia-product-manager-interview-process",
+      "title": "NVIDIA product manager interview process",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://prepfully.com/interview-guides/nvidia-design-verification-engineer",
+      "title": "NVIDIA design verification engineer interview guide",
+      "retrieved_at": "2026-10-28",
+      "fields": ["question_patterns", "persona"]
     }
   ],
   "field_confidence": {
     "values_framework": "high",
     "loop_structure": "medium",
     "question_patterns": "medium",
-    "bar_by_level": "low",
-    "persona": "low",
-    "scoring_weights": "low",
-    "case_style": "low"
+    "bar_by_level": "medium",
+    "persona": "medium",
+    "scoring_weights": "medium",
+    "case_style": "medium"
   },
   "low_confidence_notes": [
-    "values_framework: the Code of Conduct PDF was too large to open; value names and summaries are from the search snippet of that PDF and secondary pages quoting it.",
-    "loop_structure: NVIDIA hires by team and loops vary widely; the round list is a typical pattern.",
-    "loop_structure: PM level names are generic; no public source confirms NVIDIA PM titles.",
-    "bar_by_level: NVIDIA publishes no level map; IC1-IC6 and scopes come from one third-party source and levels.fyi data.",
-    "persona: inferred from candidate reports of fast, detail-heavy technical rounds.",
-    "case_style: PM case mix is based on one aggregated guide.",
-    "scoring_weights: estimated; no public source gives weights."
+    "values_framework: the Code of Conduct PDF is still too large for our fetcher (over 10 MB); the five value names are confirmed by the PDF's search snippet and several secondary pages, and descriptions are paraphrased from those. The value weights are our estimate.",
+    "loop_structure: NVIDIA's official page confirms phone interviews, 30-60 minute panels, HackerRank coding and a required onsite, but each team runs its own loop; round lists per role family are typical patterns from prep guides and candidate reports.",
+    "loop_structure: the solutions architect loop is the only 'other' family modeled; ASIC and hardware design loops are mostly RTL, SystemVerilog and coding and are not simulated. The data_ml, tpm and solutions architect loops each rest on one or two prep guides plus candidate reports.",
+    "bar_by_level: NVIDIA publishes no ladder. The IC labels come from one third-party source; official job postings (read through job-board mirrors, because the Workday site renders no text for our fetcher) confirm 'Level 1' to 'Level 5' pay bands and the years asked for Senior, Principal and Distinguished titles. Data_ml, tpm, pm and solutions architect scopes are our summaries of single postings.",
+    "persona: drawn from prep guides and candidate reports that agree on conversational, detail-drilling interviewers; NVIDIA publishes no description of interviewer style.",
+    "scoring_weights: derived from what official job postings consistently require (deep C/C++ and architecture skills, collaboration and influence across groups) and from the stated values; no public source gives competency weights, so the numbers are our estimate.",
+    "case_style: PM case mix now rests on three prep guides that agree on product strategy plus hardware/software trade-offs; only one mentions market sizing, so estimation is weighted low.",
+    "sources: igotanoffer.com now returns HTTP 403 to our fetcher, so its three pages were not re-checked and keep their 2026-10-10 date; interviewquery.com returned HTTP 429."
   ]
 }

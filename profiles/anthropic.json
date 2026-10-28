@@ -2,10 +2,10 @@
   "company_name": "Anthropic",
   "company_slug": "anthropic",
   "meta": {
-    "version": 1,
+    "version": 2,
     "status": "draft",
     "reviewed_by": null,
-    "researched_at": "2026-10-10",
+    "researched_at": "2026-10-28",
     "published_at": null
   },
   "values_framework": {
@@ -23,7 +23,7 @@
       },
       {
         "name": "Hold light and shade",
-        "description": "Take AI's risks seriously while also seeing its potential benefits; hold both at once.",
+        "description": "Pursue AI's benefits while understanding and guarding against its bad outcomes; hold both at once.",
         "evidence_signals": [
           "Articulates concrete risks and concrete benefits of the same technology",
           "Avoids both hype and doom; reasons with nuance and uncertainty",
@@ -33,7 +33,7 @@
       },
       {
         "name": "Be good to our users",
-        "description": "Bring generosity and kindness to interactions with customers, policymakers, colleagues and affected communities.",
+        "description": "Bring generosity and kindness to everyone the technology touches: customers, policymakers, colleagues and affected communities, not only paying users.",
         "evidence_signals": [
           "Shows care for users' real needs and trust",
           "Describes treating colleagues and partners generously",
@@ -53,11 +53,12 @@
       },
       {
         "name": "Do the simple thing that works",
-        "description": "Be empirical and pragmatic: prefer simple, measurable approaches that deliver impact over unnecessary complexity.",
+        "description": "Be empirical and pragmatic: prefer the simple, measurable approach that delivers impact over a sophisticated one that is not needed.",
         "evidence_signals": [
           "Chose a simple solution and explains why it was enough",
           "Uses experiments and data to decide",
-          "Cuts complexity that did not pay off"
+          "Cuts complexity that did not pay off",
+          "Builds tooling or abstractions only when they clearly pay for themselves"
         ],
         "weight": 1.1
       },
@@ -67,17 +68,19 @@
         "evidence_signals": [
           "Admits mistakes and uncertainty plainly",
           "Gives or receives hard feedback directly and kindly",
-          "Credits others; low ego in disagreements"
+          "Credits others; low ego in disagreements",
+          "Is transparent about how they did the work, including use of AI tools"
         ],
         "weight": 1.2
       },
       {
         "name": "Put the mission first",
-        "description": "A shared purpose, the safe transition through transformative AI, is the final arbiter of decisions.",
+        "description": "A shared purpose, the safe transition through transformative AI, is the final arbiter of decisions, and each person takes personal ownership of it.",
         "evidence_signals": [
           "Motivation is clearly tied to the mission, not only the role or brand",
           "Describes putting the shared goal above personal or team credit",
-          "Can engage critically with the mission and Anthropic's strategy"
+          "Can engage critically with the mission and Anthropic's strategy",
+          "Picks up work outside the job description when the shared goal needs it"
         ],
         "weight": 1.4
       }
@@ -86,7 +89,7 @@
   "loop_structure": [
     {
       "role_family": "swe",
-      "levels": [],
+      "levels": ["Software Engineer", "Senior Software Engineer", "Staff Software Engineer", "Senior Staff Software Engineer"],
       "rounds": [
         {
           "name": "Recruiter screen",
@@ -100,55 +103,55 @@
           "interview_type": null,
           "duration_min": 90,
           "interviewer_role": "Engineer",
-          "notes": "CodeSignal-style multi-level practical problem or live coding. Not simulated in v1."
+          "notes": "60-90 minute CodeSignal-style multi-level practical problem or live coding. Take-homes are done without AI unless Anthropic says otherwise; some teams (performance engineering) use a 2-hour take-home where AI is allowed. Not simulated in v1."
         },
         {
           "name": "Coding (onsite)",
           "interview_type": null,
           "duration_min": 60,
           "interviewer_role": "Engineer",
-          "notes": "Practical coding where requirements change mid-round. Not simulated in v1."
+          "notes": "Practical coding in Colab or CodeSignal over Google Meet; requirements change mid-round and interviewers weigh how the candidate explains the approach. No AI assistance unless told otherwise. Not simulated in v1."
         },
         {
           "name": "System design",
           "interview_type": "technical_qa",
           "duration_min": 60,
           "interviewer_role": "Senior engineer",
-          "notes": "Often LLM infrastructure: inference APIs, batching, GPU utilization, distributing model weights."
+          "notes": "First onsite day, with coding and culture; often LLM infrastructure: inference APIs, batching, GPU utilization, distributing model weights, caches. Interviewers add constraints and may have no single right answer."
         },
         {
           "name": "Culture / values interview",
           "interview_type": "behavioral",
           "duration_min": 45,
           "interviewer_role": "Senior employee, often from another team",
-          "notes": "Mission alignment, AI safety views and ethical judgment. Reported as the most common reason strong engineers are rejected."
+          "notes": "First onsite day. Mission alignment, AI safety views and ethical judgment, probed with several follow-ups. Reported as the most common reason strong engineers are rejected; failing day one cancels day two."
         },
         {
           "name": "Project deep dive",
           "interview_type": "technical_qa",
           "duration_min": 60,
           "interviewer_role": "Engineer",
-          "notes": "Second-day loop: technical deep dive into past work."
+          "notes": "Second onsite day: technical deep dive into past work and the trade-offs behind it."
         },
         {
           "name": "Hiring manager / experience and goals",
           "interview_type": "hiring_manager",
           "duration_min": 45,
           "interviewer_role": "Engineering manager",
-          "notes": "Experience, goals and team fit; references follow."
+          "notes": "Second onsite day: experience, goals and team fit. Product engineering roles are matched to a team after the loop. References follow."
         }
       ]
     },
     {
       "role_family": "data_ml",
-      "levels": [],
+      "levels": ["Research Engineer", "Staff Research Engineer", "Staff+ Research Engineer / Research Scientist"],
       "rounds": [
         {
           "name": "Recruiter screen",
           "interview_type": null,
           "duration_min": 30,
           "interviewer_role": "Recruiter",
-          "notes": "Not simulated in v1."
+          "notes": "Background, motivation and logistics. Not simulated in v1."
         },
         {
           "name": "Hiring manager screen",
@@ -162,34 +165,41 @@
           "interview_type": null,
           "duration_min": 90,
           "interviewer_role": null,
-          "notes": "CodeSignal or Replit Python coding. Not simulated in v1."
+          "notes": "Timed CodeSignal-style Python assessment; some teams (for example Alignment) run all interviews in Python. Not simulated in v1."
         },
         {
-          "name": "ML coding / research implementation",
+          "name": "Research coding / paper implementation",
           "interview_type": null,
           "duration_min": 60,
           "interviewer_role": "Research engineer",
-          "notes": "Hands-on ML work, sometimes in Colab with GPU. Not simulated in v1."
+          "notes": "Implement part of a paper or an ML component, sometimes in Colab with a GPU. Not simulated in v1."
         },
         {
-          "name": "Research thinking / LLM fundamentals",
+          "name": "ML systems / research-engineering design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Research engineer",
+          "notes": "Design research infrastructure: an evaluation for a capability or safety property, a training recipe, checkpointing or fault tolerance at scale."
+        },
+        {
+          "name": "Research fluency / paper discussion",
           "interview_type": "technical_qa",
           "duration_min": 60,
           "interviewer_role": "Researcher",
-          "notes": "How the candidate designs experiments and understands LLM behaviour."
+          "notes": "Discuss a paper (often Anthropic's own), experiment design, LLM behaviour and capability-versus-safety trade-offs."
         },
         {
           "name": "Culture / values interview",
           "interview_type": "behavioral",
           "duration_min": 45,
           "interviewer_role": "Senior employee",
-          "notes": "Mission alignment and safety judgment."
+          "notes": "Mission alignment and safety judgment; why the candidate cares about alignment beyond the job."
         }
       ]
     },
     {
       "role_family": "pm",
-      "levels": [],
+      "levels": ["Product Manager"],
       "rounds": [
         {
           "name": "Recruiter screen",
@@ -232,6 +242,95 @@
           "duration_min": 45,
           "interviewer_role": "Senior employee",
           "notes": "Standalone values interview testing conviction and safety judgment."
+        }
+      ]
+    },
+    {
+      "role_family": "tpm",
+      "levels": ["Technical Program Manager", "TPM Manager"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, TPM experience and interest in Anthropic. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager interview",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "TPM lead or engineering manager",
+          "notes": "Scope of programs owned and how the candidate built trust with technical teams and researchers."
+        },
+        {
+          "name": "Technical depth",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Engineer or senior TPM",
+          "notes": "Not a coding round: infrastructure, scheduling and resource orchestration, model training and evals, at the depth of the program area."
+        },
+        {
+          "name": "Program scenarios",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "TPMs and cross-functional partners",
+          "notes": "Scenario rounds trading off speed, quality and scope: capacity planning, launch or release plans, slipping programs."
+        },
+        {
+          "name": "Cross-functional partner interviews",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineers, researchers or product partners",
+          "notes": "Influence without authority, stakeholder alignment and honest status reporting."
+        },
+        {
+          "name": "Culture / values interview",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Senior employee",
+          "notes": "Mission alignment and judgment on bringing frontier capabilities to users safely."
+        }
+      ]
+    },
+    {
+      "role_family": "design",
+      "levels": ["Product Designer"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, design process and motivation. Not simulated in v1."
+        },
+        {
+          "name": "Portfolio review",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Design lead",
+          "notes": "Deep dive into one or two shipped projects: problem choice, constraints, rejected alternatives and outcomes. Reasoning counts more than visual polish."
+        },
+        {
+          "name": "Product design exercise",
+          "interview_type": "case",
+          "duration_min": 75,
+          "interviewer_role": "Product designer",
+          "notes": "Often AI-specific, for example helping users understand a model's limits; risks, validation and success metrics."
+        },
+        {
+          "name": "Cross-functional collaboration",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineer, researcher or PM",
+          "notes": "Disagreements with engineers or PMs, using research input, working from incomplete information."
+        },
+        {
+          "name": "Values and final interview",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Design leadership",
+          "notes": "Responsible design, user trust in AI and mission fit."
         }
       ]
     }
@@ -320,6 +419,48 @@
       "pattern": "Set launch criteria or priorities when capability, helpfulness and safety conflict",
       "competencies": ["problem_framing", "prioritization", "recommendation"],
       "values": ["Ignite a race to the top on safety", "Hold light and shade"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Evaluation design",
+      "pattern": "Design an evaluation for a model capability or safety property: data, contamination, metrics and gaming",
+      "competencies": ["technical_depth", "reasoning", "trade_offs"],
+      "values": ["Do the simple thing that works", "Ignite a race to the top on safety"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Research fluency",
+      "pattern": "Explain a published safety or capabilities paper, its method and limits, and what it implies",
+      "competencies": ["accuracy", "clarity_of_explanation", "reasoning"],
+      "values": ["Hold light and shade"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Program scenario under pressure",
+      "pattern": "Plan a launch, migration or capacity program across teams when a deadline, quality bar and scope conflict",
+      "competencies": ["structure", "prioritization", "recommendation"],
+      "values": ["Put the mission first", "Do the simple thing that works"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Influence without authority",
+      "pattern": "Aligning researchers, engineers or partners with competing goals without formal authority",
+      "competencies": ["collaboration", "communication", "conflict_handling"],
+      "values": ["Be helpful, honest, and harmless", "Put the mission first"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Designing for trust in AI",
+      "pattern": "Design how an AI product shows uncertainty, limits or refusals so users keep an accurate level of trust",
+      "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
+      "values": ["Be good to our users", "Be helpful, honest, and harmless"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Killed or failed project",
+      "pattern": "A project that was stopped or failed, what the candidate learned, and how they treated it as an experiment",
+      "competencies": ["judgment", "depth_of_experience"],
+      "values": ["Do the simple thing that works", "Be helpful, honest, and harmless"]
     }
   ],
   "sample_questions": [
@@ -828,26 +969,368 @@
       },
       "role_families": ["pm", "design", "tpm"],
       "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a file cache for a service that reads large files repeatedly.",
+      "strong_answer": "Clarify read and write patterns, file sizes, hit-rate goals and consistency needs. Cover eviction policy (LRU or size-aware), memory versus local disk tiers, invalidation when the source changes, concurrency (many readers, one fill per key), and metrics such as hit rate and tail latency. Start with a simple single-node cache and say when you would shard or add a second tier.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Do the simple thing that works"],
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/",
+      "hints": {
+        "looking_for": [
+          "Whether you clarify the access pattern first",
+          "How you handle eviction, invalidation and concurrency"
+        ],
+        "strong_signals": [
+          "Picks an eviction policy and says why",
+          "Prevents many callers filling the same key at once",
+          "Names the metrics to watch"
+        ],
+        "watch_outs": [
+          "Jumping to a distributed cache with no need",
+          "Ignoring stale data"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you control how creative or random a generative model's output is?",
+      "strong_answer": "Explain sampling: temperature reshapes the probability distribution, top-k and top-p cut the tail, and greedy decoding removes randomness. Say what each does to diversity, repetition and factual errors. Match settings to the task (low for code or extraction, higher for brainstorming), mention prompt and system instructions as another lever, and say how you would evaluate the effect.",
+      "competencies": ["accuracy", "clarity_of_explanation", "trade_offs"],
+      "values": ["Do the simple thing that works"],
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/",
+      "hints": {
+        "looking_for": [
+          "Whether you understand decoding and sampling",
+          "How you match settings to the task"
+        ],
+        "strong_signals": [
+          "Explains temperature, top-k and top-p precisely",
+          "Links settings to errors and repetition",
+          "Proposes a way to measure the effect"
+        ],
+        "watch_outs": [
+          "Treating temperature as a creativity dial with no mechanism",
+          "No evaluation"
+        ]
+      },
+      "role_families": ["data_ml", "swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design an agentic system that can take on new kinds of tasks without being rebuilt.",
+      "strong_answer": "Define the loop: a model plans, calls tools, observes results and decides when it is done. Cover tool definitions, memory and context limits, task decomposition, and checks on each step. Add safety from the start: scoped permissions, human confirmation for consequential actions, sandboxing, logging and evaluations on new tasks. Start with one simple loop and add sub-agents only when the evals show a need.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Do the simple thing that works", "Ignite a race to the top on safety"],
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/",
+      "hints": {
+        "looking_for": [
+          "How you structure an agent loop with tools",
+          "Whether safety is designed in from the start"
+        ],
+        "strong_signals": [
+          "Covers tools, context limits and stopping",
+          "Adds permissions, confirmation and logging",
+          "Evaluates on new tasks"
+        ],
+        "watch_outs": [
+          "A complex multi-agent design with no reason",
+          "No guardrails on actions"
+        ]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How do you keep user data safe and private in a system built on a language model?",
+      "strong_answer": "Cover the data path end to end: what is collected, minimisation, encryption in transit and at rest, access control and audit logs, retention limits, and whether data is used for training. Add model-specific risks: prompt injection leaking data across tools, memorised training data, and logs holding sensitive prompts. Name tests such as red-teaming for extraction and privacy reviews before launch.",
+      "competencies": ["technical_depth", "accuracy", "reasoning"],
+      "values": ["Be good to our users", "Ignite a race to the top on safety"],
+      "source_url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/",
+      "hints": {
+        "looking_for": [
+          "Whether you see the full data path",
+          "Whether you know model-specific privacy risks"
+        ],
+        "strong_signals": [
+          "Covers minimisation, retention and access control",
+          "Names prompt injection and memorisation",
+          "Tests before launch"
+        ],
+        "watch_outs": [
+          "Only saying 'encrypt everything'",
+          "Ignoring logs and training use"
+        ]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design an evaluation that measures a specific model capability or safety property.",
+      "strong_answer": "Define the property precisely and what would count as evidence of it. Cover how items are written or sourced, held-out splits and contamination checks, the metric and how it is graded (exact match, model grader with spot checks), and baselines. Discuss gaming and Goodhart effects, how scores relate to real deployment, cost of running it at every checkpoint, and when the eval goes stale.",
+      "competencies": ["technical_depth", "reasoning", "trade_offs"],
+      "values": ["Do the simple thing that works", "Ignite a race to the top on safety"],
+      "source_url": "https://resumegeni.com/blog/data-scientist/at-anthropic",
+      "hints": {
+        "looking_for": [
+          "Whether you define what the eval should measure",
+          "How you protect it from contamination and gaming"
+        ],
+        "strong_signals": [
+          "Defines the property and the evidence for it",
+          "Covers splits, grading and baselines",
+          "Notes cost and decay over time"
+        ],
+        "watch_outs": [
+          "Trusting a single number without checks",
+          "Measuring an artefact instead of the property"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design checkpointing and recovery for a training run across thousands of GPUs?",
+      "strong_answer": "Estimate the failure rate at that scale to show failures are routine. Cover how often to checkpoint (cost of saving versus lost work), sharded and asynchronous writes, storage throughput, verifying a checkpoint before trusting it, and fast restart including data loader position and optimizer state. Mention detecting bad nodes and silent errors, and testing recovery regularly.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Do the simple thing that works"],
+      "source_url": "https://resumegeni.com/blog/data-scientist/at-anthropic",
+      "hints": {
+        "looking_for": [
+          "Whether you treat failure as routine at scale",
+          "How you balance checkpoint cost and lost work"
+        ],
+        "strong_signals": [
+          "Estimates failure rates",
+          "Uses sharded, asynchronous saves and verifies them",
+          "Restores full training state"
+        ],
+        "watch_outs": [
+          "Checkpointing with no estimate of cost",
+          "Forgetting optimizer or data state"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Pick a recent Anthropic research paper and explain what it found and what it means for safety.",
+      "strong_answer": "Choose a paper you have actually read. State the question, method and main result in plain words, then its limits (setup, model sizes, what was not tested). Give your own view on what it implies for safety or deployment and a follow-up experiment you would run. Be ready to defend or change your view under questions.",
+      "competencies": ["accuracy", "clarity_of_explanation", "reasoning"],
+      "values": ["Hold light and shade", "Ignite a race to the top on safety"],
+      "source_url": "https://resumegeni.com/blog/data-scientist/at-anthropic",
+      "hints": {
+        "looking_for": [
+          "Whether you have engaged with the research",
+          "Whether you form your own view"
+        ],
+        "strong_signals": [
+          "Explains method and limits plainly",
+          "Proposes a follow-up experiment",
+          "Updates under good questions"
+        ],
+        "watch_outs": [
+          "Summarising only the abstract",
+          "Overclaiming what the paper shows"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you plan GPU capacity for model inference over the next year?",
+      "strong_answer": "Start from demand: traffic forecasts by product, tokens per request, growth scenarios and new model launches. Convert to accelerator needs using per-chip throughput and target utilization, with headroom for peaks and failures. Cover supply lead times, multiple clouds and chip types, research versus production sharing, and how often the plan is revisited. Make the decision process and owners explicit.",
+      "competencies": ["structure", "estimation_logic", "prioritization"],
+      "values": ["Do the simple thing that works", "Put the mission first"],
+      "source_url": "https://www.cleverprep.com/companies/anthropic/technical-program-manager",
+      "hints": {
+        "looking_for": [
+          "How you turn demand into capacity",
+          "How you handle uncertainty and lead times"
+        ],
+        "strong_signals": [
+          "Uses scenarios and throughput numbers",
+          "Plans headroom and review cadence",
+          "Names owners and decision points"
+        ],
+        "watch_outs": [
+          "No numbers",
+          "Ignoring research needs or supply lead times"
+        ]
+      },
+      "role_families": ["tpm"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Design a release process for rolling out a new model version to users safely.",
+      "strong_answer": "Define gates: evaluation and safety results agreed in advance, red-team sign-off, and load testing. Roll out in stages (internal, small traffic share, wider) with clear metrics, rollback triggers and owners. Cover communication to customers, incident response during launch, and a written decision log. Balance speed with safety and keep the process light enough that teams follow it.",
+      "competencies": ["structure", "prioritization", "recommendation"],
+      "values": ["Ignite a race to the top on safety", "Do the simple thing that works"],
+      "source_url": "https://www.cleverprep.com/companies/anthropic/technical-program-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you set gates before launch",
+          "How you stage rollout and rollback"
+        ],
+        "strong_signals": [
+          "Defines evaluation and safety gates",
+          "Sets rollback triggers and owners",
+          "Keeps the process light"
+        ],
+        "watch_outs": [
+          "A process so heavy teams skip it",
+          "No rollback plan"
+        ]
+      },
+      "role_families": ["tpm", "pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a program that fell behind schedule. What did you do?",
+      "strong_answer": "Describe the program, the signal that it was slipping and how early you saw it. Explain how you found the real cause, the options you put to decision makers (cut scope, add people, move the date), and how you reported status honestly. Give the result and what you changed in how you track programs.",
+      "competencies": ["ownership", "communication", "learning_from_failure"],
+      "values": ["Be helpful, honest, and harmless", "Put the mission first"],
+      "source_url": "https://www.cleverprep.com/companies/anthropic/technical-program-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you spot and report slips early",
+          "How you present options to decision makers"
+        ],
+        "strong_signals": [
+          "Finds the real cause",
+          "Gives clear options with trade-offs",
+          "Reports status honestly"
+        ],
+        "watch_outs": [
+          "Hiding the slip until late",
+          "Blaming other teams"
+        ]
+      },
+      "role_families": ["tpm", "pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you aligned teams whose goals conflicted, without having authority over them.",
+      "strong_answer": "Name the teams and why their goals clashed. Show how you understood each side, found the shared goal, made the trade-off visible with data, and got a decision from the right owner. Give the outcome and how the relationships held up. Strong answers show trust earned through competence and honesty.",
+      "competencies": ["collaboration", "conflict_handling", "communication"],
+      "values": ["Be helpful, honest, and harmless", "Put the mission first"],
+      "source_url": "https://www.cleverprep.com/companies/anthropic/technical-program-manager",
+      "hints": {
+        "looking_for": [
+          "How you build alignment without authority",
+          "Whether you make trade-offs visible"
+        ],
+        "strong_signals": [
+          "Understands each side's goal",
+          "Escalates to the right owner with data",
+          "Keeps relationships intact"
+        ],
+        "watch_outs": [
+          "Forcing a decision by escalation alone",
+          "No clear outcome"
+        ]
+      },
+      "role_families": ["tpm", "pm", "design"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Design a feature that helps users understand what an AI assistant can and cannot do.",
+      "strong_answer": "Pick a user group and the moment trust goes wrong (over-trusting a wrong answer, or giving up too early). Propose a few ideas, such as showing sources, signalling uncertainty, or explaining a refusal with a next step, and choose one. Say how you would validate it with little data, the risks, and metrics like task success, correction rate and calibrated trust.",
+      "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
+      "values": ["Be good to our users", "Be helpful, honest, and harmless"],
+      "source_url": "https://interview.norahq.com/interview-guides/anthropic-product-designer-interview-guide-2026",
+      "hints": {
+        "looking_for": [
+          "How you frame the trust problem",
+          "How you validate a design with little data"
+        ],
+        "strong_signals": [
+          "Picks a user and a moment of failure",
+          "Chooses one idea and defends it",
+          "Defines metrics for calibrated trust"
+        ],
+        "watch_outs": [
+          "A tooltip with no user insight",
+          "Measuring only engagement"
+        ]
+      },
+      "role_families": ["design", "pm"],
+      "levels": []
     }
   ],
   "bar_by_level": [
     {
-      "level_name": "Member of Technical Staff (reported internal T4)",
+      "level_name": "Software Engineer",
       "normalized_level": "mid",
       "role_family": "swe",
-      "scope_expectation": "Levels are not public; everyone is titled Member of Technical Staff. Expect independent ownership of well-scoped projects."
+      "scope_expectation": "No internships or new-grad track. Postings ask for several years (some 7+) of experience; owns a product area or platform end to end with little specification and works with research, security and infrastructure."
     },
     {
-      "level_name": "Member of Technical Staff (reported internal T5)",
+      "level_name": "Senior Software Engineer",
       "normalized_level": "senior",
       "role_family": "swe",
-      "scope_expectation": "Levels not public. Expect leading significant projects with little direction and strong judgment on trade-offs."
+      "scope_expectation": "Technical leader on a team with end-to-end ownership: owns quality across the stack (performance, reliability, developer experience) and partners with product, design and research on new model capabilities."
     },
     {
-      "level_name": "Member of Technical Staff (reported internal T6)",
+      "level_name": "Staff Software Engineer (Staff+)",
       "normalized_level": "staff_principal",
       "role_family": "swe",
-      "scope_expectation": "Levels not public. Expect cross-team technical leadership on critical systems or research directions."
+      "scope_expectation": "Postings cite about 8+ years. Builds shared platforms many teams depend on, works across engineering, product, policy and go-to-market, and leads through influence."
+    },
+    {
+      "level_name": "Senior Staff Software Engineer",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Postings cite 12+ years with a record at Staff or Senior Staff level. Sets multi-year technical strategy for an org, makes org-wide architecture calls, still codes on critical paths, and mentors Staff engineers."
+    },
+    {
+      "level_name": "Research Engineer",
+      "normalized_level": "mid",
+      "role_family": "data_ml",
+      "scope_expectation": "Strong software engineering plus large-scale ML; independently leads small research projects while contributing to larger ones, and runs and analyses experiments."
+    },
+    {
+      "level_name": "Staff Research Engineer",
+      "normalized_level": "staff_principal",
+      "role_family": "data_ml",
+      "scope_expectation": "Postings cite 8+ years of ML research experience. Removes bottlenecks across the training, evaluation and inference stack and scales research ideas from prototype to production."
+    },
+    {
+      "level_name": "Anthropic Fellow (fixed-term program)",
+      "normalized_level": "new_grad",
+      "role_family": "data_ml",
+      "scope_expectation": "Not a full-time level: a funded research program and the main early-career route. Fluent Python; delivers a mentored empirical safety or security project. Some fellows later receive full-time offers."
+    },
+    {
+      "level_name": "Product Manager",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Single public title; postings prefer about 8+ years. Owns strategy, roadmap and execution for an area, turns new model capabilities into products, and balances fast iteration with safety."
+    },
+    {
+      "level_name": "Technical Program Manager",
+      "normalized_level": "senior",
+      "role_family": "tpm",
+      "scope_expectation": "Several years of TPM experience. Drives ambiguous programs across research, engineering and product, owns launch or compute trade-offs, and reports status honestly to leadership."
+    },
+    {
+      "level_name": "Product Designer",
+      "normalized_level": "senior",
+      "role_family": "design",
+      "scope_expectation": "Single public title. Has shipped complex products end to end in ambiguous settings, prototypes in code or with AI tools, and defines new interaction patterns for AI capabilities."
     }
   ],
   "persona": {
@@ -862,31 +1345,32 @@
     "collaboration": 1.2,
     "learning_from_failure": 1.2,
     "judgment": 1.4,
-    "motivation": 1.3,
+    "motivation": 1.4,
     "technical_depth": 1.3,
     "trade_offs": 1.2,
-    "reasoning": 1.3,
+    "reasoning": 1.4,
+    "clarity_of_explanation": 1.2,
     "recommendation": 1.1
   },
   "values_share": 0.35,
   "case_style": {
-    "product_sense": 0.5,
+    "product_sense": 0.45,
     "estimation": 0.1,
-    "system_thinking": 0.4,
-    "notes": "Cases are AI-specific and often turn on safety versus helpfulness trade-offs and launch criteria. Estimation is rare."
+    "system_thinking": 0.45,
+    "notes": "PM and design cases are AI-specific (new users, trust in model limits, launch criteria) and often turn on helpfulness versus harm. TPM scenarios are system-level (capacity, release gates, slipping programs). Estimation appears mainly in capacity planning."
   },
   "sources": [
     {
       "url": "https://www.anthropic.com/careers",
-      "title": "Anthropic careers (values and interview process)",
-      "retrieved_at": "2026-10-10",
-      "fields": ["values_framework", "loop_structure", "persona"]
+      "title": "Anthropic careers (values, interview format and what interviews cover)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "loop_structure", "persona", "scoring_weights"]
     },
     {
       "url": "https://cdo.som.yale.edu/blog/2026/05/18/get-a-job-at-anthropic-interview-process-and-top-questions/",
       "title": "Get a job at Anthropic: interview process and top questions",
-      "retrieved_at": "2026-10-10",
-      "fields": ["loop_structure", "question_patterns"]
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "scoring_weights"]
     },
     {
       "url": "https://www.designgurus.io/answers/detail/what-is-the-anthropic-interview-process-like-round-by-round",
@@ -913,26 +1397,136 @@
       "fields": ["loop_structure"]
     },
     {
-      "url": "https://www.teamblind.com/post/anthropic-levels-mppxx5qy",
-      "title": "Blind: Anthropic levels",
-      "retrieved_at": "2026-10-10",
+      "url": "https://www.anthropic.com/candidate-ai-guidance",
+      "title": "How to collaborate with Claude during our hiring process (Anthropic)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://www.anthropic.com/engineering/AI-resistant-technical-evaluations",
+      "title": "Designing AI-resistant technical evaluations (Anthropic engineering blog)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "scoring_weights"]
+    },
+    {
+      "url": "https://job-boards.greenhouse.io/anthropic/jobs/5134895008",
+      "title": "Anthropic job posting: Senior Staff Software Engineer, API",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level", "scoring_weights"]
+    },
+    {
+      "url": "https://job-boards.greenhouse.io/anthropic/jobs/5433814008",
+      "title": "Anthropic job posting: Staff+ Software Engineer, Access Programs",
+      "retrieved_at": "2026-10-28",
       "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://job-boards.greenhouse.io/anthropic/jobs/5174743008",
+      "title": "Anthropic job posting: Senior Software Engineer, Full-stack",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level", "loop_structure"]
+    },
+    {
+      "url": "https://job-boards.greenhouse.io/anthropic/jobs/5389305008",
+      "title": "Anthropic job posting: Software Engineer, Education",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://job-boards.greenhouse.io/anthropic/jobs/5017202008",
+      "title": "Anthropic job posting: Software Engineer, Labs",
+      "retrieved_at": "2026-10-28",
+      "fields": ["scoring_weights", "persona"]
+    },
+    {
+      "url": "https://job-boards.greenhouse.io/anthropic/jobs/5119713008",
+      "title": "Anthropic job posting: Research Engineer, Pretraining",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level", "loop_structure"]
+    },
+    {
+      "url": "https://job-boards.greenhouse.io/anthropic/jobs/4593216008",
+      "title": "Anthropic job posting: Staff Research Engineer, Discovery Team",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://job-boards.greenhouse.io/anthropic/jobs/4631822008",
+      "title": "Anthropic job posting: Research Engineer / Scientist, Alignment",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure"]
+    },
+    {
+      "url": "https://job-boards.greenhouse.io/anthropic/jobs/5183044008",
+      "title": "Anthropic Fellows Program, AI Safety & Security",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level", "loop_structure"]
+    },
+    {
+      "url": "https://job-boards.greenhouse.io/anthropic/jobs/5448167008",
+      "title": "Anthropic job posting: Product Manager, Claude",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level", "case_style"]
+    },
+    {
+      "url": "https://job-boards.greenhouse.io/anthropic/jobs/5203545008",
+      "title": "Anthropic job posting: Technical Program Manager, Research",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level", "case_style"]
+    },
+    {
+      "url": "https://job-boards.greenhouse.io/anthropic/jobs/5208193008",
+      "title": "Anthropic job posting: Technical Program Manager, Launches",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level", "case_style"]
+    },
+    {
+      "url": "https://job-boards.greenhouse.io/anthropic/jobs/5397654008",
+      "title": "Anthropic job posting: Product Designer, Claude Developer Platform",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level", "case_style"]
+    },
+    {
+      "url": "https://resumegeni.com/blog/data-scientist/at-anthropic",
+      "title": "Member of Technical Staff at Anthropic (ResumeGeni guide)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/anthropic/technical-program-manager",
+      "title": "Anthropic technical program manager interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://interview.norahq.com/interview-guides/anthropic-product-designer-interview-guide-2026",
+      "title": "Anthropic product designer interview guide 2026 (Nora AI)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://resumegeni.com/blog/product-designer/at-anthropic",
+      "title": "Product designer at Anthropic (ResumeGeni guide)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["question_patterns", "case_style"]
     }
   ],
   "field_confidence": {
     "values_framework": "high",
     "loop_structure": "medium",
     "question_patterns": "medium",
-    "bar_by_level": "low",
+    "bar_by_level": "medium",
     "persona": "medium",
-    "scoring_weights": "low",
-    "case_style": "low"
+    "scoring_weights": "medium",
+    "case_style": "medium"
   },
   "low_confidence_notes": [
-    "bar_by_level: Anthropic does not publish levels; all engineers are titled Member of Technical Staff. Internal level labels (T4-T6) come from anonymous Blind posts seen in search only. No new-grad or PM levels listed.",
-    "loop_structure: round order and durations come from candidate reports and prep guides; the careers page only confirms live coding for technical roles and conversational interviews for others. The research engineer loop is less well sourced.",
-    "values_share: set to 0.35 because several reports say the culture interview is the most common rejection point; this is a judgment call.",
-    "scoring_weights: estimated; no public source gives weights.",
-    "case_style: PM case reports are few and come from one guide."
+    "values_framework: principle names and descriptions follow the Anthropic careers page; principle weights are our estimate of interview emphasis, not published by Anthropic.",
+    "loop_structure: official pages confirm live coding in Colab or CodeSignal, conversational non-technical interviews, AI-free take-homes and live rounds unless stated, and the Fellows process; round order and durations come from candidate reports and prep guides. The TPM loop rests on one prep site and the design loop on one vendor guide; no reliable public source describes a loop for an 'other' family.",
+    "bar_by_level: Anthropic does not publish a ladder; level names and scope come from official job-posting titles (Senior, Staff+, Senior Staff) and their stated experience and responsibilities. Internal T-levels from anonymous posts are no longer used. PM, TPM and design show a single public title, so they are mapped to senior; there is no new-grad hire track, and the Fellows entry is a fixed-term program, not a level.",
+    "scoring_weights: derived from what Anthropic says interviews assess (experience and motivation, how candidates think through problems in real time, clarity and judgment, debugging judgment in take-homes) and from traits repeated across job postings; the numbers are our estimate.",
+    "case_style: PM cases come mainly from one prep guide plus official PM postings, TPM scenarios from one prep site, and design exercises from one vendor guide; the product versus system split is our estimate.",
+    "values_share: set to 0.35 because several reports say the culture interview is the most common rejection point and failing it ends the loop early; this is a judgment call.",
+    "sample_questions: igotanoffer.com blocked the fetcher (HTTP 403) on 2026-10-28, so its PM questions were not re-checked; TPM, research and design questions come from prep sites that aggregate candidate reports."
   ]
 }
