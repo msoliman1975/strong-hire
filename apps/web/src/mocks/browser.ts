@@ -15,6 +15,7 @@ import { customHandlers } from "./custom";
 import { createStore } from "./db";
 import { accountHandlers, authHandlers, inputHandlers, scoringHandlers, sessionHandlers } from "./handlers";
 import { planHandlers } from "./planHandlers";
+import { storyFitHandlers } from "./storyFitHandlers";
 import { questionHandlers } from "./questionHandlers";
 import { transcriptHandlers } from "./transcriptHandlers";
 import { waitlistHandlers } from "./waitlistHandlers";
@@ -36,6 +37,7 @@ export async function startMocks(mode: MockMode): Promise<void> {
     ...accountHandlers(store),
     ...customHandlers(store),
     ...planHandlers(store),
+    ...storyFitHandlers(),
     ...questionHandlers(),
     ...waitlistHandlers(),
     ...coachVoiceHandlers(),

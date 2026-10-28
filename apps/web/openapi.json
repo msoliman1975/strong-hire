@@ -3216,6 +3216,63 @@
         }
       }
     },
+    "/plan/{job_target_id}/{resume_id}/story-fit": {
+      "get": {
+        "tags": [
+          "interview plan"
+        ],
+        "summary": "Get Story Fit",
+        "description": "ST-5: for each skill the interview will test, the best story and whether it is strong,\nthin or missing.",
+        "operationId": "get_story_fit_plan__job_target_id___resume_id__story_fit_get",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          },
+          {
+            "name": "resume_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Resume Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryFitView"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The job target or the resume does not exist."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/providers": {
       "get": {
         "tags": [
@@ -22335,15 +22392,88 @@
         "title": "StoryFitItem",
         "type": "object"
       },
+      "StoryFitRow": {
+        "properties": {
+          "competency": {
+            "$ref": "#/components/schemas/Competency"
+          },
+          "strength": {
+            "$ref": "#/components/schemas/StoryFitStrength"
+          },
+          "story": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoryRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "competency",
+          "strength",
+          "story",
+          "reason"
+        ],
+        "title": "StoryFitRow",
+        "description": "ST-5: one tested skill, its best story (none when missing) and how well it fits."
+      },
       "StoryFitStrength": {
-        "description": "ST-5: how well the best story covers one skill the interview will test.",
+        "type": "string",
         "enum": [
           "strong",
           "thin",
           "missing"
         ],
         "title": "StoryFitStrength",
-        "type": "string"
+        "description": "ST-5: how well the best story covers one skill the interview will test."
+      },
+      "StoryFitView": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "computing"
+            ],
+            "title": "Status",
+            "description": "computing until the worker has a table for every tested skill."
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/StoryFitRow"
+            },
+            "type": "array",
+            "title": "Rows",
+            "description": "One per tested skill, in display order."
+          },
+          "computed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Computed At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "rows",
+          "computed_at"
+        ],
+        "title": "StoryFitView"
       },
       "StoryFromAnswerIn": {
         "properties": {
@@ -22702,6 +22832,29 @@
         "type": "object",
         "title": "StoryPatch",
         "description": "ST-1: change the title, the skill tags or any part. Only the fields sent change; a part\nsent as null (or blank) is cleared. The status is never set by hand (ST-7)."
+      },
+      "StoryRef": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "status": {
+            "$ref": "#/components/schemas/StoryStatus"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "status"
+        ],
+        "title": "StoryRef"
       },
       "StorySource": {
         "type": "string",

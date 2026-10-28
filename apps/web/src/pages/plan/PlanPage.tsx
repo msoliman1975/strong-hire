@@ -14,6 +14,7 @@ import { contextPath } from "../../paths";
 import { usePlan, type PlanView } from "./api";
 import { InterviewDate } from "./InterviewDate";
 import { PlanSetup } from "./PlanSetup";
+import { StoryFitTable } from "./StoryFitTable";
 import "./plan.css";
 
 const isVerdict = (r: ReportItem) => r.type === "interview_debrief" && r.hire_signal !== null;
@@ -138,7 +139,7 @@ function PlanBody({ plan, jobId, resumeId }: { plan: PlanView; jobId: string; re
             )}
           </section>
 
-          {/* ST-5: the story fit table goes here. S23 builds it (StoryFit* in this folder). */}
+          <StoryFitTable jobId={jobId} resumeId={resumeId} />
 
           <section className="card" aria-labelledby="plan-earlier-heading">
             <h2 id="plan-earlier-heading">Earlier rehearsals</h2>

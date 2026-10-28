@@ -1102,6 +1102,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/plan/{job_target_id}/{resume_id}/story-fit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Story Fit
+         * @description ST-5: for each skill the interview will test, the best story and whether it is strong,
+         *     thin or missing.
+         */
+        get: operations["get_story_fit_plan__job_target_id___resume_id__story_fit_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/providers": {
         parameters: {
             query?: never;
@@ -8528,11 +8549,38 @@ export interface components {
             reason: string;
         };
         /**
+         * StoryFitRow
+         * @description ST-5: one tested skill, its best story (none when missing) and how well it fits.
+         */
+        StoryFitRow: {
+            competency: components["schemas"]["Competency"];
+            strength: components["schemas"]["StoryFitStrength"];
+            story: components["schemas"]["StoryRef"] | null;
+            /** Reason */
+            reason: string;
+        };
+        /**
          * StoryFitStrength
          * @description ST-5: how well the best story covers one skill the interview will test.
          * @enum {string}
          */
         StoryFitStrength: "strong" | "thin" | "missing";
+        /** StoryFitView */
+        StoryFitView: {
+            /**
+             * Status
+             * @description computing until the worker has a table for every tested skill.
+             * @enum {string}
+             */
+            status: "ready" | "computing";
+            /**
+             * Rows
+             * @description One per tested skill, in display order.
+             */
+            rows: components["schemas"]["StoryFitRow"][];
+            /** Computed At */
+            computed_at: string | null;
+        };
         /**
          * StoryFromAnswerIn
          * @description ST-2: save one debrief answer as a draft story.
@@ -8662,6 +8710,17 @@ export interface components {
             reflection?: string | null;
             /** Skills */
             skills?: components["schemas"]["Competency"][] | null;
+        };
+        /** StoryRef */
+        StoryRef: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            status: components["schemas"]["StoryStatus"];
         };
         /**
          * StorySource
@@ -11394,6 +11453,45 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    get_story_fit_plan__job_target_id___resume_id__story_fit_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+                resume_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryFitView"];
+                };
+            };
+            /** @description The job target or the resume does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
             };
         };
     };

@@ -222,3 +222,24 @@
 .debrief-next p {
   margin: 0 0 12px;
 }
+
+/* ST-6, ST-2: the story an answer used (StoryUsed.tsx) and the library updates card. */
+.debrief-story {
+  display: grid;
+  gap: 4px;
+  margin: 8px 0;
+  padding: 8px 12px;
+  border-left: 3px solid var(--sh-teal);
+  background: var(--sh-surface);
+}
+
+.debrief-story__sent {
+  font-size: 0.8125rem;
+  color: var(--sh-ok);
+  white-space: nowrap;
+}
+
+.debrief-story-updates h2 {
+  margin: 0 0 6px;
+  font-size: 1.0625rem;
+}
