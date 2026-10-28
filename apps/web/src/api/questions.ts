@@ -5,10 +5,13 @@
 import { apiClient, unwrap } from "./client";
 import type { BankCompany, Competency, Level, QuestionList, RoleFamily, StandardType } from "./types";
 
+/** A type the bank can filter by: the four standard types, and Recruiter screen (RS-1). */
+export type BankType = StandardType | "recruiter_screen";
+
 /** `company` is a company slug, "general" for general questions only, or null for all. */
 export interface QuestionFilter {
   company?: string | null;
-  interviewType?: StandardType | null;
+  interviewType?: BankType | null;
   competencies?: Competency[];
   roleFamily?: RoleFamily | null;
   level?: Level | null;
@@ -38,9 +41,9 @@ export const questionsApi = {
 
 /**
  * Mirrors COMPETENCIES_BY_TYPE in strong_core.schemas.enums. Display only: it narrows the area
- * filter to the chosen interview type. A test checks it covers every Competency once.
+ * filter to the chosen interview type. A test checks it covers every Competency.
  */
-export const COMPETENCIES_BY_TYPE: Record<StandardType, Competency[]> = {
+export const COMPETENCIES_BY_TYPE: Record<BankType, Competency[]> = {
   behavioral: ["ownership", "impact", "collaboration", "conflict_handling", "learning_from_failure", "communication"],
   hiring_manager: ["role_fit", "depth_of_experience", "judgment", "motivation", "team_fit", "scope_at_level"],
   technical_qa: ["technical_depth", "accuracy", "reasoning", "trade_offs", "clarity_of_explanation"],
@@ -52,4 +55,6 @@ export const COMPETENCIES_BY_TYPE: Record<StandardType, Competency[]> = {
     "prioritization",
     "recommendation",
   ],
+  // RS-1: shares motivation, role fit and communication with the types above.
+  recruiter_screen: ["motivation", "role_fit", "communication", "logistics_and_expectations"],
 };

@@ -2,13 +2,16 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 
 import { useBankCompanies, useQuestions } from "../api/hooks";
-import { COMPETENCIES_BY_TYPE, GENERAL, type QuestionFilter } from "../api/questions";
+import { COMPETENCIES_BY_TYPE, GENERAL, type BankType, type QuestionFilter } from "../api/questions";
 import type { BankQuestion, Competency, InterviewType, Level, RoleFamily, StandardType } from "../api/types";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
 import { competencyLabel, interviewTypeLabel, levelLabel, roleFamilyLabel } from "../labels";
+import { useFeature } from "../theme/features";
 
 /** The four question categories; Custom is a session type, not a category (CU-1). */
-const TYPES = (Object.keys(interviewTypeLabel) as InterviewType[]).filter((t): t is StandardType => t !== "custom" && t !== "recruiter_screen");
+const STANDARD_TYPES = (Object.keys(interviewTypeLabel) as InterviewType[]).filter((t): t is StandardType => t !== "custom" && t !== "recruiter_screen");
+/** RS-1: v2 adds Recruiter screen to the type filter. */
+const V2_TYPES: BankType[] = [...STANDARD_TYPES, "recruiter_screen"];
 const ROLES = Object.keys(roleFamilyLabel) as RoleFamily[];
 const LEVELS = Object.keys(levelLabel) as Level[];
 const ALL_AREAS = new Set<string>(Object.values(COMPETENCIES_BY_TYPE).flat());
@@ -23,9 +26,10 @@ function pick<T extends string>(value: string | null, allowed: readonly T[]): T 
  */
 export function QuestionsPage() {
   const [params, setParams] = useSearchParams();
+  const types: readonly BankType[] = useFeature("v2_enabled") ? V2_TYPES : STANDARD_TYPES;
   const filter: QuestionFilter = {
     company: params.get("company") || null,
-    interviewType: pick(params.get("type"), TYPES),
+    interviewType: pick(params.get("type"), types),
     competencies: params.getAll("area").filter((a): a is Competency => ALL_AREAS.has(a)),
     roleFamily: pick(params.get("role"), ROLES),
     level: pick(params.get("level"), LEVELS),
@@ -49,7 +53,7 @@ export function QuestionsPage() {
       if (value) next.set("type", value);
       else next.delete("type");
       // Areas belong to an interview type; keep only the ones the new type has.
-      const keep = value ? COMPETENCIES_BY_TYPE[value as StandardType] : [];
+      const keep = value ? COMPETENCIES_BY_TYPE[value as BankType] : [];
       const areas = next.getAll("area").filter((a) => keep.includes(a as Competency));
       next.delete("area");
       for (const a of areas) next.append("area", a);
@@ -88,7 +92,7 @@ export function QuestionsPage() {
             <label htmlFor="q-type">Interview type</label>
             <select id="q-type" value={filter.interviewType ?? ""} onChange={(e) => setType(e.target.value)}>
               <option value="">All types</option>
-              {TYPES.map((t) => (
+              {types.map((t) => (
                 <option key={t} value={t}>
                   {interviewTypeLabel[t]}
                 </option>

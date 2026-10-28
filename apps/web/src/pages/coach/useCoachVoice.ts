@@ -177,8 +177,7 @@ export const connectCoachMockVoice: CoachVoiceConnector = async (_join, handlers
   };
 };
 
-/** The coach room's LiveKit token. The API endpoint is planned (see the S32 PR); until it lands
- * the browser mocks answer it. */
+/** The coach room's LiveKit token (CO-6, POST /coach/sessions/{id}/voice/join). */
 export const joinCoachVoice = (sessionId: string) =>
   request<VoiceJoin>("POST", `/coach/sessions/${encodeURIComponent(sessionId)}/voice/join`);
 

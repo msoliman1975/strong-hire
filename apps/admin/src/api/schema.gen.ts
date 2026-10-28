@@ -638,7 +638,7 @@ export interface paths {
         };
         /**
          * List Questions
-         * @description QB-1 to QB-3. 404 when `company` names a company with no Published profile.
+         * @description QB-1 to QB-3, RS-1. 404 when `company` names a company with no Published profile.
          */
         get: operations["list_questions_questions_get"];
         put?: never;
@@ -938,6 +938,27 @@ export interface paths {
          * @description End the session and record its minutes. Ending twice is harmless.
          */
         post: operations["end_coach_session_coach_sessions__session_id__end_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/coach/sessions/{session_id}/voice/join": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Join Coach Voice
+         * @description CO-6: a LiveKit token for the coach's voice room. Call it again after a dropped
+         *     connection: the room stays the same and the coach goes on from the last turn.
+         */
+        post: operations["join_coach_voice_coach_sessions__session_id__voice_join_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -10901,7 +10922,7 @@ export interface operations {
         parameters: {
             query?: {
                 company?: string | null;
-                interview_type?: ("behavioral" | "hiring_manager" | "technical_qa" | "case") | null;
+                interview_type?: components["schemas"]["InterviewType"] | null;
                 competency?: components["schemas"]["Competency"][] | null;
                 role_family?: components["schemas"]["RoleFamily"] | null;
                 level?: components["schemas"]["Level"] | null;
@@ -11601,6 +11622,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CoachSessionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    join_coach_voice_coach_sessions__session_id__voice_join_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VoiceJoin"];
                 };
             };
             /** @description Validation Error */

@@ -5,6 +5,7 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { http, HttpResponse } from "msw";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -40,7 +41,7 @@ function Where() {
   return <p data-testid="where">{location.pathname + location.search}</p>;
 }
 
-function renderAt(path: string, { voiceReady = false } = {}) {
+function renderAt(path: string) {
   return render(
     <QueryClientProvider client={createQueryClient()}>
       <MemoryRouter initialEntries={[path]}>
@@ -49,7 +50,7 @@ function renderAt(path: string, { voiceReady = false } = {}) {
           <Route path="/stories" element={<p>Stories</p>} />
           <Route path="/stories/:storyId" element={<V2Only><StoryWorkbenchPage /></V2Only>} />
           <Route path="/coach/new" element={<V2Only><CoachStartPage /></V2Only>} />
-          <Route path="/coach/:sessionId" element={<V2Only><CoachSessionPage voiceReady={voiceReady} /></V2Only>} />
+          <Route path="/coach/:sessionId" element={<V2Only><CoachSessionPage /></V2Only>} />
         </Routes>
         <Where />
       </MemoryRouter>
@@ -151,16 +152,25 @@ describe("coach session", () => {
     expect(mockStoryLibrary()).toHaveLength(2);
   });
 
-  it("CO-6: without the coach voice room the mic button is off and says why", async () => {
+  it("CO-6: when the voice join is refused, the mic says so and typing still works", async () => {
+    server.use(
+      http.post("*/api/coach/sessions/:sessionId/voice/join", () =>
+        HttpResponse.json(
+          { detail: { code: "sessions_paused", message: "New voice sessions are paused." } },
+          { status: 503 },
+        ),
+      ),
+    );
+    const user = userEvent.setup();
     renderAt("/coach/new");
-    const mic = await screen.findByRole("button", { name: "Talk to the coach" });
-    expect(mic).toBeDisabled();
-    expect(mic).toHaveAccessibleDescription("Talking to the coach by voice is coming soon. Type for now.");
+    await user.click(await screen.findByRole("button", { name: "Talk to the coach" }));
+    expect(await screen.findByText(/paused|unavailable/i)).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "Your reply" })).toBeEnabled();
   });
 
-  it("CO-6: with the voice room, the mic starts the coach by voice", async () => {
+  it("CO-6: the mic joins the coach's voice room and the coach speaks", async () => {
     const user = userEvent.setup();
-    renderAt("/coach/new", { voiceReady: true });
+    renderAt("/coach/new");
     await user.click(await screen.findByRole("button", { name: "Talk to the coach" }));
     expect(await screen.findByText(/Tell me about one time you led a hard change/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Stop talking to the coach" })).toBeEnabled();

@@ -130,11 +130,6 @@
   cursor: not-allowed;
 }
 
-.coach__mic-note {
-  flex: 1 1 100%;
-  margin: 0;
-}
-
 .coach__shape-head {
   display: flex;
   justify-content: space-between;

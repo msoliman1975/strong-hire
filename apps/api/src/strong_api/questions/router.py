@@ -7,7 +7,8 @@ Filters:
 - company: a company slug, or "general" for general questions only. Without it, every
   company's questions and the general ones.
 - interview_type, competency (repeatable, matches any), role_family, level, q (text search in
-  the question and its hints).
+  the question and its hints). interview_type is a standard type or recruiter_screen (RS-1); the
+  bank's questions have only the standard types for now, so recruiter_screen lists none.
 A question with no role_families or levels fits every job category or level.
 """
 
@@ -16,7 +17,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, status
 from sqlalchemy import select
 
 from strong_api.inputs.deps import Db, Me
@@ -28,10 +29,10 @@ from strong_core.question_bank import load_general_bank
 from strong_core.schemas import (
     CompanyProfile,
     Competency,
+    InterviewType,
     Level,
     ProfileStatus,
     RoleFamily,
-    StandardType,
 )
 
 router = APIRouter(tags=["questions"])
@@ -41,7 +42,7 @@ GENERAL = "general"
 
 @dataclass(frozen=True)
 class Filters:
-    interview_type: StandardType | None
+    interview_type: InterviewType | None
     competencies: frozenset[Competency]
     role_family: RoleFamily | None
     level: Level | None
@@ -140,13 +141,15 @@ async def list_questions(
     db: Db,
     me: Me,
     company: str | None = None,
-    interview_type: StandardType | None = None,
+    interview_type: InterviewType | None = None,
     competency: Annotated[list[Competency] | None, Query()] = None,
     role_family: RoleFamily | None = None,
     level: Level | None = None,
     q: Annotated[str | None, Query(max_length=200)] = None,
 ) -> QuestionList:
-    """QB-1 to QB-3. 404 when `company` names a company with no Published profile."""
+    """QB-1 to QB-3, RS-1. 404 when `company` names a company with no Published profile."""
+    if interview_type == InterviewType.CUSTOM:  # CU-1: Custom is a session type, not a category
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Custom is not a question type.")
     filters = Filters(
         interview_type=interview_type,
         competencies=frozenset(competency or ()),

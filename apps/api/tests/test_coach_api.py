@@ -16,12 +16,15 @@ from typing import Any
 
 import httpx
 import pytest
+from livekit import api as livekit_api
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from strong_api import controls
 from strong_api.coach import engine
 from strong_api.coach import router as coach_router  # the module
 from strong_api.coach.schemas import AskFor
+from strong_core import runtime_settings as rs
 from strong_core.db.models import CoachSession, CoachTurn
 from strong_core.db.models import Story as StoryRow
 from strong_core.gateway import ModelGateway, Role
@@ -207,6 +210,68 @@ async def test_co2_internal_turns_need_the_token(client: httpx.AsyncClient) -> N
     assert {p["part"] for p in ok.json()["reply"]["parts"]} == {"context", "stakes"}
     end = await client.post(f"/internal/coach/sessions/{sid}/end", headers=headers)
     assert end.json()["session"]["status"] == "ended"
+
+
+# --- CO-6: the coach's voice room ---------------------------------------------------------
+
+
+async def _pause_voice(sessionmaker: async_sessionmaker[AsyncSession], on: bool) -> None:
+    async with sessionmaker() as db:
+        await rs.set(db, "sessions_paused_voice", on, actor="test@example.com")
+        await db.commit()
+    controls.clear_spend_cache()
+
+
+async def test_co6_voice_join_gives_a_token_for_the_coach_room(
+    client: httpx.AsyncClient, sessionmaker: async_sessionmaker[AsyncSession]
+) -> None:
+    """CO-6: the join answers a VoiceJoin for room coach-<id>; a rejoin keeps the room."""
+    await sign_in(client)
+    sid = (await start(client, channel="voice"))["session"]["id"]
+    resp = await client.post(f"/coach/sessions/{sid}/voice/join")
+    assert resp.status_code == 200, resp.text
+    join = resp.json()
+    assert set(join) == {"livekit_url", "room", "token", "identity"}
+    assert join["room"] == f"coach-{sid}" and join["identity"].startswith("candidate-")
+    claims = livekit_api.TokenVerifier("devkey", "secret").verify(join["token"])
+    assert claims.video is not None and claims.video.room == join["room"]
+    assert claims.video.room_join and claims.video.can_publish_data
+    # A rejoin of a voice session is never refused, even while new voice sessions are paused.
+    await _pause_voice(sessionmaker, True)
+    again = await client.post(f"/coach/sessions/{sid}/voice/join")
+    assert again.status_code == 200 and again.json()["room"] == join["room"]
+
+
+async def test_co6_voice_join_moves_a_text_session_to_voice(
+    client: httpx.AsyncClient, sessionmaker: async_sessionmaker[AsyncSession]
+) -> None:
+    """CO-6, OC-2: the mic moves a text session to voice, unless new voice sessions are paused."""
+    await sign_in(client)
+    sid = (await start(client, channel="text"))["session"]["id"]
+    await _pause_voice(sessionmaker, True)
+    refused = await client.post(f"/coach/sessions/{sid}/voice/join")
+    assert refused.status_code == 503 and refused.json()["detail"]["code"] == "sessions_paused"
+    assert (await client.get(f"/coach/sessions/{sid}")).json()["session"]["channel"] == "text"
+    await _pause_voice(sessionmaker, False)
+    ok = await client.post(f"/coach/sessions/{sid}/voice/join")
+    assert ok.status_code == 200, ok.text
+    assert (await client.get(f"/coach/sessions/{sid}")).json()["session"]["channel"] == "voice"
+    # Typing still works in the same session after the switch.
+    assert (await client.post(f"/coach/sessions/{sid}/turns", json={"text": T1})).status_code == 200
+
+
+async def test_co6_voice_join_is_owner_only_and_needs_an_active_session(
+    client: httpx.AsyncClient,
+) -> None:
+    """CO-6: another user gets 404; an ended session gets 409."""
+    await sign_in(client)
+    sid = (await start(client, channel="voice"))["session"]["id"]
+    await client.post(f"/coach/sessions/{sid}/end")
+    assert (await client.post(f"/coach/sessions/{sid}/voice/join")).status_code == 409
+    other = (await start(client, channel="voice"))["session"]["id"]
+    await sign_in(client, "someone-else@example.com")
+    assert (await client.post(f"/coach/sessions/{other}/voice/join")).status_code == 404
+    assert (await client.post(f"/coach/sessions/{uuid.uuid4()}/voice/join")).status_code == 404
 
 
 # --- CO-3: parts only from the candidate's words -----------------------------------------

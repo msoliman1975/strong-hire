@@ -5,9 +5,8 @@
  * and the skills the story could prove. The style switch is CO-5. "Done" saves the title, ends
  * the session and opens the story in the workbench.
  *
- * The mic button (CO-6) joins the coach's voice room through useCoachVoice. The API's join
- * endpoint for coach rooms is not built yet, so the button is enabled only with the browser
- * mocks (VITE_API_MOCKS=all) until it is.
+ * The mic button (CO-6) joins the coach's voice room through useCoachVoice, with a token from
+ * POST /coach/sessions/{id}/voice/join (room coach-<id>).
  */
 import "./coach.css";
 
@@ -41,9 +40,6 @@ import {
 } from "./api";
 import { useCoachVoice } from "./useCoachVoice";
 
-/** The coach room's join endpoint exists only in the browser mocks for now (see the S32 PR). */
-export const COACH_VOICE_READY = import.meta.env.VITE_API_MOCKS === "all";
-
 /** The title the API gives a new coach story. */
 const NEW_STORY_TITLE = "Untitled story";
 
@@ -63,21 +59,21 @@ const PART_EMPTY: Record<StoryPart, string> = {
 type PartState = "done" | "now" | "next";
 const PART_STATE_LABEL: Record<PartState, string> = { done: "Done", now: "Coach is asking", next: "Missing" };
 
-export function CoachSessionPage({ voiceReady = COACH_VOICE_READY }: { voiceReady?: boolean }) {
+export function CoachSessionPage() {
   const { sessionId = "" } = useParams();
   const detail = useCoachSession(sessionId);
   return (
     <div className="coach stack">
       {detail.isPending && <Loading label="Loading the coach session" />}
       {detail.isError && <ErrorNotice error={detail.error} />}
-      {detail.data && <CoachSession key={detail.data.session.id} detail={detail.data} voiceReady={voiceReady} />}
+      {detail.data && <CoachSession key={detail.data.session.id} detail={detail.data} />}
     </div>
   );
 }
 
 const filled = (story: Story | null, part: StoryPart) => ((story?.[part] ?? "") as string).trim() !== "";
 
-function CoachSession({ detail, voiceReady }: { detail: CoachSessionDetail; voiceReady: boolean }) {
+function CoachSession({ detail }: { detail: CoachSessionDetail }) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const sessionId = detail.session.id;
@@ -221,8 +217,7 @@ function CoachSession({ detail, voiceReady }: { detail: CoachSessionDetail; voic
                 className="coach__mic"
                 data-live={voiceLive || undefined}
                 aria-label={voiceLive ? "Stop talking to the coach" : "Talk to the coach"}
-                aria-describedby={voiceReady ? undefined : "coach-mic-note"}
-                disabled={!voiceReady || voice.status === "connecting"}
+                disabled={voice.status === "connecting"}
                 onClick={() => void (voiceLive ? voice.end() : voice.start())}
               >
                 <MicIcon />
@@ -242,11 +237,6 @@ function CoachSession({ detail, voiceReady }: { detail: CoachSessionDetail; voic
               <button className="btn" type="submit" disabled={!draft.trim() || turn.isPending}>
                 Send
               </button>
-              {!voiceReady && (
-                <p id="coach-mic-note" className="muted small coach__mic-note">
-                  Talking to the coach by voice is coming soon. Type for now.
-                </p>
-              )}
               {voice.error && <p className="field-error">{voice.error}</p>}
             </form>
           )}

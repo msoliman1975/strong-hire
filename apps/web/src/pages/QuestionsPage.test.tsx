@@ -7,11 +7,15 @@ import { useEffect } from "react";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
 import { COMPETENCIES_BY_TYPE } from "../api/questions";
 import { createQueryClient } from "../App";
+import { competencyLabel } from "../labels";
+import { setFeatureOverrides } from "../theme/features";
 import { QuestionsPage } from "./QuestionsPage";
+
+afterEach(() => setFeatureOverrides({}));
 
 let lastSearch = "";
 function LocationProbe() {
@@ -110,14 +114,38 @@ describe("questions page", () => {
     expect(lastSearch).toContain("q=estimation");
   });
 
-  it("the area filter knows every competency exactly once", () => {
+  it("the area filter knows every competency, once per standard type", () => {
     const openapi = JSON.parse(readFileSync(resolve(__dirname, "../../openapi.json"), "utf8")) as {
       components: { schemas: { Competency: { enum: string[] } } };
     };
-    const listed = Object.values(COMPETENCIES_BY_TYPE).flat();
+    const { recruiter_screen: recruiter, ...standard } = COMPETENCIES_BY_TYPE;
+    const listed = Object.values(standard).flat();
     expect(new Set(listed).size).toBe(listed.length);
-    // RS-1: Recruiter screen is not a question bank type; this competency is only its own.
-    const standard = openapi.components.schemas.Competency.enum.filter((c) => c !== "logistics_and_expectations");
-    expect([...listed].sort()).toEqual(standard.sort());
+    const all = new Set([...listed, ...recruiter]);
+    expect([...all].sort()).toEqual([...openapi.components.schemas.Competency.enum].sort());
+  });
+
+  it("RS-1: with v2 on, Recruiter screen is a type with its own areas", async () => {
+    setFeatureOverrides({ v2_enabled: true });
+    const user = renderAt("/questions");
+    await section(/^General questions/);
+    await user.selectOptions(screen.getByLabelText("Interview type"), "recruiter_screen");
+    expect(lastSearch).toContain("type=recruiter_screen");
+    const areas = within(screen.getByRole("group", { name: "Question area" }));
+    expect(areas.getAllByRole("checkbox").map((c) => c.closest("label")?.textContent)).toEqual([
+      competencyLabel("motivation"),
+      competencyLabel("role_fit"),
+      competencyLabel("communication"),
+      competencyLabel("logistics_and_expectations"),
+    ]);
+    // The bank holds no recruiter screen questions yet.
+    expect((await screen.findAllByText("No questions match these filters.")).length).toBeGreaterThan(0);
+  });
+
+  it("RS-1: with v2 off, Recruiter screen is not offered", async () => {
+    renderAt("/questions");
+    await section(/^General questions/);
+    const options = within(screen.getByLabelText("Interview type")).getAllByRole("option");
+    expect(options.map((o) => o.getAttribute("value"))).not.toContain("recruiter_screen");
   });
 });
