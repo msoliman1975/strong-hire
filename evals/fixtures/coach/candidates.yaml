@@ -65,6 +65,6 @@
   script:
     - "Last year we were moving checkout to the new payments provider and the rollout was already two weeks late."
     - "It mattered because Black Friday was a month out and checkout could not break."
-    - "I wrote the rollback plan and I moved traffic in five percent steps while I watched the error rates."
+    - "I wrote the rollback plan, and we moved traffic in five percent steps while I watched the error rates."
     - "I chose a slow rollout instead of a big-bang switch, at the cost of paying for both providers for a month."
     - "We were done a week before Black Friday and not one payment failed. Next time I would get the rollback plan agreed up front."

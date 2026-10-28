@@ -12,6 +12,9 @@ Code checks:
 - invented facts (CO-9): every kept part update quotes the candidate word for word, and every
   number in the final story is one the candidate said.
 - one question per coach reply (CO-4).
+- versions (CO-8): when the story has a part, the product's writer
+  (`strong_api.takes.versions.write_versions`) writes both versions with the candidate's turns
+  as takes; the eval checks them again against the turns alone.
 - word overlap of each story part with the candidate's turns, for information: a low overlap
   is worth a look, not a failure, because the coach may reword.
 """
@@ -33,6 +36,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from strong_api.coach import engine
 from strong_api.coach.schemas import AskFor
+from strong_api.takes.versions import check_versions, said_text, write_versions
 from strong_core.db.models import CoachSession, CoachTurn
 from strong_core.db.models import Story as StoryRow
 from strong_core.gateway import Message, ModelGateway, Role
@@ -169,6 +173,9 @@ class CoachRun:
     steps: list[CoachStep]
     story: dict[str, str | None]  # part -> text at the end
     ended: bool  # the coach ended the session (IV-12 strikes)
+    versions: StoryVersions | None = None  # CO-8, when the story has a part
+    versions_asked: bool = False
+    versions_rejected: list[str] = field(default_factory=list)  # the writer's own check
 
     @property
     def candidate_text(self) -> str:
@@ -235,10 +242,17 @@ async def run_coach_session(
             if result.ended:
                 ended = True
                 break
+        parts = {p.value: engine.part_text(story, p) for p in StoryPart}
+        run = CoachRun(spec, style, opener, steps, parts, ended)
+        if any(parts.values()):
+            # CO-8: the product's writer, with the candidate's turns as its takes.
+            written = await write_versions(gateway, story, [s.candidate for s in steps])
+            run.versions_asked = True
+            run.versions = written.versions
+            run.versions_rejected = written.problems
     finally:
         set_usage_sink(previous)
-    parts = {p.value: engine.part_text(story, p) for p in StoryPart}
-    return CoachRun(spec, style, opener, steps, parts, ended)
+    return run
 
 
 # --- code checks -----------------------------------------------------------------------------
@@ -307,16 +321,12 @@ def one_question_count(run: CoachRun) -> tuple[int, int]:
     return sum(r.count("?") <= 1 for r in replies), len(replies)
 
 
-def versions_unbacked(versions: StoryVersions, said: str) -> list[str]:
-    """CO-8, CO-9: versions whose quotes are not the candidate's words, or whose text has a
-    number that is not in its quotes. `said` is the candidate's words, normalized."""
-    out: list[str] = []
-    for name, version in (("sixty_second", versions.sixty_second), ("full", versions.full)):
-        update = StoryPartUpdate(part=StoryPart.CONTEXT, text=version.text, quotes=version.quotes)
-        why = engine.backed(update, said)
-        if why is not None:
-            out.append(f"{name}: {why}")
-    return out
+def versions_unbacked(run: CoachRun) -> list[str]:
+    """CO-8, CO-9: the versions checked against the candidate's turns only (the writer also
+    accepts the story's parts, which the coach wrote): quotes, numbers and sentence support."""
+    if run.versions is None:
+        return []
+    return check_versions(run.versions, said_text([s.candidate for s in run.steps]))
 
 
 def render_transcript(run: CoachRun, *, asked_for: bool = False) -> str:

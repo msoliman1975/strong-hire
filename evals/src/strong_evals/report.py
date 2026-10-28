@@ -227,6 +227,13 @@ def render_html(r: RunReport) -> str:
             judge = c.judge_error or (
                 ", ".join(f"{x.rule}: {x.verdict}" for x in c.judge.rules) if c.judge else "not run"
             )
+            versions = "not asked"
+            if c.run and c.run.versions_asked:
+                versions = (
+                    "; ".join(c.versions_unbacked) or "faithful"
+                    if c.run.versions
+                    else "rejected by the writer: " + "; ".join(c.run.versions_rejected)
+                )
             rows.append(
                 [
                     e(c.spec.id),
@@ -235,12 +242,14 @@ def render_html(r: RunReport) -> str:
                     e("; ".join(c.unbacked + c.untraced) or "none"),
                     f"{c.one_question[0]} of {c.one_question[1]}",
                     e("; ".join(c.low_overlap) or "none"),
+                    e(versions),
                     e(judge),
                     f"${c.cost_usd:.4f}",
                     e(c.error or ""),
                 ]
             )
-        headers = ["Id", "Style", "Turns", "Invented", "One question", "Low overlap", "Judge"]
+        headers = ["Id", "Style", "Turns", "Invented", "One question", "Low overlap", "Versions"]
+        headers.append("Judge")
         parts.append(_table([*headers, "Cost", "Error"], rows))
         for p in r.style_picks:
             parts.append(
@@ -378,6 +387,11 @@ def report_data(r: RunReport) -> dict[str, Any]:
                 "untraced": c.untraced,
                 "low_overlap": c.low_overlap,
                 "one_question": list(c.one_question),
+                "versions": (
+                    c.run.versions.model_dump(mode="json") if c.run and c.run.versions else None
+                ),
+                "versions_rejected": c.run.versions_rejected if c.run else [],
+                "versions_unbacked": c.versions_unbacked,
                 "judge": ([x.model_dump(mode="json") for x in c.judge.rules] if c.judge else None),
                 "judge_error": c.judge_error,
                 "cost_usd": str(c.cost_usd),

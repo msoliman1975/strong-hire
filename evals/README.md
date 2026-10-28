@@ -68,7 +68,7 @@ metrics show "not measured".
 | Follows up on what the story lacks (IV-3) | Judge `iv3_followup` verdicts | 80% (harness default) |
 | Judge rules passed | All applicable judge verdicts: invented facts, writing for the candidate, IV-3, style, staying on the story, checking big claims | 90% (harness default) |
 | Direct told from gentle (CO-5) | The judge sees one candidate in both styles and names the direct one | 75% (harness default) |
-| Versions faithful (CO-8) | `strong_evals.coach.versions_unbacked` on the 60-second and full versions | 100%; not run until the story-versions writer is on main |
+| Versions faithful (CO-8) | The product writer (`strong_api.takes.versions.write_versions`) writes both versions with the candidate's turns as takes; `strong_evals.coach.versions_unbacked` checks them against the turns alone | 100% |
 | Part updates dropped | Updates the engine dropped (CO-3 guard); also lists parts that share under 60% of their words with the candidate | Information only |
 
 Prices per gateway alias are planning estimates in `config/prices.yaml`. A vague answer is one

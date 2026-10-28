@@ -50,6 +50,7 @@ from strong_evals.coach import (
     run_coach_session,
     unbacked_updates,
     untraced_numbers,
+    versions_unbacked,
 )
 from strong_evals.coach_judge import CoachJudgeResult, StylePick, judge_session, judge_styles
 from strong_evals.gap import GapResult, fit_order, run_gap_item
@@ -146,6 +147,7 @@ class CoachResult:
     untraced: list[str] = field(default_factory=list)  # story numbers the candidate never said
     low_overlap: list[str] = field(default_factory=list)  # parts to look at, information only
     one_question: tuple[int, int] = (0, 0)
+    versions_unbacked: list[str] = field(default_factory=list)  # CO-8 against the turns
     judge: CoachJudgeResult | None = None
     judge_error: str | None = None
     error: str | None = None
@@ -344,6 +346,7 @@ async def run_coach(
         untraced=untraced_numbers(run),
         low_overlap=low_overlap_parts(run),
         one_question=one_question_count(run),
+        versions_unbacked=versions_unbacked(run),
     )
     if not gw.is_fake:
         try:
@@ -635,6 +638,9 @@ def _coach_metrics(report: RunReport, add: Any) -> None:
     )
     picks = report.style_picks
     right = sum(p.correct for p in picks)
+    asked = sum(r.run.versions_asked for r in runs if r.run)
+    written = [r for r in runs if r.run and r.run.versions is not None]
+    faithful = sum(not r.versions_unbacked for r in written)
     add(
         "coach_style_distinct",
         "Coach: judge tells direct from gentle on the same candidate (CO-5)",
@@ -645,9 +651,10 @@ def _coach_metrics(report: RunReport, add: Any) -> None:
     add(
         "coach_versions_faithful",
         "Coach: 60-second and full versions use only the candidate's words (CO-8)",
-        None,
-        "",
-        "not run: no story-versions writer on main yet (S33)",
+        faithful / len(written) if written else None,
+        f"{faithful / len(written):.0%}" if written else "",
+        f"{faithful} of {len(written)} written versions pass against the candidate's turns; "
+        f"{asked} sessions asked, {asked - len(written)} rejected twice by the writer's check",
     )
     dropped = sum(len(s.dropped) for r in runs if r.run for s in r.run.steps)
     low = sum(len(r.low_overlap) for r in runs)

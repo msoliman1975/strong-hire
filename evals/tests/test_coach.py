@@ -66,6 +66,9 @@ async def test_co9_coach_suite_runs_on_fake() -> None:
     vague = next(c for c in report.coach if c.spec.id == "coach-vague-gentle")
     assert vague.run is not None and not any(vague.run.story.values())  # nothing to back it
     assert all(s.dropped for s in vague.run.steps)  # the engine dropped the fixture's parts
+    assert not vague.run.versions_asked  # no versions of an empty story
+    assert strong.run.versions is not None and strong.versions_unbacked == []
+    assert metrics["coach_versions_faithful"].passed is True
 
 
 def test_co9_unbacked_update_and_untraced_number_are_counted() -> None:
@@ -102,16 +105,15 @@ def test_co9_low_overlap_flags_added_content() -> None:
 
 
 def test_co9_versions_must_quote_the_candidate() -> None:
-    said = "we moved traffic in five percent steps and not one payment failed"
-    good = {
-        "text": "We moved traffic in small steps.",
-        "quotes": ["we moved traffic in five percent steps"],
-    }
-    bad = {"text": "We moved 5% at a time.", "quotes": ["we moved traffic in five percent steps"]}
-    ok = StoryVersions.model_validate({"sixty_second": good, "full": good})
-    assert versions_unbacked(ok, said) == []
-    wrong = StoryVersions.model_validate({"sixty_second": bad, "full": good})
-    assert versions_unbacked(wrong, said) == ["sixty_second: number not in the quotes: 5"]
+    """CO-8, CO-9: versions are checked against the candidate's turns, not the coach's parts."""
+    quote = "we moved traffic in five percent steps"
+    good = {"text": "We moved traffic in five percent steps.", "quotes": [quote]}
+    bad = {"text": "We moved traffic in 7% steps.", "quotes": [quote]}
+    run = _run([f"Then {quote} and not one payment failed."], {"action": "Moved traffic."}, [])
+    run.versions = StoryVersions.model_validate({"sixty_second": good, "full": good})
+    assert versions_unbacked(run) == []
+    run.versions = StoryVersions.model_validate({"sixty_second": bad, "full": good})
+    assert versions_unbacked(run) == ["sixty_second: number not in the quotes: 7"]
 
 
 # --- off the fake profile: a scripted function model stands in for the hosted one -----------
@@ -126,6 +128,12 @@ def _model(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
         out = {"direct": "A", "reason": "A is shorter"}
     elif "You check one candidate turn" in text:
         out = {"conduct": "ok", "reason": ""}
+    elif "You write two versions" in text:
+        version = {
+            "text": "We were moving checkout to the new payments provider.",
+            "quotes": [STRONG_FIRST],
+        }
+        out = {"sixty_second": version, "full": version}
     elif "You are a story coach" in text:
         out = {
             "message": "What did you do yourself? And what changed?",
@@ -166,5 +174,6 @@ async def test_co9_judge_runs_off_the_fake_profile() -> None:
     assert metrics["coach_iv3_followup"].value == 1.0
     assert metrics["coach_judge_pass"].passed is True
     assert metrics["coach_style_distinct"].value is not None
+    assert metrics["coach_versions_faithful"].value == 1.0
     assert len(report.style_picks) == 1
     assert any(r.startswith("evals/coach_judge") for r in report.prompt_refs)
