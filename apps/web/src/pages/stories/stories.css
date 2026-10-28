@@ -1,0 +1,148 @@
+/* ST-3: the story library and workbench (canvas board A2 Workbench). Tokens from theme/tokens.css. */
+
+.stories .page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+
+.stories__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+}
+
+.stories__skill-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stories__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stories__list > li + li {
+  margin-top: 0;
+}
+
+.story-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.story-row__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.story-row__title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--sh-ink);
+}
+
+.story-parts-done {
+  margin: 0;
+}
+
+.story-parts-done__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+}
+
+.stories__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+}
+
+.story-head__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 6px 0 0;
+}
+
+.workbench {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.workbench__main {
+  flex: 2 1 520px;
+  min-width: 0;
+}
+
+.workbench__side {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+
+.workbench__side h2 {
+  font-size: 1.0625rem;
+  margin: 0 0 12px;
+}
+
+.workbench__parts {
+  display: flex;
+  flex-direction: column;
+}
+
+.workbench__parts > li + li {
+  border-top: 1px solid var(--sh-line);
+}
+
+.workbench__part {
+  display: grid;
+  gap: 6px;
+  padding: 14px 0;
+}
+
+.workbench__part-label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.workbench__part textarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.workbench__notes p {
+  margin: 0;
+}
+
+.story-skills {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.story-skills__group p {
+  margin: 0 0 6px;
+}
+
+.stories .chip-list.plain-list > li + li,
+.home-stories .chip-list.plain-list > li + li {
+  margin-top: 0;
+}

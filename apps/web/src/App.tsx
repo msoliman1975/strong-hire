@@ -29,6 +29,10 @@ import { ResumesPage } from "./pages/ResumesPage";
 import { SessionSetupPage } from "./pages/SessionSetupPage";
 import { SignInPage } from "./pages/SignInPage";
 import { SignupPage } from "./pages/SignupPage";
+import { NewStoryPage } from "./pages/stories/NewStoryPage";
+import { StoriesPage } from "./pages/stories/StoriesPage";
+import { StoryWorkbenchPage } from "./pages/stories/StoryWorkbenchPage";
+import { V2Only } from "./pages/stories/V2Only";
 import { WaitlistConfirmPage, WaitlistPage } from "./pages/WaitlistPage";
 import { TranscriptPage } from "./pages/transcript/TranscriptPage";
 import { LiveSessionPage } from "./session/LiveSessionPage";
@@ -84,6 +88,9 @@ export function AppRoutes() {
           <Route path="/sessions/:sessionId/debrief" element={<DebriefPage />} />
           <Route path="/sessions/:sessionId/transcript" element={<TranscriptPage />} />
           <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/stories" element={<V2Only><StoriesPage /></V2Only>} />
+          <Route path="/stories/new" element={<V2Only><NewStoryPage /></V2Only>} />
+          <Route path="/stories/:storyId" element={<V2Only><StoryWorkbenchPage /></V2Only>} />
           <Route path="/questions" element={<QuestionsPage />} />
           <Route path="/questions/mine" element={<MyQuestionsPage />} />
           <Route path="/account" element={<AccountPage />} />
