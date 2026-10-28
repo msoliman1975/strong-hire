@@ -169,7 +169,7 @@ describe("v2 Check your CV", () => {
     await user.type(screen.getByRole("textbox", { name: "Certifications" }), "AWS Solutions Architect");
     await user.click(within(screen.getByRole("region", { name: "Certifications" })).getByRole("button", { name: "Save" }));
 
-    await user.click(screen.getByRole("button", { name: "Save draft" }));
+    await user.click(screen.getAllByRole("button", { name: "Save draft" })[0]);
     expect(await screen.findByText("Draft saved.")).toBeInTheDocument();
     expect(puts).toHaveLength(1);
     expect(puts[0].resume.summary).toBe("Backend engineer with 7 years in payments. I led 30 service migrations.");
@@ -177,7 +177,7 @@ describe("v2 Check your CV", () => {
     expect(puts[0].resume.education).toEqual(fixtureResume.education);
     expect(puts[0].resume.roles).toEqual(fixtureResume.roles);
 
-    await user.click(screen.getByRole("button", { name: "Looks right, continue" }));
+    await user.click(screen.getAllByRole("button", { name: "Continue to your interview plan" })[0]);
     expect(await screen.findByRole("heading", { name: "Add context (optional)" })).toBeInTheDocument();
     expect(puts).toHaveLength(2);
   });
@@ -192,7 +192,7 @@ describe("v2 Check your CV", () => {
     const added = screen.getByRole("group", { name: "Editing · New role" });
     await user.click(within(added).getByRole("button", { name: "Save role" }));
     expect(within(added).getByText("Enter the company.")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Looks right, continue" }));
+    await user.click(screen.getAllByRole("button", { name: "Back to resumes" })[0]);
     expect(await screen.findByText("Fix the fields marked in red, then continue.")).toBeInTheDocument();
     expect(puts).toHaveLength(0);
 
@@ -206,7 +206,7 @@ describe("v2 Check your CV", () => {
     await user.click(screen.getByRole("button", { name: "Edit Software Engineer II · Shoply" }));
     await user.click(screen.getByRole("button", { name: "Remove the role Software Engineer II · Shoply" }));
 
-    await user.click(screen.getByRole("button", { name: "Looks right, continue" }));
+    await user.click(screen.getAllByRole("button", { name: "Back to resumes" })[1]);
     expect(await screen.findByRole("heading", { name: "Resumes" })).toBeInTheDocument();
     expect(puts[0].resume.roles.map((r) => r.company)).toEqual(["Northwind Labs", "Invoicely"]);
   });
@@ -220,6 +220,29 @@ describe("v2 Check your CV", () => {
     await screen.findByRole("complementary", { name: "What we found" });
     expect(within(panel()).getByText("✓ Accepted: A skill missing from Skills")).toBeInTheDocument();
     expect(within(panel()).getByText(/1 accepted/)).toBeInTheDocument();
+  });
+
+  it("IN-3: a new CV says where the user is, and ends in one next step, at the top and the bottom", async () => {
+    const { resume } = await seed();
+    const puts = recordPutBodies();
+    const user = renderAt(`/resumes/${resume.id}/check`);
+    await screen.findByRole("complementary", { name: "What we found" });
+    expect(screen.getByRole("status")).toHaveTextContent("We read your CV. Check it, then continue.");
+    const next = screen.getAllByRole("button", { name: "Add a job description to practice for" });
+    expect(next).toHaveLength(2);
+    expect(within(screen.getByRole("region", { name: "Next step" })).getByRole("button", { name: "Back to resumes" })).toBeInTheDocument();
+    await user.click(next[1]);
+    expect(await screen.findByRole("heading", { name: "Add a job description" })).toBeInTheDocument();
+    expect(puts).toHaveLength(1);
+  });
+
+  it("IN-3: inside a rehearsal the next step is the interview plan, and a confirmed CV has no landing line", async () => {
+    const { job, resume } = await seed();
+    mockStore.db.resumes[0].confirmed_at = "2026-10-28T10:00:00Z";
+    renderAt(`/jobs/${job.id}/resume/${resume.id}/check`);
+    await screen.findByRole("complementary", { name: "What we found" });
+    expect(screen.getAllByRole("button", { name: "Continue to your interview plan" })).toHaveLength(2);
+    expect(screen.queryByText("We read your CV. Check it, then continue.")).not.toBeInTheDocument();
   });
 
   it("IN-3: keeps the v1 form when v2_enabled is off", async () => {

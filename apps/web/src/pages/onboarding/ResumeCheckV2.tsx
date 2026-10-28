@@ -11,7 +11,7 @@ import { keys, useJob } from "../../api/hooks";
 import { resumesApi } from "../../api/inputs";
 import type { Resume } from "../../api/types";
 import { ErrorNotice, PageHead, Steps } from "../../components/ui";
-import { contextPath } from "../../paths";
+import { contextPath, newJobPath } from "../../paths";
 import { useAcceptedIssues, type AcceptedIssues } from "./acceptedIssues";
 import {
   checkResume,
@@ -157,6 +157,7 @@ export function ResumeCheckV2({
   name,
   original,
   accepted: acceptedInitial = [],
+  fresh = false,
 }: {
   jobId: string;
   resumeId: string;
@@ -164,6 +165,8 @@ export function ResumeCheckV2({
   original: Resume;
   /** Issues the user accepted before (IN-12). */
   accepted?: readonly { key: string }[];
+  /** The CV was just read and not confirmed yet: say where the user is. */
+  fresh?: boolean;
 }) {
   const steps = useOnboardingSteps();
   const navigate = useNavigate();
@@ -338,19 +341,46 @@ export function ResumeCheckV2({
     });
   };
 
-  const onContinue = () => {
+  /** Saves the CV, then goes to `path`. */
+  const saveThen = (path: string) => {
     const built = build();
     if (!built) return;
-    save.mutate(built.resume, {
-      onSuccess: () => navigate(jobId ? contextPath(jobId, resumeId) : "/resumes"),
-    });
+    save.mutate(built.resume, { onSuccess: () => navigate(path) });
   };
+
+  // One obvious next step: the interview plan inside a rehearsal, else a job to practice for.
+  const actions = (
+    <div className="row cvc-actions">
+      {jobId ? (
+        <button type="button" className="btn btn--secondary" onClick={onSaveDraft} disabled={save.isPending}>
+          Save draft
+        </button>
+      ) : (
+        <button type="button" className="btn btn--secondary" onClick={() => saveThen("/resumes")} disabled={save.isPending}>
+          Back to resumes
+        </button>
+      )}
+      <button
+        type="button"
+        className="btn"
+        onClick={() => saveThen(jobId ? contextPath(jobId, resumeId) : newJobPath("rehearsal"))}
+        disabled={save.isPending}
+      >
+        {jobId ? "Continue to your interview plan" : "Add a job description to practice for"}
+      </button>
+    </div>
+  );
 
   const issuesFor = (index: number) => open.filter((i) => i.roles.includes(index));
 
   return (
     <div className="cvc">
       {jobId && <Steps current={1} steps={steps} />}
+      {fresh && (
+        <p className="cvc-landing" role="status">
+          We read your CV. Check it, then continue.
+        </p>
+      )}
       <div className="cvc-head">
         <PageHead title="Check your CV" eyebrow={name ? `Resumes · ${name}` : "Resumes"} eyebrowTone="muted">
           <p>
@@ -358,14 +388,7 @@ export function ResumeCheckV2({
             your match scores read this version.
           </p>
         </PageHead>
-        <div className="row cvc-head__actions">
-          <button type="button" className="btn btn--secondary" onClick={onSaveDraft} disabled={save.isPending}>
-            Save draft
-          </button>
-          <button type="button" className="btn" onClick={onContinue} disabled={save.isPending}>
-            Looks right, continue
-          </button>
-        </div>
+        <div className="cvc-head__actions">{actions}</div>
       </div>
       <div aria-live="polite" className="cvc-status">
         {saved && !save.isPending && <p className="muted">Draft saved.</p>}
@@ -460,6 +483,16 @@ export function ResumeCheckV2({
               onSave={(certifications) => setDraft((d) => ({ ...d, certifications }))}
             />
           </div>
+
+          <section className="cvc-card cvc-next" aria-label="Next step">
+            <p>
+              <b>Looks right?</b>{" "}
+              {jobId
+                ? "Next, your interview plan for this job."
+                : "Next, add a job description and we compare your CV with it."}
+            </p>
+            {actions}
+          </section>
         </div>
 
         <IssuesPanel issues={issues} accepted={accepted} jobId={jobId} onFix={fix} />
@@ -903,7 +936,7 @@ function SkillsCard({
     </ul>
   );
   return (
-    <section className="cvc-card cvc-card--wide" aria-labelledby="cvc-skills">
+    <section className="cvc-card" aria-labelledby="cvc-skills">
       <CardHead
         label={<span id="cvc-skills">Skills · {skills.length}</span>}
         action={!open && <EditLink onClick={() => setOpen(true)} label="Edit skills" />}
@@ -1096,6 +1129,8 @@ function IssuesPanel({
   onFix: (issue: ResumeIssue) => void;
 }) {
   const [filter, setFilter] = useState<Filter>("all");
+  // On phones the panel sits above the CV, folded to its summary until opened.
+  const [folded, setFolded] = useState(() => Boolean(globalThis.matchMedia?.("(max-width: 979px)").matches));
   const openIssues = issues.filter((i) => !accepted.keys.has(i.key));
   const acceptedIssues = issues.filter((i) => accepted.keys.has(i.key));
   const counts: Record<Filter, number> = {
@@ -1114,7 +1149,7 @@ function IssuesPanel({
   ];
 
   return (
-    <aside className="cvc-panel" aria-labelledby="cvc-found">
+    <aside className="cvc-panel" aria-labelledby="cvc-found" data-folded={folded || undefined}>
       <section className="cvc-card cvc-panel__head">
         <div className="cvc-card__head">
           <h2 id="cvc-found">What we found</h2>
@@ -1136,8 +1171,18 @@ function IssuesPanel({
             </button>
           ))}
         </div>
+        <button
+          type="button"
+          className="cvc-link cvc-panel__toggle"
+          aria-expanded={!folded}
+          aria-controls="cvc-issue-list"
+          onClick={() => setFolded((f) => !f)}
+        >
+          {folded ? "Show the issues" : "Hide the issues"}
+        </button>
       </section>
 
+      <div className="cvc-panel__list" id="cvc-issue-list">
       {accepted.error != null && <ErrorNotice error={accepted.error} title="We could not save that." />}
       {shown.length === 0 && filter !== "accepted" && (
         <p className="cvc-card cvc-clear">
@@ -1173,6 +1218,7 @@ function IssuesPanel({
       )}
 
       <WhatWeCheck />
+      </div>
     </aside>
   );
 }

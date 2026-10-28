@@ -110,6 +110,7 @@ export function CheckResumePage() {
       <ResumeCheckV2 key={resumeId} jobId={jobId} resumeId={resumeId} name={record.data?.name ?? null}
         original={parsed}
         accepted={record.data?.accepted_issues ?? []}
+        fresh={!record.data?.confirmed_at}
       />
     );
   }
@@ -118,10 +119,14 @@ export function CheckResumePage() {
     <div className="page--narrow">
       {jobId && <Steps current={1} steps={steps} />}
       <PageHead title="Check your CV">
-        <p>
-          This is what we read from your CV. Check that each achievement is under the right job, fix
-          anything that is wrong, then confirm. We use this version to compare your CV with the job.
-        </p>
+        {v2 ? (
+          <p>We are reading your CV. When it is done, you check it here, then continue.</p>
+        ) : (
+          <p>
+            This is what we read from your CV. Check that each achievement is under the right job, fix
+            anything that is wrong, then confirm. We use this version to compare your CV with the job.
+          </p>
+        )}
       </PageHead>
       {record.isError && <ErrorNotice error={record.error} />}
       {problem && (
