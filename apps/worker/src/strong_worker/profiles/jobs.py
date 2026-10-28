@@ -64,6 +64,12 @@ async def approved_auto_profile(
     return row if row is not None and row.status == AutoProfileStatus.APPROVED else None
 
 
+async def approved_summary(db: AsyncSession, company_name: str | None) -> str | None:
+    """AP-2: the summary text a brief may carry, or None. Only an approved row counts."""
+    row = await approved_auto_profile(db, company_name)
+    return row.summary if row is not None else None
+
+
 def build_auto_profile_messages(company_name: str, pages: list[Page]) -> list[Message]:
     company = sanitize_untrusted(company_name, max_chars=200).text
     return [

@@ -52,6 +52,7 @@ from strong_worker.gap.analysis import GapAnalysisError, run_gap_analysis
 from strong_worker.gap.brief import BriefError, build_brief
 from strong_worker.ops.context import job_context
 from strong_worker.pause import wait_if_paused
+from strong_worker.profiles.jobs import approved_summary
 
 log = logging.getLogger(__name__)
 
@@ -300,7 +301,12 @@ async def _build_interviewer_brief(
         profile = await use_profile_for_session(db, session)
         try:
             gateway = await gateway_for_org(db, session.org_id, gap.gateway)
-            built = await build_brief(gateway, config, posting, resume, profile, gap=analysis)
+            auto_summary = (  # AP-2: approved auto-profiles only, read once per brief
+                await approved_summary(db, posting.company_name) if profile.generic else None
+            )
+            built = await build_brief(
+                gateway, config, posting, resume, profile, gap=analysis, auto_summary=auto_summary
+            )
         except BriefError as exc:
             if job_try < BRIEF_MAX_TRIES:
                 log.warning(
