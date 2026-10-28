@@ -66,6 +66,12 @@ export function DebriefPage() {
           {modeLabel[config.mode]} mode, {session.minutes_billed} minutes
           {date && `, ${formatDate(date)}`}
         </p>
+        {/* TR-1 (S13): behind v2_enabled until launch. */}
+        {v2 && session.ended_at && (
+          <p>
+            <Link to={`/sessions/${session.id}/transcript`}>Read the transcript</Link>
+          </p>
+        )}
       </PageHead>
       {status === "not_ended" && (
         <section className="section panel" data-testid="not-ended">

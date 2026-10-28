@@ -1,0 +1,11 @@
+Question: $question
+
+Misses the scorer noted:
+$misses
+
+<untrusted_input>
+ANSWER
+$answer
+
+STORY $stories
+</untrusted_input>

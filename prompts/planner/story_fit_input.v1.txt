@@ -1,0 +1,9 @@
+Job: $job
+
+Skills the interview will test:
+$skills
+
+<untrusted_input>
+STORY LIBRARY (id: title [skill tags], then the parts)
+$stories
+</untrusted_input>

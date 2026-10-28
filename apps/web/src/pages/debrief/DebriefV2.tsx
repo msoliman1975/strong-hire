@@ -1,6 +1,7 @@
 import "./debrief.css";
 
 import type { ReactNode } from "react";
+import { Link } from "react-router";
 
 import type { Debrief, Scorecard } from "../../api/types";
 import { RealismRating } from "../../components/RealismRating";
@@ -45,6 +46,12 @@ export function DebriefV2({
         <p className="muted">
           {modeLabel[config.mode]} mode{date && `, ${formatDate(date)}`}
         </p>
+        {/* TR-1 (S13). */}
+        {session.ended_at && (
+          <p>
+            <Link to={`/sessions/${session.id}/transcript`}>Read the transcript</Link>
+          </p>
+        )}
       </PageHead>
 
       <section className="debrief-v2__verdict" aria-label="Verdict">
