@@ -486,7 +486,7 @@ async def get_session(
             transcript=None,
             traces=None,
             trace_retention_days=TRACE_RETENTION_DAYS,
-            setup=session_setup(row, card, consent=False),
+            setup=session_setup(row, card),
             **extra,
         )
     transcript = await _transcript(db, row)
@@ -515,7 +515,7 @@ async def get_session(
         trace_retention_days=TRACE_RETENTION_DAYS,
         audio_available=audio is not None,
         replay_available=replay,
-        setup=session_setup(row, card, consent=True),
+        setup=session_setup(row, card),
         **extra,
     )
 

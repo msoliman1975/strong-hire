@@ -752,5 +752,5 @@ async def session_replay(
         ),
         scenario=_scenario(scenario) if isinstance(scenario, dict) else None,
         inputs=_inputs(scenario) if isinstance(scenario, dict) else None,
-        setup=session_setup(row, card, consent=True),
+        setup=session_setup(row, card),
     )

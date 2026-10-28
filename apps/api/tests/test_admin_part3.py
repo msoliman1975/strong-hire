@@ -142,6 +142,7 @@ def _score(competency: str, score: int) -> dict[str, Any]:
 def recruiter_brief() -> dict[str, Any]:
     data: dict[str, Any] = json.loads(BRIEF_FIXTURE.read_text(encoding="utf-8"))
     data["session"]["interview_type"] = "recruiter_screen"
+    data["questions"][0]["text"] = f"{SECRET} question from the resume"
     return data
 
 
@@ -442,7 +443,7 @@ async def test_ad5_coach_eval_results_from_reports(admin: httpx.AsyncClient, rep
     resp = await admin.get("/admin/part3/coach")
     assert SECRET not in resp.text
     evals = resp.json()["evals"]
-    assert [r["file"] for r in evals["runs"]] == ["coach-fake-2.json", "coach-hosted-1.json"]
+    assert [r["report"] for r in evals["runs"]] == ["coach-fake-2.json", "coach-hosted-1.json"]
     latest = evals["latest"]
     assert latest["profile"] == "hosted" and latest["dev_data"] is False
     assert latest["passed"] is True
@@ -512,24 +513,25 @@ async def test_ad5_part3_is_admin_only(candidate: httpx.AsyncClient) -> None:
 # ---------------------------------------------------------------- AD-5 recruiter screen
 
 
-async def test_ad5_recruiter_screen_brief_and_rubric_on_session_page(
+async def test_ad5_recruiter_screen_brief_and_rubric_prompts_on_session_page(
     admin: httpx.AsyncClient, sessionmaker: Maker
 ) -> None:
-    """AD-5, RS-2: the session page shows a recruiter screen's brief and the rubric its
-    scorecard used. The rubric always; the brief only while the user's consent is on."""
+    """AD-5, RS-2: the session page shows the recruiter screen's brief prompt and the rubric its
+    scorecard used, consent or not. Prompt files only: never the user's brief (AA-11, D-8)."""
     ids = await _seed(sessionmaker)
     detail = (await admin.get(f"/admin/sessions/{ids['session']}")).json()
+    assert SECRET not in json.dumps(detail)
     setup = detail["setup"]
-    assert setup["brief"]["session"]["interview_type"] == "recruiter_screen"
-    assert setup["brief"]["questions"]
-    rubric = setup["rubric"]
-    expected = load_prompt("scorer", "rubric_recruiter_screen", 1, tier=None).text
-    assert rubric == {"ref": RUBRIC_REF, "text": expected, "scored": True}
+    assert set(setup) == {"brief_prompt", "rubric"}
+    brief = load_prompt("planner", "interviewer_brief_recruiter_screen", tier=None)
+    assert setup["brief_prompt"] == {"ref": brief.ref, "text": brief.text, "recorded": False}
+    rubric = load_prompt("scorer", "rubric_recruiter_screen", 1, tier=None)
+    assert setup["rubric"] == {"ref": RUBRIC_REF, "text": rubric.text, "recorded": True}
 
     # Not scored yet: the current recruiter screen rubric.
     pending = (await admin.get(f"/admin/sessions/{ids['pending']}")).json()["setup"]
     assert pending["rubric"]["ref"].startswith("scorer/rubric_recruiter_screen.v")
-    assert pending["rubric"]["scored"] is False
+    assert pending["rubric"]["recorded"] is False
 
     async with sessionmaker() as db:
         user = await db.get(User, ids["user"])
@@ -538,14 +540,13 @@ async def test_ad5_recruiter_screen_brief_and_rubric_on_session_page(
         await db.commit()
     hidden = (await admin.get(f"/admin/sessions/{ids['session']}")).json()
     assert hidden["content_visible"] is False
-    assert hidden["setup"]["brief"] is None
-    assert hidden["setup"]["rubric"]["ref"] == RUBRIC_REF
+    assert hidden["setup"] == setup
 
 
-async def test_ad5_recruiter_screen_brief_and_rubric_on_replay(
+async def test_ad5_recruiter_screen_prompts_on_replay(
     app: FastAPI, admin: httpx.AsyncClient, sessionmaker: Maker
 ) -> None:
-    """AD-5: the replay page of an AI candidate's recruiter screen shows the same setup."""
+    """AD-5: the replay page of an AI candidate's recruiter screen shows the same prompts."""
     async with httpx.AsyncClient(
         transport=httpx.ASGITransport(app=app), base_url="http://test"
     ) as sim:
@@ -565,9 +566,9 @@ async def test_ad5_recruiter_screen_brief_and_rubric_on_replay(
         )
         await db.commit()
         sid = session.id
-    replay = (await admin.get(f"/admin/sessions/{sid}/replay")).json()
-    assert replay["setup"]["brief"]["session"]["interview_type"] == "recruiter_screen"
-    assert replay["setup"]["rubric"]["ref"] == RUBRIC_REF
+    setup = (await admin.get(f"/admin/sessions/{sid}/replay")).json()["setup"]
+    assert setup["brief_prompt"]["ref"].startswith("planner/interviewer_brief_recruiter_screen.v")
+    assert setup["rubric"]["ref"] == RUBRIC_REF
 
 
 # ---------------------------------------------------------------- the no-text rule
@@ -587,7 +588,7 @@ async def test_ad5_no_admin_endpoint_returns_coach_or_story_text(
     app: FastAPI, admin: httpx.AsyncClient, sessionmaker: Maker, reports: Path
 ) -> None:
     """AD-5: every admin GET route, with the seeded user and session filled in, returns no coach
-    turn, take, story or score justification text, even with training consent on."""
+    turn, take, story, brief or score justification text, even with training consent on."""
     ids = await _seed(sessionmaker)
     _report(reports, "coach-hosted-1.json", "hosted", "2030-03-10T10:00:00+00:00", True)
     paths = sorted(

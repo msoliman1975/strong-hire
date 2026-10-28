@@ -139,8 +139,8 @@ export const mockReplay: SessionReplay = {
   scenario: scenario(),
   inputs: null,
   setup: {
-    brief: null,
-    rubric: { ref: "scorer/rubric.v2", text: "Score each answer 1 to 4 per competency.", scored: true },
+    brief_prompt: { ref: "planner/interviewer_brief.v3", text: "Build the interviewer brief.", recorded: false },
+    rubric: { ref: "scorer/rubric.v2", text: "Score each answer 1 to 4 per competency.", recorded: true },
   },
 };
 

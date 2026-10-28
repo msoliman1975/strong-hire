@@ -3512,6 +3512,27 @@ export interface components {
             /** Password */
             password: string;
         };
+        /**
+         * AdminPrompt
+         * @description A prompt file (RS-2). Prompt text only: never a user's brief (AA-11, D-8).
+         */
+        AdminPrompt: {
+            /**
+             * Ref
+             * @description The prompt ref, e.g. scorer/rubric_recruiter_screen.v1
+             */
+            ref: string;
+            /**
+             * Text
+             * @description The prompt; None when the file is gone
+             */
+            text: string | null;
+            /**
+             * Recorded
+             * @description True: the ref this session recorded. False: the current prompt for its type
+             */
+            recorded: boolean;
+        };
         /** AdminProviders */
         AdminProviders: {
             /** Google */
@@ -3573,24 +3594,6 @@ export interface components {
              * @enum {string}
              */
             status: "reading" | "to_confirm" | "confirmed" | "deleted";
-        };
-        /** AdminRubric */
-        AdminRubric: {
-            /**
-             * Ref
-             * @description The prompt ref, e.g. scorer/rubric_recruiter_screen.v1
-             */
-            ref: string;
-            /**
-             * Text
-             * @description The rubric prompt; None when the file is gone
-             */
-            text: string | null;
-            /**
-             * Scored
-             * @description False: not scored yet, this is the current rubric
-             */
-            scored: boolean;
         };
         /** AdminScore */
         AdminScore: {
@@ -3709,7 +3712,7 @@ export interface components {
              * @description AI-2: every component and role. None without usage rows.
              */
             cost_total_usd?: number | null;
-            /** @description AD-5: the brief (consent rule) and the rubric */
+            /** @description AD-5: the brief and rubric prompts for its type */
             setup?: components["schemas"]["AdminSessionSetup"] | null;
             /**
              * Turn Latency
@@ -3738,17 +3741,11 @@ export interface components {
         };
         /**
          * AdminSessionSetup
-         * @description RS-2, AD-5: the brief the interviewer worked from and the rubric the scorer used.
+         * @description AD-5, RS-2: the brief prompt (planner) and the rubric prompt (scorer) for the session.
          */
         AdminSessionSetup: {
-            /**
-             * Brief
-             * @description Only under the transcript's consent rule; None before the brief is built
-             */
-            brief: {
-                [key: string]: unknown;
-            } | null;
-            rubric: components["schemas"]["AdminRubric"] | null;
+            brief_prompt: components["schemas"]["AdminPrompt"] | null;
+            rubric: components["schemas"]["AdminPrompt"] | null;
         };
         /**
          * AdminSignInSession
@@ -4697,10 +4694,10 @@ export interface components {
         /** CoachEvalRun */
         CoachEvalRun: {
             /**
-             * File
+             * Report
              * @description Report file name in evals/reports
              */
-            file: string;
+            report: string;
             /** Suite */
             suite: string;
             /** Profile */

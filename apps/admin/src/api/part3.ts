@@ -8,7 +8,6 @@ import { apiClient, unwrap } from "./client";
 import type { components } from "./schema.gen";
 
 type S = components["schemas"];
-type Competency = S["Competency"];
 
 export type Part3Coach = S["Part3Coach"];
 export type CoachWeek = S["CoachWeek"];
@@ -16,17 +15,7 @@ export type CoachEvalRun = S["CoachEvalRun"];
 export type Part3Readiness = S["Part3Readiness"];
 export type SkillReadinessRow = S["SkillReadinessRow"];
 export type AdminSessionSetup = S["AdminSessionSetup"];
-export type AdminRubric = S["AdminRubric"];
-
-/** The fields of an InterviewerBrief the setup panel shows. The API sends the whole brief. */
-export interface BriefView {
-  session?: { interview_type?: string; level?: string };
-  target_competencies?: Competency[];
-  questions?: { id: string; text: string; competencies?: Competency[]; priority?: number }[];
-  probe_areas?: string[];
-  persona?: { tone?: string; pushback_style?: string; closing_style?: string };
-  seniority_bar?: string | null;
-}
+export type AdminPrompt = S["AdminPrompt"];
 
 export const part3Api = {
   coach: async (weeks: number) =>

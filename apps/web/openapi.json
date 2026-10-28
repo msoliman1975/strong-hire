@@ -9546,6 +9546,40 @@
         ],
         "title": "AdminPasswordIn"
       },
+      "AdminPrompt": {
+        "properties": {
+          "ref": {
+            "type": "string",
+            "title": "Ref",
+            "description": "The prompt ref, e.g. scorer/rubric_recruiter_screen.v1"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text",
+            "description": "The prompt; None when the file is gone"
+          },
+          "recorded": {
+            "type": "boolean",
+            "title": "Recorded",
+            "description": "True: the ref this session recorded. False: the current prompt for its type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ref",
+          "text",
+          "recorded"
+        ],
+        "title": "AdminPrompt",
+        "description": "A prompt file (RS-2). Prompt text only: never a user's brief (AA-11, D-8)."
+      },
       "AdminProviders": {
         "properties": {
           "google": {
@@ -9683,39 +9717,6 @@
         ],
         "title": "AdminResumeMeta",
         "description": "D-8: metadata only. Never the file, the text or the extracted fields."
-      },
-      "AdminRubric": {
-        "properties": {
-          "ref": {
-            "type": "string",
-            "title": "Ref",
-            "description": "The prompt ref, e.g. scorer/rubric_recruiter_screen.v1"
-          },
-          "text": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Text",
-            "description": "The rubric prompt; None when the file is gone"
-          },
-          "scored": {
-            "type": "boolean",
-            "title": "Scored",
-            "description": "False: not scored yet, this is the current rubric"
-          }
-        },
-        "type": "object",
-        "required": [
-          "ref",
-          "text",
-          "scored"
-        ],
-        "title": "AdminRubric"
       },
       "AdminScore": {
         "properties": {
@@ -10045,7 +10046,7 @@
                 "type": "null"
               }
             ],
-            "description": "AD-5: the brief (consent rule) and the rubric"
+            "description": "AD-5: the brief and rubric prompts for its type"
           },
           "turn_latency": {
             "items": {
@@ -10111,23 +10112,20 @@
       },
       "AdminSessionSetup": {
         "properties": {
-          "brief": {
+          "brief_prompt": {
             "anyOf": [
               {
-                "additionalProperties": true,
-                "type": "object"
+                "$ref": "#/components/schemas/AdminPrompt"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "Brief",
-            "description": "Only under the transcript's consent rule; None before the brief is built"
+            ]
           },
           "rubric": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/AdminRubric"
+                "$ref": "#/components/schemas/AdminPrompt"
               },
               {
                 "type": "null"
@@ -10137,11 +10135,11 @@
         },
         "type": "object",
         "required": [
-          "brief",
+          "brief_prompt",
           "rubric"
         ],
         "title": "AdminSessionSetup",
-        "description": "RS-2, AD-5: the brief the interviewer worked from and the rubric the scorer used."
+        "description": "AD-5, RS-2: the brief prompt (planner) and the rubric prompt (scorer) for the session."
       },
       "AdminSignInSession": {
         "properties": {
@@ -12689,9 +12687,9 @@
       },
       "CoachEvalRun": {
         "properties": {
-          "file": {
+          "report": {
             "type": "string",
-            "title": "File",
+            "title": "Report",
             "description": "Report file name in evals/reports"
           },
           "suite": {
@@ -12738,7 +12736,7 @@
         },
         "type": "object",
         "required": [
-          "file",
+          "report",
           "suite",
           "profile",
           "started_at",

@@ -5,9 +5,9 @@
                                       usage events, and the latest coach eval results (CO-9)
     GET /admin/part3/readiness        practice readiness by skill across users, aggregate only
 
-The session detail and replay pages also show a session's brief and rubric (`session_setup`):
-the rubric (a prompt file, no user data) always, the brief only under the transcript's consent
-rule, since its questions come from the user's job and resume.
+The session detail and replay pages also show the brief prompt and the rubric prompt for the
+session's type (`session_setup`, RS-2): prompt files only. A user's own brief is never shown in
+admin (AA-11, D-8).
 
 Aggregate only. No coach turn text, take text or story text is selected here: coach sessions
 give counts, minutes, channels and timestamps; usage events give cost; scorecards give only the
@@ -54,7 +54,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from strong_api.admin import metrics as m
 from strong_api.admin.deps import Admin
 from strong_api.admin.part1 import week_start
-from strong_api.admin.schemas import AdminRubric, AdminSessionSetup
+from strong_api.admin.schemas import AdminPrompt, AdminSessionSetup
 from strong_api.auth.deps import DbSession
 from strong_api.billing.entitlements import get_entitlement
 from strong_core.config import get_settings
@@ -67,7 +67,7 @@ from strong_core.db.models import (
 )
 from strong_core.gateway import CapabilityTier
 from strong_core.prompts import PromptNotFoundError, load_prompt
-from strong_core.schemas import InterviewerBrief, Mode
+from strong_core.schemas import Mode
 from strong_core.schemas.enums import CoachStyle, Competency, SessionChannel
 
 log = logging.getLogger(__name__)
@@ -133,7 +133,7 @@ class EvalMetric(BaseModel):
 
 
 class CoachEvalRun(BaseModel):
-    file: str = Field(description="Report file name in evals/reports")
+    report: str = Field(description="Report file name in evals/reports")
     suite: str
     profile: str
     started_at: str
@@ -206,7 +206,7 @@ def _eval_run(path: Path) -> CoachEvalRun | None:
     gated = [x.passed for x in metrics if x.passed is not None]
     profile = str(data.get("profile") or "")
     return CoachEvalRun(
-        file=path.name,
+        report=path.name,
         suite=str(data.get("suite") or ""),
         profile=profile,
         started_at=str(data.get("started_at") or ""),
@@ -466,43 +466,47 @@ async def get_part3_readiness(_: Admin, db: DbSession) -> Part3Readiness:
     )
 
 
-# ---------------------------------------------------------------- brief and rubric
+# ---------------------------------------------------------------- brief and rubric prompts
 
 
 _REF = re.compile(
     r"^(?P<role>[a-z_]+)/(?P<name>[a-z0-9_]+)(?:\.(?P<tier>small|medium|large))?\.v(?P<v>\d+)$"
 )
-# RS-2: the scorer's rubric prompt by type; the worker picks it the same way (RUBRIC_BY_TYPE).
-RUBRIC_NAME = {"recruiter_screen": "rubric_recruiter_screen"}
+# RS-2: the planner's brief prompt and the scorer's rubric prompt by type. The worker picks them
+# the same way (PROMPT_BY_TYPE in gap/brief.py, RUBRIC_BY_TYPE in scoring/scorer.py).
+BRIEF_PROMPT = {
+    "recruiter_screen": "interviewer_brief_recruiter_screen",
+    "custom": "interviewer_brief_custom",
+}
+RUBRIC_PROMPT = {"recruiter_screen": "rubric_recruiter_screen"}
 
 
-def rubric_for(row: InterviewSession, card: Scorecard | None) -> AdminRubric | None:
-    """The rubric the scorer used (the scorecard's rubric_version), else the current one."""
-    if card is not None:
-        match = _REF.match(card.rubric_version or "")
-        if match is None:
-            return None
-        tier = CapabilityTier(match["tier"]) if match["tier"] else None
-        try:
-            prompt = load_prompt(match["role"], match["name"], int(match["v"]), tier=tier)
-        except PromptNotFoundError:
-            return AdminRubric(ref=card.rubric_version, text=None, scored=True)
-        return AdminRubric(ref=card.rubric_version, text=prompt.text, scored=True)
+def _current(role: str, name: str) -> AdminPrompt | None:
     try:
-        prompt = load_prompt("scorer", RUBRIC_NAME.get(str(row.type), "rubric"), tier=None)
+        prompt = load_prompt(role, name, tier=None)
     except PromptNotFoundError:
         return None
-    return AdminRubric(ref=prompt.ref, text=prompt.text, scored=False)
+    return AdminPrompt(ref=prompt.ref, text=prompt.text, recorded=False)
 
 
-def session_setup(
-    row: InterviewSession, card: Scorecard | None, consent: bool
-) -> AdminSessionSetup:
-    """The brief as an InterviewerBrief (JSON), under the consent rule, and the rubric."""
-    brief: dict[str, Any] | None = None
-    if consent and row.brief_json:
-        try:
-            brief = InterviewerBrief.model_validate(row.brief_json).model_dump(mode="json")
-        except ValueError:
-            log.warning("brief of session %s does not validate", row.id, exc_info=True)
-    return AdminSessionSetup(brief=brief, rubric=rubric_for(row, card))
+def _by_ref(ref: str) -> AdminPrompt | None:
+    match = _REF.match(ref)
+    if match is None:
+        return None
+    tier = CapabilityTier(match["tier"]) if match["tier"] else None
+    try:
+        prompt = load_prompt(match["role"], match["name"], int(match["v"]), tier=tier)
+    except PromptNotFoundError:
+        return AdminPrompt(ref=ref, text=None, recorded=True)
+    return AdminPrompt(ref=ref, text=prompt.text, recorded=True)
+
+
+def session_setup(row: InterviewSession, card: Scorecard | None) -> AdminSessionSetup:
+    """The brief prompt and rubric prompt for the session's type: prompt files only, never the
+    user's brief (AA-11, D-8). The rubric is the one its scorecard recorded, when scored."""
+    kind = str(row.type)
+    rubric = _by_ref(card.rubric_version) if card is not None else None
+    return AdminSessionSetup(
+        brief_prompt=_current("planner", BRIEF_PROMPT.get(kind, "interviewer_brief")),
+        rubric=rubric or _current("scorer", RUBRIC_PROMPT.get(kind, "rubric")),
+    )

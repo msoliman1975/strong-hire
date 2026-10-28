@@ -57,7 +57,7 @@ describe("Coach (AD-5)", () => {
 
   it("AD-5: shows the latest coach eval results", async () => {
     const run = {
-      file: "coach-hosted-20301010.json",
+      report: "coach-hosted-20301010.json",
       suite: "coach",
       profile: "hosted",
       started_at: "2030-10-10T10:00:00Z",
@@ -90,38 +90,36 @@ describe("Readiness (AD-5, RD-3)", () => {
   });
 });
 
-describe("Brief and rubric (AD-5, RS-2)", () => {
-  it("AD-5: shows a recruiter screen's brief questions and the rubric used", () => {
+describe("Brief and rubric prompts (AD-5, RS-2)", () => {
+  it("AD-5: shows the recruiter screen's brief prompt and the rubric its scorecard used", () => {
     render(
       <SessionSetupPanel
         setup={{
-          brief: {
-            session: { interview_type: "recruiter_screen" },
-            target_competencies: ["motivation", "logistics_and_expectations"],
-            questions: [
-              { id: "q2", text: "When could you start?", competencies: ["logistics_and_expectations"], priority: 2 },
-              { id: "q1", text: "Why this role?", competencies: ["motivation"], priority: 1 },
-            ],
-            persona: { tone: "warm", pushback_style: "light", closing_style: "next steps" },
+          brief_prompt: {
+            ref: "planner/interviewer_brief_recruiter_screen.v1",
+            text: "Plan a recruiter screen.",
+            recorded: false,
           },
-          rubric: { ref: "scorer/rubric_recruiter_screen.v1", text: "Score motivation 1 to 4.", scored: true },
+          rubric: { ref: "scorer/rubric_recruiter_screen.v1", text: "Score motivation 1 to 4.", recorded: true },
         }}
       />,
     );
-    expect(screen.getByText("Motivation, Logistics and expectations")).toBeInTheDocument();
-    const items = within(screen.getByRole("list", { name: "Brief questions" })).getAllByRole("listitem");
-    expect(items[0]).toHaveTextContent("Why this role?");
-    expect(screen.getByText("scorer/rubric_recruiter_screen.v1")).toBeInTheDocument();
+    expect(screen.getByText("planner/interviewer_brief_recruiter_screen.v1")).toBeInTheDocument();
+    expect(screen.getByText("Plan a recruiter screen.")).toBeInTheDocument();
+    expect(screen.getByText("scorer/rubric_recruiter_screen.v1").parentElement).toHaveTextContent(
+      "used for this scorecard",
+    );
     expect(screen.getByText("Score motivation 1 to 4.")).toBeInTheDocument();
+    expect(screen.getByText(/never shown here/)).toBeInTheDocument();
   });
 
-  it("AD-5: without consent there is no brief, only the rubric", () => {
+  it("AD-5: a prompt file that is gone says so", () => {
     render(
       <SessionSetupPanel
-        setup={{ brief: null, rubric: { ref: "scorer/rubric.v2", text: null, scored: false } }}
+        setup={{ brief_prompt: null, rubric: { ref: "scorer/rubric.v1", text: null, recorded: true } }}
       />,
     );
-    expect(screen.getByText(/No brief to show/)).toBeInTheDocument();
-    expect(screen.getByText(/not scored yet/)).toBeInTheDocument();
+    expect(screen.getByText("No brief prompt found.")).toBeInTheDocument();
+    expect(screen.getByText(/no longer in the repo/)).toBeInTheDocument();
   });
 });

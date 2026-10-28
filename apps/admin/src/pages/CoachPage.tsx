@@ -18,7 +18,7 @@ function EvalRun({ run }: { run: CoachEvalRun }) {
     <>
       <p>
         {verdict(run.passed)} on the <strong>{run.profile}</strong> profile, {utc(run.started_at)}, commit{" "}
-        <code>{run.git_sha.slice(0, 7)}</code> ({run.file}).
+        <code>{run.git_sha.slice(0, 7)}</code> ({run.report}).
         {run.dev_data && " Development data: not a launch result."}
       </p>
       <div className="table-wrap">
@@ -59,7 +59,7 @@ function Evals({ evals }: { evals: Part3Coach["evals"] }) {
       {evals.runs.length > 1 && (
         <ul aria-label="Recent coach eval runs">
           {evals.runs.map((r) => (
-            <li key={r.file}>
+            <li key={r.report}>
               {utc(r.started_at)}: {r.profile}, {verdict(r.passed)}
             </li>
           ))}
