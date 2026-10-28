@@ -76,7 +76,28 @@ function pick<T extends string>(value: string | null, options: T[], fallback: T)
   return options.includes(value as T) ? (value as T) : fallback;
 }
 
-export function PlanSetup({ plan, jobId, resumeId }: { plan: PlanView; jobId: string; resumeId: string }) {
+/** A step of "Your plan" that is a rehearsal: its round, difficulty and mode start the setup. */
+export interface SuggestedRehearsal {
+  interview_type: InterviewType | null;
+  difficulty: Difficulty | null;
+  mode: Mode | null;
+}
+
+export function PlanSetup({
+  plan,
+  jobId,
+  resumeId,
+  embedded = false,
+  suggested = null,
+}: {
+  plan: PlanView;
+  jobId: string;
+  resumeId: string;
+  /** Inside "Your plan": the form only, with no card or heading of its own. */
+  embedded?: boolean;
+  /** The plan step's setup. CU-9 and CU-10 prefills and the URL still win over it. */
+  suggested?: SuggestedRehearsal | null;
+}) {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   // CU-9 and CU-10 arrive as router state, as on the v1 setup page.
@@ -95,14 +116,16 @@ export function PlanSetup({ plan, jobId, resumeId }: { plan: PlanView; jobId: st
 
   const [type, setType] = useState<InterviewType>(
     prefill?.config.interview_type ??
-      (recommended ? "custom" : pick(params.get("type"), TYPES, pick(defaults.interview_type, TYPES, "behavioral"))),
+      (recommended
+        ? "custom"
+        : pick(params.get("type"), TYPES, pick(suggested?.interview_type ?? defaults.interview_type, TYPES, "behavioral"))),
   );
   const [difficulty, setDifficulty] = useState<Difficulty>(
-    prefill?.config.difficulty ?? recommended?.difficulty ?? pick(params.get("difficulty"), DIFFICULTIES, defaults.difficulty),
+    prefill?.config.difficulty ?? recommended?.difficulty ?? pick(params.get("difficulty"), DIFFICULTIES, suggested?.difficulty ?? defaults.difficulty),
   );
   const [tone, setTone] = useState<Tone>(pick(prefill?.config.tone ?? defaults.tone, tones, tones[0]));
   const [duration, setDuration] = useState<Duration | null>(prefill ? prefill.config.duration_min : null);
-  const [mode, setMode] = useState<Mode>(prefill?.config.mode ?? pick(params.get("mode"), MODES, defaults.mode));
+  const [mode, setMode] = useState<Mode>(prefill?.config.mode ?? pick(params.get("mode"), MODES, suggested?.mode ?? defaults.mode));
   const [level, setLevel] = useState<Level | "">(prefill?.config.level ?? "");
   const [refusedInline, setRefusedInline] = useState(false);
 
@@ -173,15 +196,8 @@ export function PlanSetup({ plan, jobId, resumeId }: { plan: PlanView; jobId: st
     });
   };
 
-  return (
-    <section className="card plan-next" aria-labelledby="plan-next-heading">
-      <h2 id="plan-next-heading">Next rehearsal</h2>
-      <p className="muted">
-        {plan.next_session
-          ? `Set up from your gaps: ${plan.next_session.reason} Change anything.`
-          : "Set up from your plan. Change anything."}
-      </p>
-      <form onSubmit={onSubmit} noValidate className="stack">
+  const form = (
+      <form onSubmit={onSubmit} noValidate className="stack" aria-label="Rehearsal setup">
         <Choices
           legend="Interview type"
           name="type"
@@ -297,6 +313,17 @@ export function PlanSetup({ plan, jobId, resumeId }: { plan: PlanView; jobId: st
           </button>
         )}
       </form>
+  );
+  if (embedded) return form;
+  return (
+    <section className="card plan-next" aria-labelledby="plan-next-heading">
+      <h2 id="plan-next-heading">Next rehearsal</h2>
+      <p className="muted">
+        {plan.next_session
+          ? `Set up from your gaps: ${plan.next_session.reason} Change anything.`
+          : "Set up from your plan. Change anything."}
+      </p>
+      {form}
     </section>
   );
 }

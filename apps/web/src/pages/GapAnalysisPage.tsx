@@ -8,6 +8,8 @@ import type { GapAnalysis, GapAnalysisOut, PlannedSession } from "../api/types";
 import { CV_DELETED, JD_DELETED, ReportList } from "../components/ReportList";
 import { Bar, ErrorNotice, Loading, PageHead } from "../components/ui";
 import { competencyLabel, difficultyLabel, formatDate, interviewTypeLabel, severityLabel } from "../labels";
+import { useFeature } from "../theme/features";
+import { GapReport } from "./plan/GapReport";
 
 /** Session setup, with the planned type and difficulty, and the CV to interview against (PR-3). */
 export function setupLink(jobId: string, plan?: PlannedSession | null, resumeId?: string | null): string {
@@ -25,7 +27,12 @@ export function setupLink(jobId: string, plan?: PlannedSession | null, resumeId?
  * GA-1 to GA-3: match score, breakdown, strengths, gaps, probe areas and the session plan.
  * `?report=<id>` shows one earlier run from the Reports page (R1); otherwise the latest run.
  */
+/** With `v2_enabled` on this is the v2 gap report (GapReport); v1 keeps its page. */
 export function GapAnalysisPage() {
+  return useFeature("v2_enabled") ? <GapReport /> : <GapAnalysisV1 />;
+}
+
+function GapAnalysisV1() {
   const { jobId = "" } = useParams();
   const [params] = useSearchParams();
   const reportId = params.get("report");

@@ -178,3 +178,209 @@
 .plan-next form > fieldset legend {
   margin-bottom: 8px;
 }
+
+/* The v2 gap report (GapReport.tsx). */
+.gap-report__back {
+  margin: 0;
+}
+
+.gap-report .card h2 {
+  margin: 0 0 6px;
+  font-size: 1.25rem;
+}
+
+.gap-report__match {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+
+.gap-report__match p {
+  margin: 0 0 6px;
+}
+
+.gap-report__score {
+  margin: 0;
+  font-family: var(--sh-font-mono);
+  font-size: 3rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--sh-teal);
+}
+
+.gap-report__score .muted {
+  font-size: 1.25rem;
+}
+
+.gap-report__pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.gap-report__list > li + li {
+  margin-top: 12px;
+}
+
+.gap-report__list p {
+  margin: 4px 0 0;
+}
+
+.gap-report__quote {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--sh-ground);
+  font-size: 0.875rem;
+}
+
+.gap-report__sev {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: var(--sh-radius-pill);
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--sh-sunken);
+  color: var(--sh-muted);
+}
+
+.gap-report__sev[data-severity="high"] {
+  background: var(--sh-danger-soft);
+  color: var(--sh-danger-ink);
+}
+
+.gap-report__sev[data-severity="medium"] {
+  background: var(--sh-warn-soft);
+  color: var(--sh-warn-ink);
+}
+
+.gap-report__probes {
+  margin: 8px 0 0;
+}
+
+.gap-report__more > summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  margin: 12px 0;
+}
+
+/* "Where they'll probe" on the plan: a short summary with a link to the full report. */
+.plan-probe__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.plan-probe__head h2 {
+  margin: 0;
+}
+
+.plan-probe__badge {
+  padding: 2px 10px;
+  border-radius: var(--sh-radius-pill);
+  background: var(--sh-teal-soft);
+  color: var(--sh-teal);
+  font-family: var(--sh-font-mono);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.plan-probe__list {
+  margin: 10px 0;
+  padding-left: 1.2em;
+}
+
+.plan-probe__list li {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* PP-1: "Your plan" (YourPlan.tsx), on the dark card: done steps ticked, one step open, the rest one line each. */
+.your-plan h2 {
+  margin: 0 0 4px;
+}
+
+.your-plan__steps {
+  margin-top: 8px;
+}
+
+.your-plan__step {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 10px 0;
+  border-top: 1px solid #2c2938;
+}
+
+.your-plan__step + .your-plan__step {
+  margin-top: 0;
+}
+
+.your-plan__mark {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid #45405a;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #c9c5d6;
+}
+
+.your-plan__step[data-state="done"] .your-plan__mark {
+  border-color: var(--sh-ok);
+  background: var(--sh-ok);
+  color: #ffffff;
+}
+
+.your-plan__step[data-state="open"] .your-plan__mark {
+  border-color: var(--sh-violet-light);
+  color: var(--sh-violet-light);
+}
+
+.your-plan__step[data-state="done"] .your-plan__line > span:first-child {
+  color: #c9c5d6;
+}
+
+.your-plan__line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+  min-height: 24px;
+}
+
+.your-plan__day,
+.your-plan__meta {
+  font-family: var(--sh-font-mono);
+  font-size: 0.75rem;
+  color: #c9c5d6;
+}
+
+.your-plan .text-button {
+  color: var(--sh-violet-light);
+}
+
+.your-plan__open {
+  margin-top: 10px;
+}
+
+.your-plan__open > p {
+  margin: 0;
+}
+
+.gap-report__cta {
+  margin-top: 14px;
+}

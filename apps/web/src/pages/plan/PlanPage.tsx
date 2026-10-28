@@ -10,12 +10,11 @@ import { Link, useParams } from "react-router";
 import type { ReportItem } from "../../api/types";
 import { CV_DELETED, ReportList } from "../../components/ReportList";
 import { Bar, ErrorNotice, Loading, PageHead, StatusBadge } from "../../components/ui";
-import { competencyLabel, difficultyLabel, formatDate, interviewTypeLabel } from "../../labels";
+import { competencyLabel, formatDate, interviewTypeLabel } from "../../labels";
 import { contextPath } from "../../paths";
 import { usePlan, type PlanView } from "./api";
-import { DayPlan } from "./DayPlan";
 import { InterviewDate } from "./InterviewDate";
-import { PlanSetup } from "./PlanSetup";
+import { YourPlan } from "./YourPlan";
 import { StoryFitTable } from "./StoryFitTable";
 import { ReadinessPanel, ReadinessRing } from "./ReadinessPanel";
 import "./plan.css";
@@ -104,39 +103,31 @@ function PlanBody({ plan, jobId, resumeId }: { plan: PlanView; jobId: string; re
             </section>
 
             <section className="card" aria-labelledby="plan-probe-heading">
-              <h2 id="plan-probe-heading">Where they'll probe</h2>
+              <div className="plan-probe__head">
+                <h2 id="plan-probe-heading">Where they'll probe</h2>
+                {analysis && (
+                  <span className="plan-probe__badge" data-testid="plan-match">
+                    Match {analysis.match_score}
+                  </span>
+                )}
+              </div>
               {analysis ? (
                 <>
-                  <ul data-testid="probe-areas">
-                    {analysis.probe_areas.map((p) => (
-                      <li key={p}>{p}</li>
+                  {/* A short summary: the top 3, one line each. The full report has the rest. */}
+                  <ul className="plan-probe__list" data-testid="probe-areas">
+                    {analysis.probe_areas.slice(0, 3).map((p) => (
+                      <li key={p} title={p}>
+                        {p}
+                      </li>
                     ))}
                   </ul>
-                  <p className="muted">
-                    Match score {analysis.match_score} of 100, from the gap analysis on {formatDate(gap!.created_at)}.
-                    {gap!.stale && " The job, your CV or the company profile changed since; run it again to update it."}{" "}
-                    <Link to={`/jobs/${jobId}/gap?report=${encodeURIComponent(gap!.id)}`}>See the full gap analysis</Link>
+                  <p className="muted small">
+                    From the gap analysis on {formatDate(gap!.created_at)}.
+                    {gap!.stale && " The job, your CV or the company profile changed since; run it again to update it."}
                   </p>
-                  {analysis.session_plan.length > 0 && (
-                    <>
-                      <h3>Practice plan</h3>
-                      <ol className="plain-list" data-testid="session-plan">
-                        {[...analysis.session_plan]
-                          .sort((a, b) => a.priority - b.priority)
-                          .map((p) => (
-                            <li key={p.priority}>
-                              <strong>
-                                {interviewTypeLabel[p.interview_type]}, {difficultyLabel[p.difficulty]}
-                              </strong>
-                              <span className="muted">
-                                {" "}
-                                {p.focus_topics.join(", ")}. {p.reason}
-                              </span>
-                            </li>
-                          ))}
-                      </ol>
-                    </>
-                  )}
+                  <Link className="btn btn--secondary" to={`/jobs/${jobId}/gap-report?report=${encodeURIComponent(gap!.id)}`}>
+                    Show full report
+                  </Link>
                 </>
               ) : gap?.status === "running" ? (
                 <Loading label="Comparing your resume with the job. This takes about a minute." />
@@ -171,16 +162,16 @@ function PlanBody({ plan, jobId, resumeId }: { plan: PlanView; jobId: string; re
         </div>
 
         <div className="plan-side stack">
-          {/* RD-1 to RD-3 (S34): practice readiness per skill and the day-by-day plan. */}
-          <ReadinessPanel jobId={jobId} resumeId={resumeId} />
-          <DayPlan jobId={jobId} resumeId={resumeId} />
           {plan.job.deleted ? (
             <section className="card">
               <p>This job description was deleted, so it cannot be rehearsed again.</p>
             </section>
           ) : (
-            <PlanSetup plan={plan} jobId={jobId} resumeId={resumeId} />
+            // PP-1, PP-4, RD-2: one card, "Your plan": the day plan's steps with the setup inline.
+            <YourPlan plan={plan} jobId={jobId} resumeId={resumeId} />
           )}
+          {/* RD-1 to RD-3 (S34): practice readiness per skill. */}
+          <ReadinessPanel jobId={jobId} resumeId={resumeId} />
         </div>
       </div>
     </div>
