@@ -34,6 +34,7 @@ from strong_worker.ops import sampler
 from strong_worker.pause import PAUSED_MAX_TRIES
 from strong_worker.profiles import jobs as profile_jobs
 from strong_worker.scoring import jobs as scoring_jobs
+from strong_worker.scoring import takes as take_jobs
 
 
 async def ping(ctx: dict[str, Any], value: str = "pong") -> str:
@@ -96,6 +97,16 @@ class WorkerSettings:
                 max_tries=PAUSED_MAX_TRIES,  # OC-5
             )
             for f in scoring_jobs.FUNCTIONS
+        ),
+        # CO-7: takes, scored by the same scorer.
+        *(
+            func(
+                f,
+                keep_result=scoring_jobs.RESULT_TTL_S,
+                timeout=scoring_jobs.JOB_TIMEOUT_S,
+                max_tries=PAUSED_MAX_TRIES,  # OC-5
+            )
+            for f in take_jobs.FUNCTIONS
         ),
         # ST-5: the story fit table the plan page asks for (v2 S22). The result lives in its
         # own Redis key; keep_result=0 frees the fixed job id as soon as a run ends.

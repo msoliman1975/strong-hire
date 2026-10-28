@@ -37,7 +37,8 @@ Suites live in `suites/<name>.yaml`:
 | `goldset` | All 30 scripted transcripts, scored and compared with the gold-set labels |
 | `simulated` | 12 simulated sessions: 4 interview types times strong, average and weak answers |
 | `gap` | Gap analysis over the P2 posting and resume fixtures: 7 matched pairs (one in company mode) and 4 mismatched pairs, 2 runs each |
-| `full` | `goldset`, `simulated` and `gap` |
+| `coach` | Coach evals (CO-9): 4 simulated candidates (vague, overclaim, off topic, strong), each in the gentle and the direct style |
+| `full` | `goldset`, `simulated`, `gap` and `coach` |
 
 ## Metrics and thresholds
 
@@ -56,6 +57,19 @@ Thresholds are in `config/thresholds.yaml`.
 | Gap analysis score spread | Gap pairs: largest difference between the match scores of one pair across runs (GA-1) | 3 points or less (P6) |
 | Gap analysis fit order | Gap pairs: matched resumes score above mismatched resumes on the same posting | 100% (harness default) |
 | Gap analysis cost per run | Gap pairs: `UsageEvent.cost_usd` per run | Information only |
+
+Coach metrics (`coach` suite). On the fake profile only the code checks are measured; the judge
+metrics show "not measured".
+
+| Metric | How it is measured | Threshold |
+| --- | --- | --- |
+| Facts the candidate did not say (CO-9) | Kept part updates whose quotes are not the candidate's words or whose numbers are not quoted, story numbers the candidate never said, and judge `invented_facts` fails | 0 (spec) |
+| One question at most (CO-4) | Coach replies with more than one "?" (warning lines left out) | 100% (spec) |
+| Follows up on what the story lacks (IV-3) | Judge `iv3_followup` verdicts | 80% (harness default) |
+| Judge rules passed | All applicable judge verdicts: invented facts, writing for the candidate, IV-3, style, staying on the story, checking big claims | 90% (harness default) |
+| Direct told from gentle (CO-5) | The judge sees one candidate in both styles and names the direct one | 75% (harness default) |
+| Versions faithful (CO-8) | The product writer (`strong_api.takes.versions.write_versions`) writes both versions with the candidate's turns as takes; `strong_evals.coach.versions_unbacked` checks them against the turns alone | 100% |
+| Part updates dropped | Updates the engine dropped (CO-3 guard); also lists parts that share under 60% of their words with the candidate | Information only |
 
 Prices per gateway alias are planning estimates in `config/prices.yaml`. A vague answer is one
 that misses two or more of: own role, measurable result, concrete example, trade-off reasoning
@@ -81,6 +95,13 @@ that misses two or more of: own role, measurable result, concrete example, trade
   Simulated sessions use it by default.
 - Stubs (`strong_evals.stubs`) stand in for the interviewer and scorer until P7 and P8 land. They
   sit behind the interfaces in `strong_evals.interfaces`. `StubPlanner` is kept for tests.
+- Coach sessions (`strong_evals.coach`, CO-9): `run_coach_session` runs the real coach engine
+  (`strong_api.coach.engine.run_turn`) with an in-memory stand-in for the database. The
+  candidates are in `fixtures/coach/candidates.yaml`: on the fake profile each reads its script,
+  elsewhere the candidate role plays it from its facts (`prompts/evals/coach_candidate*`).
+  The judge (`strong_evals.coach_judge`, `prompts/evals/coach_judge*`) runs off the fake profile
+  only, because the fake model has no judge fixtures.
+  Hosted run: `./scripts/eval.ps1 -Suite coach -Profile hosted -Gate` (about 160 model calls).
 - Fixture recorder (`strong_core.gateway.recorder`): `-Record` saves every model call of a run as
   a fixture that the fake model replays.
 
