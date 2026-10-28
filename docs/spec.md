@@ -570,6 +570,17 @@ Paying subscribers is the north star; every other metric explains why it moves. 
 
 **v2 launch gate.** A closed beta of the full v2 keeps perceived realism at 4.2 of 5 or more, the coach evals pass (CO-9), and 40% of beta users save a story within 30 days.
 
+The coach evals pass when `./scripts/eval.ps1 -Suite coach -Profile claude -Gate` exits 0 (after `./scripts/profile.ps1 claude`). The thresholds are in `evals/config/thresholds.yaml`:
+
+| Coach metric | Pass |
+| --- | --- |
+| Facts the candidate did not say | 0 |
+| Replies with one question at most (CO-4) | 100% |
+| Follows up on what the story lacks (IV-3, judge) | 80% or more |
+| Judge rules passed | 90% or more |
+| Judge tells direct from gentle (CO-5) | 75% or more |
+| Versions use only the candidate's words (CO-8) | 100% |
+
 Use PostHog (self-hosted on Hetzner, or its cloud) for product events, and the UsageEvent table for cost. Add a two-question exit survey on cancellation: why you're leaving, and whether you got the job.
 
 ## Build plan with Claude Code

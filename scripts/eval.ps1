@@ -7,11 +7,14 @@
   ./scripts/eval.ps1 -Suite full                      # everything, fake model
   ./scripts/eval.ps1 -Suite goldset -Profile local    # scorer calibration on local models
   ./scripts/eval.ps1 -Suite full -Profile local -Record -Gate
+  ./scripts/eval.ps1 -Suite coach -Profile claude -Gate  # after ./scripts/profile.ps1 claude
 
 .NOTES
   -Profile fake needs no Docker and no model. It checks that the harness runs end to end.
   -Profile local starts the ollama and litellm containers (models profile) and calls them from
   the host. -Profile hosted starts litellm only and needs HOSTED_API_KEY in .env.
+  -Profile claude uses the stack that ./scripts/profile.ps1 claude starts, and calls LiteLLM with
+  the app key (LITELLM_APP_KEY), so the daily and monthly budgets apply to the run.
   -Record saves every model call as a fixture the fake model can replay.
   -Gate exits with code 1 when a metric fails its threshold (spec: 85% within one band).
   -NoStart skips starting containers, for when the models stack is already up.
@@ -20,7 +23,7 @@
 param(
     [string]$Suite = 'smoke',
     [Alias('Profile')]
-    [ValidateSet('fake', 'local', 'hosted')]
+    [ValidateSet('fake', 'local', 'hosted', 'claude')]
     [string]$ModelProfile = 'fake',
     [switch]$Record,
     [string]$RecordDir = '',
@@ -45,7 +48,10 @@ try {
         if ($ModelProfile -eq 'hosted' -and -not $env:HOSTED_API_KEY) {
             throw 'The hosted profile needs HOSTED_API_KEY in .env.'
         }
-        if (-not $NoStart) {
+        if ($ModelProfile -eq 'claude' -and -not $env:LITELLM_APP_KEY) {
+            throw 'The claude profile needs LITELLM_APP_KEY in .env. Run: ./scripts/profile.ps1 claude'
+        }
+        if (-not $NoStart -and $ModelProfile -ne 'claude') {  # profile.ps1 claude starts its stack
             Assert-Docker
             $services = if ($ModelProfile -eq 'local') { @('ollama', 'litellm') } else { @('litellm') }
             Start-ModelServices -ModelProfile $ModelProfile -Services $services

@@ -101,7 +101,9 @@ that misses two or more of: own role, measurable result, concrete example, trade
   elsewhere the candidate role plays it from its facts (`prompts/evals/coach_candidate*`).
   The judge (`strong_evals.coach_judge`, `prompts/evals/coach_judge*`) runs off the fake profile
   only, because the fake model has no judge fixtures.
-  Hosted run: `./scripts/eval.ps1 -Suite coach -Profile hosted -Gate` (about 160 model calls).
+  Real-model run (the launch gate, docs/spec.md): `./scripts/profile.ps1 claude`, then
+  `./scripts/eval.ps1 -Suite coach -Profile claude -Gate` (about 160 model calls, about $0.16).
+  The claude profile calls LiteLLM with the app key, so its budgets apply.
 - Fixture recorder (`strong_core.gateway.recorder`): `-Record` saves every model call of a run as
   a fixture that the fake model replays.
 

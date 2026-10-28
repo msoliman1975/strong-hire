@@ -12,6 +12,8 @@ llm_per_mtok:            # [input, output] USD per million tokens
   fake-planner: [0.60, 0.80]
   fake-interviewer: [0.60, 0.80]
   fake-scorer: [0.90, 0.90]
+  claude-fast: [0.10, 0.50]     # as in config/litellm.claude.yaml
+  claude-strong: [2.00, 10.00]
   local-small: [0, 0]      # runs on this machine
   local-mid: [0, 0]
   local-lmstudio: [0, 0]

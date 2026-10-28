@@ -65,7 +65,8 @@ function Invoke-HostPython([string]$ModelProfile, [string[]]$PythonArgs) {
         if ($saved) { Remove-Item Env:SSL_CERT_FILE; $env:UV_NATIVE_TLS = '1' }
         $env:MODEL_PROFILE = $ModelProfile
         $env:MODEL_GATEWAY_URL = "http://localhost:$port/v1"
-        $env:MODEL_GATEWAY_API_KEY = $env:LITELLM_MASTER_KEY
+        # The claude profile uses the app key, so its LiteLLM budgets apply to the run.
+        $env:MODEL_GATEWAY_API_KEY = if ($ModelProfile -eq 'claude') { $env:LITELLM_APP_KEY } else { $env:LITELLM_MASTER_KEY }
         & uv run python @PythonArgs | Out-Host
         return $LASTEXITCODE
     }
