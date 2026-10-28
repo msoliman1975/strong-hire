@@ -21,6 +21,7 @@ from strong_api.admin.ops import router as ops_router
 from strong_api.admin.overview import router as overview_router
 from strong_api.admin.part1 import router as part1_router
 from strong_api.admin.part2 import router as part2_router
+from strong_api.admin.part3 import router as part3_router
 from strong_api.admin.router import router
 from strong_api.admin.sim import router as sim_router
 from strong_api.admin.users import router as users_router
@@ -49,6 +50,7 @@ ROUTERS: list[APIRouter] = [
     part1_router,
     auto_profiles_router,
     part2_router,
+    part3_router,
 ]
 
 

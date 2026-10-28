@@ -39,6 +39,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from strong_api.admin import metrics as m
 from strong_api.admin.deps import Admin, admin_settings
 from strong_api.admin.identity import AdminPrincipal
+from strong_api.admin.part3 import session_setup
 from strong_api.admin.schemas import (
     AdminAuditEntry,
     AdminCostLine,
@@ -485,6 +486,7 @@ async def get_session(
             transcript=None,
             traces=None,
             trace_retention_days=TRACE_RETENTION_DAYS,
+            setup=session_setup(row, card, consent=False),
             **extra,
         )
     transcript = await _transcript(db, row)
@@ -513,6 +515,7 @@ async def get_session(
         trace_retention_days=TRACE_RETENTION_DAYS,
         audio_available=audio is not None,
         replay_available=replay,
+        setup=session_setup(row, card, consent=True),
         **extra,
     )
 

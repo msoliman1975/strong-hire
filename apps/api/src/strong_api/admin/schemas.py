@@ -12,6 +12,7 @@ from strong_core.schemas import (
     Competency,
     Difficulty,
     HireSignal,
+    InterviewerBrief,
     InterviewType,
     Mode,
     Phase,
@@ -106,6 +107,21 @@ class AdminTrace(BaseModel):
     created_at: datetime
 
 
+class AdminRubric(BaseModel):
+    ref: str = Field(description="The prompt ref, e.g. scorer/rubric_recruiter_screen.v1")
+    text: str | None = Field(description="The rubric prompt; None when the file is gone")
+    scored: bool = Field(description="False: not scored yet, this is the current rubric")
+
+
+class SessionSetup(BaseModel):
+    """RS-2, AD-5: the brief the interviewer worked from and the rubric the scorer used."""
+
+    brief: InterviewerBrief | None = Field(
+        description="Only under the transcript's consent rule; None before the brief is built"
+    )
+    rubric: AdminRubric | None
+
+
 class AdminSessionDetail(BaseModel):
     session: AdminSession
     content_visible: bool = Field(
@@ -127,6 +143,9 @@ class AdminSessionDetail(BaseModel):
     )
     cost_total_usd: float | None = Field(
         default=None, description="AI-2: every component and role. None without usage rows."
+    )
+    setup: SessionSetup | None = Field(
+        default=None, description="AD-5: the brief (consent rule) and the rubric"
     )
     turn_latency: list[AdminTurnLatency] = Field(
         default_factory=list, description="AI-3: per-turn voice latency (OB-3)"

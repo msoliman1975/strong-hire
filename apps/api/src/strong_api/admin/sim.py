@@ -35,6 +35,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from strong_api.admin.actions import ActionIn, AdminWrite, audit_action
 from strong_api.admin.deps import Admin, admin_settings
+from strong_api.admin.part3 import session_setup
 from strong_api.admin.router import (
     _audit,
     _content_user,
@@ -751,4 +752,5 @@ async def session_replay(
         ),
         scenario=_scenario(scenario) if isinstance(scenario, dict) else None,
         inputs=_inputs(scenario) if isinstance(scenario, dict) else None,
+        setup=session_setup(row, card, consent=True),
     )

@@ -1215,7 +1215,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SessionSetup"
+                  "$ref": "#/components/schemas/strong_api__sessions__schemas__SessionSetup"
                 }
               }
             }
@@ -8235,6 +8235,76 @@
         }
       }
     },
+    "/admin/part3/coach": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Part3 Coach",
+        "description": "AD-5: coach sessions and minutes, minutes against plan caps, cost per coach session and\nthe latest coach eval results.",
+        "operationId": "get_part3_coach_admin_part3_coach_get",
+        "parameters": [
+          {
+            "name": "weeks",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 52,
+              "minimum": 1,
+              "description": "How many weeks, this one included",
+              "default": 8,
+              "title": "Weeks"
+            },
+            "description": "How many weeks, this one included"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Part3Coach"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/part3/readiness": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Part3 Readiness",
+        "description": "AD-5: practice readiness by skill across users (RD-1), aggregate only.",
+        "operationId": "get_part3_readiness_admin_part3_readiness_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Part3Readiness"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/public/waitlist": {
       "post": {
         "tags": [
@@ -9614,6 +9684,39 @@
         "title": "AdminResumeMeta",
         "description": "D-8: metadata only. Never the file, the text or the extracted fields."
       },
+      "AdminRubric": {
+        "properties": {
+          "ref": {
+            "type": "string",
+            "title": "Ref",
+            "description": "The prompt ref, e.g. scorer/rubric_recruiter_screen.v1"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text",
+            "description": "The rubric prompt; None when the file is gone"
+          },
+          "scored": {
+            "type": "boolean",
+            "title": "Scored",
+            "description": "False: not scored yet, this is the current rubric"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ref",
+          "text",
+          "scored"
+        ],
+        "title": "AdminRubric"
+      },
       "AdminScore": {
         "properties": {
           "competency": {
@@ -9932,6 +10035,17 @@
             ],
             "title": "Cost Total Usd",
             "description": "AI-2: every component and role. None without usage rows."
+          },
+          "setup": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/strong_api__admin__schemas__SessionSetup"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "AD-5: the brief (consent rule) and the rubric"
           },
           "turn_latency": {
             "items": {
@@ -12291,92 +12405,91 @@
         "type": "object"
       },
       "BriefQuestion": {
-        "additionalProperties": false,
         "properties": {
           "id": {
-            "description": "Stable id, used as Turn.question_ref.",
+            "type": "string",
             "pattern": "^[a-z0-9_-]+$",
             "title": "Id",
-            "type": "string"
+            "description": "Stable id, used as Turn.question_ref."
           },
           "text": {
+            "type": "string",
             "minLength": 1,
-            "title": "Text",
-            "type": "string"
+            "title": "Text"
           },
           "competencies": {
             "items": {
               "$ref": "#/components/schemas/Competency"
             },
+            "type": "array",
             "minItems": 1,
-            "title": "Competencies",
-            "type": "array"
+            "title": "Competencies"
           },
           "values": {
-            "description": "Company values this question probes (target_values).",
             "items": {
               "type": "string"
             },
+            "type": "array",
             "title": "Values",
-            "type": "array"
+            "description": "Company values this question probes (target_values)."
           },
           "priority": {
-            "description": "1 is asked first.",
-            "minimum": 1,
+            "type": "integer",
+            "minimum": 1.0,
             "title": "Priority",
-            "type": "integer"
+            "description": "1 is asked first."
           },
           "probe_hints": {
             "items": {
               "type": "string"
             },
-            "title": "Probe Hints",
-            "type": "array"
+            "type": "array",
+            "title": "Probe Hints"
           },
           "source": {
             "$ref": "#/components/schemas/QuestionSource",
-            "default": "planner",
-            "description": "CU-3: candidate for the candidate's own."
+            "description": "CU-3: candidate for the candidate's own.",
+            "default": "planner"
           },
           "category": {
             "anyOf": [
               {
+                "type": "string",
                 "enum": [
                   "behavioral",
                   "hiring_manager",
                   "technical_qa",
                   "case"
-                ],
-                "type": "string"
+                ]
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
             "description": "Custom sessions only: the question's category (CU-1)."
           },
           "must_ask": {
-            "default": false,
-            "description": "CU-4: the session controller asks it before CANDIDATE_QUESTIONS.",
+            "type": "boolean",
             "title": "Must Ask",
-            "type": "boolean"
+            "description": "CU-4: the session controller asks it before CANDIDATE_QUESTIONS.",
+            "default": false
           },
           "verbatim": {
-            "default": false,
-            "description": "CU-4: read the text word for word.",
+            "type": "boolean",
             "title": "Verbatim",
-            "type": "boolean"
+            "description": "CU-4: read the text word for word.",
+            "default": false
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "id",
           "text",
           "competencies",
           "priority"
         ],
-        "title": "BriefQuestion",
-        "type": "object"
+        "title": "BriefQuestion"
       },
       "Budget": {
         "properties": {
@@ -12494,6 +12607,152 @@
           "changed"
         ],
         "title": "ChangeKind"
+      },
+      "CoachCapUse": {
+        "properties": {
+          "paid_users": {
+            "type": "integer",
+            "title": "Paid Users",
+            "description": "Users on a paid or comp plan now"
+          },
+          "coach_minutes": {
+            "type": "integer",
+            "title": "Coach Minutes",
+            "description": "Their coach minutes in their current plan periods"
+          },
+          "interview_minutes": {
+            "type": "integer",
+            "title": "Interview Minutes",
+            "description": "Their plan minutes used in those periods"
+          },
+          "cap_minutes": {
+            "type": "integer",
+            "title": "Cap Minutes",
+            "description": "Sum of their plan caps, grants included"
+          },
+          "over_cap_if_counted": {
+            "type": "integer",
+            "title": "Over Cap If Counted",
+            "description": "Users whose interview plus coach minutes would pass their cap"
+          },
+          "free_user_coach_minutes": {
+            "type": "integer",
+            "title": "Free User Coach Minutes",
+            "description": "Coach minutes of users without a paid plan, in the weeks shown"
+          }
+        },
+        "type": "object",
+        "required": [
+          "paid_users",
+          "coach_minutes",
+          "interview_minutes",
+          "cap_minutes",
+          "over_cap_if_counted",
+          "free_user_coach_minutes"
+        ],
+        "title": "CoachCapUse"
+      },
+      "CoachEvalRun": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "title": "File",
+            "description": "Report file name in evals/reports"
+          },
+          "suite": {
+            "type": "string",
+            "title": "Suite"
+          },
+          "profile": {
+            "type": "string",
+            "title": "Profile"
+          },
+          "started_at": {
+            "type": "string",
+            "title": "Started At"
+          },
+          "git_sha": {
+            "type": "string",
+            "title": "Git Sha"
+          },
+          "dev_data": {
+            "type": "boolean",
+            "title": "Dev Data",
+            "description": "PL-6: fake, tiny or local profile; not a launch result"
+          },
+          "passed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Passed",
+            "description": "Every gated coach metric passed; None if none gated"
+          },
+          "metrics": {
+            "items": {
+              "$ref": "#/components/schemas/EvalMetric"
+            },
+            "type": "array",
+            "title": "Metrics",
+            "description": "Coach metrics only (key starts with coach_)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file",
+          "suite",
+          "profile",
+          "started_at",
+          "git_sha",
+          "dev_data",
+          "passed",
+          "metrics"
+        ],
+        "title": "CoachEvalRun"
+      },
+      "CoachEvals": {
+        "properties": {
+          "latest": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CoachEvalRun"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "runs": {
+            "items": {
+              "$ref": "#/components/schemas/CoachEvalRun"
+            },
+            "type": "array",
+            "title": "Runs",
+            "description": "Up to 5, newest first"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason",
+            "description": "Why there is no result"
+          }
+        },
+        "type": "object",
+        "required": [
+          "latest",
+          "runs"
+        ],
+        "title": "CoachEvals"
       },
       "CoachReply": {
         "properties": {
@@ -12792,6 +13051,49 @@
         ],
         "title": "CoachTurnResult",
         "description": "One candidate turn and the coach's reply."
+      },
+      "CoachWeek": {
+        "properties": {
+          "week_start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Week Start",
+            "description": "Monday 00:00 UTC"
+          },
+          "sessions": {
+            "type": "integer",
+            "title": "Sessions",
+            "description": "Coach sessions started that week"
+          },
+          "minutes": {
+            "type": "integer",
+            "title": "Minutes",
+            "description": "Their recorded minutes"
+          },
+          "voice": {
+            "type": "integer",
+            "title": "Voice"
+          },
+          "text": {
+            "type": "integer",
+            "title": "Text"
+          },
+          "users": {
+            "type": "integer",
+            "title": "Users",
+            "description": "Distinct users with a coach session that week"
+          }
+        },
+        "type": "object",
+        "required": [
+          "week_start",
+          "sessions",
+          "minutes",
+          "voice",
+          "text",
+          "users"
+        ],
+        "title": "CoachWeek"
       },
       "CompanyActiveIn": {
         "properties": {
@@ -14281,6 +14583,54 @@
         "title": "ErrorGroupStatus",
         "description": "OB-12: a resolved group that happens again reopens."
       },
+      "EvalMetric": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "threshold": {
+            "type": "string",
+            "title": "Threshold"
+          },
+          "passed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Passed",
+            "description": "None: information only, or not measured"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "name",
+          "value",
+          "threshold",
+          "passed"
+        ],
+        "title": "EvalMetric"
+      },
       "ExitSurveyIn": {
         "properties": {
           "reason": {
@@ -15131,8 +15481,6 @@
         "description": "L04 waitlist: when the person's real interview is, as they told us."
       },
       "InterviewerBrief": {
-        "additionalProperties": false,
-        "description": "Built by the planner before each session. The live interviewer reads only this.",
         "properties": {
           "session": {
             "$ref": "#/components/schemas/SessionConfig"
@@ -15146,72 +15494,70 @@
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "None in generic mode.",
-            "title": "Company Name"
+            "title": "Company Name",
+            "description": "None in generic mode."
           },
           "generic_mode": {
-            "title": "Generic Mode",
-            "type": "boolean"
+            "type": "boolean",
+            "title": "Generic Mode"
           },
           "profile_version": {
             "anyOf": [
               {
-                "minimum": 1,
-                "type": "integer"
+                "type": "integer",
+                "minimum": 1.0
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Profile Version"
           },
           "target_competencies": {
-            "description": "4 to 6; a mini interview has 2.",
             "items": {
               "$ref": "#/components/schemas/Competency"
             },
+            "type": "array",
             "maxItems": 6,
             "minItems": 2,
             "title": "Target Competencies",
-            "type": "array"
+            "description": "4 to 6; a mini interview has 2."
           },
           "target_values": {
-            "description": "Company value names (Principle.name) to probe. Empty in generic mode.",
             "items": {
               "type": "string"
             },
+            "type": "array",
             "maxItems": 4,
             "title": "Target Values",
-            "type": "array"
+            "description": "Company value names (Principle.name) to probe. Empty in generic mode."
           },
           "questions": {
-            "description": "6 to 10; a mini interview has 3.",
             "items": {
               "$ref": "#/components/schemas/BriefQuestion"
             },
+            "type": "array",
             "maxItems": 10,
             "minItems": 3,
             "title": "Questions",
-            "type": "array"
+            "description": "6 to 10; a mini interview has 3."
           },
           "probe_areas": {
             "items": {
               "type": "string"
             },
-            "title": "Probe Areas",
-            "type": "array"
+            "type": "array",
+            "title": "Probe Areas"
           },
           "persona": {
             "$ref": "#/components/schemas/PersonaBrief"
           },
           "max_probes_per_question": {
-            "description": "IV-3.",
-            "maximum": 3,
-            "minimum": 0,
+            "type": "integer",
+            "maximum": 3.0,
+            "minimum": 0.0,
             "title": "Max Probes Per Question",
-            "type": "integer"
+            "description": "IV-3."
           },
           "curveball": {
             "anyOf": [
@@ -15222,9 +15568,8 @@
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "Tough difficulty only (IV-4).",
-            "title": "Curveball"
+            "title": "Curveball",
+            "description": "Tough difficulty only (IV-4)."
           },
           "seniority_bar": {
             "anyOf": [
@@ -15235,31 +15580,32 @@
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "Scope expected at session.level (IV-6). Level changes the bar.",
-            "title": "Seniority Bar"
+            "title": "Seniority Bar",
+            "description": "Scope expected at session.level (IV-6). Level changes the bar."
           },
           "pushback": {
-            "default": false,
-            "description": "Tough difficulty only: challenge assumptions (IV-4).",
+            "type": "boolean",
             "title": "Pushback",
-            "type": "boolean"
+            "description": "Tough difficulty only: challenge assumptions (IV-4).",
+            "default": false
           },
           "coach_help": {
-            "default": false,
-            "description": "Coach mode only: pause, hint and redo are allowed (IV-8).",
+            "type": "boolean",
             "title": "Coach Help",
-            "type": "boolean"
+            "description": "Coach mode only: pause, hint and redo are allowed (IV-8).",
+            "default": false
           },
           "time_plan": {
-            "description": "Minutes per phase. When set, the minutes add up to session.duration_min.",
             "items": {
               "$ref": "#/components/schemas/PhaseTime"
             },
+            "type": "array",
             "title": "Time Plan",
-            "type": "array"
+            "description": "Minutes per phase. When set, the minutes add up to session.duration_min."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "session",
           "generic_mode",
@@ -15269,7 +15615,7 @@
           "max_probes_per_question"
         ],
         "title": "InterviewerBrief",
-        "type": "object"
+        "description": "Built by the planner before each session. The live interviewer reads only this."
       },
       "InviteIn": {
         "properties": {
@@ -17684,6 +18030,133 @@
         ],
         "title": "Part2Stories"
       },
+      "Part3Coach": {
+        "properties": {
+          "sessions": {
+            "type": "integer",
+            "title": "Sessions",
+            "description": "Coach sessions started in the weeks shown"
+          },
+          "minutes": {
+            "type": "integer",
+            "title": "Minutes"
+          },
+          "users": {
+            "type": "integer",
+            "title": "Users"
+          },
+          "by_style": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/CoachStyle"
+            },
+            "type": "object",
+            "title": "By Style",
+            "description": "Every style is present"
+          },
+          "by_channel": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/SessionChannel"
+            },
+            "type": "object",
+            "title": "By Channel",
+            "description": "Every channel is present"
+          },
+          "minutes_per_session": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "cost_per_session": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "cost_total_usd": {
+            "type": "number",
+            "title": "Cost Total Usd"
+          },
+          "cap_share": {
+            "$ref": "#/components/schemas/AdminMetric",
+            "description": "Coach minutes as a share of plan caps"
+          },
+          "caps": {
+            "$ref": "#/components/schemas/CoachCapUse"
+          },
+          "weeks": {
+            "items": {
+              "$ref": "#/components/schemas/CoachWeek"
+            },
+            "type": "array",
+            "title": "Weeks",
+            "description": "Oldest first; the last is this week"
+          },
+          "evals": {
+            "$ref": "#/components/schemas/CoachEvals"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sessions",
+          "minutes",
+          "users",
+          "by_style",
+          "by_channel",
+          "minutes_per_session",
+          "cost_per_session",
+          "cost_total_usd",
+          "cap_share",
+          "caps",
+          "weeks",
+          "evals"
+        ],
+        "title": "Part3Coach"
+      },
+      "Part3Readiness": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "title": "Kind",
+            "description": "RD-3: a practice estimate",
+            "default": "practice_estimate"
+          },
+          "note": {
+            "type": "string",
+            "title": "Note",
+            "default": "Practice estimate from Realistic sessions only, last 90 days, without development data. Fewer than 2 scored sessions for a skill is not enough data."
+          },
+          "window_days": {
+            "type": "integer",
+            "title": "Window Days"
+          },
+          "min_sessions": {
+            "type": "integer",
+            "title": "Min Sessions"
+          },
+          "users": {
+            "type": "integer",
+            "title": "Users",
+            "description": "Users with any Realistic score in the window"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/SkillReadinessRow"
+            },
+            "type": "array",
+            "title": "Skills",
+            "description": "Skills with any score, most users first"
+          }
+        },
+        "type": "object",
+        "required": [
+          "window_days",
+          "min_sessions",
+          "users",
+          "skills"
+        ],
+        "title": "Part3Readiness"
+      },
       "PasswordLoginRequest": {
         "properties": {
           "email": {
@@ -17777,31 +18250,31 @@
         "title": "PasswordSignupRequest"
       },
       "PersonaBrief": {
-        "additionalProperties": false,
         "properties": {
           "tone": {
+            "type": "string",
             "minLength": 1,
-            "title": "Tone",
-            "type": "string"
+            "title": "Tone"
           },
           "pushback_style": {
+            "type": "string",
             "minLength": 1,
-            "title": "Pushback Style",
-            "type": "string"
+            "title": "Pushback Style"
           },
           "closing_style": {
+            "type": "string",
             "minLength": 1,
-            "title": "Closing Style",
-            "type": "string"
+            "title": "Closing Style"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "tone",
           "pushback_style",
           "closing_style"
         ],
-        "title": "PersonaBrief",
-        "type": "object"
+        "title": "PersonaBrief"
       },
       "PersonaNotes": {
         "additionalProperties": false,
@@ -17850,25 +18323,25 @@
         "description": "Session state machine phases (IV-7). The session controller moves phases, not the LLM."
       },
       "PhaseTime": {
-        "additionalProperties": false,
-        "description": "Minutes planned for one phase of the session (IV-7).",
         "properties": {
           "phase": {
             "$ref": "#/components/schemas/Phase"
           },
           "minutes": {
-            "maximum": 45,
-            "minimum": 0,
-            "title": "Minutes",
-            "type": "integer"
+            "type": "integer",
+            "maximum": 45.0,
+            "minimum": 0.0,
+            "title": "Minutes"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "phase",
           "minutes"
         ],
         "title": "PhaseTime",
-        "type": "object"
+        "description": "Minutes planned for one phase of the session (IV-7)."
       },
       "PlanOut": {
         "properties": {
@@ -20880,6 +21353,17 @@
               }
             ],
             "description": "SM-20: the pasted job and CV the run used, if any"
+          },
+          "setup": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/strong_api__admin__schemas__SessionSetup"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "AD-5: the brief and the rubric, as on the session page"
           }
         },
         "type": "object",
@@ -20897,43 +21381,6 @@
           "scenario"
         ],
         "title": "SessionReplay"
-      },
-      "SessionSetup": {
-        "properties": {
-          "job_target_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Job Target Id"
-          },
-          "resume_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Resume Id"
-          },
-          "config": {
-            "$ref": "#/components/schemas/SessionConfig",
-            "description": "For a Custom session, `custom` holds its setup."
-          },
-          "channel": {
-            "$ref": "#/components/schemas/SessionChannel"
-          }
-        },
-        "type": "object",
-        "required": [
-          "job_target_id",
-          "resume_id",
-          "config",
-          "channel"
-        ],
-        "title": "SessionSetup",
-        "description": "CU-9: a setup to prefill, from an earlier session. Same fields as CreateSessionRequest."
       },
       "SessionStatus": {
         "type": "string",
@@ -21975,6 +22422,55 @@
         ],
         "title": "SkillReadiness",
         "type": "object"
+      },
+      "SkillReadinessRow": {
+        "properties": {
+          "competency": {
+            "$ref": "#/components/schemas/Competency"
+          },
+          "users": {
+            "type": "integer",
+            "title": "Users",
+            "description": "Users with at least one Realistic score for the skill"
+          },
+          "users_enough_data": {
+            "type": "integer",
+            "title": "Users Enough Data",
+            "description": "Of them, users with 2 or more scored sessions"
+          },
+          "users_at_bar": {
+            "type": "integer",
+            "title": "Users At Bar",
+            "description": "Of those, users whose mean score is 3 or more"
+          },
+          "mean_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Score",
+            "description": "Mean of the users' means, 1 to 4"
+          },
+          "sessions": {
+            "type": "integer",
+            "title": "Sessions",
+            "description": "Realistic sessions that scored the skill"
+          }
+        },
+        "type": "object",
+        "required": [
+          "competency",
+          "users",
+          "users_enough_data",
+          "users_at_bar",
+          "mean_score",
+          "sessions"
+        ],
+        "title": "SkillReadinessRow"
       },
       "Source": {
         "additionalProperties": false,
@@ -23770,6 +24266,75 @@
           "duplicate"
         ],
         "title": "WebhookOut"
+      },
+      "strong_api__admin__schemas__SessionSetup": {
+        "properties": {
+          "brief": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/InterviewerBrief"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Only under the transcript's consent rule; None before the brief is built"
+          },
+          "rubric": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdminRubric"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "brief",
+          "rubric"
+        ],
+        "title": "SessionSetup",
+        "description": "RS-2, AD-5: the brief the interviewer worked from and the rubric the scorer used."
+      },
+      "strong_api__sessions__schemas__SessionSetup": {
+        "properties": {
+          "job_target_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Job Target Id"
+          },
+          "resume_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resume Id"
+          },
+          "config": {
+            "$ref": "#/components/schemas/SessionConfig",
+            "description": "For a Custom session, `custom` holds its setup."
+          },
+          "channel": {
+            "$ref": "#/components/schemas/SessionChannel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "job_target_id",
+          "resume_id",
+          "config",
+          "channel"
+        ],
+        "title": "SessionSetup",
+        "description": "CU-9: a setup to prefill, from an earlier session. Same fields as CreateSessionRequest."
       }
     }
   }

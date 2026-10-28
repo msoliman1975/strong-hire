@@ -2934,6 +2934,47 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/part3/coach": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Part3 Coach
+         * @description AD-5: coach sessions and minutes, minutes against plan caps, cost per coach session and
+         *     the latest coach eval results.
+         */
+        get: operations["get_part3_coach_admin_part3_coach_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/part3/readiness": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Part3 Readiness
+         * @description AD-5: practice readiness by skill across users (RD-1), aggregate only.
+         */
+        get: operations["get_part3_readiness_admin_part3_readiness_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/public/waitlist": {
         parameters: {
             query?: never;
@@ -3533,6 +3574,24 @@ export interface components {
              */
             status: "reading" | "to_confirm" | "confirmed" | "deleted";
         };
+        /** AdminRubric */
+        AdminRubric: {
+            /**
+             * Ref
+             * @description The prompt ref, e.g. scorer/rubric_recruiter_screen.v1
+             */
+            ref: string;
+            /**
+             * Text
+             * @description The rubric prompt; None when the file is gone
+             */
+            text: string | null;
+            /**
+             * Scored
+             * @description False: not scored yet, this is the current rubric
+             */
+            scored: boolean;
+        };
         /** AdminScore */
         AdminScore: {
             competency: components["schemas"]["Competency"];
@@ -3650,6 +3709,8 @@ export interface components {
              * @description AI-2: every component and role. None without usage rows.
              */
             cost_total_usd?: number | null;
+            /** @description AD-5: the brief (consent rule) and the rubric */
+            setup?: components["schemas"]["strong_api__admin__schemas__SessionSetup"] | null;
             /**
              * Turn Latency
              * @description AI-3: per-turn voice latency (OB-3)
@@ -4524,11 +4585,8 @@ export interface components {
              * @default planner
              */
             source: components["schemas"]["QuestionSource"];
-            /**
-             * @description Custom sessions only: the question's category (CU-1).
-             * @default null
-             */
-            category: ("behavioral" | "hiring_manager" | "technical_qa" | "case") | null;
+            /** @description Custom sessions only: the question's category (CU-1). */
+            category?: ("behavioral" | "hiring_manager" | "technical_qa" | "case") | null;
             /**
              * Must Ask
              * @description CU-4: the session controller asks it before CANDIDATE_QUESTIONS.
@@ -4586,6 +4644,84 @@ export interface components {
          * @enum {string}
          */
         ChangeKind: "added" | "removed" | "changed";
+        /** CoachCapUse */
+        CoachCapUse: {
+            /**
+             * Paid Users
+             * @description Users on a paid or comp plan now
+             */
+            paid_users: number;
+            /**
+             * Coach Minutes
+             * @description Their coach minutes in their current plan periods
+             */
+            coach_minutes: number;
+            /**
+             * Interview Minutes
+             * @description Their plan minutes used in those periods
+             */
+            interview_minutes: number;
+            /**
+             * Cap Minutes
+             * @description Sum of their plan caps, grants included
+             */
+            cap_minutes: number;
+            /**
+             * Over Cap If Counted
+             * @description Users whose interview plus coach minutes would pass their cap
+             */
+            over_cap_if_counted: number;
+            /**
+             * Free User Coach Minutes
+             * @description Coach minutes of users without a paid plan, in the weeks shown
+             */
+            free_user_coach_minutes: number;
+        };
+        /** CoachEvalRun */
+        CoachEvalRun: {
+            /**
+             * File
+             * @description Report file name in evals/reports
+             */
+            file: string;
+            /** Suite */
+            suite: string;
+            /** Profile */
+            profile: string;
+            /** Started At */
+            started_at: string;
+            /** Git Sha */
+            git_sha: string;
+            /**
+             * Dev Data
+             * @description PL-6: fake, tiny or local profile; not a launch result
+             */
+            dev_data: boolean;
+            /**
+             * Passed
+             * @description Every gated coach metric passed; None if none gated
+             */
+            passed: boolean | null;
+            /**
+             * Metrics
+             * @description Coach metrics only (key starts with coach_)
+             */
+            metrics: components["schemas"]["EvalMetric"][];
+        };
+        /** CoachEvals */
+        CoachEvals: {
+            latest: components["schemas"]["CoachEvalRun"] | null;
+            /**
+             * Runs
+             * @description Up to 5, newest first
+             */
+            runs: components["schemas"]["CoachEvalRun"][];
+            /**
+             * Reason
+             * @description Why there is no result
+             */
+            reason?: string | null;
+        };
         /**
          * CoachReply
          * @description CO-3, CO-4: one coach turn. The coach updates only the parts the candidate's own words
@@ -4712,6 +4848,34 @@ export interface components {
              * @description True when the session ended on this turn
              */
             ended: boolean;
+        };
+        /** CoachWeek */
+        CoachWeek: {
+            /**
+             * Week Start
+             * Format: date-time
+             * @description Monday 00:00 UTC
+             */
+            week_start: string;
+            /**
+             * Sessions
+             * @description Coach sessions started that week
+             */
+            sessions: number;
+            /**
+             * Minutes
+             * @description Their recorded minutes
+             */
+            minutes: number;
+            /** Voice */
+            voice: number;
+            /** Text */
+            text: number;
+            /**
+             * Users
+             * @description Distinct users with a coach session that week
+             */
+            users: number;
         };
         /** CompanyActiveIn */
         CompanyActiveIn: {
@@ -5330,6 +5494,22 @@ export interface components {
          * @enum {string}
          */
         ErrorGroupStatus: "open" | "resolved";
+        /** EvalMetric */
+        EvalMetric: {
+            /** Key */
+            key: string;
+            /** Name */
+            name: string;
+            /** Value */
+            value: number | null;
+            /** Threshold */
+            threshold: string;
+            /**
+             * Passed
+             * @description None: information only, or not measured
+             */
+            passed: boolean | null;
+        };
         /**
          * ExitSurveyIn
          * @description The cancellation exit survey: two questions. Both are required, the detail is not.
@@ -5693,16 +5873,12 @@ export interface components {
             /**
              * Company Name
              * @description None in generic mode.
-             * @default null
              */
-            company_name: string | null;
+            company_name?: string | null;
             /** Generic Mode */
             generic_mode: boolean;
-            /**
-             * Profile Version
-             * @default null
-             */
-            profile_version: number | null;
+            /** Profile Version */
+            profile_version?: number | null;
             /**
              * Target Competencies
              * @description 4 to 6; a mini interview has 2.
@@ -5729,15 +5905,13 @@ export interface components {
             /**
              * Curveball
              * @description Tough difficulty only (IV-4).
-             * @default null
              */
-            curveball: string | null;
+            curveball?: string | null;
             /**
              * Seniority Bar
              * @description Scope expected at session.level (IV-6). Level changes the bar.
-             * @default null
              */
-            seniority_bar: string | null;
+            seniority_bar?: string | null;
             /**
              * Pushback
              * @description Tough difficulty only: challenge assumptions (IV-4).
@@ -6634,6 +6808,73 @@ export interface components {
              * @description Oldest first; the last is this week
              */
             delivery: components["schemas"]["DeliveryWeek"][];
+        };
+        /** Part3Coach */
+        Part3Coach: {
+            /**
+             * Sessions
+             * @description Coach sessions started in the weeks shown
+             */
+            sessions: number;
+            /** Minutes */
+            minutes: number;
+            /** Users */
+            users: number;
+            /**
+             * By Style
+             * @description Every style is present
+             */
+            by_style: {
+                [key: string]: number;
+            };
+            /**
+             * By Channel
+             * @description Every channel is present
+             */
+            by_channel: {
+                [key: string]: number;
+            };
+            minutes_per_session: components["schemas"]["AdminMetric"];
+            cost_per_session: components["schemas"]["AdminMetric"];
+            /** Cost Total Usd */
+            cost_total_usd: number;
+            /** @description Coach minutes as a share of plan caps */
+            cap_share: components["schemas"]["AdminMetric"];
+            caps: components["schemas"]["CoachCapUse"];
+            /**
+             * Weeks
+             * @description Oldest first; the last is this week
+             */
+            weeks: components["schemas"]["CoachWeek"][];
+            evals: components["schemas"]["CoachEvals"];
+        };
+        /** Part3Readiness */
+        Part3Readiness: {
+            /**
+             * Kind
+             * @description RD-3: a practice estimate
+             * @default practice_estimate
+             */
+            kind: string;
+            /**
+             * Note
+             * @default Practice estimate from Realistic sessions only, last 90 days, without development data. Fewer than 2 scored sessions for a skill is not enough data.
+             */
+            note: string;
+            /** Window Days */
+            window_days: number;
+            /** Min Sessions */
+            min_sessions: number;
+            /**
+             * Users
+             * @description Users with any Realistic score in the window
+             */
+            users: number;
+            /**
+             * Skills
+             * @description Skills with any score, most users first
+             */
+            skills: components["schemas"]["SkillReadinessRow"][];
         };
         /** PasswordLoginRequest */
         PasswordLoginRequest: {
@@ -7951,22 +8192,8 @@ export interface components {
             scenario: components["schemas"]["SimScenarioOut"] | null;
             /** @description SM-20: the pasted job and CV the run used, if any */
             inputs?: components["schemas"]["SimInputsOut"] | null;
-        };
-        /**
-         * SessionSetup
-         * @description CU-9: a setup to prefill, from an earlier session. Same fields as CreateSessionRequest.
-         */
-        SessionSetup: {
-            /**
-             * Job Target Id
-             * Format: uuid
-             */
-            job_target_id: string;
-            /** Resume Id */
-            resume_id: string | null;
-            /** @description For a Custom session, `custom` holds its setup. */
-            config: components["schemas"]["SessionConfig"];
-            channel: components["schemas"]["SessionChannel"];
+            /** @description AD-5: the brief and the rubric, as on the session page */
+            setup?: components["schemas"]["strong_api__admin__schemas__SessionSetup"] | null;
         };
         /**
          * SessionStatus
@@ -8373,6 +8600,35 @@ export interface components {
              * @description Realistic sessions that scored this skill.
              */
             sessions_counted: number;
+        };
+        /** SkillReadinessRow */
+        SkillReadinessRow: {
+            competency: components["schemas"]["Competency"];
+            /**
+             * Users
+             * @description Users with at least one Realistic score for the skill
+             */
+            users: number;
+            /**
+             * Users Enough Data
+             * @description Of them, users with 2 or more scored sessions
+             */
+            users_enough_data: number;
+            /**
+             * Users At Bar
+             * @description Of those, users whose mean score is 3 or more
+             */
+            users_at_bar: number;
+            /**
+             * Mean Score
+             * @description Mean of the users' means, 1 to 4
+             */
+            mean_score: number | null;
+            /**
+             * Sessions
+             * @description Realistic sessions that scored the skill
+             */
+            sessions: number;
         };
         /** Source */
         Source: {
@@ -9129,6 +9385,31 @@ export interface components {
             received: boolean;
             /** Duplicate */
             duplicate: boolean;
+        };
+        /**
+         * SessionSetup
+         * @description RS-2, AD-5: the brief the interviewer worked from and the rubric the scorer used.
+         */
+        strong_api__admin__schemas__SessionSetup: {
+            /** @description Only under the transcript's consent rule; None before the brief is built */
+            brief: components["schemas"]["InterviewerBrief"] | null;
+            rubric: components["schemas"]["AdminRubric"] | null;
+        };
+        /**
+         * SessionSetup
+         * @description CU-9: a setup to prefill, from an earlier session. Same fields as CreateSessionRequest.
+         */
+        strong_api__sessions__schemas__SessionSetup: {
+            /**
+             * Job Target Id
+             * Format: uuid
+             */
+            job_target_id: string;
+            /** Resume Id */
+            resume_id: string | null;
+            /** @description For a Custom session, `custom` holds its setup. */
+            config: components["schemas"]["SessionConfig"];
+            channel: components["schemas"]["SessionChannel"];
         };
     };
     responses: never;
@@ -10043,7 +10324,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SessionSetup"];
+                    "application/json": components["schemas"]["strong_api__sessions__schemas__SessionSetup"];
                 };
             };
             /** @description Validation Error */
@@ -14527,6 +14808,58 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_part3_coach_admin_part3_coach_get: {
+        parameters: {
+            query?: {
+                /** @description How many weeks, this one included */
+                weeks?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Part3Coach"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_part3_readiness_admin_part3_readiness_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Part3Readiness"];
                 };
             };
         };
