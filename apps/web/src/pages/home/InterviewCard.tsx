@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 
 import type { JobTargetSummary } from "../../api/types";
+import { EXPLAIN, Explain } from "../../components/Explain";
 import { CountdownBadge } from "../../components/ui";
 import type { PlanView } from "../plan/api";
 import { planPath } from "../plan/paths";
@@ -135,7 +136,10 @@ function ReadinessMeter({ jobId }: { jobId: string }) {
       ) : (
         <p className="small muted">Readiness after {MIN_SESSIONS} Realistic rehearsals</p>
       )}
-      <ReadinessNotice short />
+      <span className="explain-head">
+        <ReadinessNotice short />
+        <Explain topic="Readiness">{EXPLAIN.readiness}</Explain>
+      </span>
     </div>
   );
 }

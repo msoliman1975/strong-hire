@@ -359,16 +359,6 @@
 .story-view__parts [data-part="result"] .story-view__part-label { color: var(--sh-part-result); }
 .story-view__parts [data-part="reflection"] .story-view__part-label { color: var(--sh-part-reflection); }
 
-.text-button {
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--sh-violet);
-  font: inherit;
-  font-weight: 600;
-  text-decoration: underline;
-  cursor: pointer;
-}
 
 /* Takes: a timeline of bars, oldest first. */
 .story-takes {
@@ -532,4 +522,18 @@
 
 .story-skills__more {
   justify-self: start;
+}
+
+.studio__teach {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 16px;
+  border: 1px dashed var(--sh-line-strong);
+  border-radius: 12px;
+}
+
+.studio__teach p {
+  margin: 0;
 }

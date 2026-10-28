@@ -3216,3 +3216,271 @@ dialog::backdrop {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* R3: the ⓘ explainer (Explain.tsx), a <details> beside a heading or a number. */
+.explain-head {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+.explain-head > h2,
+.explain-head > h3,
+.explain-head > p {
+  margin: 0;
+}
+
+.explain {
+  position: relative;
+  display: inline-block;
+}
+
+.explain > summary {
+  list-style: none;
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--sh-line-strong);
+  border-radius: 50%;
+  color: var(--sh-muted);
+  font-family: var(--sh-font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.explain > summary::-webkit-details-marker {
+  display: none;
+}
+
+.explain[open] > summary,
+.explain > summary:hover {
+  border-color: var(--sh-violet);
+  color: var(--sh-violet);
+}
+
+.explain__text {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 6px);
+  z-index: 25;
+  width: min(280px, 80vw);
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--sh-ink);
+  color: #ffffff;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.45;
+  box-shadow: var(--sh-shadow-pop);
+}
+
+/* A button that reads as a link, inside a sentence. */
+.text-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--sh-violet);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* R3: the 3-step tour (Tour.tsx), a small card, and an outline on the part it points at. */
+.tour {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 50;
+  width: min(360px, calc(100vw - 32px));
+  padding: 18px 20px;
+  border-radius: var(--sh-radius);
+  background: var(--sh-ink);
+  color: #ffffff;
+  box-shadow: var(--sh-shadow-pop);
+}
+
+.tour h2 {
+  margin: 0 0 6px;
+  font-size: 1.0625rem;
+  color: #ffffff;
+}
+
+.tour p {
+  margin: 0;
+}
+
+.tour__count {
+  margin-bottom: 4px !important;
+  font-family: var(--sh-font-mono);
+  font-size: 0.75rem;
+  color: var(--sh-violet-light);
+}
+
+.tour__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.tour .btn--quiet {
+  color: #c9c5d6;
+}
+
+[data-tour-active] {
+  outline: 3px solid var(--sh-violet);
+  outline-offset: 4px;
+  border-radius: 12px;
+}
+
+@media (max-width: 599px) {
+  .tour {
+    right: 16px;
+    bottom: 16px;
+  }
+}
+
+/* ------------------------------------------------ R3 motion (canvas board R3 Explain)
+ * CSS only, no animation library, so the strict CSP stays. Each motion runs 150 to 400 ms, and
+ * none runs with prefers-reduced-motion. Nothing moves in the live interview room, the
+ * transcript or forms. */
+
+/* Lets the readiness ring's percentage animate. */
+@property --pct {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The readiness ring fills on load (plan header). */
+  .readiness-ring__dial {
+    animation: sh-ring 400ms ease-out both;
+  }
+
+  /* Bars grow in: readiness on Home, the Get started progress, and each take on the timeline. */
+  .home-readiness__fill,
+  .get-started__fill,
+  .story-take__fill {
+    transform-origin: left center;
+    animation: sh-grow 400ms ease-out both;
+  }
+
+  .story-takes__list > li:nth-child(2) .story-take__fill {
+    animation-delay: 80ms;
+  }
+
+  .story-takes__list > li:nth-child(3) .story-take__fill {
+    animation-delay: 160ms;
+  }
+
+  .story-takes__list > li:nth-child(n + 4) .story-take__fill {
+    animation-delay: 240ms;
+  }
+
+  /* Home: the cards rise in on first paint, staggered. */
+  .home-v2 > .card,
+  .home-journeys > .home-journey {
+    animation: sh-rise 400ms ease-out both;
+  }
+
+  .home-journeys > .home-journey:nth-child(2) {
+    animation-delay: 60ms;
+  }
+
+  .home-journeys > .home-journey:nth-child(3) {
+    animation-delay: 120ms;
+  }
+
+  /* Coach session: a story part lights up when the coach fills it. */
+  .coach-part[data-state="done"] {
+    animation: sh-light 400ms ease-out;
+  }
+
+  /* Coach session: the big mic pulses while it listens; each pulse moves for 400 ms, then rests. */
+  .coach__mic--big[data-live] {
+    animation: sh-pulse 1600ms ease-out infinite;
+  }
+
+  /* A small celebration when a story is Proven. */
+  .story-view__status .status-badge[data-tone="ok"] {
+    animation: sh-pop 400ms ease-out;
+  }
+
+  /* The ⓘ explainer and the tour card fade in. */
+  .explain[open] .explain__text,
+  .tour {
+    animation: sh-fade 150ms ease-out both;
+  }
+}
+
+@keyframes sh-ring {
+  from {
+    --pct: 0%;
+  }
+}
+
+@keyframes sh-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes sh-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes sh-light {
+  from {
+    background: var(--sh-violet-soft);
+    transform: scale(0.98);
+  }
+}
+
+@keyframes sh-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgb(229 72 77 / 45%);
+  }
+  25% {
+    box-shadow: 0 0 0 14px rgb(229 72 77 / 0%);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(229 72 77 / 0%);
+  }
+}
+
+@keyframes sh-pop {
+  0% {
+    transform: scale(0.8);
+  }
+  60% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes sh-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Beside a sentence, the ⓘ stays on the sentence's line. */
+.explain-head:has(> p) {
+  flex-wrap: nowrap;
+  align-items: flex-start;
+}
+
+.explain-head > p {
+  min-width: 0;
+}

@@ -13,6 +13,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 
 import { competencyLabel, formatDate } from "../../labels";
+import { EXPLAIN, Explain } from "../../components/Explain";
 import { CoachMark, ErrorNotice, Loading, Segmented, STORY_PART_LABEL } from "../../components/ui";
 import { takesApi, useTakes } from "../coach/api";
 import { newCoachPath } from "../coach/paths";
@@ -53,6 +54,7 @@ function StoryHead({ story, editing, onEdit }: { story: Story; editing: boolean;
         <h2 id="story-title-heading">{story.title}</h2>
         <span className="story-view__status">
           <StoryStatusBadge status={story.status} />
+          <Explain topic="Proven">{EXPLAIN.proven}</Explain>
           {best && <span className="story-view__score">Best take {takeAverage(best).toFixed(1)} of 4</span>}
         </span>
       </div>

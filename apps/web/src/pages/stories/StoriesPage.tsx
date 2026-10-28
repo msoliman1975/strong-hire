@@ -101,11 +101,21 @@ export function StoriesPage() {
           {stories.isError && <ErrorNotice error={stories.error} />}
           {stories.data &&
             (shown.length === 0 ? (
-              <p className="muted studio__empty">
-                {filtered
-                  ? "No stories match these filters."
-                  : "No stories yet. Build one with your coach, or save one from a debrief."}
-              </p>
+              filtered ? (
+                <p className="muted studio__empty">No stories match these filters.</p>
+              ) : (
+                /* R3: an empty page teaches what it is for, and gives the one button to start. */
+                <div className="studio__empty studio__teach" data-testid="stories-empty">
+                  <b>No stories yet</b>
+                  <p className="muted">
+                    A story is one moment from your career, told in 5 parts, ready for "tell me about a time…"
+                    questions. Your coach builds the first one with you, from your own words.
+                  </p>
+                  <Link className="btn" to={newCoachPath()}>
+                    Build my first story
+                  </Link>
+                </div>
+              )
             ) : (
               <ul className="plain-list studio__list" aria-label="Stories">
                 {shown.map((s) => (

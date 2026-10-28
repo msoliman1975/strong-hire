@@ -15,6 +15,7 @@ import type { PlanView } from "../plan/api";
 import { planPath } from "../plan/paths";
 import { useStories, type Story } from "../stories/api";
 import { storiesPath } from "../stories/paths";
+import { GetStarted } from "./GetStarted";
 import { InterviewCard } from "./InterviewCard";
 import { ResumesCard } from "./ResumesCard";
 import { coachNudge, focusInterview, interviewDate, daysUntil, isReady, type StoryGap } from "./interviews";
@@ -43,6 +44,7 @@ export function HomeV2({ today }: { today?: Date }) {
   return (
     <div className="home-v2">
       <PageHead title="Home" hidden />
+      <GetStarted />
       {!plansPending && (
         <HomeCoach summary={focus} planLink={entry ? planPath(entry.jobId, entry.resumeId) : null} gap={gap} days={days} today={today} />
       )}
