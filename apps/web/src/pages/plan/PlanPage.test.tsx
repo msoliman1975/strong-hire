@@ -4,7 +4,7 @@
  * the plan page.
  */
 import { QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router";
@@ -192,6 +192,9 @@ describe("interview plan page", () => {
     expect(await screen.findByRole("heading", { level: 1, name: /Acme/ })).toBeInTheDocument();
     const tested = screen.getByRole("region", { name: "What they'll test" });
     expect(within(tested).getByText(/Acme's interview profile and its Acme Values/)).toBeInTheDocument();
+    // The rounds in their loop show; the others open on request.
+    expect(within(tested).getAllByTestId("tested-type")).toHaveLength(1);
+    fireEvent.click(within(tested).getByRole("button", { name: "Show the other round" }));
     const types = within(tested).getAllByTestId("tested-type");
     expect(types).toHaveLength(2);
     expect(within(types[0]).getByText("In their loop")).toBeInTheDocument();

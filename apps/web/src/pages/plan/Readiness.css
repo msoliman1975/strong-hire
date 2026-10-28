@@ -54,3 +54,65 @@
 .day-plan__item {
   font-size: 0.875rem;
 }
+
+/* RD-1 in the plan header: the ring with the share of skills at the bar. */
+.readiness-ring {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.readiness-ring > span:last-child {
+  display: grid;
+}
+
+.readiness-ring__dial {
+  flex: 0 0 64px;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side, var(--sh-surface) 76%, transparent 77%),
+    conic-gradient(var(--sh-teal) var(--pct), var(--sh-line) 0);
+  font-family: var(--sh-font-mono);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* RD-2 as a timeline: a dot per day, done days filled. */
+.day-plan__days {
+  position: relative;
+  gap: 18px;
+  padding-left: 24px;
+}
+
+.day-plan__day {
+  position: relative;
+}
+
+.day-plan__day::before {
+  content: "";
+  position: absolute;
+  left: -24px;
+  top: 3px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--sh-line-strong);
+  border-radius: 50%;
+  background: var(--sh-surface);
+}
+
+.day-plan__day:first-child::before {
+  border-color: var(--sh-violet);
+  background: var(--sh-violet);
+}
+
+.day-plan__day h3 {
+  font-family: var(--sh-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}

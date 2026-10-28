@@ -243,3 +243,11 @@
   margin: 0 0 6px;
   font-size: 1.0625rem;
 }
+
+/* The plan link and "Read the transcript", as on the canvas board B3 Debrief. */
+.debrief-v2__head-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 20px;
+}
