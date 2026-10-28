@@ -306,7 +306,8 @@ export interface paths {
         };
         /**
          * Get Debrief
-         * @description FB-1, FB-2, PR-2. Poll while status is "scoring" (FB-3: ready within 60 seconds).
+         * @description FB-1, FB-2, PR-2, DB-1, DB-2. Poll while status is "scoring" (FB-3: ready within 60
+         *     seconds).
          */
         get: operations["get_debrief_sessions__session_id__debrief_get"];
         put?: never;
@@ -4020,6 +4021,16 @@ export interface components {
          */
         AnswerConduct: "ok" | "off_scope" | "inappropriate";
         /**
+         * AnswersAtBar
+         * @description DB-2: answers whose average rubric score is 3 or more, out of the answers scored.
+         */
+        AnswersAtBar: {
+            /** Met */
+            met: number;
+            /** Scored */
+            scored: number;
+        };
+        /**
          * AskFor
          * @description CO-4: the one thing the coach asks for next, from the IV-3 follow-up rules.
          * @enum {string}
@@ -4853,6 +4864,10 @@ export interface components {
              * @description CU-6: the planned questions with their source and category, in plan order. Empty when the session has no interview plan.
              */
             questions?: components["schemas"]["DebriefQuestion"][];
+            /** @description DB-1. Null when no earlier session of the same job target was scored. */
+            previous_signal?: components["schemas"]["PreviousSignal"] | null;
+            /** @description DB-2. Null until the debrief is ready. */
+            answers_at_bar?: components["schemas"]["AnswersAtBar"] | null;
         };
         /**
          * DebriefQuestion
@@ -6428,6 +6443,25 @@ export interface components {
              * @enum {string}
              */
             flow: "manage" | "cancel";
+        };
+        /**
+         * PreviousSignal
+         * @description DB-1: the hire signal of the session before this one for the same job target.
+         */
+        PreviousSignal: {
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            hire_signal: components["schemas"]["HireSignal"];
+            /** Ended At */
+            ended_at: string | null;
+            /**
+             * Change
+             * @description Bands moved since that session: positive is better, 0 is the same.
+             */
+            change: number;
         };
         /**
          * Principle
