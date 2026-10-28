@@ -2856,6 +2856,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/part2/stories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Part2 Stories
+         * @description AD-4: story save rate, stories per user, Draft to Proven rate, delivery trends.
+         */
+        get: operations["get_part2_stories_admin_part2_stories_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/public/waitlist": {
         parameters: {
             query?: never;
@@ -3636,6 +3656,20 @@ export interface components {
              */
             current: boolean;
         };
+        /**
+         * AdminStoryMeta
+         * @description AD-4: counts only. Never a story's title, text, notes or skills.
+         */
+        AdminStoryMeta: {
+            /** Total */
+            total: number;
+            /** Draft */
+            draft: number;
+            /** Proven */
+            proven: number;
+            /** Last Saved At */
+            last_saved_at: string | null;
+        };
         /** AdminSubscription */
         AdminSubscription: {
             status: components["schemas"]["SubscriptionStatus"];
@@ -3825,6 +3859,7 @@ export interface components {
             gap_analysis_count: number;
             /** Gap Analyses */
             gap_analyses: components["schemas"]["AdminGapMeta"][];
+            stories: components["schemas"]["AdminStoryMeta"];
             /**
              * Cost To Date Usd
              * @description All model usage of the account (usage_events).
@@ -5109,6 +5144,29 @@ export interface components {
             fillers_per_minute: number;
             /** Duration Seconds */
             duration_seconds: number;
+        };
+        /** DeliveryWeek */
+        DeliveryWeek: {
+            /**
+             * Week Start
+             * Format: date-time
+             * @description Monday 00:00 UTC
+             */
+            week_start: string;
+            /**
+             * Answers
+             * @description Scored answers with delivery metrics
+             */
+            answers: number;
+            /**
+             * Words Per Minute
+             * @description Mean over those answers
+             */
+            words_per_minute: number | null;
+            /** Fillers Per Minute */
+            fillers_per_minute: number | null;
+            /** Duration Seconds */
+            duration_seconds: number | null;
         };
         /** DevLoginRequest */
         DevLoginRequest: {
@@ -6501,6 +6559,24 @@ export interface components {
             /** @description Sessions started from the plan page */
             plan_sessions: components["schemas"]["AdminMetric"];
         };
+        /** Part2Stories */
+        Part2Stories: {
+            story_save_rate: components["schemas"]["AdminMetric"];
+            stories_per_user: components["schemas"]["AdminMetric"];
+            draft_to_proven_rate: components["schemas"]["AdminMetric"];
+            save_cohort: components["schemas"]["SaveCohort"];
+            counts: components["schemas"]["StoryCounts"];
+            /**
+             * Stories By Week
+             * @description Oldest first; the last is this week
+             */
+            stories_by_week: components["schemas"]["StoryWeek"][];
+            /**
+             * Delivery
+             * @description Oldest first; the last is this week
+             */
+            delivery: components["schemas"]["DeliveryWeek"][];
+        };
         /** PasswordLoginRequest */
         PasswordLoginRequest: {
             /**
@@ -7573,6 +7649,19 @@ export interface components {
              */
             levels?: components["schemas"]["Level"][];
         };
+        /** SaveCohort */
+        SaveCohort: {
+            /**
+             * Users
+             * @description Users whose first debrief is 30 or more days old
+             */
+            users: number;
+            /**
+             * Saved
+             * @description Of them, users who saved a story within the 30 days
+             */
+            saved: number;
+        };
         /** SavedQuestionIn */
         SavedQuestionIn: {
             /** Text */
@@ -8336,6 +8425,24 @@ export interface components {
              */
             updated_at: string;
         };
+        /** StoryCounts */
+        StoryCounts: {
+            /** Total */
+            total: number;
+            /** Draft */
+            draft: number;
+            /** Proven */
+            proven: number;
+            /**
+             * By Source
+             * @description Stories per source; every source
+             */
+            by_source: {
+                [key: string]: number;
+            };
+            /** Users With Stories */
+            users_with_stories: number;
+        };
         /**
          * StoryFit
          * @description ST-5: the planner's story fit table, one item per tested skill.
@@ -8532,6 +8639,20 @@ export interface components {
             sixty_second: components["schemas"]["StoryVersion"];
             /** @description All five parts, in order. */
             full: components["schemas"]["StoryVersion"];
+        };
+        /** StoryWeek */
+        StoryWeek: {
+            /**
+             * Week Start
+             * Format: date-time
+             * @description Monday 00:00 UTC
+             */
+            week_start: string;
+            /**
+             * Saved
+             * @description Stories created that week
+             */
+            saved: number;
         };
         /** Strength */
         Strength: {
@@ -14121,6 +14242,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AdminAutoProfile"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_part2_stories_admin_part2_stories_get: {
+        parameters: {
+            query?: {
+                /** @description How many weeks, this one included */
+                weeks?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Part2Stories"];
                 };
             };
             /** @description Validation Error */

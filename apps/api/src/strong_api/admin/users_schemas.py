@@ -153,6 +153,15 @@ class AdminGapMeta(BaseModel):
     updated_at: datetime | None
 
 
+class AdminStoryMeta(BaseModel):
+    """AD-4: counts only. Never a story's title, text, notes or skills."""
+
+    total: int
+    draft: int
+    proven: int
+    last_saved_at: datetime | None
+
+
 class AdminRefund(BaseModel):
     """AU-6: a refund made in the Stripe dashboard, from the charge.refunded webhook."""
 
@@ -180,6 +189,7 @@ class AdminUserDetail(BaseModel):
     resumes: list[AdminResumeMeta]
     gap_analysis_count: int
     gap_analyses: list[AdminGapMeta]
+    stories: AdminStoryMeta
     cost_to_date_usd: float = Field(description="All model usage of the account (usage_events).")
     cost_unknown_events: int = Field(description="Usage rows with no known price (D-12).")
     refunds: list[AdminRefund]

@@ -10,6 +10,7 @@ import { adminApi } from "../api/admin";
 import { alertsApi } from "../api/alerts";
 import { waitlistApi } from "../api/waitlist";
 import { part1Api } from "../api/part1";
+import { part2Api } from "../api/part2";
 import { authApi } from "../api/auth";
 import { controlsApi } from "../api/controls";
 import { usersApi } from "../api/users";
@@ -169,6 +170,12 @@ describe("admin mocks match openapi.json", () => {
     mockStore.db.users["admin@example.com"] = user("admin@example.com", 9, false);
     mockSignIn(mockStore, "admin@example.com");
     expectApiShape("AdminWaitlist", await waitlistApi.list());
+  });
+
+  it("v2 part 2: story library metrics (AD-4)", async () => {
+    mockStore.db.users["admin@example.com"] = user("admin@example.com", 9, false);
+    mockSignIn(mockStore, "admin@example.com");
+    expectApiShape("Part2Stories", await part2Api.stories(8));
   });
 
   it("v2 part 1: plan usage and auto-profiles (AD-3, AP-3)", async () => {

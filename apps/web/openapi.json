@@ -7991,6 +7991,54 @@
         }
       }
     },
+    "/admin/part2/stories": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Part2 Stories",
+        "description": "AD-4: story save rate, stories per user, Draft to Proven rate, delivery trends.",
+        "operationId": "get_part2_stories_admin_part2_stories_get",
+        "parameters": [
+          {
+            "name": "weeks",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 52,
+              "minimum": 1,
+              "description": "How many weeks, this one included",
+              "default": 8,
+              "title": "Weeks"
+            },
+            "description": "How many weeks, this one included"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Part2Stories"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/public/waitlist": {
       "post": {
         "tags": [
@@ -9821,6 +9869,43 @@
         "title": "AdminSignInSession",
         "description": "AA-8: one of my admin sessions."
       },
+      "AdminStoryMeta": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "draft": {
+            "type": "integer",
+            "title": "Draft"
+          },
+          "proven": {
+            "type": "integer",
+            "title": "Proven"
+          },
+          "last_saved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Saved At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "draft",
+          "proven",
+          "last_saved_at"
+        ],
+        "title": "AdminStoryMeta",
+        "description": "AD-4: counts only. Never a story's title, text, notes or skills."
+      },
       "AdminSubscription": {
         "properties": {
           "status": {
@@ -10451,6 +10536,9 @@
             "type": "array",
             "title": "Gap Analyses"
           },
+          "stories": {
+            "$ref": "#/components/schemas/AdminStoryMeta"
+          },
           "cost_to_date_usd": {
             "type": "number",
             "title": "Cost To Date Usd",
@@ -10501,6 +10589,7 @@
           "resumes",
           "gap_analysis_count",
           "gap_analyses",
+          "stories",
           "cost_to_date_usd",
           "cost_unknown_events",
           "refunds",
@@ -13668,6 +13757,64 @@
         ],
         "title": "DeliveryMetrics",
         "description": "DM-1: how one answer was delivered, from turn timestamps and text. No audio is used."
+      },
+      "DeliveryWeek": {
+        "properties": {
+          "week_start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Week Start",
+            "description": "Monday 00:00 UTC"
+          },
+          "answers": {
+            "type": "integer",
+            "title": "Answers",
+            "description": "Scored answers with delivery metrics"
+          },
+          "words_per_minute": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Words Per Minute",
+            "description": "Mean over those answers"
+          },
+          "fillers_per_minute": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fillers Per Minute"
+          },
+          "duration_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Seconds"
+          }
+        },
+        "type": "object",
+        "required": [
+          "week_start",
+          "answers",
+          "words_per_minute",
+          "fillers_per_minute",
+          "duration_seconds"
+        ],
+        "title": "DeliveryWeek"
       },
       "DevLoginRequest": {
         "properties": {
@@ -17295,6 +17442,52 @@
         ],
         "title": "Part1Usage"
       },
+      "Part2Stories": {
+        "properties": {
+          "story_save_rate": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "stories_per_user": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "draft_to_proven_rate": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "save_cohort": {
+            "$ref": "#/components/schemas/SaveCohort"
+          },
+          "counts": {
+            "$ref": "#/components/schemas/StoryCounts"
+          },
+          "stories_by_week": {
+            "items": {
+              "$ref": "#/components/schemas/StoryWeek"
+            },
+            "type": "array",
+            "title": "Stories By Week",
+            "description": "Oldest first; the last is this week"
+          },
+          "delivery": {
+            "items": {
+              "$ref": "#/components/schemas/DeliveryWeek"
+            },
+            "type": "array",
+            "title": "Delivery",
+            "description": "Oldest first; the last is this week"
+          }
+        },
+        "type": "object",
+        "required": [
+          "story_save_rate",
+          "stories_per_user",
+          "draft_to_proven_rate",
+          "save_cohort",
+          "counts",
+          "stories_by_week",
+          "delivery"
+        ],
+        "title": "Part2Stories"
+      },
       "PasswordLoginRequest": {
         "properties": {
           "email": {
@@ -19855,6 +20048,26 @@
         "title": "SampleQuestion",
         "type": "object"
       },
+      "SaveCohort": {
+        "properties": {
+          "users": {
+            "type": "integer",
+            "title": "Users",
+            "description": "Users whose first debrief is 30 or more days old"
+          },
+          "saved": {
+            "type": "integer",
+            "title": "Saved",
+            "description": "Of them, users who saved a story within the 30 days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "users",
+          "saved"
+        ],
+        "title": "SaveCohort"
+      },
       "SavedQuestionIn": {
         "properties": {
           "text": {
@@ -21832,6 +22045,46 @@
         "title": "Story",
         "description": "ST-1: one story in the user's library. The stories table holds org_id and user_id."
       },
+      "StoryCounts": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "draft": {
+            "type": "integer",
+            "title": "Draft"
+          },
+          "proven": {
+            "type": "integer",
+            "title": "Proven"
+          },
+          "by_source": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/StorySource"
+            },
+            "type": "object",
+            "title": "By Source",
+            "description": "Stories per source; every source"
+          },
+          "users_with_stories": {
+            "type": "integer",
+            "title": "Users With Stories"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "draft",
+          "proven",
+          "by_source",
+          "users_with_stories"
+        ],
+        "title": "StoryCounts"
+      },
       "StoryFit": {
         "additionalProperties": false,
         "description": "ST-5: the planner's story fit table, one item per tested skill.",
@@ -22318,6 +22571,27 @@
         ],
         "title": "StoryVersions",
         "type": "object"
+      },
+      "StoryWeek": {
+        "properties": {
+          "week_start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Week Start",
+            "description": "Monday 00:00 UTC"
+          },
+          "saved": {
+            "type": "integer",
+            "title": "Saved",
+            "description": "Stories created that week"
+          }
+        },
+        "type": "object",
+        "required": [
+          "week_start",
+          "saved"
+        ],
+        "title": "StoryWeek"
       },
       "Strength": {
         "properties": {
