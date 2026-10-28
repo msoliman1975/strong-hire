@@ -138,6 +138,10 @@ export const mockReplay: SessionReplay = {
   audio: { available: true, bytes: 48_000 },
   scenario: scenario(),
   inputs: null,
+  setup: {
+    brief: null,
+    rubric: { ref: "scorer/rubric.v2", text: "Score each answer 1 to 4 per competency.", scored: true },
+  },
 };
 
 const states = new WeakMap<MockDb, SimState>();

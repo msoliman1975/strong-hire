@@ -24,3 +24,9 @@ export function money(usd: number | null | undefined): string {
 export function words(code: string): string {
   return code.replace(/_/g, " ");
 }
+
+/** A code as a sentence-case label: "logistics_and_expectations" is "Logistics and expectations". */
+export function sentence(code: string): string {
+  const text = words(code);
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}

@@ -9,6 +9,7 @@ import {
   adminDownloads,
   useAdminSession,
 } from "../api/admin";
+import { SessionSetupPanel } from "../components/SessionSetupPanel";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
 import { difficultyLabel, interviewTypeLabel, modeLabel, phaseLabel } from "../labels";
 import { clock, money, utc, words } from "../format";
@@ -306,6 +307,7 @@ export function AdminSessionPage() {
       <Metadata session={session} />
       <CostBreakdown lines={cost_breakdown} total={cost_total_usd} />
       <TurnLatency turns={turn_latency} summary={latency_summary} />
+      <SessionSetupPanel setup={detail.data.setup} />
 
       {!content_visible && (
         <div className="notice section" role="status">
