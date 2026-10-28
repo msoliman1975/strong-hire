@@ -428,7 +428,18 @@ def test_ad1_every_launch_company_has_a_valid_profile_file(slug: str) -> None:
     assert all(q.source_url in cited for q in profile.sample_questions)
 
 
-def test_ad1_profile_files_are_launch_companies_only() -> None:
-    slugs = {slug for slug, _ in LAUNCH_COMPANIES}
-    files = {p.stem for p in (REPO / "profiles").glob("*.json")}
-    assert files <= slugs, f"profiles for unknown companies: {sorted(files - slugs)}"
+def test_ad1_non_launch_profile_files_are_valid() -> None:
+    """AD-1: a profile for a company outside the launch list must still be a valid file.
+
+    Non-launch companies are added inactive at import (create_company) and switched on by an
+    admin in the admin app.
+    """
+    launch = {slug for slug, _ in LAUNCH_COMPANIES}
+    for path in sorted((REPO / "profiles").glob("*.json")):
+        if path.stem in launch:
+            continue
+        profile = load_profile_file(path)
+        assert profile.company_slug == path.stem, f"{path.name}: company_slug must match file"
+        cited = {s.url for s in profile.sources}
+        uncited = [q.question for q in profile.sample_questions if q.source_url not in cited]
+        assert not uncited, f"{path.name}: sample questions cite no listed source: {uncited}"
