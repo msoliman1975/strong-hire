@@ -3065,7 +3065,7 @@
           "takes"
         ],
         "summary": "Create Versions",
-        "description": "CO-8: a 60-second and a full version, every sentence from the story's parts or takes.",
+        "description": "CO-8: a 60-second and a full version, every sentence from the candidate's own words:\ntheir coach turns, the interview answer the story came from, and their takes.",
         "operationId": "create_versions_stories__story_id__versions_post",
         "parameters": [
           {

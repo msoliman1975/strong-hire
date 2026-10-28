@@ -10,7 +10,8 @@ scorer, one answer on the story's skill tags. A take never changes the story's D
 status (only ST-7 does) and never counts toward readiness: nothing here writes the story's status
 or a progress snapshot.
 
-Versions are written by the coach role and checked in code (strong_api.takes.versions); they are
+Versions are written by the coach role and checked in code (strong_api.takes.versions) against
+the candidate's own words only (strong_api.takes.words), never the coach-written parts; they are
 returned, not stored.
 """
 
@@ -27,6 +28,7 @@ from strong_api.inputs.deps import Db, Me, Queue
 from strong_api.inputs.queue import JobQueue
 from strong_api.takes import versions as story_versions
 from strong_api.takes.schemas import TakeOut, TakeRequest, TakeStatus
+from strong_api.takes.words import own_words
 from strong_core.db.models import Story as StoryRow
 from strong_core.db.models import Take
 from strong_core.gateway import get_gateway
@@ -144,16 +146,17 @@ async def get_take(
 
 @router.post("/stories/{story_id}/versions", response_model=StoryVersions)
 async def create_versions(story_id: uuid.UUID, db: Db, me: Me) -> StoryVersions:
-    """CO-8: a 60-second and a full version, every sentence from the story's parts or takes."""
+    """CO-8: a 60-second and a full version, every sentence from the candidate's own words:
+    their coach turns, the interview answer the story came from, and their takes."""
     story = await _owned_story(db, me, story_id)
-    takes = [t.text for t in reversed(await _takes(db, story))]  # oldest first
-    if not story_versions.sources(story, takes):
+    said = await own_words(db, story)
+    if not said:
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_CONTENT,
-            "The story has no parts or takes yet, so there is nothing to write from.",
+            "Tell the story once as a take first, so the versions can use your own words.",
         )
     gateway = await gateway_for_org(db, me.org_id, get_gateway())
-    result = await story_versions.write_versions(gateway, story, takes)
+    result = await story_versions.write_versions(gateway, story, said)
     if result.versions is None:
         log.warning("story %s: versions rejected: %s", story.id, "; ".join(result.problems))
         raise HTTPException(

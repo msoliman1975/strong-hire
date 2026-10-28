@@ -1031,7 +1031,8 @@ export interface paths {
         put?: never;
         /**
          * Create Versions
-         * @description CO-8: a 60-second and a full version, every sentence from the story's parts or takes.
+         * @description CO-8: a 60-second and a full version, every sentence from the candidate's own words:
+         *     their coach turns, the interview answer the story came from, and their takes.
          */
         post: operations["create_versions_stories__story_id__versions_post"];
         delete?: never;

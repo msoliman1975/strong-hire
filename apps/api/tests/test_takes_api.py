@@ -1,13 +1,14 @@
 """Takes (CO-7) and the coach's 60-second and full versions (CO-8) on the fake model.
 
-The versions tests use the default fixture `fixtures/coach/StoryVersions.json`; the story below
-holds every quote in it, in its parts or in a take.
+The versions tests use the default fixture `fixtures/coach/StoryVersions.json`. The candidate's
+words below (coach turns and a take) hold every quote in it; the coach's parts do not.
 """
 
 from __future__ import annotations
 
 import json
 import uuid
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -18,11 +19,38 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from strong_api.takes import router as takes_router  # the module
 from strong_api.takes import versions
-from strong_core.db.models import ProgressSnapshot, Story, Take, User
+from strong_api.takes.words import own_words
+from strong_core.db.models import (
+    CoachSession,
+    CoachTurn,
+    InterviewSession,
+    JobTarget,
+    ProgressSnapshot,
+    Story,
+    Take,
+    User,
+)
+from strong_core.db.models import Turn as TurnRow
 from strong_core.gateway import ModelGateway
 from strong_core.gateway.fake import FakeBackend
 from strong_core.gateway.registry import fake_models_config
-from strong_core.schemas import Competency, Level, StorySource, StoryStatus, StoryVersion
+from strong_core.schemas import (
+    CoachSessionStatus,
+    CoachSpeaker,
+    CoachStyle,
+    Competency,
+    Difficulty,
+    InterviewType,
+    Level,
+    Mode,
+    Phase,
+    SessionChannel,
+    SessionStatus,
+    Speaker,
+    StorySource,
+    StoryStatus,
+    StoryVersion,
+)
 from strong_worker.scoring import jobs, takes
 from strong_worker.scoring.testing import ScriptedBackend, scorecard_reply
 
@@ -52,6 +80,7 @@ async def _story(
     skills: list[str] | None = None,
     parts: bool = True,
     status: StoryStatus = StoryStatus.DRAFT,
+    source: StorySource = StorySource.COACH,
 ) -> Story:
     async with maker() as db:
         story = Story(
@@ -65,7 +94,7 @@ async def _story(
             skills=["ownership"] if skills is None else skills,
             notes_json=[],
             status=status,
-            source=StorySource.COACH,
+            source=source,
         )
         db.add(story)
         await db.commit()
@@ -169,13 +198,75 @@ async def test_co7_take_needs_an_own_tagged_story(
 # --- CO-8: versions --------------------------------------------------------------------------
 
 
-async def test_co8_versions_come_from_parts_and_takes(
+# The coach's wording of the parts (CO-3). Close to what the candidate said, but not the same
+# words, so the versions must never quote it.
+COACH_PARTS = {
+    "context": "We were moving checkout to a new payments provider, two weeks behind plan.",
+    "stakes": "Black Friday was a month away and checkout had to keep working.",
+    "action": "I wrote the rollback plan and moved traffic in 5% steps.",
+    "reflection": "Next time I would agree the rollback plan before starting.",
+}
+
+
+async def _coach_story(
+    maker: async_sessionmaker[AsyncSession], user: User, candidate: list[str]
+) -> Story:
+    """A coach story: parts in the coach's words, the candidate's words in a coach session."""
+    async with maker() as db:
+        story = Story(
+            org_id=user.org_id,
+            user_id=user.id,
+            title="the checkout migration",
+            skills=["ownership"],
+            notes_json=[],
+            status=StoryStatus.DRAFT,
+            source=StorySource.COACH,
+            **COACH_PARTS,
+        )
+        db.add(story)
+        await db.flush()
+        session = CoachSession(
+            org_id=user.org_id,
+            user_id=user.id,
+            story_id=story.id,
+            style=CoachStyle.GENTLE,
+            channel=SessionChannel.TEXT,
+            status=CoachSessionStatus.ENDED,
+            minutes=3,
+            started_at=datetime.now(UTC),
+        )
+        db.add(session)
+        await db.flush()
+        lines = [(s, t) for text in candidate for s, t in _exchange(text)]
+        for seq, (speaker, text) in enumerate(lines, 1):
+            db.add(
+                CoachTurn(
+                    org_id=user.org_id,
+                    coach_session_id=session.id,
+                    seq=seq,
+                    speaker=speaker,
+                    text=text,
+                    start_ms=seq * 1000,
+                    end_ms=seq * 1000 + 500,
+                )
+            )
+        await db.commit()
+        return story
+
+
+def _exchange(text: str) -> list[tuple[CoachSpeaker, str]]:
+    return [(CoachSpeaker.COACH, "Tell me more."), (CoachSpeaker.CANDIDATE, text)]
+
+
+async def test_co8_versions_quote_the_candidates_turns_and_takes(
     client: httpx.AsyncClient, sessionmaker: async_sessionmaker[AsyncSession], queue: InlineQueue
 ) -> None:
-    """CO-8: a 60-second and a full version; every quote is in the story's parts or takes."""
+    """CO-8: a 60-second and a full version; every quote is in what the candidate said (coach
+    turns and takes), never in the coach's parts."""
     queue.run_jobs = False
     await sign_in(client)
-    story = await _story(sessionmaker, await _user(sessionmaker, "dev@example.com"))
+    user = await _user(sessionmaker, "dev@example.com")
+    story = await _coach_story(sessionmaker, user, [CONTEXT, STAKES, ACTION, REFLECTION])
     await client.post(f"/stories/{story.id}/takes", json={"text": RESULT_TAKE})
 
     resp = await client.post(f"/stories/{story.id}/versions")
@@ -190,14 +281,123 @@ async def test_co8_versions_come_from_parts_and_takes(
         assert row is not None and row.status == StoryStatus.DRAFT
 
 
-async def test_co8_a_quote_only_in_a_missing_take_is_rejected(
-    client: httpx.AsyncClient, sessionmaker: async_sessionmaker[AsyncSession]
+async def test_co8_a_quote_of_the_coachs_parts_is_rejected(
+    client: httpx.AsyncClient, sessionmaker: async_sessionmaker[AsyncSession], queue: InlineQueue
 ) -> None:
-    """CO-8: without the take, the result quote is not the candidate's words: rejected (502)."""
+    """CO-8: the candidate said "checkout simply could not break"; the coach's part and the
+    version's quote say "checkout could not break". That is not the candidate's words, so it is
+    rejected even though the story's part holds the quote (the first coach eval's failure)."""
+    queue.run_jobs = False
     await sign_in(client)
-    story = await _story(sessionmaker, await _user(sessionmaker, "dev@example.com"))
+    user = await _user(sessionmaker, "dev@example.com")
+    said = [
+        CONTEXT,
+        "Black Friday was a month out and checkout simply could not break.",
+        ACTION,
+        REFLECTION,
+    ]
+    story = await _coach_story(sessionmaker, user, said)
+    async with sessionmaker() as db:
+        row = await db.get(Story, story.id)
+        assert row is not None
+        row.stakes = STAKES  # the coach's part holds the version's quote word for word
+        await db.commit()
+    await client.post(f"/stories/{story.id}/takes", json={"text": RESULT_TAKE})
     resp = await client.post(f"/stories/{story.id}/versions")
     assert resp.status_code == 502
+    assert "own words" in resp.json()["detail"]
+
+
+async def test_co8_manual_story_parts_are_the_candidates_words(
+    client: httpx.AsyncClient, sessionmaker: async_sessionmaker[AsyncSession], queue: InlineQueue
+) -> None:
+    """CO-8: a story the candidate typed, with no coach session, may be quoted from its parts.
+    A coach story's parts never count."""
+    queue.run_jobs = False
+    await sign_in(client)
+    user = await _user(sessionmaker, "dev@example.com")
+    manual = await _story(sessionmaker, user, source=StorySource.MANUAL)
+    await client.post(f"/stories/{manual.id}/takes", json={"text": RESULT_TAKE})
+    assert (await client.post(f"/stories/{manual.id}/versions")).status_code == 200
+
+    coach = await _story(sessionmaker, user)
+    await client.post(f"/stories/{coach.id}/takes", json={"text": RESULT_TAKE})
+    assert (await client.post(f"/stories/{coach.id}/versions")).status_code == 502
+
+
+async def test_co8_own_words_skip_parts_once_the_coach_touched_the_story(
+    client: httpx.AsyncClient, sessionmaker: async_sessionmaker[AsyncSession]
+) -> None:
+    """CO-8: a manual story worked on in a coach session may hold the coach's wording in its
+    parts, so only the candidate's turns and takes count."""
+    await sign_in(client)
+    user = await _user(sessionmaker, "dev@example.com")
+    story = await _coach_story(sessionmaker, user, ["I was the backend lead at Acme."])
+    async with sessionmaker() as db:
+        row = await db.get(Story, story.id)
+        assert row is not None
+        row.source = StorySource.MANUAL
+        await db.commit()
+        assert await own_words(db, row) == ["I was the backend lead at Acme."]
+
+
+async def test_co8_debrief_story_quotes_the_interview_answer(
+    client: httpx.AsyncClient, sessionmaker: async_sessionmaker[AsyncSession]
+) -> None:
+    """CO-8, ST-2: a story saved from a debrief answer may quote the candidate's turns on that
+    question; not the interviewer, not other questions, not the saved parts."""
+    await sign_in(client)
+    user = await _user(sessionmaker, "dev@example.com")
+    async with sessionmaker() as db:
+        target = JobTarget(org_id=user.org_id, user_id=user.id)
+        db.add(target)
+        await db.flush()
+        session = InterviewSession(
+            org_id=user.org_id,
+            job_target_id=target.id,
+            type=InterviewType.BEHAVIORAL,
+            difficulty=Difficulty.REALISTIC,
+            mode=Mode.REALISTIC,
+            duration_min=30,
+            status=SessionStatus.COMPLETED,
+            started_at=datetime.now(UTC),
+        )
+        db.add(session)
+        await db.flush()
+        rows = [
+            (Speaker.INTERVIEWER, "q2", "Tell me about a launch."),
+            (Speaker.CANDIDATE, "q2", CONTEXT),
+            (Speaker.CANDIDATE, "q3", "Something about another project."),
+            (Speaker.CANDIDATE, "q2", STAKES),
+        ]
+        for i, (speaker, ref, text) in enumerate(rows):
+            db.add(
+                TurnRow(
+                    org_id=user.org_id,
+                    session_id=session.id,
+                    seq=i + 1,
+                    speaker=speaker,
+                    phase=Phase.CORE,
+                    text=text,
+                    start_ms=i * 1000,
+                    end_ms=i * 1000 + 500,
+                    question_ref=ref,
+                )
+            )
+        story = Story(
+            org_id=user.org_id,
+            user_id=user.id,
+            title="the checkout migration",
+            context="A summary of the context.",
+            skills=["ownership"],
+            notes_json=[],
+            source=StorySource.DEBRIEF_ANSWER,
+            source_session_id=session.id,
+            source_question_ref="q2",
+        )
+        db.add(story)
+        await db.commit()
+        assert await own_words(db, story) == [CONTEXT, STAKES]
 
 
 async def test_co8_a_version_with_an_unsupported_sentence_is_rejected(
@@ -219,19 +419,36 @@ async def test_co8_a_version_with_an_unsupported_sentence_is_rejected(
     monkeypatch.setattr(takes_router, "get_gateway", lambda: gateway)
 
     await sign_in(client)
-    story = await _story(sessionmaker, await _user(sessionmaker, "dev@example.com"))
+    user = await _user(sessionmaker, "dev@example.com")
+    story = await _coach_story(sessionmaker, user, [CONTEXT, STAKES, ACTION, REFLECTION])
     await client.post(f"/stories/{story.id}/takes", json={"text": RESULT_TAKE})
     resp = await client.post(f"/stories/{story.id}/versions")
     assert resp.status_code == 502
     assert "own words" in resp.json()["detail"]
 
 
-async def test_co8_versions_need_something_to_write_from(
+async def test_co8_versions_need_the_candidates_words(
     client: httpx.AsyncClient, sessionmaker: async_sessionmaker[AsyncSession]
 ) -> None:
+    """CO-8: a coach story with parts but none of the candidate's words has nothing to quote."""
     await sign_in(client)
-    story = await _story(sessionmaker, await _user(sessionmaker, "dev@example.com"), parts=False)
+    story = await _story(sessionmaker, await _user(sessionmaker, "dev@example.com"))
     assert (await client.post(f"/stories/{story.id}/versions")).status_code == 422
+
+
+def test_co8_the_writer_reads_the_parts_as_an_outline_only() -> None:
+    """CO-8: the prompt keeps the outline apart from the words the versions may quote."""
+    story = Story(title="t", skills=[], notes_json=[], source=StorySource.COACH, **COACH_PARTS)
+    [system, user] = versions.version_messages(story, [CONTEXT, RESULT_TAKE])
+    assert system.prompt_ref == "coach/story_versions.v2"
+    outline, said = user.content.split("What the candidate said", 1)
+    assert COACH_PARTS["stakes"] in outline and COACH_PARTS["stakes"] not in said
+    assert CONTEXT in said and RESULT_TAKE in said
+
+
+def test_co8_recent_words_keep_the_newest_within_budget() -> None:
+    assert versions.recent_words(["a" * 10, "b" * 10, "c" * 10], budget=25) == ["b" * 10, "c" * 10]
+    assert versions.recent_words(["x" * 50], budget=10) == ["x" * 50]  # always the newest one
 
 
 # --- CO-8: the checks in code ----------------------------------------------------------------
