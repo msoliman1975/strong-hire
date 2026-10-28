@@ -104,7 +104,8 @@ describe("v2 Home", () => {
   it("PP-3: an empty Home asks for the first interview", async () => {
     renderHome([]);
     expect(await screen.findByText(/Add the job you are interviewing for/)).toBeInTheDocument();
-    expect(screen.getAllByRole("link", { name: /Add (your|an) interview/ }).length).toBe(2);
+    // R3: the coach card and the prep card both say "Add a job description".
+    expect(screen.getAllByRole("link", { name: "Add a job description" }).length).toBe(2);
   });
 
   it("FL-1: with the flag off Home is the v1 dashboard", async () => {

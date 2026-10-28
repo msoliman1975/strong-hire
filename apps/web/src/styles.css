@@ -2907,3 +2907,264 @@ dialog::backdrop {
     font-size: 1.25rem;
   }
 }
+
+/* ------------------------------------------------ v2 shell: the top bar (canvas board R3 Shell) */
+
+.shell2 {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 12px 20px;
+  min-height: 64px;
+  padding: 0 var(--space-5);
+  background: var(--sh-surface);
+  border-bottom: 1px solid var(--sh-line);
+}
+
+.topbar .brand {
+  flex: 0 0 auto;
+  width: calc(var(--sh-rail-width) - var(--space-5));
+}
+
+.topbar__greet {
+  margin: 0;
+  min-width: 0;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topbar__right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.plan-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: var(--sh-radius-pill);
+  background: var(--sh-violet-soft);
+  color: var(--sh-violet-ink);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.plan-chip a {
+  color: var(--sh-violet-ink);
+}
+
+.topbar__pop {
+  position: relative;
+}
+
+.topbar__icon,
+.topbar__avatar {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 6px;
+  border: 1px solid var(--sh-line);
+  border-radius: var(--sh-radius-pill);
+  background: var(--sh-surface);
+  color: var(--sh-ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.topbar__icon:hover,
+.topbar__avatar:hover {
+  background: var(--sh-ground);
+}
+
+.topbar__dot {
+  position: absolute;
+  top: 8px;
+  right: 9px;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--sh-surface);
+  border-radius: 50%;
+  background: var(--sh-rec);
+}
+
+.topbar__menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 30;
+  width: min(320px, calc(100vw - 32px));
+  padding: var(--space-3);
+  background: var(--sh-surface);
+  border: 1px solid var(--sh-line);
+  border-radius: var(--sh-radius);
+  box-shadow: var(--sh-shadow-pop);
+}
+
+.topbar__menu-label {
+  margin: 4px 8px 8px;
+  font-family: var(--sh-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sh-muted);
+}
+
+.topbar__menu ul > li + li {
+  margin-top: 2px;
+}
+
+.topbar__menu a,
+.topbar__menu li > div,
+.topbar__menu button {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--sh-ink);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.topbar__menu a:hover,
+.topbar__menu button:hover {
+  background: var(--sh-ground);
+}
+
+.topbar__updates li[data-unread] > * {
+  background: var(--sh-violet-soft);
+}
+
+.topbar__who {
+  display: grid;
+  margin: 4px 12px 8px;
+}
+
+.topbar__signout {
+  border-top: 1px solid var(--sh-line);
+  padding-top: 4px;
+  margin-top: 4px;
+}
+
+.shell2__body {
+  flex: 1 1 auto;
+  display: flex;
+}
+
+/* The rail under the top bar: only the menu and "Talk to your coach". */
+.rail.rail--v2 {
+  top: 64px;
+  height: calc(100vh - 64px);
+}
+
+.rail-nav__badge {
+  margin-left: auto;
+  padding: 1px 8px;
+  border-radius: var(--sh-radius-pill);
+  background: var(--sh-ok-soft);
+  color: var(--sh-ok-ink);
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+@media (max-width: 899px) {
+  .topbar {
+    flex-wrap: wrap;
+    padding: 8px 16px;
+  }
+
+  .topbar .brand {
+    width: auto;
+  }
+
+  .topbar__greet {
+    order: 3;
+    flex-basis: 100%;
+    white-space: normal;
+    padding-bottom: 4px;
+  }
+
+  .topbar__right {
+    gap: 6px;
+  }
+
+  .plan-chip {
+    display: none;
+  }
+
+  .shell2__body {
+    flex-direction: column;
+  }
+
+  .rail.rail--v2 {
+    position: static;
+    height: auto;
+    padding: 0 16px;
+    border: 0;
+  }
+
+  .rail.rail--v2 .rail__body[data-open="true"] {
+    border-bottom: 1px solid var(--sh-line);
+  }
+}
+
+.rail__plan {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .rail__plan {
+    display: block;
+  }
+
+  .rail__plan .plan-chip {
+    display: inline-flex;
+    white-space: normal;
+  }
+}
+
+/* Tabs inside a page, like the Question bank's Questions and My questions. */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 var(--space-4);
+  border-bottom: 1px solid var(--sh-line);
+}
+
+.tabs a {
+  padding: 10px 14px;
+  margin-bottom: -1px;
+  border-bottom: 2px solid transparent;
+  color: var(--sh-muted);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.tabs a[aria-current="page"] {
+  border-bottom-color: var(--sh-violet);
+  color: var(--sh-ink);
+}

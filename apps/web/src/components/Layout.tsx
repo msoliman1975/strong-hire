@@ -4,11 +4,13 @@ import { Link, NavLink, Navigate, Outlet, useLocation, useMatch, useNavigate } f
 
 import { authApi } from "../api/auth";
 import { useAuth, useModelUsage, useUsage } from "../api/hooks";
+import type { AuthUser, ModelUsage, Usage } from "../api/types";
 import { hasSlogan, SLOGAN } from "../labels";
 import { newCoachPath } from "../pages/coach/paths";
 import { useFeature } from "../theme/features";
 import { BrandMark } from "./BrandMark";
 import { ModelUsageBadge } from "./ModelUsageBadge";
+import { AvatarMenu, PlanChip, UpdatesBell, useFirstVisitGreeting } from "./TopBar";
 import { CoachMark, ErrorNotice, Loading } from "./ui";
 import { UsageMeter } from "./UsageMeter";
 
@@ -101,7 +103,7 @@ function AccountMenu({
   );
 }
 
-type NavItem = { to: string; label: string; end?: boolean; match?: RegExp };
+type NavItem = { to: string; label: string; end?: boolean; match?: RegExp; badge?: string };
 
 /** The v1 menu, shown until launch: the same labels and targets, so v1 users find their pages. */
 const V1_NAV: NavItem[] = [
@@ -114,14 +116,16 @@ const V1_NAV: NavItem[] = [
 ];
 
 /**
- * UI-2: the v2 rail, in the owner's order: Home, Resumes, Interviews, Stories, Progress (the
- * reports). Questions and Account are in the account menu.
+ * UI-2: the v2 rail (canvas board R3 Shell): Home, Resumes, Interviews, Stories, Question bank
+ * (the Questions page, with My questions as a tab) and Progress (the reports). Account, Plan and
+ * billing, Reports and Sign out are in the top bar's avatar menu.
  */
 const V2_NAV: NavItem[] = [
   { to: "/", label: "Home", end: true },
   { to: "/resumes", label: "Resumes" },
   { to: "/jobs", label: "Interviews", match: /^\/(jobs|interviews|sessions)(\/|$)/ },
   { to: "/stories", label: "Stories", match: /^\/(stories|coach)(\/|$)/ },
+  { to: "/questions", label: "Question bank", match: /^\/questions(\/|$)/, badge: "New" },
   { to: "/reports", label: "Progress" },
 ];
 
@@ -129,13 +133,8 @@ const ACCOUNT_LINK: NavItem = { to: "/account", label: "Account" };
 
 const DEV_NAV: NavItem = { to: "/dev/interview", label: "Text interview (dev)" };
 
-/** The v2 account menu. The dev text interview shows in dev builds only. */
-const V2_ACCOUNT_LINKS: NavItem[] = [
-  { to: "/questions", label: "Questions" },
-  { to: "/resumes", label: "Resumes" },
-  ACCOUNT_LINK,
-  ...(import.meta.env.DEV ? [DEV_NAV] : []),
-];
+/** Dev builds only: the text interview, in the v2 avatar menu. */
+const V2_DEV_LINKS = import.meta.env.DEV ? [DEV_NAV] : [];
 
 /** UI-2: the left rail menu. "Stories" and the v2 labels show only when `v2_enabled` is on. */
 export function RailNav() {
@@ -144,15 +143,23 @@ export function RailNav() {
   const item = (it: NavItem) => {
     // NavLink only marks exact routes; items with `match` cover several route trees.
     const matched = it.match?.test(pathname) ?? false;
+    const label = it.badge ? (
+      <>
+        {it.label}
+        <span className="rail-nav__badge">{it.badge}</span>
+      </>
+    ) : (
+      it.label
+    );
     return (
       <li key={it.to}>
         {matched ? (
           <Link to={it.to} aria-current="page">
-            {it.label}
+            {label}
           </Link>
         ) : (
           <NavLink to={it.to} end={it.end}>
-            {it.label}
+            {label}
           </NavLink>
         )}
       </li>
@@ -261,6 +268,21 @@ export function AppLayout() {
 
   const email = auth.data.email ?? auth.data.user?.email ?? "";
 
+  if (v2) {
+    return (
+      <V2Shell
+        user={auth.data.user ?? null}
+        email={email}
+        usage={usage.data}
+        modelUsage={modelUsage.data}
+        menuOpen={menuOpen}
+        onMenu={() => setMenuOpen((o) => !o)}
+        onSignOut={() => logout.mutate()}
+        signingOut={logout.isPending}
+      />
+    );
+  }
+
   return (
     <div className="shell">
       <a className="skip-link" href="#main">
@@ -282,26 +304,96 @@ export function AppLayout() {
         <div className="rail__body" id="main-menu" data-open={menuOpen}>
           <RailNav />
           <div className="rail__foot">
-            {v2 && (
-              <Link className="rail__coach" to={newCoachPath()}>
-                <CoachMark size={20} tone="dark" />
-                Talk to your coach
-              </Link>
-            )}
             <ModelUsageBadge usage={modelUsage.data} />
-            {usage.data && <UsageMeter usage={usage.data} label={v2 ? "Interview minutes" : undefined} />}
-            <AccountMenu
-              email={email}
-              onSignOut={() => logout.mutate()}
-              busy={logout.isPending}
-              links={v2 ? V2_ACCOUNT_LINKS : undefined}
-            />
+            {usage.data && <UsageMeter usage={usage.data} />}
+            <AccountMenu email={email} onSignOut={() => logout.mutate()} busy={logout.isPending} />
           </div>
         </div>
       </aside>
       <main id="main" className="page shell__main">
         <Outlet />
       </main>
+    </div>
+  );
+}
+
+/**
+ * The v2 shell (canvas board R3 Shell): the top bar across the page (the mark, the first-visit
+ * greeting, the updates bell, the plan chip, the avatar menu), and beside the page the rail with
+ * only the menu and "Talk to your coach". Below 900px the rail folds behind the Menu button.
+ */
+function V2Shell({
+  user,
+  email,
+  usage,
+  modelUsage,
+  menuOpen,
+  onMenu,
+  onSignOut,
+  signingOut,
+}: {
+  user: AuthUser | null;
+  email: string;
+  usage: Usage | undefined;
+  modelUsage: ModelUsage | undefined;
+  menuOpen: boolean;
+  onMenu: () => void;
+  onSignOut: () => void;
+  signingOut: boolean;
+}) {
+  const greeting = useFirstVisitGreeting(user);
+  return (
+    <div className="shell2">
+      <a className="skip-link" href="#main">
+        Skip to content
+      </a>
+      <header className="topbar" aria-label="Top bar">
+        <Brand link />
+        {greeting && <p className="topbar__greet">{greeting}</p>}
+        <div className="topbar__right">
+          <ModelUsageBadge usage={modelUsage} />
+          {usage && <PlanChip usage={usage} />}
+          {user && <UpdatesBell userId={user.id} />}
+          <AvatarMenu
+            name={user?.full_name ?? null}
+            email={email}
+            onSignOut={onSignOut}
+            busy={signingOut}
+            extraLinks={V2_DEV_LINKS}
+          />
+          <button
+            type="button"
+            className="menu-toggle"
+            aria-expanded={menuOpen}
+            aria-controls="main-menu"
+            onClick={onMenu}
+          >
+            Menu
+          </button>
+        </div>
+      </header>
+      <div className="shell2__body">
+        <aside className="rail rail--v2">
+          <div className="rail__body" id="main-menu" data-open={menuOpen}>
+            <RailNav />
+            <div className="rail__foot">
+              <Link className="rail__coach" to={newCoachPath()}>
+                <CoachMark size={20} tone="dark" />
+                Talk to your coach
+              </Link>
+              {/* Phones: the top bar has no room for the plan chip, so it sits in the menu. */}
+              {usage && (
+                <div className="rail__plan">
+                  <PlanChip usage={usage} />
+                </div>
+              )}
+            </div>
+          </div>
+        </aside>
+        <main id="main" className="page shell__main">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }

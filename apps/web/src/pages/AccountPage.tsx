@@ -60,7 +60,7 @@ function PlanSection({ usage }: { usage: Usage }) {
   const paid = usage.plan === "paid";
 
   return (
-    <section className="panel" aria-labelledby="plan-heading">
+    <section className="panel" aria-labelledby="plan-heading" id="plan">
       <h2 id="plan-heading">Plan</h2>
       {paid ? (
         <dl className="dl">
