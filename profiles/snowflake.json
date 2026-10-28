@@ -2,10 +2,10 @@
   "company_name": "Snowflake",
   "company_slug": "snowflake",
   "meta": {
-    "version": 1,
+    "version": 2,
     "status": "draft",
     "reviewed_by": null,
-    "researched_at": "2026-10-10",
+    "researched_at": "2026-10-28",
     "published_at": null
   },
   "values_framework": {
@@ -33,7 +33,7 @@
       },
       {
         "name": "Think Big",
-        "description": "Be ambitious, focus on what matters, innovate and take prudent risks to make a lasting impact.",
+        "description": "Be ambitious with big goals, focus on what matters, innovate and take prudent risks to make a lasting impact and win.",
         "evidence_signals": [
           "Pursued an ambitious goal beyond the obvious scope",
           "Took a prudent, well-reasoned risk",
@@ -53,7 +53,7 @@
       },
       {
         "name": "Get it Done",
-        "description": "Results matter. Execute precisely and accountably while staying nimble; make commitments and deliver.",
+        "description": "Results matter. Work hard and smart, execute precisely and accountably while staying nimble, and follow through on commitments.",
         "evidence_signals": [
           "Delivered on a commitment despite obstacles",
           "Describes concrete execution steps and results, not intentions",
@@ -95,63 +95,63 @@
   "loop_structure": [
     {
       "role_family": "swe",
-      "levels": ["IC1", "IC2", "IC3", "IC4", "IC5"],
+      "levels": ["IC1", "IC2", "IC3", "IC4", "IC5", "IC6"],
       "rounds": [
         {
-          "name": "Recruiter or hiring manager screen",
+          "name": "Initial screen (recruiter or hiring manager)",
           "interview_type": "hiring_manager",
           "duration_min": 30,
-          "interviewer_role": "Engineering manager or recruiter",
-          "notes": "Hiring managers are often the first contact; casual conversation about the role, the candidate's work and goals."
+          "interviewer_role": "Recruiter and/or hiring manager",
+          "notes": "Official careers page: a 30-minute call about the candidate's technical background; the first conversation may be with the future manager. Third-party guides add a values and motivation check."
         },
         {
-          "name": "Technical phone screen",
+          "name": "Technical interview",
           "interview_type": null,
           "duration_min": 60,
           "interviewer_role": "Software engineer",
-          "notes": "Live coding (sometimes with a design part, up to 2 hours). Not simulated in v1."
+          "notes": "Official: 60-minute coding and/or system design interviews with live coding. Some candidates report a 2-hour screen with one coding and one design part. Not simulated in v1."
         },
         {
           "name": "Coding",
           "interview_type": null,
           "duration_min": 60,
           "interviewer_role": "Software engineer",
-          "notes": "One or two onsite coding rounds; harder-than-average problems with systems flavor. Not simulated in v1."
+          "notes": "Panel coding round; roughly LeetCode medium with database or systems twists. Snowflake's AI guidance says at least one coding round may be in person. Not simulated in v1."
         },
         {
           "name": "System design",
           "interview_type": "technical_qa",
           "duration_min": 60,
           "interviewer_role": "Senior engineer",
-          "notes": "Data infrastructure focus: query engines, storage, caching, multi-tenancy, security."
+          "notes": "Data infrastructure focus: query engines, storage, caching, multi-tenancy, security. Interviewers expect clarifying questions and follow up on trade-offs."
         },
         {
-          "name": "Expertise / technical deep dive",
+          "name": "Expertise",
           "interview_type": "technical_qa",
           "duration_min": 60,
           "interviewer_role": "Senior engineer from the hiring team",
-          "notes": "CS fundamentals and database internals, plus the depth of the candidate's own projects."
+          "notes": "Official panel round. Team-specific: coding, system design, or a deep dive into database internals, a language or framework, or the candidate's own projects."
         },
         {
-          "name": "Presentation / tech talk",
+          "name": "Tech Talk presentation",
           "interview_type": "technical_qa",
           "duration_min": 30,
-          "interviewer_role": "Panel of engineers",
-          "notes": "Reported for senior and principal candidates: present a past project and take questions."
+          "interviewer_role": "Panel of engineers from the team",
+          "notes": "Official: a 30-minute Tech Talk may be included depending on level and role. Guides report it for IC3 and above: present a past project, then answer questions."
         },
         {
-          "name": "Behavioral",
+          "name": "Behavioral and collaboration",
           "interview_type": "behavioral",
           "duration_min": 60,
-          "interviewer_role": "Engineering manager",
-          "notes": "Ownership, collaboration, mistakes and impact; reflects Snowflake values."
+          "interviewer_role": "Engineering manager or program/project manager",
+          "notes": "Official panel includes behavioral and collaboration interviews. Ownership, teamwork, disagreement and mistakes; reflects Snowflake values."
         },
         {
           "name": "Cross-functional",
           "interview_type": "behavioral",
           "duration_min": 60,
-          "interviewer_role": "Leaders from partner teams",
-          "notes": "Reported for IC5 and above."
+          "interviewer_role": "People from several partner teams (engineering, product, sales)",
+          "notes": "Reported by two guides for IC5 and above; each interviewer brings questions from their own department."
         }
       ]
     },
@@ -164,42 +164,179 @@
           "interview_type": null,
           "duration_min": 30,
           "interviewer_role": "Recruiter",
-          "notes": "Motivation and logistics. Not simulated in v1."
+          "notes": "Background, why Snowflake and fit for the team. Not simulated in v1."
         },
         {
           "name": "Hiring manager deep dive",
           "interview_type": "hiring_manager",
           "duration_min": 45,
-          "interviewer_role": "Director of product",
-          "notes": "Deep questions on products the candidate launched: roadmap, trade-offs, UX."
+          "interviewer_role": "Hiring manager (director of product)",
+          "notes": "Deep questions on a product the candidate launched: roadmap, trade-offs, UX, what they would do differently. Interviewers double-click on details."
         },
         {
-          "name": "Product sense / strategy",
+          "name": "Presentation",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Panel of product and engineering leaders",
+          "notes": "Reported by Prepfully and a Blind thread: present past work or career story, then defend choices (why this approach, what to cut if scope halved)."
+        },
+        {
+          "name": "Strategy case",
           "interview_type": "case",
           "duration_min": 60,
           "interviewer_role": "Senior product manager",
-          "notes": "Live product strategy case; may follow a presentation the candidate prepared."
+          "notes": "A generic PM or customer scenario with technical follow-ups; scoping and clarifying first is expected. Classic consumer product-sense cases are rare."
         },
         {
-          "name": "Analytical / execution",
-          "interview_type": "case",
-          "duration_min": 60,
-          "interviewer_role": "Product manager",
-          "notes": "Metrics definition, root-cause debugging and experiments."
-        },
-        {
-          "name": "Technical",
+          "name": "Technical / domain",
           "interview_type": "technical_qa",
           "duration_min": 45,
           "interviewer_role": "Engineering leader",
-          "notes": "Technical chops on data systems; domain gaps are tolerated."
+          "notes": "Conversational fluency on cloud and data systems; more depth for senior and technical PM roles. Some teams skip it."
         },
         {
-          "name": "Behavioral and leadership",
+          "name": "Behavioral",
           "interview_type": "behavioral",
           "duration_min": 45,
           "interviewer_role": "Product leader",
-          "notes": "Ownership, influence, conflict."
+          "notes": "Ownership, wrong decisions, disagreements with engineering."
+        },
+        {
+          "name": "Cross-functional",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Partner from engineering, security or go-to-market",
+          "notes": "Aligning teams with conflicting goals and managing stakeholders."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": ["Data Engineer", "Senior Data Engineer", "Software Engineer (ML)"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background and motivation for Snowflake. Not simulated in v1."
+        },
+        {
+          "name": "Technical phone screen (SQL)",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Data engineer or hiring manager",
+          "notes": "Live SQL: window functions, self-joins, consecutive-day problems, semi-structured data. Not simulated in v1."
+        },
+        {
+          "name": "SQL and query performance deep dive",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior data engineer",
+          "notes": "How the engine plans queries; pruning and clustering rather than indexes; diagnosing queries that slow as tables grow."
+        },
+        {
+          "name": "Data system design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior engineer",
+          "notes": "Pipelines that mix streaming and historical data, incremental loads, cost and reliability trade-offs."
+        },
+        {
+          "name": "Coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Engineer",
+          "notes": "Python, Java or C++ data structures, depending on team. ML roles add ML, statistics and applied AI topics. Not simulated in v1."
+        },
+        {
+          "name": "Behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager",
+          "notes": "Customer-first thinking, ownership and building at scale."
+        }
+      ]
+    },
+    {
+      "role_family": "tpm",
+      "levels": ["Technical Program Manager", "Senior Technical Program Manager", "Principal Technical Program Manager"],
+      "rounds": [
+        {
+          "name": "Initial screen (recruiter or hiring manager)",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Recruiter and/or TPM hiring manager",
+          "notes": "Background and the programs the candidate ran. Based on the official general process; no TPM-specific official loop is published."
+        },
+        {
+          "name": "Technical / system design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior engineer",
+          "notes": "Candidate reports mention system design prompts and security or compliance programs (for example a GDPR plan for a security TPM)."
+        },
+        {
+          "name": "Program execution",
+          "interview_type": "behavioral",
+          "duration_min": 60,
+          "interviewer_role": "Senior TPM",
+          "notes": "Scope creep, delays, a critical bug just before release, timeline changes and their impact."
+        },
+        {
+          "name": "Behavioral and cross-functional",
+          "interview_type": "behavioral",
+          "duration_min": 60,
+          "interviewer_role": "Engineering or product partner",
+          "notes": "A program that went badly, failures and lessons, working with engineering and product."
+        }
+      ]
+    },
+    {
+      "role_family": "other",
+      "levels": ["Solution Engineer", "Senior Solution Engineer", "Principal Solution Engineer"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Pre-sales background, platforms sold with or against, territory. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager interview",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Sales engineering manager",
+          "notes": "Approach to technical sales, demos and complex enterprise deals."
+        },
+        {
+          "name": "Technical interview",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior solution engineer",
+          "notes": "SQL, Snowflake architecture, data integration scenarios and light coding or API work; not LeetCode style."
+        },
+        {
+          "name": "Demo / case presentation",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Panel: SE manager, senior SE and account executive",
+          "notes": "Candidates get a customer scenario (about a week to prepare per one report), then demo and handle objections live."
+        },
+        {
+          "name": "Sales team panel",
+          "interview_type": "behavioral",
+          "duration_min": 60,
+          "interviewer_role": "Account executive and sales leader",
+          "notes": "How the AE and SE split a deal, pressure to overpromise, lost deals."
+        },
+        {
+          "name": "Regional leadership final",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Regional or area vice president",
+          "notes": "Career direction and fit with a fast-paced sales culture."
         }
       ]
     }
@@ -281,6 +418,62 @@
       "pattern": "Improve the experience of a technical persona (data engineer, analyst) using the platform",
       "competencies": ["problem_framing", "prioritization", "user_and_business_sense"],
       "values": ["Put Customers First"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Enterprise customer scenario",
+      "pattern": "An enterprise customer makes an unusual request or reports a problem the metrics do not show; scope it, investigate and decide, with technical follow-ups",
+      "competencies": ["problem_framing", "structure", "recommendation"],
+      "values": ["Put Customers First"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Tech Talk defense",
+      "pattern": "Present a past technical project, then defend design choices, alternatives rejected and what would change at larger scale",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["Be Excellent"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Query performance at scale",
+      "pattern": "Diagnose and fix analytical queries or pipelines that degrade as data volume grows",
+      "competencies": ["technical_depth", "reasoning", "accuracy"],
+      "values": ["Be Excellent"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Data pipeline design",
+      "pattern": "Design a pipeline that combines streaming and historical data with correctness, cost and freshness trade-offs",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Get it Done"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Program delivery under pressure",
+      "pattern": "A program hit a delay, scope change or late critical bug; how the candidate re-planned, communicated and protected the key outcome",
+      "competencies": ["ownership", "communication", "impact"],
+      "values": ["Get it Done", "Integrity Always"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Conflicting team goals",
+      "pattern": "Two teams or functions had conflicting goals (for example security versus latency) and the candidate brought them to a decision",
+      "competencies": ["conflict_handling", "collaboration", "communication"],
+      "values": ["Make Each Other The Best", "Integrity Always"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Honesty with customers",
+      "pattern": "A time the candidate had to tell a customer or partner about a limitation or resist pressure to overpromise",
+      "competencies": ["communication", "ownership"],
+      "values": ["Integrity Always", "Put Customers First"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Customer demo and proof of concept",
+      "pattern": "Plan a demo or proof of concept for a customer scenario, tailored to its audience, with success criteria and objection handling",
+      "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
+      "values": ["Put Customers First", "Think Big"]
     }
   ],
   "sample_questions": [
@@ -549,30 +742,6 @@
       "levels": []
     },
     {
-      "interview_type": "behavioral",
-      "question": "Describe your most innovative idea and what happened with it.",
-      "strong_answer": "Describe the problem, the insight behind the idea, and why it was not obvious. Show how you tested it cheaply, won support, and what impact it had. If it failed, say what you learned. Strong answers show ambition with prudent risk.",
-      "competencies": ["impact", "communication"],
-      "values": ["Think Big"],
-      "source_url": "https://www.interviewquery.com/interview-guides/snowflake-product-manager",
-      "hints": {
-        "looking_for": [
-          "How you spot a non-obvious opportunity",
-          "Whether you pair ambition with careful risk"
-        ],
-        "strong_signals": [
-          "Shows a cheap test and how you won support",
-          "States the impact, or the lesson if it failed"
-        ],
-        "watch_outs": [
-          "An idea that never left your head",
-          "No evidence it worked"
-        ]
-      },
-      "role_families": [],
-      "levels": []
-    },
-    {
       "interview_type": "hiring_manager",
       "question": "How does your experience align with Snowflake's values?",
       "strong_answer": "Know the values (for example Put Customers First, Own It, Get it Done). Pick two that truly fit you and give a short, specific story for each. Avoid listing all values. Interviewers look for authenticity and evidence, not slogans.",
@@ -669,24 +838,96 @@
       "levels": []
     },
     {
-      "interview_type": "case",
-      "question": "Snowflake wants to enter real-time analytics on streaming data. Design a new product or feature for that market.",
-      "strong_answer": "Clarify target customers and use cases (monitoring, personalization, fraud). Size the opportunity roughly. Map needs versus current strengths and gaps (latency, ingestion). Propose a product with clear scope and differentiation from competitors, a phased plan, and success metrics such as adoption and consumption. Name technical and go-to-market risks.",
-      "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
-      "values": ["Think Big"],
-      "source_url": "https://www.interviewquery.com/interview-guides/snowflake-product-manager",
+      "interview_type": "technical_qa",
+      "question": "Give a 30-minute talk on a past technical project, then answer the panel's questions about your design choices.",
+      "strong_answer": "Pick a project you owned with real technical depth. Structure it: problem and constraints, architecture, your specific decisions, alternatives you rejected and why, results with numbers, and what you would change. Keep slides light and leave time for questions. In Q&A, answer directly, admit unknowns, and reason out loud about how the design would behave at larger scale or under failure.",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["Be Excellent", "Own It"],
+      "source_url": "https://careers.snowflake.com/us/en/gethired",
       "hints": {
         "looking_for": [
-          "How you frame and roughly size a new market",
-          "Whether you build on strengths and address gaps"
+          "Whether you can explain your own work clearly to engineers",
+          "How you defend design choices under questions"
         ],
         "strong_signals": [
-          "Defines target customers, use cases and differentiation",
-          "Lays out a phased plan, metrics and risks"
+          "Separates your decisions from the team's and names rejected options",
+          "Gives measured results and honest weaknesses"
         ],
         "watch_outs": [
-          "No differentiation from competitors",
-          "Skipping technical or go-to-market risks"
+          "Running over time and leaving no room for questions",
+          "Getting defensive when a choice is challenged"
+        ]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design authentication and authorization for a large web application.",
+      "strong_answer": "Clarify users, clients and threat model. Separate authentication (password plus MFA, SSO through SAML or OIDC, session or token handling, rotation and revocation) from authorization (roles, attributes, resource ownership). Cover where checks run, caching of permission decisions and its staleness risk, audit logs, rate limiting and lockout, secrets management, and key rotation. Discuss latency cost of checks and how the design scales across services.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Integrity Always"],
+      "source_url": "https://prepfully.com/interview-guides/snowflake-software-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you separate authentication from authorization",
+          "How you handle revocation and permission caching"
+        ],
+        "strong_signals": [
+          "Covers SSO, MFA, tokens, roles and audit logs",
+          "Weighs the latency of checks against freshness of permissions"
+        ],
+        "watch_outs": [
+          "Stopping at a login form",
+          "No plan to revoke sessions or rotate keys"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "How do you handle a disagreement with a teammate about a technical approach?",
+      "strong_answer": "Use a real example. Show that you first understood the other view, then moved the debate to evidence: data, a prototype, or agreed criteria. Explain how the decision was made, how you committed to it even if it was not your option, and the result. Name what the disagreement taught you about working with that person.",
+      "competencies": ["conflict_handling", "collaboration", "communication"],
+      "values": ["Integrity Always", "Make Each Other The Best"],
+      "source_url": "https://prepfully.com/interview-guides/snowflake-software-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you argue with evidence rather than opinion",
+          "Whether you commit once a decision is made"
+        ],
+        "strong_signals": [
+          "Restates the other view fairly",
+          "Shows commitment to the final decision and the outcome"
+        ],
+        "watch_outs": [
+          "A story where you were simply right",
+          "Escalating before trying to resolve it"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a product decision you made that turned out to be wrong.",
+      "strong_answer": "Pick a real decision with visible cost. Explain the information you had and why the choice looked right then, the signal that showed it was wrong, how quickly you raised it, and what you did to correct course. Close with what you changed in how you decide, such as earlier validation or clearer kill criteria.",
+      "competencies": ["learning_from_failure", "ownership", "communication"],
+      "values": ["Own It", "Integrity Always"],
+      "source_url": "https://prepfully.com/interview-guides/snowflake-product-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you own a real wrong call",
+          "How fast you noticed and corrected it"
+        ],
+        "strong_signals": [
+          "Explains the reasoning at the time and the signal that it was wrong",
+          "Names a lasting change in how you decide"
+        ],
+        "watch_outs": [
+          "Blaming the data or another team",
+          "A decision that was not really wrong"
         ]
       },
       "role_families": ["pm"],
@@ -694,26 +935,290 @@
     },
     {
       "interview_type": "case",
-      "question": "How would you improve the developer experience for data engineers who use Snowflake?",
-      "strong_answer": "Map the data engineer workflow (ingest, transform, test, deploy, monitor). Find the biggest pains with evidence. Prioritize one by impact and effort. Propose a solution, how it integrates with existing tools, and metrics such as time to first pipeline or failed-job rate. Mention trade-offs and validation.",
-      "competencies": ["problem_framing", "prioritization", "user_and_business_sense"],
-      "values": ["Put Customers First"],
-      "source_url": "https://www.interviewquery.com/interview-guides/snowflake-product-manager",
+      "question": "A large customer asks for a dedicated network path that only they would use. How do you respond?",
+      "strong_answer": "Start by finding the real need: security, compliance, latency or predictability. Check how many other customers share it and what existing options (private connectivity, dedicated tiers) already cover. Weigh revenue and strategic value against build and operating cost, margin impact and precedent. Recommend a path, such as a standard offering that solves the need or a scoped exception with clear terms, and say how you would measure success.",
+      "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
+      "values": ["Put Customers First", "Think Big"],
+      "source_url": "https://prepfully.com/interview-guides/snowflake-product-manager",
       "hints": {
         "looking_for": [
-          "Whether you understand the data engineer's workflow",
-          "How you prioritize by impact and effort"
+          "Whether you clarify the underlying need first",
+          "How you balance one customer against the platform"
         ],
         "strong_signals": [
-          "Maps the workflow and finds the biggest pain with evidence",
-          "Defines metrics like time to first pipeline"
+          "Considers existing options and how many customers share the need",
+          "Weighs margin, operating cost and precedent before recommending"
         ],
         "watch_outs": [
-          "Ignoring the tools they already use",
-          "Solving a pain with no evidence"
+          "Saying yes or no without asking why",
+          "Ignoring the technical cost of a one-off"
         ]
       },
       "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Customers in one region report slow performance, but your dashboards look normal. How do you investigate?",
+      "strong_answer": "Take the reports seriously and get specifics: which workloads, times, clients and networks. Question the dashboards: aggregation hiding a tail, missing client-side or network metrics, sampling. Form hypotheses (regional network path, a dependency, a recent release, data skew) and test them with segmented metrics and customer traces. Communicate with the customers while you investigate, then fix the gap in monitoring so it shows next time.",
+      "competencies": ["problem_framing", "structure", "recommendation"],
+      "values": ["Put Customers First"],
+      "source_url": "https://prepfully.com/interview-guides/snowflake-product-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you trust customer reports over averages",
+          "How you structure hypotheses"
+        ],
+        "strong_signals": [
+          "Questions what the dashboards measure, such as tail latency",
+          "Segments by region, workload and release, and fixes the monitoring gap"
+        ],
+        "watch_outs": [
+          "Dismissing the reports because metrics look fine",
+          "Jumping to one cause without testing"
+        ]
+      },
+      "role_families": ["pm", "tpm"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you weigh reliability against cost when deciding on cross-region failover for a cloud service?",
+      "strong_answer": "Start from customer requirements: recovery time and data-loss targets per tier, and contractual commitments. Compare options: backups with restore, warm standby, active-active, with their cost, complexity and consistency implications. Tie the choice to the cost of downtime for customers and the business. Mention testing failover regularly and offering higher tiers to customers who need more.",
+      "competencies": ["trade_offs", "reasoning", "clarity_of_explanation"],
+      "values": ["Put Customers First", "Be Excellent"],
+      "source_url": "https://prepfully.com/interview-guides/snowflake-product-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you start from recovery targets",
+          "How you link technical options to business cost"
+        ],
+        "strong_signals": [
+          "Compares standby and active-active with cost and consistency",
+          "Mentions failover testing and tiered offerings"
+        ],
+        "watch_outs": [
+          "Choosing maximum reliability with no cost view",
+          "Not knowing what failover options exist"
+        ]
+      },
+      "role_families": ["pm", "tpm"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "A security requirement adds latency that breaks another team's service-level targets. How do you resolve it?",
+      "strong_answer": "Bring both teams to shared facts: the actual risk the control addresses and the measured latency impact. Look for options that keep the protection with less cost: async checks, caching, scoping to sensitive paths, or optimizing the control. If a trade-off remains, frame it for the right decision maker with clear risk and impact, then communicate and track the outcome. Show you kept both teams' trust.",
+      "competencies": ["conflict_handling", "collaboration", "communication"],
+      "values": ["Make Each Other The Best", "Integrity Always"],
+      "source_url": "https://prepfully.com/interview-guides/snowflake-product-manager",
+      "hints": {
+        "looking_for": [
+          "How you turn a conflict into shared facts",
+          "Whether you find options before escalating"
+        ],
+        "strong_signals": [
+          "Quantifies both the risk and the latency impact",
+          "Proposes options that keep protection and frames the remaining trade-off"
+        ],
+        "watch_outs": [
+          "Picking a side without data",
+          "Escalating immediately"
+        ]
+      },
+      "role_families": ["pm", "tpm"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Queries on a table that grew from about 10 GB to 2 TB have become slow. How would you diagnose and fix this?",
+      "strong_answer": "Look at the query profile first: bytes scanned versus partitions pruned, spilling, join explosion, skew. If filters no longer prune, reconsider clustering on common filter columns. Check for poor join order, exploding joins and SELECT *. Consider pre-aggregation or materialized results, incremental processing, and right-sizing compute. Measure before and after, and weigh compute and maintenance cost of each fix.",
+      "competencies": ["technical_depth", "reasoning", "accuracy"],
+      "values": ["Be Excellent"],
+      "source_url": "https://datadriven.io/companies/snowflake/interview",
+      "hints": {
+        "looking_for": [
+          "Whether you diagnose before tuning",
+          "How well you understand pruning and clustering"
+        ],
+        "strong_signals": [
+          "Reads the query profile for scanned bytes, pruning, spills and skew",
+          "Weighs clustering, pre-aggregation and compute size by cost"
+        ],
+        "watch_outs": [
+          "Only saying 'use a bigger warehouse'",
+          "Talking about indexes as if it were a row store"
+        ]
+      },
+      "role_families": ["data_ml", "swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a pipeline that combines real-time point-of-sale data with historical sales data for reporting.",
+      "strong_answer": "Clarify freshness, volume, late data and consumers. Ingest events continuously into a raw layer, deduplicate with idempotent keys, and merge incrementally into curated tables alongside batch-loaded history. Handle late and corrected transactions, schema changes, and slowly changing dimensions. Cover data quality checks, monitoring, backfills, and cost of keeping data fresh versus batch windows.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Get it Done"],
+      "source_url": "https://datadriven.io/companies/snowflake/interview",
+      "hints": {
+        "looking_for": [
+          "How you reconcile streaming and batch data",
+          "Whether you plan for late and corrected records"
+        ],
+        "strong_signals": [
+          "Uses idempotent incremental merges and a raw-to-curated flow",
+          "Covers quality checks, backfills and the cost of freshness"
+        ],
+        "watch_outs": [
+          "Ignoring duplicates and late data",
+          "No monitoring or backfill plan"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "How would you handle a major delay in a program you are running?",
+      "strong_answer": "Find the cause and real impact fast, then tell stakeholders early with facts and options rather than waiting for certainty. Re-plan: cut or phase scope, add or move resources, run work in parallel, and protect the outcome that matters most. Agree the new plan with engineering, product and leadership, track it visibly, and fix the planning gap that let the delay surprise you.",
+      "competencies": ["ownership", "communication", "impact"],
+      "values": ["Get it Done", "Integrity Always"],
+      "source_url": "https://www.interviewpal.com/interview-question/tough-delay-management-snowflake",
+      "hints": {
+        "looking_for": [
+          "How early and honestly you communicate",
+          "Whether you re-plan around the key outcome"
+        ],
+        "strong_signals": [
+          "Brings options, not just bad news",
+          "Fixes the planning gap that caused the surprise"
+        ],
+        "watch_outs": [
+          "Hiding the delay until the deadline",
+          "Only asking for more people"
+        ]
+      },
+      "role_families": ["tpm"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a hard technical challenge you worked through and how its lessons would apply at Snowflake.",
+      "strong_answer": "Choose a challenge with real complexity and explain it simply. Show your role: how you organized people, dependencies and decisions, and which trade-offs you weighed. Give the result with numbers. Then connect the lesson to Snowflake's world, such as reliability at scale, multi-cloud operations, or coordinating many engineering teams.",
+      "competencies": ["ownership", "impact", "communication"],
+      "values": ["Own It", "Get it Done"],
+      "source_url": "https://prepfully.com/answers/technical-challenge-lesson-snowflake",
+      "hints": {
+        "looking_for": [
+          "Whether you understand the technical problem yourself",
+          "How you connect the lesson to the company"
+        ],
+        "strong_signals": [
+          "Explains the challenge simply and your part in solving it",
+          "Links the lesson to scale, reliability or cross-team work"
+        ],
+        "watch_outs": [
+          "Staying vague about the technical details",
+          "A generic lesson with no link to the role"
+        ]
+      },
+      "role_families": ["tpm"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Plan a demo of the platform for a global enterprise that is modernizing its data estate.",
+      "strong_answer": "Start with discovery: business goals, current architecture, pains, decision makers and competitors. Pick two or three use cases that map to those pains and build a story around the customer's data, not a feature tour. Tailor depth to the audience: business value for executives, hands-on detail for engineers. Prepare for likely objections such as migration risk and cost, and end with clear next steps.",
+      "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
+      "values": ["Put Customers First"],
+      "source_url": "https://www.cleverprep.com/companies/snowflake/sales-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you start from discovery rather than features",
+          "How you tailor the story to the audience"
+        ],
+        "strong_signals": [
+          "Maps a few use cases to the customer's stated pains",
+          "Anticipates objections and ends with next steps"
+        ],
+        "watch_outs": [
+          "A feature tour with no customer story",
+          "One depth for every audience"
+        ]
+      },
+      "role_families": ["other"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you approach a competitive proof of concept against another data platform vendor?",
+      "strong_answer": "Agree success criteria with the customer up front: workloads, performance, cost, security and ease of use, with measurable exit criteria and a fixed timeline. Keep scope tight and say what is out of scope. Pick tests that reflect real workloads, play to real strengths, and be honest about gaps. Track progress with the account team and present results in the customer's terms.",
+      "competencies": ["problem_framing", "prioritization", "recommendation"],
+      "values": ["Put Customers First", "Integrity Always"],
+      "source_url": "https://www.cleverprep.com/companies/snowflake/sales-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you set measurable exit criteria",
+          "How you control scope"
+        ],
+        "strong_signals": [
+          "Agrees criteria and timeline with the customer first",
+          "Uses real workloads and is honest about gaps"
+        ],
+        "watch_outs": [
+          "Open-ended scope",
+          "Attacking the competitor instead of proving value"
+        ]
+      },
+      "role_families": ["other"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "During a customer's proof of concept, compute spend spikes overnight. How do you find the cause?",
+      "strong_answer": "Look at usage history by warehouse, user and query to find when and where the spike started. Check for runaway or repeated queries, scheduled tasks, auto-resume and auto-suspend settings, oversized compute, and failed retries. Fix the cause, then add guardrails such as resource monitors, budgets and alerts. Explain it to the customer plainly and agree how to prevent repeats.",
+      "competencies": ["reasoning", "technical_depth", "clarity_of_explanation"],
+      "values": ["Put Customers First", "Own It"],
+      "source_url": "https://www.cleverprep.com/companies/snowflake/sales-engineer",
+      "hints": {
+        "looking_for": [
+          "How systematically you trace usage",
+          "Whether you add guardrails afterwards"
+        ],
+        "strong_signals": [
+          "Breaks spend down by warehouse, user, query and time",
+          "Adds monitors or budgets and explains it plainly to the customer"
+        ],
+        "watch_outs": [
+          "Guessing a cause without looking at usage",
+          "Hiding the issue from the customer"
+        ]
+      },
+      "role_families": ["other", "data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time a salesperson pushed you to promise something the product could not do.",
+      "strong_answer": "Describe the deal and the pressure. Show how you kept the promise honest: you explained the limitation to the account executive privately, found what the customer actually needed, and offered a workaround, roadmap context with care, or a partner option. Give the outcome for the deal and the relationship, and what you agreed with the sales team for next time.",
+      "competencies": ["communication", "conflict_handling", "ownership"],
+      "values": ["Integrity Always", "Put Customers First"],
+      "source_url": "https://www.cleverprep.com/companies/snowflake/sales-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you stay honest under sales pressure",
+          "How you keep the partnership with the account executive"
+        ],
+        "strong_signals": [
+          "Finds the customer's real need and offers a truthful alternative",
+          "Keeps trust with both the customer and the seller"
+        ],
+        "watch_outs": [
+          "Overpromising to win the deal",
+          "Undermining the seller in front of the customer"
+        ]
+      },
+      "role_families": ["other"],
       "levels": []
     }
   ],
@@ -722,7 +1227,7 @@
       "level_name": "IC1",
       "normalized_level": "new_grad",
       "role_family": "swe",
-      "scope_expectation": "Software Engineer I. Delivers well-defined tasks with strong coding fundamentals."
+      "scope_expectation": "Software Engineer I. Delivers well-defined tasks with strong coding fundamentals and guidance from senior engineers."
     },
     {
       "level_name": "IC2",
@@ -734,26 +1239,38 @@
       "level_name": "IC3",
       "normalized_level": "senior",
       "role_family": "swe",
-      "scope_expectation": "Senior Software Engineer. Leads design of significant components and mentors others."
+      "scope_expectation": "Senior Software Engineer (postings ask about 5-6+ years). Owns projects end to end from design through testing and careful production rollout, runs services in production, solves hard performance problems, and mentors junior engineers."
     },
     {
       "level_name": "IC4",
-      "normalized_level": "staff_principal",
+      "normalized_level": "senior",
       "role_family": "swe",
-      "scope_expectation": "Senior or staff-level engineer. Owns large areas and drives technical direction across teams."
+      "scope_expectation": "Upper senior (Senior Software Engineer II on Levels.fyi; some sources call it Staff). Owns large components, designs next-generation architecture for a team's area and promotes good practices across the organization."
     },
     {
       "level_name": "IC5",
       "normalized_level": "staff_principal",
       "role_family": "swe",
-      "scope_expectation": "Principal Software Engineer. Sets architecture for a major product area and influences the organization."
+      "scope_expectation": "Principal Software Engineer I (postings ask about 10+ years). Plans and leads complex technical projects across many teams, acts as technical leader on critical cross-functional work, and mentors others."
+    },
+    {
+      "level_name": "IC6",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Principal Software Engineer II (postings ask about 14+ years). Owns the technical vision for a major layer of the platform, such as data transformation processing, and sets direction for several teams."
+    },
+    {
+      "level_name": "Senior Technical Program Manager",
+      "normalized_level": "senior",
+      "role_family": "tpm",
+      "scope_expectation": "About 7+ years. Owns and drives key cross-functional, often global programs to completion, maps dependencies and risks, and brings data-driven technical judgment to engineering and product decisions."
     }
   ],
   "persona": {
-    "tone": "Professional and direct, casual in early conversations with hiring managers",
-    "pace": "Steady, then deep: double-clicks on details of the candidate's answers",
-    "pushback_style": "Asks for data-system specifics, performance numbers and the reasoning behind trade-offs",
-    "closing_style": "Leaves a few minutes for candidate questions"
+    "tone": "Professional and conversational; the first call may be a relaxed chat with the future manager, later rounds are focused and technical",
+    "pace": "Opens with one broad question, then double-clicks with layered follow-ups on the candidate's own answers",
+    "pushback_style": "Asks why one option over another, what would have changed your mind, and for data-system specifics, performance numbers and database internals",
+    "closing_style": "Leaves time for the candidate's questions; Snowflake invites questions at every stage"
   },
   "scoring_weights": {
     "technical_depth": 1.4,
@@ -761,15 +1278,17 @@
     "trade_offs": 1.3,
     "ownership": 1.3,
     "impact": 1.2,
+    "collaboration": 1.1,
+    "clarity_of_explanation": 1.1,
     "depth_of_experience": 1.2,
     "user_and_business_sense": 1.2
   },
   "values_share": 0.2,
   "case_style": {
-    "product_sense": 0.5,
-    "estimation": 0.15,
-    "system_thinking": 0.35,
-    "notes": "PM cases are strategy and product sense on a data platform, often after a presentation; interviewers probe technical understanding."
+    "product_sense": 0.45,
+    "estimation": 0.1,
+    "system_thinking": 0.45,
+    "notes": "PM cases are strategy or customer scenarios on a cloud data platform (an unusual customer request, a regional performance complaint) with technical follow-ups, often after a presentation; scoping first is expected and estimation is rarely reported. Solution engineer cases are prepared customer demos and proof-of-concept plans with objection handling."
   },
   "sources": [
     {
@@ -779,10 +1298,34 @@
       "fields": ["values_framework"]
     },
     {
+      "url": "https://www.snowflake.com/en/company/overview/about-snowflake/",
+      "title": "About Snowflake: company values (official)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://careers.snowflake.com/us/en/gethired",
+      "title": "How we hire: Apply, Interview, Decide and the engineering process (Snowflake Careers, official)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://careers.snowflake.com/us/en/blogarticle/ai-cheat-sheet-how-and-when-to-use-ai-in-your-snowflake-interview",
+      "title": "AI cheat sheet: how and when to use AI in your Snowflake interview (Snowflake Careers blog; body did not render for the fetcher, content seen via a third-party summary)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure"]
+    },
+    {
       "url": "https://interviewing.io/snowflake-interview-questions",
       "title": "Snowflake interview process and questions (interviewing.io)",
-      "retrieved_at": "2026-10-10",
-      "fields": ["loop_structure", "question_patterns"]
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "persona", "bar_by_level"]
+    },
+    {
+      "url": "https://prepfully.com/interview-guides/snowflake-software-engineer-interview",
+      "title": "Snowflake software engineer interview guide (Prepfully)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "persona"]
     },
     {
       "url": "https://www.aced.io/blog/snowflake-interview-process",
@@ -797,16 +1340,16 @@
       "fields": ["loop_structure", "question_patterns", "scoring_weights"]
     },
     {
-      "url": "https://www.teamblind.com/post/what-to-expect-from-snowflake-sr-product-manager-interview-hdzpabjg",
-      "title": "What to expect from Snowflake Sr PM interview (Blind thread)",
-      "retrieved_at": "2026-10-10",
-      "fields": ["loop_structure", "persona", "case_style"]
+      "url": "https://prepfully.com/interview-guides/snowflake-product-manager",
+      "title": "Snowflake product manager interview guide (Prepfully)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "persona", "case_style"]
     },
     {
-      "url": "https://www.interviewquery.com/interview-guides/snowflake-product-manager",
-      "title": "Snowflake product manager interview guide (Interview Query)",
-      "retrieved_at": "2026-10-10",
-      "fields": ["loop_structure", "question_patterns", "case_style"]
+      "url": "https://www.teamblind.com/post/what-to-expect-from-snowflake-sr-product-manager-interview-hdzpabjg",
+      "title": "What to expect from Snowflake Sr PM interview (Blind thread)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "persona", "case_style"]
     },
     {
       "url": "https://prepfully.com/answers/improvement-suggestions-snowflake",
@@ -821,9 +1364,69 @@
       "fields": ["question_patterns"]
     },
     {
+      "url": "https://datadriven.io/companies/snowflake/interview",
+      "title": "Snowflake data engineer interview guide with candidate-reported questions (DataDriven)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.interviewpal.com/interview-question/tough-delay-management-snowflake",
+      "title": "Snowflake TPM question: handling a tough delay (InterviewPal)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["question_patterns"]
+    },
+    {
+      "url": "https://prepfully.com/answers/technical-challenge-lesson-snowflake",
+      "title": "Snowflake TPM question: technical challenge and lessons (Prepfully)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["question_patterns"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/snowflake/sales-engineer",
+      "title": "Snowflake solution (sales) engineer interview guide (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.teamblind.com/post/what-is-the-snowflake-sales-engineer-interview-like-gem0v51g",
+      "title": "What is the Snowflake sales engineer interview like? (Blind thread)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "case_style"]
+    },
+    {
+      "url": "https://careers.wing.vc/companies/snowflake/jobs/84501393-senior-software-engineer-database-engineering",
+      "title": "Snowflake job posting: Senior Software Engineer, Database Engineering (mirror of official posting)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://careers.wing.vc/companies/snowflake/jobs/87948887-principal-software-engineer",
+      "title": "Snowflake job posting: Principal Software Engineer, Apps and Experiences (mirror of official posting)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://builtin.com/job/principal-software-engineer-platform-infrastructure-engineering/6753060",
+      "title": "Snowflake job posting: Principal Software Engineer I, Capacity (Built In mirror, removed Dec 2025)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://www.monster.com/job-openings/principal-software-engineer-ii-next-gen-data-transformations-menlo-park-ca--2ebf0c7c-7589-4f90-a8f4-d89e07c185d9",
+      "title": "Snowflake job posting: Principal Software Engineer II, Next-Gen Data Transformations (seen via search summary)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://builtin.com/job/senior-technical-program-manager/7980470",
+      "title": "Snowflake job posting: Senior Technical Program Manager, Customer Experience Engineering (Built In mirror, removed Apr 2026)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level", "loop_structure"]
+    },
+    {
       "url": "https://www.levels.fyi/en-gb/companies/snowflake/salaries/software-engineer",
       "title": "Snowflake software engineer levels (Levels.fyi)",
-      "retrieved_at": "2026-10-10",
+      "retrieved_at": "2026-10-28",
       "fields": ["bar_by_level"]
     }
   ],
@@ -831,18 +1434,18 @@
     "values_framework": "high",
     "loop_structure": "medium",
     "question_patterns": "medium",
-    "bar_by_level": "low",
-    "persona": "low",
-    "scoring_weights": "low",
-    "case_style": "low"
+    "bar_by_level": "medium",
+    "persona": "medium",
+    "scoring_weights": "medium",
+    "case_style": "medium"
   },
   "low_confidence_notes": [
-    "values_framework: values come from Snowflake's Code of Conduct; no public source says how they are scored in interviews. 'Embrace Each Other's Differences' is weighted lower because it is rarely probed directly.",
-    "loop_structure: round names and durations vary across third-party guides (onsite of 3-5 rounds); the presentation and cross-functional rounds are reported for senior levels only. PM loop comes from third-party guides and one Blind thread.",
-    "question_patterns: the streaming-analytics and developer-experience PM cases and the innovative-idea question were seen only in a search summary of the Interview Query PM guide, which returned HTTP 429 when opened; verify before publishing.",
-    "bar_by_level: IC4 is described as Staff by some sources and Senior by others; mapped to staff_principal tentatively.",
-    "persona: inferred from candidate reports of casual HM screens and deep follow-ups.",
-    "scoring_weights: estimated; no public source gives weights.",
-    "case_style: thin public evidence for PM case formats."
+    "values_framework: the eight values match on the official About page and the Code of Conduct, and job postings ask candidates to share them, but no public source says how they are scored in interviews. 'Embrace Each Other's Differences' is weighted lower because it is rarely probed directly.",
+    "loop_structure: the SWE loop follows Snowflake's official engineering process (30-minute screen, 60-minute technical interviews, 3-5 panel sessions, optional 30-minute Tech Talk). Round order varies by team. PM, data_ml, tpm and other (solution engineer) loops come from third-party guides and Blind threads only; the TPM loop is the thinnest (no TPM-specific process write-up found) and ML engineer rounds could not be checked because Interview Query returned HTTP 429.",
+    "question_patterns: the two PM sample questions sourced only to the Interview Query PM guide (streaming analytics product, data engineer developer experience) and the 'most innovative idea' question were removed because the guide still returned HTTP 429 on 2026-10-28; the developer-experience pattern stays as a pattern only. TPM questions rest on single question pages from Prepfully and InterviewPal.",
+    "bar_by_level: SWE scope comes from Snowflake job postings (Senior about 6+ years, Principal I about 10+, Principal II about 14+) read through job-board mirrors because careers.snowflake.com job pages did not render for the fetcher. Postings use only Senior and Principal titles; IC4 is now mapped to senior (Levels.fyi lists it as Senior Software Engineer II in some tables and Staff in others). PM levels have no public scope text and are not listed.",
+    "persona: based on the official note that the first call may be with the hiring manager and on several guides and a Blind thread that agree on layered 'double-click' follow-ups; no official description of interviewer style.",
+    "scoring_weights: derived from the evaluation areas Snowflake publishes for engineering (live coding and system design, role expertise, behavioral and collaboration, Tech Talk communication) plus guides that agree on database internals and ownership; the numbers are our estimate.",
+    "case_style: PM case format rests on Prepfully's PM guide and one Blind thread; solution engineer cases on CleverPrep and a Blind thread. No official case guidance."
   ]
 }

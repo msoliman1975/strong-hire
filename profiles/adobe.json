@@ -2,10 +2,10 @@
   "company_name": "Adobe",
   "company_slug": "adobe",
   "meta": {
-    "version": 1,
+    "version": 2,
     "status": "draft",
     "reviewed_by": null,
-    "researched_at": "2026-10-10",
+    "researched_at": "2026-10-28",
     "published_at": null
   },
   "values_framework": {
@@ -37,7 +37,8 @@
         "evidence_signals": [
           "Raised quality or performance with a measurable before and after",
           "Admits honestly where the work fell short and what changed",
-          "Holds self and team to a high standard of execution"
+          "Holds self and team to a high standard of execution",
+          "Names a real mistake or hard feedback and shows what was learned from it"
         ],
         "weight": 1.0
       },
@@ -47,7 +48,9 @@
         "evidence_signals": [
           "Gave honest, direct feedback respectfully",
           "Included or supported people with different views or backgrounds",
-          "Answers candidly, including about mistakes"
+          "Answers candidly, including about mistakes",
+          "Speaks in their own voice and is clear about what they did versus the team or tools such as AI",
+          "Credits collaborators instead of presenting team work as solely their own"
         ],
         "weight": 1.0
       }
@@ -63,7 +66,7 @@
           "interview_type": null,
           "duration_min": 30,
           "interviewer_role": "Recruiter (talent partner)",
-          "notes": "Background, goals and role expectations. Not simulated in v1."
+          "notes": "Adobe's official process calls this the talent conversation: background, career goals, the role and what success looks like. Not simulated in v1."
         },
         {
           "name": "Online assessment",
@@ -156,6 +159,136 @@
           "notes": null
         }
       ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": ["Machine Learning Engineer", "Senior Machine Learning Engineer", "Staff Machine Learning Engineer", "Research Scientist (Applied)", "Senior Applied Researcher", "Principal Scientist"],
+      "rounds": [
+        {
+          "name": "Talent partner screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter (talent partner)",
+          "notes": "ML or research background, publications, interest in creative or document AI. Not simulated in v1."
+        },
+        {
+          "name": "Technical screen (ML fundamentals)",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "ML engineer or research scientist",
+          "notes": "Verbal ML and statistics fundamentals (overfitting, evaluation, model choice); some teams add a short coding problem."
+        },
+        {
+          "name": "Research or project deep dive",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Hiring manager or senior researcher",
+          "notes": "Walk through a past research or production ML project: novelty versus existing methods, results, own contribution. Research roles often present this as a talk to the team."
+        },
+        {
+          "name": "Coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Engineer or scientist",
+          "notes": "Algorithms in Python, around medium difficulty. Not simulated in v1."
+        },
+        {
+          "name": "ML system design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior ML engineer or principal scientist",
+          "notes": "Design an ML feature for an Adobe-style product (image editing, generative media, asset search), covering data, training, serving cost and evaluation."
+        },
+        {
+          "name": "Behavioral and team fit",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineering or research manager",
+          "notes": "Collaboration with product teams, failed experiments, mentoring."
+        }
+      ]
+    },
+    {
+      "role_family": "design",
+      "levels": ["Product Designer", "Senior Product Designer", "Group Product Design Manager"],
+      "rounds": [
+        {
+          "name": "Talent partner screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter (talent partner)",
+          "notes": "Background, portfolio highlights and goals. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager conversation",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Design manager",
+          "notes": "Background, motivation, problem solving and fit; Adobe calls it a two-way conversation."
+        },
+        {
+          "name": "Portfolio presentation",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Panel of designers and design managers",
+          "notes": "Present one or two case studies: problem and outcome first, own role, collaboration with PM and engineering, trade-offs and lessons. Panel asks probing follow-ups."
+        },
+        {
+          "name": "Design exercise or creative brief",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Senior designer and design manager",
+          "notes": "Official page lists creative briefs, design thinking exercises or case study presentations. Some teams give a take-home first, then a presentation and critique."
+        },
+        {
+          "name": "Cross-functional partner interviews",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Product manager or engineer",
+          "notes": "How the designer works with partners, handles feedback and disagreement, and what motivates them."
+        }
+      ]
+    },
+    {
+      "role_family": "tpm",
+      "levels": ["Technical Program Manager", "Senior Technical Program Manager"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter (talent partner)",
+          "notes": "Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Program management leader",
+          "notes": "Two or three complex cross-functional programs: scope, dependencies, risks and outcome."
+        },
+        {
+          "name": "Program execution scenario",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Senior TPM",
+          "notes": "Plan a multi-team program (for example a platform migration or an AI capability across products), manage slipping dependencies and risks."
+        },
+        {
+          "name": "Technical depth",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager or architect",
+          "notes": "High-level system design and technical trade-offs; depth varies by team, and some candidates report no technical round."
+        },
+        {
+          "name": "Stakeholder and leadership",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Director",
+          "notes": "Cross-team conflict, communicating risk and bad news to leaders, holding owners accountable."
+        }
+      ]
     }
   ],
   "question_patterns": [
@@ -242,6 +375,69 @@
       "pattern": "Define how to measure success for a product or feature, including subscription and engagement metrics",
       "competencies": ["structure", "user_and_business_sense", "recommendation"],
       "values": []
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Mistakes and hard feedback",
+      "pattern": "The candidate's worst work mistake or hardest feedback, how they responded, and what changed afterwards",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Raise the bar", "Be genuine"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Self-awareness and work style",
+      "pattern": "What frustrates the candidate at work, how colleagues would notice, and how they work with design, product and engineering partners",
+      "competencies": ["communication", "collaboration"],
+      "values": ["Be genuine"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Portfolio or project story",
+      "pattern": "Why a showcased project mattered, who it affected, how the candidate learned their needs, and what the candidate personally contributed",
+      "competencies": ["depth_of_experience", "role_fit", "scope_at_level"],
+      "values": ["Own the outcome", "Be genuine"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Growth and motivation",
+      "pattern": "What drives the candidate, an area where they have not yet had room to grow, and how this role could help",
+      "competencies": ["motivation", "team_fit"],
+      "values": ["Be genuine"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Using AI in real work",
+      "pattern": "A concrete example of how the candidate used AI to improve their own work, in their own words",
+      "competencies": ["role_fit", "judgment"],
+      "values": ["Create the future", "Be genuine"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Research contribution",
+      "pattern": "The candidate's most important research or ML contribution, its novelty against existing methods, and how it reached a product",
+      "competencies": ["depth_of_experience", "judgment"],
+      "values": ["Create the future"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Program at risk",
+      "pattern": "How the candidate runs a multi-team program when dependencies slip or commitments are at risk",
+      "competencies": ["judgment", "scope_at_level"],
+      "values": ["Own the outcome"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "ML for creative media",
+      "pattern": "Design an ML system for an image, video or asset feature, covering data, model choice, evaluation, and serving latency and cost",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Create the future"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Design for experts and newcomers",
+      "pattern": "Redesign a workflow in a complex professional tool so new users can start easily without slowing down experts",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Create the future"]
     }
   ],
   "sample_questions": [
@@ -655,14 +851,452 @@
       },
       "role_families": ["pm", "data_ml"],
       "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "What is the worst mistake you have made at work, or the hardest feedback you have received, and how did you respond?",
+      "strong_answer": "Pick a real mistake with consequences, not a disguised strength. Own your part plainly, without blaming others. Explain how you reacted in the moment, what you did to repair the damage, and the concrete habit or process you changed afterwards. Give credit to anyone who helped. Close with evidence the change stuck. Pitfall: saying you cannot think of a failure.",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Raise the bar", "Be genuine"],
+      "source_url": "https://adobe.design/ideas/ask-adobe-design-how-can-applicants-stand-out-when-interviewing-for-design-jobs",
+      "hints": {
+        "looking_for": [
+          "Self-awareness and humility about your own mistakes",
+          "How you respond to hard feedback"
+        ],
+        "strong_signals": [
+          "Owns their part without blaming others",
+          "Names the habit or process that changed afterwards"
+        ],
+        "watch_outs": [
+          "A disguised strength instead of a real mistake",
+          "Being unable to name any failure"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "What makes you frustrated at work, and how would your teammates be able to tell?",
+      "strong_answer": "Answer honestly with a real trigger (for example unclear decisions or late changes). Show you know how it shows up in your behavior, how you manage it, and how you tell partners what you need. Link it to how you work with design, product and engineering. Pitfall: a polished non-answer that reveals nothing about you.",
+      "competencies": ["communication", "collaboration"],
+      "values": ["Be genuine"],
+      "source_url": "https://adobe.design/ideas/ask-adobe-design-how-can-applicants-stand-out-when-interviewing-for-design-jobs",
+      "hints": {
+        "looking_for": [
+          "Self-awareness about your work style",
+          "How you manage frustration with partners"
+        ],
+        "strong_signals": [
+          "Names a real trigger and how it shows",
+          "Explains how you communicate what you need"
+        ],
+        "watch_outs": [
+          "A polished answer that reveals nothing",
+          "Blaming colleagues for your reactions"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Walk me through one project from your portfolio: why did it matter, who did it affect, and how did you come to understand their needs?",
+      "strong_answer": "Open with the problem and the outcome, then the people affected and how you learned about them (research, data, support tickets). Make your own role clear versus the team's. Show two key decisions with the options you rejected, how you worked with PM and engineering, and the measured result. End with what you learned and would change. Pitfall: a tour of polished screens with no problem context.",
+      "competencies": ["depth_of_experience", "role_fit", "scope_at_level"],
+      "values": ["Own the outcome", "Be genuine"],
+      "source_url": "https://adobe.design/ideas/ask-adobe-design-how-can-applicants-stand-out-when-interviewing-for-design-jobs",
+      "hints": {
+        "looking_for": [
+          "Whether the work solved a real problem for real people",
+          "What you personally contributed"
+        ],
+        "strong_signals": [
+          "Starts with the problem and the outcome",
+          "Shows decisions, trade-offs and collaboration with partners"
+        ],
+        "watch_outs": [
+          "Polished screens with no problem context",
+          "Vague about own role versus the team"
+        ]
+      },
+      "role_families": ["design"],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Is there an area where you have not yet had the chance to grow, and how could this role help you with it?",
+      "strong_answer": "Name a specific, honest gap that matters for your career, why you have not developed it yet, and what you are already doing about it. Connect it to something real about the role or team. Show you would also bring strengths in return. Pitfall: naming a gap that is central to the job without a plan.",
+      "competencies": ["motivation", "team_fit"],
+      "values": ["Be genuine"],
+      "source_url": "https://adobe.design/ideas/ask-adobe-design-how-can-applicants-stand-out-when-interviewing-for-design-jobs",
+      "hints": {
+        "looking_for": [
+          "Honesty about your own development",
+          "Whether the role fits your growth"
+        ],
+        "strong_signals": [
+          "Names a specific gap and steps already taken",
+          "Links it to something real about the team"
+        ],
+        "watch_outs": [
+          "A fake weakness",
+          "A gap that is core to the job with no plan"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "From where you stand, what would you improve about Adobe or its products, and why do you want to work here?",
+      "strong_answer": "Show research on one product or strategy area. Offer one specific, respectful improvement grounded in user evidence or your own use, with the trade-off it carries. Connect your motivation to the team's work and what you would bring. Pitfall: harsh criticism with no reasoning, or flattery with no idea.",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["Create the future"],
+      "source_url": "https://adobe.design/ideas/ask-adobe-design-how-can-applicants-stand-out-when-interviewing-for-design-jobs",
+      "hints": {
+        "looking_for": [
+          "Whether you have researched the company and team",
+          "Whether you can critique thoughtfully"
+        ],
+        "strong_signals": [
+          "One specific improvement grounded in evidence",
+          "Motivation tied to the team's actual work"
+        ],
+        "watch_outs": [
+          "Flattery with no idea",
+          "Criticism with no reasoning"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Give a concrete example of how you have used AI to improve your own work.",
+      "strong_answer": "Describe one real task, the tool and how you used it, and the measurable effect (time saved, quality, new options). Explain where you checked or overrode its output and what stayed your own judgment. Mention a limit or risk you noticed. Pitfall: listing AI tools with no example, or an answer that sounds written by a tool.",
+      "competencies": ["role_fit", "judgment"],
+      "values": ["Create the future", "Be genuine"],
+      "source_url": "https://careers.adobe.com/us/en/ai-and-your-hiring-experience",
+      "hints": {
+        "looking_for": [
+          "Real, applied use of AI rather than a list of tools",
+          "Your own judgment on top of the tool"
+        ],
+        "strong_signals": [
+          "One concrete task with a measured effect",
+          "Says where the output was checked or overridden"
+        ],
+        "watch_outs": [
+          "Listing tools with no example",
+          "No awareness of limits or risks"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time user research contradicted what your stakeholders believed. What did you do?",
+      "strong_answer": "Set up the belief and why stakeholders held it. Explain the research method and why the finding was credible. Show how you shared it: early, with evidence, and respecting their goals. Describe the decision reached, any compromise, and the result. Pitfall: treating stakeholders as opponents.",
+      "competencies": ["conflict_handling", "communication", "collaboration"],
+      "values": ["Be genuine"],
+      "source_url": "https://www.cleverprep.com/companies/adobe/ux-designer",
+      "hints": {
+        "looking_for": [
+          "How you use evidence to change minds",
+          "How you keep stakeholder trust"
+        ],
+        "strong_signals": [
+          "Explains why the finding was credible",
+          "Describes the decision and the result"
+        ],
+        "watch_outs": [
+          "Treating stakeholders as opponents",
+          "No outcome"
+        ]
+      },
+      "role_families": ["design", "pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you redesign the main toolbar of a professional image editor so new users can get started without slowing down expert users?",
+      "strong_answer": "Clarify the user segments and the goal (activation of new users without hurting pro retention). Use evidence of where newcomers get stuck. Consider progressive disclosure, contextual tools, search for commands, and customizable workspaces. Protect expert speed (shortcuts, muscle memory). Define success metrics for both groups and plan testing with real users. Recommend one direction with trade-offs.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Create the future"],
+      "source_url": "https://www.cleverprep.com/companies/adobe/ux-designer",
+      "hints": {
+        "looking_for": [
+          "How you design for two very different user groups",
+          "Whether you ground ideas in user evidence"
+        ],
+        "strong_signals": [
+          "Protects expert speed while easing onboarding",
+          "Defines metrics for both groups and a test plan"
+        ],
+        "watch_outs": [
+          "Simplifying by removing power features",
+          "Jumping to visuals before framing the problem"
+        ]
+      },
+      "role_families": ["design", "pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Design AI suggestions inside a creative app that help users without interrupting their creative flow.",
+      "strong_answer": "Define the user and the moments where help is wanted. Choose when to suggest (on request, at natural pauses) and how (non-modal, easy to dismiss, previewable, undoable). Address trust: explain the suggestion, keep user control, handle low-quality results. Define metrics such as acceptance rate, undo rate and task completion, with a guardrail on interruptions. Pitfall: pop-ups that break concentration.",
+      "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
+      "values": ["Create the future"],
+      "source_url": "https://www.cleverprep.com/companies/adobe/ux-designer",
+      "hints": {
+        "looking_for": [
+          "How you balance help against interruption",
+          "How you keep the user in control of AI output"
+        ],
+        "strong_signals": [
+          "Chooses timing and form of suggestions deliberately",
+          "Measures acceptance and undo, with guardrails"
+        ],
+        "watch_outs": [
+          "Modal pop-ups that break concentration",
+          "No plan for poor suggestions"
+        ]
+      },
+      "role_families": ["design", "pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design an ML system that removes the background from photos with high accuracy.",
+      "strong_answer": "Clarify inputs (resolution, hair and fine edges, video or still) and latency targets (interactive or batch). Frame it as segmentation or matting; discuss labeled data, synthetic compositing for training, and model choice. Cover evaluation (IoU, edge quality, human review), on-device versus cloud serving, and a fallback for user correction. Discuss the accuracy versus latency and cost trade-off.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": [],
+      "source_url": "https://www.cleverprep.com/companies/adobe/machine-learning-engineer",
+      "hints": {
+        "looking_for": [
+          "How you frame the ML problem and the data",
+          "How you evaluate quality on hard edges"
+        ],
+        "strong_signals": [
+          "Plans training data and evaluation metrics",
+          "Weighs on-device against cloud serving"
+        ],
+        "watch_outs": [
+          "Naming a model with no data or evaluation plan",
+          "Ignoring latency for interactive use"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you build semantic search over a large library of creative assets such as images, videos and templates?",
+      "strong_answer": "Clarify query types (text, image), library size and freshness. Use multimodal embeddings, an offline pipeline to embed new assets, and an approximate nearest neighbor index. Combine with metadata filters and keyword search, then rerank. Cover evaluation (relevance judgments, click data), permissions, and cost of embedding and storage. Discuss index updates and latency.",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": [],
+      "source_url": "https://www.cleverprep.com/companies/adobe/machine-learning-engineer",
+      "hints": {
+        "looking_for": [
+          "How you represent and index mixed media",
+          "How you measure search relevance"
+        ],
+        "strong_signals": [
+          "Uses embeddings plus filters and reranking",
+          "Plans relevance evaluation and index updates"
+        ],
+        "watch_outs": [
+          "Skipping permissions on private assets",
+          "No way to measure relevance"
+        ]
+      },
+      "role_families": ["data_ml", "swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How have you balanced model accuracy against inference latency in a production ML system?",
+      "strong_answer": "Describe a real system with its latency budget and quality metric. Explain the options you tried (smaller model, distillation, quantization, caching, batching, cascades) and the measured effect of each. Show how you chose the operating point with product partners and monitored it after launch. Pitfall: optimizing one metric with no business context.",
+      "competencies": ["trade_offs", "technical_depth", "accuracy"],
+      "values": ["Raise the bar"],
+      "source_url": "https://www.cleverprep.com/companies/adobe/machine-learning-engineer",
+      "hints": {
+        "looking_for": [
+          "How you trade quality against speed and cost",
+          "Whether you measured each option"
+        ],
+        "strong_signals": [
+          "States the latency budget and quality metric",
+          "Explains the chosen operating point and monitoring"
+        ],
+        "watch_outs": [
+          "Only one metric with no business context",
+          "No numbers"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you evaluate the quality of AI-generated images or other creative content?",
+      "strong_answer": "Separate dimensions: fidelity to the prompt, visual quality, diversity, safety and brand or legal constraints. Combine automatic metrics (prompt-alignment scores, distribution metrics) with structured human ratings and side-by-side comparisons. Explain sampling, rater agreement, and how offline scores link to user signals such as downloads or regenerations. Note the limits of each metric.",
+      "competencies": ["reasoning", "technical_depth", "accuracy"],
+      "values": ["Create the future"],
+      "source_url": "https://www.cleverprep.com/companies/adobe/research-scientist",
+      "hints": {
+        "looking_for": [
+          "How you define quality for generated media",
+          "How you combine metrics with human judgment"
+        ],
+        "strong_signals": [
+          "Splits quality into clear dimensions",
+          "Links offline scores to user behavior"
+        ],
+        "watch_outs": [
+          "Relying on one automatic metric",
+          "Ignoring safety and rights"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "What is your most important research contribution, what is new about it compared with existing methods, and why does it matter?",
+      "strong_answer": "State the problem and the prior state of the art in two sentences. Explain the core idea, the evidence (benchmarks, ablations), and your own part versus co-authors. Be honest about limits. Then explain the impact: adoption, follow-up work, or a path into a product. Pitfall: listing papers without explaining the idea.",
+      "competencies": ["depth_of_experience", "clarity_of_explanation", "judgment"],
+      "values": ["Create the future"],
+      "source_url": "https://www.cleverprep.com/companies/adobe/research-scientist",
+      "hints": {
+        "looking_for": [
+          "Whether you can explain the novelty clearly",
+          "Your own contribution versus co-authors"
+        ],
+        "strong_signals": [
+          "Compares cleanly with prior methods",
+          "Admits limits and shows impact"
+        ],
+        "watch_outs": [
+          "Listing papers without the core idea",
+          "Overclaiming results"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a research or ML project that did not work out. What did you learn?",
+      "strong_answer": "Pick a real dead end. Explain the hypothesis, the signals that it was failing, and when and how you decided to stop or pivot. Share what you salvaged (data, tools, negative results) and how it changed how you choose or de-risk projects. Pitfall: blaming data or compute without reflection.",
+      "competencies": ["learning_from_failure", "judgment"],
+      "values": ["Raise the bar"],
+      "source_url": "https://www.cleverprep.com/companies/adobe/research-scientist",
+      "hints": {
+        "looking_for": [
+          "How you recognize and handle a failing project",
+          "What you learned from it"
+        ],
+        "strong_signals": [
+          "Explains the decision to stop or pivot",
+          "Shows what changed in later projects"
+        ],
+        "watch_outs": [
+          "Blaming data or compute",
+          "A project that actually succeeded"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "How would you lead a program to bring a generative AI capability into several products at the same time?",
+      "strong_answer": "Clarify the goal, launch date and which products are in scope. Set up a shared platform team and per-product owners, a dependency map, and milestones. Address model capacity, safety and legal review, and consistent user experience. Define a risk register, a decision process, and launch metrics. Explain how you sequence products (pilot first) and report status to leaders.",
+      "competencies": ["judgment", "scope_at_level"],
+      "values": ["Own the outcome", "Create the future"],
+      "source_url": "https://www.cleverprep.com/companies/adobe/technical-program-manager",
+      "hints": {
+        "looking_for": [
+          "How you structure a large multi-team program",
+          "How you manage shared dependencies"
+        ],
+        "strong_signals": [
+          "Pilots first, then sequences other products",
+          "Covers capacity, safety review and launch metrics"
+        ],
+        "watch_outs": [
+          "A plan with no owners or decision process",
+          "Ignoring legal and safety review"
+        ]
+      },
+      "role_families": ["tpm"],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "A program you run has key dependencies on other teams that are at risk of slipping. How do you handle it?",
+      "strong_answer": "Confirm the facts and the impact on the critical path. Talk to the owning teams to understand causes. Lay out options (re-sequence, cut scope, add help, change the date) with trade-offs, and escalate early with a recommendation. Agree new commitments and checkpoints, and communicate clearly to stakeholders. Pitfall: hoping it recovers or escalating with no options.",
+      "competencies": ["judgment", "communication"],
+      "values": ["Own the outcome"],
+      "source_url": "https://www.cleverprep.com/companies/adobe/technical-program-manager",
+      "hints": {
+        "looking_for": [
+          "How early you spot and act on risk",
+          "Whether you bring options, not only problems"
+        ],
+        "strong_signals": [
+          "Quantifies impact on the critical path",
+          "Escalates early with a recommendation"
+        ],
+        "watch_outs": [
+          "Waiting and hoping",
+          "Blaming the other team"
+        ]
+      },
+      "role_families": ["tpm", "pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to tell senior leaders bad news about a program.",
+      "strong_answer": "Explain the situation and why the news mattered. Show you raised it early and directly, with facts, impact, root cause and a recovery plan with options. Describe how leaders reacted, the decision made and the outcome. Reflect on what you would do to catch it sooner. Pitfall: softening the message until it is unclear.",
+      "competencies": ["communication", "ownership"],
+      "values": ["Be genuine", "Own the outcome"],
+      "source_url": "https://www.cleverprep.com/companies/adobe/technical-program-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you deliver bad news early and directly",
+          "Whether you bring a recovery plan"
+        ],
+        "strong_signals": [
+          "States facts, impact and options clearly",
+          "Reflects on how to catch it sooner"
+        ],
+        "watch_outs": [
+          "Softening the message until it is unclear",
+          "Hiding the problem until it is too late"
+        ]
+      },
+      "role_families": ["tpm", "pm"],
+      "levels": ["senior", "staff_principal"]
     }
   ],
   "bar_by_level": [
     {
+      "level_name": "University Graduate Software Engineer",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "0 to 1 years (internships, research or projects). Improves quality, performance and reliability of a component with guidance from the team; works independently on well-scoped tasks."
+    },
+    {
       "level_name": "MTS 1",
       "normalized_level": "new_grad",
       "role_family": "swe",
-      "scope_expectation": "Member of Technical Staff 1. Delivers well-defined tasks with guidance."
+      "scope_expectation": "Member of Technical Staff 1 (title used mainly in India). Delivers well-defined tasks with guidance."
     },
     {
       "level_name": "MTS 2",
@@ -671,43 +1305,112 @@
       "scope_expectation": "Member of Technical Staff 2. Owns features independently inside one team."
     },
     {
+      "level_name": "Software Development Engineer",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "4 to 9 years. Designs and builds features end to end in a cloud service, aligns with leadership on priorities, and mentors others on the team."
+    },
+    {
       "level_name": "Computer Scientist",
       "normalized_level": "senior",
       "role_family": "swe",
-      "scope_expectation": "Owns components or services end to end, leads designs and mentors engineers."
+      "scope_expectation": "Around 6 to 8 years for Computer Scientist 2. Owns components or services end to end including production operations and on-call, leads designs, reviews code and mentors junior engineers."
+    },
+    {
+      "level_name": "Senior Software Engineer",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "US title. Owns design and implementation of key components of a large-scale platform, joins architecture reviews and drives cross-team efforts. Required experience varies widely by posting."
     },
     {
       "level_name": "Senior Computer Scientist",
       "normalized_level": "staff_principal",
       "role_family": "swe",
-      "scope_expectation": "Technical lead for a product area; drives architecture across teams."
+      "scope_expectation": "Technical lead or architect for a product area (one architect posting asks for 14+ years). Leads technical design, vision and implementation strategy, shapes architecture with product and UX, and mentors the team."
+    },
+    {
+      "level_name": "Senior Staff Engineer",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "12+ years. Sets architectural standards that other teams across Adobe adopt, designs for a multi-year horizon, and influences direction across business units without formal authority."
     },
     {
       "level_name": "Principal Scientist",
       "normalized_level": "staff_principal",
       "role_family": "swe",
-      "scope_expectation": "Sets technical direction for a large product or platform and influences the organization."
+      "scope_expectation": "10+ years. Sets technical direction for a large product or platform, owns end-to-end outcomes such as cost and throughput at very large scale, and influences the organization."
+    },
+    {
+      "level_name": "Machine Learning Engineer",
+      "normalized_level": "mid",
+      "role_family": "data_ml",
+      "scope_expectation": "3+ years building and deploying ML solutions. Builds, trains and ships models for a product feature within one team."
+    },
+    {
+      "level_name": "Staff Machine Learning Engineer",
+      "normalized_level": "staff_principal",
+      "role_family": "data_ml",
+      "scope_expectation": "Architects end-to-end ML systems, owns the ML lifecycle from features to retraining, and guides technical direction across teams through design reviews and mentoring."
+    },
+    {
+      "level_name": "Research Scientist (Applied)",
+      "normalized_level": "senior",
+      "role_family": "data_ml",
+      "scope_expectation": "Level IV asks for a PhD plus 3 years or 6 years of experience. Leads research initiatives independently, takes research risks on hard problems, and leads ambitious projects."
+    },
+    {
+      "level_name": "Senior Applied Researcher",
+      "normalized_level": "staff_principal",
+      "role_family": "data_ml",
+      "scope_expectation": "Recognized technical leader with 5+ years developing, evaluating and deploying ML models. Leads architecture and technology choices for applied research that ships in products."
+    },
+    {
+      "level_name": "Product Manager",
+      "normalized_level": "mid",
+      "role_family": "pm",
+      "scope_expectation": "Drives defined initiatives in one area (for example pricing and packaging), builds the ROI case and gains cross-functional and executive approval."
     },
     {
       "level_name": "Senior Product Manager",
       "normalized_level": "senior",
       "role_family": "pm",
       "scope_expectation": "Owns a product area, its roadmap and metrics, and leads cross-functional teams."
+    },
+    {
+      "level_name": "Principal Product Manager",
+      "normalized_level": "staff_principal",
+      "role_family": "pm",
+      "scope_expectation": "8+ years. Leads vision, strategy and execution for a large product area through the full lifecycle, and drives strategy across multiple teams and organizations."
+    },
+    {
+      "level_name": "Senior Product Designer",
+      "normalized_level": "senior",
+      "role_family": "design",
+      "scope_expectation": "7+ years shipping complex products. Owns experience flows for a product area with minimal guidance and leads design decisions with PM and engineering, working from customer requirements."
+    },
+    {
+      "level_name": "Group Product Design Manager",
+      "normalized_level": "staff_principal",
+      "role_family": "design",
+      "scope_expectation": "8+ years including team leadership. Sets direction for a design area, grows designers through coaching, owns delivery quality, and ties design work to measurable business and customer impact."
     }
   ],
   "persona": {
-    "tone": "Professional and friendly, relationship-driven, genuinely curious about the candidate's work",
-    "pace": "Moderate; moves quickly through resume topics then goes deep on one project",
-    "pushback_style": "Probes trade-offs behind technical decisions and asks for measurable impact; may shift requirements mid-design",
-    "closing_style": "Invites thoughtful questions about the team and products"
+    "tone": "Warm, professional and two-way; curious about the person as well as the work, and wants to hear the candidate's own voice",
+    "pace": "Moderate; moves quickly through the resume, then goes deep on one project or portfolio piece with probing follow-ups",
+    "pushback_style": "Asks for measurable impact and for what the candidate personally did versus the team; probes mistakes, hard feedback and trade-offs; poses 'what would you do?' scenarios and may change requirements mid-design",
+    "closing_style": "Leaves real time for the candidate's questions about the team, strategy and culture, and notices when a candidate has none"
   },
   "scoring_weights": {
-    "ownership": 1.3,
-    "impact": 1.2,
+    "ownership": 1.2,
+    "impact": 1.3,
+    "collaboration": 1.2,
+    "learning_from_failure": 1.2,
     "technical_depth": 1.3,
     "trade_offs": 1.2,
     "depth_of_experience": 1.2,
     "user_and_business_sense": 1.2,
+    "problem_framing": 1.1,
     "structure": 1.1
   },
   "values_share": 0.2,
@@ -715,7 +1418,7 @@
     "product_sense": 0.6,
     "estimation": 0.1,
     "system_thinking": 0.3,
-    "notes": "PM cases center on improving Adobe products for a segment (SMB, new markets) and on subscription and engagement metrics. Estimation is light."
+    "notes": "PM cases center on improving Adobe products for a segment (SMB, new markets) and on subscription, monetization and engagement metrics. Design cases are creative briefs or redesigns of complex pro workflows, presented and critiqued. Estimation is light."
   },
   "sources": [
     {
@@ -727,14 +1430,128 @@
     {
       "url": "https://www.adobe.com/careers/interviewing-at-adobe",
       "title": "Interviewing at Adobe (Adobe careers)",
-      "retrieved_at": "2026-10-10",
-      "fields": ["loop_structure", "persona"]
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "persona", "scoring_weights", "case_style"]
+    },
+    {
+      "url": "https://careers.adobe.com/us/en/ai-and-your-hiring-experience",
+      "title": "AI and your hiring experience (Adobe careers)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "question_patterns", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://adobe.design/ideas/ask-adobe-design-how-can-applicants-stand-out-when-interviewing-for-design-jobs",
+      "title": "Ask Adobe Design: how can applicants stand out when interviewing for design jobs? (Adobe Design)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://adobe.design/ideas/ask-adobe-design-how-can-applicants-stand-out-when-applying-to-design-jobs",
+      "title": "Ask Adobe Design: how can applicants stand out when applying to design jobs? (Adobe Design)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "scoring_weights", "case_style"]
+    },
+    {
+      "url": "https://blog.adobe.com/en/publish/2019/01/04/heres-the-best-career-advice-heading-into-2019",
+      "title": "On the job search? Here's what you should know (Adobe blog, 2019)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["persona"]
+    },
+    {
+      "url": "https://adobe.wd5.myworkdayjobs.com/external_experienced/job/San-Jose/XMLNAME-2027-University-Graduate---Software-Engineer_R172083",
+      "title": "2027 University Graduate - Software Engineer, R172083 (Adobe job posting)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://adobe.wd5.myworkdayjobs.com/external_experienced/job/San-Jose/Software-Development-Engineer_R164904",
+      "title": "Software Development Engineer, R164904 (Adobe job posting)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://adobe.wd5.myworkdayjobs.com/external_experienced/job/Noida/Computer-Scientist-2_R172249",
+      "title": "Computer Scientist 2, R172249 (Adobe job posting)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://adobe.wd5.myworkdayjobs.com/external_experienced/job/San-Jose/Senior-Software-Engineer_R147125-1",
+      "title": "Senior Software Engineer, R147125 (Adobe job posting)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://adobe.wd5.myworkdayjobs.com/external_experienced/job/Noida/Senior-Computer-Scientist--Architect-_R170641",
+      "title": "Senior Computer Scientist (Architect), R170641 (Adobe job posting)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://adobe.wd5.myworkdayjobs.com/external_experienced/job/San-Jose/Sr-Staff-Engineer_R171717",
+      "title": "Senior Staff Engineer, R171717 (Adobe job posting)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://adobe.wd5.myworkdayjobs.com/external_experienced/job/San-Jose/Principal-Scientist---Data-Pipeline-Engineer_R170588",
+      "title": "Principal Scientist - Data Pipeline Engineer, R170588 (Adobe job posting)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://adobe.wd5.myworkdayjobs.com/external_experienced/job/San-Jose/Machine-Learning-Engineer_R171718",
+      "title": "Machine Learning Engineer, R171718 (Adobe job posting)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://adobe.wd5.myworkdayjobs.com/external_experienced/job/San-Jose/Staff-Machine-Learning-Engineer_R171768",
+      "title": "Sr / Staff Machine Learning Engineer, R171768 (Adobe job posting)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://adobe.wd5.myworkdayjobs.com/external_experienced/job/Noida/Applied-Scientist-4_R171067",
+      "title": "Research Scientist (Applied) - IV, R171067 (Adobe job posting)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://adobe.wd5.myworkdayjobs.com/external_experienced/job/San-Jose/Senior-Applied-Researcher_R156806",
+      "title": "Senior Applied Researcher, R156806 (Adobe job posting)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://adobe.wd5.myworkdayjobs.com/external_experienced/job/San-Francisco/Product-Manager_R172087",
+      "title": "Product Manager, R172087 (Adobe job posting)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level", "case_style"]
+    },
+    {
+      "url": "https://adobe.wd5.myworkdayjobs.com/external_experienced/job/San-Jose/Principal-Product-Manager_R170627",
+      "title": "Principal Product Manager, R170627 (Adobe job posting)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://adobe.wd5.myworkdayjobs.com/external_experienced/job/Bucharest/Senior-Product-Designer--AI-powered-Experiences--Adobe-Experience-Platform-_R173026-1",
+      "title": "Senior Product Designer, AI-powered Experiences, R173026 (Adobe job posting; includes Adobe's AI use guidelines for interviews)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level", "loop_structure", "persona"]
+    },
+    {
+      "url": "https://adobe.wd5.myworkdayjobs.com/external_experienced/job/San-Francisco/Group-Product-Design-Manager--Systems_R171676",
+      "title": "Group Product Design Manager, Systems, R171676 (Adobe job posting)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level", "scoring_weights"]
     },
     {
       "url": "https://interviewing.io/adobe-interview-questions",
       "title": "Adobe's interview process and questions (interviewing.io)",
-      "retrieved_at": "2026-10-10",
-      "fields": ["loop_structure", "question_patterns"]
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "scoring_weights"]
     },
     {
       "url": "https://www.aced.io/blog/adobe-interview-process",
@@ -771,23 +1588,48 @@
       "title": "Adobe product manager interview guide (Interview Query)",
       "retrieved_at": "2026-10-10",
       "fields": ["loop_structure", "case_style"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/adobe/ux-designer",
+      "title": "Adobe UX designer interview guide (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/adobe/machine-learning-engineer",
+      "title": "Adobe machine learning engineer interview guide (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/adobe/research-scientist",
+      "title": "Adobe research scientist interview guide (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/adobe/technical-program-manager",
+      "title": "Adobe technical program manager interview guide (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns"]
     }
   ],
   "field_confidence": {
     "values_framework": "high",
     "loop_structure": "medium",
     "question_patterns": "medium",
-    "bar_by_level": "low",
-    "persona": "low",
-    "scoring_weights": "low",
+    "bar_by_level": "medium",
+    "persona": "medium",
+    "scoring_weights": "medium",
     "case_style": "low"
   },
   "low_confidence_notes": [
-    "values_framework: Adobe has no dedicated values round; values are probed inside hiring manager and leadership rounds. Adobe's careers page still mentions the older values (genuine, exceptional, innovative, involved), so interviewers may use either set.",
-    "loop_structure: rounds vary widely by team and country; many India candidate reports show 2 DSA + LLD + HM/director rounds. PM loop comes from third-party guides only.",
-    "bar_by_level: Adobe does not publish its ladder; title-to-level mapping comes from third-party summaries, and US postings also use Software Engineer / Senior Software Engineer titles.",
-    "persona: based on Adobe's 'relationship-driven' interview tips and candidate reports; thin evidence.",
-    "scoring_weights: estimated; no public source gives weights.",
-    "case_style: PM case examples come from third-party guides (one example uses a non-Adobe product)."
+    "values_framework: Adobe has no dedicated values round; values are probed inside hiring manager and leadership rounds. Adobe's 'AI and your hiring experience' page ties authenticity to 'Be genuine', so the current values are used in hiring, but older careers pages still mention the earlier set (genuine, exceptional, innovative, involved). Principle weights are our estimate.",
+    "loop_structure: Adobe's official page confirms the stages (talent conversation, hiring manager, skills assessments and team interviews, with coding, system design, portfolio reviews or creative briefs by role) but not round counts or durations. Round detail comes from candidate reports and prep sites and varies by team and country. The data_ml, design and tpm loops come mainly from CleverPrep; the tpm loop has no official source and some candidates report no technical round.",
+    "bar_by_level: Adobe does not publish a ladder. Scope text now comes from current official postings on adobe.wd5.myworkdayjobs.com, which state years of experience and scope by title, but years vary widely between postings (one US Senior Software Engineer posting asks for 15+ years). MTS 1, MTS 2 and the title-to-level mapping still come from third parties. Postings expire, so the cited links may stop working. No TPM postings were open on 2026-10-28, so tpm has no bar entries.",
+    "persona: based on Adobe's official Interviewing at Adobe and AI hiring pages and an Adobe Design article in which design managers describe what they ask and look for; that article covers design hiring only, so engineering interviewer style is inferred from candidate reports.",
+    "scoring_weights: derived from officially published signals (measurable impact and problem solving on the Interviewing at Adobe page; collaboration, credit sharing, self-awareness and learning from mistakes in the Adobe Design article; own voice on the AI hiring page) mapped to our competencies. No public source gives weights; the numbers are our estimate.",
+    "case_style: left low. Adobe confirms that design roles get creative briefs or design exercises and that other roles get scenario-based discussions, but PM case prompts and the product_sense, estimation and system_thinking split come only from third-party guides (one PM example uses a non-Adobe product).",
+    "sample_questions: Glassdoor (HTTP 403) and Interview Query (HTTP 429) blocked the fetcher, so ML, research and TPM questions cite CleverPrep, a prep site that aggregates candidate reports. Five questions come from the official Adobe Design article, which reports questions design managers ask; four are tagged for all roles but were reported for design hiring."
   ]
 }

@@ -2,10 +2,10 @@
   "company_name": "OpenAI",
   "company_slug": "openai",
   "meta": {
-    "version": 1,
+    "version": 2,
     "status": "draft",
     "reviewed_by": null,
-    "researched_at": "2026-10-10",
+    "researched_at": "2026-10-28",
     "published_at": null
   },
   "values_framework": {
@@ -13,37 +13,39 @@
     "principles": [
       {
         "name": "AGI focus",
-        "description": "Committed to building safe, beneficial AGI with a large positive impact on humanity; work that does not help with that is out of scope.",
+        "description": "Committed to building safe, beneficial AGI with a large positive impact on humanity; work that does not help with that is out of scope. The current careers page frames this as 'Humanity first' and 'Feel the AGI': take the stakes of AGI, upside and downside, seriously and with rigor.",
         "evidence_signals": [
           "Connects motivation and past work to the mission of safe, beneficial AGI",
           "Shows a considered view on AI safety and benefits, not hype",
+          "Names a specific safety or deployment question and gives their own position",
           "Cuts work that does not serve the core goal"
         ],
         "weight": 1.3
       },
       {
         "name": "Intense and scrappy",
-        "description": "Work hard with urgency, including on unglamorous tasks; be unpretentious, do what works, and take good ideas from anywhere.",
+        "description": "Work hard with urgency, including on unglamorous tasks; be unpretentious, do what works, and take good ideas from anywhere. Close to the current operating principles 'Find a way', 'Intense focus' and 'Update quickly': act with agency, start from a hypothesis and change course fast when the evidence says so.",
         "evidence_signals": [
           "Describes doing unglamorous work to unblock a result",
           "Ships a simple solution fast and iterates",
-          "Ramps up quickly in an unfamiliar domain and produces results"
+          "Ramps up quickly in an unfamiliar domain and produces results",
+          "Changed their mind quickly when data contradicted their first plan"
         ],
         "weight": 1.3
       },
       {
         "name": "Scale",
-        "description": "Believe scale in models, systems, people, processes and ambition is powerful; when in doubt, scale it up.",
+        "description": "Believe scale in models, systems, people, processes and ambition is powerful; when in doubt, scale it up. Not named in the current careers values, but interviewers still probe how designs hold up at 100x or 1,000x load.",
         "evidence_signals": [
           "Reasons about what breaks at 10x or 100x",
           "Designs systems and processes that grow without rewrites",
           "Shows ambition in the size of problems taken on"
         ],
-        "weight": 1.1
+        "weight": 1.0
       },
       {
         "name": "Make something people love",
-        "description": "Technology and products should have a transformative positive effect on people's lives.",
+        "description": "Technology and products should have a transformative positive effect on people's lives. The current careers page calls this 'Ship joy': research and products that change how people live.",
         "evidence_signals": [
           "Talks about real users and how the work changed their experience",
           "Uses user feedback or data to decide what to build",
@@ -53,11 +55,12 @@
       },
       {
         "name": "Team spirit",
-        "description": "Big advances come from collaboration within and across teams; goals stay aligned and nothing is someone else's problem.",
+        "description": "Big advances come from collaboration within and across teams; goals stay aligned and nothing is someone else's problem. The official interview guide evaluates collaboration, communication and openness to feedback, and the current values add 'Act with humility': know the limits of your knowledge and stay open to being wrong.",
         "evidence_signals": [
           "Picks up a problem outside their remit because it mattered",
           "Works through disagreement with another team to a shared goal",
-          "Is open to feedback and communicates clearly"
+          "Is open to feedback and communicates clearly",
+          "Admits what they do not know instead of bluffing"
         ],
         "weight": 1.1
       }
@@ -80,7 +83,7 @@
           "interview_type": "hiring_manager",
           "duration_min": 30,
           "interviewer_role": "Hiring manager",
-          "notes": "Can be substantive: past projects, failures and complexity."
+          "notes": "Can be substantive: past projects, failures and complexity. Some candidates report the 30-minute call is already a full behavioral interview."
         },
         {
           "name": "Technical screen (coding)",
@@ -101,28 +104,35 @@
           "interview_type": null,
           "duration_min": 60,
           "interviewer_role": "Engineer",
-          "notes": "Practical coding and refactoring. Not simulated in v1."
+          "notes": "Practical coding and refactoring. The official guide says engineering interviews look for well-designed solutions, high-quality code, optimal performance and good test coverage. Some loops add a beta agentic-coding round in an existing codebase where AI tools are allowed. Not simulated in v1."
         },
         {
           "name": "Final: system design",
           "interview_type": "technical_qa",
           "duration_min": 60,
           "interviewer_role": "Senior engineer",
-          "notes": "Designs often relate to LLM products or infrastructure."
+          "notes": "Designs often relate to LLM products or infrastructure; interviewers push on scale (100x to 1,000x), reliability and justified technology choices."
         },
         {
           "name": "Final: project deep dive",
           "interview_type": "technical_qa",
           "duration_min": 45,
           "interviewer_role": "Engineer or manager",
-          "notes": "Walk through a past project and the candidate's role in depth."
+          "notes": "Walk through a past project and the candidate's role in depth; some candidates present a short 4-5 slide deck on a system they built."
         },
         {
-          "name": "Final: behavioral / working style",
+          "name": "Final: leadership behavioral",
           "interview_type": "behavioral",
           "duration_min": 45,
-          "interviewer_role": "Manager or cross-functional partner",
-          "notes": "Collaboration, communication, openness to feedback, mission alignment."
+          "interviewer_role": "Senior manager",
+          "notes": "Ownership, failures, disagreement and mission alignment, with follow-ups on personal contribution."
+        },
+        {
+          "name": "Final: cross-functional / working style",
+          "interview_type": "behavioral",
+          "duration_min": 30,
+          "interviewer_role": "Cross-functional partner (for example legal or product)",
+          "notes": "Collaboration, communication, openness to feedback and explaining technical limits to non-engineers."
         }
       ]
     },
@@ -156,21 +166,28 @@
           "interview_type": null,
           "duration_min": 60,
           "interviewer_role": "Research engineer",
-          "notes": "Implement or debug ML code (for example transformer pieces). Not simulated in v1."
+          "notes": "Multi-part ML coding from simple to hard, often in NumPy or PyTorch (for example a distributed all_gather). Not simulated in v1."
+        },
+        {
+          "name": "Final: ML debugging",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Research engineer",
+          "notes": "Find seeded bugs in a model such as a transformer, then extend it (for example add key-value caching). Not simulated in v1."
         },
         {
           "name": "Final: ML systems design",
           "interview_type": "technical_qa",
           "duration_min": 60,
           "interviewer_role": "Research engineer or scientist",
-          "notes": "Training and inference systems, evaluation and data pipelines."
+          "notes": "Training and inference systems, evaluation and data pipelines, deploying and monitoring an LLM."
         },
         {
           "name": "Final: ML depth / research discussion",
           "interview_type": "technical_qa",
           "duration_min": 60,
           "interviewer_role": "Research scientist",
-          "notes": "ML theory, past research and how the candidate reasons about experiments."
+          "notes": "Discussion of a paper assigned in advance (idea, method, findings, limits), then the candidate's own research and overlap with the team. Graduate-level ML theory, such as the RLHF objective, is reported as the hardest bar."
         },
         {
           "name": "Final: mission and working style",
@@ -197,35 +214,179 @@
           "interview_type": "hiring_manager",
           "duration_min": 30,
           "interviewer_role": "Product lead",
-          "notes": "Past launches, failures and motivation."
+          "notes": "Past launches, failures and motivation, plus what the candidate would do for this team's strategy if already in the role."
         },
         {
           "name": "Product sense",
           "interview_type": "case",
-          "duration_min": 45,
+          "duration_min": 60,
           "interviewer_role": "Product manager",
-          "notes": "AI-native product design and goal setting."
+          "notes": "AI-native product design and goal setting from a vague prompt; scope early. Often two rounds."
         },
         {
-          "name": "Product strategy / execution",
+          "name": "Product execution",
           "interview_type": "case",
           "duration_min": 45,
           "interviewer_role": "Product manager or lead",
-          "notes": "Trade-offs such as capability versus cost, experiments, metrics."
+          "notes": "Trade-offs such as capability versus cost, launch plans, and a metrics framework with hero, supporting and counter metrics."
         },
         {
-          "name": "Technical / cross-functional",
+          "name": "Technical / engineering partner",
           "interview_type": "technical_qa",
           "duration_min": 45,
           "interviewer_role": "Engineer or researcher",
-          "notes": "Working with research and engineering; explaining model limits."
+          "notes": "Working with research and engineering; model quality versus inference cost; may involve reading an LLM paper beforehand."
+        },
+        {
+          "name": "Stakeholder: safety and responsible deployment",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Leader from legal, research, finance or trust and safety",
+          "notes": "Balancing velocity against safety, safeguards for agents that act for users, bias detection."
         },
         {
           "name": "Behavioral",
           "interview_type": "behavioral",
           "duration_min": 45,
           "interviewer_role": "Cross-functional partner",
-          "notes": "Collaboration, conflict and communication."
+          "notes": "Collaboration, conflict and communication, including go-to-market partners pushing for off-roadmap work."
+        }
+      ]
+    },
+    {
+      "role_family": "design",
+      "levels": [],
+      "rounds": [
+        {
+          "name": "Recruiter call",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Not simulated in v1."
+        },
+        {
+          "name": "Portfolio screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Design manager",
+          "notes": "Portfolio walkthrough: the problem, the candidate's own decisions and the outcome."
+        },
+        {
+          "name": "Final: portfolio presentation",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Panel of about ten designers, PMs and engineers",
+          "notes": "Presentation to a group. Not simulated in v1."
+        },
+        {
+          "name": "Final: one-on-one portfolio deep dive",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Designer",
+          "notes": "Follow-ups on craft, trade-offs and personal contribution."
+        },
+        {
+          "name": "Final: whiteboard design exercise",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Designer",
+          "notes": "Design an AI-built app; practical concerns such as whether the flow scales, stays responsive and handles model latency."
+        },
+        {
+          "name": "Final: product critique",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Designer or PM",
+          "notes": "Critique the design choices of a real product."
+        }
+      ]
+    },
+    {
+      "role_family": "tpm",
+      "levels": [],
+      "rounds": [
+        {
+          "name": "Recruiter call",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Which opening fits the candidate's experience and level. Not simulated in v1."
+        },
+        {
+          "name": "Project retrospective / technical deep dive",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "TPM or engineer",
+          "notes": "Walk through a large program with technical depth, including architecture questions."
+        },
+        {
+          "name": "Cross-functional collaboration",
+          "interview_type": "behavioral",
+          "duration_min": 60,
+          "interviewer_role": "Engineering or research partner",
+          "notes": "Aligning teams that do not report to you and getting decisions made."
+        },
+        {
+          "name": "Program scenario",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "TPM",
+          "notes": "Diagnose a bottleneck or plan a program (for example a model rollout across products) and structure the fix."
+        },
+        {
+          "name": "Hiring manager / values",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager",
+          "notes": "Working style, interest in AI and fit with the team."
+        }
+      ]
+    },
+    {
+      "role_family": "other",
+      "levels": [],
+      "rounds": [
+        {
+          "name": "Recruiter or hiring manager call",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Recruiter or hiring manager",
+          "notes": "Data science track. Background and motivation."
+        },
+        {
+          "name": "Take-home A/B test",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Data scientist",
+          "notes": "48-hour take-home analysis submitted as a slide deck, then a one-hour review: deck plus live SQL or Python, including fixing AI-generated code. Not simulated in v1."
+        },
+        {
+          "name": "Final: experimentation cases",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Data scientist",
+          "notes": "Usually two cases with mixed metric results; define success and decide whether to launch."
+        },
+        {
+          "name": "Final: statistics",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Data scientist",
+          "notes": "Rapid statistics questions, such as p-values and experiment design."
+        },
+        {
+          "name": "Final: product partner",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product manager",
+          "notes": "Metrics and goal setting for a product area."
+        },
+        {
+          "name": "Final: leadership",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Data science lead",
+          "notes": "Ownership, collaboration and mission fit."
         }
       ]
     }
@@ -313,6 +474,55 @@
       "theme": "Goals and experiments",
       "pattern": "Set goals and design an experiment for an AI product launch or onboarding flow",
       "competencies": ["structure", "prioritization", "estimation_logic"],
+      "values": ["Make something people love"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Being wrong and updating",
+      "pattern": "A time the candidate's first plan or belief turned out wrong and how fast they changed course",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Intense and scrappy", "Team spirit"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Hard cross-functional launch",
+      "pattern": "The most difficult launch or program that needed several teams, and how the candidate kept it moving",
+      "competencies": ["collaboration", "ownership", "impact"],
+      "values": ["Team spirit", "Intense and scrappy"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Paper and research discussion",
+      "pattern": "Discuss a recent ML paper or the candidate's own research: idea, method, results, limits and next experiments",
+      "competencies": ["technical_depth", "reasoning", "clarity_of_explanation"],
+      "values": ["AGI focus"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Safety versus velocity",
+      "pattern": "Ship an AI feature or agent quickly while designing safeguards against misuse, harm or bias",
+      "competencies": ["problem_framing", "prioritization", "recommendation"],
+      "values": ["AGI focus", "Make something people love"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Program plan under uncertainty",
+      "pattern": "Plan or rescue a program that depends on research timelines and many teams",
+      "competencies": ["structure", "prioritization", "problem_framing"],
+      "values": ["Team spirit", "Scale"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Designing for model behavior",
+      "pattern": "Design or critique an AI product flow that must handle latency, uncertainty and wrong model output",
+      "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
+      "values": ["Make something people love"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Experiment readout",
+      "pattern": "Read mixed A/B test results, define success and decide whether to launch",
+      "competencies": ["structure", "estimation_logic", "recommendation"],
       "values": ["Make something people love"]
     }
   ],
@@ -816,6 +1026,356 @@
       },
       "role_families": ["pm", "design", "tpm"],
       "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you were wrong about something important at work.",
+      "strong_answer": "Pick a real belief or plan that mattered, say what evidence showed it was wrong and how quickly you noticed. Show you said so openly, changed course, and limited the cost. Close with how you now test assumptions earlier. OpenAI's current values stress humility and updating quickly. Pitfall: a 'mistake' that is really a strength, or one fixed only after others forced it.",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Intense and scrappy", "Team spirit"],
+      "source_url": "https://prepare.sh/articles/openai-interview-process-2026",
+      "hints": {
+        "looking_for": [
+          "Whether you admit being wrong openly",
+          "How fast you update when evidence changes"
+        ],
+        "strong_signals": [
+          "A real belief or plan that mattered",
+          "Names the evidence and how quickly they acted on it",
+          "Changes how they test assumptions afterwards"
+        ],
+        "watch_outs": [
+          "A disguised strength",
+          "Changing course only when forced"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "What was your most difficult cross-functional launch, and what made it hard?",
+      "strong_answer": "Name the launch, the teams involved and the real source of difficulty (conflicting goals, unclear ownership, a hard deadline, a safety or legal question). Show what you personally did to align people, unblock decisions and cut scope, and how the launch went in numbers. Reflect on what you would set up earlier next time. Pitfall: listing teams without showing your own actions.",
+      "competencies": ["collaboration", "ownership", "impact"],
+      "values": ["Team spirit", "Intense and scrappy"],
+      "source_url": "https://supacv.com/blog/interview-playbook/openai",
+      "hints": {
+        "looking_for": [
+          "How you drive a launch across teams you do not manage",
+          "Whether you can name the real source of difficulty"
+        ],
+        "strong_signals": [
+          "Clear on the teams, the conflict and their own actions",
+          "Unblocks decisions and cuts scope when needed",
+          "Gives the outcome and a lesson for next time"
+        ],
+        "watch_outs": [
+          "Listing teams without own actions",
+          "Blaming other teams for delays"
+        ]
+      },
+      "role_families": ["pm", "tpm", "swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Imagine you already had this product role. What would you focus on for this team, and what are the risks?",
+      "strong_answer": "Show you studied the team's products and recent announcements. Name the users and the main opportunity, propose two or three priorities with the reasoning and what you would measure, and call out risks (model limits, cost, safety, competition). Say what you would learn first before committing. Pitfall: a generic roadmap that could fit any company.",
+      "competencies": ["role_fit", "judgment", "scope_at_level"],
+      "values": ["Make something people love", "AGI focus"],
+      "source_url": "https://www.aakashg.com/openai-pm-interview/",
+      "hints": {
+        "looking_for": [
+          "Whether you understand this team's products and users",
+          "How you set priorities and name risks"
+        ],
+        "strong_signals": [
+          "Refers to the team's actual products",
+          "Two or three priorities with reasons and metrics",
+          "Names model, cost and safety risks and what to learn first"
+        ],
+        "watch_outs": [
+          "A generic roadmap",
+          "No risks or trade-offs"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you improve ChatGPT for enterprise customers?",
+      "strong_answer": "Segment enterprise users (admins, knowledge workers, developers) and pick one with a clear pain, such as trust in answers, data controls or getting work done in existing tools. Propose a few solutions, choose one with reasons, and define success (weekly active seats, task completion, expansion) with a guardrail on data safety. Pitfall: listing features with no chosen user or metric.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Make something people love"],
+      "source_url": "https://www.aakashg.com/openai-pm-interview/",
+      "hints": {
+        "looking_for": [
+          "How you pick a user segment and a real pain",
+          "Whether you define success and guardrails"
+        ],
+        "strong_signals": [
+          "Segments admins, workers and developers",
+          "Chooses one solution with clear reasons",
+          "Success metrics plus a data-safety guardrail"
+        ],
+        "watch_outs": [
+          "A feature list with no chosen user",
+          "Ignoring enterprise data concerns"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you design safeguards for an AI agent that takes actions on a user's behalf, without killing its usefulness?",
+      "strong_answer": "Classify actions by risk (read-only, reversible, irreversible or costly) and match controls: confirmations for high-risk steps, scoped permissions, spending limits, audit logs and easy undo. Cover misuse and prompt injection, monitoring and red-teaming before launch. Define metrics for both task success and harm, and stage the rollout. Pitfall: either no guardrails or so many confirmations the agent is useless.",
+      "competencies": ["problem_framing", "prioritization", "recommendation"],
+      "values": ["AGI focus", "Make something people love"],
+      "source_url": "https://www.aakashg.com/openai-pm-interview/",
+      "hints": {
+        "looking_for": [
+          "How you balance safety and usefulness",
+          "Whether you tie controls to the risk of each action"
+        ],
+        "strong_signals": [
+          "Tiers actions by risk and reversibility",
+          "Covers permissions, confirmations, logs and undo",
+          "Measures task success and harm, with a staged rollout"
+        ],
+        "watch_outs": [
+          "No guardrails at all",
+          "Confirmation on every step"
+        ]
+      },
+      "role_families": ["pm", "tpm", "design"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you launch a new ChatGPT model, and how would you measure whether the launch succeeded?",
+      "strong_answer": "Define the goal of the launch and who it is for. Plan staged rollout (internal, small percentage, full), safety evaluation and capacity checks. Pick a hero metric (for example task success or retention), supporting metrics and counter metrics (latency, cost, safety incidents). Say what you would do if instrumentation broke: fallback signals and a rollback rule. Pitfall: a launch plan with no rollback.",
+      "competencies": ["structure", "prioritization", "user_and_business_sense"],
+      "values": ["Make something people love", "Scale"],
+      "source_url": "https://www.aakashg.com/openai-pm-interview/",
+      "hints": {
+        "looking_for": [
+          "How you plan a staged, safe launch",
+          "Whether your metrics include counter metrics"
+        ],
+        "strong_signals": [
+          "Staged rollout with safety and capacity checks",
+          "Hero, supporting and counter metrics",
+          "A fallback if instrumentation fails and a rollback rule"
+        ],
+        "watch_outs": [
+          "No rollback plan",
+          "Only usage metrics"
+        ]
+      },
+      "role_families": ["pm", "tpm"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "You are given a transformer implementation that trains badly. How would you find the bugs, and how would you then add key-value caching for inference?",
+      "strong_answer": "Debug systematically: overfit a tiny batch, check tensor shapes, attention masking (causal mask direction), softmax axis and scaling, positional encoding, layer norm placement and the loss target shift. Compare against a reference on small inputs. For KV caching, store keys and values per layer from earlier tokens and compute attention only for the new token, noting memory growth with sequence length. Pitfall: guessing instead of isolating.",
+      "competencies": ["technical_depth", "reasoning", "accuracy"],
+      "values": ["Intense and scrappy"],
+      "source_url": "https://www.aced.io/blog/openai-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you debug ML code systematically",
+          "Whether you understand attention well enough to optimize it"
+        ],
+        "strong_signals": [
+          "Overfits a tiny batch and checks shapes and masks",
+          "Names common bugs: mask, softmax axis, target shift",
+          "Explains KV caching and its memory cost"
+        ],
+        "watch_outs": [
+          "Random changes without isolating the bug",
+          "Vague description of caching"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Explain the RLHF objective. Why is there a KL penalty to the reference model, and what happens if it is too small or too large?",
+      "strong_answer": "Describe the setup: a reward model trained on human preferences, then policy optimization to maximize expected reward minus a KL term to the supervised reference model. The KL term limits drift, keeps outputs fluent and reduces reward hacking. Too small: the policy exploits reward model errors. Too large: little improvement over the reference. Mention alternatives such as direct preference optimization. Be precise and admit uncertainty.",
+      "competencies": ["accuracy", "technical_depth", "clarity_of_explanation"],
+      "values": ["AGI focus"],
+      "source_url": "https://supacv.com/blog/interview-playbook/openai",
+      "hints": {
+        "looking_for": [
+          "Whether you understand the RLHF objective precisely",
+          "How you reason about the role of the KL term"
+        ],
+        "strong_signals": [
+          "States reward minus KL to a reference policy",
+          "Links the KL term to reward hacking and drift",
+          "Explains both failure directions"
+        ],
+        "watch_outs": [
+          "Confusing the reward model with the policy",
+          "Confident but wrong math"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a continuous integration system like GitHub Actions.",
+      "strong_answer": "Clarify scale (repos, jobs per minute) and features (triggers, workflows, logs, secrets). Cover event intake from pushes, a workflow parser, a job queue with priorities, a fleet of isolated runners with autoscaling, artifact and log storage, secret handling and status reporting. Discuss isolation for untrusted code, retries, fairness between tenants and cost. Pitfall: running untrusted code without isolation.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Scale"],
+      "source_url": "https://supacv.com/blog/interview-playbook/openai",
+      "hints": {
+        "looking_for": [
+          "How you design a multi-tenant job execution system",
+          "Whether you handle isolation and fairness"
+        ],
+        "strong_signals": [
+          "Covers triggers, queue, runners, logs and secrets",
+          "Isolates untrusted code and autoscales runners",
+          "Discusses retries, tenant fairness and cost"
+        ],
+        "watch_outs": [
+          "No isolation for untrusted code",
+          "One shared queue with no fairness"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you run a program to roll out a new model across several products at once?",
+      "strong_answer": "Clarify the products, the deadline and what 'ready' means. Build a plan with clear owners, a shared launch checklist (evals, safety review, capacity, docs, support), dependencies between research, infrastructure and product teams, and staged rollout with go or no-go gates. Name the top risks and mitigations, a communication cadence, and how you would decide to slip or cut scope. Pitfall: a timeline with no owners or gates.",
+      "competencies": ["structure", "prioritization", "problem_framing"],
+      "values": ["Team spirit", "Scale"],
+      "source_url": "https://www.cleverprep.com/companies/openai/technical-program-manager",
+      "hints": {
+        "looking_for": [
+          "How you structure a large cross-team program",
+          "Whether you manage risk and decisions explicitly"
+        ],
+        "strong_signals": [
+          "Owners, checklist and dependencies made explicit",
+          "Staged rollout with go or no-go gates",
+          "Top risks, mitigations and a cut-scope rule"
+        ],
+        "watch_outs": [
+          "A timeline with no owners",
+          "No plan for slips"
+        ]
+      },
+      "role_families": ["tpm"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time a research or engineering dependency slipped while other teams were waiting on it. What did you do?",
+      "strong_answer": "Describe the dependency, who was blocked and the cost of delay. Show you found out early, got the real reason from the team, re-planned with options (cut scope, parallel work, a stopgap) and communicated a new date honestly. Give the outcome and what you changed in how you track risk. Pitfall: just escalating or pushing the research team harder.",
+      "competencies": ["ownership", "collaboration", "communication"],
+      "values": ["Team spirit", "Intense and scrappy"],
+      "source_url": "https://www.cleverprep.com/companies/openai/technical-program-manager",
+      "hints": {
+        "looking_for": [
+          "How you handle a slip you do not control",
+          "Whether you communicate honestly and offer options"
+        ],
+        "strong_signals": [
+          "Detects the slip early and learns the real cause",
+          "Re-plans with options such as cutting scope",
+          "Shares a new date honestly with blocked teams"
+        ],
+        "watch_outs": [
+          "Only escalating",
+          "Hiding the slip until it is too late"
+        ]
+      },
+      "role_families": ["tpm", "pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Design the main flow of an app built around a language model, where responses can take several seconds and are sometimes wrong.",
+      "strong_answer": "Start from the user and the core task. Handle latency with streaming, progress states and the ability to keep working or cancel. Handle uncertainty with clear sources, easy correction or retry, and feedback controls. Plan empty, error and slow states, and say how the flow scales as features grow. Show how you would test it with users. Pitfall: a polished static screen that ignores latency and wrong answers.",
+      "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
+      "values": ["Make something people love"],
+      "source_url": "https://www.aced.io/blog/openai-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you design for model latency and errors",
+          "How practical and scalable your flow is"
+        ],
+        "strong_signals": [
+          "Uses streaming and clear progress states",
+          "Lets users check sources, correct or retry",
+          "Covers empty, error and slow states"
+        ],
+        "watch_outs": [
+          "Ignoring latency",
+          "Treating model output as always correct"
+        ]
+      },
+      "role_families": ["design"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "An A/B test shows higher engagement but lower retention in one segment. Define success and decide whether to launch.",
+      "strong_answer": "Restate the goal and the primary metric chosen before the test. Check validity: sample ratio, duration, novelty effects and multiple comparisons. Break down the segment result and ask whether it is real and how large. Weigh the trade-off against guardrails, then recommend: launch, launch with a fix for the segment, or rerun. Say what extra data would change the decision. Pitfall: picking the metric after seeing results.",
+      "competencies": ["structure", "estimation_logic", "recommendation"],
+      "values": ["Make something people love"],
+      "source_url": "https://www.aced.io/blog/openai-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you check validity before interpreting",
+          "How you decide with mixed metrics"
+        ],
+        "strong_signals": [
+          "Anchors on the pre-chosen primary metric",
+          "Checks sample ratio, novelty and multiple tests",
+          "Makes a clear launch call with conditions"
+        ],
+        "watch_outs": [
+          "Choosing the metric after the fact",
+          "No recommendation"
+        ]
+      },
+      "role_families": ["other", "pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Explain a p-value to a product manager, then describe how you would design a factorial experiment.",
+      "strong_answer": "Define the p-value correctly: the chance of a result at least this extreme if there were no real effect, not the chance the hypothesis is true. Mention significance level, power and practical significance. For a factorial design, test two or more factors together, assign users to every combination, estimate main effects and interactions, and size the sample for the interaction you care about. Pitfall: the common wrong definition.",
+      "competencies": ["accuracy", "clarity_of_explanation", "reasoning"],
+      "values": [],
+      "source_url": "https://www.aced.io/blog/openai-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether you define a p-value correctly and simply",
+          "Whether you understand factorial designs"
+        ],
+        "strong_signals": [
+          "Correct definition in plain words",
+          "Mentions power and practical significance",
+          "Explains main effects, interactions and sample size"
+        ],
+        "watch_outs": [
+          "Saying it is the chance the hypothesis is true",
+          "Ignoring interactions"
+        ]
+      },
+      "role_families": ["other", "data_ml"],
+      "levels": []
     }
   ],
   "bar_by_level": [
@@ -845,36 +1405,43 @@
     }
   ],
   "persona": {
-    "tone": "Intense, curious and pragmatic; informal but high-bar",
-    "pace": "Fast; follows up quickly and drills into details of the candidate's own work",
-    "pushback_style": "Asks 'what exactly did you do?', 'what breaks at 10x?' and 'how would you know it works?', and stretches the candidate beyond their comfort zone",
+    "tone": "Intense, curious and pragmatic; conversational but high-bar, focused on the candidate's own area of expertise",
+    "pace": "Fast; follows up quickly and drills into details of the candidate's own work, often starting from a long, open prompt the candidate must clarify",
+    "pushback_style": "Asks 'what exactly did you do?', 'what breaks at 100x?', 'how would you know it works?' and 'what is your own view on safe deployment?'; stretches the candidate beyond their comfort zone and watches how they take feedback",
     "closing_style": "Leaves a few minutes for the candidate's questions about the team and mission"
   },
   "scoring_weights": {
     "ownership": 1.3,
     "impact": 1.3,
-    "collaboration": 1.2,
-    "communication": 1.2,
+    "collaboration": 1.3,
+    "communication": 1.3,
     "depth_of_experience": 1.2,
-    "motivation": 1.2,
+    "motivation": 1.3,
     "technical_depth": 1.4,
+    "accuracy": 1.2,
     "reasoning": 1.3,
     "trade_offs": 1.2,
     "user_and_business_sense": 1.1
   },
   "values_share": 0.2,
   "case_style": {
-    "product_sense": 0.5,
-    "estimation": 0.1,
+    "product_sense": 0.55,
+    "estimation": 0.05,
     "system_thinking": 0.4,
-    "notes": "PM cases are AI-native: model capability versus cost and safety, experiments for ChatGPT, goal setting for new devices. Classic estimation is rare."
+    "notes": "PM cases are AI-native: product sense from vague prompts (improve ChatGPT for a segment, take a new invention to market, goals for a new device), execution with hero, supporting and counter metrics, launch plans for new models, capability versus cost, and safety versus velocity with legal or trust and safety leaders. No public report mentions classic market-size estimation."
   },
   "sources": [
     {
       "url": "https://openai.com/interview-guide/",
       "title": "OpenAI interview guide",
-      "retrieved_at": "2026-10-10",
-      "fields": ["loop_structure", "persona", "scoring_weights"]
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "persona", "scoring_weights", "values_framework"]
+    },
+    {
+      "url": "https://openai.com/careers/",
+      "title": "OpenAI careers (values and operating principles)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework"]
     },
     {
       "url": "https://www.semafor.com/article/10/12/2023/openai-quietly-changed-its-core-values",
@@ -896,9 +1463,9 @@
     },
     {
       "url": "https://www.aced.io/blog/openai-interview-process",
-      "title": "OpenAI interview process",
-      "retrieved_at": "2026-10-10",
-      "fields": ["loop_structure", "question_patterns", "case_style"]
+      "title": "OpenAI interview process (Aced, formerly Exponent)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style", "persona", "bar_by_level"]
     },
     {
       "url": "https://igotanoffer.com/en/advice/openai-research-scientist-interview",
@@ -911,6 +1478,36 @@
       "title": "Levels.fyi: OpenAI software engineer levels",
       "retrieved_at": "2026-10-10",
       "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://supacv.com/blog/interview-playbook/openai",
+      "title": "How OpenAI interviews in 2026 (SupaCV)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "loop_structure", "question_patterns", "persona"]
+    },
+    {
+      "url": "https://prepare.sh/articles/openai-interview-process-2026",
+      "title": "OpenAI interview process (2026) (Prepare.sh)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "loop_structure", "persona", "scoring_weights", "bar_by_level"]
+    },
+    {
+      "url": "https://www.aakashg.com/openai-pm-interview/",
+      "title": "OpenAI PM interview process 2026 (Aakash Gupta)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://careerservices.fas.harvard.edu/blog/2025/04/07/how-to-get-and-ace-interviews-at-openai/",
+      "title": "How to get and ace interviews at OpenAI (Harvard Mignone Center)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/openai/technical-program-manager",
+      "title": "OpenAI technical program manager interview guide (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns"]
     }
   ],
   "field_confidence": {
@@ -918,16 +1515,16 @@
     "loop_structure": "medium",
     "question_patterns": "medium",
     "bar_by_level": "low",
-    "persona": "low",
-    "scoring_weights": "low",
-    "case_style": "low"
+    "persona": "medium",
+    "scoring_weights": "medium",
+    "case_style": "medium"
   },
   "low_confidence_notes": [
-    "values_framework: the five values are as reported by press in October 2023; openai.com returned 403 to our fetcher, so the current careers page could not be checked. Confirm the values are unchanged.",
-    "loop_structure: OpenAI's interview guide (seen via search, not fully read) confirms recruiter and hiring manager calls, a skills-based assessment, and 4-6 hours of finals with 4-6 people; individual round names and durations come from prep guides and vary by team.",
-    "bar_by_level: level names L2-L6 appear only on Levels.fyi compensation pages; scope text is our generic mapping. Everyone's public title is Member of Technical Staff. PM levels are not public.",
-    "persona: inferred from the interview guide wording ('stretch you beyond your comfort zone') and candidate reports.",
-    "scoring_weights: estimated; no public source gives weights.",
-    "case_style: few public PM case reports."
+    "values_framework: the five principle names are the October 2023 list (Semafor) and are kept as stable ids. As of 2026 the careers page lists different values (Humanity first, Act with humility, Feel the AGI, Ship joy) and operating principles (Find a way, Creativity over control, Update quickly, Intense focus), seen via search snippets of openai.com/careers and two 2026 prep guides; openai.com returned 403 to our fetcher. Descriptions now map the current wording onto the old ids; 'Scale' has no current counterpart, so its weight was lowered to 1.0. A reviewer should decide whether a future version should adopt the new names.",
+    "loop_structure: OpenAI's interview guide (403 to our fetcher, read only via search snippets and guides quoting it) confirms an intro call, a team-specific skills assessment, and 4-6 hours of finals with 4-6 people over 1-2 days; round names and durations come from prep guides and vary by team. The design, tpm and other (data science) loops each rest on one or two prep-site write-ups; the tpm loop comes from CleverPrep only.",
+    "bar_by_level: still low. OpenAI publishes no levels, and job postings on the Ashby board describe scope by team, not by level (the board did not render for our fetcher; postings were seen via aggregators). Level names L2-L7 appear only on Levels.fyi, which we could not re-check (empty page); scope text is our generic mapping. One guide maps OpenAI L5 to roughly Google or Meta L6, and several report downleveling at offer time. PM, design and TPM levels are not public.",
+    "persona: medium because the official guide (via snippets) says finals focus on the candidate's area of expertise, are designed to stretch them beyond their comfort zone, and assess openness to feedback; tone and pushback phrases still come from candidate reports.",
+    "scoring_weights: medium; weights are our estimate but derived from the evaluation signals the official guide publishes (well-designed solutions, high-quality code, performance and test coverage; communication, collaboration, openness to feedback and mission alignment; high potential shown by fast ramp-up), cross-checked with 2026 prep guides. No source gives numeric weights.",
+    "case_style: medium; three 2026 write-ups (Aced, Aakash Gupta, SupaCV) agree on product sense, execution metrics and safety-versus-velocity cases and none mentions market-size estimation. All are candidate-reported, not official."
   ]
 }
