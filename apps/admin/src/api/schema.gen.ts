@@ -1102,6 +1102,67 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/plan/{job_target_id}/{resume_id}/readiness": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Readiness
+         * @description RD-1: practice readiness per tested skill for this pair. RD-3: a practice estimate.
+         */
+        get: operations["get_readiness_plan__job_target_id___resume_id__readiness_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/readiness/{job_target_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Job Readiness
+         * @description RD-1 for the Home card: the pair of the job's newest session. No session yet: every
+         *     tested skill is not_enough_data.
+         */
+        get: operations["get_job_readiness_readiness__job_target_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/plan/{job_target_id}/{resume_id}/day-plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Day Plan
+         * @description RD-2: the day-by-day plan to the interview date, or the next three steps without one.
+         */
+        get: operations["get_day_plan_plan__job_target_id___resume_id__day_plan_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/providers": {
         parameters: {
             query?: never;
@@ -5094,6 +5155,90 @@ export interface components {
             sessions: number;
             /** Cost Usd */
             cost_usd: number;
+        };
+        /**
+         * DayPlan
+         * @description RD-2: what to do each day until the interview, or the next three steps.
+         */
+        DayPlan: {
+            /**
+             * Job Target Id
+             * Format: uuid
+             */
+            job_target_id: string;
+            /**
+             * Resume Id
+             * Format: uuid
+             */
+            resume_id: string;
+            /** Interview Date */
+            interview_date: string | null;
+            /** Days Left */
+            days_left: number | null;
+            /**
+             * Kind
+             * @description by_day with an interview date today or ahead, else next_steps.
+             * @enum {string}
+             */
+            kind: "by_day" | "next_steps";
+            /**
+             * Days
+             * @description by_day: one entry per day from today.
+             */
+            days: components["schemas"]["DayPlanDay"][];
+            /**
+             * Days Not Shown
+             * @description by_day: days after the last one listed.
+             */
+            days_not_shown: number;
+            /**
+             * Next Steps
+             * @description next_steps: up to three items.
+             */
+            next_steps: components["schemas"]["DayPlanItem"][];
+        };
+        /** DayPlanDay */
+        DayPlanDay: {
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** Items */
+            items: components["schemas"]["DayPlanItem"][];
+        };
+        /**
+         * DayPlanItem
+         * @description One thing to do: a rehearsal (type, difficulty, mode) or work on one story.
+         */
+        DayPlanItem: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "rehearsal" | "story";
+            /** @description Rehearsals only. */
+            interview_type: components["schemas"]["InterviewType"] | null;
+            /** @description Rehearsals only. */
+            difficulty: components["schemas"]["Difficulty"] | null;
+            /** @description Rehearsals only. */
+            mode: components["schemas"]["Mode"] | null;
+            /**
+             * Focus Topics
+             * @description Rehearsals only; empty for story items.
+             */
+            focus_topics: string[];
+            /** @description Story items: the skill to cover. */
+            competency: components["schemas"]["Competency"] | null;
+            /**
+             * Story Id
+             * @description Story items: the thin story to improve.
+             */
+            story_id: string | null;
+            /** @description Story items: thin or missing. */
+            strength: components["schemas"]["StoryFitStrength"] | null;
+            /** Reason */
+            reason: string;
         };
         /** Debrief */
         Debrief: {
@@ -11394,6 +11539,122 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    get_readiness_plan__job_target_id___resume_id__readiness_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+                resume_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Readiness"];
+                };
+            };
+            /** @description The job target or the resume does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_job_readiness_readiness__job_target_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Readiness"];
+                };
+            };
+            /** @description The job target does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_day_plan_plan__job_target_id___resume_id__day_plan_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+                resume_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DayPlan"];
+                };
+            };
+            /** @description The job target or the resume does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
             };
         };
     };

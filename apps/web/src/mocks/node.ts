@@ -7,6 +7,7 @@ import { createStore } from "./db";
 import { accountHandlers, authHandlers, inputHandlers, sessionHandlers, scoringHandlers } from "./handlers";
 import { planHandlers } from "./planHandlers";
 import { questionHandlers } from "./questionHandlers";
+import { readinessHandlers } from "./readinessHandlers";
 import { transcriptHandlers } from "./transcriptHandlers";
 import { waitlistHandlers } from "./waitlistHandlers";
 
@@ -19,6 +20,7 @@ export const server = setupServer(
   ...accountHandlers(mockStore),
   ...customHandlers(mockStore),
   ...planHandlers(mockStore),
+  ...readinessHandlers(),
   ...questionHandlers(),
   ...waitlistHandlers(),
   ...coachVoiceHandlers(),

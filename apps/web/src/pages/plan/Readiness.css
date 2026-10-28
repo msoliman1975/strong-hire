@@ -1,0 +1,56 @@
+/* RD-1 to RD-3: practice readiness and the day plan. Tokens from theme/tokens.css. */
+
+.readiness-skills {
+  display: grid;
+  gap: 8px;
+}
+
+.readiness-skill {
+  display: grid;
+  grid-template-columns: minmax(110px, 40%) 1fr;
+  gap: 12px;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.readiness-skill__score {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.readiness-notice {
+  margin: 4px 0 12px;
+}
+
+.readiness-badge {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+}
+
+.readiness-badge .readiness-notice {
+  margin: 0;
+}
+
+.day-plan__days {
+  display: grid;
+  gap: 14px;
+}
+
+.day-plan__day h3 {
+  font-size: 0.875rem;
+  margin: 0 0 4px;
+  color: var(--sh-muted);
+}
+
+.day-plan__items {
+  display: grid;
+  gap: 6px;
+}
+
+.day-plan__item {
+  font-size: 0.875rem;
+}
