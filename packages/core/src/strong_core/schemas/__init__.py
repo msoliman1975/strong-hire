@@ -65,7 +65,17 @@ from strong_core.schemas.enums import (
     Tone,
     UsageComponent,
 )
-from strong_core.schemas.inputs import Education, InputCheck, JobPosting, Resume, ResumeRole
+from strong_core.schemas.inputs import (
+    ACCEPTED_ISSUE_KEY_MAX,
+    ACCEPTED_ISSUES_MAX,
+    AcceptedIssue,
+    AcceptedIssues,
+    Education,
+    InputCheck,
+    JobPosting,
+    Resume,
+    ResumeRole,
+)
 from strong_core.schemas.profile import (
     AutoProfileSummary,
     CaseStyle,
@@ -151,6 +161,8 @@ EXPORTED_SCHEMAS: dict[str, type[BaseModel]] = {
 }
 
 __all__ = [
+    "ACCEPTED_ISSUES_MAX",
+    "ACCEPTED_ISSUE_KEY_MAX",
     "BANK_INTERVIEW_TYPES",
     "BRIEF_COMPANY_SUMMARY_MAX",
     "COMPETENCIES_BY_TYPE",
@@ -160,6 +172,8 @@ __all__ = [
     "MINI_MAX_PROBES",
     "STANDARD_INTERVIEW_TYPES",
     "STORY_TITLE_MAX_CHARS",
+    "AcceptedIssue",
+    "AcceptedIssues",
     "AnswerCheck",
     "AnswerConduct",
     "AuthProvider",

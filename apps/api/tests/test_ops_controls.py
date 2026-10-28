@@ -89,7 +89,9 @@ def test_oc1_password_signup_is_refused_with_a_waitlist_message(auth: AuthHarnes
 
 
 def test_oc1_existing_password_user_still_signs_in(auth: AuthHarness) -> None:
-    assert auth.client.post("/auth/password/signup", json=SIGNUP).status_code == 200
+    signup = auth.client.post("/auth/password/signup", json=SIGNUP)
+    assert signup.status_code == 200
+    auth.client.get(signup.json()["dev_link"].replace("http://web.test/api", ""))  # AC-4
     auth.client.post("/auth/logout")
     _harness_set(auth, "signups_paused", True)
     login = {"email": SIGNUP["email"], "password": SIGNUP["password"]}

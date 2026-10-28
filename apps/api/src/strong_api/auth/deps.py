@@ -66,6 +66,11 @@ async def optional_user(request: Request, db: DbSession) -> User | None:
     if user.suspended_at is not None:  # AU-7
         request.session.clear()
         raise AccountSuspendedError()
+    if user.email_verified_at is None and user.password_hash is not None:
+        # AC-4: a password account counts as signed out until its email is confirmed, also
+        # with a cookie from before that rule.
+        request.session.clear()
+        return None
     return user
 
 

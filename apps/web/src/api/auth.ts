@@ -18,6 +18,9 @@ export const authApi = {
     unwrap(await apiClient.POST("/auth/password/signup", { body: { ...body, training_consent: false } })),
   passwordLogin: async (body: { email: string; password: string }) =>
     unwrap(await apiClient.POST("/auth/password/login", { body })),
+  /** AC-4: send the confirmation link again. */
+  resendConfirmation: async (email: string) =>
+    unwrap(await apiClient.POST("/auth/password/resend", { body: { email } })),
   forgotPassword: async (email: string) =>
     unwrap(await apiClient.POST("/auth/password/forgot", { body: { email } })),
   resetPassword: async (body: { token: string; password: string }) =>

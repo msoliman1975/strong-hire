@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+from typing import Annotated, Final
+
 from pydantic import Field
 
 from strong_core.schemas.base import Contract, YearMonth
@@ -66,3 +69,22 @@ class InputCheck(Contract):
     reason: str = Field(
         default="", max_length=200, description="One short sentence on what the text is."
     )
+
+
+ACCEPTED_ISSUE_KEY_MAX: Final = 200
+ACCEPTED_ISSUES_MAX: Final = 100
+
+
+class AcceptedIssue(Contract):
+    """A CV check issue the user marked as fine, stored in resumes.accepted_issues.
+
+    The web computes `key` from the issue, for example
+    'overlap:2019-06:2022-03:northwind:lumen-pay'. Core treats it as opaque.
+    """
+
+    key: str = Field(min_length=1, max_length=ACCEPTED_ISSUE_KEY_MAX)
+    accepted_at: datetime
+
+
+AcceptedIssues = Annotated[list[AcceptedIssue], Field(max_length=ACCEPTED_ISSUES_MAX)]
+"""The accepted_issues list of one CV, at most ACCEPTED_ISSUES_MAX entries."""
