@@ -2869,6 +2869,202 @@
         }
       }
     },
+    "/stories/{story_id}/takes": {
+      "post": {
+        "tags": [
+          "takes"
+        ],
+        "summary": "Create Take",
+        "description": "CO-7: store a take and queue its scoring on the story's skills.",
+        "operationId": "create_take_stories__story_id__takes_post",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TakeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TakeOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "takes"
+        ],
+        "summary": "List Takes",
+        "operationId": "list_takes_stories__story_id__takes_get",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TakeOut"
+                  },
+                  "title": "Response List Takes Stories  Story Id  Takes Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{story_id}/takes/{take_id}": {
+      "get": {
+        "tags": [
+          "takes"
+        ],
+        "summary": "Get Take",
+        "operationId": "get_take_stories__story_id__takes__take_id__get",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          },
+          {
+            "name": "take_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Take Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TakeOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{story_id}/versions": {
+      "post": {
+        "tags": [
+          "takes"
+        ],
+        "summary": "Create Versions",
+        "description": "CO-8: a 60-second and a full version, every sentence from the story's parts or takes.",
+        "operationId": "create_versions_stories__story_id__versions_post",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryVersions"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/dev/model-usage": {
       "get": {
         "tags": [
@@ -22527,34 +22723,32 @@
         "description": "ST-1, ST-7: a story is a draft until a Realistic answer that used it scores 3 or more."
       },
       "StoryVersion": {
-        "additionalProperties": false,
-        "description": "CO-8: one telling of the story, built only from the candidate's words.",
         "properties": {
           "text": {
+            "type": "string",
             "minLength": 1,
-            "title": "Text",
-            "type": "string"
+            "title": "Text"
           },
           "quotes": {
-            "description": "The candidate's words this version came from, verbatim.",
             "items": {
               "type": "string"
             },
+            "type": "array",
             "minItems": 1,
             "title": "Quotes",
-            "type": "array"
+            "description": "The candidate's words this version came from, verbatim."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "text",
           "quotes"
         ],
         "title": "StoryVersion",
-        "type": "object"
+        "description": "CO-8: one telling of the story, built only from the candidate's words."
       },
       "StoryVersions": {
-        "additionalProperties": false,
-        "description": "CO-8: the coach's 60-second and full versions of a story.",
         "properties": {
           "sixty_second": {
             "$ref": "#/components/schemas/StoryVersion",
@@ -22565,12 +22759,14 @@
             "description": "All five parts, in order."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "sixty_second",
           "full"
         ],
         "title": "StoryVersions",
-        "type": "object"
+        "description": "CO-8: the coach's 60-second and full versions of a story."
       },
       "StoryWeek": {
         "properties": {
@@ -22665,6 +22861,121 @@
           "summary"
         ],
         "title": "SummaryIn"
+      },
+      "TakeOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "story_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Story Id"
+          },
+          "channel": {
+            "$ref": "#/components/schemas/SessionChannel"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "duration_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration S"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TakeStatus"
+          },
+          "scores": {
+            "items": {
+              "$ref": "#/components/schemas/CompetencyScore"
+            },
+            "type": "array",
+            "title": "Scores",
+            "description": "Per skill, 1 to 4, with the take's words as quotes"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason",
+            "description": "Why scoring failed, in plain words"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "story_id",
+          "channel",
+          "text",
+          "duration_s",
+          "status",
+          "created_at"
+        ],
+        "title": "TakeOut"
+      },
+      "TakeRequest": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 8000,
+            "minLength": 1,
+            "title": "Text"
+          },
+          "channel": {
+            "$ref": "#/components/schemas/SessionChannel",
+            "description": "voice when the text is a spoken transcript",
+            "default": "text"
+          },
+          "duration_s": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration S",
+            "description": "Length of a spoken take; leave out for a typed one"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "TakeRequest",
+        "description": "CO-7: one telling of a story, typed or a voice transcript (S32)."
+      },
+      "TakeStatus": {
+        "type": "string",
+        "enum": [
+          "scoring",
+          "scored",
+          "failed"
+        ],
+        "title": "TakeStatus"
       },
       "TextTurnRequest": {
         "properties": {

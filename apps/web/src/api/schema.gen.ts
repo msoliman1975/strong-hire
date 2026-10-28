@@ -961,6 +961,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/stories/{story_id}/takes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Takes */
+        get: operations["list_takes_stories__story_id__takes_get"];
+        put?: never;
+        /**
+         * Create Take
+         * @description CO-7: store a take and queue its scoring on the story's skills.
+         */
+        post: operations["create_take_stories__story_id__takes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/takes/{take_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Take */
+        get: operations["get_take_stories__story_id__takes__take_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Versions
+         * @description CO-8: a 60-second and a full version, every sentence from the story's parts or takes.
+         */
+        post: operations["create_versions_stories__story_id__versions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/dev/model-usage": {
         parameters: {
             query?: never;
@@ -8690,6 +8748,63 @@ export interface components {
              */
             summary: string;
         };
+        /** TakeOut */
+        TakeOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Story Id
+             * Format: uuid
+             */
+            story_id: string;
+            channel: components["schemas"]["SessionChannel"];
+            /** Text */
+            text: string;
+            /** Duration S */
+            duration_s: number | null;
+            status: components["schemas"]["TakeStatus"];
+            /**
+             * Scores
+             * @description Per skill, 1 to 4, with the take's words as quotes
+             */
+            scores?: components["schemas"]["CompetencyScore"][];
+            /**
+             * Reason
+             * @description Why scoring failed, in plain words
+             */
+            reason?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * TakeRequest
+         * @description CO-7: one telling of a story, typed or a voice transcript (S32).
+         */
+        TakeRequest: {
+            /** Text */
+            text: string;
+            /**
+             * @description voice when the text is a spoken transcript
+             * @default text
+             */
+            channel: components["schemas"]["SessionChannel"];
+            /**
+             * Duration S
+             * @description Length of a spoken take; leave out for a typed one
+             */
+            duration_s?: number | null;
+        };
+        /**
+         * TakeStatus
+         * @enum {string}
+         */
+        TakeStatus: "scoring" | "scored" | "failed";
         /** TextTurnRequest */
         TextTurnRequest: {
             /** Text */
@@ -11021,6 +11136,135 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CoachSessionOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_takes_stories__story_id__takes_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TakeOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_take_stories__story_id__takes_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TakeRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TakeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_take_stories__story_id__takes__take_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+                take_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TakeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_versions_stories__story_id__versions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryVersions"];
                 };
             };
             /** @description Validation Error */

@@ -1,0 +1,1 @@
+"""Takes and story versions (CO-7, CO-8)."""
