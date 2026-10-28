@@ -1,0 +1,50 @@
+/* PP-1: the interview plan page (canvas board B1 Plan). Tokens from theme/tokens.css. */
+
+.plan-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.plan-main {
+  flex: 2 1 560px;
+  min-width: 0;
+}
+
+.plan-side {
+  flex: 1 1 340px;
+  min-width: 0;
+}
+
+.plan-date {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin-top: 12px;
+}
+
+.plan-tested {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px 28px;
+}
+
+.plan-tested__type h3 {
+  font-size: 1rem;
+  margin: 0 0 8px;
+}
+
+.plan-weight {
+  display: grid;
+  grid-template-columns: minmax(110px, 40%) 1fr;
+  gap: 12px;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+/* The next rehearsal panel: the dark card of the board. */
+.plan-next {
+  border-top: 4px solid var(--sh-teal);
+}
