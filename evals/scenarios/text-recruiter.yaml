@@ -1,0 +1,8 @@
+name: text-recruiter
+description: Recruiter screen (RS-1, RS-2). Three answer qualities at 30 minutes, plus a Coach mode and a Tough run.
+scenarios:
+  - {id: rs-strong, interview_type: recruiter_screen, quality: strong}
+  - {id: rs-average, interview_type: recruiter_screen, quality: average}
+  - {id: rs-weak, interview_type: recruiter_screen, quality: weak}
+  - {id: rs-coach, interview_type: recruiter_screen, mode: coach, quality: average}
+  - {id: rs-tough-questions-back, interview_type: recruiter_screen, difficulty: tough, quality: average, behavior: many_questions_back}

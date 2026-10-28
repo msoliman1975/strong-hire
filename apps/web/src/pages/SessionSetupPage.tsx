@@ -20,6 +20,7 @@ import { CustomFields } from "../custom/CustomFields";
 import type { CustomDuration } from "../custom/rules";
 import type { SetupState } from "../custom/repeat";
 import { useCustomSetup } from "../custom/useCustomSetup";
+import { useFeature } from "../theme/features";
 import {
   difficultyHint,
   difficultyLabel,
@@ -31,7 +32,9 @@ import {
 } from "../labels";
 
 // The four standard types, then Custom (D-1), which opens its own setup below the type choice.
-const TYPES = Object.keys(interviewTypeLabel) as InterviewType[];
+// Recruiter screen (RS-1) is a v2 type: it shows only when v2_enabled is on (FL-1).
+const ALL_TYPES = Object.keys(interviewTypeLabel) as InterviewType[];
+const V1_TYPES = ALL_TYPES.filter((t) => t !== "recruiter_screen");
 const DIFFICULTIES = Object.keys(difficultyLabel) as Difficulty[];
 const MODES = Object.keys(modeLabel) as Mode[];
 const LEVELS = Object.keys(levelLabel) as Level[];
@@ -73,9 +76,10 @@ export function SessionSetupPage() {
   const resumeId = params.get("resume") ?? prefill?.resume_id ?? null;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const types = useFeature("v2_enabled") ? ALL_TYPES : V1_TYPES;
 
   const [type, setType] = useState<InterviewType>(
-    prefill?.config.interview_type ?? (recommended ? "custom" : pick(params.get("type"), TYPES, "behavioral")),
+    prefill?.config.interview_type ?? (recommended ? "custom" : pick(params.get("type"), types, "behavioral")),
   );
   const [difficulty, setDifficulty] = useState<Difficulty>(
     prefill?.config.difficulty ?? recommended?.difficulty ?? pick(params.get("difficulty"), DIFFICULTIES, "realistic"),
@@ -169,7 +173,7 @@ export function SessionSetupPage() {
         <Choices
           legend="Interview type"
           name="type"
-          options={TYPES}
+          options={types}
           value={type}
           onChange={setType}
           label={(v) => interviewTypeLabel[v]}

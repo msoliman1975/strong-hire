@@ -20,6 +20,10 @@ brief follows the rules even with a weak model:
 A 10-minute mini interview gets 3 questions, 2 competencies, no curveball, at most 1 probe per
 question, and a time plan with no small talk and no candidate questions.
 
+Recruiter screen (RS-1, RS-2): its own planner prompt (PROMPT_BY_TYPE), chosen by type. Code
+drops any question or probe hint that asks about salary history or a protected characteristic
+(flag `off_limits_question`), so a weak model cannot put one in the brief.
+
 Custom sessions (docs/custom-interview-spec.md, CU-1, CU-2, CU-4, CU-12):
 
 - The candidate's own questions are copied into the brief in code (`source=candidate`), with
@@ -86,6 +90,8 @@ PROMPT_INPUT = "interviewer_brief_input"
 PROMPT_CUSTOM = "interviewer_brief_custom"
 PROMPT_CUSTOM_INPUT = "interviewer_brief_custom_input"
 PROMPT_TONES = "interviewer_brief_tones"
+PROMPT_BY_TYPE = {InterviewType.RECRUITER_SCREEN: "interviewer_brief_recruiter_screen"}
+"""RS-2: a type with its own brief prompt. The others use PROMPT. Chosen by type, never by model."""
 ATTEMPTS = 2
 MAX_BRIEF_TOKENS = 1500
 CHARS_PER_TOKEN = 4  # rough and conservative for English JSON
@@ -171,6 +177,27 @@ TIME_PLANS: dict[int, tuple[tuple[Phase, int], ...]] = {
 }
 
 _ID = re.compile(r"^[a-z0-9_-]+$")
+# RS-2: what a recruiter screen question must never ask. An expected range for this role and
+# work authorization or sponsorship are allowed, so they are not matched.
+OFF_LIMITS = tuple(
+    re.compile(p, re.IGNORECASE)
+    for p in (
+        r"\b(salary|pay|compensation|earnings?) (history|today)\b",
+        r"\b(current|previous|past|last|present|old) (salary|pay|compensation|bonus|base|equity|"
+        r"package|earnings)\b",
+        r"\bhow much (do|did) you (make|earn|get paid)\b",
+        r"\b(salary|pay|bonus|equity|compensation)\b.{0,40}\b(current|last|previous|past) "
+        r"(job|role|company|employer)\b",
+        r"\b(make|made|earn|earned|paid) (now|currently|today|at your (current|last) (job|role))\b",
+        r"\bhow old\b|\byour age\b|\bdate of birth\b|\bwhen were you born\b|\bbirth ?year\b",
+        r"\bwhere (were you|are you originally) (born|from)\b|\bnational origin\b|\bbirthplace\b",
+        r"\b(citizenship|citizen of|nationality|ethnicity|race|religio\w*|church)\b",
+        r"\b(married|marital|spouse|husband|wife|pregnan\w*|maternity|kids|children|family plans|"
+        r"childcare)\b",
+        r"\b(disabilit\w*|medical (history|condition)|health (condition|issues?)|illness)\b",
+        r"\b(sexual orientation|gender identity|maiden name|arrest\w*|veteran)\b",
+    )
+)
 
 
 class BriefError(RuntimeError):
@@ -323,6 +350,11 @@ def probe_areas(gap: GapAnalysis | None) -> list[str]:
     return out[:MAX_PROBE_AREAS]
 
 
+def brief_prompt(config: SessionConfig) -> str:
+    """The planner's system prompt for the session's type (RS-2)."""
+    return PROMPT_BY_TYPE.get(config.interview_type, PROMPT)
+
+
 def build_messages(
     config: SessionConfig,
     posting: JobPosting,
@@ -348,7 +380,7 @@ def build_messages(
     gaps = [f"[{g.severity.value}] {g.summary}" for g in (gap.gaps if gap else [])][:6]
     curveball = config.difficulty == Difficulty.TOUGH and not config.is_mini
     return [
-        load_prompt(Role.PLANNER, PROMPT).message("system"),
+        load_prompt(Role.PLANNER, brief_prompt(config)).message("system"),
         load_prompt(Role.PLANNER, PROMPT_INPUT).message(
             "user",
             interview_type=config.interview_type.value,
@@ -392,6 +424,8 @@ def assemble(
             )
     else:
         questions = _clean_questions(draft.questions, comps, values, flags)
+        if config.interview_type == InterviewType.RECRUITER_SCREEN:
+            questions = _drop_off_limits(questions, flags)
         questions = questions[: QUESTIONS_BY_DURATION[config.duration_min]]
         if len(questions) < needed:
             raise BriefError(
@@ -488,6 +522,22 @@ def _clean_questions(
             )
         )
     return out
+
+
+def off_limits(text: str) -> bool:
+    """RS-2: the question asks about salary history or a protected characteristic. A recruiter
+    may ask for an expected range or work authorization, but not for these."""
+    return any(p.search(text) for p in OFF_LIMITS)
+
+
+def _drop_off_limits(questions: list[BriefQuestion], flags: list[str]) -> list[BriefQuestion]:
+    kept = []
+    for q in questions:
+        if off_limits(" ".join([q.text, *q.probe_hints])):
+            flags.append(f"off_limits_question: {q.id}")
+        else:
+            kept.append(q)
+    return kept
 
 
 def _least_covered(questions: list[BriefQuestion], comps: list[Competency]) -> Competency:
