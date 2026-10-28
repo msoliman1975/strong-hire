@@ -966,7 +966,7 @@
           "scoring"
         ],
         "summary": "Get Debrief",
-        "description": "FB-1, FB-2, PR-2. Poll while status is \"scoring\" (FB-3: ready within 60 seconds).",
+        "description": "FB-1, FB-2, PR-2, DB-1, DB-2. Poll while status is \"scoring\" (FB-3: ready within 60\nseconds).",
         "operationId": "get_debrief_sessions__session_id__debrief_get",
         "parameters": [
           {
@@ -11517,6 +11517,28 @@
         "title": "AnswerConduct",
         "description": "IV-12: whether a candidate turn belongs in the interview.\n\n`off_scope` is not a weak or off-topic answer (IV-3 probes those). It is a turn about\nsomething outside the interview, such as an unrelated subject or a request for an unrelated\ntask. `inappropriate` is abuse, harassment, threats, hate or sexual content."
       },
+      "AnswersAtBar": {
+        "properties": {
+          "met": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Met"
+          },
+          "scored": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Scored"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "met",
+          "scored"
+        ],
+        "title": "AnswersAtBar",
+        "description": "DB-2: answers whose average rubric score is 3 or more, out of the answers scored."
+      },
       "AskFor": {
         "type": "string",
         "enum": [
@@ -13447,6 +13469,28 @@
             "type": "array",
             "title": "Questions",
             "description": "CU-6: the planned questions with their source and category, in plan order. Empty when the session has no interview plan."
+          },
+          "previous_signal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PreviousSignal"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "DB-1. Null when no earlier session of the same job target was scored."
+          },
+          "answers_at_bar": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AnswersAtBar"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "DB-2. Null until the debrief is ready."
           }
         },
         "additionalProperties": false,
@@ -17722,6 +17766,45 @@
         "additionalProperties": false,
         "type": "object",
         "title": "PortalRequest"
+      },
+      "PreviousSignal": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Id"
+          },
+          "hire_signal": {
+            "$ref": "#/components/schemas/HireSignal"
+          },
+          "ended_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ended At"
+          },
+          "change": {
+            "type": "integer",
+            "title": "Change",
+            "description": "Bands moved since that session: positive is better, 0 is the same."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "session_id",
+          "hire_signal",
+          "ended_at",
+          "change"
+        ],
+        "title": "PreviousSignal",
+        "description": "DB-1: the hire signal of the session before this one for the same job target."
       },
       "Principle": {
         "additionalProperties": false,

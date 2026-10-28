@@ -50,6 +50,8 @@ const debrief: Debrief = {
   company_slug: null,
   values_framework: null,
   questions: [],
+  previous_signal: null,
+  answers_at_bar: null,
 };
 
 describe("transcript page (TR-1)", () => {

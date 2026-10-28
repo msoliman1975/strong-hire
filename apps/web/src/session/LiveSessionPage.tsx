@@ -1,12 +1,15 @@
 /**
  * Live session screen (P10): microphone check, the voice room, phase and timer, the interviewer
- * avatar, captions, prep time (IV-11), Coach controls, reconnect, and the end of the interview. P10 owns apps/web/src/session.
+ * state (AV-1: the 3D avatar only behind a build flag), captions, the answer length (LR-1, v2),
+ * prep time (IV-11), Coach controls, reconnect, and the end of the interview.
  *
  * Steps: check the microphone -> wait for the interview plan (brief) -> join the room (this starts
  * the session and its clock) -> wait for the interviewer -> live -> end -> debrief page, which
  * waits for the score. If the plan cannot be built, the session fails before it starts: the page
  * stops waiting, shows the reason, and offers "Try again" (a new session with the same settings).
  */
+import "./room.css";
+
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router";
@@ -17,14 +20,17 @@ import { paywallReason, sessionsApi } from "../api/sessions";
 import type { Phase, SessionRecord } from "../api/types";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
 import { difficultyLabel, interviewTypeLabel, modeLabel, phaseLabel } from "../labels";
+import { useFeature } from "../theme/features";
+import { AnswerLengthBar } from "./AnswerLengthBar";
+import { SUGGESTED_ANSWER_SECONDS, useActivityTiming } from "./answerLength";
 import { InterviewerAvatar } from "./avatar/InterviewerAvatar";
+import { avatarEnabled, InterviewerState } from "./InterviewerState";
 import { micProblem, micProblemText, openMicrophone, type MicCheck, type MicProblem } from "./microphone";
 import {
   isMockVoice,
   PREP_MINUTES,
   prepLeftMs,
   remainingMs,
-  type AgentActivity,
   type AgentCommand,
   type AgentState,
   type InterviewerVoice,
@@ -91,11 +97,13 @@ function LiveView({ session }: { session: SessionRecord }) {
   const [failure, setFailure] = useState<string | null>(null);
   const [link, setLink] = useState<"connected" | "reconnecting" | "disconnected">("connected");
   const [agent, setAgent] = useState<AgentState | null>(null);
-  const [activity, setActivity] = useState<AgentActivity>("idle");
+  const { activity, timing, onActivity } = useActivityTiming();
   const [agentAudio, setAgentAudio] = useState<MediaStreamTrack | null>(null);
   const [voice, setVoice] = useState<InterviewerVoice | null>(null);
   const [slowAgent, setSlowAgent] = useState(false);
   const now = useNow();
+  // FL-1: the answer-length bar (LR-1) is a v2 addition.
+  const v2 = useFeature("v2_enabled");
   const { config } = session;
   const sessionId = session.id;
 
@@ -125,7 +133,7 @@ function LiveView({ session }: { session: SessionRecord }) {
           toDebrief();
         },
         onConnection: setLink,
-        onActivity: setActivity,
+        onActivity,
         onAgentAudio: setAgentAudio,
         onInterviewerVoice: setVoice,
       });
@@ -145,7 +153,7 @@ function LiveView({ session }: { session: SessionRecord }) {
           : "We could not connect to the interview. Check your internet connection, then try again.",
       );
     }
-  }, [config.interview_type, navigate, queryClient, sessionId, toDebrief]);
+  }, [config.interview_type, navigate, onActivity, queryClient, sessionId, toDebrief]);
 
   // The voice agent should join within seconds. If it does not, say so and offer a retry.
   useEffect(() => {
@@ -249,21 +257,39 @@ function LiveView({ session }: { session: SessionRecord }) {
               </li>
             ))}
           </ol>
-          <InterviewerAvatar
-            activity={stage === "live" ? activity : "idle"}
-            audioTrack={agentAudio}
-            voice={voice}
-          />
-          <div
-            className="live__captions"
-            aria-live="polite"
-            aria-label="What the interviewer said"
-            data-testid="captions"
-          >
-            {agent?.said.length ? (
-              agent.said.map((line, i) => <p key={i}>{line}</p>)
-            ) : (
-              <p className="muted">The interviewer speaks here, and you answer out loud.</p>
+          <div className="room-live__grid">
+            <div className="room-live__stage">
+              {/* AV-1: the 3D avatar only with VITE_INTERVIEWER_AVATAR=on; else the state alone. */}
+              {avatarEnabled() ? (
+                <InterviewerAvatar
+                  activity={stage === "live" ? activity : "idle"}
+                  audioTrack={agentAudio}
+                  voice={voice}
+                />
+              ) : (
+                <InterviewerState activity={stage === "live" ? activity : "idle"} />
+              )}
+              <div
+                className="live__captions"
+                aria-live="polite"
+                aria-label="What the interviewer said"
+                data-testid="captions"
+              >
+                {agent?.said.length ? (
+                  agent.said.map((line, i) => <p key={i}>{line}</p>)
+                ) : (
+                  <p className="muted">The interviewer speaks here, and you answer out loud.</p>
+                )}
+              </div>
+            </div>
+            {v2 && stage === "live" && (
+              <aside className="room-live__side" aria-label="Your answer">
+                <AnswerLengthBar
+                  timing={timing}
+                  suggestedSeconds={SUGGESTED_ANSWER_SECONDS[config.interview_type]}
+                  now={now}
+                />
+              </aside>
             )}
           </div>
           <p className="muted">Your audio is never stored. Only the text of the interview is kept.</p>

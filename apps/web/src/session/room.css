@@ -1,0 +1,145 @@
+/* The live room (canvas board B2): layout, interviewer state and answer length. The dark ground
+ * comes from S01's .room shell; colors here are S01's --sh-room-* tokens. */
+
+.room-live__grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin: var(--space-5) 0;
+}
+
+.room-live__stage {
+  flex: 2 1 480px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.room-live__side {
+  flex: 1 1 280px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* AV-1: the interviewer without the avatar. */
+.interviewer-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5) 0;
+  text-align: center;
+}
+
+.interviewer-state__orb > * {
+  fill: none;
+  stroke-width: 2;
+  transition: stroke 200ms ease, fill 200ms ease;
+}
+
+.interviewer-state__outer {
+  stroke: var(--sh-room-line);
+}
+
+.interviewer-state__middle {
+  stroke: var(--sh-room-line-strong);
+}
+
+.interviewer-state__inner {
+  fill: var(--sh-room-raised);
+  stroke: var(--sh-room-line-strong);
+  stroke-width: 3;
+}
+
+.interviewer-state__core {
+  fill: var(--sh-room-line-strong);
+  stroke: none;
+}
+
+.interviewer-state[data-activity="listening"] .interviewer-state__inner,
+.interviewer-state[data-activity="speaking"] .interviewer-state__inner {
+  stroke: var(--sh-violet-light);
+}
+
+.interviewer-state[data-activity="listening"] .interviewer-state__core,
+.interviewer-state[data-activity="speaking"] .interviewer-state__core {
+  fill: var(--sh-violet-light);
+}
+
+.interviewer-state[data-activity="speaking"] .interviewer-state__middle {
+  stroke: var(--sh-violet-light);
+}
+
+.interviewer-state[data-activity="thinking"] .interviewer-state__inner {
+  stroke: var(--sh-room-muted);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .interviewer-state[data-activity="speaking"] .interviewer-state__orb {
+    animation: interviewer-pulse 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes interviewer-pulse {
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+.interviewer-state__orb {
+  transform-origin: center;
+}
+
+.interviewer-state__text {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--sh-room-muted);
+}
+
+/* LR-1. */
+.answer-length {
+  padding: 22px;
+  border: 1px solid var(--sh-room-line);
+  border-radius: var(--sh-radius-lg);
+  background: var(--sh-room-raised);
+}
+
+.answer-length__row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: 6px;
+  font-size: 0.8125rem;
+  color: var(--sh-room-muted);
+}
+
+.answer-length__time {
+  font-family: var(--sh-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.answer-length__track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--sh-room-line);
+}
+
+.answer-length__track span {
+  display: block;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--sh-violet-light);
+}
+
+.answer-length__track span[data-over="true"] {
+  background: #f5b06b;
+}
+
+.answer-length__hint {
+  margin: var(--space-2) 0 0;
+  font-size: 0.8125rem;
+  color: #f5b06b;
+}
