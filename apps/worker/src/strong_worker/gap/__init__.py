@@ -4,4 +4,5 @@
 - strong_worker.gap.analysis: the planner call for a gap analysis
 - strong_worker.gap.brief: the planner call for an interviewer brief
 - strong_worker.gap.jobs: the Arq jobs that run them and save the results
+- strong_worker.gap.story_fit: the story fit table for the plan page (ST-5) and its job
 """
