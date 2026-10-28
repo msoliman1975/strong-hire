@@ -23,6 +23,9 @@ spoken line still passes the output guard. If the guard rejects the question tex
 question is asked in the interviewer's own words instead, through the normal path. The trace
 marks the rejected line `verbatim: "rejected"` and the adapted calls `verbatim: "adapted"` (CU-5
 risk).
+
+Recruiter screen (RS-2): the system prompt is prompts/interviewer/turn_recruiter_screen, chosen
+by the session's type (TURN_BY_TYPE), never by model.
 """
 
 from __future__ import annotations
@@ -45,6 +48,7 @@ from strong_core.schemas import (
     AnswerConduct,
     BriefQuestion,
     InterviewerBrief,
+    InterviewType,
     Phase,
     ProbeDecision,
     QuestionSource,
@@ -65,6 +69,8 @@ _LABEL = re.compile(r"^\s*(interviewer|[a-z]+)\s*:\s*", re.IGNORECASE)
 LEAD_IN_MAX_WORDS = 12  # D-7: the lead-in said before a verbatim question
 VERBATIM_MOVES = (MoveKind.ASK, MoveKind.REDO)
 _FIRST_SENTENCE = re.compile(r"^.*?[.!](?=\s|$)")
+TURN_BY_TYPE = {InterviewType.RECRUITER_SCREEN: "turn_recruiter_screen"}
+"""RS-2: a type with its own turn prompt. The others use prompts/interviewer/turn."""
 
 
 def lead_in(text: str) -> str:
@@ -231,7 +237,8 @@ class Interviewer:
             if brief.company_name
             else "No company is named; use a general tech interview style."
         )
-        return load_prompt(Role.INTERVIEWER, "turn").message(
+        name = TURN_BY_TYPE.get(brief.session.interview_type, "turn")
+        return load_prompt(Role.INTERVIEWER, name).message(
             "system",
             interviewer_name=self.name,
             interview_type=self.interview_type(question),

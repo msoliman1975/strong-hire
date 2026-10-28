@@ -7,13 +7,14 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { MemoryRouter, Route, Routes, useSearchParams } from "react-router";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
 import type { CreateSessionRequest, JobTargetOut, Usage } from "../api/types";
 import { createQueryClient } from "../App";
 import { FREE_USAGE } from "../mocks/db";
 import { jobPosting } from "../mocks/fixtures";
 import { server } from "../mocks/node";
+import { setFeatureOverrides } from "../theme/features";
 import { PaywallPage } from "./PaywallPage";
 import { SessionSetupPage } from "./SessionSetupPage";
 
@@ -128,5 +129,26 @@ describe("session setup durations", () => {
     expect(
       await screen.findByText(/Full interviews \(30 and 45 minutes\) are part of the subscription\./),
     ).toBeInTheDocument();
+  });
+});
+
+describe("recruiter screen type", () => {
+  afterEach(() => setFeatureOverrides({}));
+
+  it("RS-1: Recruiter screen is hidden until v2 is on", async () => {
+    renderSetup(PAID);
+    await screen.findByRole("radio", { name: /^Behavioral/ });
+    expect(screen.queryByRole("radio", { name: /^Recruiter screen/ })).not.toBeInTheDocument();
+  });
+
+  it("RS-1: with v2 on, Recruiter screen can be picked and defaults to 30 minutes", async () => {
+    setFeatureOverrides({ v2_enabled: true });
+    const { user, bodies } = renderSetup(PAID);
+    expect(await screen.findAllByText("A full interview.")).toHaveLength(2);
+    await user.click(screen.getByRole("radio", { name: /^Recruiter screen/ }));
+    expect(screen.getByRole("radio", { name: /^30 minutes/ })).toBeChecked();
+    await user.click(screen.getByRole("button", { name: "Start interview" }));
+    await screen.findByTestId("upgrade-reason");
+    expect(bodies[0].config).toMatchObject({ interview_type: "recruiter_screen", duration_min: 30 });
   });
 });

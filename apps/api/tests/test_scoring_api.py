@@ -455,3 +455,15 @@ def test_pr2_all_at_the_bar_moves_to_tough() -> None:
 
 def test_pr2_nothing_to_go_on() -> None:
     assert recommend_next_session({}, [], []) is None
+
+
+def test_rs1_plan_never_recommends_recruiter_screen() -> None:
+    """RS-1: recruiter screen shares competencies with the other types. The plan recommends only
+    the four standard types, and recruiter-only scores give no recommendation."""
+    at_bar = {C.LOGISTICS_AND_EXPECTATIONS: 3.0, C.MOTIVATION: 3.2, C.OWNERSHIP: 3.6}
+    nxt = recommend_next_session(at_bar, [], [])
+    assert nxt is not None and nxt.interview_type == InterviewType.HIRING_MANAGER
+    weak = {C.LOGISTICS_AND_EXPECTATIONS: 1.5, C.OWNERSHIP: 3.5}
+    nxt = recommend_next_session(weak, [], [])
+    assert nxt is not None and nxt.interview_type == InterviewType.BEHAVIORAL
+    assert recommend_next_session({C.LOGISTICS_AND_EXPECTATIONS: 2.0}, [], []) is None

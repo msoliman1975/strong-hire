@@ -11,6 +11,9 @@ Steps:
 4. A second call writes the 3 to 5 sentence rationale for the computed signal
    (scorer/rationale). If it names another signal or has the wrong length after one retry, a
    rationale built in code from the same facts is used.
+
+Recruiter screen (RS-2) has its own rubric prompt (RUBRIC_BY_TYPE), chosen by type; its ref is
+the scorecard's rubric_version.
 """
 
 from __future__ import annotations
@@ -31,6 +34,7 @@ from strong_core.schemas import (
     CompetencyScore,
     HireSignal,
     InterviewerBrief,
+    InterviewType,
     Phase,
     QuestionScore,
     QuestionSource,
@@ -53,7 +57,13 @@ MAX_QUOTES = 3
 TRANSCRIPT_SHARE = 0.55
 CHARS_PER_TOKEN = 4
 _SENTENCE_END = re.compile(r"(?<=[.!?])\s+(?=[A-Z0-9\"'])")
+RUBRIC_BY_TYPE = {InterviewType.RECRUITER_SCREEN: "rubric_recruiter_screen"}
 _SIGNAL_NAMES = sorted((s.value for s in HireSignal), key=len, reverse=True)
+
+
+def rubric_prompt(brief: InterviewerBrief) -> str:
+    """The scorer's rubric prompt for the session's type (RS-2)."""
+    return RUBRIC_BY_TYPE.get(brief.session.interview_type, "rubric")
 
 
 class ScoringError(RuntimeError):
@@ -135,7 +145,7 @@ class SessionScorer:
         checker = QuoteChecker(turns)
         asked = _asked_questions(brief, turns)
         allowed_values = _allowed_values(brief, profile)
-        rubric = load_prompt(ROLE, "rubric")
+        rubric = load_prompt(ROLE, rubric_prompt(brief))
         messages = [
             rubric.message("system"),
             self._input(brief, turns, profile, asked, allowed_values),
