@@ -12,16 +12,39 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from pydantic import Field, model_validator
+from pydantic import AfterValidator, Field, WithJsonSchema, model_validator
 
 from strong_core.schemas.base import Contract
-from strong_core.schemas.custom import StandardType
 from strong_core.schemas.enums import (
     COMPETENCIES_BY_TYPE,
+    STANDARD_INTERVIEW_TYPES,
     Competency,
+    InterviewType,
     Level,
     RoleFamily,
 )
+
+BANK_INTERVIEW_TYPES: tuple[InterviewType, ...] = (
+    *STANDARD_INTERVIEW_TYPES,
+    InterviewType.RECRUITER_SCREEN,
+)
+"""The types a bank question can have: the four standard types and Recruiter screen (RS-1)."""
+
+
+def _bank_type(value: InterviewType) -> InterviewType:
+    if value not in BANK_INTERVIEW_TYPES:
+        raise ValueError(
+            f"{value.value} is not a question category; use a standard type or recruiter_screen"
+        )
+    return value
+
+
+BankType = Annotated[
+    InterviewType,
+    AfterValidator(_bank_type),
+    WithJsonSchema({"enum": [t.value for t in BANK_INTERVIEW_TYPES], "type": "string"}),
+]
+"""A standard interview type or recruiter_screen (RS-1). Never Custom."""
 
 HintLine = Annotated[str, Field(min_length=1, max_length=200)]
 
@@ -48,7 +71,7 @@ class GeneralQuestion(Contract):
         max_length=80,
         description="Stable slug, unique in the bank.",
     )
-    interview_type: StandardType
+    interview_type: BankType
     question: str = Field(min_length=1, max_length=400)
     hints: QuestionHints
     competencies: list[Competency] = Field(min_length=1, max_length=3)

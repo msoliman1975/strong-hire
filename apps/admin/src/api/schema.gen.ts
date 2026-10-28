@@ -4601,7 +4601,7 @@ export interface components {
             /** Company Name */
             company_name: string | null;
             /** @enum {string} */
-            interview_type: "behavioral" | "hiring_manager" | "technical_qa" | "case";
+            interview_type: "behavioral" | "hiring_manager" | "technical_qa" | "case" | "recruiter_screen";
             /** Question */
             question: string;
             /** Competencies */
@@ -5935,7 +5935,7 @@ export interface components {
              */
             id: string;
             /** @enum {string} */
-            interview_type: "behavioral" | "hiring_manager" | "technical_qa" | "case";
+            interview_type: "behavioral" | "hiring_manager" | "technical_qa" | "case" | "recruiter_screen";
             /** Question */
             question: string;
             hints: components["schemas"]["QuestionHints"];
@@ -6107,6 +6107,12 @@ export interface components {
              * @description IV-3.
              */
             max_probes_per_question: number;
+            /**
+             * Company Summary
+             * @description AP-2: a short company summary from an auto-generated profile, shown to the interviewer labeled auto-generated. None for curated profiles and generic mode.
+             * @default null
+             */
+            company_summary: string | null;
             /**
              * Curveball
              * @description Tough difficulty only (IV-4).

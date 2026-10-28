@@ -35,6 +35,8 @@ MINI_DURATION_MIN: Final = 10
 MINI_MAX_PROBES: Final = 1
 FULL_MIN_QUESTIONS: Final = 6
 FULL_MIN_COMPETENCIES: Final = 4
+BRIEF_COMPANY_SUMMARY_MAX: Final = 1200
+"""AP-2: longest company summary a brief carries; a longer auto-profile summary is cut."""
 
 
 def session_duration(minutes: int) -> DurationMin:
@@ -159,6 +161,12 @@ class InterviewerBrief(Contract):
     probe_areas: list[str] = Field(default_factory=list)
     persona: PersonaBrief
     max_probes_per_question: int = Field(ge=0, le=3, description="IV-3.")
+    company_summary: str | None = Field(
+        default=None,
+        max_length=BRIEF_COMPANY_SUMMARY_MAX,
+        description="AP-2: a short company summary from an auto-generated profile, shown to the "
+        "interviewer labeled auto-generated. None for curated profiles and generic mode.",
+    )
     curveball: str | None = Field(default=None, description="Tough difficulty only (IV-4).")
     seniority_bar: str | None = Field(
         default=None, description="Scope expected at session.level (IV-6). Level changes the bar."

@@ -12502,7 +12502,8 @@
               "behavioral",
               "hiring_manager",
               "technical_qa",
-              "case"
+              "case",
+              "recruiter_screen"
             ]
           },
           "question": {
@@ -15661,7 +15662,8 @@
               "behavioral",
               "hiring_manager",
               "technical_qa",
-              "case"
+              "case",
+              "recruiter_screen"
             ],
             "type": "string"
           },
@@ -16062,6 +16064,20 @@
             "minimum": 0,
             "title": "Max Probes Per Question",
             "type": "integer"
+          },
+          "company_summary": {
+            "anyOf": [
+              {
+                "maxLength": 1200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "AP-2: a short company summary from an auto-generated profile, shown to the interviewer labeled auto-generated. None for curated profiles and generic mode.",
+            "title": "Company Summary"
           },
           "curveball": {
             "anyOf": [
