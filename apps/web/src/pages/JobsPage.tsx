@@ -3,12 +3,16 @@ import { Link } from "react-router";
 import { JobLibrary } from "../components/LibrarySection";
 import { PageHead } from "../components/ui";
 import { newJobPath } from "../paths";
+import { useFeature } from "../theme/features";
+import { InterviewsV2 } from "./interviews/InterviewsV2";
 
 /**
- * LB-2: the saved job descriptions. One with no reports can be deleted; one with reports is
+ * With `v2_enabled` on, the Interviews page (InterviewsV2). Otherwise, LB-2: the saved job descriptions. One with no reports can be deleted; one with reports is
  * archived instead, and "Show archived" lists those again so they can be restored.
  */
 export function JobsPage() {
+  const v2 = useFeature("v2_enabled");
+  if (v2) return <InterviewsV2 />;
   return (
     <div className="page--narrow">
       <PageHead title="Job descriptions">

@@ -21,6 +21,7 @@ import type {
 } from "../../api/types";
 import { Choices } from "../../components/Choices";
 import { ErrorNotice } from "../../components/ui";
+import { contextPath } from "../../paths";
 import { CustomFields } from "../../custom/CustomFields";
 import type { SetupState } from "../../custom/repeat";
 import type { CustomDuration } from "../../custom/rules";
@@ -153,6 +154,7 @@ export function PlanSetup({ plan, jobId, resumeId }: { plan: PlanView; jobId: st
   const redirected = paywallReason(start.error, type === "custom") !== null;
   // A gap analysis of this pair is needed to build the interviewer brief (PR-3).
   const gapReady = plan.gap?.status === "ready";
+  const gapRunning = plan.gap?.status === "running";
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -265,7 +267,9 @@ export function PlanSetup({ plan, jobId, resumeId }: { plan: PlanView; jobId: st
         </div>
         {!gapReady && (
           <p className="hint" data-testid="needs-gap">
-            The rehearsal starts once the gap analysis for this job and CV is ready.
+            {gapRunning
+              ? "Comparing your CV with the job. Start rehearsal unlocks when it is done, in about a minute."
+              : "The rehearsal starts once the gap analysis for this job and CV is ready."}
           </p>
         )}
         {(sessionsClosed || isPausedError(start.error)) && (
@@ -276,13 +280,20 @@ export function PlanSetup({ plan, jobId, resumeId }: { plan: PlanView; jobId: st
         {start.isError && !isPausedError(start.error) && !redirected && !refusedInline && (
           <ErrorNotice error={start.error} title="The interview could not start" />
         )}
-        <button
-          type="submit"
-          className="btn btn--block"
-          disabled={start.isPending || !chosenLevel || sessionsClosed || blocked || !gapReady}
-        >
-          Start rehearsal
-        </button>
+        {/* PP-1: with no gap analysis yet, the one clear next step is to run it; never a dead end. */}
+        {!gapReady && !gapRunning && !plan.resume.deleted ? (
+          <Link className="btn btn--block" to={contextPath(jobId, resumeId)}>
+            {plan.gap?.status === "failed" ? "Run the gap analysis again" : "Run the gap analysis"}
+          </Link>
+        ) : (
+          <button
+            type="submit"
+            className="btn btn--block"
+            disabled={start.isPending || !chosenLevel || sessionsClosed || blocked || !gapReady}
+          >
+            Start rehearsal
+          </button>
+        )}
       </form>
     </section>
   );

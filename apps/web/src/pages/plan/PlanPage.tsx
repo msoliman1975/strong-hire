@@ -48,7 +48,7 @@ function PlanBody({ plan, jobId, resumeId }: { plan: PlanView; jobId: string; re
 
   return (
     <div className="plan-page">
-      <PageHead title={title} eyebrow="B · INTERVIEW PREP" eyebrowTone="prep">
+      <PageHead title={title} eyebrow="Interview prep" eyebrowTone="prep">
         <p className="muted">
           With {cvName}.{" "}
           {plan.company_mode === "curated"

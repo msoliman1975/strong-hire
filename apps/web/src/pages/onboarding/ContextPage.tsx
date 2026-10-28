@@ -7,6 +7,7 @@ import { jobTargetsApi } from "../../api/inputs";
 import { gapApi } from "../../api/gap";
 import type { JobContext } from "../../api/types";
 import { ErrorNotice, Loading, ONBOARDING_STEPS, PageHead, Steps } from "../../components/ui";
+import { useFeature } from "../../theme/features";
 
 const STAGES = ["Recruiter screen", "Phone screen", "Onsite or final loop", "Not sure"];
 
@@ -19,6 +20,7 @@ export function ContextPage() {
   const resumeId = params.get("resume");
   const job = useJob(jobId);
   const navigate = useNavigate();
+  const v2 = useFeature("v2_enabled");
   const queryClient = useQueryClient();
   const [form, setForm] = useState<Record<Fields, string>>({
     stage: "",
@@ -111,7 +113,7 @@ export function ContextPage() {
         {finish.isError && <ErrorNotice error={finish.error} />}
         <div className="row section">
           <button type="submit" className="btn" disabled={finish.isPending || !resumeId}>
-            Save and see my gap analysis
+            {v2 ? "Save and open my plan" : "Save and see my gap analysis"}
           </button>
           <button type="button" className="btn btn--quiet" disabled={finish.isPending || !resumeId} onClick={() => finish.mutate(null)}>
             Skip this step

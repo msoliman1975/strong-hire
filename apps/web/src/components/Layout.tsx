@@ -101,7 +101,7 @@ function AccountMenu({
   );
 }
 
-type NavItem = { to: string; label: string; end?: boolean; match?: RegExp; journey?: "A" | "B" };
+type NavItem = { to: string; label: string; end?: boolean; match?: RegExp };
 
 /** The v1 menu, shown until launch: the same labels and targets, so v1 users find their pages. */
 const V1_NAV: NavItem[] = [
@@ -114,13 +114,14 @@ const V1_NAV: NavItem[] = [
 ];
 
 /**
- * UI-2: the v2 rail, as on the canvas Home board: the two journeys, Stories (A) and Interviews
- * (B), then Progress (the reports). Questions, Resumes and Account moved to the account menu.
+ * UI-2: the v2 rail, in the owner's order: Home, Resumes, Interviews, Stories, Progress (the
+ * reports). Questions and Account are in the account menu.
  */
 const V2_NAV: NavItem[] = [
   { to: "/", label: "Home", end: true },
-  { to: "/stories", label: "Stories", journey: "A", match: /^\/(stories|coach)(\/|$)/ },
-  { to: "/jobs", label: "Interviews", journey: "B", match: /^\/(jobs|interviews|sessions)(\/|$)/ },
+  { to: "/resumes", label: "Resumes" },
+  { to: "/jobs", label: "Interviews", match: /^\/(jobs|interviews|sessions)(\/|$)/ },
+  { to: "/stories", label: "Stories", match: /^\/(stories|coach)(\/|$)/ },
   { to: "/reports", label: "Progress" },
 ];
 
@@ -143,26 +144,15 @@ export function RailNav() {
   const item = (it: NavItem) => {
     // NavLink only marks exact routes; items with `match` cover several route trees.
     const matched = it.match?.test(pathname) ?? false;
-    // The journey letter is decoration; the link's name stays the label.
-    const label = it.journey ? (
-      <>
-        <span>{it.label}</span>
-        <span className="rail-nav__journey" aria-hidden="true">
-          {it.journey}
-        </span>
-      </>
-    ) : (
-      it.label
-    );
     return (
       <li key={it.to}>
         {matched ? (
           <Link to={it.to} aria-current="page">
-            {label}
+            {it.label}
           </Link>
         ) : (
           <NavLink to={it.to} end={it.end}>
-            {label}
+            {it.label}
           </NavLink>
         )}
       </li>
