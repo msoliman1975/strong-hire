@@ -728,6 +728,120 @@ export interface paths {
         patch: operations["edit_saved_question_questions_mine__question_id__patch"];
         trace?: never;
     };
+    "/coach/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start Coach Session
+         * @description CO-2: start a coach session. The coach greets and asks for the first missing thing.
+         */
+        post: operations["start_coach_session_coach_sessions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/coach/sessions/{session_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Coach Session */
+        get: operations["get_coach_session_coach_sessions__session_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/coach/sessions/{session_id}/turns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Coach Turn
+         * @description CO-2, CO-3, CO-4: the candidate's turn; the story's parts update from their words.
+         */
+        post: operations["coach_turn_coach_sessions__session_id__turns_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/coach/sessions/{session_id}/style": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Set Coach Style
+         * @description CO-5: gentle or direct. Only the style section of the prompt changes.
+         */
+        post: operations["set_coach_style_coach_sessions__session_id__style_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/coach/sessions/{session_id}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * End Coach Session
+         * @description End the session and record its minutes. Ending twice is harmless.
+         */
+        post: operations["end_coach_session_coach_sessions__session_id__end_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/coach-sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Story Coach Sessions */
+        get: operations["list_story_coach_sessions_stories__story_id__coach_sessions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/dev/model-usage": {
         parameters: {
             query?: never;
@@ -3917,6 +4031,12 @@ export interface components {
             scored: number;
         };
         /**
+         * AskFor
+         * @description CO-4: the one thing the coach asks for next, from the IV-3 follow-up rules.
+         * @enum {string}
+         */
+        AskFor: "concrete_example" | "stakes" | "own_role" | "measurable_result" | "tradeoff_reasoning" | "reflection" | "nothing";
+        /**
          * AuthProvider
          * @enum {string}
          */
@@ -4248,6 +4368,98 @@ export interface components {
              * @enum {string}
              */
             command: "pause" | "resume" | "hint" | "redo";
+        };
+        /** CoachSessionDetail */
+        CoachSessionDetail: {
+            session: components["schemas"]["CoachSessionOut"];
+            story: components["schemas"]["Story"] | null;
+            /** Turns */
+            turns: components["schemas"]["CoachTurnOut"][];
+            /**
+             * Missing
+             * @description CO-3: parts the story does not have yet
+             */
+            missing: components["schemas"]["StoryPart"][];
+            /** @description CO-4: what the coach is asking for now */
+            asking_for: components["schemas"]["AskFor"];
+        };
+        /** CoachSessionOut */
+        CoachSessionOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Story Id */
+            story_id: string | null;
+            style: components["schemas"]["CoachStyle"];
+            channel: components["schemas"]["SessionChannel"];
+            status: components["schemas"]["CoachSessionStatus"];
+            /** Minutes */
+            minutes: number;
+            /** Started At */
+            started_at: string | null;
+            /** Ended At */
+            ended_at: string | null;
+        };
+        /**
+         * CoachSessionStatus
+         * @description CO-2: state of one coach session.
+         * @enum {string}
+         */
+        CoachSessionStatus: "active" | "ended" | "failed";
+        /**
+         * CoachSpeaker
+         * @description CO-2: who said a coach turn.
+         * @enum {string}
+         */
+        CoachSpeaker: "coach" | "candidate";
+        /**
+         * CoachStyle
+         * @description CO-5: how the coach talks, picked by the candidate.
+         * @enum {string}
+         */
+        CoachStyle: "gentle" | "direct";
+        /** CoachTurnOut */
+        CoachTurnOut: {
+            /** Seq */
+            seq: number;
+            speaker: components["schemas"]["CoachSpeaker"];
+            /** Text */
+            text: string;
+            /**
+             * At Ms
+             * @description Milliseconds from the start of the session
+             */
+            at_ms: number;
+        };
+        /** CoachTurnRequest */
+        CoachTurnRequest: {
+            /** Text */
+            text: string;
+        };
+        /**
+         * CoachTurnResult
+         * @description One candidate turn and the coach's reply.
+         */
+        CoachTurnResult: {
+            /** @description CO-3: only the part updates the candidate's own words back */
+            reply: components["schemas"]["CoachReply"];
+            /** @description None when an empty new story was dropped at the end */
+            story: components["schemas"]["Story"] | null;
+            /**
+             * Turns
+             * @description The candidate's turn, then the coach's
+             */
+            turns: components["schemas"]["CoachTurnOut"][];
+            asking_for: components["schemas"]["AskFor"];
+            /** @description IV-12: ok, or why the turn got a warning */
+            conduct: components["schemas"]["AnswerConduct"];
+            /**
+             * Ended
+             * @description True when the session ended on this turn
+             */
+            ended: boolean;
         };
         /** CompanyActiveIn */
         CompanyActiveIn: {
@@ -7792,6 +8004,28 @@ export interface components {
             month_usd: number;
         };
         /**
+         * StartCoachRequest
+         * @description Start a coach session on a new story (no story_id) or an existing one.
+         */
+        StartCoachRequest: {
+            /** Story Id */
+            story_id?: string | null;
+            /** @default gentle */
+            style: components["schemas"]["CoachStyle"];
+            /**
+             * @description CO-6: voice sessions run through the voice agent
+             * @default text
+             */
+            channel: components["schemas"]["SessionChannel"];
+            /** @description The skill the story should show; tags the story. */
+            target_skill?: components["schemas"]["Competency"] | null;
+            /**
+             * Job Target Id
+             * @description The plan page whose story-fit gap opened this session (with target_skill).
+             */
+            job_target_id?: string | null;
+        };
+        /**
          * Story
          * @description ST-1: one story in the user's library. The stories table holds org_id and user_id.
          */
@@ -7803,31 +8037,16 @@ export interface components {
             id: string;
             /** Title */
             title: string;
-            /**
-             * Context
-             * @default null
-             */
-            context: string | null;
-            /**
-             * Stakes
-             * @default null
-             */
-            stakes: string | null;
-            /**
-             * Action
-             * @default null
-             */
-            action: string | null;
-            /**
-             * Result
-             * @default null
-             */
-            result: string | null;
-            /**
-             * Reflection
-             * @default null
-             */
-            reflection: string | null;
+            /** Context */
+            context?: string | null;
+            /** Stakes */
+            stakes?: string | null;
+            /** Action */
+            action?: string | null;
+            /** Result */
+            result?: string | null;
+            /** Reflection */
+            reflection?: string | null;
             /**
              * Skills
              * @description Skill tags.
@@ -7839,15 +8058,13 @@ export interface components {
             /**
              * Source Session Id
              * @description ST-2: the session of the debrief answer it came from.
-             * @default null
              */
-            source_session_id: string | null;
+            source_session_id?: string | null;
             /**
              * Source Question Ref
              * @description ST-2: QuestionScore.question_ref of that answer.
-             * @default null
              */
-            source_question_ref: string | null;
+            source_question_ref?: string | null;
             /** Notes */
             notes?: components["schemas"]["StoryNote"][];
             /**
@@ -7903,15 +8120,13 @@ export interface components {
             /**
              * Session Id
              * @description The debrief's session.
-             * @default null
              */
-            session_id: string | null;
+            session_id?: string | null;
             /**
              * Question Ref
              * @description QuestionScore.question_ref.
-             * @default null
              */
-            question_ref: string | null;
+            question_ref?: string | null;
             /**
              * At
              * Format: date-time
@@ -7985,6 +8200,13 @@ export interface components {
              * @description Resume evidence (GA-2).
              */
             evidence: string;
+        };
+        /**
+         * StyleRequest
+         * @description CO-5: switch the style mid-session; the next reply uses it.
+         */
+        StyleRequest: {
+            style: components["schemas"]["CoachStyle"];
         };
         /**
          * SubscriptionStatus
@@ -9773,6 +9995,202 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    start_coach_session_coach_sessions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartCoachRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoachSessionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_coach_session_coach_sessions__session_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoachSessionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    coach_turn_coach_sessions__session_id__turns_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CoachTurnRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoachTurnResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_coach_style_coach_sessions__session_id__style_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StyleRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoachSessionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    end_coach_session_coach_sessions__session_id__end_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoachSessionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_story_coach_sessions_stories__story_id__coach_sessions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoachSessionOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
             };
         };
     };
