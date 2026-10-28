@@ -13,6 +13,7 @@ import { DeliveryMetrics } from "./DeliveryMetrics";
 import { NextInPlan } from "./NextInPlan";
 import { PracticeQuestions } from "./PracticeQuestions";
 import { SignalCard } from "./SignalCard";
+import { StoryUpdates } from "./StoryUpdates";
 
 /** The notice under the verdict: the signal is practice, not a hiring prediction. */
 export const PRACTICE_NOTICE =
@@ -71,6 +72,7 @@ export function DebriefV2({
         </div>
         <aside className="debrief-v2__side" aria-label="What to do next">
           <NextInPlan debrief={debrief} />
+          <StoryUpdates sessionId={session.id} />
           {sideExtra}
           <PracticeQuestions debrief={debrief} />
           <RealismRating sessionId={session.id} />

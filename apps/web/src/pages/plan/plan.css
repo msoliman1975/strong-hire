@@ -48,3 +48,27 @@
 .plan-next {
   border-top: 4px solid var(--sh-teal);
 }
+
+/* ST-5: the story fit table (StoryFitTable.tsx). */
+.plan-story-fit {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.plan-story-fit th,
+.plan-story-fit td {
+  text-align: left;
+  vertical-align: top;
+  padding: 8px 8px 8px 0;
+  border-top: 1px solid var(--sh-line);
+}
+
+.plan-story-fit thead th {
+  border-top: 0;
+  font-weight: 500;
+  color: var(--sh-muted);
+}
+
+.plan-story-fit__reason {
+  display: block;
+}

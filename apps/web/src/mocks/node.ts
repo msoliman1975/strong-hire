@@ -6,6 +6,7 @@ import { customHandlers } from "./custom";
 import { createStore } from "./db";
 import { accountHandlers, authHandlers, inputHandlers, sessionHandlers, scoringHandlers } from "./handlers";
 import { planHandlers } from "./planHandlers";
+import { storyFitHandlers } from "./storyFitHandlers";
 import { questionHandlers } from "./questionHandlers";
 import { readinessHandlers } from "./readinessHandlers";
 import { storyHandlers } from "./storyHandlers";
@@ -21,6 +22,7 @@ export const server = setupServer(
   ...accountHandlers(mockStore),
   ...customHandlers(mockStore),
   ...planHandlers(mockStore),
+  ...storyFitHandlers(),
   ...readinessHandlers(),
   ...questionHandlers(),
   ...storyHandlers(),
