@@ -747,6 +747,105 @@ export interface paths {
         patch: operations["edit_saved_question_questions_mine__question_id__patch"];
         trace?: never;
     };
+    "/stories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Stories
+         * @description ST-1: the user's stories, newest first.
+         */
+        get: operations["list_stories_stories_get"];
+        put?: never;
+        /**
+         * Create Story
+         * @description ST-1: create a draft story.
+         */
+        post: operations["create_story_stories_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/from-answer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Story From Answer
+         * @description ST-2: "Save as a story" on a debrief answer. Creates a draft story with the candidate's
+         *     answer to that question, tagged with the competencies it was scored on and linked to the
+         *     session and question. The answer goes into `action` until a split into parts is known.
+         */
+        post: operations["story_from_answer_stories_from_answer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Story
+         * @description ST-1: one story with its notes.
+         */
+        get: operations["get_story_stories__story_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete Story
+         * @description ST-1: delete a story and its notes. Debriefs that used it keep their scores.
+         */
+        delete: operations["delete_story_stories__story_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Edit Story
+         * @description ST-1: change the title, the skill tags or any of the five parts. Only the fields sent
+         *     change; a part sent as null or blank is cleared.
+         */
+        patch: operations["edit_story_stories__story_id__patch"];
+        trace?: never;
+    };
+    "/stories/{story_id}/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Story Notes
+         * @description ST-6: the story's fix notes, oldest first.
+         */
+        get: operations["list_story_notes_stories__story_id__notes_get"];
+        put?: never;
+        /**
+         * Add Story Note
+         * @description ST-6: append a fix note (S22 sends the debrief's story fix here).
+         */
+        post: operations["add_story_note_stories__story_id__notes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/coach/sessions": {
         parameters: {
             query?: never;
@@ -8097,6 +8196,57 @@ export interface components {
          */
         StoryFitStrength: "strong" | "thin" | "missing";
         /**
+         * StoryFromAnswerIn
+         * @description ST-2: save one debrief answer as a draft story.
+         */
+        StoryFromAnswerIn: {
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            /**
+             * Question Ref
+             * @description QuestionScore.question_ref.
+             */
+            question_ref: string;
+            /**
+             * Title
+             * @description Default: the question's text, cut to the title limit.
+             */
+            title?: string | null;
+        };
+        /**
+         * StoryIn
+         * @description ST-1: a new story typed by the candidate (or built by the coach). It starts as a draft.
+         */
+        StoryIn: {
+            /** Title */
+            title: string;
+            /** Context */
+            context?: string | null;
+            /** Stakes */
+            stakes?: string | null;
+            /** Action */
+            action?: string | null;
+            /** Result */
+            result?: string | null;
+            /** Reflection */
+            reflection?: string | null;
+            /**
+             * Skills
+             * @description Skill tags.
+             */
+            skills?: components["schemas"]["Competency"][];
+            /**
+             * Source
+             * @description A debrief answer becomes a story through POST /stories/from-answer.
+             * @default manual
+             * @enum {string}
+             */
+            source: "manual" | "coach";
+        };
+        /**
          * StoryNote
          * @description ST-6: a fix note sent to the story from a debrief answer that used it.
          */
@@ -8120,6 +8270,18 @@ export interface components {
             at: string;
         };
         /**
+         * StoryNoteIn
+         * @description ST-6: a fix note for the story, usually from a debrief answer that used it.
+         */
+        StoryNoteIn: {
+            /** Text */
+            text: string;
+            /** Session Id */
+            session_id?: string | null;
+            /** Question Ref */
+            question_ref?: string | null;
+        };
+        /**
          * StoryPart
          * @description ST-1: the five parts of a story, in the order the workbench and prompts show them.
          * @enum {string}
@@ -8141,6 +8303,27 @@ export interface components {
              * @description The candidate's words this part came from, verbatim.
              */
             quotes: string[];
+        };
+        /**
+         * StoryPatch
+         * @description ST-1: change the title, the skill tags or any part. Only the fields sent change; a part
+         *     sent as null (or blank) is cleared. The status is never set by hand (ST-7).
+         */
+        StoryPatch: {
+            /** Title */
+            title?: string | null;
+            /** Context */
+            context?: string | null;
+            /** Stakes */
+            stakes?: string | null;
+            /** Action */
+            action?: string | null;
+            /** Result */
+            result?: string | null;
+            /** Reflection */
+            reflection?: string | null;
+            /** Skills */
+            skills?: components["schemas"]["Competency"][] | null;
         };
         /**
          * StorySource
@@ -10068,6 +10251,279 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    list_stories_stories_get: {
+        parameters: {
+            query?: {
+                /** @description Only drafts, or only proven. */
+                status?: components["schemas"]["StoryStatus"] | null;
+                /** @description Only stories with this tag. */
+                skill?: components["schemas"]["Competency"] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Story"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_story_stories_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoryIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Story"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    story_from_answer_stories_from_answer_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoryFromAnswerIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Story"];
+                };
+            };
+            /** @description The session is not the user's, or detail.code is 'scorecard_not_found' or 'question_not_found'. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description detail.code is 'story_exists'; detail.story_id is that story. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description detail.code is 'answer_empty' when the answer has no text. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    get_story_stories__story_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Story"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_story_stories__story_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_story_stories__story_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoryPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Story"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_story_notes_stories__story_id__notes_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryNote"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_story_note_stories__story_id__notes_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoryNoteIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryNote"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
             };
         };
     };
