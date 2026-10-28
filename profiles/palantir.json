@@ -1,0 +1,924 @@
+{
+  "company_name": "Palantir",
+  "company_slug": "palantir",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-28",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Palantir culture and mission (from public careers pages; no formal values list)",
+    "principles": [
+      {
+        "name": "Mission-driven engineering",
+        "description": "Palantir says it builds software for the most critical problems of government, commercial and non-profit institutions, and wants people who believe in that work, including defense and intelligence customers and the privacy and civil liberties questions that come with it.",
+        "evidence_signals": [
+          "Gives a specific reason for Palantir, not a generic reason for a tech job",
+          "Knows what the platforms do and who the customers are",
+          "Talks about the government and defense work openly and with a considered view",
+          "Connects their own past work to an institution's real mission"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "Own the solution",
+        "description": "Palantirians take initiative without top-down instruction. When you see a solution, you own it, end to end, with few layers of oversight.",
+        "evidence_signals": [
+          "Started work nobody assigned because they saw the problem",
+          "Owned a result from the first customer or user conversation to shipped software",
+          "Uses 'I' for own decisions and explains what they did when nobody was checking"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Judged by outcomes",
+        "description": "Work is judged by results for the partner, not by demos or promises. Solutions must work in practice, often before there is time to make them perfect.",
+        "evidence_signals": [
+          "Describes a concrete result for a user or customer, with a number where possible",
+          "Shipped a working first version under time pressure, then improved it",
+          "Separates what worked in practice from what only looked good in a demo"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Strong convictions, open minds",
+        "description": "Palantir describes its people as free thinkers who are contrarian at heart, hold strong views, change them with evidence, and speak with candor.",
+        "evidence_signals": [
+          "States a clear opinion and defends it with reasons",
+          "Changed their mind when the evidence or the interviewer's constraint required it",
+          "Pushed back on a customer, manager or peer and explains how it ended"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Learn fast",
+        "description": "Palantir stresses learning potential over current knowledge: picking up unfamiliar systems, domains and tools quickly, and asking the right questions to scope a problem.",
+        "evidence_signals": [
+          "Asks targeted questions to understand an unfamiliar problem or codebase",
+          "Describes how they got productive quickly in a new domain or technology",
+          "Says plainly what they do not know and how they would find out"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Introspection",
+        "description": "Palantir says it asks about real failures, mistakes and struggles because high-ownership roles need people who are critical of their own work.",
+        "evidence_signals": [
+          "Tells a real failure with their own part in it, not a disguised success",
+          "Names what they learned and what they now do differently",
+          "Reflects honestly on their weaknesses and on how they work"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Solve backwards from the user",
+        "description": "Start from the user's real workflow and the true problem limiting the partner's mission, then connect data and software to value for that user.",
+        "evidence_signals": [
+          "Names a specific user and the step in their workflow that breaks",
+          "Asks who uses the system and what decision they need to make before designing",
+          "Explains how data turned into value for someone, not only the technique used"
+        ],
+        "weight": 1.2
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["Software Engineer, New Grad", "Software Engineer", "Senior Software Engineer"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, motivation and why Palantir; may ask whether you want the Software Engineer (Dev) or Forward Deployed (Delta) track. Not simulated in v1."
+        },
+        {
+          "name": "Technical phone screen",
+          "interview_type": null,
+          "duration_min": 45,
+          "interviewer_role": "Software engineer",
+          "notes": "Palantir says it starts with one or two phone interviews of 20 to 45 minutes with a coding question. Candidates also report a 60-minute live screen or a HackerRank assessment. Not simulated in v1."
+        },
+        {
+          "name": "Decomposition",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Reported in nearly every loop. An open-ended, real-world problem broken into users, data, components and APIs, with little or no code. The interviewer adds constraints along the way."
+        },
+        {
+          "name": "Learning",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Pick up an unfamiliar library or codebase and extend it, with the interviewer as a resource. Not simulated in v1."
+        },
+        {
+          "name": "Re-engineering",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Find and fix bugs or add a feature in unfamiliar existing code. Palantir's 'Working inside existing systems' guide describes the skill. Not simulated in v1."
+        },
+        {
+          "name": "Coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Live coding, often with a long, user-framed prompt. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior software engineer",
+          "notes": "Not in every loop; some loops fold design into decomposition. Emphasis on data pipelines, permissions on sensitive data, and trade-offs."
+        },
+        {
+          "name": "Behavioral questions inside technical rounds",
+          "interview_type": "behavioral",
+          "duration_min": 20,
+          "interviewer_role": "Software engineer",
+          "notes": "Reported as about 15 to 20 minutes inside most technical rounds; no standalone behavioral round. Palantir says it asks about accomplishments, judgment, motivating others and real failures."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager",
+          "notes": "One or two calls of 30 to 60 minutes. Revisits a weak area from the onsite, a deep dive on past projects, why Palantir, and team matching."
+        }
+      ]
+    },
+    {
+      "role_family": "other",
+      "levels": ["Forward Deployed Software Engineer, New Grad", "Forward Deployed Software Engineer"],
+      "rounds": [
+        {
+          "name": "Recruiter call",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Forward Deployed Software Engineer (FDSE, the 'Delta' role). Motivation, specific interest in Palantir, travel. Not simulated in v1."
+        },
+        {
+          "name": "Technical screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Live coding or an online assessment with coding, SQL and an API task. Not simulated in v1."
+        },
+        {
+          "name": "Decomposition",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Forward deployed engineer",
+          "notes": "The core FDSE round. A vague customer or public-sector problem scoped into a solution that could be deployed quickly: users, data, a first version, then extensions."
+        },
+        {
+          "name": "Learning, re-engineering or coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Two of these, drawn from a pool that can also include system design. Not simulated in v1."
+        },
+        {
+          "name": "Behavioral questions inside technical rounds",
+          "interview_type": "behavioral",
+          "duration_min": 20,
+          "interviewer_role": "Forward deployed engineer",
+          "notes": "Customer-facing work, pushing back on customers, failures and motivation; asked inside most rounds."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Hiring manager",
+          "notes": "Re-tests a weaker area from the onsite, past work in depth, conviction about the mission, team matching."
+        }
+      ]
+    },
+    {
+      "role_family": "other",
+      "levels": ["Deployment Strategist, New Grad", "Deployment Strategist"],
+      "rounds": [
+        {
+          "name": "Motivation screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Recruiter or deployment strategist",
+          "notes": "Deployment Strategist (the 'Echo' role). Why Palantir, what you believe in, what you know about the platforms, and whether you will thrive in a demanding, travel-heavy role."
+        },
+        {
+          "name": "Decomposition",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Deployment strategist",
+          "notes": "Reported as 45 to 90 minutes. Open-ended real-world problem: problem statement, metrics, root causes, a few solutions, the data needed, and a pilot. Feels like a consulting case but wants concrete data reasoning."
+        },
+        {
+          "name": "Technical data exercise",
+          "interview_type": null,
+          "duration_min": 45,
+          "interviewer_role": "Deployment strategist or engineer",
+          "notes": "Data or SQL-style exercise, sometimes in an invented query language. Some recent loops add a take-home build in Foundry. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager",
+          "notes": "One or two rounds. Targets gaps from earlier rounds; may include a short decomposition. Behavioral questions come up here and after the exercises."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "case",
+      "theme": "Decompose a public-sector problem",
+      "pattern": "A broad problem for a city, hospital or agency; scope it to one user and one decision, name the data, and propose a first version that could ship in weeks",
+      "competencies": ["problem_framing", "structure", "prioritization"],
+      "values": ["Solve backwards from the user", "Judged by outcomes"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Data across organizations",
+      "pattern": "Two or more organizations or systems hold related data; design how it is integrated, kept in sync, and shared without exposing what should stay private",
+      "competencies": ["problem_framing", "structure", "recommendation"],
+      "values": ["Mission-driven engineering"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Build for a specific user",
+      "pattern": "Design a tool for a narrowly described person with a practical need; start from their workflow and constraints before any technology",
+      "competencies": ["user_and_business_sense", "problem_framing", "prioritization"],
+      "values": ["Solve backwards from the user"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Diagnose, measure and pilot",
+      "pattern": "An operational problem in an organization; define the goal and metrics, find root causes, compare a few solutions, and design a pilot with the data it needs",
+      "competencies": ["structure", "estimation_logic", "recommendation"],
+      "values": ["Judged by outcomes"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Constraint change mid-problem",
+      "pattern": "The interviewer adds a new constraint or scale change to the candidate's design; adapt the plan and explain what changes and what stays",
+      "competencies": ["problem_framing", "prioritization", "recommendation"],
+      "values": ["Strong convictions, open minds", "Learn fast"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Permissions on sensitive data",
+      "pattern": "Explain how a data platform would let different users see different slices of sensitive data, and the trade-offs of the access model",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": ["Mission-driven engineering"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Past project deep dive",
+      "pattern": "Walk through the architecture of a system the candidate built, the decisions made, and what they would change now",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Introspection"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "A real failure",
+      "pattern": "A genuine failure or mistake, the candidate's own part in it, and what they changed afterwards",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Introspection"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Ownership without instruction",
+      "pattern": "A time the candidate saw a problem nobody owned and drove it to a result",
+      "competencies": ["ownership", "impact"],
+      "values": ["Own the solution", "Judged by outcomes"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Pushing back on a customer or stakeholder",
+      "pattern": "A time the candidate disagreed with what a customer, user or senior stakeholder asked for, and how it was resolved",
+      "competencies": ["conflict_handling", "communication", "collaboration"],
+      "values": ["Strong convictions, open minds", "Solve backwards from the user"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Getting productive fast",
+      "pattern": "A time the candidate had to learn an unfamiliar domain, codebase or tool quickly to deliver something",
+      "competencies": ["learning_from_failure", "ownership", "impact"],
+      "values": ["Learn fast"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Why Palantir and why this role",
+      "pattern": "Why Palantir specifically, why this role family, and how the candidate thinks about the company's customers and mission",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["Mission-driven engineering"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Proudest accomplishment",
+      "pattern": "The accomplishment the candidate is proudest of, their own part, and the result for the people it served",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Own the solution", "Judged by outcomes"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "case",
+      "question": "How would you design a system to reduce traffic congestion in a large city like New York?",
+      "strong_answer": "Do not start with technology. Ask who the user is (a traffic control center, the transit authority, drivers) and pick one decision to improve, such as signal timing at the worst intersections. Name the data: sensors, cameras, GPS feeds, incidents, events. Propose a first version that could ship in weeks, for example a live view of congestion with alerts and suggested signal changes, then extend it with prediction. Say where a model helps and what data feeds it. State assumptions, check scope with the interviewer, and say how success is measured, such as travel time on key corridors. Adapt when the interviewer changes a constraint.",
+      "competencies": ["problem_framing", "structure", "prioritization", "recommendation"],
+      "values": ["Solve backwards from the user", "Judged by outcomes"],
+      "source_url": "https://www.aced.io/guides/palantir-forward-deployed-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you scope a huge problem to one user and one decision",
+          "How you reason about the data you would need"
+        ],
+        "strong_signals": [
+          "Asks who the user is before designing",
+          "Proposes a small first version, then extensions",
+          "Names the data sources and where a model fits"
+        ],
+        "watch_outs": [
+          "Jumping straight to a big architecture",
+          "Trying to solve all of traffic at once",
+          "No way to measure success"
+        ]
+      },
+      "role_families": ["swe", "other"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Two systems hold employee records for the same company. Design a way to keep them in sync.",
+      "strong_answer": "Clarify first: which system is the source of truth for which fields, how often records change, who reads them, and what happens on a conflict. Define a shared identifier and a mapping between the two schemas. Compare batch sync with change events and pick one for the first version, with reasons. Cover conflicts (last write wins, field ownership, or a review queue), deletes, failures and retries, and an audit log, since HR data is sensitive. Mention access control and who can see what. Close with how you would test it and detect drift between the systems.",
+      "competencies": ["problem_framing", "structure", "recommendation"],
+      "values": ["Judged by outcomes"],
+      "source_url": "https://www.aced.io/guides/palantir-forward-deployed-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "How you handle the messy details of real data integration",
+          "Whether you ask about the source of truth"
+        ],
+        "strong_signals": [
+          "Defines ownership of each field and a conflict rule",
+          "Covers failures, retries and drift detection",
+          "Treats the data as sensitive"
+        ],
+        "watch_outs": [
+          "Assuming the two schemas match",
+          "Ignoring deletes and conflicts"
+        ]
+      },
+      "role_families": ["swe", "other"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Several teams need to query a shared dataset, but they must not see the raw data. How would you design that?",
+      "strong_answer": "Ask what the teams need to answer, how sensitive the data is, and what rules apply. Separate who may see which rows and columns from what kind of output is allowed, such as aggregates only. Options include role-based and attribute-based access, views per team, masking, and minimum group sizes for aggregates. Pick a first version and explain the trade-off between usefulness and protection. Add audit logging and a way to request more access. Strong answers raise privacy as a design goal, not an afterthought, and note how a clever query could still leak data.",
+      "competencies": ["problem_framing", "structure", "recommendation", "user_and_business_sense"],
+      "values": ["Mission-driven engineering", "Solve backwards from the user"],
+      "source_url": "https://www.aced.io/guides/palantir-forward-deployed-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "How you balance data usefulness with protection",
+          "Whether you treat privacy as part of the design"
+        ],
+        "strong_signals": [
+          "Starts from what each team needs to answer",
+          "Compares access models and picks one with reasons",
+          "Mentions audit and leaks through aggregate queries"
+        ],
+        "watch_outs": [
+          "All-or-nothing access",
+          "Treating security as a later step"
+        ]
+      },
+      "role_families": ["swe", "other"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Design technology that helps an older person with failing eyesight cook meals for themselves at home.",
+      "strong_answer": "Start with the person: what they can and cannot do, what goes wrong today (reading labels, measuring, knowing when food is done, safety at the stove), and who else is involved, such as family or carers. Pick the one or two problems that matter most and say why. Propose a simple first version, for example voice guidance with spoken recipes and timers, then additions like label reading with a phone camera or stove sensors. Weigh cost, ease of setup and safety. Say how you would test it with real users and what success looks like, such as cooking unaided more days a week.",
+      "competencies": ["user_and_business_sense", "problem_framing", "prioritization"],
+      "values": ["Solve backwards from the user"],
+      "source_url": "https://prepfully.com/interview-guides/palantir-software-engineer",
+      "hints": {
+        "looking_for": [
+          "Empathy for a specific user and their constraints",
+          "Whether you prioritize their most important problem"
+        ],
+        "strong_signals": [
+          "Maps the cooking workflow and where it breaks",
+          "Picks a simple, usable first version",
+          "Plans to test with real users"
+        ],
+        "watch_outs": [
+          "A gadget-heavy design the user could not set up",
+          "Ignoring safety"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Design a system that helps public health officials trace the spread of a disease back from the first known case.",
+      "strong_answer": "Clarify the user (an epidemiologist or a contact-tracing team) and the decision (who to test or isolate next). Name the data: confirmed cases, interviews, locations and times, test results, and how reliable each is. Model people, places and contacts as a graph and explain how a tracer would explore it. Start with a first version that links cases and contacts and shows likely chains, then add risk scoring. Address privacy and who can see personal data. Discuss data quality, such as missing or late reports, and say how you would measure that the tool speeds up tracing.",
+      "competencies": ["problem_framing", "structure", "recommendation"],
+      "values": ["Mission-driven engineering", "Solve backwards from the user"],
+      "source_url": "https://prepfully.com/interview-guides/palantir-software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you model real-world entities and links in data",
+          "Whether you consider privacy and data quality"
+        ],
+        "strong_signals": [
+          "Names the user and the decision they make",
+          "Uses a clear data model such as a graph",
+          "Plans for missing or late data"
+        ],
+        "watch_outs": [
+          "No mention of personal data protection",
+          "Assuming clean, complete data"
+        ]
+      },
+      "role_families": ["swe", "other"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you help an agency detect money laundering or tax fraud using its data?",
+      "strong_answer": "Set the goal and the user, such as investigators who must pick which cases to open. Write a short problem statement and metrics, for example the share of opened cases that lead to action. List the data: transactions, accounts, company registries, past cases. Find root causes of missed fraud today, such as data spread across systems. Propose three or four options, from simple rules to network analysis to a model trained on past cases, including one ambitious idea. Say what query or data join you would run first. End with a pilot on one region or case type, how you would measure it, and how to handle false positives fairly.",
+      "competencies": ["structure", "problem_framing", "estimation_logic", "recommendation"],
+      "values": ["Judged by outcomes", "Mission-driven engineering"],
+      "source_url": "https://www.aced.io/guides/palantir-deployment-strategist-interview",
+      "hints": {
+        "looking_for": [
+          "A structured path from goal to metrics to a pilot",
+          "Concrete data reasoning, not buzzwords"
+        ],
+        "strong_signals": [
+          "Defines a metric investigators care about",
+          "Offers several options and picks one with reasons",
+          "Designs a small, measurable pilot"
+        ],
+        "watch_outs": [
+          "Saying 'use AI' without naming the data",
+          "No plan for false positives"
+        ]
+      },
+      "role_families": ["other"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "A city wants to improve or expand its subway system. How would you approach the problem?",
+      "strong_answer": "Ask what 'improve' means to the client: reliability, crowding, coverage or cost, and pick one with them. Define metrics, such as on-time performance or peak crowding on key lines. Break down the causes with data: ridership by station and hour, delays and their causes, maintenance records, population growth. Size the problem roughly to see which cause matters most. Propose a few options, from schedule changes to targeted maintenance to a new line, with rough cost and time to impact. Recommend one and design a pilot on a single line, with how you would know it worked.",
+      "competencies": ["problem_framing", "structure", "estimation_logic", "prioritization", "recommendation"],
+      "values": ["Judged by outcomes", "Solve backwards from the user"],
+      "source_url": "https://www.aced.io/guides/palantir-deployment-strategist-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you agree on the goal before solving",
+          "How you use data to find the biggest cause"
+        ],
+        "strong_signals": [
+          "Picks one goal and a metric for it",
+          "Rough sizing to prioritize causes",
+          "Ends with a recommendation and a pilot"
+        ],
+        "watch_outs": [
+          "A long list of ideas with no choice",
+          "Ignoring cost and time to impact"
+        ]
+      },
+      "role_families": ["other"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "On a data platform, different users must see different slices of sensitive data. How would you design the permissions?",
+      "strong_answer": "Clarify the rules first: by role, by team, by data classification, or by purpose. Explain the main models (role-based, attribute-based, row and column level controls, data markings that travel with derived data) and their trade-offs in flexibility, performance and ease of audit. Cover where checks run so they cannot be bypassed, how permissions follow data into derived datasets, caching without leaks, and audit logs. Mention how users request access and how admins review it. A strong answer keeps privacy and least privilege as goals while keeping the system usable.",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation", "reasoning"],
+      "values": ["Mission-driven engineering"],
+      "source_url": "https://prepfully.com/interview-guides/palantir-software-engineer",
+      "hints": {
+        "looking_for": [
+          "Depth on access control models and their trade-offs",
+          "How permissions survive when data is transformed"
+        ],
+        "strong_signals": [
+          "Compares role-based and attribute-based access",
+          "Explains propagation to derived data",
+          "Covers enforcement points and audit"
+        ],
+        "watch_outs": [
+          "Only checking permissions in the UI",
+          "Forgetting caches and derived datasets"
+        ]
+      },
+      "role_families": ["swe", "other"],
+      "levels": ["mid", "senior"]
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a real failure or mistake you made. What did you learn from it?",
+      "strong_answer": "Pick an actual failure with real cost, not a strength in disguise. Explain the situation briefly, then your own part in it without blaming others. Describe how you found out, what you did to repair the damage, and what you learned about yourself. Show the change in how you work now, with a later example if possible. Palantir says it values introspection because roles carry high ownership with little oversight, so honesty and self-awareness matter more than a happy ending.",
+      "competencies": ["learning_from_failure", "communication"],
+      "values": ["Introspection"],
+      "source_url": "https://blog.palantir.com/interviewing-at-palantir-advice-from-palantirians-88444a90e7c4",
+      "hints": {
+        "looking_for": [
+          "Honest self-awareness about your own mistakes",
+          "Whether the lesson changed how you work"
+        ],
+        "strong_signals": [
+          "A real failure with your own part named",
+          "What you did to repair it",
+          "A later example of the changed behavior"
+        ],
+        "watch_outs": [
+          "A disguised success story",
+          "Blaming others or bad luck"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you pushed back on a request from a customer or stakeholder.",
+      "strong_answer": "Describe what was asked and why you thought it was wrong for the user or the outcome, using facts about their workflow or data. Show how you raised it: early, directly and with respect, often by proposing an alternative or a quick test. Explain how it ended, including if you were wrong or if you built what they asked anyway and why. Show the relationship afterwards. Strong answers keep the customer's real goal at the center, not your own preference.",
+      "competencies": ["conflict_handling", "communication", "collaboration"],
+      "values": ["Strong convictions, open minds", "Solve backwards from the user"],
+      "source_url": "https://www.aced.io/guides/palantir-forward-deployed-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you hold a view and still respect the customer",
+          "How you tie the disagreement to the customer's real goal"
+        ],
+        "strong_signals": [
+          "Uses facts about the user's workflow",
+          "Offers an alternative, not just a no",
+          "Shows the relationship stayed strong"
+        ],
+        "watch_outs": [
+          "Building whatever was asked without thought",
+          "Overriding the customer for your own preference"
+        ]
+      },
+      "role_families": ["other", "swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you worked closely with someone whose working style was very different from yours.",
+      "strong_answer": "Describe the difference concretely, such as fast and rough versus careful and thorough, and the friction it caused. Show what you did to understand their view and adapt, and what they changed too. Explain the result for the work and what you learned about collaborating. Palantir teams are small and mix engineers, strategists and designers, so strong answers show you can work with very different people without losing your own judgment.",
+      "competencies": ["collaboration", "communication", "conflict_handling"],
+      "values": ["Strong convictions, open minds"],
+      "source_url": "https://prepfully.com/interview-guides/palantir-software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you collaborate across different styles",
+          "Whether you adapt without giving up your judgment"
+        ],
+        "strong_signals": [
+          "Names the difference concretely",
+          "Shows what both sides changed",
+          "Describes a good result for the work"
+        ],
+        "watch_outs": [
+          "A story about a difficult person",
+          "No change on your side"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you used data to settle a question when others were going on instinct.",
+      "strong_answer": "Explain the decision and what people believed. Show how you found or built the data, what you checked for quality, and what it showed. Describe how you presented it so others could act, and the decision that followed. Mention limits of the data honestly. Strong answers connect the data to value for a real user or customer, not only the analysis technique.",
+      "competencies": ["impact", "communication", "ownership"],
+      "values": ["Solve backwards from the user", "Judged by outcomes"],
+      "source_url": "https://prepfully.com/interview-guides/palantir-software-engineer",
+      "hints": {
+        "looking_for": [
+          "Whether you can connect data to a real decision",
+          "How you persuade with evidence"
+        ],
+        "strong_signals": [
+          "Checks data quality before trusting it",
+          "Explains the decision that changed",
+          "States the limits of the data"
+        ],
+        "watch_outs": [
+          "Analysis that changed nothing",
+          "Focusing on the technique, not the value"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Give an example of when you had to prioritize ruthlessly.",
+      "strong_answer": "Set up the constraint: too much work, a hard deadline, or an urgent customer problem. Explain how you decided what mattered most, for example by impact on the user's mission, and what you dropped or delayed. Show how you told the people affected. Describe the result and whether the trade-off was right in hindsight. Palantir stresses solutions that work before they are perfect, so show you shipped something useful first and improved it later.",
+      "competencies": ["ownership", "impact", "communication"],
+      "values": ["Judged by outcomes", "Own the solution"],
+      "source_url": "https://prepfully.com/interview-guides/palantir-software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you choose under real constraints",
+          "Whether you ship something useful before perfect"
+        ],
+        "strong_signals": [
+          "A clear rule for what mattered most",
+          "Says what was dropped and who was told",
+          "Reflects on whether the call was right"
+        ],
+        "watch_outs": [
+          "Doing everything by working longer hours",
+          "No real trade-off"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why do you want to work at Palantir, and what about the company's direction appeals to you?",
+      "strong_answer": "Be specific. Show you know what Palantir builds (Foundry, Gotham, AIP, Apollo) and who it works with, and pick the part of the mission that matters to you and why. Address the government and defense work directly with your own considered view. Connect your past work to the role: why Dev, Delta or Echo and not another track. Palantir's own staff advise understanding the business and being authentic, so a personal, honest reason beats a polished generic one.",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["Mission-driven engineering"],
+      "source_url": "https://www.aced.io/guides/palantir-deployment-strategist-interview",
+      "hints": {
+        "looking_for": [
+          "Specific, informed motivation for Palantir",
+          "Conviction about the mission and its customers"
+        ],
+        "strong_signals": [
+          "Names products and customer problems that matter to you",
+          "Has a considered view on the defense work",
+          "Explains why this role and not another track"
+        ],
+        "watch_outs": [
+          "A reason that fits any tech company",
+          "Avoiding the government work"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "What do you believe in, and what might keep you from succeeding in this job?",
+      "strong_answer": "For the first part, give a real conviction that shapes how you work or what you work on, and an example of acting on it. For the second, name a real risk, such as a weakness or a part of the role that will be hard for you (heavy travel, ambiguity, customer pressure), and what you already do about it. Honesty and self-awareness count more than a perfect fit. Avoid fake weaknesses.",
+      "competencies": ["motivation", "judgment", "team_fit"],
+      "values": ["Strong convictions, open minds", "Introspection"],
+      "source_url": "https://www.aced.io/guides/palantir-deployment-strategist-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you hold real convictions",
+          "Honest self-assessment of risks in the role"
+        ],
+        "strong_signals": [
+          "A belief backed by something you did",
+          "A real risk with a plan to handle it"
+        ],
+        "watch_outs": [
+          "A fake weakness such as 'I work too hard'",
+          "Vague beliefs with no example"
+        ]
+      },
+      "role_families": ["other"],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "What is the accomplishment you are proudest of so far, and what was your part in it?",
+      "strong_answer": "Pick work with real stakes and explain why it mattered to the people it served. Separate your own decisions from the team's. Walk through the hardest part, the judgment calls, and the result, with a number where possible. Say what you would do differently now. Palantir says it asks how candidates executed, challenged themselves, motivated others and made judgments, so show all four where you can. At senior levels show scope beyond your own code, such as leading others or shaping the design.",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Own the solution", "Judged by outcomes"],
+      "source_url": "https://www.palantir.com/careers/getting-hired/",
+      "hints": {
+        "looking_for": [
+          "The size of your own contribution",
+          "How you execute and make judgment calls"
+        ],
+        "strong_signals": [
+          "Clear 'I' versus 'we'",
+          "A hard judgment call explained",
+          "A measurable result"
+        ],
+        "watch_outs": [
+          "Team results with no personal role",
+          "No reflection on what you would change"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about something you are passionate about and why it motivates you.",
+      "strong_answer": "Pick something you care about, at work or outside it, and show the energy honestly. Explain what you have actually done with it: built, learned, organized or taught. Connect it, without forcing it, to how you work or why this role appeals. Palantir says there is no wrong answer here; it wants to see what motivates you, so authenticity matters more than relevance.",
+      "competencies": ["communication", "impact"],
+      "values": ["Own the solution"],
+      "source_url": "https://www.palantir.com/careers/getting-hired/",
+      "hints": {
+        "looking_for": [
+          "What genuinely motivates you",
+          "Whether you act on your interests"
+        ],
+        "strong_signals": [
+          "Real energy and detail",
+          "Something you built or did, not only liked"
+        ],
+        "watch_outs": [
+          "A rehearsed answer chosen to impress",
+          "No concrete example"
+        ]
+      },
+      "role_families": [],
+      "levels": ["new_grad", "mid"]
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "Software Engineer, New Grad",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Contributes production code to a product team with a mentor, learns new languages and systems quickly, and asks good questions; judged on potential and learning speed more than current knowledge."
+    },
+    {
+      "level_name": "Software Engineer",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Works across the product lifecycle on a small team, from idea and design to shipping and support, with direct user contact. Palantir publishes one title for a wide experience range; no internal levels are public."
+    },
+    {
+      "level_name": "Senior Software Engineer",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Owns design and architecture for reliability and scale, and mentors or tech-leads others. One public posting asks for 5 or more years of experience, 2 or more in design and 2 or more in mentoring or leading."
+    },
+    {
+      "level_name": "Forward Deployed Software Engineer, New Grad",
+      "normalized_level": "new_grad",
+      "role_family": "other",
+      "scope_expectation": "Works embedded with customers on their data and workflows under guidance, builds and ships solutions on Palantir platforms, and travels to customer sites."
+    },
+    {
+      "level_name": "Forward Deployed Software Engineer",
+      "normalized_level": "mid",
+      "role_family": "other",
+      "scope_expectation": "Owns customer projects end to end, from the first conversation to shipped software, makes decisions with incomplete information, and manages stakeholders from users to executives. Postings ask for about 6 months or more of post-college experience."
+    },
+    {
+      "level_name": "Deployment Strategist, New Grad",
+      "normalized_level": "new_grad",
+      "role_family": "other",
+      "scope_expectation": "Learns customer workflows on site, finds the right data with engineers, and helps design and train users on workflows, with support from senior strategists."
+    },
+    {
+      "level_name": "Deployment Strategist",
+      "normalized_level": "mid",
+      "role_family": "other",
+      "scope_expectation": "Turns customer problems into working solutions with engineers, presents results to analysts and executives, scopes new opportunities, and travels 25 to 75 percent of the time."
+    }
+  ],
+  "persona": {
+    "tone": "Collaborative and conversational, like a working session with a colleague rather than an exam",
+    "pace": "Moderate; lets the candidate think out loud and ask clarifying questions, then adds constraints as the problem grows",
+    "pushback_style": "Changes a constraint mid-problem and asks who the user is, what data exists, and what would ship first; asks for a real failure, not a success story, and presses on why Palantir specifically",
+    "closing_style": "Leaves time for the candidate's questions and welcomes direct questions about the work, the customers and the culture"
+  },
+  "scoring_weights": {
+    "problem_framing": 1.5,
+    "structure": 1.4,
+    "user_and_business_sense": 1.3,
+    "prioritization": 1.3,
+    "recommendation": 1.2,
+    "estimation_logic": 0.8,
+    "learning_from_failure": 1.4,
+    "ownership": 1.4,
+    "communication": 1.3,
+    "impact": 1.1,
+    "motivation": 1.5,
+    "judgment": 1.3,
+    "role_fit": 1.2,
+    "trade_offs": 1.3,
+    "reasoning": 1.2
+  },
+  "values_share": 0.25,
+  "case_style": {
+    "product_sense": 0.3,
+    "estimation": 0.05,
+    "system_thinking": 0.65,
+    "notes": "Cases are decomposition rounds: an open-ended real-world problem broken into users, data, components and a first deployable version, with constraints added along the way. User empathy matters; market sizing is rare. Deployment Strategist cases add metrics, root causes and a pilot."
+  },
+  "sources": [
+    {
+      "url": "https://www.palantir.com/careers/",
+      "title": "Palantir Careers: who we are and types of roles (Echos, Deltas, Devs)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "loop_structure", "bar_by_level"]
+    },
+    {
+      "url": "https://www.palantir.com/careers/getting-hired/",
+      "title": "Palantir Careers: Getting Hired (interview process and on-site advice)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://www.palantir.com/careers/getting-hired/the-phone-interview/",
+      "title": "Palantir Careers: The Phone Interview",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "persona"]
+    },
+    {
+      "url": "https://www.palantir.com/careers/getting-hired/navigating-open-ended-questions/",
+      "title": "Palantir Careers: Navigating Open-Ended Questions",
+      "retrieved_at": "2026-10-28",
+      "fields": ["question_patterns", "case_style", "scoring_weights", "values_framework"]
+    },
+    {
+      "url": "https://www.palantir.com/careers/getting-hired/working-inside-existing-systems/",
+      "title": "Palantir Careers: Working Inside Existing Systems",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure"]
+    },
+    {
+      "url": "https://blog.palantir.com/interviewing-at-palantir-advice-from-palantirians-88444a90e7c4",
+      "title": "Interviewing at Palantir: Advice from Palantirians (Palantir Blog, September 2020)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "persona", "question_patterns", "scoring_weights"]
+    },
+    {
+      "url": "https://www.palantir.com/about/",
+      "title": "About Palantir: why we're here",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://www.aced.io/guides/palantir-forward-deployed-engineer-interview",
+      "title": "Palantir Forward Deployed Engineer interview guide (Aced, formerly Exponent)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.aced.io/guides/palantir-deployment-strategist-interview",
+      "title": "Palantir Deployment Strategist interview guide (Aced, formerly Exponent)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://prepfully.com/interview-guides/palantir-software-engineer",
+      "title": "Palantir Software Engineer interview guide (Prepfully, updated September 2026)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.levels.fyi/companies/palantir/salaries/software-engineer",
+      "title": "Palantir Software Engineer levels and pay (Levels.fyi)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://jobs.lever.co/palantir",
+      "title": "Palantir open positions (job titles and postings for Software Engineer, FDSE and Deployment Strategist)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level", "loop_structure", "values_framework"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "low",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "medium",
+    "scoring_weights": "low",
+    "case_style": "medium"
+  },
+  "low_confidence_notes": [
+    "values_framework: Palantir publishes no formal values list. The seven principles are our synthesis of the careers page (free thinkers, catalysts, independents; Echos, Deltas, Devs), the About page, the 2020 Palantir blog post on interviewing, and the 'ownership, collaboration, and trust' line in job postings. Names are ours.",
+    "loop_structure: Palantir officially confirms only one or two phone interviews of 20 to 45 minutes and an onsite personalized to the candidate. The round names (decomposition, learning, re-engineering) and durations come from third-party prep guides and vary by team, government versus commercial, and how the candidate entered the pipeline.",
+    "loop_structure: the Deployment Strategist loop rests mainly on one prep guide (Aced); the motivation screen is mapped to hiring_manager because it is a conversation about motivation and fit with a recruiter or strategist.",
+    "bar_by_level: Palantir has a flat title structure and says it uses no traditional career ladders. Level names are public job titles only (New Grad, unmarked, Senior); Levels.fyi shows a single 'Software Engineer' level. No staff_principal title is public, so none is listed. Mid scope covers a wide experience range.",
+    "scoring_weights: no public source gives weights; they are our estimate from Palantir's guides (open-ended problems, failures, motivation) and the prep guides' emphasis on decomposition.",
+    "sample_questions: most questions come from prep sites (Aced, Prepfully) that aggregate candidate reports; only the accomplishment and passion questions come from Palantir's own Getting Hired page, and the failure question from the Palantir blog. No pm or data_ml loop is included because current postings show no such roles and no public interview sources were found."
+  ]
+}

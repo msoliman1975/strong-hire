@@ -1,0 +1,1211 @@
+{
+  "company_name": "Workday",
+  "company_slug": "workday",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-28",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Workday core values",
+    "principles": [
+      {
+        "name": "Employees",
+        "description": "People come first. High performers bring their real selves to work, speak up with respect, and keep raising their game.",
+        "evidence_signals": [
+          "Helped a teammate grow or get through a hard stretch, with a visible result",
+          "Protected the team's wellbeing while still meeting a commitment",
+          "Spoke up respectfully about a problem instead of staying quiet"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Customer Service",
+        "description": "Deliver real value to customers and care about their success. Aim for the highest customer and user satisfaction.",
+        "evidence_signals": [
+          "Names a specific customer or user and their problem",
+          "Owned a customer-impacting issue from first report to fix",
+          "Measures success by the customer's outcome, not only by shipping"
+        ],
+        "weight": 1.5
+      },
+      {
+        "name": "Innovation",
+        "description": "Innovate quickly in a competitive market, make it safe to experiment and take risks, and invest in value that lasts and scales.",
+        "evidence_signals": [
+          "Proposed or tried a new approach and others adopted it",
+          "Ran a small experiment to test an idea before a big bet",
+          "Balances a new idea against long-term maintainability"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Integrity",
+        "description": "Build a lasting culture of honesty. Earn trust through clear expectations, accountability, measured results and ownership of outcomes.",
+        "evidence_signals": [
+          "Delivered bad news early and honestly, with a plan",
+          "Refused to cut a corner on quality, security or data handling",
+          "Owns a mistake without blaming others and follows through on commitments"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "Fun",
+        "description": "Work should be enjoyable. Inspire, win and celebrate together in ways that build lasting relationships.",
+        "evidence_signals": [
+          "Gives a specific, sincere example of enjoying work with a team",
+          "Started a ritual or habit that made a team closer or happier"
+        ],
+        "weight": 0.8
+      },
+      {
+        "name": "Profitability",
+        "description": "Profit matters but is not the reason the company exists. Good values, smart choices and careful spending lead to it.",
+        "evidence_signals": [
+          "Connects a technical or product decision to cost or business value",
+          "Chose a simpler or cheaper option when it served the customer equally well"
+        ],
+        "weight": 0.9
+      },
+      {
+        "name": "Inclusion and belonging (VIBE)",
+        "description": "Workday's VIBE program (Value Inclusion and Belonging for Everyone): a workplace where everyone can contribute their best and has fair opportunity.",
+        "evidence_signals": [
+          "Made a team process more inclusive and describes the observed effect",
+          "Worked well with someone very different and explains the practices that helped"
+        ],
+        "weight": 0.8
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, motivation, product area interest (platform, HCM, financials) and logistics. Not simulated in v1."
+        },
+        {
+          "name": "Coding assessment or technical phone screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Some candidates report an online assessment (about three medium problems in two hours); others a live screen with one or two problems or an object-oriented design task. Not simulated in v1."
+        },
+        {
+          "name": "Coding and object-oriented design",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "One or two onsite rounds: algorithms plus modeling a domain with classes and interfaces. Java fluency helps. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior or principal engineer",
+          "notes": "Mainly for senior levels. Enterprise-scale problems: multi-tenancy, tenant isolation, effective-dated data, audit, privacy and reliability."
+        },
+        {
+          "name": "Technical deep dive",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior engineer",
+          "notes": "Defend decisions from a past project under scrutiny and say what you would change. Some guides combine it with behavioral questions."
+        },
+        {
+          "name": "Behavioral and values",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineer or manager from the team",
+          "notes": "STAR stories mapped to the core values. Some candidates report questions on VIBE (inclusion and belonging)."
+        },
+        {
+          "name": "Hiring manager and team match",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager",
+          "notes": "Scope, past projects, customer focus and team fit. Some loops end with a short executive or skip-level conversation."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": [
+        "Product Manager",
+        "Senior Product Manager",
+        "Principal Product Manager"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Why Workday and enterprise HR or finance software. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Product leader",
+          "notes": "Product philosophy, how you discover and define customer problems, and one product you ran end to end."
+        },
+        {
+          "name": "Product case or design session",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Senior product manager",
+          "notes": "A product design or strategy prompt for an enterprise product area. Some candidates report a take-home and a presentation instead."
+        },
+        {
+          "name": "Cross-functional interviews",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineering, UX or go-to-market partner",
+          "notes": "Several short interviews on working with engineering, design, sales and customers, plus values questions."
+        },
+        {
+          "name": "Executive interview",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Product executive",
+          "notes": "Vision, market view and how you measure product success."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": [
+        "Data Scientist",
+        "Senior Data Scientist",
+        "Principal Data Scientist"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Match modeling background to a team. Not simulated in v1."
+        },
+        {
+          "name": "Technical screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Senior data scientist",
+          "notes": "Hands-on SQL or pandas on messy data, plus statistics. ML engineer roles may get data structures questions. Not simulated in v1."
+        },
+        {
+          "name": "ML technical deep dive",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Data scientist or ML engineer",
+          "notes": "Model choice, features, evaluation metrics, serving, and fairness for HR and finance data."
+        },
+        {
+          "name": "Project presentation",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Data science manager and partners",
+          "notes": "Walk through one past project: framing, data, model, deployment and outcome."
+        },
+        {
+          "name": "Hiring manager and culture fit",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Data science manager",
+          "notes": "Scope and level, stakeholder trust, and judgment when a model is right on paper but wrong in practice."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Going the extra mile for a customer",
+      "pattern": "A time the candidate went beyond the requirement to solve a customer's or user's real problem",
+      "competencies": [
+        "ownership",
+        "impact"
+      ],
+      "values": [
+        "Customer Service"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Supporting a teammate",
+      "pattern": "A time the candidate helped a teammate grow, recover or succeed, and what changed for that person",
+      "competencies": [
+        "collaboration",
+        "communication"
+      ],
+      "values": [
+        "Employees"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Honesty under pressure",
+      "pattern": "Delivering bad news to a stakeholder, or refusing to cut a corner on quality, security or data",
+      "competencies": [
+        "communication",
+        "ownership"
+      ],
+      "values": [
+        "Integrity"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "An idea that others adopted",
+      "pattern": "A new approach or improvement the candidate proposed, tested and got others to adopt",
+      "competencies": [
+        "impact",
+        "ownership"
+      ],
+      "values": [
+        "Innovation"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Technical disagreement",
+      "pattern": "A disagreement with a teammate or product partner about an approach and how it was settled",
+      "competencies": [
+        "conflict_handling",
+        "collaboration",
+        "communication"
+      ],
+      "values": [
+        "Employees",
+        "Integrity"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Inclusion and team culture",
+      "pattern": "Concrete changes the candidate made to make a team more inclusive or enjoyable, and the effect",
+      "competencies": [
+        "collaboration",
+        "impact"
+      ],
+      "values": [
+        "Inclusion and belonging (VIBE)",
+        "Fun"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Failure and learning",
+      "pattern": "A launch, project or model that did not go as planned and what the candidate does differently now",
+      "competencies": [
+        "learning_from_failure",
+        "ownership"
+      ],
+      "values": [
+        "Integrity"
+      ]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Project the candidate ran end to end",
+      "pattern": "Walk through one project: the customer problem, own role, what was cut and why, and the result",
+      "competencies": [
+        "depth_of_experience",
+        "scope_at_level",
+        "judgment"
+      ],
+      "values": [
+        "Customer Service"
+      ]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Why Workday and enterprise software",
+      "pattern": "Why Workday, which product area, and how the candidate feels about regulated, slower-moving enterprise customers",
+      "competencies": [
+        "motivation",
+        "team_fit",
+        "role_fit"
+      ],
+      "values": [
+        "Employees",
+        "Customer Service"
+      ]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Multi-tenant enterprise system",
+      "pattern": "Design an HR or finance system for many customer tenants with isolation, correctness, audit and burst load",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "reasoning",
+        "clarity_of_explanation"
+      ],
+      "values": [
+        "Customer Service",
+        "Integrity"
+      ]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Configurable workflows and access control",
+      "pattern": "Design configurable business rules, approval workflows or role-based access for sensitive people data",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "accuracy"
+      ],
+      "values": [
+        "Integrity",
+        "Innovation"
+      ]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "ML on people and finance data",
+      "pattern": "Build and evaluate a model on HR or finance data, including bias, interpretability and how stakeholders use it",
+      "competencies": [
+        "technical_depth",
+        "reasoning",
+        "trade_offs"
+      ],
+      "values": [
+        "Integrity",
+        "Customer Service"
+      ]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Enterprise product strategy",
+      "pattern": "Prioritize or design a feature for an enterprise HR or finance product, balancing customer configurability and simplicity, with a success metric",
+      "competencies": [
+        "problem_framing",
+        "user_and_business_sense",
+        "prioritization",
+        "recommendation"
+      ],
+      "values": [
+        "Customer Service",
+        "Innovation",
+        "Profitability"
+      ]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you went beyond what was asked to help a customer or user.",
+      "strong_answer": "Name the customer and the real problem behind the request. Show why the stated requirement was not enough, what the candidate did personally, and how they checked the customer was better off (a metric, a renewal, direct feedback). Mention any trade-off with other work and how it was agreed. Pitfalls: a story with no real customer, or extra work nobody needed.",
+      "competencies": [
+        "ownership",
+        "impact"
+      ],
+      "values": [
+        "Customer Service"
+      ],
+      "source_url": "https://www.designgurus.io/answers/detail/top-workday-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "Whether you care about the customer's outcome, not just the ticket",
+          "How you check the result with the customer"
+        ],
+        "strong_signals": [
+          "Names a specific customer and their pain",
+          "Shows what you did personally",
+          "Measures the outcome for the customer"
+        ],
+        "watch_outs": [
+          "No real customer in the story",
+          "Extra work that nobody needed"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a customer-impacting problem you handled from start to finish.",
+      "strong_answer": "Set the stakes: who was affected and how badly. Walk through detection, triage, communication with the customer or support team, the fix, and the follow-up that stopped it happening again. Show calm, clear updates and ownership even for parts outside the candidate's code. Pitfalls: stopping at the hotfix, or blaming another team.",
+      "competencies": [
+        "ownership",
+        "communication",
+        "impact"
+      ],
+      "values": [
+        "Customer Service",
+        "Integrity"
+      ],
+      "source_url": "https://www.designgurus.io/answers/detail/top-workday-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "How dependable you are when customers are hurting",
+          "Whether you fix the cause, not only the symptom"
+        ],
+        "strong_signals": [
+          "Clear timeline from detection to follow-up",
+          "Keeps the customer and support informed",
+          "Adds a lasting fix or guardrail"
+        ],
+        "watch_outs": [
+          "Stopping at the hotfix",
+          "Blaming another team"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you supported a teammate who was struggling.",
+      "strong_answer": "Describe what the candidate noticed and how they offered help without taking over. Show concrete actions (pairing, reshaping work, a frank but kind conversation) and the result for the teammate and the team. A strong answer shows care and still meets the team's commitments. Pitfalls: a story that is really about the candidate's own heroics.",
+      "competencies": [
+        "collaboration",
+        "communication"
+      ],
+      "values": [
+        "Employees"
+      ],
+      "source_url": "https://www.designgurus.io/answers/detail/top-workday-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "Whether you look after the people around you",
+          "How you help without taking over"
+        ],
+        "strong_signals": [
+          "Concrete actions such as pairing or reshaping work",
+          "Teammate is visibly better off afterwards",
+          "Team commitments are still met"
+        ],
+        "watch_outs": [
+          "The story is about your own heroics",
+          "Vague kindness with no actions"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to deliver bad news to a stakeholder.",
+      "strong_answer": "Explain the bad news (a slip, a defect, a missed target) and why it had to be said. Show the candidate raised it early, gave the facts without spin, took their share of responsibility, and came with options and a recovery plan. End with how trust held or grew. Pitfalls: waiting until the last moment, or softening the message until it misleads.",
+      "competencies": [
+        "communication",
+        "ownership"
+      ],
+      "values": [
+        "Integrity"
+      ],
+      "source_url": "https://www.designgurus.io/answers/detail/top-workday-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "Whether you are honest when it is uncomfortable",
+          "How you keep trust after bad news"
+        ],
+        "strong_signals": [
+          "Raises the issue early with plain facts",
+          "Brings options and a recovery plan",
+          "Owns your part"
+        ],
+        "watch_outs": [
+          "Waiting until the last moment",
+          "Softening the message until it misleads"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you made a difficult ethical choice at work.",
+      "strong_answer": "Describe the pressure (a deadline, a request to skip a check, to share data, or to hide a problem) and what was at stake. Show how the candidate decided, who they involved, and how they held the line respectfully while still helping the team move. Tie it to trust with customers whose people and money data Workday holds. Pitfalls: a dilemma with no real cost, or self-righteous framing.",
+      "competencies": [
+        "ownership",
+        "communication",
+        "conflict_handling"
+      ],
+      "values": [
+        "Integrity"
+      ],
+      "source_url": "https://www.techinterview.org/companies/workday/",
+      "hints": {
+        "looking_for": [
+          "How you act when the right choice has a cost",
+          "Whether you protect customer data and trust"
+        ],
+        "strong_signals": [
+          "Explains the real pressure and stakes",
+          "Involves the right people and holds the line respectfully",
+          "Finds a way for the team to keep moving"
+        ],
+        "watch_outs": [
+          "A dilemma with no real cost",
+          "Self-righteous framing of others"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a creative solution you proposed for a hard problem.",
+      "strong_answer": "State the problem and why the usual approach failed. Explain the idea, how the candidate tested it cheaply before committing, and how they won support. Give the result and whether it was adopted beyond the original team. Note any long-term cost of the new approach. Pitfalls: novelty for its own sake, or an idea that never shipped.",
+      "competencies": [
+        "impact",
+        "ownership"
+      ],
+      "values": [
+        "Innovation"
+      ],
+      "source_url": "https://www.techinterview.org/companies/workday/",
+      "hints": {
+        "looking_for": [
+          "How you find new approaches to hard problems",
+          "Whether your ideas ship and get adopted"
+        ],
+        "strong_signals": [
+          "Tests the idea cheaply before committing",
+          "Wins support from others",
+          "Shows adoption and lasting value"
+        ],
+        "watch_outs": [
+          "Novelty for its own sake",
+          "An idea that never shipped"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "What makes work enjoyable for you, and how do you make it enjoyable for others?",
+      "strong_answer": "Answer sincerely with specifics: the kind of problems and people that energize the candidate, and one example of something they started (a demo day, a team ritual, celebrating a launch) and how the team responded. Keep it warm and genuine. Pitfalls: a stiff or rehearsed answer, or treating the question as unimportant.",
+      "competencies": [
+        "collaboration",
+        "communication"
+      ],
+      "values": [
+        "Fun",
+        "Employees"
+      ],
+      "source_url": "https://www.techinterview.org/companies/workday/",
+      "hints": {
+        "looking_for": [
+          "Whether you add warmth and energy to a team",
+          "How genuine you are"
+        ],
+        "strong_signals": [
+          "A specific example you started",
+          "Shows how the team responded"
+        ],
+        "watch_outs": [
+          "A stiff or rehearsed answer",
+          "Treating the question as unimportant"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "How have you made a team or process more inclusive?",
+      "strong_answer": "Name a concrete change, such as meeting formats that let quieter people contribute, clearer review criteria, or better onboarding, and why it was needed. Show what the candidate did and the observed effect (more voices in decisions, faster ramp-up, better retention). Pitfalls: only stating beliefs or intentions with no actions or results.",
+      "competencies": [
+        "collaboration",
+        "impact"
+      ],
+      "values": [
+        "Inclusion and belonging (VIBE)",
+        "Employees"
+      ],
+      "source_url": "https://www.designgurus.io/answers/detail/top-workday-behavioral-interview-questions-and-how-to-answer-them",
+      "hints": {
+        "looking_for": [
+          "Whether you take concrete steps toward inclusion",
+          "What changed because of them"
+        ],
+        "strong_signals": [
+          "Names a specific change to how the team works",
+          "Describes an observed effect"
+        ],
+        "watch_outs": [
+          "Only beliefs or intentions",
+          "No actions or results"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to balance technical debt against delivering features.",
+      "strong_answer": "Describe the debt and its real cost (incidents, slow delivery, customer risk). Show how the candidate quantified it, made the case to product partners, and agreed a plan, for example a fixed share of each sprint or paying debt down inside related features. Give the outcome. Strong answers tie the choice to customers and cost. Pitfalls: all-or-nothing positions, or no data.",
+      "competencies": [
+        "communication",
+        "impact",
+        "conflict_handling"
+      ],
+      "values": [
+        "Customer Service",
+        "Profitability"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/workday/software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you weigh long-term health against short-term delivery",
+          "Whether you can make the case with data"
+        ],
+        "strong_signals": [
+          "Quantifies the cost of the debt",
+          "Agrees a plan with product partners",
+          "Ties the choice to customers and cost"
+        ],
+        "watch_outs": [
+          "All-or-nothing positions",
+          "No data behind the argument"
+        ]
+      },
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Walk me through a product you ran end to end. What did you cut, and why?",
+      "strong_answer": "Start with the customer problem and how it was discovered (research, customer calls, data). Explain the candidate's role, the key decisions, and what was cut to ship, with the reasoning. Give measurable results for customers and the business, and what they would change. Match scope to the target level. Pitfalls: a feature list with no customer problem, or no hard choices.",
+      "competencies": [
+        "depth_of_experience",
+        "judgment",
+        "scope_at_level"
+      ],
+      "values": [
+        "Customer Service"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/workday/product-manager",
+      "hints": {
+        "looking_for": [
+          "How you discover and define customer problems",
+          "What you cut and why"
+        ],
+        "strong_signals": [
+          "Starts from a real customer problem",
+          "Explains hard trade-offs and your own role",
+          "Measures customer and business results"
+        ],
+        "watch_outs": [
+          "A feature list with no problem behind it",
+          "No hard choices"
+        ]
+      },
+      "role_families": [
+        "pm"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Why Workday, and what draws you to enterprise HR and finance software?",
+      "strong_answer": "Be specific: name a product area (HCM, financials, the platform, AI features) and link it to the candidate's past work and goals. Show an understanding of enterprise customers: configurability, compliance, long release cycles and high trust. Mention the people-first culture only with a concrete reason. Pitfalls: generic praise, or showing no interest in enterprise customers.",
+      "competencies": [
+        "motivation",
+        "role_fit",
+        "team_fit"
+      ],
+      "values": [
+        "Employees",
+        "Customer Service"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/workday/product-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you understand what Workday builds and for whom",
+          "Which product area you want and why"
+        ],
+        "strong_signals": [
+          "Names a product area and links it to your experience",
+          "Shows you understand enterprise customers"
+        ],
+        "watch_outs": [
+          "Generic praise of the culture",
+          "No interest in enterprise customers"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a payroll processing system that runs for thousands of customer companies on a regular schedule.",
+      "strong_answer": "Clarify scale, pay frequencies and correctness needs. Snapshot effective-dated inputs per pay period and treat each calculation as a deterministic function of inputs and versioned rules. Fan out per-employee work with per-tenant concurrency limits so one large customer cannot slow others. Keep calculation traces for audit, handle retroactive changes with scoped recalculation, make disbursement idempotent, and resume from checkpoints so a few exceptions do not block everyone. Close with tenant-scoped privacy. Pitfalls: ignoring retro changes or audit.",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "reasoning",
+        "accuracy"
+      ],
+      "values": [
+        "Customer Service",
+        "Integrity"
+      ],
+      "source_url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-workday-system-design-interview",
+      "hints": {
+        "looking_for": [
+          "Whether you design for correctness and audit first",
+          "How you isolate tenants under burst load"
+        ],
+        "strong_signals": [
+          "Deterministic calculation from effective-dated inputs",
+          "Per-tenant limits and checkpointed retries",
+          "Idempotent payments and retained calculation traces"
+        ],
+        "watch_outs": [
+          "Ignoring retroactive changes",
+          "No audit trail or tenant isolation"
+        ]
+      },
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design an audit log that records every field change on employee and finance records for compliance.",
+      "strong_answer": "Clarify which records, retention, and who may read the log. Capture changes as append-only events with who, what, when, old and new values, and the business process that caused them. Partition by tenant, make the log tamper-evident, and keep it off the hot write path with a durable queue. Support as-of queries and exports for auditors, with access controls and data residency per customer. Discuss storage cost and deletion rules such as privacy requests. Pitfalls: mutable logs, or one shared store with no tenant boundary.",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "accuracy"
+      ],
+      "values": [
+        "Integrity",
+        "Customer Service"
+      ],
+      "source_url": "https://www.techinterview.org/companies/workday/",
+      "hints": {
+        "looking_for": [
+          "How you meet compliance needs at scale",
+          "Whether you keep tenants and access separate"
+        ],
+        "strong_signals": [
+          "Append-only, tamper-evident events",
+          "Partitioned by tenant with residency rules",
+          "Handles retention and privacy deletion"
+        ],
+        "watch_outs": [
+          "Mutable log records",
+          "No tenant boundary or access control"
+        ]
+      },
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you implement role-based access control for sensitive HR data across many customers?",
+      "strong_answer": "Clarify the roles and data types (pay, health, performance). Model permissions per tenant with roles, security groups and scopes such as a manager's subtree in the org hierarchy, with effective dates. Enforce checks in one service close to the data, cache decisions carefully, and log every access to sensitive fields. Allow per-customer configuration within safe limits, and test that one tenant can never see another's data. Pitfalls: checks only in the UI, or ignoring org changes over time.",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "clarity_of_explanation"
+      ],
+      "values": [
+        "Integrity"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/workday/software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you protect sensitive people data",
+          "Whether you handle hierarchy and change over time"
+        ],
+        "strong_signals": [
+          "Scopes access by org subtree with effective dates",
+          "Enforces checks near the data and logs access",
+          "Keeps per-customer configuration within safe limits"
+        ],
+        "watch_outs": [
+          "Access checks only in the UI",
+          "Ignoring reorganizations"
+        ]
+      },
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you build a model to predict employee attrition, and how would you check it for bias?",
+      "strong_answer": "Define the target (voluntary leave within a window) and the decision it supports. Pick features carefully, excluding protected attributes and close proxies, and watch for leakage. Start with an interpretable baseline, then a stronger model, and evaluate with metrics that fit class imbalance. Measure performance and error rates across groups, explain predictions to HR users, and keep a human in the loop. Pitfalls: using sensitive data blindly, or reporting accuracy alone.",
+      "competencies": [
+        "technical_depth",
+        "reasoning",
+        "trade_offs"
+      ],
+      "values": [
+        "Integrity",
+        "Customer Service"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/workday/data-scientist",
+      "hints": {
+        "looking_for": [
+          "How you frame an ML problem on people data",
+          "Whether you take fairness and interpretability seriously"
+        ],
+        "strong_signals": [
+          "Clear target and the decision it supports",
+          "Checks leakage, imbalance and group-level errors",
+          "Keeps a human in the loop"
+        ],
+        "watch_outs": [
+          "Using sensitive attributes blindly",
+          "Reporting accuracy alone"
+        ]
+      },
+      "role_families": [
+        "data_ml"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time your analysis contradicted what the business believed.",
+      "strong_answer": "State the belief, what the data showed, and how the candidate checked their own work first. Show how they presented it: plain language, the business impact, and a recommendation, with respect for the people who held the belief. Give the outcome and how trust in the analysis grew. Pitfalls: proving people wrong as the goal, or giving up when challenged.",
+      "competencies": [
+        "communication",
+        "conflict_handling",
+        "impact"
+      ],
+      "values": [
+        "Integrity",
+        "Employees"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/workday/data-scientist",
+      "hints": {
+        "looking_for": [
+          "Whether you speak up honestly with data",
+          "How you build trust with business partners"
+        ],
+        "strong_signals": [
+          "Double-checks the analysis first",
+          "Explains impact in plain language with a recommendation",
+          "Keeps the relationship intact"
+        ],
+        "watch_outs": [
+          "Proving people wrong as the goal",
+          "Giving up when challenged"
+        ]
+      },
+      "role_families": [
+        "data_ml"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you prioritize features for a new employee onboarding module?",
+      "strong_answer": "Clarify the customer (company size, industry) and users: new hires, managers, HR admins. Map the onboarding journey and the main pains (paperwork, slow access to tools, unclear first weeks). List options, prioritize by customer value, effort and fit with existing HCM data, and recommend a first release. Define success metrics such as time to productivity and admin hours saved, with guardrails like data accuracy. Pitfalls: designing for one user only, or no metric.",
+      "competencies": [
+        "problem_framing",
+        "user_and_business_sense",
+        "prioritization",
+        "recommendation"
+      ],
+      "values": [
+        "Customer Service",
+        "Employees"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/workday/product-manager",
+      "hints": {
+        "looking_for": [
+          "Whether you consider every user of an enterprise product",
+          "How you prioritize and pick a first release"
+        ],
+        "strong_signals": [
+          "Separates new hires, managers and HR admins",
+          "Prioritizes by value, effort and platform fit",
+          "Defines success and guardrail metrics"
+        ],
+        "watch_outs": [
+          "Designing for one user only",
+          "No success metric"
+        ]
+      },
+      "role_families": [
+        "pm"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you balance enterprise customers' demand for customization with keeping the product simple?",
+      "strong_answer": "Frame the tension: large customers want their own processes, but each option adds cost, test burden and confusion. Segment requests by how many customers need them and the value at stake. Propose layers: good defaults, a small set of supported configuration points, and an extension platform for the rest. Explain how to decide when a request becomes a core feature, and how to measure success (adoption, support load, upgrade pain). Pitfalls: saying yes to every big customer, or refusing all customization.",
+      "competencies": [
+        "problem_framing",
+        "user_and_business_sense",
+        "prioritization",
+        "recommendation"
+      ],
+      "values": [
+        "Customer Service",
+        "Profitability",
+        "Innovation"
+      ],
+      "source_url": "https://www.cleverprep.com/companies/workday/product-manager",
+      "hints": {
+        "looking_for": [
+          "How you handle the pull between customization and simplicity",
+          "Whether you have a clear rule for what goes into the core"
+        ],
+        "strong_signals": [
+          "Segments requests by reach and value",
+          "Proposes defaults, configuration points and extensions",
+          "Measures adoption, support load and upgrade pain"
+        ],
+        "watch_outs": [
+          "Saying yes to every large customer",
+          "Refusing all customization"
+        ]
+      },
+      "role_families": [
+        "pm"
+      ],
+      "levels": []
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "P1",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Software Engineer I. Delivers well-defined tasks with guidance; loop focuses on coding and behavioral rounds."
+    },
+    {
+      "level_name": "P2",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Software Engineer II. Delivers features within a team with growing independence."
+    },
+    {
+      "level_name": "P3",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Software Engineer III. Owns features end to end and handles some ambiguity; may get a design round."
+    },
+    {
+      "level_name": "P4",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Senior Software Engineer. Owns components or services, designs for multi-tenant scale, and mentors others."
+    },
+    {
+      "level_name": "P5",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Principal Software Engineer. Leads technical direction across teams; loop adds deeper design and leadership discussion."
+    },
+    {
+      "level_name": "P6",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Senior Principal Software Engineer. Shapes architecture for a product area or platform."
+    },
+    {
+      "level_name": "Senior Product Manager",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns a product area, its roadmap and metrics, and works across engineering, UX and go-to-market."
+    },
+    {
+      "level_name": "Principal Product Manager",
+      "normalized_level": "staff_principal",
+      "role_family": "pm",
+      "scope_expectation": "Sets strategy for a large product area and handles conflicting stakeholder needs across teams."
+    },
+    {
+      "level_name": "Senior Data Scientist",
+      "normalized_level": "senior",
+      "role_family": "data_ml",
+      "scope_expectation": "Owns models from framing to deployment and earns the trust of business stakeholders."
+    }
+  ],
+  "persona": {
+    "tone": "Warm, friendly and people-focused, with a professional enterprise feel",
+    "pace": "Moderate; lets the candidate tell a full story, then asks for specifics",
+    "pushback_style": "Asks for the customer impact, the candidate's own part, and what they would do differently; in design rounds asks about tenant isolation, correctness and audit",
+    "closing_style": "Leaves time for the candidate's questions about the team, culture and product area"
+  },
+  "scoring_weights": {
+    "collaboration": 1.3,
+    "communication": 1.2,
+    "ownership": 1.2,
+    "impact": 1.1,
+    "team_fit": 1.3,
+    "motivation": 1.2,
+    "judgment": 1.2,
+    "trade_offs": 1.2,
+    "accuracy": 1.2,
+    "technical_depth": 1.1,
+    "user_and_business_sense": 1.3,
+    "prioritization": 1.2
+  },
+  "values_share": 0.3,
+  "case_style": {
+    "product_sense": 0.5,
+    "estimation": 0.1,
+    "system_thinking": 0.4,
+    "notes": "PM cases are enterprise product strategy and design: prioritizing features for HCM or finance products, customization versus simplicity, and success metrics. Some loops use a take-home with a presentation. Market sizing is rarely reported."
+  },
+  "sources": [
+    {
+      "url": "https://www.workday.com/en-us/company/about-workday/core-values.html",
+      "title": "Our values (Workday)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "values_framework",
+        "persona"
+      ]
+    },
+    {
+      "url": "https://www.workday.com/en-us/company/about-workday/value-inclusion-belonging-for-everyone.html",
+      "title": "Value Inclusion and Belonging for Everyone (Workday)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "values_framework"
+      ]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/what-is-the-workday-interview-process-like-round-by-round",
+      "title": "What is the Workday interview process like, round by round (Design Gurus)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "values_framework",
+        "persona"
+      ]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/top-workday-behavioral-interview-questions-and-how-to-answer-them",
+      "title": "Top Workday behavioral interview questions (Design Gurus)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "question_patterns",
+        "persona",
+        "scoring_weights"
+      ]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/what-to-expect-in-the-workday-system-design-interview",
+      "title": "What to expect in the Workday system design interview (Design Gurus)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "question_patterns",
+        "case_style"
+      ]
+    },
+    {
+      "url": "https://www.techinterview.org/companies/workday/",
+      "title": "Workday interview guide 2026 (techinterview.org)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns",
+        "bar_by_level"
+      ]
+    },
+    {
+      "url": "https://www.techprep.app/blog/workday-interview-process",
+      "title": "Workday's interview process (TechPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns"
+      ]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/workday/software-engineer",
+      "title": "Workday software engineer interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns"
+      ]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/workday/product-manager",
+      "title": "Workday product manager interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns",
+        "bar_by_level",
+        "case_style"
+      ]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/workday/data-scientist",
+      "title": "Workday data scientist interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns",
+        "bar_by_level"
+      ]
+    },
+    {
+      "url": "https://scaleengineer.com/interviews/workday",
+      "title": "Workday levels and interview guides (ScaleEngineer)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "bar_by_level",
+        "loop_structure"
+      ]
+    },
+    {
+      "url": "https://www.levels.fyi/companies/workday/salaries/software-engineer",
+      "title": "Workday software engineer levels (Levels.fyi)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "bar_by_level"
+      ]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "low"
+  },
+  "low_confidence_notes": [
+    "values_framework: the six core values come from Workday's official values page. 'Inclusion and belonging (VIBE)' is not a core value; it is Workday's inclusion program (now 'Value Inclusion and Belonging for Everyone'), added because prep guides and candidate reports mention VIBE questions. The claim that interviewers score against the values comes from prep sites, not Workday.",
+    "loop_structure: no official Workday interview guide was found. Rounds come from third-party prep sites that disagree on the order, the online assessment, the take-home and the executive close; the loop varies by team. PM and data_ml loops come mostly from one prep site (CleverPrep).",
+    "question_patterns: sample questions come from prep sites that aggregate candidate reports (CleverPrep, Design Gurus, techinterview.org); some may be the sites' own practice questions rather than verified Workday questions.",
+    "bar_by_level: P1 to P6 labels and SWE titles come from Levels.fyi and ScaleEngineer, not Workday; scope text is our summary. PM and data scientist titles are job titles from CleverPrep, not confirmed level codes.",
+    "persona: inferred from the values page and prep guides that stress a warm, people-first register; no source describes interviewer style directly.",
+    "scoring_weights: our estimate from the values emphasis (Employees, Customer Service, Integrity) and enterprise design themes; no public source gives weights.",
+    "case_style: based on PM question lists from one prep site and a few candidate reports of a design session or take-home; split between product sense and system thinking is our estimate."
+  ]
+}

@@ -1,0 +1,981 @@
+{
+  "company_name": "Datadog",
+  "company_slug": "datadog",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-28",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Datadog culture (from careers and engineering pages)",
+    "principles": [
+      {
+        "name": "Pragmatism and simplicity",
+        "description": "Solve hard problems the right way with simple, practical solutions. Value simple, fast code over clever designs.",
+        "evidence_signals": [
+          "Chose the simplest design that met the real need and says why",
+          "Cut scope or complexity to ship something that worked",
+          "Talks about performance and cost, not only features"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "You build it, you own it",
+        "description": "Teams run what they build. They watch their services, get paged when they break, and fix the cause.",
+        "evidence_signals": [
+          "Was on call for own service and describes a real incident",
+          "Added monitoring or alerts so the team knew when something broke",
+          "Followed a problem to its root cause and prevented a repeat"
+        ],
+        "weight": 1.5
+      },
+      {
+        "name": "Honesty and accountability, not blame",
+        "description": "Be honest about what went wrong. Treat failures as system problems, run postmortems, and own the follow-up.",
+        "evidence_signals": [
+          "Admits own mistake plainly, without blaming others",
+          "Describes a postmortem and the system change that came out of it",
+          "Gave or received honest feedback and acted on it"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Humility and a desire to learn",
+        "description": "Stay low-ego and curious. Learn from colleagues, share what you know, and keep growing.",
+        "evidence_signals": [
+          "Names something they learned from a colleague or a failure",
+          "Picked up a new domain or tool quickly for a project",
+          "Gives credit to others and is open about gaps"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Solve tough problems together",
+        "description": "Work across teams to solve hard problems. Each win is a team win.",
+        "evidence_signals": [
+          "Worked with another team to unblock a shared problem",
+          "Helped a teammate or new hire succeed",
+          "Uses 'we' for team results and 'I' for own decisions"
+        ],
+        "weight": 1.1
+      },
+      {
+        "name": "Clear communication and visibility",
+        "description": "Share clear status, metrics and decisions so others can act, especially during incidents and cross-team work.",
+        "evidence_signals": [
+          "Kept stakeholders or customers updated on a regular cadence",
+          "Used metrics or dashboards to make progress visible",
+          "Explains a technical point simply to a non-expert"
+        ],
+        "weight": 1.0
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": [
+        "Software Engineer I",
+        "Software Engineer II",
+        "Senior Software Engineer",
+        "Staff Software Engineer",
+        "Senior Staff Software Engineer",
+        "Principal Software Engineer"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter call",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Past experience, interest in Datadog and logistics. Not simulated in v1."
+        },
+        {
+          "name": "Technical phone screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "One or two practical coding problems in a shared editor. Not simulated in v1."
+        },
+        {
+          "name": "Coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Two coding rounds below Staff, one at Staff and above. Problems start simple and add constraints. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior software engineer",
+          "notes": "Often data-heavy systems such as ingestion, time-series storage, alerting or tracing. Used for leveling."
+        },
+        {
+          "name": "Project deep dive or presentation",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Senior engineer or panel",
+          "notes": "Walk through a system you built: choices, trade-offs, failure modes. At Staff and above this is a presentation to a panel and replaces a coding round."
+        },
+        {
+          "name": "Behavioral and experience",
+          "interview_type": "behavioral",
+          "duration_min": 60,
+          "interviewer_role": "Engineering manager or director of engineering",
+          "notes": "Past work, impact, teamwork, ownership and incidents. May include technical questions about past projects."
+        },
+        {
+          "name": "Team matching",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Hiring manager",
+          "notes": "After a hiring committee approves the loop. Mostly mutual fit: team scope, motivation and what the candidate wants next."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": [
+        "Product Manager",
+        "Senior Product Manager"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "PM background, interest in Datadog and fit. Not simulated in v1."
+        },
+        {
+          "name": "PM screen",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Product manager or hiring manager",
+          "notes": "Experience, product sense and approach to PM work. May include a short case."
+        },
+        {
+          "name": "Product case",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Product manager",
+          "notes": "Usually tied to an observability or developer-tools problem in the area of the opening."
+        },
+        {
+          "name": "Analytical round",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Product manager or product leader",
+          "notes": "Metrics, success measures and data-driven decisions, for example what a dashboard should show."
+        },
+        {
+          "name": "Technical round",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Engineering manager",
+          "notes": "Technical understanding of monitoring, cloud and system design at a PM level."
+        },
+        {
+          "name": "Cross-functional and behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 60,
+          "interviewer_role": "Engineering manager or cross-functional partner",
+          "notes": "Working with engineering, shipping, prioritization and failures."
+        },
+        {
+          "name": "Executive interview",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Product leader",
+          "notes": "Only for some roles. Strategy, vision and fit."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": [
+        "Applied Scientist",
+        "Senior Applied Scientist"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background and interest in Datadog. Not simulated in v1."
+        },
+        {
+          "name": "Technical phone screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Applied scientist or engineer",
+          "notes": "Statistics, ML concepts and coding in Python or SQL. Not simulated in v1."
+        },
+        {
+          "name": "ML fundamentals and statistics",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Applied scientist",
+          "notes": "Verbal questions on statistics, modeling and evaluation."
+        },
+        {
+          "name": "Applied ML design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior applied scientist or ML engineer",
+          "notes": "Design an ML system for observability data, such as anomaly detection on time series, including production monitoring and retraining."
+        },
+        {
+          "name": "Project presentation or case",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Panel",
+          "notes": "Present a past project or work through an observability ML case."
+        },
+        {
+          "name": "Behavioral and hiring manager",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager",
+          "notes": "Impact of past ML work, models that failed, and explaining results to non-experts."
+        }
+      ]
+    },
+    {
+      "role_family": "other",
+      "levels": [
+        "Sales Engineer",
+        "Senior Sales Engineer"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Sales or solutions engineering role. Background and motivation. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager interview",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Sales engineering manager",
+          "notes": "Experience, technical depth and approach to customer engagements."
+        },
+        {
+          "name": "Panel with sales engineers and account executives",
+          "interview_type": "behavioral",
+          "duration_min": 60,
+          "interviewer_role": "Sales engineer and account executive",
+          "notes": "Customer stories, working with sales and handling a deal or proof of concept that went wrong."
+        },
+        {
+          "name": "Technical questions",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Senior sales engineer",
+          "notes": "Cloud, Kubernetes, APM and observability concepts, explained simply for a customer."
+        },
+        {
+          "name": "Technical demo or presentation",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Panel",
+          "notes": "A prepared demo or technical presentation. Some roles add a take-home. Not simulated in v1."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Production incident",
+      "pattern": "A production issue the candidate diagnosed and fixed: how they found the cause, what they did in the moment, and what stopped it happening again",
+      "competencies": ["ownership", "learning_from_failure", "communication"],
+      "values": ["You build it, you own it", "Honesty and accountability, not blame"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Owning a mistake",
+      "pattern": "A failure or mistake the candidate was part of, how they admitted it, and the system change that followed",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Honesty and accountability, not blame", "Humility and a desire to learn"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Conflicting priorities",
+      "pattern": "A project with competing priorities or stakeholders and how the candidate decided what came first",
+      "competencies": ["collaboration", "conflict_handling", "impact"],
+      "values": ["Solve tough problems together"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Cross-team work",
+      "pattern": "A problem that needed another team's help and how the candidate got it solved without authority over that team",
+      "competencies": ["collaboration", "communication"],
+      "values": ["Solve tough problems together", "Clear communication and visibility"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Learning fast",
+      "pattern": "A time the candidate had to learn a new system, language or domain quickly to deliver",
+      "competencies": ["learning_from_failure", "impact"],
+      "values": ["Humility and a desire to learn"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Past project walkthrough",
+      "pattern": "Walk through the most complex system on the resume: own role, key design choices, and measurable impact",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["You build it, you own it"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Motivation for the domain",
+      "pattern": "Why observability, infrastructure or developer tools, and why this team now",
+      "competencies": ["motivation", "role_fit", "team_fit"],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Data-heavy system design",
+      "pattern": "Talk through a design for ingesting, storing and querying high volumes of metrics, logs, events or traces, with throughput and cost trade-offs",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Pragmatism and simplicity"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Defending a design choice",
+      "pattern": "Explain why a past system used one technology or design over another, and what the candidate would change now",
+      "competencies": ["trade_offs", "technical_depth", "clarity_of_explanation"],
+      "values": ["Pragmatism and simplicity", "Honesty and accountability, not blame"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Scaling and failure modes",
+      "pattern": "Take a working design and push it: ten or a hundred times more load, a failed node or region, and how you would know it broke",
+      "competencies": ["reasoning", "trade_offs", "accuracy"],
+      "values": ["You build it, you own it"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Explaining observability concepts",
+      "pattern": "Explain a monitoring concept such as metrics versus logs versus traces, or alert fatigue, clearly to a given audience",
+      "competencies": ["clarity_of_explanation", "accuracy", "technical_depth"],
+      "values": ["Clear communication and visibility"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Product for engineers",
+      "pattern": "Design or improve a feature for engineers who run production systems, with a target user, a success metric and a first version",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Pragmatism and simplicity"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Metrics and dashboards",
+      "pattern": "Define how to measure a product or launch, and what a dashboard for a given leader should show",
+      "competencies": ["structure", "problem_framing", "recommendation"],
+      "values": ["Clear communication and visibility"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a complex production problem you diagnosed and fixed. How did you debug it, and how did you stop it from coming back?",
+      "strong_answer": "Pick a real incident on a system you owned. Explain the first signal (an alert, a customer report), how you narrowed the cause with metrics, logs or traces, and the fix you shipped. Say what you communicated and to whom while it was happening. End with the lasting change: a test, an alert, a runbook or a design change, and how you know it worked. Pitfalls: a story where someone else did the debugging, no root cause, or blaming a person instead of the system.",
+      "competencies": ["ownership", "learning_from_failure", "communication"],
+      "values": ["You build it, you own it", "Honesty and accountability, not blame"],
+      "source_url": "https://codemia.io/guides/datadog-software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you debug a live system step by step",
+          "Whether you own the service end to end"
+        ],
+        "strong_signals": [
+          "Uses metrics, logs or traces to narrow the cause",
+          "Names the lasting fix and how it was verified",
+          "Kept people informed during the incident"
+        ],
+        "watch_outs": [
+          "Someone else did the real debugging",
+          "No root cause or no prevention step",
+          "Blaming a person instead of the system"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you led a project with conflicting priorities. How did you decide what to do first?",
+      "strong_answer": "Name the competing asks and who owned each. Show how you made the trade-off visible: impact, cost, deadlines, risk. Explain the decision, who you aligned with, and what you said no to. Give the result and what happened to the deferred work. At senior levels the priorities should cross teams. Pitfalls: doing everything by working late, or a decision with no reasoning.",
+      "competencies": ["collaboration", "conflict_handling", "impact"],
+      "values": ["Solve tough problems together", "Clear communication and visibility"],
+      "source_url": "https://designgurus.io/answers/detail/what-is-datadog-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you weigh competing demands",
+          "Whether you align people instead of just choosing"
+        ],
+        "strong_signals": [
+          "States clear criteria for the trade-off",
+          "Says what was dropped and how that was communicated",
+          "Shows the outcome"
+        ],
+        "watch_outs": [
+          "Solving it only by working longer hours",
+          "No reasoning behind the choice"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a major outage or production issue you were part of. What was your role and what changed afterwards?",
+      "strong_answer": "Describe the impact in plain numbers (users, duration), your exact role in the response, and how the team coordinated. Be honest about what went wrong, including your own part. Describe the postmortem and the system changes it produced, not individual blame. Strong answers mention communication to customers or stakeholders. Pitfalls: a minor bug framed as an outage, or no follow-up.",
+      "competencies": ["ownership", "learning_from_failure", "communication"],
+      "values": ["Honesty and accountability, not blame", "You build it, you own it"],
+      "source_url": "https://designgurus.io/answers/detail/what-is-datadog-interview-process",
+      "hints": {
+        "looking_for": [
+          "How you act under incident pressure",
+          "Whether you learn at the system level"
+        ],
+        "strong_signals": [
+          "Clear personal role in the response",
+          "A blameless postmortem with concrete changes",
+          "Mentions customer or stakeholder updates"
+        ],
+        "watch_outs": [
+          "A small bug told as a big outage",
+          "Blaming a colleague",
+          "No follow-up after the fix"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Walk me through a system you built. Why did you choose your main technologies, for example one message queue over another?",
+      "strong_answer": "Give the problem and the constraints first: load, latency, team skills, cost. Explain the main components and the choice under question, with the option you rejected and why. Be honest about what turned out wrong and what you would change now. Show you know the failure modes and how the system was monitored. Pitfalls: listing tools without reasons, or claiming decisions you did not make.",
+      "competencies": ["trade_offs", "technical_depth", "clarity_of_explanation"],
+      "values": ["Pragmatism and simplicity", "Honesty and accountability, not blame"],
+      "source_url": "https://www.techprep.app/blog/datadog-interview-process",
+      "hints": {
+        "looking_for": [
+          "Whether your design choices had real reasons",
+          "How well you know your own system"
+        ],
+        "strong_signals": [
+          "Starts from constraints, then the choice",
+          "Names the rejected option and why",
+          "Admits what you would change"
+        ],
+        "watch_outs": [
+          "Tool names with no reasoning",
+          "Claiming decisions you did not make"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design a system that collects, aggregates and shows metrics from thousands of servers in near real time?",
+      "strong_answer": "Clarify scale (hosts, points per second, retention) and queries first. Cover an agent that batches and sends data, an ingestion tier behind a queue, aggregation by time window and tags, and a time-series store with compression and rollups. Discuss high-cardinality tags, late data, backpressure and partial failures. Explain the read path and caching for dashboards. Keep it simple first, then scale. Pitfalls: jumping to tools without numbers, or ignoring cost and cardinality.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Pragmatism and simplicity"],
+      "source_url": "https://codemia.io/guides/datadog-software-engineer",
+      "hints": {
+        "looking_for": [
+          "How you size and shape a write-heavy system",
+          "Your grasp of time-series trade-offs"
+        ],
+        "strong_signals": [
+          "Asks about scale and queries first",
+          "Handles cardinality, late data and backpressure",
+          "Starts simple, then scales"
+        ],
+        "watch_outs": [
+          "Naming tools before numbers",
+          "Ignoring storage cost and retention"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": ["mid", "senior", "staff_principal"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a service that finds good flight deals from the last week and notifies users when a matching flight appears.",
+      "strong_answer": "Clarify what a deal is, data sources, freshness and user volume. Sketch ingestion of fare data, storage indexed for the queries you need, a matching step against saved user preferences, and a notification service with de-duplication and rate limits. Discuss batch versus streaming matching, idempotency and what happens when a provider is down. Keep it high level but justify each choice. Pitfalls: skipping requirements, or a design with no failure handling.",
+      "competencies": ["reasoning", "trade_offs", "clarity_of_explanation"],
+      "values": ["Pragmatism and simplicity"],
+      "source_url": "https://interviewing.io/datadog-interview-questions",
+      "hints": {
+        "looking_for": [
+          "How you turn a vague product ask into requirements",
+          "Clear, justified high-level design"
+        ],
+        "strong_signals": [
+          "Defines a deal and freshness before designing",
+          "Handles duplicate and failed notifications",
+          "Compares batch and streaming matching"
+        ],
+        "watch_outs": [
+          "Designing before clarifying",
+          "No thought on failures or duplicates"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design a distributed tracing system that follows requests across many microservices?",
+      "strong_answer": "Explain trace and span ids and how context passes between services. Cover client libraries, a collector, sampling (head versus tail) to control volume, storage keyed by trace id plus indexes for search, and a view that rebuilds the request tree. Discuss overhead on the traced service, clock skew and missing spans. Pitfalls: storing every span with no sampling plan, or ignoring the cost to the application.",
+      "competencies": ["technical_depth", "trade_offs", "accuracy"],
+      "values": ["Pragmatism and simplicity"],
+      "source_url": "https://designgurus.io/answers/detail/what-are-datadog-system-design-interview-questions",
+      "hints": {
+        "looking_for": [
+          "Understanding of trace context and sampling",
+          "Awareness of overhead and volume"
+        ],
+        "strong_signals": [
+          "Explains context propagation clearly",
+          "Compares head and tail sampling",
+          "Mentions clock skew or missing spans"
+        ],
+        "watch_outs": [
+          "No sampling plan",
+          "Ignoring overhead on the traced service"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": ["mid", "senior", "staff_principal"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you monitor a microservices system that runs on Kubernetes?",
+      "strong_answer": "Cover the layers: nodes and cluster, pods and containers, services, and the user-facing experience. Name the signals at each layer (resource use, restarts, latency, errors, saturation) and how metrics, logs and traces connect. Explain alerting on symptoms users feel, with fewer noisy alerts, and dashboards per service. Mention tags for ownership and short-lived pods. Pitfalls: a long list of metrics with no alerting strategy.",
+      "competencies": ["technical_depth", "reasoning", "clarity_of_explanation"],
+      "values": ["You build it, you own it", "Clear communication and visibility"],
+      "source_url": "https://designgurus.io/answers/detail/what-is-datadog-interview-process",
+      "hints": {
+        "looking_for": [
+          "A layered view of what to monitor",
+          "Good alerting judgment"
+        ],
+        "strong_signals": [
+          "Separates infrastructure and user-facing signals",
+          "Alerts on symptoms, not every metric",
+          "Links metrics, logs and traces"
+        ],
+        "watch_outs": [
+          "Listing metrics with no alert plan",
+          "Forgetting short-lived pods and ownership tags"
+        ]
+      },
+      "role_families": ["swe", "other"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Design a product that helps engineers reduce alert fatigue.",
+      "strong_answer": "Start with who suffers (on-call engineers, team leads) and why: noisy, duplicate or unactionable alerts. Pick one segment and the core problem. Propose a few options such as grouping related alerts, suggesting threshold changes from history, or showing alert quality per team, then choose one first version. Define success, for example fewer pages per on-call shift without more missed incidents. Address the risk of hiding a real problem. Pitfalls: features without a user, or a metric that rewards silencing alerts.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Pragmatism and simplicity"],
+      "source_url": "https://www.cleverprep.com/companies/datadog/product-manager",
+      "hints": {
+        "looking_for": [
+          "Empathy for on-call engineers",
+          "A focused first version with a sound metric"
+        ],
+        "strong_signals": [
+          "Names a clear user and their pain",
+          "Picks one option and explains why",
+          "A metric that also guards against missed incidents"
+        ],
+        "watch_outs": [
+          "A feature list with no user",
+          "A metric that rewards muting alerts"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "How would you design a product that helps users connect metrics, logs and traces for the same problem?",
+      "strong_answer": "Frame the user job: going from a symptom to a cause during an incident. Map today's pain, such as switching tools and losing context. Propose a flow that carries shared context (service, time, tags) across the three signals, and pick the first slice to build. Define success, such as time to find the cause or how often users jump between views. Mention data and tagging prerequisites. Pitfalls: a generic all-in-one vision with no first step.",
+      "competencies": ["problem_framing", "structure", "user_and_business_sense"],
+      "values": ["Pragmatism and simplicity", "Clear communication and visibility"],
+      "source_url": "https://www.cleverprep.com/companies/datadog/product-manager",
+      "hints": {
+        "looking_for": [
+          "Understanding of the incident workflow",
+          "Ability to slice a big idea"
+        ],
+        "strong_signals": [
+          "Starts from the user's job during an incident",
+          "Uses shared context to link signals",
+          "Picks a first slice and a success metric"
+        ],
+        "watch_outs": [
+          "A vague all-in-one vision",
+          "Ignoring the data needed to link signals"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "You have three competing feature requests from customers and engineering. How would you decide which to build first?",
+      "strong_answer": "Clarify each request: who asks, what problem, how many customers, revenue or risk at stake, and effort. Make the criteria explicit and compare the options on them. Look for data, such as usage or support tickets, before deciding. Make a call, say what you will tell the people whose request waits, and how you will revisit it. Pitfalls: a scoring framework with no decision, or going with the loudest customer.",
+      "competencies": ["prioritization", "recommendation", "user_and_business_sense"],
+      "values": ["Clear communication and visibility"],
+      "source_url": "https://www.cleverprep.com/companies/datadog/product-manager",
+      "hints": {
+        "looking_for": [
+          "Clear prioritization criteria",
+          "Willingness to make a call"
+        ],
+        "strong_signals": [
+          "Asks what problem each request solves",
+          "Uses data to compare",
+          "Says how the decision is communicated"
+        ],
+        "watch_outs": [
+          "Framework with no decision",
+          "Choosing the loudest voice"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a product you launched that did not work. What did you learn?",
+      "strong_answer": "Describe the goal, the bet you made and how you measured it. Be honest about why it failed and your own part in that. Show what you did next: killed it, changed it, or changed how you validate ideas. Give evidence that the lesson changed later work. Pitfalls: a failure that is really a success, or blaming engineering or timing.",
+      "competencies": ["learning_from_failure", "ownership", "impact"],
+      "values": ["Honesty and accountability, not blame", "Humility and a desire to learn"],
+      "source_url": "https://www.cleverprep.com/companies/datadog/product-manager",
+      "hints": {
+        "looking_for": [
+          "Honesty about your own part",
+          "A lesson that changed later work"
+        ],
+        "strong_signals": [
+          "Had a clear success metric up front",
+          "Owns the wrong call",
+          "Shows a later decision made differently"
+        ],
+        "watch_outs": [
+          "A disguised success story",
+          "Blaming other teams or timing"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design a system that detects anomalies in time-series metrics?",
+      "strong_answer": "Clarify the metrics, seasonality, latency needs and the cost of false alarms. Start with a simple baseline (rolling statistics, seasonal decomposition) before a learned model. Discuss labeling, evaluation with precision and recall on past incidents, and per-series versus shared models at scale. Cover running it in production: drift, retraining, and letting users give feedback. Pitfalls: jumping to deep learning with no baseline or no evaluation plan.",
+      "competencies": ["technical_depth", "reasoning", "trade_offs"],
+      "values": ["Pragmatism and simplicity"],
+      "source_url": "https://www.cleverprep.com/companies/datadog/data-scientist",
+      "hints": {
+        "looking_for": [
+          "Practical modeling judgment",
+          "A plan to evaluate and run the model"
+        ],
+        "strong_signals": [
+          "Starts with a simple baseline",
+          "Handles seasonality and false alarms",
+          "Covers drift and retraining"
+        ],
+        "watch_outs": [
+          "Complex model with no baseline",
+          "No way to measure if it works"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you handle concept drift in a model that runs in production?",
+      "strong_answer": "Define drift (input distribution versus the input-label relation). Explain how to detect it: monitor feature distributions, prediction distributions and live accuracy where labels arrive. Describe responses: alerts, scheduled or triggered retraining, and fallbacks. Mention testing a retrained model before it replaces the old one. Pitfalls: retraining blindly on a schedule with no monitoring.",
+      "competencies": ["technical_depth", "accuracy", "reasoning"],
+      "values": ["You build it, you own it"],
+      "source_url": "https://www.cleverprep.com/companies/datadog/data-scientist",
+      "hints": {
+        "looking_for": [
+          "Clear definition of drift types",
+          "How you monitor and respond"
+        ],
+        "strong_signals": [
+          "Monitors inputs, outputs and accuracy",
+          "Validates a new model before switching"
+        ],
+        "watch_outs": [
+          "Blind scheduled retraining",
+          "No monitoring of the live model"
+        ]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you explain the difference between metrics, logs and traces to a customer, and when each one helps?",
+      "strong_answer": "Give short definitions: metrics are numbers over time, logs are event records, traces follow one request across services. Use one example incident to show how they work together: a metric alerts, a trace shows the slow service, logs show the error. Adjust depth to the audience. Pitfalls: jargon, or treating one signal as enough for everything.",
+      "competencies": ["clarity_of_explanation", "accuracy", "technical_depth"],
+      "values": ["Clear communication and visibility"],
+      "source_url": "https://www.cleverprep.com/companies/datadog/solutions-engineer",
+      "hints": {
+        "looking_for": [
+          "Simple, correct explanations",
+          "How the signals fit together"
+        ],
+        "strong_signals": [
+          "One example that uses all three",
+          "Adjusts depth to the listener"
+        ],
+        "watch_outs": [
+          "Heavy jargon",
+          "Saying one signal is enough"
+        ]
+      },
+      "role_families": ["other", "pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a proof of concept with a customer that did not go as planned.",
+      "strong_answer": "Set the scene: the customer, success criteria and what was at stake. Explain what went wrong and when you noticed. Show how you were honest with the customer and the account team, what you changed, and the result. End with what you now do differently at the start of a proof of concept. Pitfalls: blaming the customer or the product, or no clear success criteria.",
+      "competencies": ["learning_from_failure", "communication", "collaboration"],
+      "values": ["Honesty and accountability, not blame", "Solve tough problems together"],
+      "source_url": "https://www.cleverprep.com/companies/datadog/solutions-engineer",
+      "hints": {
+        "looking_for": [
+          "Honesty with customers and sales partners",
+          "How you recover a deal at risk"
+        ],
+        "strong_signals": [
+          "Clear success criteria from the start",
+          "Raised the problem early",
+          "Changed how you run proofs of concept"
+        ],
+        "watch_outs": [
+          "Blaming the customer or product",
+          "No lesson for next time"
+        ]
+      },
+      "role_families": ["other"],
+      "levels": []
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "Software Engineer I",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Delivers well-scoped tasks with guidance; loop is mostly coding plus behavioral."
+    },
+    {
+      "level_name": "Software Engineer II",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns features and the services behind them, including on-call; can talk through a sound design."
+    },
+    {
+      "level_name": "Senior Software Engineer",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Designs and owns systems at high scale, leads projects in the team, and handles incidents end to end. System design strongly affects leveling."
+    },
+    {
+      "level_name": "Staff Software Engineer",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Sets technical direction across teams and explains technical and business reasons for decisions; presents a past project to a panel."
+    },
+    {
+      "level_name": "Principal Software Engineer",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Shapes architecture for a large area of the platform and influences many teams."
+    },
+    {
+      "level_name": "Product Manager",
+      "normalized_level": "mid",
+      "role_family": "pm",
+      "scope_expectation": "Owns a feature area, ships with engineering and measures results."
+    },
+    {
+      "level_name": "Senior Product Manager",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns a product area and its strategy, works across teams, and makes hard prioritization calls."
+    },
+    {
+      "level_name": "Senior Applied Scientist",
+      "normalized_level": "senior",
+      "role_family": "data_ml",
+      "scope_expectation": "Leads applied ML projects on observability data from idea to production, and explains results to non-experts."
+    },
+    {
+      "level_name": "Senior Sales Engineer",
+      "normalized_level": "senior",
+      "role_family": "other",
+      "scope_expectation": "Runs technical evaluations for enterprise customers on their own, from demo to proof of concept, with account executives."
+    }
+  ],
+  "persona": {
+    "tone": "Friendly, practical and low-ego",
+    "pace": "Moderate; starts with a simple version of a problem, then adds constraints",
+    "pushback_style": "Asks why each design choice was made, what the candidate did personally, how it scales to much more load, and how they would know it broke",
+    "closing_style": "Leaves a few minutes for the candidate's questions"
+  },
+  "scoring_weights": {
+    "ownership": 1.4,
+    "learning_from_failure": 1.2,
+    "collaboration": 1.1,
+    "communication": 1.2,
+    "depth_of_experience": 1.3,
+    "judgment": 1.2,
+    "technical_depth": 1.3,
+    "trade_offs": 1.4,
+    "reasoning": 1.2,
+    "clarity_of_explanation": 1.2,
+    "user_and_business_sense": 1.2,
+    "prioritization": 1.2
+  },
+  "values_share": 0.15,
+  "case_style": {
+    "product_sense": 0.45,
+    "estimation": 0.1,
+    "system_thinking": 0.45,
+    "notes": "PM cases center on products for engineers who run production systems, such as alerting, logs and traces. Expect metrics and dashboard questions and some technical depth. Market sizing is rarely reported."
+  },
+  "sources": [
+    {
+      "url": "https://careers.datadoghq.com/",
+      "title": "Datadog Careers",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://careers.datadoghq.com/candidate-experience/",
+      "title": "Candidate experience (Datadog Careers)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure"]
+    },
+    {
+      "url": "https://careers.datadoghq.com/engineering/",
+      "title": "Engineering at Datadog (Datadog Careers)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "persona"]
+    },
+    {
+      "url": "https://careers.datadoghq.com/detail/4599148/?gh_jid=4599148",
+      "title": "Senior Software Engineer - Backend (Datadog job posting)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "bar_by_level", "scoring_weights"]
+    },
+    {
+      "url": "https://www.datadoghq.com/blog/engineering/2023-03-08-deep-dive-into-incident-response/",
+      "title": "2023-03-08 Incident: A deep dive into our incident response (Datadog engineering blog)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "question_patterns", "scoring_weights"]
+    },
+    {
+      "url": "https://www.builtinboston.com/company/datadog/faq/culture-values",
+      "title": "Datadog culture and values (Built In)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "persona"]
+    },
+    {
+      "url": "https://interviewing.io/datadog-interview-questions",
+      "title": "Datadog interview process and questions (interviewing.io)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "bar_by_level", "persona"]
+    },
+    {
+      "url": "https://codemia.io/guides/datadog-software-engineer",
+      "title": "Datadog software engineer interview guide (Codemia)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "scoring_weights"]
+    },
+    {
+      "url": "https://www.techprep.app/blog/datadog-interview-process",
+      "title": "Datadog's interview process (TechPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "persona"]
+    },
+    {
+      "url": "https://designgurus.io/answers/detail/what-is-datadog-interview-process",
+      "title": "What is the Datadog interview process? (Design Gurus)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["question_patterns"]
+    },
+    {
+      "url": "https://designgurus.io/answers/detail/what-are-datadog-system-design-interview-questions",
+      "title": "Datadog system design interview questions (Design Gurus)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["question_patterns"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/datadog/product-manager",
+      "title": "Datadog product manager interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/datadog/data-scientist",
+      "title": "Datadog data scientist interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "bar_by_level"]
+    },
+    {
+      "url": "https://www.cleverprep.com/companies/datadog/solutions-engineer",
+      "title": "Datadog solutions engineer interview (CleverPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "bar_by_level"]
+    },
+    {
+      "url": "https://scaleengineer.com/interviews/datadog?ref=hello-world",
+      "title": "Datadog software engineering levels (Scale Engineer)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "low",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "low"
+  },
+  "low_confidence_notes": [
+    "values_framework: Datadog publishes no formal values list. The six principles are our synthesis of phrases on Datadog's careers pages, a job posting ('pragmatism, honesty, and simplicity'), the incident-response blog post (you build it, you own it; blameless), and employee quotes on Built In. Third-party lists disagree with each other and were not used. values_share is set low at 0.15 because no source reports a separate values round.",
+    "loop_structure: the SWE loop agrees across interviewing.io, Codemia and TechPrep, but Datadog's own candidate page gives only generic stages. PM, data_ml and other (sales engineer) loops rest mainly on CleverPrep pages that mix candidate reports with editorial analysis; round names and durations there are approximate.",
+    "bar_by_level: SWE titles (Software Engineer I and II, Senior, Staff, Senior Staff, Principal) come from a third-party level list and job titles; internal level codes are not public and are not used. PM, Applied Scientist and Sales Engineer labels are generic job titles, not confirmed Datadog levels. Scope text is our summary.",
+    "persona: inferred from prep guides (problems that start simple and add constraints, follow-ups on scaling and design choices) and culture pages; no official description of interviewer style.",
+    "scoring_weights: our estimate from emphasized traits in prep guides (ownership, incidents, trade-offs, pragmatism); no public source gives weights.",
+    "case_style: based on one prep site's PM page and search snippets of candidate reports; the analytical and dashboard focus is reported but thinly sourced.",
+    "sample_questions: all come from third-party prep sites (Codemia, Design Gurus, TechPrep, interviewing.io, CleverPrep), not from Datadog. Design Gurus and CleverPrep pages are partly editorial, so some questions may be typical rather than actually asked."
+  ]
+}
