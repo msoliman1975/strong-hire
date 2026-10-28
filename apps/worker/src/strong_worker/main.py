@@ -32,6 +32,7 @@ from strong_worker.ops import sampler
 from strong_worker.pause import PAUSED_MAX_TRIES
 from strong_worker.profiles import jobs as profile_jobs
 from strong_worker.scoring import jobs as scoring_jobs
+from strong_worker.scoring import takes as take_jobs
 
 
 async def ping(ctx: dict[str, Any], value: str = "pong") -> str:
@@ -94,6 +95,16 @@ class WorkerSettings:
                 max_tries=PAUSED_MAX_TRIES,  # OC-5
             )
             for f in scoring_jobs.FUNCTIONS
+        ),
+        # CO-7: takes, scored by the same scorer.
+        *(
+            func(
+                f,
+                keep_result=scoring_jobs.RESULT_TTL_S,
+                timeout=scoring_jobs.JOB_TIMEOUT_S,
+                max_tries=PAUSED_MAX_TRIES,  # OC-5
+            )
+            for f in take_jobs.FUNCTIONS
         ),
         func(account_jobs.export_account, keep_result=account_jobs.RESULT_TTL_S, timeout=600),
         # AP-1: auto-profiles for companies outside the curated list.
