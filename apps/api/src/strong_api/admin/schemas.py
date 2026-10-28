@@ -106,6 +106,23 @@ class AdminTrace(BaseModel):
     created_at: datetime
 
 
+class AdminPrompt(BaseModel):
+    """A prompt file (RS-2). Prompt text only: never a user's brief (AA-11, D-8)."""
+
+    ref: str = Field(description="The prompt ref, e.g. scorer/rubric_recruiter_screen.v1")
+    text: str | None = Field(description="The prompt; None when the file is gone")
+    recorded: bool = Field(
+        description="True: the ref this session recorded. False: the current prompt for its type"
+    )
+
+
+class AdminSessionSetup(BaseModel):
+    """AD-5, RS-2: the brief prompt (planner) and the rubric prompt (scorer) for the session."""
+
+    brief_prompt: AdminPrompt | None
+    rubric: AdminPrompt | None
+
+
 class AdminSessionDetail(BaseModel):
     session: AdminSession
     content_visible: bool = Field(
@@ -127,6 +144,9 @@ class AdminSessionDetail(BaseModel):
     )
     cost_total_usd: float | None = Field(
         default=None, description="AI-2: every component and role. None without usage rows."
+    )
+    setup: AdminSessionSetup | None = Field(
+        default=None, description="AD-5: the brief and rubric prompts for its type"
     )
     turn_latency: list[AdminTurnLatency] = Field(
         default_factory=list, description="AI-3: per-turn voice latency (OB-3)"

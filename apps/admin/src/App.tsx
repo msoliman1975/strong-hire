@@ -28,6 +28,8 @@ import { WaitlistPage } from "./pages/WaitlistPage";
 import { AutoProfilesPage } from "./pages/AutoProfilesPage";
 import { PlanUsagePage } from "./pages/PlanUsagePage";
 import { StoryLibraryPage } from "./pages/StoryLibraryPage";
+import { CoachPage } from "./pages/CoachPage";
+import { ReadinessPage } from "./pages/ReadinessPage";
 
 export function createQueryClient(): QueryClient {
   return new QueryClient({
@@ -75,6 +77,8 @@ export function AppRoutes() {
         <Route path="/content/auto-profiles" element={<AutoProfilesPage />} />
         <Route path="/plan-usage" element={<PlanUsagePage />} />
         <Route path="/story-library" element={<StoryLibraryPage />} />
+        <Route path="/coach" element={<CoachPage />} />
+        <Route path="/readiness" element={<ReadinessPage />} />
         <Route path="/settings" element={<Navigate to="/settings/admins" replace />} />
         <Route path="/settings/admins" element={<AdminsPage />} />
         <Route path="/settings/sessions" element={<MySessionsPage />} />

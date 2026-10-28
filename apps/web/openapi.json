@@ -8453,6 +8453,76 @@
         }
       }
     },
+    "/admin/part3/coach": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Part3 Coach",
+        "description": "AD-5: coach sessions and minutes, minutes against plan caps, cost per coach session and\nthe latest coach eval results.",
+        "operationId": "get_part3_coach_admin_part3_coach_get",
+        "parameters": [
+          {
+            "name": "weeks",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 52,
+              "minimum": 1,
+              "description": "How many weeks, this one included",
+              "default": 8,
+              "title": "Weeks"
+            },
+            "description": "How many weeks, this one included"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Part3Coach"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/part3/readiness": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Part3 Readiness",
+        "description": "AD-5: practice readiness by skill across users (RD-1), aggregate only.",
+        "operationId": "get_part3_readiness_admin_part3_readiness_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Part3Readiness"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/public/waitlist": {
       "post": {
         "tags": [
@@ -9694,6 +9764,40 @@
         ],
         "title": "AdminPasswordIn"
       },
+      "AdminPrompt": {
+        "properties": {
+          "ref": {
+            "type": "string",
+            "title": "Ref",
+            "description": "The prompt ref, e.g. scorer/rubric_recruiter_screen.v1"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text",
+            "description": "The prompt; None when the file is gone"
+          },
+          "recorded": {
+            "type": "boolean",
+            "title": "Recorded",
+            "description": "True: the ref this session recorded. False: the current prompt for its type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ref",
+          "text",
+          "recorded"
+        ],
+        "title": "AdminPrompt",
+        "description": "A prompt file (RS-2). Prompt text only: never a user's brief (AA-11, D-8)."
+      },
       "AdminProviders": {
         "properties": {
           "google": {
@@ -10151,6 +10255,17 @@
             "title": "Cost Total Usd",
             "description": "AI-2: every component and role. None without usage rows."
           },
+          "setup": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdminSessionSetup"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "AD-5: the brief and rubric prompts for its type"
+          },
           "turn_latency": {
             "items": {
               "$ref": "#/components/schemas/AdminTurnLatency"
@@ -10212,6 +10327,37 @@
           "limit"
         ],
         "title": "AdminSessionList"
+      },
+      "AdminSessionSetup": {
+        "properties": {
+          "brief_prompt": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdminPrompt"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rubric": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdminPrompt"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "brief_prompt",
+          "rubric"
+        ],
+        "title": "AdminSessionSetup",
+        "description": "AD-5, RS-2: the brief prompt (planner) and the rubric prompt (scorer) for the session."
       },
       "AdminSignInSession": {
         "properties": {
@@ -12713,6 +12859,152 @@
         ],
         "title": "ChangeKind"
       },
+      "CoachCapUse": {
+        "properties": {
+          "paid_users": {
+            "type": "integer",
+            "title": "Paid Users",
+            "description": "Users on a paid or comp plan now"
+          },
+          "coach_minutes": {
+            "type": "integer",
+            "title": "Coach Minutes",
+            "description": "Their coach minutes in their current plan periods"
+          },
+          "interview_minutes": {
+            "type": "integer",
+            "title": "Interview Minutes",
+            "description": "Their plan minutes used in those periods"
+          },
+          "cap_minutes": {
+            "type": "integer",
+            "title": "Cap Minutes",
+            "description": "Sum of their plan caps, grants included"
+          },
+          "over_cap_if_counted": {
+            "type": "integer",
+            "title": "Over Cap If Counted",
+            "description": "Users whose interview plus coach minutes would pass their cap"
+          },
+          "free_user_coach_minutes": {
+            "type": "integer",
+            "title": "Free User Coach Minutes",
+            "description": "Coach minutes of users without a paid plan, in the weeks shown"
+          }
+        },
+        "type": "object",
+        "required": [
+          "paid_users",
+          "coach_minutes",
+          "interview_minutes",
+          "cap_minutes",
+          "over_cap_if_counted",
+          "free_user_coach_minutes"
+        ],
+        "title": "CoachCapUse"
+      },
+      "CoachEvalRun": {
+        "properties": {
+          "report": {
+            "type": "string",
+            "title": "Report",
+            "description": "Report file name in evals/reports"
+          },
+          "suite": {
+            "type": "string",
+            "title": "Suite"
+          },
+          "profile": {
+            "type": "string",
+            "title": "Profile"
+          },
+          "started_at": {
+            "type": "string",
+            "title": "Started At"
+          },
+          "git_sha": {
+            "type": "string",
+            "title": "Git Sha"
+          },
+          "dev_data": {
+            "type": "boolean",
+            "title": "Dev Data",
+            "description": "PL-6: fake, tiny or local profile; not a launch result"
+          },
+          "passed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Passed",
+            "description": "Every gated coach metric passed; None if none gated"
+          },
+          "metrics": {
+            "items": {
+              "$ref": "#/components/schemas/EvalMetric"
+            },
+            "type": "array",
+            "title": "Metrics",
+            "description": "Coach metrics only (key starts with coach_)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "report",
+          "suite",
+          "profile",
+          "started_at",
+          "git_sha",
+          "dev_data",
+          "passed",
+          "metrics"
+        ],
+        "title": "CoachEvalRun"
+      },
+      "CoachEvals": {
+        "properties": {
+          "latest": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CoachEvalRun"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "runs": {
+            "items": {
+              "$ref": "#/components/schemas/CoachEvalRun"
+            },
+            "type": "array",
+            "title": "Runs",
+            "description": "Up to 5, newest first"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason",
+            "description": "Why there is no result"
+          }
+        },
+        "type": "object",
+        "required": [
+          "latest",
+          "runs"
+        ],
+        "title": "CoachEvals"
+      },
       "CoachReply": {
         "properties": {
           "message": {
@@ -13010,6 +13302,49 @@
         ],
         "title": "CoachTurnResult",
         "description": "One candidate turn and the coach's reply."
+      },
+      "CoachWeek": {
+        "properties": {
+          "week_start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Week Start",
+            "description": "Monday 00:00 UTC"
+          },
+          "sessions": {
+            "type": "integer",
+            "title": "Sessions",
+            "description": "Coach sessions started that week"
+          },
+          "minutes": {
+            "type": "integer",
+            "title": "Minutes",
+            "description": "Their recorded minutes"
+          },
+          "voice": {
+            "type": "integer",
+            "title": "Voice"
+          },
+          "text": {
+            "type": "integer",
+            "title": "Text"
+          },
+          "users": {
+            "type": "integer",
+            "title": "Users",
+            "description": "Distinct users with a coach session that week"
+          }
+        },
+        "type": "object",
+        "required": [
+          "week_start",
+          "sessions",
+          "minutes",
+          "voice",
+          "text",
+          "users"
+        ],
+        "title": "CoachWeek"
       },
       "CompanyActiveIn": {
         "properties": {
@@ -14709,6 +15044,54 @@
         ],
         "title": "ErrorGroupStatus",
         "description": "OB-12: a resolved group that happens again reopens."
+      },
+      "EvalMetric": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "threshold": {
+            "type": "string",
+            "title": "Threshold"
+          },
+          "passed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Passed",
+            "description": "None: information only, or not measured"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "name",
+          "value",
+          "threshold",
+          "passed"
+        ],
+        "title": "EvalMetric"
       },
       "ExitSurveyIn": {
         "properties": {
@@ -18113,6 +18496,133 @@
         ],
         "title": "Part2Stories"
       },
+      "Part3Coach": {
+        "properties": {
+          "sessions": {
+            "type": "integer",
+            "title": "Sessions",
+            "description": "Coach sessions started in the weeks shown"
+          },
+          "minutes": {
+            "type": "integer",
+            "title": "Minutes"
+          },
+          "users": {
+            "type": "integer",
+            "title": "Users"
+          },
+          "by_style": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/CoachStyle"
+            },
+            "type": "object",
+            "title": "By Style",
+            "description": "Every style is present"
+          },
+          "by_channel": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/SessionChannel"
+            },
+            "type": "object",
+            "title": "By Channel",
+            "description": "Every channel is present"
+          },
+          "minutes_per_session": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "cost_per_session": {
+            "$ref": "#/components/schemas/AdminMetric"
+          },
+          "cost_total_usd": {
+            "type": "number",
+            "title": "Cost Total Usd"
+          },
+          "cap_share": {
+            "$ref": "#/components/schemas/AdminMetric",
+            "description": "Coach minutes as a share of plan caps"
+          },
+          "caps": {
+            "$ref": "#/components/schemas/CoachCapUse"
+          },
+          "weeks": {
+            "items": {
+              "$ref": "#/components/schemas/CoachWeek"
+            },
+            "type": "array",
+            "title": "Weeks",
+            "description": "Oldest first; the last is this week"
+          },
+          "evals": {
+            "$ref": "#/components/schemas/CoachEvals"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sessions",
+          "minutes",
+          "users",
+          "by_style",
+          "by_channel",
+          "minutes_per_session",
+          "cost_per_session",
+          "cost_total_usd",
+          "cap_share",
+          "caps",
+          "weeks",
+          "evals"
+        ],
+        "title": "Part3Coach"
+      },
+      "Part3Readiness": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "title": "Kind",
+            "description": "RD-3: a practice estimate",
+            "default": "practice_estimate"
+          },
+          "note": {
+            "type": "string",
+            "title": "Note",
+            "default": "Practice estimate from Realistic sessions only, last 90 days, without development data. Fewer than 2 scored sessions for a skill is not enough data."
+          },
+          "window_days": {
+            "type": "integer",
+            "title": "Window Days"
+          },
+          "min_sessions": {
+            "type": "integer",
+            "title": "Min Sessions"
+          },
+          "users": {
+            "type": "integer",
+            "title": "Users",
+            "description": "Users with any Realistic score in the window"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/SkillReadinessRow"
+            },
+            "type": "array",
+            "title": "Skills",
+            "description": "Skills with any score, most users first"
+          }
+        },
+        "type": "object",
+        "required": [
+          "window_days",
+          "min_sessions",
+          "users",
+          "skills"
+        ],
+        "title": "Part3Readiness"
+      },
       "PasswordLoginRequest": {
         "properties": {
           "email": {
@@ -21309,6 +21819,17 @@
               }
             ],
             "description": "SM-20: the pasted job and CV the run used, if any"
+          },
+          "setup": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdminSessionSetup"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "AD-5: the brief and the rubric, as on the session page"
           }
         },
         "type": "object",
@@ -22404,6 +22925,55 @@
         ],
         "title": "SkillReadiness",
         "description": "RD-1: readiness for one skill, from Realistic sessions only."
+      },
+      "SkillReadinessRow": {
+        "properties": {
+          "competency": {
+            "$ref": "#/components/schemas/Competency"
+          },
+          "users": {
+            "type": "integer",
+            "title": "Users",
+            "description": "Users with at least one Realistic score for the skill"
+          },
+          "users_enough_data": {
+            "type": "integer",
+            "title": "Users Enough Data",
+            "description": "Of them, users with 2 or more scored sessions"
+          },
+          "users_at_bar": {
+            "type": "integer",
+            "title": "Users At Bar",
+            "description": "Of those, users whose mean score is 3 or more"
+          },
+          "mean_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Score",
+            "description": "Mean of the users' means, 1 to 4"
+          },
+          "sessions": {
+            "type": "integer",
+            "title": "Sessions",
+            "description": "Realistic sessions that scored the skill"
+          }
+        },
+        "type": "object",
+        "required": [
+          "competency",
+          "users",
+          "users_enough_data",
+          "users_at_bar",
+          "mean_score",
+          "sessions"
+        ],
+        "title": "SkillReadinessRow"
       },
       "Source": {
         "additionalProperties": false,

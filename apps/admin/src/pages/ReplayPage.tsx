@@ -12,6 +12,7 @@ import {
   type ReplayScorecard,
   type SessionReplay,
 } from "../api/sim";
+import { SessionSetupPanel } from "../components/SessionSetupPanel";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
 import { clock, words } from "../format";
 import { levelLabel, phaseLabel } from "../labels";
@@ -589,6 +590,7 @@ export function ReplayPage() {
           <ScorecardPanel card={r.scorecard} />
         </div>
       </div>
+      <SessionSetupPanel setup={r.setup} />
     </>
   );
 }

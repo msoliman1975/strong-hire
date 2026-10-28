@@ -138,6 +138,10 @@ export const mockReplay: SessionReplay = {
   audio: { available: true, bytes: 48_000 },
   scenario: scenario(),
   inputs: null,
+  setup: {
+    brief_prompt: { ref: "planner/interviewer_brief.v3", text: "Build the interviewer brief.", recorded: false },
+    rubric: { ref: "scorer/rubric.v2", text: "Score each answer 1 to 4 per competency.", recorded: true },
+  },
 };
 
 const states = new WeakMap<MockDb, SimState>();

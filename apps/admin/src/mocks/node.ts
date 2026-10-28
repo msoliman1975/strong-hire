@@ -14,6 +14,7 @@ import { usersHandlers } from "./usersHandlers";
 import { waitlistHandlers } from "./waitlistHandlers";
 import { part1Handlers } from "./part1Handlers";
 import { part2Handlers } from "./part2Handlers";
+import { part3Handlers } from "./part3Handlers";
 
 export const mockStore = createStore({ persist: false });
-export const server = setupServer(...authHandlers(mockStore), ...adminHandlers(mockStore), ...alertsHandlers(mockStore), ...controlsHandlers(mockStore), ...usersHandlers(mockStore), ...opsHandlers(mockStore), ...simHandlers(mockStore), ...contentHandlers(mockStore), ...settingsHandlers(mockStore), ...waitlistHandlers(mockStore), ...part1Handlers(mockStore), ...part2Handlers(mockStore));
+export const server = setupServer(...authHandlers(mockStore), ...adminHandlers(mockStore), ...alertsHandlers(mockStore), ...controlsHandlers(mockStore), ...usersHandlers(mockStore), ...opsHandlers(mockStore), ...simHandlers(mockStore), ...contentHandlers(mockStore), ...settingsHandlers(mockStore), ...waitlistHandlers(mockStore), ...part1Handlers(mockStore), ...part2Handlers(mockStore), ...part3Handlers(mockStore));

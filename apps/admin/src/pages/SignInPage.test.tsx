@@ -51,6 +51,8 @@ describe("admin sign-in (AA-2)", () => {
       "Overview",
       "Plan usage",
       "Story library",
+      "Coach",
+      "Readiness",
       "Interviews",
       "Simulations",
       "Users",

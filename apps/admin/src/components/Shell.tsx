@@ -19,6 +19,8 @@ const SECTIONS: { to: string; label: string; group?: string; badge?: ComponentTy
   { to: "/overview", label: "Overview" },
   { to: "/plan-usage", label: "Plan usage" },
   { to: "/story-library", label: "Story library" },
+  { to: "/coach", label: "Coach" },
+  { to: "/readiness", label: "Readiness" },
   { to: "/interviews", label: "Interviews" },
   { to: "/simulations", label: "Simulations" },
   { to: "/users", label: "Users" },
