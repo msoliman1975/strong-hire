@@ -78,7 +78,7 @@ export const MOCK_PART3_READINESS: Part3Readiness = {
 };
 
 export function part3Handlers(store: MockStore) {
-  const guard = (body: unknown) =>
+  const guard = (body: Part3Coach | Part3Readiness) =>
     currentAdmin(store.db) ? HttpResponse.json(body) : HttpResponse.json({ detail: "Not Found" }, { status: 404 });
   return [
     http.get(`${API}/admin/part3/coach`, () => guard(MOCK_PART3_COACH)),
