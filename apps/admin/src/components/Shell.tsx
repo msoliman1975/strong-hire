@@ -18,6 +18,7 @@ import { ErrorNotice, Loading } from "./ui";
 const SECTIONS: { to: string; label: string; group?: string; badge?: ComponentType }[] = [
   { to: "/overview", label: "Overview" },
   { to: "/plan-usage", label: "Plan usage" },
+  { to: "/story-library", label: "Story library" },
   { to: "/interviews", label: "Interviews" },
   { to: "/simulations", label: "Simulations" },
   { to: "/users", label: "Users" },

@@ -20,6 +20,7 @@ import { settingsHandlers } from "./settingsHandlers";
 import { usersHandlers } from "./usersHandlers";
 import { waitlistHandlers } from "./waitlistHandlers";
 import { part1Handlers } from "./part1Handlers";
+import { part2Handlers } from "./part2Handlers";
 import { opsHandlers } from "./opsHandlers";
 import { simHandlers } from "./simHandlers";
 
@@ -63,7 +64,7 @@ function seed(db: MockDb): void {
 export async function startMocks(mode: MockMode): Promise<void> {
   if (mode === "off") return;
   const store = createStore({ persist: true, seed });
-  await setupWorker(...authHandlers(store), ...adminHandlers(store), ...alertsHandlers(store), ...controlsHandlers(store), ...usersHandlers(store), ...opsHandlers(store), ...simHandlers(store), ...contentHandlers(store), ...settingsHandlers(store), ...waitlistHandlers(store), ...part1Handlers(store)).start({
+  await setupWorker(...authHandlers(store), ...adminHandlers(store), ...alertsHandlers(store), ...controlsHandlers(store), ...usersHandlers(store), ...opsHandlers(store), ...simHandlers(store), ...contentHandlers(store), ...settingsHandlers(store), ...waitlistHandlers(store), ...part1Handlers(store), ...part2Handlers(store)).start({
     onUnhandledFrame: "bypass",
     quiet: true,
   });
