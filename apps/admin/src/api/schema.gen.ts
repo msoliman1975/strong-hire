@@ -587,6 +587,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/sessions/{session_id}/transcript": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Transcript
+         * @description TR-1: the transcript of the signed-in user's finished session. 404 for anyone else.
+         */
+        get: operations["get_transcript_sessions__session_id__transcript_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/questions/companies": {
         parameters: {
             query?: never;
@@ -8217,6 +8237,62 @@ export interface components {
          * @enum {string}
          */
         Tone: "as_company" | "warm" | "neutral" | "direct";
+        /** Transcript */
+        Transcript: {
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            /** Started At */
+            started_at: string | null;
+            /**
+             * Ended At
+             * Format: date-time
+             */
+            ended_at: string;
+            /** Groups */
+            groups: components["schemas"]["TranscriptGroup"][];
+        };
+        /**
+         * TranscriptGroup
+         * @description Consecutive turns about one question, or about one phase when there is no question.
+         */
+        TranscriptGroup: {
+            /**
+             * Question Ref
+             * @description The brief question id, None outside questions.
+             */
+            question_ref: string | null;
+            /**
+             * Question Text
+             * @description The question as planned, when known.
+             */
+            question_text: string | null;
+            /** @description The phase of the group's first turn. */
+            phase: components["schemas"]["Phase"];
+            /** Turns */
+            turns: components["schemas"]["TranscriptTurn"][];
+        };
+        /** TranscriptTurn */
+        TranscriptTurn: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            speaker: components["schemas"]["Speaker"];
+            phase: components["schemas"]["Phase"];
+            /** Text */
+            text: string;
+            /**
+             * Start Ms
+             * @description Time offset from the session start, in milliseconds.
+             */
+            start_ms: number;
+            /** End Ms */
+            end_ms: number;
+        };
         /** TransitionIn */
         TransitionIn: {
             /**
@@ -9652,6 +9728,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ReportItem"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_transcript_sessions__session_id__transcript_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Transcript"];
                 };
             };
             /** @description Validation Error */
