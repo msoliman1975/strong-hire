@@ -201,9 +201,16 @@ describe("interview plan page", () => {
     expect(within(types[0]).getByText("In their loop")).toBeInTheDocument();
     expect(within(types[0]).getByLabelText("Ownership: 50% of this round")).toBeInTheDocument();
 
+    // A short summary: the top 3 areas, the match score, and the full report one click away.
     const probe = screen.getByRole("region", { name: "Where they'll probe" });
-    for (const area of gapAnalysis.probe_areas) expect(within(probe).getByText(area)).toBeInTheDocument();
-    expect(within(probe).getByTestId("session-plan").children).toHaveLength(gapAnalysis.session_plan.length);
+    expect(within(probe).getByTestId("probe-areas").children).toHaveLength(Math.min(3, gapAnalysis.probe_areas.length));
+    expect(within(probe).getByTestId("plan-match")).toHaveTextContent(`Match ${gapAnalysis.match_score}`);
+    expect(within(probe).getByRole("link", { name: "Show full report" })).toHaveAttribute(
+      "href",
+      expect.stringContaining("/jobs/j1/gap-report?report="),
+    );
+    // The practice plan moved out of this card, into "Your plan".
+    expect(within(probe).queryByTestId("session-plan")).toBeNull();
 
     const earlier = screen.getByRole("region", { name: "Earlier rehearsals" });
     expect(within(earlier).getByText(/1 scored interview\. Latest hire signal: Lean Hire/)).toBeInTheDocument();
@@ -217,8 +224,8 @@ describe("interview plan page", () => {
       "/jobs/j1/context?resume=r1",
     );
     // The next rehearsal card's one primary action runs it too: never a disabled dead end.
-    const next = screen.getByRole("region", { name: "Next rehearsal" });
-    expect(within(next).getByRole("link", { name: "Run the gap analysis" })).toHaveAttribute(
+    const next = await screen.findByRole("region", { name: "Your plan" });
+    expect(await within(next).findByRole("link", { name: "Run the gap analysis" })).toHaveAttribute(
       "href",
       "/jobs/j1/context?resume=r1",
     );
@@ -250,7 +257,7 @@ describe("interview plan page", () => {
 
   it("PP-4: the setup keeps type, Custom, difficulty, tone, mode and 30 or 45 minutes", async () => {
     const { user, bodies } = renderPlan(planView());
-    const setup = await screen.findByRole("region", { name: "Next rehearsal" });
+    const setup = await screen.findByRole("form", { name: "Rehearsal setup" });
     await within(setup).findAllByText("A full interview.");
     for (const name of [/^Behavioral/, /^Hiring manager/, /^Verbal technical/, /^Case/, /^Custom/]) {
       expect(within(setup).getByRole("radio", { name })).toBeEnabled();
@@ -288,7 +295,7 @@ describe("interview plan page", () => {
 
   it("PP-4: Custom opens the shared Custom setup", async () => {
     const { user } = renderPlan(planView());
-    const setup = await screen.findByRole("region", { name: "Next rehearsal" });
+    const setup = await screen.findByRole("form", { name: "Rehearsal setup" });
     await within(setup).findAllByText("A full interview.");
     await user.click(within(setup).getByRole("radio", { name: /^Custom/ }));
     // The Custom fields replace the duration choice, as on the v1 setup page.
@@ -297,7 +304,7 @@ describe("interview plan page", () => {
 
   it("PP-4, TN-3: in generic mode the tone defaults to Neutral and there is no company tone", async () => {
     renderPlan(planView({ company_mode: "generic", setup: { ...planView().setup, tone: "neutral" } }), FREE_USAGE);
-    const setup = await screen.findByRole("region", { name: "Next rehearsal" });
+    const setup = await screen.findByRole("form", { name: "Rehearsal setup" });
     expect(within(setup).getByRole("radio", { name: /^Neutral/ })).toBeChecked();
     expect(within(setup).queryByRole("radio", { name: /^Like / })).not.toBeInTheDocument();
     // Free accounts: the mini interview, as on the v1 setup page.
@@ -325,7 +332,7 @@ describe("v2_enabled and the old pages", () => {
   it("flag off: the gap analysis, rehearsals and setup routes are unchanged", async () => {
     renderApp("/jobs/j1/sessions/new?resume=r1");
     expect(await screen.findByRole("heading", { level: 1, name: "Set up your interview" })).toBeInTheDocument();
-    expect(screen.queryByRole("region", { name: "Next rehearsal" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "Your plan" })).not.toBeInTheDocument();
   });
 
   it("flag off: the gap analysis page still shows", async () => {
@@ -340,7 +347,7 @@ describe("v2_enabled and the old pages", () => {
   ])("PP-1: flag on, %s opens the plan page", async (path) => {
     setFeatureOverrides({ v2_enabled: true });
     renderApp(path);
-    expect(await screen.findByRole("region", { name: "Next rehearsal" })).toBeInTheDocument();
+    expect(await screen.findByRole("region", { name: "Your plan" })).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "What they'll test" })).toBeInTheDocument();
   });
 });

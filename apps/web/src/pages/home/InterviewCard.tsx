@@ -90,6 +90,15 @@ export function InterviewCard({
           {" · "}
           {summary.sessions_count} {summary.sessions_count === 1 ? "session" : "sessions"}
         </span>
+        {/* GA-1: the gap analysis behind the match score, one click away (v2 gap report). */}
+        {summary.match_score !== null && (
+          <>
+            {" · "}
+            <Link className="text-link" to={`/jobs/${job.id}/gap-report`}>
+              View gap report
+            </Link>
+          </>
+        )}
       </p>
       {ready && <ReadinessMeter jobId={job.id} />}
       {action ? (
