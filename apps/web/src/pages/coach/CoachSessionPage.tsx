@@ -2,17 +2,21 @@
  * CO-2 (UI): a coach session (canvas board A1 Coach session). The conversation is on the left,
  * the story taking shape on the right: the five parts as the coach fills them from the
  * candidate's own words (CO-3), what is still missing and what the coach asks for now (CO-4),
- * and the skills the story could prove. The style switch is CO-5. "Done" saves the title, ends
- * the session and opens the story in the workbench.
+ * and the skills the story could prove. The style switch is CO-5. "Save and exit" saves the
+ * title, ends the session and opens the story in the studio.
  *
  * The mic button (CO-6) joins the coach's voice room through useCoachVoice, with a token from
- * POST /coach/sessions/{id}/voice/join (room coach-<id>).
+ * POST /coach/sessions/{id}/voice/join (room coach-<id>). When voice is open and the browser has a
+ * microphone, the page is voice-first, as on the canvas: a big mic, what the coach is doing now,
+ * and "Type instead". `?voice=1` (the mic on Home) starts talking at once.
  */
 import "./coach.css";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, type FormEvent, type KeyboardEvent } from "react";
-import { Link, useNavigate, useParams } from "react-router";
+import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router";
+
+import { useSiteStatus } from "../../api/status";
 
 import { competencyLabel } from "../../labels";
 import {
@@ -71,6 +75,30 @@ export function CoachSessionPage() {
   );
 }
 
+/** Voice is open on the site (OC-1) and the browser can open a microphone. */
+function useVoiceAvailable(): boolean {
+  const status = useSiteStatus();
+  const mic = typeof navigator !== "undefined" && typeof navigator.mediaDevices?.getUserMedia === "function";
+  return mic && status.data?.voice_sessions_open === true;
+}
+
+const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+
+/** Whole seconds since `on` turned true, ticking each second; null while it is false. */
+function useSecondsOn(on: boolean): number | null {
+  const [seconds, setSeconds] = useState(0);
+  useEffect(() => {
+    if (!on) return;
+    const started = Date.now();
+    const id = window.setInterval(() => setSeconds(Math.floor((Date.now() - started) / 1000)), 1000);
+    return () => {
+      window.clearInterval(id);
+      setSeconds(0);
+    };
+  }, [on]);
+  return on ? seconds : null;
+}
+
 const filled = (story: Story | null, part: StoryPart) => ((story?.[part] ?? "") as string).trim() !== "";
 
 function CoachSession({ detail }: { detail: CoachSessionDetail }) {
@@ -82,6 +110,10 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
   const [title, setTitle] = useState(story && story.title !== NEW_STORY_TITLE ? story.title : "");
   const [shows, setShows] = useState<Competency[]>([]); // CoachReply.skills, the latest turn's
   const [voiceLines, setVoiceLines] = useState<string[]>([]); // spoken lines not yet in the turns
+  const [spoken, setSpoken] = useState<Set<number>>(() => new Set()); // candidate turns said by voice here
+  const voiceAvailable = useVoiceAvailable();
+  const [typing, setTyping] = useState(false);
+  const [params] = useSearchParams();
   const ended = detail.session.status !== "active";
 
   const update = (next: Partial<CoachSessionDetail>) =>
@@ -132,11 +164,27 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
 
   const voice = useCoachVoice(sessionId, {
     onTurn: (said, result) => {
-      if (result) apply(result as CoachTurnResult);
+      if (result) {
+        const r = result as CoachTurnResult;
+        const mine = r.turns.filter((t) => t.speaker === "candidate").map((t) => t.seq);
+        if (mine.length) setSpoken((prev) => new Set([...prev, ...mine]));
+        apply(r);
+      }
       else if (said.length) setVoiceLines((lines) => [...lines, ...said]);
     },
   });
   const voiceLive = voice.status === "live" || voice.status === "connecting" || voice.status === "reconnecting";
+  const voiceFirst = voiceAvailable && !typing;
+  const listening = useSecondsOn(voice.status === "live" && voice.activity === "listening");
+
+  // `?voice=1`: the candidate pressed a mic to get here, so start talking once.
+  const autoStarted = useRef(false);
+  const startVoice = voice.start;
+  useEffect(() => {
+    if (autoStarted.current || ended || params.get("voice") !== "1" || !voiceAvailable) return;
+    autoStarted.current = true;
+    void startVoice();
+  }, [ended, params, startVoice, voiceAvailable]);
 
   const send = (e?: FormEvent) => {
     e?.preventDefault();
@@ -151,6 +199,13 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
   const asked = ASK_PART[detail.asking_for];
   const stateOf = (p: StoryPart): PartState => (p === asked && !ended ? "now" : filled(story, p) ? "done" : "next");
   const couldProve = [...new Set([...((story?.skills ?? []) as Competency[]), ...shows])];
+  // The canvas tip: while the coach asks what the candidate did, say "I".
+  const lastCoach = [...detail.turns].reverse().find((t) => t.speaker === "coach")?.seq;
+  const tipOn = !ended && detail.asking_for === "own_role";
+
+  useEffect(() => {
+    document.title = `${heading} | Strong Hire`;
+  }, [heading]);
 
   return (
     <>
@@ -175,8 +230,8 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
             }}
           />
         </div>
-        <button className="btn" type="button" onClick={() => done.mutate()} disabled={done.isPending}>
-          {done.isPending ? "Saving" : "Done"}
+        <button className="btn btn--secondary" type="button" onClick={() => done.mutate()} disabled={done.isPending}>
+          {done.isPending ? "Saving" : "Save and exit"}
         </button>
       </header>
       {done.isError && <ErrorNotice error={done.error} title="The story was not saved" />}
@@ -188,10 +243,16 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
             {detail.turns.map((t) => (
               <li key={t.seq} className="coach-turn" data-speaker={t.speaker} data-testid="coach-turn">
                 {t.speaker === "coach" && <CoachMark size={32} />}
-                <p>
-                  <span className="visually-hidden">{t.speaker === "coach" ? "Coach: " : "You: "}</span>
-                  {t.text}
-                </p>
+                <div className="coach-turn__body">
+                  <p>
+                    <span className="visually-hidden">{t.speaker === "coach" ? "Coach: " : "You: "}</span>
+                    {t.text}
+                  </p>
+                  {t.speaker === "coach" && t.seq === lastCoach && tipOn && (
+                    <p className="coach-turn__tip">Tip: say “I”, not “we”</p>
+                  )}
+                  {t.speaker === "candidate" && spoken.has(t.seq) && <p className="coach-turn__meta">Spoken</p>}
+                </div>
               </li>
             ))}
             {voiceLines.map((line, i) => (
@@ -209,7 +270,35 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
           </p>
           {turn.isError && <ErrorNotice error={turn.error} title="Your message was not sent" />}
           {ended ? (
-            <p className="notice coach__ended">This session has ended. Your story is saved; press Done to open it.</p>
+            <p className="notice coach__ended">This session has ended. Your story is saved; press Save and exit to open it.</p>
+          ) : voiceFirst ? (
+            <div className="coach__voice">
+              <button
+                type="button"
+                className="coach__mic coach__mic--big"
+                data-live={voiceLive || undefined}
+                aria-label={voiceLive ? "Stop talking to the coach" : "Talk to the coach"}
+                disabled={voice.status === "connecting"}
+                onClick={() => void (voiceLive ? voice.end() : voice.start())}
+              >
+                {voiceLive ? <StopIcon /> : <MicIcon />}
+              </button>
+              <p className="coach__voice-state" role="status">
+                {voice.status === "connecting"
+                  ? "Connecting"
+                  : !voiceLive
+                    ? "Tap to talk"
+                    : voice.activity === "speaking"
+                      ? "Your coach is talking"
+                      : voice.activity === "thinking"
+                        ? "Your coach is thinking"
+                        : `Listening${listening !== null ? ` · ${clock(listening)}` : ""}`}
+              </p>
+              <button className="btn btn--secondary" type="button" onClick={() => setTyping(true)}>
+                Type instead
+              </button>
+              {voice.error && <p className="field-error">{voice.error}</p>}
+            </div>
           ) : (
             <form className="coach__input" onSubmit={send} aria-label="Reply to your coach">
               <button
@@ -237,6 +326,11 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
               <button className="btn" type="submit" disabled={!draft.trim() || turn.isPending}>
                 Send
               </button>
+              {voiceAvailable && (
+                <button className="btn btn--quiet coach__talk-instead" type="button" onClick={() => setTyping(false)}>
+                  Talk instead
+                </button>
+              )}
               {voice.error && <p className="field-error">{voice.error}</p>}
             </form>
           )}
@@ -305,6 +399,14 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
         </aside>
       </div>
     </>
+  );
+}
+
+function StopIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor" />
+    </svg>
   );
 }
 

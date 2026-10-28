@@ -1,11 +1,32 @@
 /* ST-3: the story library and workbench (canvas board A2 Workbench). Tokens from theme/tokens.css. */
 
 .stories .page-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 4px 24px;
+}
+
+.stories .page-head > :not(.eyebrow, h1) {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+
+.stories .page-head > .eyebrow,
+.stories .page-head > h1 {
+  grid-column: 1;
+  margin: 0;
+}
+
+@media (max-width: 599px) {
+  .stories .page-head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .stories .page-head > :not(.eyebrow, h1) {
+    grid-column: 1;
+    grid-row: auto;
+  }
 }
 
 .stories__filters {
@@ -145,4 +166,370 @@
 .stories .chip-list.plain-list > li + li,
 .home-stories .chip-list.plain-list > li + li {
   margin-top: 0;
+}
+
+/* ------------------------------------------------ v2 studio: two panes (canvas A2 Workbench) */
+
+.studio {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.studio__panes {
+  display: grid;
+  grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.studio__library {
+  position: sticky;
+  top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+}
+
+.studio__filters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.studio__filters input[type="search"] {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--sh-line-strong);
+  border-radius: var(--sh-radius-sm);
+  background: var(--sh-ground);
+  font: inherit;
+}
+
+.studio__filters .stories__skill-filter {
+  font-size: 0.875rem;
+}
+
+.studio__list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.studio__list > li + li {
+  margin-top: 0;
+}
+
+.studio__row {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: var(--sh-ink);
+  text-decoration: none;
+}
+
+.studio__row:hover {
+  background: var(--sh-ground);
+}
+
+.studio__row[aria-current="page"] {
+  background: var(--sh-violet-soft);
+}
+
+.studio__row-title {
+  font-weight: 600;
+}
+
+.studio__row-meta {
+  font-size: 0.8125rem;
+  color: var(--sh-muted);
+}
+
+.studio__empty {
+  margin: 0;
+}
+
+.studio__back {
+  display: none;
+  margin: 0 0 12px;
+}
+
+.studio__detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+}
+
+/* Wide screens: the takes and notes sit beside the story, as on the canvas at 1440px. */
+@media (min-width: 1400px) {
+  .studio__detail {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+    align-items: start;
+  }
+}
+
+.studio__aside {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.story-view {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 28px 32px;
+}
+
+.story-view__head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.story-view__head p {
+  margin: 0;
+}
+
+.story-view__head .stories__actions {
+  margin-top: 8px;
+}
+
+.story-view__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.story-view__title h2 {
+  margin: 0;
+  font-size: 1.875rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.story-view__status {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.story-view__score {
+  font-family: var(--sh-font-mono);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--sh-ok-ink);
+}
+
+.story-view__parts > li {
+  display: grid;
+  grid-template-columns: 128px minmax(0, 1fr);
+  gap: 4px 20px;
+  padding: 18px 0;
+  border-top: 1px solid var(--sh-line);
+}
+
+.story-view__parts > li + li {
+  margin-top: 0;
+}
+
+.story-view__parts p {
+  margin: 0;
+}
+
+.story-view__part-label {
+  padding-top: 2px;
+  font-family: var(--sh-font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.story-view__parts [data-part="context"] .story-view__part-label { color: var(--sh-part-context); }
+.story-view__parts [data-part="stakes"] .story-view__part-label { color: var(--sh-part-stakes); }
+.story-view__parts [data-part="action"] .story-view__part-label { color: var(--sh-part-action); }
+.story-view__parts [data-part="result"] .story-view__part-label { color: var(--sh-part-result); }
+.story-view__parts [data-part="reflection"] .story-view__part-label { color: var(--sh-part-reflection); }
+
+.text-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--sh-violet);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Takes: a timeline of bars, oldest first. */
+.story-takes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.story-takes h3,
+.story-notes h3 {
+  margin: 0;
+  font-size: 1.0625rem;
+}
+
+.story-take__row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) 36px;
+  align-items: center;
+  gap: 12px;
+}
+
+.story-take__name {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.story-take__track {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--sh-sunken);
+  overflow: hidden;
+}
+
+.story-take__fill {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--sh-warn);
+}
+
+.story-take__fill[data-level="ok"] {
+  background: var(--sh-ok);
+}
+
+.story-take__avg {
+  font-family: var(--sh-font-mono);
+  font-weight: 600;
+  text-align: right;
+}
+
+.story-take .story-take__scores {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-top: 2px;
+  gap: 4px 14px;
+  font-size: 0.8125rem;
+  color: var(--sh-muted);
+}
+
+.story-take .story-take__scores b {
+  color: var(--sh-ink);
+  font-weight: 600;
+}
+
+.btn--rec {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Coach notes: the dark card, numbered. */
+.story-notes {
+  background: var(--sh-ink);
+  border-color: var(--sh-ink);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.story-notes h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ffffff;
+}
+
+.story-notes__list > li {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.story-notes__list > li + li {
+  margin-top: 12px;
+}
+
+.story-notes p {
+  margin: 0;
+}
+
+.story-notes__n {
+  font-family: var(--sh-font-mono);
+  font-weight: 600;
+  color: var(--sh-violet-light);
+}
+
+.story-notes__meta,
+.story-notes__empty {
+  color: #c9c5d6;
+}
+
+.story-notes a {
+  color: #ffffff;
+}
+
+/* Below 900px one pane shows: the list on /stories, the story on /stories/:id. */
+@media (max-width: 899px) {
+  .studio__panes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .studio__library {
+    position: static;
+  }
+
+  .studio[data-selected="false"] .studio__story,
+  .studio[data-selected="true"] .studio__library {
+    display: none;
+  }
+
+  .studio__back {
+    display: block;
+  }
+
+  .story-view {
+    padding: 20px;
+  }
+
+  .story-view__parts > li {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.story-takes .story-takes__list {
+  gap: 10px;
+}
+
+.story-takes .story-takes__list > li + li {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.story-skills__more {
+  justify-self: start;
 }

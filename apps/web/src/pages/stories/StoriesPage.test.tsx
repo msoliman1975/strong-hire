@@ -69,67 +69,113 @@ function renderAt(path: string) {
 }
 
 describe("story library", () => {
+  const library = () => screen.getByRole("navigation", { name: "Story library" });
+
   it("ST-3: lists the stories, newest first, with status and skill tags", async () => {
     renderAt("/stories");
     const rows = await screen.findAllByTestId("story-row");
     expect(rows).toHaveLength(2);
-    expect(within(rows[0]).getByRole("link", { name: "Pushback from platform" })).toHaveAttribute("href", "/stories/s2");
-    expect(rows[0]).toHaveTextContent("Draft");
-    expect(rows[0]).toHaveTextContent("Conflict handling");
-    expect(rows[1]).toHaveTextContent("Proven");
-    expect(within(rows[1]).getByRole("list", { name: "Skills" })).toHaveTextContent("OwnershipImpact");
-    // Parts done are said in text, not only in color.
-    expect(rows[1]).toHaveTextContent("3 of 5 parts written: context, action, result.");
+    expect(within(rows[0]).getByRole("link", { name: /Pushback from platform/ })).toHaveAttribute("href", "/stories/s2");
+    expect(rows[0]).toHaveTextContent("Draft · 0 of 5 parts · Conflict handling");
+    expect(rows[1]).toHaveTextContent("Proven · Ownership, Impact");
   });
 
-  it("ST-3: filters by status and by skill, in the URL", async () => {
+  it("ST-3: the studio opens the first story beside the list, in a read view", async () => {
+    renderAt("/stories");
+    expect(await screen.findByRole("heading", { level: 2, name: "Pushback from platform" })).toBeInTheDocument();
+    const rows = screen.getAllByTestId("story-row");
+    expect(within(rows[0]).getByRole("link")).toHaveAttribute("aria-current", "page");
+  });
+
+  it("ST-3: filters by status (All, Proven, Needs work), by skill, in the URL, and searches by title", async () => {
     const user = userEvent.setup();
     renderAt("/stories");
     await screen.findAllByTestId("story-row");
 
-    await user.click(screen.getByRole("button", { name: "Proven" }));
+    await user.click(within(library()).getByRole("button", { name: "Proven" }));
     expect(await screen.findByTestId("where")).toHaveTextContent("/stories?status=proven");
     await expect.poll(() => screen.getAllByTestId("story-row").map((r) => r.textContent)).toHaveLength(1);
     expect(screen.getByTestId("story-row")).toHaveTextContent("Checkout migration");
 
-    await user.click(screen.getByRole("button", { name: "All" }));
+    await user.click(within(library()).getByRole("button", { name: "Needs work" }));
+    expect(screen.getByTestId("where")).toHaveTextContent("/stories?status=draft");
+
+    await user.click(within(library()).getByRole("button", { name: "All 2" }));
     await user.selectOptions(screen.getByRole("combobox", { name: "Skill" }), "conflict_handling");
     expect(screen.getByTestId("where")).toHaveTextContent("/stories?skill=conflict_handling");
-    await expect.poll(() => screen.queryByText("Checkout migration")).toBeNull();
+    await expect.poll(() => within(library()).queryByText("Checkout migration")).toBeNull();
     expect(screen.getByTestId("story-row")).toHaveTextContent("Pushback from platform");
 
+    await user.selectOptions(screen.getByRole("combobox", { name: "Skill" }), "");
+    await expect.poll(() => screen.getAllByTestId("story-row")).toHaveLength(2);
+    await user.type(screen.getByRole("searchbox", { name: "Search stories" }), "checkout");
+    expect(screen.getAllByTestId("story-row").map((r) => r.textContent)).toEqual([expect.stringContaining("Checkout migration")]);
+
+    await user.clear(screen.getByRole("searchbox", { name: "Search stories" }));
     await user.selectOptions(screen.getByRole("combobox", { name: "Skill" }), "judgment");
     expect(await screen.findByText("No stories match these filters.")).toBeInTheDocument();
+  });
+
+  it("ST-3: the skill filter lists each skill once", async () => {
+    renderAt("/stories");
+    const options = within(await screen.findByRole("combobox", { name: "Skill" }))
+      .getAllByRole("option")
+      .map((o) => o.textContent);
+    expect(options).toContain("Motivation");
+    expect(new Set(options).size).toBe(options.length);
   });
 
   it("ST-3: an empty library says how to add a story", async () => {
     resetMockStories([]);
     renderAt("/stories");
     expect(await screen.findByText(/No stories yet/)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "New story" })).toHaveAttribute("href", "/stories/new");
+    expect(screen.getByRole("link", { name: "New story with the coach" })).toHaveAttribute("href", "/coach/new");
+    expect(screen.getByRole("link", { name: "Write one yourself" })).toHaveAttribute("href", "/stories/new");
   });
 });
 
-describe("story workbench", () => {
-  it("ST-3: shows each part with its name, the status and the fix notes newest first", async () => {
+describe("story view", () => {
+  it("ST-3: reads each part with its name, the status and the numbered fix notes, newest first", async () => {
     renderAt("/stories/s1");
-    expect(await screen.findByRole("heading", { level: 1, name: "Checkout migration" })).toBeInTheDocument();
-    expect(screen.getByText("Proven")).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 2, name: "Checkout migration" })).toBeInTheDocument();
+    const view = screen.getByRole("article");
+    expect(within(view).getByText("Proven")).toBeInTheDocument();
+    expect(view).toHaveTextContent("Proves Ownership and Impact");
+    for (const label of ["Context", "Stakes", "Your action", "Result", "Reflection"]) {
+      expect(within(view).getByText(label)).toBeInTheDocument();
+    }
+    expect(within(view).getByText("Payments service nobody owned.")).toBeInTheDocument();
+    // An empty part offers the coach.
+    expect(within(view).getAllByRole("link", { name: "Add it with the coach" })[0]).toHaveAttribute("href", "/coach/new?story=s1");
+    expect(screen.queryByRole("textbox", { name: "Context" })).toBeNull();
+
+    const notes = screen.getAllByTestId("story-note");
+    expect(notes.map((n) => n.querySelector("p")?.textContent)).toEqual(["Newer note", "Older note"]);
+    expect(notes[0]).toHaveTextContent(/^1/);
+    expect(within(notes[0]).getByRole("link", { name: "Open the debrief" })).toHaveAttribute(
+      "href",
+      "/sessions/5e551011-0000-4000-8000-000000000000/debrief",
+    );
+  });
+
+  it("ST-3: Edit story opens the form with each part, and the skills the story uses", async () => {
+    const user = userEvent.setup();
+    renderAt("/stories/s1");
+    await user.click(await screen.findByRole("button", { name: "Edit story" }));
     for (const label of ["Context", "Stakes", "Your action", "Result", "Reflection"]) {
       expect(screen.getByRole("textbox", { name: label })).toBeInTheDocument();
     }
     expect(screen.getByRole("textbox", { name: "Context" })).toHaveValue("Payments service nobody owned.");
     expect(screen.getByRole("textbox", { name: "Stakes" })).toHaveValue("");
     expect(screen.getByRole("button", { name: "Ownership" })).toHaveAttribute("aria-pressed", "true");
+    // Only the groups the story uses show; the rest open on request, each skill once.
+    expect(screen.queryByRole("button", { name: "Judgment" })).toBeNull();
+    await user.click(screen.getByRole("button", { name: /Show all skills/ }));
     expect(screen.getByRole("button", { name: "Judgment" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getAllByRole("button", { name: "Motivation" })).toHaveLength(1);
 
-    const notes = screen.getAllByTestId("story-note");
-    expect(notes.map((n) => n.querySelector("p")?.textContent)).toEqual(["Newer note", "Older note"]);
-    expect(within(notes[0]).getByRole("link", { name: "Open the debrief" })).toHaveAttribute(
-      "href",
-      "/sessions/5e551011-0000-4000-8000-000000000000/debrief",
-    );
-    expect(screen.getByTestId("story-takes")).toHaveTextContent("Work on it with the coach");
+    await user.click(screen.getByRole("button", { name: "Back to the story" }));
+    expect(screen.queryByRole("textbox", { name: "Context" })).toBeNull();
   });
 
   it("ST-3: edits a story part by part and saves only what changed", async () => {
@@ -139,12 +185,14 @@ describe("story workbench", () => {
     });
     const user = userEvent.setup();
     renderAt("/stories/s1");
-    const stakes = await screen.findByRole("textbox", { name: "Stakes" });
+    await user.click(await screen.findByRole("button", { name: "Edit story" }));
+    const stakes = screen.getByRole("textbox", { name: "Stakes" });
     const save = screen.getByRole("button", { name: "Save changes" });
     expect(save).toBeDisabled();
 
     await user.type(stakes, "2 percent of checkouts failed.");
     await user.clear(screen.getByRole("textbox", { name: "Result" }));
+    await user.click(screen.getByRole("button", { name: /Show all skills/ }));
     await user.click(screen.getByRole("button", { name: "Judgment" }));
     await user.click(save);
 
@@ -159,8 +207,8 @@ describe("story workbench", () => {
   it("ST-3: a story needs a title", async () => {
     const user = userEvent.setup();
     renderAt("/stories/s1");
-    const title = await screen.findByRole("textbox", { name: "Title" });
-    await user.clear(title);
+    await user.click(await screen.findByRole("button", { name: "Edit story" }));
+    await user.clear(screen.getByRole("textbox", { name: "Title" }));
     await user.click(screen.getByRole("button", { name: "Save changes" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("A story needs a title.");
   });
@@ -173,7 +221,7 @@ describe("story workbench", () => {
 });
 
 describe("new story", () => {
-  it("ST-3: New story creates a manual draft and opens it in the workbench", async () => {
+  it("ST-3: New story creates a manual draft and opens it in the studio", async () => {
     const user = userEvent.setup();
     renderAt("/stories/new?skill=conflict_handling");
     expect(screen.getByRole("button", { name: "Conflict handling" })).toHaveAttribute("aria-pressed", "true");
@@ -183,10 +231,11 @@ describe("new story", () => {
 
     await user.type(screen.getByRole("textbox", { name: "Title" }), "Hiring my first PM");
     await user.click(screen.getByRole("button", { name: "Create story" }));
-    expect(await screen.findByRole("heading", { level: 1, name: "Hiring my first PM" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 2, name: "Hiring my first PM" })).toBeInTheDocument();
     expect(screen.getByTestId("where").textContent).toMatch(/^\/stories\/[0-9a-f-]{36}$/);
-    expect(screen.getByText("Draft")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Conflict handling" })).toHaveAttribute("aria-pressed", "true");
+    const view = screen.getByRole("article");
+    expect(within(view).getByText("Draft")).toBeInTheDocument();
+    expect(view).toHaveTextContent("Proves Conflict handling");
   });
 });
 

@@ -1,29 +1,39 @@
 /**
- * ST-3: the story library (canvas board A2 Workbench, left column). Filters by status and skill
- * live in the URL (`?status=`, `?skill=`) and go to the API, which does the filtering.
+ * ST-3: the story studio (canvas board A2 Workbench), two panes. Left: the library, with search,
+ * the status filter (All, Proven, Needs work) and a skill filter; status and skill live in the URL
+ * (`?status=`, `?skill=`) and go to the API. Right: the selected story (StoryView). `/stories`
+ * shows the first story beside the list; `/stories/:storyId` shows that one. Below 900px only one
+ * pane shows: the list on `/stories`, the story on `/stories/:storyId`.
  */
 import "./stories.css";
 
-import { Link, useSearchParams } from "react-router";
+import { useState } from "react";
+import { Link, useParams, useSearchParams } from "react-router";
 
 import { COMPETENCIES_BY_TYPE } from "../../api/questions";
 import { competencyLabel } from "../../labels";
-import { ErrorNotice, Loading, PageHead, Pill, Segmented, StatusBadge, StoryPartChip } from "../../components/ui";
+import { ErrorNotice, Loading, PageHead, Segmented, StatusBadge, StoryPartChip } from "../../components/ui";
+import { newCoachPath } from "../coach/paths";
 import { filledParts, STORY_PARTS, storyStatusLabel, useStories, type Competency, type Story, type StoryStatus } from "./api";
-import { newStoryPath, storyPath } from "./paths";
+import { newStoryPath, storiesPath, storyPath } from "./paths";
+import { StoryView } from "./StoryView";
 
-const SKILLS = Object.values(COMPETENCIES_BY_TYPE).flat() as Competency[];
+/** Every competency once, in the order of COMPETENCIES_BY_TYPE. The recruiter screen repeats three. */
+export const SKILLS = [...new Set(Object.values(COMPETENCIES_BY_TYPE).flat())] as Competency[];
 const STATUSES: StoryStatus[] = ["proven", "draft"];
 
 type StatusChoice = StoryStatus | "all";
 
 export function StoriesPage() {
+  const { storyId } = useParams();
   const [params, setParams] = useSearchParams();
+  const [search, setSearch] = useState("");
   const statusParam = params.get("status");
   const status = STATUSES.find((s) => s === statusParam);
   const skillParam = params.get("skill");
   const skill = SKILLS.find((s) => s === skillParam);
   const stories = useStories({ status, skill });
+  const all = useStories();
 
   const setFilter = (key: "status" | "skill", value: string | undefined) => {
     const next = new URLSearchParams(params);
@@ -31,80 +41,119 @@ export function StoriesPage() {
     else next.delete(key);
     setParams(next, { replace: true });
   };
-  const filtered = status !== undefined || skill !== undefined;
+  const filtered = status !== undefined || skill !== undefined || search.trim() !== "";
+  const needle = search.trim().toLowerCase();
+  const shown = (stories.data ?? []).filter((s) => needle === "" || s.title.toLowerCase().includes(needle));
+  const selected = storyId ?? shown[0]?.id ?? null;
+  const query = params.toString();
 
   return (
-    <div className="stories stack">
+    <div className="stories studio" data-selected={storyId ? "true" : "false"}>
       <PageHead title="Your stories" eyebrow="A · Story studio">
-        <Link className="btn" to={newStoryPath()}>
-          New story
-        </Link>
+        <div className="stories__actions">
+          <Link className="btn btn--secondary" to={newCoachPath()}>
+            New story with the coach
+          </Link>
+          <Link className="btn btn--quiet" to={newStoryPath()}>
+            Write one yourself
+          </Link>
+        </div>
       </PageHead>
 
-      <div className="stories__filters" role="search" aria-label="Filter stories">
-        <Segmented<StatusChoice>
-          label="Status"
-          value={status ?? "all"}
-          onChange={(v) => setFilter("status", v === "all" ? undefined : v)}
-          options={[
-            { value: "all", label: "All" },
-            { value: "proven", label: "Proven" },
-            { value: "draft", label: "Draft" },
-          ]}
-        />
-        <label className="stories__skill-filter">
-          <span className="label">Skill</span>
-          <select value={skill ?? ""} onChange={(e) => setFilter("skill", e.target.value || undefined)}>
-            <option value="">All skills</option>
-            {SKILLS.map((c) => (
-              <option key={c} value={c}>
-                {competencyLabel(c)}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-
-      {stories.isPending && <Loading label="Loading your stories" />}
-      {stories.isError && <ErrorNotice error={stories.error} />}
-      {stories.data &&
-        (stories.data.length === 0 ? (
-          <div className="card card--soft">
-            <p>{filtered ? "No stories match these filters." : "No stories yet. Save one from a debrief, or write one here."}</p>
+      <div className="studio__panes">
+        <nav className="card studio__library" aria-label="Story library">
+          <div className="studio__filters" role="search" aria-label="Filter stories">
+            <label htmlFor="studio-search" className="visually-hidden">
+              Search stories
+            </label>
+            <input
+              id="studio-search"
+              type="search"
+              placeholder="Search stories"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <Segmented<StatusChoice>
+              label="Status"
+              value={status ?? "all"}
+              onChange={(v) => setFilter("status", v === "all" ? undefined : v)}
+              options={[
+                { value: "all", label: all.data ? `All ${all.data.length}` : "All" },
+                { value: "proven", label: "Proven" },
+                // A Draft is a story that still needs work: it is not yet proven (ST-7).
+                { value: "draft", label: "Needs work" },
+              ]}
+            />
+            <label className="stories__skill-filter">
+              <span className="label">Skill</span>
+              <select value={skill ?? ""} onChange={(e) => setFilter("skill", e.target.value || undefined)}>
+                <option value="">All skills</option>
+                {SKILLS.map((c) => (
+                  <option key={c} value={c}>
+                    {competencyLabel(c)}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
-        ) : (
-          <ul className="plain-list stories__list" aria-label="Stories">
-            {stories.data.map((s) => (
-              <StoryRow key={s.id} story={s} />
+
+          {stories.isPending && <Loading label="Loading your stories" />}
+          {stories.isError && <ErrorNotice error={stories.error} />}
+          {stories.data &&
+            (shown.length === 0 ? (
+              <p className="muted studio__empty">
+                {filtered
+                  ? "No stories match these filters."
+                  : "No stories yet. Build one with your coach, or save one from a debrief."}
+              </p>
+            ) : (
+              <ul className="plain-list studio__list" aria-label="Stories">
+                {shown.map((s) => (
+                  <StoryRow key={s.id} story={s} current={s.id === selected} query={query} />
+                ))}
+              </ul>
             ))}
-          </ul>
-        ))}
+        </nav>
+
+        <div className="studio__story">
+          {storyId && (
+            <p className="studio__back">
+              <Link className="text-link" to={`${storiesPath}${query ? `?${query}` : ""}`}>
+                All stories
+              </Link>
+            </p>
+          )}
+          {selected ? (
+            <StoryView key={selected} storyId={selected} />
+          ) : (
+            stories.data && (
+              <div className="card studio__none">
+                <p className="muted">Your stories show here, each with its versions, takes and coach notes.</p>
+              </div>
+            )
+          )}
+        </div>
+      </div>
     </div>
   );
 }
 
-function StoryRow({ story }: { story: Story }) {
-  const filled = filledParts(story);
+function StoryRow({ story, current, query }: { story: Story; current: boolean; query: string }) {
+  const filled = filledParts(story).length;
   return (
-    <li className="card story-row" data-testid="story-row">
-      <div className="story-row__top">
-        <Link className="story-row__title" to={storyPath(story.id)}>
-          {story.title}
-        </Link>
-        <StoryStatusBadge status={story.status} />
-      </div>
-      {story.skills.length > 0 ? (
-        <ul className="plain-list chip-list" aria-label="Skills">
-          {story.skills.map((c) => (
-            <li key={c}>
-              <Pill>{competencyLabel(c)}</Pill>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="muted small">No skill tags yet</p>
-      )}
-      <PartsDone filled={filled} />
+    <li data-testid="story-row">
+      <Link
+        className="studio__row"
+        to={`${storyPath(story.id)}${query ? `?${query}` : ""}`}
+        aria-current={current ? "page" : undefined}
+      >
+        <span className="studio__row-title">{story.title}</span>
+        <span className="studio__row-meta">
+          {storyStatusLabel[story.status]}
+          {story.status === "draft" && ` · ${filled} of 5 parts`}
+          {story.skills.length > 0 && <> · {story.skills.map(competencyLabel).join(", ")}</>}
+        </span>
+      </Link>
     </li>
   );
 }
