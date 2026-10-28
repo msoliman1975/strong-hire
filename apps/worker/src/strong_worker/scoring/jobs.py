@@ -40,6 +40,7 @@ from strong_core.schemas import MINI_DURATION_MIN, InterviewerBrief, Mode, Sessi
 from strong_core.sim import gateway_for_org
 from strong_worker.ops.context import job_context
 from strong_worker.pause import wait_if_paused
+from strong_worker.scoring.delivery import with_delivery
 from strong_worker.scoring.scorer import ScoringError, ScoringOutcome, SessionScorer
 from strong_worker.scoring.stories import run_story_step
 
@@ -116,7 +117,8 @@ async def score_session(ctx: dict[str, Any], session_id: str, org_id: str) -> di
             log.exception("scoring failed for session %s", session.id)
             return await _fail(db, session, f"Scoring failed: {type(exc).__name__}")
 
-        card = outcome.scorecard
+        turns = await load_turns(db, session.id)
+        card = with_delivery(outcome.scorecard, turns, session.channel)  # DM-1
         row = ScorecardRow(
             org_id=session.org_id,
             session_id=session.id,
