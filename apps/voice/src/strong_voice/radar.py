@@ -210,6 +210,7 @@ class StoryRadar:
             log.info("story radar read failed; waiting for the next caption", exc_info=True)
             return
         reading = self._merge(reading)
+        log.info("story radar read %d: %s", self.calls, reading.model_dump(mode="json"))
         if reading == self.reading:
             return
         self.reading = reading
