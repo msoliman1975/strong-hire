@@ -5,11 +5,13 @@ import { Link, useNavigate } from "react-router";
 import { accountApi } from "../api/account";
 import { authApi } from "../api/auth";
 import { billingApi } from "../api/billing";
-import { keys, POLL_MS, useAuth, usePlan, useProfile, useUsage } from "../api/hooks";
+import { keys, POLL_MS, useAuth, usePlan, useProfile, useResumes, useUsage } from "../api/hooks";
 import type { AuthState, ExitReason, GotJob, Usage } from "../api/types";
 import { ConsentSwitch } from "../components/ConsentSwitch";
 import { ErrorNotice, PageHead } from "../components/ui";
 import { formatDate, levelLabel } from "../labels";
+import { MAX_RESUMES } from "../limits";
+import { useFeature } from "../theme/features";
 
 const EXIT_REASONS: { value: ExitReason; label: string }[] = [
   { value: "got_the_job", label: "I got the job" },
@@ -58,10 +60,19 @@ function PlanSection({ usage }: { usage: Usage }) {
 
   const busy = portal.isPending || survey.isPending;
   const paid = usage.plan === "paid";
+  // R3: "Plan and usage" also counts the resumes on file against the limit.
+  const v2 = useFeature("v2_enabled");
+  const resumes = useResumes();
+  const resumesOnFile = resumes.data ? resumes.data.filter((r) => !r.deleted).length : null;
 
   return (
-    <section className="panel" aria-labelledby="plan-heading" id="plan">
-      <h2 id="plan-heading">Plan</h2>
+    <section className="panel" aria-labelledby="plan-heading" id="plan" data-order="2">
+      <h2 id="plan-heading">{v2 ? "Plan and usage" : "Plan"}</h2>
+      {v2 && resumesOnFile !== null && (
+        <p className="muted" data-testid="account-resumes">
+          Resumes: {resumesOnFile} of {MAX_RESUMES}
+        </p>
+      )}
       {paid ? (
         <dl className="dl">
           <dt>Plan</dt>
@@ -175,7 +186,16 @@ function PlanSection({ usage }: { usage: Usage }) {
 }
 
 /** AC-1 (export, delete), AC-2 (consent), AC-3 (profile) and BL-1 (plan and cancellation). */
+/** How the user signs in (AC-4, AC-5): the auth provider in words. */
+const SIGN_IN_LABEL: Record<string, string> = {
+  password: "Email and password",
+  email: "Email link",
+  google: "Google",
+  dev: "Dev login (local only)",
+};
+
 export function AccountPage() {
+  const v2 = useFeature("v2_enabled");
   const auth = useAuth();
   const usage = useUsage();
   const profile = useProfile();
@@ -218,10 +238,12 @@ export function AccountPage() {
   if (!user) return null;
   const consentValue = consent.isPending ? (consent.variables ?? user.training_consent) : user.training_consent;
 
+  // R3 (v2): two columns, one on phones, in this order: Profile, Plan and usage, Sign-in, Privacy,
+  // Your data, Delete. My questions moved into the Question bank. v1 keeps its one column.
   return (
-    <div className="page--narrow">
+    <div className={v2 ? "account-v2" : "page--narrow"}>
       <PageHead title="Account" />
-      <section className="panel" aria-labelledby="profile-heading" id="profile">
+      <section className="panel" aria-labelledby="profile-heading" id="profile" data-order="1">
         <h2 id="profile-heading">Profile</h2>
         {profile.isError && <ErrorNotice error={profile.error} />}
         <dl className="dl">
@@ -254,17 +276,32 @@ export function AccountPage() {
       {usage.data && <PlanSection usage={usage.data} />}
       {usage.isError && <ErrorNotice error={usage.error} />}
 
-      {/* CU-8: until the Questions page lands, My questions is reached from here and the Custom setup. */}
-      <section className="panel" aria-labelledby="my-questions-heading">
-        <h2 id="my-questions-heading">My questions</h2>
-        <p>Questions you saved to practice in a Custom interview.</p>
-        <Link className="btn btn--secondary" to="/questions/mine">
-          Manage my questions
-        </Link>
-      </section>
+      {v2 ? (
+        <section className="panel" aria-labelledby="signin-heading" data-order="3">
+          <h2 id="signin-heading">Sign-in</h2>
+          <dl className="dl">
+            <dt>Email</dt>
+            <dd>{user.email}</dd>
+            <dt>Signs in with</dt>
+            <dd>{SIGN_IN_LABEL[user.auth_provider] ?? user.auth_provider}</dd>
+          </dl>
+          {user.auth_provider === "password" && (
+            <p className="muted small">To change your password, sign out and choose "Forgot password" on the sign-in page.</p>
+          )}
+        </section>
+      ) : (
+        /* CU-8: until the Questions page lands, My questions is reached from here and the Custom setup. */
+        <section className="panel" aria-labelledby="my-questions-heading">
+          <h2 id="my-questions-heading">My questions</h2>
+          <p>Questions you saved to practice in a Custom interview.</p>
+          <Link className="btn btn--secondary" to="/questions/mine">
+            Manage my questions
+          </Link>
+        </section>
+      )}
 
-      <section className="panel" aria-labelledby="privacy-heading">
-        <h2 id="privacy-heading">Training data</h2>
+      <section className="panel" aria-labelledby="privacy-heading" data-order="4">
+        <h2 id="privacy-heading">{v2 ? "Privacy" : "Training data"}</h2>
         <ConsentSwitch checked={consentValue} onChange={(v) => consent.mutate(v)} disabled={consent.isPending} />
         <p role="status" className="muted">
           {consent.isSuccess && `Saved. Training-data use is ${consentValue ? "on" : "off"}.`}
@@ -272,8 +309,8 @@ export function AccountPage() {
         {consent.isError && <ErrorNotice error={consent.error} />}
       </section>
 
-      <section className="panel" aria-labelledby="export-heading">
-        <h2 id="export-heading">Export your data</h2>
+      <section className="panel" aria-labelledby="export-heading" data-order="5">
+        <h2 id="export-heading">{v2 ? "Your data" : "Export your data"}</h2>
         <p>
           Download all your data as a zip file: a JSON file with every record, and your original resume files. The
           download link works once, for 24 hours.
@@ -312,7 +349,7 @@ export function AccountPage() {
         {(startExport.isError || exportJob.isError) && <ErrorNotice error={startExport.error ?? exportJob.error} />}
       </section>
 
-      <section className="panel" aria-labelledby="delete-heading">
+      <section className="panel" aria-labelledby="delete-heading" data-order="6">
         <h2 id="delete-heading">Delete your account</h2>
         <p>
           This deletes your account, resumes, jobs, transcripts and scores within 24 hours, and cancels your plan.

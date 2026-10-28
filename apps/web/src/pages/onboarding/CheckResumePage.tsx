@@ -5,7 +5,8 @@ import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 import { keys, useResume, useResumeTask } from "../../api/hooks";
 import { jobProblem, resumesApi } from "../../api/inputs";
 import type { Resume } from "../../api/types";
-import { ErrorNotice, Loading, ONBOARDING_STEPS, PageHead, Steps } from "../../components/ui";
+import { ErrorNotice, Loading, PageHead, Steps } from "../../components/ui";
+import { useOnboardingSteps } from "./steps";
 import { contextPath, rehearsalPath } from "../../paths";
 import { useFeature } from "../../theme/features";
 
@@ -92,6 +93,7 @@ export function validateResumeDraft(
  * Inside a rehearsal it goes on to that job and CV; from the Resumes page (no job) it goes back there.
  */
 export function CheckResumePage() {
+  const steps = useOnboardingSteps();
   const { jobId = "", resumeId = "" } = useParams();
   const [params] = useSearchParams();
   // A new upload from the Resumes page brings its reading job, so a refused CV shows why (IN-7).
@@ -102,7 +104,7 @@ export function CheckResumePage() {
 
   return (
     <div className="page--narrow">
-      {jobId && <Steps current={1} steps={ONBOARDING_STEPS} />}
+      {jobId && <Steps current={1} steps={steps} />}
       <PageHead title="Check your CV">
         <p>
           This is what we read from your CV. Check that each achievement is under the right job, fix

@@ -6,7 +6,8 @@ import { keys, useJob } from "../../api/hooks";
 import { jobTargetsApi } from "../../api/inputs";
 import { gapApi } from "../../api/gap";
 import type { JobContext } from "../../api/types";
-import { ErrorNotice, Loading, ONBOARDING_STEPS, PageHead, Steps } from "../../components/ui";
+import { ErrorNotice, Loading, PageHead, Steps } from "../../components/ui";
+import { useOnboardingSteps } from "./steps";
 import { useFeature } from "../../theme/features";
 
 const STAGES = ["Recruiter screen", "Phone screen", "Onsite or final loop", "Not sure"];
@@ -15,6 +16,7 @@ type Fields = keyof JobContext | "stage";
 
 /** IN-4: optional context. Saving or skipping starts the gap analysis with the chosen resume. */
 export function ContextPage() {
+  const steps = useOnboardingSteps();
   const { jobId = "" } = useParams();
   const [params] = useSearchParams();
   const resumeId = params.get("resume");
@@ -68,7 +70,7 @@ export function ContextPage() {
 
   return (
     <div className="page--narrow">
-      <Steps current={2} steps={ONBOARDING_STEPS} />
+      <Steps current={2} steps={steps} />
       <PageHead title="Add context (optional)">
         <p>Anything you know about the interview helps the interviewer focus. You can skip this step.</p>
       </PageHead>

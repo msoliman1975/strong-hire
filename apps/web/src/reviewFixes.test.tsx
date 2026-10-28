@@ -75,8 +75,10 @@ describe("Interviews page (v2)", () => {
     expect(await screen.findByRole("heading", { level: 1, name: "Interviews" })).toBeInTheDocument();
     const list = await screen.findByRole("list", { name: "Your interviews" });
     const card = within(list).getAllByTestId("interview-card")[0];
-    // An interview with no CV yet: its one primary button goes to the CV step.
-    expect(within(card).getByRole("link", { name: "Get ready to rehearse" })).toHaveAttribute(
+    // An interview with no CV yet is a draft: Continue setup goes to the CV step.
+    expect(card).toHaveTextContent("Draft ·");
+    expect(card).toHaveTextContent("Next: pick the resume you sent them.");
+    expect(within(card).getByRole("link", { name: "Continue setup →" })).toHaveAttribute(
       "href",
       expect.stringMatching(/^\/jobs\/.+\/resume$/),
     );
@@ -85,7 +87,7 @@ describe("Interviews page (v2)", () => {
 
   it("PP-3: with no interviews it says what to do, with Add a job description", async () => {
     renderApp("/jobs");
-    expect(await screen.findByText(/Add the job description for the interview you have/)).toBeInTheDocument();
+    expect(await screen.findByText(/Paste the job description for an interview you have/)).toBeInTheDocument();
   });
 
   it("LB-2: the saved job descriptions stay one click away", async () => {

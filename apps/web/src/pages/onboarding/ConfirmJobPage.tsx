@@ -5,7 +5,8 @@ import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 import { keys, useJob, useJobTask } from "../../api/hooks";
 import { jobProblem, jobTargetsApi } from "../../api/inputs";
 import type { JobPosting, JobTargetOut, Level, RoleFamily } from "../../api/types";
-import { ErrorNotice, Loading, ONBOARDING_STEPS, PageHead, Steps } from "../../components/ui";
+import { ErrorNotice, Loading, PageHead, Steps } from "../../components/ui";
+import { useOnboardingSteps } from "./steps";
 import { levelLabel, roleFamilyLabel } from "../../labels";
 import { newJobPath, type NewJobReturn } from "../../paths";
 import { afterConfirmPath, confirmPath, MIN_POSTING_CHARS, newJobReturn } from "./NewJobPage";
@@ -17,6 +18,7 @@ const lines = (value: string) =>
     .filter(Boolean);
 
 export function ConfirmJobPage() {
+  const steps = useOnboardingSteps();
   const { jobId = "" } = useParams();
   const [params] = useSearchParams();
   const then = newJobReturn(params.get("then"));
@@ -26,7 +28,7 @@ export function ConfirmJobPage() {
 
   return (
     <div className="page--narrow">
-      {then === "rehearsal" && <Steps current={0} steps={ONBOARDING_STEPS} />}
+      {then === "rehearsal" && <Steps current={0} steps={steps} />}
       {job.isPending && <Loading label="Loading the job" />}
       {job.isError && <ErrorNotice error={job.error} />}
       {task.isError && <ErrorNotice error={task.error} />}

@@ -226,8 +226,9 @@ describe("interview plan page", () => {
 
   it("PP-1: while the gap analysis runs, Start rehearsal waits and says why", async () => {
     renderPlan(planView({ gap: { ...planView().gap!, status: "running", analysis: null }, reports: [] }));
-    expect(await screen.findByRole("button", { name: "Start rehearsal" })).toBeDisabled();
-    expect(screen.getByTestId("needs-gap")).toHaveTextContent("Start rehearsal unlocks when it is done");
+    // No rehearsal yet: the add flow ends on "Start your first rehearsal" (R3).
+    expect(await screen.findByRole("button", { name: "Start your first rehearsal" })).toBeDisabled();
+    expect(screen.getByTestId("needs-gap")).toHaveTextContent("The rehearsal unlocks when it is done");
   });
 
   it("PP-2: asks for the interview date, then shows the days left", async () => {

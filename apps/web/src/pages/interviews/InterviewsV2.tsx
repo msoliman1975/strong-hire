@@ -39,6 +39,7 @@ export function InterviewsV2() {
         <div className="page-head__row">
           <p className="muted">Each interview has a plan: what they'll test, your stories for it, and the next rehearsal.</p>
           <Link className="btn" to={newJobPath("rehearsal")}>
+            <span aria-hidden="true">+ </span>
             Add a job description
           </Link>
         </div>
@@ -49,7 +50,7 @@ export function InterviewsV2() {
       {jobs.data &&
         (ordered.length === 0 ? (
           <section className="card stack" aria-label="No interviews yet">
-            <p>Add the job description for the interview you have. You get a free match score and a plan for it.</p>
+            <p>Paste the job description for an interview you have, and we'll build your plan.</p>
             <div>
               <Link className="btn" to={newJobPath("rehearsal")}>
                 Add a job description
