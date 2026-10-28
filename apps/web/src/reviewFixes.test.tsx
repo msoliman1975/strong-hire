@@ -185,7 +185,7 @@ describe("Interview path (v2)", () => {
     const job = await addJob();
     const resume = await addResume();
     const user = renderApp(`/jobs/${job.id}/resume/${resume.id}/check`);
-    await user.click(await screen.findByRole("button", { name: "Confirm and continue" }));
+    await user.click(await screen.findByRole("button", { name: "Looks right, continue" }));
     expect(await screen.findByRole("button", { name: "Save and open my plan" })).toBeInTheDocument();
     expect(screen.getByTestId("where")).toHaveTextContent(`/jobs/${job.id}/context?resume=${resume.id}`);
   });

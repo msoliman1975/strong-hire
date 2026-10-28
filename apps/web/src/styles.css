@@ -3484,3 +3484,596 @@ dialog::backdrop {
 .explain-head > p {
   min-width: 0;
 }
+
+/* ------------------------------------------------------------ v2 Check your CV (IN-3, IN-12) */
+
+.cvc-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.cvc-head .page-head {
+  flex: 1 1 420px;
+  min-width: 0;
+  margin-bottom: var(--space-3);
+}
+
+.cvc-head__actions {
+  margin-bottom: var(--space-3);
+}
+
+.cvc-status p {
+  margin: 0 0 var(--space-3);
+}
+
+.cvc-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  margin-top: var(--space-4);
+}
+
+.cvc-cv {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.cvc-card {
+  background: var(--sh-surface);
+  border: 1px solid var(--sh-line);
+  border-radius: 18px;
+  padding: 20px 22px;
+  margin: 0;
+  min-width: 0;
+}
+
+.cvc-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.cvc-panel__head h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.cvc-label {
+  margin: 0 0 4px;
+  font-family: var(--sh-font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sh-muted);
+}
+
+.cvc-label--section {
+  margin: 8px 0 -6px;
+}
+
+.cvc-mono {
+  font-family: var(--sh-font-mono);
+  font-size: 0.8rem;
+  color: var(--sh-muted);
+  white-space: nowrap;
+}
+
+.cvc-link {
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--sh-violet);
+  background: none;
+  border: 0;
+  padding: 4px 0;
+  min-height: 32px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.cvc-link:hover {
+  text-decoration: underline;
+}
+
+.cvc-link:disabled {
+  color: var(--sh-muted);
+  opacity: 0.6;
+  cursor: default;
+  text-decoration: none;
+}
+
+.cvc-link--quiet {
+  color: var(--sh-muted);
+}
+
+.cvc-link--danger {
+  color: var(--sh-danger);
+}
+
+.cvc-add {
+  align-self: flex-start;
+}
+
+.cvc-summary {
+  margin: 4px 0 0;
+}
+
+.cvc-note {
+  margin: 8px 0 0;
+  font-size: 0.8rem;
+  color: var(--sh-warn-ink);
+}
+
+.cvc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cvc-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--sh-sunken);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.cvc-chip--ok {
+  background: var(--sh-ok-soft);
+  color: var(--sh-ok-ink);
+}
+
+.cvc-chip--warn {
+  background: var(--sh-warn-soft);
+  color: var(--sh-warn-ink);
+}
+
+.cvc-chip--bad {
+  background: var(--sh-danger-soft);
+  color: var(--sh-danger-ink);
+}
+
+/* Role cards: a violet stripe on the current role, grey on older ones, red while editing. */
+.cvc-role {
+  border-left: 4px solid var(--sh-line-strong);
+}
+
+.cvc-role--current {
+  border-left-color: var(--sh-violet);
+}
+
+.cvc-role--editing {
+  border-left-color: var(--sh-danger);
+  box-shadow: 0 8px 24px rgba(23, 22, 31, 0.08);
+}
+
+.cvc-role__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cvc-role__title {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.cvc-role--editing .cvc-role__head {
+  margin-bottom: 12px;
+}
+
+.cvc-role__span {
+  margin: 2px 0 0;
+  color: var(--sh-muted);
+  font-size: 0.875rem;
+}
+
+.cvc-role__actions {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  flex: none;
+}
+
+.cvc-role__list {
+  margin: 10px 0 8px;
+  padding-left: 18px;
+}
+
+.cvc-role--line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px 12px;
+  flex-wrap: wrap;
+  padding: 10px 22px;
+}
+
+.cvc-role__line {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.cvc-role__toggle {
+  font: inherit;
+  font-weight: 700;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.cvc-role__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--sh-muted);
+  font-size: 0.875rem;
+}
+
+.cvc-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 14px;
+}
+
+.cvc-fields .field {
+  align-content: start;
+  margin-bottom: 10px;
+}
+
+.cvc-achievement textarea,
+.cvc-card textarea#cv-skills,
+.cvc-card textarea#cv-certifications {
+  min-height: 64px;
+}
+
+.cvc-fields label {
+  font-size: 0.8rem;
+}
+
+.cvc-fields .hint {
+  font-weight: 400;
+  font-size: 0.8rem;
+}
+
+.cvc-fields input[data-flagged] {
+  border: 2px solid var(--sh-danger);
+}
+
+.cvc-field-note {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--sh-danger-ink);
+}
+
+.cvc-sub {
+  margin: 14px 0 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.cvc-achievements {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 4px;
+  padding: 0;
+  list-style: none;
+}
+
+.cvc-achievement[data-flagged] textarea {
+  border: 1px dashed var(--sh-warn);
+  background: var(--sh-warn-soft);
+}
+
+.cvc-achievement[data-flagged] .cvc-field-note {
+  color: var(--sh-warn-ink);
+}
+
+.cvc-achievement__actions {
+  gap: var(--space-2);
+  margin-top: 2px;
+}
+
+.cvc-achievement__actions select {
+  width: auto;
+  min-height: 32px;
+  font-size: 0.8rem;
+  padding: 2px 8px;
+}
+
+.cvc-role-skills {
+  margin: 12px 0 0;
+}
+
+.cvc-editor-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.cvc-save {
+  margin-top: 10px;
+}
+
+.cvc-editor-foot .cvc-save {
+  margin-top: 0;
+}
+
+/* Fix focuses a field and flashes it. */
+.cvc-card [data-flash] {
+  outline: 3px solid var(--sh-violet);
+  outline-offset: 2px;
+  animation: cvc-flash 1.2s ease-out 2;
+}
+
+@keyframes cvc-flash {
+  0% {
+    box-shadow: 0 0 0 0 var(--sh-violet-soft);
+  }
+  60% {
+    box-shadow: 0 0 0 8px var(--sh-violet-soft);
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cvc-card [data-flash] {
+    animation: none;
+  }
+}
+
+.cvc-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.cvc-card--wide {
+  grid-column: 1 / -1;
+}
+
+.cvc-skill-group + .cvc-skill-group {
+  margin-top: 6px;
+}
+
+.cvc-skill-group .cvc-sub {
+  margin: 8px 0 0;
+}
+
+.cvc-edu b {
+  display: block;
+}
+
+.cvc-edu p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.cvc-edu-row {
+  border: 0;
+  border-bottom: 1px solid var(--sh-line);
+  margin: 0 0 10px;
+  padding: 0 0 6px;
+}
+
+.cvc-edu-row .field {
+  margin-bottom: 8px;
+}
+
+.cvc-plain {
+  margin: 0;
+  padding-left: 18px;
+}
+
+/* The issues panel stays in view on wide screens. */
+.cvc-panel {
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  min-width: 0;
+}
+
+.cvc-panel__head {
+  padding: 18px 20px;
+}
+
+.cvc-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.cvc-filter {
+  font: inherit;
+  font-size: 0.8rem;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 0;
+  background: var(--sh-sunken);
+  color: var(--sh-ink);
+  cursor: pointer;
+}
+
+.cvc-filter[aria-pressed="true"] {
+  background: var(--sh-ink);
+  color: var(--sh-surface);
+}
+
+.cvc-issue {
+  padding: 14px 18px;
+  border-left: 4px solid var(--sh-violet);
+}
+
+.cvc-issue[data-severity="high"] {
+  border-left-color: var(--sh-danger);
+}
+
+.cvc-issue[data-group="dates"]:not([data-severity="high"]) {
+  border-left-color: var(--sh-warn);
+}
+
+.cvc-issue summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cvc-issue summary::-webkit-details-marker {
+  display: none;
+}
+
+.cvc-issue__detail {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--sh-muted);
+  overflow-wrap: anywhere;
+}
+
+.cvc-issue__group {
+  flex: none;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--sh-violet);
+}
+
+.cvc-issue__group::after {
+  content: " ▸";
+}
+
+.cvc-issue[open] .cvc-issue__group::after {
+  content: " ▾";
+}
+
+.cvc-issue[data-severity="high"] .cvc-issue__group {
+  color: var(--sh-danger-ink);
+}
+
+.cvc-issue[data-group="dates"]:not([data-severity="high"]) .cvc-issue__group {
+  color: var(--sh-warn-ink);
+}
+
+.cvc-issue__why {
+  margin: 10px 0;
+  font-size: 0.875rem;
+}
+
+.cvc-issue__actions {
+  gap: 8px;
+}
+
+.cvc-issue .btn {
+  min-height: 36px;
+  padding: 0 14px;
+  font-size: 0.875rem;
+}
+
+.cvc-practice {
+  font-size: 0.875rem;
+}
+
+.cvc-accepted {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  background: var(--sh-ground);
+  color: var(--sh-muted);
+  font-size: 0.875rem;
+}
+
+.cvc-clear {
+  margin: 0;
+  max-width: none;
+  color: var(--sh-muted);
+  font-size: 0.875rem;
+}
+
+.cvc-checks {
+  padding: 16px 18px;
+  font-size: 0.875rem;
+}
+
+.cvc-checks summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.cvc-checks ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  color: var(--sh-muted);
+}
+
+.cvc-checks b {
+  color: var(--sh-ink);
+}
+
+@media (max-width: 979px) {
+  .cvc-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* On narrow screens the issues come first, then the CV. */
+  .cvc-panel {
+    position: static;
+    max-height: none;
+    overflow: visible;
+    order: -1;
+  }
+}
+
+@media (max-width: 599px) {
+  .cvc-fields,
+  .cvc-pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cvc-head__actions {
+    width: 100%;
+  }
+
+  .cvc-head__actions .btn {
+    flex: 1 1 auto;
+  }
+
+  .cvc-card {
+    padding: 16px;
+  }
+
+  .cvc-role__head {
+    flex-wrap: wrap;
+  }
+}

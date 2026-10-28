@@ -13,7 +13,14 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 from strong_api.inputs.limits import MAX_POSTING_CHARS
 from strong_api.inputs.queue import JobState
 from strong_core.library import NAME_MAX_CHARS, clean_name
-from strong_core.schemas import GapStatus, JobPosting, Level, Resume
+from strong_core.schemas import (
+    ACCEPTED_ISSUE_KEY_MAX,
+    AcceptedIssue,
+    GapStatus,
+    JobPosting,
+    Level,
+    Resume,
+)
 
 MAX_RESUME_TEXT_CHARS = 60_000
 
@@ -70,6 +77,13 @@ class JobTargetUpdate(_Body):
 
 class ResumeUpdate(_Body):
     resume: Resume
+
+
+class AcceptedIssueUpdate(_Body):
+    """IN-12: accept a CV check issue, or clear an accepted one. The web builds the key."""
+
+    key: str = Field(min_length=1, max_length=ACCEPTED_ISSUE_KEY_MAX)
+    accepted: bool
 
 
 class LibraryRename(_Body):
@@ -150,6 +164,10 @@ class ResumeOut(BaseModel):
         ),
     )
     uploaded_at: datetime
+    accepted_issues: list[AcceptedIssue] = Field(
+        default_factory=list,
+        description="IN-12: CV check issues the user accepted, oldest first. At most 100.",
+    )
 
 
 class JobTargetAccepted(BaseModel):

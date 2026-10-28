@@ -129,6 +129,7 @@ IDs are referenced by the build plan and acceptance tests. Priority: P0 must shi
 | IN-1 | Accept job posting as pasted text or URL; scrape common boards (Greenhouse, Lever, Ashby, Workday, company career pages). LinkedIn falls back to paste. | P0 |
 | IN-2 | Extract structured job data: company, title, level, team, must-have and nice-to-have skills, responsibilities. User confirms or edits. | P0 |
 | IN-3 | Accept resume as PDF, DOCX or text; parse into roles, achievements, skills, dates. | P0 |
+| IN-12 | The CV check finds date, detail, level and consistency issues; the user fixes or accepts each. Rule-based, instant, no model calls. When opened for a job, it also lists the job's must-have skills the CV never shows. | P0 |
 | IN-4 | Optional context fields: stage, interviewer name/role, recruiter notes, concerns. | P0 |
 | IN-5 | Match company to one of 20 profiles, else run generic mode. | P0 |
 | IN-6 | Refuse a job description input (link or pasted text) that is not a job posting, for example a list of jobs, a company home page, an article or a sign-in page. Show the user the reason. | P0 |

@@ -55,6 +55,7 @@ from strong_api.inputs.queue import (
 )
 from strong_api.inputs.schemas import (
     MAX_RESUME_TEXT_CHARS,
+    AcceptedIssueUpdate,
     JobContext,
     JobOut,
     JobTargetAccepted,
@@ -81,7 +82,13 @@ from strong_core.library import (
     normalize_url,
     posting_text_hash,
 )
-from strong_core.schemas import GapStatus, JobPosting, Resume
+from strong_core.schemas import (
+    ACCEPTED_ISSUES_MAX,
+    AcceptedIssue,
+    GapStatus,
+    JobPosting,
+    Resume,
+)
 
 router = APIRouter(tags=["inputs"])
 
@@ -161,6 +168,7 @@ def _resume_out(row: ResumeRow) -> ResumeOut:
         resume=Resume.model_validate(row.parsed_json) if extracted else None,
         confirmed_at=row.confirmed_at,
         uploaded_at=row.uploaded_at,
+        accepted_issues=[AcceptedIssue.model_validate(i) for i in row.accepted_issues or []],
     )
 
 
@@ -602,6 +610,7 @@ async def delete_resume(resume_id: uuid.UUID, db: Db, me: Me, queue: Queue) -> R
         row.file_ref = None
         row.content_hash = None
         row.confirmed_at = None
+        row.accepted_issues = None
         db.add(_audit(me, "library.resume_deleted", f"resume:{row.id}"))
         await db.commit()
         if ref:
@@ -636,6 +645,38 @@ async def update_resume(
     await gap_service.recompute(
         db, queue, org_id=me.org_id, user_id=me.user_id, settings=limits, resume_id=row.id
     )
+    await db.refresh(row)
+    return _resume_out(row)
+
+
+@router.put("/resumes/{resume_id}/accepted-issues")
+async def set_accepted_issue(
+    resume_id: uuid.UUID, body: AcceptedIssueUpdate, db: Db, me: Me
+) -> ResumeOut:
+    """IN-12: accept a CV check issue (accepted true) or clear it (false). Safe to repeat.
+
+    The key is opaque here; the web builds it from the issue type and fields. A CV keeps at most
+    100 accepted issues: one more answers 422 with code accepted_issues_limit.
+    """
+    row = await _owned_resume(db, me, resume_id, live=True)
+    issues = [i for i in row.accepted_issues or [] if i.get("key") != body.key]
+    if body.accepted:
+        if len(issues) >= ACCEPTED_ISSUES_MAX:
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_CONTENT,
+                {
+                    "code": "accepted_issues_limit",
+                    "message": f"You can accept up to {ACCEPTED_ISSUES_MAX} issues on one CV.",
+                },
+            )
+        old = next((i for i in row.accepted_issues or [] if i.get("key") == body.key), None)
+        issue = old or AcceptedIssue(key=body.key, accepted_at=datetime.now(UTC)).model_dump(
+            mode="json"
+        )
+        issues.append(issue)
+    # A new list, so SQLAlchemy sees the change to the JSON column.
+    row.accepted_issues = issues or None
+    await db.commit()
     await db.refresh(row)
     return _resume_out(row)
 

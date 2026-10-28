@@ -110,6 +110,14 @@ export const resumesApi = {
         body: { resume },
       }),
     ) as ResumeOut,
+  /** IN-12: accept a CV check issue, or clear it with accepted false. */
+  setAcceptedIssue: async (resumeId: string, key: string, accepted: boolean) =>
+    unwrap(
+      await apiClient.PUT("/resumes/{resume_id}/accepted-issues", {
+        params: { path: { resume_id: resumeId } },
+        body: { key, accepted },
+      }),
+    ) as ResumeOut,
   job: async (resumeId: string, jobId: string) =>
     unwrap(
       await apiClient.GET("/resumes/{resume_id}/jobs/{job_id}", {
