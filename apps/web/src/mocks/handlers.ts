@@ -58,6 +58,7 @@ import {
   mockCustomRecommendation,
 } from "./custom";
 import { gapAnalysis, jobPosting, resume, scorecardFor, sessionPlan } from "./fixtures";
+import { mockAnswersAtBar, mockPreviousSignal } from "./debrief";
 
 /** CU-1: fill the defaults the API adds to a Custom setup. */
 function withCustomDefaults(custom: CreateSessionRequest["config"]["custom"]): SessionRecord["config"]["custom"] {
@@ -1045,6 +1046,9 @@ export function scoringHandlers(store: MockStore) {
         company_slug: generic ? null : (job?.posting?.company_name ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "-") || null,
         values_framework: generic ? null : "Company values",
         questions: custom ? customDebriefQuestions(custom) : [],
+        // DB-1, DB-2 (S12): the mock scorecards are fixed, so the previous signal is the same.
+        previous_signal: scorecard ? mockPreviousSignal(s, scorecard, db().sessions) : null,
+        answers_at_bar: scorecard ? mockAnswersAtBar(scorecard) : null,
       };
       return HttpResponse.json(debrief);
     }),

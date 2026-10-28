@@ -1,4 +1,7 @@
-/** The live session page (P10): mic check, joining, phase and timer, Coach controls, reconnect (IV-9). */
+/**
+ * The live session page (P10): mic check, joining, phase and timer, Coach controls, reconnect
+ * (IV-9), the interviewer state without the avatar (AV-1) and the answer length (LR-1).
+ */
 import { QueryClientProvider } from "@tanstack/react-query";
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -9,6 +12,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { SessionRecord, VoiceJoin } from "../api/types";
 import { createQueryClient } from "../App";
 import { server } from "../mocks/node";
+import { setFeatureOverrides } from "../theme/features";
+import { minSec, nextTiming, SUGGESTED_ANSWER_SECONDS } from "./answerLength";
 import { AGENT_WAIT_MS, LiveSessionPage } from "./LiveSessionPage";
 import {
   encodeCommand,
@@ -54,6 +59,8 @@ afterEach(() => {
   voice.sent = [];
   voice.micError = null;
   vi.useRealTimers();
+  vi.unstubAllEnvs();
+  setFeatureOverrides({});
 });
 
 function session(changes: Partial<SessionRecord> = {}): SessionRecord {
@@ -172,15 +179,62 @@ describe("live session page", () => {
     expect(screen.getByRole("button", { name: "Ask for a hint" })).toBeDisabled();
   });
 
-  it("IV-10: the avatar shows when the interviewer speaks and listens", async () => {
+  it("AV-1: without the avatar flag the room shows the interviewer state, and no 3D avatar", async () => {
     const { user } = renderLive(session());
     await joinRoom(user);
+    expect(screen.queryByTestId("interviewer-avatar")).not.toBeInTheDocument();
+    expect(screen.getByTestId("interviewer-state")).toHaveTextContent("Interviewer is joining");
+    act(() => voice.handlers!.onAgentJoined());
+    act(() => voice.handlers!.onActivity("speaking"));
+    expect(screen.getByTestId("interviewer-state")).toHaveTextContent("Interviewer is speaking");
+    act(() => voice.handlers!.onActivity("thinking"));
+    expect(screen.getByTestId("interviewer-state")).toHaveTextContent("Interviewer is thinking");
+    act(() => voice.handlers!.onActivity("listening"));
+    expect(screen.getByTestId("interviewer-state")).toHaveAttribute("data-activity", "listening");
+  });
+
+  it("IV-10, AV-1: with VITE_INTERVIEWER_AVATAR=on the avatar shows when the interviewer speaks and listens", async () => {
+    vi.stubEnv("VITE_INTERVIEWER_AVATAR", "on");
+    const { user } = renderLive(session());
+    await joinRoom(user);
+    expect(screen.queryByTestId("interviewer-state")).not.toBeInTheDocument();
     expect(screen.getByTestId("interviewer-avatar")).toHaveTextContent("Interviewer: Joining");
     act(() => voice.handlers!.onAgentJoined());
     act(() => voice.handlers!.onActivity("speaking"));
     expect(screen.getByTestId("interviewer-avatar")).toHaveTextContent("Interviewer: Speaking");
     act(() => voice.handlers!.onActivity("listening"));
     expect(screen.getByTestId("interviewer-avatar")).toHaveAttribute("data-activity", "listening");
+  });
+
+  it("LR-1: with v2 on, the answer bar runs from when the interviewer listens until it thinks", async () => {
+    setFeatureOverrides({ v2_enabled: true });
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const { user } = renderLive(session());
+    await joinRoom(user);
+    act(() => voice.handlers!.onAgentJoined());
+    expect(screen.getByTestId("answer-length-time")).toHaveTextContent(
+      `About ${minSec(SUGGESTED_ANSWER_SECONDS.behavioral)}`,
+    );
+    act(() => voice.handlers!.onActivity("speaking"));
+    act(() => voice.handlers!.onActivity("listening"));
+    act(() => vi.advanceTimersByTime(100_000));
+    expect(screen.getByTestId("answer-length-time")).toHaveTextContent(/^1:(39|40) of about 2:00$/);
+    act(() => vi.advanceTimersByTime(30_000));
+    expect(screen.getByTestId("answer-length")).toHaveTextContent("Past the suggested length");
+    act(() => voice.handlers!.onActivity("thinking"));
+    const stopped = screen.getByTestId("answer-length-time").textContent;
+    act(() => vi.advanceTimersByTime(5_000));
+    expect(screen.getByTestId("answer-length-time").textContent).toBe(stopped);
+    // The next question starts a new answer.
+    act(() => voice.handlers!.onActivity("speaking"));
+    expect(screen.getByTestId("answer-length-time")).toHaveTextContent("About 2:00");
+  });
+
+  it("LR-1: the answer bar is a v2 addition; with the flag off the room has none", async () => {
+    const { user } = renderLive(session());
+    await joinRoom(user);
+    act(() => voice.handlers!.onAgentJoined());
+    expect(screen.queryByTestId("answer-length")).not.toBeInTheDocument();
   });
 
   it("IV-11: prep time in Realistic mode: the clock stops, a prep timer runs, and I am ready ends it", async () => {
@@ -361,5 +415,22 @@ describe("agent messages", () => {
     const decode = (c: AgentCommand) => JSON.parse(new TextDecoder().decode(encodeCommand(c))) as unknown;
     expect(decode({ prep: 3 })).toEqual({ command: "prep", minutes: 3 });
     expect(decode("ready")).toEqual({ command: "ready" });
+  });
+});
+
+describe("answer length (LR-1)", () => {
+  it("LR-1: an answer starts when the interviewer listens, stops when it thinks, and clears when it speaks", () => {
+    const started = nextTiming(null, "speaking", "listening", 1_000);
+    expect(started).toEqual({ startedAt: 1_000, endedAt: null });
+    expect(nextTiming(started, "listening", "listening", 5_000)).toBe(started);
+    const ended = nextTiming(started, "listening", "thinking", 61_000);
+    expect(ended).toEqual({ startedAt: 1_000, endedAt: 61_000 });
+    expect(nextTiming(ended, "thinking", "speaking", 62_000)).toBeNull();
+    expect(nextTiming(null, "idle", "thinking", 0)).toBeNull();
+  });
+
+  it("LR-1: every interview type has one suggested length", () => {
+    for (const seconds of Object.values(SUGGESTED_ANSWER_SECONDS)) expect(seconds).toBeGreaterThan(0);
+    expect(minSec(90)).toBe("1:30");
   });
 });

@@ -1,0 +1,63 @@
+/* The v2 Home (canvas board Home). Uses S01's --sh-* tokens only. */
+
+.home-v2 {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.home-interviews {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.home-interviews h2 {
+  margin: 0;
+  font-size: 1.625rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.home-interviews__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  gap: 14px;
+}
+
+.home-interview {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.home-interview__top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-3);
+}
+
+.home-interview__top h3 {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 700;
+}
+
+.home-interview__match {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.home-interview__match b {
+  font-family: var(--sh-font-mono);
+  font-weight: 600;
+}
+
+.home-interview__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}

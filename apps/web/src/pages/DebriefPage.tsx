@@ -5,7 +5,6 @@ import { ApiError } from "../api/client";
 import { savedQuestionsApi } from "../api/custom";
 import { keys, useDebrief, useJob, useProgress } from "../api/hooks";
 import type {
-  Competency,
   CustomSessionSpec,
   Debrief,
   DebriefQuestion,
@@ -21,18 +20,24 @@ import { ErrorNotice, HireSignalScale, Loading, PageHead, Rubric } from "../comp
 import { CustomNext } from "../custom/CustomNext";
 import { useRepeatSetup } from "../custom/repeat";
 import { competencyLabel, difficultyLabel, formatDate, interviewTypeLabel, modeLabel } from "../labels";
-import { questionsPath } from "../paths";
+import { useFeature } from "../theme/features";
+import { DebriefV2 } from "./debrief/DebriefV2";
+import { PracticeQuestions } from "./debrief/PracticeQuestions";
 import { setupLink } from "./GapAnalysisPage";
+
+export { weakestCompetencies } from "./debrief/PracticeQuestions";
 
 /**
  * FB-1, FB-2, PR-2: hire signal and rationale, per-question rubric, company values, next session.
  * In generic mode there are no company values; the page says so instead of showing an empty table.
  * A 10-minute mini interview says how many questions the signal rests on, and that it is not
  * counted in the progress trends. L05: a one-question rating, "felt like a real interview".
+ * With `v2_enabled` (FL-1) a ready debrief uses the v2 layout in ./debrief (DB-1, DB-2).
  */
 export function DebriefPage() {
   const { sessionId = "" } = useParams();
   const debrief = useDebrief(sessionId);
+  const v2 = useFeature("v2_enabled");
 
   if (debrief.isPending) return <Loading label="Loading the debrief" />;
   if (debrief.isError) return <ErrorNotice error={debrief.error} />;
@@ -40,6 +45,17 @@ export function DebriefPage() {
   const { session, scorecard, next_session: next, status } = debrief.data;
   const config = session.config;
   const date = session.ended_at ?? session.started_at;
+
+  // FL-1: the v2 debrief replaces the ready view only; the waiting states stay as they are.
+  if (v2 && status === "ready" && scorecard) {
+    return (
+      <DebriefV2
+        debrief={debrief.data}
+        scorecard={scorecard}
+        sideExtra={config.custom && <CustomActions session={session} custom={config.custom} />}
+      />
+    );
+  }
 
   return (
     <>
@@ -199,44 +215,6 @@ function Breadcrumb({ jobId, company }: { jobId: string; company: string | null 
         <li aria-current="page">Debrief</li>
       </ol>
     </nav>
-  );
-}
-
-/**
- * QB-4: the two or three competencies with the lowest scores, weakest first. The third is kept
- * only when it scored as low as the second.
- */
-export function weakestCompetencies(scorecard: Scorecard | null): Competency[] {
-  if (!scorecard) return [];
-  const sorted = [...scorecard.competency_scores].sort((a, b) => a.score - b.score);
-  const picked = sorted.slice(0, 2);
-  if (sorted.length > 2 && sorted[2].score === sorted[1].score) picked.push(sorted[2]);
-  return picked.map((c) => c.competency);
-}
-
-/** QB-4: the Questions page for this company (General when it is not curated), this interview
- * type and the weakest areas. A Custom session mixes types, so its link filters by area only. */
-function PracticeQuestions({ debrief }: { debrief: Debrief }) {
-  const areas = weakestCompetencies(debrief.scorecard);
-  const company = debrief.company_slug;
-  const { config } = debrief.session;
-  const to = questionsPath({
-    company: company ?? "general",
-    interviewType: config.custom ? null : config.interview_type,
-    competencies: areas,
-  });
-  return (
-    <section className="side-panel" aria-labelledby="practice-heading">
-      <h2 id="practice-heading">Practice questions</h2>
-      <p className="muted small">
-        {company && debrief.company_name ? `${debrief.company_name} and common` : "Common"} questions
-        {areas.length > 0 && ` for ${areas.map((a) => competencyLabel(a).toLowerCase()).join(", ")}`}, with
-        hints on what each one looks for.
-      </p>
-      <Link className="btn btn--secondary" to={to}>
-        Practice questions for your weak areas
-      </Link>
-    </section>
   );
 }
 

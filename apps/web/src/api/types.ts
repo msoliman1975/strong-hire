@@ -59,6 +59,8 @@ export type GapStatus = S["GapStatus"];
 export type Debrief = DeepRequired<S["Debrief"]>;
 export type DebriefStatus = Debrief["status"];
 export type DebriefSession = DeepRequired<S["DebriefSession"]>;
+export type PreviousSignal = DeepRequired<S["PreviousSignal"]>;
+export type AnswersAtBar = DeepRequired<S["AnswersAtBar"]>;
 export type JobProgress = DeepRequired<S["JobProgress"]>;
 export type CompetencyTrend = DeepRequired<S["CompetencyTrend"]>;
 

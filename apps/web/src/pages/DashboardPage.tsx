@@ -7,6 +7,8 @@ import { ErrorNotice, Loading, PageHead } from "../components/ui";
 import { CustomNext } from "../custom/CustomNext";
 import { difficultyLabel, formatDate, interviewTypeLabel } from "../labels";
 import { newJobPath } from "../paths";
+import { useFeature } from "../theme/features";
+import { HomeV2 } from "./home/HomeV2";
 
 /** Where an unfinished job setup continues. Display routing only. */
 function nextSetupStep(s: JobTargetSummary): string | null {
@@ -33,7 +35,13 @@ function latestPracticed(jobs: JobTargetSummary[]): JobTargetSummary | null {
   return practiced[0] ?? null;
 }
 
+/** Home. With `v2_enabled` (FL-1) it is the v2 Home (PP-3, PR-2); without it, the v1 dashboard. */
 export function DashboardPage() {
+  const v2 = useFeature("v2_enabled");
+  return v2 ? <HomeV2 /> : <DashboardV1 />;
+}
+
+function DashboardV1() {
   const jobs = useJobs();
   const [params] = useSearchParams();
   const focus = jobs.data ? latestPracticed(jobs.data) : null;
