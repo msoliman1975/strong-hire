@@ -6,10 +6,11 @@ pending sign-up, and the web app asks for the 18+ confirmation, the terms and th
 consent (AC-2, default off) before POST /auth/signup creates the user.
 
 Password flow (AC-4): POST /auth/password/signup takes the confirmations with the password,
-creates the user, signs them in and emails a link to confirm the address. Password sign-in works
-before the link is opened. A link or Google sign-in also proves the email; for an unconfirmed
-user it removes the password, because nobody proved that the person who chose it owns the
-email.
+creates the user and emails a link to confirm the address. It does not sign the user in. Password
+sign-in is refused with 403 `email_not_confirmed` until the link is opened, and the link confirms
+the address and signs the user in. A magic link or Google sign-in also proves the email; for an
+unconfirmed user it removes the password, because nobody proved that the person who chose it owns
+the email.
 """
 
 from __future__ import annotations
@@ -55,6 +56,13 @@ _DEV_EMAIL = re.compile(r"^[^@\s]+@[^@\s]+$")
 ACCOUNT_UNAVAILABLE = "account_unavailable"
 """AU-7: the /signin error code for a suspended user (the apps show the neutral message)."""
 
+EMAIL_NOT_CONFIRMED = "email_not_confirmed"
+"""AC-4: the password sign-in error code until the user opens the confirmation link."""
+
+_RESEND_KEY = "resend:"
+"""AC-4: confirmation resends count in the sign-in throttle under this key prefix, so one email
+gets at most LOCKOUT_FAILURES resends in the lockout window."""
+
 OptionalUser = Annotated[User | None, Depends(optional_user)]
 
 
@@ -89,9 +97,15 @@ class AuthUser(BaseModel):
 
 
 class AuthState(BaseModel):
-    status: Literal["signed_out", "needs_signup", "signed_in"]
-    email: str | None = Field(default=None, description="Set for needs_signup and signed_in.")
+    status: Literal["signed_out", "needs_signup", "signed_in", "confirm_email"]
+    email: str | None = Field(
+        default=None, description="Set for needs_signup, signed_in and confirm_email."
+    )
     user: AuthUser | None = None
+    dev_link: str | None = Field(
+        default=None,
+        description="confirm_email only, and only when APP_ENV=local: the confirmation link.",
+    )
 
 
 class AuthProviders(BaseModel):
@@ -291,8 +305,8 @@ def build_router(
     async def password_signup(
         request: Request, db: DbSession, body: PasswordSignupRequest
     ) -> AuthState:
-        """AC-4: create an account with a password and sign in. The email is confirmed later,
-        from the link we send."""
+        """AC-4: create an account with a password and email the confirmation link. The user is
+        not signed in: the reply is `confirm_email`, and the link signs them in."""
         if not body.age_confirmed:
             raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "You must be 18 or older")
         if not body.terms_accepted:
@@ -320,13 +334,26 @@ def build_router(
             password_hash=hash_password(body.password),
             full_name=full_name,
         )
-        await send_confirmation(user)
-        await _sign_in_user(request, db, user)
-        return _state(request, user, settings)
+        link = await send_confirmation(user)
+        await db.commit()
+        request.session.clear()  # nobody stays signed in from an earlier session
+        return AuthState(
+            status="confirm_email", email=email, dev_link=link if settings.is_local else None
+        )
 
     @router.post("/password/resend", status_code=status.HTTP_202_ACCEPTED)
     async def resend_confirmation(db: DbSession, body: EmailOnlyRequest) -> EmailSent:
-        user = await find_user(db, str(body.email))
+        """AC-4: send the confirmation link again. Same reply whether or not the email has an
+        unconfirmed account. Limited per email, counted before the lookup so the limit reveals
+        nothing either."""
+        email = normalize_email(str(body.email))
+        if await throttle.blocked(_RESEND_KEY + email):
+            raise HTTPException(
+                status.HTTP_429_TOO_MANY_REQUESTS,
+                "We sent several links already. Wait 15 minutes, then ask again.",
+            )
+        await throttle.fail(_RESEND_KEY + email)
+        user = await find_user(db, email)
         if user is None or user.email_verified_at is not None or not user.password_hash:
             return EmailSent(sent=True)
         link = await send_confirmation(user)
@@ -355,7 +382,8 @@ def build_router(
         except AccountSuspendedError:
             await db.commit()  # the email is still confirmed
             return web_redirect("/signin", error=ACCOUNT_UNAVAILABLE)
-        return web_redirect("/")
+        # AC-3: a new account goes on to the first sign-in profile.
+        return web_redirect("/welcome" if user.profile_completed_at is None else "/")
 
     @router.post("/password/login")
     async def password_login(
@@ -373,6 +401,19 @@ def build_router(
             await throttle.fail(email)
             raise HTTPException(status.HTTP_401_UNAUTHORIZED, "The email or password is wrong.")
         await throttle.reset(email)
+        if user.suspended_at is not None:
+            raise AccountSuspendedError()  # AU-7 answers first, with its neutral message
+        if user.email_verified_at is None:
+            # AC-4: only someone who knows the password gets here, so this reveals nothing more.
+            raise HTTPException(
+                status.HTTP_403_FORBIDDEN,
+                {
+                    "code": EMAIL_NOT_CONFIRMED,
+                    "message": "Confirm your email first. Open the link we sent, or ask for a "
+                    "new one.",
+                    "email": user.email,
+                },
+            )
         if hashed and needs_rehash(hashed):
             user.password_hash = hash_password(body.password)
         await _sign_in_user(request, db, user)

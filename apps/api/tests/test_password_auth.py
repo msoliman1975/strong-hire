@@ -1,6 +1,6 @@
 """Email and password sign-in tests (P3). Requirement IDs: AC-4 (sign up and sign in with a
-password; the email is confirmed by a link), AC-5 (forgot password), AC-6 (lockout after 5
-failures)."""
+password; nothing works until the email is confirmed by a link), AC-5 (forgot password), AC-6
+(lockout after 5 failures)."""
 
 from __future__ import annotations
 
@@ -10,6 +10,7 @@ from urllib.parse import parse_qs, urlparse
 import pytest
 from sqlalchemy import select
 
+from strong_api.auth.deps import CurrentUser
 from strong_api.auth.passwords import (
     LOCKOUT_FAILURES,
     hash_password,
@@ -60,6 +61,18 @@ def _signed_up_and_confirmed(auth: AuthHarness) -> None:
     auth.client.post("/auth/logout")
 
 
+def _confirm_redirect(auth: AuthHarness, link: str) -> str:
+    resp = auth.client.get(f"/auth/password/confirm?token={_token(link)}", follow_redirects=False)
+    assert resp.status_code == 303
+    return resp.headers["location"]  # type: ignore[no-any-return]
+
+
+async def _unconfirm(db: Any) -> None:
+    user = (await db.execute(select(User))).scalar_one()
+    user.email_verified_at = None
+    await db.commit()
+
+
 # ---------------------------------------------------------------- password rules
 
 
@@ -84,11 +97,14 @@ def test_ac4_hash_is_argon2_and_verifies() -> None:
 # ---------------------------------------------------------------- sign-up and confirmation
 
 
-def test_ac4_signup_signs_in_and_emails_a_confirmation_link(auth: AuthHarness) -> None:
+def test_ac4_signup_emails_a_confirmation_link_and_does_not_sign_in(auth: AuthHarness) -> None:
     resp = auth.client.post("/auth/password/signup", json=SIGNUP)
     assert resp.status_code == 200, resp.text
-    assert resp.json()["status"] == "signed_in"
-    assert auth.client.get("/auth/me").json()["user"]["email"] == "ana@example.com"
+    assert resp.json()["status"] == "confirm_email"
+    assert resp.json()["email"] == "ana@example.com"
+    assert resp.json()["user"] is None
+    assert resp.json()["dev_link"] is not None  # the harness is APP_ENV=local
+    assert auth.client.get("/auth/me").json()["status"] == "signed_out"
     user = _user(auth)
     assert user is not None
     assert user.auth_provider == "password"
@@ -127,31 +143,104 @@ def test_ac4_signup_rejects_a_weak_password(auth: AuthHarness) -> None:
     assert _user(auth) is None
 
 
-def test_ac4_password_sign_in_works_before_the_confirmation(auth: AuthHarness) -> None:
+def test_ac4_password_sign_in_is_refused_until_the_email_is_confirmed(auth: AuthHarness) -> None:
     auth.client.post("/auth/password/signup", json=SIGNUP)
-    auth.client.post("/auth/logout")
     resp = _login(auth)
-    assert resp.status_code == 200, resp.text
-    assert resp.json()["status"] == "signed_in"
+    assert resp.status_code == 403, resp.text
+    detail = resp.json()["detail"]
+    assert detail["code"] == "email_not_confirmed"
+    assert detail["email"] == "ana@example.com"
+    assert "new one" in detail["message"]
+    assert auth.client.get("/auth/me").json()["status"] == "signed_out"
     user = _user(auth)
     assert user is not None and user.email_verified_at is None
+
+    _confirm_redirect(auth, _last(auth, "confirm")[1])
+    auth.client.post("/auth/logout")
+    assert _login(auth).status_code == 200
+
+
+def test_ac4_unconfirmed_wrong_password_gets_the_usual_reply(auth: AuthHarness) -> None:
+    """The not-confirmed answer needs the right password, so it reveals no account."""
+    auth.client.post("/auth/password/signup", json=SIGNUP)
+    wrong = _login(auth, password="not the password")
+    unknown = _login(auth, email="nobody@example.com")
+    assert wrong.status_code == unknown.status_code == 401
+    assert wrong.json() == unknown.json()
+
+
+def test_ac4_unconfirmed_user_with_an_old_session_is_signed_out(auth: AuthHarness) -> None:
+    """A cookie from before the rule (sign-up used to sign in) no longer opens the app."""
+
+    @auth.app.get("/probe")
+    async def probe(user: CurrentUser) -> dict[str, str]:
+        return {"email": user.email}
+
+    _signed_up_and_confirmed(auth)
+    assert _login(auth).status_code == 200
+    assert auth.client.get("/probe").status_code == 200
+
+    auth.query(_unconfirm)
+    assert auth.client.get("/probe").status_code == 401
+    assert auth.client.get("/auth/me").json()["status"] == "signed_out"
 
 
 def test_ac4_confirmation_link_signs_in(auth: AuthHarness) -> None:
     auth.client.post("/auth/password/signup", json=SIGNUP)
-    auth.client.post("/auth/logout")
     _, link = _last(auth, "confirm")
-    cb = auth.client.get(f"/auth/password/confirm?token={_token(link)}", follow_redirects=False)
-    assert cb.status_code == 303
-    assert cb.headers["location"] == "http://web.test/"
+    assert _confirm_redirect(auth, link) == "http://web.test/welcome"  # AC-3 profile step
     me = auth.client.get("/auth/me").json()
     assert me["status"] == "signed_in"
     assert me["user"]["auth_provider"] == "password"
     user = _user(auth)
     assert user is not None and user.email_verified_at is not None
 
-    again = auth.client.get(f"/auth/password/confirm?token={_token(link)}", follow_redirects=False)
-    assert again.headers["location"] == "http://web.test/signin?confirmed=1"
+    assert _confirm_redirect(auth, link) == "http://web.test/signin?confirmed=1"
+
+
+def test_ac4_confirmation_link_expires_after_24_hours(
+    auth: AuthHarness, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import time
+
+    auth.client.post("/auth/password/signup", json=SIGNUP)
+    _, link = _last(auth, "confirm")
+    now = time.time()
+    monkeypatch.setattr(time, "time", lambda: now + 24 * 3600 - 60)
+    assert _confirm_redirect(auth, link) == "http://web.test/welcome"  # still good at 23:59
+    auth.query(_unconfirm)
+    auth.client.post("/auth/logout")
+    auth.client.post("/auth/password/resend", json={"email": "ana@example.com"})
+    _, link = _last(auth, "confirm")
+    monkeypatch.setattr(time, "time", lambda: now + 48 * 3600 + 60)
+    assert _confirm_redirect(auth, link) == "http://web.test/signin?error=link_expired"
+    user = _user(auth)
+    assert user is not None and user.email_verified_at is None
+    assert auth.client.get("/auth/me").json()["status"] == "signed_out"
+
+
+def test_ac4_used_link_on_an_unconfirmed_account_does_not_sign_in(auth: AuthHarness) -> None:
+    auth.client.post("/auth/password/signup", json=SIGNUP)
+    _, link = _last(auth, "confirm")
+    _confirm_redirect(auth, link)
+    auth.query(_unconfirm)
+    auth.client.post("/auth/logout")
+    assert _confirm_redirect(auth, link) == "http://web.test/signin?error=link_used"
+    assert auth.client.get("/auth/me").json()["status"] == "signed_out"
+
+
+def test_ac4_confirmed_user_with_a_profile_lands_home(auth: AuthHarness) -> None:
+    from datetime import UTC, datetime
+
+    auth.client.post("/auth/password/signup", json=SIGNUP)
+
+    async def profile(db: Any) -> None:
+        user = (await db.execute(select(User))).scalar_one()
+        user.profile_completed_at = datetime.now(UTC)
+        await db.commit()
+
+    auth.query(profile)
+    assert _confirm_redirect(auth, _last(auth, "confirm")[1]) == "http://web.test/"
 
 
 def test_ac4_sign_in_with_password_after_confirmation(auth: AuthHarness) -> None:
@@ -177,7 +266,6 @@ def test_ac4_signup_for_a_taken_email_is_refused(auth: AuthHarness, confirmed: b
         _signed_up_and_confirmed(auth)
     else:
         auth.client.post("/auth/password/signup", json=SIGNUP)
-        auth.client.post("/auth/logout")
     before = _user(auth)
     resp = auth.client.post("/auth/password/signup", json={**SIGNUP, "password": "another pw"})
     assert resp.status_code == 409
@@ -186,7 +274,7 @@ def test_ac4_signup_for_a_taken_email_is_refused(auth: AuthHarness, confirmed: b
     after = _user(auth)
     assert before is not None and after is not None
     assert after.password_hash == before.password_hash
-    assert _login(auth).status_code == 200
+    assert _login(auth).status_code == (200 if confirmed else 403)
 
 
 def test_ac4_resend_confirmation(auth: AuthHarness) -> None:
@@ -199,6 +287,28 @@ def test_ac4_resend_confirmation(auth: AuthHarness) -> None:
     # Unknown emails get the same reply and no email.
     auth.client.post("/auth/password/resend", json={"email": "nobody@example.com"})
     assert len(auth.email.mail) == count + 1
+    # The new link confirms and signs in.
+    assert _confirm_redirect(auth, _last(auth, "confirm")[1]) == "http://web.test/welcome"
+    assert auth.client.get("/auth/me").json()["status"] == "signed_in"
+
+
+def test_ac4_resend_is_rate_limited_per_email(auth: AuthHarness) -> None:
+    auth.client.post("/auth/password/signup", json=SIGNUP)
+    for _ in range(LOCKOUT_FAILURES):
+        resp = auth.client.post("/auth/password/resend", json={"email": "Ana@example.com"})
+        assert resp.status_code == 202
+    sent = len(auth.email.mail)
+    limited = auth.client.post("/auth/password/resend", json={"email": "ana@example.com"})
+    assert limited.status_code == 429
+    assert "15 minutes" in limited.json()["detail"]
+    assert len(auth.email.mail) == sent
+    # Unknown emails hit the same limit, so the limit reveals no account.
+    nobody = {"email": "nobody@example.com"}
+    for _ in range(LOCKOUT_FAILURES):
+        auth.client.post("/auth/password/resend", json=nobody)
+    assert auth.client.post("/auth/password/resend", json=nobody).status_code == 429
+    # The resend limit does not lock password sign-in (AC-6 counts only wrong passwords).
+    assert _login(auth).status_code == 403
 
 
 def test_ac4_confirm_rejects_a_forged_token(auth: AuthHarness) -> None:
@@ -209,9 +319,9 @@ def test_ac4_confirm_rejects_a_forged_token(auth: AuthHarness) -> None:
 def test_ac4_magic_link_on_unconfirmed_account_drops_the_untrusted_password(
     auth: AuthHarness,
 ) -> None:
-    """Someone signed up with an email they do not own. The owner's magic link wins."""
+    """Someone signed up with an email they do not own. The owner's magic link wins, and it
+    confirms the address."""
     auth.client.post("/auth/password/signup", json=SIGNUP)
-    auth.client.post("/auth/logout")
     auth.client.post("/auth/magic-link", json={"email": "ana@example.com"})
     _, link = auth.email.sent[-1]
     auth.client.get(f"/auth/magic-link/callback?token={_token(link)}", follow_redirects=False)
@@ -236,7 +346,9 @@ def test_ac4_magic_link_still_works_for_password_users(auth: AuthHarness) -> Non
 
 def test_ac4_dev_links_are_hidden_outside_local() -> None:
     for harness in build_harness(AppEnv.PRODUCTION):
-        harness.client.post("/auth/password/signup", json=SIGNUP)
+        signup = harness.client.post("/auth/password/signup", json=SIGNUP)
+        assert signup.json()["status"] == "confirm_email"
+        assert signup.json()["dev_link"] is None
         assert harness.email.mail[-1][0] == "confirm"
         resp = harness.client.post("/auth/password/forgot", json={"email": "ana@example.com"})
         assert resp.json() == {"sent": True, "dev_link": None}
@@ -319,6 +431,13 @@ def test_ac6_lockout_after_repeated_failures(auth: AuthHarness) -> None:
     locked = _login(auth)
     assert locked.status_code == 429
     assert "15 minutes" in locked.json()["detail"]
+
+
+def test_ac6_lockout_also_covers_unconfirmed_accounts(auth: AuthHarness) -> None:
+    auth.client.post("/auth/password/signup", json=SIGNUP)
+    for _ in range(LOCKOUT_FAILURES):
+        assert _login(auth, password="wrong password!").status_code == 401
+    assert _login(auth).status_code == 429
 
 
 def test_ac6_success_clears_the_failure_count(auth: AuthHarness) -> None:
