@@ -17,6 +17,7 @@ import { accountHandlers, authHandlers, inputHandlers, scoringHandlers, sessionH
 import { planHandlers } from "./planHandlers";
 import { questionHandlers } from "./questionHandlers";
 import { readinessHandlers } from "./readinessHandlers";
+import { storyHandlers } from "./storyHandlers";
 import { transcriptHandlers } from "./transcriptHandlers";
 import { waitlistHandlers } from "./waitlistHandlers";
 
@@ -39,6 +40,7 @@ export async function startMocks(mode: MockMode): Promise<void> {
     ...planHandlers(store),
     ...readinessHandlers(),
     ...questionHandlers(),
+    ...storyHandlers(),
     ...waitlistHandlers(),
     ...coachVoiceHandlers(),
     ...transcriptHandlers(),

@@ -1,0 +1,103 @@
+/* ST-4: the story library and skill coverage sections of the v2 Home. Tokens from theme/tokens.css. */
+
+.home-stories {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.home-section__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 16px;
+}
+
+.home-stories h2,
+.home-coverage h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  letter-spacing: -0.01em;
+}
+
+.home-stories__counts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 14px 0;
+  border-top: 1px solid var(--sh-line);
+  border-bottom: 1px solid var(--sh-line);
+}
+
+.home-stories__counts dt {
+  font-size: 0.8125rem;
+  color: var(--sh-muted);
+}
+
+.home-stories__counts dd {
+  margin: 0;
+  font-family: var(--sh-font-mono);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.home-stories__counts dd[data-tone="ok"] {
+  color: var(--sh-ok-ink);
+}
+
+.home-stories__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 14px;
+}
+
+.home-stories__list > li + li {
+  margin-top: 0;
+}
+
+.home-story {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.home-story p {
+  margin: 0;
+}
+
+.home-story__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.home-story__title {
+  font-weight: 700;
+  color: var(--sh-ink);
+}
+
+.home-coverage {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.home-coverage__skills > li + li {
+  margin-top: 0;
+}
+
+.home-coverage__state {
+  font-weight: 400;
+}
+
+.home-coverage__link {
+  text-decoration: none;
+}
+
+.home-coverage__link:hover .pill,
+.home-coverage__link:focus-visible .pill {
+  text-decoration: underline;
+}
