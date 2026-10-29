@@ -456,6 +456,12 @@
       "title": "Bloomberg AI engineer case: real-time news NLP signals (refer.me)",
       "retrieved_at": "2026-10-28",
       "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.refer.me/interview/interviewtypecase-interview-for-bloomberg-software-engineer-case-interview-realtime-market-data-ingestion-and-alerting-at",
+      "title": "Bloomberg software engineer case: real-time market data ingestion and alerting (refer.me)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["question_patterns"]
     }
   ],
   "field_confidence": {
