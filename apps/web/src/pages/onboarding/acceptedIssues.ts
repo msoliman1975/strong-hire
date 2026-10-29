@@ -40,6 +40,8 @@ export function useAcceptedIssues(resumeId: string, initial: readonly { key: str
       try {
         const record = await resumesApi.setAcceptedIssue(resumeId, key, accepted);
         queryClient.setQueryData(queryKeys.resume(resumeId), record);
+        // The Resumes list and the Home card summarize the accepted issues too.
+        void queryClient.invalidateQueries({ queryKey: queryKeys.resumes, exact: true });
       } catch (e) {
         setKeys((prev) => toggle(prev, key, !accepted));
         setError(e);

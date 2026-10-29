@@ -17,6 +17,7 @@ import type { GapAnalysis, GapAnalysisOut } from "../../api/types";
 import { CV_DELETED } from "../../components/ReportList";
 import { Bar, ErrorNotice, Loading, PageHead } from "../../components/ui";
 import { competencyLabel, difficultyLabel, formatDate, interviewTypeLabel } from "../../labels";
+import { resumeCheckPath } from "../../paths";
 import { planPath } from "./paths";
 
 const SEVERITY: Record<string, string> = { high: "High", medium: "Medium", low: "Low" };
@@ -58,7 +59,15 @@ export function GapReport() {
         <p>{role}</p>
         {data && (
           <p className="muted small">
-            CV: {data.resume_deleted ? CV_DELETED : (data.resume_name ?? "CV")} · {formatDate(data.created_at)}
+            CV:{" "}
+            {data.resume_deleted ? (
+              CV_DELETED
+            ) : (
+              <Link to={resumeCheckPath(data.resume_id)} aria-label={`Open breakdown for ${data.resume_name ?? "the CV"}`}>
+                {data.resume_name ?? "CV"}
+              </Link>
+            )}{" "}
+            · {formatDate(data.created_at)}
           </p>
         )}
       </PageHead>

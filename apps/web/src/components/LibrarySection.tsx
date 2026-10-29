@@ -1,9 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useRef, useState, type FormEvent, type MouseEvent, type ReactNode } from "react";
+import { Link, useNavigate } from "react-router";
 
 import { keys, useJobs, useResumes } from "../api/hooks";
 import { jobTargetsApi, resumesApi } from "../api/inputs";
 import { formatDate } from "../labels";
+import { resumeCheckPath } from "../paths";
+import { checkedLabel, issueSummary, resumeIssueCounts } from "../pages/onboarding/resumeSummary";
+import { useFeature } from "../theme/features";
 import { ErrorNotice, Loading } from "./ui";
 
 /** The API rejects names that are empty or longer than this (R1). */
@@ -32,6 +36,10 @@ interface Item {
   archivedAt?: string | null;
   /** Extra text after the date, for example the number of sessions. */
   detail?: string;
+  /** IN-12 (v2 CVs): the breakdown page. The row opens it, and "Open breakdown" is its main action. */
+  to?: string;
+  /** IN-12: a second line, for example "Checked Oct 28 · 3 to fix · 1 accepted · 0 high". */
+  summary?: string;
 }
 
 interface Props {
@@ -77,6 +85,12 @@ export function Library({
   const [editing, setEditing] = useState<{ id: string; value: string } | null>(null);
   const [nameError, setNameError] = useState<string | null>(null);
   const [toDelete, setToDelete] = useState<Item | null>(null);
+  const navigate = useNavigate();
+  // A click anywhere on a linked row opens it, except on its own links, buttons and fields.
+  const openRow = (e: MouseEvent, to: string | undefined) => {
+    if (!to || (e.target as HTMLElement).closest("a, button, input, select, textarea, label, form")) return;
+    navigate(to);
+  };
 
   const save = useMutation({
     mutationFn: ({ id, name }: { id: string; name: string }) => rename(id, name),
@@ -146,15 +160,31 @@ export function Library({
                     {save.isError && <ErrorNotice error={save.error} />}
                   </form>
                 ) : (
-                  <div className="row row--between">
-                    <span>
-                      {label} {archived && <span className="chip">Archived</span>}{" "}
+                  <div
+                    className={`row row--between${item.to ? " library-row--link" : ""}`}
+                    onClick={(e) => openRow(e, item.to)}
+                  >
+                    <span className={item.to ? "library-row__text" : undefined}>
+                      {item.to ? (
+                        <Link className="library-row__name" to={item.to}>
+                          {label}
+                        </Link>
+                      ) : (
+                        label
+                      )}{" "}
+                      {archived && <span className="chip">Archived</span>}{" "}
                       <span className="muted">
                         added {formatDate(item.addedAt)}
                         {item.detail ? `, ${item.detail}` : ""}
                       </span>
+                      {item.summary && <span className="muted small library-row__summary">{item.summary}</span>}
                     </span>
                     <span className="row">
+                      {item.to && (
+                        <Link className="btn" to={item.to} aria-label={`Open breakdown for ${label}`}>
+                          Open breakdown
+                        </Link>
+                      )}
                       {!archived && (
                         <button
                           type="button"
@@ -284,20 +314,36 @@ export function JobLibrary({ empty }: { empty?: ReactNode }) {
   );
 }
 
-/** LB-1: the saved CVs. */
+/**
+ * LB-1: the saved CVs. v2 (IN-12): each row opens its breakdown and shows its state and issue counts,
+ * worked out from the saved CV with the check page's rules.
+ */
 export function CvLibrary() {
   const resumes = useResumes();
   const refresh = useLibraryRefresh();
+  const v2 = useFeature("v2_enabled");
   return (
     <Library
       kind="cv"
       title="Saved CVs"
-      items={resumes.data?.map((r) => ({
-        id: r.id,
-        name: r.name,
-        addedAt: r.uploaded_at,
-        detail: r.status === "pending" ? "reading the file" : r.confirmed_at ? undefined : "not checked yet",
-      }))}
+      items={resumes.data?.map((r) => {
+        if (!v2 || r.status === "pending") {
+          return {
+            id: r.id,
+            name: r.name,
+            addedAt: r.uploaded_at,
+            detail: r.status === "pending" ? "reading the file" : r.confirmed_at ? undefined : "not checked yet",
+          };
+        }
+        const counts = resumeIssueCounts(r);
+        return {
+          id: r.id,
+          name: r.name,
+          addedAt: r.uploaded_at,
+          to: resumeCheckPath(r.id),
+          summary: [checkedLabel(r), counts && issueSummary(counts)].filter(Boolean).join(" · "),
+        };
+      })}
       loading={resumes.isPending}
       error={resumes.error}
       rename={resumesApi.rename}

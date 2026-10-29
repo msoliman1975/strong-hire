@@ -111,7 +111,7 @@ describe("Resumes card on Home (v2)", () => {
     const card = await screen.findByRole("region", { name: "The CV your interviews are measured against." });
     expect(await within(card).findByText("On file")).toBeInTheDocument();
     expect(within(card).getByText("2")).toBeInTheDocument();
-    expect(card).toHaveTextContent("Needs a check");
+    expect(card).toHaveTextContent("Not checked yet");
     expect(within(card).getByRole("link", { name: "Check a resume" })).toHaveAttribute(
       "href",
       expect.stringMatching(/^\/resumes\/.+\/check$/),

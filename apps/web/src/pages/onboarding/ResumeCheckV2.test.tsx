@@ -39,9 +39,9 @@ async function seed() {
   await jobTargetsApi.get(job.id);
   const form = new FormData();
   form.append("text", "Backend engineer, seven years of Python.");
-  const { resume } = await resumesApi.upload(form);
+  const { resume, job: task } = await resumesApi.upload(form);
   await resumesApi.get(resume.id);
-  return { job, resume };
+  return { job, resume, task };
 }
 
 function renderAt(path: string) {
@@ -223,9 +223,10 @@ describe("v2 Check your CV", () => {
   });
 
   it("IN-3: a new CV says where the user is, and ends in one next step, at the top and the bottom", async () => {
-    const { resume } = await seed();
+    const { resume, task } = await seed();
     const puts = recordPutBodies();
-    const user = renderAt(`/resumes/${resume.id}/check`);
+    // A new upload from the Resumes page brings its reading job.
+    const user = renderAt(`/resumes/${resume.id}/check?task=${task?.id ?? ""}`);
     await screen.findByRole("complementary", { name: "What we found" });
     expect(screen.getByRole("status")).toHaveTextContent("We read your CV. Check it, then continue.");
     const next = screen.getAllByRole("button", { name: "Add a job description to practice for" });
@@ -251,5 +252,84 @@ describe("v2 Check your CV", () => {
     renderAt(`/resumes/${resume.id}/check`);
     expect(await screen.findByRole("button", { name: "Confirm and continue" })).toBeInTheDocument();
     expect(screen.queryByRole("complementary", { name: "What we found" })).not.toBeInTheDocument();
+  });
+});
+
+describe("v2 coming back to a saved CV", () => {
+  const ACCEPTED = { key: "consistency.skills-missing:celery", accepted_at: "2026-10-28T10:00:00Z" };
+  const confirmed = () => {
+    Object.assign(mockStore.db.resumes[0], { confirmed_at: "2026-10-28T10:00:00Z", accepted_issues: [ACCEPTED] });
+  };
+  const expectSameBreakdown = async () => {
+    await screen.findByRole("complementary", { name: "What we found" });
+    expect(within(panel()).getByText("✓ Accepted: A skill missing from Skills")).toBeInTheDocument();
+    expect(screen.queryByText("We read your CV. Check it, then continue.")).not.toBeInTheDocument();
+    expect(screen.getByTestId("cvc-saved")).toHaveTextContent(/^Last saved Oct 28(, 2026)? · \d+ issues? open$/);
+    expect(screen.getAllByRole("button", { name: "Use this CV for an interview" })).toHaveLength(2);
+    expect(screen.getAllByRole("button", { name: "Back to resumes" })).toHaveLength(2);
+  };
+
+  it("IN-12: the Saved CVs row shows its state and opens the same breakdown, accepted issues kept", async () => {
+    await seed();
+    confirmed();
+    const user = renderAt("/resumes");
+    const list = await screen.findByRole("list", { name: "Saved CVs" });
+    const row = within(list).getAllByRole("listitem")[0];
+    expect(row).toHaveTextContent(/Checked Oct 28(, 2026)? · \d+ to fix · 1 accepted · \d+ high/);
+    const open = within(row).getByRole("link", { name: /^Open breakdown for / });
+    expect(open).toHaveAttribute("href", `/resumes/${mockStore.db.resumes[0].id}/check`);
+    await user.click(open);
+    await expectSameBreakdown();
+  });
+
+  it("IN-12: a click on the row itself opens the breakdown, and Rename stays a rename", async () => {
+    await seed();
+    const user = renderAt("/resumes");
+    const list = await screen.findByRole("list", { name: "Saved CVs" });
+    const row = within(list).getAllByRole("listitem")[0];
+    expect(row).toHaveTextContent("Not checked yet");
+    await user.click(within(row).getByRole("button", { name: /^Rename / }));
+    expect(within(row).getByRole("textbox", { name: "New name" })).toBeInTheDocument();
+    await user.click(within(row).getByRole("button", { name: "Cancel" }));
+    await user.click(within(row).getByText(/^added /));
+    expect(await screen.findByRole("complementary", { name: "What we found" })).toBeInTheDocument();
+  });
+
+  it("IN-12: a deep link with no task loads the saved CV, recomputes the issues and keeps the accepted ones", async () => {
+    const { resume } = await seed();
+    confirmed();
+    renderAt(`/resumes/${resume.id}/check`);
+    await expectSameBreakdown();
+  });
+
+  it("IN-12: an unchecked CV opened later has no landing line, and says it is not saved yet", async () => {
+    const { resume } = await seed();
+    const puts = recordPutBodies();
+    const user = renderAt(`/resumes/${resume.id}/check`);
+    await screen.findByRole("complementary", { name: "What we found" });
+    expect(screen.queryByText("We read your CV. Check it, then continue.")).not.toBeInTheDocument();
+    expect(screen.getByTestId("cvc-saved")).toHaveTextContent(/Not saved yet · \d+ issues? open/);
+    await user.click(screen.getAllByRole("button", { name: "Use this CV for an interview" })[0]);
+    expect(await screen.findByRole("heading", { name: "Add a job description" })).toBeInTheDocument();
+    expect(puts).toHaveLength(1);
+  });
+
+  it("IN-12: the Resumes card on Home links each CV to its breakdown", async () => {
+    await seed();
+    const form = new FormData();
+    form.append("text", "Second CV, Python and Go.");
+    const { resume: second } = await resumesApi.upload(form);
+    await resumesApi.get(second.id);
+    confirmed();
+    const user = renderAt("/");
+    const card = await screen.findByRole("region", { name: "The CV your interviews are measured against." });
+    const links = await within(card).findAllByRole("link", { name: /^Open breakdown for / });
+    expect(links.map((l) => l.getAttribute("href")).sort()).toEqual(
+      mockStore.db.resumes.map((r) => `/resumes/${r.id}/check`).sort(),
+    );
+    expect(card).toHaveTextContent(/1 accepted/);
+    const first = links.find((l) => l.getAttribute("href") === `/resumes/${mockStore.db.resumes[0].id}/check`)!;
+    await user.click(first);
+    await expectSameBreakdown();
   });
 });

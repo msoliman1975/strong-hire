@@ -4188,3 +4188,30 @@ dialog::backdrop {
     flex-wrap: wrap;
   }
 }
+
+/* IN-12: a saved CV row opens its breakdown. The name is the link; the rest of the row is a
+   larger click target for the pointer. */
+.library-row--link {
+  cursor: pointer;
+  border-radius: var(--sh-radius-sm);
+}
+
+.library-row--link:hover {
+  background: var(--paper);
+}
+
+.library-row__text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.library-row__name {
+  font-weight: 600;
+  color: inherit;
+  overflow-wrap: anywhere;
+}
+
+.cvc-saved {
+  margin-top: 4px;
+}

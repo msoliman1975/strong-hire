@@ -428,3 +428,15 @@
 .get-started > p {
   margin: 0;
 }
+
+/* IN-12: the other CVs, each linked to its breakdown. */
+.home-resumes__others {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+a.home-resumes__name {
+  color: inherit;
+}

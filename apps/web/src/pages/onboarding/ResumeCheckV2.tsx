@@ -24,6 +24,7 @@ import {
   type IssueGroup,
   type ResumeIssue,
 } from "./resumeChecks";
+import { issuesOpen, shortDate } from "./resumeSummary";
 import { useOnboardingSteps } from "./steps";
 
 type Education = Resume["education"][number];
@@ -158,6 +159,8 @@ export function ResumeCheckV2({
   original,
   accepted: acceptedInitial = [],
   fresh = false,
+  confirmedAt = null,
+  uploadedAt = null,
 }: {
   jobId: string;
   resumeId: string;
@@ -165,8 +168,14 @@ export function ResumeCheckV2({
   original: Resume;
   /** Issues the user accepted before (IN-12). */
   accepted?: readonly { key: string }[];
-  /** The CV was just read and not confirmed yet: say where the user is. */
+  /**
+   * The CV was just read and not confirmed yet: say where the user is. Otherwise the user came back
+   * to a saved CV (from Resumes, Home, the plan or a link), and the next step says so.
+   */
   fresh?: boolean;
+  /** When the CV was last saved from this page (ResumeOut.confirmed_at). */
+  confirmedAt?: string | null;
+  uploadedAt?: string | null;
 }) {
   const steps = useOnboardingSteps();
   const navigate = useNavigate();
@@ -348,7 +357,8 @@ export function ResumeCheckV2({
     save.mutate(built.resume, { onSuccess: () => navigate(path) });
   };
 
-  // One obvious next step: the interview plan inside a rehearsal, else a job to practice for.
+  // One obvious next step: the interview plan inside a rehearsal. From Resumes, a job to practice
+  // for right after an upload, or this CV for an interview when the user comes back to it.
   const actions = (
     <div className="row cvc-actions">
       {jobId ? (
@@ -366,7 +376,11 @@ export function ResumeCheckV2({
         onClick={() => saveThen(jobId ? contextPath(jobId, resumeId) : newJobPath("rehearsal"))}
         disabled={save.isPending}
       >
-        {jobId ? "Continue to your interview plan" : "Add a job description to practice for"}
+        {jobId
+          ? "Continue to your interview plan"
+          : fresh
+            ? "Add a job description to practice for"
+            : "Use this CV for an interview"}
       </button>
     </div>
   );
@@ -386,6 +400,12 @@ export function ResumeCheckV2({
           <p>
             We read your CV into the parts below. Fix anything we got wrong, and look at what we found. Interviewers and
             your match scores read this version.
+          </p>
+          <p className="muted small cvc-saved" data-testid="cvc-saved">
+            {confirmedAt
+              ? `Last saved ${shortDate(confirmedAt)}`
+              : `${uploadedAt ? `Added ${shortDate(uploadedAt)} · ` : ""}Not saved yet`}{" "}
+            · {issuesOpen(open.length)}
           </p>
         </PageHead>
         <div className="cvc-head__actions">{actions}</div>
@@ -489,7 +509,9 @@ export function ResumeCheckV2({
               <b>Looks right?</b>{" "}
               {jobId
                 ? "Next, your interview plan for this job."
-                : "Next, add a job description and we compare your CV with it."}
+                : fresh
+                  ? "Next, add a job description and we compare your CV with it."
+                  : "Use it for an interview: add the job description and we compare your CV with it."}
             </p>
             {actions}
           </section>
