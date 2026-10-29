@@ -191,6 +191,8 @@ describe("interview plan page", () => {
   it("PP-1: shows what they'll test, where they'll probe and the earlier rehearsals", async () => {
     renderPlan(planView());
     expect(await screen.findByRole("heading", { level: 1, name: /Acme/ })).toBeInTheDocument();
+    // IN-12: the CV in use links to its breakdown.
+    expect(screen.getByRole("link", { name: "see its breakdown" })).toHaveAttribute("href", "/resumes/r1/check");
     const tested = screen.getByRole("region", { name: "What they'll test" });
     expect(within(tested).getByText(/Acme's interview profile and its Acme Values/)).toBeInTheDocument();
     // The rounds in their loop show; the others open on request.

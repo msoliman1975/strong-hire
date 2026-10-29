@@ -14,6 +14,7 @@ import { jobTargetsApi, resumesApi, sha256Hex } from "../api/inputs";
 import { AppRoutes, createQueryClient } from "../App";
 import { MOCK_NOT_CV_REFUSAL } from "../mocks/handlers";
 import { mockStore } from "../mocks/node";
+import { setFeatureOverrides } from "../theme/features";
 
 const POSTING = "Senior Software Engineer at Stripe. Payments reliability, Python, Go. ".repeat(4);
 const JOB_NAME = "Senior Software Engineer, Payments Reliability at Stripe";
@@ -362,6 +363,20 @@ describe("R1 Reports page", () => {
     expect(screen.getByText(/CV: CV deleted/)).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Start the recommended session" })).not.toBeInTheDocument();
     expect(mockStore.db.gaps[job.id].id).toBe(gap.id);
+  });
+
+  it("IN-12: the v2 gap report links the CV in use to its breakdown", async () => {
+    const { job, resume } = await seed();
+    setFeatureOverrides({ v2_enabled: true });
+    try {
+      renderAt(`/jobs/${job.id}/gap-report`);
+      expect(await screen.findByRole("link", { name: /^Open breakdown for / })).toHaveAttribute(
+        "href",
+        `/resumes/${resume.id}/check`,
+      );
+    } finally {
+      setFeatureOverrides({});
+    }
   });
 
   it("the gap page lists the job's own reports", async () => {

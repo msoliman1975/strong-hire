@@ -105,12 +105,17 @@ export function CheckResumePage() {
   // v2 (IN-12): the CV as cards with the issues panel. v1 keeps the form below.
   const v2 = useFeature("v2_enabled");
 
-  if (v2 && parsed && !record.data?.deleted) {
+  if (v2 && parsed && record.data && !record.data.deleted) {
+    // Everything comes from the saved CV, so the page works the same from a link, Resumes or Home.
+    // Only a new upload brings `?task=`; inside a rehearsal, an unconfirmed CV was just picked.
+    const fresh = !record.data.confirmed_at && (Boolean(jobId) || params.has("task"));
     return (
-      <ResumeCheckV2 key={resumeId} jobId={jobId} resumeId={resumeId} name={record.data?.name ?? null}
+      <ResumeCheckV2 key={resumeId} jobId={jobId} resumeId={resumeId} name={record.data.name}
         original={parsed}
-        accepted={record.data?.accepted_issues ?? []}
-        fresh={!record.data?.confirmed_at}
+        accepted={record.data.accepted_issues}
+        fresh={fresh}
+        confirmedAt={record.data.confirmed_at ?? null}
+        uploadedAt={record.data.uploaded_at}
       />
     );
   }

@@ -11,7 +11,7 @@ import type { ReportItem } from "../../api/types";
 import { CV_DELETED, ReportList } from "../../components/ReportList";
 import { Bar, ErrorNotice, Loading, PageHead, StatusBadge } from "../../components/ui";
 import { competencyLabel, formatDate, interviewTypeLabel } from "../../labels";
-import { contextPath } from "../../paths";
+import { contextPath, resumeCheckPath } from "../../paths";
 import { usePlan, type PlanView } from "./api";
 import { InterviewDate } from "./InterviewDate";
 import { YourPlan } from "./YourPlan";
@@ -49,7 +49,14 @@ function PlanBody({ plan, jobId, resumeId }: { plan: PlanView; jobId: string; re
     <div className="plan-page">
       <PageHead title={title} eyebrow="Interview prep" eyebrowTone="prep">
         <p className="muted">
-          With {cvName}.{" "}
+          With {cvName}
+          {!plan.resume.deleted && (
+            <>
+              {" "}
+              (<Link to={resumeCheckPath(resumeId)}>see its breakdown</Link>)
+            </>
+          )}
+          .{" "}
           {plan.company_mode === "curated"
             ? `Company profile and job details loaded.`
             : "No curated profile for this company yet, so the plan uses a general tech interview style."}
