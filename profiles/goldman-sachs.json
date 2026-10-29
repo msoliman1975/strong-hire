@@ -1,0 +1,584 @@
+{
+  "company_name": "Goldman Sachs",
+  "company_slug": "goldman-sachs",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-28",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Core Values",
+    "principles": [
+      {
+        "name": "Client Service",
+        "description": "Lead with a service mindset; earn clients' trust and exceed their expectations by understanding their goals. Clients' interests come first.",
+        "evidence_signals": [
+          "Names the client or internal user and what they actually needed",
+          "Went beyond the request and shows the effect for the client",
+          "Kept the client informed when something went wrong"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Partnership",
+        "description": "Prioritize collaboration and the strength of the team over individual credit.",
+        "evidence_signals": [
+          "Worked across teams or desks to deliver something no one team could",
+          "Gives credit to others while being clear about own part",
+          "Helped a colleague succeed at a cost to own time"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Integrity",
+        "description": "Hold to the highest ethical standards, be transparent, and own mistakes; follow controls even under pressure.",
+        "evidence_signals": [
+          "Raised a risk or mistake early, including own mistake",
+          "Followed change control or compliance rules under deadline pressure",
+          "Explains a decision openly rather than hiding trade-offs"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Excellence",
+        "description": "Strive for exceptional performance and superior results; high standards for correctness and detail.",
+        "evidence_signals": [
+          "Shows attention to detail and testing, especially on edge cases",
+          "Set a higher bar than required and explains the result",
+          "Learns quickly and improves after feedback"
+        ],
+        "weight": 1.2
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": [
+        "Analyst",
+        "Associate",
+        "Vice President"
+      ],
+      "rounds": [
+        {
+          "name": "Online assessment",
+          "interview_type": null,
+          "duration_min": 90,
+          "interviewer_role": "Automated (HackerRank)",
+          "notes": "Two or three coding problems graded on hidden tests. Not simulated in v1."
+        },
+        {
+          "name": "Recorded video interview",
+          "interview_type": "behavioral",
+          "duration_min": 25,
+          "interviewer_role": "Recorded (HireVue), no live interviewer",
+          "notes": "Mainly for campus and early-career hires: a few recorded behavioral and motivation questions with a short time to answer."
+        },
+        {
+          "name": "Technical screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Engineer",
+          "notes": "One or two live calls, usually a CoderPad coding problem plus a resume discussion. Coding part not simulated in v1."
+        },
+        {
+          "name": "Superday: coding",
+          "interview_type": null,
+          "duration_min": 45,
+          "interviewer_role": "Engineer",
+          "notes": "One or two coding rounds, easy to medium difficulty; correctness and edge cases matter. Not simulated in v1."
+        },
+        {
+          "name": "Superday: system design",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Senior engineer or VP",
+          "notes": "Design with a correctness and auditability focus, such as market-data ingestion, positions or order management. Java and SDLC questions are common."
+        },
+        {
+          "name": "Superday: resume and behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "VP or managing director",
+          "notes": "Why Goldman, why this division, teamwork and past projects in depth."
+        },
+        {
+          "name": "Team-match conversation",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Hiring manager",
+          "notes": "Some candidates meet one or two specific teams after the Superday to check stack and team fit."
+        },
+        {
+          "name": "Managing director conversation",
+          "interview_type": "hiring_manager",
+          "duration_min": 20,
+          "interviewer_role": "Managing director",
+          "notes": "Short final conversation on motivation and fit; may include an unexpected technical question."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": [
+        "Analyst",
+        "Associate",
+        "Vice President"
+      ],
+      "rounds": [
+        {
+          "name": "Online assessment",
+          "interview_type": null,
+          "duration_min": 90,
+          "interviewer_role": "Automated (HackerRank)",
+          "notes": "Coding plus probability and math questions for strats and quant roles. Not simulated in v1."
+        },
+        {
+          "name": "Technical screen",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Strat or data scientist",
+          "notes": "Probability, statistics and a discussion of a past model or project."
+        },
+        {
+          "name": "Superday: probability and modelling",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Senior strat",
+          "notes": "Probability puzzles reasoned aloud, plus modelling questions tied to pricing or risk."
+        },
+        {
+          "name": "Superday: behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "VP or managing director",
+          "notes": "Motivation, teamwork with traders or bankers, and handling pressure."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Why Goldman and why this division",
+      "pattern": "Why the candidate wants this firm and this business area, tied to what the division's engineers actually build",
+      "competencies": [
+        "communication",
+        "impact"
+      ],
+      "values": [
+        "Client Service"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Teamwork under pressure",
+      "pattern": "A time the candidate worked with others under a tight deadline and how they kept the team together",
+      "competencies": [
+        "collaboration",
+        "communication"
+      ],
+      "values": [
+        "Partnership"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Owning a mistake",
+      "pattern": "A mistake or production issue the candidate caused or found, how they raised it, and what changed afterwards",
+      "competencies": [
+        "learning_from_failure",
+        "ownership"
+      ],
+      "values": [
+        "Integrity",
+        "Excellence"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Serving a demanding user",
+      "pattern": "A time the candidate dealt with a demanding client or internal user and delivered what they needed",
+      "competencies": [
+        "impact",
+        "communication"
+      ],
+      "values": [
+        "Client Service"
+      ]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Disagreement",
+      "pattern": "A time the candidate disagreed with a teammate or senior colleague about an approach and how it was resolved",
+      "competencies": [
+        "conflict_handling",
+        "collaboration"
+      ],
+      "values": [
+        "Partnership",
+        "Integrity"
+      ]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Correctness-first design",
+      "pattern": "Design a trading-related service (positions, market data, orders) with focus on ordering, idempotency, reconciliation and audit",
+      "competencies": [
+        "trade_offs",
+        "technical_depth",
+        "reasoning"
+      ],
+      "values": [
+        "Excellence"
+      ]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Language and SDLC knowledge",
+      "pattern": "Explain a core language or software-process concept (collections, concurrency, testing, release controls) and when it matters",
+      "competencies": [
+        "accuracy",
+        "clarity_of_explanation"
+      ],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Probability reasoning",
+      "pattern": "A probability or expected-value puzzle reasoned aloud, with conditioning shown step by step",
+      "competencies": [
+        "reasoning",
+        "accuracy"
+      ],
+      "values": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Project deep dive",
+      "pattern": "Walk through the most significant project on the resume: the candidate's part, the hardest technical choice and the result",
+      "competencies": [
+        "depth_of_experience",
+        "scope_at_level"
+      ],
+      "values": [
+        "Excellence"
+      ]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Why do you want to work at Goldman Sachs, and why in this particular division?",
+      "strong_answer": "Be specific and sincere. Link your interests to what the division's engineers build (for example trading platforms, risk systems, consumer or asset-management technology) and to the firm's values, such as client service and partnership. Mention a concrete product, talk or person you learned from, and how your skills fit. Show that you understand engineering here sits close to the business. Pitfalls: generic prestige or pay answers, or not knowing what the division does.",
+      "competencies": [
+        "communication",
+        "impact"
+      ],
+      "values": [
+        "Client Service",
+        "Partnership"
+      ],
+      "source_url": "https://www.techinterview.org/companies/goldman-sachs/",
+      "hints": {
+        "looking_for": [
+          "Real knowledge of the division",
+          "Motivation beyond prestige"
+        ],
+        "strong_signals": [
+          "Names a specific platform or business problem",
+          "Connects own skills to that work"
+        ],
+        "watch_outs": [
+          "A generic 'top bank' answer",
+          "Confusing divisions"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design a service that ingests market data and keeps trading positions up to date?",
+      "strong_answer": "Clarify scale, latency and correctness needs first. Sketch ingestion from feeds, a durable log or queue, a position service and a store, plus a query API. Then spend most time on correctness: message ordering, duplicates and gaps, idempotent updates, sequence numbers, and reconciling positions against an end-of-day source after failures. Cover audit trails and monitoring. Pitfalls: optimizing only for scale, or ignoring what happens when messages are lost or replayed.",
+      "competencies": [
+        "trade_offs",
+        "technical_depth",
+        "reasoning"
+      ],
+      "values": [
+        "Excellence",
+        "Integrity"
+      ],
+      "source_url": "https://www.techinterview.org/companies/goldman-sachs/",
+      "hints": {
+        "looking_for": [
+          "Correctness and recovery thinking",
+          "Clear requirements before design"
+        ],
+        "strong_signals": [
+          "Handles duplicates, ordering and replay",
+          "Describes reconciliation and audit"
+        ],
+        "watch_outs": [
+          "Pure scale talk with no correctness story",
+          "No plan for failures"
+        ]
+      },
+      "role_families": [
+        "swe"
+      ],
+      "levels": [
+        "mid",
+        "senior"
+      ]
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design the main classes for a simple banking system with customers, accounts and credit cards. How do they relate, and how would you keep balances correct?",
+      "strong_answer": "Start from use cases (open account, deposit, withdraw, transfer, card payment). Propose classes such as Customer, Account (with subtypes), Card and Transaction, and explain the relationships and which object owns which behavior. Keep balances correct with an append-only transaction record, atomic transfers, validation rules and clear handling of concurrent updates. Mention where a design pattern helps, for example a strategy for fee or interest rules. Pitfalls: a class list with no behavior, or balances updated with no audit trail.",
+      "competencies": [
+        "technical_depth",
+        "trade_offs",
+        "clarity_of_explanation"
+      ],
+      "values": [
+        "Excellence",
+        "Integrity"
+      ],
+      "source_url": "https://www.techprep.app/blog/goldman-sachs-interview-process",
+      "hints": {
+        "looking_for": [
+          "Clean object modelling from use cases",
+          "How correctness of money is protected"
+        ],
+        "strong_signals": [
+          "Transaction log and atomic transfers",
+          "Sensible use of a design pattern"
+        ],
+        "watch_outs": [
+          "Classes with no behavior",
+          "No thought for concurrent updates"
+        ]
+      },
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time something you were responsible for failed. What did you do next?",
+      "strong_answer": "Pick a real failure with consequences, for example a release that broke something. Own your part without blaming others. Explain how quickly you raised it, how you limited the impact, and the root cause. Describe the fix and what you changed (tests, checks, process) so it cannot recur, and what you learned. Pitfalls: a fake failure, blaming others, or no prevention step.",
+      "competencies": [
+        "learning_from_failure",
+        "ownership"
+      ],
+      "values": [
+        "Excellence",
+        "Integrity"
+      ],
+      "source_url": "https://www.placementpreparation.io/goldman-sachs/preparation-tips/",
+      "hints": {
+        "looking_for": [
+          "Ownership of your own part",
+          "How you limited the impact"
+        ],
+        "strong_signals": [
+          "Raised the issue quickly and openly",
+          "Added a test or control so it cannot recur"
+        ],
+        "watch_outs": [
+          "A failure that was not really yours",
+          "Blaming others"
+        ]
+      },
+      "role_families": [
+        "swe"
+      ],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you worked on a team under a tight deadline. What was your role and how did it turn out?",
+      "strong_answer": "Set up the deadline and why it mattered. Be clear about your own role and decisions, how the team split work, and how you handled friction or a teammate who was stuck. Show the result and what you would do differently. Pitfalls: only 'we', or a story where the team succeeded despite poor collaboration.",
+      "competencies": [
+        "collaboration",
+        "communication"
+      ],
+      "values": [
+        "Partnership"
+      ],
+      "source_url": "https://www.designgurus.io/answers/detail/what-is-the-goldman-sachs-interview-process-like-round-by-round",
+      "hints": {
+        "looking_for": [
+          "Your own role inside the team",
+          "How you supported others"
+        ],
+        "strong_signals": [
+          "Clear split of work and own decisions",
+          "Helped a stuck teammate"
+        ],
+        "watch_outs": [
+          "Only 'we'",
+          "No reflection"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "You roll a fair die until a six appears. What is the expected sum of all the rolls, including the six?",
+      "strong_answer": "Reason aloud. The number of rolls is geometric with mean 6. Each roll before the six is uniform on 1 to 5 with mean 3, and there are on average 5 such rolls, giving 15; add the final six for an expected total of 21. Cross-check with Wald's identity: 6 expected rolls times 3.5 per roll is also 21. Check the answer for sense. Pitfalls: guessing, or forgetting that pre-six rolls cannot be six.",
+      "competencies": [
+        "reasoning",
+        "accuracy"
+      ],
+      "values": [],
+      "source_url": "https://www.techinterview.org/companies/goldman-sachs/",
+      "hints": {
+        "looking_for": [
+          "Structured probability reasoning",
+          "Explicit conditioning"
+        ],
+        "strong_signals": [
+          "Uses linearity of expectation",
+          "Sanity-checks the result"
+        ],
+        "watch_outs": [
+          "Guessing a number",
+          "Ignoring that earlier rolls exclude six"
+        ]
+      },
+      "role_families": [
+        "data_ml"
+      ],
+      "levels": []
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "Analyst",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Delivers well-defined features with guidance; writes correct, tested code and learns the business domain."
+    },
+    {
+      "level_name": "Associate",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns components or services within a team, designs features and works directly with business users."
+    },
+    {
+      "level_name": "Vice President",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Leads design for a system or small team, owns delivery and production risk, and mentors associates and analysts."
+    },
+    {
+      "level_name": "Managing Director",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Sets technical direction for a platform or group of teams and represents engineering to business leaders."
+    },
+    {
+      "level_name": "Associate",
+      "normalized_level": "mid",
+      "role_family": "data_ml",
+      "scope_expectation": "Builds and maintains pricing, risk or analytics models with traders or bankers, owning their correctness."
+    }
+  ],
+  "persona": {
+    "tone": "Professional, polite and businesslike; more formal than a tech company",
+    "pace": "Brisk; Superday interviews run back to back with little small talk",
+    "pushback_style": "Checks precision: asks about edge cases, failure handling and 'why this firm'; pushes for specifics on own role",
+    "closing_style": "Leaves a few minutes for questions; no feedback given"
+  },
+  "scoring_weights": {
+    "accuracy": 1.4,
+    "technical_depth": 1.2,
+    "trade_offs": 1.2,
+    "reasoning": 1.3,
+    "collaboration": 1.3,
+    "communication": 1.2,
+    "ownership": 1.1,
+    "learning_from_failure": 1.1,
+    "motivation": 1.2
+  },
+  "values_share": 0.25,
+  "case_style": {
+    "product_sense": 0.1,
+    "estimation": 0.4,
+    "system_thinking": 0.5,
+    "notes": "No business case round for engineering roles. Closest equivalents are correctness-focused system design for trading systems and probability or estimation puzzles for strats."
+  },
+  "sources": [
+    {
+      "url": "https://www.goldmansachs.com/our-firm/purpose-and-values",
+      "title": "Our Purpose and Values (Goldman Sachs)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "values_framework",
+        "scoring_weights"
+      ]
+    },
+    {
+      "url": "https://www.techinterview.org/companies/goldman-sachs/",
+      "title": "Goldman Sachs engineering interview guide (techinterview.org)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns",
+        "case_style",
+        "persona",
+        "bar_by_level"
+      ]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/what-is-the-goldman-sachs-interview-process-like-round-by-round",
+      "title": "What is the Goldman Sachs interview process like (Design Gurus)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns"
+      ]
+    },
+    {
+      "url": "https://www.techprep.app/blog/goldman-sachs-interview-process",
+      "title": "Goldman Sachs's interview process (TechPrep)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "loop_structure",
+        "question_patterns"
+      ]
+    },
+    {
+      "url": "https://www.placementpreparation.io/goldman-sachs/preparation-tips/",
+      "title": "Goldman Sachs preparation tips (PlacementPreparation)",
+      "retrieved_at": "2026-10-28",
+      "fields": [
+        "question_patterns"
+      ]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "medium"
+  },
+  "low_confidence_notes": [
+    "values_framework: the four values are official; principle weights are our estimate.",
+    "loop_structure: no official Goldman page describes the engineering loop; round count (3 to 6 Superday interviews) and HireVue length vary by source, division and year.",
+    "bar_by_level: Analyst, Associate, VP and MD titles are public; the scope text is our summary, not a published ladder.",
+    "persona: based on candidate reports, not an official description.",
+    "scoring_weights: no public source; derived from the emphasis on correctness and teamwork in reports.",
+    "loop_structure: the data_ml (strats) loop comes from one prep guide."
+  ]
+}

@@ -1,0 +1,606 @@
+{
+  "company_name": "McKinsey & Company",
+  "company_slug": "mckinsey",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-28",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Personal Experience Interview dimensions and firm values",
+    "principles": [
+      {
+        "name": "Personal Impact",
+        "description": "Influence people who start out disagreeing, especially skeptical or senior ones, by understanding their concerns and building real agreement (renamed 'Connection' in 2025, per prep sites).",
+        "evidence_signals": [
+          "Names the person or group who disagreed and why they disagreed",
+          "Explains how they adapted the message to that person's concerns",
+          "Shows what changed in the other person's view and how they know"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Entrepreneurial Drive",
+        "description": "Set an ambitious goal, often outside one's own role, and push through obstacles to deliver it (renamed 'Drive' in 2025, per prep sites).",
+        "evidence_signals": [
+          "Started the effort themselves rather than being assigned it",
+          "Describes a concrete obstacle and the different tactics used to get past it",
+          "Ends with a measurable result"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Inclusive Leadership",
+        "description": "Lead a diverse group toward a shared result, bring out every voice, and handle conflict inside the team (renamed 'Leadership' in 2025, per prep sites).",
+        "evidence_signals": [
+          "Describes the people on the team and how their differences mattered",
+          "Took a specific step to include someone who was not being heard",
+          "Resolved a conflict and kept the team on the goal"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Courageous Change",
+        "description": "Adapt well when circumstances shift, stay resilient in ambiguity, and lead others through change (renamed 'Growth' in 2025, per prep sites).",
+        "evidence_signals": [
+          "Describes an unexpected change and how they re-planned",
+          "Shows how they kept themselves and others steady under uncertainty",
+          "Names what they learned and used afterwards"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Problem Solving",
+        "description": "Think critically and structure complex, ambiguous problems; assessed mainly in the case (problem-solving) interview.",
+        "evidence_signals": [
+          "Sets up a clear, tailored structure before diving into details",
+          "Does calculations aloud, accurately, and states the 'so what'",
+          "Ends with a recommendation, risks and next steps"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "Obligation to Dissent",
+        "description": "Firm value: speak up with a different view, even to seniors, and engage with respect; put client interests ahead of the firm's.",
+        "evidence_signals": [
+          "Raised a disagreement with a more senior person, with evidence",
+          "Kept the client's or user's interest as the deciding factor"
+        ],
+        "weight": 0.8
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "other",
+      "levels": [
+        "Business Analyst",
+        "Associate",
+        "Engagement Manager"
+      ],
+      "rounds": [
+        {
+          "name": "Solve assessment",
+          "interview_type": null,
+          "duration_min": 70,
+          "interviewer_role": "Automated",
+          "notes": "Gamified problem-solving assessment for most consulting roles. Not simulated in v1."
+        },
+        {
+          "name": "First round: Personal Experience Interview",
+          "interview_type": "behavioral",
+          "duration_min": 20,
+          "interviewer_role": "Consultant or engagement manager",
+          "notes": "One PEI dimension per interview, explored as one story in depth. Usually the first part of a roughly 50-minute interview."
+        },
+        {
+          "name": "First round: Problem-solving (case) interview",
+          "interview_type": "case",
+          "duration_min": 25,
+          "interviewer_role": "Consultant or engagement manager",
+          "notes": "Interviewer-led case: a series of questions on one client situation (structure, chart reading, math without a calculator, synthesis). Two or three such interviews in the first round."
+        },
+        {
+          "name": "Final round: PEI and case with partners",
+          "interview_type": "case",
+          "duration_min": 50,
+          "interviewer_role": "Associate partner or partner",
+          "notes": "Two or three interviews, each again a PEI story plus a case; partners push harder on judgment and the recommendation."
+        }
+      ]
+    },
+    {
+      "role_family": "swe",
+      "levels": [
+        "Software Engineer",
+        "Senior Software Engineer",
+        "Lead Software Engineer"
+      ],
+      "rounds": [
+        {
+          "name": "Technical assessment",
+          "interview_type": null,
+          "duration_min": 90,
+          "interviewer_role": "Automated",
+          "notes": "Hands-on assessment (coding, data or system design tasks) for technical roles. Not simulated in v1."
+        },
+        {
+          "name": "Pair programming",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Senior engineer",
+          "notes": "Collaborative coding on a practical task; clean, tested code and talking through choices matter. Not simulated in v1."
+        },
+        {
+          "name": "Technical experience interview",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Senior or lead engineer",
+          "notes": "Deep dive into a past system: architecture, trade-offs, what the candidate personally built."
+        },
+        {
+          "name": "Personal Experience Interview",
+          "interview_type": "behavioral",
+          "duration_min": 30,
+          "interviewer_role": "Engineering manager or partner",
+          "notes": "Same PEI dimensions as consulting roles."
+        },
+        {
+          "name": "Technical or client case",
+          "interview_type": "case",
+          "duration_min": 30,
+          "interviewer_role": "Engineering lead or partner",
+          "notes": "For McKinsey Digital roles: a client problem with a technology angle, such as how to modernize a platform or what to build first."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": [
+        "Data Scientist",
+        "Senior Data Scientist",
+        "Lead Data Scientist"
+      ],
+      "rounds": [
+        {
+          "name": "Coding and statistics test",
+          "interview_type": null,
+          "duration_min": 90,
+          "interviewer_role": "Automated",
+          "notes": "Online coding and statistics test (QuantumBlack uses this in place of Solve, per prep sites). Not simulated in v1."
+        },
+        {
+          "name": "Technical experience interview",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Senior data scientist",
+          "notes": "Past modelling work: problem framing, features, validation, deployment and impact."
+        },
+        {
+          "name": "Data case",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Data science lead or partner",
+          "notes": "Hybrid of a business case and an analytics problem: how to frame a client question as a model and judge whether it is worth doing."
+        },
+        {
+          "name": "Personal Experience Interview",
+          "interview_type": "behavioral",
+          "duration_min": 30,
+          "interviewer_role": "Partner or senior data scientist",
+          "notes": null
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Changing someone's mind",
+      "pattern": "A time the candidate persuaded a person or group who disagreed, and how they adapted their approach to that audience",
+      "competencies": ["communication", "conflict_handling"],
+      "values": ["Personal Impact"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Going beyond the role",
+      "pattern": "A goal the candidate set themselves, outside their normal responsibilities, and the obstacles they overcame to reach it",
+      "competencies": ["ownership", "impact"],
+      "values": ["Entrepreneurial Drive"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Leading a diverse team",
+      "pattern": "A time the candidate led people with different backgrounds or views to a result, including how they brought in quieter voices",
+      "competencies": ["collaboration", "conflict_handling"],
+      "values": ["Inclusive Leadership"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Ambiguity and change",
+      "pattern": "A situation that changed unexpectedly, how the candidate re-planned, and how they helped others adjust",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Courageous Change"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Speaking up",
+      "pattern": "A time the candidate disagreed with someone more senior and raised it, with the evidence they used and the outcome",
+      "competencies": ["communication", "conflict_handling"],
+      "values": ["Obligation to Dissent", "Personal Impact"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Investment attractiveness",
+      "pattern": "Should a client invest in a new product, market or technology; structure the factors, read a cost comparison, compute a break-even, recommend",
+      "competencies": ["problem_framing", "structure", "estimation_logic", "recommendation"],
+      "values": ["Problem Solving"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Public-sector or social impact",
+      "pattern": "Use an existing network or program to deliver a new service to an underserved group; feasibility, benefits, costs and risks",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Problem Solving"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Product launch",
+      "pattern": "Plan a product launch for a client: target customers, positioning, channel, and a market-size estimate",
+      "competencies": ["user_and_business_sense", "estimation_logic", "structure"],
+      "values": ["Problem Solving"]
+    },
+    {
+      "interview_type": "case",
+      "theme": "Digital or analytics case",
+      "pattern": "A client wants to use data or a new platform to fix a business problem; frame the use case, data needs, value at stake and rollout",
+      "competencies": ["problem_framing", "prioritization", "recommendation"],
+      "values": ["Problem Solving"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Past system deep dive",
+      "pattern": "Walk through a system or model the candidate built: the goal, architecture, trade-offs, and what they would change",
+      "competencies": ["technical_depth", "trade_offs", "clarity_of_explanation"],
+      "values": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Why consulting and why McKinsey",
+      "pattern": "Why the candidate wants client-facing work at this firm and how their background fits the role and practice",
+      "competencies": ["motivation", "role_fit"],
+      "values": []
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "case",
+      "question": "A European truck maker is considering building electric trucks. What would you want to know to judge whether making and selling them in Europe is attractive?",
+      "strong_answer": "Lay out a tailored structure before details: market (demand from large fleets vs owner-operators, regulation, growth), customer economics (total cost of ownership vs diesel, charging time, range), the client's ability to compete (technology, batteries, partners, manufacturing changes), competitors, and financials (investment, margin, payback) plus risks. Say which branch you would test first and why. Pitfalls: a generic framework not tied to trucks, or diving into one branch without an overall map.",
+      "competencies": ["problem_framing", "structure", "user_and_business_sense"],
+      "values": ["Problem Solving"],
+      "source_url": "https://www.mckinsey.com/careers/interviewing/talbot-trucks",
+      "hints": {
+        "looking_for": [
+          "A clear, case-specific structure before any detail",
+          "Both customer economics and the client's own capabilities"
+        ],
+        "strong_signals": [
+          "Separates large fleet customers from owner-operators",
+          "States which area to investigate first and why"
+        ],
+        "watch_outs": [
+          "A memorized framework with generic buckets",
+          "Jumping into numbers before laying out the approach"
+        ]
+      },
+      "role_families": ["other"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Customers will only switch if an electric truck's total cost of ownership matches a diesel truck's. Given the cost differences per category, what is the most the client could charge for the electric truck?",
+      "strong_answer": "Restate the condition: purchase price plus lifetime running costs must equal the diesel total. Sum the cost categories where the electric truck is cheaper or dearer, net them, and add the difference to the diesel purchase price to get the maximum price. Do the math step by step aloud, without a calculator, and sanity-check the result. Then add the 'so what': whether that price is realistic given battery costs, and what else (residual value, driver shortage, tolls) could shift it. Pitfalls: silent math, unit slips, no implication.",
+      "competencies": ["estimation_logic", "structure", "recommendation"],
+      "values": ["Problem Solving"],
+      "source_url": "https://www.mckinsey.com/careers/interviewing/talbot-trucks",
+      "hints": {
+        "looking_for": [
+          "Accurate mental math talked through step by step",
+          "An implication drawn from the number"
+        ],
+        "strong_signals": [
+          "Restates the break-even condition before calculating",
+          "Sanity-checks the result against the diesel price"
+        ],
+        "watch_outs": [
+          "Calculating silently",
+          "Stopping at the number with no 'so what'"
+        ]
+      },
+      "role_families": ["other"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "A foundation wants to use a government-run network of rural stores to deliver basic financial services, starting with benefit payments. What should the team investigate to decide whether it could and should be done?",
+      "strong_answer": "Split 'could' from 'should'. Could: store coverage and capacity, cash handling and security, technology and connectivity, staff skills, regulation. Should: benefits to recipients (time and cost saved, safety), costs and who pays, impact on the store network, and alternatives such as mobile payments. Name key stakeholders (recipients, government, store operators). Propose how to test it, for example a pilot region and success metrics. Pitfalls: only commercial profit logic for a social-impact client.",
+      "competencies": ["problem_framing", "user_and_business_sense", "structure"],
+      "values": ["Problem Solving"],
+      "source_url": "https://www.mckinsey.com/careers/interviewing/diconsa",
+      "hints": {
+        "looking_for": [
+          "Separates feasibility from desirability",
+          "Considers recipients, operators and government"
+        ],
+        "strong_signals": [
+          "Includes risks such as cash security and fraud",
+          "Suggests a pilot with clear success metrics"
+        ],
+        "watch_outs": [
+          "Treating a social-impact client like a profit-maximizer",
+          "No view on how to test the idea"
+        ]
+      },
+      "role_families": ["other"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to convince someone who strongly disagreed with you.",
+      "strong_answer": "Pick one story that mattered to you and go deep: who the person was, why they disagreed, and what was at stake. Lead with your reasoning: how you worked out their real concern, what you changed in your approach (data, a different messenger, a smaller first step), and what you said. Show the outcome and the relationship afterwards. Expect many follow-ups like 'what exactly did you say?' and 'why that approach?'. Pitfalls: a rehearsed speech, a team story with no 'I', or 'winning' by authority.",
+      "competencies": ["communication", "conflict_handling"],
+      "values": ["Personal Impact"],
+      "source_url": "https://strategycase.com/mckinsey-pei-courageous-change",
+      "hints": {
+        "looking_for": [
+          "How you understood the other person's concern",
+          "Your reasoning for the approach you chose"
+        ],
+        "strong_signals": [
+          "Can say what exactly you said and why",
+          "The relationship stayed good afterwards"
+        ],
+        "watch_outs": [
+          "Persuading by authority or pressure",
+          "A polished story that falls apart under 'why?'"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time you set yourself an ambitious goal beyond your role and ran into a serious obstacle.",
+      "strong_answer": "Show that the idea was yours and why the goal was ambitious. Describe the obstacle concretely and the different things you tried when the first attempt failed. Quantify the result and what it meant for others. Interviewers dig into motivation, so be clear why it mattered to you personally. Pitfalls: a goal that was really assigned, an easy win, or no measurable outcome.",
+      "competencies": ["ownership", "impact"],
+      "values": ["Entrepreneurial Drive"],
+      "source_url": "https://strategycase.com/mckinsey-pei-courageous-change",
+      "hints": {
+        "looking_for": [
+          "Initiative you took yourself",
+          "Persistence when the first approach failed"
+        ],
+        "strong_signals": [
+          "Several tactics tried in turn",
+          "A quantified result"
+        ],
+        "watch_outs": [
+          "A goal someone else gave you",
+          "An obstacle that was not really hard"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you led a group of people with very different backgrounds or views to a result.",
+      "strong_answer": "Describe the team and how its differences showed up. Explain specific steps you took to bring everyone in, for example asking quieter members for input or changing how decisions were made, and how you handled a conflict. Show the result and what you learned about leading. Pitfalls: describing the team as harmonious with no real tension, or leading by simply deciding for everyone.",
+      "competencies": ["collaboration", "conflict_handling"],
+      "values": ["Inclusive Leadership"],
+      "source_url": "https://strategycase.com/mckinsey-pei-courageous-change",
+      "hints": {
+        "looking_for": [
+          "How you made space for different views",
+          "How you handled a real conflict"
+        ],
+        "strong_signals": [
+          "Names a specific step to include someone",
+          "The team result depended on that inclusion"
+        ],
+        "watch_outs": [
+          "No real tension in the story",
+          "Leading by deciding for everyone"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a situation where your plans changed suddenly and you had to adapt.",
+      "strong_answer": "Set up what changed and why it was hard. Show how you re-prioritized, what you let go, and how you kept yourself and others steady. Close with the result and a lesson you have used since. Pitfalls: a minor change, blaming others, or no reflection.",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Courageous Change"],
+      "source_url": "https://strategycase.com/mckinsey-pei-courageous-change",
+      "hints": {
+        "looking_for": [
+          "How you re-plan under uncertainty",
+          "How you support others through change"
+        ],
+        "strong_signals": [
+          "Clear re-prioritization with reasons",
+          "A lesson applied later"
+        ],
+        "watch_outs": [
+          "A trivial change",
+          "Blaming others for the disruption"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "A beauty company wants to know whether to train its in-store consultants to reach customers through virtual channels such as video and social media. How would you assess it?",
+      "strong_answer": "Clarify the objective (sales, loyalty, reach). Structure: customer demand for virtual advice by segment, consultant readiness and incentives (will commission still work?), channel conflict with stores, required tools and training cost, and the expected revenue uplift. Suggest a pilot and the metrics to judge it. Pitfalls: ignoring the consultants' incentives, or no way to measure success.",
+      "competencies": ["user_and_business_sense", "problem_framing", "prioritization"],
+      "values": ["Problem Solving"],
+      "source_url": "https://www.mckinsey.com/careers/interviewing",
+      "hints": {
+        "looking_for": [
+          "Customer and employee perspectives together",
+          "A way to test before full rollout"
+        ],
+        "strong_signals": [
+          "Spots the incentive and channel-conflict issue",
+          "Defines pilot metrics"
+        ],
+        "watch_outs": [
+          "Assuming all customers want virtual advice",
+          "No cost side"
+        ]
+      },
+      "role_families": ["other"],
+      "levels": []
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "Business Analyst",
+      "normalized_level": "new_grad",
+      "role_family": "other",
+      "scope_expectation": "Owns one workstream's analysis under an engagement manager; structures problems, builds models and presents findings to client counterparts."
+    },
+    {
+      "level_name": "Associate",
+      "normalized_level": "mid",
+      "role_family": "other",
+      "scope_expectation": "Owns a larger workstream end to end, works directly with client managers, and coaches business analysts."
+    },
+    {
+      "level_name": "Engagement Manager",
+      "normalized_level": "senior",
+      "role_family": "other",
+      "scope_expectation": "Leads the day-to-day engagement and team, manages client relationships and is accountable for the quality of the answer."
+    },
+    {
+      "level_name": "Associate Partner",
+      "normalized_level": "staff_principal",
+      "role_family": "other",
+      "scope_expectation": "Leads several engagements, shapes client relationships and problem definitions, and develops firm knowledge."
+    },
+    {
+      "level_name": "Software Engineer",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Builds production features on client or firm platforms with clean, tested code, and explains choices to non-engineers."
+    },
+    {
+      "level_name": "Senior Software Engineer",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Leads technical design for a client product, works with client engineering teams and mentors others."
+    },
+    {
+      "level_name": "Senior Data Scientist",
+      "normalized_level": "senior",
+      "role_family": "data_ml",
+      "scope_expectation": "Turns a client question into a modelling approach, leads analysis to deployment and explains impact to client executives."
+    }
+  ],
+  "persona": {
+    "tone": "Warm and professional, but focused; treats the case as a client conversation",
+    "pace": "Interviewer-led and steady; moves the candidate through a fixed sequence of case questions and keeps the PEI to one story",
+    "pushback_style": "In the PEI repeatedly asks 'why?', 'what exactly did you say?', 'how did they react?'; in the case asks for the 'so what' after each analysis and probes math errors",
+    "closing_style": "Leaves about five minutes for the candidate's questions; often shares stories about the firm's culture"
+  },
+  "scoring_weights": {
+    "problem_framing": 1.5,
+    "structure": 1.5,
+    "estimation_logic": 1.3,
+    "recommendation": 1.4,
+    "user_and_business_sense": 1.2,
+    "communication": 1.3,
+    "ownership": 1.2,
+    "conflict_handling": 1.1,
+    "collaboration": 1.1,
+    "motivation": 1.0
+  },
+  "values_share": 0.35,
+  "case_style": {
+    "product_sense": 0.25,
+    "estimation": 0.35,
+    "system_thinking": 0.4,
+    "notes": "Interviewer-led cases: one client situation with a sequence of questions (structure the problem, read a chart, do math without a calculator, synthesize a recommendation). Frameworks must be tailored to the case. Digital and data roles add a technology or analytics angle."
+  },
+  "sources": [
+    {
+      "url": "https://www.mckinsey.com/careers/interviewing",
+      "title": "Interviewing at McKinsey (McKinsey careers)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "persona", "case_style", "values_framework"]
+    },
+    {
+      "url": "https://www.mckinsey.com/about-us/overview/our-purpose-mission-and-values",
+      "title": "Our purpose, mission, and values (McKinsey)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://www.mckinsey.com/careers/interviewing/talbot-trucks",
+      "title": "Talbot Trucks practice case (McKinsey careers)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.mckinsey.com/careers/interviewing/diconsa",
+      "title": "Diconsa practice case (McKinsey careers)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.mckinsey.com/careers/meet-our-people/careers-blog/jenny-phung",
+      "title": "Practice for interviews, but don't become scripted (McKinsey careers blog)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "persona"]
+    },
+    {
+      "url": "https://strategycase.com/mckinsey-pei-courageous-change",
+      "title": "McKinsey PEI: guide to all four dimensions (StrategyCase)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "loop_structure", "persona", "question_patterns"]
+    },
+    {
+      "url": "https://www.myconsultingoffer.org/case-study-interview-prep/mckinsey-digital-interview",
+      "title": "The McKinsey Digital interview (MyConsultingOffer)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure"]
+    },
+    {
+      "url": "https://www.hackingthecaseinterview.com/pages/mckinsey-quantumblack-interview",
+      "title": "McKinsey QuantumBlack interview guide (Hacking the Case Interview)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "bar_by_level"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "medium",
+    "loop_structure": "medium",
+    "question_patterns": "high",
+    "bar_by_level": "low",
+    "persona": "medium",
+    "scoring_weights": "low",
+    "case_style": "high"
+  },
+  "low_confidence_notes": [
+    "values_framework: McKinsey's own page names four PEI themes without text we could read; the names and the 2025 renaming (Connection, Drive, Leadership, Growth) come from prep sites. We kept the older names as ids; the reviewer may want to switch to the new names. Weights are our estimate.",
+    "loop_structure: the PEI and case minute split inside a roughly 50-minute interview comes from prep sites; Solve duration is approximate. Digital (pair programming, technical case) and QuantumBlack loops come from single prep-site accounts and vary by office.",
+    "bar_by_level: the consulting ladder is widely known but scope text is our summary; technical and data titles and their mapping are not published by McKinsey.",
+    "scoring_weights: no public source gives weights; derived from the case-plus-PEI format.",
+    "sample_questions: the beauty-company case is paraphrased from the one-line summary on the interviewing page, not from the full case text."
+  ]
+}

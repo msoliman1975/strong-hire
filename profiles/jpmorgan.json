@@ -1,0 +1,520 @@
+{
+  "company_name": "JPMorgan Chase",
+  "company_slug": "jpmorgan",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-28",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "How We Do Business principles",
+    "principles": [
+      {
+        "name": "Exceptional client service",
+        "description": "Focus on the customer, see things from their side, and build for the long term so the franchise holds up in good and bad markets.",
+        "evidence_signals": [
+          "Names the customer or business user and the need behind the request",
+          "Made a decision that favored the long-term customer outcome over a quick win",
+          "Measured the result for the customer"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Operational excellence",
+        "description": "Set high standards, execute with skill and urgency, keep strong controls and risk discipline, and build efficient systems; act like owners.",
+        "evidence_signals": [
+          "Delivered on a commitment with attention to detail and on time",
+          "Worked within controls, change management or risk rules rather than around them",
+          "Simplified a process or system and cut waste"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "Integrity, fairness and responsibility",
+        "description": "Never compromise integrity, follow the letter and spirit of the rules, and treat people with respect and humility.",
+        "evidence_signals": [
+          "Raised a concern or risk even when it was uncomfortable",
+          "Followed the rules when a shortcut was tempting, and explains why",
+          "Treats colleagues and users with respect in the story"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Face facts",
+        "description": "Assess reality candidly, admit mistakes, keep one version of the truth, and persist through setbacks.",
+        "evidence_signals": [
+          "Admits own mistake plainly and explains what changed afterwards",
+          "Uses data to tell an unwelcome truth",
+          "Kept going after a setback and learned from it"
+        ],
+        "weight": 1.1
+      },
+      {
+        "name": "Great team and winning culture",
+        "description": "Build teamwork and loyalty, communicate honestly and clearly, put shared goals ahead of personal agendas, and lead well.",
+        "evidence_signals": [
+          "Helped teammates succeed and shares credit",
+          "Communicated clearly across large or distributed teams",
+          "Gave or took honest feedback and acted on it"
+        ],
+        "weight": 1.1
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": [
+        "Analyst (Software Engineer II)",
+        "Associate (Software Engineer III)",
+        "Vice President (Lead Software Engineer)",
+        "Executive Director"
+      ],
+      "rounds": [
+        {
+          "name": "Online assessment",
+          "interview_type": null,
+          "duration_min": 75,
+          "interviewer_role": "Automated (HackerRank)",
+          "notes": "Two easy-to-medium coding problems; some tracks add aptitude questions. Not simulated in v1."
+        },
+        {
+          "name": "Recorded video interview",
+          "interview_type": "behavioral",
+          "duration_min": 20,
+          "interviewer_role": "Recorded (HireVue), no live interviewer",
+          "notes": "Mainly for students and new grads: recorded behavioral prompts. Some early-career candidates then join the Code for Good hackathon, where employees observe teamwork."
+        },
+        {
+          "name": "Technical screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "One or two medium problems in CoderPad or HackerRank plus a resume project discussion; Java questions are common. Coding part not simulated in v1."
+        },
+        {
+          "name": "Superday: coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "Often opens with a short code-review exercise, then a live medium problem. Not simulated in v1."
+        },
+        {
+          "name": "Superday: system design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Lead software engineer or VP",
+          "notes": "For Associate and above. Problems tied to the bank's work, such as payments, reconciliation or rate limiting; consistency, retries, idempotency and auditability matter."
+        },
+        {
+          "name": "Superday: behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager or VP",
+          "notes": "Production incidents, change control, working across large teams, and why this line of business."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Hiring manager (VP or Executive Director)",
+          "notes": "Team fit, scope and motivation; sometimes combined with the behavioral round."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": [
+        "Associate (Product Manager)",
+        "Vice President (Senior Product Manager)",
+        "Executive Director (Product Lead)"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background and logistics. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Product leader (VP or Executive Director)",
+          "notes": "Products the candidate launched, prioritization and stakeholder management."
+        },
+        {
+          "name": "Product case",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product manager",
+          "notes": "A product or delivery case, such as improving a feature, measuring success or rescuing a late project."
+        },
+        {
+          "name": "Engineering partner",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineering lead",
+          "notes": "How the candidate works with engineers, agile delivery and backlog management; not a coding round."
+        },
+        {
+          "name": "Senior leader and culture fit",
+          "interview_type": "behavioral",
+          "duration_min": 30,
+          "interviewer_role": "Executive Director or Managing Director",
+          "notes": "Several senior conversations are reported for VP-level roles."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": [
+        "Associate",
+        "Vice President"
+      ],
+      "rounds": [
+        {
+          "name": "Online assessment",
+          "interview_type": null,
+          "duration_min": 75,
+          "interviewer_role": "Automated",
+          "notes": "Coding, SQL or statistics tasks. Not simulated in v1."
+        },
+        {
+          "name": "Technical interview",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Data scientist or ML engineer",
+          "notes": "Statistics, ML fundamentals and a past project: validation, monitoring and model risk."
+        },
+        {
+          "name": "Behavioral and hiring manager",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager",
+          "notes": "Working with business partners and explaining models to non-experts."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Production incident",
+      "pattern": "A production issue the candidate caused or handled, how they communicated it and what they changed afterwards",
+      "competencies": ["ownership", "learning_from_failure"],
+      "values": ["Face facts", "Operational excellence"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Working within controls",
+      "pattern": "A time a deadline pushed against a process, control or rule, and how the candidate delivered without cutting corners",
+      "competencies": ["judgment", "ownership"],
+      "values": ["Integrity, fairness and responsibility", "Operational excellence"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Large-team collaboration",
+      "pattern": "Delivering something that depended on several teams or locations, and how the candidate kept everyone aligned",
+      "competencies": ["collaboration", "communication"],
+      "values": ["Great team and winning culture"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Customer impact",
+      "pattern": "A change the candidate made because of a customer or business-user need, and how the result was measured",
+      "competencies": ["impact", "ownership"],
+      "values": ["Exceptional client service"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Late project",
+      "pattern": "A project that was falling behind schedule and the steps the candidate took to recover it",
+      "competencies": ["ownership", "communication"],
+      "values": ["Operational excellence", "Face facts"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Correct financial systems",
+      "pattern": "Design a payments, reconciliation or rate-limiting service and explain how correctness is guaranteed and shown to an auditor",
+      "competencies": ["trade_offs", "technical_depth", "reasoning"],
+      "values": ["Operational excellence"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Java and platform fundamentals",
+      "pattern": "Explain a core Java or framework concept (collections, concurrency, garbage collection, dependency injection) and its practical effect",
+      "competencies": ["accuracy", "clarity_of_explanation"],
+      "values": []
+    },
+    {
+      "interview_type": "case",
+      "theme": "Product success metrics",
+      "pattern": "How the candidate would measure whether a banking feature they launched is working, and what they would do if it is not",
+      "competencies": ["user_and_business_sense", "prioritization", "problem_framing"],
+      "values": ["Exceptional client service"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "End-to-end launch",
+      "pattern": "Walk through a product or system the candidate took from idea to launch: own role, key decisions and result",
+      "competencies": ["depth_of_experience", "scope_at_level"],
+      "values": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Why this line of business",
+      "pattern": "Why the candidate wants this bank and this business (consumer, corporate and investment bank, asset and wealth management)",
+      "competencies": ["motivation", "role_fit"],
+      "values": []
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design a payments backend so that a payment is never charged twice, and how would you prove it to an auditor?",
+      "strong_answer": "Clarify volumes, latency and failure modes. Use an idempotency key per request, a durable payment state machine (created, authorized, settled, failed) and an append-only ledger. Handle retries and timeouts with exactly-once effects, not exactly-once delivery. Add reconciliation against the payment network's records and alerts on mismatches. For audit: immutable logs, who changed what and when, and reports that tie ledger to external statements. Pitfalls: ignoring retries, or a design that mutates balances with no history.",
+      "competencies": ["trade_offs", "technical_depth", "reasoning"],
+      "values": ["Operational excellence", "Integrity, fairness and responsibility"],
+      "source_url": "https://www.techinterview.org/companies/jpmorgan/",
+      "hints": {
+        "looking_for": [
+          "Idempotency and retry handling",
+          "Evidence of correctness for audit"
+        ],
+        "strong_signals": [
+          "State machine plus append-only ledger",
+          "Reconciliation with external records"
+        ],
+        "watch_outs": [
+          "Assuming the network never retries",
+          "No audit trail"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": ["mid", "senior"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "What is the difference between a HashMap and a ConcurrentHashMap in Java, and when would you use each?",
+      "strong_answer": "HashMap is not thread-safe; concurrent writes can corrupt it or lose updates. ConcurrentHashMap allows safe concurrent reads and writes with fine-grained locking or CAS, and offers atomic operations such as computeIfAbsent and merge. It does not allow null keys or values. Use HashMap for single-threaded or confined data, ConcurrentHashMap for shared state. Mention that compound check-then-act still needs the atomic methods. Pitfalls: saying it locks the whole map, or suggesting Collections.synchronizedMap is equivalent in performance.",
+      "competencies": ["accuracy", "clarity_of_explanation", "technical_depth"],
+      "values": [],
+      "source_url": "https://www.techinterview.org/companies/jpmorgan/",
+      "hints": {
+        "looking_for": [
+          "Accurate concurrency knowledge",
+          "When each fits"
+        ],
+        "strong_signals": [
+          "Mentions atomic compound operations",
+          "Knows null handling differences"
+        ],
+        "watch_outs": [
+          "Saying it locks the whole map",
+          "Ignoring check-then-act races"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a production incident you were involved in. What happened and what did you change afterwards?",
+      "strong_answer": "Pick a real incident and own your part. Explain detection, impact on users, how you communicated with stakeholders, how you restored service, and the root cause. Describe the lasting change: tests, monitoring, runbooks or change-control steps. In a regulated bank, show you followed process during the fix. Pitfalls: claiming you have never broken anything, blaming others, or a fix with no prevention.",
+      "competencies": ["ownership", "learning_from_failure", "communication"],
+      "values": ["Face facts", "Operational excellence"],
+      "source_url": "https://www.techinterview.org/companies/jpmorgan/",
+      "hints": {
+        "looking_for": [
+          "Honest ownership of your part",
+          "Calm, process-aware recovery"
+        ],
+        "strong_signals": [
+          "Clear stakeholder communication",
+          "A lasting prevention step"
+        ],
+        "watch_outs": [
+          "'I have never broken anything'",
+          "Bypassing controls during the fix"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe a time a project you were managing fell behind schedule. What steps did you take?",
+      "strong_answer": "Explain why it slipped, honestly, including your part. Show how you found out early (or what you learned from finding out late), how you re-planned (scope cuts, re-sequencing, extra help), and how you told stakeholders with a realistic new date. Close with the outcome and what you now do differently. Pitfalls: heroics with no communication, or only blaming dependencies.",
+      "competencies": ["ownership", "communication", "prioritization"],
+      "values": ["Operational excellence", "Face facts"],
+      "source_url": "https://www.interviewquery.com/guides/jp-morgan-chase-product-manager",
+      "hints": {
+        "looking_for": [
+          "Early detection and honest reporting",
+          "A realistic recovery plan"
+        ],
+        "strong_signals": [
+          "Clear scope trade-offs",
+          "Told stakeholders before they asked"
+        ],
+        "watch_outs": [
+          "Only blaming other teams",
+          "Working overtime with no re-plan"
+        ]
+      },
+      "role_families": ["pm", "tpm"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "You launched a new feature in a banking app. How would you tell whether it is successful?",
+      "strong_answer": "Start from the feature's goal and the customer problem. Define a primary metric (for example adoption or completion rate) and guardrails (complaints, fraud, call-center volume, regulatory issues). Set a baseline and a target, use an experiment or phased rollout if possible, and segment results. Say what you would do if the metric is flat: diagnose the funnel, talk to customers, iterate or roll back. Pitfalls: vanity metrics, or ignoring risk and compliance guardrails.",
+      "competencies": ["user_and_business_sense", "problem_framing", "prioritization"],
+      "values": ["Exceptional client service"],
+      "source_url": "https://www.interviewquery.com/guides/jp-morgan-chase-product-manager",
+      "hints": {
+        "looking_for": [
+          "Metrics tied to the feature's goal",
+          "Risk and compliance guardrails"
+        ],
+        "strong_signals": [
+          "Baseline, target and rollout plan",
+          "A plan if results are flat"
+        ],
+        "watch_outs": [
+          "Vanity metrics such as page views",
+          "No guardrails"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "What is the difference between a product manager and a product owner, and how have you worked in each role?",
+      "strong_answer": "Explain the common distinction: the product manager owns the problem, strategy and outcomes; the product owner (often in agile teams) owns the backlog, acceptance criteria and day-to-day priorities with engineers. Note that at large banks one person may do both. Give a concrete example of each part from your work, and how you kept strategy and delivery connected. Pitfalls: textbook definitions with no personal example.",
+      "competencies": ["role_fit", "depth_of_experience"],
+      "values": [],
+      "source_url": "https://www.interviewquery.com/guides/jp-morgan-chase-product-manager",
+      "hints": {
+        "looking_for": [
+          "A clear view of both roles",
+          "Your own experience in each"
+        ],
+        "strong_signals": [
+          "Concrete backlog and strategy examples",
+          "Links delivery to outcomes"
+        ],
+        "watch_outs": [
+          "Textbook definitions only",
+          "Dismissing one role as less important"
+        ]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "Analyst (Software Engineer II)",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Delivers well-defined tasks in an agile team with guidance; writes tested code and follows the change process."
+    },
+    {
+      "level_name": "Associate (Software Engineer III)",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns features and services within a team, designs components and handles production support."
+    },
+    {
+      "level_name": "Vice President (Lead Software Engineer)",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Leads design and delivery for an application or platform area, owns production risk and mentors engineers."
+    },
+    {
+      "level_name": "Executive Director",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Leads several teams or a platform, sets technical direction and works with senior business partners."
+    },
+    {
+      "level_name": "Vice President (Senior Product Manager)",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns a product area's roadmap and metrics and leads delivery with several engineering teams."
+    }
+  ],
+  "persona": {
+    "tone": "Professional and practical; friendly but focused on how work gets done in a large regulated bank",
+    "pace": "Moderate; a few questions per round with follow-ups on details",
+    "pushback_style": "Asks about risk, controls and production impact ('what could go wrong?', 'how would you roll it back?'); pushes for honest failures",
+    "closing_style": "Leaves time for the candidate's questions about the team and line of business"
+  },
+  "scoring_weights": {
+    "ownership": 1.3,
+    "learning_from_failure": 1.2,
+    "collaboration": 1.3,
+    "communication": 1.2,
+    "trade_offs": 1.2,
+    "technical_depth": 1.1,
+    "accuracy": 1.2,
+    "judgment": 1.2,
+    "user_and_business_sense": 1.1
+  },
+  "values_share": 0.25,
+  "case_style": {
+    "product_sense": 0.5,
+    "estimation": 0.15,
+    "system_thinking": 0.35,
+    "notes": "Only PM loops have a case. It is practical and delivery-focused: success metrics, prioritization and rescuing late projects, with risk and compliance as constraints. Engineering design rounds stress correctness and auditability."
+  },
+  "sources": [
+    {
+      "url": "https://www.jpmorganchase.com/about/our-business/business-principles",
+      "title": "How We Do Business principles (JPMorganChase)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://www.techinterview.org/companies/jpmorgan/",
+      "title": "JPMorgan Chase interview guide: software engineers and strats (techinterview.org)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "bar_by_level", "persona"]
+    },
+    {
+      "url": "https://www.interviewquery.com/guides/jp-morgan-chase-product-manager",
+      "title": "JPMorgan Chase product manager interview guide (Interview Query)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://prachub.com/interview-experiences/jp-morgan-chase-software-engineer-interview-assessment-hirevue-and-hackathon-path-703cbd11d9",
+      "title": "JPMorgan Chase software engineer: assessment, HireVue and hackathon path (PracHub)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "medium",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "low"
+  },
+  "low_confidence_notes": [
+    "values_framework: the four categories and 'We face facts' are official wording, condensed; we chose which sub-principles to keep and the weights are our estimate.",
+    "loop_structure: no official JPMorgan page describes the tech loop; round counts and the code-review opener come from one prep guide and candidate reports. The PM loop varies widely (reports range from three to six conversations).",
+    "loop_structure: the data_ml loop is thinly sourced and generic; reviewer may want to drop it.",
+    "bar_by_level: the Analyst/Associate/VP/ED to Software Engineer II/III/Lead mapping comes from one prep guide; scope text is our summary.",
+    "persona: inferred from the business principles and candidate reports, not an official description.",
+    "case_style: based on PM candidate reports from a prep site; no official PM interview guide found."
+  ]
+}

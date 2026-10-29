@@ -1,0 +1,411 @@
+{
+  "company_name": "Bloomberg",
+  "company_slug": "bloomberg",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-28",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Bloomberg values",
+    "principles": [
+      {
+        "name": "Customer Service",
+        "description": "The Terminal's users depend on it during live markets; understand what they need and keep it fast, accurate and reliable.",
+        "evidence_signals": [
+          "Names the end user (trader, analyst, internal team) and what they needed",
+          "Treats reliability and data accuracy as user features",
+          "Responded quickly when users were affected"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Collaboration",
+        "description": "Engineers work closely in teams and across teams; listen, share ideas and accept help.",
+        "evidence_signals": [
+          "Worked with another team or with product and news staff to deliver",
+          "Listened to and used a teammate's suggestion",
+          "Resolved a disagreement with a peer constructively"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Innovation",
+        "description": "Find better ways to solve hard technical problems, including through open source and new technology.",
+        "evidence_signals": [
+          "Proposed and built a better approach than the existing one",
+          "Explains why the new approach was worth the risk"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Doing the Right Thing",
+        "description": "Act with integrity, own mistakes and give back to the community.",
+        "evidence_signals": [
+          "Raised a problem or own mistake openly",
+          "Chose the right approach over the fastest one and explains why"
+        ],
+        "weight": 0.9
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": [
+        "Software Engineer",
+        "Senior Software Engineer",
+        "Team Lead"
+      ],
+      "rounds": [
+        {
+          "name": "Recruiter or engineer intro call",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter or engineer",
+          "notes": "Interests, background and why Bloomberg; curiosity about financial markets helps but finance knowledge is not required."
+        },
+        {
+          "name": "Technical phone interview",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "45 to 60 minutes of coding in a shared editor on data structures and algorithms, with time for questions at the end. Not simulated in v1."
+        },
+        {
+          "name": "In-house coding interviews",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Two engineers from the hiring team",
+          "notes": "Usually two rounds, each about an hour with two interviewers. Open-ended problems with several valid solutions; interviewers give hints and add constraints. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior engineers or team lead",
+          "notes": "Mostly for experienced hires: low-latency, reliable systems such as real-time quote or data-feed processing, plus object-oriented design."
+        },
+        {
+          "name": "Engineering manager interview",
+          "interview_type": "hiring_manager",
+          "duration_min": 60,
+          "interviewer_role": "Engineering manager or team lead",
+          "notes": "Project depth, design reasoning, language trade-offs and motivation; often the most technical non-coding conversation."
+        },
+        {
+          "name": "HR interview",
+          "interview_type": "behavioral",
+          "duration_min": 30,
+          "interviewer_role": "HR or recruiter",
+          "notes": "Conversational behavioral questions: teamwork, conflict, motivation and career goals."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Teamwork",
+      "pattern": "A time the candidate worked closely with others on a hard problem and what they personally contributed",
+      "competencies": ["collaboration", "communication"],
+      "values": ["Collaboration"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Conflict with a teammate",
+      "pattern": "A disagreement with a teammate about a technical approach and how it was resolved",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["Collaboration"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Pressure and detail",
+      "pattern": "A time the candidate had to deliver under time pressure without losing accuracy",
+      "competencies": ["ownership", "impact"],
+      "values": ["Customer Service"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Owning a mistake",
+      "pattern": "A mistake that affected users or a team, how the candidate raised it and what they changed",
+      "competencies": ["learning_from_failure", "ownership"],
+      "values": ["Doing the Right Thing"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Why Bloomberg",
+      "pattern": "Why the candidate wants to build products for financial-market users at Bloomberg, and what they know about its products or open-source work",
+      "competencies": ["motivation", "role_fit"],
+      "values": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Project deep dive",
+      "pattern": "Walk through a project on the resume: design decisions, language choice, what went wrong and what the candidate would change",
+      "competencies": ["depth_of_experience", "judgment", "scope_at_level"],
+      "values": ["Innovation"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Low-latency real-time systems",
+      "pattern": "Design a system that delivers or processes real-time market data with low latency and high reliability",
+      "competencies": ["trade_offs", "technical_depth", "reasoning"],
+      "values": ["Customer Service"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Language trade-offs",
+      "pattern": "Compare programming languages or language features (memory management, compiled vs interpreted) and when each fits",
+      "competencies": ["accuracy", "clarity_of_explanation"],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Numerical correctness",
+      "pattern": "How to represent and compute money or prices exactly, and other correctness pitfalls in financial data",
+      "competencies": ["accuracy", "reasoning"],
+      "values": ["Customer Service"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design a system that delivers real-time stock quotes to many users with very low latency?",
+      "strong_answer": "Clarify scale (symbols, update rate, users), latency target and consistency needs. Sketch feed handlers that normalize exchange data, an in-memory latest-quote store, and a publish-subscribe fan-out to clients, with conflation for slow consumers. Discuss latency sources (serialization, network hops, GC), redundancy across feeds and data centers, gap detection and recovery, and monitoring. Pitfalls: a generic web-app design with a database in the hot path, or ignoring slow consumers and failover.",
+      "competencies": ["trade_offs", "technical_depth", "reasoning"],
+      "values": ["Customer Service"],
+      "source_url": "https://www.techinterview.org/companies/bloomberg/",
+      "hints": {
+        "looking_for": [
+          "Latency-aware architecture",
+          "Reliability and failover"
+        ],
+        "strong_signals": [
+          "Pub-sub fan-out with conflation",
+          "Gap detection and recovery"
+        ],
+        "watch_outs": [
+          "A database in the hot path",
+          "No plan for slow consumers"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": ["mid", "senior"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you store and calculate monetary values such as prices and account balances in code? What can go wrong?",
+      "strong_answer": "Never use binary floating point for money: values like 0.1 are not exact, and errors accumulate. Use a decimal type or fixed-point integers (for example cents or ticks), with explicit rounding rules and currency precision. Never compare floats for equality; define tolerance only where approximation is acceptable, such as analytics. Mention overflow, currency conversion and consistent rounding across systems. Pitfalls: 'use double, it is precise enough'.",
+      "competencies": ["accuracy", "reasoning", "clarity_of_explanation"],
+      "values": ["Customer Service"],
+      "source_url": "https://www.techinterview.org/companies/bloomberg/",
+      "hints": {
+        "looking_for": [
+          "Awareness of floating-point error",
+          "A correct representation for money"
+        ],
+        "strong_signals": [
+          "Decimal or integer minor units",
+          "Explicit rounding rules"
+        ],
+        "watch_outs": [
+          "Using double for money",
+          "Comparing floats for equality"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "What is your favorite programming language and why? When would you choose C++, Java or Python instead?",
+      "strong_answer": "Pick a language you know deeply and give concrete reasons tied to work you did. Compare honestly: C++ for control over memory and latency, with complexity costs; Java for a managed runtime, strong tooling and large services, with GC pauses to manage; Python for speed of development and data work, with performance limits. Mention compiled vs interpreted and how you would choose for a given problem. Pitfalls: language fandom with no trade-offs.",
+      "competencies": ["accuracy", "trade_offs", "clarity_of_explanation"],
+      "values": [],
+      "source_url": "https://www.aced.io/guides/bloomberg-software-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "Depth in at least one language",
+          "Balanced trade-offs"
+        ],
+        "strong_signals": [
+          "Reasons tied to real projects",
+          "Knows each language's costs"
+        ],
+        "watch_outs": [
+          "Fandom with no downsides",
+          "Wrong facts about runtimes"
+        ]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a conflict you had with a teammate and how you resolved it.",
+      "strong_answer": "Describe a real disagreement, usually technical, and both views fairly. Explain how you understood the other person's reasoning, what evidence or experiment settled it, and how you kept the relationship good. Close with the outcome and what you learned. Pitfalls: a story where you were simply right, or escalating to a manager as the first step.",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["Collaboration"],
+      "source_url": "https://www.aced.io/guides/bloomberg-software-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "Respect for the other view",
+          "How the disagreement was settled"
+        ],
+        "strong_signals": [
+          "Uses data or a test to decide",
+          "Relationship stayed good"
+        ],
+        "watch_outs": [
+          "You were simply right",
+          "Escalating first"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Which experience on your resume best prepared you for this role, and why?",
+      "strong_answer": "Pick one experience and connect it to the team's work: the technical problems, the scale or latency needs, or the users. Describe your own part, a key decision and its result. End with what you want to learn next and how this role offers it. Pitfalls: listing the whole resume, or no link to the role.",
+      "competencies": ["role_fit", "depth_of_experience", "motivation"],
+      "values": [],
+      "source_url": "https://www.aced.io/guides/bloomberg-software-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "A clear link to the role",
+          "Your own contribution"
+        ],
+        "strong_signals": [
+          "One focused story with a result",
+          "Knows what the team builds"
+        ],
+        "watch_outs": [
+          "Reciting the whole resume",
+          "Generic answer for any company"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you worked closely with a team to deliver something difficult.",
+      "strong_answer": "Set up the goal and why it was hard. Be clear about your role, how work was split, and how you communicated with teammates and other teams. Show a moment where you helped someone else or took a teammate's idea. Quantify the result. Pitfalls: only 'we', or no real difficulty.",
+      "competencies": ["collaboration", "communication", "impact"],
+      "values": ["Collaboration"],
+      "source_url": "https://www.aced.io/guides/bloomberg-software-engineer-interview",
+      "hints": {
+        "looking_for": [
+          "Your role inside the team",
+          "Communication across people"
+        ],
+        "strong_signals": [
+          "Took or gave help visibly",
+          "A measurable result"
+        ],
+        "watch_outs": [
+          "Only 'we'",
+          "No real difficulty"
+        ]
+      },
+      "role_families": [],
+      "levels": []
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "Software Engineer (new graduate)",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Delivers well-scoped features in a team with guidance; strong data structures and algorithms in one language."
+    },
+    {
+      "level_name": "Software Engineer",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns features and components end to end, designs within the team's systems and supports them in production."
+    },
+    {
+      "level_name": "Senior Software Engineer",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Leads design of systems, sets technical standards for the team and mentors engineers; several years in C++, Java or Python."
+    },
+    {
+      "level_name": "Team Lead",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Leads a team's technical direction and people, coordinates with other teams and owns delivery for a product area."
+    }
+  ],
+  "persona": {
+    "tone": "Friendly, collaborative and engineer-to-engineer; interviewers act as partners on the problem",
+    "pace": "Moderate; interviewers add constraints as you go and give hints when you stall",
+    "pushback_style": "Asks clarifying 'what if' follow-ups, adds a new constraint, and asks why a design or language choice fits; values thought process over the optimal answer",
+    "closing_style": "Leaves time for the candidate's questions and expects thoughtful ones about the team and products"
+  },
+  "scoring_weights": {
+    "reasoning": 1.4,
+    "clarity_of_explanation": 1.3,
+    "trade_offs": 1.2,
+    "technical_depth": 1.2,
+    "accuracy": 1.2,
+    "collaboration": 1.3,
+    "communication": 1.2,
+    "conflict_handling": 1.1,
+    "motivation": 1.1
+  },
+  "values_share": 0.2,
+  "case_style": {
+    "product_sense": 0.15,
+    "estimation": 0.15,
+    "system_thinking": 0.7,
+    "notes": "No business case round for engineers. The closest equivalent is system design for real-time, low-latency financial data with a focus on reliability and correctness."
+  },
+  "sources": [
+    {
+      "url": "https://www.bloomberg.com/company/careers/application-process/engineering-experienced-hire/",
+      "title": "Engineering experienced hire application process (Bloomberg careers)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "persona", "question_patterns", "scoring_weights"]
+    },
+    {
+      "url": "https://www.aced.io/guides/bloomberg-software-engineer-interview",
+      "title": "Bloomberg software engineer interview guide (Aced, formerly Exponent)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "bar_by_level", "persona"]
+    },
+    {
+      "url": "https://www.techinterview.org/companies/bloomberg/",
+      "title": "Bloomberg software engineer interview guide (techinterview.org)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style"]
+    },
+    {
+      "url": "https://hackernoon.com/company/bloomberg",
+      "title": "Bloomberg company profile (HackerNoon)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "low",
+    "loop_structure": "high",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "medium",
+    "scoring_weights": "low",
+    "case_style": "medium"
+  },
+  "low_confidence_notes": [
+    "values_framework: Bloomberg's own values page blocked automated access (CAPTCHA); the four value names come from a secondary company profile. The reviewer should check bloomberg.com/company/values and correct names before publishing. Descriptions and weights are ours.",
+    "loop_structure: the official page confirms phone interviews and hour-long in-house rounds with two engineers; the split into coding, system design, manager and HR rounds comes from prep sites and varies by role.",
+    "loop_structure: only the swe family is included; we found no reliable public account of Bloomberg's data science or product manager loops.",
+    "bar_by_level: Bloomberg does not publish a level ladder; titles and scope are our summary of job postings and prep sites.",
+    "scoring_weights: derived from the official emphasis on thought process and collaboration; no public weights."
+  ]
+}
