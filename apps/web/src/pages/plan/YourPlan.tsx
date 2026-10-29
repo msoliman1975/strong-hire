@@ -20,6 +20,7 @@ import { newCoachPath } from "../coach/paths";
 import type { PlanView } from "./api";
 import { PlanSetup, type SuggestedRehearsal } from "./PlanSetup";
 import { useDayPlan, type DayPlanItem } from "./ReadinessApi";
+import { GAP_COPY } from "../../copy";
 
 /** One step still to do: a day plan item, with its day when the plan runs by day. */
 interface TodoStep {
@@ -176,7 +177,7 @@ function OpenStep({
         {item
           ? `${item.focus_topics.length ? `${item.focus_topics.join(", ")}. ` : ""}${item.reason} Change anything.`
           : plan.next_session
-            ? `Set up from your gaps: ${plan.next_session.reason} Change anything.`
+            ? `${GAP_COPY.setUpFrom} ${plan.next_session.reason} Change anything.`
             : "Set up from your plan. Change anything."}
       </p>
       {/* The key resets the setup when another step opens, so it starts from that step. */}

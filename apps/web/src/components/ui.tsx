@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from "react";
+import { Link } from "react-router";
 
 import type { HireSignal } from "../api/types";
 import { hireSignalTone, rubricLabel } from "../labels";
@@ -103,20 +104,52 @@ export function HireSignalScale({ signal }: { signal: HireSignal }) {
   );
 }
 
-export function Steps({ current, steps }: { current: number; steps: string[] }) {
+/**
+ * The setup step bar. Done steps with a link in `links` are links back to that step. `note` is one
+ * line under the bar that says how the user got to the current step and what it is for.
+ */
+export function Steps({
+  current,
+  steps,
+  links,
+  note,
+}: {
+  current: number;
+  steps: string[];
+  links?: (string | null | undefined)[];
+  note?: ReactNode;
+}) {
   return (
-    <ol className="steps" aria-label="Setup steps">
-      {steps.map((name, i) => (
-        <li
-          key={name}
-          aria-current={i === current ? "step" : undefined}
-          data-state={i < current ? "done" : undefined}
-        >
-          {name}
-          {i < current && <span className="visually-hidden"> (done)</span>}
-        </li>
-      ))}
-    </ol>
+    <div className="steps-bar">
+      <ol className="steps" aria-label="Setup steps">
+        {steps.map((name, i) => {
+          const href = i < current ? links?.[i] : null;
+          return (
+            <li
+              key={name}
+              aria-current={i === current ? "step" : undefined}
+              data-state={i < current ? "done" : undefined}
+            >
+              {href ? (
+                <Link to={href} aria-label={`${name} (done): go back to this step`}>
+                  {name}
+                </Link>
+              ) : (
+                <>
+                  {name}
+                  {i < current && <span className="visually-hidden"> (done)</span>}
+                </>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+      {note && (
+        <p className="steps__note" data-testid="steps-note">
+          {note}
+        </p>
+      )}
+    </div>
   );
 }
 

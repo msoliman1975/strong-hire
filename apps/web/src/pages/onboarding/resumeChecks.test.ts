@@ -146,6 +146,33 @@ describe("IN-12 detail", () => {
     expect(find(issues, "detail.few-achievements:")?.key).toBe("detail.few-achievements:brightline/product-manager");
   });
 
+  it("IN-12: several roles at one company are named by title, so each issue says which role it means", () => {
+    const issues = checkResume(
+      cv([
+        role({ company: "Microsoft", title: "Principal PM, Windows", end: null, achievements: ["Shipped it"] }),
+        role({ company: "Microsoft", title: "PM, AIOps", start: null, end: null }),
+        role({ company: "Contoso", title: "Analyst", start: "2012-01", end: "2014-01", achievements: ["Ran reports"] }),
+      ]),
+      { today: TODAY },
+    );
+    const titles = issues.map((i) => i.title);
+    expect(titles).toContain("No start date on PM, AIOps at Microsoft");
+    expect(titles).toContain("One achievement on Principal PM, Windows at Microsoft");
+    expect(titles).toContain("One achievement on Contoso");
+    expect(new Set(titles).size).toBe(titles.length);
+  });
+
+  it("IN-12: advice for an achievement without a result offers proxy and qualitative wording, not only numbers", () => {
+    const issues = checkResume(cv([role({ end: null, achievements: ["Ran usability tests for the app", "Owned research"] })]), {
+      today: TODAY,
+    });
+    const noResult = find(issues, "detail.no-result:")!;
+    expect(noResult.why).toContain("you do not need one");
+    expect(noResult.why).toContain("improved task success, time on task and error rate in usability benchmarks");
+    expect(noResult.why).toMatch(/scale and scope/);
+    expect(noResult.fieldNote).not.toMatch(/number/i);
+  });
+
   it('IN-12: finds "we" with no "I"', () => {
     const issues = checkResume(
       cv([role({ end: null, achievements: ["We shipped a new checkout, 20% faster", "Our team grew revenue 10%"] })]),

@@ -11,6 +11,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { gapApi } from "./api/gap";
 import { jobTargetsApi, resumesApi } from "./api/inputs";
 import { AppRoutes, createQueryClient } from "./App";
+import { GAP_COPY } from "./copy";
 import { mockStore } from "./mocks/node";
 import { setFeatureOverrides } from "./theme/features";
 
@@ -101,7 +102,7 @@ describe("gap report (v2)", () => {
     await user.click(await within(probe).findByRole("link", { name: "Show full report" }));
     expect(await screen.findByRole("heading", { level: 1, name: "Gap report" })).toBeInTheDocument();
     expect(screen.getByTestId("match-score")).toHaveTextContent(String(gap.analysis?.match_score));
-    for (const name of ["Match score", "Strengths", "Gaps", "Where they'll probe", "Practice plan"]) {
+    for (const name of ["Match score", "Strengths", GAP_COPY.heading, "Where they'll probe", "Practice plan"]) {
       expect(screen.getByRole("heading", { level: 2, name })).toBeInTheDocument();
     }
     expect(screen.getByRole("link", { name: "← Back to your plan" })).toHaveAttribute(

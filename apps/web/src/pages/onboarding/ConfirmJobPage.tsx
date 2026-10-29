@@ -6,7 +6,7 @@ import { keys, useJob, useJobTask } from "../../api/hooks";
 import { jobProblem, jobTargetsApi } from "../../api/inputs";
 import type { JobPosting, JobTargetOut, Level, RoleFamily } from "../../api/types";
 import { ErrorNotice, Loading, PageHead, Steps } from "../../components/ui";
-import { useOnboardingSteps } from "./steps";
+import { STEP_NOTES, useOnboardingSteps } from "./steps";
 import { levelLabel, roleFamilyLabel } from "../../labels";
 import { newJobPath, type NewJobReturn } from "../../paths";
 import { afterConfirmPath, confirmPath, MIN_POSTING_CHARS, newJobReturn } from "./NewJobPage";
@@ -28,7 +28,7 @@ export function ConfirmJobPage() {
 
   return (
     <div className="page--narrow">
-      {then === "rehearsal" && <Steps current={0} steps={steps} />}
+      {then === "rehearsal" && <Steps current={0} steps={steps} note={STEP_NOTES.confirmJob} />}
       {job.isPending && <Loading label="Loading the job" />}
       {job.isError && <ErrorNotice error={job.error} />}
       {task.isError && <ErrorNotice error={task.error} />}

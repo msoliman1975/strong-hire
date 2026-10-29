@@ -10,6 +10,7 @@ import { Bar, ErrorNotice, Loading, PageHead } from "../components/ui";
 import { competencyLabel, difficultyLabel, formatDate, interviewTypeLabel, severityLabel } from "../labels";
 import { useFeature } from "../theme/features";
 import { GapReport } from "./plan/GapReport";
+import { GAP_COPY } from "../copy";
 
 /** Session setup, with the planned type and difficulty, and the CV to interview against (PR-3). */
 export function setupLink(jobId: string, plan?: PlannedSession | null, resumeId?: string | null): string {
@@ -184,7 +185,8 @@ function AnalysisView({
           </ul>
         </section>
         <section className="panel" aria-labelledby="gaps-heading">
-          <h2 id="gaps-heading">Gaps</h2>
+          <h2 id="gaps-heading">{GAP_COPY.heading}</h2>
+          <p className="muted">{GAP_COPY.intro}</p>
           <ul className="plain-list">
             {analysis.gaps.map((g) => (
               <li key={g.summary}>

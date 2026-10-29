@@ -12,6 +12,7 @@ import { describe, expect, it } from "vitest";
 import { gapApi } from "../api/gap";
 import { jobTargetsApi, resumesApi, sha256Hex } from "../api/inputs";
 import { AppRoutes, createQueryClient } from "../App";
+import { GAP_COPY } from "../copy";
 import { MOCK_NOT_CV_REFUSAL } from "../mocks/handlers";
 import { mockStore } from "../mocks/node";
 import { setFeatureOverrides } from "../theme/features";
@@ -198,7 +199,7 @@ describe("PR-3 interview rehearsals: one job and CV pair", () => {
     expect(within(stand).getByText("Scored interviews").nextElementSibling).toHaveTextContent("1");
     const history = screen.getByRole("region", { name: "Earlier reports for this job and CV" });
     expect(within(history).getAllByRole("listitem")).toHaveLength(2);
-    expect(await screen.findByRole("region", { name: "Gaps to work on" })).toBeInTheDocument();
+    expect(await screen.findByRole("region", { name: GAP_COPY.shortHeading })).toBeInTheDocument();
 
     await user.click(screen.getByRole("link", { name: "Start a session" }));
     await user.click(await screen.findByRole("button", { name: "Start interview" }));
