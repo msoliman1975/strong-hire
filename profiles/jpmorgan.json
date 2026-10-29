@@ -1,0 +1,499 @@
+{
+  "company_name": "JPMorgan Chase",
+  "company_slug": "jpmorgan",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-28",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "JPMorganChase Business Principles",
+    "principles": [
+      {
+        "name": "Exceptional client service",
+        "description": "Put the client's best interests first, make it easy to do business with the firm, and choose long-term relationships over short-term gain.",
+        "evidence_signals": [
+          "Names the client or internal user affected and what they needed",
+          "Made a decision close to the client instead of escalating everything",
+          "Chose the durable fix over a quick win that would hurt clients later"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Operational excellence",
+        "description": "Set high standards, execute with discipline and urgency, manage risk and keep strong controls, and spend the firm's resources like an owner.",
+        "evidence_signals": [
+          "Describes testing, change control or monitoring that kept a release safe",
+          "Quantifies the result with metrics or a scorecard",
+          "Cut waste or simplified a system and shows the saving",
+          "Follows through to completion, not just the design"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "A commitment to integrity, fairness and responsibility",
+        "description": "Do the right thing even when it is hard, follow the letter and spirit of rules, face facts, admit mistakes and learn from them.",
+        "evidence_signals": [
+          "Admits a mistake plainly and describes how it was surfaced and fixed",
+          "Raised a risk or compliance concern rather than working around it",
+          "Uses one consistent version of the facts with stakeholders"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "A great team and winning culture",
+        "description": "Build strong, diverse teams, communicate openly with direct feedback, support colleagues and challenge the status quo responsibly.",
+        "evidence_signals": [
+          "Gave or received direct feedback and acted on it",
+          "Helped a teammate or new joiner succeed",
+          "Challenged an existing process with a better proposal and got buy-in"
+        ],
+        "weight": 1.1
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["Software Engineer II (Analyst)", "Software Engineer III (Associate)", "Lead Software Engineer (VP)", "Executive Director"],
+      "rounds": [
+        {
+          "name": "Online assessment",
+          "interview_type": null,
+          "duration_min": 90,
+          "interviewer_role": "None (HackerRank)",
+          "notes": "Two easy-to-medium coding problems, sometimes with aptitude questions. Not simulated in v1."
+        },
+        {
+          "name": "HireVue video interview",
+          "interview_type": "behavioral",
+          "duration_min": 20,
+          "interviewer_role": "None (recorded)",
+          "notes": "Mainly for students and new grads: preset behavioral prompts with short prep time and a fixed recording window. Some interns go through the Code for Good hackathon instead of a Superday."
+        },
+        {
+          "name": "Technical screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "One or two medium problems in a shared editor plus a resume project discussion; Java teams may ask language internals. Not simulated in v1."
+        },
+        {
+          "name": "Superday coding and code review",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "A medium coding problem and a short pull-request review exercise (bugs, style, missing tests). Not simulated in v1."
+        },
+        {
+          "name": "Superday system design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Lead software engineer (VP)",
+          "notes": "Above entry level. Banking-grade prompts: idempotent and auditable payments, end-of-day reconciliation, rate limiters, market-data fan-out. Stress on consistency, retries and proving correctness to an auditor."
+        },
+        {
+          "name": "Superday behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager or senior engineer",
+          "notes": "Teamwork, production incidents, change control and integrity. Many Superday rounds mix technical and behavioral questions."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager (VP or Executive Director)",
+          "notes": "For experienced hires: past scope, motivation for JPMorganChase and team fit."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": ["Associate", "Vice President"],
+      "rounds": [
+        {
+          "name": "Online assessment or HireVue",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "None (automated)",
+          "notes": "Maths, logic and programming test, or recorded screening questions. Not simulated in v1."
+        },
+        {
+          "name": "Coding",
+          "interview_type": null,
+          "duration_min": 45,
+          "interviewer_role": "Data scientist",
+          "notes": "SQL and Python problems. Not simulated in v1."
+        },
+        {
+          "name": "ML and statistics",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior data scientist or ML engineer",
+          "notes": "ML theory (bagging versus boosting, regularization, imbalanced data), probability such as Bayes' theorem, and a deep dive into a resume ML project."
+        },
+        {
+          "name": "Behavioral and fit",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager",
+          "notes": "Why JPMorganChase, stakeholder work and experience-based questions."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": ["Associate", "Vice President", "Executive Director"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background and interest. Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Product lead (VP or Executive Director)",
+          "notes": "Past experience and role fit; products launched end to end."
+        },
+        {
+          "name": "Team interviews",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Product and technology partners",
+          "notes": "Stakeholder management, a challenging project, what product management means, product manager versus product owner."
+        },
+        {
+          "name": "Product case",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product lead",
+          "notes": "Reported only for some teams: improving a banking or payments product within risk and regulatory limits."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Production incident",
+      "pattern": "A time something the candidate shipped broke in production and how it was handled",
+      "competencies": ["ownership", "learning_from_failure", "communication"],
+      "values": ["Operational excellence", "A commitment to integrity, fairness and responsibility"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Integrity under pressure",
+      "pattern": "A situation where the right thing and the convenient thing differed, such as a control or compliance concern",
+      "competencies": ["ownership", "communication"],
+      "values": ["A commitment to integrity, fairness and responsibility"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Teamwork on a large team",
+      "pattern": "Working with many teams or stakeholders to deliver something, including a disagreement",
+      "competencies": ["collaboration", "conflict_handling"],
+      "values": ["A great team and winning culture"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Why JPMorganChase",
+      "pattern": "Why technology at a bank, and why this firm and line of business",
+      "competencies": ["motivation"],
+      "values": ["Exceptional client service"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Resume project",
+      "pattern": "Walk through a project: the client or business need, own role, controls and result",
+      "competencies": ["depth_of_experience", "scope_at_level", "judgment"],
+      "values": ["Operational excellence"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Correct and auditable systems",
+      "pattern": "Design a financial system that must never double-process and must be provable to an auditor",
+      "competencies": ["technical_depth", "trade_offs", "accuracy"],
+      "values": ["Operational excellence", "A commitment to integrity, fairness and responsibility"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Language and runtime internals",
+      "pattern": "Explain how a core language feature works, such as hash map equality or garbage collection",
+      "competencies": ["technical_depth", "clarity_of_explanation"],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "ML fundamentals",
+      "pattern": "Explain an ML or statistics concept and when it matters on real financial data",
+      "competencies": ["technical_depth", "reasoning", "clarity_of_explanation"],
+      "values": []
+    },
+    {
+      "interview_type": "case",
+      "theme": "Banking product improvement",
+      "pattern": "Improve a consumer or business banking product for one user group within risk and regulatory limits",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Exceptional client service"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time something you shipped broke in production. What did you do?",
+      "strong_answer": "Pick a real incident with meaningful impact. Explain how it was detected, how you contained it (rollback, feature flag), who you informed and when, and the honest root cause. Finish with the lasting fix: a test, a monitoring alert or a change-control step, and what you learned. Pitfalls: claiming you never broke anything, blaming another team, or no prevention step.",
+      "competencies": ["ownership", "learning_from_failure", "communication"],
+      "values": ["Operational excellence", "A commitment to integrity, fairness and responsibility"],
+      "source_url": "https://www.techinterview.org/companies/jpmorgan/",
+      "hints": {
+        "looking_for": ["Ownership of production issues", "Respect for change control"],
+        "strong_signals": ["Contained fast and told people early", "Honest root cause", "Lasting prevention"],
+        "watch_outs": ["Claiming a perfect record", "Blaming others"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "A release you worked on is showing some customers the wrong account balance. Walk me through what you would do.",
+      "strong_answer": "Stay calm and process-driven: confirm and size the problem, stop the bleeding (roll back or disable the feature), escalate through the incident process, and tell operations and client-facing teams so customers get accurate information. Preserve evidence, find the root cause, correct affected records with an audit trail, and add controls to prevent repeats. Show you put client trust and accuracy ahead of speed.",
+      "competencies": ["ownership", "communication", "judgment"],
+      "values": ["Exceptional client service", "A commitment to integrity, fairness and responsibility"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-is-the-jpmorgan-chase-interview-process-like-round-by-round",
+      "hints": {
+        "looking_for": ["Calm incident handling", "Client trust and auditability"],
+        "strong_signals": ["Contains first, then investigates", "Escalates through process", "Fixes records with an audit trail"],
+        "watch_outs": ["Silently patching data", "Jumping to code changes before containing"]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Why do you want to work in technology at JPMorganChase rather than at a tech company?",
+      "strong_answer": "Show you understand the scale and impact: technology that moves trillions of dollars, serves millions of customers and must be secure and reliable. Name the line of business or platform that interests you and connect it to your experience. Mention the appeal of hard constraints such as regulation and correctness. Pitfalls: generic 'big brand' answers, or treating the bank as a fallback.",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["Exceptional client service"],
+      "source_url": "https://www.interviewquery.com/interview-guides/jp-morgan-chase-data-scientist",
+      "hints": {
+        "looking_for": ["Genuine interest in the firm", "Understanding of the business"],
+        "strong_signals": ["Names a line of business or platform", "Links to own experience"],
+        "watch_outs": ["Generic brand praise", "Sounds like a fallback choice"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a payments backend that processes transfers exactly once and can be audited later.",
+      "strong_answer": "Clarify volume and consistency needs. Use idempotency keys on requests, a double-entry ledger as the source of truth, state machines for payment status, and an outbox or durable queue for downstream events. Cover retries with backoff, timeouts with unknown outcomes, reconciliation against external systems, immutable audit logs and access controls. Explain how you would prove to an auditor that no payment was lost or duplicated.",
+      "competencies": ["technical_depth", "trade_offs", "accuracy", "clarity_of_explanation"],
+      "values": ["Operational excellence", "A commitment to integrity, fairness and responsibility"],
+      "source_url": "https://www.techinterview.org/companies/jpmorgan/",
+      "hints": {
+        "looking_for": ["Correctness under retries and failures", "Auditability"],
+        "strong_signals": ["Idempotency keys", "Double-entry ledger", "Reconciliation and immutable logs"],
+        "watch_outs": ["Ignoring timeouts with unknown outcomes", "No audit story"]
+      },
+      "role_families": ["swe"],
+      "levels": ["mid", "senior", "staff_principal"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you design an end-of-day reconciliation job that matches the firm's trade records against a counterparty's?",
+      "strong_answer": "Define inputs, matching keys and tolerances, then a batch pipeline that normalizes both sides, matches exact and fuzzy records, and produces breaks for operations to investigate. Discuss scale and deadlines, reruns that must give the same result, late files, data lineage, and alerting when breaks exceed a threshold. Mention controls such as maker-checker for manual fixes.",
+      "competencies": ["technical_depth", "accuracy", "reasoning"],
+      "values": ["Operational excellence"],
+      "source_url": "https://www.techinterview.org/companies/jpmorgan/",
+      "hints": {
+        "looking_for": ["Batch data design", "Controls and repeatability"],
+        "strong_signals": ["Clear matching rules and tolerances", "Rerunnable jobs", "Break workflow for operations"],
+        "watch_outs": ["No handling of late or missing files", "Manual fixes without controls"]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Explain the difference between bagging and boosting, and how you would handle a heavily imbalanced fraud data set.",
+      "strong_answer": "Bagging trains models on bootstrap samples in parallel to cut variance; boosting trains sequentially on previous errors to cut bias but can overfit. For imbalance: pick metrics such as precision-recall and cost-weighted loss instead of accuracy, use class weights or resampling, set thresholds by business cost, and validate on a time-based split to avoid leakage. Mention monitoring for drift as fraud patterns change.",
+      "competencies": ["technical_depth", "reasoning", "clarity_of_explanation"],
+      "values": [],
+      "source_url": "https://www.interviewquery.com/interview-guides/jp-morgan-chase-data-scientist",
+      "hints": {
+        "looking_for": ["Solid ML fundamentals", "Practical judgment on real data"],
+        "strong_signals": ["Correct variance versus bias framing", "Right metrics for imbalance", "Time-based validation"],
+        "watch_outs": ["Using accuracy as the metric", "No link to business cost"]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "How do you manage stakeholders with conflicting priorities on a product you own?",
+      "strong_answer": "Use one concrete example. Show how you mapped stakeholders (business, technology, risk, compliance), made the trade-offs visible with data and client impact, agreed a decision process, and communicated the outcome to those who did not get their way. End with the result and how relationships held up.",
+      "competencies": ["collaboration", "conflict_handling", "communication"],
+      "values": ["A great team and winning culture", "Exceptional client service"],
+      "source_url": "https://www.glassdoor.com/Interview/JPMorganChase-Interview-E5224839-RVW64862293.htm",
+      "hints": {
+        "looking_for": ["Stakeholder management in a large firm", "Transparent trade-offs"],
+        "strong_signals": ["Includes risk and compliance partners", "Uses data and client impact", "Closes the loop with everyone"],
+        "watch_outs": ["Escalating everything", "Ignoring control functions"]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "What is the difference between a product manager and a product owner, and which have you been?",
+      "strong_answer": "Explain the distinction many banks use: the product manager owns strategy, outcomes and the roadmap; the product owner translates that into a prioritized backlog and works daily with the agile team. Be honest about which you have done, with an example of each part, and how you would grow into the role on offer.",
+      "competencies": ["role_fit", "depth_of_experience", "communication"],
+      "values": [],
+      "source_url": "https://www.glassdoor.com/Interview/JPMorganChase-Interview-E5224839-RVW64862293.htm",
+      "hints": {
+        "looking_for": ["Understanding of product roles at the firm", "Honest self-assessment"],
+        "strong_signals": ["Clear distinction", "Concrete example of each", "Link to the role on offer"],
+        "watch_outs": ["Treating the titles as identical", "Overclaiming scope"]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "Software Engineer II (Analyst)",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Delivers well-defined tasks within an agile team, with guidance; writes correct, tested code."
+    },
+    {
+      "level_name": "Software Engineer III (Associate)",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns features and services within a team, handles production support and can design components."
+    },
+    {
+      "level_name": "Lead Software Engineer (VP)",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Leads design for a product area, mentors engineers and is accountable for reliability and controls."
+    },
+    {
+      "level_name": "Executive Director",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Leads multiple teams or a platform, sets technical direction and manages senior stakeholders across a line of business."
+    },
+    {
+      "level_name": "Associate",
+      "normalized_level": "mid",
+      "role_family": "pm",
+      "scope_expectation": "Owns a backlog or a product feature set with a product lead's guidance."
+    },
+    {
+      "level_name": "Vice President",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns a product and its outcomes, manages stakeholders across business, technology and risk."
+    },
+    {
+      "level_name": "Executive Director",
+      "normalized_level": "staff_principal",
+      "role_family": "pm",
+      "scope_expectation": "Leads a product portfolio and team of product managers; long tenure managing complex programs expected."
+    }
+  ],
+  "persona": {
+    "tone": "Professional, polite and structured",
+    "pace": "Brisk; Superday rounds are back to back and often mix technical and behavioral questions in one slot",
+    "pushback_style": "Asks 'what happens on a retry?', 'how would you prove that to an auditor?', 'who did you tell?' and expects calm, process-based answers",
+    "closing_style": "Leaves a few minutes for questions; recruiter follows up on next steps"
+  },
+  "scoring_weights": {
+    "ownership": 1.3,
+    "collaboration": 1.2,
+    "communication": 1.2,
+    "learning_from_failure": 1.1,
+    "motivation": 1.1,
+    "judgment": 1.2,
+    "accuracy": 1.4,
+    "technical_depth": 1.2,
+    "trade_offs": 1.2,
+    "user_and_business_sense": 1.1
+  },
+  "values_share": 0.25,
+  "case_style": {
+    "product_sense": 0.4,
+    "estimation": 0.1,
+    "system_thinking": 0.5,
+    "notes": "Engineering cases are banking systems with correctness, controls and audit at the centre. Product cases, where used, improve a banking or payments product within risk and regulatory limits. Market sizing is rare."
+  },
+  "sources": [
+    {
+      "url": "https://www.jpmorganchase.com/about/our-business/business-principles",
+      "title": "Business Principles (JPMorganChase)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "persona"]
+    },
+    {
+      "url": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/documents/how-we-do-business.pdf",
+      "title": "How We Do Business (JPMorganChase)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/what-is-the-jpmorgan-chase-interview-process-like-round-by-round",
+      "title": "What is the JPMorgan Chase interview process like, round by round (Design Gurus)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "persona"]
+    },
+    {
+      "url": "https://www.techinterview.org/companies/jpmorgan/",
+      "title": "JPMorgan Chase interview guide: software engineers and strats (techinterview.org)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "bar_by_level", "case_style", "scoring_weights"]
+    },
+    {
+      "url": "https://www.interviewquery.com/interview-guides/jp-morgan-chase-data-scientist",
+      "title": "JP Morgan data scientist interview guide (Interview Query)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.glassdoor.com/Interview/JPMorganChase-Interview-E5224839-RVW64862293.htm",
+      "title": "JPMorganChase product manager interview report (Glassdoor)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://dataford.io/interview-guides/jp-morgan-chase/product-manager",
+      "title": "JPMorganChase product manager interview guide (Dataford)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "bar_by_level"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "medium",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "low"
+  },
+  "low_confidence_notes": [
+    "values_framework: the four principles come from the official Business Principles page; the firm's longer document has around 20 sub-principles, which we folded into the four descriptions.",
+    "loop_structure: SWE loop from two prep guides plus Glassdoor reports; Superday format varies (two 30-minute to four 60-minute rounds). data_ml and pm loops are thin; the PM case round is reported only for some teams.",
+    "bar_by_level: SWE title-to-level mapping (SE II Analyst, SE III Associate, Lead SE VP, ED) comes from one prep site's compensation table; scope text is our summary. The Dataford PM page returned 429, so PM level expectations rest on its search snippet.",
+    "persona: inferred from prep-guide advice (calm, process-based answers, auditor framing); no official description.",
+    "scoring_weights: our estimate; accuracy and ownership raised for the bank's stress on controls and incidents.",
+    "case_style: few public reports of product cases at JPMorganChase."
+  ]
+}
