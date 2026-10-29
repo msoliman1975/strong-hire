@@ -14,7 +14,8 @@
 
 .NOTES
   The script edits MODEL_PROFILE and LITELLM_PROFILE in .env, then recreates api, worker, web and
-  litellm so they read the new values, and applies database migrations. Works in Windows
+  litellm so they read the new values, and applies database migrations. On the test server it
+  also seeds the launch companies and imports changed company profiles as Drafts. Works in Windows
   PowerShell 5.1 and PowerShell 7.
 
   claude profile: the Anthropic key is read from your environment (process, user or machine
@@ -258,6 +259,14 @@ try {
     # New code can bring new database migrations; apply them, as ./scripts/dev.ps1 up does.
     Write-Step 'Applying database migrations'
     Invoke-Docker ($compose + @('exec', '-T', 'api', 'alembic', '-c', 'packages/core/alembic.ini', 'upgrade', 'head'))
+    if (Test-Server) {
+        # The launch companies, then every new or changed file in profiles/ as a Draft, so new
+        # research shows in the admin app (Content, Companies). Publishing stays a reviewed step.
+        Write-Step 'Seeding the launch companies and importing changed company profiles as Drafts'
+        Invoke-Docker ($compose + @('exec', '-T', 'api', 'python', '-m', 'strong_core.db.seed'))
+        try { Invoke-Docker ($compose + @('exec', '-T', 'api', 'strongctl', 'profiles', 'sync')) }
+        catch { Write-Warning "Profile sync reported a problem; the stack is up. $_" }
+    }
     if (Test-SimService) {
         Write-Step 'Rebuilding if needed and restarting the sim service (admin-started AI runs)'
         Invoke-Docker ($compose + @('--profile', 'sim', 'up', '-d', '--build', '--force-recreate', 'sim'))

@@ -78,6 +78,10 @@ class TransitionError(ProfileError):
     """The workflow does not allow this status change (AT-4)."""
 
 
+class UnchangedProfileError(ProfileError):
+    """The file has the same content as the latest stored version, so nothing was stored."""
+
+
 @dataclass(frozen=True)
 class CompanySummary:
     id: uuid.UUID
@@ -144,7 +148,7 @@ async def import_profile(
     )
     data = profile.model_dump(mode="json")
     if latest is not None and not force and not diff_profiles(latest.profile_json, data):
-        raise ProfileError(
+        raise UnchangedProfileError(
             f"The file has the same content as version {latest.version} of "
             f"'{company.slug}'. Nothing was stored. Pass --force to store it anyway."
         )

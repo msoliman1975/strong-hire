@@ -20,6 +20,7 @@ uv run strongctl profiles validate profiles/acme.json   # checks the file, no da
 uv run strongctl profiles import profiles/acme.json     # stores the next version as Draft
 uv run strongctl profiles publish acme 2                # makes version 2 the active profile
 uv run strongctl profiles list                          # published and latest version per company
+uv run strongctl profiles sync                          # every changed file in profiles/ as a Draft
 uv run strongctl profiles show acme --version 1         # read any version, also old ones
 ```
 
@@ -28,6 +29,11 @@ uv run strongctl profiles show acme --version 1         # read any version, also
 - The database assigns version numbers. `meta.version` in the file is for your own tracking.
 - `import` refuses a file whose content equals the latest stored version. Use `--force` to
   store it anyway.
+- `sync` imports every top-level file in `profiles/` (not `examples/`) like
+  `import --create-company`: new and changed files become Drafts, unchanged ones are skipped, and
+  an invalid file is reported while the rest still import. It never publishes. The test server
+  runs it on every deploy (`scripts/profile.ps1`), so a merged profile shows in the admin app,
+  ready for review.
 - `import` fails if the company is not in the companies table. The launch companies come
   from the seed (`./scripts/dev.ps1 seed`). For a test company, pass `--create-company`.
   It adds the company as inactive, so job matching (IN-5) does not use it.
