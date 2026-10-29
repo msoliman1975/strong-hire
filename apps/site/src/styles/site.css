@@ -444,6 +444,11 @@ figcaption {
   font-size: 0.95rem;
 }
 
+figcaption h2,
+figcaption h3 {
+  color: var(--ink);
+}
+
 /* Forms */
 .form {
   display: grid;
