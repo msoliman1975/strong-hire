@@ -1,8 +1,7 @@
 ---
 import "../styles/site.css";
 // Preloaded so the headline and lede do not wait for the stylesheet to find them (LCP).
-import archivoUrl from "@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url";
-import atkinsonUrl from "@fontsource/atkinson-hyperlegible/files/atkinson-hyperlegible-latin-400-normal.woff2?url";
+import geistUrl from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
 import BrandMark from "../components/BrandMark.astro";
 import { APP_URL, CTA, NOT_AFFILIATED, PRIVACY_EMAIL, SUPPORT_EMAIL, signupUrl } from "../data/site";
 
@@ -17,6 +16,7 @@ const canonical = new URL(Astro.url.pathname.replace(/\.html$/, ""), Astro.site)
 const path = Astro.url.pathname.replace(/\.html$/, "");
 const NAV = [
   ["/how-it-works", "How it works"],
+  ["/#stories", "Stories and coach"],
   ["/sample-debrief", "Sample debrief"],
   ["/pricing", "Pricing"],
 ] as const;
@@ -33,8 +33,7 @@ const ctaLabel = CTA === "signup" ? "Start free" : "Join the waitlist";
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="preload" href={archivoUrl} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={atkinsonUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={geistUrl} as="font" type="font/woff2" crossorigin />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
@@ -43,7 +42,7 @@ const ctaLabel = CTA === "signup" ? "Start free" : "Join the waitlist";
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="theme-color" content="#3a4f63" />
+    <meta name="theme-color" content="#f4f3f8" />
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>

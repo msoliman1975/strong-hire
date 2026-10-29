@@ -1,31 +1,54 @@
 /*
- * Strong Hire marketing site (L04). The same tokens as apps/web/src/styles.css, theme "The
- * Approved h": amber (--light) means practice, green (--ok) means an earned verdict, ink means
- * action. Amber is a fill only, never text on white. Green is never on a button or link.
+ * Strong Hire marketing site (L04, UI-3), in the app's v2 visual language: the same values as
+ * apps/web/src/theme/tokens.css. Violet (--action) means action, teal (--prep) means interview
+ * prep, green (--ok) means an earned verdict. Story parts carry their color and a text label,
+ * never color alone. Green is never on a button or link.
  */
-@import "@fontsource/atkinson-hyperlegible/400.css";
-@import "@fontsource/atkinson-hyperlegible/700.css";
-@import "@fontsource-variable/archivo/wdth.css";
+@import "@fontsource-variable/geist/wght.css";
+@import "@fontsource-variable/geist-mono/wght.css";
 
 :root {
-  --paper: #f4f6f7;
+  --paper: #f4f3f8;
   --surface: #ffffff;
-  --ink: #14202b;
-  --ink-hover: #2a3a4b;
-  --muted: #566371;
-  --line: #d6dce2;
-  --line-strong: #a9b3be;
-  --focus: #0b6bcb;
-  --danger: #a1302b;
-  --ok: #1a7d50;
-  --stage: #3a4f63;
-  --on-stage: #f3f6f8;
-  --light: #f0a92e;
-  --light-soft: #fdf1da;
-  --radius: 6px;
-  --font: "Atkinson Hyperlegible", system-ui, sans-serif;
-  --font-display: "Archivo Variable", "Segoe UI", system-ui, sans-serif;
-  --wrap: 1080px;
+  --sunken: #ecebf2;
+  --ink: #17161f;
+  --ink-hover: #2e2c3b;
+  --muted: #5e5b6b;
+  --line: #e2e0ea;
+  --line-strong: #c9c5d6;
+  --action: #5332e6;
+  --action-hover: #3d22c4;
+  --action-soft: #eeeafe;
+  --action-light: #a594ff;
+  --prep: #0b6e8c;
+  --prep-soft: #e0f2f7;
+  --focus: #5332e6;
+  --danger: #b4321f;
+  --danger-soft: #fbe7e3;
+  --ok: #12775a;
+  --ok-soft: #e3f4ec;
+  --warn: #a34d00;
+  --warn-soft: #fdeedc;
+  --part-context: #5e5b6b;
+  --part-stakes: #a34d00;
+  --part-action: #5332e6;
+  --part-result: #12775a;
+  --part-reflection: #0b6e8c;
+  --room: #0e0d14;
+  --room-raised: #1a1824;
+  --room-line: #2c2938;
+  --room-text: #f2f0f7;
+  --room-muted: #a29fb0;
+  --room-live: #ff6b5e;
+  --prep-light: #6fd0ea;
+  --radius-sm: 10px;
+  --radius: 16px;
+  --radius-pill: 999px;
+  --shadow-pop: 0 6px 24px rgb(23 22 31 / 14%);
+  --font: "Geist Variable", "Geist", system-ui, sans-serif;
+  --font-display: var(--font);
+  --font-mono: "Geist Mono Variable", "Geist Mono", ui-monospace, Consolas, monospace;
+  --wrap: 1120px;
   color-scheme: light;
 }
 
@@ -52,18 +75,19 @@ h1,
 h2,
 h3 {
   font-family: var(--font-display);
-  font-stretch: 90%;
+  font-weight: 700;
   line-height: 1.15;
   margin: 0 0 12px;
 }
 
 h1 {
   font-size: clamp(2rem, 5vw, 3.25rem);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.03em;
 }
 
 h2 {
   font-size: clamp(1.4rem, 3vw, 1.9rem);
+  letter-spacing: -0.02em;
 }
 
 h3 {
@@ -75,12 +99,12 @@ p {
 }
 
 a {
-  color: var(--ink);
+  color: var(--action);
   text-underline-offset: 3px;
 }
 
 a:hover {
-  color: var(--ink-hover);
+  color: var(--action-hover);
 }
 
 :focus-visible {
@@ -114,8 +138,9 @@ img {
 
 /* Header: the stage */
 .site-header {
-  background: var(--stage);
-  color: var(--on-stage);
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
 }
 
 .site-header .wrap {
@@ -131,20 +156,23 @@ img {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: var(--on-stage);
+  color: var(--ink);
   text-decoration: none;
-  font-family: var(--font-display);
   font-weight: 700;
-  font-size: 1.15rem;
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
 }
 
 .brand:hover {
-  color: var(--on-stage);
+  color: var(--ink);
 }
 
+/* The Approved h logo keeps the official colors of logo.svg, never the action or status tokens. */
 .brand-mark {
-  --brand-main: var(--on-stage);
-  --brand-bg: var(--stage);
+  --brand-lamp: #14202b;
+  --brand-light: #f0a92e;
+  --brand-cut: #ffffff;
+  --brand-check: #1a7d50;
 }
 
 .site-nav {
@@ -155,34 +183,33 @@ img {
 }
 
 .site-nav a {
-  color: var(--on-stage);
+  color: var(--muted);
+  font-weight: 500;
   text-decoration: none;
 }
 
 .site-nav a:hover,
 .site-nav a[aria-current="page"] {
-  color: var(--on-stage);
+  color: var(--ink);
   text-decoration: underline;
 }
 
-.site-nav .btn {
-  background: var(--on-stage);
-  color: var(--ink);
-}
-
+.site-nav .btn,
 .site-nav .btn:hover {
-  background: #ffffff;
-  color: var(--ink);
+  color: #ffffff;
+  text-decoration: none;
 }
 
-/* Buttons: ink means action */
+/* Buttons: violet means action */
 .btn {
-  display: inline-block;
-  background: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  background: var(--action);
   color: #ffffff;
   border: 0;
-  border-radius: var(--radius);
-  padding: 12px 20px;
+  border-radius: var(--radius-pill);
+  padding: 0 22px;
   font: inherit;
   font-weight: 700;
   text-decoration: none;
@@ -190,7 +217,7 @@ img {
 }
 
 .btn:hover {
-  background: var(--ink-hover);
+  background: var(--action-hover);
   color: #ffffff;
 }
 
@@ -200,21 +227,21 @@ img {
 }
 
 .btn--ghost {
-  background: transparent;
+  background: var(--surface);
   color: var(--ink);
-  box-shadow: inset 0 0 0 2px var(--ink);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
 }
 
 .btn--ghost:hover {
-  background: var(--surface);
-  color: var(--ink);
+  background: var(--action-soft);
+  color: var(--action-hover);
 }
 
 /* Sections */
 .hero {
   padding: 56px 0 40px;
   border-bottom: 1px solid var(--line);
-  background: linear-gradient(180deg, var(--light-soft), var(--paper) 70%);
+  background: linear-gradient(180deg, var(--action-soft), var(--paper) 70%);
 }
 
 .hero__grid {
@@ -269,7 +296,7 @@ img {
 .steps li {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius);
   padding: 20px;
   counter-increment: step;
 }
@@ -285,8 +312,8 @@ img {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--light);
-  color: var(--ink);
+  background: var(--action-soft);
+  color: var(--action-hover);
   font-weight: 700;
   margin-bottom: 10px;
 }
@@ -294,7 +321,7 @@ img {
 .card {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius);
   padding: 24px;
 }
 
@@ -324,9 +351,9 @@ img {
   padding-left: 12px;
 }
 
-/* The verdict: amber is the practice frame, ink marks the signal. */
+/* The verdict: violet is the practice frame, ink marks the signal. */
 .verdict {
-  border-left: 5px solid var(--light);
+  border-left: 5px solid var(--action);
 }
 
 .signal {
@@ -394,8 +421,8 @@ blockquote {
 }
 
 .placeholder {
-  background: var(--light-soft);
-  border: 1px solid var(--light);
+  background: var(--action-soft);
+  border: 1px solid var(--action-light);
   border-radius: var(--radius);
   padding: 10px 14px;
 }
@@ -403,8 +430,8 @@ blockquote {
 .shot {
   display: block;
   border: 1px solid var(--line);
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgb(20 32 43 / 10%);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-pop);
 }
 
 figure {
@@ -446,7 +473,7 @@ select {
   font: inherit;
   padding: 10px 12px;
   border: 1px solid var(--line-strong);
-  border-radius: var(--radius);
+  border-radius: var(--radius-sm);
   background: var(--surface);
   color: var(--ink);
   width: 100%;
@@ -490,9 +517,9 @@ select {
 }
 
 .draft-banner {
-  background: var(--light-soft);
-  border: 1px solid var(--light);
-  border-radius: var(--radius);
+  background: var(--warn-soft);
+  border: 1px solid var(--warn);
+  border-radius: var(--radius-sm);
   padding: 12px 16px;
   margin-bottom: 24px;
 }
@@ -513,21 +540,11 @@ select {
 }
 
 /*
- * Homepage: the briefed interviewer. Green marks a strength or an earned verdict, the
- * signal-negative rust marks a leak, and amber's text shade marks a coherence break. Every mark
- * also has its own underline style and a text label, so color is never the only cue.
+ * Homepage. Green marks a strength or an earned verdict, the danger rust marks a leak, and the
+ * warn shade marks a coherence break. Every mark also has its own underline style and a text
+ * label, so color is never the only cue. Teal frames interview prep; the dark room is the live
+ * interviewer.
  */
-:root {
-  --stage-line: #4d6378;
-  --on-stage-muted: #c8d3dd;
-  --light-ink: #8a5a00;
-  --ok-soft: #ebf6f0;
-  --signal-positive: #3d7a4c;
-  --signal-negative: #a8452c;
-  --danger-soft: #f8e9e8;
-  --font-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
-}
-
 .mono {
   font-family: var(--font-mono);
   font-weight: 600;
@@ -548,7 +565,7 @@ select {
   width: 8px;
   height: 8px;
   border-radius: 999px;
-  background: var(--light);
+  background: var(--action);
 }
 
 .pill {
@@ -560,8 +577,8 @@ select {
   font-size: 0.75rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--light-ink);
-  background: var(--light-soft);
+  color: var(--action-hover);
+  background: var(--action-soft);
   padding: 4px 10px;
   border-radius: 999px;
   margin-bottom: 16px;
@@ -622,7 +639,6 @@ select {
 
 .brief-sources h2 {
   font-family: var(--font);
-  font-stretch: normal;
   font-size: 1.1rem;
   margin-bottom: 4px;
 }
@@ -640,9 +656,9 @@ select {
 .brief {
   flex: 1.4 1 420px;
   min-width: 0;
-  background: var(--ink);
-  color: var(--on-stage);
-  border-radius: 10px;
+  background: var(--room);
+  color: var(--room-text);
+  border-radius: var(--radius);
   padding: 28px;
 }
 
@@ -661,12 +677,11 @@ select {
 
 .brief .tag,
 .brief .eyebrow {
-  color: var(--on-stage-muted);
+  color: var(--room-muted);
 }
 
 .brief .eyebrow {
   font-family: var(--font);
-  font-stretch: normal;
   font-size: 0.8rem;
 }
 
@@ -683,7 +698,7 @@ select {
   font-size: 0.9rem;
   padding: 4px 12px;
   border-radius: 999px;
-  border: 1px solid var(--stage-line);
+  border: 1px solid var(--room-line);
 }
 
 .probes {
@@ -707,7 +722,7 @@ select {
   width: 8px;
   height: 8px;
   border-radius: 999px;
-  background: var(--light);
+  background: var(--prep-light);
 }
 
 .brief__facts {
@@ -716,7 +731,7 @@ select {
   gap: 12px;
   margin: 0;
   padding-top: 16px;
-  border-top: 1px solid var(--ink-hover);
+  border-top: 1px solid var(--room-line);
 }
 
 .brief__facts div {
@@ -726,7 +741,7 @@ select {
 
 .brief__facts dt {
   font-size: 0.85rem;
-  color: var(--on-stage-muted);
+  color: var(--room-muted);
 }
 
 .brief__facts dd {
@@ -748,7 +763,7 @@ select {
   flex: 1.5 1 520px;
   min-width: 0;
   background: var(--paper);
-  border-radius: 10px;
+  border-radius: var(--radius);
   padding: 28px;
 }
 
@@ -774,12 +789,12 @@ select {
 
 .ann--leak {
   background: var(--danger-soft);
-  border-bottom: 2px dashed var(--signal-negative);
+  border-bottom: 2px dashed var(--danger);
 }
 
 .ann--flow {
-  background: var(--light-soft);
-  border-bottom: 2px dotted var(--light-ink);
+  background: var(--warn-soft);
+  border-bottom: 2px dotted var(--warn);
 }
 
 .ann-n {
@@ -794,11 +809,11 @@ select {
 }
 
 .ann-n--leak {
-  color: var(--signal-negative);
+  color: var(--danger);
 }
 
 .ann-n--flow {
-  color: var(--light-ink);
+  color: var(--warn);
 }
 
 .ann-n--gap {
@@ -859,17 +874,17 @@ select {
 .meter__fill {
   display: block;
   height: 100%;
-  background: var(--signal-positive);
+  background: var(--ok);
 }
 
 .meter__fill--1 {
   width: 25%;
-  background: var(--signal-negative);
+  background: var(--danger);
 }
 
 .meter__fill--2 {
   width: 50%;
-  background: var(--signal-negative);
+  background: var(--danger);
 }
 
 .meter__fill--3 {
@@ -930,8 +945,8 @@ select {
 }
 
 .segmented button[aria-pressed="true"] {
-  background: var(--ink);
-  border-color: var(--ink);
+  background: var(--action);
+  border-color: var(--action);
   color: #ffffff;
 }
 
@@ -947,17 +962,20 @@ select {
 }
 
 .room__reply {
-  background: var(--ink);
-  color: var(--on-stage);
-  border-radius: 10px;
+  background: var(--room);
+  color: var(--room-text);
+  border-radius: var(--radius);
   padding: 24px 28px;
 }
 
 .tag--stage {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--on-stage-muted);
+  color: var(--room-muted);
+}
+
+.tag--stage .dot {
+  margin-right: 8px;
+  vertical-align: 1px;
+  background: var(--room-live);
 }
 
 .room__line {
@@ -984,7 +1002,7 @@ select {
 }
 
 .badge--below {
-  color: var(--signal-negative);
+  color: var(--danger);
   background: var(--danger-soft);
 }
 
@@ -994,7 +1012,7 @@ select {
 
 .minds__item {
   padding-top: 16px;
-  border-top: 4px solid var(--light);
+  border-top: 4px solid var(--action);
 }
 
 .minds__item--verdict {
@@ -1002,7 +1020,7 @@ select {
 }
 
 .minds__item--live .tag {
-  color: var(--light-ink);
+  color: var(--action-hover);
 }
 
 .minds__item--verdict .tag {
@@ -1021,7 +1039,7 @@ select {
 }
 
 .home-join {
-  background: var(--ink);
+  background: var(--room);
   color: #ffffff;
 }
 
@@ -1030,17 +1048,556 @@ select {
 }
 
 .home-join__note {
-  color: var(--on-stage-muted);
+  color: var(--room-muted);
 }
 
 .home-join .card {
   color: var(--ink);
 }
 
+/* v2 homepage sections (UI-3) */
+.eyebrow--action {
+  color: var(--action-hover);
+}
+
+.eyebrow--prep {
+  color: var(--prep);
+}
+
+.section--prep {
+  background: linear-gradient(180deg, var(--prep-soft), var(--paper) 55%);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+/* Two journeys: violet builds stories, teal preps for an interview. */
+.journeys {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.journey {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--action);
+  border-radius: var(--radius);
+  padding: 28px;
+}
+
+.journey--prep {
+  border-top-color: var(--prep);
+}
+
+.journey .tag {
+  color: var(--action-hover);
+}
+
+.journey--prep .tag {
+  color: var(--prep);
+}
+
+.journey h3 {
+  font-size: 1.4rem;
+  letter-spacing: -0.02em;
+}
+
+.journey__steps {
+  margin: 16px 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 6px;
+}
+
+.journey p:last-child {
+  margin: 0;
+  font-weight: 600;
+}
+
+/* Story library: five parts, each a colored rule and a text label. */
+.library {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: stretch;
+}
+
+.story-card {
+  flex: 1.6 1 520px;
+  min-width: 0;
+}
+
+.story-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px 16px;
+}
+
+.story-card__head h3 {
+  font-size: 1.3rem;
+  letter-spacing: -0.02em;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 2px 12px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.status--proven {
+  color: var(--ok);
+  background: var(--ok-soft);
+}
+
+.chips--light li {
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+.parts {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.part {
+  --part: var(--part-context);
+  border-left: 4px solid var(--part);
+  padding: 2px 0 2px 14px;
+}
+
+.part p {
+  margin: 0;
+}
+
+.part__label,
+.part-chip__name {
+  display: block;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--part);
+}
+
+.part--stakes,
+.part-chip--stakes {
+  --part: var(--part-stakes);
+}
+
+.part--action,
+.part-chip--action {
+  --part: var(--part-action);
+}
+
+.part--result,
+.part-chip--result {
+  --part: var(--part-result);
+}
+
+.part--reflection,
+.part-chip--reflection {
+  --part: var(--part-reflection);
+}
+
+.coverage {
+  flex: 1 1 300px;
+  min-width: 0;
+}
+
+.coverage ul {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+}
+
+.coverage__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font-weight: 600;
+}
+
+.coverage__count {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.coverage__state {
+  font-size: 0.8rem;
+  padding: 1px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--sunken);
+  color: var(--muted);
+}
+
+.coverage__state--covered {
+  background: var(--ok-soft);
+  color: var(--ok);
+}
+
+.coverage__state--gap {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+/* The coach */
+.coach {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  align-items: start;
+}
+
+.coach__chat {
+  flex: 1.2 1 460px;
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+.turns {
+  list-style: none;
+  margin: 12px 0 20px;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.turn {
+  max-width: 88%;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  background: var(--action-soft);
+}
+
+.turn--you {
+  justify-self: end;
+  background: var(--sunken);
+}
+
+.turn p {
+  margin: 0;
+}
+
+.turn__who {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--action-hover);
+}
+
+.turn--you .turn__who {
+  color: var(--muted);
+}
+
+.coach__parts {
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.coach__parts ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.part-chip {
+  --part: var(--part-context);
+  min-width: 96px;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--part);
+  border-radius: var(--radius-sm);
+}
+
+.part-chip__state {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.part-chip--asking {
+  background: var(--action-soft);
+}
+
+.part-chip--asking .part-chip__state {
+  color: var(--action-hover);
+  font-weight: 600;
+}
+
+.part-chip--empty {
+  border-top-style: dashed;
+}
+
+.points {
+  flex: 1 1 360px;
+  min-width: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px 24px;
+}
+
+.points h3 {
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+.points p {
+  margin: 0;
+}
+
+/* The interview plan: teal is interview prep. */
+.plan {
+  padding: 28px;
+}
+
+.plan__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.plan__head .tag {
+  color: var(--prep);
+}
+
+.plan__head h3 {
+  font-size: 1.4rem;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.plan__stats {
+  display: flex;
+  gap: 24px;
+  margin: 0;
+}
+
+.plan__stats div {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.plan__stats dt {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.plan__stats dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 1.8rem;
+  color: var(--prep);
+}
+
+.plan__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px 40px;
+}
+
+.plan__grid h4 {
+  margin-top: 0;
+}
+
+.weights,
+.readiness,
+.days {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.meter--prep .meter__fill {
+  background: var(--prep);
+}
+
+.meter__fill--w30 {
+  width: 100%;
+}
+
+.meter__fill--w25 {
+  width: 83%;
+}
+
+.meter__fill--w20 {
+  width: 67%;
+}
+
+.meter__fill--w15 {
+  width: 50%;
+}
+
+.meter__fill--w10 {
+  width: 33%;
+}
+
+.fit {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.fit th,
+.fit td {
+  text-align: left;
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--line);
+}
+
+.fit thead th {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.fit-badge {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 1px 10px;
+  border-radius: var(--radius-pill);
+}
+
+.fit-badge--strong {
+  color: var(--ok);
+  background: var(--ok-soft);
+}
+
+.fit-badge--thin {
+  color: var(--warn);
+  background: var(--warn-soft);
+}
+
+.fit-badge--missing {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.readiness li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-weight: 600;
+}
+
+.readiness .rubric span.on {
+  background: var(--prep);
+}
+
+.days li {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.days .mono {
+  color: var(--prep);
+}
+
+.types {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 24px 0 0;
+}
+
+.type {
+  padding: 2px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* The v2 debrief */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 0 0 32px;
+}
+
+.facts .card {
+  padding: 20px;
+}
+
+.facts dt {
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.facts dd {
+  margin: 0;
+}
+
+.facts__value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 4px 0 !important;
+}
+
+.trio--plain {
+  list-style: none;
+  padding: 0;
+}
+
+.trio--plain h3 {
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+/* The header stays in view on wider screens; on a phone its nav wraps and would cover the page. */
+@media (min-width: 761px) {
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+
+  [id] {
+    scroll-margin-top: 80px;
+  }
+}
+
 @media (max-width: 760px) {
   .hero__grid,
   .grid-2,
-  .steps {
+  .steps,
+  .journeys,
+  .plan__grid {
     grid-template-columns: minmax(0, 1fr);
   }
 

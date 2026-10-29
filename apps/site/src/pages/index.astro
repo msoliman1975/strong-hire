@@ -1,11 +1,20 @@
 ---
 import Base from "../layouts/Base.astro";
 import WaitlistForm from "../components/WaitlistForm.astro";
-import { COMPANIES, COMPANY_COUNT, CTA, NOT_AFFILIATED, PRACTICE_NOTICE, signupUrl } from "../data/site";
+import {
+  COMPANIES,
+  COMPANY_COUNT,
+  CTA,
+  NOT_AFFILIATED,
+  PRACTICE_NOTICE,
+  READINESS_NOTICE,
+  signupUrl,
+} from "../data/site";
 
-// The homepage sells the interviewer's preparation and judgment: the brief it builds from the
-// company, the role and the resume (spec "Interviewer brief"), how it reads a story, the tone and
-// difficulty you set, and why the same story scores differently for a different job.
+// The homepage tells the v2 story (UI-3): two journeys, build your stories with a coach and prep
+// for an interview, both ending in a debrief. It keeps the briefed interviewer (spec "Interviewer
+// brief"), how it reads a story, the tone and difficulty you choose, and why the same story
+// scores differently for a different job. Every example is made up.
 // Q3: company names only in one plain line, next to the notice.
 const companiesLine =
   COMPANIES.length > 0
@@ -15,7 +24,7 @@ const companiesLine =
 const SOURCES = [
   ["The company", "How they interview", "Their values framework, question style, the bar at each level, and how their interviewers push back."],
   ["The role", "What the job demands", "Level, must-haves, the problems the team owns, and the scope a hire at that level is expected to show."],
-  ["You", "What your resume proves", "Your projects and scope, and the gaps between your experience and the role."],
+  ["You", "What your resume and stories prove", "Your projects and scope, the stories you've built, and the gaps between your experience and the role."],
 ] as const;
 
 const BRIEF_COMPETENCIES = ["Ownership", "Cross-team influence", "Judgment", "Customer focus", "Impact at scale"];
@@ -24,6 +33,99 @@ const BRIEF_PROBES = [
   "Payments is new to you. Expect “why this domain, why now”.",
   "Your launch numbers are strong. It will ask how you measured them.",
 ];
+
+const JOURNEYS = [
+  {
+    kind: "stories",
+    tag: "Build your stories",
+    title: "Turn what you did into stories that hold up.",
+    body: "A coach asks the questions an interviewer would, fills each part of the story from your own words, and scores every take you tell.",
+    steps: ["Talk it through with the coach, by voice or text", "Practice it in takes, scored 1 to 4", "Get a 60-second and a full version"],
+    href: "#stories",
+    link: "See the story coach",
+  },
+  {
+    kind: "prep",
+    tag: "Prep for an interview",
+    title: "Get ready for one real interview.",
+    body: "Add the job posting and your resume. You get one plan: what they'll test, where they'll probe, which story fits each skill, and the days left.",
+    steps: ["Check your CV against the job", "Rehearse with a briefed interviewer", "Read a debrief, then fix one thing"],
+    href: "#prep",
+    link: "See the interview plan",
+  },
+] as const;
+
+// The story library: one story in five parts. Each part has a color and always a text label.
+const STORY_PARTS = [
+  ["context", "Context", "Checkout ran on a vendor's payment page. Three teams owned pieces of it, and nobody owned errors."],
+  ["stakes", "Stakes", "One in twelve payments failed at peak. Support tickets doubled in a quarter."],
+  ["action", "Action", "I proposed moving checkout in house, wrote the plan, and got platform, payments and support to split the work."],
+  ["result", "Result", "Checkout errors dropped 40 percent in six weeks, and tickets went back to their old level."],
+  ["reflection", "Reflection", "I'd bring support in on day one. They saw the failure patterns months before we did."],
+] as const;
+const STORY_SKILLS = ["Ownership", "Cross-team influence", "Impact"];
+
+const COVERAGE = [
+  { skill: "Ownership", stories: 3, state: "covered" },
+  { skill: "Cross-team influence", stories: 2, state: "covered" },
+  { skill: "Impact", stories: 2, state: "covered" },
+  { skill: "Judgment", stories: 1, state: "thin" },
+  { skill: "Conflict", stories: 0, state: "gap" },
+  { skill: "Failure and learning", stories: 0, state: "gap" },
+] as const;
+const COVERAGE_LABEL = { covered: "Covered", thin: "One story", gap: "Gap" } as const;
+
+// The coach conversation: it asks for what's missing (the IV-3 rules) and never adds facts.
+const COACH_TURNS = [
+  ["coach", "Coach", "You said checkout errors “went down a lot”. Do you know by how much, and over what time?"],
+  ["you", "You", "About 40 percent. We measured it over the six weeks after launch."],
+  ["coach", "Coach", "That's your result. Now the action: what did you propose yourself, and who had to agree?"],
+] as const;
+const COACH_PARTS = [
+  ["context", "Context", "filled"],
+  ["stakes", "Stakes", "filled"],
+  ["action", "Action", "asking"],
+  ["result", "Result", "filled"],
+  ["reflection", "Reflection", "empty"],
+] as const;
+const PART_STATE = { filled: "Filled", asking: "Asking now", empty: "Not yet" } as const;
+const COACH_POINTS = [
+  ["Your words, not ours", "The coach asks for your role, a number, a concrete example and the trade-off. It never adds a fact you didn't say."],
+  ["Gentle or direct", "Pick the coaching style. Gentle encourages and suggests; direct names the gap and moves on."],
+  ["Voice or text", "Talk it through out loud the way you will in the room, or type when you can't."],
+  ["Takes, scored", "Tell the story again as a take. Each one is scored 1 to 4 on the story's skills, so you can see it improve."],
+  ["Two lengths", "Get a 60-second version and a full version, built from your own words."],
+  ["Proven, not just written", "A story turns Proven when a Realistic answer that used it meets the bar."],
+] as const;
+
+// The interview plan: one page per job and resume.
+const PLAN_TESTS = [
+  ["Customer focus", 30],
+  ["Ownership", 25],
+  ["Cross-team influence", 20],
+  ["Judgment", 15],
+  ["Impact at scale", 10],
+] as const;
+const STORY_FIT = [
+  ["Customer focus", "Checkout migration", "strong"],
+  ["Ownership", "Checkout migration", "strong"],
+  ["Cross-team influence", "Pricing page launch", "thin"],
+  ["Judgment", "No story yet", "missing"],
+] as const;
+const FIT_LABEL = { strong: "Strong", thin: "Thin", missing: "Missing" } as const;
+const READINESS = [
+  ["Customer focus", 3],
+  ["Ownership", 3],
+  ["Cross-team influence", 2],
+  ["Judgment", 1],
+] as const;
+const DAY_PLAN = [
+  ["Today", "Build a Judgment story with the coach"],
+  ["Tomorrow", "Realistic behavioral rehearsal, 30 minutes"],
+  ["Day 3", "Two takes of the pricing story, aim for the result"],
+  ["Day 4", "Recruiter screen rehearsal"],
+] as const;
+const INTERVIEW_TYPES = ["Behavioral", "Hiring manager deep dive", "Verbal technical Q&A", "Case", "Recruiter screen"];
 
 // The annotated answer: each span is a strength ("win") or a leak, with a numbered note.
 const STORY = [
@@ -49,8 +151,11 @@ const STORY_SCORES = [
   ["Scope for the level", 3],
 ] as const;
 
-// The tone and difficulty demo. public/js/tone-demo.js reads this table from the JSON block below.
+// The tone and difficulty demo (TN-1, IV-4). public/js/tone-demo.js reads this table from the
+// JSON block below. "Like the company" uses the company profile's interviewer persona; here, a
+// made-up customer-first one.
 const TONES = [
+  ["company", "Like the company"],
   ["warm", "Warm"],
   ["neutral", "Neutral"],
   ["direct", "Direct"],
@@ -62,6 +167,11 @@ const LEVELS = [
 ] as const;
 const DEMO = {
   replies: {
+    company: {
+      friendly: "Let's bring it back to the customer. What did you suggest to get things moving for them?",
+      realistic: "How was it resolved, and what did the wait cost your customers? What did you propose?",
+      tough: "Customers were failing at checkout while you went back and forth. What did you propose, who said no, and how did you decide?",
+    },
     warm: {
       friendly: "That sounds like a tricky stretch. What did you suggest to get things moving?",
       realistic: "I'd love to hear how it ended. What did you propose, and who made the call?",
@@ -85,8 +195,21 @@ const DEMO = {
   },
   labels: Object.fromEntries([...TONES, ...LEVELS]),
 };
-const DEFAULT_TONE = "neutral";
+const DEFAULT_TONE = "company";
 const DEFAULT_LEVEL = "realistic";
+
+// The v2 debrief (DB-1, DB-2, DM-1, DM-2, TR-1, ST-2, ST-6).
+const DEBRIEF_FACTS = [
+  ["Hire signal", "Lean Hire", "Up from Lean No Hire last time"],
+  ["Answers that met the bar", "4 of 6", "A score of 3 or more"],
+  ["Speaking pace", "178 wpm", "Faster than usual. Normal is 110 to 170 words a minute."],
+  ["Filler words", "2 a minute", "In the normal range"],
+] as const;
+const DEBRIEF_ACTIONS = [
+  ["Story used", "Each answer shows the story you told, and its fix goes to that story as a note."],
+  ["Save as a story", "Turn any answer into a Draft story, with skill tags from how it was scored."],
+  ["Full transcript", "Read every turn of the interview. Delivery comes from the text and timing; no audio is kept."],
+] as const;
 
 const CONTEXTS = [
   {
@@ -105,18 +228,19 @@ const CONTEXTS = [
 ---
 
 <Base
-  title="Strong Hire: an AI interviewer that has done the homework"
-  description="A voice interview simulator that studies the company, the role and your resume, listens to your stories like a hiring panel, and tells you where they win and where they leak. For tech candidates in the US and Canada."
+  title="Strong Hire: build your stories, then face an interviewer who has done the homework"
+  description="An AI story coach and voice interview simulator. Build your career stories with a coach, then rehearse with an interviewer that has studied the company, the role and your resume, and get a debrief you can act on. For tech candidates in the US and Canada."
   waitlist={CTA === "waitlist"}
 >
   <section class="home-hero">
     <div class="wrap">
       <div class="home-hero__intro">
-        <p class="pill"><span class="dot" aria-hidden="true"></span>AI interview simulation, by voice</p>
+        <p class="pill"><span class="dot" aria-hidden="true"></span>AI story coach and interview simulator</p>
         <h1>An interviewer who has done the homework.</h1>
         <p class="lede">
-          Before you say a word, it has studied how the company interviews, what the role demands at your level, and
-          what your resume can and can't prove. Then it listens to your stories the way a hiring panel would.
+          Build your stories with a coach that asks the right questions. Then rehearse with an interviewer that has
+          studied how the company interviews, what the role demands at your level, and what your resume can and can't
+          prove.
         </p>
         <div class="actions">
           {
@@ -126,7 +250,7 @@ const CONTEXTS = [
               <a class="btn" href="#join">Join the beta waitlist</a>
             )
           }
-          <a class="btn btn--ghost" href="#how">See how it thinks</a>
+          <a class="btn btn--ghost" href="#journeys">See how it works</a>
         </div>
         <p class="small muted">For engineers, product managers, data, design and TPM candidates.</p>
       </div>
@@ -157,11 +281,236 @@ const CONTEXTS = [
           <ul class="probes">{BRIEF_PROBES.map((p) => <li>{p}</li>)}</ul>
           <dl class="brief__facts">
             <div><dt>Questions, ranked</dt><dd>8</dd></div>
-            <div><dt>Persona tone</dt><dd>Direct</dd></div>
+            <div><dt>Tone</dt><dd>Your pick</dd></div>
             <div><dt>Bar it scores to</dt><dd>Senior</dd></div>
           </dl>
         </section>
       </div>
+    </div>
+  </section>
+
+  <section class="section home-section" id="journeys" aria-labelledby="journeys-title">
+    <div class="wrap">
+      <p class="eyebrow">Two ways in</p>
+      <h2 id="journeys-title">Start with your stories, or start with the interview.</h2>
+      <p class="lede">
+        Most people do both: build a few strong stories, then rehearse them for the job you want. Each one feeds the
+        other.
+      </p>
+      <div class="journeys">
+        {
+          JOURNEYS.map((j) => (
+            <article class={`journey journey--${j.kind}`}>
+              <p class="tag">{j.tag}</p>
+              <h3>{j.title}</h3>
+              <p class="muted">{j.body}</p>
+              <ol class="journey__steps">{j.steps.map((s) => <li>{s}</li>)}</ol>
+              <p><a href={j.href}>{j.link}</a></p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt home-section" id="stories" aria-labelledby="stories-title">
+    <div class="wrap">
+      <p class="eyebrow eyebrow--action">Your story library</p>
+      <h2 id="stories-title">Your career, told as stories that hold up.</h2>
+      <p class="lede">
+        A story is one moment from your work in five parts. Keep them in one library, tagged by the skills they show,
+        and see which skills still have no story.
+      </p>
+      <div class="library">
+        <article class="story-card card" aria-labelledby="story-card-title">
+          <div class="story-card__head">
+            <h3 id="story-card-title">Checkout migration across three teams</h3>
+            <p class="status status--proven">
+              <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M3 8.5 L6.5 12 L13 4.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+              Proven
+            </p>
+          </div>
+          <ul class="chips chips--light" aria-label="Skills">{STORY_SKILLS.map((s) => <li>{s}</li>)}</ul>
+          <ol class="parts">
+            {
+              STORY_PARTS.map(([id, label, text]) => (
+                <li class={`part part--${id}`}>
+                  <span class="part__label">{label}</span>
+                  <p>{text}</p>
+                </li>
+              ))
+            }
+          </ol>
+          <p class="small muted">Example story. Proven: a Realistic answer that used it scored 3 or more.</p>
+        </article>
+        <aside class="coverage card" aria-labelledby="coverage-title">
+          <h3 id="coverage-title" class="eyebrow">Skills your stories cover</h3>
+          <ul>
+            {
+              COVERAGE.map((c) => (
+                <li class={`coverage__row coverage__row--${c.state}`}>
+                  <span>{c.skill}</span>
+                  <span class="coverage__count">
+                    <span class="mono">{c.stories}</span>
+                    <span class={`coverage__state coverage__state--${c.state}`}>{COVERAGE_LABEL[c.state]}</span>
+                  </span>
+                </li>
+              ))
+            }
+          </ul>
+          <p class="small muted">
+            Gaps are the skills you'll be asked about with no story ready. Build one with the coach, or save one from a
+            rehearsal answer.
+          </p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="section home-section" id="coach" aria-labelledby="coach-title">
+    <div class="wrap">
+      <p class="eyebrow eyebrow--action">The story coach</p>
+      <h2 id="coach-title">A coach that asks. It never invents.</h2>
+      <p class="lede">
+        Tell it what happened. It asks for what an interviewer will want, the way a good mentor would, and fills in the
+        story as you talk.
+      </p>
+      <div class="coach">
+        <figure class="coach__chat" aria-labelledby="coach-chat-cap">
+          <figcaption id="coach-chat-cap" class="tag">Coach session · Example · Direct style</figcaption>
+          <ol class="turns">
+            {
+              COACH_TURNS.map(([who, label, text]) => (
+                <li class={`turn turn--${who}`}>
+                  <span class="turn__who">{label}</span>
+                  <p>{text}</p>
+                </li>
+              ))
+            }
+          </ol>
+          <div class="coach__parts">
+            <h3 class="eyebrow">Story parts</h3>
+            <ul>
+              {
+                COACH_PARTS.map(([id, label, state]) => (
+                  <li class={`part-chip part-chip--${id} part-chip--${state}`}>
+                    <span class="part-chip__name">{label}</span>
+                    <span class="part-chip__state">{PART_STATE[state]}</span>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </figure>
+        <ul class="points">
+          {
+            COACH_POINTS.map(([title, body]) => (
+              <li>
+                <h3>{title}</h3>
+                <p class="muted">{body}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--prep home-section" id="prep" aria-labelledby="prep-title">
+    <div class="wrap">
+      <p class="eyebrow eyebrow--prep">Interview prep</p>
+      <h2 id="prep-title">One plan for each interview.</h2>
+      <p class="lede">
+        Add the job posting and your resume. Strong Hire checks your CV against the job and builds one plan that
+        counts down to the day.
+      </p>
+      <div class="plan card" aria-labelledby="plan-title">
+        <div class="plan__head">
+          <div>
+            <p class="tag">Example plan</p>
+            <h3 id="plan-title">Senior product manager, payments</h3>
+          </div>
+          <dl class="plan__stats">
+            <div><dt>Match</dt><dd>72</dd></div>
+            <div><dt>Days left</dt><dd>9</dd></div>
+          </dl>
+        </div>
+        <div class="plan__grid">
+          <section aria-labelledby="plan-tests">
+            <h4 id="plan-tests" class="eyebrow">What they'll test</h4>
+            <ul class="weights">
+              {
+                PLAN_TESTS.map(([skill, weight]) => (
+                  <li>
+                    <span class="score-row">
+                      <span>{skill}</span>
+                      <span class="mono">{weight}%</span>
+                    </span>
+                    <span class="meter meter--prep">
+                      <span class={`meter__fill meter__fill--w${weight}`}></span>
+                    </span>
+                  </li>
+                ))
+              }
+            </ul>
+          </section>
+          <section aria-labelledby="plan-fit">
+            <h4 id="plan-fit" class="eyebrow">Story fit</h4>
+            <table class="fit">
+              <thead>
+                <tr><th scope="col">Skill</th><th scope="col">Best story</th><th scope="col">Fit</th></tr>
+              </thead>
+              <tbody>
+                {
+                  STORY_FIT.map(([skill, story, fit]) => (
+                    <tr>
+                      <th scope="row">{skill}</th>
+                      <td class={fit === "missing" ? "muted" : undefined}>{story}</td>
+                      <td><span class={`fit-badge fit-badge--${fit}`}>{FIT_LABEL[fit]}</span></td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </section>
+          <section aria-labelledby="plan-ready">
+            <h4 id="plan-ready" class="eyebrow">Practice readiness</h4>
+            <ul class="readiness">
+              {
+                READINESS.map(([skill, level]) => (
+                  <li>
+                    <span>{skill}</span>
+                    <span class="rubric" role="img" aria-label={`${level} of 4`}>
+                      {[1, 2, 3, 4].map((n) => <span class={n <= level ? "on" : undefined}></span>)}
+                    </span>
+                  </li>
+                ))
+              }
+            </ul>
+            <p class="small muted">{READINESS_NOTICE}</p>
+          </section>
+          <section aria-labelledby="plan-days">
+            <h4 id="plan-days" class="eyebrow">Day by day</h4>
+            <ol class="days">
+              {
+                DAY_PLAN.map(([day, task]) => (
+                  <li>
+                    <span class="mono">{day}</span>
+                    <span>{task}</span>
+                  </li>
+                ))
+              }
+            </ol>
+          </section>
+        </div>
+      </div>
+      <p class="types">
+        <span class="muted">Rehearse any of five interview types:</span>
+        {INTERVIEW_TYPES.map((t) => <span class="type">{t}</span>)}
+        <span class="muted">or a Custom interview from your own questions.</span>
+      </p>
     </div>
   </section>
 
@@ -227,8 +576,8 @@ const CONTEXTS = [
         <p class="eyebrow">Set the room</p>
         <h2 id="room-title">Choose who you face.</h2>
         <p class="lede">
-          Warm up with a friendly interviewer, then rehearse against the toughest one you might meet. Same answer,
-          different pressure.
+          Pick the interviewer's tone and how hard it pushes. Warm up with a friendly one, then rehearse against the
+          toughest one you might meet. Tone never changes your score.
         </p>
         <div class="room__controls" data-tone-demo-controls hidden>
           <fieldset>
@@ -278,7 +627,40 @@ const CONTEXTS = [
     <script is:inline type="application/json" id="tone-demo-data" set:html={JSON.stringify(DEMO)} />
   </section>
 
-  <section class="section section--alt home-section" aria-labelledby="context-title">
+  <section class="section section--alt home-section" id="debrief" aria-labelledby="debrief-title">
+    <div class="wrap">
+      <p class="eyebrow">After the interview</p>
+      <h2 id="debrief-title">A debrief you can act on.</h2>
+      <p class="lede">
+        A hire signal with the reasons, a 1 to 4 score per answer with quotes, and how you sounded. Then one fix, sent to
+        the story that needs it.
+      </p>
+      <dl class="facts">
+        {
+          DEBRIEF_FACTS.map(([label, value, note]) => (
+            <div class="card">
+              <dt>{label}</dt>
+              <dd class="facts__value">{value}</dd>
+              <dd class="small muted">{note}</dd>
+            </div>
+          ))
+        }
+      </dl>
+      <ul class="trio trio--plain">
+        {
+          DEBRIEF_ACTIONS.map(([title, body]) => (
+            <li>
+              <h3>{title}</h3>
+              <p class="muted">{body}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <p><a href="/sample-debrief">See a sample debrief</a></p>
+    </div>
+  </section>
+
+  <section class="section home-section" aria-labelledby="context-title">
     <div class="wrap">
       <h2 id="context-title">Same story. Different job. Different verdict.</h2>
       <p class="lede">
@@ -307,7 +689,7 @@ const CONTEXTS = [
     </div>
   </section>
 
-  <section class="section home-section" aria-labelledby="minds-title">
+  <section class="section section--alt home-section" aria-labelledby="minds-title">
     <div class="wrap">
       <h2 id="minds-title">One AI asks. A different one judges.</h2>
       <div class="grid-2 minds">
@@ -332,8 +714,8 @@ const CONTEXTS = [
         <div class="card">
           <h3>Private by design</h3>
           <p class="muted">
-            Audio is never stored. Export or delete your resume and transcripts in one click. Nothing is used for training
-            unless you turn that on.
+            Audio is never stored. Export or delete your resumes, stories and transcripts in one click. Nothing is used
+            for training unless you turn that on.
           </p>
           <p><a href="/legal/privacy">Read the privacy policy</a></p>
         </div>
