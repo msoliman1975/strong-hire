@@ -255,6 +255,45 @@ describe("v2 Check your CV", () => {
     expect(puts[0].resume.roles.map((r) => r.achievements)).toEqual(fixtureResume.roles.map((r) => r.achievements));
   });
 
+  it("IN-3 regression: editing the company of a saved CV opened from Resumes updates that role", async () => {
+    await seed();
+    mockStore.db.resumes[0].confirmed_at = "2026-10-28T10:00:00Z";
+    const puts = recordPutBodies();
+    const user = renderAt("/resumes");
+    const list = await screen.findByRole("list", { name: "Saved CVs" });
+    await user.click(within(list).getAllByRole("link", { name: /^Open breakdown for / })[0]);
+    await screen.findByRole("complementary", { name: "What we found" });
+
+    await user.click(screen.getByRole("button", { name: "Edit Software Engineer II · Shoply" }));
+    const editor = screen.getByRole("group", { name: "Editing · Software Engineer II · Shoply" });
+    const company = within(editor).getByLabelText("Company");
+    await user.clear(company);
+    await user.type(company, "Shoply Inc");
+    await user.click(within(editor).getByRole("button", { name: "Save role" }));
+    expect(screen.getByText(/Experience · 2 roles/)).toBeInTheDocument();
+
+    await user.click(screen.getAllByRole("button", { name: "Back to resumes" })[0]);
+    expect(await screen.findByRole("heading", { name: "Resumes" })).toBeInTheDocument();
+    expect(puts[0].resume.roles.map((r) => `${r.title} · ${r.company}`)).toEqual([
+      "Software Engineer II · Shoply Inc",
+      "Software Engineer · Invoicely",
+    ]);
+
+    // Opened again from Resumes and edited again: still two roles.
+    await user.click(within(await screen.findByRole("list", { name: "Saved CVs" })).getAllByRole("link", { name: /^Open breakdown for / })[0]);
+    await screen.findByRole("complementary", { name: "What we found" });
+    await user.click(screen.getByRole("button", { name: "Edit Software Engineer II · Shoply Inc" }));
+    const again = screen.getByRole("group", { name: "Editing · Software Engineer II · Shoply Inc" });
+    await user.type(within(again).getByLabelText("Title"), " (Payments)");
+    await user.click(within(again).getByRole("button", { name: "Save role" }));
+    await user.click(screen.getAllByRole("button", { name: "Back to resumes" })[0]);
+    await screen.findByRole("heading", { name: "Resumes" });
+    expect(puts[1].resume.roles.map((r) => `${r.title} · ${r.company}`)).toEqual([
+      "Software Engineer II (Payments) · Shoply Inc",
+      "Software Engineer · Invoicely",
+    ]);
+  });
+
   it("IN-12: a section's issue count shows and highlights its issues in the panel", async () => {
     const { resume } = await seed();
     const user = renderAt(`/resumes/${resume.id}/check`);

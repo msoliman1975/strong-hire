@@ -144,7 +144,20 @@ export function roleIds(roles: Pick<ResumeRole, "company" | "title">[]): string[
   });
 }
 
-const roleName = (r: Pick<ResumeRole, "company" | "title">) => r.company.trim() || r.title.trim() || "this role";
+/**
+ * How issues name a role: by company, or "title at company" when the CV lists the company more
+ * than once, so each issue says which of those roles it is about.
+ */
+function roleNamer(roles: Pick<ResumeRole, "company" | "title">[]) {
+  const counts = new Map<string, number>();
+  for (const r of roles) counts.set(companyKey(r.company), (counts.get(companyKey(r.company)) ?? 0) + 1);
+  return (r: Pick<ResumeRole, "company" | "title">) => {
+    const company = r.company.trim();
+    const title = r.title.trim();
+    if (company && title && (counts.get(companyKey(r.company)) ?? 0) > 1) return `${title} at ${company}`;
+    return company || title || "this role";
+  };
+}
 
 /** A number, a percent, money or a result verb: the achievement says what changed. */
 const RESULT =
@@ -202,6 +215,7 @@ export function checkResume(resume: Resume, options: CheckOptions): ResumeIssue[
   const now = index(today, "late");
   const roles = resume.roles;
   const ids = roleIds(roles);
+  const roleName = roleNamer(roles);
 
   // ---- Dates, one role at a time.
   roles.forEach((r, i) => {
