@@ -10,6 +10,8 @@ export const SAMPLE_IS_PLACEHOLDER = true;
 export const sample = {
   interview: "Behavioral interview, senior level, 30 minutes",
   hire_signal: "Lean Hire" as const,
+  /** DB-1: the previous session's signal for the same job and resume. */
+  previous_signal: "Lean No Hire",
   rationale:
     "Clear ownership of a large migration and good use of numbers. The answers were weaker on conflict: two of three stories ended before saying how the disagreement was resolved, which the bar for this level expects.",
   competencies: [
@@ -25,18 +27,24 @@ export const sample = {
       score: 3,
       evidence: "“I owned the migration end to end and cut checkout errors by 40 percent.”",
       feedback: "Strong ownership and a clear result. Add what you would do differently: the bar for this level expects reflection.",
+      story: "Checkout migration across three teams",
+      delivery: { wpm: 142, fillers: 1.2 },
     },
     {
       question: "Describe a disagreement with another team. How was it resolved?",
       score: 2,
       evidence: "“We went back and forth for a while, and then we moved on to the next milestone.”",
       feedback: "The story stops before the resolution. Say what you proposed, who decided, and what changed afterwards.",
+      story: "Platform team API dispute",
+      delivery: { wpm: 178, fillers: 3.4 },
     },
     {
       question: "Tell me about a decision you made with incomplete data.",
       score: 3,
       evidence: "“We shipped to 5 percent of traffic first, because we could not test the fraud rules offline.”",
       feedback: "Good use of a staged rollout. Name the risk you accepted and how you would have known it went wrong.",
+      story: "Fraud rules rollout",
+      delivery: { wpm: 131, fillers: 0.8 },
     },
   ],
   fix_first: [
