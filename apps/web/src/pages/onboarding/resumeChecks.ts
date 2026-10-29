@@ -37,7 +37,24 @@ export interface ResumeIssue {
   items?: number[];
   /** Gaps only: the period, for the practice link. */
   gap?: { from: string; to: string };
+  /** Reasons the user can accept the issue with, shown as extra Accept buttons (missing dates). */
+  reasons?: AcceptReason[];
 }
+
+export interface AcceptReason {
+  /** Stored with the accepted key; letters and dashes only. */
+  code: string;
+  label: string;
+}
+
+/**
+ * IN-12: a missing date can be on purpose. Coaches advise leaving old dates off to avoid age bias,
+ * so accepting it with a reason closes the issue.
+ */
+export const MISSING_DATE_REASONS: AcceptReason[] = [
+  { code: "on-purpose", label: "Left out on purpose (age bias)" },
+  { code: "dont-remember", label: "I don't remember" },
+];
 
 export interface CheckOptions {
   /** This month as YYYY-MM. Injected so the checks stay deterministic. */
@@ -133,6 +150,16 @@ const roleName = (r: Pick<ResumeRole, "company" | "title">) => r.company.trim() 
 const RESULT =
   /\d|%|\$|€|£|\b(one|two|three|four|five|six|seven|eight|nine|ten|twice|half|third|quarter|double[ds]?|tripled?|halved)\b|\b(cut|reduc|increas|grew|rais|sav|lower|boost|doubl|fell|dropp|decreas|accelerat|shorten)\w*/i;
 const NUMBER = /\d|%|\$|€|£/;
+
+/**
+ * IN-12: an achievement with no result. Exact numbers are often not available, so the advice
+ * offers qualitative and proxy results too and never insists on a number.
+ */
+export const NO_RESULT_WHY =
+  "Say what changed. A number helps if you have one, but you do not need one: name the measure that " +
+  'moved ("improved task success, time on task and error rate in usability benchmarks"), the direction ' +
+  '("cut support tickets after launch"), or the scale and scope ("for 3 product teams", "used by every ' +
+  'store in the region"). Results are what interviewers remember.';
 const WE = /\b(we|our|us)\b/i;
 const I = /\b(i|my|me)\b|^\s*(led|built|owned|designed|drove|ran|wrote|managed|created|launched|shipped|hired|cut|grew|started|founded|mentored|coached)\b/i;
 const SCOPE =
@@ -236,9 +263,10 @@ export function checkResume(resume: Resume, options: CheckOptions): ResumeIssue[
         severity: "medium",
         title: `No start date on ${name}`,
         detail: "We could not find when this role started.",
-        why: "Without dates, interviewers cannot tell how long you held the role.",
+        why: "Without dates, interviewers cannot tell how long you held the role, so they may ask. Leaving old dates off on purpose is fine: accept it and say why, and be ready to answer.",
         fixLabel: "Add the date",
         acceptLabel: "Accept as it is",
+        reasons: MISSING_DATE_REASONS,
         target: { section: "role", role: i, field: "start" },
         roles: [i],
         fieldNote: "Add a start date",
@@ -379,13 +407,13 @@ export function checkResume(resume: Resume, options: CheckOptions): ResumeIssue[
             ? `An achievement without a result at ${name}`
             : `${noResult.length} achievements without a result at ${name}`,
         detail: `"${truncate(r.achievements[noResult[0]], 60)}"`,
-        why: "Say what changed: a number, a percent, time saved or who it helped. Results are what interviewers remember.",
+        why: NO_RESULT_WHY,
         fixLabel: "Add a result",
         acceptLabel: "Accept as it is",
         target: { section: "role", role: i, field: "achievement", item: noResult[0] },
         roles: [i],
         items: noResult,
-        fieldNote: "No result or number. Add what changed?",
+        fieldNote: "No result yet. What changed, for whom, or how big was it?",
       });
     }
     const we = r.achievements.filter((a) => WE.test(a));

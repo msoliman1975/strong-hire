@@ -6,7 +6,7 @@ import { keys, useResume, useResumeTask } from "../../api/hooks";
 import { jobProblem, resumesApi } from "../../api/inputs";
 import type { Resume } from "../../api/types";
 import { ErrorNotice, Loading, PageHead, Steps } from "../../components/ui";
-import { useOnboardingSteps } from "./steps";
+import { onboardingLinks, STEP_NOTES, useOnboardingSteps } from "./steps";
 import { contextPath, rehearsalPath } from "../../paths";
 import { useFeature } from "../../theme/features";
 import { ResumeCheckV2 } from "./ResumeCheckV2";
@@ -122,7 +122,7 @@ export function CheckResumePage() {
 
   return (
     <div className="page--narrow">
-      {jobId && <Steps current={1} steps={steps} />}
+      {jobId && <Steps current={1} steps={steps} links={onboardingLinks(jobId)} note={STEP_NOTES.check} />}
       <PageHead title="Check your CV">
         {v2 ? (
           <p>We are reading your CV. When it is done, you check it here, then continue.</p>

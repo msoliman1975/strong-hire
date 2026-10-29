@@ -8,6 +8,7 @@ import { useRepeatSetup } from "../custom/repeat";
 import { formatDate, interviewTypeLabel, severityLabel } from "../labels";
 import { contextPath } from "../paths";
 import { setupLink } from "./GapAnalysisPage";
+import { GAP_COPY } from "../copy";
 
 const isGap = (r: ReportItem) => r.type === "gap_report";
 const isVerdict = (r: ReportItem) => r.type === "interview_debrief" && r.hire_signal !== null;
@@ -87,7 +88,7 @@ export function RehearsalPage() {
               </ul>
             </section>
             <section className="panel" aria-labelledby="pair-gaps-heading">
-              <h2 id="pair-gaps-heading">Gaps to work on</h2>
+              <h2 id="pair-gaps-heading">{GAP_COPY.shortHeading}</h2>
               <ul className="plain-list">
                 {analysis.gaps.slice(0, 3).map((g) => (
                   <li key={g.summary}>

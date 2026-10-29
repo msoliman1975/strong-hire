@@ -7,7 +7,8 @@ import { jobTargetsApi } from "../../api/inputs";
 import { gapApi } from "../../api/gap";
 import type { JobContext } from "../../api/types";
 import { ErrorNotice, Loading, PageHead, Steps } from "../../components/ui";
-import { useOnboardingSteps } from "./steps";
+import { pasteKeepingLinks } from "./pasteLinks";
+import { onboardingLinks, STEP_NOTES, useOnboardingSteps } from "./steps";
 import { useFeature } from "../../theme/features";
 
 const STAGES = ["Recruiter screen", "Phone screen", "Onsite or final loop", "Not sure"];
@@ -70,9 +71,17 @@ export function ContextPage() {
 
   return (
     <div className="page--narrow">
-      <Steps current={2} steps={steps} />
+      <Steps current={2} steps={steps} links={onboardingLinks(jobId, resumeId)} note={STEP_NOTES.context} />
       <PageHead title="Add context (optional)">
         <p>Anything you know about the interview helps the interviewer focus. You can skip this step.</p>
+        <button
+          type="button"
+          className="btn btn--secondary"
+          disabled={finish.isPending || !resumeId}
+          onClick={() => finish.mutate(null)}
+        >
+          {v2 ? "Skip and open my plan" : "Skip and see my gap analysis"}
+        </button>
       </PageHead>
       {job.isError && <ErrorNotice error={job.error} />}
       {!resumeId && (
@@ -106,7 +115,17 @@ export function ContextPage() {
         </div>
         <div className="field">
           <label htmlFor="recruiter_notes">Notes from the recruiter</label>
-          <textarea id="recruiter_notes" rows={4} value={form.recruiter_notes} onChange={set("recruiter_notes")} />
+          <textarea
+            id="recruiter_notes"
+            rows={4}
+            value={form.recruiter_notes}
+            aria-describedby="recruiter_notes-hint"
+            onChange={set("recruiter_notes")}
+            onPaste={pasteKeepingLinks((value) => setForm((f) => ({ ...f, recruiter_notes: value })))}
+          />
+          <p className="hint" id="recruiter_notes-hint">
+            Paste the recruiter's email or notes. Links are kept.
+          </p>
         </div>
         <div className="field">
           <label htmlFor="concerns">What worries you about this interview?</label>

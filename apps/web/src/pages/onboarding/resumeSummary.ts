@@ -4,6 +4,7 @@
  * the same rules as the check page (resumeChecks.ts), so nothing else needs storing.
  */
 import type { ResumeOut } from "../../api/types";
+import { acceptedKeySet } from "./acceptedIssues";
 import { checkResume, thisMonth, type ResumeIssue } from "./resumeChecks";
 
 export interface IssueCounts {
@@ -28,7 +29,7 @@ export function countIssues(issues: readonly ResumeIssue[], accepted: ReadonlySe
 export function resumeIssueCounts(record: ResumeOut, today = thisMonth()): IssueCounts | null {
   if (!record.resume) return null;
   const issues = checkResume(record.resume, { today, job: null });
-  return countIssues(issues, new Set(record.accepted_issues.map((a) => a.key)));
+  return countIssues(issues, acceptedKeySet(record.accepted_issues));
 }
 
 /** "3 to fix · 1 accepted · 0 high". */

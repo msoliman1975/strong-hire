@@ -10,7 +10,7 @@ import { formatDate } from "../../labels";
 import { friendlyLimitError, MAX_RESUME_BYTES_V2, MAX_RESUME_MB, MAX_RESUMES, RESUME_TOO_BIG, RESUMES_FULL } from "../../limits";
 import { checkPath, rehearsalPath } from "../../paths";
 import { useFeature } from "../../theme/features";
-import { useOnboardingSteps } from "./steps";
+import { onboardingLinks, STEP_NOTES, useOnboardingSteps } from "./steps";
 
 /** The API accepts files up to 5 MB. */
 export const MAX_RESUME_BYTES = 5 * 1024 * 1024;
@@ -45,7 +45,7 @@ export function ResumePage() {
 
   return (
     <div className="page--narrow">
-      <Steps current={1} steps={steps} />
+      <Steps current={1} steps={steps} links={onboardingLinks(jobId)} note={STEP_NOTES.resume} />
       <PageHead title="Choose a resume">
         <p>Pick a resume you saved, or upload a new one. We save it for next time. We compare it with the job to find your strengths and gaps.</p>
       </PageHead>

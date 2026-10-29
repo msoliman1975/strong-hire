@@ -9,7 +9,7 @@ import type { JobTargetCreate, JobTargetOut } from "../../api/types";
 import { ErrorNotice, PageHead, Steps } from "../../components/ui";
 import { countWords, fmt, friendlyLimitError, JD_MAX_WORDS, JD_TOO_LONG, JD_WARN_WORDS } from "../../limits";
 import { useFeature } from "../../theme/features";
-import { useOnboardingSteps } from "./steps";
+import { STEP_NOTES, useOnboardingSteps } from "./steps";
 import { formatDate } from "../../labels";
 import type { NewJobReturn } from "../../paths";
 
@@ -106,7 +106,7 @@ export function NewJobPage() {
 
   return (
     <div className="page--narrow">
-      {then === "rehearsal" && <Steps current={0} steps={steps} />}
+      {then === "rehearsal" && <Steps current={0} steps={steps} note={STEP_NOTES.job} />}
       <PageHead title="Add a job description">
         <p>
           A job description is the job posting for the real job you are interviewing for. Paste its link or its text.

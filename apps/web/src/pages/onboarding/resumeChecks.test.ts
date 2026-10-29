@@ -146,6 +146,17 @@ describe("IN-12 detail", () => {
     expect(find(issues, "detail.few-achievements:")?.key).toBe("detail.few-achievements:brightline/product-manager");
   });
 
+  it("IN-12: advice for an achievement without a result offers proxy and qualitative wording, not only numbers", () => {
+    const issues = checkResume(cv([role({ end: null, achievements: ["Ran usability tests for the app", "Owned research"] })]), {
+      today: TODAY,
+    });
+    const noResult = find(issues, "detail.no-result:")!;
+    expect(noResult.why).toContain("you do not need one");
+    expect(noResult.why).toContain("improved task success, time on task and error rate in usability benchmarks");
+    expect(noResult.why).toMatch(/scale and scope/);
+    expect(noResult.fieldNote).not.toMatch(/number/i);
+  });
+
   it('IN-12: finds "we" with no "I"', () => {
     const issues = checkResume(
       cv([role({ end: null, achievements: ["We shipped a new checkout, 20% faster", "Our team grew revenue 10%"] })]),

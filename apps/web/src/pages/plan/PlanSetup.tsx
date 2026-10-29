@@ -36,6 +36,7 @@ import {
   modeLabel,
 } from "../../labels";
 import type { PlanView, Tone } from "./api";
+import { GAP_COPY } from "../../copy";
 
 // The four standard types, then Custom (D-1). S35 adds Recruiter screen (RS-1) to this list.
 const TYPES: InterviewType[] = ["behavioral", "hiring_manager", "technical_qa", "case", "custom"];
@@ -320,7 +321,7 @@ export function PlanSetup({
       <h2 id="plan-next-heading">Next rehearsal</h2>
       <p className="muted">
         {plan.next_session
-          ? `Set up from your gaps: ${plan.next_session.reason} Change anything.`
+          ? `${GAP_COPY.setUpFrom} ${plan.next_session.reason} Change anything.`
           : "Set up from your plan. Change anything."}
       </p>
       {form}

@@ -211,6 +211,102 @@ describe("v2 Check your CV", () => {
     expect(puts[0].resume.roles.map((r) => r.company)).toEqual(["Northwind Labs", "Invoicely"]);
   });
 
+  it("IN-3 regression: editing a role updates that role, and never adds one", async () => {
+    const { resume } = await seed();
+    const puts = recordPutBodies();
+    const user = renderAt(`/resumes/${resume.id}/check`);
+    await screen.findByRole("complementary", { name: "What we found" });
+
+    await user.click(screen.getByRole("button", { name: "Edit Software Engineer · Invoicely" }));
+    const editor = screen.getByRole("group", { name: "Editing · Software Engineer · Invoicely" });
+    const title = within(editor).getByLabelText("Title");
+    await user.clear(title);
+    await user.type(title, "Backend Engineer");
+    await user.click(within(editor).getByRole("button", { name: "Save role" }));
+    expect(screen.getByRole("region", { name: "Backend Engineer · Invoicely" })).toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "Software Engineer · Invoicely" })).not.toBeInTheDocument();
+    expect(screen.getByText(/Experience · 2 roles/)).toBeInTheDocument();
+
+    // A role added and then cancelled leaves nothing behind.
+    await user.click(screen.getByRole("button", { name: "+ Add a role" }));
+    await user.click(within(screen.getByRole("group", { name: "Editing · New role" })).getByRole("button", { name: "Cancel" }));
+    expect(screen.getByText(/Experience · 2 roles/)).toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: /Untitled role/ })).not.toBeInTheDocument();
+
+    // Moving an achievement, then cancelling, does not copy it into both roles.
+    await user.click(screen.getByRole("button", { name: "Edit Software Engineer II · Shoply" }));
+    const shoply = screen.getByRole("group", { name: "Editing · Software Engineer II · Shoply" });
+    await user.selectOptions(
+      within(shoply).getByRole("combobox", { name: "Move achievement 1 at Software Engineer II · Shoply to another role" }),
+      "Backend Engineer at Invoicely",
+    );
+    await user.click(within(shoply).getByRole("button", { name: "Cancel" }));
+    await user.click(
+      within(screen.getByRole("group", { name: "Editing · Backend Engineer · Invoicely" })).getByRole("button", { name: "Cancel" }),
+    );
+
+    await user.click(screen.getAllByRole("button", { name: "Back to resumes" })[0]);
+    expect(await screen.findByRole("heading", { name: "Resumes" })).toBeInTheDocument();
+    expect(puts).toHaveLength(1);
+    expect(puts[0].resume.roles.map((r) => `${r.title} · ${r.company}`)).toEqual([
+      "Software Engineer II · Shoply",
+      "Backend Engineer · Invoicely",
+    ]);
+    expect(puts[0].resume.roles.map((r) => r.achievements)).toEqual(fixtureResume.roles.map((r) => r.achievements));
+  });
+
+  it("IN-12: a section's issue count shows and highlights its issues in the panel", async () => {
+    const { resume } = await seed();
+    const user = renderAt(`/resumes/${resume.id}/check`);
+    await screen.findByRole("complementary", { name: "What we found" });
+    // Another filter first: the click shows every issue again.
+    await user.click(within(panel()).getByRole("button", { name: /^Dates/ }));
+    expect(within(panel()).queryByText("One achievement on Invoicely")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /^Show the \d+ issues? for Software Engineer · Invoicely$/ }));
+    const card = issueCard("One achievement on Invoicely");
+    expect(card).toHaveAttribute("data-highlight", "true");
+    expect(card).toHaveAttribute("open");
+    expect(issueCard("A skill missing from Skills")).not.toHaveAttribute("data-highlight");
+
+    await user.click(screen.getByRole("button", { name: "Show the 1 issue for Skills" }));
+    expect(issueCard("A skill missing from Skills")).toHaveAttribute("data-highlight", "true");
+  });
+
+  it("IN-12: What we check sits at the top of the issues column, folded", async () => {
+    const { resume } = await seed();
+    renderAt(`/resumes/${resume.id}/check`);
+    await screen.findByRole("complementary", { name: "What we found" });
+    const checks = within(panel()).getByText("What we check").closest("details")!;
+    expect(panel().firstElementChild).toBe(checks);
+    expect(checks).not.toHaveAttribute("open");
+  });
+
+  it("IN-12: a missing date can be accepted with a reason, and stops counting as an issue", async () => {
+    const { resume } = await seed();
+    mockStore.db.resumes[0].resume!.roles[1].start = null;
+    const user = renderAt(`/resumes/${resume.id}/check`);
+    await screen.findByRole("complementary", { name: "What we found" });
+    const card = issueCard("No start date on Invoicely");
+    expect(within(card).getByText(/Leaving old dates off on purpose is fine/)).toBeInTheDocument();
+    const before = Number(/(\d+) open/.exec(within(panel()).getByText(/open ·/).textContent!)![1]);
+
+    await user.click(within(card).getByRole("button", { name: "Accept: Left out on purpose (age bias)" }));
+    expect(within(panel()).queryByText("No start date on Invoicely")).not.toBeInTheDocument();
+    expect(within(panel()).getByText(/✓ Accepted: No start date on Invoicely/)).toHaveTextContent(
+      "Left out on purpose (age bias)",
+    );
+    expect(within(panel()).getByText(/open ·/)).toHaveTextContent(`${before - 1} open · 1 accepted`);
+    const stored = () => (mockStore.db.resumes[0].accepted_issues ?? []).map((i) => i.key);
+    await waitFor(() => expect(stored()).toEqual(["dates.missing-start:invoicely/software-engineer|why=on-purpose"]));
+
+    // Changing the reason replaces the stored key; the issue stays accepted after a reload.
+    await user.click(within(panel()).getByRole("button", { name: "Undo accepting No start date on Invoicely" }));
+    await waitFor(() => expect(stored()).toEqual([]));
+    await user.click(within(issueCard("No start date on Invoicely")).getByRole("button", { name: "Accept: I don't remember" }));
+    await waitFor(() => expect(stored()).toEqual(["dates.missing-start:invoicely/software-engineer|why=dont-remember"]));
+  });
+
   it("IN-12: issues accepted earlier stay accepted when the page opens again", async () => {
     const { resume } = await seed();
     mockStore.db.resumes[0].accepted_issues = [

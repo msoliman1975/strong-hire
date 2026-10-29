@@ -19,6 +19,7 @@ import { Bar, ErrorNotice, Loading, PageHead } from "../../components/ui";
 import { competencyLabel, difficultyLabel, formatDate, interviewTypeLabel } from "../../labels";
 import { resumeCheckPath } from "../../paths";
 import { planPath } from "./paths";
+import { GAP_COPY } from "../../copy";
 
 const SEVERITY: Record<string, string> = { high: "High", medium: "Medium", low: "Low" };
 
@@ -154,7 +155,8 @@ function ReportBody({ analysis, generic, plan }: { analysis: GapAnalysis; generi
           </ul>
         </section>
         <section className="card" aria-labelledby="gap-gaps-heading">
-          <h2 id="gap-gaps-heading">Gaps</h2>
+          <h2 id="gap-gaps-heading">{GAP_COPY.heading}</h2>
+          <p className="muted small">{GAP_COPY.intro}</p>
           <ul className="plain-list gap-report__list">
             {analysis.gaps.map((g) => (
               <li key={g.summary}>

@@ -25,7 +25,7 @@ import {
   type ResumeIssue,
 } from "./resumeChecks";
 import { issuesOpen, shortDate } from "./resumeSummary";
-import { useOnboardingSteps } from "./steps";
+import { onboardingLinks, STEP_NOTES, useOnboardingSteps } from "./steps";
 
 type Education = Resume["education"][number];
 
@@ -135,7 +135,15 @@ function omit<T>(record: Record<number, T>, key: number): Record<number, T> {
   return next;
 }
 
-const splitList = (text: string, by: RegExp) => text.split(by).map((s) => s.trim()).filter(Boolean);
+/** A copy of `set` without `key`. */
+function without<T>(set: ReadonlySet<T>, key: T): ReadonlySet<T> {
+  if (!set.has(key)) return set;
+  const next = new Set(set);
+  next.delete(key);
+  return next;
+}
+
+const splitList =(text: string, by: RegExp) => text.split(by).map((s) => s.trim()).filter(Boolean);
 
 type Filter = "all" | "dates" | "detail" | "accepted";
 const GROUP_LABEL: Record<IssueGroup, string> = {
@@ -149,6 +157,12 @@ const GROUP_LABEL: Record<IssueGroup, string> = {
 /** The field to focus and highlight after Fix, by element id. */
 interface Flash {
   id: string;
+  n: number;
+}
+
+/** Issues to scroll to and highlight in the panel, by key. `n` repeats it on every click. */
+interface Highlight {
+  keys: string[];
   n: number;
 }
 
@@ -192,6 +206,10 @@ export function ResumeCheckV2({
   const [openSection, setOpenSection] = useState<Record<string, boolean>>({});
   const [shown, setShown] = useState<Set<number>>(() => new Set());
   const [flash, setFlash] = useState<Flash | null>(null);
+  /** Roles added on this page and not saved yet: Cancel removes them again. */
+  const [added, setAdded] = useState<ReadonlySet<number>>(() => new Set());
+  /** Issues to point at in the panel after a click on an issue count. */
+  const [highlight, setHighlight] = useState<Highlight | null>(null);
   const [saved, setSaved] = useState(false);
   const [blocked, setBlocked] = useState(false);
 
@@ -216,6 +234,14 @@ export function ResumeCheckV2({
 
   const focus = (id: string) => setFlash((f) => ({ id, n: (f?.n ?? 0) + 1 }));
 
+  // The highlight in the panel fades like the field flash.
+  const highlights = useRef(0);
+  useEffect(() => {
+    if (!highlight) return;
+    const timer = window.setTimeout(() => setHighlight(null), 2400);
+    return () => window.clearTimeout(timer);
+  }, [highlight]);
+
   const save = useMutation({
     mutationFn: (resume: Resume) => resumesApi.update(resumeId, resume),
     onSuccess: (record) => {
@@ -231,6 +257,12 @@ export function ResumeCheckV2({
   const closeRole = (key: number) => {
     setEditing((e) => omit(e, key));
     setRoleErrors((e) => omit(e, key));
+    setAdded((a) => without(a, key));
+  };
+  /** Cancel: a role added here and never saved goes away, so Cancel never leaves an empty role behind. */
+  const cancelRole = (key: number) => {
+    if (added.has(key)) setDraft((d) => ({ ...d, roles: d.roles.filter((r) => r.key !== key) }));
+    closeRole(key);
   };
   const changeRole = (key: number, change: Partial<CvRole>) =>
     setEditing((e) => ({ ...e, [key]: { ...e[key], ...change } }));
@@ -249,6 +281,7 @@ export function ResumeCheckV2({
     const role: CvRole = { key: newKey(), company: "", title: "", start: "", end: "", achievements: [""], skills: [] };
     setDraft((d) => ({ ...d, roles: [...d.roles, role] }));
     setEditing((e) => ({ ...e, [role.key]: role }));
+    setAdded((a) => new Set(a).add(role.key));
     focus(`role-${role.key}-title`);
   };
   const removeRole = (key: number) => {
@@ -266,18 +299,27 @@ export function ResumeCheckV2({
     });
     focus(`role-${key}-move-${by < 0 ? "up" : "down"}`);
   };
-  /** Moves an achievement from an open role to the end of another role. */
+  /**
+   * Moves an achievement from an open role to the end of another role. The other role opens for
+   * editing too, so both changes are saved or cancelled together and nothing is copied twice.
+   */
   const moveAchievement = (fromKey: number, item: number, toKey: number) => {
     const text = editing[fromKey].achievements[item];
-    changeRole(fromKey, { achievements: editing[fromKey].achievements.filter((_, j) => j !== item) });
-    if (editing[toKey]) {
-      changeRole(toKey, { achievements: [...editing[toKey].achievements, text] });
-    } else {
-      setDraft((d) => ({
-        ...d,
-        roles: d.roles.map((r) => (r.key === toKey ? { ...r, achievements: [...r.achievements, text] } : r)),
-      }));
-    }
+    const target = editing[toKey] ?? draft.roles.find((r) => r.key === toKey);
+    if (!target) return;
+    setEditing((e) => ({
+      ...e,
+      [fromKey]: { ...e[fromKey], achievements: e[fromKey].achievements.filter((_, j) => j !== item) },
+      [toKey]: { ...target, achievements: [...target.achievements, text] },
+    }));
+    setShown((s) => new Set(s).add(toKey));
+  };
+
+  /** A click on an issue count: show those issues in the panel. */
+  const showIssues = (list: ResumeIssue[]) => {
+    if (list.length === 0) return;
+    highlights.current += 1;
+    setHighlight({ keys: list.map((i) => i.key), n: highlights.current });
   };
 
   const fix = (issue: ResumeIssue) => {
@@ -336,6 +378,7 @@ export function ResumeCheckV2({
     setDraft((d) => ({ ...d, roles }));
     setEditing({});
     setRoleErrors({});
+    setAdded(new Set());
   };
 
   const onSaveDraft = () => {
@@ -389,7 +432,7 @@ export function ResumeCheckV2({
 
   return (
     <div className="cvc">
-      {jobId && <Steps current={1} steps={steps} />}
+      {jobId && <Steps current={1} steps={steps} links={onboardingLinks(jobId)} note={STEP_NOTES.check} />}
       {fresh && (
         <p className="cvc-landing" role="status">
           We read your CV. Check it, then continue.
@@ -429,6 +472,7 @@ export function ResumeCheckV2({
             onSave={(summary) => setDraft((d) => ({ ...d, summary }))}
             notes={open.filter((i) => i.target.section === "summary")}
             flash={flash?.id}
+            onShowIssues={showIssues}
           />
 
           <p className="cvc-label cvc-label--section">
@@ -452,7 +496,8 @@ export function ResumeCheckV2({
                   others={draft.roles.filter((r) => r.key !== role.key).map((r) => editing[r.key] ?? r)}
                   flash={flash?.id}
                   onChange={(change) => changeRole(role.key, change)}
-                  onCancel={() => closeRole(role.key)}
+                  onShowIssues={() => showIssues(roleIssues)}
+                  onCancel={() => cancelRole(role.key)}
                   onSave={() => saveRole(role.key)}
                   onRemove={() => removeRole(role.key)}
                   onMove={(by) => moveRole(role.key, by)}
@@ -469,6 +514,7 @@ export function ResumeCheckV2({
                 collapsed={collapsed}
                 current={index === 0}
                 issueCount={roleIssues.length}
+                onShowIssues={() => showIssues(roleIssues)}
                 onShow={() => setShown((s) => new Set(s).add(role.key))}
                 onEdit={() => {
                   editRole(role);
@@ -489,6 +535,8 @@ export function ResumeCheckV2({
               setOpen={(v) => setOpenSection((s) => ({ ...s, skills: v }))}
               onSave={(skills) => setDraft((d) => ({ ...d, skills }))}
               flash={flash?.id}
+              issues={open.filter((i) => i.target.section === "skills")}
+              onShowIssues={showIssues}
             />
             <EducationCard
               education={draft.education}
@@ -517,7 +565,7 @@ export function ResumeCheckV2({
           </section>
         </div>
 
-        <IssuesPanel issues={issues} accepted={accepted} jobId={jobId} onFix={fix} />
+        <IssuesPanel issues={issues} accepted={accepted} jobId={jobId} onFix={fix} highlight={highlight} />
       </div>
     </div>
   );
@@ -538,6 +586,38 @@ function EditLink({ onClick, label }: { onClick: () => void; label: string }) {
   return (
     <button type="button" className="cvc-link" onClick={onClick} aria-label={label}>
       Edit
+    </button>
+  );
+}
+
+const issueWord = (n: number) => (n === 1 ? "1 issue" : `${n} issues`);
+
+/**
+ * A section's issue count. With issues it is a button that shows them in the panel (IN-12);
+ * `tone` is "warn" on cards and "bad" while the role is being edited.
+ */
+function IssueCount({
+  count,
+  about,
+  tone = "warn",
+  showNone = false,
+  onShow,
+}: {
+  count: number;
+  about: string;
+  tone?: "warn" | "bad";
+  showNone?: boolean;
+  onShow: () => void;
+}) {
+  if (count === 0) return showNone ? <span className="cvc-chip cvc-chip--ok">No issues</span> : null;
+  return (
+    <button
+      type="button"
+      className={`cvc-chip cvc-chip--${tone} cvc-chip--button`}
+      onClick={onShow}
+      aria-label={`Show the ${issueWord(count)} for ${about}`}
+    >
+      {issueWord(count)}
     </button>
   );
 }
@@ -606,6 +686,7 @@ function SummaryCard({
   onSave,
   notes,
   flash,
+  onShowIssues,
 }: {
   summary: string;
   open: boolean;
@@ -613,12 +694,18 @@ function SummaryCard({
   onSave: (summary: string) => void;
   notes: ResumeIssue[];
   flash?: string;
+  onShowIssues: (issues: ResumeIssue[]) => void;
 }) {
   return (
     <section className="cvc-card" aria-labelledby="cvc-summary">
       <CardHead
         label={<span id="cvc-summary">Summary and intro</span>}
-        action={!open && <EditLink onClick={() => setOpen(true)} label="Edit the summary" />}
+        action={
+          <span className="cvc-card__actions">
+            <IssueCount count={notes.length} about="the summary" onShow={() => onShowIssues(notes)} />
+            {!open && <EditLink onClick={() => setOpen(true)} label="Edit the summary" />}
+          </span>
+        }
       />
       {open ? (
         <TextEditor
@@ -640,8 +727,10 @@ function SummaryCard({
       )}
       {notes.length > 0 && (
         <p className="cvc-note">
-          ⚠ {notes.length === 1 ? "1 note" : `${notes.length} notes`}: {notes.map((n) => n.title.toLowerCase()).join("; ")}.
-          See What we found.
+          ⚠ {notes.length === 1 ? "1 note" : `${notes.length} notes`}: {notes.map((n) => n.title.toLowerCase()).join("; ")}.{" "}
+          <button type="button" className="cvc-link cvc-link--inline" onClick={() => onShowIssues(notes)}>
+            See What we found
+          </button>
         </p>
       )}
     </section>
@@ -654,6 +743,7 @@ function RoleCard({
   collapsed,
   current,
   issueCount,
+  onShowIssues,
   onShow,
   onEdit,
 }: {
@@ -662,6 +752,7 @@ function RoleCard({
   collapsed: boolean;
   current: boolean;
   issueCount: number;
+  onShowIssues: () => void;
   onShow: () => void;
   onEdit: () => void;
 }) {
@@ -679,7 +770,7 @@ function RoleCard({
         </h3>
         <span className="cvc-role__meta">
           {role.start ? `${formatDate(role.start)} to ${role.end ? formatDate(role.end) : "now"}` : "No dates"}
-          {issueCount > 0 && <span className="cvc-chip cvc-chip--warn">{issueCount === 1 ? "1 issue" : `${issueCount} issues`}</span>}
+          <IssueCount count={issueCount} about={name} onShow={onShowIssues} />
           {edit}
         </span>
       </section>
@@ -695,9 +786,7 @@ function RoleCard({
           <p className="cvc-role__span">{span}</p>
         </div>
         <div className="cvc-role__actions">
-          <span className={`cvc-chip ${issueCount ? "cvc-chip--warn" : "cvc-chip--ok"}`}>
-            {issueCount === 0 ? "No issues" : issueCount === 1 ? "1 issue" : `${issueCount} issues`}
-          </span>
+          <IssueCount count={issueCount} about={name} showNone onShow={onShowIssues} />
           {edit}
         </div>
       </div>
@@ -735,6 +824,7 @@ function RoleEditor({
   others,
   flash,
   onChange,
+  onShowIssues,
   onCancel,
   onSave,
   onRemove,
@@ -752,6 +842,7 @@ function RoleEditor({
   others: CvRole[];
   flash?: string;
   onChange: (change: Partial<CvRole>) => void;
+  onShowIssues: () => void;
   onCancel: () => void;
   onSave: () => void;
   onRemove: () => void;
@@ -779,9 +870,7 @@ function RoleEditor({
         <h3 id={`${id}-legend`} className="cvc-role__title">
           Editing · {label}
         </h3>
-        {allIssues.length > 0 && (
-          <span className="cvc-chip cvc-chip--bad">{allIssues.length === 1 ? "1 issue" : `${allIssues.length} issues`}</span>
-        )}
+        <IssueCount count={allIssues.length} about={label} tone="bad" onShow={onShowIssues} />
       </div>
       <div className="cvc-fields">
         {fields.map(([name, text, hint]) => {
@@ -940,12 +1029,16 @@ function SkillsCard({
   setOpen,
   onSave,
   flash,
+  issues,
+  onShowIssues,
 }: {
   skills: string[];
   open: boolean;
   setOpen: (v: boolean) => void;
   onSave: (skills: string[]) => void;
   flash?: string;
+  issues: ResumeIssue[];
+  onShowIssues: (issues: ResumeIssue[]) => void;
 }) {
   const groups = skills.length > GROUP_SKILLS_OVER ? groupSkills(skills) : null;
   const chips = (list: string[]) => (
@@ -961,7 +1054,12 @@ function SkillsCard({
     <section className="cvc-card" aria-labelledby="cvc-skills">
       <CardHead
         label={<span id="cvc-skills">Skills · {skills.length}</span>}
-        action={!open && <EditLink onClick={() => setOpen(true)} label="Edit skills" />}
+        action={
+          <span className="cvc-card__actions">
+            <IssueCount count={issues.length} about="Skills" onShow={() => onShowIssues(issues)} />
+            {!open && <EditLink onClick={() => setOpen(true)} label="Edit skills" />}
+          </span>
+        }
       />
       {open ? (
         <TextEditor
@@ -1139,20 +1237,43 @@ const gapPracticePath = (gap: { from: string; to: string }, jobId: string) => {
   return `/coach/new?ask=${encodeURIComponent(ask)}${jobId ? `&job=${encodeURIComponent(jobId)}` : ""}`;
 };
 
+/** The label of the reason an issue was accepted with, if it is one of the issue's reasons. */
+const acceptedReason = (issue: ResumeIssue, code: string | undefined) =>
+  code ? (issue.reasons?.find((r) => r.code === code)?.label ?? null) : null;
+
 function IssuesPanel({
   issues,
   accepted,
   jobId,
   onFix,
+  highlight,
 }: {
   issues: ResumeIssue[];
   accepted: AcceptedIssues;
   jobId: string;
   onFix: (issue: ResumeIssue) => void;
+  highlight: Highlight | null;
 }) {
   const [filter, setFilter] = useState<Filter>("all");
   // On phones the panel sits above the CV, folded to its summary until opened.
   const [folded, setFolded] = useState(() => Boolean(globalThis.matchMedia?.("(max-width: 979px)").matches));
+  const listRef = useRef<HTMLDivElement>(null);
+  const lit = new Set(highlight?.keys ?? []);
+
+  // A click on a section's issue count: show every issue and open the panel, once per click.
+  const [seen, setSeen] = useState(0);
+  if (highlight && highlight.n !== seen) {
+    setSeen(highlight.n);
+    setFilter("all");
+    setFolded(false);
+  }
+  // Then scroll to the first of them.
+  useEffect(() => {
+    if (!highlight) return;
+    const first = listRef.current?.querySelector<HTMLElement>("[data-highlight]");
+    first?.scrollIntoView?.({ block: "start", behavior: "smooth" });
+    first?.querySelector<HTMLElement>("summary")?.focus();
+  }, [highlight]);
   const openIssues = issues.filter((i) => !accepted.keys.has(i.key));
   const acceptedIssues = issues.filter((i) => accepted.keys.has(i.key));
   const counts: Record<Filter, number> = {
@@ -1172,6 +1293,7 @@ function IssuesPanel({
 
   return (
     <aside className="cvc-panel" aria-labelledby="cvc-found" data-folded={folded || undefined}>
+      <WhatWeCheck />
       <section className="cvc-card cvc-panel__head">
         <div className="cvc-card__head">
           <h2 id="cvc-found">What we found</h2>
@@ -1204,7 +1326,7 @@ function IssuesPanel({
         </button>
       </section>
 
-      <div className="cvc-panel__list" id="cvc-issue-list">
+      <div className="cvc-panel__list" id="cvc-issue-list" ref={listRef}>
       {accepted.error != null && <ErrorNotice error={accepted.error} title="We could not save that." />}
       {shown.length === 0 && filter !== "accepted" && (
         <p className="cvc-card cvc-clear">
@@ -1216,15 +1338,21 @@ function IssuesPanel({
           key={issue.key}
           issue={issue}
           defaultOpen={n < 2}
+          highlighted={lit.has(issue.key)}
           jobId={jobId}
           onFix={() => onFix(issue)}
-          onAccept={() => accepted.accept(issue.key)}
+          onAccept={(reason) => accepted.accept(issue.key, reason)}
         />
       ))}
       {(filter === "all" || filter === "accepted") &&
         acceptedIssues.map((issue) => (
-          <div key={issue.key} className="cvc-card cvc-accepted">
-            <span>✓ Accepted: {issue.title}</span>
+          <div key={issue.key} className="cvc-card cvc-accepted" data-highlight={lit.has(issue.key) || undefined}>
+            <span>
+              ✓ Accepted: {issue.title}
+              {acceptedReason(issue, accepted.reasons.get(issue.key)) && (
+                <span className="cvc-accepted__why"> · {acceptedReason(issue, accepted.reasons.get(issue.key))}</span>
+              )}
+            </span>
             <button
               type="button"
               className="cvc-link"
@@ -1238,30 +1366,27 @@ function IssuesPanel({
       {filter === "accepted" && acceptedIssues.length === 0 && (
         <p className="cvc-card cvc-clear">Nothing accepted yet.</p>
       )}
-
-      <WhatWeCheck />
       </div>
     </aside>
   );
 }
 
-/** The list of checks. Open on wide screens; closed on phones, where the panel sits above the CV. */
+/**
+ * The list of checks, folded at the top of the issues column so it is seen without scrolling and
+ * does not push the issues down.
+ */
 function WhatWeCheck() {
-  const ref = useRef<HTMLDetailsElement>(null);
-  useEffect(() => {
-    if (ref.current && globalThis.matchMedia?.("(min-width: 980px)").matches) ref.current.open = true;
-  }, []);
   return (
-    <details ref={ref} className="cvc-card cvc-checks">
+    <details className="cvc-card cvc-checks">
       <summary>What we check</summary>
         <ul>
           <li>
-            <b>Dates:</b> gaps over 3 months, overlapping roles, end before start, future dates, years only, current role not
-            marked.
+            <b>Dates:</b> gaps over 3 months, overlapping roles, end before start, future dates, years only, missing
+            dates, current role not marked. Left old dates off on purpose? Accept it and say why.
           </li>
           <li>
-            <b>Detail:</b> roles with fewer than 2 achievements, achievements with no result or number, "we" with no "I", a
-            very short or missing summary.
+            <b>Detail:</b> roles with fewer than 2 achievements, achievements with no result (a number, a measure that
+            moved, or the scale), "we" with no "I", a very short or missing summary.
           </li>
           <li>
             <b>Fit for level:</b> a Senior target with no scope signals (team size, budget, cross-team work).
@@ -1280,15 +1405,18 @@ function WhatWeCheck() {
 function IssueCard({
   issue,
   defaultOpen,
+  highlighted,
   jobId,
   onFix,
   onAccept,
 }: {
   issue: ResumeIssue;
   defaultOpen: boolean;
+  /** Pointed at from a section's issue count: drawn highlighted and opened. */
+  highlighted: boolean;
   jobId: string;
   onFix: () => void;
-  onAccept: () => void;
+  onAccept: (reason?: string) => void;
 }) {
   const ref = useRef<HTMLDetailsElement>(null);
   useEffect(() => {
@@ -1296,8 +1424,17 @@ function IssueCard({
     // Only on mount: the user opens and closes it after that.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  useEffect(() => {
+    if (ref.current && highlighted) ref.current.open = true;
+  }, [highlighted]);
   return (
-    <details ref={ref} className="cvc-card cvc-issue" data-severity={issue.severity} data-group={issue.group}>
+    <details
+      ref={ref}
+      className="cvc-card cvc-issue"
+      data-severity={issue.severity}
+      data-group={issue.group}
+      data-highlight={highlighted || undefined}
+    >
       <summary>
         <span>
           <b>{issue.title}</b>
@@ -1310,9 +1447,20 @@ function IssueCard({
         <button type="button" className="btn btn--small" onClick={onFix}>
           {issue.fixLabel}
         </button>
-        <button type="button" className="btn btn--secondary btn--small" onClick={onAccept}>
+        <button type="button" className="btn btn--secondary btn--small" onClick={() => onAccept()}>
           {issue.acceptLabel}
         </button>
+        {issue.reasons?.map((r) => (
+          <button
+            key={r.code}
+            type="button"
+            className="btn btn--secondary btn--small"
+            onClick={() => onAccept(r.code)}
+            aria-label={`Accept: ${r.label}`}
+          >
+            {r.label}
+          </button>
+        ))}
         {issue.gap && (
           <Link to={gapPracticePath(issue.gap, jobId)} className="cvc-practice">
             Practice "tell me about this gap"

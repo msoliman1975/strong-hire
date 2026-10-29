@@ -682,12 +682,17 @@ a.usage:hover .usage__value {
 
 /* ------------------------------------------------------------ stepper */
 
+.steps-bar {
+  margin: 0 0 var(--space-5);
+}
+
 .steps {
   display: flex;
-  gap: var(--space-5);
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
   list-style: none;
   padding: 0;
-  margin: 0 0 var(--space-5);
+  margin: 0;
   counter-reset: step;
   font-size: 0.95rem;
 }
@@ -709,6 +714,22 @@ a.usage:hover .usage__value {
   border-radius: 50%;
   border: 1px solid var(--line-strong);
   font-size: 0.8rem;
+}
+
+.steps li a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.steps li a:hover {
+  color: var(--sh-violet);
+}
+
+.steps__note {
+  margin: var(--space-2) 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
 }
 
 .steps li[data-state="done"]::before {
@@ -3654,6 +3675,42 @@ dialog::backdrop {
   white-space: nowrap;
 }
 
+/* Skill chips wrap inside their card: a long skill breaks onto a second line instead of overflowing. */
+.cvc-chips .cvc-chip {
+  max-width: 100%;
+  min-width: 0;
+  padding: 4px 10px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.3;
+  border-radius: 14px;
+}
+
+/* A section issue count is a button that shows those issues in the panel (IN-12). */
+.cvc-chip--button {
+  font: inherit;
+  font-size: 0.8rem;
+  border: 0;
+  cursor: pointer;
+}
+
+.cvc-chip--button:hover {
+  text-decoration: underline;
+}
+
+.cvc-card__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cvc-link--inline {
+  display: inline;
+  min-height: 0;
+  padding: 0;
+  font-size: inherit;
+}
+
 .cvc-chip--ok {
   background: var(--sh-ok-soft);
   color: var(--sh-ok-ink);
@@ -4086,6 +4143,23 @@ dialog::backdrop {
   background: var(--sh-ground);
   color: var(--sh-muted);
   font-size: 0.875rem;
+}
+
+/* Issues shown from a section issue count: outlined and flashed, below the sticky panel head. */
+.cvc-panel__list > * {
+  scroll-margin-top: 200px;
+}
+
+.cvc-panel [data-highlight] {
+  outline: 3px solid var(--sh-violet);
+  outline-offset: 2px;
+  animation: cvc-flash 1.2s ease-out 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cvc-panel [data-highlight] {
+    animation: none;
+  }
 }
 
 .cvc-clear {
