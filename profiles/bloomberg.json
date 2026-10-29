@@ -1,0 +1,478 @@
+{
+  "company_name": "Bloomberg",
+  "company_slug": "bloomberg",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-28",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Bloomberg core values",
+    "principles": [
+      {
+        "name": "Knowing your customer",
+        "description": "Understand the people who use the Terminal, news and data products, how they work under time pressure, and build what actually helps them make decisions.",
+        "evidence_signals": [
+          "Names a specific user (trader, analyst, journalist, internal team) and their workflow",
+          "Gathered feedback from users directly instead of guessing",
+          "Measured the result in terms the user cares about, such as latency, accuracy or time saved"
+        ],
+        "weight": 1.4
+      },
+      {
+        "name": "Innovation",
+        "description": "Keep improving products and engineering practice: new data sets, new tools and better ways of building, while keeping a long-lived product reliable.",
+        "evidence_signals": [
+          "Proposed and built a new approach instead of patching around a problem",
+          "Modernized legacy code or infrastructure without breaking users",
+          "Shows curiosity about technology and finance beyond the task"
+        ],
+        "weight": 1.0
+      },
+      {
+        "name": "Collaboration",
+        "description": "Work across teams and functions, share knowledge openly and help colleagues succeed.",
+        "evidence_signals": [
+          "Worked with another team, product or data group to ship a result",
+          "Resolved a disagreement with a teammate by listening and finding common ground",
+          "Credits others with 'we' and owns own part with 'I'"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Doing the right thing",
+        "description": "Act with integrity toward clients, colleagues and communities: accurate data, honest communication and responsibility for mistakes.",
+        "evidence_signals": [
+          "Raised a data-quality or correctness problem even when it was inconvenient",
+          "Admitted a mistake early and fixed it",
+          "Puts accuracy and trust ahead of shipping fast"
+        ],
+        "weight": 1.2
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["Software Engineer", "Senior Software Engineer", "Team Lead"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Background, resume and a real 'why Bloomberg' check. Not simulated in v1."
+        },
+        {
+          "name": "Technical phone screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "One or two live coding rounds on HackerRank CodePair, LeetCode-medium level, often with a constraint added midway. Not simulated in v1."
+        },
+        {
+          "name": "Onsite coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Software engineer",
+          "notes": "One or two harder data-structures rounds (graphs, trees, intervals, streams). Interviewers give hints. Not simulated in v1."
+        },
+        {
+          "name": "System design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior software engineer",
+          "notes": "Real-time financial systems: market data distribution, alerting, news pipelines, Terminal-scale services. Follow-ups ask what fails first and how you would know. Lighter or object-oriented design for entry-level candidates."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Engineering manager (Team Lead)",
+          "notes": "Often the most technical conversation: deep dive into resume projects, language trade-offs (C++, Python, Java), plus team fit and motivation."
+        },
+        {
+          "name": "HR close",
+          "interview_type": "behavioral",
+          "duration_min": 30,
+          "interviewer_role": "HR partner",
+          "notes": "Culture fit, teamwork and conflict questions, why Bloomberg, logistics."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": [],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Not simulated in v1."
+        },
+        {
+          "name": "Coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "ML or software engineer",
+          "notes": "Live coding similar to the SWE loop. Not simulated in v1."
+        },
+        {
+          "name": "ML and NLP deep dive",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior ML engineer",
+          "notes": "Past ML projects and applied problems close to Bloomberg's products, such as real-time news NLP, entity tagging and sentiment signals for the Terminal."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "AI engineering team lead",
+          "notes": "Motivation, team fit and scope."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": [],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter",
+          "notes": "Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Product manager or product lead",
+          "notes": "Product experience and why Bloomberg; candidates report being told to expect a case at this stage."
+        },
+        {
+          "name": "Product case",
+          "interview_type": "case",
+          "duration_min": 45,
+          "interviewer_role": "Product team",
+          "notes": "Terminal or data-product problem for a professional user, such as helping analysts spot trends. Some teams ask for a short presentation of how the candidate solved a past product problem."
+        },
+        {
+          "name": "Behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Product or engineering partner",
+          "notes": "Working with engineers and clients; evidence-based decisions."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Why Bloomberg",
+      "pattern": "Why the candidate wants Bloomberg specifically, tied to its products, users or engineering work",
+      "competencies": ["motivation", "communication"],
+      "values": ["Knowing your customer"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Conflict with a teammate",
+      "pattern": "A disagreement with a teammate about an approach and how it was resolved",
+      "competencies": ["conflict_handling", "collaboration"],
+      "values": ["Collaboration"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Correctness over speed",
+      "pattern": "A time the candidate found a data or correctness problem and had to decide whether to ship",
+      "competencies": ["ownership", "communication"],
+      "values": ["Doing the right thing"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Resume project deep dive",
+      "pattern": "Walk through one project on the resume: design, own role, trade-offs and what would change now",
+      "competencies": ["depth_of_experience", "judgment", "scope_at_level"],
+      "values": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Language and tooling trade-offs",
+      "pattern": "Compare languages or tools the candidate has used and when each fits",
+      "competencies": ["depth_of_experience", "judgment"],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Real-time data system",
+      "pattern": "Design a low-latency system that ingests and distributes financial data or news to many users",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Knowing your customer"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Failure modes",
+      "pattern": "For a design, what fails first under load and how the team would detect and recover",
+      "competencies": ["trade_offs", "accuracy", "reasoning"],
+      "values": ["Doing the right thing"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Object-oriented design",
+      "pattern": "Model the classes and data flow for a small system that processes and stores user data",
+      "competencies": ["technical_depth", "clarity_of_explanation"],
+      "values": []
+    },
+    {
+      "interview_type": "case",
+      "theme": "Feature for a professional user",
+      "pattern": "Design or improve a Terminal-style feature for a specific finance user, with a success metric",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization"],
+      "values": ["Knowing your customer", "Innovation"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a conflict you had with a teammate and how you handled it.",
+      "strong_answer": "Pick a real technical or priority disagreement, not a personality clash. Explain both positions fairly, how you listened and used evidence (a benchmark, data, a user need) to converge, and what was decided. Show the relationship stayed good and what you learned about working with that person. Pitfalls: making the other person the villain, or a conflict that resolved itself.",
+      "competencies": ["conflict_handling", "collaboration", "communication"],
+      "values": ["Collaboration"],
+      "source_url": "https://www.aced.io/guides/bloomberg-software-engineer-interview",
+      "hints": {
+        "looking_for": ["How you handle disagreement with peers", "Whether you use evidence rather than authority"],
+        "strong_signals": ["States the other view fairly", "Converges with data or a test", "Relationship stays intact"],
+        "watch_outs": ["Blaming the teammate", "No clear resolution"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Which experience on your resume best prepared you for this role, and why?",
+      "strong_answer": "Choose one experience and connect it to what Bloomberg engineers do: performance-sensitive code, data correctness, serving demanding users. Give the problem, your specific contribution, a measurable result, and the skill you took away. Pitfalls: listing everything, or picking something with no link to the role.",
+      "competencies": ["depth_of_experience", "role_fit", "communication"],
+      "values": [],
+      "source_url": "https://www.aced.io/guides/bloomberg-software-engineer-interview",
+      "hints": {
+        "looking_for": ["Self-awareness about your strongest experience", "Fit with the role"],
+        "strong_signals": ["One focused example", "Clear own contribution and result", "Explicit link to the role"],
+        "watch_outs": ["Reciting the whole resume", "No measurable outcome"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Why do you want to work at Bloomberg rather than a big tech company or a bank?",
+      "strong_answer": "Show real knowledge: the Terminal and its professional users, the mix of finance, news and data, the scale of real-time data, open-source work, or the philanthropy model. Tie it to your own interests and past work. A strong answer is specific enough that it could not be said about any other company. Pitfalls: generic praise, or focusing on pay.",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["Knowing your customer"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-is-the-bloomberg-interview-process-like-round-by-round",
+      "hints": {
+        "looking_for": ["Genuine interest in Bloomberg", "Understanding of its products and users"],
+        "strong_signals": ["Names specific products or engineering work", "Links to own experience"],
+        "watch_outs": ["Generic praise", "Compensation as the main reason"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a system that delivers real-time market price updates to thousands of Terminal users with low latency.",
+      "strong_answer": "Clarify scale (instruments, update rate, subscribers) and latency goals. Propose ingestion from exchanges, normalization, a publish-subscribe fan-out layer, per-client subscription filtering and conflation for slow consumers. Discuss ordering, gaps and recovery (sequence numbers, snapshots plus deltas), failover across data centers, and monitoring for staleness. Explain trade-offs such as push versus pull and conflation versus completeness.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning", "clarity_of_explanation"],
+      "values": ["Knowing your customer"],
+      "source_url": "https://www.designgurus.io/answers/detail/what-is-the-bloomberg-interview-process-like-round-by-round",
+      "hints": {
+        "looking_for": ["Real-time systems knowledge", "Handling slow consumers and failures"],
+        "strong_signals": ["Clarifies scale and latency first", "Snapshot plus delta recovery", "Monitors staleness"],
+        "watch_outs": ["Ignoring ordering and gaps", "One big database as the answer"]
+      },
+      "role_families": ["swe"],
+      "levels": ["mid", "senior", "staff_principal"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design an alerting service that notifies users when a price or news condition they set is met.",
+      "strong_answer": "Define alert types and scale, then separate rule storage, a streaming evaluator partitioned by instrument, deduplication and delivery channels. Cover exactly-once versus at-least-once delivery, avoiding alert storms, latency targets and what happens when the evaluator falls behind. Explain how you would know it is broken: lag metrics and synthetic alerts.",
+      "competencies": ["technical_depth", "trade_offs", "accuracy"],
+      "values": ["Doing the right thing"],
+      "source_url": "https://www.refer.me/interview/interviewtypecase-interview-for-bloomberg-software-engineer-case-interview-realtime-market-data-ingestion-and-alerting-at",
+      "hints": {
+        "looking_for": ["Streaming design", "Delivery guarantees"],
+        "strong_signals": ["Partitions evaluation by instrument", "Deduplicates alerts", "Defines lag monitoring"],
+        "watch_outs": ["Polling a database every second", "No plan for falling behind"]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "hiring_manager",
+      "question": "Pick a project from your resume and walk me through the design decisions you made and what you would do differently.",
+      "strong_answer": "Give context in a minute, then go deep: the requirements, the main design choice, the alternative you rejected and why, how you tested it, and what broke in production. Be precise about your own part. End with a concrete change you would make now. Pitfalls: staying high level, or not being able to answer follow-ups about details.",
+      "competencies": ["depth_of_experience", "judgment", "technical_depth"],
+      "values": [],
+      "source_url": "https://www.aced.io/guides/bloomberg-software-engineer-interview",
+      "hints": {
+        "looking_for": ["Depth on your own work", "Honest reflection"],
+        "strong_signals": ["Explains a rejected alternative", "Knows the details", "Names a concrete improvement"],
+        "watch_outs": ["Vague 'we' throughout", "Cannot answer detail questions"]
+      },
+      "role_families": ["swe", "data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "How would you build a system that tags breaking news stories with the companies they mention and a sentiment signal, in near real time?",
+      "strong_answer": "Clarify latency and accuracy needs. Cover the pipeline: ingestion, entity recognition and linking to a company identifier, sentiment or impact scoring, and publishing to users. Discuss model choice versus latency, ambiguous names, labeled data and evaluation (precision matters more than recall for a trading signal), monitoring for drift, and a human review path for errors.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": ["Knowing your customer", "Doing the right thing"],
+      "source_url": "https://www.refer.me/interview/interviewtypecase-interview-for-bloomberg-ai-engineer-case-interview-realtime-news-nlp-signals-for-the-terminal-at",
+      "hints": {
+        "looking_for": ["Applied NLP judgment", "Latency and accuracy trade-offs"],
+        "strong_signals": ["Entity linking, not just recognition", "Precision-focused evaluation", "Drift monitoring"],
+        "watch_outs": ["Only naming a model", "No evaluation plan"]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "Design a feature that helps equity analysts spot emerging market trends faster.",
+      "strong_answer": "Pick one analyst segment and their current workflow, find the slowest or noisiest step, and propose one focused feature using Bloomberg's data and news. Define success (time to insight, adoption, retention) and how you would test it with real users. Prioritize, name what you would not build first, and note data-quality risks.",
+      "competencies": ["problem_framing", "user_and_business_sense", "prioritization", "recommendation"],
+      "values": ["Knowing your customer", "Innovation"],
+      "source_url": "https://www.interviewquery.com/guides/bloomberg-lp-product-manager",
+      "hints": {
+        "looking_for": ["Understanding of professional users", "Focused prioritization"],
+        "strong_signals": ["Picks one segment and workflow", "Clear success metric", "Plan to test with users"],
+        "watch_outs": ["Consumer-app thinking", "A long feature list with no priority"]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "Software Engineer (entry)",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Delivers well-defined features in one team with guidance; strong data structures and one object-oriented language."
+    },
+    {
+      "level_name": "Software Engineer",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns features end to end within a team and works directly with product and users."
+    },
+    {
+      "level_name": "Senior Software Engineer",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Leads the technical direction of a team's systems, mentors junior engineers and designs for performance and reliability."
+    },
+    {
+      "level_name": "Team Lead",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Leads a team of engineers, sets its technical roadmap and coordinates with other teams; usually also hands-on."
+    }
+  ],
+  "persona": {
+    "tone": "Professional, collaborative and practical",
+    "pace": "Moderate; adds a new constraint midway and gives hints when the candidate stalls",
+    "pushback_style": "Asks 'why this choice?', 'what fails first?', 'how would you know it broke?' and probes details of the candidate's own projects",
+    "closing_style": "Leaves time for the candidate's questions and expects real interest in Bloomberg"
+  },
+  "scoring_weights": {
+    "motivation": 1.3,
+    "collaboration": 1.2,
+    "communication": 1.2,
+    "depth_of_experience": 1.3,
+    "technical_depth": 1.3,
+    "trade_offs": 1.3,
+    "accuracy": 1.2,
+    "clarity_of_explanation": 1.2,
+    "user_and_business_sense": 1.2
+  },
+  "values_share": 0.2,
+  "case_style": {
+    "product_sense": 0.5,
+    "estimation": 0.1,
+    "system_thinking": 0.4,
+    "notes": "PM cases start from a professional finance user (analyst, trader, journalist) and the Terminal's data and news. Engineering 'cases' are real-time data system designs. Market sizing is rare."
+  },
+  "sources": [
+    {
+      "url": "https://www.designgurus.io/answers/detail/what-is-the-bloomberg-interview-process-like-round-by-round",
+      "title": "What is the Bloomberg interview process like, round by round (Design Gurus)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "persona", "scoring_weights"]
+    },
+    {
+      "url": "https://www.aced.io/guides/bloomberg-software-engineer-interview",
+      "title": "Bloomberg software engineer interview guide (Exponent / Aced)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "persona", "bar_by_level"]
+    },
+    {
+      "url": "https://jobteaser.com/en/companies/bloomberg",
+      "title": "Bloomberg employer profile (JobTeaser)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://builtin.com/company/bloomberg/faq/culture-values",
+      "title": "Bloomberg culture and values (Built In)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://www.levels.fyi/companies/bloomberg/salaries/software-engineer/levels/senior-software-engineer",
+      "title": "Bloomberg software engineer levels (Levels.fyi)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://www.teamblind.com/post/bloomberg-levels-and-performance-expectations-5o3s4a6q",
+      "title": "Bloomberg levels and performance expectations (Blind)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["bar_by_level"]
+    },
+    {
+      "url": "https://www.interviewquery.com/guides/bloomberg-lp-product-manager",
+      "title": "Bloomberg product manager interview guide (Interview Query)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "case_style"]
+    },
+    {
+      "url": "https://www.refer.me/interview/interviewtypecase-interview-for-bloomberg-ai-engineer-case-interview-realtime-news-nlp-signals-for-the-terminal-at",
+      "title": "Bloomberg AI engineer case: real-time news NLP signals (refer.me)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "low",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "low",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "low"
+  },
+  "low_confidence_notes": [
+    "values_framework: the four values come from job-board profiles (JobTeaser, Built In); Bloomberg's own careers and interview-guide pages returned 403, so exact wording ('Knowing your customer' versus 'customer service') is unconfirmed. Descriptions and evidence signals are our own.",
+    "loop_structure: SWE rounds come from two prep sites and agree well; data_ml and pm loops rest on thin candidate reports and prep blogs, and list no levels.",
+    "bar_by_level: Bloomberg has two IC titles (Software Engineer, Senior Software Engineer); the entry versus mid split inside 'Software Engineer' and mapping Team Lead to staff_principal are our judgment. Team Lead is a manager role.",
+    "persona: inferred from prep-site descriptions of hints, added constraints and design follow-ups.",
+    "scoring_weights: our estimate; 'why Bloomberg' motivation is reported as able to sink an offer, so motivation is raised.",
+    "case_style: PM case examples come from prep sites partly behind paywalls; we used only the publicly visible prompt themes."
+  ]
+}
