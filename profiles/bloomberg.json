@@ -70,14 +70,14 @@
           "interview_type": null,
           "duration_min": 60,
           "interviewer_role": "Software engineer",
-          "notes": "One or two live coding rounds on HackerRank CodePair, LeetCode-medium level, often with a constraint added midway. Not simulated in v1."
+          "notes": "45 to 60 minutes with an engineer. The candidate picks the language and medium; Bloomberg says the thought process matters more than syntax. Usually one or two LeetCode-medium problems, often with a constraint added midway. Not simulated in v1."
         },
         {
           "name": "Onsite coding",
           "interview_type": null,
           "duration_min": 60,
-          "interviewer_role": "Software engineer",
-          "notes": "One or two harder data-structures rounds (graphs, trees, intervals, streams). Interviewers give hints. Not simulated in v1."
+          "interviewer_role": "Two software engineers",
+          "notes": "In-house rounds of about an hour, each with two engineers (official careers page). One or two harder data-structures rounds (graphs, trees, intervals, streams). Interviewers give hints. Not simulated in v1."
         },
         {
           "name": "System design",
@@ -387,28 +387,35 @@
   "persona": {
     "tone": "Professional, collaborative and practical",
     "pace": "Moderate; adds a new constraint midway and gives hints when the candidate stalls",
-    "pushback_style": "Asks 'why this choice?', 'what fails first?', 'how would you know it broke?' and probes details of the candidate's own projects",
+    "pushback_style": "Asks 'why this choice?', 'what fails first?', 'how would you know it broke?' and probes details of the candidate's own projects; cares more about the thought process than the optimal answer",
     "closing_style": "Leaves time for the candidate's questions and expects real interest in Bloomberg"
   },
   "scoring_weights": {
-    "motivation": 1.3,
-    "collaboration": 1.2,
-    "communication": 1.2,
-    "depth_of_experience": 1.3,
+    "reasoning": 1.4,
+    "clarity_of_explanation": 1.3,
     "technical_depth": 1.3,
     "trade_offs": 1.3,
     "accuracy": 1.2,
-    "clarity_of_explanation": 1.2,
-    "user_and_business_sense": 1.2
+    "collaboration": 1.2,
+    "communication": 1.2,
+    "depth_of_experience": 1.2,
+    "motivation": 1.2,
+    "user_and_business_sense": 1.1
   },
   "values_share": 0.2,
   "case_style": {
     "product_sense": 0.5,
     "estimation": 0.1,
     "system_thinking": 0.4,
-    "notes": "PM cases start from a professional finance user (analyst, trader, journalist) and the Terminal's data and news. Engineering 'cases' are real-time data system designs. Market sizing is rare."
+    "notes": "Only the PM loop has a business case: it starts from a professional finance user (analyst, trader, journalist) and the Terminal's data and news. Engineers get no business case; their nearest equivalent is real-time data system design, scored as technical_qa. Market sizing is rare."
   },
   "sources": [
+    {
+      "url": "https://www.bloomberg.com/company/careers/application-process/engineering-experienced-hire/",
+      "title": "Engineering experienced hire application process (Bloomberg careers)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "persona", "scoring_weights"]
+    },
     {
       "url": "https://www.designgurus.io/answers/detail/what-is-the-bloomberg-interview-process-like-round-by-round",
       "title": "What is the Bloomberg interview process like, round by round (Design Gurus)",
@@ -466,19 +473,19 @@
   ],
   "field_confidence": {
     "values_framework": "low",
-    "loop_structure": "medium",
+    "loop_structure": "high",
     "question_patterns": "medium",
     "bar_by_level": "low",
-    "persona": "low",
+    "persona": "medium",
     "scoring_weights": "low",
     "case_style": "low"
   },
   "low_confidence_notes": [
     "values_framework: the four values come from job-board profiles (JobTeaser, Built In); Bloomberg's own careers and interview-guide pages returned 403, so exact wording ('Knowing your customer' versus 'customer service') is unconfirmed. Descriptions and evidence signals are our own.",
-    "loop_structure: SWE rounds come from two prep sites and agree well; data_ml and pm loops rest on thin candidate reports and prep blogs, and list no levels.",
+    "loop_structure: Bloomberg's official engineering page confirms a 45 to 60 minute phone screen and hour-long in-house rounds with two engineers; the split into coding, system design, manager and HR rounds comes from two prep sites that agree well; data_ml and pm loops rest on thin candidate reports and prep blogs, and list no levels.",
     "bar_by_level: Bloomberg has two IC titles (Software Engineer, Senior Software Engineer); the entry versus mid split inside 'Software Engineer' and mapping Team Lead to staff_principal are our judgment. Team Lead is a manager role.",
-    "persona: inferred from prep-site descriptions of hints, added constraints and design follow-ups.",
-    "scoring_weights: our estimate; 'why Bloomberg' motivation is reported as able to sink an offer, so motivation is raised.",
+    "persona: the focus on thought process over syntax is from the official engineering page; hints, added constraints and design follow-ups come from prep sites.",
+    "scoring_weights: our estimate. Reasoning and clarity lead because the official page says thought process matters more than syntax; 'why Bloomberg' motivation is reported as able to sink an offer, so it stays above baseline.",
     "case_style: PM case examples come from prep sites partly behind paywalls; we used only the publicly visible prompt themes."
   ]
 }

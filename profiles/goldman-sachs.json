@@ -56,7 +56,7 @@
   "loop_structure": [
     {
       "role_family": "swe",
-      "levels": ["Analyst", "Associate", "Vice President", "Executive Director"],
+      "levels": ["Analyst", "Associate", "Vice President", "Managing Director"],
       "rounds": [
         {
           "name": "HireVue video",
@@ -104,14 +104,14 @@
           "name": "Superday behavioral",
           "interview_type": "behavioral",
           "duration_min": 45,
-          "interviewer_role": "Vice President or Executive Director",
+          "interviewer_role": "Vice President or Managing Director",
           "notes": "Why Goldman Sachs, toughest situation, teamwork; may be folded into technical rounds. Interviewers compare notes, so consistency across rounds matters."
         },
         {
           "name": "Hiring manager",
           "interview_type": "hiring_manager",
           "duration_min": 45,
-          "interviewer_role": "Hiring manager (VP or Executive Director)",
+          "interviewer_role": "Hiring manager (VP or Managing Director)",
           "notes": "Team fit and scope; some teams add a separate team-match conversation after the Superday."
         }
       ]
@@ -179,7 +179,7 @@
           "name": "Behavioral",
           "interview_type": "behavioral",
           "duration_min": 45,
-          "interviewer_role": "Vice President or Executive Director",
+          "interviewer_role": "Vice President or Managing Director",
           "notes": "Influencing without authority, proudest project, using data to drive a product decision."
         }
       ]
@@ -392,7 +392,7 @@
       "scope_expectation": "Leads design for a system or small team, mentors engineers and partners with the business on priorities."
     },
     {
-      "level_name": "Executive Director",
+      "level_name": "Managing Director",
       "normalized_level": "staff_principal",
       "role_family": "swe",
       "scope_expectation": "Leads multiple teams or a platform, sets technical direction across a business area and owns senior stakeholder relationships."
@@ -491,7 +491,7 @@
   "low_confidence_notes": [
     "values_framework: the four core value names are official (purpose and values page, annual report); the page itself returned 403, so descriptions are our paraphrase from search snippets and third-party summaries.",
     "loop_structure: sources disagree on Superday size (two to five rounds) and HireVue length (15 to 30 minutes); data_ml and pm loops rest on thin prep-site and single candidate reports.",
-    "bar_by_level: Analyst, Associate, VP and ED are Goldman's firm-wide corporate titles; the mapping to normalized levels and the scope text are our judgment, not a published ladder. MD is left out as above the simulated range.",
+    "bar_by_level: Analyst, Associate, Vice President and Managing Director are Goldman's public corporate titles; the mapping to normalized levels and the scope text are our judgment, not a published ladder. MD maps to staff_principal as the nearest match.",
     "persona: inferred from prep-site notes that interviewers compare notes and probe resume details; no official description.",
     "scoring_weights: our estimate from the values and reported round mix.",
     "case_style: PM case examples are general themes from prep sites; the savings-account A/B test is our own scenario built on the reported 'evaluate an A/B test' theme."

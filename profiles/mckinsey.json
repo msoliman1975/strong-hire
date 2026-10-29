@@ -452,7 +452,7 @@
     "product_sense": 0.15,
     "estimation": 0.35,
     "system_thinking": 0.5,
-    "notes": "Interviewer-led business cases: profitability, market entry, growth, operations and digital or AI transformation. Each case mixes structuring, exhibit reading, math and brainstorming, ending with a synthesis. QuantumBlack use cases frame an ML solution around the client's business goal. Product-design cases are rare."
+    "notes": "Interviewer-led business cases: profitability, market entry, growth, operations and digital or AI transformation. Each case mixes structuring, exhibit reading, math and brainstorming, ending with a synthesis. QuantumBlack use cases frame an ML solution around the client's business goal. Product-design cases are rare. McKinsey's official practice cases (Talbot Trucks: structure, total cost of ownership and break-even price; Diconsa: rural financial services) show the interviewer-led format."
   },
   "sources": [
     {
@@ -466,6 +466,30 @@
       "title": "Technical opportunities for students in Europe (McKinsey careers)",
       "retrieved_at": "2026-10-28",
       "fields": ["loop_structure"]
+    },
+    {
+      "url": "https://www.mckinsey.com/about-us/overview/our-purpose-mission-and-values",
+      "title": "Our purpose, mission, and values (McKinsey)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://www.mckinsey.com/careers/interviewing/talbot-trucks",
+      "title": "Talbot Trucks practice case (McKinsey careers)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.mckinsey.com/careers/interviewing/diconsa",
+      "title": "Diconsa practice case (McKinsey careers)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["question_patterns", "case_style"]
+    },
+    {
+      "url": "https://www.mckinsey.com/careers/meet-our-people/careers-blog/jenny-phung",
+      "title": "Practice for interviews, but don't become scripted (McKinsey careers blog)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework", "persona"]
     },
     {
       "url": "https://www.hackingthecaseinterview.com/pages/mckinsey-pei-questions",
@@ -508,7 +532,7 @@
     "case_style": "medium"
   },
   "low_confidence_notes": [
-    "values_framework: we use the PEI dimensions as the values, under their long-standing names. Several 2025-26 prep guides say McKinsey renamed them (Leadership, Connection, Growth, Drive); McKinsey's own page was not reachable (timeouts) to confirm, so review the names before publishing. Renaming later changes the principle ids.",
+    "values_framework: we use the PEI dimensions as the values, under their long-standing names. Several 2025-26 prep guides say McKinsey renamed them (Leadership, Connection, Growth, Drive); McKinsey's own page was not reachable (timeouts) to confirm, so review the names before publishing. Renaming later changes the principle ids. McKinsey's values page also lists an 'obligation to dissent', which the Courageous change theme covers.",
     "loop_structure: McKinsey's interviewing and technical-opportunities pages timed out; the consulting loop and the tech-track formats (timed challenge, pair programming, PEI, problem-solving exercise) come from search snippets of those pages plus prep sites. QuantumBlack round order is from one candidate report. No product manager loop was sourced, so none is listed.",
     "bar_by_level: consulting titles are standard and well known; QuantumBlack titles come from one prep site's job-listing snapshot. Mapping Engagement Manager to senior and Associate Partner to staff_principal is our judgment.",
     "scoring_weights: our estimate; structure, framing and recommendation dominate case feedback in every source.",
