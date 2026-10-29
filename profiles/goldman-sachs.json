@@ -1,0 +1,499 @@
+{
+  "company_name": "Goldman Sachs",
+  "company_slug": "goldman-sachs",
+  "meta": {
+    "version": 1,
+    "status": "draft",
+    "reviewed_by": null,
+    "researched_at": "2026-10-28",
+    "published_at": null
+  },
+  "values_framework": {
+    "name": "Goldman Sachs core values",
+    "principles": [
+      {
+        "name": "Partnership",
+        "description": "Work as one firm: collaborate across teams and divisions, share credit, and help colleagues feel they belong and succeed.",
+        "evidence_signals": [
+          "Worked across teams or divisions (business, risk, engineering) to deliver one result",
+          "Shares credit with 'we' while being precise about own part",
+          "Helped or mentored a colleague at a cost to their own time"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Client Service",
+        "description": "Put clients' interests first, earn their trust and go beyond what they expect, whether the client is external or an internal desk.",
+        "evidence_signals": [
+          "Names the client or internal user and what they needed",
+          "Changed a design or plan after understanding the client better",
+          "Measured the result in client terms such as speed, accuracy or trust"
+        ],
+        "weight": 1.3
+      },
+      {
+        "name": "Integrity",
+        "description": "Hold to the highest ethical standards, protect the firm's reputation and be honest about mistakes and risks.",
+        "evidence_signals": [
+          "Raised a risk, control or ethical concern even when it slowed things down",
+          "Admits a mistake plainly and explains how it was corrected",
+          "Shows awareness that reputation is hard to rebuild"
+        ],
+        "weight": 1.2
+      },
+      {
+        "name": "Excellence",
+        "description": "Aim for exceptional performance and outstanding results, with high standards for quality and continuous improvement.",
+        "evidence_signals": [
+          "Quantifies impact clearly and accurately",
+          "Raised the quality bar (tests, reviews, performance) beyond what was required",
+          "Learned quickly in an unfamiliar area and delivered"
+        ],
+        "weight": 1.3
+      }
+    ]
+  },
+  "loop_structure": [
+    {
+      "role_family": "swe",
+      "levels": ["Analyst", "Associate", "Vice President", "Executive Director"],
+      "rounds": [
+        {
+          "name": "HireVue video",
+          "interview_type": "behavioral",
+          "duration_min": 15,
+          "interviewer_role": "None (recorded)",
+          "notes": "Mostly for campus candidates: about five behavioral prompts, around 30 seconds to prepare and 2 minutes to answer each. Experienced hires usually start with a recruiter call instead."
+        },
+        {
+          "name": "Online assessment",
+          "interview_type": null,
+          "duration_min": 90,
+          "interviewer_role": "None (HackerRank)",
+          "notes": "Two or three easy-to-medium problems. Not simulated in v1."
+        },
+        {
+          "name": "Technical screen",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Goldman Sachs engineer",
+          "notes": "Short resume discussion, then one or two coding problems on CoderPad. Not simulated in v1."
+        },
+        {
+          "name": "Superday coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Associate or Vice President engineer",
+          "notes": "One or two data-structures rounds, often starting with resume questions. Not simulated in v1."
+        },
+        {
+          "name": "Superday system design",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Vice President engineer",
+          "notes": "For most experienced candidates: a large-scale product (web crawler, ticketing, social network) or finance-flavored design such as REST APIs for bank transactions. Clarify requirements, then scalability, reliability and trade-offs."
+        },
+        {
+          "name": "Superday SDLC and resume",
+          "interview_type": "technical_qa",
+          "duration_min": 45,
+          "interviewer_role": "Senior engineer",
+          "notes": "How the candidate builds and ships software: testing, code review, CI/CD, production support, and deep questions on resume projects."
+        },
+        {
+          "name": "Superday behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Vice President or Executive Director",
+          "notes": "Why Goldman Sachs, toughest situation, teamwork; may be folded into technical rounds. Interviewers compare notes, so consistency across rounds matters."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 45,
+          "interviewer_role": "Hiring manager (VP or Executive Director)",
+          "notes": "Team fit and scope; some teams add a separate team-match conversation after the Superday."
+        }
+      ]
+    },
+    {
+      "role_family": "data_ml",
+      "levels": ["Analyst", "Associate", "Vice President"],
+      "rounds": [
+        {
+          "name": "Screening",
+          "interview_type": null,
+          "duration_min": 30,
+          "interviewer_role": "Recruiter or HireVue",
+          "notes": "Background and interest in the role. Not simulated in v1."
+        },
+        {
+          "name": "Coding",
+          "interview_type": null,
+          "duration_min": 60,
+          "interviewer_role": "Data scientist or engineer",
+          "notes": "Data structures, SQL and Python. Not simulated in v1."
+        },
+        {
+          "name": "ML, statistics and projects",
+          "interview_type": "technical_qa",
+          "duration_min": 60,
+          "interviewer_role": "Senior data scientist or strat",
+          "notes": "Deep dive on past ML projects, ML concepts (overfitting, regularization, imbalanced data) and probability puzzles such as dice and Bayes' theorem."
+        },
+        {
+          "name": "Behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Vice President",
+          "notes": "Why Goldman Sachs and teamwork."
+        }
+      ]
+    },
+    {
+      "role_family": "pm",
+      "levels": ["Associate", "Vice President"],
+      "rounds": [
+        {
+          "name": "Recruiter screen",
+          "interview_type": null,
+          "duration_min": 15,
+          "interviewer_role": "Recruiter",
+          "notes": "Not simulated in v1."
+        },
+        {
+          "name": "Hiring manager",
+          "interview_type": "hiring_manager",
+          "duration_min": 30,
+          "interviewer_role": "Product lead",
+          "notes": "Behavioral questions on past projects, product sense and light technical questions; some teams add a take-home product analysis."
+        },
+        {
+          "name": "Panel case",
+          "interview_type": "case",
+          "duration_min": 60,
+          "interviewer_role": "Product and engineering panel",
+          "notes": "Small case studies and product scenarios: defining success, evaluating an A/B test, walking from design to engineering."
+        },
+        {
+          "name": "Behavioral",
+          "interview_type": "behavioral",
+          "duration_min": 45,
+          "interviewer_role": "Vice President or Executive Director",
+          "notes": "Influencing without authority, proudest project, using data to drive a product decision."
+        }
+      ]
+    }
+  ],
+  "question_patterns": [
+    {
+      "interview_type": "behavioral",
+      "theme": "Why Goldman Sachs",
+      "pattern": "Why engineering at Goldman Sachs and this business specifically",
+      "competencies": ["motivation", "communication"],
+      "values": ["Client Service"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Toughest situation",
+      "pattern": "The most challenging situation in the candidate's career and how they got through it",
+      "competencies": ["ownership", "learning_from_failure"],
+      "values": ["Excellence"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Teamwork across groups",
+      "pattern": "Working with people from another team or function to get a result, including friction",
+      "competencies": ["collaboration", "conflict_handling"],
+      "values": ["Partnership"]
+    },
+    {
+      "interview_type": "behavioral",
+      "theme": "Ethics and risk",
+      "pattern": "A time the candidate raised a risk or did the right thing at a cost",
+      "competencies": ["ownership", "communication"],
+      "values": ["Integrity"]
+    },
+    {
+      "interview_type": "hiring_manager",
+      "theme": "Resume walk-through",
+      "pattern": "Walk through the resume and one project in depth: own role, decisions and impact",
+      "competencies": ["depth_of_experience", "scope_at_level", "role_fit"],
+      "values": ["Excellence"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Large-scale design",
+      "pattern": "Design a large-scale service after clarifying requirements, covering scalability, reliability and trade-offs",
+      "competencies": ["technical_depth", "trade_offs", "reasoning"],
+      "values": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "Software delivery lifecycle",
+      "pattern": "How the candidate tests, reviews, deploys and supports code in production",
+      "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
+      "values": ["Excellence", "Integrity"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "theme": "ML and probability",
+      "pattern": "Explain an ML concept or solve a short probability problem out loud",
+      "competencies": ["reasoning", "accuracy", "clarity_of_explanation"],
+      "values": []
+    },
+    {
+      "interview_type": "case",
+      "theme": "Define and test product success",
+      "pattern": "Define success metrics for a financial product and evaluate an experiment result",
+      "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
+      "values": ["Client Service"]
+    }
+  ],
+  "sample_questions": [
+    {
+      "interview_type": "behavioral",
+      "question": "Why do you want to work at Goldman Sachs, and why in engineering?",
+      "strong_answer": "Be specific: engineering is a large share of the firm, systems run markets and client platforms, and the work mixes hard technology with financial stakes. Name a business or platform that interests you (markets, transaction banking, asset management) and connect it to your experience and goals. Mention the people and learning culture if you have real evidence. Pitfalls: prestige or pay as the main reason, or an answer that fits any bank.",
+      "competencies": ["motivation", "role_fit"],
+      "values": ["Client Service", "Excellence"],
+      "source_url": "https://www.aced.io/blog/goldman-sachs-interview-process",
+      "hints": {
+        "looking_for": ["Genuine interest in the firm", "Understanding of engineering's role there"],
+        "strong_signals": ["Names a specific business or platform", "Links to own experience"],
+        "watch_outs": ["Prestige as the main reason", "Answer fits any bank"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Describe the most challenging situation you have faced at work or school and how you handled it.",
+      "strong_answer": "Pick a genuinely hard situation with stakes: a deadline at risk, a failing project, a conflict. Explain your specific actions, how you kept others informed, and the measurable result. Close with what you learned and how you now act differently. Pitfalls: a minor inconvenience, or a story where others did the work.",
+      "competencies": ["ownership", "learning_from_failure", "impact"],
+      "values": ["Excellence"],
+      "source_url": "https://www.aced.io/blog/goldman-sachs-interview-process",
+      "hints": {
+        "looking_for": ["Resilience and ownership", "Reflection"],
+        "strong_signals": ["Real stakes", "Clear own actions", "A concrete lesson applied later"],
+        "watch_outs": ["Trivial challenge", "Vague 'we' story"]
+      },
+      "role_families": [],
+      "levels": []
+    },
+    {
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to influence a decision without having authority over the people involved.",
+      "strong_answer": "Describe the decision, the people and why they disagreed. Show how you built the case with data and client impact, talked to people one on one, adjusted your proposal to address concerns, and reached a decision. Give the result and what it did for the relationship. Pitfalls: escalating to a manager as the main tactic, or winning by persistence alone.",
+      "competencies": ["collaboration", "communication", "conflict_handling"],
+      "values": ["Partnership"],
+      "source_url": "https://www.aced.io/blog/goldman-sachs-interview-process",
+      "hints": {
+        "looking_for": ["Influence through evidence", "Partnership with peers"],
+        "strong_signals": ["Uses data and client impact", "Adapts the proposal", "Relationships stay strong"],
+        "watch_outs": ["Escalation as the main tactic", "No outcome"]
+      },
+      "role_families": ["pm", "swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a web crawler that can fetch and index a very large number of pages.",
+      "strong_answer": "Clarify scope (pages, freshness, politeness). Cover a URL frontier with priorities, distributed fetchers, per-domain rate limits and robots rules, de-duplication by URL and content hash, parsing and link extraction, and storage for raw pages and the index. Discuss failure handling, re-crawl scheduling, partitioning by domain, and the trade-off between freshness and coverage.",
+      "competencies": ["technical_depth", "trade_offs", "reasoning", "clarity_of_explanation"],
+      "values": [],
+      "source_url": "https://www.aced.io/blog/goldman-sachs-interview-process",
+      "hints": {
+        "looking_for": ["Distributed system design", "Clear requirements first"],
+        "strong_signals": ["Politeness and rate limits", "De-duplication", "Partitioning and re-crawl plan"],
+        "watch_outs": ["Single-machine design", "Skipping requirements"]
+      },
+      "role_families": ["swe"],
+      "levels": ["mid", "senior", "staff_principal"]
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Design a set of REST APIs for creating and querying bank transactions.",
+      "strong_answer": "Define resources (accounts, transactions), endpoints and status codes, and pagination and filtering for queries. Make creation idempotent with a client key, validate input, and keep amounts in exact decimal types. Cover authentication and authorization, audit logging, versioning, consistency between balance and transaction records, and how errors are reported to clients.",
+      "competencies": ["technical_depth", "accuracy", "trade_offs"],
+      "values": ["Integrity", "Client Service"],
+      "source_url": "https://www.jointaro.com/interviews/companies/goldman-sachs/experiences/associate-software-engineer-london-england-august-1-2024-no-offer-positive-544df01f",
+      "hints": {
+        "looking_for": ["Clean API design", "Financial correctness"],
+        "strong_signals": ["Idempotent creation", "Exact decimal amounts", "Audit and authorization"],
+        "watch_outs": ["Floating-point money", "No idempotency"]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Walk me through how your team takes a change from a pull request to production, and how you handle a bad release.",
+      "strong_answer": "Describe the actual pipeline: code review standards, unit and integration tests, CI checks, staged environments, approvals and the deploy method (canary, blue-green). Explain monitoring after release, rollback and the incident process. Show judgment about what you would improve and why controls matter in a regulated firm.",
+      "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
+      "values": ["Excellence", "Integrity"],
+      "source_url": "https://www.interviewquery.com/guides/goldman-sachs-software-engineer",
+      "hints": {
+        "looking_for": ["Real delivery experience", "Quality and controls mindset"],
+        "strong_signals": ["Concrete pipeline steps", "Clear rollback plan", "Suggests an improvement"],
+        "watch_outs": ["Textbook answer with no own experience", "No testing story"]
+      },
+      "role_families": ["swe"],
+      "levels": []
+    },
+    {
+      "interview_type": "technical_qa",
+      "question": "Explain overfitting and how regularization helps, and when you would choose logistic over linear regression.",
+      "strong_answer": "Overfitting is fitting noise so training error is low but new-data error is high; detect it with validation curves. Regularization (L1, L2) penalizes large weights, trading a little bias for lower variance; L1 can also select features. Logistic regression models probabilities for a binary outcome through a sigmoid, while linear regression predicts a continuous value. Tie to a financial example and how you would validate on time-ordered data.",
+      "competencies": ["technical_depth", "accuracy", "clarity_of_explanation"],
+      "values": [],
+      "source_url": "https://www.aced.io/blog/goldman-sachs-interview-process",
+      "hints": {
+        "looking_for": ["Solid ML fundamentals", "Clear explanation"],
+        "strong_signals": ["Bias-variance framing", "L1 versus L2", "Time-ordered validation"],
+        "watch_outs": ["Memorized definitions only", "Confusing classification and regression"]
+      },
+      "role_families": ["data_ml"],
+      "levels": []
+    },
+    {
+      "interview_type": "case",
+      "question": "An A/B test on a new savings-account sign-up flow shows higher sign-ups but lower funded accounts. What do you recommend?",
+      "strong_answer": "Clarify the goal: funded, retained accounts matter more than sign-ups. Check the test design (randomization, sample size, duration, novelty effect) and segment results. Look at the funnel to see where users drop and why, and weigh risk and compliance effects. Recommend iterating on the funding step or running a follow-up test, not shipping on the vanity metric, and state the metric you would use to decide.",
+      "competencies": ["problem_framing", "user_and_business_sense", "recommendation"],
+      "values": ["Client Service"],
+      "source_url": "https://www.interviewquery.com/guides/goldman-sachs-product-manager",
+      "hints": {
+        "looking_for": ["Metric judgment", "Experiment literacy"],
+        "strong_signals": ["Picks the right success metric", "Checks test validity", "Clear recommendation"],
+        "watch_outs": ["Shipping on sign-ups alone", "No recommendation"]
+      },
+      "role_families": ["pm"],
+      "levels": []
+    }
+  ],
+  "bar_by_level": [
+    {
+      "level_name": "Analyst",
+      "normalized_level": "new_grad",
+      "role_family": "swe",
+      "scope_expectation": "Delivers well-defined tasks within a team with guidance; strong fundamentals and fast learning."
+    },
+    {
+      "level_name": "Associate",
+      "normalized_level": "mid",
+      "role_family": "swe",
+      "scope_expectation": "Owns features or services end to end, supports them in production and works directly with business users."
+    },
+    {
+      "level_name": "Vice President",
+      "normalized_level": "senior",
+      "role_family": "swe",
+      "scope_expectation": "Leads design for a system or small team, mentors engineers and partners with the business on priorities."
+    },
+    {
+      "level_name": "Executive Director",
+      "normalized_level": "staff_principal",
+      "role_family": "swe",
+      "scope_expectation": "Leads multiple teams or a platform, sets technical direction across a business area and owns senior stakeholder relationships."
+    },
+    {
+      "level_name": "Associate",
+      "normalized_level": "mid",
+      "role_family": "pm",
+      "scope_expectation": "Owns a product area's backlog and delivery with guidance from a product lead."
+    },
+    {
+      "level_name": "Vice President",
+      "normalized_level": "senior",
+      "role_family": "pm",
+      "scope_expectation": "Owns a product, its metrics and its roadmap, and aligns business, engineering and risk partners."
+    }
+  ],
+  "persona": {
+    "tone": "Professional, sharp and courteous",
+    "pace": "Brisk; back-to-back Superday rounds often open with quick resume questions",
+    "pushback_style": "Asks for precision: 'what exactly did you do?', 'what are the numbers?', 'what breaks at ten times the load?'",
+    "closing_style": "Leaves a few minutes for the candidate's questions"
+  },
+  "scoring_weights": {
+    "collaboration": 1.3,
+    "ownership": 1.2,
+    "impact": 1.2,
+    "communication": 1.2,
+    "motivation": 1.2,
+    "depth_of_experience": 1.2,
+    "technical_depth": 1.2,
+    "accuracy": 1.3,
+    "trade_offs": 1.2,
+    "clarity_of_explanation": 1.2
+  },
+  "values_share": 0.25,
+  "case_style": {
+    "product_sense": 0.4,
+    "estimation": 0.15,
+    "system_thinking": 0.45,
+    "notes": "Engineering design rounds are general large-scale systems or finance-flavored APIs. PM panels use small product scenarios: success metrics, A/B test reads and design-to-engineering walkthroughs. Data rounds add probability puzzles."
+  },
+  "sources": [
+    {
+      "url": "https://www.goldmansachs.com/about-us/purpose-and-values",
+      "title": "Our Purpose and Values (Goldman Sachs)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["values_framework"]
+    },
+    {
+      "url": "https://www.designgurus.io/answers/detail/what-is-the-goldman-sachs-interview-process-like-round-by-round",
+      "title": "What is the Goldman Sachs interview process like, round by round (Design Gurus)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "persona"]
+    },
+    {
+      "url": "https://www.aced.io/blog/goldman-sachs-interview-process",
+      "title": "Get a job at Goldman Sachs: interview process and top questions (Exponent / Aced)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns", "case_style", "scoring_weights"]
+    },
+    {
+      "url": "https://www.interviewquery.com/guides/goldman-sachs-software-engineer",
+      "title": "Goldman Sachs software engineer interview guide (Interview Query)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "question_patterns"]
+    },
+    {
+      "url": "https://www.interviewquery.com/guides/goldman-sachs-product-manager",
+      "title": "Goldman Sachs product manager interview guide (Interview Query)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "case_style"]
+    },
+    {
+      "url": "https://www.interviewquery.com/guides/goldman-sachs-data-scientist",
+      "title": "Goldman Sachs data scientist interview guide (Interview Query)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure"]
+    },
+    {
+      "url": "https://www.jointaro.com/interviews/companies/goldman-sachs/experiences/associate-software-engineer-london-england-august-1-2024-no-offer-positive-544df01f",
+      "title": "Goldman Sachs associate software engineer interview report (Taro)",
+      "retrieved_at": "2026-10-28",
+      "fields": ["loop_structure", "bar_by_level"]
+    }
+  ],
+  "field_confidence": {
+    "values_framework": "high",
+    "loop_structure": "medium",
+    "question_patterns": "medium",
+    "bar_by_level": "medium",
+    "persona": "low",
+    "scoring_weights": "low",
+    "case_style": "low"
+  },
+  "low_confidence_notes": [
+    "values_framework: the four core value names are official (purpose and values page, annual report); the page itself returned 403, so descriptions are our paraphrase from search snippets and third-party summaries.",
+    "loop_structure: sources disagree on Superday size (two to five rounds) and HireVue length (15 to 30 minutes); data_ml and pm loops rest on thin prep-site and single candidate reports.",
+    "bar_by_level: Analyst, Associate, VP and ED are Goldman's firm-wide corporate titles; the mapping to normalized levels and the scope text are our judgment, not a published ladder. MD is left out as above the simulated range.",
+    "persona: inferred from prep-site notes that interviewers compare notes and probe resume details; no official description.",
+    "scoring_weights: our estimate from the values and reported round mix.",
+    "case_style: PM case examples are general themes from prep sites; the savings-account A/B test is our own scenario built on the reported 'evaluate an A/B test' theme."
+  ]
+}
