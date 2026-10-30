@@ -272,3 +272,18 @@ def test_rm2_one_main_resume_per_user() -> None:
     text = MIGRATION.read_text("utf-8")
     assert "UPDATE resumes SET is_main = true" in text
     assert "ORDER BY user_id, uploaded_at DESC" in text
+
+
+def test_st13_story_answer_contract_and_fixture() -> None:
+    """ST-13: Strova's answer on Career Stories names the stories it leans on and the user's
+    words its facts came from; unknown fields are rejected."""
+    from strong_core.gateway.fake import DEFAULT_FIXTURES_DIR
+    from strong_core.schemas import StoryAnswer
+
+    raw = (Path(DEFAULT_FIXTURES_DIR) / "coach" / "StoryAnswer.json").read_text(encoding="utf-8")
+    answer = StoryAnswer.model_validate_json(raw)
+    assert answer.answer and answer.quotes
+    with pytest.raises(ValidationError):
+        StoryAnswer.model_validate({"answer": ""})
+    with pytest.raises(ValidationError):
+        StoryAnswer.model_validate({"answer": "Yes.", "extra": 1})

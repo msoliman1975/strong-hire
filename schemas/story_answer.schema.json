@@ -1,0 +1,36 @@
+{
+  "$id": "https://strong-hire.local/schemas/story_answer.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "ST-13: Strova's answer to a question asked on Career Stories, from the user's own stories\nand roles. The stories it leans on are named, so the screen can link them.",
+  "properties": {
+    "answer": {
+      "description": "Two to four sentences, spoken to the user.",
+      "minLength": 1,
+      "title": "Answer",
+      "type": "string"
+    },
+    "quotes": {
+      "description": "The user's words the answer's facts came from, verbatim (CO-9).",
+      "items": {
+        "type": "string"
+      },
+      "title": "Quotes",
+      "type": "array"
+    },
+    "story_ids": {
+      "description": "The user's stories the answer is about, best first.",
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "title": "Story Ids",
+      "type": "array"
+    }
+  },
+  "required": [
+    "answer"
+  ],
+  "title": "StoryAnswer",
+  "type": "object"
+}
