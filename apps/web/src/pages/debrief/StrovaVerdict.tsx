@@ -63,7 +63,7 @@ export function StrovaVerdict({
         </div>
         {atBar && atBar.scored > 0 && (
           <div className="sx-stack">
-            <span className="sx-small sx-muted">Answers that met the bar</span>
+            <span className="sx-small sx-muted">Met the bar</span>
             <span className="sx-mono debrief-verdict__num" data-testid="answers-at-bar">
               {atBar.met} of {atBar.scored}
             </span>

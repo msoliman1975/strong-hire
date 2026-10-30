@@ -155,7 +155,7 @@ describe("v2 debrief", () => {
     renderDebrief(debrief());
     // The fixture: q1 averages 3 (met), q2 averages 2 (not met).
     expect(await screen.findByTestId("answers-at-bar")).toHaveTextContent("1 of 2");
-    expect(screen.getByText("Answers that met the bar")).toBeInTheDocument();
+    expect(screen.getByText("Met the bar")).toBeInTheDocument();
   });
 
   it("FB-2: each answer with its score, a quote from it, and its fix", async () => {

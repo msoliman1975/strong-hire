@@ -39,31 +39,31 @@ function AnswerCard({ answer, number }: { answer: QuestionScore; number: number 
   const met = avg !== null && avg >= BAR_SCORE;
   return (
     <li className="sx-list-row debrief-answer" data-testid="answer">
-      <div className="debrief-answer__head">
+      <div className="debrief-answer__body">
         <h3>
           <span className="debrief-answer__num" aria-hidden="true">
             {number}.{" "}
           </span>
           {answer.question_text}
         </h3>
-        {avg !== null && (
-          <span className="debrief-answer__score" data-met={met ? "true" : undefined}>
-            {Number.isInteger(avg) ? avg : avg.toFixed(1)} of 4
-          </span>
+        <StoryUsed answer={answer} />
+        {quote && <blockquote className="debrief-answer__quote">“{quote}”</blockquote>}
+        {fix ? (
+          <p>
+            <b>Fix:</b> {fix}
+          </p>
+        ) : (
+          kept && (
+            <p>
+              <b>Kept:</b> {kept}
+            </p>
+          )
         )}
       </div>
-      <StoryUsed answer={answer} />
-      {quote && <blockquote className="debrief-answer__quote">“{quote}”</blockquote>}
-      {fix ? (
-        <p>
-          <b>Fix:</b> {fix}
-        </p>
-      ) : (
-        kept && (
-          <p>
-            <b>Kept:</b> {kept}
-          </p>
-        )
+      {avg !== null && (
+        <span className="debrief-answer__score" data-met={met ? "true" : undefined}>
+          {Number.isInteger(avg) ? avg : avg.toFixed(1)} of 4
+        </span>
       )}
     </li>
   );

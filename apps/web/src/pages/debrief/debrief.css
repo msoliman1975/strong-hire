@@ -15,7 +15,7 @@
   margin: 0;
 }
 
-.debrief-verdict__facts {
+.debrief-verdict .debrief-verdict__facts {
   gap: 32px;
   align-items: flex-end;
 }
@@ -63,22 +63,25 @@
 }
 
 .debrief-answer {
+  align-items: flex-start;
+}
+
+.debrief-answer__body {
+  flex: 1 1 380px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
+  min-width: 0;
 }
 
-.debrief-answer__head {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 4px 16px;
-}
-
-.debrief-answer__head h3 {
-  flex: 1 1 320px;
+.debrief-answer__body h3 {
   margin: 0;
   font-size: 1rem;
+}
+
+.debrief-story p {
+  font-size: 0.875rem;
+  color: var(--sh-ink-2);
 }
 
 .debrief-answer__score {
@@ -93,6 +96,7 @@
 
 .debrief-answer__quote {
   margin: 0;
+  font-style: italic;
   font-size: 0.875rem;
   color: var(--sh-ink-2);
 }
