@@ -101,6 +101,7 @@ describe("coach session", () => {
     expect(within(strova).getByRole("img", { name: "Strova is thinking" })).toHaveAttribute("width", "72");
     expect(strova).toHaveTextContent("Strova is shaping your story from your words.");
     expect(screen.getByRole("heading", { name: "Taking shape" })).toBeInTheDocument();
+    expect(screen.getByText("Strova uses only your words. Nothing is added that you didn't say.")).toBeInTheDocument();
   });
 
   it("CO-2, CO-3: each turn adds to the conversation and the story takes shape beside it", async () => {

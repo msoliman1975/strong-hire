@@ -16,7 +16,8 @@ export function WhatFirstPage() {
   const main = resumes.data?.find((r) => !r.deleted && r.is_main) ?? resumes.data?.find((r) => !r.deleted) ?? null;
   const ideas = useStoryIdeas(main?.id ?? null);
   const strongest = ideas.data?.ideas[0];
-  const short = (t: string) => (t.length > 40 ? `${t.slice(0, 38).trimEnd()}…` : t);
+  // Shorten at a word boundary, so the quote never ends mid-word.
+  const short = (t: string) => (t.length > 40 ? `${t.slice(0, 39).replace(/\s+\S*$/, "").replace(/[,;:]$/, "")}…` : t);
   const craft = strongest
     ? `${CRAFT_PATH}?idea=${encodeURIComponent(strongest.resume_line_ref)}&resume=${main?.id ?? ""}`
     : CRAFT_PATH;

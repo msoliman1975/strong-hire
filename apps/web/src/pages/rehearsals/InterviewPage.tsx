@@ -17,9 +17,9 @@ import { ErrorNotice, Loading } from "../../components/ui";
 import "../../components/ux/ux.css";
 import { competencyLabel, difficultyLabel, formatDate, modeHintV2, modeLabelV2 } from "../../labels";
 import type { Tone } from "../plan/api";
-import { roleTitle, rolePath, typeName } from "../roles/shared";
+import { DEFAULT_TAKE_MINUTES, roleTitle, rolePath, typeName } from "../roles/shared";
 
-const MINI = 10;
+const MINI = DEFAULT_TAKE_MINUTES;
 const LENGTHS = [10, 30, 45] as const;
 const DIFFICULTIES: Difficulty[] = ["friendly", "realistic", "tough"];
 const MODES: Mode[] = ["realistic", "coach"];

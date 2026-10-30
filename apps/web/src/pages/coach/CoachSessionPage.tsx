@@ -398,6 +398,7 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
                 Still missing: {detail.missing.map((p) => STORY_PART_LABEL[p]).join(", ")}
               </p>
             )}
+            <p className="muted small">Strova uses only your words. Nothing is added that you didn't say.</p>
           </section>
           <section className="card" aria-labelledby="coach-prove-heading">
             <h2 id="coach-prove-heading" className="muted small coach__prove-heading">

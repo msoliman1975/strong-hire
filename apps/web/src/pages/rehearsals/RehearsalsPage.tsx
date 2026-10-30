@@ -9,7 +9,7 @@ import type { RehearsalItem } from "../../api/types";
 import { Strova } from "../../components/strova";
 import { ErrorNotice, Loading } from "../../components/ui";
 import "../../components/ux/ux.css";
-import { interviewPath, takesMeta, typeName } from "../roles/shared";
+import { DEFAULT_TAKE_MINUTES, interviewPath, takesMeta, typeName } from "../roles/shared";
 
 const GOAL = 75;
 
@@ -50,7 +50,7 @@ export function RehearsalsPage() {
             Recommended next take
           </span>
           <div className="big">
-            {company(next)} · {typeName(next.interview)}, Realistic
+            {company(next)} · {typeName(next.interview)}, Realistic, {DEFAULT_TAKE_MINUTES} minutes
           </div>
           <div className="sub">{why(next)}</div>
           <div className="sx-row">
