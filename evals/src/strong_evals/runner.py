@@ -71,6 +71,7 @@ from strong_evals.metrics import (
 )
 from strong_evals.session import run_text_session
 from strong_evals.stubs import GatewayScorer, StubInterviewer
+from strong_evals.suggestions import SuggestionResult, invented_facts, load_cases, run_case
 from strong_evals.suites import (
     CoachSpec,
     GapSpec,
@@ -178,6 +179,7 @@ class RunReport:
     simulated: list[SimulatedResult] = field(default_factory=list)
     gap: list[GapResult] = field(default_factory=list)
     coach: list[CoachResult] = field(default_factory=list)
+    suggestions: list[SuggestionResult] = field(default_factory=list)
     style_picks: list[StylePick] = field(default_factory=list)
     metrics: list[MetricResult] = field(default_factory=list)
     recorded: int = 0
@@ -186,11 +188,14 @@ class RunReport:
 
     @property
     def errors(self) -> int:
-        items: list[ScriptedResult | SimulatedResult | GapResult | CoachResult] = [
+        items: list[
+            ScriptedResult | SimulatedResult | GapResult | CoachResult | SuggestionResult
+        ] = [
             *self.scripted,
             *self.simulated,
             *self.gap,
             *self.coach,
+            *self.suggestions,
         ]
         return sum(r.error is not None for r in items)
 
@@ -523,6 +528,19 @@ def compute_metrics(report: RunReport, thresholds: dict[str, dict[str, Any]]) ->
     if report.coach:
         _coach_metrics(report, add)
 
+    if report.suggestions:
+        fake = report.profile == "fake"
+        invented = invented_facts(report.suggestions, fake)
+        kept = sum(r.outcome == "kept" for r in report.suggestions)
+        add(
+            "suggestions_invented_facts",
+            "Suggestions: texts that are not the user's words (SG-7)",
+            float(invented),
+            str(invented),
+            f"{len(report.suggestions)} cases, {kept} kept"
+            + (", checked against each case's expected result" if fake else ""),
+        )
+
     # Reference numbers from the human-written transcripts (not the system under test).
     s_probed = sum(r.follow_ups.probed for r in report.scripted)
     s_eligible = sum(r.follow_ups.eligible for r in report.scripted)
@@ -743,6 +761,15 @@ async def run_suite(
         steps = len(c.run.steps) if c.run else 0
         print(f"  coach {coach_spec.id}: {steps} turns {c.error or c.judge_error or ''}")
     report.style_picks = await run_style_pairs(report.coach, base, refs)
+    if suite.suggestions:
+        cases = load_cases()
+        ids = list(cases) if suite.suggestions == "all" else suite.suggestions
+        for case_id in ids:
+            if case_id not in cases:
+                raise SystemExit(f"No suggestion case {case_id!r}; known: {', '.join(cases)}")
+            report.suggestions.append(await run_case(cases[case_id], base))
+            done = report.suggestions[-1]
+            print(f"  suggestion {case_id}: {done.outcome} {done.error or ''}")
     report.prompt_refs = sorted(refs)
     report.recorded = len(recorder.saved) if recorder else 0
     thresholds = yaml.safe_load(THRESHOLDS_FILE.read_text(encoding="utf-8"))

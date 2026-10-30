@@ -43,6 +43,7 @@ from strong_api.scoring import router as scoring_router
 from strong_api.sessions.feedback import router as feedback_router
 from strong_api.sessions.router import router as sessions_router
 from strong_api.stories import router as stories_router
+from strong_api.suggestions.router import router as suggestions_router
 from strong_api.takes.router import router as takes_router
 from strong_core import __version__
 from strong_core.config import get_settings
@@ -141,6 +142,7 @@ def create_app(
     app.include_router(readiness_router)  # v2 S34: practice readiness (RD-1)
     app.include_router(day_plan_router)  # v2 S34: day plan (RD-2)
     app.include_router(interviews_router)  # U06: target roles, interviews, readiness (RH-1, RH-2)
+    app.include_router(suggestions_router)  # U08: suggestions from Strova (SG-2 to SG-8)
     install_auth(app)
     install_billing(app)
     install_account(app)

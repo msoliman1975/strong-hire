@@ -51,6 +51,7 @@ from strong_core.sim import gateway_for_org
 from strong_worker.gap.jobs import _gap
 from strong_worker.quoting import quote_untrusted
 from strong_worker.scoring.stories import load_user_stories, render_story, story_from_row
+from strong_worker.suggestions.tailor import suggest_tailoring
 
 log = logging.getLogger(__name__)
 
@@ -246,7 +247,19 @@ async def run_story_fit(
         computed_at=datetime.now(UTC),
     )
     await cache.set(key, record.model_dump_json(), ex=CACHE_TTL_S)
-    return {"outcome": "computed", "input_hash": input_hash, "model_calls": result.model_calls}
+    # SG-5: a new table gives each lead story a "For {company}" suggestion. Never fails the job.
+    try:
+        async with gap.sessionmaker() as db:
+            tailoring = await suggest_tailoring(db, gateway, target, stories, result.fit, job)
+    except Exception as exc:
+        log.warning("tailoring failed for job %s: %s", job_target_id, exc)
+        tailoring = {"tailor_errors": 1}
+    return {
+        "outcome": "computed",
+        "input_hash": input_hash,
+        "model_calls": result.model_calls,
+        **tailoring,
+    }
 
 
 FUNCTIONS = [run_story_fit]

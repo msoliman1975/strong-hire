@@ -38,7 +38,8 @@ Suites live in `suites/<name>.yaml`:
 | `simulated` | 12 simulated sessions: 4 interview types times strong, average and weak answers |
 | `gap` | Gap analysis over the P2 posting and resume fixtures: 7 matched pairs (one in company mode) and 4 mismatched pairs, 2 runs each |
 | `coach` | Coach evals (CO-9): 4 simulated candidates (vague, overclaim, off topic, strong), each in the gentle and the direct style |
-| `full` | `goldset`, `simulated`, `gap` and `coach` |
+| `suggestions` | Suggestion checks (SG-7): tune a story, new story, improve a resume line and review, each with a reply from the user's words and one that adds a fact |
+| `full` | `goldset`, `simulated`, `gap`, `coach` and `suggestions` |
 
 ## Metrics and thresholds
 
@@ -57,6 +58,7 @@ Thresholds are in `config/thresholds.yaml`.
 | Gap analysis score spread | Gap pairs: largest difference between the match scores of one pair across runs (GA-1) | 3 points or less (P6) |
 | Gap analysis fit order | Gap pairs: matched resumes score above mismatched resumes on the same posting | 100% (harness default) |
 | Gap analysis cost per run | Gap pairs: `UsageEvent.cost_usd` per run | Information only |
+| Suggestions: texts not in the user's words | Suggestion cases: kept texts that fail the no-new-facts check (`strong_worker.suggestions.facts`); on the fake profile also replies kept or rejected against the case's `expect` (SG-7) | 0 (spec) |
 
 Coach metrics (`coach` suite). On the fake profile only the code checks are measured; the judge
 metrics show "not measured".

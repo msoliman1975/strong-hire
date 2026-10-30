@@ -1,0 +1,4 @@
+Some of what you wrote is not in the candidate's own words:
+$problems
+
+Reply again with the same JSON fields. Quote only from the candidate's words you were given, and copy each quote character for character. Remove every sentence, number or detail the candidate did not say.

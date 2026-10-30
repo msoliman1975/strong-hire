@@ -49,6 +49,8 @@ function debrief(previous: PreviousSignal | null = null): Debrief {
     questions: [],
     previous_signal: previous,
     answers_at_bar: mockAnswersAtBar(scorecard),
+    suggestions: [],
+    next_plan_item: null,
   };
 }
 

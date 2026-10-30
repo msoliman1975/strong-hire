@@ -3996,6 +3996,262 @@
         }
       }
     },
+    "/suggestions": {
+      "get": {
+        "tags": [
+          "suggestions"
+        ],
+        "summary": "List Suggestions",
+        "description": "SG-8: the open suggestions for one place, newest first.",
+        "operationId": "list_suggestions_suggestions_get",
+        "parameters": [
+          {
+            "name": "place",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Place"
+            }
+          },
+          {
+            "name": "session_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "story_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Story Id"
+            }
+          },
+          {
+            "name": "job_target_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Job Target Id"
+            }
+          },
+          {
+            "name": "resume_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Resume Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Suggestion"
+                  },
+                  "title": "Response List Suggestions Suggestions Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/suggestions/{suggestion_id}/accept": {
+      "post": {
+        "tags": [
+          "suggestions"
+        ],
+        "summary": "Accept Suggestion",
+        "description": "SG-8: apply the suggestion. 409 `not_open` when it was already accepted or dismissed.",
+        "operationId": "accept_suggestion_suggestions__suggestion_id__accept_post",
+        "parameters": [
+          {
+            "name": "suggestion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Suggestion Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/suggestions/{suggestion_id}/dismiss": {
+      "post": {
+        "tags": [
+          "suggestions"
+        ],
+        "summary": "Dismiss Suggestion",
+        "description": "SG-8: dismissed suggestions never come back. 409 `not_open` when already resolved.",
+        "operationId": "dismiss_suggestion_suggestions__suggestion_id__dismiss_post",
+        "parameters": [
+          {
+            "name": "suggestion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Suggestion Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Suggestion"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/suggestions/{suggestion_id}/undo": {
+      "post": {
+        "tags": [
+          "suggestions"
+        ],
+        "summary": "Undo Suggestion",
+        "description": "SG-2: restore what accepting changed; the suggestion is open again. 409 `cannot_undo`\nwhen nothing was applied, `changed_since` when the text was edited after accepting.",
+        "operationId": "undo_suggestion_suggestions__suggestion_id__undo_post",
+        "parameters": [
+          {
+            "name": "suggestion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Suggestion Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Suggestion"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/providers": {
       "get": {
         "tags": [
@@ -9231,6 +9487,96 @@
   },
   "components": {
     "schemas": {
+      "AcceptIn": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "After",
+            "description": "\"Edit first\": the user's edited text, in place of the proposed one. For tune_story, improve_resume_line and tailor_role."
+          },
+          "parts": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/StoryPart"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parts",
+            "description": "review: the parts whose edits to apply. Null applies every edit."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "AcceptIn"
+      },
+      "AcceptOut": {
+        "properties": {
+          "suggestion": {
+            "$ref": "#/components/schemas/Suggestion"
+          },
+          "story_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Story Id",
+            "description": "The story it changed or created (SG-2, SG-3, SG-5, ST-11)."
+          },
+          "resume_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resume Id",
+            "description": "The resume it changed (SG-6)."
+          },
+          "crafting": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Crafting"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "SG-4, RM-4: open crafting with this target."
+          },
+          "can_undo": {
+            "type": "boolean",
+            "title": "Can Undo",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "suggestion"
+        ],
+        "title": "AcceptOut"
+      },
       "AcceptReason": {
         "properties": {
           "code": {
@@ -14786,6 +15132,55 @@
         ],
         "title": "CostSlice"
       },
+      "Crafting": {
+        "properties": {
+          "competency": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Competency"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "job_target_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Target Id"
+          },
+          "achievement": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Achievement",
+            "description": "RM-4: the context to start from."
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "type": "array",
+            "title": "Skills"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Crafting",
+        "description": "SG-4, RM-4: what \"Craft with Strova\" opens with."
+      },
       "CreateSessionRequest": {
         "properties": {
           "job_target_id": {
@@ -15438,6 +15833,26 @@
               }
             ],
             "description": "DB-2. Null until the debrief is ready."
+          },
+          "suggestions": {
+            "items": {
+              "$ref": "#/components/schemas/Suggestion"
+            },
+            "type": "array",
+            "title": "Suggestions",
+            "description": "DB-4, SG-2 to SG-4: Strova's open suggestions from this take, newest first."
+          },
+          "next_plan_item": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Plan Item",
+            "description": "DB-6: the next item of the personal plan. Null until the plan has one (U11)."
           }
         },
         "additionalProperties": false,
@@ -16770,48 +17185,48 @@
         "description": "FB-1. Ordered from strongest to weakest."
       },
       "ImproveResumeLinePayload": {
-        "additionalProperties": false,
-        "description": "SG-6: the payload of an improve resume line suggestion.",
         "properties": {
           "resume_line_ref": {
-            "description": "Where the line is in schemas.Resume, as roles[<i>].achievements[<j>].",
+            "type": "string",
             "minLength": 1,
             "pattern": "^roles\\[\\d+\\]\\.achievements\\[\\d+\\]$",
             "title": "Resume Line Ref",
-            "type": "string"
+            "description": "Where the line is in schemas.Resume, as roles[<i>].achievements[<j>]."
           },
           "before": {
+            "type": "string",
             "minLength": 1,
-            "title": "Before",
-            "type": "string"
+            "title": "Before"
           },
           "after": {
+            "type": "string",
             "minLength": 1,
-            "title": "After",
-            "type": "string"
+            "title": "After"
           },
           "quotes": {
-            "description": "The story's words the rewrite came from, verbatim.",
             "items": {
               "type": "string"
             },
+            "type": "array",
             "title": "Quotes",
-            "type": "array"
+            "description": "The story's words the rewrite came from, verbatim."
           },
           "kind": {
+            "type": "string",
             "const": "improve_resume_line",
-            "default": "improve_resume_line",
             "title": "Kind",
-            "type": "string"
+            "default": "improve_resume_line"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "resume_line_ref",
           "before",
           "after"
         ],
         "title": "ImproveResumeLinePayload",
-        "type": "object"
+        "description": "SG-6: the payload of an improve resume line suggestion."
       },
       "InputCheck": {
         "additionalProperties": false,
@@ -18550,25 +18965,25 @@
         "title": "MagicLinkSent"
       },
       "MissingSkillPayload": {
-        "additionalProperties": false,
-        "description": "SG-4: a tested skill with no story; accepting opens crafting aimed at it.",
         "properties": {
           "kind": {
+            "type": "string",
             "const": "missing_skill",
-            "default": "missing_skill",
             "title": "Kind",
-            "type": "string"
+            "default": "missing_skill"
           },
           "competency": {
             "$ref": "#/components/schemas/Competency",
             "description": "The target skill for crafting."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "competency"
         ],
         "title": "MissingSkillPayload",
-        "type": "object"
+        "description": "SG-4: a tested skill with no story; accepting opens crafting aimed at it."
       },
       "MixWeek": {
         "properties": {
@@ -18715,20 +19130,18 @@
         "title": "ModelUsage"
       },
       "NewStoryPayload": {
-        "additionalProperties": false,
-        "description": "SG-3: a new story from a strong answer that matches no story.",
         "properties": {
           "kind": {
+            "type": "string",
             "const": "new_story",
-            "default": "new_story",
             "title": "Kind",
-            "type": "string"
+            "default": "new_story"
           },
           "title": {
+            "type": "string",
             "maxLength": 200,
             "minLength": 1,
-            "title": "Title",
-            "type": "string"
+            "title": "Title"
           },
           "context": {
             "anyOf": [
@@ -18739,7 +19152,6 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Context"
           },
           "stakes": {
@@ -18751,7 +19163,6 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Stakes"
           },
           "action": {
@@ -18763,7 +19174,6 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Action"
           },
           "result": {
@@ -18775,7 +19185,6 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Result"
           },
           "reflection": {
@@ -18787,30 +19196,31 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Reflection"
           },
           "skills": {
             "items": {
               "$ref": "#/components/schemas/Competency"
             },
-            "title": "Skills",
-            "type": "array"
+            "type": "array",
+            "title": "Skills"
           },
           "quotes": {
-            "description": "The answer's words the parts came from, verbatim.",
             "items": {
               "type": "string"
             },
+            "type": "array",
             "title": "Quotes",
-            "type": "array"
+            "description": "The answer's words the parts came from, verbatim."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "title"
         ],
         "title": "NewStoryPayload",
-        "type": "object"
+        "description": "SG-3: a new story from a strong answer that matches no story."
       },
       "OpsErrorDetail": {
         "properties": {
@@ -20368,6 +20778,18 @@
         ],
         "title": "PhaseTime",
         "type": "object"
+      },
+      "Place": {
+        "type": "string",
+        "enum": [
+          "debrief",
+          "story",
+          "role",
+          "stories",
+          "resume"
+        ],
+        "title": "Place",
+        "description": "Where the suggestions are shown (ux-spec section 8)."
       },
       "Plan": {
         "additionalProperties": false,
@@ -23025,24 +23447,24 @@
         "title": "ResumeUpdate"
       },
       "ReviewPayload": {
-        "additionalProperties": false,
-        "description": "ST-11: the payload of a review suggestion.",
         "properties": {
           "kind": {
+            "type": "string",
             "const": "review",
-            "default": "review",
             "title": "Kind",
-            "type": "string"
+            "default": "review"
           },
           "review": {
             "$ref": "#/components/schemas/StoryReview"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "review"
         ],
         "title": "ReviewPayload",
-        "type": "object"
+        "description": "ST-11: the payload of a review suggestion."
       },
       "RoleFamily": {
         "type": "string",
@@ -25731,14 +26153,12 @@
         "title": "StoryIdeaOut"
       },
       "StoryIdeaPayload": {
-        "additionalProperties": false,
-        "description": "RM-4: the payload of a story idea suggestion.",
         "properties": {
           "achievement": {
-            "description": "The resume line, verbatim.",
+            "type": "string",
             "minLength": 1,
             "title": "Achievement",
-            "type": "string"
+            "description": "The resume line, verbatim."
           },
           "role": {
             "anyOf": [
@@ -25749,52 +26169,52 @@
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "The role it is under: title, company.",
-            "title": "Role"
+            "title": "Role",
+            "description": "The role it is under: title, company."
           },
           "resume_line_ref": {
             "anyOf": [
               {
-                "pattern": "^roles\\[\\d+\\]\\.achievements\\[\\d+\\]$",
-                "type": "string"
+                "type": "string",
+                "pattern": "^roles\\[\\d+\\]\\.achievements\\[\\d+\\]$"
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "Where the line is in schemas.Resume, as roles[<i>].achievements[<j>].",
-            "title": "Resume Line Ref"
+            "title": "Resume Line Ref",
+            "description": "Where the line is in schemas.Resume, as roles[<i>].achievements[<j>]."
           },
           "skills": {
-            "description": "Likely skills. Empty when the worker call failed.",
             "items": {
               "$ref": "#/components/schemas/Competency"
             },
+            "type": "array",
             "title": "Skills",
-            "type": "array"
+            "description": "Likely skills. Empty when the worker call failed."
           },
           "missing_parts": {
-            "description": "Story parts the line does not give.",
             "items": {
               "$ref": "#/components/schemas/StoryPart"
             },
+            "type": "array",
             "title": "Missing Parts",
-            "type": "array"
+            "description": "Story parts the line does not give."
           },
           "kind": {
+            "type": "string",
             "const": "story_idea",
-            "default": "story_idea",
             "title": "Kind",
-            "type": "string"
+            "default": "story_idea"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "achievement"
         ],
         "title": "StoryIdeaPayload",
-        "type": "object"
+        "description": "RM-4: the payload of a story idea suggestion."
       },
       "StoryIdeas": {
         "additionalProperties": false,
@@ -26042,8 +26462,6 @@
         "description": "ST-1: the five parts of a story, in the order the workbench and prompts show them."
       },
       "StoryPartEdit": {
-        "additionalProperties": false,
-        "description": "SG-2, ST-11: a before-and-after edit of one story part.",
         "properties": {
           "part": {
             "$ref": "#/components/schemas/StoryPart"
@@ -26057,31 +26475,33 @@
                 "type": "null"
               }
             ],
-            "description": "The part as it is now. Null when it is empty.",
-            "title": "Before"
+            "title": "Before",
+            "description": "The part as it is now. Null when it is empty."
           },
           "after": {
-            "description": "The proposed text.",
+            "type": "string",
             "minLength": 1,
             "title": "After",
-            "type": "string"
+            "description": "The proposed text."
           },
           "quotes": {
-            "description": "The user's words the new text came from, verbatim.",
             "items": {
               "type": "string"
             },
+            "type": "array",
             "title": "Quotes",
-            "type": "array"
+            "description": "The user's words the new text came from, verbatim."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "part",
           "before",
           "after"
         ],
         "title": "StoryPartEdit",
-        "type": "object"
+        "description": "SG-2, ST-11: a before-and-after edit of one story part."
       },
       "StoryPartUpdate": {
         "properties": {
@@ -26233,40 +26653,38 @@
         "title": "StoryRef"
       },
       "StoryReview": {
-        "additionalProperties": false,
-        "description": "ST-11: per-part notes and before-and-after edits for one story.",
         "properties": {
           "summary": {
-            "description": "One or two sentences from Strova.",
+            "type": "string",
             "minLength": 1,
             "title": "Summary",
-            "type": "string"
+            "description": "One or two sentences from Strova."
           },
           "notes": {
             "items": {
               "$ref": "#/components/schemas/StoryReviewNote"
             },
-            "title": "Notes",
-            "type": "array"
+            "type": "array",
+            "title": "Notes"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "summary"
         ],
         "title": "StoryReview",
-        "type": "object"
+        "description": "ST-11: per-part notes and before-and-after edits for one story."
       },
       "StoryReviewNote": {
-        "additionalProperties": false,
-        "description": "ST-11: Strova's note on one story part, with an optional edit from the user's words.",
         "properties": {
           "part": {
             "$ref": "#/components/schemas/StoryPart"
           },
           "note": {
+            "type": "string",
             "minLength": 1,
-            "title": "Note",
-            "type": "string"
+            "title": "Note"
           },
           "edit": {
             "anyOf": [
@@ -26276,16 +26694,17 @@
               {
                 "type": "null"
               }
-            ],
-            "default": null
+            ]
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "part",
           "note"
         ],
         "title": "StoryReviewNote",
-        "type": "object"
+        "description": "ST-11: Strova's note on one story part, with an optional edit from the user's words."
       },
       "StorySource": {
         "type": "string",
@@ -26484,13 +26903,11 @@
         "description": "TG-3: Strova's suggested interviews for a role, usual ones first."
       },
       "Suggestion": {
-        "additionalProperties": false,
-        "description": "SG-1: one suggestion from Strova. The suggestions table holds org_id and user_id.",
         "properties": {
           "id": {
+            "type": "string",
             "format": "uuid",
-            "title": "Id",
-            "type": "string"
+            "title": "Id"
           },
           "kind": {
             "$ref": "#/components/schemas/SuggestionKind"
@@ -26500,18 +26917,6 @@
             "default": "open"
           },
           "payload": {
-            "discriminator": {
-              "mapping": {
-                "improve_resume_line": "#/components/schemas/ImproveResumeLinePayload",
-                "missing_skill": "#/components/schemas/MissingSkillPayload",
-                "new_story": "#/components/schemas/NewStoryPayload",
-                "review": "#/components/schemas/ReviewPayload",
-                "story_idea": "#/components/schemas/StoryIdeaPayload",
-                "tailor_role": "#/components/schemas/TailorRolePayload",
-                "tune_story": "#/components/schemas/TuneStoryPayload"
-              },
-              "propertyName": "kind"
-            },
             "oneOf": [
               {
                 "$ref": "#/components/schemas/TuneStoryPayload"
@@ -26535,27 +26940,38 @@
                 "$ref": "#/components/schemas/ReviewPayload"
               }
             ],
-            "title": "Payload"
+            "title": "Payload",
+            "discriminator": {
+              "propertyName": "kind",
+              "mapping": {
+                "improve_resume_line": "#/components/schemas/ImproveResumeLinePayload",
+                "missing_skill": "#/components/schemas/MissingSkillPayload",
+                "new_story": "#/components/schemas/NewStoryPayload",
+                "review": "#/components/schemas/ReviewPayload",
+                "story_idea": "#/components/schemas/StoryIdeaPayload",
+                "tailor_role": "#/components/schemas/TailorRolePayload",
+                "tune_story": "#/components/schemas/TuneStoryPayload"
+              }
+            }
           },
           "reason": {
-            "description": "Why Strova suggests it, one sentence.",
+            "type": "string",
             "minLength": 1,
             "title": "Reason",
-            "type": "string"
+            "description": "Why Strova suggests it, one sentence."
           },
           "source_session_id": {
             "anyOf": [
               {
-                "format": "uuid",
-                "type": "string"
+                "type": "string",
+                "format": "uuid"
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "The debrief's session.",
-            "title": "Source Session Id"
+            "title": "Source Session Id",
+            "description": "The debrief's session."
           },
           "source_question_ref": {
             "anyOf": [
@@ -26566,65 +26982,60 @@
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "QuestionScore.question_ref of the answer.",
-            "title": "Source Question Ref"
+            "title": "Source Question Ref",
+            "description": "QuestionScore.question_ref of the answer."
           },
           "source_resume_id": {
             "anyOf": [
               {
-                "format": "uuid",
-                "type": "string"
+                "type": "string",
+                "format": "uuid"
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "The resume it came from.",
-            "title": "Source Resume Id"
+            "title": "Source Resume Id",
+            "description": "The resume it came from."
           },
           "job_target_id": {
             "anyOf": [
               {
-                "format": "uuid",
-                "type": "string"
+                "type": "string",
+                "format": "uuid"
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "The role it is for.",
-            "title": "Job Target Id"
+            "title": "Job Target Id",
+            "description": "The role it is for."
           },
           "story_id": {
             "anyOf": [
               {
-                "format": "uuid",
-                "type": "string"
+                "type": "string",
+                "format": "uuid"
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "The story it changes.",
-            "title": "Story Id"
+            "title": "Story Id",
+            "description": "The story it changes."
           },
           "resume_id": {
             "anyOf": [
               {
-                "format": "uuid",
-                "type": "string"
+                "type": "string",
+                "format": "uuid"
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "The resume it changes.",
-            "title": "Resume Id"
+            "title": "Resume Id",
+            "description": "The resume it changes."
           },
           "prompt_ref": {
             "anyOf": [
@@ -26635,30 +27046,30 @@
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "The prompt that wrote it. Null for rule-based suggestions.",
-            "title": "Prompt Ref"
+            "title": "Prompt Ref",
+            "description": "The prompt that wrote it. Null for rule-based suggestions."
           },
           "created_at": {
+            "type": "string",
             "format": "date-time",
-            "title": "Created At",
-            "type": "string"
+            "title": "Created At"
           },
           "resolved_at": {
             "anyOf": [
               {
-                "format": "date-time",
-                "type": "string"
+                "type": "string",
+                "format": "date-time"
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "When it was accepted or dismissed.",
-            "title": "Resolved At"
+            "title": "Resolved At",
+            "description": "When it was accepted or dismissed."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "id",
           "kind",
@@ -26667,10 +27078,10 @@
           "created_at"
         ],
         "title": "Suggestion",
-        "type": "object"
+        "description": "SG-1: one suggestion from Strova. The suggestions table holds org_id and user_id."
       },
       "SuggestionKind": {
-        "description": "SG-1: what a suggestion from Strova proposes (ux-spec section 8).",
+        "type": "string",
         "enum": [
           "tune_story",
           "new_story",
@@ -26681,17 +27092,17 @@
           "review"
         ],
         "title": "SuggestionKind",
-        "type": "string"
+        "description": "SG-1: what a suggestion from Strova proposes (ux-spec section 8)."
       },
       "SuggestionStatus": {
-        "description": "SG-1, SG-8: a suggestion is open until accepted or dismissed. Dismissed ones never return.",
+        "type": "string",
         "enum": [
           "open",
           "accepted",
           "dismissed"
         ],
         "title": "SuggestionStatus",
-        "type": "string"
+        "description": "SG-1, SG-8: a suggestion is open until accepted or dismissed. Dismissed ones never return."
       },
       "SummaryIn": {
         "properties": {
@@ -26719,20 +27130,18 @@
         "title": "SummaryIn"
       },
       "TailorRolePayload": {
-        "additionalProperties": false,
-        "description": "SG-5: the lead story for a skill at one company and one detail to bring forward.",
         "properties": {
           "kind": {
+            "type": "string",
             "const": "tailor_role",
-            "default": "tailor_role",
             "title": "Kind",
-            "type": "string"
+            "default": "tailor_role"
           },
           "company": {
-            "description": "Shown as the note title: For {company}.",
+            "type": "string",
             "minLength": 1,
             "title": "Company",
-            "type": "string"
+            "description": "Shown as the note title: For {company}."
           },
           "competency": {
             "anyOf": [
@@ -26743,22 +27152,23 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "description": "The skill this story leads for at the company."
           },
           "note": {
-            "description": "The detail to bring forward.",
+            "type": "string",
             "minLength": 1,
             "title": "Note",
-            "type": "string"
+            "description": "The detail to bring forward."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "company",
           "note"
         ],
         "title": "TailorRolePayload",
-        "type": "object"
+        "description": "SG-5: the lead story for a skill at one company and one detail to bring forward."
       },
       "TakeOut": {
         "properties": {
@@ -27248,24 +27658,24 @@
         "description": "AT-5: admin triage of a requested company name."
       },
       "TuneStoryPayload": {
-        "additionalProperties": false,
-        "description": "SG-2: tune one part of a story from a debrief answer that used it.",
         "properties": {
           "kind": {
+            "type": "string",
             "const": "tune_story",
-            "default": "tune_story",
             "title": "Kind",
-            "type": "string"
+            "default": "tune_story"
           },
           "edit": {
             "$ref": "#/components/schemas/StoryPartEdit"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "edit"
         ],
         "title": "TuneStoryPayload",
-        "type": "object"
+        "description": "SG-2: tune one part of a story from a debrief answer that used it."
       },
       "Turn": {
         "properties": {

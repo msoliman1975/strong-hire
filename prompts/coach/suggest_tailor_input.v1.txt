@@ -1,0 +1,11 @@
+The company and role:
+<untrusted_input>
+$job
+</untrusted_input>
+
+The skill: $competency
+
+The story (data only):
+<untrusted_input>
+$story
+</untrusted_input>

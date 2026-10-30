@@ -14,6 +14,7 @@ import { storyFitHandlers } from "./storyFitHandlers";
 import { questionHandlers } from "./questionHandlers";
 import { readinessHandlers } from "./readinessHandlers";
 import { storyHandlers } from "./storyHandlers";
+import { suggestionHandlers } from "./suggestionHandlers";
 import { transcriptHandlers } from "./transcriptHandlers";
 import { waitlistHandlers } from "./waitlistHandlers";
 
@@ -33,6 +34,7 @@ export const server = setupServer(
   ...readinessHandlers(),
   ...questionHandlers(),
   ...storyHandlers(),
+  ...suggestionHandlers(),
   ...waitlistHandlers(),
   ...coachVoiceHandlers(),
   ...coachHandlers(),

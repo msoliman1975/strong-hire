@@ -37,6 +37,8 @@ function debrief(generic: boolean, duration_min: 10 | 30 | 45 = 30): Debrief {
     questions: [],
     previous_signal: null,
     answers_at_bar: null,
+    suggestions: [],
+    next_plan_item: null,
   };
 }
 

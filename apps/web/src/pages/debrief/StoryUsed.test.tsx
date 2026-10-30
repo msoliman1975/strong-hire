@@ -79,6 +79,8 @@ function debrief(): Debrief {
     questions: [],
     previous_signal: null,
     answers_at_bar: mockAnswersAtBar(scorecard),
+    suggestions: [],
+    next_plan_item: null,
   };
 }
 

@@ -1,0 +1,101 @@
+# SG-7: suggestion cases for the no-new-facts eval. Each case gives the user's words and, for
+# the fake profile, the model reply to check. `expect` is what the check must do with that reply:
+# kept (every text is the user's words) or rejected (the reply adds a fact). Off the fake profile
+# the real coach writes the reply and every kept text must pass the check.
+#
+# kinds: tune_story (story + answer + fix), new_story (question + answer),
+# improve_resume_line (story + line), review (story + said).
+
+- id: tune-result-number
+  kind: tune_story
+  story: {title: Checkout migration, result: The migration went well.}
+  fix: The result has no measure.
+  answer: >-
+    We moved checkout to the new payments provider over six weeks. I wrote the rollback plan.
+    We were done a week before Black Friday and not one payment failed.
+  reply: {part: result, before: null, after: "We were done a week before Black Friday and not one payment failed.", quotes: ["We were done a week before Black Friday and not one payment failed"]}
+  expect: kept
+
+- id: tune-adds-a-number
+  kind: tune_story
+  story: {title: Checkout migration, result: The migration went well.}
+  fix: The result has no measure.
+  answer: >-
+    We moved checkout to the new payments provider over six weeks. We were done a week before
+    Black Friday and not one payment failed.
+  reply: {part: result, before: null, after: "We were done a week early and saved 2 million dollars in fees.", quotes: ["We were done a week before Black Friday"]}
+  expect: rejected
+
+- id: new-story-from-answer
+  kind: new_story
+  question: Tell me about a time you owned a risky change.
+  answer: >-
+    We were moving checkout to the new payments provider. Black Friday was a month out and
+    checkout could not break. I wrote the rollback plan and we moved traffic in five percent
+    steps. We were done a week before Black Friday and not one payment failed.
+  reply:
+    kind: new_story
+    title: Checkout migration before Black Friday
+    context: We were moving checkout to the new payments provider.
+    stakes: Black Friday was a month out and checkout could not break.
+    action: I wrote the rollback plan and we moved traffic in five percent steps.
+    result: We were done a week before Black Friday and not one payment failed.
+    skills: [ownership]
+    quotes:
+      - We were moving checkout to the new payments provider
+      - Black Friday was a month out and checkout could not break
+      - I wrote the rollback plan and we moved traffic in five percent steps
+      - We were done a week before Black Friday and not one payment failed
+  expect: kept
+
+- id: new-story-adds-a-team
+  kind: new_story
+  question: Tell me about a time you owned a risky change.
+  answer: >-
+    We were moving checkout to the new payments provider. I wrote the rollback plan.
+  reply:
+    kind: new_story
+    title: Checkout migration
+    context: We were moving checkout to the new payments provider.
+    action: I wrote the rollback plan and hired three engineers to run the cutover with me.
+    skills: [ownership]
+    quotes: [We were moving checkout to the new payments provider, I wrote the rollback plan]
+  expect: rejected
+
+- id: resume-line-from-story
+  kind: improve_resume_line
+  story: {title: Refunds API rebuild, action: I rebuilt the refunds API for our merchants., result: Refunds took 40 percent less time after the rebuild.}
+  line: Rebuilt the refunds API
+  reply: {resume_line_ref: "roles[0].achievements[0]", before: Rebuilt the refunds API, after: "Rebuilt the refunds API; refunds took 40 percent less time", quotes: [I rebuilt the refunds API, Refunds took 40 percent less time]}
+  expect: kept
+
+- id: resume-line-adds-a-customer-count
+  kind: improve_resume_line
+  story: {title: Refunds API rebuild, action: I rebuilt the refunds API for our merchants., result: Refunds took 40 percent less time after the rebuild.}
+  line: Rebuilt the refunds API
+  reply: {resume_line_ref: "roles[0].achievements[0]", before: Rebuilt the refunds API, after: "Rebuilt the refunds API for 9,000 merchants; refunds took 40 percent less time", quotes: [I rebuilt the refunds API, Refunds took 40 percent less time]}
+  expect: rejected
+
+- id: review-edit-from-words
+  kind: review
+  story: {title: Checkout migration, context: We were done a week before Black Friday and not one payment failed., result: The migration went well.}
+  said: []
+  reply:
+    summary: The action is yours. The result needs the number you gave.
+    notes:
+      - part: result
+        note: Put your number in the result.
+        edit: {part: result, before: null, after: "We were done a week before Black Friday and not one payment failed.", quotes: ["We were done a week before Black Friday and not one payment failed"]}
+  expect: kept
+
+- id: review-edit-adds-a-result
+  kind: review
+  story: {title: Checkout migration, result: The migration went well.}
+  said: []
+  reply:
+    summary: The result needs a number.
+    notes:
+      - part: result
+        note: Put a number in the result.
+        edit: {part: result, before: null, after: "Checkout conversion rose by 12 percent.", quotes: ["The migration went well"]}
+  expect: rejected

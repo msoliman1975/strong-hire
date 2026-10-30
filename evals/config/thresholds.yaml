@@ -51,3 +51,6 @@ coach_dropped_updates:
   source: "Information. Part updates the engine dropped because the quotes did not match (CO-3)"
 coach_cost_per_session_usd:
   source: "Information. Coach minutes are not priced yet"
+suggestions_invented_facts:
+  max: 0
+  source: "Spec SG-7: tune, new story, improve resume line and review use only the user's words. On the fake profile, each case's reply must be kept or rejected as expected"
