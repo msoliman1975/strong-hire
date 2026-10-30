@@ -27,6 +27,7 @@ export const storyFitKey = (jobId: string, resumeId: string) => ["plan", jobId, 
 export const useStoryFit = (jobId: string, resumeId: string) =>
   useQuery({
     queryKey: storyFitKey(jobId, resumeId),
+    enabled: Boolean(jobId && resumeId),
     queryFn: async () =>
       unwrap(
         await apiClient.GET("/plan/{job_target_id}/{resume_id}/story-fit", {

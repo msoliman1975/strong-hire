@@ -43,5 +43,6 @@ export const usePlan = (jobId: string, resumeId: string) =>
   useQuery({
     queryKey: planKey(jobId, resumeId),
     queryFn: () => planApi.get(jobId, resumeId),
+    enabled: Boolean(jobId && resumeId),
     refetchInterval: (query) => (query.state.data?.gap?.status === "running" ? 1000 : false),
   });

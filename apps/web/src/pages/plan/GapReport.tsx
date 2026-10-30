@@ -18,7 +18,7 @@ import { CV_DELETED } from "../../components/ReportList";
 import { Bar, ErrorNotice, Loading, PageHead } from "../../components/ui";
 import { competencyLabel, difficultyLabel, formatDate, interviewTypeLabel } from "../../labels";
 import { resumeCheckPath } from "../../paths";
-import { planPath } from "./paths";
+import { rolePath } from "../roles/shared";
 import { GAP_COPY } from "../../copy";
 
 const SEVERITY: Record<string, string> = { high: "High", medium: "Medium", low: "Low" };
@@ -45,14 +45,14 @@ export function GapReport() {
   const role = posting ? `${posting.title} · ${posting.company_name}` : (job.data?.name ?? "Your interview");
   const notStarted = !reportId && gap.error instanceof ApiError && gap.error.status === 404;
   const canRun = !(job.data?.deleted ?? false) && !data?.resume_deleted;
-  const plan = data ? planPath(jobId, data.resume_id) : null;
+  const plan = data ? rolePath(jobId) : null;
 
   return (
     <div className="gap-report stack">
       {plan && (
         <p className="gap-report__back">
           <Link className="text-link" to={plan}>
-            ← Back to your plan
+            ← Back to the role
           </Link>
         </p>
       )}

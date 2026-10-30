@@ -64,19 +64,22 @@ async function addResumes(n: number) {
 const words = (n: number) => Array.from({ length: n }, (_, i) => `w${i}`).join(" ");
 
 describe("add flow (v2)", () => {
-  it("PP-1: the step bar reads Job description, Your resume, Your plan", async () => {
+  it("TG-2: with v2 on, adding a job opens Add a target role with its three steps", async () => {
     renderApp("/jobs/new");
-    const steps = await screen.findByText("Job description");
-    expect(steps).toBeInTheDocument();
-    expect(screen.getByText("Your resume")).toBeInTheDocument();
-    expect(screen.getByText("Your plan")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Next: pick your resume" })).toBeInTheDocument();
+    const steps = await screen.findByRole("list", { name: "Add a target role steps" });
+    expect(within(steps).getAllByRole("listitem").map((li) => li.textContent)).toEqual([
+      "1 · Job posting",
+      "2 · Check the role",
+      "3 · Interviews",
+    ]);
+    expect(screen.getByRole("button", { name: "Read the posting" })).toBeInTheDocument();
   });
 
-  it("IN-1: a live word counter turns amber at 2,000 words and blocks Next past 2,500", async () => {
-    renderApp("/jobs/new");
-    const box = await screen.findByRole("textbox", { name: "Or paste the job posting text" });
+  it("IN-1: a live word counter turns amber at 2,000 words and blocks Read the posting past 2,500", async () => {
+    renderApp("/roles/new");
     const user = userEvent.setup();
+    await user.click(await screen.findByRole("button", { name: "paste the text" }));
+    const box = screen.getByRole("textbox", { name: "Job posting text" });
     await user.click(box);
     await user.paste(words(812));
     expect(screen.getByText(/812 \/ 2,500 words/)).not.toHaveAttribute("data-level");
@@ -86,7 +89,7 @@ describe("add flow (v2)", () => {
     const count = screen.getByText(/2,612 \/ 2,500 words/);
     expect(count).toHaveAttribute("data-level", "over");
     expect(count).toHaveTextContent("Trim the benefits and company boilerplate");
-    expect(screen.getByRole("button", { name: "Next: pick your resume" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Read the posting" })).toBeDisabled();
   });
 
   it("FL-1: with v2 off the add form has no word counter and the v1 steps", async () => {

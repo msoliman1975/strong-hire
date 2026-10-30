@@ -8,7 +8,7 @@ import { useResumes, useStoryIdeas } from "../../api/hooks";
 import { Strova } from "../../components/strova";
 import "../../components/ux/ux.css";
 
-export const ADD_ROLE_PATH = "/jobs/new";
+export const ADD_ROLE_PATH = "/roles/new";
 export const CRAFT_PATH = "/coach/new";
 
 export function WhatFirstPage() {

@@ -368,7 +368,7 @@ describe("v2 Check your CV", () => {
     expect(next).toHaveLength(2);
     expect(within(screen.getByRole("region", { name: "Next step" })).getByRole("button", { name: "Back to resumes" })).toBeInTheDocument();
     await user.click(next[1]);
-    expect(await screen.findByRole("heading", { name: "Add a job description" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Add a target role" })).toBeInTheDocument();
     expect(puts).toHaveLength(1);
   });
 
@@ -445,7 +445,7 @@ describe("v2 coming back to a saved CV", () => {
     expect(screen.queryByText("We read your resume. Check it, then continue.")).not.toBeInTheDocument();
     expect(screen.getByTestId("cvc-saved")).toHaveTextContent(/Not saved yet · \d+ issues? open/);
     await user.click(screen.getAllByRole("button", { name: "Use this resume for an interview" })[0]);
-    expect(await screen.findByRole("heading", { name: "Add a job description" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Add a target role" })).toBeInTheDocument();
     expect(puts).toHaveLength(1);
   });
 
