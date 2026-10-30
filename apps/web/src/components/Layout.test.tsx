@@ -1,4 +1,4 @@
-/** UI-2: the left rail nav. "Stories" and the v2 labels show only when `v2_enabled` is on. */
+/** UI-2, NV-1, NV-3, SV-7: the left rail nav and the top bar. The v2 items show only when `v2_enabled` is on. */
 import { QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -10,7 +10,7 @@ import { AppRoutes, createQueryClient } from "../App";
 import { refreshUsage } from "../mocks/handlers";
 import { mockStore, server } from "../mocks/node";
 import { setFeatureOverrides } from "../theme/features";
-import { RailNav } from "./Layout";
+import { RailNav, resumesLabel } from "./Layout";
 
 function renderNav(path = "/") {
   render(
@@ -25,6 +25,21 @@ function renderNav(path = "/") {
 
 afterEach(() => setFeatureOverrides({}));
 
+function signIn(fullName: string | null) {
+  const email = "ana@example.com";
+  mockStore.db.users[email] = {
+    id: "u1",
+    org_id: "o1",
+    email,
+    auth_provider: "dev",
+    training_consent: false,
+    created_at: "2026-10-01T10:00:00Z",
+    full_name: fullName,
+    profile_complete: true,
+  };
+  mockStore.db.auth = { status: "signed_in", email, userEmail: email };
+}
+
 describe("UI-2 left rail nav", () => {
   it("UI-2: hides Stories and keeps the v1 menu when v2_enabled is off", () => {
     const nav = renderNav();
@@ -33,33 +48,59 @@ describe("UI-2 left rail nav", () => {
     expect(within(nav).getByRole("link", { name: "Resumes" })).toHaveAttribute("href", "/resumes");
   });
 
-  it("UI-2: shows Home, Resumes, Interviews, Stories, Question bank and Progress, in that order, when v2_enabled is on", () => {
+  it("NV-1: shows exactly Home, {First name}'s Resumes, Target roles, Rehearsals with Strova and Career Stories with Strova, in that order", async () => {
     setFeatureOverrides({ v2_enabled: true });
+    signIn("Ana Lopez");
     const nav = renderNav();
+    expect(await within(nav).findByRole("link", { name: "Ana's Resumes" })).toHaveAttribute("href", "/resumes");
     const labels = within(nav)
       .getAllByRole("link")
       .map((a) => a.textContent);
-    expect(labels).toEqual(["Home", "Resumes", "Interviews", "Stories", "Question bankNew", "Progress"]);
-    expect(within(nav).getByRole("link", { name: /Question bank/ })).toHaveAttribute("href", "/questions");
-    expect(within(nav).getByRole("link", { name: "Resumes" })).toHaveAttribute("href", "/resumes");
-    expect(within(nav).getByRole("link", { name: "Stories" })).toHaveAttribute("href", "/stories");
-    expect(within(nav).getByRole("link", { name: "Interviews" })).toHaveAttribute("href", "/jobs");
-    expect(within(nav).getByRole("link", { name: "Progress" })).toHaveAttribute("href", "/reports");
-    // The dev text interview moved to the account menu.
+    expect(labels).toEqual(["Home", "Ana's Resumes", "Target roles", "Rehearsals with Strova", "Career Stories with Strova"]);
+    expect(within(nav).getByRole("link", { name: "Target roles" })).toHaveAttribute("href", "/roles");
+    expect(within(nav).getByRole("link", { name: "Rehearsals with Strova" })).toHaveAttribute("href", "/rehearsals");
+    expect(within(nav).getByRole("link", { name: "Career Stories with Strova" })).toHaveAttribute("href", "/stories");
+    // The 18 px interviewing Strova sits in the Rehearsals item only.
+    const rehearsals = within(nav).getByRole("link", { name: "Rehearsals with Strova" });
+    const avatar = rehearsals.querySelector("svg");
+    expect(avatar).toHaveAttribute("data-mode", "interviewing");
+    expect(avatar).toHaveAttribute("width", "18");
+    expect(nav.querySelectorAll("svg")).toHaveLength(1);
+    // No separate coach button, and the dev text interview stays in the account menu.
+    expect(screen.queryByRole("link", { name: "Talk to your coach" })).toBeNull();
     expect(within(nav).queryByRole("link", { name: /Text interview/ })).not.toBeInTheDocument();
   });
 
-  it("UI-2: marks Stories current on story and coach pages", () => {
+  it("NV-1: the resumes item says Your resumes when the profile has no name", async () => {
     setFeatureOverrides({ v2_enabled: true });
-    const nav = renderNav("/coach/abc");
-    expect(within(nav).getByRole("link", { name: "Stories" })).toHaveAttribute("aria-current", "page");
+    signIn(null);
+    const nav = renderNav();
+    expect(await within(nav).findByRole("link", { name: "Your resumes" })).toHaveAttribute("href", "/resumes");
+    expect(resumesLabel("  Sara  Ali ")).toBe("Sara's Resumes");
+    expect(resumesLabel("")).toBe("Your resumes");
   });
 
-  it("UI-2: marks Interviews current on interview pages", () => {
+  it("NV-3: Question bank and Progress are not in the v2 rail", () => {
     setFeatureOverrides({ v2_enabled: true });
-    const nav = renderNav("/sessions/abc/debrief");
-    expect(within(nav).getByRole("link", { name: "Interviews" })).toHaveAttribute("aria-current", "page");
+    const nav = renderNav();
+    expect(within(nav).queryByRole("link", { name: /Question bank/ })).toBeNull();
+    expect(within(nav).queryByRole("link", { name: "Progress" })).toBeNull();
+  });
+
+  it("NV-1: marks Career Stories current on story and coach pages", () => {
+    setFeatureOverrides({ v2_enabled: true });
+    const nav = renderNav("/coach/abc");
+    expect(within(nav).getByRole("link", { name: "Career Stories with Strova" })).toHaveAttribute("aria-current", "page");
+  });
+
+  it("NV-1: marks Rehearsals current on interview and take pages, and Target roles on job pages", () => {
+    setFeatureOverrides({ v2_enabled: true });
+    let nav = renderNav("/sessions/abc/debrief");
+    expect(within(nav).getByRole("link", { name: "Rehearsals with Strova" })).toHaveAttribute("aria-current", "page");
     expect(within(nav).getByRole("link", { name: "Home" })).not.toHaveAttribute("aria-current");
+    cleanup();
+    nav = renderNav("/jobs/j1/confirm");
+    expect(within(nav).getByRole("link", { name: "Target roles" })).toHaveAttribute("aria-current", "page");
   });
 });
 
@@ -67,7 +108,7 @@ describe("FL-1 v2 flag from GET /status", () => {
   it("FL-1: shows the v2 nav when GET /status says v2_enabled is on", async () => {
     mockStore.db.siteStatus = { ...mockStore.db.siteStatus, v2_enabled: true };
     const nav = renderNav();
-    expect(await within(nav).findByRole("link", { name: "Stories" })).toHaveAttribute("href", "/stories");
+    expect(await within(nav).findByRole("link", { name: "Career Stories with Strova" })).toHaveAttribute("href", "/stories");
   });
 
   it("FL-1: keeps the v1 nav when GET /status says v2_enabled is off", async () => {
@@ -96,7 +137,7 @@ describe("FL-1 v2 flag from GET /status", () => {
   });
 });
 
-describe("UI-2 v2 rail footer and account menu", () => {
+describe("SV-7, NV-3 v2 top bar and old routes", () => {
   function signedIn() {
     const email = "ana@example.com";
     mockStore.db.users[email] = {
@@ -113,13 +154,13 @@ describe("UI-2 v2 rail footer and account menu", () => {
     mockStore.db.usage = refreshUsage({ ...mockStore.db.usage, plan: "paid", minutes_used: 42, minutes_cap: 120 });
   }
 
-  function renderShell(v2: boolean) {
+  function renderShell(v2: boolean, path = "/reports") {
     signedIn();
     setFeatureOverrides({ v2_enabled: v2 });
     const user = userEvent.setup();
     render(
       <QueryClientProvider client={createQueryClient()}>
-        <MemoryRouter initialEntries={["/reports"]}>
+        <MemoryRouter initialEntries={[path]}>
           <AppRoutes />
         </MemoryRouter>
       </QueryClientProvider>,
@@ -127,53 +168,45 @@ describe("UI-2 v2 rail footer and account menu", () => {
     return user;
   }
 
-  it("UI-2: v2 has a top bar (plan chip, updates, avatar menu); the rail keeps the menu and Talk to your coach", async () => {
+  it("SV-7: the v2 top bar has the lockup with the Strong Hire logo, the usage pill and the initials button that opens Profile", async () => {
     const user = renderShell(true);
     const bar = await screen.findByRole("banner", { name: "Top bar" });
+    const brand = within(bar).getByRole("link", { name: "Strong Hire with Strova, home" });
+    // The existing logo, never a Strova avatar or mark.
+    expect(within(brand).getByRole("img", { name: "Strong Hire" })).toBeInTheDocument();
+    expect(brand.querySelector(".strova")).toBeNull();
+    expect(brand).toHaveTextContent("Strong Hirewith Strova");
+    expect(within(brand).getByText("with Strova")).toHaveClass("brand__with");
     expect(await within(bar).findByText(/Monthly plan · 78 of 120 minutes left/)).toBeInTheDocument();
-    expect(within(bar).getByRole("button", { name: /^Updates/ })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Talk to your coach" })).toHaveAttribute("href", "/coach/new");
+    // The mockup's top bar has no greeting and no bell.
+    expect(within(bar).queryByRole("button", { name: /^Updates/ })).toBeNull();
+    expect(screen.queryByText(/Let's get you ready/)).toBeNull();
     // The old rail meter and rail account menu are gone.
     expect(screen.queryByText("Interview minutes")).toBeNull();
-    await user.click(within(bar).getByRole("button", { name: "Account menu" }));
-    const menu = within(bar).getByRole("button", { name: "Account menu" }).nextElementSibling as HTMLElement;
+    const initials = within(bar).getByRole("button", { name: "Account menu" });
+    expect(initials).toHaveTextContent("AN");
+    await user.click(initials);
+    const menu = initials.nextElementSibling as HTMLElement;
     const links = within(menu)
       .getAllByRole("link")
       .map((a) => [a.textContent, a.getAttribute("href")]);
-    expect(links.slice(0, 3)).toEqual([
+    expect(links.slice(0, 4)).toEqual([
+      ["Profile", "/account/profile"],
       ["Account", "/account"],
       ["Plan and billing", "/account#plan"],
       ["Reports", "/reports"],
     ]);
-    expect(within(menu).queryByRole("link", { name: "Questions" })).toBeNull();
-    expect(within(menu).queryByRole("link", { name: "Resumes" })).toBeNull();
     expect(within(menu).getByRole("button", { name: "Sign out" })).toBeInTheDocument();
+    await user.click(within(menu).getByRole("link", { name: "Profile" }));
+    expect(await screen.findByRole("heading", { level: 1 })).toBeInTheDocument();
   });
 
-  it("UI-2: the greeting shows on the first visit only", async () => {
-    globalThis.localStorage?.clear();
-    renderShell(true);
-    expect(await screen.findByText("Welcome, Ana. Let's get you ready.")).toBeInTheDocument();
+  it("NV-3: the Question bank and Progress routes still render with v2 on", async () => {
+    renderShell(true, "/questions");
+    expect(await screen.findByRole("heading", { level: 1, name: "Question bank" })).toBeInTheDocument();
     cleanup();
-    renderShell(true);
-    await screen.findByRole("banner", { name: "Top bar" });
-    expect(screen.queryByText(/Let's get you ready/)).toBeNull();
-  });
-
-  it("UI-2: the bell shows a dot until it is opened, with the site banner and what's new", async () => {
-    globalThis.localStorage?.clear();
-    mockStore.db.siteStatus = {
-      ...mockStore.db.siteStatus,
-      banner: { text: "Maintenance Sunday 02:00 UTC", severity: "info", until: "2099-01-01T00:00:00Z" },
-    };
-    const user = renderShell(true);
-    const bell = await screen.findByRole("button", { name: /^Updates, \d+ new$/ });
-    await user.click(bell);
-    const panel = screen.getByRole("region", { name: "Updates" });
-    expect(within(panel).getByText("Maintenance Sunday 02:00 UTC")).toBeInTheDocument();
-    expect(within(panel).getByText("New: Question bank")).toBeInTheDocument();
-    expect(await screen.findByRole("button", { name: "Updates" })).toBeInTheDocument();
-    mockStore.db.siteStatus = { ...mockStore.db.siteStatus, banner: null };
+    renderShell(true, "/reports");
+    expect(await screen.findByRole("heading", { level: 1, name: "Progress" })).toBeInTheDocument();
   });
 
   it("FL-1: v1 keeps its rail footer, with no coach button", async () => {

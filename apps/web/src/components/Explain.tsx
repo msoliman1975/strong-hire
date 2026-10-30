@@ -19,7 +19,7 @@ export function Explain({ topic, children }: { topic: string; children: string }
 /** The sentences, in one place, so the same thing is explained the same way everywhere. */
 export const EXPLAIN = {
   readiness:
-    "Readiness: how many of the skills this interview tests you have passed in Realistic rehearsals. It counts nothing from Coach mode, and it is a practice estimate, not a prediction.",
+    "Readiness: how many of the skills this interview tests you have passed in Realistic rehearsals. It counts nothing from Practice mode, and it is a practice estimate, not a prediction.",
   proven:
     "Proven: a story turns Proven when a Realistic rehearsal answer that uses it meets the bar, a 3 of 4 on its skills.",
   takes:

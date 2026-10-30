@@ -60,12 +60,12 @@ export function GapReport() {
         <p>{role}</p>
         {data && (
           <p className="muted small">
-            CV:{" "}
+            Resume:{" "}
             {data.resume_deleted ? (
               CV_DELETED
             ) : (
-              <Link to={resumeCheckPath(data.resume_id)} aria-label={`Open breakdown for ${data.resume_name ?? "the CV"}`}>
-                {data.resume_name ?? "CV"}
+              <Link to={resumeCheckPath(data.resume_id)} aria-label={`Open breakdown for ${data.resume_name ?? "the resume"}`}>
+                {data.resume_name ?? "Resume"}
               </Link>
             )}{" "}
             · {formatDate(data.created_at)}

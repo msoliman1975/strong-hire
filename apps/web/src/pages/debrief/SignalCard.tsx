@@ -7,7 +7,7 @@ const SCALE: HireSignal[] = ["No Hire", "Lean No Hire", "Lean Hire", "Hire", "St
 
 /** DB-1: the sentence under the scale. */
 export function changeText(previous: PreviousSignal | null): string {
-  if (!previous) return "Your first scored session for this interview.";
+  if (!previous) return "Your first scored take for this interview.";
   const when = previous.ended_at ? ` on ${formatDate(previous.ended_at)}` : "";
   if (previous.change > 0) return `Up from ${previous.hire_signal}${when} (dashed).`;
   if (previous.change < 0) return `Down from ${previous.hire_signal}${when} (dashed).`;

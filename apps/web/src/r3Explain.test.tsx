@@ -67,7 +67,7 @@ describe("explainers", () => {
     const toggle = screen.getByText("i").closest("summary") as HTMLElement;
     expect(toggle).toHaveAttribute("aria-label", "What's this: Readiness");
     await user.click(toggle);
-    expect(screen.getByRole("note")).toHaveTextContent("It counts nothing from Coach mode");
+    expect(screen.getByRole("note")).toHaveTextContent("It counts nothing from Practice mode");
   });
 
   it("RD-3: the readiness, takes, Proven and hire-signal sentences keep the practice-estimate framing", () => {
@@ -125,7 +125,7 @@ describe("tour", () => {
     const tour = await screen.findByRole("dialog", { name: "Your menu" });
     expect(tour).toHaveTextContent("1 of 3");
     await user.click(within(tour).getByRole("button", { name: "Next tip" }));
-    expect(screen.getByRole("dialog", { name: "Talk to your coach" })).toHaveTextContent("2 of 3");
+    expect(screen.getByRole("dialog", { name: "Career Stories with Strova" })).toHaveTextContent("2 of 3");
     await user.click(screen.getByRole("button", { name: "Skip the tour" }));
     expect(screen.queryByRole("dialog")).toBeNull();
     cleanup();
@@ -151,7 +151,7 @@ describe("How it works", () => {
     await user.click(within(bar).getByRole("button", { name: "Account menu" }));
     await user.click(within(bar).getByRole("link", { name: "Help and how it works" }));
     expect(await screen.findByRole("heading", { level: 1, name: "How it works" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Coach mode and Realistic mode" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Practice mode and Realistic mode" })).toBeInTheDocument();
     expect(screen.getByText(/Your audio is never stored/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Replay the tour" })).toBeInTheDocument();
   });

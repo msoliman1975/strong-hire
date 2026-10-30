@@ -88,7 +88,7 @@ export function InterviewCard({
         )}
         <span className="muted">
           {" · "}
-          {summary.sessions_count} {summary.sessions_count === 1 ? "session" : "sessions"}
+          {summary.sessions_count} {summary.sessions_count === 1 ? "take" : "takes"}
         </span>
         {/* GA-1: the gap analysis behind the match score, one click away (v2 gap report). */}
         {summary.match_score !== null && (

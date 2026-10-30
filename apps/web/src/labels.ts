@@ -48,6 +48,19 @@ export const modeHint: Record<Mode, string> = {
   realistic: "No interruptions. Counts toward your progress.",
 };
 
+/** RH-5: the v2 mode labels. The stored value stays `coach`; only the label is Practice. */
+export const modeLabelV2: Record<Mode, string> = { coach: "Practice", realistic: "Realistic" };
+
+export const modeHintV2: Record<Mode, string> = {
+  coach: "Pause, ask for a hint, or redo an answer. Does not count toward readiness.",
+  realistic: "No interruptions, like the real interview. Counts toward readiness.",
+};
+
+/** The mode labels for the screen: v2 says Practice, v1 keeps Coach. */
+export function modeLabels(v2: boolean): { label: Record<Mode, string>; hint: Record<Mode, string> } {
+  return v2 ? { label: modeLabelV2, hint: modeHintV2 } : { label: modeLabel, hint: modeHint };
+}
+
 export const levelLabel: Record<Level, string> = {
   new_grad: "New grad",
   mid: "Mid level",

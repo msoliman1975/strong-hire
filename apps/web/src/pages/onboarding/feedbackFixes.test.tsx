@@ -138,7 +138,7 @@ describe("the add flow's step bar", () => {
     expect(skip.compareDocumentPosition(screen.getByLabelText("Interview stage")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
     await user.click(cv);
-    expect(await screen.findByRole("heading", { name: "Check your CV" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Check your resume" })).toBeInTheDocument();
     expect(screen.getByTestId("steps-note")).toHaveTextContent(STEP_NOTES.check);
   });
 

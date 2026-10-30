@@ -36,7 +36,7 @@ export function CoachSummary({
           not counted in your progress trends.
         </p>
       )}
-      {coach && <p className="debrief-coach__note">Coach sessions are not counted in your progress trends.</p>}
+      {coach && <p className="debrief-coach__note">Practice takes do not count toward readiness.</p>}
     </div>
   );
 }

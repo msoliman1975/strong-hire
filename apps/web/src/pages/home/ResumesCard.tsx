@@ -27,7 +27,7 @@ function resumeState(r: ResumeOut): string {
 
 /** The CV's name, linked to its breakdown once it is read. */
 function CvName({ r }: { r: ResumeOut }) {
-  const name = r.name ?? "Your CV";
+  const name = r.name ?? "Your resume";
   return r.status === "extracted" ? (
     <Link className="home-resumes__name" to={resumeCheckPath(r.id)} aria-label={`Open breakdown for ${name}`}>
       {name}
@@ -49,11 +49,11 @@ export function ResumesCard() {
   return (
     <section className="card home-journey" data-journey="resumes" aria-labelledby="home-resumes">
       <p className="home-journey__eyebrow">Your resumes</p>
-      <h2 id="home-resumes">The CV your interviews are measured against.</h2>
+      <h2 id="home-resumes">The resume your interviews are measured against.</h2>
       {resumes.isPending ? (
         <p className="muted">Loading your resumes</p>
       ) : latest === null ? (
-        <p className="muted">Add the CV you will interview with. Every match score and plan reads it.</p>
+        <p className="muted">Add the resume you will interview with. Every match score and plan reads it.</p>
       ) : (
         <>
           <dl className="home-journey__counts home-resumes__counts">
@@ -72,7 +72,7 @@ export function ResumesCard() {
             </div>
           </dl>
           {others.length > 0 && (
-            <ul className="plain-list home-resumes__others" aria-label="Your other CVs">
+            <ul className="plain-list home-resumes__others" aria-label="Your other resumes">
               {others.map((r) => (
                 <li key={r.id}>
                   <CvName r={r} /> <span className="muted small">{resumeState(r)}</span>

@@ -14,7 +14,7 @@ export const GAP_COPY = {
   /** A shorter heading where space is tight (the rehearsal page). */
   shortHeading: "Topics your resume can't cover in depth",
   /** One line under the heading. */
-  intro: "The gap is on your resume, not in your experience. Practice the stories your CV leaves out.",
+  intro: "The gap is on your resume, not in your experience. Practice the stories your resume leaves out.",
   /** Before the reason the next rehearsal was set up this way. */
   setUpFrom: "Set up from the topics your resume can't cover in depth:",
 } as const;

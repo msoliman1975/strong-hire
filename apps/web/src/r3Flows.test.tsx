@@ -112,7 +112,7 @@ describe("resume limits (v2)", () => {
   it("LB-1: at 5 resumes the card says Replace one and the upload is blocked", async () => {
     await addResumes(5);
     renderApp("/");
-    const card = await screen.findByRole("region", { name: "The CV your interviews are measured against." });
+    const card = await screen.findByRole("region", { name: "The resume your interviews are measured against." });
     expect(await within(card).findByRole("link", { name: "Replace one" })).toHaveAttribute("href", "/resumes");
     expect(card).toHaveTextContent("5 of 5 · up to 1 MB each");
   });

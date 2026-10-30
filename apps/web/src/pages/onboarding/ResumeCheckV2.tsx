@@ -423,7 +423,7 @@ export function ResumeCheckV2({
           ? "Continue to your interview plan"
           : fresh
             ? "Add a job description to practice for"
-            : "Use this CV for an interview"}
+            : "Use this resume for an interview"}
       </button>
     </div>
   );
@@ -435,13 +435,13 @@ export function ResumeCheckV2({
       {jobId && <Steps current={1} steps={steps} links={onboardingLinks(jobId)} note={STEP_NOTES.check} />}
       {fresh && (
         <p className="cvc-landing" role="status">
-          We read your CV. Check it, then continue.
+          We read your resume. Check it, then continue.
         </p>
       )}
       <div className="cvc-head">
-        <PageHead title="Check your CV" eyebrow={name ? `Resumes · ${name}` : "Resumes"} eyebrowTone="muted">
+        <PageHead title="Check your resume" eyebrow={name ? `Resumes · ${name}` : "Resumes"} eyebrowTone="muted">
           <p>
-            We read your CV into the parts below. Fix anything we got wrong, and look at what we found. Interviewers and
+            We read your resume into the parts below. Fix anything we got wrong, and look at what we found. Interviewers and
             your match scores read this version.
           </p>
           <p className="muted small cvc-saved" data-testid="cvc-saved">
@@ -479,7 +479,7 @@ export function ResumeCheckV2({
             Experience · {draft.roles.length} {draft.roles.length === 1 ? "role" : "roles"}
             {draft.roles.length > 1 ? " · newest first" : ""}
           </p>
-          {draft.roles.length === 0 && <p className="muted">We found no roles in your CV. Add one if you want.</p>}
+          {draft.roles.length === 0 && <p className="muted">We found no roles in your resume. Add one if you want.</p>}
           {draft.roles.map((role, index) => {
             const copy = editing[role.key];
             const roleIssues = issuesFor(index);
@@ -558,8 +558,8 @@ export function ResumeCheckV2({
               {jobId
                 ? "Next, your interview plan for this job."
                 : fresh
-                  ? "Next, add a job description and we compare your CV with it."
-                  : "Use it for an interview: add the job description and we compare your CV with it."}
+                  ? "Next, add a job description and we compare your resume with it."
+                  : "Use it for an interview: add the job description and we compare your resume with it."}
             </p>
             {actions}
           </section>
@@ -1330,7 +1330,7 @@ function IssuesPanel({
       {accepted.error != null && <ErrorNotice error={accepted.error} title="We could not save that." />}
       {shown.length === 0 && filter !== "accepted" && (
         <p className="cvc-card cvc-clear">
-          {filter === "all" ? "Nothing to fix. Your CV reads well." : `No ${filter === "dates" ? "date" : "detail"} issues.`}
+          {filter === "all" ? "Nothing to fix. Your resume reads well." : `No ${filter === "dates" ? "date" : "detail"} issues.`}
         </p>
       )}
       {shown.map((issue, n) => (
@@ -1395,7 +1395,7 @@ function WhatWeCheck() {
             <b>Consistency:</b> skills used in roles but missing from Skills, the same company listed twice.
           </li>
           <li>
-            <b>Against a job:</b> when you check it for an interview, the job's must-have skills that your CV never shows.
+            <b>Against a job:</b> when you check it for an interview, the job's must-have skills that your resume never shows.
           </li>
         </ul>
     </details>

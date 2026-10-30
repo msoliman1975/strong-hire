@@ -90,6 +90,9 @@ export function AppRoutes() {
           <Route index element={<DashboardPage />} />
           <Route path="/welcome" element={<WelcomePage />} />
           <Route path="/jobs" element={<JobsPage />} />
+          {/* NV-1: the v2 rail's routes. Placeholders until U07 builds Target roles and Rehearsals. */}
+          <Route path="/roles" element={<V2Only><JobsPage /></V2Only>} />
+          <Route path="/rehearsals" element={<V2Only><JobsPage /></V2Only>} />
           <Route path="/resumes" element={<ResumesPage />} />
           <Route path="/resumes/:resumeId/check" element={<CheckResumePage />} />
           <Route path="/jobs/new" element={<NewJobPage />} />

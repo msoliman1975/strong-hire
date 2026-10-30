@@ -6,7 +6,7 @@ import { Link } from "react-router";
 import type { Debrief, Scorecard } from "../../api/types";
 import { RealismRating } from "../../components/RealismRating";
 import { PageHead } from "../../components/ui";
-import { difficultyLabel, formatDate, interviewTypeLabel, modeLabel } from "../../labels";
+import { difficultyLabel, formatDate, interviewTypeLabel, modeLabelV2 as modeLabel } from "../../labels";
 import { AnswerList } from "./AnswerList";
 import { CoachSummary } from "./CoachSummary";
 import { DeliveryMetrics } from "./DeliveryMetrics";

@@ -213,12 +213,14 @@ function UpdateBody({ item, onGo }: { item: UpdateItem; onGo: () => void }) {
 }
 
 const AVATAR_LINKS: { to: string; label: string }[] = [
+  // SV-7: the initials button opens Profile first.
+  { to: "/account/profile", label: "Profile" },
   { to: "/account", label: "Account" },
   { to: "/account#plan", label: "Plan and billing" },
   { to: "/reports", label: "Reports" },
 ];
 
-/** Initials that open Account, Plan and billing, Reports, Help and how it works, and Sign out. */
+/** Initials that open Profile, Account, Plan and billing, Reports, Help and how it works, and Sign out. */
 export function AvatarMenu({
   name,
   email,

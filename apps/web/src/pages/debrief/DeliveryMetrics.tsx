@@ -21,7 +21,7 @@ export const DELIVERY_RANGES = {
 } as const;
 
 export const NO_DELIVERY_NOTE =
-  "Pace and filler words are measured from spoken answers. This session has none to measure, for example because it was typed.";
+  "Pace and filler words are measured from spoken answers. This take has none to measure, for example because it was typed.";
 
 /** The plain notes for one answer, empty when everything is within the normal range. */
 export function deliveryNotes(d: NonNullable<QuestionScore["delivery"]>): string[] {

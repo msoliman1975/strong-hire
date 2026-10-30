@@ -147,7 +147,7 @@ describe("DayPlan", () => {
     expect(screen.getByRole("heading", { name: "Your next steps" })).toBeInTheDocument();
     expect(items.map((i) => i.dataset.kind)).toEqual(["rehearsal", "story", "rehearsal"]);
     expect(items[0]).toHaveTextContent("Behavioral rehearsal");
-    expect(items[0]).toHaveTextContent("Coach");
+    expect(items[0]).toHaveTextContent("Practice");
     expect(items[1]).toHaveTextContent("Build a story for");
     expect(screen.getByText(/Add your interview date/)).toBeInTheDocument();
   });
