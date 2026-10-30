@@ -18,8 +18,10 @@ import type {
   JobTargetUpdate,
   Resume,
   ResumeAccepted,
+  ResumeIssues,
   ResumeMatch,
   ResumeOut,
+  StoryIdeasOut,
 } from "./types";
 
 export const jobTargetsApi = {
@@ -134,6 +136,33 @@ export const resumesApi = {
         body: { name },
       }),
     ) as ResumeOut,
+  /** RM-2: make this the main resume. */
+  setMain: async (resumeId: string) =>
+    unwrap(
+      await apiClient.POST("/resumes/{resume_id}/main", { params: { path: { resume_id: resumeId } } }),
+    ) as ResumeOut,
+  /** RM-5: the API's resume check, open and accepted issues. */
+  issues: async (resumeId: string, jobTargetId?: string | null) =>
+    unwrap(
+      await apiClient.GET("/resumes/{resume_id}/issues", {
+        params: { path: { resume_id: resumeId }, query: jobTargetId ? { job_target_id: jobTargetId } : {} },
+      }),
+    ) as ResumeIssues,
+  /** RM-4: story ideas from the resume's achievements. */
+  storyIdeas: async (resumeId: string) =>
+    unwrap(
+      await apiClient.GET("/resumes/{resume_id}/story-ideas", { params: { path: { resume_id: resumeId } } }),
+    ) as StoryIdeasOut,
+  /** RM-4: "Not a story". */
+  dismissIdea: async (resumeId: string, resumeLineRef: string) => {
+    unwrap(
+      await apiClient.POST("/resumes/{resume_id}/story-ideas/dismiss", {
+        params: { path: { resume_id: resumeId } },
+        body: { resume_line_ref: resumeLineRef },
+        parseAs: "text",
+      }),
+    );
+  },
   /** R1: delete a saved CV and its stored file. Its gap reports stay. */
   remove: async (resumeId: string) => {
     unwrap(
