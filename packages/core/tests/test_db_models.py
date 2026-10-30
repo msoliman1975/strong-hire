@@ -47,6 +47,9 @@ SPEC_TABLES = {
     "coach_sessions",  # CO-2
     "coach_turns",  # CO-2
     "takes",  # CO-7
+    # v2.1 UX with Strova
+    "target_interviews",  # RH-1
+    "suggestions",  # SG-1
 }
 
 

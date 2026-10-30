@@ -1,0 +1,167 @@
+{
+  "$defs": {
+    "PlanItem": {
+      "additionalProperties": false,
+      "description": "PS-1: one rehearsal, story or resume item. Done is computed, never ticked by hand.",
+      "properties": {
+        "action_label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The action button's label.",
+          "title": "Action Label"
+        },
+        "action_target": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The app path the action opens, for example /interviews/<id>.",
+          "title": "Action Target"
+        },
+        "due": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "PS-4: the day it is planned for (weekly).",
+          "title": "Due"
+        },
+        "key": {
+          "description": "Stable id of the item, for example interview:<uuid>.",
+          "minLength": 1,
+          "title": "Key",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/PlanItemKind"
+        },
+        "status": {
+          "$ref": "#/$defs/PlanItemStatus"
+        },
+        "sub": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The sub-line, for example: now 58.",
+          "title": "Sub"
+        },
+        "target_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The interview, story or resume the item is about.",
+          "title": "Target Id"
+        },
+        "title": {
+          "description": "Stripe \u00b7 Behavioral: readiness 75 or more",
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "kind",
+        "title",
+        "status"
+      ],
+      "title": "PlanItem",
+      "type": "object"
+    },
+    "PlanItemKind": {
+      "description": "PS-1: the three kinds of personal plan items, each with its own chip.",
+      "enum": [
+        "rehearsal",
+        "story",
+        "resume"
+      ],
+      "title": "PlanItemKind",
+      "type": "string"
+    },
+    "PlanItemStatus": {
+      "description": "PS-1: done is computed from the user's data, never ticked by hand.",
+      "enum": [
+        "done",
+        "next",
+        "todo"
+      ],
+      "title": "PlanItemStatus",
+      "type": "string"
+    },
+    "PlanStyle": {
+      "description": "PS-2: how the personal plan is shown. NULL on the user until chosen in onboarding.",
+      "enum": [
+        "weekly",
+        "checklist"
+      ],
+      "title": "PlanStyle",
+      "type": "string"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/plan.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "PS-1: the user's personal plan in the chosen style.",
+  "properties": {
+    "items": {
+      "items": {
+        "$ref": "#/$defs/PlanItem"
+      },
+      "title": "Items",
+      "type": "array"
+    },
+    "style": {
+      "$ref": "#/$defs/PlanStyle"
+    },
+    "week_start": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "PS-4: the Monday of the week shown. Weekly style only.",
+      "title": "Week Start"
+    }
+  },
+  "required": [
+    "style"
+  ],
+  "title": "Plan",
+  "type": "object"
+}

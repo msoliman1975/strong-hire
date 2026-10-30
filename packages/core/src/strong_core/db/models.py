@@ -62,6 +62,7 @@ from strong_core.schemas.enums import (
     OrgType,
     Phase,
     PlanCode,
+    PlanStyle,
     ProfileStatus,
     RoleFamily,
     SessionChannel,
@@ -71,6 +72,8 @@ from strong_core.schemas.enums import (
     StorySource,
     StoryStatus,
     SubscriptionStatus,
+    SuggestionKind,
+    SuggestionStatus,
     Tone,
     TriageState,
     UsageComponent,
@@ -139,6 +142,8 @@ USER_OWNED_TABLES = (
     "coach_sessions",
     "coach_turns",
     "takes",
+    "target_interviews",
+    "suggestions",
 )
 
 # Platform tables: no org_id, not owned by one user. A test checks that every table is in
@@ -246,6 +251,16 @@ class User(Base):
         server_default="false",
         comment="L05: client-side analytics only when true",
     )
+    # v2.1 UX with Strova: the personal plan (PS-2, PS-6).
+    plan_style: Mapped[PlanStyle | None] = mapped_column(
+        str_enum(PlanStyle, "plan_style"), comment="PS-2: weekly or checklist. NULL until chosen"
+    )
+    plan_email_muted: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+        server_default="false",
+        comment="PS-6: true mutes the weekly plan reminder emails",
+    )
 
 
 class Subscription(Base):
@@ -318,6 +333,16 @@ class ExitSurvey(Base):
 
 class Resume(Base):
     __tablename__ = "resumes"
+    __table_args__ = (
+        # RM-2: at most one main resume per user among non-deleted resumes.
+        Index(
+            "uq_resumes_main_per_user",
+            "user_id",
+            unique=True,
+            postgresql_where=text("is_main AND deleted_at IS NULL"),
+            sqlite_where=text("is_main AND deleted_at IS NULL"),
+        ),
+    )
 
     id: Mapped[uuid.UUID] = _uuid_pk()
     org_id: Mapped[uuid.UUID] = _org_fk()
@@ -344,6 +369,12 @@ class Resume(Base):
     )
     accepted_issues: Mapped[list[Any] | None] = mapped_column(
         comment="schemas.AcceptedIssues: CV check issues the user accepted. NULL: none yet"
+    )
+    is_main: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+        server_default="false",
+        comment="RM-2: the user's main resume, preselected for new roles. One per user",
     )
     uploaded_at: Mapped[datetime] = _created_at()
 
@@ -1272,3 +1303,90 @@ class Take(Base):
         String(200), comment="PL-6: scorer prompt refs, comma separated"
     )
     created_at: Mapped[datetime] = _created_at()
+
+
+class TargetInterview(Base):
+    """RH-1, TG-3: one interview the user keeps for a target role: role x resume x type.
+
+    The unit for takes, readiness and the plan.
+    """
+
+    __tablename__ = "target_interviews"
+    __table_args__ = (
+        Index(
+            "uq_target_interviews_role_resume_type",
+            "job_target_id",
+            "resume_id",
+            "interview_type",
+            unique=True,
+            postgresql_where=text("archived_at IS NULL"),
+            sqlite_where=text("archived_at IS NULL"),
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    org_id: Mapped[uuid.UUID] = _org_fk()
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    job_target_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("job_targets.id", ondelete="CASCADE"), index=True
+    )
+    resume_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("resumes.id", ondelete="CASCADE"), index=True
+    )
+    interview_type: Mapped[InterviewType] = mapped_column(str_enum(InterviewType, "interview_type"))
+    custom_json: Mapped[dict[str, Any] | None] = mapped_column(
+        comment="CU-1: schemas.CustomSessionSpec. NULL for the standard types"
+    )
+    created_at: Mapped[datetime] = _created_at()
+    archived_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), comment="TG-3: removed by the user. NULL: kept"
+    )
+
+
+class Suggestion(Base):
+    """SG-1: one suggestion from Strova (schemas.Suggestion)."""
+
+    __tablename__ = "suggestions"
+    __table_args__ = (Index("ix_suggestions_user_status", "user_id", "status"),)
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    org_id: Mapped[uuid.UUID] = _org_fk()
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    kind: Mapped[SuggestionKind] = mapped_column(str_enum(SuggestionKind, "suggestion_kind"))
+    status: Mapped[SuggestionStatus] = mapped_column(
+        str_enum(SuggestionStatus, "suggestion_status"),
+        default=SuggestionStatus.OPEN,
+        server_default="open",
+    )
+    source_session_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("sessions.id", ondelete="SET NULL"), comment="The debrief's session"
+    )
+    source_question_ref: Mapped[str | None] = mapped_column(
+        String(200), comment="QuestionScore.question_ref of the answer"
+    )
+    source_resume_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("resumes.id", ondelete="SET NULL"), comment="The resume it came from"
+    )
+    job_target_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("job_targets.id", ondelete="SET NULL"), comment="The role it is for"
+    )
+    story_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("stories.id", ondelete="CASCADE"), index=True, comment="The story it changes"
+    )
+    resume_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("resumes.id", ondelete="CASCADE"), comment="The resume it changes"
+    )
+    payload: Mapped[dict[str, Any]] = mapped_column(comment="schemas.SuggestionPayload")
+    reason: Mapped[str] = mapped_column(Text, comment="Why Strova suggests it")
+    prompt_ref: Mapped[str | None] = mapped_column(
+        String(200), comment="The prompt that wrote it. NULL for rule-based suggestions"
+    )
+    undo: Mapped[dict[str, Any] | None] = mapped_column(
+        comment="SG-2: what accepting changed, to restore it. NULL until applied"
+    )
+    created_at: Mapped[datetime] = _created_at()
+    resolved_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), comment="When it was accepted or dismissed"
+    )

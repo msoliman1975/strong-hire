@@ -1,0 +1,21 @@
+{
+  "summary": "The action is clear and yours. The result needs the number you gave me.",
+  "notes": [
+    {
+      "part": "result",
+      "note": "You said not one payment failed. Put that in the result.",
+      "edit": {
+        "part": "result",
+        "before": "The migration went well.",
+        "after": "We finished a week before Black Friday and not one payment failed.",
+        "quotes": [
+          "we were done a week before Black Friday and not one payment failed"
+        ]
+      }
+    },
+    {
+      "part": "reflection",
+      "note": "Say what you would do differently next time."
+    }
+  ]
+}

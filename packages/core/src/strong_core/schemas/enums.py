@@ -268,6 +268,49 @@ class ReadinessStatus(StrEnum):
     NOT_ENOUGH_DATA = "not_enough_data"
 
 
+class PlanStyle(StrEnum):
+    """PS-2: how the personal plan is shown. NULL on the user until chosen in onboarding."""
+
+    WEEKLY = "weekly"
+    CHECKLIST = "checklist"
+
+
+class PlanItemKind(StrEnum):
+    """PS-1: the three kinds of personal plan items, each with its own chip."""
+
+    REHEARSAL = "rehearsal"
+    STORY = "story"
+    RESUME = "resume"
+
+
+class PlanItemStatus(StrEnum):
+    """PS-1: done is computed from the user's data, never ticked by hand."""
+
+    DONE = "done"
+    NEXT = "next"
+    TODO = "todo"
+
+
+class SuggestionKind(StrEnum):
+    """SG-1: what a suggestion from Strova proposes (ux-spec section 8)."""
+
+    TUNE_STORY = "tune_story"
+    NEW_STORY = "new_story"
+    MISSING_SKILL = "missing_skill"
+    TAILOR_ROLE = "tailor_role"
+    IMPROVE_RESUME_LINE = "improve_resume_line"
+    STORY_IDEA = "story_idea"
+    REVIEW = "review"
+
+
+class SuggestionStatus(StrEnum):
+    """SG-1, SG-8: a suggestion is open until accepted or dismissed. Dismissed ones never return."""
+
+    OPEN = "open"
+    ACCEPTED = "accepted"
+    DISMISSED = "dismissed"
+
+
 class GapStatus(StrEnum):
     """State of one gap analysis run (GA-1 to GA-4)."""
 

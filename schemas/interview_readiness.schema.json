@@ -1,0 +1,137 @@
+{
+  "$defs": {
+    "Competency": {
+      "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.",
+      "enum": [
+        "ownership",
+        "impact",
+        "collaboration",
+        "conflict_handling",
+        "learning_from_failure",
+        "communication",
+        "role_fit",
+        "depth_of_experience",
+        "judgment",
+        "motivation",
+        "team_fit",
+        "scope_at_level",
+        "technical_depth",
+        "accuracy",
+        "reasoning",
+        "trade_offs",
+        "clarity_of_explanation",
+        "problem_framing",
+        "structure",
+        "user_and_business_sense",
+        "estimation_logic",
+        "prioritization",
+        "recommendation",
+        "logistics_and_expectations"
+      ],
+      "title": "Competency",
+      "type": "string"
+    },
+    "CompetencyReadiness": {
+      "additionalProperties": false,
+      "description": "RH-2: the most recent rubric score of one competency over the last three Realistic takes.",
+      "properties": {
+        "competency": {
+          "$ref": "#/$defs/Competency"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "maximum": 4,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "1 to 4. Null when not scored yet.",
+          "title": "Score"
+        }
+      },
+      "required": [
+        "competency",
+        "score"
+      ],
+      "title": "CompetencyReadiness",
+      "type": "object"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/interview_readiness.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "RH-2: readiness for one interview (role x resume x type), from Realistic takes only.\n\nscore = round((mean - 1) / 3 * 100) over the competencies scored so far; null with no\nRealistic take.",
+  "properties": {
+    "change": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Change since the previous take. Null when there is none.",
+      "title": "Change"
+    },
+    "competencies": {
+      "items": {
+        "$ref": "#/$defs/CompetencyReadiness"
+      },
+      "title": "Competencies",
+      "type": "array"
+    },
+    "goal": {
+      "default": 75,
+      "maximum": 100,
+      "minimum": 0,
+      "title": "Goal",
+      "type": "integer"
+    },
+    "interview_id": {
+      "format": "uuid",
+      "title": "Interview Id",
+      "type": "string"
+    },
+    "kind": {
+      "const": "practice_estimate",
+      "default": "practice_estimate",
+      "description": "RD-3: every screen labels it this way.",
+      "title": "Kind",
+      "type": "string"
+    },
+    "score": {
+      "anyOf": [
+        {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "0 to 100. Null with no Realistic take.",
+      "title": "Score"
+    },
+    "takes_counted": {
+      "default": 0,
+      "description": "Realistic takes used.",
+      "maximum": 3,
+      "minimum": 0,
+      "title": "Takes Counted",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "interview_id",
+    "score"
+  ],
+  "title": "InterviewReadiness",
+  "type": "object"
+}

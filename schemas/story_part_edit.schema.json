@@ -1,0 +1,58 @@
+{
+  "$defs": {
+    "StoryPart": {
+      "description": "ST-1: the five parts of a story, in the order the workbench and prompts show them.",
+      "enum": [
+        "context",
+        "stakes",
+        "action",
+        "result",
+        "reflection"
+      ],
+      "title": "StoryPart",
+      "type": "string"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/story_part_edit.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "SG-2, ST-11: a before-and-after edit of one story part.",
+  "properties": {
+    "after": {
+      "description": "The proposed text.",
+      "minLength": 1,
+      "title": "After",
+      "type": "string"
+    },
+    "before": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The part as it is now. Null when it is empty.",
+      "title": "Before"
+    },
+    "part": {
+      "$ref": "#/$defs/StoryPart"
+    },
+    "quotes": {
+      "description": "The user's words the new text came from, verbatim.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Quotes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "part",
+    "before",
+    "after"
+  ],
+  "title": "StoryPartEdit",
+  "type": "object"
+}

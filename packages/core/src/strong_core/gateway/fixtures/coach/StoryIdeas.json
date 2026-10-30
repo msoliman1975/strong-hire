@@ -1,0 +1,17 @@
+{
+  "items": [
+    {
+      "achievement": "Moved checkout to a new payments provider with zero failed payments",
+      "role": "Senior Engineer, Shopfront",
+      "resume_line_ref": "roles[0].achievements[1]",
+      "skills": [
+        "ownership",
+        "impact"
+      ],
+      "missing_parts": [
+        "stakes",
+        "reflection"
+      ]
+    }
+  ]
+}
