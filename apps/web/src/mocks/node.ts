@@ -15,6 +15,7 @@ import { questionHandlers } from "./questionHandlers";
 import { readinessHandlers } from "./readinessHandlers";
 import { storyHandlers } from "./storyHandlers";
 import { suggestionHandlers } from "./suggestionHandlers";
+import { personalPlanHandlers } from "./personalPlanHandlers";
 import { transcriptHandlers } from "./transcriptHandlers";
 import { waitlistHandlers } from "./waitlistHandlers";
 
@@ -35,6 +36,7 @@ export const server = setupServer(
   ...questionHandlers(),
   ...storyHandlers(),
   ...suggestionHandlers(),
+  ...personalPlanHandlers(),
   ...waitlistHandlers(),
   ...coachVoiceHandlers(),
   ...coachHandlers(mockStore),

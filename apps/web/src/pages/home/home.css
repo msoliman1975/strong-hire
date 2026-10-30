@@ -440,3 +440,136 @@
 a.home-resumes__name {
   color: inherit;
 }
+
+/* HO-1: Home with Strova (mockup #home). Cards and chips come from components/ux/ux.css. */
+.home-strova h1 {
+  margin: 0;
+}
+
+.home-strova__eyebrow {
+  color: var(--sh-violet-light, #a594ff);
+}
+
+.home-strova__legend {
+  gap: 6px;
+}
+
+.home-strova__card {
+  text-decoration: none;
+  color: inherit;
+}
+
+.home-strova__card h3 {
+  margin: 0;
+}
+
+.home-strova__warn {
+  color: var(--sh-warn-ink);
+}
+
+.home-strova__violet {
+  color: var(--sh-violet-ink);
+}
+
+.home-strova__ok {
+  color: var(--sh-ok-ink);
+}
+
+/* PS-3, PS-4: plan rows, as the mockup's .planitem and .check. */
+.home-planitem {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--sh-line);
+}
+
+.home-planitem:last-child {
+  border-bottom: 0;
+}
+
+.home-planitem.next {
+  background: var(--sh-violet-soft);
+  margin: 0 -12px;
+  padding: 12px;
+  border-radius: 12px;
+  border-bottom-color: transparent;
+}
+
+.home-planitem__day {
+  width: 44px;
+  flex: none;
+  font: 500 12px var(--sh-font-mono);
+  color: var(--sh-muted);
+  padding-top: 2px;
+}
+
+.home-planitem__body {
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.home-planitem__done {
+  text-decoration: line-through;
+}
+
+.home-check {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  border-radius: 6px;
+  border: 2px solid var(--sh-line-strong);
+  margin-top: 2px;
+}
+
+.home-check.done {
+  background: var(--sh-ok);
+  border-color: var(--sh-ok);
+}
+
+.home-cgroup {
+  border-left: 4px solid var(--sh-line-strong);
+  padding-left: 14px;
+}
+
+.home-cgroup[data-kind="rehearsal"] {
+  border-left-color: var(--sh-teal);
+}
+
+.home-cgroup[data-kind="story"] {
+  border-left-color: var(--sh-violet);
+}
+
+.home-cgroup[data-kind="resume"] {
+  border-left-color: var(--sh-warn);
+}
+
+.home-cgroup summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.home-cgroup summary::-webkit-details-marker {
+  display: none;
+}
+
+.home-cgroup summary h3 {
+  margin: 0;
+}
+
+.home-cgroup .caret {
+  transition: transform 0.15s;
+  color: var(--sh-muted);
+}
+
+.home-cgroup[open] .caret {
+  transform: rotate(180deg);
+}
+
+.home-cgroup[data-kind="resume"] .home-cgroup__bar > span {
+  background: var(--sh-warn);
+}

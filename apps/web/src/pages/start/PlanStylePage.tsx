@@ -45,7 +45,6 @@ export function PlanStylePage() {
   const ideaCount = ideas.data?.ideas.length ?? 0;
   const issueCount = issues.data?.open.length ?? 0;
   const firstIdea = ideas.data?.ideas[0]?.achievement;
-  const short = (t: string) => (t.length > 38 ? `${t.slice(0, 36).trimEnd()}…` : t);
   const weekly = style === "weekly";
 
   return (
@@ -84,45 +83,7 @@ export function PlanStylePage() {
           </div>
         </div>
       </div>
-      <div className="sx-grid2" role="group" aria-label="Plan style">
-        <button type="button" className={`sx-choice${weekly ? " sel" : ""}`} aria-pressed={weekly} onClick={() => setStyle("weekly")}>
-          <span className="sx-eyebrow">Weekly plan</span>
-          <h2>Strova plans each week for you</h2>
-          <span className="sx-small sx-muted">Good if you like a routine, or have an interview date.</span>
-          <span className="sx-card tight" style={{ marginTop: 6 }}>
-            <span className="sx-small">
-              <span className="sx-mono sx-muted">Mon</span> Story goal: build {firstIdea ? `"${short(firstIdea)}"` : "your first story"}
-            </span>
-            <span className="sx-small">
-              <span className="sx-mono sx-muted">Wed</span> Fix one resume issue
-            </span>
-            <span className="sx-small">
-              <span className="sx-mono sx-muted">Fri</span> Story goal: get it to Ready
-            </span>
-            <Later />
-          </span>
-          <span className="sx-small sx-muted">
-            Strova reminds you in the app and by email when something is due. You can mute email.
-          </span>
-        </button>
-        <button type="button" className={`sx-choice${!weekly ? " sel" : ""}`} aria-pressed={!weekly} onClick={() => setStyle("checklist")}>
-          <span className="sx-eyebrow">Readiness checklist</span>
-          <h2>Work through a list at your own pace</h2>
-          <span className="sx-small sx-muted">Good if your schedule changes week to week.</span>
-          <span className="sx-card tight" style={{ marginTop: 6 }}>
-            <span className="sx-small">
-              <span className="sx-chip v">Stories</span>{" "}
-              {ideaCount > 0 ? `Build your ${plural(ideaCount, "story idea")} to Ready` : "Build your first story to Ready"}
-            </span>
-            <span className="sx-small">
-              <span className="sx-chip warn">Resume</span>{" "}
-              {issueCount > 0 ? `Fix or accept ${plural(issueCount, "resume issue")}` : "Keep your resume clean"}
-            </span>
-            <Later />
-          </span>
-          <span className="sx-small sx-muted">No schedule and no reminders, just a clear list that ticks itself off.</span>
-        </button>
-      </div>
+      <PlanStyleChoices style={style} onChange={setStyle} examples={{ firstIdea, ideaCount, issueCount }} />
       <p className="sx-muted sx-small">
         Both styles cover the same work. When you add a target role, its mock interviews are added to whichever style
         you pick. You can change the style any time in your profile.
@@ -133,6 +94,87 @@ export function PlanStylePage() {
           Use the {weekly ? "weekly plan" : "checklist"}
         </button>
       </div>
+    </div>
+  );
+}
+
+/** PS-2: the two plan styles, each with an example of what it shows. Onboarding (ON-5) shows the
+ * plan before a role; Profile passes `rehearsal` and `story` from the user's plan. */
+export function PlanStyleChoices({
+  style,
+  onChange,
+  examples,
+}: {
+  style: Style;
+  onChange: (next: Style) => void;
+  examples: { firstIdea?: string; ideaCount: number; issueCount: number; rehearsal?: string; story?: string };
+}) {
+  const { firstIdea, ideaCount, issueCount, rehearsal, story = "your next story" } = examples;
+  const withRole = rehearsal !== undefined;
+  const short = (t: string) => (t.length > 38 ? `${t.slice(0, 36).trimEnd()}…` : t);
+  const weekly = style === "weekly";
+  const setStyle = onChange;
+  return (
+    <div className="sx-grid2" role="group" aria-label="Plan style">
+      <button type="button" className={`sx-choice${weekly ? " sel" : ""}`} aria-pressed={weekly} onClick={() => setStyle("weekly")}>
+        <span className="sx-eyebrow">Weekly plan</span>
+        <h2>Strova plans each week for you</h2>
+        <span className="sx-small sx-muted">Good if you like a routine, or have an interview date.</span>
+        <span className="sx-card tight" style={{ marginTop: 6 }}>
+          {withRole ? (
+            <>
+              <span className="sx-small">
+                <span className="sx-mono sx-muted">Mon</span> Take: {rehearsal}
+              </span>
+              <span className="sx-small">
+                <span className="sx-mono sx-muted">Wed</span> Story goal: {story} to Ready
+              </span>
+              <span className="sx-small">
+                <span className="sx-mono sx-muted">Fri</span> Fix one resume issue
+              </span>
+            </>
+          ) : (
+            <>
+              <span className="sx-small">
+                <span className="sx-mono sx-muted">Mon</span> Story goal: build{" "}
+                {firstIdea ? `"${short(firstIdea)}"` : "your first story"}
+              </span>
+              <span className="sx-small">
+                <span className="sx-mono sx-muted">Wed</span> Fix one resume issue
+              </span>
+              <span className="sx-small">
+                <span className="sx-mono sx-muted">Fri</span> Story goal: get it to Ready
+              </span>
+              <Later />
+            </>
+          )}
+        </span>
+        <span className="sx-small sx-muted">
+          Strova reminds you in the app and by email when something is due. You can mute email.
+        </span>
+      </button>
+      <button type="button" className={`sx-choice${!weekly ? " sel" : ""}`} aria-pressed={!weekly} onClick={() => setStyle("checklist")}>
+        <span className="sx-eyebrow">Readiness checklist</span>
+        <h2>Work through a list at your own pace</h2>
+        <span className="sx-small sx-muted">Good if your schedule changes week to week.</span>
+        <span className="sx-card tight" style={{ marginTop: 6 }}>
+          {withRole && (
+            <span className="sx-small">
+              <span className="sx-chip t">Rehearsals</span> {rehearsal} readiness 75 or more
+            </span>
+          )}
+          <span className="sx-small">
+            <span className="sx-chip v">Stories</span>{" "}
+            {ideaCount > 0 ? `Build your ${plural(ideaCount, "story idea")} to Ready` : "Build your first story to Ready"}
+          </span>
+          <span className="sx-small">
+            <span className="sx-chip warn">Resume</span>{" "}
+            {issueCount > 0 ? `Fix or accept ${plural(issueCount, "resume issue")}` : "Keep your resume clean"}
+          </span>
+          {!withRole && <Later />}
+        </span>
+        <span className="sx-small sx-muted">No schedule and no reminders, just a clear list that ticks itself off.</span>
+      </button>
     </div>
   );
 }
