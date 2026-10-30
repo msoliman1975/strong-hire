@@ -24,6 +24,7 @@ from strong_core.schemas import (
     SessionConfig,
     SessionStatus,
     StandardType,
+    Suggestion,
 )
 
 # "not_ended": the interview has not ended yet (created, in progress or interrupted), so nothing
@@ -135,6 +136,14 @@ class Debrief(_Out):
     )
     answers_at_bar: AnswersAtBar | None = Field(
         default=None, description="DB-2. Null until the debrief is ready."
+    )
+    suggestions: list[Suggestion] = Field(
+        default_factory=list,
+        description="DB-5, SG-2 to SG-4: Strova's open suggestions from this take, newest first.",
+    )
+    next_plan_item: str | None = Field(
+        default=None,
+        description="DB-6: the next item of the personal plan. Null until the plan has one (U11).",
     )
 
 

@@ -41,6 +41,9 @@ from strong_worker.inputs.testing import (
     enable_sqlite_jsonb,
     make_fetcher,
 )
+from strong_worker.scoring import jobs as scoring_jobs
+from strong_worker.scoring.jobs import ScoringContext
+from strong_worker.suggestions import jobs as suggestion_jobs
 
 enable_sqlite_jsonb()
 
@@ -62,7 +65,13 @@ def _no_usage_sink() -> Iterator[None]:
 
 
 WORKER_FUNCTIONS = {
-    f.__name__: f for f in (*jobs.FUNCTIONS, *gap_jobs.FUNCTIONS, *account_jobs.FUNCTIONS)
+    f.__name__: f
+    for f in (
+        *jobs.FUNCTIONS,
+        *gap_jobs.FUNCTIONS,
+        *account_jobs.FUNCTIONS,
+        *suggestion_jobs.FUNCTIONS,
+    )
 }
 
 
@@ -135,6 +144,8 @@ def ctx(
         account_jobs.CTX_KEY: AccountContext(
             sessionmaker=sessionmaker, store=store, exports=export_store
         ),
+        # U08: the suggestion jobs use the scoring context.
+        scoring_jobs.CTX_KEY: ScoringContext(sessionmaker=sessionmaker, gateway=gateway),
     }
 
 

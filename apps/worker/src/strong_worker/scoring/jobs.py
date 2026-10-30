@@ -43,6 +43,7 @@ from strong_worker.pause import wait_if_paused
 from strong_worker.scoring.delivery import with_delivery
 from strong_worker.scoring.scorer import ScoringError, ScoringOutcome, SessionScorer
 from strong_worker.scoring.stories import run_story_step
+from strong_worker.suggestions.after_take import run_suggestion_step
 
 log = logging.getLogger(__name__)
 
@@ -161,6 +162,10 @@ async def score_session(ctx: dict[str, Any], session_id: str, org_id: str) -> di
             DEBRIEF_BUDGET_S,
         )
     stories = await run_story_step(scoring.sessionmaker, gateway, session.id, session.org_id)
+    # SG-2 to SG-4: Strova's suggestions from the scored answers, after the story step.
+    suggestions = await run_suggestion_step(
+        scoring.sessionmaker, gateway, session.id, session.org_id
+    )
     return {
         "outcome": "scored",
         "hire_signal": card.hire_signal.value,
@@ -175,6 +180,7 @@ async def score_session(ctx: dict[str, Any], session_id: str, org_id: str) -> di
         "ready_after_s": round(ready_after, 3),
         "within_budget": ready_after <= DEBRIEF_BUDGET_S,
         **stories,
+        **suggestions,
     }
 
 

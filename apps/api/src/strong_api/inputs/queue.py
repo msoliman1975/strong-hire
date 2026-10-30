@@ -15,6 +15,9 @@ MATCH_JOB_TARGET = "match_job_target"
 PARSE_RESUME = "parse_resume"
 DELETE_RESUME_FILE = "delete_resume_file"  # R1: the file of a deleted CV
 STORY_IDEA_SKILLS = "story_idea_skills"  # RM-4: likely skills of a resume's story ideas
+# Names of the Arq functions in strong_worker.suggestions.jobs (U08).
+SUGGEST_RESUME_LINE = "suggest_resume_line"  # SG-6: improve a resume line from a story
+REVIEW_STORY = "review_story"  # ST-11: Strova's review of one story
 # Names of the Arq functions in strong_worker.gap.jobs (P6).
 RUN_GAP_ANALYSIS = "run_gap_analysis_job"
 BUILD_INTERVIEWER_BRIEF = "build_interviewer_brief"

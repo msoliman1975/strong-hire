@@ -57,6 +57,7 @@ from strong_api.scoring.schemas import (
     ScoringAccepted,
 )
 from strong_api.sessions.failure import failed_before_start, failure_reason
+from strong_api.suggestions.router import debrief_suggestions
 from strong_core.db.models import Company, InterviewSession, JobTarget
 from strong_core.db.models import GapAnalysis as GapRow
 from strong_core.db.models import ProgressSnapshot as SnapshotRow
@@ -375,6 +376,7 @@ async def get_debrief(session_id: uuid.UUID, db: Db, me: Me) -> Debrief:
         questions=_debrief_questions(_brief(session)),
         previous_signal=None if card is None else await _previous_signal(db, session, card),
         answers_at_bar=None if card is None else answers_at_bar(card),
+        suggestions=await debrief_suggestions(db, me.org_id, me.user_id, session.id),
     )
 
 
