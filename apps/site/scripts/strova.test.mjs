@@ -25,7 +25,8 @@ test("SV-8: Meet Strova sits below the hero with the copy and the call to action
       "Strova reads your resume, helps you build the stories you'll tell, and rehearses the real interview with you.",
     ),
   );
-  assert.match(page, /<a class="btn" href=\{signupUrl\("strova"\)\}>Start with your resume<\/a>/);
+  // The call to action signs up; while the site is in waitlist mode it joins the waitlist, as the hero does.
+  assert.match(page, /CTA === "signup" \? \(\s*<a class="btn" href=\{signupUrl\("strova"\)\}>Start with your resume<\/a>/);
   assert.match(page, /<Strova mode="coaching" size=\{104\} \/>/);
 });
 

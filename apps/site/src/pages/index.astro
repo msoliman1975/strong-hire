@@ -304,7 +304,13 @@ const CONTEXTS = [
           <li><Strova mode="interviewing" size={64} /><span>Plays the interviewer, then gives you the verdict.</span></li>
         </ul>
         <div class="actions">
-          <a class="btn" href={signupUrl("strova")}>Start with your resume</a>
+          {
+            CTA === "signup" ? (
+              <a class="btn" href={signupUrl("strova")}>Start with your resume</a>
+            ) : (
+              <a class="btn" href="#join">Join the beta waitlist</a>
+            )
+          }
         </div>
       </div>
     </div>
