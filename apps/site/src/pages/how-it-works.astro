@@ -1,51 +1,122 @@
 ---
 import Base from "../layouts/Base.astro";
-import { CTA, PRACTICE_NOTICE } from "../data/site";
+import { CTA, PRACTICE_NOTICE, READINESS_NOTICE } from "../data/site";
 
-// Q8: a still walkthrough until the demo video exists. The screenshots come from the app with
-// its mock API (apps/site/scripts/screenshots.md); they show made-up data.
-const SHOTS = [
+// UI-3: the v2 walkthrough, the same two journeys as the app's own "How it works" page. Q8: still
+// images until the demo video exists. The screenshots come from the app with its mock API
+// (apps/site/scripts/screenshots.md); they show made-up data.
+const JOURNEYS = [
   {
-    src: "/img/step-gap.jpg",
-    title: "1. Paste the job posting and your CV",
-    text: "Strong Hire reads both and shows where you match, where you don't, and the sessions to practice first. This part is free.",
-    alt: "The gap analysis page: a match score, the posting's requirements with evidence from the CV, and a suggested session plan.",
+    id: "stories",
+    eyebrow: "Build your stories",
+    title: "Turn what you did into stories that hold up",
+    lede: "A story is one moment from your career, told in five parts: context, stakes, your action, the result and what you learned.",
+    shots: [
+      {
+        src: "/img/v2-coach.jpg",
+        title: "1. Talk it through with the coach",
+        text: "Tell the coach what happened, by voice or by text. It asks for what an interviewer will want, your own role, a number, a concrete example, the trade-off, and fills in each part from your words. Pick a gentle or a direct coaching style.",
+        alt: "A coach session: the conversation with the coach beside the story's five parts, showing which are filled.",
+      },
+      {
+        src: "/img/v2-story.jpg",
+        title: "2. Practice it in takes",
+        text: "Tell the story again, spoken or typed. Each take is scored 1 to 4 on the story's skills. The coach gives you a 60-second and a full version from your own words, and the story turns Proven when a Realistic answer that used it meets the bar.",
+        alt: "The story workbench: a story's five parts, its skills, and its scored takes.",
+      },
+    ],
   },
   {
-    src: "/img/step-live.jpg",
-    title: "2. Rehearse out loud",
-    text: "The interviewer speaks, listens, and follows up when an answer is vague. Choose Realistic mode for a straight run, or Coach mode to pause, get a hint and redo an answer.",
-    alt: "A live interview: the interviewer's captions, a timer and the controls to end the interview.",
-  },
-  {
-    src: "/img/step-debrief.jpg",
-    title: "3. Read the debrief",
-    text: "A hire signal with the reasons, a 1 to 4 score per question with quotes from your answers, and what to practice next.",
-    alt: "The debrief: the hire signal scale, the rationale, and a score per question.",
+    id: "prep",
+    eyebrow: "Prep for an interview",
+    title: "Get ready for one real interview",
+    lede: "Add the job posting and your resume. Everything for that interview lives on one plan, counting down to the day.",
+    shots: [
+      {
+        src: "/img/v2-plan.jpg",
+        title: "1. Read your plan",
+        text: "Strong Hire checks your CV against the job and shows a match score, what the company will test, where it will probe, which of your stories fits each skill, and a day-by-day plan to the interview. Gap analyses are free.",
+        alt: "The interview plan: what the interview will test, the story fit for each skill, and the next rehearsal.",
+      },
+      {
+        src: "/img/v2-room.jpg",
+        title: "2. Rehearse out loud",
+        text: "The interviewer works from a brief built from the company, the role and your resume. Pick the type, the tone, the difficulty and 30 or 45 minutes. Realistic mode runs straight through; Coach mode lets you pause, get a hint and redo an answer.",
+        alt: "The live interview room: the interviewer's captions, the time on the current answer and the controls.",
+      },
+      {
+        src: "/img/v2-debrief.jpg",
+        title: "3. Read the debrief",
+        text: "A hire signal with the reasons and the change since last time, how many answers met the bar, a 1 to 4 score per answer with quotes, your pace and filler words, and the full transcript. Save any answer as a story.",
+        alt: "The debrief: the hire signal, the answers that met the bar and a score per answer.",
+      },
+    ],
   },
 ];
 ---
 
 <Base
   title="How it works | Strong Hire"
-  description="Paste a job posting and your CV, rehearse the interview by voice with an AI interviewer, then read a debrief with a hire signal and quoted evidence."
+  description="Build your career stories with an AI coach, then prep for a real interview: a plan from the job posting and your resume, a voice rehearsal with a briefed AI interviewer, and a debrief you can act on."
 >
   <section class="section">
     <div class="wrap">
       <h1>How it works</h1>
-      <p class="lede">Three steps, about 40 minutes from the job posting to your first verdict.</p>
-      <div class="stack">
-        {
-          SHOTS.map((s) => (
-            <figure class="grid-2">
-              <img class="shot" src={s.src} alt={s.alt} width="1280" height="860" loading="lazy" decoding="async" />
-              <figcaption>
-                <h2>{s.title}</h2>
-                <p>{s.text}</p>
-              </figcaption>
-            </figure>
-          ))
-        }
+      <p class="lede">Two ways in: build your stories, or prep for an interview. Most people do both, and each one feeds the other.</p>
+      <figure class="grid-2">
+        <img class="shot" src="/img/v2-home.jpg" alt="Home: your resume, your interview with the days left and the next step, and your story library." width="1280" height="860" decoding="async" fetchpriority="high" />
+        <figcaption>
+          <h2>Everything starts at Home</h2>
+          <p>Your resumes, a card for each interview with its match score, the days left and the next step, and your story library with the stories that still need work.</p>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+  {
+    JOURNEYS.map((j, i) => (
+      <section class={`section home-section${i % 2 === 0 ? " section--alt" : ""}`} id={j.id} aria-labelledby={`${j.id}-title`}>
+        <div class="wrap">
+          <p class={`eyebrow ${j.id === "prep" ? "eyebrow--prep" : "eyebrow--action"}`}>{j.eyebrow}</p>
+          <h2 id={`${j.id}-title`}>{j.title}</h2>
+          <p class="lede">{j.lede}</p>
+          <div class="stack">
+            {
+              j.shots.map((s) => (
+                <figure class="grid-2">
+                  <img class="shot" src={s.src} alt={s.alt} width="1280" height="860" loading="lazy" decoding="async" />
+                  <figcaption>
+                    <h3>{s.title}</h3>
+                    <p>{s.text}</p>
+                  </figcaption>
+                </figure>
+              ))
+            }
+          </div>
+        </div>
+      </section>
+    ))
+  }
+  <section class="section">
+    <div class="wrap">
+      <div class="grid-2">
+        <div class="card">
+          <h2>Coach mode and Realistic mode</h2>
+          <p>
+            <b>Coach mode</b> lets you pause, ask for a hint, or redo an answer. It doesn't count toward your progress.
+          </p>
+          <p>
+            <b>Realistic mode</b> runs like a real interview, with no interruptions. Only Realistic rehearsals count toward
+            practice readiness.
+          </p>
+        </div>
+        <div class="card">
+          <h2>How scoring works</h2>
+          <p>
+            Each answer is scored on the skills the interview tests, from 1 to 4. A 3 or more meets the bar. Tone changes
+            how the interviewer sounds, never your score.
+          </p>
+          <p class="small muted">{READINESS_NOTICE}</p>
+        </div>
       </div>
       <p class="small muted">Screenshots show made-up data. {PRACTICE_NOTICE}</p>
       <div class="actions">

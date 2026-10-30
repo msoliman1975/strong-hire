@@ -29,9 +29,13 @@ export const COMPANIES = [
   "Airbnb",
   "Shopify",
 ];
-export const COMPANY_COUNT = 21;
+export const COMPANY_COUNT = 39;
 export const NOT_AFFILIATED =
   "Strong Hire is not affiliated with, endorsed by or sponsored by any company named on this site.";
+
+/** RD-3: the same words as the app's readiness notice (apps/web/src/pages/plan/ReadinessApi.ts). */
+export const READINESS_NOTICE =
+  "Practice readiness is an estimate from your scored Realistic rehearsals. It is not a prediction of the hiring decision.";
 
 /** Q3: verdicts are practice estimates, never a claim about a real company's decision. */
 export const PRACTICE_NOTICE =

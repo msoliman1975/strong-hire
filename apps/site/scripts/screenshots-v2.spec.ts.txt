@@ -1,0 +1,173 @@
+import { expect, test, type Page } from "@playwright/test";
+
+// v2 screens for the marketing site. Run from apps/web (see apps/site/scripts/screenshots.md);
+// writes into apps/site/public/img. The mock API keeps its database in localStorage, so an init
+// script turns on `v2_enabled` in the mock's GET /status before the app loads (no source change).
+const OUT = "../site/public/img";
+const COMPANIES = /\b(Stripe|Google|Amazon|Meta|Apple|Microsoft|Netflix|Shopify|Airbnb|Uber)\b/g;
+
+const clean = (page: Page) =>
+  page.evaluate((source) => {
+    const re = new RegExp(source, "g");
+    for (const a of Array.from(document.querySelectorAll("a"))) if (a.textContent?.includes("(dev)")) a.remove();
+    const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    for (let n = walk.nextNode(); n; n = walk.nextNode()) n.nodeValue = (n.nodeValue ?? "").replace(re, "Northwind");
+    for (const el of Array.from(document.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>("input, textarea"))) {
+      if (el.value) el.value = el.value.replace(re, "Northwind");
+      if (el.placeholder) el.placeholder = el.placeholder.replace(re, "Northwind");
+    }
+  }, COMPANIES.source);
+
+/** Scrolls the window to `y` (or puts the heading with text `at` just below the sticky header), cleans, snaps. */
+const snap = async (page: Page, name: string, at: number | string = 0) => {
+  await page.evaluate((target) => {
+    if (typeof target === "number") window.scrollTo(0, target);
+    else {
+      const el = Array.from(document.querySelectorAll("h1, h2, h3")).find((h) => h.textContent?.trim() === target);
+      const card = el?.closest("section, article") ?? el;
+      if (card) window.scrollTo(0, card.getBoundingClientRect().top + window.scrollY - 84);
+    }
+  }, at);
+  await page.waitForTimeout(400);
+  await clean(page);
+  await page.screenshot({ path: `${OUT}/${name}.jpg`, type: "jpeg", quality: 82 });
+};
+
+async function signUp(page: Page) {
+  await page.goto("/");
+  await page.getByLabel("Email for dev login").fill("ana@example.com");
+  await page.getByRole("button", { name: "Sign in as dev user" }).click();
+  await page.getByLabel("I am 18 or older.").check();
+  await page.getByLabel("I accept the terms of service and the privacy policy.").check();
+  await page.getByRole("button", { name: "Create account" }).click();
+  await page.getByLabel("Full name").fill("Ana Lopez");
+  await page.getByLabel("Years of experience").fill("7");
+  await page.getByLabel("Level you are interviewing for").selectOption("senior");
+  await page.getByRole("button", { name: "Save and continue" }).click();
+  await page.getByRole("button", { name: "Skip the tour" }).click();
+}
+
+async function addInterview(page: Page) {
+  await page.getByRole("link", { name: "Add a job description" }).first().click();
+  await page.getByLabel("Job posting link").fill("https://example-board.test/jobs/1234");
+  await page.getByRole("button", { name: "Next: pick your resume" }).click();
+  await expect(page.getByRole("heading", { name: "Check the job details" })).toBeVisible({ timeout: 10_000 });
+  await page.getByRole("button", { name: "Save and continue" }).click();
+  await page.getByLabel("Or paste your resume text").fill("Backend engineer, 7 years of Python and payments.");
+  await page.getByRole("button", { name: "Upload resume" }).click();
+  await page.getByRole("button", { name: "Check and continue" }).click();
+  await expect(page.getByRole("heading", { name: "Check your CV" })).toBeVisible({ timeout: 10_000 });
+  await page.getByRole("button", { name: "Continue to your interview plan" }).first().click();
+  await page.getByLabel("Interview stage").selectOption({ label: "Onsite or final loop" });
+  await page.getByRole("button", { name: "Save and open my plan" }).click();
+  await expect(page.getByRole("heading", { name: "What they'll test" })).toBeVisible({ timeout: 15_000 });
+  const date = new Date(Date.now() + 6 * 86_400_000).toISOString().slice(0, 10);
+  await page.getByLabel("When is your interview?").fill(date);
+  await page.getByRole("button", { name: "Save the date" }).click();
+  await expect(page.getByText("6 days left", { exact: false })).toBeVisible();
+}
+
+/** From the live page: mic check, join, wait for the question, run `during`, then end. */
+async function interview(page: Page, during?: () => Promise<void>) {
+  await page.getByRole("button", { name: "Check my microphone" }).click();
+  await page.getByRole("button", { name: "Join the interview" }).click();
+  await expect(page.getByTestId("captions")).not.toContainText("The interviewer speaks here", { timeout: 15_000 });
+  await page.waitForTimeout(4000);
+  if (during) await during();
+  await page.getByRole("button", { name: "End interview" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "End interview" }).click();
+  await expect(page.getByTestId("hire-signal")).toBeVisible({ timeout: 20_000 });
+  await page.waitForTimeout(800);
+}
+
+test("site screenshots, v2", async ({ page }) => {
+  test.setTimeout(240_000);
+  await page.addInitScript(() => {
+    const key = "strong-hire-mock-db-v5";
+    let db: { siteStatus?: Record<string, unknown> } = {};
+    try {
+      db = JSON.parse(localStorage.getItem(key) ?? "{}");
+    } catch {
+      db = {};
+    }
+    db.siteStatus = {
+      banner: null,
+      signups_open: true,
+      voice_sessions_open: true,
+      text_sessions_open: true,
+      custom_interview_access: "everyone",
+      ...db.siteStatus,
+      v2_enabled: true,
+    };
+    localStorage.setItem(key, JSON.stringify(db));
+  });
+
+  await signUp(page);
+  await addInterview(page);
+
+  // First rehearsal (behavioral); the room is snapped while the question is on screen.
+  await page.getByRole("button", { name: "Start your first rehearsal" }).click();
+  await interview(page, () => snap(page, "v2-room", 61));
+
+  // Back on the plan: one step done, the day plan and the story fit table.
+  await page.getByRole("link", { name: /^\w+ plan$/ }).click();
+  await expect(page.getByText("1 scored interview.", { exact: false })).toBeVisible({ timeout: 15_000 });
+  await snap(page, "v2-plan", "Your stories for this interview");
+
+  // Second rehearsal: its debrief shows the change from the first.
+  await page.getByRole("button", { name: "Start rehearsal" }).click();
+  await interview(page);
+  await expect(page.getByText(/^Up from /)).toBeVisible();
+  await snap(page, "v2-debrief", 0);
+
+  // A coach session from Home's suggestion (the missing learning-from-failure story).
+  const nav = page.getByRole("navigation", { name: "Main" });
+  await nav.getByRole("link", { name: "Home" }).click();
+  await page.getByRole("button", { name: "Build it with me" }).or(page.getByRole("link", { name: "Build it with me" })).click();
+  await page.getByRole("button", { name: "Type instead" }).click();
+  for (const text of [
+    "Last spring I shipped a fraud rule change on a Friday without a staged rollout, and it blocked about 3 percent of good payments over the weekend.",
+    "Merchants lost sales and support got over 200 tickets. It was my change, so it was on me to fix it and explain it.",
+    "I rolled the rule back, wrote the incident review myself, and added a shadow mode so new rules score traffic for a week before they block anything.",
+  ]) {
+    await page.locator("#coach-reply").fill(text);
+    await page.getByRole("button", { name: "Send" }).click();
+    await expect(page.getByText(text, { exact: true }).first()).toBeVisible();
+    await page.waitForTimeout(1200);
+  }
+  await page.locator("#coach-story-title").fill("Friday fraud rule");
+  await page.locator("#coach-reply").click();
+  await page.waitForTimeout(600);
+  await snap(page, "v2-coach", 0);
+  await page.getByRole("button", { name: "Save and exit" }).click();
+  await expect(page.getByRole("heading", { name: "Friday fraud rule" })).toBeVisible({ timeout: 10_000 });
+
+  // The story workbench: all five parts and two scored takes.
+  await nav.getByRole("link", { name: "Stories" }).click();
+  await page.getByRole("link", { name: "Checkout migration" }).first().click();
+  await page.getByRole("button", { name: "Edit story" }).click();
+  await page
+    .locator("#story-reflection")
+    .fill("Agree on the rollback plan before the first phase, not after the first incident. I now write it into every migration plan.");
+  await page.getByRole("button", { name: "Save changes" }).click();
+  await expect(page.getByText("Saved", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Back to the story" }).click();
+  for (const text of [
+    "Our checkout depended on a payments service three teams shared. I wrote the migration plan, got the leads to agree on a phased rollout, and errors fell 40 percent.",
+    "Checkout errors dropped 40 percent in six weeks. Three teams shared an old payments service and no one owned moving off it, so I wrote the plan, got the three leads to agree on phases, and ran a weekly error review.",
+  ]) {
+    await page.getByRole("button", { name: /^Record (a take|take \d)$/ }).click();
+    await page.locator("#take-text").fill(text);
+    await page.getByRole("button", { name: "Score this take" }).click();
+    await page.waitForTimeout(1500);
+  }
+  await expect(page.getByText("Take 2", { exact: true })).toBeVisible();
+  await page.waitForTimeout(1200);
+  await snap(page, "v2-story", 140);
+
+  // Home: the interview card, the story library and skill coverage.
+  await nav.getByRole("link", { name: "Home" }).click();
+  await expect(page.getByText("Your story library")).toBeVisible();
+  await page.waitForTimeout(1200);
+  await snap(page, "v2-home", 360);
+});

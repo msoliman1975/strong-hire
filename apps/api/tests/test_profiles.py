@@ -409,6 +409,80 @@ def test_ad1_cli_import_rejects_invalid_file_before_database(cli_db: Path, tmp_p
     sync.dispose()
 
 
+def _profile_rows(path: Path) -> list[tuple[str, int, str, bool]]:
+    sync = create_engine(f"sqlite:///{path}")
+    with sync.connect() as conn:
+        rows = conn.execute(
+            select(Company.slug, ProfileRow.version, ProfileRow.status, Company.active)
+            .join(ProfileRow, ProfileRow.company_id == Company.id)
+            .order_by(Company.slug, ProfileRow.version)
+        ).all()
+    sync.dispose()
+    return [(slug, version, str(status), active) for slug, version, status, active in rows]
+
+
+def test_ad1_cli_sync_imports_changed_files_as_drafts(cli_db: Path, tmp_path: Path) -> None:
+    """AD-1: sync stores new and changed files as Drafts, skips unchanged ones, never publishes."""
+    folder = tmp_path / "profiles"
+    (folder / "examples").mkdir(parents=True)
+    write(folder, as_google(example_data()), "google.json")
+    write(folder, example_data(), "example-corp.json")
+    write(folder / "examples", as_google(example_data()), "ignored.json")
+
+    first = invoke("profiles", "sync", str(folder))
+    assert first.exit_code == 0, first.output
+    assert "Stored example-corp version 1 as Draft (new company, inactive)" in first.output
+    assert "Stored google version 1 as Draft, no published version yet." in first.output
+    assert "Sync done: 2 stored, 0 unchanged, 0 failed." in first.output
+
+    again = invoke("profiles", "sync", str(folder))
+    assert again.exit_code == 0, again.output
+    assert "Sync done: 0 stored, 2 unchanged, 0 failed." in again.output
+
+    pub = invoke("profiles", "publish", "google", "1", "-y")
+    assert pub.exit_code == 0, pub.output
+    changed = as_google(example_data())
+    changed["persona"]["tone"] = "Direct"
+    write(folder, changed, "google.json")
+    third = invoke("profiles", "sync", str(folder))
+    assert "Stored google version 2 as Draft, 1 changed values from published version 1." in (
+        third.output
+    )
+
+    rows = _profile_rows(cli_db)
+    versions = [(slug, v) for slug, v, _, _ in rows]
+    assert versions == [("example-corp", 1), ("google", 1), ("google", 2)]
+    statuses = {(slug, v): status for slug, v, status, _ in rows}
+    assert statuses[("google", 2)] == statuses[("example-corp", 1)] == str(ProfileStatus.DRAFT)
+    assert ("example-corp", 1, str(ProfileStatus.DRAFT), False) in rows
+
+
+def test_ad1_cli_sync_reports_an_invalid_file_and_imports_the_rest(
+    cli_db: Path, tmp_path: Path
+) -> None:
+    folder = tmp_path / "profiles"
+    folder.mkdir()
+    bad = as_google(example_data())
+    del bad["persona"]["tone"]
+    write(folder, bad, "google.json")
+    write(folder, example_data(), "example-corp.json")
+
+    result = invoke("profiles", "sync", str(folder))
+    assert result.exit_code == 1
+    assert "Invalid: google.json" in result.output and "persona.tone" in result.output
+    assert "Sync done: 1 stored, 0 unchanged, 1 failed." in result.output
+    assert [slug for slug, *_ in _profile_rows(cli_db)] == ["example-corp"]
+
+
+def test_ad1_cli_sync_imports_every_researched_profile(cli_db: Path) -> None:
+    """AD-1: the deploy's sync of profiles/ stores a Draft for every researched company."""
+    files = sorted((REPO / "profiles").glob("*.json"))
+    result = invoke("profiles", "sync")
+    assert result.exit_code == 0, result.output
+    assert f"Sync done: {len(files)} stored, 0 unchanged, 0 failed." in result.output
+    assert {slug for slug, *_ in _profile_rows(cli_db)} == {p.stem for p in files}
+
+
 def test_launch_companies_are_the_21_from_the_spec() -> None:
     slugs = [slug for slug, _ in LAUNCH_COMPANIES]
     assert len(slugs) == len(set(slugs)) == 21

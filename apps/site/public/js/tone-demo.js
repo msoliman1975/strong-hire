@@ -1,7 +1,7 @@
 // Homepage "Choose who you face": swaps the interviewer's follow-up for the chosen tone and
 // difficulty. The replies come from the JSON block index.astro writes, so the copy has one
 // source. A plain file, so the strict CSP allows it (script-src 'self'). Without JavaScript the
-// controls stay hidden and the page shows the Neutral, Realistic reply.
+// controls stay hidden and the page shows the "Like the company", Realistic reply.
 (() => {
   const data = document.getElementById("tone-demo-data");
   const controls = document.querySelector("[data-tone-demo-controls]");

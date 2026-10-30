@@ -4,11 +4,17 @@ import Rubric from "../components/Rubric.astro";
 import SignalScale from "../components/SignalScale.astro";
 import { PRACTICE_NOTICE } from "../data/site";
 import { SAMPLE_IS_PLACEHOLDER, sample } from "../data/sample-debrief";
+
+// DB-2: an answer meets the bar at a rubric score of 3 or more. DM-2: the app's normal range.
+const met = sample.questions.filter((q) => q.score >= 3).length;
+const PACE = { min: 110, max: 170 };
+const paceNote = (wpm: number) =>
+  wpm > PACE.max ? "faster than usual" : wpm < PACE.min ? "slower than usual" : "in the normal range";
 ---
 
 <Base
   title="Sample debrief | Strong Hire"
-  description="What you get after a Strong Hire interview: a hire signal with the reasons, a score per question with quoted evidence, and what to fix first."
+  description="What you get after a Strong Hire interview: a hire signal with the reasons and the change since last time, a score per question with quoted evidence, the story you used, how you sounded, and what to fix first."
 >
   <section class="section">
     <div class="wrap">
@@ -30,6 +36,10 @@ import { SAMPLE_IS_PLACEHOLDER, sample } from "../data/sample-debrief";
         <h2>Hire signal: {sample.hire_signal}</h2>
         <SignalScale signal={sample.hire_signal} />
         <p>{sample.rationale}</p>
+        <p>
+          <b>{met} of {sample.questions.length}</b> answers met the bar (a score of 3 or more). Last session for this job:
+          {sample.previous_signal}.
+        </p>
         <p class="small muted">{PRACTICE_NOTICE}</p>
       </div>
     </div>
@@ -74,12 +84,20 @@ import { SAMPLE_IS_PLACEHOLDER, sample } from "../data/sample-debrief";
             </p>
             <blockquote>{q.evidence}</blockquote>
             <p>{q.feedback}</p>
+            <p class="small muted">
+              Story used: {q.story}. Pace {q.delivery.wpm} words a minute ({paceNote(q.delivery.wpm)}),{" "}
+              {q.delivery.fillers} filler words a minute.
+            </p>
           </article>
         ))
       }
       <div class="card">
         <h2>Fix these first</h2>
         <ol>{sample.fix_first.map((f) => <li>{f}</li>)}</ol>
+        <p class="small muted">
+          Each answer's fix is also sent to the story you used, as a note. Any answer can be saved as a new story. Pace
+          and filler words come from the transcript and its timing; no audio is kept.
+        </p>
       </div>
     </div>
   </section>

@@ -39,6 +39,8 @@ COPY ${APP_DIR} ${APP_DIR}
 COPY config config
 COPY prompts prompts
 COPY questions questions
+# Company profile files: the server deploy imports changed ones as Drafts (strongctl profiles sync).
+COPY profiles profiles
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev --package ${PACKAGE}
 

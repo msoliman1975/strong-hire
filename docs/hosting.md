@@ -51,7 +51,9 @@ Sign-in uses email and password (AC-4), with email links as a second way in. The
 6. Save the Anthropic key: `install -m 600 /dev/null /etc/stronghire/anthropic.key`, then write the key into it.
 7. Start: `./scripts/server-deploy.sh`. The first run builds the images and downloads the speech
    models.
-8. Load the launch companies once: `pwsh scripts/dev.ps1 seed`.
+8. Load the launch companies once: `pwsh scripts/dev.ps1 seed`. Each deploy also runs the seed
+   and `strongctl profiles sync`, which imports new or changed files in `profiles/` as Drafts for
+   review in the admin app (Content, Companies). Publishing stays a manual step there.
 
 ## Admin app
 

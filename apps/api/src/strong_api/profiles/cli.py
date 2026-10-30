@@ -2,6 +2,7 @@
 
     uv run strongctl profiles validate profiles/examples/example-corp.json
     uv run strongctl profiles import profiles/google.json
+    uv run strongctl profiles sync [profiles/]
     uv run strongctl profiles publish google 2
     uv run strongctl profiles list
     uv run strongctl profiles show google [--version 1] [--json]
@@ -16,6 +17,7 @@ import asyncio
 import getpass
 import json
 from collections.abc import Awaitable, Callable
+from functools import partial
 from pathlib import Path
 from typing import Annotated
 
@@ -142,6 +144,66 @@ def import_cmd(
         typer.echo(f"  {line}")
     typer.echo(f"Total: {len(result.changes)} changed values.")
     typer.echo(f"After review, publish with: strongctl profiles publish {slug} {result.version}")
+
+
+async def _import_draft(
+    db: AsyncSession, *, profile: CompanyProfile, actor: str
+) -> repo.ImportResult:
+    return await repo.import_profile(db, profile, actor=actor, create_company=True)
+
+
+@profiles_app.command("sync")
+def sync_cmd(
+    folder: Annotated[
+        Path | None,
+        typer.Argument(help="Folder of profile files. Default: profiles/ in the repo."),
+    ] = None,
+) -> None:
+    """Import every changed profile file in a folder as a Draft. Never publishes.
+
+    The server deploy runs this, so researched files reach the admin app for review. New
+    companies are added inactive. Unchanged files are skipped; an invalid file is reported and
+    the rest still import. Only the top level is read, so profiles/examples/ is left out.
+    """
+    root = folder or get_settings().repo_root / "profiles"
+    files = sorted(root.glob("*.json"))
+    if not files:
+        raise fail(f"No profile files in {root}.")
+    actor = default_actor()
+    stored = unchanged = 0
+    failed: list[str] = []
+    for path in files:
+        try:
+            profile = load_profile_file(path)
+        except ProfileFileError as exc:
+            failed.append(path.name)
+            typer.secho(f"Invalid: {path.name}", fg=typer.colors.RED, err=True)
+            for problem in exc.problems:
+                typer.secho(f"  - {problem}", fg=typer.colors.RED, err=True)
+            continue
+        try:
+            result = run_db(partial(_import_draft, profile=profile, actor=actor), commit=True)
+        except repo.UnchangedProfileError:
+            unchanged += 1
+            continue
+        except ProfileError as exc:
+            failed.append(path.name)
+            typer.secho(f"Failed: {path.name}: {exc}", fg=typer.colors.RED, err=True)
+            continue
+        stored += 1
+        added = " (new company, inactive)" if result.company_created else ""
+        against = (
+            "no published version yet"
+            if result.published_version is None
+            else f"{len(result.changes)} changed values from published version "
+            f"{result.published_version}"
+        )
+        typer.echo(
+            f"Stored {result.company.slug} version {result.version} as Draft{added}, {against}."
+        )
+    typer.echo(f"Sync done: {stored} stored, {unchanged} unchanged, {len(failed)} failed.")
+    if failed:
+        raise typer.Exit(code=1)
 
 
 @profiles_app.command("publish")
