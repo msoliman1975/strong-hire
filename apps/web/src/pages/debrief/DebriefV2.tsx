@@ -1,28 +1,38 @@
 import "./debrief.css";
+import "../../components/ux/ux.css";
 
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 
-import type { Debrief, Scorecard } from "../../api/types";
+import { useInterview, useRoleInterviews } from "../../api/roles";
+import type { Debrief, DebriefSession, InterviewDetail, Scorecard } from "../../api/types";
 import { RealismRating } from "../../components/RealismRating";
-import { PageHead } from "../../components/ui";
-import { difficultyLabel, formatDate, interviewTypeLabel, modeLabelV2 as modeLabel } from "../../labels";
+import { formatDate, interviewTypeLabel, modeLabelV2 as modeLabel } from "../../labels";
+import { interviewPath } from "../roles/shared";
 import { AnswerList } from "./AnswerList";
-import { CoachSummary } from "./CoachSummary";
 import { DeliveryMetrics } from "./DeliveryMetrics";
 import { NextInPlan } from "./NextInPlan";
 import { PracticeQuestions } from "./PracticeQuestions";
-import { SignalCard } from "./SignalCard";
 import { StoryUpdates } from "./StoryUpdates";
+import { StrovaCoaching } from "./StrovaCoaching";
+import { StrovaVerdict } from "./StrovaVerdict";
 
-/** The notice under the verdict: the signal is practice, not a hiring prediction. */
-export const PRACTICE_NOTICE =
-  "The verdict is a practice estimate from an AI interviewer. It is not a prediction of any company's hiring decision.";
+export { PRACTICE_NOTICE } from "./StrovaVerdict";
+
+/** The interview this take belongs to (RH-1): its role's interview of the same type with this take. */
+export function useTakeInterview(session: DebriefSession): InterviewDetail | null {
+  const interviews = useRoleInterviews(session.job_target_id);
+  const sameType = (interviews.data ?? []).filter(
+    (i) => i.interview.interview_type === session.config.interview_type,
+  );
+  const detail = useInterview(sameType[0]?.interview.id ?? "");
+  return detail.data ?? null;
+}
 
 /**
- * The v2 debrief (canvas board B3), shown when `v2_enabled` is on and the scorecard is ready.
- * Each section is its own component in this folder, so later streams add theirs without editing
- * this layout: StoryUsed (S23) inside each answer, DeliveryMetrics (S24) under the answers.
+ * The v2 debrief (mockup #debrief), shown when `v2_enabled` is on and the scorecard is ready:
+ * Strova's verdict (DB-3), the answers, the delivery metrics (DM-2), then Strova's coaching with
+ * this take's suggestions (DB-4 to DB-6). The plan, library, Questions and realism cards follow.
  */
 export function DebriefV2({
   debrief,
@@ -37,55 +47,47 @@ export function DebriefV2({
   const { session } = debrief;
   const { config } = session;
   const date = session.ended_at ?? session.started_at;
+  const interview = useTakeInterview(session);
+  const take = interview?.takes.find((t) => t.session_id === session.id)?.number ?? null;
+  const eyebrow = [debrief.company_name, interviewTypeLabel[config.interview_type], "debrief"]
+    .filter(Boolean)
+    .join(" · ");
   return (
-    <div className="debrief-v2">
-      <PageHead
-        eyebrow={debrief.company_name ? `${debrief.company_name} · Debrief` : "Debrief"}
-        eyebrowTone="prep"
-        title={`${interviewTypeLabel[config.interview_type]} · ${difficultyLabel[config.difficulty]} · ${config.duration_min} min`}
-      >
-        <p className="muted">
-          {modeLabel[config.mode]} mode{date && `, ${formatDate(date)}`}
-        </p>
-        <p className="debrief-v2__head-links">
-          {/* The job's gap route opens its plan page with v2 on (V2Redirect, PP-1). */}
-          <Link className="text-link" to={`/jobs/${session.job_target_id}/gap`}>
-            {debrief.company_name ? `${debrief.company_name} plan` : "Your plan"}
-          </Link>
-          {/* TR-1 (S13). */}
-          {session.ended_at && (
-            <Link className="btn btn--secondary" to={`/sessions/${session.id}/transcript`}>
-              Read the transcript
-            </Link>
-          )}
-        </p>
-      </PageHead>
-
-      <section className="debrief-v2__verdict" aria-label="Verdict">
-        <SignalCard signal={scorecard.hire_signal} previous={debrief.previous_signal} />
-        <CoachSummary
-          scorecard={scorecard}
-          atBar={debrief.answers_at_bar}
-          mini={config.duration_min === 10}
-          coach={config.mode === "coach"}
-        />
-      </section>
-
-      <div className="debrief-v2__body">
-        <div className="debrief-v2__main">
-          <AnswerList answers={scorecard.per_question} />
-          <DeliveryMetrics scorecard={scorecard} />
+    <div className="sx-page debrief-v2">
+      <div className="sx-between">
+        <div className="sx-stack debrief-v2__head">
+          <div className="sx-eyebrow teal">{eyebrow}</div>
+          <h1>{take ? `Take ${take} with Strova` : "Your take with Strova"}</h1>
+          <span className="sx-small sx-muted">
+            {modeLabel[config.mode]} mode · {config.duration_min} minutes{date && ` · ${formatDate(date)}`}
+          </span>
         </div>
-        <aside className="debrief-v2__side" aria-label="What to do next">
-          <NextInPlan debrief={debrief} />
-          <StoryUpdates sessionId={session.id} />
-          {sideExtra}
-          <PracticeQuestions debrief={debrief} />
-          <RealismRating sessionId={session.id} />
-          <p className="muted small" data-testid="practice-notice">
-            {PRACTICE_NOTICE}
-          </p>
-        </aside>
+        <div className="sx-row sx-small">
+          {interview && <Link to={interviewPath(interview.interview.id)}>Back to the interview</Link>}
+          {/* TR-1 (S13). */}
+          {session.ended_at && <Link to={`/sessions/${session.id}/transcript`}>Read the transcript</Link>}
+        </div>
+      </div>
+
+      <StrovaVerdict
+        debrief={debrief}
+        scorecard={scorecard}
+        interview={interview}
+        mini={config.duration_min === 10}
+        coach={config.mode === "coach"}
+      />
+
+      <AnswerList answers={scorecard.per_question} />
+      <DeliveryMetrics scorecard={scorecard} />
+
+      <StrovaCoaching debrief={debrief} scorecard={scorecard} />
+
+      <div className="sx-grid2 debrief-v2__more" aria-label="What to do next" role="region">
+        <NextInPlan debrief={debrief} />
+        <StoryUpdates sessionId={session.id} />
+        {sideExtra}
+        <PracticeQuestions debrief={debrief} />
+        <RealismRating sessionId={session.id} />
       </div>
     </div>
   );

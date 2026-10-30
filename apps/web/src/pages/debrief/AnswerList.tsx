@@ -20,45 +20,50 @@ export function answerQuote(q: QuestionScore): string | null {
  */
 export function AnswerList({ answers }: { answers: QuestionScore[] }) {
   return (
-    <section className="debrief-answers" aria-labelledby="debrief-answers-heading">
+    <section className="sx-card debrief-answers" aria-labelledby="debrief-answers-heading">
       <h2 id="debrief-answers-heading">Answer by answer</h2>
       <ol className="plain-list debrief-answers__list">
-        {answers.map((q) => (
-          <AnswerCard key={q.question_ref} answer={q} />
+        {answers.map((q, i) => (
+          <AnswerCard key={q.question_ref} answer={q} number={i + 1} />
         ))}
       </ol>
     </section>
   );
 }
 
-function AnswerCard({ answer }: { answer: QuestionScore }) {
+function AnswerCard({ answer, number }: { answer: QuestionScore; number: number }) {
   const avg = answerAverage(answer);
   const quote = answerQuote(answer);
   const fix = answer.misses[0] ?? null;
   const kept = answer.strengths[0] ?? null;
   const met = avg !== null && avg >= BAR_SCORE;
   return (
-    <li className="card debrief-answer" data-testid="answer">
-      <div className="debrief-answer__head">
-        <h3>{answer.question_text}</h3>
-        {avg !== null && (
-          <span className="debrief-answer__score" data-met={met ? "true" : undefined}>
-            {Number.isInteger(avg) ? avg : avg.toFixed(1)} of 4
+    <li className="sx-list-row debrief-answer" data-testid="answer">
+      <div className="debrief-answer__body">
+        <h3>
+          <span className="debrief-answer__num" aria-hidden="true">
+            {number}.{" "}
           </span>
+          {answer.question_text}
+        </h3>
+        <StoryUsed answer={answer} />
+        {quote && <blockquote className="debrief-answer__quote">“{quote}”</blockquote>}
+        {fix ? (
+          <p>
+            <b>Fix:</b> {fix}
+          </p>
+        ) : (
+          kept && (
+            <p>
+              <b>Kept:</b> {kept}
+            </p>
+          )
         )}
       </div>
-      <StoryUsed answer={answer} />
-      {quote && <blockquote className="debrief-answer__quote">“{quote}”</blockquote>}
-      {fix ? (
-        <p>
-          <b>Fix:</b> {fix}
-        </p>
-      ) : (
-        kept && (
-          <p>
-            <b>Kept:</b> {kept}
-          </p>
-        )
+      {avg !== null && (
+        <span className="debrief-answer__score" data-met={met ? "true" : undefined}>
+          {Number.isInteger(avg) ? avg : avg.toFixed(1)} of 4
+        </span>
       )}
     </li>
   );
