@@ -20,6 +20,13 @@ from sqlalchemy import select
 
 from strong_api.inputs.deps import Db, Me
 from strong_api.resume_checks.checks import ResumeIssue, check_resume
+from strong_api.resume_checks.story_ideas import (
+    Achievement,
+    achievements,
+    idea_reason,
+    missing_parts,
+    normalize,
+)
 from strong_core.db.models import JobTarget, Story
 from strong_core.db.models import Resume as ResumeRow
 from strong_core.db.models import Suggestion as SuggestionRow
@@ -31,13 +38,6 @@ from strong_core.schemas import (
     StoryPart,
     SuggestionKind,
     SuggestionStatus,
-)
-from strong_worker.inputs.story_ideas import (
-    Achievement,
-    achievements,
-    idea_reason,
-    missing_parts,
-    normalize,
 )
 
 router = APIRouter(tags=["resume checks"])

@@ -164,3 +164,36 @@ async def test_rm4_story_ideas_are_per_user(client: httpx.AsyncClient, fake_fixt
     resume = await add_resume(client, fake_fixtures)
     await sign_in(client, "someone@example.com")
     assert (await client.get(f"/resumes/{resume['id']}/story-ideas")).status_code == 404
+
+
+def test_rm4_api_and_worker_story_idea_rules_are_identical() -> None:
+    """RM-4: the API's copy of the idea rules (no worker code in the API image) matches the
+    worker's."""
+    from strong_api.resume_checks import story_ideas as api
+    from strong_core.schemas import Resume
+    from strong_worker.inputs import story_ideas as worker
+
+    lines = [
+        PAYOUTS,
+        "Payout service redesign",
+        "Responsible for payouts, where I rebuilt the retries",
+        "  Ran the on-call rota. ",
+        "",
+    ]
+    for line in lines:
+        assert api.missing_parts(line) == worker.missing_parts(line)
+        assert api.normalize(line) == worker.normalize(line)
+    resume = Resume.model_validate(
+        {
+            "summary": None,
+            "roles": [{"title": "SWE", "company": "Acme", "achievements": lines}],
+            "skills": [],
+            "education": [],
+            "certifications": [],
+        }
+    )
+    assert [(a.ref, a.text, a.role) for a in api.achievements(resume)] == [
+        (a.ref, a.text, a.role) for a in worker.achievements(resume)
+    ]
+    item = api.achievements(resume)[0]
+    assert api.idea_reason(item) == worker.idea_reason(worker.achievements(resume)[0])
