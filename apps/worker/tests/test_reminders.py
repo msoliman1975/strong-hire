@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from strong_core.db.models import EmailLog, JobTarget, TargetInterview, User
 from strong_core.db.models import Resume as ResumeRow
 from strong_core.db.models import Story as StoryRow
+from strong_core.email import Email
 from strong_core.schemas import (
     Competency,
     CompetencyScore,
@@ -212,3 +213,34 @@ def test_ps6_readiness_is_rh2() -> None:
 def test_ps6_reminder_job_is_registered() -> None:
     names = {getattr(j, "name", "") for j in WorkerSettings.cron_jobs}
     assert any("plan_reminders" in n for n in names)
+
+
+class RichSender(Sender):
+    def __init__(self) -> None:
+        super().__init__()
+        self.messages: list[Email] = []
+
+    async def send_message(self, email: Email) -> None:
+        self.messages.append(email)
+
+
+async def test_sv9_the_reminder_comes_from_strova_with_her_avatar_beside_the_logo(
+    sessionmaker: Maker, account: tuple[uuid.UUID, uuid.UUID]
+) -> None:
+    """SV-9: the plan reminder is sent as "Strova from Strong Hire", with an HTML part that shows
+    the 64 px coaching avatar (alt "Strova") beside the Strong Hire logo, as inline images."""
+    org_id, user_id = account
+    await _user(sessionmaker, user_id)
+    await _interview(sessionmaker, org_id, user_id, None)
+    sender = RichSender()
+    assert (await send_reminders(sessionmaker, sender, WEDNESDAY_8))["sent"] == 1
+    assert sender.sent == []  # the rich path, not the plain text
+    (email,) = sender.messages
+    assert email.from_name == "Strova from Strong Hire"
+    assert email.html is not None
+    assert '<img src="cid:strova" alt="Strova" width="64" height="64">' in email.html
+    assert email.html.index('alt="Strong Hire"') < email.html.index('alt="Strova"')
+    images = {i.cid: i.data for i in email.images}
+    assert set(images) == {"strova", "strong-hire"}
+    assert images["strova"][:8] == b"\x89PNG\r\n\x1a\n"
+    assert "Start the take" in email.html and "Start the take: http" in email.text

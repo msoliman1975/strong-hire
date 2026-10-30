@@ -13,7 +13,7 @@ these rules read the same data. Readiness is RH-2 (`readiness_score`); an API te
 matches the API's. Resume items are not reminded about here: their checks run in the API.
 
 Each reminder is one `email_logs` row (kind plan_reminder, ref = the user's local date), so a
-rerun never sends twice. The sender's display name is set with the product email templates (U12).
+rerun never sends twice. The email comes from Strova (SV-9, strong_worker.strova_email).
 """
 
 from __future__ import annotations
@@ -33,7 +33,7 @@ from strong_core.db import get_sessionmaker
 from strong_core.db.models import EmailLog, InterviewSession, JobTarget, TargetInterview, User
 from strong_core.db.models import Scorecard as ScorecardRow
 from strong_core.db.models import Story as StoryRow
-from strong_core.email import EmailSender, make_email_sender
+from strong_core.email import Email, EmailSender, make_email_sender, send_email
 from strong_core.schemas import (
     COMPETENCIES_BY_TYPE,
     READINESS_GOAL,
@@ -46,6 +46,7 @@ from strong_core.schemas import (
     PlanStyle,
 )
 from strong_worker.scoring.stories import DEV_PROFILES
+from strong_worker.strova_email import strova_email
 
 log = logging.getLogger(__name__)
 
@@ -140,6 +141,8 @@ async def _readiness(db: AsyncSession, row: TargetInterview) -> int | None:
 class Reminder:
     subject: str
     lines: list[str]
+    action_label: str
+    action_url: str
 
 
 def local_now(user: User, now: datetime) -> datetime:
@@ -198,8 +201,9 @@ async def reminder_for(db: AsyncSession, user: User, today: date) -> Reminder | 
             lines=[
                 f"Your {name} interview is in {COUNTDOWN_DAYS} days, and your readiness is {now}.",
                 "A take today gives you time to work on what it finds.",
-                f"Start a take: {WEB_BASE_URL}/interviews/{iv}",
             ],
+            action_label="Start a take",
+            action_url=f"{WEB_BASE_URL}/interviews/{iv}",
         )
     if below:
         below.sort(key=lambda b: (b[0] is None, b[0] or date.max, -1 if b[2] is None else b[2]))
@@ -209,8 +213,9 @@ async def reminder_for(db: AsyncSession, user: User, today: date) -> Reminder | 
             subject=f"Today's plan: a take of {name}",
             lines=[
                 f"Today's item in your plan is a take of {name}. {now}",
-                f"Start the take: {WEB_BASE_URL}/interviews/{iv}",
             ],
+            action_label="Start the take",
+            action_url=f"{WEB_BASE_URL}/interviews/{iv}",
         )
     drafts = [
         s
@@ -229,8 +234,9 @@ async def reminder_for(db: AsyncSession, user: User, today: date) -> Reminder | 
             lines=[
                 f"Today's item in your plan is your story “{story.title}”: {filled} of 5 parts "
                 "are written.",
-                f"Open it: {WEB_BASE_URL}/stories/{story.id}",
             ],
+            action_label="Open the story",
+            action_url=f"{WEB_BASE_URL}/stories/{story.id}",
         )
     return None
 
@@ -240,16 +246,17 @@ def _company(target: JobTarget) -> str:
     return str(posting.get("company_name") or target.name or "Your role")
 
 
-def render(user: User, reminder: Reminder) -> str:
+def message(user: User, reminder: Reminder) -> Email:
+    """SV-9: the reminder as an email from Strova."""
     first = (user.full_name or "").split(" ")[0] or "there"
-    return "\n\n".join(
-        [
-            f"Hi {first},",
-            *reminder.lines,
-            "Strova",
-            f"You get this because your plan is weekly. Mute plan emails in Profile: "
-            f"{WEB_BASE_URL}/account/profile",
-        ]
+    return strova_email(
+        user.email,
+        reminder.subject,
+        [f"Hi {first},", *reminder.lines],
+        action_label=reminder.action_label,
+        action_url=reminder.action_url,
+        footer="You get this because your plan is weekly. Mute plan emails in Profile: "
+        f"{WEB_BASE_URL}/account/profile",
     )
 
 
@@ -293,7 +300,7 @@ async def send_reminders(
             )
             await db.commit()  # logged first: a failed send is not retried into a double email
             try:
-                await sender.send(user.email, reminder.subject, render(user, reminder))
+                await send_email(sender, message(user, reminder))
                 sent += 1
             except Exception:
                 log.exception("plan reminder to user %s failed", user.id)

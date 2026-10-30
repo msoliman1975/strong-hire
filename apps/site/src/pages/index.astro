@@ -1,5 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
+import Strova from "../components/Strova.astro";
 import WaitlistForm from "../components/WaitlistForm.astro";
 import {
   COMPANIES,
@@ -285,6 +286,32 @@ const CONTEXTS = [
             <div><dt>Bar it scores to</dt><dd>Senior</dd></div>
           </dl>
         </section>
+      </div>
+    </div>
+  </section>
+
+  <section class="section meet-strova" id="strova" aria-labelledby="strova-title">
+    <div class="wrap meet-strova__inner">
+      <Strova mode="coaching" size={104} />
+      <div class="meet-strova__text">
+        <h2 id="strova-title">Meet Strova, your interview partner.</h2>
+        <p class="lede">
+          Strova reads your resume, helps you build the stories you'll tell, and rehearses the real interview with you.
+        </p>
+        <ul class="meet-strova__modes">
+          <li><Strova mode="analysing" size={64} /><span>Reads your resume and the job, and finds what's missing.</span></li>
+          <li><Strova mode="coaching" size={64} /><span>Asks the questions that turn your work into stories.</span></li>
+          <li><Strova mode="interviewing" size={64} /><span>Plays the interviewer, then gives you the verdict.</span></li>
+        </ul>
+        <div class="actions">
+          {
+            CTA === "signup" ? (
+              <a class="btn" href={signupUrl("strova")}>Start with your resume</a>
+            ) : (
+              <a class="btn" href="#join">Join the beta waitlist</a>
+            )
+          }
+        </div>
       </div>
     </div>
   </section>

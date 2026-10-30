@@ -1,0 +1,33 @@
+/* Strova's animations (SV-3), the same as apps/web/src/components/strova/strova.css. Every one
+   stops under prefers-reduced-motion, with the tick drawn. */
+.strova .sv-box { transform-box: fill-box; transform-origin: center; }
+.strova .sv-spin { transform-box: view-box; transform-origin: 100px 100px; animation: sv-spin 9s linear infinite; }
+.strova .sv-pulse-ring { transform-box: view-box; transform-origin: 100px 100px; animation: sv-ring 1.6s ease-in-out infinite; }
+.strova .sv-blink { animation: sv-blink 4.5s infinite; }
+.strova .sv-dot { animation: sv-dot 1.4s ease-in-out infinite; }
+.strova .sv-scan { animation: sv-scan 2.4s ease-in-out infinite; }
+.strova .sv-bob { animation: sv-bob 2.6s ease-in-out infinite; }
+.strova .sv-twinkle { animation: sv-twinkle 1.8s ease-in-out infinite; }
+.strova .sv-check { stroke-dasharray: 30; animation: sv-check 2.4s ease-in-out infinite; }
+.strova .sv-wave { animation: sv-wave 1.2s ease-in-out infinite; }
+.strova .sv-talk { animation: sv-talk 0.35s ease-in-out infinite alternate; }
+.strova .sv-float { animation: sv-float 2.2s ease-in-out infinite; }
+.strova .sv-d2 { animation-delay: 0.2s; }
+.strova .sv-d3 { animation-delay: 0.4s; }
+
+@keyframes sv-spin { to { transform: rotate(360deg); } }
+@keyframes sv-ring { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+@keyframes sv-blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+@keyframes sv-dot { 0%, 100% { opacity: 0.25; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.1); } }
+@keyframes sv-scan { 0%, 100% { transform: translate(-14px, -22px); } 50% { transform: translate(0, 0); } }
+@keyframes sv-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes sv-twinkle { 0%, 100% { transform: scale(1) rotate(0); } 50% { transform: scale(1.25) rotate(20deg); } }
+@keyframes sv-check { 0%, 20% { stroke-dashoffset: 30; } 50%, 100% { stroke-dashoffset: 0; } }
+@keyframes sv-wave { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+@keyframes sv-talk { from { transform: scaleY(0.35); } to { transform: scaleY(1); } }
+@keyframes sv-float { 0% { transform: translateY(4px) scale(0.9); opacity: 0.5; } 50% { opacity: 1; } 100% { transform: translateY(-6px) scale(1.1); opacity: 0.5; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .strova * { animation: none !important; }
+  .strova .sv-check { stroke-dashoffset: 0; }
+}
