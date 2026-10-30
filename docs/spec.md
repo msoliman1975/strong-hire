@@ -57,7 +57,7 @@ The 21 launch companies: Google, Amazon, Microsoft, Meta, Apple, Netflix, Nvidia
 | Stories | Story library, from the v1 "story bank" item: save from debriefs, workbench, story fit, Proven status (ST-1 to ST-7) | | |
 | Coach | AI coach that builds stories by text and voice, takes, 60-second and full versions (CO-1 to CO-9) | | |
 | Planning | One interview plan page per job and resume pair (PP-1 to PP-4), practice readiness and a day-by-day plan (RD-1 to RD-3) | | |
-| Business | B2C, pricing unchanged until a separate pricing decision | Org accounts and seats (B2B) | |
+| Business | B2C, one plan at $39 a month or $89 for 90 days, founding price, guarantee and retention flows (`docs/pricing-spec.md`) | Org accounts and seats (B2B) | |
 | Markets | US and Canada, English | Other languages (Arabic is the candidate) | |
 | Roles | Tech only | Adjacent corporate roles | |
 
@@ -158,8 +158,8 @@ IDs are referenced by the build plan and acceptance tests. Priority: P0 must shi
 | PR-1 | Progress dashboard per target job: competency trends from Realistic sessions only. | P0 |
 | PR-2 | Recommended next session based on remaining gaps. | P0 |
 | PR-3 | Interview rehearsals: the user picks a job description and a CV, or adds one. For that pair, the app shows the earlier gap reports, debriefs and hire signals. In v2 the rehearsals page is replaced by PP-1. | P0 |
-| BL-1 | Stripe subscription, one plan, monthly minute cap, usage meter visible in the app. | P0 |
-| BL-2 | Free tier: unlimited gap analyses (rate limited) plus one free interview. | P0 |
+| BL-1 | Stripe billing for one plan with two options (monthly subscription, 90-day pass), a shared minute pool for interviews and voice coaching, and a usage meter in the app. Details: `docs/pricing-spec.md` (PB, SB). | P0 |
+| BL-2 | Free tier: gap analyses and the plan page (rate limited), one interview of up to 30 minutes, and two stories built with the text coach. Details: `docs/pricing-spec.md` (PB-2, PB-3). | P0 |
 | AC-1 | Self-service export and full delete of account and all data. | P0 |
 | AC-2 | Training-data consent toggle, off by default, changeable any time. | P0 |
 | AC-3 | At the first sign-in, ask for a short profile: full name, years of experience and target level, plus optional current title, country, time zone and LinkedIn URL. No payment details. The user edits it under Account, Profile. | P0 |
@@ -252,7 +252,7 @@ These IDs are the acceptance tests for v2.0. They are grouped by build part; the
 | AD-5 | The admin portal shows coach sessions and minutes, cost per coach session, coach eval results, readiness by skill, and the recruiter screen brief and rubric. | P0 |
 | UI-3 | The marketing site describes v2 and uses the v2 visual language. | P0 |
 
-Coach sessions record minutes like any other session; billing rules (BL-1, BL-2) do not change in v2.0 until the pricing decision is made.
+Coach sessions record minutes like any other session. Voice coaching uses the same minute pool as interviews; text coaching does not (`docs/pricing-spec.md`, PB-5).
 
 ### v2.1 UX with Strova
 
@@ -616,7 +616,7 @@ The design rule is to keep as little as possible: audio never touches disk, and 
 
 ## Pricing and cost model
 
-A 45-minute session should cost roughly $0.40 to $0.80 in AI usage, so the beta fits comfortably under $300 a month and a $29 plan carries healthy margin. All figures below are approximate planning estimates from memory, not quotes; verify current provider pricing before committing.
+A 45-minute session should cost roughly $0.40 to $0.80 in AI usage, so the beta fits comfortably under $300 a month and the $39 plan carries healthy margin. All figures below are approximate planning estimates from memory, not quotes; verify current provider pricing before committing.
 
 During the local development period, infrastructure cost is close to zero: everything runs in Docker on your machine, and hosted model APIs are only called for latency and quality tests.
 
@@ -645,7 +645,7 @@ During the local development period, infrastructure cost is close to zero: every
 
 At about $0.60 per session, the $180 left after fixed costs covers roughly 300 sessions a month during beta.
 
-**Suggested plan.** $29 per month (or $24 per month billed annually) for 300 interview minutes, about six 45-minute sessions. Gap analyses are unlimited with fair-use rate limits. A heavy user at the full cap costs about $4 in AI usage, plus Stripe fees of about $1.15. Treat the price as a hypothesis: test $19, $29 and $39 on the paywall during beta.
+**Plan (decided Oct 30, 2026).** $39 a month (CAD $52) or a one-time $89 for 90 days (CAD $119), with a shared pool of 500 minutes per 30 days for interviews and voice coaching. Free accounts get one interview of up to 30 minutes and two coached stories. The first 500 monthly subscribers pay $29 a month for 12 months. A heavy user at the full pool costs about $6.50 in AI usage plus a Stripe fee of about $1.43, an 80% gross margin. The full offer, unit economics, Stripe integration, guardrails, admin revenue page and retention flows are in `docs/pricing-spec.md`; it replaces the earlier $29 suggestion and its paywall test.
 
 **GPU crossover.** A dedicated Hetzner GPU server (the GEX44 class, roughly $200 a month) can run a quantized 30B to 70B-class model for low concurrency. Switch when hosted LLM spend passes about $250 a month for two months running, and only after load testing concurrency, since one GPU handles a limited number of simultaneous voice sessions. As far as I know, Hetzner's GPU servers are only in its European data centers, which would bring back the transatlantic latency for the interviewer; at that point compare a US GPU host for the interviewer role, while the scorer (not latency-sensitive) can run in Europe.
 
@@ -759,7 +759,7 @@ The biggest risk is not the tech: it's whether the hire signal feels credible en
 
 **Open questions.**
 
-- [ ] Final price point and minute cap after paywall tests
+- [x] Price point and minute cap: $39 a month or $89 for 90 days, 500 minutes per 30 days (`docs/pricing-spec.md`); the $39 against $49 test runs after launch (AB-6)
 - [ ] Which hosted model providers meet zero-retention requirements and latency targets
 - [ ] Who helps build the 60 to 100 transcript gold set
 - [ ] Domain and trademark availability for "Strong Hire"
