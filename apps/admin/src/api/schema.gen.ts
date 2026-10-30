@@ -954,6 +954,49 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/stories/{story_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Review Story
+         * @description ST-11: ask Strova to review the story. The worker writes per-part notes and
+         *     before-and-after edits from the user's words (U08's review prompt), and stores them as an
+         *     open `review` suggestion for the story, replacing an older open one.
+         */
+        post: operations["review_story_stories__story_id__review_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/ask": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ask About Stories
+         * @description ST-13: Strova answers from the user's own stories and target roles. Story ids are only the
+         *     user's, and every fact is checked against their words (CO-9).
+         */
+        post: operations["ask_about_stories_stories_ask_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/coach/sessions": {
         parameters: {
             query?: never;
@@ -9021,6 +9064,15 @@ export interface components {
             review: components["schemas"]["StoryReview"];
         };
         /**
+         * ReviewQueued
+         * @description ST-11: the review is being written. It arrives as an open `review` suggestion for the
+         *     story (GET /suggestions?place=story&story_id=...).
+         */
+        ReviewQueued: {
+            /** Job Id */
+            job_id: string;
+        };
+        /**
          * RoleFamily
          * @enum {string}
          */
@@ -9998,6 +10050,14 @@ export interface components {
              */
             quotes?: string[];
         };
+        /**
+         * StoryAskIn
+         * @description ST-13: a question for Strova about the user's stories.
+         */
+        StoryAskIn: {
+            /** Question */
+            question: string;
+        };
         /** StoryCounts */
         StoryCounts: {
             /** Total */
@@ -10269,6 +10329,66 @@ export interface components {
             session_id?: string | null;
             /** Question Ref */
             question_ref?: string | null;
+        };
+        /**
+         * StoryOut
+         * @description ST-1 and ST-8: a story with the status to show. Proven stays as stored (ST-7); a draft
+         *     with all five parts filled shows as Ready.
+         */
+        StoryOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /** Context */
+            context?: string | null;
+            /** Stakes */
+            stakes?: string | null;
+            /** Action */
+            action?: string | null;
+            /** Result */
+            result?: string | null;
+            /** Reflection */
+            reflection?: string | null;
+            /**
+             * Skills
+             * @description Skill tags.
+             */
+            skills?: components["schemas"]["Competency"][];
+            /** @default draft */
+            status: components["schemas"]["StoryStatus"];
+            source: components["schemas"]["StorySource"];
+            /**
+             * Source Session Id
+             * @description ST-2: the session of the debrief answer it came from.
+             */
+            source_session_id?: string | null;
+            /**
+             * Source Question Ref
+             * @description ST-2: QuestionScore.question_ref of that answer.
+             */
+            source_question_ref?: string | null;
+            /** Notes */
+            notes?: components["schemas"]["StoryNote"][];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /**
+             * Display Status
+             * @description ST-8: draft, ready or proven.
+             * @enum {string}
+             */
+            display_status: "draft" | "ready" | "proven";
         };
         /**
          * StoryPart
@@ -12727,7 +12847,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Story"][];
+                    "application/json": components["schemas"]["StoryOut"][];
                 };
             };
             /** @description Validation Error */
@@ -12760,7 +12880,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Story"];
+                    "application/json": components["schemas"]["StoryOut"];
                 };
             };
             /** @description Validation Error */
@@ -12793,7 +12913,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Story"];
+                    "application/json": components["schemas"]["StoryOut"];
                 };
             };
             /** @description The session is not the user's, or detail.code is 'scorecard_not_found' or 'question_not_found'. */
@@ -12836,7 +12956,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Story"];
+                    "application/json": components["schemas"]["StoryOut"];
                 };
             };
             /** @description Validation Error */
@@ -12900,7 +13020,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Story"];
+                    "application/json": components["schemas"]["StoryOut"];
                 };
             };
             /** @description Validation Error */
@@ -12967,6 +13087,70 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StoryNote"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    review_story_stories__story_id__review_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewQueued"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ask_about_stories_stories_ask_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoryAskIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryAnswer"];
                 };
             };
             /** @description Validation Error */

@@ -1,4 +1,4 @@
-"""Story library endpoints (ST-1, ST-2, ST-6 notes).
+"""Story library endpoints (ST-1, ST-2, ST-6 notes, ST-8, ST-11, ST-13).
 
     GET    /stories                   ST-1: the user's stories, newest first; `?status=` and
                                       `?skill=` filter
@@ -9,6 +9,10 @@
     DELETE /stories/{id}              ST-1: delete a story
     GET    /stories/{id}/notes        ST-6: the story's fix notes, oldest first
     POST   /stories/{id}/notes        ST-6: append a fix note
+    POST   /stories/{id}/review       ST-11: queue Strova's review (an open review suggestion)
+    POST   /stories/ask               ST-13: Strova answers from the user's stories and roles
+
+Every story carries `display_status` (ST-8): draft, ready (all five parts filled) or proven.
 
 Stories belong to one user: every query filters by both `org_id` and `user_id`, and another
 user's story answers 404. Account export and delete (AC-1) cover stories and their notes through
@@ -31,22 +35,35 @@ from fastapi import APIRouter, HTTPException, Query, Response, status
 from pydantic import ValidationError
 from sqlalchemy import select
 
-from strong_api.inputs.deps import Db, Me
-from strong_api.stories.schemas import StoryFromAnswerIn, StoryIn, StoryNoteIn, StoryPatch
-from strong_core.db.models import InterviewSession, Scorecard
+from strong_api.inputs.deps import Db, Me, Queue
+from strong_api.inputs.queue import REVIEW_STORY
+from strong_api.stories.ask import ask_strova
+from strong_api.stories.schemas import (
+    DisplayStatus,
+    ReviewQueued,
+    StoryAskIn,
+    StoryFromAnswerIn,
+    StoryIn,
+    StoryNoteIn,
+    StoryOut,
+    StoryPatch,
+)
+from strong_core.db.models import InterviewSession, JobTarget, Scorecard
 from strong_core.db.models import Story as StoryRow
 from strong_core.db.models import Turn as TurnRow
+from strong_core.gateway import get_gateway
 from strong_core.schemas import (
     Competency,
     QuestionScore,
     Speaker,
-    Story,
+    StoryAnswer,
     StoryNote,
     StoryPart,
     StorySource,
     StoryStatus,
 )
 from strong_core.schemas.stories import STORY_TITLE_MAX_CHARS
+from strong_core.sim import gateway_for_org
 
 router = APIRouter(tags=["stories"])
 
@@ -73,8 +90,15 @@ def _clean(text: str | None) -> str | None:
     return text or None
 
 
-def story_out(row: StoryRow) -> Story:
-    return Story(
+def display_status(row: StoryRow) -> DisplayStatus:
+    """ST-8: Proven stays as stored; a draft with all five parts filled is Ready."""
+    if row.status == StoryStatus.PROVEN:
+        return "proven"
+    return "ready" if all(_clean(getattr(row, p.value)) for p in StoryPart) else "draft"
+
+
+def story_out(row: StoryRow) -> StoryOut:
+    return StoryOut(
         id=row.id,
         title=row.title,
         context=row.context,
@@ -90,6 +114,7 @@ def story_out(row: StoryRow) -> Story:
         notes=_notes(row),
         created_at=row.created_at,
         updated_at=row.updated_at,
+        display_status=display_status(row),
     )
 
 
@@ -110,7 +135,7 @@ async def _owned(db: Db, me: Me, story_id: uuid.UUID) -> StoryRow:
     return row
 
 
-async def _save(db: Db, row: StoryRow) -> Story:
+async def _save(db: Db, row: StoryRow) -> StoryOut:
     await db.commit()
     await db.refresh(row)
     return story_out(row)
@@ -127,7 +152,7 @@ async def list_stories(
         StoryStatus | None, Query(alias="status", description="Only drafts, or only proven.")
     ] = None,
     skill: Annotated[Competency | None, Query(description="Only stories with this tag.")] = None,
-) -> list[Story]:
+) -> list[StoryOut]:
     """ST-1: the user's stories, newest first."""
     query = select(StoryRow).where(StoryRow.org_id == me.org_id, StoryRow.user_id == me.user_id)
     if story_status is not None:
@@ -138,7 +163,7 @@ async def list_stories(
 
 
 @router.post("/stories", status_code=status.HTTP_201_CREATED)
-async def create_story(body: StoryIn, db: Db, me: Me) -> Story:
+async def create_story(body: StoryIn, db: Db, me: Me) -> StoryOut:
     """ST-1: create a draft story."""
     row = StoryRow(
         org_id=me.org_id,
@@ -162,7 +187,7 @@ async def create_story(body: StoryIn, db: Db, me: Me) -> Story:
     status_code=status.HTTP_201_CREATED,
     responses=_FROM_ANSWER_RESPONSES,
 )
-async def story_from_answer(body: StoryFromAnswerIn, db: Db, me: Me) -> Story:
+async def story_from_answer(body: StoryFromAnswerIn, db: Db, me: Me) -> StoryOut:
     """ST-2: "Save as a story" on a debrief answer. Creates a draft story with the candidate's
     answer to that question, tagged with the competencies it was scored on and linked to the
     session and question. The answer goes into `action` until a split into parts is known."""
@@ -262,13 +287,13 @@ def _title(question_text: str) -> str:
 
 
 @router.get("/stories/{story_id}")
-async def get_story(story_id: uuid.UUID, db: Db, me: Me) -> Story:
+async def get_story(story_id: uuid.UUID, db: Db, me: Me) -> StoryOut:
     """ST-1: one story with its notes."""
     return story_out(await _owned(db, me, story_id))
 
 
 @router.patch("/stories/{story_id}")
-async def edit_story(story_id: uuid.UUID, body: StoryPatch, db: Db, me: Me) -> Story:
+async def edit_story(story_id: uuid.UUID, body: StoryPatch, db: Db, me: Me) -> StoryOut:
     """ST-1: change the title, the skill tags or any of the five parts. Only the fields sent
     change; a part sent as null or blank is cleared."""
     row = await _owned(db, me, story_id)
@@ -321,3 +346,43 @@ async def add_story_note(story_id: uuid.UUID, body: StoryNoteIn, db: Db, me: Me)
     row.notes_json = [*(row.notes_json or []), note.model_dump(mode="json")]
     await db.commit()
     return note
+
+
+# --- ST-11, ST-13 ----------------------------------------------------------------------------
+
+
+@router.post("/stories/{story_id}/review", status_code=status.HTTP_202_ACCEPTED)
+async def review_story(story_id: uuid.UUID, db: Db, me: Me, queue: Queue) -> ReviewQueued:
+    """ST-11: ask Strova to review the story. The worker writes per-part notes and
+    before-and-after edits from the user's words (U08's review prompt), and stores them as an
+    open `review` suggestion for the story, replacing an older open one."""
+    row = await _owned(db, me, story_id)
+    job_id = f"review_story:{row.id}:{uuid.uuid4().hex[:8]}"
+    await queue.enqueue(REVIEW_STORY, job_id, org_id=str(me.org_id), story_id=str(row.id))
+    return ReviewQueued(job_id=job_id)
+
+
+@router.post("/stories/ask")
+async def ask_about_stories(body: StoryAskIn, db: Db, me: Me) -> StoryAnswer:
+    """ST-13: Strova answers from the user's own stories and target roles. Story ids are only the
+    user's, and every fact is checked against their words (CO-9)."""
+    stories = list(
+        await db.scalars(
+            select(StoryRow)
+            .where(StoryRow.org_id == me.org_id, StoryRow.user_id == me.user_id)
+            .order_by(StoryRow.updated_at.desc(), StoryRow.id)
+        )
+    )
+    targets = list(
+        await db.scalars(
+            select(JobTarget).where(
+                JobTarget.org_id == me.org_id,
+                JobTarget.user_id == me.user_id,
+                JobTarget.deleted_at.is_(None),
+                JobTarget.archived_at.is_(None),
+            )
+        )
+    )
+    gateway = await gateway_for_org(db, me.org_id, get_gateway())
+    asked = await ask_strova(gateway, body.question, stories, targets)
+    return asked.answer

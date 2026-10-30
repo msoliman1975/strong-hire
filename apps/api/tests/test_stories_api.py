@@ -14,10 +14,11 @@ from fastapi import FastAPI
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from strong_api.stories.schemas import StoryOut
 from strong_core.db.models import Scorecard
 from strong_core.db.models import Story as StoryRow
 from strong_core.db.models import Turn as TurnRow
-from strong_core.schemas import HireSignal, Speaker, Story
+from strong_core.schemas import HireSignal, Speaker
 
 from .accounts_support import FakeStripe
 from .conftest import sign_in
@@ -103,7 +104,7 @@ async def test_st1_create_get_list_update_delete(client: httpx.AsyncClient) -> N
     """ST-1: a story is created as a draft, read, edited by part and deleted."""
     resp = await client.post("/stories", json=story_body())
     assert resp.status_code == 201, resp.text
-    story = Story.model_validate(resp.json())
+    story = StoryOut.model_validate(resp.json())
     assert story.status == "draft" and story.source == "manual"
     assert story.context == "Checkout failed for 2% of users."
     assert story.stakes is None and story.notes == []
@@ -267,7 +268,7 @@ async def test_st2_save_debrief_answer_as_draft_story(
         "/stories/from-answer", json={"session_id": str(session_id), "question_ref": ref}
     )
     assert resp.status_code == 201, resp.text
-    story = Story.model_validate(resp.json())
+    story = StoryOut.model_validate(resp.json())
     assert story.status == "draft" and story.source == "debrief_answer"
     assert story.title == question["question_text"]
     assert story.action == "\n\n".join(t.strip() for t in said)
