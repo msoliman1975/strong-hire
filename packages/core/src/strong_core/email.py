@@ -76,7 +76,7 @@ def build_message(email: Email, from_addr: str) -> EmailMessage:
     msg.set_content(email.text)
     if email.html is not None:
         msg.add_alternative(email.html, subtype="html")
-        html_part = msg.get_payload()[-1]
+        html_part = next(p for p in msg.iter_parts() if p.get_content_type() == "text/html")
         assert isinstance(html_part, EmailMessage)
         for image in email.images:
             html_part.add_related(
