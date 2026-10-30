@@ -1,0 +1,928 @@
+<title>Strong Hire Mockups</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: an app shell (top bar, left nav rail, content) under a slim prototype guide bar; the rail becomes a scrolling top strip on phones. Strong Hire v2 tokens. */
+:root {
+  --ground: #f4f3f8; --surface: #ffffff; --sunken: #ecebf2;
+  --ink: #17161f; --ink-2: #3c3a48; --muted: #5e5b6b; --line: #e2e0ea; --line-strong: #c9c5d6;
+  --violet: #5332e6; --violet-hover: #3d22c4; --violet-soft: #eeeafe; --violet-ink: #3d22c4; --violet-light: #a594ff;
+  --teal: #0b6e8c; --teal-soft: #e0f2f7; --teal-light: #5cc3e0;
+  --ok: #12775a; --ok-ink: #0f5f48; --ok-soft: #e3f4ec;
+  --warn: #a34d00; --warn-ink: #8a4200; --warn-soft: #fdeedc;
+  --bad: #b4321f; --bad-ink: #9a2c1b; --bad-soft: #fbe7e3;
+  --lean: #7a600f;
+  --p-context: #5e5b6b; --p-stakes: #a34d00; --p-action: #5332e6; --p-result: #12775a; --p-reflection: #0b6e8c;
+  --hero: #17161f; --on-hero: #f4f3f8; --on-hero-muted: #c9c5d6; --hero-line: #45405a;
+  --room: #0e0d14; --room-raised: #1a1824; --room-line: #2c2938; --room-text: #f2f0f7; --room-muted: #a29fb0; --room-live: #ff6b5e;
+  --guide: #17161f; --on-guide: #f4f3f8;
+  --font: "Geist", system-ui, sans-serif; --mono: "Geist Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --ground: #121118; --surface: #1b1a23; --sunken: #24222e; --ink: #f0eef6; --ink-2: #d4d1de; --muted: #a6a2b4; --line: #2e2b3a; --line-strong: #464157;
+  --violet: #7b63ff; --violet-hover: #9480ff; --violet-soft: #2a2350; --violet-ink: #c4b8ff; --violet-light: #a594ff;
+  --teal: #4fb3d1; --teal-soft: #11303a; --teal-light: #5cc3e0;
+  --ok: #5fd0a8; --ok-ink: #8fe0c2; --ok-soft: #12302a; --warn: #f2a65a; --warn-ink: #f6bf86; --warn-soft: #3a2614;
+  --bad: #ff8b78; --bad-ink: #ffab9c; --bad-soft: #3c1c17; --lean: #e3c35a;
+  --p-context: #a6a2b4; --p-stakes: #f2a65a; --p-action: #a594ff; --p-result: #5fd0a8; --p-reflection: #5cc3e0;
+  --hero: #26233a; --hero-line: #4d4766; --guide: #000000; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --ground: #121118; --surface: #1b1a23; --sunken: #24222e; --ink: #f0eef6; --ink-2: #d4d1de; --muted: #a6a2b4; --line: #2e2b3a; --line-strong: #464157;
+  --violet: #7b63ff; --violet-hover: #9480ff; --violet-soft: #2a2350; --violet-ink: #c4b8ff; --violet-light: #a594ff;
+  --teal: #4fb3d1; --teal-soft: #11303a; --teal-light: #5cc3e0;
+  --ok: #5fd0a8; --ok-ink: #8fe0c2; --ok-soft: #12302a; --warn: #f2a65a; --warn-ink: #f6bf86; --warn-soft: #3a2614;
+  --bad: #ff8b78; --bad-ink: #ffab9c; --bad-soft: #3c1c17; --lean: #e3c35a;
+  --p-context: #a6a2b4; --p-stakes: #f2a65a; --p-action: #a594ff; --p-result: #5fd0a8; --p-reflection: #5cc3e0;
+  --hero: #26233a; --hero-line: #4d4766; --guide: #000000; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--ground); color: var(--ink); font: 15px/1.5 var(--font); }
+a { color: var(--violet-ink); }
+button { font: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--violet); outline-offset: 2px; }
+h1, h2, h3 { margin: 0; line-height: 1.2; text-wrap: balance; }
+h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
+h2 { font-size: 19px; font-weight: 700; }
+h3 { font-size: 16px; font-weight: 600; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+.small { font-size: 13.5px; }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.eyebrow { font: 500 11.5px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--violet-ink); }
+.eyebrow.teal { color: var(--teal); }
+.eyebrow.plain { color: var(--muted); }
+
+/* Guide bar */
+.guide { background: var(--guide); color: var(--on-guide); padding-block: 8px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 13px; }
+.guide .tag { font: 500 11px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--violet-light); }
+.guide select { font: inherit; font-size: 13px; padding: 4px 8px; border-radius: 8px; border: 1px solid #45405a; background: #26233a; color: #f4f3f8; }
+.guide .step { color: #c9c5d6; }
+.guide .gbtn { padding: 4px 12px; border-radius: 999px; border: 1px solid #45405a; background: transparent; color: #f4f3f8; font-size: 13px; }
+.guide .gbtn.primary { background: var(--violet); border-color: var(--violet); color: #fff; }
+.guide .gbtn:disabled { opacity: 0.4; cursor: default; }
+.guide .spacer { flex: 1 1 auto; }
+.guide a { color: #c9c5d6; }
+
+/* App shell */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: var(--surface); border-bottom: 1px solid var(--line); padding-block: 12px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 17px; text-decoration: none; color: var(--ink); }
+.brand .mark { width: 26px; height: 26px; border-radius: 8px; background: var(--violet); }
+.brand .with { font-weight: 400; font-size: 13px; color: var(--muted); }
+.top-right { display: flex; align-items: center; gap: 10px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; background: var(--violet-soft); color: var(--violet-ink); font-size: 12.5px; font-weight: 600; }
+.avatar-me { width: 34px; height: 34px; border-radius: 999px; background: var(--sunken); display: inline-flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 600; color: var(--ink); text-decoration: none; }
+.shell { display: flex; flex-wrap: wrap; align-items: flex-start; }
+.rail { flex: 1 1 200px; max-width: 232px; padding: 18px 12px; display: flex; flex-direction: column; gap: 3px; }
+.rail a { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: var(--ink); text-decoration: none; }
+.rail a:hover { background: var(--sunken); }
+.rail a.on { background: var(--violet-soft); color: var(--violet-ink); font-weight: 600; }
+.rail .ask { margin-top: 20px; background: var(--hero); color: var(--on-hero); font-weight: 600; border-radius: 999px; }
+.rail .ask:hover { background: var(--hero); opacity: 0.9; }
+main { flex: 999 1 560px; min-width: 0; max-width: 1040px; padding: 28px 36px 64px; display: flex; flex-direction: column; gap: 20px; }
+main.narrow { max-width: 780px; margin: 0 auto; }
+.solo { max-width: 860px; margin: 0 auto; padding: 40px 20px 64px; display: flex; flex-direction: column; gap: 22px; }
+
+/* Building blocks */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.card.tight { padding: 14px 16px; gap: 6px; border-radius: 12px; }
+.card.coach { border-top: 4px solid var(--violet); }
+.card.interviewer { border-top: 4px solid var(--teal); }
+.card.dashed { border-style: dashed; border-color: var(--line-strong); }
+.hero { background: var(--hero); color: var(--on-hero); border-radius: 20px; padding: 24px 26px; display: flex; flex-direction: column; gap: 10px; }
+.hero .sub { color: var(--on-hero-muted); font-size: 14.5px; }
+.hero .big { font-size: 24px; font-weight: 700; line-height: 1.25; max-width: 34ch; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.grid4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; align-items: start; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.between { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.stack { display: flex; flex-direction: column; gap: 10px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 0 18px; border-radius: 999px; border: 1px solid transparent; background: var(--violet); color: #fff; font-weight: 600; text-decoration: none; font-size: 14.5px; }
+.btn:hover { background: var(--violet-hover); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line-strong); font-weight: 500; }
+.btn.ghost:hover { background: var(--sunken); }
+.btn.quiet { background: transparent; color: var(--muted); border-color: transparent; font-weight: 500; padding: 0 10px; }
+.btn.dark { background: var(--hero); color: var(--on-hero); }
+.hero .btn.ghost { color: var(--on-hero); border-color: var(--hero-line); }
+.hero .btn.ghost:hover { background: rgb(255 255 255 / 8%); }
+.btn.sm { min-height: 36px; padding: 0 14px; font-size: 13.5px; }
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 999px; font-size: 12.5px; border: 1px solid var(--line); color: var(--ink-2); white-space: nowrap; }
+.chip.v { background: var(--violet-soft); color: var(--violet-ink); border-color: transparent; }
+.chip.t { background: var(--teal-soft); color: var(--teal); border-color: transparent; }
+.chip.ok { background: var(--ok-soft); color: var(--ok-ink); border-color: transparent; font-weight: 600; }
+.chip.warn { background: var(--warn-soft); color: var(--warn-ink); border-color: transparent; font-weight: 600; }
+.chip.bad { background: var(--bad-soft); color: var(--bad-ink); border-color: transparent; font-weight: 600; }
+.chip.dark { background: var(--ink); color: var(--surface); border-color: transparent; font-weight: 600; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.bar { height: 8px; border-radius: 999px; background: var(--sunken); overflow: hidden; }
+.bar > span { display: block; height: 100%; background: var(--teal); border-radius: 999px; }
+.bar.v > span { background: var(--violet); }
+.diff { font-size: 14px; padding: 10px 12px; border-radius: 10px; background: var(--ground); }
+.diff del { color: var(--bad); }
+.diff ins { color: var(--ok); text-decoration: none; }
+.sugg { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; }
+.sugg .txt { flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.list-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; text-decoration: none; color: var(--ink); }
+.list-row:last-child { border-bottom: 0; }
+.notice { padding: 12px 14px; border-radius: 12px; font-size: 14px; }
+.notice.warn { background: var(--warn-soft); }
+.notice.ok { background: var(--ok-soft); color: var(--ok-ink); }
+.notice.v { background: var(--violet-soft); }
+.notice.t { background: var(--teal-soft); }
+.part { display: flex; flex-direction: column; gap: 3px; }
+.part .lbl { font: 500 11.5px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); background: var(--hero); color: var(--on-hero); padding: 10px 18px; border-radius: 999px; font-size: 14px; z-index: 20; }
+.choice { display: flex; flex-direction: column; gap: 8px; padding: 18px; border-radius: 14px; border: 2px solid var(--line); background: var(--surface); text-align: left; color: var(--ink); text-decoration: none; }
+.choice:hover { border-color: var(--line-strong); }
+.choice.sel { border-color: var(--violet); background: var(--violet-soft); }
+.choice.t { border-color: var(--teal); background: var(--teal-soft); }
+.choice.v { border-color: var(--violet); background: var(--violet-soft); }
+.seg { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.seg button { padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-size: 13.5px; }
+.seg button.on { background: var(--violet-soft); border-color: var(--violet); color: var(--violet-ink); font-weight: 600; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-weight: 600; font-size: 14px; }
+.field input, .field textarea { font: inherit; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface); color: var(--ink); }
+.drop { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 36px 20px; border: 2px dashed var(--line-strong); border-radius: 14px; background: var(--ground); text-align: center; }
+.steps { display: flex; gap: 8px; flex-wrap: wrap; }
+.steps span { padding: 4px 12px; border-radius: 999px; background: var(--sunken); color: var(--muted); font-size: 12.5px; }
+.steps span.on { background: var(--violet-soft); color: var(--violet-ink); font-weight: 600; }
+.steps span.done { background: var(--ok-soft); color: var(--ok-ink); }
+.score { font-size: 34px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.bubble { padding: 10px 14px; border-radius: 14px; max-width: 80%; font-size: 14.5px; }
+.bubble.s { background: var(--violet-soft); }
+.bubble.me { background: var(--sunken); align-self: flex-end; }
+.chat { display: flex; flex-direction: column; gap: 10px; }
+.chatline { display: flex; gap: 10px; align-items: flex-start; }
+.drawer { border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 12px; background: var(--ground); }
+.planitem { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.planitem:last-child { border-bottom: 0; }
+.planitem .day { width: 44px; flex: none; font: 500 12px var(--mono); color: var(--muted); padding-top: 2px; }
+.check { width: 20px; height: 20px; flex: none; border-radius: 6px; border: 2px solid var(--line-strong); margin-top: 2px; display: inline-flex; align-items: center; justify-content: center; }
+.check.done { background: var(--ok); border-color: var(--ok); }
+.cgroup { border: 1px solid var(--line); border-left: 4px solid var(--line); border-radius: 14px; padding: 0 16px; }
+.cgroup summary { list-style: none; cursor: pointer; display: flex; flex-direction: column; gap: 6px; padding: 14px 0; }
+.cgroup summary::-webkit-details-marker { display: none; }
+.cgroup .caret { transition: transform 0.15s; color: var(--muted); }
+.cgroup[open] .caret { transform: rotate(180deg); }
+.cgroup[open] summary { border-bottom: 1px solid var(--line); }
+.fold summary { list-style: none; cursor: pointer; }
+.fold summary::-webkit-details-marker { display: none; }
+.fold .caret { transition: transform 0.15s; color: var(--muted); }
+.fold[open] .caret { transform: rotate(180deg); }
+.planitem.next { background: var(--violet-soft); margin: 0 -12px; padding: 12px; border-radius: 12px; border-bottom-color: transparent; }
+
+/* Live room */
+.room { background: var(--room); color: var(--room-text); min-height: 640px; display: flex; flex-direction: column; }
+.room header { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding-block: 16px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); border-bottom: 1px solid var(--room-line); }
+.room .phases { display: flex; gap: 6px; flex-wrap: wrap; padding: 12px max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px)); font-size: 12.5px; }
+.room .phases span { padding: 4px 12px; border-radius: 999px; background: var(--room-raised); color: var(--room-muted); }
+.room .phases span.on { background: #0b6e8c; color: #fff; font-weight: 600; }
+.room .body { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px max(16px, env(safe-area-inset-right, 0px)) 28px max(16px, env(safe-area-inset-left, 0px)); flex: 1; }
+.room .panel { background: var(--room-raised); border: 1px solid var(--room-line); border-radius: 20px; padding: 24px; }
+.room .muted { color: var(--room-muted); }
+.room .btn.ghost { color: var(--room-text); border-color: #45405a; }
+.room .btn.end { background: var(--room-live); color: #0e0d14; }
+
+@media (max-width: 760px) {
+  .rail { flex-basis: 100%; max-width: none; flex-direction: row; overflow-x: auto; padding: 10px 16px; }
+  .rail a { white-space: nowrap; }
+  .rail .ask { margin-top: 0; }
+  main { padding: 20px 16px 48px; }
+  .grid2, .grid3, .grid4 { grid-template-columns: 1fr; }
+}
+.sv-box { transform-box: fill-box; transform-origin: center; }
+.sv-spin { transform-box: view-box; transform-origin: 100px 100px; animation: sv-spin 9s linear infinite; }
+.sv-pulse-ring { transform-box: view-box; transform-origin: 100px 100px; animation: sv-ring 1.6s ease-in-out infinite; }
+.sv-blink { animation: sv-blink 4.5s infinite; }
+.sv-dot { animation: sv-dot 1.4s ease-in-out infinite; }
+.sv-d2 { animation-delay: .2s; } .sv-d3 { animation-delay: .4s; }
+.sv-scan { animation: sv-scan 2.4s ease-in-out infinite; }
+.sv-bob { animation: sv-bob 2.6s ease-in-out infinite; }
+.sv-twinkle { animation: sv-twinkle 1.8s ease-in-out infinite; }
+.sv-check { stroke-dasharray: 30; animation: sv-check 2.4s ease-in-out infinite; }
+.sv-wave { animation: sv-wave 1.2s ease-in-out infinite; }
+.sv-talk { animation: sv-talk .35s ease-in-out infinite alternate; }
+.sv-float { animation: sv-float 2.2s ease-in-out infinite; }
+@keyframes sv-spin { to { transform: rotate(360deg); } }
+@keyframes sv-ring { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+@keyframes sv-blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+@keyframes sv-dot { 0%, 100% { opacity: .25; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.1); } }
+@keyframes sv-scan { 0%, 100% { transform: translate(-14px, -22px); } 50% { transform: translate(0, 0); } }
+@keyframes sv-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes sv-twinkle { 0%, 100% { transform: scale(1) rotate(0); } 50% { transform: scale(1.25) rotate(20deg); } }
+@keyframes sv-check { 0%, 20% { stroke-dashoffset: 30; } 50%, 100% { stroke-dashoffset: 0; } }
+@keyframes sv-wave { 0%, 100% { opacity: .2; } 50% { opacity: 1; } }
+@keyframes sv-talk { from { transform: scaleY(.35); } to { transform: scaleY(1); } }
+@keyframes sv-float { 0% { transform: translateY(4px) scale(.9); opacity: .5; } 50% { opacity: 1; } 100% { transform: translateY(-6px) scale(1.1); opacity: .5; } }
+.hero-row { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; }
+.hero-row > div { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.reading { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; padding: 60px 20px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } .sv-check { stroke-dashoffset: 0; } }
+</style>
+
+<div id="guide" class="guide" aria-label="Prototype guide"></div>
+<div id="app"></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+// Prototype of the Strong Hire experience from the UX discovery. Views are routed on the hash.
+const state = {
+  planStyle: 'weekly',
+  tookTake: false,
+  applied: false,
+  craftStep: 0,
+  reviewed: false,
+  reviewApplied: false,
+  roleStep: 1,
+  drawer: false,
+  ideasDismissed: {},
+  liveMode: 'listening',
+  iv: 'beh',
+  role: 'stripe',
+  story: 'checkout',
+};
+try { const saved = JSON.parse(localStorage.getItem('sh-mockups') || 'null'); if (saved) Object.assign(state, saved); } catch (e) {}
+function save() { try { localStorage.setItem('sh-mockups', JSON.stringify(state)); } catch (e) {} }
+
+// Strova, the approved avatar. Modes: listening, speaking, interviewing, thinking, analysing, coaching, celebrating.
+const ZIG = (() => { const n = 56; let d = ''; for (let i = 0; i <= n; i++) { const a = (i / n) * Math.PI * 2; const r = i % 2 ? 90 : 96; d += (i ? 'L' : 'M') + (100 + r * Math.cos(a)).toFixed(1) + ' ' + (100 + r * Math.sin(a)).toFixed(1) + ' '; } return d + 'Z'; })();
+let strovaN = 0;
+function strova(mode, size) {
+  const id = 'sv' + (++strovaN);
+  const fx = size >= 64;
+  const interviewer = mode === 'interviewing' || mode === 'speaking' || mode === 'listening';
+  const accent = interviewer ? '#0b6e8c' : mode === 'celebrating' ? '#12775a' : '#5332e6';
+  const soft = interviewer ? '#e0f2f7' : mode === 'celebrating' ? '#e3f4ec' : '#eeeafe';
+  const hair = '#6b4226', skin = '#e8b996', shade = '#d6a37f', top = '#a99bdc';
+  const mouth = { listening: 'M94 116 Q100 117.5 106 116', thinking: 'M93 117 Q99 115 107 118', analysing: 'M91 116 L109 116', coaching: 'M91 114 Q100 120 109 114', interviewing: 'M91 116 L109 116', celebrating: 'M91 114 Q100 120 109 114' }[mode] || 'M92 115 Q100 119 108 115';
+  const up = mode === 'thinking', down = mode === 'analysing', browUp = mode === 'thinking' || mode === 'celebrating';
+  const eL = up ? 88 : down ? 85 : 86, eR = up ? 116 : down ? 113 : 114, eY = up ? 92 : down ? 99 : 96;
+  const eRY = mode === 'coaching' || mode === 'celebrating' ? 4.4 : 5;
+  const bL = browUp ? 'M79 82 Q86 77 93 81' : mode === 'interviewing' ? 'M78 84 L94 83' : 'M78 83 Q86 79 94 82';
+  const bR = browUp ? 'M107 81 Q114 76 121 82' : mode === 'interviewing' ? 'M106 83 L122 84' : 'M106 82 Q114 79 122 83';
+  const zig = mode === 'thinking' || mode === 'analysing';
+  const ringCls = mode === 'celebrating' || mode === 'speaking' ? 'sv-pulse-ring' : '';
+  const label = { listening: 'Strova is listening', speaking: 'Strova is speaking', interviewing: 'Strova is interviewing', thinking: 'Strova is thinking', analysing: 'Strova is analysing', coaching: 'Strova is coaching', celebrating: 'Strova is celebrating' }[mode] || 'Strova';
+  const T = 'translate(40 29.6) scale(1.2)';
+  let fxs = '';
+  if (fx && mode === 'thinking') fxs = `<circle class="sv-box sv-dot" cx="150" cy="58" r="5" fill="${accent}"/><circle class="sv-box sv-dot sv-d2" cx="163" cy="42" r="7" fill="${accent}"/><circle class="sv-box sv-dot sv-d3" cx="178" cy="24" r="10" fill="${accent}"/>`;
+  if (fx && mode === 'analysing') fxs = `<rect x="132" y="120" width="52" height="64" rx="8" fill="#fff" stroke="${accent}" stroke-width="3"/><line x1="142" y1="136" x2="174" y2="136" stroke="${accent}" stroke-width="3" stroke-linecap="round"/><line x1="142" y1="148" x2="168" y2="148" stroke="#c9c5d6" stroke-width="3" stroke-linecap="round"/><line x1="142" y1="160" x2="172" y2="160" stroke="#c9c5d6" stroke-width="3" stroke-linecap="round"/><g class="sv-scan"><circle cx="170" cy="168" r="9" fill="none" stroke="${accent}" stroke-width="3"/><line x1="176" y1="175" x2="184" y2="183" stroke="${accent}" stroke-width="3.5" stroke-linecap="round"/></g>`;
+  if (fx && mode === 'coaching') fxs = `<g class="sv-bob"><path d="M140 22 H186 A10 10 0 0 1 196 32 V54 A10 10 0 0 1 186 64 H160 L150 74 L151 64 H140 A10 10 0 0 1 130 54 V32 A10 10 0 0 1 140 22 Z" fill="${accent}"/><path class="sv-box sv-twinkle" d="M163 32 L166 40 L174 43 L166 46 L163 54 L160 46 L152 43 L160 40 Z" fill="#fff"/></g>`;
+  if (fx && mode === 'interviewing') fxs = `<rect x="138" y="128" width="44" height="54" rx="6" fill="#fff" stroke="${accent}" stroke-width="3"/><rect x="150" y="122" width="20" height="10" rx="3" fill="${accent}"/><line x1="146" y1="146" x2="174" y2="146" stroke="#c9c5d6" stroke-width="3" stroke-linecap="round"/><line x1="146" y1="158" x2="170" y2="158" stroke="#c9c5d6" stroke-width="3" stroke-linecap="round"/><path class="sv-check" d="M146 170 L152 175 L162 165" fill="none" stroke="${accent}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`;
+  if (fx && mode === 'speaking') fxs = `<path class="sv-wave" d="M150 100 Q158 112 150 124" fill="none" stroke="${accent}" stroke-width="4" stroke-linecap="round"/><path class="sv-wave sv-d2" d="M162 92 Q176 112 162 132" fill="none" stroke="${accent}" stroke-width="4" stroke-linecap="round"/><path class="sv-wave sv-d3" d="M174 84 Q194 112 174 140" fill="none" stroke="${accent}" stroke-width="4" stroke-linecap="round"/>`;
+  if (fx && mode === 'listening') fxs = `<path class="sv-wave sv-d2" d="M42 86 Q34 98 42 110" fill="none" stroke="${accent}" stroke-width="4" stroke-linecap="round"/><path class="sv-wave" d="M30 78 Q18 98 30 118" fill="none" stroke="${accent}" stroke-width="4" stroke-linecap="round"/>`;
+  if (fx && mode === 'celebrating') fxs = `<path class="sv-box sv-twinkle" d="M36 40 L40 50 L50 54 L40 58 L36 68 L32 58 L22 54 L32 50 Z" fill="#12775a"/><path class="sv-box sv-twinkle sv-d2" d="M164 30 L167 38 L175 41 L167 44 L164 52 L161 44 L153 41 L161 38 Z" fill="${accent}"/><circle class="sv-box sv-float" cx="170" cy="74" r="4" fill="#a34d00"/><circle class="sv-box sv-float sv-d3" cx="30" cy="84" r="4" fill="${accent}"/>`;
+  return `<svg role="img" aria-label="${label}" width="${size}" height="${size}" viewBox="0 0 200 200" style="flex:none">
+  <circle cx="100" cy="100" r="96" fill="${soft}"/>
+  ${zig ? `<path class="sv-spin" d="${ZIG}" fill="none" stroke="${accent}" stroke-width="4" stroke-linejoin="round"/>` : `<circle class="${ringCls}" cx="100" cy="100" r="93" fill="none" stroke="${accent}" stroke-width="6"/>`}
+  <defs><clipPath id="${id}"><circle cx="100" cy="100" r="93"/></clipPath></defs>
+  <g clip-path="url(#${id})">
+    <path d="M28 205 C28 162 60 144 100 144 C140 144 172 162 172 205 Z" fill="${top}"/>
+    <path d="M84 145 L100 170 L116 145 Z" fill="${shade}"/>
+    <path d="M78 147 L100 176 L90 186 Z" fill="rgba(23,22,31,0.12)"/><path d="M122 147 L100 176 L110 186 Z" fill="rgba(23,22,31,0.12)"/>
+    <g transform="${T}" fill="${hair}"><path d="M47,88c-6.674,0-15,0-21-2c-6.077-2.026-9.104-6.691-8-13c0.868-4.959,5-15,5-23l21,9L47,88z"/><path d="M53.776,88c6.674,0,15,0,21-2c6.077-2.026,9.104-6.691,8-13c-0.868-4.959-5-15-5-23l-21,9L53.776,88z"/></g>
+    <rect x="88" y="118" width="24" height="32" rx="10" fill="${shade}"/>
+    <path transform="${T}" fill="${skin}" d="M81.5,51.317c-1.844-2.356-5.112-1.351-6.575,0.741c0.844-4.43,0.452-7.502,0.452-11.063c0-15.62-11.171-25.27-24.877-25.944v-0.038c-0.168,0.003-0.333,0.014-0.5,0.019c-0.167-0.006-0.332-0.016-0.5-0.019v0.038c-13.706,0.675-24.877,10.324-24.877,25.944c0,3.562-0.392,6.633,0.452,11.063c-1.463-2.092-4.731-3.097-6.575-0.741c-2.853,3.644-1.201,10.895,1.771,13.851c2.768,2.754,4.229,2.333,5.922,1.764c0.012-0.004,1.68,9.529,4.308,13.568c3.024,4.647,12.317,9.588,19,9.967h1c6.683-0.38,15.976-5.32,19-9.967c2.628-4.039,4.296-13.572,4.308-13.568c1.692,0.568,3.153,0.99,5.922-1.764C82.701,62.211,84.353,54.961,81.5,51.317z"/>
+    <g transform="${T}" fill="${hair}"><path d="M26.996,50.572c0,0,1.059-3.728,1.139-9.039c0,0,29.191,5.185,33.143-23.857c0,0,0-4.09-10.906-4.771C36.698,12.05,23.825,25.855,23.825,36.761S26.996,50.572,26.996,50.572z"/><path d="M58.551,16.604c0,0-4.894,22.294,17.04,26.292l2.009-2.726l-2.69-9.543l-6.135-12.951l-6.816-2.045L58.551,16.604z"/><path d="M75.702,51.986c-0.126,0-0.256-0.012-0.385-0.037c-1.11-0.212-1.837-1.283-1.626-2.392c0.791-4.148,1.219-6.529,1.219-10.153c0-14.558-10.32-25.124-24.538-25.124c-1.13,0-2.045-0.915-2.045-2.045s0.915-2.045,2.045-2.045C66.961,10.191,79,22.477,79,39.405c0,3.949-0.454,6.525-1.291,10.918C77.522,51.304,76.664,51.986,75.702,51.986z"/><path d="M25.042,52.007c-0.963,0-1.82-0.682-2.007-1.663c-0.837-4.393-1.291-6.991-1.291-10.939c0-16.927,12.039-29.214,28.628-29.214c1.13,0,2.045,0.915,2.045,2.045s-0.915,2.045-2.045,2.045c-14.218,0-24.538,10.566-24.538,25.124c0,3.624,0.429,6.026,1.219,10.174c0.211,1.109-0.517,2.18-1.626,2.392C25.298,51.995,25.169,52.007,25.042,52.007z"/><path d="M28.471,41.181c0,0-0.191,6.582-1.484,10.795c-0.679,2.214-2.681,2.25-3.279,0.479c-0.829-2.455-0.694-9.215-0.407-12.136C26.125,39.984,28.471,41.181,28.471,41.181z"/><path d="M71.677,41.181c0,0,0.191,6.582,1.484,10.795c0.679,2.214,2.681,2.25,3.279,0.479c0.829-2.455,0.694-9.215,0.407-12.136C74.023,39.984,71.677,41.181,71.677,41.181z"/></g>
+    <path d="${bL}" fill="none" stroke="${hair}" stroke-width="3.5" stroke-linecap="round"/><path d="${bR}" fill="none" stroke="${hair}" stroke-width="3.5" stroke-linecap="round"/>
+    <ellipse class="sv-box sv-blink" cx="${eL}" cy="${eY}" rx="4.2" ry="${eRY}" fill="#1f1a24"/><ellipse class="sv-box sv-blink" cx="${eR}" cy="${eY}" rx="4.2" ry="${eRY}" fill="#1f1a24"/>
+    ${mode === 'speaking' ? '<ellipse class="sv-box sv-talk" cx="100" cy="116" rx="7" ry="5" fill="#7a2e2e"/>' : `<path d="${mouth}" fill="none" stroke="#9a3b3b" stroke-width="3" stroke-linecap="round"/>`}
+  </g>
+  ${fxs}
+</svg>`;
+}
+function av(hat, size) { return strova(hat === 'i' ? 'interviewing' : 'coaching', size); }
+
+const readiness = () => state.tookTake ? 66 : 58;
+const ROLES = {
+  stripe: { title: 'Senior Software Engineer, Payments Reliability', company: 'Stripe', short: 'Stripe · Senior SWE', date: 'Onsite Nov 5 · 6 days', dateCls: 't', match: 72, ivs: ['beh', 'hm', 'tech'], acting: 'Engineering Manager at Stripe', look: ['Ownership', 'Impact', 'Conflict handling', 'Learning from failure', 'Payments systems', 'Incident response'], probe: 'design review leadership, failure handling in money movement, incident response', gaps: 'distributed systems, on-call ownership' },
+  shopify: { title: 'Staff Engineer, Checkout', company: 'Shopify', short: 'Shopify · Staff Engineer', date: 'No date yet', dateCls: '', match: 64, ivs: ['sbeh', 'shm'], acting: 'Director of Engineering at Shopify', look: ['Ownership', 'Impact', 'Influence across teams', 'Technical direction'], probe: 'setting technical direction across teams, mentoring senior engineers', gaps: 'Ruby, leading multi-team projects' },
+};
+const IVS = {
+  beh: { role: 'stripe', name: 'Behavioral', score: () => readiness(), meta: () => state.tookTake ? '3 takes · last: Hire' : '2 takes · last: Lean Hire', focus: 'conflict across teams' },
+  hm: { role: 'stripe', name: 'Hiring manager deep dive', score: () => 40, meta: () => '1 take · last: Lean No Hire', focus: 'judgment and scope at senior level' },
+  tech: { role: 'stripe', name: 'Technical Q&amp;A', score: () => null, meta: () => 'Not started', focus: 'idempotency and exactly-once payments' },
+  sbeh: { role: 'shopify', name: 'Behavioral', score: () => null, meta: () => 'Not started', focus: 'ownership at staff level' },
+  shm: { role: 'shopify', name: 'Hiring manager deep dive', score: () => null, meta: () => 'Not started', focus: 'technical direction across teams' },
+};
+const iv = () => IVS[state.iv] || IVS.beh;
+const role = () => ROLES[state.role] || ROLES.stripe;
+const ivLink = (k) => `href="#interview" data-act="pick-iv" data-v="${k}"`;
+const roleLink = (k) => `href="#role" data-act="pick-role" data-v="${k}"`;
+const storyLink = (k) => `href="#story" data-act="pick-story" data-v="checkout" data-act="pick-story" data-v="${k}"`;
+
+// Flows for the guide bar.
+const FLOWS = [
+  { id: 'f1', name: '1 · First use', steps: ['start', 'reading', 'cv-ready', 'plan-style', 'what-first', 'home'] },
+  { id: 'f2', name: '2 · Add a target role', steps: ['roles', 'add-role', 'role'] },
+  { id: 'f3', name: '3 · Rehearse with Strova', steps: ['interview', 'live', 'debrief', 'interview'] },
+  { id: 'f4', name: '4 · Build a story', steps: ['stories', 'craft', 'story', 'stories', 'write', 'review'] },
+  { id: 'f5', name: '5 · Returning user', steps: ['home', 'interview', 'story', 'cv'] },
+  { id: 'all', name: 'Free browse', steps: [] },
+];
+let flowId = 'f1', flowPos = 0;
+
+const NAV = [
+  ['home', 'Home'], ['cvs', "Ana's Resumes"], ['roles', 'Target roles'], ['rehearse', 'Rehearsals with Strova'], ['stories', 'Career Stories with Strova'],
+];
+const NAV_OF = { home: 'home', cvs: 'cvs', cv: 'cvs', roles: 'roles', 'add-role': 'roles', role: 'roles', rehearse: 'rehearse', interview: 'rehearse', debrief: 'rehearse', stories: 'stories', story: 'stories', craft: 'stories', review: 'stories', write: 'stories', profile: '' };
+
+function shell(view, inner, narrow) {
+  const on = NAV_OF[view];
+  return `
+  <div class="top">
+    <a class="brand" href="#home"><span class="mark" aria-hidden="true"></span>Strong Hire <span class="with">with Strova</span></a>
+    <div class="top-right"><span class="pill">Monthly plan · 140 of 300 min left</span><a class="avatar-me" href="#profile" aria-label="Your profile">AL</a></div>
+  </div>
+  <div class="shell">
+    <nav class="rail" aria-label="Main">
+      ${NAV.map(([k, l]) => `<a href="#${k}" class="${on === k ? 'on' : ''}"${on === k ? ' aria-current="page"' : ''}>${k === 'rehearse' ? av('i', 18) : ''}${l}</a>`).join('')}
+    </nav>
+    <main class="${narrow ? 'narrow' : ''}">${inner}</main>
+  </div>`;
+}
+
+function solo(inner, step) {
+  return `
+  <div class="top">
+    <span class="brand"><span class="mark" aria-hidden="true"></span>Strong Hire <span class="with">with Strova</span></span>
+    ${step ? `<div class="steps">${['Profile', 'Your resume', 'Plan style'].map((s, i) => `<span class="${i + 1 < step ? 'done' : i + 1 === step ? 'on' : ''}">${s}</span>`).join('')}</div>` : ''}
+  </div>
+  <div class="solo">${inner}</div>`;
+}
+
+const V = {};
+
+V.start = () => solo(`
+  <div class="stack" style="gap:8px">
+    <div class="eyebrow">Welcome, Ana</div>
+    <h1 style="font-size:34px">Start with your resume</h1>
+    <p class="muted" style="font-size:17px;max-width:60ch">Everything in Strong Hire builds on it. Strova reads your resume, finds issues to fix, and suggests the stories you can tell in interviews.</p>
+  </div>
+  <div class="card">
+    <div class="drop"><strong>Drop your resume here, or choose a file</strong><span class="muted small">PDF or DOCX, up to 1 MB. Stored encrypted. You can delete it at any time.</span></div>
+    <div class="field"><label for="cvtext">Or paste your resume text</label><textarea id="cvtext" rows="3" placeholder="Paste the text of your resume"></textarea></div>
+    <div class="between"><span class="muted small">No resume file? <a href="#reading">Paste your LinkedIn experience</a> instead.</span><a class="btn" href="#reading">Read my resume</a></div>
+  </div>
+  <div class="grid3">
+    <div class="card tight"><h3>Resume breakdown</h3><p class="muted small">Your roles, achievements and skills, the way an interviewer reads them.</p></div>
+    <div class="card tight"><h3>Resume issues</h3><p class="muted small">Gaps in dates, thin roles and missing skills, to fix or accept.</p></div>
+    <div class="card tight"><h3>Story ideas</h3><p class="muted small">The achievements that could become your interview stories.</p></div>
+  </div>`, 2);
+
+V.reading = () => solo(`<div class="reading">${strova('analysing', 160)}<h1>Strova is reading your resume</h1><p class="muted">Finding your roles, achievements, issues to fix and story ideas. This takes a few seconds.</p></div>`, 2);
+
+V['resume-check'] = () => solo(`
+  <a href="#cv-ready" class="small">Back to what your resume shows</a>
+  <div class="stack" style="gap:4px"><div class="eyebrow">Resume 2026-10-30</div><h1>Breakdown and issues</h1><p class="muted">Check what Strova read, and fix or accept each issue. Interviewers and your match scores read this version.</p></div>
+  <div class="grid2">
+    <div class="card"><div class="between"><h2>Breakdown</h2><button class="btn quiet sm" data-act="toast" data-v="Each part would become editable here">Edit</button></div>
+      <p class="small muted">Backend engineer with 7 years in billing and payments systems.</p>
+      <div class="stack" style="gap:2px;border-top:1px solid var(--line);padding-top:10px"><strong>Software Engineer II · Shoply</strong><span class="small muted">Mar 2021 to now · 5 years 8 months</span><span class="small">· Built the refunds API used by 40,000 merchants</span><span class="small">· Led migration of 30 services to PostgreSQL 15 with zero downtime</span></div>
+      <div class="stack" style="gap:2px;border-top:1px solid var(--line);padding-top:10px"><strong>Software Engineer · Invoicely</strong><span class="small muted">Jun 2018 to Feb 2021 · 2 years 9 months</span><span class="small">· Cut nightly invoice job runtime from 4 hours to 25 minutes</span></div>
+      <div class="stack" style="gap:6px;border-top:1px solid var(--line);padding-top:10px"><strong class="small">Skills</strong><div class="chips"><span class="chip">Python</span><span class="chip">Go</span><span class="chip">PostgreSQL</span><span class="chip">Kafka</span><span class="chip">AWS</span></div></div>
+      <div class="stack" style="gap:2px;border-top:1px solid var(--line);padding-top:10px"><strong class="small">Education</strong><span class="small">BSc Computer Science · State University · 2018</span></div>
+    </div>
+    <div class="card"><div class="between"><h2>Issues</h2><span class="small muted">3 open · 0 accepted</span></div>
+      <div class="notice warn"><strong style="color:var(--warn-ink)">One achievement on Invoicely</strong><br><span class="small">Roles read best with 2 to 5. Adding one also gives you a new story idea.</span><div class="row" style="margin-top:6px"><button class="btn sm" data-act="toast" data-v="An achievement field would open here">Add an achievement</button><button class="btn quiet sm" data-act="toast" data-v="Accepted as it is">Accept as it is</button></div></div>
+      <div class="notice" style="background:var(--ground)"><strong>A very short summary</strong><br><span class="small muted">10 words. Say who you are, your years and field, and one result.</span><div class="row" style="margin-top:6px"><button class="btn ghost sm" data-act="toast" data-v="The summary would become editable here">Add to the summary</button><button class="btn quiet sm" data-act="toast" data-v="Accepted as it is">Accept as it is</button></div></div>
+      <div class="notice" style="background:var(--ground)"><strong>A skill missing from Skills</strong><br><span class="small muted">Celery appears in a role but not in Skills.</span><div class="row" style="margin-top:6px"><button class="btn ghost sm" data-act="toast" data-v="Celery added to Skills">Add to Skills</button><button class="btn quiet sm" data-act="toast" data-v="Accepted as it is">Accept as it is</button></div></div>
+    </div>
+  </div>
+  <div class="row"><a class="btn" href="#plan-style">Continue</a><a class="btn ghost" href="#cv-ready">Back</a></div>`, 2);
+
+V['cv-ready'] = () => solo(`
+  <div class="row">${strova('coaching', 88)}<div class="stack" style="gap:4px"><div class="eyebrow">Strova read your resume</div><h1>Here is what your resume shows</h1><p class="muted">Resume 2026-10-30 · Backend engineer, 7 years in billing and payments.</p></div></div>
+  <div class="stack">
+    <details class="card fold"><summary><div class="between"><div class="stack" style="gap:2px"><div class="eyebrow plain">Breakdown</div><h2>2 roles · 3 achievements · 5 skills</h2></div><span class="row small" style="gap:8px">Show<span class="caret" aria-hidden="true">▾</span></span></div></summary>
+      <div class="stack" style="gap:2px;border-top:1px solid var(--line);padding-top:10px"><strong>Software Engineer II · Shoply</strong><span class="small muted">Mar 2021 to now</span><span class="small">· Built the refunds API used by 40,000 merchants</span><span class="small">· Led migration of 30 services to PostgreSQL 15 with zero downtime</span></div>
+      <div class="stack" style="gap:2px"><strong>Software Engineer · Invoicely</strong><span class="small muted">Jun 2018 to Feb 2021</span><span class="small">· Cut nightly invoice job runtime from 4 hours to 25 minutes</span></div>
+      <div class="chips"><span class="chip">Python</span><span class="chip">Go</span><span class="chip">PostgreSQL</span><span class="chip">Kafka</span><span class="chip">AWS</span></div>
+      <div class="between"><span class="small muted">Edit any part on the full breakdown.</span><a class="btn ghost sm" href="#resume-check">Open breakdown and issues</a></div></details>
+    <details class="card fold"><summary><div class="between"><div class="stack" style="gap:2px"><div class="eyebrow plain" style="color:var(--warn-ink)">Resume issues</div><h2>3 to look at</h2></div><span class="row small" style="gap:8px">Show<span class="caret" aria-hidden="true">▾</span></span></div></summary>
+      <div class="notice warn small"><strong style="color:var(--warn-ink)">One achievement on Invoicely.</strong> Roles read best with 2 to 5. Adding one also gives you a new story idea.</div>
+      <div class="notice small" style="background:var(--ground)"><strong>A very short summary.</strong> Say who you are, your years and field, and one result.</div>
+      <div class="notice small" style="background:var(--ground)"><strong>A skill missing from Skills.</strong> Celery appears in a role but not in Skills.</div>
+      <div class="between"><span class="small muted">Fix or accept each one now, or later from your plan.</span><a class="btn ghost sm" href="#resume-check">Open breakdown and issues</a></div></details>
+    <details class="card fold"><summary><div class="between"><div class="stack" style="gap:2px"><div class="eyebrow">Story ideas</div><h2>2 ideas</h2></div><span class="row small" style="gap:8px">Show<span class="caret" aria-hidden="true">▾</span></span></div></summary>
+      <div class="card tight"><strong>Led migration of 30 services to PostgreSQL 15 with zero downtime</strong><span class="chips"><span class="chip v">Ownership</span><span class="chip v">Technical depth</span></span></div>
+      <div class="card tight"><strong>Cut nightly invoice job runtime from 4 hours to 25 minutes</strong><span class="chips"><span class="chip v">Impact</span></span></div>
+      <div class="between"><span class="small muted">Build or dismiss each idea on your stories page.</span><a class="btn ghost sm" href="#stories">Open Career Stories</a></div></details>
+  </div>
+  <div class="notice v"><strong>One more question, then you're in.</strong> Strova will plan your practice and your story work. Choose how you like to work.</div>
+  <div class="row"><a class="btn" href="#plan-style">Continue</a></div>`, 2);
+
+function planStyleBody(inProfile) {
+  const w = state.planStyle === 'weekly';
+  const later = `<span class="small muted" style="border-top:1px dashed var(--line-strong);padding-top:6px"><span class="chip">Rehearsals</span> Added when you add a target role</span>`;
+  const weeklyItems = inProfile
+    ? `<span class="small"><span class="mono muted">Mon</span> Take: Stripe · Behavioral</span><span class="small"><span class="mono muted">Wed</span> Story goal: Pushback from platform to Ready</span><span class="small"><span class="mono muted">Fri</span> Fix one resume issue</span>`
+    : `<span class="small"><span class="mono muted">Mon</span> Story goal: build "Led migration of 30 services"</span><span class="small"><span class="mono muted">Wed</span> Fix one resume issue</span><span class="small"><span class="mono muted">Fri</span> Story goal: get it to Ready</span>${later}`;
+  const listItems = inProfile
+    ? `<span class="small"><span class="chip t">Rehearsals</span> Stripe · Behavioral readiness 75 or more</span><span class="small"><span class="chip v">Stories</span> A Ready story for Conflict handling</span><span class="small"><span class="chip warn">Resume</span> Fix or accept 3 resume issues</span>`
+    : `<span class="small"><span class="chip v">Stories</span> Build your 2 story ideas to Ready</span><span class="small"><span class="chip warn">Resume</span> Fix or accept 3 resume issues</span>${later}`;
+  return `
+  ${inProfile ? '' : `<div class="card tight" style="gap:10px">
+    <strong>What your plan covers now</strong>
+    <div class="grid3">
+      <div class="notice v small"><span class="chip v">Stories</span><br><strong>Complete your stories</strong><br>Start with the 2 ideas from your resume.</div>
+      <div class="notice warn small"><span class="chip warn">Resume</span><br><strong>Fix your resume findings</strong><br>3 issues to fix or accept.</div>
+      <div class="notice small" style="background:var(--ground);border:1px dashed var(--line-strong)"><span class="chip">Rehearsals</span><br><strong>Not yet</strong><br>Mock interviews join your plan once you add a target role.</div>
+    </div>
+  </div>`}
+  <div class="grid2">
+    <button class="choice ${w ? 'sel' : ''}" data-act="style" data-v="weekly" aria-pressed="${w}">
+      <span class="eyebrow">Weekly plan</span>
+      <h2>Strova plans each week for you</h2>
+      <span class="small muted">Good if you like a routine, or have an interview date.</span>
+      <span class="card tight" style="margin-top:6px">${weeklyItems}</span>
+      <span class="small muted">Strova reminds you in the app and by email when something is due. You can mute email.</span>
+    </button>
+    <button class="choice ${!w ? 'sel' : ''}" data-act="style" data-v="checklist" aria-pressed="${!w}">
+      <span class="eyebrow">Readiness checklist</span>
+      <h2>Work through a list at your own pace</h2>
+      <span class="small muted">Good if your schedule changes week to week.</span>
+      <span class="card tight" style="margin-top:6px">${listItems}</span>
+      <span class="small muted">No schedule and no reminders, just a clear list that ticks itself off.</span>
+    </button>
+  </div>
+  <p class="muted small">${inProfile ? 'Both styles cover the same work: your stories, your resume and your mock interviews.' : 'Both styles cover the same work. When you add a target role, its mock interviews are added to whichever style you pick. You can change the style any time in your profile.'}</p>`;
+}
+
+V['plan-style'] = () => solo(`
+  <div class="stack" style="gap:6px"><div class="eyebrow">Your plan</div><h1>How do you like to work?</h1><p class="muted" style="max-width:62ch">Strova keeps one plan for you. For now it covers completing your stories and fixing your resume findings. Pick the style that suits you.</p></div>
+  ${planStyleBody(false)}
+  <div class="row"><a class="btn" href="#what-first">Use the ${state.planStyle === 'weekly' ? 'weekly plan' : 'checklist'}</a></div>`, 3);
+
+V['what-first'] = () => solo(`
+  <div class="row" style="gap:16px">${strova('coaching', 72)}<div class="stack" style="gap:6px"><div class="eyebrow">You're all set</div><h1>What would you like to do first?</h1><p class="muted" style="max-width:62ch">Your resume and your plan are ready, so you can start anywhere. There's no wrong first step: every path below feeds the others, and you can switch at any time from Home.</p></div></div>
+  <div class="grid2">
+    <a class="choice t" href="#add-role"><span class="eyebrow teal">Prep and rehearse</span><h2>I'm applying to a role</h2><span class="small">Add the job posting. Strova suggests the interviews to rehearse and measures them against your resume.</span><span class="small" style="color:var(--teal);font-weight:600">Add a target role</span></a>
+    <a class="choice v" href="#craft"><span class="eyebrow">Build your stories</span><h2>Build my stories</h2><span class="small">Start with your strongest idea, "Led migration of 30 services". Strova asks the questions.</span><span class="small" style="color:var(--violet-ink);font-weight:600">Craft a story with Strova</span></a>
+  </div>
+  <p class="muted small">Or <a href="#cv">fix my resume first</a>, or <a href="#home">go to Home</a>.</p>`);
+
+const KIND = {
+  reh: { label: 'Rehearsal', cls: 't', color: 'var(--teal)' },
+  story: { label: 'Story', cls: 'v', color: 'var(--violet)' },
+  cv: { label: 'Resume', cls: 'warn', color: 'var(--warn)' },
+};
+function kindChip(k) { return `<span class="chip ${KIND[k].cls}">${KIND[k].label}</span>`; }
+function checkGroup(k, title, done, total, items, status) {
+  return `<details class="cgroup" style="border-left-color:${KIND[k].color}">
+    <summary>
+      <div class="between"><div class="row" style="gap:8px">${kindChip(k)}<h3>${title}</h3></div><div class="row" style="gap:10px"><span class="small mono">${done} of ${total} done</span><span class="caret" aria-hidden="true">▾</span></div></div>
+      <div class="bar ${k === 'story' ? 'v' : ''}"><span style="width:${Math.round(done / total * 100)}%;${k === 'cv' ? 'background:var(--warn)' : ''}"></span></div>
+      <div class="small muted">${status}</div>
+    </summary>
+    <div>${items}</div></details>`;
+}
+function checkItem(done, text, sub, href, label, next) {
+  return `<div class="planitem${next ? ' next' : ''}"><span class="check${done ? ' done' : ''}" aria-label="${done ? 'Done' : 'To do'}"></span><div class="stack" style="gap:2px;flex:1"><span${done ? ' class="muted" style="text-decoration:line-through"' : next ? ' style="font-weight:600"' : ''}>${text}</span>${sub ? `<span class="small muted">${sub}</span>` : ''}</div>${href ? `<a class="btn ${next ? '' : 'ghost'} sm" ${href.includes(':') ? ivLink(href.split(':')[1]) : `href="#${href}"`}>${label}</a>` : ''}</div>`;
+}
+function planCard() {
+  if (state.planStyle === 'weekly') {
+    return `<div class="card coach">
+      <div class="between"><div class="row">${av('c', 28)}<h2>This week's plan</h2></div><span class="muted small">Oct 27 to Nov 2 · <a href="#profile">Change style</a></span></div>
+      <div class="chips small">${kindChip('reh')}<span class="muted">mock interviews</span>${kindChip('story')}<span class="muted">story goals</span>${kindChip('cv')}<span class="muted">Resume issues</span></div>
+      <div>
+        <div class="planitem"><span class="day">Mon</span><span class="check done" aria-label="Done"></span><div class="stack" style="gap:4px;flex:1"><span class="muted" style="text-decoration:line-through">Fix the short summary</span>${kindChip('cv')}</div></div>
+        <div class="planitem next"><span class="day">Today</span><span class="check" aria-label="To do"></span><div class="stack" style="gap:4px;flex:1"><strong>Take: Stripe · Behavioral, Realistic</strong><span class="small muted">Readiness ${readiness()} of 75. Your onsite is in 6 days.</span>${kindChip('reh')}</div><a class="btn sm" ${ivLink('beh')}>Start</a></div>
+        <div class="planitem"><span class="day">Thu</span><span class="check" aria-label="To do"></span><div class="stack" style="gap:4px;flex:1"><span>Get "Pushback from platform" to Ready</span><span class="small muted">3 of 5 parts written</span>${kindChip('story')}</div><a class="btn ghost sm" href="#review">Open</a></div>
+        <div class="planitem"><span class="day">Fri</span><span class="check" aria-label="To do"></span><div class="stack" style="gap:4px;flex:1"><span>Add a second achievement to Invoicely</span>${kindChip('cv')}</div><a class="btn ghost sm" href="#cv">Open</a></div>
+        <div class="planitem"><span class="day">Sat</span><span class="check" aria-label="To do"></span><div class="stack" style="gap:4px;flex:1"><span>Take: Stripe · Hiring manager</span><span class="small muted">Readiness 40 of 75</span>${kindChip('reh')}</div><a class="btn ghost sm" ${ivLink('hm')}>Open</a></div>
+      </div></div>`;
+  }
+  const r = readiness();
+  return `<div class="card coach">
+    <div class="between"><div class="row">${av('c', 28)}<h2>Your readiness checklist</h2></div><span class="muted small">${r >= 75 ? 4 : 3} of 10 done · <a href="#profile">Change style</a></span></div>
+    ${checkGroup('reh', 'Rehearsals', 0, 4,
+      checkItem(false, 'Stripe · Behavioral: readiness 75 or more', `Now ${r}`, 'interview:beh', 'Take', true) +
+      checkItem(false, 'Stripe · Hiring manager: readiness 75 or more', 'Now 40', 'interview:hm', 'Take') +
+      checkItem(false, 'Stripe · Technical Q&amp;A: readiness 75 or more', 'Not started', 'interview:tech', 'Start') +
+      checkItem(false, 'Shopify · Behavioral: readiness 75 or more', 'Not started', 'interview:sbeh', 'Start'),
+      `Next: Stripe · Behavioral, ${r} of 75 · 1 in progress · 2 not started`)}
+    ${checkGroup('story', 'Story completion', 2, 4,
+      checkItem(true, 'Ownership: a Proven story', 'Checkout migration') +
+      checkItem(true, 'Impact: a Ready story', 'Payments outage') +
+      checkItem(false, 'Conflict handling: a Ready story', '"Pushback from platform" has 3 of 5 parts', 'review', 'Open') +
+      checkItem(false, 'Learning from failure: a Ready story', 'No story yet', 'craft', 'Craft with Strova'),
+      'Next: Conflict handling, 3 of 5 parts · 1 Proven · 1 Ready · 1 missing')}
+    ${checkGroup('cv', 'Resume gaps and issues', 1, 3,
+      checkItem(true, 'Fix the short summary') +
+      checkItem(false, 'Add a second achievement to Invoicely', 'Also gives you a new story idea', 'cv', 'Fix') +
+      checkItem(false, 'Add Celery to Skills, or accept as it is', '', 'cv', 'Fix'),
+      'Next: add a second achievement to Invoicely · 2 issues open')}
+  </div>`;
+}
+
+V.home = () => shell('home', `
+  <h1>Good morning, Ana</h1>
+  <div class="hero hero-row">
+    ${strova('coaching', 104)}
+    <div><span class="eyebrow" style="color:var(--violet-light)">Strova · next step</span>
+    <div class="big">Your Stripe onsite is in 6 days. Rehearse conflict across teams, your weakest skill.</div>
+    <div class="sub">Your last debrief had no example with another team. A 10-minute Behavioral take focuses on it.</div>
+    <div class="row"><a class="btn" ${ivLink('beh')}>Start the take</a><a class="btn ghost" ${roleLink('stripe')}>Open Stripe</a></div></div>
+  </div>
+  ${planCard()}
+  <div class="grid4">
+    <a class="card tight" href="#cv" style="text-decoration:none;color:inherit"><div class="eyebrow plain">Ana's Resumes</div><h3>Resume 2026-10-30 <span class="chip dark">Main</span></h3><span class="small" style="color:var(--warn-ink)">3 issues open</span><span class="small" style="color:var(--violet-ink)">2 story ideas</span></a>
+    <a class="card tight" href="#roles" style="text-decoration:none;color:inherit"><div class="eyebrow teal">Target roles</div><h3>2 roles</h3><span class="small muted">Stripe · 6 days</span><span class="small muted">Shopify · no date</span></a>
+    <a class="card tight" href="#rehearse" style="text-decoration:none;color:inherit"><div class="eyebrow teal">Rehearsals with Strova</div><h3>5 interviews</h3><span class="small muted">Best: Stripe · Behavioral ${readiness()}</span><span class="small muted">2 not started</span></a>
+    <a class="card tight" href="#stories" style="text-decoration:none;color:inherit"><div class="eyebrow">Career Stories with Strova</div><h3>3 stories</h3><span class="small" style="color:var(--ok-ink)">1 Proven · 1 Ready · 1 Draft</span><span class="small" style="color:var(--violet-ink)">${state.applied ? 2 : 3} suggestions from Strova</span></a>
+  </div>`);
+
+V.cvs = () => shell('cvs', `
+  <div class="between"><h1>Ana's Resumes</h1><a class="btn" href="#start">Add a resume</a></div>
+  <p class="muted">Your main resume feeds your story ideas and is used for new target roles. Use other resumes for roles where you sent a different version.</p>
+  <div class="card">
+    <a class="list-row" href="#cv"><div class="stack" style="gap:2px"><strong>Resume 2026-10-30 <span class="chip dark">Main</span></strong><span class="small muted">Used by Stripe and Shopify · 3 issues open · 2 story ideas</span></div><span class="small">Open</span></a>
+    <a class="list-row" href="#cvs" data-act="toast" data-v="This sample shows only your main resume in full"><div class="stack" style="gap:2px"><strong>Resume 2026-06 platform focus</strong><span class="small muted">Not used by a role · 1 issue open</span></div><span class="small">Open</span></a>
+  </div>`);
+
+V.cv = () => shell('cvs', `
+  <div class="between"><div class="stack" style="gap:6px"><h1>Resume 2026-10-30</h1><div class="row small muted"><span class="chip dark">Main resume</span>Used by <a href="#role">Stripe · Senior SWE</a> and Shopify · Staff Engineer</div></div><a class="btn ghost" href="#start">Upload a new version</a></div>
+  <div class="card coach">
+    <div class="between"><div class="row">${av('c', 28)}<h2>Story ideas from this resume</h2></div><span class="muted small">Strova found these in your achievements</span></div>
+    ${state.ideasDismissed.a ? '' : `<div class="card tight sugg"><div class="txt"><strong>Led migration of 30 services to PostgreSQL 15 with zero downtime</strong><span class="chips"><span class="chip v">Ownership</span><span class="chip v">Technical depth</span><span class="small muted">Still needs: stakes, reflection</span></span></div><div class="row"><a class="btn sm" href="#craft">Craft with Strova</a><button class="btn quiet sm" data-act="dismiss-idea" data-v="a">Not a story</button></div></div>`}
+    ${state.ideasDismissed.b ? '' : `<div class="card tight sugg"><div class="txt"><strong>Cut nightly invoice job runtime from 4 hours to 25 minutes</strong><span class="chips"><span class="chip v">Impact</span><span class="small muted">Still needs: stakes, your action, reflection</span></span></div><div class="row"><a class="btn sm" href="#craft">Craft with Strova</a><button class="btn quiet sm" data-act="dismiss-idea" data-v="b">Not a story</button></div></div>`}
+    <div class="between notice" style="background:var(--ground)"><span class="muted">Built the refunds API used by 40,000 merchants</span><a href="#story" data-act="pick-story" data-v="checkout" class="small" style="color:var(--ok-ink);font-weight:600">Story: Checkout migration · Proven</a></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><div class="between"><h2>Breakdown</h2><button class="btn quiet sm" data-act="toast" data-v="Each part would become editable here">Edit</button></div>
+      <p class="small muted">Backend engineer with 7 years in billing and payments systems.</p>
+      <div class="stack" style="gap:2px;border-top:1px solid var(--line);padding-top:10px"><strong>Software Engineer II · Shoply</strong><span class="small muted">Mar 2021 to now</span><span class="small">· Built the refunds API used by 40,000 merchants</span><span class="small">· Led migration of 30 services to PostgreSQL 15 with zero downtime</span></div>
+      <div class="stack" style="gap:2px;border-top:1px solid var(--line);padding-top:10px"><strong>Software Engineer · Invoicely</strong><span class="small muted">Jun 2018 to Feb 2021</span><span class="small">· Cut nightly invoice job runtime from 4 hours to 25 minutes</span></div>
+      <div class="chips" style="border-top:1px solid var(--line);padding-top:10px"><span class="chip">Python</span><span class="chip">Go</span><span class="chip">PostgreSQL</span><span class="chip">Kafka</span><span class="chip">AWS</span></div>
+    </div>
+    <div class="stack" style="gap:16px">
+      <div class="card"><div class="between"><h2>Resume issues</h2><span class="small muted">3 open</span></div>
+        <div class="notice warn"><strong style="color:var(--warn-ink)">One achievement on Invoicely</strong><br><span class="small">Roles read best with 2 to 5. Adding one also gives you a new story idea.</span><div class="row small" style="margin-top:6px"><button class="btn quiet sm" style="padding:0" data-act="toast" data-v="An achievement field would open here">Add an achievement</button><button class="btn quiet sm" data-act="toast" data-v="Accepted as it is">Accept as it is</button></div></div>
+        <div class="notice" style="background:var(--ground)"><strong>A very short summary</strong><br><span class="small muted">Say who you are, your years and field, and one result.</span></div>
+        <div class="notice" style="background:var(--ground)"><strong>A skill missing from Skills</strong><br><span class="small muted">Celery appears in a role but not in Skills.</span></div>
+      </div>
+      <div class="card coach"><div class="eyebrow">Strova suggests · from your stories</div><p class="small">"Checkout migration" says latency fell 40%. Your resume line doesn't.</p><div class="diff"><del>Built the refunds API used by 40,000 merchants</del><br><ins>Built the refunds API used by 40,000 merchants and cut its latency by 40%</ins></div><div class="row"><button class="btn sm" data-act="toast" data-v="Resume line updated. The resume check ran again.">Add to resume</button><button class="btn quiet sm" data-act="toast" data-v="Dismissed">Dismiss</button></div></div>
+    </div>
+  </div>`);
+
+V.roles = () => shell('roles', `
+  <div class="between"><h1>Target roles</h1><a class="btn" href="#add-role">Add a target role</a></div>
+  <p class="muted">Each role is a real job posting. Strova suggests the interviews to rehearse for it, measured against your resume.</p>
+  <div class="grid2">
+    <a class="card" ${roleLink('stripe')} style="text-decoration:none;color:inherit"><div class="between"><h2>Stripe · Senior SWE, Payments</h2><span class="chip t">Onsite in 6 days</span></div><span class="small muted">Main resume · match 72</span>
+      <div class="stack" style="gap:8px">
+        <div><div class="between small"><span>Behavioral</span><span class="mono">${readiness()}</span></div><div class="bar"><span style="width:${readiness()}%"></span></div></div>
+        <div><div class="between small"><span>Hiring manager</span><span class="mono">40</span></div><div class="bar"><span style="width:40%"></span></div></div>
+        <div><div class="between small"><span>Technical Q&amp;A</span><span class="muted">Not started</span></div><div class="bar"><span style="width:0%"></span></div></div>
+      </div></a>
+    <a class="card" ${roleLink('shopify')} style="text-decoration:none;color:inherit"><div class="between"><h2>Shopify · Staff Engineer</h2><span class="chip">No date yet</span></div><span class="small muted">Main resume · match 64</span>
+      <div class="stack" style="gap:8px">
+        <div><div class="between small"><span>Behavioral</span><span class="muted">Not started</span></div><div class="bar"><span style="width:0%"></span></div></div>
+        <div><div class="between small"><span>Hiring manager</span><span class="muted">Not started</span></div><div class="bar"><span style="width:0%"></span></div></div>
+      </div></a>
+  </div>`);
+
+V['add-role'] = () => {
+  const s = state.roleStep;
+  const steps = `<div class="steps">${['Job posting', 'Check the role', 'Interviews'].map((t, i) => `<span class="${i + 1 < s ? 'done' : i + 1 === s ? 'on' : ''}">${i + 1} · ${t}</span>`).join('')}</div>`;
+  let body = '';
+  if (s === 1) body = `
+    <div class="card"><div class="field"><label for="joblink">Job posting link</label><input id="joblink" value="https://stripe.com/jobs/listing/senior-software-engineer-payments"></div>
+    <p class="small muted">Greenhouse, Lever, Ashby, Workday and most career pages work. For LinkedIn, paste the text.</p>
+    <div class="row"><button class="btn" data-act="role-step" data-v="2">Read the posting</button></div></div>`;
+  if (s === 2) body = `
+    <div class="card"><div class="notice t">Strova has an interview profile for Stripe and will interview in its style.</div>
+    <div class="grid2"><div class="field"><label for="co">Company</label><input id="co" value="Stripe"></div><div class="field"><label for="ti">Job title</label><input id="ti" value="Senior Software Engineer, Payments Reliability"></div></div>
+    <div class="grid2"><div class="field"><label for="lv">Level</label><input id="lv" value="Senior"></div><div class="field"><label for="dt">Interview date (optional)</label><input id="dt" value="Nov 5, 2026"></div></div>
+    <div class="field"><label>Must-have skills</label><div class="chips"><span class="chip">Python or Go</span><span class="chip">Distributed systems</span><span class="chip">On-call ownership</span><span class="chip">Payments</span></div></div>
+    <div class="row"><button class="btn" data-act="role-step" data-v="3">Looks right</button><button class="btn quiet" data-act="role-step" data-v="1">Back</button></div></div>`;
+  if (s === 3) body = `
+    <div class="card coach"><div class="row">${av('c', 28)}<h2>Interviews Strova suggests for Stripe</h2></div>
+    <p class="small muted">From Stripe's usual interview rounds. Keep, remove or add types.</p>
+    <div class="stack">
+      <label class="card tight" style="flex-direction:row;align-items:center;gap:12px"><input type="checkbox" checked id="i1"> <span style="flex:1"><strong>Behavioral</strong><br><span class="small muted">Ownership, impact, collaboration, conflict</span></span></label>
+      <label class="card tight" style="flex-direction:row;align-items:center;gap:12px"><input type="checkbox" checked id="i2"> <span style="flex:1"><strong>Hiring manager deep dive</strong><br><span class="small muted">Your experience, judgment and fit</span></span></label>
+      <label class="card tight" style="flex-direction:row;align-items:center;gap:12px"><input type="checkbox" checked id="i3"> <span style="flex:1"><strong>Technical Q&amp;A</strong><br><span class="small muted">Spoken questions on payments systems. No live coding.</span></span></label>
+      <label class="card tight" style="flex-direction:row;align-items:center;gap:12px"><input type="checkbox" id="i4"> <span style="flex:1"><strong>Recruiter screen</strong><br><span class="small muted">Not usual at Stripe for this level</span></span></label>
+    </div>
+    <div class="between small"><span>Measured against: <strong>Resume 2026-10-30 (main)</strong></span><a href="#cvs">Use another resume</a></div>
+    <div class="row"><a class="btn" href="#role" data-act="role-done">Create the role</a><button class="btn quiet" data-act="role-step" data-v="2">Back</button></div></div>`;
+  return shell('roles', `<div class="stack" style="gap:6px"><div class="eyebrow teal">Target roles</div><h1>Add a target role</h1></div>${steps}${body}`, true);
+};
+
+V.role = () => {
+  const R = role();
+  const card = (k) => { const I = IVS[k]; const sc = I.score(); return `<a class="card tight" ${ivLink(k)} style="text-decoration:none;color:inherit"><strong>${I.name}</strong><div class="between"><span class="score ${sc == null ? 'muted' : ''}">${sc ?? '–'}</span><span class="small muted">goal 75</span></div><div class="bar"><span style="width:${sc ?? 0}%"></span></div><span class="small muted">${I.meta()}</span><span class="btn ${k === 'beh' ? '' : 'ghost'} sm" style="margin-top:6px">${sc == null ? 'Start a take' : 'Retake'}</span></a>`; };
+  return shell('roles', `
+  <div class="stack" style="gap:6px"><a href="#roles" class="small">Target roles</a><div class="eyebrow teal">Target role</div><h1>${R.title} · ${R.company}</h1>
+  <div class="row small muted"><span class="chip ${R.dateCls}">${R.date}</span><span class="mono" style="color:var(--ink)">Match ${R.match}</span><span>Main resume · <a href="#cvs">change</a></span></div></div>
+  <div class="card"><div class="between"><h2>Interviews for this role</h2><span class="small muted">Readiness is a practice estimate from Realistic takes</span></div>
+    <div class="grid3">${R.ivs.map(card).join('')}</div></div>
+  <div class="grid2">
+    <div class="card"><h2>What they'll look for</h2><div class="chips">${R.look.map(x => `<span class="chip">${x}</span>`).join('')}</div>
+      <p class="small"><strong>Where they'll probe:</strong> ${R.probe}.</p>
+      <div class="notice warn small"><strong style="color:var(--warn-ink)">Must-haves your resume never shows:</strong> ${R.gaps}. <a href="#cv">Open your resume</a></div></div>
+    <div class="card coach"><div class="row">${av('c', 24)}<h2>Your stories for this role</h2></div>
+      <div class="list-row"><div class="stack" style="gap:3px"><span class="small muted">Ownership</span><a ${storyLink('checkout')}><strong>Checkout migration</strong></a><span class="notice t small">For ${R.company}: ${R.company === 'Stripe' ? 'lead with this, and bring forward the 40,000 merchants.' : 'stress how you led the migration across teams.'}</span></div><span class="chip ok">Proven</span></div>
+      <div class="list-row"><div class="stack" style="gap:3px"><span class="small muted">Impact</span><a ${storyLink('outage')}><strong>Payments outage</strong></a><span class="small muted">The result has no number yet.</span></div><span class="chip warn">Thin</span></div>
+      <div class="list-row"><div class="stack" style="gap:3px"><span class="small muted">${R.company === 'Stripe' ? 'Conflict handling' : 'Influence across teams'}</span><span class="small muted">None of your stories shows this yet.</span><a href="#craft" class="small"><strong>Craft it with Strova</strong></a></div><span class="chip bad">Missing</span></div>
+    </div>
+  </div>
+  <div class="card dashed"><h2>Know anything about this interview?</h2><p class="small muted">The stage, the interviewer's role, recruiter notes, or what worries you. Optional, and Strova focuses on it.</p><div class="row"><button class="btn ghost sm" data-act="toast" data-v="Context form would open here">Add what you know</button></div></div>`);
+};
+
+V.rehearse = () => shell('rehearse', `
+  <div class="between"><div class="row">${strova('interviewing', 72)}<div><h1>Rehearsals with Strova</h1><p class="muted small">Rehearse every interview across your target roles with Strova, who plays the interviewer.</p></div></div></div>
+  <div class="hero"><span class="eyebrow" style="color:var(--teal-light)">Recommended next take</span><div class="big">Stripe · Behavioral, Realistic, 10 minutes</div><div class="sub">Closest to your interview date, and ${75 - readiness()} points from your readiness goal.</div><div class="row"><a class="btn" ${ivLink('beh')}>Start the take</a></div></div>
+  <div class="card">
+    ${Object.keys(IVS).map(k => { const I = IVS[k]; const r = I.score(); return `
+      <a class="list-row" ${ivLink(k)}><div class="stack" style="gap:4px;flex:1 1 300px"><strong>${ROLES[I.role].company} · ${I.name}</strong><span class="small muted">${I.meta()}</span></div><div style="flex:0 1 220px;min-width:140px"><div class="between small"><span class="muted">Readiness</span><span class="mono">${r ?? '–'}</span></div><div class="bar"><span style="width:${r ?? 0}%"></span></div></div><span class="btn ${r ? '' : 'ghost'} sm">${r ? 'Retake' : 'Start'}</span></a>`; }).join('')}
+  </div>`);
+
+V.interview = () => {
+  const I = iv(), R = ROLES[I.role], sc = I.score(), isBeh = state.iv === 'beh';
+  const takeNo = isBeh ? (state.tookTake ? 4 : 3) : state.iv === 'hm' ? 2 : 1;
+  return shell('rehearse', `
+  <div class="stack" style="gap:6px"><a ${roleLink(I.role)} class="small">${R.short}</a><h1>${I.name} interview</h1><p class="muted small">Role × Resume × Type: ${R.company} · Resume 2026-10-30 · ${I.name}</p></div>
+  <div class="grid2">
+    <div class="card interviewer"><div class="eyebrow teal">Readiness</div>${sc == null ? `<div class="row" style="align-items:baseline"><span class="score muted">–</span><span class="muted">goal 75</span></div><div class="bar"><span style="width:0%"></span></div><p class="small muted">Your readiness appears after your first Realistic take.</p>` : `<div class="row" style="align-items:baseline"><span class="score">${sc}</span><span class="muted">of 100 · goal 75</span>${isBeh && state.tookTake ? '<span class="chip ok">+8 after your last take</span>' : ''}</div><div class="bar"><span style="width:${sc}%"></span></div><p class="small muted">A practice estimate from your Realistic takes. It is not a prediction of ${R.company}'s decision.</p>`}</div>
+    <div class="card"><div class="eyebrow plain">Skill coverage</div>
+      ${isBeh ? `<div class="chips"><span class="chip ok">Ownership · 3.5</span><span class="chip ok">Impact · 3.0</span><span class="chip warn">Collaboration · 2.5</span><span class="chip ${state.tookTake ? 'warn' : 'bad'}">Conflict · ${state.tookTake ? '2.5' : '2.0'}</span><span class="chip">Failure · not asked yet</span></div>` : state.iv === 'hm' ? `<div class="chips"><span class="chip warn">Judgment · 2.5</span><span class="chip bad">Scope at level · 2.0</span><span class="chip">Motivation · not asked yet</span></div>` : `<p class="small muted">Shows after your first take.</p>`}
+      <p class="small muted">For information. Scores out of 4 from Realistic takes.</p></div>
+  </div>
+  <div class="hero"><div class="row" style="gap:8px">${av('i', 22)}<span class="eyebrow" style="color:var(--teal-light)">Take ${takeNo}</span></div><div class="big">Realistic, 10 minutes, warm tone. Focus: ${I.focus}.</div><div class="sub">Strova will act as ${R.acting}.</div>
+    <div class="row"><a class="btn" href="#live">${sc == null ? 'Start the first take' : 'Retake'}</a><button class="btn ghost" data-act="drawer">${state.drawer ? 'Hide settings' : 'Change settings'}</button></div>
+    ${state.drawer ? `<div class="drawer" style="color:var(--ink)">
+      <div class="stack" style="gap:6px"><strong class="small">Difficulty</strong><div class="seg"><button>Friendly</button><button class="on">Realistic</button><button>Tough</button></div></div>
+      <div class="stack" style="gap:6px"><strong class="small">Mode</strong><div class="seg"><button class="on">Realistic</button><button>Practice</button></div><span class="small muted">Practice lets you pause, ask for a hint and redo an answer. It doesn't count toward readiness.</span></div>
+      <div class="stack" style="gap:6px"><strong class="small">Tone</strong><div class="seg"><button>As ${R.company}</button><button class="on">Warm</button><button>Neutral</button><button>Direct</button></div></div>
+      <div class="stack" style="gap:6px"><strong class="small">Length</strong><div class="seg"><button class="on">10 min</button><button>30 min</button><button>45 min</button></div></div>
+    </div>` : ''}
+  </div>
+  <div class="card"><h2>Takes</h2>
+    ${isBeh ? `${state.tookTake ? `<a class="list-row" href="#debrief"><div class="stack" style="gap:2px"><strong>Take 3 · Realistic</strong><span class="small muted">Today · 2 of 3 met the bar</span></div><span style="color:var(--ok);font-weight:700">Hire</span></a>` : ''}
+    <a class="list-row" href="#debrief"><div class="stack" style="gap:2px"><strong>Take 2 · Realistic</strong><span class="small muted">Oct 30 · 1 of 2 met the bar</span></div><span style="color:var(--lean);font-weight:700">Lean Hire</span></a>
+    <a class="list-row" href="#debrief"><div class="stack" style="gap:2px"><strong>Take 1 · Practice</strong><span class="small muted">Oct 28 · not counted</span></div><span class="muted">Practice</span></a>` : state.iv === 'hm' ? `<a class="list-row" href="#debrief"><div class="stack" style="gap:2px"><strong>Take 1 · Realistic</strong><span class="small muted">Oct 29 · 1 of 3 met the bar</span></div><span style="color:var(--bad);font-weight:700">Lean No Hire</span></a>` : '<p class="small muted">No takes yet. Your first take sets your starting readiness.</p>'}
+  </div>`);
+};
+
+V.live = () => `
+  <div class="room">
+    <header><div class="stack" style="gap:2px"><strong>${ROLES[iv().role].company} · ${iv().name}</strong><span class="small muted">Realistic difficulty · Realistic mode · warm tone</span></div>
+      <div class="row" style="gap:16px"><span class="small muted"><span style="display:inline-block;width:8px;height:8px;border-radius:999px;background:var(--room-live)"></span> Connected</span><span class="mono" style="font-size:26px">7:42</span></div></header>
+    <div class="phases"><span>Intro</span><span>Small talk</span><span class="on">Core questions · 2 of 3</span><span>Your questions</span><span>Wrap-up</span></div>
+    <div class="body">
+      <section class="panel" style="flex:1 1 280px;max-width:360px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center" aria-label="Strova, your interviewer">
+        ${strova(state.liveMode, 160)}
+        <div style="font-size:22px;font-weight:700">Strova</div>
+        <div class="muted">Strova is acting as<br>${ROLES[iv().role].acting}</div>
+        <span class="chip t" style="background:#11303a;color:#5cc3e0">Strova is ${state.liveMode}</span>
+        <div class="stack" style="gap:6px;margin-top:8px"><span class="small muted">Preview her states</span><div class="seg">${['listening', 'thinking', 'speaking'].map(m => `<button data-act="live-mode" data-v="${m}" class="${state.liveMode === m ? 'on' : ''}">${m[0].toUpperCase() + m.slice(1)}</button>`).join('')}</div></div>
+      </section>
+      <section style="flex:999 1 420px;min-width:0;display:flex;flex-direction:column;gap:16px">
+        <div class="panel"><div class="small muted">Strova asked</div><p style="font-size:21px;line-height:1.4;margin-top:6px">Tell me about a time you disagreed with another team about a technical decision. What did you do?</p></div>
+        <div class="panel"><div class="between small muted"><span>Your answer</span><span class="mono">1:10 of about 2:00</span></div><div class="bar" style="background:var(--room-line);margin-top:8px"><span style="width:58%;background:#5cc3e0"></span></div></div>
+        <div class="row"><button class="btn ghost" data-act="toast" data-v="Prep timer: 1 minute">Take 1 minute to prepare</button><a class="btn end" href="#debrief" data-act="take-done" style="margin-left:auto">End take</a></div>
+        <p class="small muted">Realistic mode: no pauses or hints, and it counts toward readiness. Your audio is never stored.</p>
+      </section>
+    </div>
+  </div>`;
+
+V.debrief = () => shell('rehearse', `
+  <div class="between"><div class="stack" style="gap:4px"><div class="eyebrow teal">${ROLES[iv().role].company} · ${iv().name} · debrief</div>${state.iv === 'beh' ? '' : '<span class="small muted">Sample debrief: the answers below come from the Behavioral example.</span>'}<h1>Take ${state.tookTake ? 3 : 2} with Strova</h1><span class="small muted">Realistic mode · 10 minutes · ${state.tookTake ? 'today' : 'Oct 30'}</span></div><div class="row small"><a href="#interview">Back to the interview</a><button class="btn quiet sm" style="padding:0" data-act="toast" data-v="The transcript would open here">Read the transcript</button></div></div>
+  <div class="card interviewer">
+    <div class="row">${strova('interviewing', 72)}<div><h2>Strova's verdict</h2><span class="small muted">Wearing the interviewer hat: ${ROLES[iv().role].acting}</span></div></div>
+    <div class="row" style="gap:32px;align-items:flex-end">
+      <div class="stack" style="gap:2px"><span class="small muted">Hire signal</span><span style="font-size:34px;font-weight:700;color:${state.tookTake ? 'var(--ok)' : 'var(--lean)'}">${state.tookTake ? 'Hire' : 'Lean Hire'}</span><span class="small" style="color:var(--ok-ink);font-weight:600">${state.tookTake ? 'Up from Lean Hire last take' : 'Up from Lean No Hire'}</span></div>
+      <div class="stack" style="gap:2px"><span class="small muted">Met the bar</span><span class="mono" style="font-size:26px">2 of 3</span></div>
+      <div class="stack" style="gap:2px"><span class="small muted">Readiness</span><span class="mono" style="font-size:26px">${readiness()}</span></div>
+    </div>
+    <p style="max-width:70ch">The candidate showed clear ownership of the checkout migration and gave a measurable result. The conflict example stayed within one team. At senior level we expect cross-team influence.</p>
+  </div>
+  <div class="card"><h2>Answer by answer</h2>
+    <div class="list-row"><div class="stack" style="gap:2px;flex:1 1 380px"><strong>1. Tell me about a project you owned end to end.</strong><span class="small muted">Used your story <a href="#story" data-act="pick-story" data-v="checkout">Checkout migration</a> · Fix: say which trade-offs you weighed</span></div><span class="mono">3 of 4</span></div>
+    <div class="list-row"><div class="stack" style="gap:2px;flex:1 1 380px"><strong>2. Tell me about a time you disagreed with another team.</strong><span class="small muted">No story for this skill · Fix: the example did not involve another team</span></div><span class="mono" style="color:var(--warn)">2 of 4</span></div>
+    <div class="list-row"><div class="stack" style="gap:2px;flex:1 1 380px"><strong>3. Tell me about a result you are proud of.</strong><span class="small muted">A strong answer that is not in your stories yet</span></div><span class="mono" style="color:var(--ok)">4 of 4</span></div>
+  </div>
+  <div class="card coach">
+    <div class="row">${strova('coaching', 72)}<div><h2>Strova's coaching</h2><span class="small muted">Back on your side: what to do next</span></div></div>
+    <p>You showed real ownership. Next, you need one story where you changed another team's mind. Here is what I suggest:</p>
+    ${state.applied ? `<div class="notice ok"><strong>Applied to "Checkout migration".</strong> <a href="#story" data-act="pick-story" data-v="checkout">See the story</a> · <button class="btn quiet sm" data-act="undo-apply">Undo</button></div>` : `
+    <div class="card tight"><span class="eyebrow">Tune a story · Checkout migration</span><span>In answer 1 you named the trade-offs out loud. Add them to Your action?</span>
+      <div class="diff"><del>I wrote the plan and ran the cutover myself.</del><br><ins>I wrote the plan, chose a dual-write over a big-bang cutover to keep refunds live, and ran the cutover myself.</ins></div>
+      <div class="row"><button class="btn sm" data-act="apply">Apply</button><a class="btn ghost sm" href="#story" data-act="pick-story" data-v="checkout">Edit first</a><button class="btn quiet sm" data-act="toast" data-v="Dismissed">Dismiss</button></div></div>`}
+    <div class="card tight sugg"><div class="txt"><span class="eyebrow" style="color:var(--ok-ink)">New story · from answer 3</span><span>"Invoice job" scored 4 of 4. Save it with all five parts filled from your answer.</span></div><button class="btn ghost sm" data-act="toast" data-v="Saved as a Draft story">Save as a story</button></div>
+    <div class="card tight sugg"><div class="txt"><span class="eyebrow" style="color:var(--warn-ink)">Missing skill · Conflict handling</span><span>None of your stories covers another team. Let's find one together.</span></div><a class="btn ghost sm" href="#craft">Craft it with Strova</a></div>
+    <div class="notice ok row" style="gap:14px">${strova('celebrating', 72)}<span><strong>Checkout migration is now Proven.</strong> It met the bar in a Realistic take.</span></div>
+    <div class="between" style="border-top:1px solid var(--line);padding-top:12px"><span><strong>Your plan updated:</strong> next is the Hiring manager take on Saturday.</span><a class="btn dark sm" href="#home">Back to Home</a></div>
+  </div>`);
+
+function idea(key, title, skills, needs) {
+  if (state.ideasDismissed[key]) return '';
+  return `<div class="card tight sugg"><div class="txt"><strong>${title}</strong><span class="chips">${skills.map(k => `<span class="chip v">${k}</span>`).join('')}<span class="small muted">Still needs: ${needs}</span></span></div><div class="row"><a class="btn sm" href="#craft">Build on it</a><button class="btn quiet sm" data-act="dismiss-idea" data-v="${key}">Dismiss</button></div></div>`;
+}
+
+V.stories = () => {
+  const ideas = idea('a', 'Led migration of 30 services to PostgreSQL 15 with zero downtime', ['Ownership', 'Technical depth'], 'stakes, reflection') +
+    idea('b', 'Cut nightly invoice job runtime from 4 hours to 25 minutes', ['Impact'], 'stakes, your action, reflection');
+  return shell('stories', `
+  <h1>Career Stories with Strova</h1>
+  <div class="card">
+    <h2>Start a new story</h2>
+    <div class="grid2">
+      <a class="choice v" href="#craft"><span class="row" style="gap:8px">${av('c', 28)}<span class="eyebrow">Craft with Strova</span></span><h3>Strova asks, you answer</h3><span class="small">Talk or type. The five parts fill in from your own words.</span></a>
+      <a class="choice" href="#write"><span class="eyebrow plain">Write it yourself</span><h3>Write the five parts</h3><span class="small muted">Write or paste your story. When you're done, Strova can review it and suggest edits.</span></a>
+    </div>
+  </div>
+  <details class="card coach fold">
+    <summary><div class="between"><div class="row">${av('c', 28)}<h2>Stories recommended from your resume</h2></div><div class="row" style="gap:10px"><span class="small muted">${2 - Object.keys(state.ideasDismissed).length} ideas · 1 already a story</span><span class="caret" aria-hidden="true">▾</span></div></div></summary>
+    <p class="small muted">Strova found these in your resume's achievements. Build on one with Strova, or dismiss it.</p>
+    ${ideas || '<p class="small muted">No more ideas from this resume. Add an achievement on your resume to get new ones.</p>'}
+    <div class="between notice" style="background:var(--ground)"><span class="muted small">Built the refunds API used by 40,000 merchants</span><a href="#story" data-act="pick-story" data-v="checkout" class="small" style="color:var(--ok-ink);font-weight:600">Already a story: Checkout migration</a></div>
+  </details>
+  <form class="card tight" style="flex-direction:row;align-items:center;gap:10px" data-ask>${av('c', 28)}<label for="askstrova" class="small" style="font-weight:600;white-space:nowrap">Ask Strova</label><input id="askstrova" style="flex:1;min-width:0;font:inherit;padding:8px 12px;border:1px solid var(--line-strong);border-radius:999px;background:var(--surface);color:var(--ink)" placeholder="Which story should I use for leadership at Stripe?"><button class="btn sm" type="submit">Ask</button></form>
+  <div class="card">
+    <div class="between"><h2>Your stories</h2><span class="small muted">1 Proven · 1 Ready · 1 Draft</span></div>
+    <div class="chips"><span class="chip ok">Ownership · covered</span><span class="chip ok">Impact · covered</span><span class="chip warn">Conflict handling · thin</span><span class="chip bad">Learning from failure · missing</span><span class="chip bad">Communication · missing</span></div>
+    <div>
+      <a class="list-row" href="#story" data-act="pick-story" data-v="checkout"><div class="stack" style="gap:3px"><strong>Checkout migration</strong><span class="small muted">Ownership, Impact, Collaboration · used for Stripe</span></div><span class="chip ok">Proven</span></a>
+      <a class="list-row" href="#story" data-act="pick-story" data-v="outage"><div class="stack" style="gap:3px"><strong>Payments outage</strong><span class="small muted">Ownership, Impact · result has no number</span></div><span class="chip v">Ready</span></a>
+      <a class="list-row" href="#review"><div class="stack" style="gap:3px"><strong>Pushback from platform</strong><span class="small muted">Conflict handling · 3 of 5 parts · you wrote it · plan goal: Ready by Thursday</span></div><span class="chip">Draft</span></a>
+    </div>
+  </div>
+  <details class="card coach fold">
+    <summary><div class="between"><div class="row">${av('c', 28)}<h2>Strova suggests</h2></div><div class="row" style="gap:10px"><span class="muted small">${state.applied ? 2 : 3} for your stories</span><span class="caret" aria-hidden="true">▾</span></div></div></summary>
+    ${state.applied ? '' : `<div class="card tight sugg"><div class="txt"><span class="eyebrow">Tune a story · from your Stripe take</span><span>Add the trade-offs to "Checkout migration". You named them out loud in answer 1.</span></div><div class="row"><a class="btn sm" href="#story" data-act="pick-story" data-v="checkout">Review</a><button class="btn quiet sm" data-act="toast" data-v="Dismissed">Dismiss</button></div></div>`}
+    <div class="card tight sugg"><div class="txt"><span class="eyebrow teal">Tailor for Stripe</span><span>Lead with "Checkout migration" for Ownership, and bring forward the 40,000 merchants.</span></div><div class="row"><button class="btn ghost sm" data-act="toast" data-v="Added a note for Stripe to Checkout migration">Add to story</button><button class="btn quiet sm" data-act="toast" data-v="Dismissed">Dismiss</button></div></div>
+    <div class="card tight sugg"><div class="txt"><span class="eyebrow" style="color:var(--warn-ink)">Missing skill · Conflict handling</span><span>Your Stripe take asked about another team, and no story covers it.</span></div><a class="btn ghost sm" href="#craft">Craft it with Strova</a></div>
+  </details>`);
+};
+
+V.write = () => shell('stories', `
+  <a href="#stories" class="small">Career Stories with Strova</a>
+  <div class="stack" style="gap:4px"><div class="eyebrow plain">Write it yourself</div><h1>New story</h1><p class="small muted">Write each part in your own words. You can leave parts empty and come back.</p></div>
+  <div class="card">
+    <div class="field"><label for="wt">Story title</label><input id="wt" placeholder="For example: Pushback from platform"></div>
+    ${PARTS.map(([k, l]) => `<div class="field"><label for="w-${k}" style="color:var(--p-${k})">● ${l}</label><textarea id="w-${k}" rows="2" placeholder="${{ context: 'Where you were and what was going on', stakes: 'Why it mattered, and what could go wrong', action: 'What you did yourself, and the trade-offs', result: 'What changed, with a number if you have one', reflection: 'What you learned, or would do differently' }[k]}"></textarea></div>`).join('')}
+    <div class="notice v small">${av('c', 20)} <strong>Want a second pair of eyes?</strong> Strova reviews each part against what interviewers look for, and suggests edits in your own words for you to accept or skip.</div>
+    <div class="row"><a class="btn" href="#review" data-act="write-review">Save and ask Strova to review</a><a class="btn ghost" href="#stories" data-act="write-save">Save as a Draft</a></div>
+  </div>`, true);
+
+const CRAFT = [
+  { s: "Let's turn this resume line into a story: \"Led migration of 30 services to PostgreSQL 15 with zero downtime.\" What was going on at the time?", me: 'Our old database couldn\'t handle the holiday peak, and checkout depended on it.', fill: ['context'] },
+  { s: 'What was at stake if the migration went wrong?', me: 'Refunds would stop for 40,000 merchants in the busiest week of the year.', fill: ['context', 'stakes'] },
+  { s: 'What did you do yourself, and what trade-offs did you weigh?', me: 'I wrote the plan, chose a dual-write over a big-bang cutover, and ran it service by service.', fill: ['context', 'stakes', 'action'] },
+  { s: 'What changed, ideally with a number?', me: 'Zero downtime, and checkout latency fell 40%.', fill: ['context', 'stakes', 'action', 'result'] },
+  { s: 'Last one: what did you learn, or would do differently?', me: 'I\'d bring the platform team in earlier; their review caught two risks late.', fill: ['context', 'stakes', 'action', 'result', 'reflection'] },
+];
+const PARTS = [['context', 'Context', 'Our old database couldn\'t handle the holiday peak; checkout depended on it.'], ['stakes', 'Stakes', 'Refunds would stop for 40,000 merchants in peak week.'], ['action', 'Your action', 'I wrote the plan, chose a dual-write over a big-bang cutover, and ran it service by service.'], ['result', 'Result', 'Zero downtime; checkout latency fell 40%.'], ['reflection', 'Reflection', 'Bring the platform team in earlier.']];
+
+V.craft = () => {
+  const n = state.craftStep;
+  const filled = n === 0 ? [] : CRAFT[n - 1].fill;
+  const lines = [];
+  for (let i = 0; i <= Math.min(n, CRAFT.length - 1); i++) {
+    lines.push(`<div class="chatline">${av('c', 28)}<div class="bubble s">${CRAFT[i].s}</div></div>`);
+    if (i < n) lines.push(`<div class="bubble me">${CRAFT[i].me}</div>`);
+  }
+  const done = n >= CRAFT.length;
+  return shell('stories', `
+    <div class="between"><div class="stack" style="gap:4px"><div class="eyebrow">Craft with Strova</div><h1>Build a story</h1></div><div class="seg" aria-label="Coaching style"><button class="on">Gentle</button><button>Direct</button></div></div>
+    <div class="grid2" style="grid-template-columns:minmax(0,3fr) minmax(0,2fr)">
+      <div class="card"><div class="chat">${lines.join('')}${done ? `<div class="chatline">${av('c', 28)}<div class="bubble s">That's a complete story. I saved it as Ready. Want to practice a take?</div></div>` : ''}</div>
+        ${done ? `<div class="row"><a class="btn" href="#story" data-act="pick-story" data-v="migration">Open the story</a><a class="btn ghost" href="#stories">All stories</a></div>` : `<div class="row" style="border-top:1px solid var(--line);padding-top:12px"><span class="muted small" style="flex:1">Tap to talk, or type your answer</span><button class="btn" data-act="craft-next">Send the answer</button></div>`}</div>
+      <div class="card"><div class="row">${strova(state.craftStep >= CRAFT.length ? 'celebrating' : 'thinking', 72)}<span class="small muted">${state.craftStep >= CRAFT.length ? 'Strova saved your story as Ready.' : 'Strova is shaping your story from your words.'}</span></div><div class="between"><h3>Taking shape</h3><span class="chip ${filled.length === 5 ? 'v' : ''}">${filled.length === 5 ? 'Ready' : 'Draft'}</span></div>
+        ${PARTS.map(([k, l, t]) => `<div class="part"><span class="lbl" style="color:var(--p-${k})">${filled.includes(k) ? '●' : '○'} ${l}</span><span class="small ${filled.includes(k) ? '' : 'muted'}">${filled.includes(k) ? t : 'Not yet'}</span></div>`).join('')}
+        <p class="small muted">Strova uses only your words. Nothing is added that you didn't say.</p></div>
+    </div>`);
+};
+
+V.review = () => shell('stories', `
+  <div class="stack" style="gap:4px"><div class="eyebrow">Review with Strova</div><h1>Pushback from platform</h1><p class="small muted">You wrote this story. Strova reviews it part by part.</p></div>
+  <div class="grid2" style="grid-template-columns:minmax(0,3fr) minmax(0,2fr)">
+    <div class="card">
+      <div class="part"><span class="lbl" style="color:var(--p-context)">● Context</span><span>The platform team refused to change an API my team needed for the new checkout.</span></div>
+      <div class="part"><span class="lbl" style="color:var(--p-stakes)">● Stakes</span><span>Without it, we would miss the holiday launch.</span></div>
+      <div class="part"><span class="lbl" style="color:var(--p-action)">● Your action</span><span>${state.reviewApplied ? 'I set up a meeting with their lead, showed the error data from our side, and offered to write the change myself under their review.' : 'We talked to them and worked it out.'}</span></div>
+      <div class="part"><span class="lbl" style="color:var(--p-result)">○ Result</span><span class="muted">Not written yet</span></div>
+      <div class="part"><span class="lbl" style="color:var(--p-reflection)">○ Reflection</span><span class="muted">Not written yet</span></div>
+      ${state.reviewed ? '' : `<div class="row"><button class="btn" data-act="review">Review with Strova</button><button class="btn ghost" data-act="toast" data-v="Strova would continue this story with you, starting from the result">Craft the rest with Strova</button></div>`}
+    </div>
+    <div class="card coach">${state.reviewed ? `
+      <div class="row">${strova('analysing', 72)}<h3>Strova's review</h3></div>
+      <div class="notice ok small"><strong>Context and stakes are clear.</strong> An interviewer knows what was at risk.</div>
+      ${state.reviewApplied ? `<div class="notice ok small"><strong>Your action updated.</strong></div>` : `
+      <div class="card tight"><span class="eyebrow">Your action is too vague</span><span class="small">"We worked it out" hides what you did. In your Stripe take you described it better:</span>
+        <div class="diff"><del>We talked to them and worked it out.</del><br><ins>I set up a meeting with their lead, showed the error data from our side, and offered to write the change myself under their review.</ins></div>
+        <div class="row"><button class="btn sm" data-act="review-apply">Accept</button><button class="btn quiet sm" data-act="toast" data-v="Skipped">Skip</button></div></div>`}
+      <div class="notice warn small"><strong style="color:var(--warn-ink)">Result and reflection are missing.</strong> What changed after the API was updated? <button class="btn quiet sm" style="padding:0" data-act="toast" data-v="Strova would ask you about the result, then the reflection">Answer with Strova</button></div>` : `
+      <div class="row">${av('c', 28)}<h3>Ask Strova to review</h3></div><p class="small muted">Strova checks each part against what interviewers look for: your own role, a measurable result, trade-offs and what you learned. Suggested edits use your own words, and you accept or skip each one.</p>`}
+    </div>
+  </div>`);
+
+const STORIES = {
+  checkout: { title: 'Checkout migration', status: 'Proven', skills: 'Ownership, Impact, Collaboration', parts: () => ["Shoply's checkout ran on a billing service that could not scale for the holiday peak. 40,000 merchants depended on it.", 'A failed cutover would stop refunds for every merchant in the busiest week.', state.applied ? 'I wrote the plan, chose a dual-write over a big-bang cutover to keep refunds live, and ran the cutover myself.' : 'I wrote the plan and ran the cutover myself.', 'Zero downtime, and checkout latency fell by 40%.', 'Bring the platform team in earlier; their review caught two risks late.'], used: 'Leads for Ownership.', note: 'For Stripe: bring forward the 40,000 merchants.', source: 'Your resume: "Built the refunds API used by 40,000 merchants"', takes: '3 takes · best 3.5 of 4', sugg: () => !state.applied },
+  outage: { title: 'Payments outage', status: 'Ready', skills: 'Ownership, Impact', parts: () => ['A deploy broke card payments for 12% of checkouts on a Friday evening.', 'Every minute cost merchants sales and put our status page on the news.', 'I rolled back, led the incident call, and wrote the fix for the retry logic.', 'Payments recovered within the hour.', 'We added a canary step to every payments deploy.'], used: 'Backs up Impact (thin: the result has no number).', note: 'For Stripe: say how many payments recovered, and how fast.', source: 'Written by you', takes: 'No takes yet', sugg: () => false },
+  migration: { title: 'Database migration', status: 'Ready', skills: 'Ownership, Technical depth', parts: () => PARTS.map(p => p[2]), used: 'Not used by a role yet.', note: '', source: 'Your resume: "Led migration of 30 services to PostgreSQL 15 with zero downtime"', takes: 'No takes yet', sugg: () => false },
+};
+V.story = () => {
+  const S = STORIES[state.story] || STORIES.checkout;
+  const steps = ['Draft', 'Ready', 'Proven'].map(x => `<span class="chip ${x === S.status ? (x === 'Proven' ? 'ok' : 'v') : ''}">${x}</span>`).join('→');
+  const parts = S.parts();
+  return shell('stories', `
+  <a href="#stories" class="small">All stories</a>
+  <div class="between"><div class="stack" style="gap:8px"><div class="row"><h1>${S.title}</h1><span class="chip ${S.status === 'Proven' ? 'ok' : 'v'}">${S.status}</span></div>
+    <div class="row small muted">${steps}<span>· proves ${S.skills}</span></div></div>
+    <div class="row"><button class="btn" data-act="toast" data-v="A practice take would start here">Practice a take</button><button class="btn ghost" data-act="toast" data-v="Strova would review this story part by part">Review with Strova</button></div></div>
+  ${S.sugg() ? `<div class="card coach"><span class="eyebrow">Strova suggests · from your Stripe take, answer 1</span><span>Add the trade-offs you named out loud to Your action.</span>
+    <div class="diff"><del>I wrote the plan and ran the cutover myself.</del><br><ins>I wrote the plan, chose a dual-write over a big-bang cutover to keep refunds live, and ran the cutover myself.</ins></div>
+    <div class="row"><button class="btn sm" data-act="apply">Apply</button><button class="btn quiet sm" data-act="toast" data-v="Dismissed">Dismiss</button></div></div>` : ''}
+  <div class="grid2" style="grid-template-columns:minmax(0,2fr) minmax(0,1fr)">
+    <div class="card"><div class="row small"><strong style="border-bottom:2px solid var(--violet);padding-bottom:6px">Story parts</strong><span class="muted">60-second version</span><span class="muted">Full version</span></div>
+      ${PARTS.map(([k, l], i) => `<div class="part"><span class="lbl" style="color:var(--p-${k})">● ${l}</span><span>${parts[i]}</span></div>`).join('')}
+    </div>
+    <div class="stack" style="gap:16px">
+      <div class="card"><h3>Used for</h3>${S.note ? `<a ${roleLink('stripe')}><strong>Stripe · Senior SWE</strong></a>` : ''}<span class="small">${S.used}</span>${S.note ? `<span class="notice t small">${S.note}</span>` : ''}</div>
+      <div class="card"><h3>Where it came from</h3><span class="small">${S.source}</span><span class="small muted">${S.takes}</span></div>
+    </div>
+  </div>`);
+};
+
+V.profile = () => shell('', `
+  <h1>Profile</h1>
+  <div class="card"><h2>Your plan style</h2><p class="small muted">Strova keeps one plan for your stories, your resume and your interviews. Switch any time; your progress stays.</p>${planStyleBody(true)}</div>
+  <div class="card"><h2>Reminders from Strova</h2>
+    <div class="between"><div><strong>In the app</strong><br><span class="small muted">When a plan item is due, or your interview is close.</span></div><span class="chip ok">On</span></div>
+    <div class="between"><div><strong>By email</strong><br><span class="small muted">Same reminders, from "Strova from Strong Hire".</span></div><button class="btn ghost sm" data-act="toast" data-v="Email reminders muted">Mute email</button></div>
+  </div>
+  <div class="card"><h2>Account</h2><span class="small">Ana Lopez · ana@example.com · Senior · 7 years</span><span class="small muted">Billing, data export and account deletion live here too.</span></div>`);
+
+// Router and guide
+function current() { const h = location.hash.replace('#', ''); return V[h] ? h : 'start'; }
+function renderGuide(view) {
+  const f = FLOWS.find(x => x.id === flowId);
+  let pos = f.steps.indexOf(view, flowPos > 0 ? flowPos - 1 : 0);
+  if (pos === -1) pos = f.steps.indexOf(view);
+  if (pos !== -1) flowPos = pos;
+  const inFlow = f.steps.length && pos !== -1;
+  const nextV = inFlow && pos < f.steps.length - 1 ? f.steps[pos + 1] : null;
+  const prevV = inFlow && pos > 0 ? f.steps[pos - 1] : null;
+  document.getElementById('guide').innerHTML = `
+    <span class="tag">Prototype</span>
+    <label for="flowpick" class="step">Walk through</label>
+    <select id="flowpick">${FLOWS.map(x => `<option value="${x.id}" ${x.id === flowId ? 'selected' : ''}>${x.name}</option>`).join('')}</select>
+    <span class="step">${inFlow ? `Step ${pos + 1} of ${f.steps.length}` : f.steps.length ? 'Off this flow' : 'Click anywhere'}</span>
+    <button class="gbtn" data-act="flow-prev" ${prevV ? '' : 'disabled'}>Back</button>
+    <button class="gbtn primary" data-act="flow-next" ${nextV || (f.steps.length && !inFlow) ? '' : 'disabled'}>${!inFlow && f.steps.length ? 'Go to start' : 'Next step'}</button>
+    <span class="spacer"></span>
+    <button class="gbtn" data-act="reset">Reset demo</button>
+    <span class="step">Comment on any screen to request a change</span>`;
+}
+function render() {
+  const view = current();
+  clearTimeout(render.t);
+  if (view === 'reading') render.t = setTimeout(() => go('cv-ready'), 2600);
+  document.getElementById('app').innerHTML = V[view]();
+  renderGuide(view);
+  document.title = 'Strong Hire Mockups';
+}
+function go(v) { if (location.hash === '#' + v) render(); else location.hash = v; window.scrollTo(0, 0); }
+function toast(t) { const el = document.getElementById('toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => { el.hidden = true; }, 2200); }
+
+document.addEventListener('submit', e => {
+  if (e.target.matches('[data-ask]')) { e.preventDefault(); toast('Strova would answer here, using your stories and roles'); }
+});
+document.addEventListener('change', e => {
+  if (e.target.id === 'flowpick') { flowId = e.target.value; flowPos = 0; const f = FLOWS.find(x => x.id === flowId); if (f.steps.length) { if (f.id === 'f2') state.roleStep = 1; go(f.steps[0]); } else render(); }
+});
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act]'); if (!t) return;
+  const a = t.dataset.act, v = t.dataset.v;
+  const f = FLOWS.find(x => x.id === flowId);
+  if (a === 'flow-next') { const view = current(); const p = f.steps.indexOf(view, flowPos); if (p === -1) { flowPos = 0; go(f.steps[0]); } else { flowPos = p + 1; go(f.steps[p + 1]); } return; }
+  if (a === 'flow-prev') { flowPos = Math.max(0, flowPos - 1); go(f.steps[flowPos]); return; }
+  if (a === 'reset') { Object.assign(state, { planStyle: 'weekly', tookTake: false, applied: false, craftStep: 0, reviewed: false, reviewApplied: false, roleStep: 1, drawer: false, ideasDismissed: {}, liveMode: 'listening', iv: 'beh', role: 'stripe', story: 'checkout' }); save(); flowId = 'f1'; flowPos = 0; go('start'); toast('Demo reset'); return; }
+  if (a === 'style') { state.planStyle = v; save(); render(); return; }
+  if (a === 'toast') { toast(v); return; }
+  if (a === 'dismiss-idea') { state.ideasDismissed[v] = true; save(); render(); toast('Removed from story ideas'); return; }
+  if (a === 'role-step') { state.roleStep = Number(v); save(); render(); return; }
+  if (a === 'role-done') { state.roleStep = 1; state.role = 'stripe'; save(); toast('Stripe added with 3 interviews'); return; }
+  if (a === 'drawer') { state.drawer = !state.drawer; save(); render(); return; }
+  if (a === 'take-done') { if (state.iv === 'beh') state.tookTake = true; save(); return; }
+  if (a === 'pick-iv') { state.iv = v; state.role = IVS[v].role; save(); if (location.hash === '#interview') render(); return; }
+  if (a === 'pick-role') { state.role = v; save(); if (location.hash === '#role') render(); return; }
+  if (a === 'pick-story') { state.story = v; save(); if (location.hash === '#story') render(); return; }
+  if (a === 'live-mode') { state.liveMode = v; save(); render(); return; }
+  if (a === 'apply') { state.applied = true; save(); render(); toast('Applied to Checkout migration'); return; }
+  if (a === 'undo-apply') { state.applied = false; save(); render(); toast('Restored the earlier version'); return; }
+  if (a === 'craft-next') { state.craftStep = Math.min(CRAFT.length, state.craftStep + 1); save(); render(); return; }
+  if (a === 'review') { state.reviewed = true; save(); render(); return; }
+  if (a === 'write-review') { state.reviewed = true; save(); return; }
+  if (a === 'write-save') { toast('Saved as a Draft'); return; }
+  if (a === 'review-apply') { state.reviewApplied = true; save(); render(); toast('Your action updated'); return; }
+});
+window.addEventListener('hashchange', () => { render(); window.scrollTo(0, 0); });
+render();
+</script>

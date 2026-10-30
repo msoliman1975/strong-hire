@@ -1,6 +1,6 @@
 # Strong Hire: Product & Technical Spec v1 and v2.0
 
-Updated Oct 27, 2026 · Mo Soliman
+Updated Oct 30, 2026 · Mo Soliman
 
 v1 launches on December 14, 2026. v2.0 follows as one release, planned for June 2027, built in three parts (Part 1: Journey B reshaped, Part 2: story library, Part 3: AI coach). Text marked "v2" describes v2.0; everything else describes v1 as it ships. The build plan for v2.0 is `docs/v2/execution-plan.md`; its decisions and risks are in the [v2 plan doc](https://claude.ai/artifact/BSjZFLreXzRgqapKdqz87V), and its UX in the [App UX canvas](https://claude.ai/artifact/VspB7PtbLJzFMkrEjaRrKj).
 
@@ -119,6 +119,8 @@ In v2 the journeys above become two. Journey B (prep for an interview) is journe
 4. Mic check, then the live room as in v1, without the 3D avatar (AV-1). The room shows how long the current answer has run against a suggested length (LR-1).
 5. The debrief shows the hire signal, the change from the previous session for the same pair (DB-1), how many answers met the bar (DB-2), the story used for each answer with its fix sent back to the story (ST-6), delivery metrics (DM-2) and a link to the transcript (TR-1). Any answer can be saved as a story (ST-2). A Realistic answer that used a story and scores 3 or more makes the story Proven (ST-7).
 6. The candidate returns to the plan page, which now shows the new debrief and updated readiness.
+
+**v2.1 note.** With v2.1 (UX with Strova), Journey A and Journey B follow the flows in `docs/ux-strova/ux-spec.md`: the resume is the only setup input, interviews live under target roles, and stories are built and reviewed with Strova.
 
 ## Functional requirements
 
@@ -251,6 +253,113 @@ These IDs are the acceptance tests for v2.0. They are grouped by build part; the
 | UI-3 | The marketing site describes v2 and uses the v2 visual language. | P0 |
 
 Coach sessions record minutes like any other session; billing rules (BL-1, BL-2) do not change in v2.0 until the pricing decision is made.
+
+### v2.1 UX with Strova
+
+v2.1 redesigns the v2 screens around the resume and Strova, the AI coach and interviewer character. Setup starts from the resume alone; the candidate then adds target roles, each with the interviews they expect, and rehearses each interview in takes. One personal plan covers rehearsals, stories and the resume, and Strova's suggestions (tune a story, new story, missing skill, tailor for a role, improve a resume line) can be accepted or dismissed everywhere. The approved behaviour is `docs/ux-strova/ux-spec.md` and the approved screens are `docs/ux-strova/reference/mockups.html`; the build plan is `docs/ux-strova/execution-plan.md`. These IDs are the acceptance tests for v2.1. All are P0, and they replace v2 screens behind `v2_enabled` (FL-1).
+
+**Navigation and terms**
+
+| ID | Requirement | Priority |
+| --- | --- | --- |
+| NV-1 | The v2 nav has exactly: Home, {First name}'s Resumes, Target roles, Rehearsals with Strova, Career Stories with Strova. | P0 |
+| NV-2 | User-facing copy says resume (never CV), take, Practice mode and Strova as in `ux-spec.md` section 3. | P0 |
+| NV-3 | Question bank and Progress are not in the v2 nav; their routes still work. | P0 |
+
+**Strova**
+
+| ID | Requirement | Priority |
+| --- | --- | --- |
+| SV-1 | One `Strova` component renders the seven modes exactly as the approved drawing. | P0 |
+| SV-2 | The ring colour shows the hat: violet coach, teal interviewer, green celebrating; zigzag ring when thinking or analysing. | P0 |
+| SV-3 | Each mode animates as in `ux-spec.md` section 4.2; all animation stops under reduced motion. | P0 |
+| SV-4 | Every avatar has an accessible label naming the state. | P0 |
+| SV-5 | Below 64 px the side effects are hidden. | P0 |
+| SV-6 | The live room shows "Strova is acting as {title} at {company}" and a state chip, driven by the interviewer state. | P0 |
+| SV-7 | The app top bar and the site header use the lockup with the existing Strong Hire logo; Strova never appears as a logo. | P0 |
+| SV-8 | The marketing site has the "Meet Strova" section with the animated avatar and the approved copy. | P0 |
+| SV-9 | Emails Strova sends come from "Strova from Strong Hire" with her 64 px avatar; account emails are unchanged. | P0 |
+
+**Onboarding**
+
+| ID | Requirement | Priority |
+| --- | --- | --- |
+| ON-1 | After the profile, the only setup input is the resume: upload, paste, or pasted LinkedIn experience. | P0 |
+| ON-2 | A reading screen with Strova analysing waits for the extraction and handles refusal. | P0 |
+| ON-3 | The results screen shows Breakdown, Resume issues and Story ideas as collapsed expandable cards with links to the breakdown-and-issues screen and to Career Stories. | P0 |
+| ON-4 | The breakdown-and-issues screen shows both on one screen with fix and accept actions. | P0 |
+| ON-5 | The plan style screen explains what the plan covers now, marks rehearsals as added with a target role, and stores the choice. | P0 |
+| ON-6 | The what-first screen offers the two paths with the "start anywhere" copy. | P0 |
+
+**Resumes**
+
+| ID | Requirement | Priority |
+| --- | --- | --- |
+| RM-1 | The resumes page is titled with the user's first name and lists resumes with the main one marked. | P0 |
+| RM-2 | One main resume per user; the first resume is main; the main resume is preselected for new roles. | P0 |
+| RM-3 | The resume page shows story ideas, breakdown, issues and resume-line suggestions. | P0 |
+| RM-4 | Story ideas list each achievement not used by a story, with likely skills, Craft with Strova and Not a story; dismissals persist. | P0 |
+| RM-5 | The rule-based resume check runs in the API with the same results as the web check (shared fixtures). | P0 |
+
+**Target roles and interviews**
+
+| ID | Requirement | Priority |
+| --- | --- | --- |
+| TG-1 | The target roles page shows each role with one readiness bar per interview. | P0 |
+| TG-2 | Adding a role is three steps in one screen: posting, check, interviews. | P0 |
+| TG-3 | Strova suggests interview types from the company's rounds; the user keeps or removes them; each kept type is a stored interview. | P0 |
+| TG-4 | The role page shows the interviews, what they'll look for, stories for this role and the context card. | P0 |
+| RH-1 | An interview is role × resume × type and is the unit for takes, readiness and the plan. | P0 |
+| RH-2 | Readiness per interview follows `ux-spec.md` section 9, from Realistic takes only, with goal 75. | P0 |
+| RH-3 | The interview page shows readiness, skill coverage, the next take with a settings drawer, and the takes. | P0 |
+| RH-4 | The rehearsals page lists every interview across roles and recommends the next take. | P0 |
+| RH-5 | The mode labels are Realistic and Practice; the stored value is unchanged. | P0 |
+
+**Debrief**
+
+| ID | Requirement | Priority |
+| --- | --- | --- |
+| DB-3 | The debrief opens with Strova's verdict in the interviewer hat. | P0 |
+| DB-4 | Strova's coaching follows the answers, with the suggestions from this take. | P0 |
+| DB-5 | A story that becomes Proven is celebrated with the celebrating avatar. | P0 |
+| DB-6 | The debrief says what the plan's next item is now. | P0 |
+
+**Stories**
+
+| ID | Requirement | Priority |
+| --- | --- | --- |
+| ST-8 | A story with all five parts is Ready; status shows as Draft, Ready or Proven. | P0 |
+| ST-9 | The Career Stories page has, in order: start a new story, stories recommended from the resume (collapsed), Ask Strova, your stories, Strova suggests (collapsed). | P0 |
+| ST-10 | Write it yourself saves a story and can send it to Review with Strova. | P0 |
+| ST-11 | Review with Strova returns per-part notes and before-and-after edits from the user's words. | P0 |
+| ST-12 | Crafting can start from a resume idea (seeded as context) or a missing skill (target skill). | P0 |
+| ST-13 | Ask Strova answers a question about the user's stories and roles. | P0 |
+| ST-14 | The story page shows status steps, parts and versions, used-for notes and its source. | P0 |
+
+**Suggestions**
+
+| ID | Requirement | Priority |
+| --- | --- | --- |
+| SG-1 | Suggestions are one user-owned model with kind, status, source, target, payload and reason, in export and delete. | P0 |
+| SG-2 | Tune a story from a debrief answer, applied with undo. | P0 |
+| SG-3 | New story from a strong answer that matches no story. | P0 |
+| SG-4 | Missing skill opens crafting for that skill and role. | P0 |
+| SG-5 | Tailor for a role adds a "For {company}" note. | P0 |
+| SG-6 | Improve a resume line from a story's words; the resume check runs again. | P0 |
+| SG-7 | The no-new-facts eval covers tune, new story, review and improve resume line. | P0 |
+| SG-8 | Every suggestion can be accepted or dismissed; dismissed ones do not return. | P0 |
+
+**Plan and Home**
+
+| ID | Requirement | Priority |
+| --- | --- | --- |
+| PS-1 | One personal plan per user with rehearsal, story and resume items. | P0 |
+| PS-2 | The plan style (weekly or checklist) is stored and can be changed in Profile. | P0 |
+| PS-3 | Checklist groups are collapsed by default and show count, progress and next item. | P0 |
+| PS-4 | The weekly plan shows up to one item per day with chips and today's item highlighted. | P0 |
+| PS-5 | Before any target role the plan has only story and resume items. | P0 |
+| PS-6 | Weekly-style reminders by email respect product_email and the plan email mute. | P0 |
+| HO-1 | Home shows the greeting, Strova's next step, the plan and the four summary cards, and no suggestion lists. | P0 |
 
 ## Interviewer and scoring design
 
