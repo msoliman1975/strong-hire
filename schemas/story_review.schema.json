@@ -1,0 +1,113 @@
+{
+  "$defs": {
+    "StoryPart": {
+      "description": "ST-1: the five parts of a story, in the order the workbench and prompts show them.",
+      "enum": [
+        "context",
+        "stakes",
+        "action",
+        "result",
+        "reflection"
+      ],
+      "title": "StoryPart",
+      "type": "string"
+    },
+    "StoryPartEdit": {
+      "additionalProperties": false,
+      "description": "SG-2, ST-11: a before-and-after edit of one story part.",
+      "properties": {
+        "after": {
+          "description": "The proposed text.",
+          "minLength": 1,
+          "title": "After",
+          "type": "string"
+        },
+        "before": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The part as it is now. Null when it is empty.",
+          "title": "Before"
+        },
+        "part": {
+          "$ref": "#/$defs/StoryPart"
+        },
+        "quotes": {
+          "description": "The user's words the new text came from, verbatim.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Quotes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "part",
+        "before",
+        "after"
+      ],
+      "title": "StoryPartEdit",
+      "type": "object"
+    },
+    "StoryReviewNote": {
+      "additionalProperties": false,
+      "description": "ST-11: Strova's note on one story part, with an optional edit from the user's words.",
+      "properties": {
+        "edit": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StoryPartEdit"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "note": {
+          "minLength": 1,
+          "title": "Note",
+          "type": "string"
+        },
+        "part": {
+          "$ref": "#/$defs/StoryPart"
+        }
+      },
+      "required": [
+        "part",
+        "note"
+      ],
+      "title": "StoryReviewNote",
+      "type": "object"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/story_review.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "ST-11: per-part notes and before-and-after edits for one story.",
+  "properties": {
+    "notes": {
+      "items": {
+        "$ref": "#/$defs/StoryReviewNote"
+      },
+      "title": "Notes",
+      "type": "array"
+    },
+    "summary": {
+      "description": "One or two sentences from Strova.",
+      "minLength": 1,
+      "title": "Summary",
+      "type": "string"
+    }
+  },
+  "required": [
+    "summary"
+  ],
+  "title": "StoryReview",
+  "type": "object"
+}

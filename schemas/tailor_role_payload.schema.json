@@ -1,0 +1,77 @@
+{
+  "$defs": {
+    "Competency": {
+      "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.",
+      "enum": [
+        "ownership",
+        "impact",
+        "collaboration",
+        "conflict_handling",
+        "learning_from_failure",
+        "communication",
+        "role_fit",
+        "depth_of_experience",
+        "judgment",
+        "motivation",
+        "team_fit",
+        "scope_at_level",
+        "technical_depth",
+        "accuracy",
+        "reasoning",
+        "trade_offs",
+        "clarity_of_explanation",
+        "problem_framing",
+        "structure",
+        "user_and_business_sense",
+        "estimation_logic",
+        "prioritization",
+        "recommendation",
+        "logistics_and_expectations"
+      ],
+      "title": "Competency",
+      "type": "string"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/tailor_role_payload.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "SG-5: the lead story for a skill at one company and one detail to bring forward.",
+  "properties": {
+    "company": {
+      "description": "Shown as the note title: For {company}.",
+      "minLength": 1,
+      "title": "Company",
+      "type": "string"
+    },
+    "competency": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Competency"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The skill this story leads for at the company."
+    },
+    "kind": {
+      "const": "tailor_role",
+      "default": "tailor_role",
+      "title": "Kind",
+      "type": "string"
+    },
+    "note": {
+      "description": "The detail to bring forward.",
+      "minLength": 1,
+      "title": "Note",
+      "type": "string"
+    }
+  },
+  "required": [
+    "company",
+    "note"
+  ],
+  "title": "TailorRolePayload",
+  "type": "object"
+}

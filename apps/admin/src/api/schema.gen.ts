@@ -5174,6 +5174,18 @@ export interface components {
              */
             notes: string | null;
         };
+        /**
+         * CompetencyReadiness
+         * @description RH-2: the most recent rubric score of one competency over the last three Realistic takes.
+         */
+        CompetencyReadiness: {
+            competency: components["schemas"]["Competency"];
+            /**
+             * Score
+             * @description 1 to 4. Null when not scored yet.
+             */
+            score: number | null;
+        };
         /** CompetencyScore */
         CompetencyScore: {
             competency: components["schemas"]["Competency"];
@@ -6080,6 +6092,31 @@ export interface components {
          */
         HireSignal: "Strong Hire" | "Hire" | "Lean Hire" | "Lean No Hire" | "No Hire";
         /**
+         * ImproveResumeLinePayload
+         * @description SG-6: the payload of an improve resume line suggestion.
+         */
+        ImproveResumeLinePayload: {
+            /**
+             * Resume Line Ref
+             * @description Where the line is in schemas.Resume, as roles[<i>].achievements[<j>].
+             */
+            resume_line_ref: string;
+            /** Before */
+            before: string;
+            /** After */
+            after: string;
+            /**
+             * Quotes
+             * @description The story's words the rewrite came from, verbatim.
+             */
+            quotes?: string[];
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "improve_resume_line";
+        };
+        /**
          * InputCheck
          * @description Is the text the kind of document the user gave it as (IN-6 job description, IN-7 CV)?
          *
@@ -6111,6 +6148,51 @@ export interface components {
             interview_date: string | null;
             /** Days Left */
             days_left: number | null;
+        };
+        /**
+         * InterviewReadiness
+         * @description RH-2: readiness for one interview (role x resume x type), from Realistic takes only.
+         *
+         *     score = round((mean - 1) / 3 * 100) over the competencies scored so far; null with no
+         *     Realistic take.
+         */
+        InterviewReadiness: {
+            /**
+             * Interview Id
+             * Format: uuid
+             */
+            interview_id: string;
+            /**
+             * Kind
+             * @description RD-3: every screen labels it this way.
+             * @default practice_estimate
+             * @constant
+             */
+            kind: "practice_estimate";
+            /**
+             * Score
+             * @description 0 to 100. Null with no Realistic take.
+             */
+            score: number | null;
+            /**
+             * Goal
+             * @default 75
+             */
+            goal: number;
+            /** Competencies */
+            competencies?: components["schemas"]["CompetencyReadiness"][];
+            /**
+             * Change
+             * @description Change since the previous take. Null when there is none.
+             * @default null
+             */
+            change: number | null;
+            /**
+             * Takes Counted
+             * @description Realistic takes used.
+             * @default 0
+             */
+            takes_counted: number;
         };
         /**
          * InterviewType
@@ -6572,6 +6654,19 @@ export interface components {
              */
             dev_link?: string | null;
         };
+        /**
+         * MissingSkillPayload
+         * @description SG-4: a tested skill with no story; accepting opens crafting aimed at it.
+         */
+        MissingSkillPayload: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "missing_skill";
+            /** @description The target skill for crafting. */
+            competency: components["schemas"]["Competency"];
+        };
         /** MixWeek */
         MixWeek: {
             /**
@@ -6635,6 +6730,51 @@ export interface components {
             month?: components["schemas"]["Budget"] | null;
             /** Rpm Limit */
             rpm_limit?: number | null;
+        };
+        /**
+         * NewStoryPayload
+         * @description SG-3: a new story from a strong answer that matches no story.
+         */
+        NewStoryPayload: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "new_story";
+            /** Title */
+            title: string;
+            /**
+             * Context
+             * @default null
+             */
+            context: string | null;
+            /**
+             * Stakes
+             * @default null
+             */
+            stakes: string | null;
+            /**
+             * Action
+             * @default null
+             */
+            action: string | null;
+            /**
+             * Result
+             * @default null
+             */
+            result: string | null;
+            /**
+             * Reflection
+             * @default null
+             */
+            reflection: string | null;
+            /** Skills */
+            skills?: components["schemas"]["Competency"][];
+            /**
+             * Quotes
+             * @description The answer's words the parts came from, verbatim.
+             */
+            quotes?: string[];
         };
         /** OpsErrorDetail */
         OpsErrorDetail: {
@@ -7230,6 +7370,81 @@ export interface components {
             minutes: number;
         };
         /**
+         * Plan
+         * @description PS-1: the user's personal plan in the chosen style.
+         */
+        Plan: {
+            style: components["schemas"]["PlanStyle"];
+            /**
+             * Week Start
+             * @description PS-4: the Monday of the week shown. Weekly style only.
+             * @default null
+             */
+            week_start: string | null;
+            /** Items */
+            items?: components["schemas"]["PlanItem"][];
+        };
+        /**
+         * PlanItem
+         * @description PS-1: one rehearsal, story or resume item. Done is computed, never ticked by hand.
+         */
+        PlanItem: {
+            /**
+             * Key
+             * @description Stable id of the item, for example interview:<uuid>.
+             */
+            key: string;
+            kind: components["schemas"]["PlanItemKind"];
+            /**
+             * Title
+             * @description Stripe · Behavioral: readiness 75 or more
+             */
+            title: string;
+            /**
+             * Sub
+             * @description The sub-line, for example: now 58.
+             * @default null
+             */
+            sub: string | null;
+            status: components["schemas"]["PlanItemStatus"];
+            /**
+             * Due
+             * @description PS-4: the day it is planned for (weekly).
+             * @default null
+             */
+            due: string | null;
+            /**
+             * Action Label
+             * @description The action button's label.
+             * @default null
+             */
+            action_label: string | null;
+            /**
+             * Action Target
+             * @description The app path the action opens, for example /interviews/<id>.
+             * @default null
+             */
+            action_target: string | null;
+            /**
+             * Target Id
+             * @description The interview, story or resume the item is about.
+             * @default null
+             */
+            target_id: string | null;
+        };
+        /**
+         * PlanItemKind
+         * @description PS-1: the three kinds of personal plan items, each with its own chip.
+         * @enum {string}
+         */
+        PlanItemKind: "rehearsal" | "story" | "resume";
+        /**
+         * PlanItemStatus
+         * @description PS-1: done is computed from the user's data, never ticked by hand.
+         * @enum {string}
+         */
+        PlanItemStatus: "done" | "next" | "todo";
+        /**
          * PlanOut
          * @description The one paid plan. Every number comes from the API config.
          */
@@ -7274,6 +7489,12 @@ export interface components {
             /** @description TN-3: as_company with a curated profile, else neutral. */
             tone: components["schemas"]["Tone"];
         };
+        /**
+         * PlanStyle
+         * @description PS-2: how the personal plan is shown. NULL on the user until chosen in onboarding.
+         * @enum {string}
+         */
+        PlanStyle: "weekly" | "checklist";
         /**
          * PlanView
          * @description PP-1: everything the plan page for one job and CV pair shows, in one read.
@@ -8034,6 +8255,26 @@ export interface components {
             job: components["schemas"]["JobOut"] | null;
         };
         /**
+         * ResumeLineEdit
+         * @description SG-6: a rewrite of one resume line from a story's words.
+         */
+        ResumeLineEdit: {
+            /**
+             * Resume Line Ref
+             * @description Where the line is in schemas.Resume, as roles[<i>].achievements[<j>].
+             */
+            resume_line_ref: string;
+            /** Before */
+            before: string;
+            /** After */
+            after: string;
+            /**
+             * Quotes
+             * @description The story's words the rewrite came from, verbatim.
+             */
+            quotes?: string[];
+        };
+        /**
          * ResumeMatch
          * @description R1: the saved CV with the same file content, or None.
          */
@@ -8110,6 +8351,18 @@ export interface components {
         /** ResumeUpdate */
         ResumeUpdate: {
             resume: components["schemas"]["Resume"];
+        };
+        /**
+         * ReviewPayload
+         * @description ST-11: the payload of a review suggestion.
+         */
+        ReviewPayload: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "review";
+            review: components["schemas"]["StoryReview"];
         };
         /**
          * RoleFamily
@@ -9135,6 +9388,85 @@ export interface components {
             title?: string | null;
         };
         /**
+         * StoryIdea
+         * @description RM-4: one resume achievement not used by a story, as a seed for crafting.
+         */
+        StoryIdea: {
+            /**
+             * Achievement
+             * @description The resume line, verbatim.
+             */
+            achievement: string;
+            /**
+             * Role
+             * @description The role it is under: title, company.
+             * @default null
+             */
+            role: string | null;
+            /**
+             * Resume Line Ref
+             * @description Where the line is in schemas.Resume, as roles[<i>].achievements[<j>].
+             * @default null
+             */
+            resume_line_ref: string | null;
+            /**
+             * Skills
+             * @description Likely skills. Empty when the worker call failed.
+             */
+            skills?: components["schemas"]["Competency"][];
+            /**
+             * Missing Parts
+             * @description Story parts the line does not give.
+             */
+            missing_parts?: components["schemas"]["StoryPart"][];
+        };
+        /**
+         * StoryIdeaPayload
+         * @description RM-4: the payload of a story idea suggestion.
+         */
+        StoryIdeaPayload: {
+            /**
+             * Achievement
+             * @description The resume line, verbatim.
+             */
+            achievement: string;
+            /**
+             * Role
+             * @description The role it is under: title, company.
+             * @default null
+             */
+            role: string | null;
+            /**
+             * Resume Line Ref
+             * @description Where the line is in schemas.Resume, as roles[<i>].achievements[<j>].
+             * @default null
+             */
+            resume_line_ref: string | null;
+            /**
+             * Skills
+             * @description Likely skills. Empty when the worker call failed.
+             */
+            skills?: components["schemas"]["Competency"][];
+            /**
+             * Missing Parts
+             * @description Story parts the line does not give.
+             */
+            missing_parts?: components["schemas"]["StoryPart"][];
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "story_idea";
+        };
+        /**
+         * StoryIdeas
+         * @description RM-4: the likely skills for a resume's achievements, one worker call per resume.
+         */
+        StoryIdeas: {
+            /** Items */
+            items?: components["schemas"]["StoryIdea"][];
+        };
+        /**
          * StoryIn
          * @description ST-1: a new story typed by the candidate (or built by the coach). It starts as a draft.
          */
@@ -9206,6 +9538,28 @@ export interface components {
          */
         StoryPart: "context" | "stakes" | "action" | "result" | "reflection";
         /**
+         * StoryPartEdit
+         * @description SG-2, ST-11: a before-and-after edit of one story part.
+         */
+        StoryPartEdit: {
+            part: components["schemas"]["StoryPart"];
+            /**
+             * Before
+             * @description The part as it is now. Null when it is empty.
+             */
+            before: string | null;
+            /**
+             * After
+             * @description The proposed text.
+             */
+            after: string;
+            /**
+             * Quotes
+             * @description The user's words the new text came from, verbatim.
+             */
+            quotes?: string[];
+        };
+        /**
          * StoryPartUpdate
          * @description CO-3, CO-9: new text for one story part, backed by the candidate's own words.
          */
@@ -9253,6 +9607,30 @@ export interface components {
             /** Title */
             title: string;
             status: components["schemas"]["StoryStatus"];
+        };
+        /**
+         * StoryReview
+         * @description ST-11: per-part notes and before-and-after edits for one story.
+         */
+        StoryReview: {
+            /**
+             * Summary
+             * @description One or two sentences from Strova.
+             */
+            summary: string;
+            /** Notes */
+            notes?: components["schemas"]["StoryReviewNote"][];
+        };
+        /**
+         * StoryReviewNote
+         * @description ST-11: Strova's note on one story part, with an optional edit from the user's words.
+         */
+        StoryReviewNote: {
+            part: components["schemas"]["StoryPart"];
+            /** Note */
+            note: string;
+            /** @default null */
+            edit: components["schemas"]["StoryPartEdit"] | null;
         };
         /**
          * StorySource
@@ -9326,6 +9704,92 @@ export interface components {
          * @enum {string}
          */
         SubscriptionStatus: "trialing" | "active" | "past_due" | "canceled" | "incomplete";
+        /**
+         * Suggestion
+         * @description SG-1: one suggestion from Strova. The suggestions table holds org_id and user_id.
+         */
+        Suggestion: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            kind: components["schemas"]["SuggestionKind"];
+            /** @default open */
+            status: components["schemas"]["SuggestionStatus"];
+            /** Payload */
+            payload: components["schemas"]["TuneStoryPayload"] | components["schemas"]["NewStoryPayload"] | components["schemas"]["MissingSkillPayload"] | components["schemas"]["TailorRolePayload"] | components["schemas"]["ImproveResumeLinePayload"] | components["schemas"]["StoryIdeaPayload"] | components["schemas"]["ReviewPayload"];
+            /**
+             * Reason
+             * @description Why Strova suggests it, one sentence.
+             */
+            reason: string;
+            /**
+             * Source Session Id
+             * @description The debrief's session.
+             * @default null
+             */
+            source_session_id: string | null;
+            /**
+             * Source Question Ref
+             * @description QuestionScore.question_ref of the answer.
+             * @default null
+             */
+            source_question_ref: string | null;
+            /**
+             * Source Resume Id
+             * @description The resume it came from.
+             * @default null
+             */
+            source_resume_id: string | null;
+            /**
+             * Job Target Id
+             * @description The role it is for.
+             * @default null
+             */
+            job_target_id: string | null;
+            /**
+             * Story Id
+             * @description The story it changes.
+             * @default null
+             */
+            story_id: string | null;
+            /**
+             * Resume Id
+             * @description The resume it changes.
+             * @default null
+             */
+            resume_id: string | null;
+            /**
+             * Prompt Ref
+             * @description The prompt that wrote it. Null for rule-based suggestions.
+             * @default null
+             */
+            prompt_ref: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Resolved At
+             * @description When it was accepted or dismissed.
+             * @default null
+             */
+            resolved_at: string | null;
+        };
+        /**
+         * SuggestionKind
+         * @description SG-1: what a suggestion from Strova proposes (ux-spec section 8).
+         * @enum {string}
+         */
+        SuggestionKind: "tune_story" | "new_story" | "missing_skill" | "tailor_role" | "improve_resume_line" | "story_idea" | "review";
+        /**
+         * SuggestionStatus
+         * @description SG-1, SG-8: a suggestion is open until accepted or dismissed. Dismissed ones never return.
+         * @enum {string}
+         */
+        SuggestionStatus: "open" | "accepted" | "dismissed";
         /** SummaryIn */
         SummaryIn: {
             /**
@@ -9338,6 +9802,32 @@ export interface components {
              * @description AutoProfileSummary.summary
              */
             summary: string;
+        };
+        /**
+         * TailorRolePayload
+         * @description SG-5: the lead story for a skill at one company and one detail to bring forward.
+         */
+        TailorRolePayload: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "tailor_role";
+            /**
+             * Company
+             * @description Shown as the note title: For {company}.
+             */
+            company: string;
+            /**
+             * @description The skill this story leads for at the company.
+             * @default null
+             */
+            competency: components["schemas"]["Competency"] | null;
+            /**
+             * Note
+             * @description The detail to bring forward.
+             */
+            note: string;
         };
         /** TakeOut */
         TakeOut: {
@@ -9535,6 +10025,18 @@ export interface components {
          * @enum {string}
          */
         TriageState: "new" | "planned" | "declined" | "added";
+        /**
+         * TuneStoryPayload
+         * @description SG-2: tune one part of a story from a debrief answer that used it.
+         */
+        TuneStoryPayload: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "tune_story";
+            edit: components["schemas"]["StoryPartEdit"];
+        };
         /**
          * Turn
          * @description One utterance in the transcript. Text only; audio is never stored.

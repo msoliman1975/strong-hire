@@ -1,0 +1,8 @@
+{
+  "resume_line_ref": "roles[0].achievements[1]",
+  "before": "Led checkout migration to new payments provider",
+  "after": "Led checkout migration to a new payments provider a week before Black Friday, with zero failed payments",
+  "quotes": [
+    "we were done a week before Black Friday and not one payment failed"
+  ]
+}
