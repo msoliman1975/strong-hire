@@ -50,6 +50,8 @@ export const keys = {
   resumes: ["resumes"] as const,
   resume: (id: string) => ["resumes", id] as const,
   resumeTask: (id: string, taskId: string) => ["resumes", id, "task", taskId] as const,
+  resumeIssues: (id: string, jobId: string) => ["resumes", id, "issues", jobId] as const,
+  storyIdeas: (id: string) => ["resumes", id, "story-ideas"] as const,
   session: (id: string) => ["sessions", id] as const,
   debrief: (id: string) => ["sessions", id, "debrief"] as const,
 };
@@ -110,6 +112,23 @@ export const useResume = (resumeId: string | null, poll = true) =>
     queryFn: () => resumesApi.get(resumeId ?? ""),
     enabled: Boolean(resumeId),
     refetchInterval: (q) => (poll && q.state.data?.status === "pending" ? POLL_MS : false),
+  });
+
+/** RM-5: the API's check of a resume (open and accepted issues). */
+export const useResumeIssues = (resumeId: string | null, jobTargetId: string | null = null) =>
+  useQuery({
+    queryKey: keys.resumeIssues(resumeId ?? "", jobTargetId ?? ""),
+    queryFn: () => resumesApi.issues(resumeId ?? "", jobTargetId),
+    enabled: Boolean(resumeId),
+  });
+
+/** RM-4: story ideas. Polls a little while the skills job has not run yet. */
+export const useStoryIdeas = (resumeId: string | null) =>
+  useQuery({
+    queryKey: keys.storyIdeas(resumeId ?? ""),
+    queryFn: () => resumesApi.storyIdeas(resumeId ?? ""),
+    enabled: Boolean(resumeId),
+    refetchInterval: (q) => (q.state.data?.skills === "pending" && q.state.dataUpdateCount < 10 ? POLL_MS : false),
   });
 
 export const useResumeTask = (resumeId: string | null, taskId: string | null) =>

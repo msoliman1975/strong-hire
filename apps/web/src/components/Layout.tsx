@@ -9,6 +9,9 @@ import { hasSlogan, SLOGAN } from "../labels";
 import { useFeature } from "../theme/features";
 import { BrandMark } from "./BrandMark";
 import { ModelUsageBadge } from "./ModelUsageBadge";
+import { useFirstRunRedirect } from "../pages/start/gate";
+import { isStartPath, startStep } from "../pages/start/paths";
+import { StartSteps } from "../pages/start/StartSteps";
 import { Strova } from "./strova";
 import { AvatarMenu, PlanChip } from "./TopBar";
 import { Tour } from "./Tour";
@@ -217,6 +220,8 @@ export function AppLayout() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const v2 = useFeature("v2_enabled");
+  // U05: first-run routing (no resume: /start; no plan style: the plan style screen).
+  const firstRun = useFirstRunRedirect(v2 && signedIn && Boolean(auth.data?.user?.profile_complete), location.pathname);
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuPath, setMenuPath] = useState(location.pathname);
   const logout = useMutation({
@@ -259,6 +264,21 @@ export function AppLayout() {
   if (auth.data.user && !auth.data.user.profile_complete && !welcome) {
     return <Navigate to="/welcome" replace state={{ from: location.pathname }} />;
   }
+  const step = startStep(location.pathname);
+  if (v2 && (welcome || isStartPath(location.pathname))) {
+    // U05 (ux-spec section 6.1): setup has no rail, only the lockup and the three steps.
+    return (
+      <>
+        <header className="sx-top">
+          <Brand link={false} lockup />
+          {step && <StartSteps step={step} />}
+        </header>
+        <main id="main">
+          <Outlet />
+        </main>
+      </>
+    );
+  }
   if (welcome) {
     return (
       <>
@@ -298,6 +318,9 @@ export function AppLayout() {
   }
 
   const email = auth.data.email ?? auth.data.user?.email ?? "";
+
+  if (v2 && firstRun === undefined) return <Loading label="Loading your resumes" />;
+  if (v2 && firstRun) return <Navigate to={firstRun} replace />;
 
   if (v2) {
     return (

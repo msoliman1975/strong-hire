@@ -36,6 +36,12 @@ import { SignupPage } from "./pages/SignupPage";
 import { NewStoryPage } from "./pages/stories/NewStoryPage";
 import { StoriesPage } from "./pages/stories/StoriesPage";
 import { StoryWorkbenchPage } from "./pages/stories/StoryWorkbenchPage";
+import { BreakdownPage } from "./pages/start/BreakdownPage";
+import { PlanStylePage } from "./pages/start/PlanStylePage";
+import { ReadingPage } from "./pages/start/ReadingPage";
+import { ResumeReadyPage } from "./pages/start/ResumeReadyPage";
+import { StartPage } from "./pages/start/StartPage";
+import { WhatFirstPage } from "./pages/start/WhatFirstPage";
 import { V2Only } from "./pages/stories/V2Only";
 import { WaitlistConfirmPage, WaitlistPage } from "./pages/WaitlistPage";
 import { TranscriptPage } from "./pages/transcript/TranscriptPage";
@@ -89,6 +95,13 @@ export function AppRoutes() {
         <Route element={<AppLayout />}>
           <Route index element={<DashboardPage />} />
           <Route path="/welcome" element={<WelcomePage />} />
+          {/* U05: first run with v2 on (ON-1 to ON-6). */}
+          <Route path="/start" element={<V2Only><StartPage /></V2Only>} />
+          <Route path="/start/reading/:resumeId" element={<V2Only><ReadingPage /></V2Only>} />
+          <Route path="/start/ready/:resumeId" element={<V2Only><ResumeReadyPage /></V2Only>} />
+          <Route path="/start/check/:resumeId" element={<V2Only><BreakdownPage /></V2Only>} />
+          <Route path="/start/plan-style" element={<V2Only><PlanStylePage /></V2Only>} />
+          <Route path="/start/what-first" element={<V2Only><WhatFirstPage /></V2Only>} />
           <Route path="/jobs" element={<JobsPage />} />
           {/* NV-1: the v2 rail's routes. Placeholders until U07 builds Target roles and Rehearsals. */}
           <Route path="/roles" element={<V2Only><JobsPage /></V2Only>} />
