@@ -1,253 +1,144 @@
-/* The v2 debrief (canvas board B3). Uses S01's --sh-* tokens only. */
+/* The v2 debrief (mockup #debrief). Cards and rows come from components/ux/ux.css (sx-*). */
 
-.debrief-v2 {
+.debrief-v2 h1 {
+  margin: 0;
+}
+
+.debrief-v2__head {
+  gap: 4px;
+}
+
+/* DB-3: Strova's verdict. */
+.debrief-verdict h2,
+.debrief-coaching h2,
+.debrief-answers h2 {
+  margin: 0;
+}
+
+.debrief-verdict__facts {
+  gap: 32px;
+  align-items: flex-end;
+}
+
+.debrief-verdict__facts .sx-stack {
+  gap: 2px;
+}
+
+.debrief-verdict__signal {
+  font-size: 34px;
+  line-height: 1.1;
+}
+
+.debrief-verdict__change {
+  font-weight: 600;
+  color: var(--sh-ink-2);
+}
+
+.debrief-verdict__change[data-change^="1"],
+.debrief-verdict__change[data-change^="2"],
+.debrief-verdict__change[data-change^="3"],
+.debrief-verdict__change[data-change^="4"] {
+  color: var(--sh-ok-ink);
+}
+
+.debrief-verdict__change[data-change^="-"] {
+  color: var(--sh-danger-ink);
+}
+
+.debrief-verdict__num {
+  font-size: 26px;
+}
+
+.debrief-verdict__rationale {
+  max-width: 70ch;
+}
+
+/* Answer by answer: one row per answer. */
+.debrief-answers__list {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-}
-
-.debrief-v2__verdict {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.debrief-signal {
-  flex: 1 1 380px;
-  min-width: 0;
-}
-
-.debrief-signal__label {
-  margin: 0 0 var(--space-1);
-  font-size: 0.8125rem;
-  font-weight: 400;
-  color: var(--sh-muted);
-}
-
-.debrief-signal__value {
-  margin: 0 0 var(--space-4);
-  font-size: 3rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1;
-}
-
-.debrief-signal__value[data-tone="strong"],
-.debrief-signal__value[data-tone="positive"] {
-  color: var(--sh-ok);
-}
-
-.debrief-signal__value[data-tone="neutral"] {
-  color: var(--sh-warn);
-}
-
-.debrief-signal__value[data-tone="negative"] {
-  color: var(--sh-danger);
-}
-
-.debrief-scale {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 4px;
-  margin: 0 0 10px;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.debrief-scale li {
-  padding: 6px 2px;
-  border-radius: 6px;
-  background: var(--sh-sunken);
-  color: var(--sh-muted);
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-align: center;
-}
-
-.debrief-scale li[data-previous="true"] {
-  padding: 4px 2px;
-  background: var(--sh-surface);
-  border: 2px dashed var(--sh-line-strong);
-}
-
-.debrief-scale li[aria-current="true"] {
-  font-weight: 700;
-  color: #ffffff;
-  background: var(--sh-ok);
-}
-
-.debrief-scale li[aria-current="true"][data-tone="neutral"] {
-  background: var(--sh-warn);
-}
-
-.debrief-scale li[aria-current="true"][data-tone="negative"] {
-  background: var(--sh-danger);
-}
-
-.debrief-signal__change {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--sh-muted);
-}
-
-.debrief-coach {
-  flex: 2 1 520px;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding: 26px 28px;
-  border-radius: var(--sh-radius-lg);
-  background: var(--sh-ink);
-  color: var(--sh-room-text);
-}
-
-.debrief-coach .coach-line {
-  padding: 0;
-  border: 0;
-}
-
-.debrief-coach__facts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--sh-room-muted);
-}
-
-.debrief-coach__facts div {
-  display: flex;
-  gap: var(--space-2);
-}
-
-.debrief-coach__facts dd {
-  margin: 0;
-  font-family: var(--sh-font-mono);
-  font-weight: 700;
-  color: var(--sh-room-text);
-}
-
-.debrief-coach__note {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--sh-room-muted);
-}
-
-.debrief-v2__body {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 20px;
-}
-
-.debrief-v2__main {
-  flex: 2 1 560px;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.debrief-v2__side {
-  flex: 1 1 340px;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.debrief-answers h2 {
-  margin: 0 0 14px;
-  font-size: 1.25rem;
-}
-
-.debrief-answers__list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
 .debrief-answer {
-  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .debrief-answer__head {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: var(--space-2) var(--space-4);
-  margin-bottom: var(--space-2);
+  gap: 4px 16px;
 }
 
 .debrief-answer__head h3 {
   flex: 1 1 320px;
   margin: 0;
-  font-size: 1.0625rem;
+  font-size: 1rem;
 }
 
 .debrief-answer__score {
-  align-self: flex-start;
-  padding: 3px 10px;
-  border-radius: var(--sh-radius-pill);
-  background: var(--sh-warn-soft);
-  color: var(--sh-warn-ink);
   font-family: var(--sh-font-mono);
-  font-size: 0.875rem;
-  font-weight: 600;
+  color: var(--sh-warn-ink);
   white-space: nowrap;
 }
 
 .debrief-answer__score[data-met="true"] {
-  background: var(--sh-ok-soft);
   color: var(--sh-ok-ink);
 }
 
 .debrief-answer__quote {
-  margin: 0 0 10px;
-  padding: 10px 14px;
-  border-radius: var(--sh-radius-sm);
-  background: var(--sh-ground);
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--sh-ink-2);
 }
 
 .debrief-answer p {
   margin: 0;
+  font-size: 0.875rem;
+  color: var(--sh-ink-2);
 }
 
-.debrief-next h2 {
+/* ST-6, ST-2: the story an answer used (StoryUsed.tsx) and the library updates card. */
+.debrief-story p {
+  margin: 0;
+}
+
+.debrief-story__sent {
+  font-size: 0.8125rem;
+  color: var(--sh-ok-ink);
+  white-space: nowrap;
+}
+
+/* DB-4: Strova's coaching. */
+.debrief-coaching__ok {
+  color: var(--sh-ok-ink);
+}
+
+.debrief-coaching__plan {
+  border-top: 1px solid var(--sh-line);
+  padding-top: 12px;
+}
+
+.debrief-coaching .sx-notice.sx-row {
+  gap: 14px;
+}
+
+/* After the coaching card: the plan, library, Questions and realism cards. */
+.debrief-v2__more {
+  align-items: start;
+}
+
+.debrief-next h2,
+.debrief-story-updates h2 {
   margin: 0 0 6px;
   font-size: 1.0625rem;
 }
 
 .debrief-next p {
   margin: 0 0 12px;
-}
-
-/* ST-6, ST-2: the story an answer used (StoryUsed.tsx) and the library updates card. */
-.debrief-story {
-  display: grid;
-  gap: 4px;
-  margin: 8px 0;
-  padding: 8px 12px;
-  border-left: 3px solid var(--sh-teal);
-  background: var(--sh-surface);
-}
-
-.debrief-story__sent {
-  font-size: 0.8125rem;
-  color: var(--sh-ok);
-  white-space: nowrap;
-}
-
-.debrief-story-updates h2 {
-  margin: 0 0 6px;
-  font-size: 1.0625rem;
-}
-
-/* The plan link and "Read the transcript", as on the canvas board B3 Debrief. */
-.debrief-v2__head-links {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px 20px;
 }
