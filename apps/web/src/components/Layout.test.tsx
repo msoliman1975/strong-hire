@@ -184,7 +184,7 @@ describe("SV-7, NV-3 v2 top bar and old routes", () => {
     // The old rail meter and rail account menu are gone.
     expect(screen.queryByText("Interview minutes")).toBeNull();
     const initials = within(bar).getByRole("button", { name: "Account menu" });
-    expect(initials).toHaveTextContent("AN");
+    expect(initials).toHaveTextContent("AL");
     await user.click(initials);
     const menu = initials.nextElementSibling as HTMLElement;
     const links = within(menu)

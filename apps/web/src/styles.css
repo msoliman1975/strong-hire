@@ -3169,7 +3169,32 @@ dialog::backdrop {
   width: auto;
 }
 
+/* ux-spec section 5: the v2 rail sits on the page ground, with no panel or border, as in the mockup. */
+.rail.rail--v2 {
+  background: transparent;
+  border-right: 0;
+}
+
+/* SV-7: the initials as a round button, as in the mockup's top bar. */
+.topbar .topbar__avatar {
+  width: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.topbar .topbar__avatar .account-menu__initials {
+  width: 34px;
+  height: 34px;
+  background: var(--sh-sunken);
+  color: var(--sh-ink);
+}
+
 /* NV-1: Rehearsals with Strova carries an 18 px avatar before its label. */
+.rail.rail--v2 .rail-nav a {
+  padding: 9px 12px;
+}
+
 .rail-nav__strova {
   display: inline-flex;
   margin-right: 10px;
