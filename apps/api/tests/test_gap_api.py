@@ -330,7 +330,11 @@ async def test_list_resumes_newest_first_and_own_only(
         row.uploaded_at = datetime.now(UTC) - timedelta(days=1)
         await db.commit()
     listed = (await client.get("/resumes")).json()
-    assert [r["id"] for r in listed] == [second["id"], first["id"]]
+    # RM-2: the main resume (the first one added) comes first, then the others newest first.
+    assert [r["id"] for r in listed] == [first["id"], second["id"]]
+    third = (await client.post("/resumes", data={"text": text})).json()["resume"]
+    listed = (await client.get("/resumes")).json()
+    assert [r["id"] for r in listed] == [first["id"], third["id"], second["id"]]
 
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as other:
