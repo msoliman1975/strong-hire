@@ -26,8 +26,11 @@ on. Never stop to ask.
   in the third person.
 - Use the existing v2 tokens in `apps/web/src/theme/tokens.css` and the v2 components. Do not add
   a new colour unless the mockup uses it; then add it as a token.
+- Keep the Strong Hire branding exactly: the existing `BrandMark` logo, favicon, fonts and colours.
+  The violet square in the mockups is a placeholder for the logo. Follow the brand rules in spec
+  section 4.5 (lockup "Strong Hire with Strova"; Strova is never a logo).
 - Use the `Strova` component (U02) for every avatar. Pick the mode and size the spec gives for that
-  place (spec section 4.3).
+  place (spec section 4.4).
 - Collapsible sections use `<details>`/`<summary>` (or an equivalent with `aria-expanded`), closed
   by default where the mockup shows them closed, with counts visible when closed.
 - Accessibility: real buttons and links, labels on inputs, visible focus, WCAG AA contrast,
@@ -52,7 +55,7 @@ Do this before you mark a PR ready, and again after any visual change:
 5. List the screens and states you checked in the PR description.
 
 Add or update MSW handlers in `apps/web/src/mocks/` for every new endpoint, so the mock-mode app
-works end to end. U12's Playwright journey runs on these mocks.
+works end to end. U13's Playwright journey runs on these mocks.
 
 ## Checks before every push
 

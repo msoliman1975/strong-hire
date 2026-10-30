@@ -6,10 +6,11 @@ Everything a dedicated loop session needs to build the approved UX, unattended.
 | --- | --- |
 | `ux-spec.md` | The approved design: principles, concepts and words, Strova, every screen, the plan, suggestions, readiness, data changes, requirement IDs |
 | `reference/mockups.html` | The approved clickable mockups, the visual and copy reference (open as a file; screens are hash routes) |
-| `execution-plan.md` | The 13 tasks (U00 to U12), their order, branches, folders and requirement IDs |
+| `execution-plan.md` | The 14 tasks (U00 to U13), their order, branches, folders and requirement IDs |
 | `prompts/LOOP.md` | The loop driver: what the session does on every wake-up |
 | `prompts/00-common.md` | Rules for every task, including the fidelity check against the mockups |
-| `prompts/U00-*.md` to `prompts/U12-*.md` | One prompt per task |
+| `prompts/U00-*.md` to `prompts/U13-*.md` | One prompt per task |
+| `reference/strova-avatar.html` | Every Strova mode at every size, animated: the avatar reference |
 | `settings.suggested.json` | An optional permissions allowlist you can copy to `.claude/settings.json` |
 
 Published copies: mockups https://claude.ai/artifact/85ETi6z82XtAKXmS4wQ7tn · Strova avatar
@@ -41,10 +42,10 @@ https://claude.ai/artifact/KwPbVu6fzqAv3Kk4sGwv4J (page "Strova avatar (approved
 
 ## While it runs
 
-- It works task by task (U00 to U12), one PR each, titled "UX with Strova U<NN>: …".
+- It works task by task (U00 to U13), one PR each, titled "UX with Strova U<NN>: …".
 - To follow progress, watch those PRs, or ask the session "status?" at any time.
 - To give feedback, comment on a PR. The session addresses comments on its next wake-up.
 - To pause, interrupt the session. To stop, tell it to stop the loop.
 - If it hits something only you can provide (a secret, a paid model run), it writes "BLOCKED:" in
   the PR and moves on to the next task it can do.
-- When U12 merges, the session posts a final report on the U12 PR and stops.
+- When U13 merges, the session posts a final report on the U13 PR and stops.

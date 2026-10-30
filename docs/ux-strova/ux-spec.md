@@ -97,7 +97,26 @@ never the only cue, so the state also appears as text where it matters (live roo
 Thinking mode colour: thinking uses the teal hat in the live room and the violet hat when
 crafting a story (pass the hat explicitly).
 
-### 4.3 Where Strova appears (sizes)
+### 4.3 Animation timings (exact, from the approved mockups)
+
+| Class | Element | Animation |
+| --- | --- | --- |
+| `sv-spin` | zigzag ring | rotate 360° in 9 s, linear, infinite, around the avatar centre |
+| `sv-pulse-ring` | plain ring (speaking, celebrating) | scale 1 → 1.03 → 1 in 1.6 s, ease-in-out, infinite |
+| `sv-blink` | both eyes | scaleY 1 → 0.1 → 1 at 92 to 100 % of a 4.5 s cycle |
+| `sv-dot` + `sv-d2`/`sv-d3` | thought dots | opacity 0.25 → 1 and scale 0.8 → 1.1 in 1.4 s, delays 0, 0.2 s, 0.4 s |
+| `sv-scan` | magnifier | translate (−14, −22) → (0, 0) → back in 2.4 s |
+| `sv-bob` | speech bubble | translateY 0 → −4 px → 0 in 2.6 s |
+| `sv-twinkle` | sparks | scale 1 → 1.25 and rotate 0 → 20° → back in 1.8 s |
+| `sv-check` | scorecard tick | stroke draws (dashoffset 30 → 0) between 20 % and 50 % of 2.4 s |
+| `sv-wave` | sound and voice waves | opacity 0.2 → 1 → 0.2 in 1.2 s, staggered by 0.2 s |
+| `sv-talk` | open mouth | scaleY 0.35 ↔ 1 every 0.35 s, alternate |
+| `sv-float` | celebration dots | rise 10 px with scale 0.9 → 1.1 and fade in 2.2 s |
+
+All of them stop under `prefers-reduced-motion: reduce`, and the tick shows fully drawn. A
+standalone sheet with every mode and size is `reference/strova-avatar.html`.
+
+### 4.4 Where Strova appears (sizes)
 
 Reading your resume 160 (analysing) · Resume ready 88 (coaching) · What first 72 (coaching) ·
 Home next step 104 (coaching) · Rehearsals header 72 (interviewing) · Live room 160 (listening,
@@ -105,9 +124,32 @@ thinking, speaking from the real interviewer state) · Debrief verdict 72 (inter
 coaching 72 (coaching) · Proven notice 72 (celebrating) · Crafting 72 (thinking, then celebrating
 when Ready) · Review result 72 (analysing) · Section headers 24 to 28 · Nav item 18.
 
+### 4.5 Brand rules
+
+- **Strong Hire stays the product and the only logo.** Keep the existing logo exactly: the
+  `BrandMark` component (`apps/web/src/components/BrandMark.tsx`), the favicon and the site's logo
+  files. The violet square in the mockups is a placeholder for it; never ship the square.
+- **The lockup** is the Strong Hire logo and name followed by "with Strova" in the muted text
+  colour and regular weight, as in the mockups' top bar. It appears in the app top bar, the
+  marketing site header and Strova's emails.
+- **Strova is a character, never a logo.** She is shown only as her avatar, with her name in text.
+  Do not make a Strova wordmark, icon font or favicon.
+- **No change** to the v2 visual language: Geist and Geist Mono from `apps/web/src/theme/tokens.css`
+  (the mockups load Geist from Google Fonts only because they are a standalone file), the violet
+  action colour, teal for interview prep, the story-part colours, the dark live room.
+- **Marketing site** (`apps/site`): a "Meet Strova" section in the v2 site, using the approved
+  avatar (coaching, animated, reduced motion respected): "Meet Strova, your interview partner."
+  and "Strova reads your resume, helps you build the stories you'll tell, and rehearses the real
+  interview with you.", with the primary call to action "Start with your resume". The site header
+  uses the lockup. Lighthouse budgets stay green.
+- **Emails:** emails Strova sends (plan reminders, debrief ready) come from the display name
+  "Strova from Strong Hire" and show her coaching avatar at 64 px (a PNG rendered from the
+  component, because many mail clients do not show SVG) next to the Strong Hire logo. Account
+  emails (sign-in, confirmation, password reset, billing) stay from "Strong Hire" with no avatar.
+
 ## 5. Navigation and app shell
 
-Top bar: logo "Strong Hire" with "with Strova", the usage pill, and the profile button (initials)
+Top bar: the Strong Hire logo (`BrandMark`) and name with "with Strova" (the lockup, section 4.5), the usage pill, and the profile button (initials)
 that opens Profile. Left rail, exactly these five items in this order:
 
 1. **Home**
@@ -362,6 +404,9 @@ section "v2.1 UX with Strova".
 - SV-4 Every avatar has an accessible label naming the state.
 - SV-5 Below 64 px the side effects are hidden.
 - SV-6 The live room shows "Strova is acting as {title} at {company}" and a state chip, driven by the interviewer state.
+- SV-7 The app top bar and the site header use the lockup with the existing Strong Hire logo; Strova never appears as a logo.
+- SV-8 The marketing site has the "Meet Strova" section with the animated avatar and the approved copy.
+- SV-9 Emails Strova sends come from "Strova from Strong Hire" with her 64 px avatar; account emails are unchanged.
 
 **Onboarding**
 - ON-1 After the profile, the only setup input is the resume: upload, paste, or pasted LinkedIn experience.

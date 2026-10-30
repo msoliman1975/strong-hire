@@ -4,7 +4,7 @@
 - **Waits for:** U00.
 - **Owns:** `apps/web/src/components/strova/` (new), its tests, and a dev preview route.
 - **Requirement IDs:** SV-1 to SV-5.
-- **Mockup:** the `strova(mode, size)` function and the `.sv-*` CSS in
+- **Mockup:** `docs/ux-strova/reference/strova-avatar.html` (every mode and size), and the `strova(mode, size)` function and the `.sv-*` CSS in
   `docs/ux-strova/reference/mockups.html`; the canvas page "Strova avatar (approved)".
 
 ## Goal
@@ -22,7 +22,7 @@ the approved avatar exactly, in every mode, with its animations.
    coach).
 3. Clip-path ids must be unique per instance (`useId`).
 4. Effects hidden below 64 px (SV-5). `role="img"` and an `aria-label` naming the state (SV-4).
-5. Move the `.sv-*` keyframes into a CSS file next to the component; stop all of them under
+5. Move the `.sv-*` keyframes (timings in spec section 4.3, exactly) into a CSS file next to the component; stop all of them under
    `prefers-reduced-motion: reduce`, with the tick drawn (SV-3).
 6. A dev-only preview route (behind the existing dev routes) showing every mode at 160, 72, 40, 28
    and 18 px, so the fidelity check can screenshot it.
@@ -37,5 +37,6 @@ the approved avatar exactly, in every mode, with its animations.
 
 ## Done when
 
-Tests pass, and the preview route matches the canvas page and the mockup avatars side by side at
-the same sizes (fidelity check).
+Tests pass, and the preview route matches `reference/strova-avatar.html` side by side at the same
+sizes and in motion (fidelity check). Also export a 64 px PNG of the coaching mode to
+`apps/web/public/strova/strova-coaching-64.png` (and a 128 px one) for emails and the site.

@@ -86,9 +86,9 @@ task, U00, brings the whole `docs/ux-strova/` folder onto `main`.
    times: write "BLOCKED: <one line>" at the top of the log and in the PR description, leave the PR
    as a draft, and move on to the next task that does not depend on it. If no task can move, end
    the loop (`ScheduleWakeup` with `stop: true`) with a one-line summary that starts "BLOCKED:".
-7. **Finished.** When U12 has merged, write the final report at the top of the log (every
+7. **Finished.** When U13 has merged, write the final report at the top of the log (every
    requirement ID with its test, every PR with its link, every decision), post the same report as
-   a comment on the U12 PR, and end the loop with `stop: true`.
+   a comment on the U13 PR, and end the loop with `stop: true`.
 
 ## Never
 

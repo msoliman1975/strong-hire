@@ -4,7 +4,7 @@
 - **Waits for:** U02.
 - **Owns:** `apps/web/src/components/Layout.tsx`, `TopBar.tsx`, `copy.ts`, `labels.ts`, and copy
   changes in existing v2 screens; the session setup labels.
-- **Requirement IDs:** NV-1, NV-2, NV-3, RH-5.
+- **Requirement IDs:** NV-1, NV-2, NV-3, RH-5, SV-7 (app).
 - **Mockup routes:** the shell on every screen (`#home` is enough to compare), `#interview` drawer
   for the mode labels.
 
@@ -19,7 +19,9 @@ The app frame and the words match the approved design before the screens are reb
    18 px `<Strova mode="interviewing" />`), Career Stories with Strova. Remove the separate coach
    button and the Question bank and Progress items from the v2 rail; keep their routes (NV-3).
    The current item uses the v2 selected style; on phones the rail scrolls horizontally.
-2. Top bar: "Strong Hire" with "with Strova", usage pill, initials button that opens Profile.
+2. Top bar: the existing `BrandMark` logo and "Strong Hire", then "with Strova" in the muted colour
+   (the lockup, spec section 4.5; never the mockup's violet square), usage pill, initials button that
+   opens Profile (SV-7, test it).
 3. Terms (NV-2): replace "CV" with "resume" in all user-facing v2 copy (keep code identifiers and
    API names as they are), "session" with "take" where it means one run of an interview, and the
    mode label "Coach" with "Practice" (with its explanation: pause, ask for a hint, redo; does not

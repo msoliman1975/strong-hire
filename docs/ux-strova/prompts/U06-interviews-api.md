@@ -3,7 +3,7 @@
 - **Branch:** `feat/ux-u06-interviews-api`
 - **Waits for:** U01.
 - **Owns:** `apps/api/src/strong_api/plan/` (new files for interviews and readiness; the old plan
-  page endpoints stay until U12), the job target routes in `apps/api/src/strong_api/inputs/`, the
+  page endpoints stay until U13), the job target routes in `apps/api/src/strong_api/inputs/`, the
   sessions create path (to link a session to its interview), MSW handlers for these endpoints.
 - **Requirement IDs:** TG-3, RH-1, RH-2.
 
