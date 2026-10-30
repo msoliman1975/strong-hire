@@ -210,3 +210,132 @@
 .live[data-v2] ~ .row.section {
   justify-content: center;
 }
+
+/* ------------------------------------------------ SV-6, v2: the room as in the mockup's #live */
+
+.strova-live {
+  min-height: 100%;
+}
+
+.strova-live__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--sh-room-line);
+}
+
+.strova-live__head h1 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.strova-live__head p {
+  margin: 2px 0 0;
+  font-size: 0.8125rem;
+}
+
+.strova-live__head .row {
+  gap: 16px;
+  align-items: center;
+}
+
+.strova-live__head .live-dot {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.strova-live__timer {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 26px;
+}
+
+.strova-live__room .phases {
+  justify-content: flex-start;
+  margin: 12px 0 0;
+}
+
+.strova-live__body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px 0 28px;
+}
+
+.strova-live__panel {
+  background: var(--sh-room-raised);
+  border: 1px solid var(--sh-room-line);
+  border-radius: 20px;
+  padding: 24px;
+}
+
+.strova-live__strova {
+  flex: 1 1 280px;
+  max-width: 360px;
+}
+
+.strova-live__main {
+  flex: 999 1 420px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.strova-live__main > p,
+.strova-live__panel > p.muted {
+  margin: 0;
+  font-size: 0.8125rem;
+}
+
+/* The latest line large; earlier lines stay above it, smaller. */
+.strova-live__question p {
+  margin: 6px 0 0;
+  color: var(--sh-room-muted);
+}
+
+.strova-live__question p:last-child {
+  font-size: 21px;
+  line-height: 1.4;
+  color: var(--sh-room-text);
+}
+
+.strova-live__question p.muted:last-child {
+  font-size: 1rem;
+  color: var(--sh-room-muted);
+}
+
+.strova-live__main .answer-length {
+  border-radius: 20px;
+}
+
+.strova-live__controls {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.strova-live__controls > .row {
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.strova-live__controls > .btn--danger {
+  margin-left: auto;
+  background: var(--sh-room-live);
+  color: #0e0d14;
+}
+
+@media (max-width: 640px) {
+  .strova-live__strova {
+    max-width: none;
+  }
+}
+
+.strova-live__room .phases li[aria-current="step"] {
+  background: #0b6e8c;
+  border-color: #0b6e8c;
+  color: #fff;
+}

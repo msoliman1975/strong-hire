@@ -107,3 +107,23 @@
 .sx-solo.sx-solo--wide { max-width: 1120px; }
 .sx-plain { color: inherit; text-decoration: none; }
 .sx-plain:hover { text-decoration: underline; }
+
+/* Segmented choice (the interview settings drawer). */
+.sx-seg { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.sx-seg button { padding: 6px 14px; border-radius: 999px; border: 1px solid var(--sh-line-strong); background: var(--sh-surface); color: var(--sh-ink); font: inherit; font-size: 13.5px; cursor: pointer; }
+.sx-seg button[aria-pressed="true"] { background: var(--sh-violet-soft); border-color: var(--sh-violet); color: var(--sh-violet-ink); font-weight: 600; }
+.sx-seg button:disabled { opacity: 0.5; cursor: not-allowed; }
+.sx-drawer { border: 1px solid var(--sh-line); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 12px; background: var(--sh-ground); color: var(--sh-ink); }
+.sx-signal-hire, .sx-signal-strong { color: var(--sh-ok); font-weight: 700; }
+.sx-signal-lean { color: #7a600f; font-weight: 700; }
+.sx-signal-no { color: var(--sh-danger); font-weight: 700; }
+[id="jobtext-count"][data-level="warn"] { color: var(--sh-warn-ink); }
+[id="jobtext-count"][data-level="over"] { color: var(--sh-danger-ink); font-weight: 600; }
+
+/* SV-6: Strova in the dark live room. */
+.strova-room { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+.strova-room__name { font-size: 22px; font-weight: 700; }
+.strova-room__acting { color: var(--sh-room-muted); white-space: pre-line; }
+.strova-room__chip { display: inline-flex; padding: 2px 10px; border-radius: 999px; font-size: 12.5px; background: #11303a; color: var(--sh-teal-light); }
+.sx-dialog { border: 0; padding: 0; background: transparent; max-width: 560px; width: calc(100% - 32px); }
+.sx-dialog::backdrop { background: rgb(23 22 31 / 45%); }

@@ -5,12 +5,13 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { gapApi } from "./api/gap";
 import { jobTargetsApi, resumesApi } from "./api/inputs";
 import { AppRoutes, createQueryClient } from "./App";
+import { PlanPage } from "./pages/plan/PlanPage";
 import { GAP_COPY } from "./copy";
 import { mockStore } from "./mocks/node";
 import { setFeatureOverrides } from "./theme/features";
@@ -56,7 +57,11 @@ function renderApp(path: string) {
   render(
     <QueryClientProvider client={createQueryClient()}>
       <MemoryRouter initialEntries={[path]}>
-        <AppRoutes />
+        {/* U07 retired the v2 plan page from the routes; its parts are still tested here until U13 removes them. */}
+        <Routes>
+          <Route path="/interviews/:jobId/:resumeId" element={<PlanPage />} />
+          <Route path="*" element={<AppRoutes />} />
+        </Routes>
       </MemoryRouter>
     </QueryClientProvider>,
   );
@@ -101,14 +106,12 @@ describe("gap report (v2)", () => {
     const probe = await screen.findByRole("region", { name: "Where they'll probe" });
     await user.click(await within(probe).findByRole("link", { name: "Show full report" }));
     expect(await screen.findByRole("heading", { level: 1, name: "Gap report" })).toBeInTheDocument();
-    expect(screen.getByTestId("match-score")).toHaveTextContent(String(gap.analysis?.match_score));
+    expect(await screen.findByTestId("match-score")).toHaveTextContent(String(gap.analysis?.match_score));
     for (const name of ["Match score", "Strengths", GAP_COPY.heading, "Where they'll probe", "Practice plan"]) {
       expect(screen.getByRole("heading", { level: 2, name })).toBeInTheDocument();
     }
-    expect(screen.getByRole("link", { name: "← Back to your plan" })).toHaveAttribute(
-      "href",
-      `/interviews/${jobId}/${resumeId}`,
-    );
+    // U07: the plan page is retired; the report goes back to the role page.
+    expect(screen.getByRole("link", { name: "← Back to the role" })).toHaveAttribute("href", `/roles/${jobId}`);
   });
 
   it("R1: an earlier report link (/jobs/:id/gap?report=) opens the v2 report too", async () => {

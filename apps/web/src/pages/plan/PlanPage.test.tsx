@@ -4,7 +4,7 @@
  * the plan page.
  */
 import { QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router";
@@ -330,7 +330,7 @@ describe("interview plan page", () => {
 });
 
 describe("v2_enabled and the old pages", () => {
-  function renderApp(path: string) {
+  function renderApp(path: string, track = false) {
     signedIn();
     server.use(
       http.get("*/api/job-targets/:jobId", () => HttpResponse.json(JOB)),
@@ -341,6 +341,11 @@ describe("v2_enabled and the old pages", () => {
       <QueryClientProvider client={createQueryClient()}>
         <MemoryRouter initialEntries={[path]}>
           <AppRoutes />
+          {track && (
+            <Routes>
+              <Route path="*" element={<Where />} />
+            </Routes>
+          )}
         </MemoryRouter>
       </QueryClientProvider>,
     );
@@ -361,10 +366,10 @@ describe("v2_enabled and the old pages", () => {
     ["/jobs/j1/sessions/new?resume=r1"],
     ["/jobs/j1/rehearse/r1"],
     ["/jobs/j1/gap"],
-  ])("PP-1: flag on, %s opens the plan page", async (path) => {
+    ["/interviews/j1/r1"],
+  ])("TG-4: flag on, %s opens the target role page (the v2 plan page is retired)", async (path) => {
     setFeatureOverrides({ v2_enabled: true });
-    renderApp(path);
-    expect(await screen.findByRole("region", { name: "Your plan" })).toBeInTheDocument();
-    expect(screen.getByRole("region", { name: "What they'll test" })).toBeInTheDocument();
+    renderApp(path, true);
+    await waitFor(() => expect(screen.getByTestId("where")).toHaveTextContent("/roles/j1"));
   });
 });

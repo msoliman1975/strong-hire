@@ -16,6 +16,7 @@ import { Navigate, useNavigate, useParams } from "react-router";
 
 import { ApiError } from "../api/client";
 import { keys, useSession } from "../api/hooks";
+import { useRoles } from "../api/roles";
 import { paywallReason, sessionsApi } from "../api/sessions";
 import type { Phase, SessionRecord } from "../api/types";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
@@ -24,7 +25,9 @@ import { useFeature } from "../theme/features";
 import { AnswerLengthBar } from "./AnswerLengthBar";
 import { SUGGESTED_ANSWER_SECONDS, useActivityTiming } from "./answerLength";
 import { InterviewerAvatar } from "./avatar/InterviewerAvatar";
+import "../components/ux/ux.css";
 import { avatarEnabled, InterviewerState } from "./InterviewerState";
+import { StrovaInterviewer } from "./StrovaInterviewer";
 import { micProblem, micProblemText, openMicrophone, type MicCheck, type MicProblem } from "./microphone";
 import {
   isMockVoice,
@@ -114,6 +117,8 @@ function LiveView({ session }: { session: SessionRecord }) {
   const v2 = useFeature("v2_enabled");
   const { config } = session;
   const sessionId = session.id;
+  const roles = useRoles(v2);
+  const company = roles.data?.find((r) => r.role.id === session.job_target_id)?.role.company_name ?? null;
 
   const toDebrief = useCallback(() => {
     void queryClient.invalidateQueries({ queryKey: keys.session(sessionId) });
@@ -201,16 +206,118 @@ function LiveView({ session }: { session: SessionRecord }) {
   const preparing = prepLeft !== null;
   const inRoom = stage === "waiting" || stage === "live";
 
+  const settings = (
+    <>
+      {interviewTypeLabel[config.interview_type]} interview, {difficultyLabel[config.difficulty]} difficulty,{" "}
+      {modeLabels(v2).label[config.mode]} mode
+      {/* TN-1: the tone stored on the session, as in the canvas room's header. */}
+      {v2 && config.tone && `, ${ROOM_TONE_LABEL[config.tone]} tone`}
+    </>
+  );
+  const status =
+    stage === "waiting"
+      ? slowAgent
+        ? "The interviewer is starting. This can take up to a minute."
+        : "Waiting for the interviewer to join"
+      : preparing
+        ? "Preparing. The clock is stopped."
+        : paused
+          ? "Paused"
+          : "Connected";
+  const said = agent?.said ?? [];
+  const endButton = (
+    <button type="button" className="btn btn--danger" onClick={() => openDialog(dialog.current)}>
+      {v2 ? "End take" : "End interview"}
+    </button>
+  );
+  const prepControls = preparing ? (
+    <>
+      <p>
+        Prep time left: <span data-testid="prep-timer">{clock(prepLeft)}</span>
+      </p>
+      <button type="button" className="btn" onClick={() => void send("ready")}>
+        I am ready
+      </button>
+    </>
+  ) : (
+    PREP_MINUTES.map((minutes) => (
+      <button
+        key={minutes}
+        type="button"
+        className="btn btn--secondary"
+        disabled={stage !== "live" || paused}
+        onClick={() => void send({ prep: minutes })}
+      >
+        Take {minutes} {minutes === 1 ? "minute" : "minutes"} to prepare
+      </button>
+    ))
+  );
+  const coachControls = config.mode === "coach" && (
+    <div className="row section">
+      <button
+        type="button"
+        className="btn btn--secondary"
+        disabled={stage !== "live" || preparing}
+        onClick={() => void send(paused ? "resume" : "pause")}
+      >
+        {paused ? "Resume" : "Pause"}
+      </button>
+      <button
+        type="button"
+        className="btn btn--secondary"
+        disabled={stage !== "live" || paused}
+        onClick={() => void send("hint")}
+      >
+        Ask for a hint
+      </button>
+      <button
+        type="button"
+        className="btn btn--secondary"
+        disabled={stage !== "live" || paused}
+        onClick={() => void send("redo")}
+      >
+        Redo my answer
+      </button>
+    </div>
+  );
+  const phases = (
+    <ol className="phases" aria-label="Interview phases">
+      {PHASES.map((p) => (
+        <li key={p} aria-current={p === phase ? "step" : undefined}>
+          {phaseLabel[p]}
+        </li>
+      ))}
+    </ol>
+  );
+  // SV-6 (mockup #live): with v2, the room is a header strip, the phases, Strova on the left and
+  // the question, the answer length and the controls on the right.
+  const v2Room = v2 && inRoom && !avatarEnabled();
+
   return (
-    <div className="page--narrow">
-      <PageHead title="Interview in progress">
-        <p>
-          {interviewTypeLabel[config.interview_type]} interview, {difficultyLabel[config.difficulty]} difficulty,{" "}
-          {modeLabels(v2).label[config.mode]} mode
-          {/* TN-1: the tone stored on the session, as in the canvas room's header. */}
-          {v2 && config.tone && `, ${ROOM_TONE_LABEL[config.tone]} tone`}
-        </p>
-      </PageHead>
+    <div className={v2Room ? "strova-live" : "page--narrow"}>
+      {v2Room ? (
+        <header className="strova-live__head">
+          <div>
+            <h1>{company ? `${company} · ` : ""}{interviewTypeLabel[config.interview_type]}</h1>
+            <p className="muted">
+              {difficultyLabel[config.difficulty]} difficulty · {modeLabels(v2).label[config.mode]} mode
+              {config.tone && ` · ${ROOM_TONE_LABEL[config.tone]} tone`}
+            </p>
+          </div>
+          <div className="row">
+            <span className="muted" role="status">
+              <span className="live-dot" aria-hidden="true" /> {status}
+            </span>
+            <span className="strova-live__timer" aria-live="off" data-testid="timer" aria-label="Time left">
+              {clock(remainingMs(config.duration_min, agent, now))}
+            </span>
+          </div>
+        </header>
+      ) : (
+        <PageHead title="Interview in progress">
+          <p>{settings}</p>
+        </PageHead>
+      )}
 
       {stage === "check" && <MicCheckPanel briefReady={session.brief_ready} onReady={() => void join()} />}
       {stage === "joining" && <Loading label="Connecting to the interview" />}
@@ -239,7 +346,55 @@ function LiveView({ session }: { session: SessionRecord }) {
         </div>
       )}
 
-      {inRoom && (
+      {v2Room && (
+        <section className="strova-live__room" aria-label="Interview">
+          {phases}
+          <div className="strova-live__body">
+            <section className="strova-live__panel strova-live__strova" aria-label="Strova, your interviewer">
+              <StrovaInterviewer activity={stage === "live" ? activity : "idle"} session={session} />
+            </section>
+            <div className="strova-live__main">
+              <div className="strova-live__panel">
+                <p className="muted">Strova asked</p>
+                <div
+                  className="strova-live__question"
+                  aria-live="polite"
+                  aria-label="What the interviewer said"
+                  data-testid="captions"
+                >
+                  {said.length ? (
+                    said.map((line, i) => <p key={i}>{line}</p>)
+                  ) : (
+                    <p className="muted">The interviewer speaks here, and you answer out loud.</p>
+                  )}
+                </div>
+              </div>
+              {stage === "live" && (
+                <AnswerLengthBar
+                  timing={timing}
+                  suggestedSeconds={SUGGESTED_ANSWER_SECONDS[config.interview_type]}
+                  now={now}
+                />
+              )}
+              <div className="row strova-live__controls">
+                <div className="row" aria-label="Prep time">
+                  {prepControls}
+                </div>
+                {endButton}
+              </div>
+              {coachControls}
+              <p className="muted small">
+                {config.mode === "coach"
+                  ? "Practice mode: pause, ask for a hint, or redo an answer. It does not count toward readiness."
+                  : "Realistic mode: no pauses or hints, and it counts toward readiness."}{" "}
+                Your audio is never stored.
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {inRoom && !v2Room && (
         // v2 (canvas board B2 Room): the stage centered, the question as a quote, controls in a bar.
         <section className="live" aria-label="Interview" data-v2={v2 || undefined}>
           <div className="row row--between">
@@ -250,24 +405,10 @@ function LiveView({ session }: { session: SessionRecord }) {
               </p>
             </div>
             <p className="muted" role="status">
-              {stage === "waiting"
-                ? slowAgent
-                  ? "The interviewer is starting. This can take up to a minute."
-                  : "Waiting for the interviewer to join"
-                : preparing
-                  ? "Preparing. The clock is stopped."
-                  : paused
-                    ? "Paused"
-                    : "Connected"}
+              {status}
             </p>
           </div>
-          <ol className="phases" aria-label="Interview phases">
-            {PHASES.map((p) => (
-              <li key={p} aria-current={p === phase ? "step" : undefined}>
-                {phaseLabel[p]}
-              </li>
-            ))}
-          </ol>
+          {phases}
           <div className="room-live__grid">
             <div className="room-live__stage">
               {/* AV-1: the 3D avatar only with VITE_INTERVIEWER_AVATAR=on; else the state alone. */}
@@ -286,8 +427,8 @@ function LiveView({ session }: { session: SessionRecord }) {
                 aria-label="What the interviewer said"
                 data-testid="captions"
               >
-                {agent?.said.length ? (
-                  agent.said.map((line, i) => <p key={i}>{line}</p>)
+                {said.length ? (
+                  said.map((line, i) => <p key={i}>{line}</p>)
                 ) : (
                   <p className="muted">The interviewer speaks here, and you answer out loud.</p>
                 )}
@@ -306,73 +447,19 @@ function LiveView({ session }: { session: SessionRecord }) {
           <p className="muted live__privacy">Your audio is never stored. Only the text of the interview is kept.</p>
           <div className="live__controls">
             <div className="row section" aria-label="Prep time">
-              {preparing ? (
-                <>
-                  <p>
-                    Prep time left: <span data-testid="prep-timer">{clock(prepLeft)}</span>
-                  </p>
-                  <button type="button" className="btn" onClick={() => void send("ready")}>
-                    I am ready
-                  </button>
-                </>
-              ) : (
-                PREP_MINUTES.map((minutes) => (
-                  <button
-                    key={minutes}
-                    type="button"
-                    className="btn btn--secondary"
-                    disabled={stage !== "live" || paused}
-                    onClick={() => void send({ prep: minutes })}
-                  >
-                    Take {minutes} {minutes === 1 ? "minute" : "minutes"} to prepare
-                  </button>
-                ))
-              )}
+              {prepControls}
             </div>
-            {config.mode === "coach" && (
-              <div className="row section">
-                <button
-                  type="button"
-                  className="btn btn--secondary"
-                  disabled={stage !== "live" || preparing}
-                  onClick={() => void send(paused ? "resume" : "pause")}
-                >
-                  {paused ? "Resume" : "Pause"}
-                </button>
-                <button
-                  type="button"
-                  className="btn btn--secondary"
-                  disabled={stage !== "live" || paused}
-                  onClick={() => void send("hint")}
-                >
-                  Ask for a hint
-                </button>
-                <button
-                  type="button"
-                  className="btn btn--secondary"
-                  disabled={stage !== "live" || paused}
-                  onClick={() => void send("redo")}
-                >
-                  Redo my answer
-                </button>
-              </div>
-            )}
+            {coachControls}
           </div>
         </section>
       )}
 
-      {stage !== "joining" && (
-        <div className="row section">
-          <button type="button" className="btn btn--danger" onClick={() => openDialog(dialog.current)}>
-            End interview
-          </button>
-        </div>
-      )}
+      {stage !== "joining" && !v2Room && <div className="row section">{endButton}</div>}
       {end.isError && <ErrorNotice error={end.error} />}
 
       <dialog ref={dialog} aria-labelledby="end-title" aria-describedby="end-text">
-        <h2 id="end-title">End the interview?</h2>
-        <p id="end-text">Your debrief is ready about a minute after you end the interview.</p>
+        <h2 id="end-title">{v2 ? "End the take?" : "End the interview?"}</h2>
+        <p id="end-text">Your debrief is ready about a minute after you end the {v2 ? "take" : "interview"}.</p>
         <div className="row row--end">
           <button type="button" className="btn btn--quiet" onClick={() => closeDialog(dialog.current)}>
             Keep going
@@ -386,7 +473,7 @@ function LiveView({ session }: { session: SessionRecord }) {
               end.mutate();
             }}
           >
-            End interview
+            {v2 ? "End take" : "End interview"}
           </button>
         </div>
       </dialog>

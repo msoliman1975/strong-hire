@@ -21,9 +21,13 @@ import { NewJobPage } from "./pages/onboarding/NewJobPage";
 import { CheckResumePage } from "./pages/onboarding/CheckResumePage";
 import { ResumePage } from "./pages/onboarding/ResumePage";
 import { PaywallPage } from "./pages/PaywallPage";
-import { PlanPage } from "./pages/plan/PlanPage";
 import { GapReport } from "./pages/plan/GapReport";
-import { V2Redirect } from "./pages/plan/V2Redirect";
+import { RetiredPlanRedirect, V2Redirect } from "./pages/plan/V2Redirect";
+import { InterviewPage } from "./pages/rehearsals/InterviewPage";
+import { RehearsalsPage } from "./pages/rehearsals/RehearsalsPage";
+import { AddRolePage } from "./pages/roles/AddRolePage";
+import { RolePage } from "./pages/roles/RolePage";
+import { RolesPage } from "./pages/roles/RolesPage";
 import { EditProfilePage, WelcomePage } from "./pages/ProfilePage";
 import { RehearsalPage } from "./pages/RehearsalPage";
 import { QuestionsPage } from "./pages/QuestionsPage";
@@ -60,6 +64,11 @@ const StrovaPreviewPage = import.meta.env.DEV
   : null;
 
 /** RM-1: "{First name}'s Resumes" with v2 on; the v1 Resumes page otherwise. */
+/** TG-2: with v2 on, adding a job is adding a target role. */
+function AddRoleRoute() {
+  return useFeature("v2_enabled") ? <Navigate to="/roles/new" replace /> : <NewJobPage />;
+}
+
 function ResumesRoute() {
   return useFeature("v2_enabled") ? <ResumesListPage /> : <ResumesPage />;
 }
@@ -112,13 +121,17 @@ export function AppRoutes() {
           <Route path="/start/what-first" element={<V2Only><WhatFirstPage /></V2Only>} />
           <Route path="/jobs" element={<JobsPage />} />
           {/* NV-1: the v2 rail's routes. Placeholders until U07 builds Target roles and Rehearsals. */}
-          <Route path="/roles" element={<V2Only><JobsPage /></V2Only>} />
-          <Route path="/rehearsals" element={<V2Only><JobsPage /></V2Only>} />
+          {/* U07: target roles, rehearsals and interviews (TG-1, TG-2, TG-4, RH-3, RH-4). */}
+          <Route path="/roles" element={<V2Only><RolesPage /></V2Only>} />
+          <Route path="/roles/new" element={<V2Only><AddRolePage /></V2Only>} />
+          <Route path="/roles/:jobId" element={<V2Only><RolePage /></V2Only>} />
+          <Route path="/rehearsals" element={<V2Only><RehearsalsPage /></V2Only>} />
+          <Route path="/interviews/:interviewId" element={<V2Only><InterviewPage /></V2Only>} />
           {/* RM-1, RM-3: the v2 resume pages; v1 keeps its Resumes page. */}
           <Route path="/resumes" element={<ResumesRoute />} />
           <Route path="/resumes/:resumeId" element={<V2Only><ResumeDetailPage /></V2Only>} />
           <Route path="/resumes/:resumeId/check" element={<CheckResumePage />} />
-          <Route path="/jobs/new" element={<NewJobPage />} />
+          <Route path="/jobs/new" element={<AddRoleRoute />} />
           <Route path="/jobs/:jobId/confirm" element={<ConfirmJobPage />} />
           <Route path="/jobs/:jobId/resume" element={<ResumePage />} />
           <Route path="/jobs/:jobId/resume/:resumeId/check" element={<CheckResumePage />} />
@@ -129,7 +142,7 @@ export function AppRoutes() {
           <Route path="/jobs/:jobId/gap-report" element={<V2Only><GapReport /></V2Only>} />
           <Route path="/jobs/:jobId/sessions/new" element={<V2Redirect><SessionSetupPage /></V2Redirect>} />
           {/* v2 S10: the interview plan page (PP-1). The three routes above open it when v2_enabled is on. */}
-          <Route path="/interviews/:jobId/:resumeId" element={<PlanPage />} />
+          <Route path="/interviews/:jobId/:resumeId" element={<RetiredPlanRedirect />} />
           <Route path="/sessions/:sessionId/live" element={<LiveSessionPage />} />
           <Route path="/sessions/:sessionId/debrief" element={<DebriefPage />} />
           <Route path="/sessions/:sessionId/transcript" element={<TranscriptPage />} />
