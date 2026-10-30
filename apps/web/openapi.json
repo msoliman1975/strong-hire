@@ -3722,6 +3722,280 @@
         }
       }
     },
+    "/roles/{job_target_id}/suggested-interviews": {
+      "get": {
+        "tags": [
+          "target roles and interviews"
+        ],
+        "summary": "Suggested Interviews",
+        "description": "TG-3: the company's usual rounds for this role (standard loop in generic mode).",
+        "operationId": "suggested_interviews_roles__job_target_id__suggested_interviews_get",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuggestedInterviews"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/roles/{job_target_id}/interviews": {
+      "get": {
+        "tags": [
+          "target roles and interviews"
+        ],
+        "summary": "List Interviews",
+        "operationId": "list_interviews_roles__job_target_id__interviews_get",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InterviewWithReadiness"
+                  },
+                  "title": "Response List Interviews Roles  Job Target Id  Interviews Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "target roles and interviews"
+        ],
+        "summary": "Add Interviews",
+        "description": "RH-1, TG-3: keep the chosen types as interviews of the role.",
+        "operationId": "add_interviews_roles__job_target_id__interviews_post",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InterviewsCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InterviewOut"
+                  },
+                  "title": "Response Add Interviews Roles  Job Target Id  Interviews Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/interviews/{interview_id}": {
+      "delete": {
+        "tags": [
+          "target roles and interviews"
+        ],
+        "summary": "Archive Interview",
+        "description": "RH-1: remove an interview from the role. Its takes and debriefs stay.",
+        "operationId": "archive_interview_interviews__interview_id__delete",
+        "parameters": [
+          {
+            "name": "interview_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Interview Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "target roles and interviews"
+        ],
+        "summary": "Get Interview",
+        "description": "RH-2, RH-3: the interview, its role, readiness and takes.",
+        "operationId": "get_interview_interviews__interview_id__get",
+        "parameters": [
+          {
+            "name": "interview_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Interview Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterviewDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/roles": {
+      "get": {
+        "tags": [
+          "target roles and interviews"
+        ],
+        "summary": "List Roles",
+        "description": "TG-1: every live role, newest first, with one readiness per interview.",
+        "operationId": "list_roles_roles_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RoleOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Roles Roles Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rehearsals": {
+      "get": {
+        "tags": [
+          "target roles and interviews"
+        ],
+        "summary": "Rehearsals",
+        "description": "RH-4: every interview across live roles and the recommended next take.",
+        "operationId": "rehearsals_rehearsals_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Rehearsals"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/providers": {
       "get": {
         "tags": [
@@ -9199,6 +9473,38 @@
         "title": "AccountDeletedOut",
         "description": "AC-1 account delete. Rows are gone now; resume files go within the deadline."
       },
+      "ActingAs": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "company": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text",
+            "description": "The full line the live room shows."
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "company",
+          "text"
+        ],
+        "title": "ActingAs",
+        "description": "SV-6: \"Strova is acting as {title} at {company}\" (\"a {title}\" in generic mode)."
+      },
       "ActionIn": {
         "properties": {
           "reason": {
@@ -14211,8 +14517,6 @@
         "type": "object"
       },
       "CompetencyReadiness": {
-        "additionalProperties": false,
-        "description": "RH-2: the most recent rubric score of one competency over the last three Realistic takes.",
         "properties": {
           "competency": {
             "$ref": "#/components/schemas/Competency"
@@ -14220,24 +14524,26 @@
           "score": {
             "anyOf": [
               {
-                "maximum": 4,
-                "minimum": 1,
-                "type": "integer"
+                "type": "integer",
+                "maximum": 4.0,
+                "minimum": 1.0
               },
               {
                 "type": "null"
               }
             ],
-            "description": "1 to 4. Null when not scored yet.",
-            "title": "Score"
+            "title": "Score",
+            "description": "1 to 4. Null when not scored yet."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "competency",
           "score"
         ],
         "title": "CompetencyReadiness",
-        "type": "object"
+        "description": "RH-2: the most recent rubric score of one competency over the last three Realistic takes."
       },
       "CompetencyScore": {
         "properties": {
@@ -14507,6 +14813,19 @@
             "$ref": "#/components/schemas/SessionChannel",
             "description": "text runs the same interviewer with typed input; dev and test only (PL-7)",
             "default": "voice"
+          },
+          "interview_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interview Id",
+            "description": "RH-1: a take of this interview. Its job target, resume, type and Custom setup set the session's; job_target_id must match."
           }
         },
         "additionalProperties": false,
@@ -16576,49 +16895,169 @@
         ],
         "title": "InterviewDateOut"
       },
-      "InterviewReadiness": {
-        "additionalProperties": false,
-        "description": "RH-2: readiness for one interview (role x resume x type), from Realistic takes only.\n\nscore = round((mean - 1) / 3 * 100) over the competencies scored so far; null with no\nRealistic take.",
+      "InterviewDetail": {
         "properties": {
-          "interview_id": {
-            "format": "uuid",
-            "title": "Interview Id",
-            "type": "string"
+          "interview": {
+            "$ref": "#/components/schemas/InterviewOut"
           },
-          "kind": {
-            "const": "practice_estimate",
-            "default": "practice_estimate",
-            "description": "RD-3: every screen labels it this way.",
-            "title": "Kind",
-            "type": "string"
+          "readiness": {
+            "$ref": "#/components/schemas/InterviewReadiness"
           },
-          "score": {
+          "takes_count": {
+            "type": "integer",
+            "title": "Takes Count"
+          },
+          "last_signal": {
             "anyOf": [
               {
-                "maximum": 100,
-                "minimum": 0,
-                "type": "integer"
+                "$ref": "#/components/schemas/HireSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "role": {
+            "$ref": "#/components/schemas/RoleSummary"
+          },
+          "resume_name": {
+            "anyOf": [
+              {
+                "type": "string"
               },
               {
                 "type": "null"
               }
             ],
-            "description": "0 to 100. Null with no Realistic take.",
-            "title": "Score"
+            "title": "Resume Name"
+          },
+          "takes": {
+            "items": {
+              "$ref": "#/components/schemas/InterviewTakeOut"
+            },
+            "type": "array",
+            "title": "Takes",
+            "description": "Newest first."
+          }
+        },
+        "type": "object",
+        "required": [
+          "interview",
+          "readiness",
+          "takes_count",
+          "last_signal",
+          "role",
+          "resume_name",
+          "takes"
+        ],
+        "title": "InterviewDetail",
+        "description": "RH-3: everything the interview page shows."
+      },
+      "InterviewOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "job_target_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Job Target Id"
+          },
+          "resume_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Resume Id"
+          },
+          "interview_type": {
+            "$ref": "#/components/schemas/InterviewType"
+          },
+          "custom": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CustomSessionSpec"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "archived_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Archived At"
+          },
+          "acting_as": {
+            "$ref": "#/components/schemas/ActingAs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "job_target_id",
+          "resume_id",
+          "interview_type",
+          "custom",
+          "created_at",
+          "archived_at",
+          "acting_as"
+        ],
+        "title": "InterviewOut"
+      },
+      "InterviewReadiness": {
+        "properties": {
+          "interview_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Interview Id"
+          },
+          "kind": {
+            "type": "string",
+            "const": "practice_estimate",
+            "title": "Kind",
+            "description": "RD-3: every screen labels it this way.",
+            "default": "practice_estimate"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 100.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score",
+            "description": "0 to 100. Null with no Realistic take."
           },
           "goal": {
-            "default": 75,
-            "maximum": 100,
-            "minimum": 0,
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 0.0,
             "title": "Goal",
-            "type": "integer"
+            "default": 75
           },
           "competencies": {
             "items": {
               "$ref": "#/components/schemas/CompetencyReadiness"
             },
-            "title": "Competencies",
-            "type": "array"
+            "type": "array",
+            "title": "Competencies"
           },
           "change": {
             "anyOf": [
@@ -16629,25 +17068,109 @@
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "Change since the previous take. Null when there is none.",
-            "title": "Change"
+            "title": "Change",
+            "description": "Change since the previous take. Null when there is none."
           },
           "takes_counted": {
-            "default": 0,
-            "description": "Realistic takes used.",
-            "maximum": 3,
-            "minimum": 0,
+            "type": "integer",
+            "maximum": 3.0,
+            "minimum": 0.0,
             "title": "Takes Counted",
-            "type": "integer"
+            "description": "Realistic takes used.",
+            "default": 0
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "interview_id",
           "score"
         ],
         "title": "InterviewReadiness",
-        "type": "object"
+        "description": "RH-2: readiness for one interview (role x resume x type), from Realistic takes only.\n\nscore = round((mean - 1) / 3 * 100) over the competencies scored so far; null with no\nRealistic take."
+      },
+      "InterviewTakeOut": {
+        "properties": {
+          "number": {
+            "type": "integer",
+            "title": "Number",
+            "description": "Take 1 is the first, in time order."
+          },
+          "session_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Id"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/Mode"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SessionStatus"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At"
+          },
+          "duration_min": {
+            "type": "integer",
+            "title": "Duration Min"
+          },
+          "hire_signal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HireSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "met_bar": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Met Bar",
+            "description": "DB-2: answers that met the bar. None until scored."
+          },
+          "scored": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scored",
+            "description": "Answers scored. None until scored."
+          },
+          "counts": {
+            "type": "boolean",
+            "title": "Counts",
+            "description": "RH-2: counts toward readiness."
+          }
+        },
+        "type": "object",
+        "required": [
+          "number",
+          "session_id",
+          "mode",
+          "status",
+          "at",
+          "duration_min",
+          "hire_signal",
+          "met_bar",
+          "scored",
+          "counts"
+        ],
+        "title": "InterviewTakeOut",
+        "description": "One take: a session of this interview."
       },
       "InterviewType": {
         "type": "string",
@@ -16661,6 +17184,38 @@
         ],
         "title": "InterviewType",
         "description": "The four v1 interview types (IV-2), plus Custom (CU-1) and Recruiter screen (RS-1).\n\nA Custom session mixes 1 to 3 of the four standard types as question categories\n(`SessionConfig.custom`). Custom is never a question category itself and has no entry in\nCOMPETENCIES_BY_TYPE; use `session_competencies(config)` for a session's competency pool."
+      },
+      "InterviewWithReadiness": {
+        "properties": {
+          "interview": {
+            "$ref": "#/components/schemas/InterviewOut"
+          },
+          "readiness": {
+            "$ref": "#/components/schemas/InterviewReadiness"
+          },
+          "takes_count": {
+            "type": "integer",
+            "title": "Takes Count"
+          },
+          "last_signal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HireSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "interview",
+          "readiness",
+          "takes_count",
+          "last_signal"
+        ],
+        "title": "InterviewWithReadiness"
       },
       "InterviewWithin": {
         "type": "string",
@@ -16827,6 +17382,48 @@
         ],
         "title": "InterviewerBrief",
         "type": "object"
+      },
+      "InterviewsCreate": {
+        "properties": {
+          "resume_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resume Id",
+            "description": "RM-2: default is the user's main resume."
+          },
+          "interview_types": {
+            "items": {
+              "$ref": "#/components/schemas/InterviewType"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Interview Types"
+          },
+          "custom": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CustomSessionSpec"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "CU-1: the Custom setup, required when Custom is kept."
+          }
+        },
+        "type": "object",
+        "required": [
+          "interview_types"
+        ],
+        "title": "InterviewsCreate",
+        "description": "RH-1, TG-3: the types the user keeps. Each becomes an interview of the role."
       },
       "InviteIn": {
         "properties": {
@@ -17592,6 +18189,45 @@
           },
           "context": {
             "$ref": "#/components/schemas/JobContext"
+          },
+          "interview_types": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/InterviewType"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interview Types",
+            "description": "TG-2, RH-1: the add flow's \"Create the role\": keep these types as the role's interviews in the same request."
+          },
+          "resume_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resume Id",
+            "description": "The resume for those interviews. Default: the main resume."
+          },
+          "custom": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CustomSessionSpec"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "CU-1: the Custom setup, when Custom is kept."
           }
         },
         "additionalProperties": false,
@@ -21330,6 +21966,73 @@
         ],
         "title": "RedirectOut"
       },
+      "RehearsalItem": {
+        "properties": {
+          "interview": {
+            "$ref": "#/components/schemas/InterviewOut"
+          },
+          "readiness": {
+            "$ref": "#/components/schemas/InterviewReadiness"
+          },
+          "takes_count": {
+            "type": "integer",
+            "title": "Takes Count"
+          },
+          "last_signal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HireSignal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "role": {
+            "$ref": "#/components/schemas/RoleSummary"
+          }
+        },
+        "type": "object",
+        "required": [
+          "interview",
+          "readiness",
+          "takes_count",
+          "last_signal",
+          "role"
+        ],
+        "title": "RehearsalItem"
+      },
+      "Rehearsals": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RehearsalItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_interview_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Interview Id",
+            "description": "Closest interview date first, then lowest readiness below 75. None when every interview is at the goal."
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "next_interview_id"
+        ],
+        "title": "Rehearsals",
+        "description": "RH-4: every interview across roles and the recommended next take."
+      },
       "RemoveAdminIn": {
         "properties": {
           "reason": {
@@ -22394,6 +23097,112 @@
           "test_only"
         ],
         "title": "RoleModel"
+      },
+      "RoleOut": {
+        "properties": {
+          "role": {
+            "$ref": "#/components/schemas/RoleSummary"
+          },
+          "interviews": {
+            "items": {
+              "$ref": "#/components/schemas/InterviewWithReadiness"
+            },
+            "type": "array",
+            "title": "Interviews"
+          }
+        },
+        "type": "object",
+        "required": [
+          "role",
+          "interviews"
+        ],
+        "title": "RoleOut",
+        "description": "TG-1: a role with one readiness per interview."
+      },
+      "RoleSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "company_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company Name"
+          },
+          "company_mode": {
+            "type": "string",
+            "title": "Company Mode"
+          },
+          "interview_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interview Date"
+          },
+          "days_left": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days Left"
+          },
+          "archived": {
+            "type": "boolean",
+            "title": "Archived"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "title",
+          "company_name",
+          "company_mode",
+          "interview_date",
+          "days_left",
+          "archived"
+        ],
+        "title": "RoleSummary"
       },
       "RuntimeSettings": {
         "properties": {
@@ -25611,6 +26420,68 @@
         ],
         "title": "SubscriptionStatus",
         "description": "Mirrors the Stripe subscription statuses we act on."
+      },
+      "SuggestedInterview": {
+        "properties": {
+          "interview_type": {
+            "$ref": "#/components/schemas/InterviewType"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "usual": {
+            "type": "boolean",
+            "title": "Usual",
+            "description": "True when the company's loop for this role has the round."
+          },
+          "round_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Round Name",
+            "description": "The round's name in the loop."
+          },
+          "acting_as": {
+            "$ref": "#/components/schemas/ActingAs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "interview_type",
+          "description",
+          "usual",
+          "acting_as"
+        ],
+        "title": "SuggestedInterview"
+      },
+      "SuggestedInterviews": {
+        "properties": {
+          "company_mode": {
+            "type": "string",
+            "title": "Company Mode",
+            "description": "curated or generic"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SuggestedInterview"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "company_mode",
+          "items"
+        ],
+        "title": "SuggestedInterviews",
+        "description": "TG-3: Strova's suggested interviews for a role, usual ones first."
       },
       "Suggestion": {
         "additionalProperties": false,

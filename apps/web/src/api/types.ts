@@ -109,6 +109,18 @@ export type Severity = S["Severity"];
 export type SessionStatus = S["SessionStatus"];
 export type SessionChannel = S["SessionChannel"];
 export type SessionRecord = DeepRequired<S["SessionRecord"]>;
+
+// Target roles, interviews and readiness per interview (U06: TG-3, RH-1, RH-2).
+export type SuggestedInterviews = DeepRequired<S["SuggestedInterviews"]>;
+export type InterviewsCreate = S["InterviewsCreate"];
+export type InterviewOut = DeepRequired<S["InterviewOut"]>;
+export type InterviewWithReadiness = DeepRequired<S["InterviewWithReadiness"]>;
+export type InterviewDetail = DeepRequired<S["InterviewDetail"]>;
+export type InterviewTakeOut = DeepRequired<S["InterviewTakeOut"]>;
+export type RoleOut = DeepRequired<S["RoleOut"]>;
+export type RoleSummary = DeepRequired<S["RoleSummary"]>;
+export type Rehearsals = DeepRequired<S["Rehearsals"]>;
+export type RehearsalItem = DeepRequired<S["RehearsalItem"]>;
 export type CreateSessionRequest = S["CreateSessionRequest"];
 export type VoiceJoin = S["VoiceJoin"];
 export type SubscriptionStatus = S["SubscriptionStatus"];

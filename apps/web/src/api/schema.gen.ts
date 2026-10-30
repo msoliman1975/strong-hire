@@ -1313,6 +1313,111 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/roles/{job_target_id}/suggested-interviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Suggested Interviews
+         * @description TG-3: the company's usual rounds for this role (standard loop in generic mode).
+         */
+        get: operations["suggested_interviews_roles__job_target_id__suggested_interviews_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/roles/{job_target_id}/interviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Interviews */
+        get: operations["list_interviews_roles__job_target_id__interviews_get"];
+        put?: never;
+        /**
+         * Add Interviews
+         * @description RH-1, TG-3: keep the chosen types as interviews of the role.
+         */
+        post: operations["add_interviews_roles__job_target_id__interviews_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/interviews/{interview_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Interview
+         * @description RH-2, RH-3: the interview, its role, readiness and takes.
+         */
+        get: operations["get_interview_interviews__interview_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Archive Interview
+         * @description RH-1: remove an interview from the role. Its takes and debriefs stay.
+         */
+        delete: operations["archive_interview_interviews__interview_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Roles
+         * @description TG-1: every live role, newest first, with one readiness per interview.
+         */
+        get: operations["list_roles_roles_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rehearsals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Rehearsals
+         * @description RH-4: every interview across live roles and the recommended next take.
+         */
+        get: operations["rehearsals_rehearsals_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/providers": {
         parameters: {
             query?: never;
@@ -3354,6 +3459,21 @@ export interface components {
             files_deleted_within_hours: number;
             /** Backups Expire Within Days */
             backups_expire_within_days: number;
+        };
+        /**
+         * ActingAs
+         * @description SV-6: "Strova is acting as {title} at {company}" ("a {title}" in generic mode).
+         */
+        ActingAs: {
+            /** Title */
+            title: string;
+            /** Company */
+            company: string | null;
+            /**
+             * Text
+             * @description The full line the live room shows.
+             */
+            text: string;
         };
         /**
          * ActionIn
@@ -5455,6 +5575,11 @@ export interface components {
              * @default voice
              */
             channel: components["schemas"]["SessionChannel"];
+            /**
+             * Interview Id
+             * @description RH-1: a take of this interview. Its job target, resume, type and Custom setup set the session's; job_target_id must match.
+             */
+            interview_id?: string | null;
         };
         /**
          * CustomCategory
@@ -6310,6 +6435,53 @@ export interface components {
             days_left: number | null;
         };
         /**
+         * InterviewDetail
+         * @description RH-3: everything the interview page shows.
+         */
+        InterviewDetail: {
+            interview: components["schemas"]["InterviewOut"];
+            readiness: components["schemas"]["InterviewReadiness"];
+            /** Takes Count */
+            takes_count: number;
+            last_signal: components["schemas"]["HireSignal"] | null;
+            role: components["schemas"]["RoleSummary"];
+            /** Resume Name */
+            resume_name: string | null;
+            /**
+             * Takes
+             * @description Newest first.
+             */
+            takes: components["schemas"]["InterviewTakeOut"][];
+        };
+        /** InterviewOut */
+        InterviewOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Job Target Id
+             * Format: uuid
+             */
+            job_target_id: string;
+            /**
+             * Resume Id
+             * Format: uuid
+             */
+            resume_id: string;
+            interview_type: components["schemas"]["InterviewType"];
+            custom: components["schemas"]["CustomSessionSpec"] | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Archived At */
+            archived_at: string | null;
+            acting_as: components["schemas"]["ActingAs"];
+        };
+        /**
          * InterviewReadiness
          * @description RH-2: readiness for one interview (role x resume x type), from Realistic takes only.
          *
@@ -6344,15 +6516,55 @@ export interface components {
             /**
              * Change
              * @description Change since the previous take. Null when there is none.
-             * @default null
              */
-            change: number | null;
+            change?: number | null;
             /**
              * Takes Counted
              * @description Realistic takes used.
              * @default 0
              */
             takes_counted: number;
+        };
+        /**
+         * InterviewTakeOut
+         * @description One take: a session of this interview.
+         */
+        InterviewTakeOut: {
+            /**
+             * Number
+             * @description Take 1 is the first, in time order.
+             */
+            number: number;
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            mode: components["schemas"]["Mode"];
+            status: components["schemas"]["SessionStatus"];
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Duration Min */
+            duration_min: number;
+            hire_signal: components["schemas"]["HireSignal"] | null;
+            /**
+             * Met Bar
+             * @description DB-2: answers that met the bar. None until scored.
+             */
+            met_bar: number | null;
+            /**
+             * Scored
+             * @description Answers scored. None until scored.
+             */
+            scored: number | null;
+            /**
+             * Counts
+             * @description RH-2: counts toward readiness.
+             */
+            counts: boolean;
         };
         /**
          * InterviewType
@@ -6364,6 +6576,14 @@ export interface components {
          * @enum {string}
          */
         InterviewType: "behavioral" | "hiring_manager" | "technical_qa" | "case" | "custom" | "recruiter_screen";
+        /** InterviewWithReadiness */
+        InterviewWithReadiness: {
+            interview: components["schemas"]["InterviewOut"];
+            readiness: components["schemas"]["InterviewReadiness"];
+            /** Takes Count */
+            takes_count: number;
+            last_signal: components["schemas"]["HireSignal"] | null;
+        };
         /**
          * InterviewWithin
          * @description L04 waitlist: when the person's real interview is, as they told us.
@@ -6447,6 +6667,21 @@ export interface components {
              * @description Minutes per phase. When set, the minutes add up to session.duration_min.
              */
             time_plan?: components["schemas"]["PhaseTime"][];
+        };
+        /**
+         * InterviewsCreate
+         * @description RH-1, TG-3: the types the user keeps. Each becomes an interview of the role.
+         */
+        InterviewsCreate: {
+            /**
+             * Resume Id
+             * @description RM-2: default is the user's main resume.
+             */
+            resume_id?: string | null;
+            /** Interview Types */
+            interview_types: components["schemas"]["InterviewType"][];
+            /** @description CU-1: the Custom setup, required when Custom is kept. */
+            custom?: components["schemas"]["CustomSessionSpec"] | null;
         };
         /** InviteIn */
         InviteIn: {
@@ -6717,6 +6952,18 @@ export interface components {
             /** Stage */
             stage?: string | null;
             context?: components["schemas"]["JobContext"];
+            /**
+             * Interview Types
+             * @description TG-2, RH-1: the add flow's "Create the role": keep these types as the role's interviews in the same request.
+             */
+            interview_types?: components["schemas"]["InterviewType"][] | null;
+            /**
+             * Resume Id
+             * @description The resume for those interviews. Default: the main resume.
+             */
+            resume_id?: string | null;
+            /** @description CU-1: the Custom setup, when Custom is kept. */
+            custom?: components["schemas"]["CustomSessionSpec"] | null;
         };
         /** LatencyPoint */
         LatencyPoint: {
@@ -8215,6 +8462,28 @@ export interface components {
             /** Url */
             url: string;
         };
+        /** RehearsalItem */
+        RehearsalItem: {
+            interview: components["schemas"]["InterviewOut"];
+            readiness: components["schemas"]["InterviewReadiness"];
+            /** Takes Count */
+            takes_count: number;
+            last_signal: components["schemas"]["HireSignal"] | null;
+            role: components["schemas"]["RoleSummary"];
+        };
+        /**
+         * Rehearsals
+         * @description RH-4: every interview across roles and the recommended next take.
+         */
+        Rehearsals: {
+            /** Items */
+            items: components["schemas"]["RehearsalItem"][];
+            /**
+             * Next Interview Id
+             * @description Closest interview date first, then lowest readiness below 75. None when every interview is at the goal.
+             */
+            next_interview_id: string | null;
+        };
         /** RemoveAdminIn */
         RemoveAdminIn: {
             /**
@@ -8642,6 +8911,37 @@ export interface components {
              * @description Roles only the AI candidate (P13) uses
              */
             test_only: boolean;
+        };
+        /**
+         * RoleOut
+         * @description TG-1: a role with one readiness per interview.
+         */
+        RoleOut: {
+            role: components["schemas"]["RoleSummary"];
+            /** Interviews */
+            interviews: components["schemas"]["InterviewWithReadiness"][];
+        };
+        /** RoleSummary */
+        RoleSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string | null;
+            /** Title */
+            title: string | null;
+            /** Company Name */
+            company_name: string | null;
+            /** Company Mode */
+            company_mode: string;
+            /** Interview Date */
+            interview_date: string | null;
+            /** Days Left */
+            days_left: number | null;
+            /** Archived */
+            archived: boolean;
         };
         /**
          * RuntimeSettings
@@ -9991,6 +10291,36 @@ export interface components {
          * @enum {string}
          */
         SubscriptionStatus: "trialing" | "active" | "past_due" | "canceled" | "incomplete";
+        /** SuggestedInterview */
+        SuggestedInterview: {
+            interview_type: components["schemas"]["InterviewType"];
+            /** Description */
+            description: string;
+            /**
+             * Usual
+             * @description True when the company's loop for this role has the round.
+             */
+            usual: boolean;
+            /**
+             * Round Name
+             * @description The round's name in the loop.
+             */
+            round_name?: string | null;
+            acting_as: components["schemas"]["ActingAs"];
+        };
+        /**
+         * SuggestedInterviews
+         * @description TG-3: Strova's suggested interviews for a role, usual ones first.
+         */
+        SuggestedInterviews: {
+            /**
+             * Company Mode
+             * @description curated or generic
+             */
+            company_mode: string;
+            /** Items */
+            items: components["schemas"]["SuggestedInterview"][];
+        };
         /**
          * Suggestion
          * @description SG-1: one suggestion from Strova. The suggestions table holds org_id and user_id.
@@ -13136,6 +13466,203 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    suggested_interviews_roles__job_target_id__suggested_interviews_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuggestedInterviews"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_interviews_roles__job_target_id__interviews_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterviewWithReadiness"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_interviews_roles__job_target_id__interviews_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InterviewsCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterviewOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_interview_interviews__interview_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                interview_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterviewDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    archive_interview_interviews__interview_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                interview_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_roles_roles_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoleOut"][];
+                };
+            };
+        };
+    };
+    rehearsals_rehearsals_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Rehearsals"];
                 };
             };
         };

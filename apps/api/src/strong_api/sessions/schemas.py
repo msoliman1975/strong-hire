@@ -27,6 +27,13 @@ class CreateSessionRequest(BaseModel):
         default=SessionChannel.VOICE,
         description="text runs the same interviewer with typed input; dev and test only (PL-7)",
     )
+    interview_id: uuid.UUID | None = Field(
+        default=None,
+        description=(
+            "RH-1: a take of this interview. Its job target, resume, type and Custom setup set "
+            "the session's; job_target_id must match."
+        ),
+    )
 
 
 class SessionSetup(BaseModel):
