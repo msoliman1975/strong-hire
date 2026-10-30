@@ -43,6 +43,7 @@ from strong_worker.inputs.matching import match_and_log
 from strong_worker.inputs.sanitize import sanitize_untrusted
 from strong_worker.inputs.settings import get_inputs_settings
 from strong_worker.inputs.storage import FileStore, build_file_store
+from strong_worker.inputs.story_ideas import queue_story_idea_skills, story_idea_skills
 from strong_worker.ops.context import job_context
 from strong_worker.profiles.queue import queue_auto_profile
 
@@ -251,7 +252,9 @@ async def parse_resume(
             return _failed("resume deleted")
         row.parsed_json = extraction.output.model_dump(mode="json")
         await db.commit()
-        return {"outcome": "extracted", "kind": kind, **extraction.summary()}
+    # RM-4: the likely skills of the resume's story ideas, after the session is closed.
+    await queue_story_idea_skills(ctx, resume_id, org_id)
+    return {"outcome": "extracted", "kind": kind, **extraction.summary()}
 
 
 DELETE_FILE_MAX_TRIES = 10
@@ -286,4 +289,10 @@ async def _job_target(db: AsyncSession, job_target_id: str, org_id: str) -> JobT
     )
 
 
-FUNCTIONS = (extract_job_target, match_job_target, parse_resume, delete_resume_file)
+FUNCTIONS = (
+    extract_job_target,
+    match_job_target,
+    parse_resume,
+    delete_resume_file,
+    story_idea_skills,
+)

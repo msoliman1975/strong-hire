@@ -7,7 +7,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from strong_core.schemas import Level
+from strong_core.schemas import Level, PlanStyle
 
 
 class ConsentIn(BaseModel):
@@ -74,6 +74,22 @@ class ProfileOut(BaseModel):
     time_zone: str | None
     linkedin_url: str | None
     complete: bool
+    plan_style: PlanStyle | None = Field(
+        default=None, description="PS-2: weekly or checklist. None until chosen in onboarding."
+    )
+    plan_email_muted: bool = Field(
+        default=False, description="PS-6: true mutes the weekly plan reminder emails."
+    )
+
+
+class PlanSettingsIn(BaseModel):
+    """PS-2, PS-6: the plan style and the reminder mute, changeable at any time (PATCH: send
+    only what changes). Progress is kept when the style changes."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    plan_style: PlanStyle | None = None
+    plan_email_muted: bool | None = None
 
 
 ExportStatus = Literal["preparing", "ready", "downloaded", "expired", "failed"]

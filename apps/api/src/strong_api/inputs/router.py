@@ -51,6 +51,7 @@ from strong_api.inputs.queue import (
     EXTRACT_JOB_TARGET,
     MATCH_JOB_TARGET,
     PARSE_RESUME,
+    STORY_IDEA_SKILLS,
     JobInfo,
 )
 from strong_api.inputs.schemas import (
@@ -169,7 +170,28 @@ def _resume_out(row: ResumeRow) -> ResumeOut:
         confirmed_at=row.confirmed_at,
         uploaded_at=row.uploaded_at,
         accepted_issues=[AcceptedIssue.model_validate(i) for i in row.accepted_issues or []],
+        is_main=row.is_main and row.deleted_at is None,
     )
+
+
+def _live_resumes(me: Me):  # type: ignore[no-untyped-def]
+    """The user's saved, not deleted resumes."""
+    return select(ResumeRow).where(
+        ResumeRow.org_id == me.org_id,
+        ResumeRow.user_id == me.user_id,
+        ResumeRow.deleted_at.is_(None),
+    )
+
+
+async def _set_main(db: Db, me: Me, row: ResumeRow | None) -> None:
+    """RM-2: make `row` the user's only main resume (None: no main). The caller commits."""
+    for other in await db.scalars(_live_resumes(me).where(ResumeRow.is_main.is_(True))):
+        if row is None or other.id != row.id:
+            other.is_main = False
+    # Clear the old main before setting the new one: the partial unique index allows one.
+    await db.flush()
+    if row is not None:
+        row.is_main = True
 
 
 async def _owned_job_target(
@@ -520,11 +542,21 @@ async def create_resume(
             {"code": RESUME_LIMIT, "message": RESUME_LIMIT_MESSAGE},
         )
 
+    # RM-2: the first resume (or the first after the main was deleted) becomes main.
+    has_main = await db.scalar(
+        select(func.count()).select_from(
+            _live_resumes(me).where(ResumeRow.is_main.is_(True)).subquery()
+        )
+    )
+    now = datetime.now(UTC)
     row = ResumeRow(
         org_id=me.org_id,
         user_id=me.user_id,
-        name=default_resume_name(filename if file is not None else None, datetime.now(UTC)),
+        name=default_resume_name(filename if file is not None else None, now),
         content_hash=content_hash(data),
+        is_main=not has_main,
+        # Set here rather than by the database clock, so "newest" is exact (RM-2).
+        uploaded_at=now,
     )
     db.add(row)
     await db.commit()
@@ -545,18 +577,11 @@ async def create_resume(
 
 @router.get("/resumes")
 async def list_resumes(db: Db, me: Me) -> list[ResumeOut]:
-    """The signed-in user's saved resumes, newest first. Used to reuse a resume for a new job.
-
-    Deleted resumes are left out (R1).
+    """The signed-in user's saved resumes: the main one first (RM-2, so it is the default for a
+    new role), then newest first. Deleted resumes are left out (R1).
     """
     rows = await db.scalars(
-        select(ResumeRow)
-        .where(
-            ResumeRow.org_id == me.org_id,
-            ResumeRow.user_id == me.user_id,
-            ResumeRow.deleted_at.is_(None),
-        )
-        .order_by(ResumeRow.uploaded_at.desc())
+        _live_resumes(me).order_by(ResumeRow.is_main.desc(), ResumeRow.uploaded_at.desc())
     )
     return [_resume_out(row) for row in rows]
 
@@ -611,6 +636,17 @@ async def delete_resume(resume_id: uuid.UUID, db: Db, me: Me, queue: Queue) -> R
         row.content_hash = None
         row.confirmed_at = None
         row.accepted_issues = None
+        if row.is_main:
+            # RM-2: the newest other resume becomes main.
+            row.is_main = False
+            await db.flush()
+            newest = await db.scalar(
+                _live_resumes(me)
+                .where(ResumeRow.id != row.id)
+                .order_by(ResumeRow.uploaded_at.desc())
+                .limit(1)
+            )
+            await _set_main(db, me, newest)
         db.add(_audit(me, "library.resume_deleted", f"resume:{row.id}"))
         await db.commit()
         if ref:
@@ -622,6 +658,16 @@ async def delete_resume(resume_id: uuid.UUID, db: Db, me: Me, queue: Queue) -> R
                 ref=ref,
             )
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post("/resumes/{resume_id}/main")
+async def set_main_resume(resume_id: uuid.UUID, db: Db, me: Me) -> ResumeOut:
+    """RM-2: make this resume the user's main resume. The previous main one stops being main."""
+    row = await _owned_resume(db, me, resume_id, live=True)
+    await _set_main(db, me, row)
+    await db.commit()
+    await db.refresh(row)
+    return _resume_out(row)
 
 
 @router.put("/resumes/{resume_id}")
@@ -642,6 +688,13 @@ async def update_resume(
     row.parsed_json = body.resume.model_dump(mode="json")
     row.confirmed_at = datetime.now(UTC)
     await db.commit()
+    # RM-4: the story ideas follow the edited achievements.
+    await queue.enqueue(
+        STORY_IDEA_SKILLS,
+        f"story_idea_skills:{row.id}:{uuid.uuid4().hex[:8]}",
+        resume_id=str(row.id),
+        org_id=str(me.org_id),
+    )
     await gap_service.recompute(
         db, queue, org_id=me.org_id, user_id=me.user_id, settings=limits, resume_id=row.id
     )

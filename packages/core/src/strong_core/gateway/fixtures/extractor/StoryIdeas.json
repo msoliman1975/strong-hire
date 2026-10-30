@@ -1,0 +1,16 @@
+{
+  "items": [
+    {
+      "achievement": "Cut invoice job runtime from 4 hours to 25 minutes by partitioning work across workers",
+      "skills": ["impact", "technical_depth"]
+    },
+    {
+      "achievement": "Led migration of 30 services to PostgreSQL 15 with zero downtime",
+      "skills": ["ownership", "technical_depth"]
+    },
+    {
+      "achievement": "Built the refunds API used by 2,000 merchants",
+      "skills": ["impact"]
+    }
+  ]
+}

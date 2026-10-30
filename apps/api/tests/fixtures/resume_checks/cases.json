@@ -1,0 +1,1520 @@
+[
+  {
+    "name": "clean",
+    "today": "2026-10",
+    "job": null,
+    "resume": {
+      "summary": "Product manager with 8 years in payments. I led cross-team launches for 12,000 merchants.",
+      "roles": [
+        {
+          "title": "Product Manager",
+          "company": "Lumen",
+          "start": "2022-03",
+          "end": null,
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        },
+        {
+          "title": "Product Manager",
+          "company": "Northwind",
+          "start": "2019-06",
+          "end": "2022-02",
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        }
+      ],
+      "skills": [],
+      "education": [],
+      "certifications": []
+    },
+    "expected": []
+  },
+  {
+    "name": "gap over 3 months",
+    "today": "2026-10",
+    "job": null,
+    "resume": {
+      "summary": "Product manager with 8 years in payments. I led cross-team launches for 12,000 merchants.",
+      "roles": [
+        {
+          "title": "Product Manager",
+          "company": "Lumen",
+          "start": "2022-03",
+          "end": null,
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        },
+        {
+          "title": "Product Manager",
+          "company": "Northwind",
+          "start": "2019-06",
+          "end": "2021-08",
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        }
+      ],
+      "skills": [],
+      "education": [],
+      "certifications": []
+    },
+    "expected": [
+      {
+        "key": "dates.gap:northwind/product-manager>lumen/product-manager",
+        "group": "dates",
+        "severity": "medium",
+        "title": "A 6-month gap",
+        "detail": "Aug 2021 to Mar 2022, between Northwind and Lumen",
+        "why": "Gaps over 3 months come up in screens. Check the dates, or accept it and practice your answer (study, travel, caring, a career break).",
+        "fixLabel": "Check the dates",
+        "acceptLabel": "Accept, I'll explain it",
+        "target": {
+          "section": "role",
+          "role": 0,
+          "field": "start"
+        },
+        "roles": [
+          1,
+          0
+        ],
+        "gap": {
+          "from": "Aug 2021",
+          "to": "Mar 2022"
+        }
+      }
+    ]
+  },
+  {
+    "name": "gap of exactly 3 months and a covered gap",
+    "today": "2026-10",
+    "job": null,
+    "resume": {
+      "summary": "Product manager with 8 years in payments. I led cross-team launches for 12,000 merchants.",
+      "roles": [
+        {
+          "title": "Product Manager",
+          "company": "Lumen",
+          "start": "2022-03",
+          "end": null,
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        },
+        {
+          "title": "Product Manager",
+          "company": "Northwind",
+          "start": "2019-06",
+          "end": "2021-11",
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        },
+        {
+          "title": "Product Manager",
+          "company": "Contoso",
+          "start": "2015-01",
+          "end": "2019-12",
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        },
+        {
+          "title": "Product Manager",
+          "company": "Fabrikam",
+          "start": "2010-01",
+          "end": "2014-08",
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        }
+      ],
+      "skills": [],
+      "education": [],
+      "certifications": []
+    },
+    "expected": [
+      {
+        "key": "dates.overlap:contoso/product-manager+northwind/product-manager",
+        "group": "dates",
+        "severity": "high",
+        "title": "Overlapping roles",
+        "detail": "Contoso ends Dec 2019, Northwind starts Jun 2019",
+        "why": "Interviewers ask about overlaps. If you really held both, say so; otherwise fix the date.",
+        "fixLabel": "Fix the date",
+        "acceptLabel": "Accept: I held both",
+        "target": {
+          "section": "role",
+          "role": 2,
+          "field": "end"
+        },
+        "roles": [
+          2,
+          1
+        ],
+        "fieldNote": "Overlaps Northwind by 6 months"
+      },
+      {
+        "key": "dates.gap:fabrikam/product-manager>contoso/product-manager",
+        "group": "dates",
+        "severity": "medium",
+        "title": "A 4-month gap",
+        "detail": "Aug 2014 to Jan 2015, between Fabrikam and Contoso",
+        "why": "Gaps over 3 months come up in screens. Check the dates, or accept it and practice your answer (study, travel, caring, a career break).",
+        "fixLabel": "Check the dates",
+        "acceptLabel": "Accept, I'll explain it",
+        "target": {
+          "section": "role",
+          "role": 2,
+          "field": "start"
+        },
+        "roles": [
+          3,
+          2
+        ],
+        "gap": {
+          "from": "Aug 2014",
+          "to": "Jan 2015"
+        }
+      }
+    ]
+  },
+  {
+    "name": "overlap and one-month handover",
+    "today": "2026-10",
+    "job": null,
+    "resume": {
+      "summary": "Product manager with 8 years in payments. I led cross-team launches for 12,000 merchants.",
+      "roles": [
+        {
+          "title": "Product Manager",
+          "company": "Lumen",
+          "start": "2021-06",
+          "end": null,
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        },
+        {
+          "title": "Product Manager",
+          "company": "Northwind",
+          "start": "2019-06",
+          "end": "2021-12",
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        },
+        {
+          "title": "Product Manager",
+          "company": "Contoso",
+          "start": "2017-01",
+          "end": "2019-06",
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        }
+      ],
+      "skills": [],
+      "education": [],
+      "certifications": []
+    },
+    "expected": [
+      {
+        "key": "dates.overlap:lumen/product-manager+northwind/product-manager",
+        "group": "dates",
+        "severity": "high",
+        "title": "Overlapping roles",
+        "detail": "Northwind ends Dec 2021, Lumen starts Jun 2021",
+        "why": "Interviewers ask about overlaps. If you really held both, say so; otherwise fix the date.",
+        "fixLabel": "Fix the date",
+        "acceptLabel": "Accept: I held both",
+        "target": {
+          "section": "role",
+          "role": 1,
+          "field": "end"
+        },
+        "roles": [
+          1,
+          0
+        ],
+        "fieldNote": "Overlaps Lumen by 6 months"
+      }
+    ]
+  },
+  {
+    "name": "end before start and future dates",
+    "today": "2026-10",
+    "job": null,
+    "resume": {
+      "summary": "Product manager with 8 years in payments. I led cross-team launches for 12,000 merchants.",
+      "roles": [
+        {
+          "title": "Product Manager",
+          "company": "Lumen",
+          "start": "2027-03",
+          "end": null,
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        },
+        {
+          "title": "Product Manager",
+          "company": "Northwind",
+          "start": "2022-06",
+          "end": "2021-01",
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        },
+        {
+          "title": "Product Manager",
+          "company": "Contoso",
+          "start": "2019-01",
+          "end": "2028",
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        }
+      ],
+      "skills": [],
+      "education": [],
+      "certifications": []
+    },
+    "expected": [
+      {
+        "key": "dates.future:lumen/product-manager:start",
+        "group": "dates",
+        "severity": "high",
+        "title": "A future date on Lumen",
+        "detail": "Starts Mar 2027",
+        "why": "Dates after today read as a mistake. If the role is current, leave the end empty.",
+        "fixLabel": "Fix the date",
+        "acceptLabel": "Accept as it is",
+        "target": {
+          "section": "role",
+          "role": 0,
+          "field": "start"
+        },
+        "roles": [
+          0
+        ],
+        "fieldNote": "This date is in the future"
+      },
+      {
+        "key": "dates.end-before-start:northwind/product-manager",
+        "group": "dates",
+        "severity": "high",
+        "title": "Northwind ends before it starts",
+        "detail": "Jun 2022 to Jan 2021",
+        "why": "An end date before the start date looks like a typo, and screeners notice.",
+        "fixLabel": "Fix the date",
+        "acceptLabel": "Accept as it is",
+        "target": {
+          "section": "role",
+          "role": 1,
+          "field": "end"
+        },
+        "roles": [
+          1
+        ],
+        "fieldNote": "Ends before it starts"
+      },
+      {
+        "key": "dates.future:contoso/product-manager:end",
+        "group": "dates",
+        "severity": "high",
+        "title": "A future date on Contoso",
+        "detail": "Ends 2028",
+        "why": "Dates after today read as a mistake. If the role is current, leave the end empty.",
+        "fixLabel": "Fix the date",
+        "acceptLabel": "Accept as it is",
+        "target": {
+          "section": "role",
+          "role": 2,
+          "field": "end"
+        },
+        "roles": [
+          2
+        ],
+        "fieldNote": "This date is in the future"
+      },
+      {
+        "key": "dates.year-only:contoso/product-manager",
+        "group": "dates",
+        "severity": "low",
+        "title": "Years only on Contoso",
+        "detail": "Jan 2019 to 2028",
+        "why": "Years alone can hide up to 11 months on each side. Screeners often ask for the months.",
+        "fixLabel": "Add the months",
+        "acceptLabel": "Accept, years are enough",
+        "target": {
+          "section": "role",
+          "role": 2,
+          "field": "end"
+        },
+        "roles": [
+          2
+        ],
+        "fieldNote": "Add the month, for example 2016-04"
+      }
+    ]
+  },
+  {
+    "name": "years only",
+    "today": "2026-10",
+    "job": null,
+    "resume": {
+      "summary": "Product manager with 8 years in payments. I led cross-team launches for 12,000 merchants.",
+      "roles": [
+        {
+          "title": "Product Manager",
+          "company": "Lumen",
+          "start": "2021",
+          "end": null,
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        },
+        {
+          "title": "Product Manager",
+          "company": "Northwind",
+          "start": "2016",
+          "end": "2020",
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        }
+      ],
+      "skills": [],
+      "education": [],
+      "certifications": []
+    },
+    "expected": [
+      {
+        "key": "dates.year-only:lumen/product-manager",
+        "group": "dates",
+        "severity": "low",
+        "title": "Years only on Lumen",
+        "detail": "2021 to now",
+        "why": "Years alone can hide up to 11 months on each side. Screeners often ask for the months.",
+        "fixLabel": "Add the months",
+        "acceptLabel": "Accept, years are enough",
+        "target": {
+          "section": "role",
+          "role": 0,
+          "field": "start"
+        },
+        "roles": [
+          0
+        ],
+        "fieldNote": "Add the month, for example 2016-04"
+      },
+      {
+        "key": "dates.year-only:northwind/product-manager",
+        "group": "dates",
+        "severity": "low",
+        "title": "Years only on Northwind",
+        "detail": "2016 to 2020",
+        "why": "Years alone can hide up to 11 months on each side. Screeners often ask for the months.",
+        "fixLabel": "Add the months",
+        "acceptLabel": "Accept, years are enough",
+        "target": {
+          "section": "role",
+          "role": 1,
+          "field": "start"
+        },
+        "roles": [
+          1
+        ],
+        "fieldNote": "Add the month, for example 2016-04"
+      }
+    ]
+  },
+  {
+    "name": "missing start",
+    "today": "2026-10",
+    "job": null,
+    "resume": {
+      "summary": "Product manager with 8 years in payments. I led cross-team launches for 12,000 merchants.",
+      "roles": [
+        {
+          "title": "Product Manager",
+          "company": "Lumen",
+          "start": null,
+          "end": null,
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        },
+        {
+          "title": "Product Manager",
+          "company": "Northwind",
+          "start": "2016-02",
+          "end": null,
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        }
+      ],
+      "skills": [],
+      "education": [],
+      "certifications": []
+    },
+    "expected": [
+      {
+        "key": "dates.missing-start:lumen/product-manager",
+        "group": "dates",
+        "severity": "medium",
+        "title": "No start date on Lumen",
+        "detail": "We could not find when this role started.",
+        "why": "Without dates, interviewers cannot tell how long you held the role, so they may ask. Leaving old dates off on purpose is fine: accept it and say why, and be ready to answer.",
+        "fixLabel": "Add the date",
+        "acceptLabel": "Accept as it is",
+        "reasons": [
+          {
+            "code": "on-purpose",
+            "label": "Left out on purpose (age bias)"
+          },
+          {
+            "code": "dont-remember",
+            "label": "I don't remember"
+          }
+        ],
+        "target": {
+          "section": "role",
+          "role": 0,
+          "field": "start"
+        },
+        "roles": [
+          0
+        ],
+        "fieldNote": "Add a start date"
+      }
+    ]
+  },
+  {
+    "name": "current role not marked",
+    "today": "2026-10",
+    "job": null,
+    "resume": {
+      "summary": "Product manager with 8 years in payments. I led cross-team launches for 12,000 merchants.",
+      "roles": [
+        {
+          "title": "Product Manager",
+          "company": "Lumen",
+          "start": "2022-01",
+          "end": "2026-09",
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        },
+        {
+          "title": "Product Manager",
+          "company": "Northwind",
+          "start": "2019-01",
+          "end": "2021-12",
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        }
+      ],
+      "skills": [],
+      "education": [],
+      "certifications": []
+    },
+    "expected": [
+      {
+        "key": "dates.current-not-marked:lumen/product-manager",
+        "group": "dates",
+        "severity": "medium",
+        "title": "Is Lumen your current role?",
+        "detail": "It ends Sep 2026, and no role is marked current.",
+        "why": "If you still work there, leave the end date empty so interviewers read it as your current job.",
+        "fixLabel": "Mark as current",
+        "acceptLabel": "Accept, I left",
+        "target": {
+          "section": "role",
+          "role": 0,
+          "field": "end"
+        },
+        "roles": [
+          0
+        ],
+        "fieldNote": "Leave empty if you still work here"
+      }
+    ]
+  },
+  {
+    "name": "two current roles",
+    "today": "2026-10",
+    "job": null,
+    "resume": {
+      "summary": "Product manager with 8 years in payments. I led cross-team launches for 12,000 merchants.",
+      "roles": [
+        {
+          "title": "Product Manager",
+          "company": "Lumen",
+          "start": "2022-01",
+          "end": null,
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        },
+        {
+          "title": "Product Manager",
+          "company": "Northwind",
+          "start": "2020-01",
+          "end": null,
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        }
+      ],
+      "skills": [],
+      "education": [],
+      "certifications": []
+    },
+    "expected": [
+      {
+        "key": "dates.overlap:lumen/product-manager+northwind/product-manager",
+        "group": "dates",
+        "severity": "high",
+        "title": "Two current roles",
+        "detail": "Northwind and Lumen both have no end date",
+        "why": "Interviewers ask about overlaps. If you really held both, say so; otherwise fix the date.",
+        "fixLabel": "Fix the date",
+        "acceptLabel": "Accept: I held both",
+        "target": {
+          "section": "role",
+          "role": 1,
+          "field": "end"
+        },
+        "roles": [
+          1,
+          0
+        ],
+        "fieldNote": "Overlaps Lumen by 57 months"
+      }
+    ]
+  },
+  {
+    "name": "few achievements and no result",
+    "today": "2026-10",
+    "job": null,
+    "resume": {
+      "summary": "Product manager with 8 years in payments. I led cross-team launches for 12,000 merchants.",
+      "roles": [
+        {
+          "title": "Product Manager",
+          "company": "Lumen",
+          "start": "2022-01",
+          "end": null,
+          "achievements": [],
+          "skills": []
+        },
+        {
+          "title": "Product Manager",
+          "company": "Northwind",
+          "start": "2019-01",
+          "end": "2021-12",
+          "achievements": [
+            "Owned the onboarding flow end to end for the whole company and all its markets"
+          ],
+          "skills": []
+        },
+        {
+          "title": "Product Manager",
+          "company": "Contoso",
+          "start": "2016-01",
+          "end": "2018-12",
+          "achievements": [
+            "Ran discovery with customers",
+            "Wrote the pricing page copy",
+            "Doubled trial conversion"
+          ],
+          "skills": []
+        }
+      ],
+      "skills": [],
+      "education": [],
+      "certifications": []
+    },
+    "expected": [
+      {
+        "key": "detail.few-achievements:lumen/product-manager",
+        "group": "detail",
+        "severity": "medium",
+        "title": "No achievements on Lumen",
+        "detail": "Roles read best with 2 to 5 achievements.",
+        "why": "Interviewers pick their questions from your achievements. A thin role gives them little to ask about, and you little to show.",
+        "fixLabel": "Add an achievement",
+        "acceptLabel": "Accept as it is",
+        "target": {
+          "section": "role",
+          "role": 0,
+          "field": "achievements"
+        },
+        "roles": [
+          0
+        ]
+      },
+      {
+        "key": "detail.few-achievements:northwind/product-manager",
+        "group": "detail",
+        "severity": "medium",
+        "title": "One achievement on Northwind",
+        "detail": "Roles read best with 2 to 5 achievements.",
+        "why": "Interviewers pick their questions from your achievements. A thin role gives them little to ask about, and you little to show.",
+        "fixLabel": "Add an achievement",
+        "acceptLabel": "Accept as it is",
+        "target": {
+          "section": "role",
+          "role": 1,
+          "field": "achievements"
+        },
+        "roles": [
+          1
+        ]
+      },
+      {
+        "key": "detail.no-result:northwind/product-manager",
+        "group": "detail",
+        "severity": "low",
+        "title": "An achievement without a result at Northwind",
+        "detail": "\"Owned the onboarding flow end to end for the whole company…\"",
+        "why": "Say what changed. A number helps if you have one, but you do not need one: name the measure that moved (\"improved task success, time on task and error rate in usability benchmarks\"), the direction (\"cut support tickets after launch\"), or the scale and scope (\"for 3 product teams\", \"used by every store in the region\"). Results are what interviewers remember.",
+        "fixLabel": "Add a result",
+        "acceptLabel": "Accept as it is",
+        "target": {
+          "section": "role",
+          "role": 1,
+          "field": "achievement",
+          "item": 0
+        },
+        "roles": [
+          1
+        ],
+        "items": [
+          0
+        ],
+        "fieldNote": "No result yet. What changed, for whom, or how big was it?"
+      },
+      {
+        "key": "detail.no-result:contoso/product-manager",
+        "group": "detail",
+        "severity": "low",
+        "title": "2 achievements without a result at Contoso",
+        "detail": "\"Ran discovery with customers\"",
+        "why": "Say what changed. A number helps if you have one, but you do not need one: name the measure that moved (\"improved task success, time on task and error rate in usability benchmarks\"), the direction (\"cut support tickets after launch\"), or the scale and scope (\"for 3 product teams\", \"used by every store in the region\"). Results are what interviewers remember.",
+        "fixLabel": "Add a result",
+        "acceptLabel": "Accept as it is",
+        "target": {
+          "section": "role",
+          "role": 2,
+          "field": "achievement",
+          "item": 0
+        },
+        "roles": [
+          2
+        ],
+        "items": [
+          0,
+          1
+        ],
+        "fieldNote": "No result yet. What changed, for whom, or how big was it?"
+      }
+    ]
+  },
+  {
+    "name": "same company twice named by title",
+    "today": "2026-10",
+    "job": null,
+    "resume": {
+      "summary": "Product manager with 8 years in payments. I led cross-team launches for 12,000 merchants.",
+      "roles": [
+        {
+          "title": "Senior PM",
+          "company": "Acme Inc.",
+          "start": "2022-01",
+          "end": null,
+          "achievements": [
+            "Ran the roadmap"
+          ],
+          "skills": []
+        },
+        {
+          "title": "PM",
+          "company": "ACME",
+          "start": "2019-01",
+          "end": "2021-12",
+          "achievements": [],
+          "skills": []
+        }
+      ],
+      "skills": [],
+      "education": [],
+      "certifications": []
+    },
+    "expected": [
+      {
+        "key": "detail.few-achievements:acme/senior-pm",
+        "group": "detail",
+        "severity": "medium",
+        "title": "One achievement on Senior PM at Acme Inc.",
+        "detail": "Roles read best with 2 to 5 achievements.",
+        "why": "Interviewers pick their questions from your achievements. A thin role gives them little to ask about, and you little to show.",
+        "fixLabel": "Add an achievement",
+        "acceptLabel": "Accept as it is",
+        "target": {
+          "section": "role",
+          "role": 0,
+          "field": "achievements"
+        },
+        "roles": [
+          0
+        ]
+      },
+      {
+        "key": "detail.few-achievements:acme/pm",
+        "group": "detail",
+        "severity": "medium",
+        "title": "No achievements on PM at ACME",
+        "detail": "Roles read best with 2 to 5 achievements.",
+        "why": "Interviewers pick their questions from your achievements. A thin role gives them little to ask about, and you little to show.",
+        "fixLabel": "Add an achievement",
+        "acceptLabel": "Accept as it is",
+        "target": {
+          "section": "role",
+          "role": 1,
+          "field": "achievements"
+        },
+        "roles": [
+          1
+        ]
+      },
+      {
+        "key": "detail.no-result:acme/senior-pm",
+        "group": "detail",
+        "severity": "low",
+        "title": "An achievement without a result at Senior PM at Acme Inc.",
+        "detail": "\"Ran the roadmap\"",
+        "why": "Say what changed. A number helps if you have one, but you do not need one: name the measure that moved (\"improved task success, time on task and error rate in usability benchmarks\"), the direction (\"cut support tickets after launch\"), or the scale and scope (\"for 3 product teams\", \"used by every store in the region\"). Results are what interviewers remember.",
+        "fixLabel": "Add a result",
+        "acceptLabel": "Accept as it is",
+        "target": {
+          "section": "role",
+          "role": 0,
+          "field": "achievement",
+          "item": 0
+        },
+        "roles": [
+          0
+        ],
+        "items": [
+          0
+        ],
+        "fieldNote": "No result yet. What changed, for whom, or how big was it?"
+      },
+      {
+        "key": "consistency.same-company:acme",
+        "group": "consistency",
+        "severity": "low",
+        "title": "Acme Inc. listed 2 times",
+        "detail": "Senior PM, PM",
+        "why": "If these are promotions, interviewers like seeing them under one company. If one is a duplicate, remove it.",
+        "fixLabel": "Open the role",
+        "acceptLabel": "Accept: separate roles",
+        "target": {
+          "section": "role",
+          "role": 1,
+          "field": "title"
+        },
+        "roles": [
+          0,
+          1
+        ]
+      }
+    ]
+  },
+  {
+    "name": "we but never I",
+    "today": "2026-10",
+    "job": null,
+    "resume": {
+      "summary": "Product manager with 8 years in payments. I led cross-team launches for 12,000 merchants.",
+      "roles": [
+        {
+          "title": "Product Manager",
+          "company": "Lumen",
+          "start": "2022-01",
+          "end": null,
+          "achievements": [
+            "We shipped payouts in 3 weeks",
+            "Our team cut errors 40%"
+          ],
+          "skills": []
+        }
+      ],
+      "skills": [],
+      "education": [],
+      "certifications": []
+    },
+    "expected": [
+      {
+        "key": "detail.we-no-i:lumen/product-manager",
+        "group": "detail",
+        "severity": "low",
+        "title": "\"We\" but never \"I\" at Lumen",
+        "detail": "\"We shipped payouts in 3 weeks\"",
+        "why": "Interviewers want your part. Say what you did, then what the team achieved.",
+        "fixLabel": "Say what you did",
+        "acceptLabel": "Accept as it is",
+        "target": {
+          "section": "role",
+          "role": 0,
+          "field": "achievement",
+          "item": 0
+        },
+        "roles": [
+          0
+        ],
+        "items": [
+          0,
+          1
+        ],
+        "fieldNote": "Says \"we\". What was your part?"
+      }
+    ]
+  },
+  {
+    "name": "summary missing",
+    "today": "2026-10",
+    "job": null,
+    "resume": {
+      "summary": null,
+      "roles": [
+        {
+          "title": "Product Manager",
+          "company": "Lumen",
+          "start": "2022-01",
+          "end": null,
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        }
+      ],
+      "skills": [],
+      "education": [],
+      "certifications": []
+    },
+    "expected": [
+      {
+        "key": "detail.summary-missing",
+        "group": "detail",
+        "severity": "medium",
+        "title": "No summary",
+        "detail": "Your resume has no intro.",
+        "why": "\"Tell me about yourself\" opens most interviews. Two or three lines here give you a ready answer.",
+        "fixLabel": "Write a summary",
+        "acceptLabel": "Accept, no summary",
+        "target": {
+          "section": "summary"
+        },
+        "roles": []
+      }
+    ]
+  },
+  {
+    "name": "summary short",
+    "today": "2026-10",
+    "job": null,
+    "resume": {
+      "summary": "Product manager in payments.",
+      "roles": [
+        {
+          "title": "Product Manager",
+          "company": "Lumen",
+          "start": "2022-01",
+          "end": null,
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        }
+      ],
+      "skills": [],
+      "education": [],
+      "certifications": []
+    },
+    "expected": [
+      {
+        "key": "detail.summary-short",
+        "group": "detail",
+        "severity": "low",
+        "title": "A very short summary",
+        "detail": "4 words.",
+        "why": "Say who you are, your years and field, and one result. It sets up your answer to \"tell me about yourself\".",
+        "fixLabel": "Add to the summary",
+        "acceptLabel": "Accept as it is",
+        "target": {
+          "section": "summary"
+        },
+        "roles": [],
+        "fieldNote": "Very short"
+      }
+    ]
+  },
+  {
+    "name": "summary with no number",
+    "today": "2026-10",
+    "job": null,
+    "resume": {
+      "summary": "Product manager in payments who led cross-team launches for merchants across many markets.",
+      "roles": [
+        {
+          "title": "Product Manager",
+          "company": "Lumen",
+          "start": "2022-01",
+          "end": null,
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        }
+      ],
+      "skills": [],
+      "education": [],
+      "certifications": []
+    },
+    "expected": [
+      {
+        "key": "detail.summary-no-number",
+        "group": "detail",
+        "severity": "low",
+        "title": "Summary has no number",
+        "detail": "No years, size or result in your intro.",
+        "why": "One number (years, team size, a result) makes the intro concrete.",
+        "fixLabel": "Add a number",
+        "acceptLabel": "Accept as it is",
+        "target": {
+          "section": "summary"
+        },
+        "roles": [],
+        "fieldNote": "No number in your summary"
+      }
+    ]
+  },
+  {
+    "name": "senior job with no scope",
+    "today": "2026-10",
+    "job": {
+      "company_name": "Stripe",
+      "title": "Product Manager",
+      "role_family": "pm",
+      "level": "senior",
+      "level_label": "L5",
+      "team": null,
+      "location": null,
+      "must_have_skills": [],
+      "nice_to_have_skills": [],
+      "responsibilities": [],
+      "source_url": null
+    },
+    "resume": {
+      "summary": "Product manager with 8 years in payments, shipping checkout work for merchants.",
+      "roles": [
+        {
+          "title": "Product Manager",
+          "company": "Lumen",
+          "start": "2022-01",
+          "end": null,
+          "achievements": [
+            "Shipped payouts in 3 weeks",
+            "Cut errors 40%"
+          ],
+          "skills": []
+        }
+      ],
+      "skills": [],
+      "education": [],
+      "certifications": []
+    },
+    "expected": [
+      {
+        "key": "level.no-scope",
+        "group": "level",
+        "severity": "medium",
+        "title": "No scope for a senior role",
+        "detail": "Target: L5. No team size, budget or cross-team work.",
+        "why": "Senior interviews test scope. Show how many people, teams or how much money your work touched.",
+        "fixLabel": "Add scope",
+        "acceptLabel": "Accept as it is",
+        "target": {
+          "section": "role",
+          "role": 0,
+          "field": "achievements"
+        },
+        "roles": [
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "senior title on the newest role, no job",
+    "today": "2026-10",
+    "job": null,
+    "resume": {
+      "summary": "Product manager with 8 years in payments, shipping checkout work for merchants.",
+      "roles": [
+        {
+          "title": "Senior Product Manager",
+          "company": "Lumen",
+          "start": "2022-01",
+          "end": null,
+          "achievements": [
+            "Shipped payouts in 3 weeks",
+            "Cut errors 40%"
+          ],
+          "skills": []
+        }
+      ],
+      "skills": [],
+      "education": [],
+      "certifications": []
+    },
+    "expected": [
+      {
+        "key": "level.no-scope",
+        "group": "level",
+        "severity": "medium",
+        "title": "No scope for a senior role",
+        "detail": "Target: Senior Product Manager. No team size, budget or cross-team work.",
+        "why": "Senior interviews test scope. Show how many people, teams or how much money your work touched.",
+        "fixLabel": "Add scope",
+        "acceptLabel": "Accept as it is",
+        "target": {
+          "section": "role",
+          "role": 0,
+          "field": "achievements"
+        },
+        "roles": [
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "mid job, no level check",
+    "today": "2026-10",
+    "job": {
+      "company_name": "Stripe",
+      "title": "Senior PM",
+      "role_family": "pm",
+      "level": "mid",
+      "level_label": null,
+      "team": null,
+      "location": null,
+      "must_have_skills": [],
+      "nice_to_have_skills": [],
+      "responsibilities": [],
+      "source_url": null
+    },
+    "resume": {
+      "summary": "Product manager with 8 years in payments, shipping checkout work for merchants.",
+      "roles": [
+        {
+          "title": "Product Manager",
+          "company": "Lumen",
+          "start": "2022-01",
+          "end": null,
+          "achievements": [
+            "Shipped payouts in 3 weeks",
+            "Cut errors 40%"
+          ],
+          "skills": []
+        }
+      ],
+      "skills": [],
+      "education": [],
+      "certifications": []
+    },
+    "expected": []
+  },
+  {
+    "name": "skills missing from Skills",
+    "today": "2026-10",
+    "job": null,
+    "resume": {
+      "summary": "Product manager with 8 years in payments. I led cross-team launches for 12,000 merchants.",
+      "roles": [
+        {
+          "title": "Product Manager",
+          "company": "Lumen",
+          "start": "2022-01",
+          "end": null,
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": [
+            "SQL",
+            "Figma",
+            "sql"
+          ]
+        },
+        {
+          "title": "Product Manager",
+          "company": "Northwind",
+          "start": "2019-01",
+          "end": "2021-12",
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": [
+            "Amplitude",
+            "Jira"
+          ]
+        }
+      ],
+      "skills": [
+        "Jira"
+      ],
+      "education": [],
+      "certifications": []
+    },
+    "expected": [
+      {
+        "key": "consistency.skills-missing:amplitude,figma,sql",
+        "group": "consistency",
+        "severity": "low",
+        "title": "3 skills missing from Skills",
+        "detail": "SQL, Figma, Amplitude",
+        "why": "Recruiters and match tools read the Skills list first. Skills you used in a role belong there too.",
+        "fixLabel": "Open Skills",
+        "acceptLabel": "Accept as it is",
+        "target": {
+          "section": "skills"
+        },
+        "roles": []
+      }
+    ]
+  },
+  {
+    "name": "must-have skills missing",
+    "today": "2026-10",
+    "job": {
+      "company_name": "Stripe",
+      "title": "Product Manager",
+      "role_family": "pm",
+      "level": null,
+      "level_label": null,
+      "team": null,
+      "location": null,
+      "must_have_skills": [
+        "SQL",
+        "C++",
+        "Payments",
+        "Go",
+        " "
+      ],
+      "nice_to_have_skills": [],
+      "responsibilities": [],
+      "source_url": null
+    },
+    "resume": {
+      "summary": "Product manager with 8 years in payments. I led cross-team launches for 12,000 merchants.",
+      "roles": [
+        {
+          "title": "Payments PM",
+          "company": "Lumen",
+          "start": "2022-01",
+          "end": null,
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": [
+            "c++"
+          ]
+        }
+      ],
+      "skills": [
+        "Jira"
+      ],
+      "education": [],
+      "certifications": []
+    },
+    "expected": [
+      {
+        "key": "job.must-have:go,sql",
+        "group": "job",
+        "severity": "medium",
+        "title": "2 must-have skills the resume never shows",
+        "detail": "SQL, Go",
+        "why": "The job lists these as must-haves. If you have them, add them to Skills or to an achievement; if not, prepare to talk about it.",
+        "fixLabel": "Open Skills",
+        "acceptLabel": "Accept, I'll address it",
+        "target": {
+          "section": "skills"
+        },
+        "roles": []
+      },
+      {
+        "key": "consistency.skills-missing:c",
+        "group": "consistency",
+        "severity": "low",
+        "title": "A skill missing from Skills",
+        "detail": "c++",
+        "why": "Recruiters and match tools read the Skills list first. Skills you used in a role belong there too.",
+        "fixLabel": "Open Skills",
+        "acceptLabel": "Accept as it is",
+        "target": {
+          "section": "skills"
+        },
+        "roles": []
+      }
+    ]
+  },
+  {
+    "name": "long keys are cut",
+    "today": "2026-10",
+    "job": null,
+    "resume": {
+      "summary": "Product manager with 8 years in payments. I led cross-team launches for 12,000 merchants.",
+      "roles": [
+        {
+          "title": "Product Manager",
+          "company": "Lumen",
+          "start": "2022-01",
+          "end": null,
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": [
+            "Skill number 0 with a long name",
+            "Skill number 1 with a long name",
+            "Skill number 2 with a long name",
+            "Skill number 3 with a long name",
+            "Skill number 4 with a long name",
+            "Skill number 5 with a long name",
+            "Skill number 6 with a long name",
+            "Skill number 7 with a long name",
+            "Skill number 8 with a long name",
+            "Skill number 9 with a long name",
+            "Skill number 10 with a long name",
+            "Skill number 11 with a long name",
+            "Skill number 12 with a long name",
+            "Skill number 13 with a long name",
+            "Skill number 14 with a long name",
+            "Skill number 15 with a long name",
+            "Skill number 16 with a long name",
+            "Skill number 17 with a long name",
+            "Skill number 18 with a long name",
+            "Skill number 19 with a long name",
+            "Skill number 20 with a long name",
+            "Skill number 21 with a long name",
+            "Skill number 22 with a long name",
+            "Skill number 23 with a long name",
+            "Skill number 24 with a long name",
+            "Skill number 25 with a long name",
+            "Skill number 26 with a long name",
+            "Skill number 27 with a long name",
+            "Skill number 28 with a long name",
+            "Skill number 29 with a long name"
+          ]
+        }
+      ],
+      "skills": [],
+      "education": [],
+      "certifications": []
+    },
+    "expected": [
+      {
+        "key": "consistency.skills-missing:skill-number-0-with-a-long-name,skill-number-1-with-a-long-name,skill-number-10-with-a-long-name,skill-number-11-with-a-long-name,skill-number-12-with-a-long-name,s~7272f481",
+        "group": "consistency",
+        "severity": "low",
+        "title": "30 skills missing from Skills",
+        "detail": "Skill number 0 with a long name, Skill number 1 with a long name, Skill number 2 with a long name, Skill number 3 with a long name, Skill number 4 with a long name, Skill number 5 with a long name, Skill number 6 with a long name, Skill number 7 with a long name, Skill number 8 with a long name, Skill number 9 with a long name, Skill number 10 with a long name, Skill number 11 with a long name, Skill number 12 with a long name, Skill number 13 with a long name, Skill number 14 with a long name, Skill number 15 with a long name, Skill number 16 with a long name, Skill number 17 with a long name, Skill number 18 with a long name, Skill number 19 with a long name, Skill number 20 with a long name, Skill number 21 with a long name, Skill number 22 with a long name, Skill number 23 with a long name, Skill number 24 with a long name, Skill number 25 with a long name, Skill number 26 with a long name, Skill number 27 with a long name, Skill number 28 with a long name, Skill number 29 with a long name",
+        "why": "Recruiters and match tools read the Skills list first. Skills you used in a role belong there too.",
+        "fixLabel": "Open Skills",
+        "acceptLabel": "Accept as it is",
+        "target": {
+          "section": "skills"
+        },
+        "roles": []
+      }
+    ]
+  },
+  {
+    "name": "same company and title twice",
+    "today": "2026-10",
+    "job": null,
+    "resume": {
+      "summary": "Product manager with 8 years in payments. I led cross-team launches for 12,000 merchants.",
+      "roles": [
+        {
+          "title": "PM",
+          "company": "Lumen",
+          "start": "2022-01",
+          "end": null,
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        },
+        {
+          "title": "PM",
+          "company": "Lumen",
+          "start": "2019-01",
+          "end": "2021-12",
+          "achievements": [
+            "Cut checkout errors 40% across three teams",
+            "Led a team of 4 engineers to launch payouts"
+          ],
+          "skills": []
+        }
+      ],
+      "skills": [],
+      "education": [],
+      "certifications": []
+    },
+    "expected": [
+      {
+        "key": "consistency.same-company:lumen",
+        "group": "consistency",
+        "severity": "low",
+        "title": "Lumen listed 2 times",
+        "detail": "PM, PM",
+        "why": "If these are promotions, interviewers like seeing them under one company. If one is a duplicate, remove it.",
+        "fixLabel": "Open the role",
+        "acceptLabel": "Accept: separate roles",
+        "target": {
+          "section": "role",
+          "role": 1,
+          "field": "title"
+        },
+        "roles": [
+          0,
+          1
+        ]
+      }
+    ]
+  },
+  {
+    "name": "no roles",
+    "today": "2026-10",
+    "job": null,
+    "resume": {
+      "summary": "Product manager with 8 years in payments. I led cross-team launches for 12,000 merchants.",
+      "roles": [],
+      "skills": [],
+      "education": [],
+      "certifications": []
+    },
+    "expected": []
+  },
+  {
+    "name": "truncated detail",
+    "today": "2026-10",
+    "job": null,
+    "resume": {
+      "summary": "Product manager with 8 years in payments. I led cross-team launches for 12,000 merchants.",
+      "roles": [
+        {
+          "title": "Product Manager",
+          "company": "Lumen",
+          "start": "2022-01",
+          "end": null,
+          "achievements": [
+            "Owned the redesign of the merchant onboarding experience across every market we serve today",
+            "Ran user research with merchants"
+          ],
+          "skills": []
+        }
+      ],
+      "skills": [],
+      "education": [],
+      "certifications": []
+    },
+    "expected": [
+      {
+        "key": "detail.no-result:lumen/product-manager",
+        "group": "detail",
+        "severity": "low",
+        "title": "2 achievements without a result at Lumen",
+        "detail": "\"Owned the redesign of the merchant onboarding experience ac…\"",
+        "why": "Say what changed. A number helps if you have one, but you do not need one: name the measure that moved (\"improved task success, time on task and error rate in usability benchmarks\"), the direction (\"cut support tickets after launch\"), or the scale and scope (\"for 3 product teams\", \"used by every store in the region\"). Results are what interviewers remember.",
+        "fixLabel": "Add a result",
+        "acceptLabel": "Accept as it is",
+        "target": {
+          "section": "role",
+          "role": 0,
+          "field": "achievement",
+          "item": 0
+        },
+        "roles": [
+          0
+        ],
+        "items": [
+          0,
+          1
+        ],
+        "fieldNote": "No result yet. What changed, for whom, or how big was it?"
+      }
+    ]
+  }
+]

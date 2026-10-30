@@ -11,6 +11,7 @@
 import { setupWorker } from "msw/browser";
 
 import { acceptedIssuesHandlers } from "./acceptedIssuesHandlers";
+import { resumeHandlers } from "./resumeHandlers";
 import { coachHandlers } from "./coachHandlers";
 import { coachVoiceHandlers } from "./coachVoiceHandlers";
 import { customHandlers } from "./custom";
@@ -36,6 +37,7 @@ export async function startMocks(mode: MockMode): Promise<void> {
   const handlers = [
     ...inputHandlers(store),
     ...acceptedIssuesHandlers(store),
+    ...resumeHandlers(store),
     ...sessionHandlers(store),
     ...scoringHandlers(store),
     ...authHandlers(store),

@@ -1,0 +1,5 @@
+The achievement lines, as a JSON list, in the following block.
+
+<untrusted_input>
+$achievements
+</untrusted_input>

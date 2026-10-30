@@ -66,6 +66,8 @@ export interface MockDb {
   feedback: Record<string, SessionFeedback>;
   /** PP-2: the interview date per job target id (planHandlers.ts). */
   interviewDates?: Record<string, string | null>;
+  /** RM-4: "Not a story" achievements per resume id, normalized (resumeHandlers.ts). */
+  storyIdeaDismissed?: Record<string, string[]>;
 }
 
 /** GET /status with every ops control at its default. */

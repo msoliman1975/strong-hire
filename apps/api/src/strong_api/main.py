@@ -37,6 +37,7 @@ from strong_api.public import install_public
 from strong_api.questions import router as questions_router
 from strong_api.reports import router as reports_router
 from strong_api.reports.transcript import router as transcript_router
+from strong_api.resume_checks.router import router as resume_checks_router
 from strong_api.scoring import router as scoring_router
 from strong_api.sessions.feedback import router as feedback_router
 from strong_api.sessions.router import router as sessions_router
@@ -120,6 +121,7 @@ def create_app(
     app.state.sessionmaker = sessionmaker or get_sessionmaker()
     app.state.queue = queue or ArqJobQueue(settings.redis_url)
     app.include_router(inputs_router)
+    app.include_router(resume_checks_router)  # RM-4, RM-5: resume issues and story ideas
     app.include_router(gap_router)
     app.include_router(scoring_router)
     app.include_router(sessions_router)

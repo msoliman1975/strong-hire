@@ -33,6 +33,7 @@ from strong_api.account.schemas import (
     ConsentOut,
     ExportOut,
     ExportStatus,
+    PlanSettingsIn,
     ProfileIn,
     ProfileOut,
 )
@@ -80,6 +81,8 @@ def profile_out(user: User) -> ProfileOut:
         time_zone=user.time_zone,
         linkedin_url=user.linkedin_url,
         complete=user.profile_completed_at is not None,
+        plan_style=user.plan_style,
+        plan_email_muted=user.plan_email_muted,
     )
 
 
@@ -107,6 +110,19 @@ def build_router(auth_settings: AuthSettings) -> APIRouter:
                     entity=f"user:{user.id}",
                 )
             )
+        await db.commit()
+        return profile_out(user)
+
+    @router.patch("/profile")
+    async def patch_plan_settings(
+        db: DbSession, user: CurrentUser, body: PlanSettingsIn
+    ) -> ProfileOut:
+        """PS-2, PS-6: set the plan style (onboarding, then Profile) or the reminder mute. Only
+        the fields sent change; a null plan_style is ignored, since a chosen style stays."""
+        if body.plan_style is not None:
+            user.plan_style = body.plan_style
+        if body.plan_email_muted is not None:
+            user.plan_email_muted = body.plan_email_muted
         await db.commit()
         return profile_out(user)
 

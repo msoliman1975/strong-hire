@@ -41,6 +41,7 @@ def test_queue_names_match_worker_functions() -> None:
         queue_names.EXTRACT_JOB_TARGET,
         queue_names.MATCH_JOB_TARGET,
         queue_names.PARSE_RESUME,
+        queue_names.STORY_IDEA_SKILLS,
     ):
         assert getattr(jobs, name) in jobs.FUNCTIONS
 

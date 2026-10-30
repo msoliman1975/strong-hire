@@ -46,6 +46,7 @@ const CV: ResumeOut = {
   confirmed_at: null,
   uploaded_at: "2026-10-01T10:00:00Z",
   accepted_issues: [],
+  is_main: true,
 };
 
 const GAP: GapAnalysisOut = {

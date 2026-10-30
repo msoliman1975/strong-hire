@@ -256,7 +256,7 @@ const EMPTY_CONTEXT: JobContext = {
 };
 
 /** AC-3: the profile of a user who has not saved it yet. */
-const EMPTY_PROFILE: Profile = {
+export const EMPTY_PROFILE: Profile = {
   full_name: null,
   years_experience: null,
   target_level: null,
@@ -265,6 +265,8 @@ const EMPTY_PROFILE: Profile = {
   time_zone: null,
   linkedin_url: null,
   complete: false,
+  plan_style: null,
+  plan_email_muted: false,
 };
 
 function safeHost(url: string): string {
@@ -603,6 +605,8 @@ export function inputHandlers(store: MockStore) {
         confirmed_at: null,
         uploaded_at: new Date().toISOString(),
         accepted_issues: [],
+        // RM-2: the first resume (or the first after the main was deleted) is main.
+        is_main: !db().resumes.some((x) => !x.deleted && x.is_main),
       };
       db().resumes.push(record);
       db().resumeHashes[record.id] = await sha256Of(hasFile ? await file.arrayBuffer() : String(text));
@@ -636,8 +640,12 @@ export function inputHandlers(store: MockStore) {
     http.delete(`${API}/resumes/:resumeId`, ({ params }) => {
       const r = findResume(params.resumeId);
       if (!r) return notFound("Resume");
-      Object.assign(r, { deleted: true, name: null, resume: null, has_file: false, confirmed_at: null });
+      const wasMain = r.is_main && !r.deleted;
+      Object.assign(r, { deleted: true, name: null, resume: null, has_file: false, confirmed_at: null, is_main: false });
       delete db().resumeHashes[r.id];
+      // RM-2: the newest other resume becomes main.
+      const newest = wasMain ? [...db().resumes].reverse().find((x) => !x.deleted) : undefined;
+      if (newest) newest.is_main = true;
       store.save();
       return new HttpResponse(null, { status: 204 });
     }),
@@ -677,7 +685,9 @@ export function inputHandlers(store: MockStore) {
     }),
     http.get(`${API}/resumes`, () => {
       advance(store);
-      return HttpResponse.json([...db().resumes].filter((r) => !r.deleted).reverse());
+      // RM-2: the main resume first, then newest first.
+      const live = [...db().resumes].filter((r) => !r.deleted).reverse();
+      return HttpResponse.json([...live.filter((r) => r.is_main), ...live.filter((r) => !r.is_main)]);
     }),
 
     // ------------------------------------------------------------ gap analysis (P6)
@@ -1218,6 +1228,9 @@ export function accountHandlers(store: MockStore) {
         time_zone: blank(body.time_zone),
         linkedin_url: blank(body.linkedin_url),
         complete: true,
+        // PS-2: a full profile save keeps the plan settings.
+        plan_style: db().profiles[email]?.plan_style ?? null,
+        plan_email_muted: db().profiles[email]?.plan_email_muted ?? false,
       };
       db().profiles[email] = profile;
       if (db().users[email]) Object.assign(db().users[email], { full_name: fullName, profile_complete: true });
