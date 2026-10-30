@@ -8,9 +8,10 @@ import { useId, useRef, useState, type DragEvent } from "react";
 import { useNavigate } from "react-router";
 
 import { resumesApi } from "../../api/inputs";
-import { useAuth } from "../../api/hooks";
+import { useAuth, useResumes } from "../../api/hooks";
 import { ErrorNotice } from "../../components/ui";
 import "../../components/ux/ux.css";
+import { MAX_RESUMES, RESUMES_FULL } from "../../limits";
 import { readingPath } from "./paths";
 
 const MAX_BYTES = 1024 * 1024;
@@ -28,6 +29,8 @@ export function StartPage() {
   const [linkedin, setLinkedin] = useState(false);
   const [over, setOver] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
+  const resumes = useResumes();
+  const full = (resumes.data ?? []).filter((r) => !r.deleted).length >= MAX_RESUMES;
 
   const upload = useMutation({
     mutationFn: resumesApi.upload,
@@ -59,6 +62,10 @@ export function StartPage() {
 
   const submit = () => {
     setProblem(null);
+    if (full) {
+      setProblem(RESUMES_FULL);
+      return;
+    }
     const form = new FormData();
     if (file) form.append("file", file);
     else if (text.trim()) form.append("text", text.trim());

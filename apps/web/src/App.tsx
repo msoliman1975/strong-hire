@@ -36,6 +36,8 @@ import { SignupPage } from "./pages/SignupPage";
 import { NewStoryPage } from "./pages/stories/NewStoryPage";
 import { StoriesPage } from "./pages/stories/StoriesPage";
 import { StoryWorkbenchPage } from "./pages/stories/StoryWorkbenchPage";
+import { ResumeDetailPage } from "./pages/resumes/ResumeDetailPage";
+import { ResumesListPage } from "./pages/resumes/ResumesListPage";
 import { BreakdownPage } from "./pages/start/BreakdownPage";
 import { PlanStylePage } from "./pages/start/PlanStylePage";
 import { ReadingPage } from "./pages/start/ReadingPage";
@@ -43,6 +45,7 @@ import { ResumeReadyPage } from "./pages/start/ResumeReadyPage";
 import { StartPage } from "./pages/start/StartPage";
 import { WhatFirstPage } from "./pages/start/WhatFirstPage";
 import { V2Only } from "./pages/stories/V2Only";
+import { useFeature } from "./theme/features";
 import { WaitlistConfirmPage, WaitlistPage } from "./pages/WaitlistPage";
 import { TranscriptPage } from "./pages/transcript/TranscriptPage";
 import { LiveSessionPage } from "./session/LiveSessionPage";
@@ -55,6 +58,11 @@ const DevTextInterviewPage = import.meta.env.DEV
 const StrovaPreviewPage = import.meta.env.DEV
   ? lazy(() => import("./dev/StrovaPreviewPage").then((m) => ({ default: m.StrovaPreviewPage })))
   : null;
+
+/** RM-1: "{First name}'s Resumes" with v2 on; the v1 Resumes page otherwise. */
+function ResumesRoute() {
+  return useFeature("v2_enabled") ? <ResumesListPage /> : <ResumesPage />;
+}
 
 export function createQueryClient(): QueryClient {
   return new QueryClient({
@@ -106,7 +114,9 @@ export function AppRoutes() {
           {/* NV-1: the v2 rail's routes. Placeholders until U07 builds Target roles and Rehearsals. */}
           <Route path="/roles" element={<V2Only><JobsPage /></V2Only>} />
           <Route path="/rehearsals" element={<V2Only><JobsPage /></V2Only>} />
-          <Route path="/resumes" element={<ResumesPage />} />
+          {/* RM-1, RM-3: the v2 resume pages; v1 keeps its Resumes page. */}
+          <Route path="/resumes" element={<ResumesRoute />} />
+          <Route path="/resumes/:resumeId" element={<V2Only><ResumeDetailPage /></V2Only>} />
           <Route path="/resumes/:resumeId/check" element={<CheckResumePage />} />
           <Route path="/jobs/new" element={<NewJobPage />} />
           <Route path="/jobs/:jobId/confirm" element={<ConfirmJobPage />} />

@@ -207,7 +207,7 @@ describe("v2 Check your CV", () => {
     await user.click(screen.getByRole("button", { name: "Remove the role Software Engineer II · Shoply" }));
 
     await user.click(screen.getAllByRole("button", { name: "Back to resumes" })[1]);
-    expect(await screen.findByRole("heading", { name: "Resumes" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: /Resumes$/i })).toBeInTheDocument();
     expect(puts[0].resume.roles.map((r) => r.company)).toEqual(["Northwind Labs", "Invoicely"]);
   });
 
@@ -246,7 +246,7 @@ describe("v2 Check your CV", () => {
     );
 
     await user.click(screen.getAllByRole("button", { name: "Back to resumes" })[0]);
-    expect(await screen.findByRole("heading", { name: "Resumes" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: /Resumes$/i })).toBeInTheDocument();
     expect(puts).toHaveLength(1);
     expect(puts[0].resume.roles.map((r) => `${r.title} · ${r.company}`)).toEqual([
       "Software Engineer II · Shoply",
@@ -273,7 +273,7 @@ describe("v2 Check your CV", () => {
     expect(screen.getByText(/Experience · 2 roles/)).toBeInTheDocument();
 
     await user.click(screen.getAllByRole("button", { name: "Back to resumes" })[0]);
-    expect(await screen.findByRole("heading", { name: "Resumes" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: /Resumes$/i })).toBeInTheDocument();
     expect(puts[0].resume.roles.map((r) => `${r.title} · ${r.company}`)).toEqual([
       "Software Engineer II · Shoply Inc",
       "Software Engineer · Invoicely",
@@ -287,7 +287,7 @@ describe("v2 Check your CV", () => {
     await user.type(within(again).getByLabelText("Title"), " (Payments)");
     await user.click(within(again).getByRole("button", { name: "Save role" }));
     await user.click(screen.getAllByRole("button", { name: "Back to resumes" })[0]);
-    await screen.findByRole("heading", { name: "Resumes" });
+    await screen.findByRole("heading", { level: 1, name: /Resumes$/i });
     expect(puts[1].resume.roles.map((r) => `${r.title} · ${r.company}`)).toEqual([
       "Software Engineer II (Payments) · Shoply Inc",
       "Software Engineer · Invoicely",

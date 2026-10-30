@@ -121,7 +121,8 @@ describe("resume limits (v2)", () => {
     await addResumes(5);
     renderApp("/resumes");
     expect(await screen.findByTestId("resumes-full")).toHaveTextContent(RESUMES_FULL);
-    expect(screen.getByRole("button", { name: "Upload resume" })).toBeDisabled();
+    // RM-1: with v2 the resumes page adds through the first-run screen; Add a resume is blocked.
+    expect(screen.getByRole("button", { name: "Add a resume" })).toBeDisabled();
   });
 
   it("LB-1: a file over 1 MB is refused in the browser, before any upload", () => {
