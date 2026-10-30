@@ -31,6 +31,13 @@ export type JobTargetOut = DeepRequired<S["JobTargetOut"]>;
 export type JobTargetAccepted = DeepRequired<S["JobTargetAccepted"]>;
 export type ResumeOut = DeepRequired<S["ResumeOut"]>;
 export type ResumeAccepted = DeepRequired<S["ResumeAccepted"]>;
+/** RM-5: the API's rule-based check, open and accepted (GET /resumes/{id}/issues). */
+export type ResumeIssues = DeepRequired<S["ResumeIssues"]>;
+/** RM-4: story ideas from a resume (GET /resumes/{id}/story-ideas). */
+export type StoryIdeasOut = DeepRequired<S["StoryIdeasOut"]>;
+export type StoryIdeaOut = DeepRequired<S["StoryIdeaOut"]>;
+/** PS-2, PS-6: PATCH /account/profile. */
+export type PlanSettingsIn = S["PlanSettingsIn"];
 /** A background job (Arq) that extracts a posting or parses a resume. */
 export type JobOut = DeepRequired<S["JobOut"]>;
 /** One row of the dashboard list (GET /job-targets). */

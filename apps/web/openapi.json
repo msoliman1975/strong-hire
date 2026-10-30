@@ -463,7 +463,7 @@
           "inputs"
         ],
         "summary": "List Resumes",
-        "description": "The signed-in user's saved resumes, newest first. Used to reuse a resume for a new job.\n\nDeleted resumes are left out (R1).",
+        "description": "The signed-in user's saved resumes: the main one first (RM-2, so it is the default for a\nnew role), then newest first. Deleted resumes are left out (R1).",
         "operationId": "list_resumes_resumes_get",
         "responses": {
           "200": {
@@ -747,6 +747,50 @@
         }
       }
     },
+    "/resumes/{resume_id}/main": {
+      "post": {
+        "tags": [
+          "inputs"
+        ],
+        "summary": "Set Main Resume",
+        "description": "RM-2: make this resume the user's main resume. The previous main one stops being main.",
+        "operationId": "set_main_resume_resumes__resume_id__main_post",
+        "parameters": [
+          {
+            "name": "resume_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Resume Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/resumes/{resume_id}/accepted-issues": {
       "put": {
         "tags": [
@@ -839,6 +883,158 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resumes/{resume_id}/issues": {
+      "get": {
+        "tags": [
+          "resume checks"
+        ],
+        "summary": "Resume Issues",
+        "description": "RM-5: open and accepted issues. With `job_target_id`, also the must-haves the resume\nnever shows (IN-12 job mode).",
+        "operationId": "resume_issues_resumes__resume_id__issues_get",
+        "parameters": [
+          {
+            "name": "resume_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Resume Id"
+            }
+          },
+          {
+            "name": "job_target_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Job Target Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeIssues"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resumes/{resume_id}/story-ideas": {
+      "get": {
+        "tags": [
+          "resume checks"
+        ],
+        "summary": "Story Ideas",
+        "description": "RM-4: one idea per achievement no story uses, not dismissed, with likely skills.",
+        "operationId": "story_ideas_resumes__resume_id__story_ideas_get",
+        "parameters": [
+          {
+            "name": "resume_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Resume Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryIdeasOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resumes/{resume_id}/story-ideas/dismiss": {
+      "post": {
+        "tags": [
+          "resume checks"
+        ],
+        "summary": "Dismiss Story Idea",
+        "description": "RM-4, SG-8: \"Not a story\". The idea is stored as a dismissed suggestion and does not come\nback, even after the skills job runs again. Safe to repeat.",
+        "operationId": "dismiss_story_idea_resumes__resume_id__story_ideas_dismiss_post",
+        "parameters": [
+          {
+            "name": "resume_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Resume Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DismissIdea"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
           },
           "422": {
             "description": "Validation Error",
@@ -4313,6 +4509,46 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/ProfileIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Patch Plan Settings",
+        "description": "PS-2, PS-6: set the plan style (onboarding, then Profile) or the reminder mute. Only\nthe fields sent change; a null plan_style is ignored, since a chosen style stays.",
+        "operationId": "patch_plan_settings_account_profile_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanSettingsIn"
               }
             }
           },
@@ -8721,6 +8957,26 @@
   },
   "components": {
     "schemas": {
+      "AcceptReason": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "description": "Stored with the accepted key; letters and dashes only."
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "label"
+        ],
+        "title": "AcceptReason"
+      },
       "AcceptedIssue": {
         "properties": {
           "key": {
@@ -8765,6 +9021,148 @@
         ],
         "title": "AcceptedIssueUpdate",
         "description": "IN-12: accept a CV check issue, or clear an accepted one. The web builds the key."
+      },
+      "AcceptedResumeIssue": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "group": {
+            "type": "string",
+            "enum": [
+              "dates",
+              "detail",
+              "level",
+              "consistency",
+              "job"
+            ],
+            "title": "Group"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ],
+            "title": "Severity",
+            "description": "\"high\" draws the red stripe."
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "detail": {
+            "type": "string",
+            "title": "Detail"
+          },
+          "why": {
+            "type": "string",
+            "title": "Why"
+          },
+          "fixLabel": {
+            "type": "string",
+            "title": "Fixlabel"
+          },
+          "acceptLabel": {
+            "type": "string",
+            "title": "Acceptlabel"
+          },
+          "target": {
+            "$ref": "#/components/schemas/IssueTarget"
+          },
+          "roles": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Roles",
+            "description": "Every role the issue is about."
+          },
+          "fieldNote": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fieldnote"
+          },
+          "items": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Items"
+          },
+          "gap": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GapPeriod"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reasons": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/AcceptReason"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reasons"
+          },
+          "acceptedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Acceptedat"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason",
+            "description": "The reason it was accepted with."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "group",
+          "severity",
+          "title",
+          "detail",
+          "why",
+          "fixLabel",
+          "acceptLabel",
+          "target",
+          "roles",
+          "acceptedAt"
+        ],
+        "title": "AcceptedResumeIssue"
       },
       "AccountDeletedOut": {
         "properties": {
@@ -15040,6 +15438,21 @@
         "title": "Difficulty",
         "description": "IV-4."
       },
+      "DismissIdea": {
+        "properties": {
+          "resume_line_ref": {
+            "type": "string",
+            "pattern": "^roles\\[\\d+\\]\\.achievements\\[\\d+\\]$",
+            "title": "Resume Line Ref",
+            "description": "The achievement, as roles[<i>].achievements[<j>] in the parsed resume."
+          }
+        },
+        "type": "object",
+        "required": [
+          "resume_line_ref"
+        ],
+        "title": "DismissIdea"
+      },
       "DocumentKind": {
         "description": "IN-6, IN-7: what kind of document a job description or CV input looks like.",
         "enum": [
@@ -15778,6 +16191,25 @@
         "title": "GapAssessment",
         "type": "object"
       },
+      "GapPeriod": {
+        "properties": {
+          "from": {
+            "type": "string",
+            "title": "From"
+          },
+          "to": {
+            "type": "string",
+            "title": "To"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "from",
+          "to"
+        ],
+        "title": "GapPeriod"
+      },
       "GapStatus": {
         "type": "string",
         "enum": [
@@ -16458,6 +16890,66 @@
           "failed"
         ],
         "title": "InviteOut"
+      },
+      "IssueTarget": {
+        "properties": {
+          "section": {
+            "type": "string",
+            "enum": [
+              "summary",
+              "skills",
+              "role"
+            ],
+            "title": "Section"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role"
+          },
+          "field": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "start",
+                  "end",
+                  "title",
+                  "achievement",
+                  "achievements"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field"
+          },
+          "item": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "section"
+        ],
+        "title": "IssueTarget",
+        "description": "Where Fix goes: a field on a role card, the summary, or the skills card."
       },
       "JobContext": {
         "properties": {
@@ -19432,6 +19924,35 @@
         "title": "PlanOut",
         "description": "The one paid plan. Every number comes from the API config."
       },
+      "PlanSettingsIn": {
+        "properties": {
+          "plan_style": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlanStyle"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "plan_email_muted": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan Email Muted"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "PlanSettingsIn",
+        "description": "PS-2, PS-6: the plan style and the reminder mute, changeable at any time (PATCH: send\nonly what changes). Progress is kept when the style changes."
+      },
       "PlanSetupDefaults": {
         "properties": {
           "interview_type": {
@@ -19482,13 +20003,13 @@
         "description": "PP-4: what the setup on the plan page starts with. Every v1 option stays editable."
       },
       "PlanStyle": {
-        "description": "PS-2: how the personal plan is shown. NULL on the user until chosen in onboarding.",
+        "type": "string",
         "enum": [
           "weekly",
           "checklist"
         ],
         "title": "PlanStyle",
-        "type": "string"
+        "description": "PS-2: how the personal plan is shown. NULL on the user until chosen in onboarding."
       },
       "PlanView": {
         "properties": {
@@ -20169,6 +20690,23 @@
           "complete": {
             "type": "boolean",
             "title": "Complete"
+          },
+          "plan_style": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlanStyle"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "PS-2: weekly or checklist. None until chosen in onboarding."
+          },
+          "plan_email_muted": {
+            "type": "boolean",
+            "title": "Plan Email Muted",
+            "description": "PS-6: true mutes the weekly plan reminder emails.",
+            "default": false
           }
         },
         "type": "object",
@@ -21377,6 +21915,168 @@
         ],
         "title": "ResumeAccepted"
       },
+      "ResumeIssue": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "group": {
+            "type": "string",
+            "enum": [
+              "dates",
+              "detail",
+              "level",
+              "consistency",
+              "job"
+            ],
+            "title": "Group"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ],
+            "title": "Severity",
+            "description": "\"high\" draws the red stripe."
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "detail": {
+            "type": "string",
+            "title": "Detail"
+          },
+          "why": {
+            "type": "string",
+            "title": "Why"
+          },
+          "fixLabel": {
+            "type": "string",
+            "title": "Fixlabel"
+          },
+          "acceptLabel": {
+            "type": "string",
+            "title": "Acceptlabel"
+          },
+          "target": {
+            "$ref": "#/components/schemas/IssueTarget"
+          },
+          "roles": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Roles",
+            "description": "Every role the issue is about."
+          },
+          "fieldNote": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fieldnote"
+          },
+          "items": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Items"
+          },
+          "gap": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GapPeriod"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reasons": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/AcceptReason"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reasons"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "group",
+          "severity",
+          "title",
+          "detail",
+          "why",
+          "fixLabel",
+          "acceptLabel",
+          "target",
+          "roles"
+        ],
+        "title": "ResumeIssue"
+      },
+      "ResumeIssues": {
+        "properties": {
+          "open": {
+            "items": {
+              "$ref": "#/components/schemas/ResumeIssue"
+            },
+            "type": "array",
+            "title": "Open"
+          },
+          "accepted": {
+            "items": {
+              "$ref": "#/components/schemas/AcceptedResumeIssue"
+            },
+            "type": "array",
+            "title": "Accepted"
+          },
+          "job_target_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Target Id",
+            "description": "Set when the job-mode check (must-haves) ran."
+          }
+        },
+        "type": "object",
+        "required": [
+          "open",
+          "accepted"
+        ],
+        "title": "ResumeIssues",
+        "description": "RM-5: the check's issues for one resume, in the web check's shape."
+      },
       "ResumeLineEdit": {
         "additionalProperties": false,
         "description": "SG-6: a rewrite of one resume line from a story's words.",
@@ -21522,6 +22222,12 @@
             "type": "array",
             "title": "Accepted Issues",
             "description": "IN-12: CV check issues the user accepted, oldest first. At most 100."
+          },
+          "is_main": {
+            "type": "boolean",
+            "title": "Is Main",
+            "description": "RM-2: the user's main resume, preselected for new roles. One per user.",
+            "default": false
           }
         },
         "type": "object",
@@ -24175,6 +24881,46 @@
         "title": "StoryIdea",
         "type": "object"
       },
+      "StoryIdeaOut": {
+        "properties": {
+          "achievement": {
+            "type": "string",
+            "title": "Achievement"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "resume_line_ref": {
+            "type": "string",
+            "title": "Resume Line Ref"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "type": "array",
+            "title": "Skills",
+            "description": "Likely skills. Empty until the job adds them."
+          },
+          "missing_parts": {
+            "items": {
+              "$ref": "#/components/schemas/StoryPart"
+            },
+            "type": "array",
+            "title": "Missing Parts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "achievement",
+          "role",
+          "resume_line_ref",
+          "skills",
+          "missing_parts"
+        ],
+        "title": "StoryIdeaOut"
+      },
       "StoryIdeaPayload": {
         "additionalProperties": false,
         "description": "RM-4: the payload of a story idea suggestion.",
@@ -24255,6 +25001,41 @@
         },
         "title": "StoryIdeas",
         "type": "object"
+      },
+      "StoryIdeasOut": {
+        "properties": {
+          "ideas": {
+            "items": {
+              "$ref": "#/components/schemas/StoryIdeaOut"
+            },
+            "type": "array",
+            "title": "Ideas"
+          },
+          "used": {
+            "items": {
+              "$ref": "#/components/schemas/UsedAchievement"
+            },
+            "type": "array",
+            "title": "Used"
+          },
+          "skills": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "pending"
+            ],
+            "title": "Skills",
+            "description": "ready: the skills job ran for every idea it knows; pending otherwise."
+          }
+        },
+        "type": "object",
+        "required": [
+          "ideas",
+          "used",
+          "skills"
+        ],
+        "title": "StoryIdeasOut",
+        "description": "RM-4: ideas from the resume, and the achievements a story already uses (they link to it)."
       },
       "StoryIn": {
         "properties": {
@@ -25812,6 +26593,35 @@
         ],
         "title": "UsageOut",
         "description": "BL-1 usage meter and BL-2 free interview, as the API counts them."
+      },
+      "UsedAchievement": {
+        "properties": {
+          "achievement": {
+            "type": "string",
+            "title": "Achievement"
+          },
+          "resume_line_ref": {
+            "type": "string",
+            "title": "Resume Line Ref"
+          },
+          "story_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Story Id"
+          },
+          "story_title": {
+            "type": "string",
+            "title": "Story Title"
+          }
+        },
+        "type": "object",
+        "required": [
+          "achievement",
+          "resume_line_ref",
+          "story_id",
+          "story_title"
+        ],
+        "title": "UsedAchievement"
       },
       "ValidationError": {
         "properties": {

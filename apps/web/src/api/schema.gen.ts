@@ -160,9 +160,8 @@ export interface paths {
         };
         /**
          * List Resumes
-         * @description The signed-in user's saved resumes, newest first. Used to reuse a resume for a new job.
-         *
-         *     Deleted resumes are left out (R1).
+         * @description The signed-in user's saved resumes: the main one first (RM-2, so it is the default for a
+         *     new role), then newest first. Deleted resumes are left out (R1).
          */
         get: operations["list_resumes_resumes_get"];
         put?: never;
@@ -239,6 +238,26 @@ export interface paths {
         patch: operations["rename_resume_resumes__resume_id__patch"];
         trace?: never;
     };
+    "/resumes/{resume_id}/main": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Set Main Resume
+         * @description RM-2: make this resume the user's main resume. The previous main one stops being main.
+         */
+        post: operations["set_main_resume_resumes__resume_id__main_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/resumes/{resume_id}/accepted-issues": {
         parameters: {
             query?: never;
@@ -273,6 +292,68 @@ export interface paths {
         get: operations["get_resume_job_resumes__resume_id__jobs__job_id__get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/resumes/{resume_id}/issues": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Resume Issues
+         * @description RM-5: open and accepted issues. With `job_target_id`, also the must-haves the resume
+         *     never shows (IN-12 job mode).
+         */
+        get: operations["resume_issues_resumes__resume_id__issues_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/resumes/{resume_id}/story-ideas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Story Ideas
+         * @description RM-4: one idea per achievement no story uses, not dismissed, with likely skills.
+         */
+        get: operations["story_ideas_resumes__resume_id__story_ideas_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/resumes/{resume_id}/story-ideas/dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Dismiss Story Idea
+         * @description RM-4, SG-8: "Not a story". The idea is stored as a dismissed suggestion and does not come
+         *     back, even after the skills job runs again. Safe to repeat.
+         */
+        post: operations["dismiss_story_idea_resumes__resume_id__story_ideas_dismiss_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1661,7 +1742,12 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        /**
+         * Patch Plan Settings
+         * @description PS-2, PS-6: set the plan style (onboarding, then Profile) or the reminder mute. Only
+         *     the fields sent change; a null plan_style is ignored, since a chosen style stays.
+         */
+        patch: operations["patch_plan_settings_account_profile_patch"];
         trace?: never;
     };
     "/account/consent": {
@@ -3165,6 +3251,16 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AcceptReason */
+        AcceptReason: {
+            /**
+             * Code
+             * @description Stored with the accepted key; letters and dashes only.
+             */
+            code: string;
+            /** Label */
+            label: string;
+        };
         /**
          * AcceptedIssue
          * @description A CV check issue the user marked as fine, stored in resumes.accepted_issues.
@@ -3190,6 +3286,55 @@ export interface components {
             key: string;
             /** Accepted */
             accepted: boolean;
+        };
+        /** AcceptedResumeIssue */
+        AcceptedResumeIssue: {
+            /** Key */
+            key: string;
+            /**
+             * Group
+             * @enum {string}
+             */
+            group: "dates" | "detail" | "level" | "consistency" | "job";
+            /**
+             * Severity
+             * @description "high" draws the red stripe.
+             * @enum {string}
+             */
+            severity: "high" | "medium" | "low";
+            /** Title */
+            title: string;
+            /** Detail */
+            detail: string;
+            /** Why */
+            why: string;
+            /** Fixlabel */
+            fixLabel: string;
+            /** Acceptlabel */
+            acceptLabel: string;
+            target: components["schemas"]["IssueTarget"];
+            /**
+             * Roles
+             * @description Every role the issue is about.
+             */
+            roles: number[];
+            /** Fieldnote */
+            fieldNote?: string | null;
+            /** Items */
+            items?: number[] | null;
+            gap?: components["schemas"]["GapPeriod"] | null;
+            /** Reasons */
+            reasons?: components["schemas"]["AcceptReason"][] | null;
+            /**
+             * Acceptedat
+             * Format: date-time
+             */
+            acceptedAt: string;
+            /**
+             * Reason
+             * @description The reason it was accepted with.
+             */
+            reason?: string | null;
         };
         /**
          * AccountDeletedOut
@@ -5702,6 +5847,14 @@ export interface components {
          * @enum {string}
          */
         Difficulty: "friendly" | "realistic" | "tough";
+        /** DismissIdea */
+        DismissIdea: {
+            /**
+             * Resume Line Ref
+             * @description The achievement, as roles[<i>].achievements[<j>] in the parsed resume.
+             */
+            resume_line_ref: string;
+        };
         /**
          * DocumentKind
          * @description IN-6, IN-7: what kind of document a job description or CV input looks like.
@@ -5992,6 +6145,13 @@ export interface components {
             probe_areas?: string[];
             /** Session Plan */
             session_plan: components["schemas"]["PlannedSession"][];
+        };
+        /** GapPeriod */
+        GapPeriod: {
+            /** From */
+            from: string;
+            /** To */
+            to: string;
         };
         /**
          * GapStatus
@@ -6315,6 +6475,23 @@ export interface components {
              * @description The email could not be sent; try again later
              */
             failed: string[];
+        };
+        /**
+         * IssueTarget
+         * @description Where Fix goes: a field on a role card, the summary, or the skills card.
+         */
+        IssueTarget: {
+            /**
+             * Section
+             * @enum {string}
+             */
+            section: "summary" | "skills" | "role";
+            /** Role */
+            role?: number | null;
+            /** Field */
+            field?: ("start" | "end" | "title" | "achievement" | "achievements") | null;
+            /** Item */
+            item?: number | null;
         };
         /**
          * JobContext
@@ -7470,6 +7647,16 @@ export interface components {
             billing_enabled: boolean;
         };
         /**
+         * PlanSettingsIn
+         * @description PS-2, PS-6: the plan style and the reminder mute, changeable at any time (PATCH: send
+         *     only what changes). Progress is kept when the style changes.
+         */
+        PlanSettingsIn: {
+            plan_style?: components["schemas"]["PlanStyle"] | null;
+            /** Plan Email Muted */
+            plan_email_muted?: boolean | null;
+        };
+        /**
          * PlanSetupDefaults
          * @description PP-4: what the setup on the plan page starts with. Every v1 option stays editable.
          */
@@ -7766,6 +7953,14 @@ export interface components {
             linkedin_url: string | null;
             /** Complete */
             complete: boolean;
+            /** @description PS-2: weekly or checklist. None until chosen in onboarding. */
+            plan_style?: components["schemas"]["PlanStyle"] | null;
+            /**
+             * Plan Email Muted
+             * @description PS-6: true mutes the weekly plan reminder emails.
+             * @default false
+             */
+            plan_email_muted: boolean;
         };
         /**
          * ProfileStatus
@@ -8254,6 +8449,60 @@ export interface components {
             resume: components["schemas"]["ResumeOut"];
             job: components["schemas"]["JobOut"] | null;
         };
+        /** ResumeIssue */
+        ResumeIssue: {
+            /** Key */
+            key: string;
+            /**
+             * Group
+             * @enum {string}
+             */
+            group: "dates" | "detail" | "level" | "consistency" | "job";
+            /**
+             * Severity
+             * @description "high" draws the red stripe.
+             * @enum {string}
+             */
+            severity: "high" | "medium" | "low";
+            /** Title */
+            title: string;
+            /** Detail */
+            detail: string;
+            /** Why */
+            why: string;
+            /** Fixlabel */
+            fixLabel: string;
+            /** Acceptlabel */
+            acceptLabel: string;
+            target: components["schemas"]["IssueTarget"];
+            /**
+             * Roles
+             * @description Every role the issue is about.
+             */
+            roles: number[];
+            /** Fieldnote */
+            fieldNote?: string | null;
+            /** Items */
+            items?: number[] | null;
+            gap?: components["schemas"]["GapPeriod"] | null;
+            /** Reasons */
+            reasons?: components["schemas"]["AcceptReason"][] | null;
+        };
+        /**
+         * ResumeIssues
+         * @description RM-5: the check's issues for one resume, in the web check's shape.
+         */
+        ResumeIssues: {
+            /** Open */
+            open: components["schemas"]["ResumeIssue"][];
+            /** Accepted */
+            accepted: components["schemas"]["AcceptedResumeIssue"][];
+            /**
+             * Job Target Id
+             * @description Set when the job-mode check (must-haves) ran.
+             */
+            job_target_id?: string | null;
+        };
         /**
          * ResumeLineEdit
          * @description SG-6: a rewrite of one resume line from a story's words.
@@ -8329,6 +8578,12 @@ export interface components {
              * @description IN-12: CV check issues the user accepted, oldest first. At most 100.
              */
             accepted_issues?: components["schemas"]["AcceptedIssue"][];
+            /**
+             * Is Main
+             * @description RM-2: the user's main resume, preselected for new roles. One per user.
+             * @default false
+             */
+            is_main: boolean;
         };
         /** ResumeRole */
         ResumeRole: {
@@ -9420,6 +9675,22 @@ export interface components {
              */
             missing_parts?: components["schemas"]["StoryPart"][];
         };
+        /** StoryIdeaOut */
+        StoryIdeaOut: {
+            /** Achievement */
+            achievement: string;
+            /** Role */
+            role: string;
+            /** Resume Line Ref */
+            resume_line_ref: string;
+            /**
+             * Skills
+             * @description Likely skills. Empty until the job adds them.
+             */
+            skills: components["schemas"]["Competency"][];
+            /** Missing Parts */
+            missing_parts: components["schemas"]["StoryPart"][];
+        };
         /**
          * StoryIdeaPayload
          * @description RM-4: the payload of a story idea suggestion.
@@ -9465,6 +9736,22 @@ export interface components {
         StoryIdeas: {
             /** Items */
             items?: components["schemas"]["StoryIdea"][];
+        };
+        /**
+         * StoryIdeasOut
+         * @description RM-4: ideas from the resume, and the achievements a story already uses (they link to it).
+         */
+        StoryIdeasOut: {
+            /** Ideas */
+            ideas: components["schemas"]["StoryIdeaOut"][];
+            /** Used */
+            used: components["schemas"]["UsedAchievement"][];
+            /**
+             * Skills
+             * @description ready: the skills job ran for every idea it knows; pending otherwise.
+             * @enum {string}
+             */
+            skills: "ready" | "pending";
         };
         /**
          * StoryIn
@@ -10128,6 +10415,20 @@ export interface components {
              */
             has_billing_account: boolean;
         };
+        /** UsedAchievement */
+        UsedAchievement: {
+            /** Achievement */
+            achievement: string;
+            /** Resume Line Ref */
+            resume_line_ref: string;
+            /**
+             * Story Id
+             * Format: uuid
+             */
+            story_id: string;
+            /** Story Title */
+            story_title: string;
+        };
         /** ValidationError */
         ValidationError: {
             /** Location */
@@ -10769,6 +11070,37 @@ export interface operations {
             };
         };
     };
+    set_main_resume_resumes__resume_id__main_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                resume_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     set_accepted_issue_resumes__resume_id__accepted_issues_put: {
         parameters: {
             query?: never;
@@ -10824,6 +11156,103 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["JobOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resume_issues_resumes__resume_id__issues_get: {
+        parameters: {
+            query?: {
+                job_target_id?: string | null;
+            };
+            header?: never;
+            path: {
+                resume_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumeIssues"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    story_ideas_resumes__resume_id__story_ideas_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                resume_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryIdeasOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dismiss_story_idea_resumes__resume_id__story_ideas_dismiss_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                resume_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DismissIdea"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -13355,6 +13784,39 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["ProfileIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    patch_plan_settings_account_profile_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlanSettingsIn"];
             };
         };
         responses: {
