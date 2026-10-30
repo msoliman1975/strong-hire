@@ -1,5 +1,5 @@
-"""Request bodies for the story API (ST-1, ST-2, ST-6). Responses use the core contracts
-`Story` and `StoryNote` (strong_core.schemas.stories)."""
+"""Request and response bodies for the story API (ST-1, ST-2, ST-6, ST-8, ST-11, ST-13).
+Stories are the core contract `Story` with the status to show (`StoryOut`)."""
 
 from __future__ import annotations
 
@@ -8,12 +8,13 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from strong_core.schemas import Competency, StorySource
+from strong_core.schemas import Competency, Story, StorySource
 from strong_core.schemas.stories import STORY_TITLE_MAX_CHARS
 
 STORY_PART_MAX_CHARS = 8000
 """One part of a story. Longer text is refused (422)."""
 STORY_NOTE_MAX_CHARS = 2000
+STORY_ASK_MAX_CHARS = 500
 
 
 class _In(BaseModel):
@@ -81,3 +82,26 @@ class StoryNoteIn(_In):
     text: str = Field(min_length=1, max_length=STORY_NOTE_MAX_CHARS)
     session_id: uuid.UUID | None = None
     question_ref: str | None = Field(default=None, min_length=1)
+
+
+DisplayStatus = Literal["draft", "ready", "proven"]
+
+
+class StoryOut(Story):
+    """ST-1 and ST-8: a story with the status to show. Proven stays as stored (ST-7); a draft
+    with all five parts filled shows as Ready."""
+
+    display_status: DisplayStatus = Field(description="ST-8: draft, ready or proven.")
+
+
+class StoryAskIn(_In):
+    """ST-13: a question for Strova about the user's stories."""
+
+    question: str = Field(min_length=1, max_length=STORY_ASK_MAX_CHARS)
+
+
+class ReviewQueued(BaseModel):
+    """ST-11: the review is being written. It arrives as an open `review` suggestion for the
+    story (GET /suggestions?place=story&story_id=...)."""
+
+    job_id: str

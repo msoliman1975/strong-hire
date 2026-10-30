@@ -346,10 +346,16 @@ async def test_st11_accept_a_review_applies_the_chosen_edits(
     )
     out = (await client.post(f"/suggestions/{sid}/accept", json={"parts": ["result"]})).json()
     assert out["can_undo"] is True
+    # One edit is left, so the review stays open (ST-11: accept or skip each edit).
+    assert out["suggestion"]["status"] == "open"
     story = await _get_story(sessionmaker, story_id)
     assert story.result == "Not one payment failed." and story.context == "Old context."
+    out = (await client.post(f"/suggestions/{sid}/accept", json={"parts": ["context"]})).json()
+    assert out["suggestion"]["status"] == "accepted"
+    assert (await _get_story(sessionmaker, story_id)).context == "New context."
     assert (await client.post(f"/suggestions/{sid}/undo")).status_code == 200
-    assert (await _get_story(sessionmaker, story_id)).result == "It went well."
+    story = await _get_story(sessionmaker, story_id)
+    assert story.result == "It went well." and story.context == "Old context."
 
 
 async def test_db4_the_debrief_lists_the_takes_open_suggestions(

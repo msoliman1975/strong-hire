@@ -39,6 +39,7 @@ import { SignInPage } from "./pages/SignInPage";
 import { SignupPage } from "./pages/SignupPage";
 import { NewStoryPage } from "./pages/stories/NewStoryPage";
 import { StoriesPage } from "./pages/stories/StoriesPage";
+import { ReviewPage } from "./pages/stories/ReviewPage";
 import { StoryWorkbenchPage } from "./pages/stories/StoryWorkbenchPage";
 import { ResumeDetailPage } from "./pages/resumes/ResumeDetailPage";
 import { ResumesListPage } from "./pages/resumes/ResumesListPage";
@@ -150,6 +151,7 @@ export function AppRoutes() {
           <Route path="/stories" element={<V2Only><StoriesPage /></V2Only>} />
           <Route path="/stories/new" element={<V2Only><NewStoryPage /></V2Only>} />
           <Route path="/stories/:storyId" element={<V2Only><StoryWorkbenchPage /></V2Only>} />
+          <Route path="/stories/:storyId/review" element={<V2Only><ReviewPage /></V2Only>} />
           {/* v2 S31: coach sessions (CO-2). */}
           <Route path="/coach/new" element={<V2Only><CoachStartPage /></V2Only>} />
           <Route path="/coach/:sessionId" element={<V2Only><CoachSessionPage /></V2Only>} />

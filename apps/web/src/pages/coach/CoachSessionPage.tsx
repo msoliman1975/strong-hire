@@ -29,7 +29,8 @@ import {
   Segmented,
   StoryPartChip,
 } from "../../components/ui";
-import { STORY_PARTS, storiesApi, storyKeys, type Competency, type Story } from "../stories/api";
+import { displayStatusOf, STORY_PARTS, storiesApi, storyKeys, type Competency, type Story } from "../stories/api";
+import { Strova } from "../../components/strova";
 import { StoryStatusBadge } from "../stories/StoriesPage";
 import { storiesPath, storyPath } from "../stories/paths";
 import {
@@ -196,6 +197,9 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
   };
 
   const heading = story && story.title !== NEW_STORY_TITLE ? story.title : "Build a story";
+  // ST-8: the coach's story response has no display status; it is computed the same way.
+  const status = story ? displayStatusOf(story) : "draft";
+  const ready = status !== "draft";
   const asked = ASK_PART[detail.asking_for];
   const stateOf = (p: StoryPart): PartState => (p === asked && !ended ? "now" : filled(story, p) ? "done" : "next");
   const couldProve = [...new Set([...((story?.skills ?? []) as Competency[]), ...shows])];
@@ -214,7 +218,7 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
           {story && story.title !== NEW_STORY_TITLE ? "Back to the story" : "Stories"}
         </Link>
         <div className="coach__title">
-          <Eyebrow>Coach session</Eyebrow>
+          <Eyebrow>Craft with Strova</Eyebrow>
           <h1>{heading}</h1>
         </div>
         <div className="coach__style">
@@ -338,11 +342,18 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
 
         <aside className="coach__side stack" aria-label="Story taking shape">
           <section className="card" aria-labelledby="coach-shape-heading">
+            {/* ST-12: Strova thinks while the story takes shape, and celebrates when it is Ready. */}
+            <div className="coach__strova" data-testid="coach-strova">
+              <Strova mode={ready ? "celebrating" : "thinking"} size={72} hat="coach" />
+              <span className="muted small">
+                {ready ? "Strova saved your story as Ready." : "Strova is shaping your story from your words."}
+              </span>
+            </div>
             <div className="coach__shape-head">
-              <p className="muted small" id="coach-shape-heading">
-                Taking shape as you talk
-              </p>
-              {story && <StoryStatusBadge status={story.status} />}
+              <h2 className="coach__shape-title" id="coach-shape-heading">
+                Taking shape
+              </h2>
+              {story && <StoryStatusBadge status={status} />}
             </div>
             {story && (
               <div className="field">

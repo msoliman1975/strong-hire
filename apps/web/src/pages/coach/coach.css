@@ -310,3 +310,16 @@
   white-space: pre-wrap;
   margin: 12px 0 0;
 }
+
+/* ST-12 (mockup #craft): Strova above the story taking shape. */
+.coach__strova {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.coach__shape-title {
+  margin: 0;
+  font-size: 1.0625rem;
+}

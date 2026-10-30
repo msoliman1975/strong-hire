@@ -1,6 +1,6 @@
 /**
  * CO-2: `/coach/new?story=&skill=&job=` starts a coach session and replaces itself with the
- * session page. Links on Home, the plan's story fit and the workbench open it, so they stay links.
+ * session page. ST-12: `?resume=&idea=` starts from a resume idea (RM-4). Links on Home, the plan's story fit and the workbench open it, so they stay links.
  */
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
@@ -38,6 +38,10 @@ export function CoachStartPage() {
       story_id: params.get("story") || null,
       target_skill: (params.get("skill") || null) as StartCoachRequest["target_skill"],
       job_target_id: params.get("job") || null,
+      // ST-12: a story idea from the resume (RM-4) seeds the context.
+      ...(params.get("resume") && params.get("idea")
+        ? { resume_id: params.get("resume"), resume_line_ref: params.get("idea") }
+        : {}),
     });
   }, [params, start]);
 

@@ -2497,7 +2497,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Story"
+                    "$ref": "#/components/schemas/StoryOut"
                   },
                   "title": "Response List Stories Stories Get"
                 }
@@ -2539,7 +2539,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Story"
+                  "$ref": "#/components/schemas/StoryOut"
                 }
               }
             }
@@ -2581,7 +2581,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Story"
+                  "$ref": "#/components/schemas/StoryOut"
                 }
               }
             }
@@ -2624,7 +2624,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Story"
+                  "$ref": "#/components/schemas/StoryOut"
                 }
               }
             }
@@ -2676,7 +2676,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Story"
+                  "$ref": "#/components/schemas/StoryOut"
                 }
               }
             }
@@ -2812,6 +2812,92 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StoryNote"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{story_id}/review": {
+      "post": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "Review Story",
+        "description": "ST-11: ask Strova to review the story. The worker writes per-part notes and\nbefore-and-after edits from the user's words (U08's review prompt), and stores them as an\nopen `review` suggestion for the story, replacing an older open one.",
+        "operationId": "review_story_stories__story_id__review_post",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewQueued"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/ask": {
+      "post": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "Ask About Stories",
+        "description": "ST-13: Strova answers from the user's own stories and target roles. Story ids are only the\nuser's, and every fact is checked against their words (CO-9).",
+        "operationId": "ask_about_stories_stories_ask_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoryAskIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryAnswer"
                 }
               }
             }
@@ -23466,6 +23552,20 @@
         "title": "ReviewPayload",
         "description": "ST-11: the payload of a review suggestion."
       },
+      "ReviewQueued": {
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "title": "Job Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "job_id"
+        ],
+        "title": "ReviewQueued",
+        "description": "ST-11: the review is being written. It arrives as an open `review` suggestion for the\nstory (GET /suggestions?place=story&story_id=...)."
+      },
       "RoleFamily": {
         "type": "string",
         "enum": [
@@ -25693,6 +25793,32 @@
             ],
             "title": "Job Target Id",
             "description": "The plan page whose story-fit gap opened this session (with target_skill)."
+          },
+          "resume_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resume Id",
+            "description": "ST-12: start from a story idea on this resume (RM-4)."
+          },
+          "resume_line_ref": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^roles\\[\\d+\\]\\.achievements\\[\\d+\\]$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resume Line Ref",
+            "description": "ST-12: the achievement, as roles[<i>].achievements[<j>]. It seeds the context, and the first question asks for the stakes."
           }
         },
         "additionalProperties": false,
@@ -25839,38 +25965,55 @@
         "description": "ST-1: one story in the user's library. The stories table holds org_id and user_id."
       },
       "StoryAnswer": {
-        "additionalProperties": false,
-        "description": "ST-13: Strova's answer to a question asked on Career Stories, from the user's own stories\nand roles. The stories it leans on are named, so the screen can link them.",
         "properties": {
           "answer": {
-            "description": "Two to four sentences, spoken to the user.",
+            "type": "string",
             "minLength": 1,
             "title": "Answer",
-            "type": "string"
+            "description": "Two to four sentences, spoken to the user."
           },
           "story_ids": {
-            "description": "The user's stories the answer is about, best first.",
             "items": {
-              "format": "uuid",
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
+            "type": "array",
             "title": "Story Ids",
-            "type": "array"
+            "description": "The user's stories the answer is about, best first."
           },
           "quotes": {
-            "description": "The user's words the answer's facts came from, verbatim (CO-9).",
             "items": {
               "type": "string"
             },
+            "type": "array",
             "title": "Quotes",
-            "type": "array"
+            "description": "The user's words the answer's facts came from, verbatim (CO-9)."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "answer"
         ],
         "title": "StoryAnswer",
-        "type": "object"
+        "description": "ST-13: Strova's answer to a question asked on Career Stories, from the user's own stories\nand roles. The stories it leans on are named, so the screen can link them."
+      },
+      "StoryAskIn": {
+        "properties": {
+          "question": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Question"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "question"
+        ],
+        "title": "StoryAskIn",
+        "description": "ST-13: a question for Strova about the user's stories."
       },
       "StoryCounts": {
         "properties": {
@@ -26482,6 +26625,155 @@
         ],
         "title": "StoryNoteIn",
         "description": "ST-6: a fix note for the story, usually from a debrief answer that used it."
+      },
+      "StoryOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "context": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context"
+          },
+          "stakes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stakes"
+          },
+          "action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "reflection": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reflection"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "type": "array",
+            "title": "Skills",
+            "description": "Skill tags."
+          },
+          "status": {
+            "$ref": "#/components/schemas/StoryStatus",
+            "default": "draft"
+          },
+          "source": {
+            "$ref": "#/components/schemas/StorySource"
+          },
+          "source_session_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Session Id",
+            "description": "ST-2: the session of the debrief answer it came from."
+          },
+          "source_question_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Question Ref",
+            "description": "ST-2: QuestionScore.question_ref of that answer."
+          },
+          "notes": {
+            "items": {
+              "$ref": "#/components/schemas/StoryNote"
+            },
+            "type": "array",
+            "title": "Notes"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "display_status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "ready",
+              "proven"
+            ],
+            "title": "Display Status",
+            "description": "ST-8: draft, ready or proven."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "source",
+          "created_at",
+          "updated_at",
+          "display_status"
+        ],
+        "title": "StoryOut",
+        "description": "ST-1 and ST-8: a story with the status to show. Proven stays as stored (ST-7); a draft\nwith all five parts filled shows as Ready."
       },
       "StoryPart": {
         "type": "string",

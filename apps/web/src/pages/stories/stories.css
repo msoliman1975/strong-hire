@@ -537,3 +537,124 @@
 .studio__teach p {
   margin: 0;
 }
+
+/* ST-9: Career Stories with Strova (mockup #stories). */
+.career-stories__row {
+  gap: 3px;
+}
+
+.career-stories__used {
+  color: var(--sh-ok-ink);
+  font-weight: 600;
+}
+
+.career-stories__ask {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.career-stories__ask label {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.career-stories__ask input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  padding: 8px 12px;
+  border: 1px solid var(--sh-line-strong);
+  border-radius: 999px;
+  background: var(--sh-surface);
+  color: var(--sh-ink);
+}
+
+.career-stories .sx-fold > summary h2 {
+  margin: 0;
+}
+
+/* The five parts, each in its colour, with its name in text (UI-1): write, review, craft, story. */
+[data-part="context"].write-part,
+.part-lbl[data-part="context"] {
+  color: var(--sh-part-context);
+}
+[data-part="stakes"].write-part,
+.part-lbl[data-part="stakes"] {
+  color: var(--sh-part-stakes);
+}
+[data-part="action"].write-part,
+.part-lbl[data-part="action"] {
+  color: var(--sh-part-action);
+}
+[data-part="result"].write-part,
+.part-lbl[data-part="result"] {
+  color: var(--sh-part-result);
+}
+[data-part="reflection"].write-part,
+.part-lbl[data-part="reflection"] {
+  color: var(--sh-part-reflection);
+}
+
+.sx-part {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.part-lbl {
+  font: 500 11.5px var(--sh-font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ST-11, ST-12: parts or chat on the left (3 fr), Strova on the right (2 fr). */
+.review-grid {
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  align-items: start;
+}
+
+@media (max-width: 760px) {
+  .review-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ST-14: the story page (mockup #story). */
+.story-page__head {
+  gap: 8px;
+}
+
+.story-page__head h1 {
+  margin: 0;
+}
+
+.story-page__steps {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.story-page__steps li + li::before {
+  content: "→";
+  margin-right: 6px;
+  color: var(--sh-muted);
+}
+
+.story-page__grid {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.story-page__side {
+  gap: 16px;
+}
+
+@media (max-width: 760px) {
+  .story-page__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

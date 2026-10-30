@@ -31,7 +31,7 @@ describe("suggestion mocks", () => {
     expect(accepted.suggestion.status).toBe("accepted");
     expect(accepted.can_undo).toBe(true);
     expect((await post(`/suggestions/${tune.id}/accept`)).status).toBe(409);
-    expect(await list("place=story&story_id=x")).toEqual(["tailor_role", "review"]);
+    expect(await list("place=story&story_id=11111111-1111-4111-8111-111111111111")).toEqual(["tailor_role"]);
     expect(((await (await post(`/suggestions/${tune.id}/undo`)).json()) as Suggestion).status).toBe("open");
 
     const crafting = (await (await post(`/suggestions/${missing.id}/accept`)).json()) as SuggestionAcceptOut;

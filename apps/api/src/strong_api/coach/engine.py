@@ -88,6 +88,7 @@ _ASK_FOR_MODEL: dict[AskFor, str] = {
 _OPEN_NEW = "Let's build one story together, from your own work."
 _OPEN_SKILL = "Let's build one story that shows {skill}, from your own work."
 _OPEN_EXISTING = 'Let\'s work on "{title}".'
+_OPEN_IDEA = 'Let\'s turn this resume line into a story: "{line}".'
 
 # IV-12 for the coach: fixed lines. The first line of each warning marks the turn as a strike.
 _FIRST: dict[AnswerConduct, str] = {
@@ -184,9 +185,13 @@ def skill_label(skill: Competency) -> str:
     return skill.value.replace("_", " ")
 
 
-def opener(story: StoryRow, *, is_new: bool, target_skill: Competency | None) -> str:
+def opener(
+    story: StoryRow, *, is_new: bool, target_skill: Competency | None, idea: str | None = None
+) -> str:
     """The coach's first line: fixed text, no model call."""
-    if not is_new:
+    if idea is not None:
+        lead = _OPEN_IDEA.format(line=idea)
+    elif not is_new:
         lead = _OPEN_EXISTING.format(title=story.title)
     elif target_skill is not None:
         lead = _OPEN_SKILL.format(skill=skill_label(target_skill))

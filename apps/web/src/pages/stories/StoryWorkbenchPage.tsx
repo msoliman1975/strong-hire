@@ -1,5 +1,2 @@
-/**
- * ST-3: `/stories/:storyId` is the story studio with that story open (StoriesPage, canvas board
- * A2 Workbench).
- */
-export { StoriesPage as StoryWorkbenchPage } from "./StoriesPage";
+/** ST-14: `/stories/:storyId` is the story page (StoryPage). */
+export { StoryPage as StoryWorkbenchPage } from "./StoryPage";

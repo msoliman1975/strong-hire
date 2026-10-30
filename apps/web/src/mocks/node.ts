@@ -37,6 +37,6 @@ export const server = setupServer(
   ...suggestionHandlers(),
   ...waitlistHandlers(),
   ...coachVoiceHandlers(),
-  ...coachHandlers(),
+  ...coachHandlers(mockStore),
   ...transcriptHandlers(),
 );

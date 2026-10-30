@@ -22,7 +22,16 @@ import type {
   TakeRequest,
 } from "../pages/coach/api";
 import { STORY_PARTS, type Competency, type Story } from "../pages/stories/api";
+import type { MockStore } from "./db";
 import { mockStory, mockStoryLibrary } from "./storyHandlers";
+
+/** ST-12: the resume achievement a story idea (RM-4) starts from, as the API reads it. */
+function ideaLine(store: MockStore | undefined, resumeId: string, ref: string): string | null {
+  const found = /^roles\[(\d+)\]\.achievements\[(\d+)\]$/.exec(ref);
+  const resume = store?.db.resumes.find((r) => r.id === resumeId)?.resume;
+  if (!found || !resume) return null;
+  return resume.roles[Number(found[1])]?.achievements[Number(found[2])]?.trim() || null;
+}
 
 const API = "*/api";
 
@@ -95,16 +104,26 @@ function addTurn(entry: MockCoachSession, speaker: CoachTurnOut["speaker"], text
 
 const notFound = (what: string) => HttpResponse.json({ detail: `${what} not found` }, { status: 404 });
 
-export function coachHandlers() {
+export function coachHandlers(store?: MockStore) {
   return [
     http.post(`${API}/coach/sessions`, async ({ request }) => {
       const body = (await request.json()) as StartCoachRequest;
       let story = body.story_id ? findStory(body.story_id) : null;
       if (body.story_id && !story) return notFound("Story");
       const isNew = !story;
+      const idea =
+        isNew && body.resume_id && body.resume_line_ref ? ideaLine(store, body.resume_id, body.resume_line_ref) : null;
+      if (isNew && body.resume_id && body.resume_line_ref && !idea) return notFound("Resume");
       if (!story) {
         const now = new Date().toISOString();
-        story = mockStory({ id: crypto.randomUUID(), title: "Untitled story", source: "coach", created_at: now, updated_at: now });
+        story = mockStory({
+          id: crypto.randomUUID(),
+          title: "Untitled story",
+          context: idea,
+          source: "coach",
+          created_at: now,
+          updated_at: now,
+        });
         mockStoryLibrary().push(story);
       }
       if (body.target_skill && !story.skills.includes(body.target_skill)) story.skills.push(body.target_skill);
@@ -122,7 +141,9 @@ export function coachHandlers() {
         },
         turns: [],
       };
-      const lead = !isNew
+      const lead = idea
+        ? `Let's turn this resume line into a story: "${idea}".`
+        : !isNew
         ? `Let's work on "${story.title}".`
         : body.target_skill
           ? `Let's build one story that shows ${body.target_skill.replace(/_/g, " ")}, from your own work.`
