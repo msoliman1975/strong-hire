@@ -287,3 +287,11 @@ def test_st13_story_answer_contract_and_fixture() -> None:
         StoryAnswer.model_validate({"answer": ""})
     with pytest.raises(ValidationError):
         StoryAnswer.model_validate({"answer": "Yes.", "extra": 1})
+
+
+def test_ps6_plan_reminder_is_an_email_kind() -> None:
+    """PS-6: the daily plan reminder is logged in email_logs like the lifecycle emails, so the
+    job sends at most one a day (ref = the day)."""
+    from strong_core.schemas import EmailKind
+
+    assert EmailKind.PLAN_REMINDER.value == "plan_reminder"
