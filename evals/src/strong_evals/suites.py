@@ -19,6 +19,8 @@ simulated:
     max_questions: 3           # optional cap on core questions
     session: {interview_type: behavioral, difficulty: realistic, mode: realistic,
               duration_min: 30, level: senior}
+suggestions: all               # optional: suggestion cases (SG-7), ids in
+                               # evals/fixtures/suggestions/cases.yaml, or "all"
 coach:                         # optional: coach sessions (CO-9)
   - id: coach-vague-gentle
     candidate: vague           # an id in evals/fixtures/coach/candidates.yaml
@@ -78,6 +80,7 @@ class Suite(Contract):
     simulated: list[SimulatedSpec] = Field(default_factory=list)
     gap: list[GapSpec] = Field(default_factory=list)
     coach: list[CoachSpec] = Field(default_factory=list)
+    suggestions: list[str] | Literal["all"] = Field(default_factory=list)
 
 
 def suite_names(folder: Path = SUITES_DIR) -> list[str]:
@@ -103,4 +106,8 @@ def load_suite(name: str, folder: Path = SUITES_DIR) -> Suite:
         suite.gap += [g for g in sub.gap if g.id not in known_gap]
         known_coach = {c.id for c in suite.coach}
         suite.coach += [c for c in sub.coach if c.id not in known_coach]
+        if sub.suggestions == "all" or suite.suggestions == "all":
+            suite.suggestions = "all"
+        else:
+            suite.suggestions = list(dict.fromkeys([*suite.suggestions, *sub.suggestions]))
     return suite

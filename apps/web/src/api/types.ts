@@ -142,3 +142,9 @@ export type SessionSetup = DeepRequired<S["SessionSetup"]>;
 export type DebriefQuestion = DeepRequired<S["DebriefQuestion"]>;
 export type OwnQuestionPoint = DeepRequired<S["OwnQuestionPoint"]>;
 export type CustomInterviewAccess = S["CustomInterviewAccess"];
+
+// Suggestions from Strova (U08: SG-2 to SG-8).
+export type Suggestion = DeepRequired<S["Suggestion"]>;
+export type SuggestionKind = Suggestion["kind"];
+export type SuggestionAcceptIn = S["AcceptIn"];
+export type SuggestionAcceptOut = DeepRequired<S["AcceptOut"]>;

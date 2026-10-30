@@ -52,6 +52,8 @@ const debrief: Debrief = {
   questions: [],
   previous_signal: null,
   answers_at_bar: null,
+  suggestions: [],
+  next_plan_item: null,
 };
 
 describe("transcript page (TR-1)", () => {

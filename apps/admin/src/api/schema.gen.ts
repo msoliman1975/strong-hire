@@ -1418,6 +1418,87 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Suggestions
+         * @description SG-8: the open suggestions for one place, newest first.
+         */
+        get: operations["list_suggestions_suggestions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/suggestions/{suggestion_id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Accept Suggestion
+         * @description SG-8: apply the suggestion. 409 `not_open` when it was already accepted or dismissed.
+         */
+        post: operations["accept_suggestion_suggestions__suggestion_id__accept_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/suggestions/{suggestion_id}/dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Dismiss Suggestion
+         * @description SG-8: dismissed suggestions never come back. 409 `not_open` when already resolved.
+         */
+        post: operations["dismiss_suggestion_suggestions__suggestion_id__dismiss_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/suggestions/{suggestion_id}/undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Undo Suggestion
+         * @description SG-2: restore what accepting changed; the suggestion is open again. 409 `cannot_undo`
+         *     when nothing was applied, `changed_since` when the text was edited after accepting.
+         */
+        post: operations["undo_suggestion_suggestions__suggestion_id__undo_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/providers": {
         parameters: {
             query?: never;
@@ -3356,6 +3437,40 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AcceptIn */
+        AcceptIn: {
+            /**
+             * After
+             * @description "Edit first": the user's edited text, in place of the proposed one. For tune_story, improve_resume_line and tailor_role.
+             */
+            after?: string | null;
+            /**
+             * Parts
+             * @description review: the parts whose edits to apply. Null applies every edit.
+             */
+            parts?: components["schemas"]["StoryPart"][] | null;
+        };
+        /** AcceptOut */
+        AcceptOut: {
+            suggestion: components["schemas"]["Suggestion"];
+            /**
+             * Story Id
+             * @description The story it changed or created (SG-2, SG-3, SG-5, ST-11).
+             */
+            story_id?: string | null;
+            /**
+             * Resume Id
+             * @description The resume it changed (SG-6).
+             */
+            resume_id?: string | null;
+            /** @description SG-4, RM-4: open crafting with this target. */
+            crafting?: components["schemas"]["Crafting"] | null;
+            /**
+             * Can Undo
+             * @default false
+             */
+            can_undo: boolean;
+        };
         /** AcceptReason */
         AcceptReason: {
             /**
@@ -5557,6 +5672,22 @@ export interface components {
             /** Rows */
             rows: number;
         };
+        /**
+         * Crafting
+         * @description SG-4, RM-4: what "Craft with Strova" opens with.
+         */
+        Crafting: {
+            competency?: components["schemas"]["Competency"] | null;
+            /** Job Target Id */
+            job_target_id?: string | null;
+            /**
+             * Achievement
+             * @description RM-4: the context to start from.
+             */
+            achievement?: string | null;
+            /** Skills */
+            skills?: components["schemas"]["Competency"][];
+        };
         /** CreateSessionRequest */
         CreateSessionRequest: {
             /**
@@ -5844,6 +5975,16 @@ export interface components {
             previous_signal?: components["schemas"]["PreviousSignal"] | null;
             /** @description DB-2. Null until the debrief is ready. */
             answers_at_bar?: components["schemas"]["AnswersAtBar"] | null;
+            /**
+             * Suggestions
+             * @description DB-5, SG-2 to SG-4: Strova's open suggestions from this take, newest first.
+             */
+            suggestions?: components["schemas"]["Suggestion"][];
+            /**
+             * Next Plan Item
+             * @description DB-6: the next item of the personal plan. Null until the plan has one (U11).
+             */
+            next_plan_item?: string | null;
         };
         /**
          * DebriefQuestion
@@ -7167,31 +7308,16 @@ export interface components {
             kind: "new_story";
             /** Title */
             title: string;
-            /**
-             * Context
-             * @default null
-             */
-            context: string | null;
-            /**
-             * Stakes
-             * @default null
-             */
-            stakes: string | null;
-            /**
-             * Action
-             * @default null
-             */
-            action: string | null;
-            /**
-             * Result
-             * @default null
-             */
-            result: string | null;
-            /**
-             * Reflection
-             * @default null
-             */
-            reflection: string | null;
+            /** Context */
+            context?: string | null;
+            /** Stakes */
+            stakes?: string | null;
+            /** Action */
+            action?: string | null;
+            /** Result */
+            result?: string | null;
+            /** Reflection */
+            reflection?: string | null;
             /** Skills */
             skills?: components["schemas"]["Competency"][];
             /**
@@ -7793,6 +7919,12 @@ export interface components {
             /** Minutes */
             minutes: number;
         };
+        /**
+         * Place
+         * @description Where the suggestions are shown (ux-spec section 8).
+         * @enum {string}
+         */
+        Place: "debrief" | "story" | "role" | "stories" | "resume";
         /**
          * Plan
          * @description PS-1: the user's personal plan in the chosen style.
@@ -10004,15 +10136,13 @@ export interface components {
             /**
              * Role
              * @description The role it is under: title, company.
-             * @default null
              */
-            role: string | null;
+            role?: string | null;
             /**
              * Resume Line Ref
              * @description Where the line is in schemas.Resume, as roles[<i>].achievements[<j>].
-             * @default null
              */
-            resume_line_ref: string | null;
+            resume_line_ref?: string | null;
             /**
              * Skills
              * @description Likely skills. Empty when the worker call failed.
@@ -10216,8 +10346,7 @@ export interface components {
             part: components["schemas"]["StoryPart"];
             /** Note */
             note: string;
-            /** @default null */
-            edit: components["schemas"]["StoryPartEdit"] | null;
+            edit?: components["schemas"]["StoryPartEdit"] | null;
         };
         /**
          * StorySource
@@ -10344,45 +10473,38 @@ export interface components {
             /**
              * Source Session Id
              * @description The debrief's session.
-             * @default null
              */
-            source_session_id: string | null;
+            source_session_id?: string | null;
             /**
              * Source Question Ref
              * @description QuestionScore.question_ref of the answer.
-             * @default null
              */
-            source_question_ref: string | null;
+            source_question_ref?: string | null;
             /**
              * Source Resume Id
              * @description The resume it came from.
-             * @default null
              */
-            source_resume_id: string | null;
+            source_resume_id?: string | null;
             /**
              * Job Target Id
              * @description The role it is for.
-             * @default null
              */
-            job_target_id: string | null;
+            job_target_id?: string | null;
             /**
              * Story Id
              * @description The story it changes.
-             * @default null
              */
-            story_id: string | null;
+            story_id?: string | null;
             /**
              * Resume Id
              * @description The resume it changes.
-             * @default null
              */
-            resume_id: string | null;
+            resume_id?: string | null;
             /**
              * Prompt Ref
              * @description The prompt that wrote it. Null for rule-based suggestions.
-             * @default null
              */
-            prompt_ref: string | null;
+            prompt_ref?: string | null;
             /**
              * Created At
              * Format: date-time
@@ -10391,9 +10513,8 @@ export interface components {
             /**
              * Resolved At
              * @description When it was accepted or dismissed.
-             * @default null
              */
-            resolved_at: string | null;
+            resolved_at?: string | null;
         };
         /**
          * SuggestionKind
@@ -10435,11 +10556,8 @@ export interface components {
              * @description Shown as the note title: For {company}.
              */
             company: string;
-            /**
-             * @description The skill this story leads for at the company.
-             * @default null
-             */
-            competency: components["schemas"]["Competency"] | null;
+            /** @description The skill this story leads for at the company. */
+            competency?: components["schemas"]["Competency"] | null;
             /**
              * Note
              * @description The detail to bring forward.
@@ -13663,6 +13781,138 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Rehearsals"];
+                };
+            };
+        };
+    };
+    list_suggestions_suggestions_get: {
+        parameters: {
+            query: {
+                place: components["schemas"]["Place"];
+                session_id?: string | null;
+                story_id?: string | null;
+                job_target_id?: string | null;
+                resume_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Suggestion"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    accept_suggestion_suggestions__suggestion_id__accept_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                suggestion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AcceptIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AcceptOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dismiss_suggestion_suggestions__suggestion_id__dismiss_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                suggestion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Suggestion"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    undo_suggestion_suggestions__suggestion_id__undo_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                suggestion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Suggestion"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

@@ -51,6 +51,7 @@ import type {
 } from "../api/types";
 import { newId, type MockGap, type MockStore, type MockTask } from "./db";
 import { addMockInterviews, interviewForTake } from "./interviewHandlers";
+import { debriefSuggestions } from "./suggestionHandlers";
 import {
   customDebriefQuestions,
   customProblem,
@@ -1087,6 +1088,8 @@ export function scoringHandlers(store: MockStore) {
         // DB-1, DB-2 (S12): the mock scorecards are fixed, so the previous signal is the same.
         previous_signal: scorecard ? mockPreviousSignal(s, scorecard, db().sessions) : null,
         answers_at_bar: scorecard ? mockAnswersAtBar(scorecard) : null,
+        suggestions: scorecard ? debriefSuggestions(s.id, s.job_target_id) : [],
+        next_plan_item: null,
       };
       return HttpResponse.json(debrief);
     }),

@@ -4,18 +4,20 @@ skill (SG-4), tailor for a role (SG-5), improve a resume line (SG-6), the no-new
 
 from __future__ import annotations
 
+import io
 import json
 import re
 import uuid
+import zipfile
 from collections.abc import Sequence
 from typing import Any
 
 from pydantic import BaseModel
-from sqlalchemy import select
+from sqlalchemy import delete, select, text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from strong_core.config import find_repo_root
-from strong_core.db.models import JobTarget
+from strong_core.db.models import USER_OWNED_TABLES, JobTarget, User
 from strong_core.db.models import Resume as ResumeRow
 from strong_core.db.models import Story as StoryRow
 from strong_core.db.models import Suggestion as SuggestionRow
@@ -23,6 +25,7 @@ from strong_core.gateway import FakeBackend, Message, ModelGateway, Role, TokenU
 from strong_core.gateway.registry import fake_models_config
 from strong_core.schemas import (
     Competency,
+    MissingSkillPayload,
     NewStoryPayload,
     StoryPartEdit,
     StoryReview,
@@ -30,8 +33,10 @@ from strong_core.schemas import (
     SuggestionKind,
     SuggestionStatus,
 )
+from strong_worker.account.bundle import build_bundle
 from strong_worker.gap import jobs as gap_jobs
 from strong_worker.gap.story_fit import run_story_fit
+from strong_worker.inputs.storage import LocalEncryptedFileStore
 from strong_worker.main import WorkerSettings
 from strong_worker.scoring import jobs
 from strong_worker.scoring.testing import (
@@ -476,3 +481,40 @@ async def test_st11_review_stores_notes_and_only_edits_from_the_users_words(
 def test_u08_jobs_are_registered() -> None:
     names = {getattr(f, "name", getattr(f, "__name__", "")) for f in WorkerSettings.functions}
     assert {"suggest_resume_line", "review_story"} <= names
+
+
+# --- SG-1: export and delete -----------------------------------------------------------------
+
+
+async def test_sg1_export_has_suggestions_and_delete_removes_them(
+    sessionmaker: async_sessionmaker[AsyncSession],
+    account: tuple[uuid.UUID, uuid.UUID],
+    store: LocalEncryptedFileStore,
+) -> None:
+    """SG-1, AC-1: the export bundle has the user's suggestions, with payload and status; they
+    go with their user."""
+    org_id, user_id = account
+    story_id = await _add_story(sessionmaker, org_id, user_id, "Checkout", result="It went well.")
+    async with sessionmaker() as db:
+        await add_suggestion(
+            db,
+            org_id=org_id,
+            user_id=user_id,
+            kind=SuggestionKind.MISSING_SKILL,
+            payload=MissingSkillPayload(competency=Competency.IMPACT),
+            reason="No story shows impact yet.",
+            story_id=story_id,
+        )
+        await db.commit()
+        bundle, summary = await build_bundle(db, store, org_id, user_id, 10_000_000)
+    with zipfile.ZipFile(io.BytesIO(bundle)) as zf:
+        rows = json.loads(zf.read("data.json"))["tables"]["suggestions"]
+    assert summary["rows"]["suggestions"] == 1
+    assert rows[0]["kind"] == "missing_skill" and rows[0]["status"] == "open"
+    assert rows[0]["payload"] == {"kind": "missing_skill", "competency": "impact"}
+    assert "suggestions" in USER_OWNED_TABLES
+    async with sessionmaker() as db:
+        await db.execute(text("PRAGMA foreign_keys=ON"))
+        await db.execute(delete(User).where(User.id == user_id))
+        await db.commit()
+        assert (await db.scalars(select(SuggestionRow))).all() == []
