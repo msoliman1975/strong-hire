@@ -87,3 +87,53 @@ def test_admin_settings_are_optional() -> None:
     """D-10 ALERT_EMAIL and D-12 INFRA_MONTHLY_USD default to empty."""
     s = Settings(_env_file=None)
     assert s.alert_email == "" and s.infra_monthly_usd is None
+
+
+async def test_sv9_rich_email_has_the_sender_name_html_and_the_inline_avatar(
+    smtp: type[FakeSmtp],
+) -> None:
+    """SV-9: Strova's emails carry "Strova from Strong Hire" with SMTP_FROM's address, a text
+    part, an HTML part and the avatar as an inline image the HTML shows by cid."""
+    sender = core_email.SmtpEmailSender(
+        "smtp.example.com", from_addr="Strong Hire <no-reply@stronghire.example>"
+    )
+    email = core_email.Email(
+        to="ana@example.com",
+        subject="Your debrief is ready",
+        text="Hi Ana",
+        html='<p><img src="cid:strova" alt="Strova" width="64"> Hi Ana</p>',
+        from_name="Strova from Strong Hire",
+        images=(core_email.InlineImage(cid="strova", data=b"\\x89PNG fake"),),
+    )
+    await core_email.send_email(sender, email)
+    (msg,) = smtp.instances[0].sent
+    assert msg["From"] == "Strova from Strong Hire <no-reply@stronghire.example>"
+    text = msg.get_body(preferencelist=("plain",))
+    html = msg.get_body(preferencelist=("html",))
+    assert text is not None and text.get_content().strip() == "Hi Ana"
+    assert html is not None and 'src="cid:strova"' in html.get_content()
+    images = [p for p in msg.walk() if p.get_content_type() == "image/png"]
+    assert len(images) == 1 and images[0]["Content-ID"] == "<strova>"
+
+
+async def test_sv9_account_emails_keep_the_strong_hire_sender(smtp: type[FakeSmtp]) -> None:
+    """SV-9: without a display name the sender stays SMTP_FROM, and a plain sender (no
+    send_message) gets the text part."""
+    sender = core_email.SmtpEmailSender(
+        "smtp.example.com", from_addr="Strong Hire <no-reply@stronghire.example>"
+    )
+    await sender.send("ana@example.com", "Sign in", "Your link")
+    assert smtp.instances[0].sent[0]["From"] == "Strong Hire <no-reply@stronghire.example>"
+
+    class Plain:
+        def __init__(self) -> None:
+            self.sent: list[tuple[str, str, str]] = []
+
+        async def send(self, to: str, subject: str, text: str) -> None:
+            self.sent.append((to, subject, text))
+
+    plain = Plain()
+    await core_email.send_email(
+        plain, core_email.Email(to="a@b.c", subject="S", text="T", html="<p>T</p>", from_name="X")
+    )
+    assert plain.sent == [("a@b.c", "S", "T")]
