@@ -184,20 +184,6 @@ def _add_refs(session: CoachSession, refs: set[str]) -> None:
     session.prompt_version = ",".join(sorted(current | refs))[:200] or None
 
 
-IDEA_TITLE_CHARS = 60
-
-
-def _idea_title(line: str) -> str:
-    """A working title from the resume line; the user can rename the story."""
-    words = line.split()
-    title = ""
-    for w in words:
-        if len(title) + len(w) + 1 > IDEA_TITLE_CHARS:
-            break
-        title = f"{title} {w}".strip()
-    return title or line[:IDEA_TITLE_CHARS]
-
-
 async def _idea(db: AsyncSession, me: Me, resume_id: uuid.UUID, ref: str) -> str:
     """ST-12: the resume achievement a story idea (RM-4) starts from."""
     row = await db.scalar(
@@ -252,7 +238,7 @@ async def start_coach_session(body: StartCoachRequest, db: Db, me: Me) -> CoachS
             id=uuid.uuid4(),
             org_id=me.org_id,
             user_id=me.user_id,
-            title=_idea_title(idea) if idea else NEW_STORY_TITLE,
+            title=NEW_STORY_TITLE,  # the user names it when ready, as for any new story
             # ST-12: the achievement (the user's own words) seeds the context.
             context=idea,
             skills=[],

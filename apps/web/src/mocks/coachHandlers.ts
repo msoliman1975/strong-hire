@@ -118,7 +118,7 @@ export function coachHandlers(store?: MockStore) {
         const now = new Date().toISOString();
         story = mockStory({
           id: crypto.randomUUID(),
-          title: idea ? idea.split(" ").slice(0, 9).join(" ") : "Untitled story",
+          title: "Untitled story",
           context: idea,
           source: "coach",
           created_at: now,

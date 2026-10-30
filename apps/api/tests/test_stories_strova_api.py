@@ -100,8 +100,8 @@ async def test_st13_an_answer_with_facts_the_user_never_wrote_gives_the_fallback
 async def test_st12_craft_from_a_resume_idea_seeds_the_context_and_asks_for_the_stakes(
     client: httpx.AsyncClient, fake_fixtures: Path
 ) -> None:
-    """ST-12: starting from a story idea (RM-4), the achievement seeds the context, the title
-    is the line, and Strova's first question asks for the stakes."""
+    """ST-12: starting from a story idea (RM-4), the achievement seeds the context and Strova's
+    first question asks for the stakes. The user names the story, as for any new one."""
     await sign_in(client)
     resume = await add_resume(client, fake_fixtures)
     line = resume["resume"]["roles"][0]["achievements"][0]
@@ -112,7 +112,6 @@ async def test_st12_craft_from_a_resume_idea_seeds_the_context_and_asks_for_the_
     assert resp.status_code == 201, resp.text
     detail = resp.json()
     assert detail["story"]["context"] == line
-    assert line.startswith(detail["story"]["title"])
     first = detail["turns"][0]["text"]
     assert first.startswith(f'Let\'s turn this resume line into a story: "{line}".')
     assert "stake" in first.lower() or "matter" in first.lower()
