@@ -39,7 +39,7 @@ async function seed() {
   form.append("text", "Backend engineer, Python and Go. Led the move of 30 services to PostgreSQL.");
   const { resume } = await resumesApi.upload(form);
   await resumesApi.get(resume.id);
-  // A pasted resume gets the core default name "CV <date>": a stored name the user can change,
+  // A pasted resume gets the core default name "Resume <date>": a stored name the user can change,
   // not interface copy (U04 follow-up). Name it, so the test checks the copy only.
   await resumesApi.rename(resume.id, "Ana Lopez resume");
   const { job_target: job } = await jobTargetsApi.create({ text: "Senior engineer, payments. ".repeat(5) });

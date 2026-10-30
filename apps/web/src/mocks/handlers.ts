@@ -304,7 +304,7 @@ function defaultJobName(target: JobTargetOut): string {
 }
 function defaultResumeName(file: File | null): string {
   const stem = file ? file.name.replace(/\.[^.]*$/, "").trim() : "";
-  return stem ? stem.slice(0, 120) : `CV ${today()}`;
+  return stem ? stem.slice(0, 120) : `Resume ${today()}`;
 }
 async function sha256Of(data: ArrayBuffer | string): Promise<string> {
   const bytes = typeof data === "string" ? new TextEncoder().encode(data) : new Uint8Array(data);
