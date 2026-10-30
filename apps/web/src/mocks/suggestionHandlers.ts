@@ -7,6 +7,7 @@
 import { http, HttpResponse } from "msw/http";
 
 import type { Suggestion, SuggestionAcceptIn, SuggestionAcceptOut, SuggestionKind } from "../api/types";
+import { mockStoryLibrary } from "./storyHandlers";
 
 const API = "*/api";
 const STORY = "11111111-1111-4111-8111-111111111111"; // the story library seed's first story
@@ -164,8 +165,21 @@ const resolved = new Map<string, Pick<Suggestion, "status" | "resolved_at">>();
 const reviewed = new Set<string>();
 const reviewParts = new Map<string, Set<string>>();
 
+/** What accepting changed in the mock story library, by suggestion id, for Undo. */
+const undoParts = new Map<string, { storyId: string; part: string; before: string | null }[]>();
+
+/** Apply one part edit to the mock library, as the API does on accept. */
+function applyPart(id: string, storyId: string | null, part: string, after: string) {
+  const story = mockStoryLibrary().find((x) => x.id === storyId);
+  if (!story) return;
+  const key = part as "context" | "stakes" | "action" | "result" | "reflection";
+  undoParts.set(id, [...(undoParts.get(id) ?? []), { storyId: story.id, part, before: story[key] }]);
+  story[key] = after;
+}
+
 export function resetMockSuggestions(): void {
   resolved.clear();
+  undoParts.clear();
   reviewed.clear();
   reviewParts.clear();
 }
@@ -245,6 +259,14 @@ export function suggestionHandlers() {
         reviewParts.set(storyId, done);
         reviewOpen = p0.review.notes.some((n) => n.edit && !done.has(n.part));
       }
+      const target = p0.kind === "review" ? ([...reviewed].at(-1) ?? s.story_id) : s.story_id;
+      if (p0.kind === "tune_story") applyPart(s.id, target, p0.edit.part, body.after ?? p0.edit.after);
+      if (p0.kind === "review") {
+        for (const n of p0.review.notes) {
+          const already = (undoParts.get(s.id) ?? []).some((u) => u.part === n.part);
+          if (n.edit && !already && (!body.parts || body.parts.includes(n.part))) applyPart(s.id, target, n.part, n.edit.after);
+        }
+      }
       if (!reviewOpen) resolved.set(s.id, { status: "accepted", resolved_at: new Date().toISOString() });
       const p = s.payload;
       const out: SuggestionAcceptOut = {
@@ -277,6 +299,11 @@ export function suggestionHandlers() {
         return HttpResponse.json({ detail: { code: "cannot_undo", message: "There is nothing to undo." } }, { status: 409 });
       resolved.delete(s.id);
       reviewParts.clear();
+      for (const u of (undoParts.get(s.id) ?? []).reverse()) {
+        const story = mockStoryLibrary().find((x) => x.id === u.storyId);
+        if (story) story[u.part as "context" | "stakes" | "action" | "result" | "reflection"] = u.before;
+      }
+      undoParts.delete(s.id);
       return HttpResponse.json({ ...s, status: "open", resolved_at: null });
     }),
   ];

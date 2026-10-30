@@ -54,7 +54,7 @@ export async function startMocks(mode: MockMode): Promise<void> {
     ...suggestionHandlers(),
     ...waitlistHandlers(),
     ...coachVoiceHandlers(),
-    ...coachHandlers(),
+    ...coachHandlers(store),
     ...transcriptHandlers(),
   ];
   await setupWorker(...handlers).start({

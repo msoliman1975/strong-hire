@@ -98,11 +98,16 @@ export function CareerStoriesPage() {
         {stories.isPending && <Loading label="Loading your stories" />}
         {stories.isError && <ErrorNotice error={stories.error} />}
         {stories.data && list.length === 0 && (
-          <div data-testid="stories-empty">
+          <div className="sx-stack" data-testid="stories-empty">
             <p className="sx-small sx-muted">
-              No stories yet. A story is one moment from your career, told in five parts, ready for "tell me
-              about a time…" questions.
+              <b>No stories yet.</b> A story is one moment from your career, told in 5 parts, ready for "tell me about a
+              time…" questions. Strova builds the first one with you, from your own words.
             </p>
+            <div>
+              <Link className="sx-btn sm" to={newCoachPath()}>
+                Build my first story
+              </Link>
+            </div>
           </div>
         )}
         {list.length > 0 && (
@@ -336,7 +341,7 @@ function SuggestRow({ suggestion }: { suggestion: Suggestion }) {
   const p = suggestion.payload;
   let eyebrow: string;
   let tone = "";
-  let action: ReactNode = null;
+  let action: ReactNode;
   switch (p.kind) {
     case "tune_story":
       eyebrow = "Tune a story";

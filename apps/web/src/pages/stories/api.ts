@@ -5,6 +5,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { apiClient, unwrap } from "../../api/client";
+import { COMPETENCIES_BY_TYPE } from "../../api/questions";
 import type { components } from "../../api/schema.gen";
 
 type S = components["schemas"];
@@ -76,3 +77,6 @@ export function displayStatusOf(s: Pick<Story, "status" | (typeof STORY_PARTS)[n
 
 /** The parts with text, in order. */
 export const filledParts = (s: Story) => STORY_PARTS.filter((p) => (s[p] ?? "").trim() !== "");
+
+/** Every competency once, in the order of COMPETENCIES_BY_TYPE. The recruiter screen repeats three. */
+export const SKILLS = [...new Set(Object.values(COMPETENCIES_BY_TYPE).flat())] as Competency[];

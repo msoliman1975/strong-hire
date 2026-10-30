@@ -53,7 +53,7 @@ function StoryHead({ story, editing, onEdit }: { story: Story; editing: boolean;
       <div className="story-view__title">
         <h2 id="story-title-heading">{story.title}</h2>
         <span className="story-view__status">
-          <StoryStatusBadge status={story.status} />
+          <StoryStatusBadge status={story.display_status} />
           <Explain topic="Proven">{EXPLAIN.proven}</Explain>
           {best && <span className="story-view__score">Best take {takeAverage(best).toFixed(1)} of 4</span>}
         </span>
@@ -93,7 +93,7 @@ function StoryHead({ story, editing, onEdit }: { story: Story; editing: boolean;
   );
 }
 
-function StoryRead({ story }: { story: Story }) {
+export function StoryRead({ story }: { story: Story }) {
   const [length, setLength] = useState<Length>("parts");
   const write = useMutation({ mutationFn: () => takesApi.versions(story.id) });
   const takes = useTakes(story.id);
@@ -160,7 +160,7 @@ function StoryRead({ story }: { story: Story }) {
 }
 
 /** The fix notes from debriefs, numbered, newest first (ST-6 sends them here). */
-function CoachNotes({ story }: { story: Story }) {
+export function CoachNotes({ story }: { story: Story }) {
   const notes = [...story.notes].sort((a, b) => b.at.localeCompare(a.at));
   return (
     <section className="card card--dark story-notes" aria-labelledby="story-notes-heading">

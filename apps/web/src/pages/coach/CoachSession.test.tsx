@@ -9,6 +9,7 @@ import { http, HttpResponse } from "msw";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
+import { resumesApi } from "../../api/inputs";
 import { createQueryClient } from "../../App";
 import { mockTakes, resetMockCoach, scriptMockCoach } from "../../mocks/coachHandlers";
 import { server } from "../../mocks/node";
@@ -83,6 +84,25 @@ describe("coach session", () => {
     );
   });
 
+  it("ST-12: crafting from a resume idea seeds the context from the line and asks for the stakes", async () => {
+    const form = new FormData();
+    form.append("text", "Ana Lopez\n\nSoftware Engineer II, Shoply, 2021 to now\n- Built the refunds API used by 40,000 merchants\n");
+    const { resume } = await resumesApi.upload(form);
+    const read = await resumesApi.get(resume.id);
+    const line = read.resume?.roles[0]?.achievements[0] ?? "";
+    expect(line).not.toBe("");
+    renderAt(`/coach/new?resume=${resume.id}&idea=${encodeURIComponent("roles[0].achievements[0]")}`);
+    const turns = await screen.findAllByTestId("coach-turn");
+    expect(turns[0]).toHaveTextContent(`Let's turn this resume line into a story: "${line}".`);
+    expect(parts().context).toBe("done");
+    expect(parts().stakes).toBe("now");
+    // Strova shapes the story beside the chat, in the coach hat, and celebrates once it is Ready.
+    const strova = screen.getByTestId("coach-strova");
+    expect(within(strova).getByRole("img", { name: "Strova is thinking" })).toHaveAttribute("width", "72");
+    expect(strova).toHaveTextContent("Strova is shaping your story from your words.");
+    expect(screen.getByRole("heading", { name: "Taking shape" })).toBeInTheDocument();
+  });
+
   it("CO-2, CO-3: each turn adds to the conversation and the story takes shape beside it", async () => {
     const user = userEvent.setup();
     scriptMockCoach([
@@ -129,7 +149,7 @@ describe("coach session", () => {
     await user.type(screen.getByRole("textbox", { name: "Story name" }), "Pushback from platform");
     await user.click(screen.getByRole("button", { name: "Save and exit" }));
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Pushback from platform" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Pushback from platform" })).toBeInTheDocument();
     const saved = mockStoryLibrary().find((s) => s.title === "Pushback from platform");
     expect(saved?.context).toBe("We were losing checkouts every week.");
     expect(screen.getByTestId("where")).toHaveTextContent(`/stories/${saved?.id}`);
@@ -250,10 +270,10 @@ describe("coach session details (canvas A1)", () => {
 });
 
 describe("workbench takes and versions", () => {
-  it("CO-2: Work on it with the coach opens a coach session on the story", async () => {
+  it("CO-2: an empty part on the story page opens a coach session on the story", async () => {
     renderAt("/stories/s1");
-    const view = await screen.findByRole("article");
-    expect(within(view).getByRole("link", { name: "Work on it with the coach" })).toHaveAttribute(
+    const parts = await screen.findByRole("region", { name: "Story parts" });
+    expect(within(parts).getAllByRole("link", { name: "Add it with the coach" })[0]).toHaveAttribute(
       "href",
       "/coach/new?story=s1",
     );
@@ -300,9 +320,8 @@ describe("workbench takes and versions", () => {
     expect(within(takes[1]).getByRole("list", { name: "Take 2 scores" })).toHaveTextContent("Ownership 3 of 4");
     expect(within(takes[1]).getByRole("list", { name: "Take 2 scores" })).toHaveTextContent("Impact 4 of 4");
     expect(screen.getByTestId("story-takes")).toHaveTextContent("Stronger each time.");
-    // The story's head shows the best take.
-    expect(screen.getByRole("article")).toHaveTextContent("Best take 3.5 of 4");
-    expect(screen.getByRole("article")).toHaveTextContent("Best take 1:52");
+    // ST-14: Where it came from counts the takes and shows the best one.
+    expect(screen.getByRole("region", { name: "Where it came from" })).toHaveTextContent("2 takes · best 3.5 of 4");
     expect(screen.getByTestId("practice-notice")).toHaveTextContent("not a prediction of any hiring decision");
     expect(screen.getByRole("button", { name: "Record take 3" })).toBeInTheDocument();
   });
