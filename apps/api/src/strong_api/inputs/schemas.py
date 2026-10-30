@@ -168,6 +168,10 @@ class ResumeOut(BaseModel):
         default_factory=list,
         description="IN-12: CV check issues the user accepted, oldest first. At most 100.",
     )
+    is_main: bool = Field(
+        default=False,
+        description="RM-2: the user's main resume, preselected for new roles. One per user.",
+    )
 
 
 class JobTargetAccepted(BaseModel):

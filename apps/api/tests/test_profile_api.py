@@ -71,3 +71,32 @@ async def test_ac3_required_fields_and_limits(client: httpx.AsyncClient) -> None
 async def test_ac3_profile_needs_sign_in(anon_client: httpx.AsyncClient) -> None:
     assert (await anon_client.get("/account/profile")).status_code == 401
     assert (await anon_client.put("/account/profile", json=PROFILE)).status_code == 401
+
+
+async def test_ps2_plan_style_and_email_mute_round_trip(client: httpx.AsyncClient) -> None:
+    """PS-2, PS-6: the profile carries the plan style (None until chosen) and the reminder mute;
+    PATCH changes only what is sent, and a full profile save keeps them."""
+    profile = (await client.get("/account/profile")).json()
+    assert profile["plan_style"] is None
+    assert profile["plan_email_muted"] is False
+
+    resp = await client.patch("/account/profile", json={"plan_style": "weekly"})
+    assert resp.status_code == 200, resp.text
+    assert resp.json()["plan_style"] == "weekly"
+    assert resp.json()["plan_email_muted"] is False
+
+    resp = await client.patch("/account/profile", json={"plan_email_muted": True})
+    assert resp.json() | {"plan_style": "weekly", "plan_email_muted": True} == resp.json()
+
+    await client.put("/account/profile", json=PROFILE)
+    resp = await client.patch("/account/profile", json={"plan_style": "checklist"})
+    profile = (await client.get("/account/profile")).json()
+    assert profile["plan_style"] == "checklist"
+    assert profile["plan_email_muted"] is True
+    assert profile["full_name"] == "Ana Lopez"
+
+
+async def test_ps2_plan_settings_reject_bad_input(client: httpx.AsyncClient) -> None:
+    """PS-2: only weekly or checklist, and no other fields through PATCH."""
+    assert (await client.patch("/account/profile", json={"plan_style": "daily"})).status_code == 422
+    assert (await client.patch("/account/profile", json={"full_name": "X"})).status_code == 422
