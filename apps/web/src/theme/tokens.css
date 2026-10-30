@@ -16,6 +16,12 @@
   --sh-muted: #5e5b6b;
   --sh-line: #e2e0ea;
   --sh-line-strong: #c9c5d6;
+  /* UX with Strova: secondary text and the dark hero card (mockups). */
+  --sh-ink-2: #3c3a48;
+  --sh-hero: #17161f;
+  --sh-on-hero: #f4f3f8;
+  --sh-on-hero-muted: #c9c5d6;
+  --sh-hero-line: #45405a;
 
   /* Action: violet. */
   --sh-violet: #5332e6;
