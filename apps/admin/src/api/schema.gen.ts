@@ -9974,6 +9974,16 @@ export interface components {
              * @description The plan page whose story-fit gap opened this session (with target_skill).
              */
             job_target_id?: string | null;
+            /**
+             * Resume Id
+             * @description ST-12: start from a story idea on this resume (RM-4).
+             */
+            resume_id?: string | null;
+            /**
+             * Resume Line Ref
+             * @description ST-12: the achievement, as roles[<i>].achievements[<j>]. It seeds the context, and the first question asks for the stakes.
+             */
+            resume_line_ref?: string | null;
         };
         /**
          * Story

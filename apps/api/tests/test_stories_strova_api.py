@@ -3,6 +3,7 @@ Strova (ST-11) and Ask Strova (ST-13)."""
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 import httpx
@@ -11,6 +12,7 @@ from strong_api.inputs import queue as queue_names
 from strong_api.stories.ask import FALLBACK
 
 from .conftest import InlineQueue, sign_in
+from .test_library_api import add_resume
 
 FULL = {
     "context": "Our checkout ran on a payments service three teams depended on.",
@@ -93,3 +95,31 @@ async def test_st13_an_answer_with_facts_the_user_never_wrote_gives_the_fallback
     data = (await client.post("/stories/ask", json={"question": "What should I lead with?"})).json()
     assert data == {"answer": FALLBACK, "story_ids": [], "quotes": []}
     assert (await client.post("/stories/ask", json={"question": ""})).status_code == 422
+
+
+async def test_st12_craft_from_a_resume_idea_seeds_the_context_and_asks_for_the_stakes(
+    client: httpx.AsyncClient, fake_fixtures: Path
+) -> None:
+    """ST-12: starting from a story idea (RM-4), the achievement seeds the context, the title
+    is the line, and Strova's first question asks for the stakes."""
+    await sign_in(client)
+    resume = await add_resume(client, fake_fixtures)
+    line = resume["resume"]["roles"][0]["achievements"][0]
+    resp = await client.post(
+        "/coach/sessions",
+        json={"resume_id": resume["id"], "resume_line_ref": "roles[0].achievements[0]"},
+    )
+    assert resp.status_code == 201, resp.text
+    detail = resp.json()
+    assert detail["story"]["context"] == line
+    assert line.startswith(detail["story"]["title"])
+    first = detail["turns"][0]["text"]
+    assert first.startswith(f'Let\'s turn this resume line into a story: "{line}".')
+    assert "stake" in first.lower() or "matter" in first.lower()
+    bad = await client.post(
+        "/coach/sessions",
+        json={"resume_id": resume["id"], "resume_line_ref": "roles[9].achievements[0]"},
+    )
+    assert bad.status_code == 404
+    half = await client.post("/coach/sessions", json={"resume_id": resume["id"]})
+    assert half.status_code == 422

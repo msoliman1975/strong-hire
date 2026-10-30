@@ -52,6 +52,15 @@ class StartCoachRequest(BaseModel):
         default=None,
         description="The plan page whose story-fit gap opened this session (with target_skill).",
     )
+    resume_id: uuid.UUID | None = Field(
+        default=None, description="ST-12: start from a story idea on this resume (RM-4)."
+    )
+    resume_line_ref: str | None = Field(
+        default=None,
+        pattern=r"^roles\[\d+\]\.achievements\[\d+\]$",
+        description="ST-12: the achievement, as roles[<i>].achievements[<j>]. It seeds the "
+        "context, and the first question asks for the stakes.",
+    )
 
 
 class CoachTurnRequest(BaseModel):

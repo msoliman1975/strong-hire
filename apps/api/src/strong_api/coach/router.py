@@ -29,6 +29,7 @@ from __future__ import annotations
 import asyncio
 import hmac
 import logging
+import re
 import uuid
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
@@ -59,12 +60,14 @@ from strong_api.sessions.settings import (
     get_voice_session_settings,
 )
 from strong_core.db.models import CoachSession, CoachTurn, JobTarget
+from strong_core.db.models import Resume as ResumeRow
 from strong_core.db.models import Story as StoryRow
 from strong_core.gateway import Role, get_gateway
 from strong_core.schemas import (
     CoachSessionStatus,
     CoachSpeaker,
     Competency,
+    Resume,
     SessionChannel,
     Story,
     StoryNote,
@@ -181,6 +184,43 @@ def _add_refs(session: CoachSession, refs: set[str]) -> None:
     session.prompt_version = ",".join(sorted(current | refs))[:200] or None
 
 
+IDEA_TITLE_CHARS = 60
+
+
+def _idea_title(line: str) -> str:
+    """A working title from the resume line; the user can rename the story."""
+    words = line.split()
+    title = ""
+    for w in words:
+        if len(title) + len(w) + 1 > IDEA_TITLE_CHARS:
+            break
+        title = f"{title} {w}".strip()
+    return title or line[:IDEA_TITLE_CHARS]
+
+
+async def _idea(db: AsyncSession, me: Me, resume_id: uuid.UUID, ref: str) -> str:
+    """ST-12: the resume achievement a story idea (RM-4) starts from."""
+    row = await db.scalar(
+        select(ResumeRow).where(
+            ResumeRow.id == resume_id,
+            ResumeRow.org_id == me.org_id,
+            ResumeRow.user_id == me.user_id,
+            ResumeRow.deleted_at.is_(None),
+        )
+    )
+    if row is None or row.parsed_json is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Resume not found")
+    found = re.match(r"^roles\[(\d+)\]\.achievements\[(\d+)\]$", ref)
+    resume = Resume.model_validate(row.parsed_json)
+    if found is not None:
+        i, j = int(found[1]), int(found[2])
+        if i < len(resume.roles) and j < len(resume.roles[i].achievements):
+            line = resume.roles[i].achievements[j].strip()
+            if line:
+                return line
+    raise HTTPException(status.HTTP_404_NOT_FOUND, "No achievement at that place")
+
+
 @router.post(
     "/coach/sessions", status_code=status.HTTP_201_CREATED, response_model=CoachSessionDetail
 )
@@ -198,6 +238,13 @@ async def start_coach_session(body: StartCoachRequest, db: Db, me: Me) -> CoachS
         if target is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "Job not found")
     is_new = body.story_id is None
+    idea = None
+    if (body.resume_id is None) != (body.resume_line_ref is None):
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT, "resume_id and resume_line_ref go together"
+        )
+    if body.resume_id is not None and body.resume_line_ref is not None and is_new:
+        idea = await _idea(db, me, body.resume_id, body.resume_line_ref)
     if body.story_id is not None:
         story = await _owned_story(db, me, body.story_id)
     else:
@@ -205,7 +252,9 @@ async def start_coach_session(body: StartCoachRequest, db: Db, me: Me) -> CoachS
             id=uuid.uuid4(),
             org_id=me.org_id,
             user_id=me.user_id,
-            title=NEW_STORY_TITLE,
+            title=_idea_title(idea) if idea else NEW_STORY_TITLE,
+            # ST-12: the achievement (the user's own words) seeds the context.
+            context=idea,
             skills=[],
             notes_json=[],
             status=StoryStatus.DRAFT,
@@ -230,7 +279,7 @@ async def start_coach_session(body: StartCoachRequest, db: Db, me: Me) -> CoachS
     )
     db.add(session)
     await db.flush()
-    line = engine.opener(story, is_new=is_new, target_skill=body.target_skill)
+    line = engine.opener(story, is_new=is_new, target_skill=body.target_skill, idea=idea)
     engine.add_turn(db, session, [], CoachSpeaker.COACH, line)
     await db.commit()
     await db.refresh(story)

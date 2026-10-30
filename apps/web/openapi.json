@@ -25793,6 +25793,32 @@
             ],
             "title": "Job Target Id",
             "description": "The plan page whose story-fit gap opened this session (with target_skill)."
+          },
+          "resume_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resume Id",
+            "description": "ST-12: start from a story idea on this resume (RM-4)."
+          },
+          "resume_line_ref": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^roles\\[\\d+\\]\\.achievements\\[\\d+\\]$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resume Line Ref",
+            "description": "ST-12: the achievement, as roles[<i>].achievements[<j>]. It seeds the context, and the first question asks for the stakes."
           }
         },
         "additionalProperties": false,

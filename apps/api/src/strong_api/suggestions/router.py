@@ -15,7 +15,8 @@ them. Accepting:
 - tailor_role: adds a "For {company}" note to the story; Undo removes it.
 - improve_resume_line: sets the resume line; the resume check runs again on its next read, and
   the story ideas follow the new line. Undo restores the line.
-- review: applies the chosen parts' edits; Undo restores those parts.
+- review: applies the chosen parts' edits; it stays open until each edit is accepted (ST-11).
+  Undo restores the parts accepted so far.
 A story whose result changes queues the improve resume line job (SG-6).
 
 Suggestions belong to one user: every query filters by `org_id` and `user_id`, and another
@@ -258,6 +259,7 @@ async def accept_suggestion(
     now = datetime.now(UTC)
     out: dict[str, Any] = {}
     undo: dict[str, Any] | None = None
+    review_open = False  # a review stays open until each of its edits is accepted
     result_changed: StoryRow | None = None
     match row.kind:
         case SuggestionKind.TUNE_STORY:
@@ -328,21 +330,27 @@ async def accept_suggestion(
             review = ReviewPayload.model_validate(row.payload).review
             story = await _story(db, me, row.story_id)
             chosen = set(body.parts) if body.parts is not None else None
-            parts: dict[str, list[str | None]] = {}
+            # ST-11: edits can be accepted one part at a time; earlier ones are kept for Undo.
+            parts: dict[str, list[str | None]] = dict((row.undo or {}).get("parts", {}))
             for n in review.notes:
-                if n.edit is None or (chosen is not None and n.part not in chosen):
+                if n.edit is None or n.part.value in parts:
+                    continue
+                if chosen is not None and n.part not in chosen:
                     continue
                 before = getattr(story, n.part.value)
                 setattr(story, n.part.value, n.edit.after)
                 parts[n.part.value] = [before, n.edit.after]
+                if n.part == StoryPart.RESULT:
+                    result_changed = story
             if parts:
                 story.updated_at = now
                 undo = {"story_id": str(story.id), "parts": parts}
-                if StoryPart.RESULT.value in parts:
-                    result_changed = story
+            edits = {n.part.value for n in review.notes if n.edit is not None}
+            review_open = not edits <= set(parts)
             out["story_id"] = story.id
-    row.status = SuggestionStatus.ACCEPTED
-    row.resolved_at = now
+    if not review_open:
+        row.status = SuggestionStatus.ACCEPTED
+        row.resolved_at = now
     row.undo = undo
     await db.commit()
     await db.refresh(row)
@@ -378,7 +386,8 @@ async def undo_suggestion(suggestion_id: uuid.UUID, db: Db, me: Me) -> Suggestio
     when nothing was applied, `changed_since` when the text was edited after accepting."""
     row = await _owned(db, me, suggestion_id)
     undo = row.undo
-    if row.status != SuggestionStatus.ACCEPTED or not undo:
+    partial_review = row.kind == SuggestionKind.REVIEW and row.status == SuggestionStatus.OPEN
+    if not undo or (row.status != SuggestionStatus.ACCEPTED and not partial_review):
         raise _conflict(CANNOT_UNDO, "There is nothing to undo.")
     now = datetime.now(UTC)
     if "parts" in undo:
