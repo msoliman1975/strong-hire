@@ -1,6 +1,6 @@
 /**
- * Practice readiness (RD-1, RD-3) and the day plan (RD-2): GET /plan/{job}/{resume}/readiness,
- * GET /readiness/{job} (the Home card), GET /plan/{job}/{resume}/day-plan.
+ * Practice readiness (RD-1, RD-3): GET /readiness/{job}. The day plan types (RD-2) stay for the
+ * mocks; U13 removed the retired v2 plan page that read the pair readiness and the day plan.
  */
 import { useQuery } from "@tanstack/react-query";
 
@@ -16,7 +16,6 @@ type DeepRequired<T> = T extends (infer U)[]
     : T;
 
 export type Readiness = DeepRequired<S["Readiness"]>;
-export type SkillReadiness = DeepRequired<S["SkillReadiness"]>;
 export type DayPlan = DeepRequired<S["DayPlan"]>;
 export type DayPlanItem = DeepRequired<S["DayPlanItem"]>;
 
@@ -33,35 +32,14 @@ export const MIN_SESSIONS = 2;
 export const atBar = (r: Readiness) => r.skills.filter((s) => s.score !== null && s.score >= BAR_SCORE).length;
 export const scored = (r: Readiness) => r.skills.filter((s) => s.status === "scored").length;
 
-export const readinessKey = (jobId: string, resumeId: string) => ["plan", jobId, resumeId, "readiness"] as const;
 export const jobReadinessKey = (jobId: string) => ["readiness", jobId] as const;
-export const dayPlanKey = (jobId: string, resumeId: string) => ["plan", jobId, resumeId, "day-plan"] as const;
 
-export const readinessApi = {
-  pair: async (jobId: string, resumeId: string) =>
-    unwrap(
-      await apiClient.GET("/plan/{job_target_id}/{resume_id}/readiness", {
-        params: { path: { job_target_id: jobId, resume_id: resumeId } },
-      }),
-    ) as Readiness,
+const readinessApi = {
   job: async (jobId: string) =>
     unwrap(
       await apiClient.GET("/readiness/{job_target_id}", { params: { path: { job_target_id: jobId } } }),
     ) as Readiness,
-  dayPlan: async (jobId: string, resumeId: string) =>
-    unwrap(
-      await apiClient.GET("/plan/{job_target_id}/{resume_id}/day-plan", {
-        params: { path: { job_target_id: jobId, resume_id: resumeId } },
-      }),
-    ) as DayPlan,
 };
-
-export const useReadiness = (jobId: string, resumeId: string) =>
-  useQuery({ queryKey: readinessKey(jobId, resumeId), queryFn: () => readinessApi.pair(jobId, resumeId) });
 
 export const useJobReadiness = (jobId: string) =>
   useQuery({ queryKey: jobReadinessKey(jobId), queryFn: () => readinessApi.job(jobId) });
-
-/** RD-2. Keyed under the plan, so a new interview date (which refetches ["plan", ...]) rebuilds it. */
-export const useDayPlan = (jobId: string, resumeId: string) =>
-  useQuery({ queryKey: dayPlanKey(jobId, resumeId), queryFn: () => readinessApi.dayPlan(jobId, resumeId) });

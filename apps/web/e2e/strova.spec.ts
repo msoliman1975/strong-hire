@@ -257,9 +257,9 @@ test("accessibility: Home by keyboard with visible focus; Strova's animation sto
   // Tab from the page heading to Strova's next step, with a visible focus ring, and open it.
   const action = hero.getByRole("link").first();
   await page.getByRole("heading", { level: 1 }).focus();
-  for (let n = 0; n < 40 && !(await action.evaluate((el) => el === document.activeElement)); n++) await page.keyboard.press("Tab");
+  for (let n = 0; n < 40 && !(await action.evaluate((el) => el === el.ownerDocument.activeElement)); n++) await page.keyboard.press("Tab");
   await expect(action).toBeFocused();
-  expect(await action.evaluate((el) => getComputedStyle(el).outlineStyle)).not.toBe("none");
+  expect(await action.evaluate((el) => el.ownerDocument.defaultView?.getComputedStyle(el).outlineStyle)).not.toBe("none");
   const href = await action.getAttribute("href");
   await page.keyboard.press("Enter");
   await expect.poll(() => {

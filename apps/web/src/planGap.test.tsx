@@ -1,17 +1,17 @@
 /**
- * The plan page's "Your plan" card and the v2 gap report (owner feedback: the gap analysis is a
- * key capability), with `v2_enabled` on, against the MSW mocks end to end.
+ * The v2 gap report (owner feedback: the gap analysis is a key capability), with `v2_enabled` on,
+ * against the MSW mocks end to end. U13 removed the retired plan page and its "Your plan" card;
+ * PP-1 and PP-4 are covered on the role and interview pages (roles.test.tsx, test_plan_api.py).
  */
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter, Route, Routes } from "react-router";
+import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { gapApi } from "./api/gap";
 import { jobTargetsApi, resumesApi } from "./api/inputs";
 import { AppRoutes, createQueryClient } from "./App";
-import { PlanPage } from "./pages/plan/PlanPage";
 import { GAP_COPY } from "./copy";
 import { mockStore } from "./mocks/node";
 import { setFeatureOverrides } from "./theme/features";
@@ -57,54 +57,17 @@ function renderApp(path: string) {
   render(
     <QueryClientProvider client={createQueryClient()}>
       <MemoryRouter initialEntries={[path]}>
-        {/* U07 retired the v2 plan page from the routes; its parts are still tested here until U13 removes them. */}
-        <Routes>
-          <Route path="/interviews/:jobId/:resumeId" element={<PlanPage />} />
-          <Route path="*" element={<AppRoutes />} />
-        </Routes>
+        <AppRoutes />
       </MemoryRouter>
     </QueryClientProvider>,
   );
   return user;
 }
 
-describe("Your plan", () => {
-  it("PP-1, RD-2: one card lists the steps; the first is open with the rehearsal setup and Start", async () => {
-    const { jobId, resumeId } = await interview();
-    renderApp(`/interviews/${jobId}/${resumeId}`);
-    const card = await screen.findByRole("region", { name: "Your plan" });
-    const steps = await within(card).findAllByTestId("plan-step");
-    expect(steps.length).toBeGreaterThan(1);
-    expect(steps[0]).toHaveAttribute("data-state", "open");
-    expect(within(steps[0]).getByRole("form", { name: "Rehearsal setup" })).toBeInTheDocument();
-    expect(within(steps[0]).getByRole("button", { name: /^Start (your first )?rehearsal$/ })).toBeInTheDocument();
-    // Later steps are one line each, and can be opened instead.
-    expect(steps[1]).toHaveAttribute("data-state", "todo");
-    expect(within(steps[1]).queryByRole("form")).toBeNull();
-    // The old two cards are gone.
-    expect(screen.queryByRole("region", { name: "Next rehearsal" })).toBeNull();
-    expect(screen.queryByTestId("day-plan")).toBeNull();
-  });
-
-  it("PP-4: opening another step sets the rehearsal up from that step", async () => {
-    const { jobId, resumeId } = await interview();
-    const user = renderApp(`/interviews/${jobId}/${resumeId}`);
-    const card = await screen.findByRole("region", { name: "Your plan" });
-    const steps = await within(card).findAllByTestId("plan-step");
-    await user.click(within(steps[1]).getByRole("button", { name: "Open" }));
-    const now = within(card).getAllByTestId("plan-step");
-    expect(now[1]).toHaveAttribute("data-state", "open");
-    expect(now[0]).toHaveAttribute("data-state", "todo");
-    expect(within(now[1]).getByRole("form", { name: "Rehearsal setup" })).toBeInTheDocument();
-  });
-});
-
 describe("gap report (v2)", () => {
-  it("GA-1: Show full report opens a v2 report with the match score, strengths, gaps, probes and practice plan", async () => {
-    const { jobId, resumeId, gap } = await interview();
-    const user = renderApp(`/interviews/${jobId}/${resumeId}`);
-    const probe = await screen.findByRole("region", { name: "Where they'll probe" });
-    await user.click(await within(probe).findByRole("link", { name: "Show full report" }));
+  it("GA-1: the v2 report with the match score, strengths, gaps, probes and practice plan", async () => {
+    const { jobId, gap } = await interview();
+    renderApp(`/jobs/${jobId}/gap-report`);
     expect(await screen.findByRole("heading", { level: 1, name: "Gap report" })).toBeInTheDocument();
     expect(await screen.findByTestId("match-score")).toHaveTextContent(String(gap.analysis?.match_score));
     for (const name of ["Match score", "Strengths", GAP_COPY.heading, "Where they'll probe", "Practice plan"]) {
