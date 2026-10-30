@@ -1,13 +1,14 @@
 /**
  * RM-1 (mockup #cvs): "{First name}'s Resumes". Every resume, the main one marked, each with its
- * open issues and story ideas. The user can make another resume main (RM-2).
+ * roles, open issues and story ideas. The user can make another resume main (RM-2).
  */
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router";
 
 import { resumesApi } from "../../api/inputs";
+import { rolesApi } from "../../api/roles";
 import { useAuth, useResumeIssues, useResumes, useStoryIdeas } from "../../api/hooks";
-import type { ResumeOut } from "../../api/types";
+import type { ResumeOut, RoleOut } from "../../api/types";
 import { resumesLabel } from "../../components/Layout";
 import { CvLibrary } from "../../components/LibrarySection";
 import { ErrorNotice, Loading } from "../../components/ui";
@@ -19,7 +20,18 @@ const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
 export const resumePath = (id: string) => `/resumes/${id}`;
 
-function ResumeRow({ resume }: { resume: ResumeOut }) {
+/** "Stripe and Shopify": the companies of the roles whose interviews use this resume. */
+function usedBy(roles: RoleOut[] | undefined, resumeId: string): string | null {
+  if (!roles) return null;
+  const names = roles
+    .filter((r) => r.interviews.some((i) => i.interview.resume_id === resumeId))
+    .map((r) => r.role.company_name ?? r.role.name ?? "a role");
+  if (names.length === 0) return "Not used by a role";
+  const list = names.length === 1 ? names[0] : `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
+  return `Used by ${list}`;
+}
+
+function ResumeRow({ resume, roles }: { resume: ResumeOut; roles: RoleOut[] | undefined }) {
   const ready = resume.status === "extracted";
   const issues = useResumeIssues(ready ? resume.id : null);
   const ideas = useStoryIdeas(ready ? resume.id : null);
@@ -31,6 +43,7 @@ function ResumeRow({ resume }: { resume: ResumeOut }) {
   const facts = !ready
     ? ["Still being read"]
     : [
+        usedBy(roles, resume.id),
         issues.data ? `${plural(issues.data.open.length, "issue")} open` : null,
         ideas.data ? plural(ideas.data.ideas.length, "story idea") : null,
       ].filter(Boolean);
@@ -62,6 +75,7 @@ function ResumeRow({ resume }: { resume: ResumeOut }) {
 export function ResumesListPage() {
   const auth = useAuth();
   const resumes = useResumes();
+  const roles = useQuery({ queryKey: ["roles"], queryFn: rolesApi.list });
   const live = (resumes.data ?? []).filter((r) => !r.deleted);
   const full = live.length >= MAX_RESUMES;
   return (
@@ -99,7 +113,7 @@ export function ResumesListPage() {
           {live.length === 0 ? (
             <p className="sx-muted">No resume yet. Add one and Strova reads it.</p>
           ) : (
-            live.map((r) => <ResumeRow key={r.id} resume={r} />)
+            live.map((r) => <ResumeRow key={r.id} resume={r} roles={roles.data} />)
           )}
         </div>
       )}

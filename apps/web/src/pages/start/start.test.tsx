@@ -214,6 +214,7 @@ describe("resume pages", () => {
     expect(within(card).getAllByRole("link", { name: /^Open / })).toHaveLength(2);
     const main = screen.getByText("Main");
     expect(main.closest(".sx-list-row")).toHaveTextContent(first.name ?? "");
+    expect(await within(main.closest(".sx-list-row") as HTMLElement).findByText(/Not used by a role/)).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Make main" }));
     await waitFor(() => expect(screen.getByText("Main").closest(".sx-list-row")).toHaveTextContent(second.name ?? ""));
   });
