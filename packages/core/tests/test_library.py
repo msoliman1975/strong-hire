@@ -62,7 +62,7 @@ def test_default_resume_names() -> None:
     when = datetime(2026, 10, 7, 23, 0, tzinfo=UTC)
     assert default_resume_name("Ana Lopez - CV.pdf", when) == "Ana Lopez - CV"
     assert default_resume_name("cv.final.docx", when) == "cv.final"
-    assert default_resume_name(None, when) == "CV 2026-10-07"
+    assert default_resume_name(None, when) == "Resume 2026-10-07"
 
 
 def test_clean_name() -> None:
