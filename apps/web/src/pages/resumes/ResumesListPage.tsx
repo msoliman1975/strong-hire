@@ -38,7 +38,9 @@ function ResumeRow({ resume }: { resume: ResumeOut }) {
     <div className="sx-list-row">
       <div className="sx-stack" style={{ gap: 2 }}>
         <strong>
-          <Link to={resumePath(resume.id)}>{resume.name ?? "Resume"}</Link>{" "}
+          <Link className="sx-plain" to={resumePath(resume.id)}>
+            {resume.name ?? "Resume"}
+          </Link>{" "}
           {resume.is_main && <span className="sx-chip dark">Main</span>}
         </strong>
         <span className="sx-small sx-muted">{facts.join(" · ")}</span>
@@ -49,7 +51,7 @@ function ResumeRow({ resume }: { resume: ResumeOut }) {
             Make main
           </button>
         )}
-        <Link className="sx-small" to={resumePath(resume.id)} aria-label={`Open ${resume.name ?? "resume"}`}>
+        <Link className="sx-small sx-plain" to={resumePath(resume.id)} aria-label={`Open ${resume.name ?? "resume"}`}>
           Open
         </Link>
       </span>

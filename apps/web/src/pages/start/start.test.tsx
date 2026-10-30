@@ -148,15 +148,19 @@ describe("first run", () => {
 
   it("ON-4: breakdown and issues on one screen, with fix and accept, Back and Continue", async () => {
     const resume = await addResume();
-    renderApp(`/start/check/${resume.id}`);
+    const record = mockStore.db.resumes.find((r) => r.id === resume.id);
+    if (record?.resume) record.resume = { ...record.resume, summary: "Backend engineer." };
+    const user = renderApp(`/start/check/${resume.id}`);
     expect(await screen.findByRole("heading", { level: 1, name: "Breakdown and issues" })).toBeInTheDocument();
-    expect(screen.getByRole("complementary", { name: "What we found" })).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: "Continue" }).length).toBeGreaterThan(0);
-    expect(screen.getAllByRole("link", { name: "Back" })[0]).toHaveAttribute("href", `/start/ready/${resume.id}`);
-    const panel = screen.getByRole("complementary", { name: "What we found" });
-    const accept = within(panel).queryAllByRole("button", { name: /^Accept/ });
-    const fix = within(panel).queryAllByRole("button", { name: /^(Fix|Add|Write|Check|Open|Mark|Say)/ });
-    expect(accept.length + fix.length).toBeGreaterThan(0);
+    const breakdown = screen.getByRole("region", { name: "Breakdown" });
+    expect(within(breakdown).getByRole("link", { name: "Edit" })).toHaveAttribute("href", `/resumes/${resume.id}/check`);
+    const issues = screen.getByRole("region", { name: "Issues" });
+    await within(issues).findByText("A very short summary");
+    expect(within(issues).getByRole("link", { name: "Add to the summary" })).toHaveAttribute("href", `/resumes/${resume.id}/check`);
+    await user.click(within(issues).getAllByRole("button", { name: /^Accept/ })[0]);
+    await waitFor(() => expect(within(issues).getByText(/\d+ open · 1 accepted/)).toBeInTheDocument());
+    expect(screen.getByRole("link", { name: "Continue" })).toHaveAttribute("href", "/start/plan-style");
+    expect(screen.getByRole("link", { name: "Back" })).toHaveAttribute("href", `/start/ready/${resume.id}`);
   });
 
   it("ON-5: the plan style screen shows what the plan covers now and saves the style", async () => {

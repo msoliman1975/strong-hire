@@ -15,6 +15,7 @@ import { competencyLabel } from "../../labels";
 import { resumeCheckPath } from "../../paths";
 import { storyPath } from "../stories/paths";
 import { BreakdownSummary } from "../start/ResumeReadyPage";
+import { IssueList } from "./IssueList";
 import { START } from "../start/paths";
 
 const PART: Record<string, string> = {
@@ -43,10 +44,6 @@ export function ResumeDetailPage() {
     mutationFn: (ref: string) => resumesApi.dismissIdea(resumeId, ref),
     onSuccess: refresh,
   });
-  const accept = useMutation({
-    mutationFn: (key: string) => resumesApi.setAcceptedIssue(resumeId, key, true),
-    onSuccess: refresh,
-  });
 
   if (record.isError) return <ErrorNotice error={record.error} />;
   if (!record.data) return <Loading label="Loading your resume" />;
@@ -55,9 +52,6 @@ export function ResumeDetailPage() {
 
   return (
     <div className="sx-page">
-      <p className="sx-small">
-        <Link to="/resumes">Back to your resumes</Link>
-      </p>
       <div className="sx-between">
         <div className="sx-stack" style={{ gap: 6 }}>
           <h1>{record.data.name ?? "Resume"}</h1>
@@ -148,28 +142,8 @@ export function ResumeDetailPage() {
                   <span className="sx-small sx-muted">{issues.data ? `${open.length} open` : ""}</span>
                 </div>
                 {issues.isError && <ErrorNotice error={issues.error} />}
-                {accept.isError && <ErrorNotice error={accept.error} />}
                 {issues.data && open.length === 0 && <p className="sx-muted sx-small">Nothing to fix. Your resume reads well.</p>}
-                {open.map((issue) => (
-                  <div key={issue.key} className={`sx-notice ${issue.severity === "low" ? "ground" : "warn"}`}>
-                    <strong style={issue.severity === "low" ? undefined : { color: "var(--sh-warn-ink)" }}>{issue.title}</strong>
-                    <br />
-                    <span className={`sx-small${issue.severity === "low" ? " sx-muted" : ""}`}>{issue.detail}</span>
-                    <div className="sx-row sx-small" style={{ marginTop: 6 }}>
-                      <Link className="sx-btn quiet sm" style={{ padding: 0 }} to={resumeCheckPath(resumeId)}>
-                        {issue.fixLabel}
-                      </Link>
-                      <button
-                        type="button"
-                        className="sx-btn quiet sm"
-                        onClick={() => accept.mutate(issue.key)}
-                        disabled={accept.isPending}
-                      >
-                        {issue.acceptLabel}
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                <IssueList resumeId={resumeId} issues={open} compactActions />
               </section>
             </div>
           </div>

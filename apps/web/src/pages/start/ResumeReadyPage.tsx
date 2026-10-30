@@ -12,6 +12,7 @@ import { ErrorNotice, Loading } from "../../components/ui";
 import "../../components/ux/ux.css";
 import { competencyLabel } from "../../labels";
 import { formatDate } from "../onboarding/resumeChecks";
+import { issueLine } from "../resumes/IssueList";
 import { breakdownPath, PLAN_STYLE } from "./paths";
 
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
@@ -140,7 +141,7 @@ export function ResumeReadyPage() {
           {open.map((issue) => (
             <div key={issue.key} className={`sx-notice sx-small ${issue.severity === "high" || issue.severity === "medium" ? "warn" : "ground"}`}>
               <strong style={issue.severity === "low" ? undefined : { color: "var(--sh-warn-ink)" }}>{issue.title}.</strong>{" "}
-              {issue.detail}
+              {issueLine(issue)}
             </div>
           ))}
           <div className="sx-between">

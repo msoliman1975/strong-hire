@@ -175,7 +175,6 @@ export function ResumeCheckV2({
   fresh = false,
   confirmedAt = null,
   uploadedAt = null,
-  onboarding,
 }: {
   jobId: string;
   resumeId: string;
@@ -191,11 +190,6 @@ export function ResumeCheckV2({
   /** When the CV was last saved from this page (ResumeOut.confirmed_at). */
   confirmedAt?: string | null;
   uploadedAt?: string | null;
-  /**
-   * ON-4: the first-run "Breakdown and issues" screen. The head says so, and the actions are
-   * Continue (save, then go on) and Back.
-   */
-  onboarding?: { continueTo: string; backTo: string };
 }) {
   const steps = useOnboardingSteps();
   const navigate = useNavigate();
@@ -408,16 +402,7 @@ export function ResumeCheckV2({
 
   // One obvious next step: the interview plan inside a rehearsal. From Resumes, a job to practice
   // for right after an upload, or this CV for an interview when the user comes back to it.
-  const actions = onboarding ? (
-    <div className="row cvc-actions">
-      <button type="button" className="btn" onClick={() => saveThen(onboarding.continueTo)} disabled={save.isPending}>
-        Continue
-      </button>
-      <Link className="btn btn--secondary" to={onboarding.backTo}>
-        Back
-      </Link>
-    </div>
-  ) : (
+  const actions = (
     <div className="row cvc-actions">
       {jobId ? (
         <button type="button" className="btn btn--secondary" onClick={onSaveDraft} disabled={save.isPending}>
@@ -454,15 +439,10 @@ export function ResumeCheckV2({
         </p>
       )}
       <div className="cvc-head">
-        <PageHead
-          title={onboarding ? "Breakdown and issues" : "Check your resume"}
-          eyebrow={onboarding ? (name ?? "Your resume") : name ? `Resumes · ${name}` : "Resumes"}
-          eyebrowTone="muted"
-        >
+        <PageHead title="Check your resume" eyebrow={name ? `Resumes · ${name}` : "Resumes"} eyebrowTone="muted">
           <p>
-            {onboarding
-              ? "Check what Strova read, and fix or accept each issue. Interviewers and your match scores read this version."
-              : "We read your resume into the parts below. Fix anything we got wrong, and look at what we found. Interviewers and your match scores read this version."}
+            We read your resume into the parts below. Fix anything we got wrong, and look at what we found. Interviewers and
+            your match scores read this version.
           </p>
           <p className="muted small cvc-saved" data-testid="cvc-saved">
             {confirmedAt
@@ -575,9 +555,7 @@ export function ResumeCheckV2({
           <section className="cvc-card cvc-next" aria-label="Next step">
             <p>
               <b>Looks right?</b>{" "}
-              {onboarding
-                ? "Next, choose how you like to work."
-                : jobId
+              {jobId
                 ? "Next, your interview plan for this job."
                 : fresh
                   ? "Next, add a job description and we compare your resume with it."
