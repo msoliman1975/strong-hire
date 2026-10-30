@@ -32,8 +32,8 @@ import {
   interviewTypeHint,
   interviewTypeLabel,
   levelLabel,
-  modeHint,
-  modeLabel,
+  modeHintV2 as modeHint,
+  modeLabelV2 as modeLabel,
 } from "../../labels";
 import type { PlanView, Tone } from "./api";
 import { GAP_COPY } from "../../copy";
@@ -286,8 +286,8 @@ export function PlanSetup({
         {!gapReady && (
           <p className="hint" data-testid="needs-gap">
             {gapRunning
-              ? "Comparing your CV with the job. The rehearsal unlocks when it is done, in about a minute."
-              : "The rehearsal starts once the gap analysis for this job and CV is ready."}
+              ? "Comparing your resume with the job. The rehearsal unlocks when it is done, in about a minute."
+              : "The rehearsal starts once the gap analysis for this job and resume is ready."}
           </p>
         )}
         {(sessionsClosed || isPausedError(start.error)) && (

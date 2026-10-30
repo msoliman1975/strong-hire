@@ -157,7 +157,7 @@ describe("v2 Home", () => {
     renderHome([job("j1")]);
     const a = await screen.findByRole("region", { name: "Turn your career into stories that win interviews." });
     const b = screen.getByRole("region", { name: "Get ready for the interview you have." });
-    const r = screen.getByRole("region", { name: "The CV your interviews are measured against." });
+    const r = screen.getByRole("region", { name: "The resume your interviews are measured against." });
     expect(r.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(b.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     // No journey letters.

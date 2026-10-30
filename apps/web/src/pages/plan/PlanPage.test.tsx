@@ -269,7 +269,7 @@ describe("interview plan page", () => {
     expect(within(setup).getByRole("radio", { name: /^Hiring manager/ })).toBeChecked();
     expect(within(setup).getByRole("radio", { name: /^Tough/ })).toBeChecked();
     expect(within(setup).getByRole("radio", { name: /^Like Acme/ })).toBeChecked();
-    expect(within(setup).getByRole("radio", { name: /^Coach/ })).toBeChecked();
+    expect(within(setup).getByRole("radio", { name: /^Practice/ })).toBeChecked();
     expect(within(setup).getByRole("radio", { name: /^30 minutes/ })).toBeChecked();
 
     await user.click(within(setup).getByRole("radio", { name: /^Behavioral/ }));
@@ -294,6 +294,20 @@ describe("interview plan page", () => {
         tone: "direct",
       },
     });
+  });
+
+  it("RH-5: the mode labels are Realistic and Practice, with what Practice means; Practice is stored as coach", async () => {
+    const { user, bodies } = renderPlan(planView());
+    const setup = await screen.findByRole("form", { name: "Rehearsal setup" });
+    const mode = await within(setup).findByRole("group", { name: "Mode" });
+    expect(within(mode).getAllByRole("radio").map((r) => r.getAttribute("value"))).toEqual(["coach", "realistic"]);
+    const practice = within(mode).getByRole("radio", { name: /^Practice/ });
+    expect(within(mode).queryByRole("radio", { name: /^Coach/ })).toBeNull();
+    expect(mode).toHaveTextContent("Pause, ask for a hint, or redo an answer. Does not count toward readiness.");
+    await user.click(practice);
+    await user.click(within(setup).getByRole("button", { name: "Start rehearsal" }));
+    await screen.findByTestId("where");
+    expect(bodies[0]?.config.mode).toBe("coach");
   });
 
   it("PP-4: Custom opens the shared Custom setup", async () => {

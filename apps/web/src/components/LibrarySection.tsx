@@ -62,6 +62,8 @@ interface Props {
 const WORDS = {
   job: { thing: "job description", deleted: "job description", empty: "You have no saved job descriptions." },
   cv: { thing: "CV", deleted: "CV and its file", empty: "You have no saved CVs." },
+  /** NV-2: the v2 wording for the same list. */
+  resume: { thing: "resume", deleted: "resume and its file", empty: "You have no saved resumes." },
 };
 
 /** R1 library list with rename and delete; LB-2 archive and restore for job descriptions. */
@@ -79,7 +81,8 @@ export function Library({
   toolbar,
   empty,
 }: Props) {
-  const words = WORDS[kind];
+  const v2 = useFeature("v2_enabled");
+  const words = WORDS[kind === "cv" && v2 ? "resume" : kind];
   const headingId = `library-${kind}-heading`;
   const dialog = useRef<HTMLDialogElement>(null);
   const [editing, setEditing] = useState<{ id: string; value: string } | null>(null);
@@ -325,7 +328,7 @@ export function CvLibrary() {
   return (
     <Library
       kind="cv"
-      title="Saved CVs"
+      title={v2 ? "Saved resumes" : "Saved CVs"}
       items={resumes.data?.map((r) => {
         if (!v2 || r.status === "pending") {
           return {

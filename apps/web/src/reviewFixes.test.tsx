@@ -108,7 +108,7 @@ describe("Resumes card on Home (v2)", () => {
     await addResume("First CV text, Python and Go.");
     await addResume("Second CV text, Python, Go and Kafka.");
     renderApp("/");
-    const card = await screen.findByRole("region", { name: "The CV your interviews are measured against." });
+    const card = await screen.findByRole("region", { name: "The resume your interviews are measured against." });
     expect(await within(card).findByText("On file")).toBeInTheDocument();
     expect(within(card).getByText("2")).toBeInTheDocument();
     expect(card).toHaveTextContent("Not checked yet");
@@ -121,8 +121,8 @@ describe("Resumes card on Home (v2)", () => {
 
   it("LB-1: with no resume, the card offers Add a resume", async () => {
     renderApp("/");
-    const card = await screen.findByRole("region", { name: "The CV your interviews are measured against." });
-    expect(await within(card).findByText(/Add the CV you will interview with/)).toBeInTheDocument();
+    const card = await screen.findByRole("region", { name: "The resume your interviews are measured against." });
+    expect(await within(card).findByText(/Add the resume you will interview with/)).toBeInTheDocument();
     expect(within(card).getByRole("link", { name: "Add a resume" })).toHaveAttribute("href", "/resumes");
     expect(within(card).queryByRole("link", { name: "Check a resume" })).toBeNull();
   });

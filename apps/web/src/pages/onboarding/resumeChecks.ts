@@ -458,7 +458,7 @@ export function checkResume(resume: Resume, options: CheckOptions): ResumeIssue[
       group: "detail",
       severity: "medium",
       title: "No summary",
-      detail: "Your CV has no intro.",
+      detail: "Your resume has no intro.",
       why: '"Tell me about yourself" opens most interviews. Two or three lines here give you a ready answer.',
       fixLabel: "Write a summary",
       acceptLabel: "Accept, no summary",
@@ -568,7 +568,7 @@ export function checkResume(resume: Resume, options: CheckOptions): ResumeIssue[
       group: "job",
       severity: "medium",
       title:
-        missing.length === 1 ? "A must-have skill the CV never shows" : `${missing.length} must-have skills the CV never shows`,
+        missing.length === 1 ? "A must-have skill the resume never shows" : `${missing.length} must-have skills the resume never shows`,
       detail: missing.join(", "),
       why: "The job lists these as must-haves. If you have them, add them to Skills or to an achievement; if not, prepare to talk about it.",
       fixLabel: "Open Skills",

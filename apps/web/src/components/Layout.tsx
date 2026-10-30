@@ -6,26 +6,28 @@ import { authApi } from "../api/auth";
 import { useAuth, useModelUsage, useUsage } from "../api/hooks";
 import type { AuthUser, ModelUsage, Usage } from "../api/types";
 import { hasSlogan, SLOGAN } from "../labels";
-import { newCoachPath } from "../pages/coach/paths";
 import { useFeature } from "../theme/features";
 import { BrandMark } from "./BrandMark";
 import { ModelUsageBadge } from "./ModelUsageBadge";
-import { AvatarMenu, PlanChip, UpdatesBell, useFirstVisitGreeting } from "./TopBar";
+import { Strova } from "./strova";
+import { AvatarMenu, PlanChip } from "./TopBar";
 import { Tour } from "./Tour";
-import { CoachMark, ErrorNotice, Loading } from "./ui";
+import { ErrorNotice, Loading } from "./ui";
 import { UsageMeter } from "./UsageMeter";
 
 /** Logo, name and (once agreed) the slogan. A link on signed-in pages, plain text elsewhere. */
-function Brand({ link, tone = "light" }: { link: boolean; tone?: "light" | "dark" }) {
+function Brand({ link, tone = "light", lockup = false }: { link: boolean; tone?: "light" | "dark"; lockup?: boolean }) {
   const inner = (
     <>
       <BrandMark size={26} tone={tone} />
       <span className="brand__name">Strong Hire</span>
+      {/* SV-7: the lockup (ux-spec section 4.5). Strova is never a logo, only these words. */}
+      {lockup && <span className="brand__with">with Strova</span>}
       {hasSlogan(SLOGAN) && <span className="brand__slogan">{SLOGAN}</span>}
     </>
   );
   return link ? (
-    <Link className="brand" to="/" aria-label="Strong Hire, interview rehearsals">
+    <Link className="brand" to="/" aria-label={lockup ? "Strong Hire with Strova, home" : "Strong Hire, interview rehearsals"}>
       {inner}
     </Link>
   ) : (
@@ -104,7 +106,17 @@ function AccountMenu({
   );
 }
 
-type NavItem = { to: string; label: string; end?: boolean; match?: RegExp; badge?: string };
+type NavItem = {
+  to: string;
+  label: string;
+  end?: boolean;
+  match?: RegExp;
+  badge?: string;
+  /** NV-1: an 18 px interviewing Strova before the label. */
+  strova?: boolean;
+  /** The tour step that points at this item. */
+  tour?: string;
+};
 
 /** The v1 menu, shown until launch: the same labels and targets, so v1 users find their pages. */
 const V1_NAV: NavItem[] = [
@@ -116,19 +128,32 @@ const V1_NAV: NavItem[] = [
   { to: "/account", label: "Account" },
 ];
 
+/** NV-1: "{First name}'s Resumes" from the profile's full name; "Your resumes" without one. */
+export function resumesLabel(fullName: string | null | undefined): string {
+  const first = fullName?.trim().split(/\s+/)[0];
+  return first ? `${first}'s Resumes` : "Your resumes";
+}
+
 /**
- * UI-2: the v2 rail (canvas board R3 Shell): Home, Resumes, Interviews, Stories, Question bank
- * (the Questions page, with My questions as a tab) and Progress (the reports). Account, Plan and
- * billing, Reports and Sign out are in the top bar's avatar menu.
+ * NV-1: the v2 rail (ux-spec section 5): exactly Home, {First name}'s Resumes, Target roles,
+ * Rehearsals with Strova and Career Stories with Strova. NV-3: Question bank and Progress left
+ * the rail; their routes still work. Account, Plan and billing, Reports and Sign out are in the
+ * top bar's avatar menu.
  */
-const V2_NAV: NavItem[] = [
-  { to: "/", label: "Home", end: true },
-  { to: "/resumes", label: "Resumes" },
-  { to: "/jobs", label: "Interviews", match: /^\/(jobs|interviews|sessions)(\/|$)/ },
-  { to: "/stories", label: "Stories", match: /^\/(stories|coach)(\/|$)/ },
-  { to: "/questions", label: "Question bank", match: /^\/questions(\/|$)/, badge: "New" },
-  { to: "/reports", label: "Progress" },
-];
+function v2Nav(fullName: string | null | undefined): NavItem[] {
+  return [
+    { to: "/", label: "Home", end: true },
+    { to: "/resumes", label: resumesLabel(fullName), match: /^\/resumes(\/|$)/ },
+    { to: "/roles", label: "Target roles", match: /^\/(roles|jobs)(\/|$)/ },
+    {
+      to: "/rehearsals",
+      label: "Rehearsals with Strova",
+      match: /^\/(rehearsals|interviews|sessions)(\/|$)/,
+      strova: true,
+    },
+    { to: "/stories", label: "Career Stories with Strova", match: /^\/(stories|coach)(\/|$)/, tour: "coach" },
+  ];
+}
 
 const ACCOUNT_LINK: NavItem = { to: "/account", label: "Account" };
 
@@ -137,23 +162,28 @@ const DEV_NAV: NavItem = { to: "/dev/interview", label: "Text interview (dev)" }
 /** The v2 avatar menu after Account, Plan and billing and Reports. The dev text interview shows in dev builds only. */
 const V2_AVATAR_EXTRA = [{ to: "/help", label: "Help and how it works" }, ...(import.meta.env.DEV ? [DEV_NAV] : [])];
 
-/** UI-2: the left rail menu. "Stories" and the v2 labels show only when `v2_enabled` is on. */
+/** UI-2, NV-1: the left rail menu. The v2 items show only when `v2_enabled` is on. */
 export function RailNav() {
   const v2 = useFeature("v2_enabled");
+  const auth = useAuth();
   const { pathname } = useLocation();
   const item = (it: NavItem) => {
     // NavLink only marks exact routes; items with `match` cover several route trees.
     const matched = it.match?.test(pathname) ?? false;
-    const label = it.badge ? (
+    const label = (
       <>
+        {/* Decorative next to its label, so the link reads "Rehearsals with Strova". */}
+        {it.strova && (
+          <span className="rail-nav__strova" aria-hidden="true">
+            <Strova mode="interviewing" size={18} />
+          </span>
+        )}
         {it.label}
-        <span className="rail-nav__badge">{it.badge}</span>
+        {it.badge && <span className="rail-nav__badge">{it.badge}</span>}
       </>
-    ) : (
-      it.label
     );
     return (
-      <li key={it.to}>
+      <li key={it.to} data-tour={it.tour}>
         {matched ? (
           <Link to={it.to} aria-current="page">
             {label}
@@ -169,7 +199,7 @@ export function RailNav() {
   return (
     <nav className="rail-nav" aria-label="Main">
       <ul>
-        {(v2 ? V2_NAV : V1_NAV).map(item)}
+        {(v2 ? v2Nav(auth.data?.user?.full_name) : V1_NAV).map(item)}
         {!v2 && import.meta.env.DEV && item(DEV_NAV)}
       </ul>
     </nav>
@@ -234,7 +264,7 @@ export function AppLayout() {
       <>
         <header className="app-header">
           <div className="app-header__inner">
-            <Brand link={false} />
+            <Brand link={false} lockup={v2} />
             <button type="button" className="header-signout" onClick={() => logout.mutate()}>
               Sign out
             </button>
@@ -253,7 +283,7 @@ export function AppLayout() {
       <div className="room">
         <header className="app-header app-header--room">
           <div className="app-header__inner">
-            <Brand link={false} tone="dark" />
+            <Brand link={false} tone="dark" lockup={v2} />
             <span className="live-bar__status">
               <span className="live-dot" aria-hidden="true" />
               Live interview
@@ -276,8 +306,6 @@ export function AppLayout() {
         email={email}
         usage={usage.data}
         modelUsage={modelUsage.data}
-        menuOpen={menuOpen}
-        onMenu={() => setMenuOpen((o) => !o)}
         onSignOut={() => logout.mutate()}
         signingOut={logout.isPending}
       />
@@ -319,17 +347,15 @@ export function AppLayout() {
 }
 
 /**
- * The v2 shell (canvas board R3 Shell): the top bar across the page (the mark, the first-visit
- * greeting, the updates bell, the plan chip, the avatar menu), and beside the page the rail with
- * only the menu and "Talk to your coach". Below 900px the rail folds behind the Menu button.
+ * The v2 shell (ux-spec section 5): the top bar (the lockup, the usage pill, the initials button
+ * for Profile and the account links) and beside the page the rail. On phones the rail becomes a
+ * horizontal strip that scrolls.
  */
 function V2Shell({
   user,
   email,
   usage,
   modelUsage,
-  menuOpen,
-  onMenu,
   onSignOut,
   signingOut,
 }: {
@@ -337,24 +363,19 @@ function V2Shell({
   email: string;
   usage: Usage | undefined;
   modelUsage: ModelUsage | undefined;
-  menuOpen: boolean;
-  onMenu: () => void;
   onSignOut: () => void;
   signingOut: boolean;
 }) {
-  const greeting = useFirstVisitGreeting(user);
   return (
     <div className="shell2">
       <a className="skip-link" href="#main">
         Skip to content
       </a>
       <header className="topbar" aria-label="Top bar">
-        <Brand link />
-        {greeting && <p className="topbar__greet">{greeting}</p>}
+        <Brand link lockup />
         <div className="topbar__right" data-tour="topbar">
           <ModelUsageBadge usage={modelUsage} />
           {usage && <PlanChip usage={usage} />}
-          {user && <UpdatesBell userId={user.id} />}
           <AvatarMenu
             name={user?.full_name ?? null}
             email={email}
@@ -362,36 +383,12 @@ function V2Shell({
             busy={signingOut}
             extraLinks={V2_AVATAR_EXTRA}
           />
-          <button
-            type="button"
-            className="menu-toggle"
-            aria-expanded={menuOpen}
-            aria-controls="main-menu"
-            onClick={onMenu}
-            data-tour="menu"
-          >
-            Menu
-          </button>
         </div>
       </header>
       <div className="shell2__body">
         <aside className="rail rail--v2">
-          <div className="rail__body" id="main-menu" data-open={menuOpen}>
-            <div data-tour="menu">
-              <RailNav />
-            </div>
-            <div className="rail__foot">
-              <Link className="rail__coach" to={newCoachPath()} data-tour="coach">
-                <CoachMark size={20} tone="dark" />
-                Talk to your coach
-              </Link>
-              {/* Phones: the top bar has no room for the plan chip, so it sits in the menu. */}
-              {usage && (
-                <div className="rail__plan">
-                  <PlanChip usage={usage} />
-                </div>
-              )}
-            </div>
+          <div className="rail__body" id="main-menu" data-tour="menu">
+            <RailNav />
           </div>
         </aside>
         <main id="main" className="page shell__main">

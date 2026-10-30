@@ -3153,6 +3153,86 @@ dialog::backdrop {
   }
 }
 
+/* SV-7: the lockup, "Strong Hire with Strova", with "with Strova" muted and regular. */
+.brand__with {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--sh-muted);
+  white-space: nowrap;
+}
+
+.app-header--room .brand__with {
+  color: var(--sh-room-muted);
+}
+
+.topbar .brand {
+  width: auto;
+}
+
+/* ux-spec section 5: the v2 rail sits on the page ground, with no panel or border, as in the mockup. */
+.rail.rail--v2 {
+  background: transparent;
+  border-right: 0;
+}
+
+/* SV-7: the initials as a round button, as in the mockup's top bar. */
+.topbar .topbar__avatar {
+  width: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.topbar .topbar__avatar .account-menu__initials {
+  width: 34px;
+  height: 34px;
+  background: var(--sh-sunken);
+  color: var(--sh-ink);
+}
+
+/* NV-1: Rehearsals with Strova carries an 18 px avatar before its label. */
+.rail.rail--v2 .rail-nav a {
+  padding: 9px 12px;
+}
+
+.rail-nav__strova {
+  display: inline-flex;
+  margin-right: 10px;
+}
+
+.rail-nav a[aria-current="page"] {
+  color: var(--sh-violet-ink);
+}
+
+/* NV-1: on phones the v2 rail is a horizontal strip that scrolls; nothing folds behind a button. */
+@media (max-width: 899px) {
+  .rail.rail--v2 {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--sh-line);
+  }
+
+  .rail.rail--v2 .rail__body {
+    display: block;
+  }
+
+  .rail.rail--v2 .rail-nav {
+    overflow-x: auto;
+  }
+
+  .rail.rail--v2 .rail-nav ul {
+    flex-direction: row;
+    gap: 3px;
+  }
+
+  .rail.rail--v2 .rail-nav a {
+    white-space: nowrap;
+  }
+
+  .shell2 .plan-chip {
+    display: inline-flex;
+  }
+}
+
 .rail__plan {
   display: none;
 }

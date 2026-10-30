@@ -85,7 +85,7 @@ export function useAcceptedIssues(resumeId: string, initial: readonly { key: str
   const accept = useCallback(
     (key: string, reason?: string) => {
       if (stored.size >= MAX_ACCEPTED && !stored.has(key)) {
-        setError(new Error(`You can accept up to ${MAX_ACCEPTED} issues on one CV.`));
+        setError(new Error(`You can accept up to ${MAX_ACCEPTED} issues on one resume.`));
         return;
       }
       void send(key, storedKey(key, reason), stored.get(key) ?? null);

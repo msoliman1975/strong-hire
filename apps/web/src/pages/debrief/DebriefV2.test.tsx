@@ -91,14 +91,14 @@ describe("v2 debrief", () => {
     expect(changeText({ ...PREVIOUS, hire_signal: "Lean Hire", change: 0, ended_at: null })).toBe(
       "The same as your last session.",
     );
-    expect(changeText(null)).toBe("Your first scored session for this interview.");
+    expect(changeText(null)).toBe("Your first scored take for this interview.");
   });
 
   it("DB-1: the first session has no dashed step", async () => {
     renderDebrief(debrief(null));
     await screen.findByTestId("hire-signal");
     expect(document.querySelector("[data-previous]")).toBeNull();
-    expect(screen.getByTestId("signal-change")).toHaveTextContent("Your first scored session");
+    expect(screen.getByTestId("signal-change")).toHaveTextContent("Your first scored take");
   });
 
   it("DB-1: the header links back to the plan and to the transcript, as on the canvas", async () => {

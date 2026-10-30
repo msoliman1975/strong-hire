@@ -19,7 +19,7 @@ import { keys, useSession } from "../api/hooks";
 import { paywallReason, sessionsApi } from "../api/sessions";
 import type { Phase, SessionRecord } from "../api/types";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
-import { difficultyLabel, interviewTypeLabel, modeLabel, phaseLabel } from "../labels";
+import { difficultyLabel, interviewTypeLabel, modeLabels, phaseLabel } from "../labels";
 import { useFeature } from "../theme/features";
 import { AnswerLengthBar } from "./AnswerLengthBar";
 import { SUGGESTED_ANSWER_SECONDS, useActivityTiming } from "./answerLength";
@@ -206,7 +206,7 @@ function LiveView({ session }: { session: SessionRecord }) {
       <PageHead title="Interview in progress">
         <p>
           {interviewTypeLabel[config.interview_type]} interview, {difficultyLabel[config.difficulty]} difficulty,{" "}
-          {modeLabel[config.mode]} mode
+          {modeLabels(v2).label[config.mode]} mode
           {/* TN-1: the tone stored on the session, as in the canvas room's header. */}
           {v2 && config.tone && `, ${ROOM_TONE_LABEL[config.tone]} tone`}
         </p>

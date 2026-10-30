@@ -19,7 +19,7 @@ import { JobTrend } from "../components/TrendChart";
 import { ErrorNotice, HireSignalScale, Loading, PageHead, Rubric } from "../components/ui";
 import { CustomNext } from "../custom/CustomNext";
 import { useRepeatSetup } from "../custom/repeat";
-import { competencyLabel, difficultyLabel, formatDate, interviewTypeLabel, modeLabel } from "../labels";
+import { competencyLabel, difficultyLabel, formatDate, interviewTypeLabel, modeLabels } from "../labels";
 import { useFeature } from "../theme/features";
 import { DebriefV2 } from "./debrief/DebriefV2";
 import { PracticeQuestions } from "./debrief/PracticeQuestions";
@@ -63,7 +63,7 @@ export function DebriefPage() {
       <PageHead title="Debrief">
         <p>
           {interviewTypeLabel[config.interview_type]} interview, {difficultyLabel[config.difficulty]} difficulty,{" "}
-          {modeLabel[config.mode]} mode, {session.minutes_billed} minutes
+          {modeLabels(v2).label[config.mode]} mode, {session.minutes_billed} minutes
           {date && `, ${formatDate(date)}`}
         </p>
         {/* TR-1 (S13): behind v2_enabled until launch. */}
