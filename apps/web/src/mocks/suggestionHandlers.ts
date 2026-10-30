@@ -169,7 +169,7 @@ function current(s: Suggestion): Suggestion {
   return { ...s, ...resolved.get(s.id) };
 }
 
-/** DB-5: the open suggestions of one take, for the mock debrief. */
+/** DB-4: the open suggestions of one take, for the mock debrief. */
 export function debriefSuggestions(sessionId: string, jobId: string): Suggestion[] {
   return sampleSuggestions({ sessionId, jobId })
     .filter((s) => PLACE_KINDS.debrief.includes(s.kind))

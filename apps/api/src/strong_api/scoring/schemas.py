@@ -139,7 +139,7 @@ class Debrief(_Out):
     )
     suggestions: list[Suggestion] = Field(
         default_factory=list,
-        description="DB-5, SG-2 to SG-4: Strova's open suggestions from this take, newest first.",
+        description="DB-4, SG-2 to SG-4: Strova's open suggestions from this take, newest first.",
     )
     next_plan_item: str | None = Field(
         default=None,

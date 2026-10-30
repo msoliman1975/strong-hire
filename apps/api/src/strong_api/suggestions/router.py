@@ -128,7 +128,7 @@ def _open_query(org_id: uuid.UUID, user_id: uuid.UUID) -> Select[SuggestionRow]:
 async def debrief_suggestions(
     db: Db, org_id: uuid.UUID, user_id: uuid.UUID, session_id: uuid.UUID
 ) -> list[Suggestion]:
-    """DB-5: the open suggestions from one take's debrief."""
+    """DB-4: the open suggestions from one take's debrief."""
     rows = await db.scalars(
         _open_query(org_id, user_id).where(
             SuggestionRow.source_session_id == session_id,

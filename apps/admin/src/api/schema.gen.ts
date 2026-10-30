@@ -5977,7 +5977,7 @@ export interface components {
             answers_at_bar?: components["schemas"]["AnswersAtBar"] | null;
             /**
              * Suggestions
-             * @description DB-5, SG-2 to SG-4: Strova's open suggestions from this take, newest first.
+             * @description DB-4, SG-2 to SG-4: Strova's open suggestions from this take, newest first.
              */
             suggestions?: components["schemas"]["Suggestion"][];
             /**

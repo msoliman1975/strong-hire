@@ -1,7 +1,7 @@
 """Suggestions from Strova, the API (U08): list by place, accept, dismiss and undo (SG-8), and
 what accepting each kind does: tune a story (SG-2), new story (SG-3), missing skill (SG-4),
 tailor for a role (SG-5), improve a resume line (SG-6), story idea (RM-4) and review (ST-11).
-The debrief carries the take's open suggestions (DB-5)."""
+The debrief carries the take's open suggestions (DB-4)."""
 
 from __future__ import annotations
 
@@ -352,12 +352,12 @@ async def test_st11_accept_a_review_applies_the_chosen_edits(
     assert (await _get_story(sessionmaker, story_id)).result == "It went well."
 
 
-async def test_db5_the_debrief_lists_the_takes_open_suggestions(
+async def test_db4_the_debrief_lists_the_takes_open_suggestions(
     sessionmaker: async_sessionmaker[AsyncSession],
     squeue: ScoringQueue,  # noqa: F811
     sclient: httpx.AsyncClient,  # noqa: F811
 ) -> None:
-    """DB-5, SG-4: after scoring, the debrief has the take's suggestions (with no stories, every
+    """DB-4, SG-4: after scoring, the debrief has the take's suggestions (with no stories, every
     tested skill is missing), and the plan item is null until U11."""
     target = await make_target(sessionmaker, gap=True)
     sid = await make_session(sessionmaker, target)
