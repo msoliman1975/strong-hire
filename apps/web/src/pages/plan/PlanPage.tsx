@@ -8,7 +8,7 @@ import { useState } from "react";
 import { Link, useParams } from "react-router";
 
 import type { ReportItem } from "../../api/types";
-import { CV_DELETED, ReportList } from "../../components/ReportList";
+import { ReportList, RESUME_DELETED } from "../../components/ReportList";
 import { Bar, ErrorNotice, Loading, PageHead, StatusBadge } from "../../components/ui";
 import { competencyLabel, formatDate, interviewTypeLabel } from "../../labels";
 import { contextPath, resumeCheckPath } from "../../paths";
@@ -33,7 +33,7 @@ function PlanBody({ plan, jobId, resumeId }: { plan: PlanView; jobId: string; re
   const posting = plan.job.posting;
   const company = plan.company_name ?? posting?.company_name ?? null;
   const title = posting ? `${posting.title}${company ? ` · ${company}` : ""}` : (plan.job.name ?? "Your interview");
-  const cvName = plan.resume.deleted ? CV_DELETED : (plan.resume.name ?? "your CV");
+  const cvName = plan.resume.deleted ? RESUME_DELETED : (plan.resume.name ?? "your resume");
   const gap = plan.gap;
   const analysis = gap?.status === "ready" ? gap.analysis : null;
   const verdicts = plan.reports.filter(isVerdict);
@@ -130,7 +130,7 @@ function PlanBody({ plan, jobId, resumeId }: { plan: PlanView; jobId: string; re
                   </ul>
                   <p className="muted small">
                     From the gap analysis on {formatDate(gap!.created_at)}.
-                    {gap!.stale && " The job, your CV or the company profile changed since; run it again to update it."}
+                    {gap!.stale && " The job, your resume or the company profile changed since; run it again to update it."}
                   </p>
                   <Link className="btn btn--secondary" to={`/jobs/${jobId}/gap-report?report=${encodeURIComponent(gap!.id)}`}>
                     Show full report
@@ -161,7 +161,7 @@ function PlanBody({ plan, jobId, resumeId }: { plan: PlanView; jobId: string; re
             <h2 id="plan-earlier-heading">Earlier rehearsals</h2>
             <p className="muted">
               {verdicts.length === 0
-                ? "No scored interview yet for this job and CV."
+                ? "No scored interview yet for this job and resume."
                 : `${verdicts.length} scored ${verdicts.length === 1 ? "interview" : "interviews"}. Latest hire signal: ${verdicts[0].hire_signal}.`}
             </p>
             {plan.reports.length > 0 && <ReportList reports={plan.reports} showJob={false} />}

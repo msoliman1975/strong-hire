@@ -3,7 +3,7 @@
  * The API rebuilds it from the latest debrief, gap analysis and story fit on every read.
  */
 import { ErrorNotice, Loading, Tag } from "../../components/ui";
-import { competencyLabel, difficultyLabel, formatDate, interviewTypeLabel, modeLabel } from "../../labels";
+import { competencyLabel, difficultyLabel, formatDate, interviewTypeLabel, modeLabelV2 as modeLabel } from "../../labels";
 import { useDayPlan, type DayPlanItem } from "./ReadinessApi";
 import "./Readiness.css";
 

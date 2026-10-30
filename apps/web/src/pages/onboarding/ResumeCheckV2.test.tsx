@@ -1,5 +1,5 @@
 /**
- * IN-3, IN-12: the v2 "Check your CV" page (behind v2_enabled). The CV as cards, the "What we
+ * IN-3, IN-12: the v2 "Check your resume" page (behind v2_enabled). The CV as cards, the "What we
  * found" panel, Fix and Accept. Runs against the MSW mock of PUT /resumes/{id}.
  */
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -84,7 +84,7 @@ describe("v2 Check your CV", () => {
     const { resume } = await seed();
     renderAt(`/resumes/${resume.id}/check`);
     await screen.findByRole("complementary", { name: "What we found" });
-    expect(screen.getByRole("heading", { name: "Check your CV" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Check your resume" })).toBeInTheDocument();
     expect(screen.getByText(fixtureResume.summary!)).toBeInTheDocument();
     const shoply = screen.getByRole("region", { name: "Software Engineer II · Shoply" });
     expect(within(shoply).getByText(/^Mar 2021 to now · /)).toBeInTheDocument();
@@ -260,7 +260,7 @@ describe("v2 Check your CV", () => {
     mockStore.db.resumes[0].confirmed_at = "2026-10-28T10:00:00Z";
     const puts = recordPutBodies();
     const user = renderAt("/resumes");
-    const list = await screen.findByRole("list", { name: "Saved CVs" });
+    const list = await screen.findByRole("list", { name: "Saved resumes" });
     await user.click(within(list).getAllByRole("link", { name: /^Open breakdown for / })[0]);
     await screen.findByRole("complementary", { name: "What we found" });
 
@@ -280,7 +280,7 @@ describe("v2 Check your CV", () => {
     ]);
 
     // Opened again from Resumes and edited again: still two roles.
-    await user.click(within(await screen.findByRole("list", { name: "Saved CVs" })).getAllByRole("link", { name: /^Open breakdown for / })[0]);
+    await user.click(within(await screen.findByRole("list", { name: "Saved resumes" })).getAllByRole("link", { name: /^Open breakdown for / })[0]);
     await screen.findByRole("complementary", { name: "What we found" });
     await user.click(screen.getByRole("button", { name: "Edit Software Engineer II · Shoply Inc" }));
     const again = screen.getByRole("group", { name: "Editing · Software Engineer II · Shoply Inc" });
@@ -363,7 +363,7 @@ describe("v2 Check your CV", () => {
     // A new upload from the Resumes page brings its reading job.
     const user = renderAt(`/resumes/${resume.id}/check?task=${task?.id ?? ""}`);
     await screen.findByRole("complementary", { name: "What we found" });
-    expect(screen.getByRole("status")).toHaveTextContent("We read your CV. Check it, then continue.");
+    expect(screen.getByRole("status")).toHaveTextContent("We read your resume. Check it, then continue.");
     const next = screen.getAllByRole("button", { name: "Add a job description to practice for" });
     expect(next).toHaveLength(2);
     expect(within(screen.getByRole("region", { name: "Next step" })).getByRole("button", { name: "Back to resumes" })).toBeInTheDocument();
@@ -378,7 +378,7 @@ describe("v2 Check your CV", () => {
     renderAt(`/jobs/${job.id}/resume/${resume.id}/check`);
     await screen.findByRole("complementary", { name: "What we found" });
     expect(screen.getAllByRole("button", { name: "Continue to your interview plan" })).toHaveLength(2);
-    expect(screen.queryByText("We read your CV. Check it, then continue.")).not.toBeInTheDocument();
+    expect(screen.queryByText("We read your resume. Check it, then continue.")).not.toBeInTheDocument();
   });
 
   it("IN-3: keeps the v1 form when v2_enabled is off", async () => {
@@ -398,9 +398,9 @@ describe("v2 coming back to a saved CV", () => {
   const expectSameBreakdown = async () => {
     await screen.findByRole("complementary", { name: "What we found" });
     expect(within(panel()).getByText("✓ Accepted: A skill missing from Skills")).toBeInTheDocument();
-    expect(screen.queryByText("We read your CV. Check it, then continue.")).not.toBeInTheDocument();
+    expect(screen.queryByText("We read your resume. Check it, then continue.")).not.toBeInTheDocument();
     expect(screen.getByTestId("cvc-saved")).toHaveTextContent(/^Last saved Oct 28(, 2026)? · \d+ issues? open$/);
-    expect(screen.getAllByRole("button", { name: "Use this CV for an interview" })).toHaveLength(2);
+    expect(screen.getAllByRole("button", { name: "Use this resume for an interview" })).toHaveLength(2);
     expect(screen.getAllByRole("button", { name: "Back to resumes" })).toHaveLength(2);
   };
 
@@ -408,7 +408,7 @@ describe("v2 coming back to a saved CV", () => {
     await seed();
     confirmed();
     const user = renderAt("/resumes");
-    const list = await screen.findByRole("list", { name: "Saved CVs" });
+    const list = await screen.findByRole("list", { name: "Saved resumes" });
     const row = within(list).getAllByRole("listitem")[0];
     expect(row).toHaveTextContent(/Checked Oct 28(, 2026)? · \d+ to fix · 1 accepted · \d+ high/);
     const open = within(row).getByRole("link", { name: /^Open breakdown for / });
@@ -420,7 +420,7 @@ describe("v2 coming back to a saved CV", () => {
   it("IN-12: a click on the row itself opens the breakdown, and Rename stays a rename", async () => {
     await seed();
     const user = renderAt("/resumes");
-    const list = await screen.findByRole("list", { name: "Saved CVs" });
+    const list = await screen.findByRole("list", { name: "Saved resumes" });
     const row = within(list).getAllByRole("listitem")[0];
     expect(row).toHaveTextContent("Not checked yet");
     await user.click(within(row).getByRole("button", { name: /^Rename / }));
@@ -442,9 +442,9 @@ describe("v2 coming back to a saved CV", () => {
     const puts = recordPutBodies();
     const user = renderAt(`/resumes/${resume.id}/check`);
     await screen.findByRole("complementary", { name: "What we found" });
-    expect(screen.queryByText("We read your CV. Check it, then continue.")).not.toBeInTheDocument();
+    expect(screen.queryByText("We read your resume. Check it, then continue.")).not.toBeInTheDocument();
     expect(screen.getByTestId("cvc-saved")).toHaveTextContent(/Not saved yet · \d+ issues? open/);
-    await user.click(screen.getAllByRole("button", { name: "Use this CV for an interview" })[0]);
+    await user.click(screen.getAllByRole("button", { name: "Use this resume for an interview" })[0]);
     expect(await screen.findByRole("heading", { name: "Add a job description" })).toBeInTheDocument();
     expect(puts).toHaveLength(1);
   });
@@ -457,7 +457,7 @@ describe("v2 coming back to a saved CV", () => {
     await resumesApi.get(second.id);
     confirmed();
     const user = renderAt("/");
-    const card = await screen.findByRole("region", { name: "The CV your interviews are measured against." });
+    const card = await screen.findByRole("region", { name: "The resume your interviews are measured against." });
     const links = await within(card).findAllByRole("link", { name: /^Open breakdown for / });
     expect(links.map((l) => l.getAttribute("href")).sort()).toEqual(
       mockStore.db.resumes.map((r) => `/resumes/${r.id}/check`).sort(),

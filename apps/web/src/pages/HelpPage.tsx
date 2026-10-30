@@ -51,9 +51,9 @@ export function HelpPage() {
       </section>
 
       <section className="card stack" aria-labelledby="help-modes">
-        <h2 id="help-modes">Coach mode and Realistic mode</h2>
+        <h2 id="help-modes">Practice mode and Realistic mode</h2>
         <p>
-          <b>Coach mode</b> lets you pause, ask for a hint, or redo an answer. It does not count toward your progress.
+          <b>Practice mode</b> lets you pause, ask for a hint, or redo an answer. It does not count toward readiness.
         </p>
         <p>
           <b>Realistic mode</b> runs like a real interview, with no interruptions. Only Realistic rehearsals count

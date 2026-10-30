@@ -186,10 +186,13 @@ export function UploadForm({
       {upload.isError && <ErrorNotice error={friendlyLimitError(upload.error)} />}
       {offer && (
         <div className="notice" role="status">
-          <p>You saved this CV before as {offer.saved.name ?? "a saved CV"}. Use it?</p>
+          <p>
+            You saved this {v2 ? "resume" : "CV"} before as {offer.saved.name ?? (v2 ? "a saved resume" : "a saved CV")}. Use
+            it?
+          </p>
           <div className="row">
             <button type="button" className="btn" onClick={() => onUseSaved(offer.saved)}>
-              Use the saved CV
+              {v2 ? "Use the saved resume" : "Use the saved CV"}
             </button>
             <button
               type="button"

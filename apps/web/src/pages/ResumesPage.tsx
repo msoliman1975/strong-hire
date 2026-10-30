@@ -19,7 +19,11 @@ export function ResumesPage() {
   return (
     <div className="page--narrow">
       <PageHead title="Resumes">
-        <p>Your saved CVs. Pick one when you set up an interview rehearsal. Deleting a CV keeps your reports.</p>
+        <p>
+          {v2
+            ? "Your saved resumes. Pick one when you add a target role. Deleting a resume keeps your reports."
+            : "Your saved CVs. Pick one when you set up an interview rehearsal. Deleting a CV keeps your reports."}
+        </p>
         {/* R3: the limits, as the API enforces them. */}
         {v2 && resumes.data && (
           <p className="muted small" data-testid="resume-limit">

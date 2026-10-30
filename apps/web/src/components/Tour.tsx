@@ -1,6 +1,6 @@
 /**
- * R3 explainability: a 3-step tour, once, on the first visit: the menu, "Talk to your coach" and
- * the top bar. Each step outlines its part of the page and says what it is for. Skip or finish,
+ * R3 explainability: a 3-step tour, once, on the first visit: the menu, Career Stories with Strova
+ * and the top bar. Each step outlines its part of the page and says what it is for. Skip or finish,
  * and it does not come back; "Replay the tour" on the How it works page starts it again. Remembered
  * per user in this browser. The tour is a small non-modal card, so the page stays usable.
  */
@@ -14,17 +14,17 @@ const STEPS = [
   {
     target: "menu",
     title: "Your menu",
-    text: "Resumes, Interviews and Stories are the three things you build. Question bank and Progress help you practice and see how far you've come.",
+    text: "Your resumes, your target roles and your Career Stories are what you build. Rehearse each interview with Strova, who plays the interviewer.",
   },
   {
     target: "coach",
-    title: "Talk to your coach",
-    text: "Your coach helps you turn your career into stories, by voice or by typing. Open it any time from here.",
+    title: "Career Stories with Strova",
+    text: "Strova helps you turn your career into stories, by voice or by typing. Open it any time from here.",
   },
   {
     target: "topbar",
     title: "Your top bar",
-    text: "Your plan and what's left of it, updates like a ready debrief, and your account. Help and how it works is in the account menu.",
+    text: "Your plan and what's left of it, and your profile and account. Help and how it works is in the account menu.",
   },
 ] as const;
 

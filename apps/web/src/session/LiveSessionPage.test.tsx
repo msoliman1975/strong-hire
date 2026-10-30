@@ -182,7 +182,7 @@ describe("live session page", () => {
   it("TN-1: with v2 on the room names the session's tone and lays out the canvas room", async () => {
     setFeatureOverrides({ v2_enabled: true });
     const { user } = renderLive(session({ config: { ...session().config, tone: "direct" } }));
-    expect(await screen.findByText(/Coach mode, direct tone/)).toBeInTheDocument();
+    expect(await screen.findByText(/Practice mode, direct tone/)).toBeInTheDocument();
     await joinRoom(user);
     expect(screen.getByRole("region", { name: "Interview" })).toHaveAttribute("data-v2", "true");
   });

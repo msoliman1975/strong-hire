@@ -120,16 +120,18 @@ export function CheckResumePage() {
     );
   }
 
+  // NV-2: v2 says resume while the reading finishes; v1 copy stays.
+  const cv = v2 ? "resume" : "CV";
   return (
     <div className="page--narrow">
       {jobId && <Steps current={1} steps={steps} links={onboardingLinks(jobId)} note={STEP_NOTES.check} />}
-      <PageHead title="Check your CV">
+      <PageHead title={`Check your ${cv}`}>
         {v2 ? (
-          <p>We are reading your CV. When it is done, you check it here, then continue.</p>
+          <p>We are reading your {cv}. When it is done, you check it here, then continue.</p>
         ) : (
           <p>
-            This is what we read from your CV. Check that each achievement is under the right job, fix
-            anything that is wrong, then confirm. We use this version to compare your CV with the job.
+            This is what we read from your {cv}. Check that each achievement is under the right job, fix
+            anything that is wrong, then confirm. We use this version to compare your {cv} with the job.
           </p>
         )}
       </PageHead>
@@ -138,12 +140,12 @@ export function CheckResumePage() {
         <div className="notice notice--error" role="alert">
           <p>{problem.message}</p>
           <p>
-            <Link to="/resumes">Upload a different CV</Link>
+            <Link to="/resumes">Upload a different {cv}</Link>
           </p>
         </div>
       )}
       {!problem && (record.isPending || record.data?.status === "pending") && <Loading label="Reading your resume." />}
-      {record.data?.deleted && <ErrorNotice error="This CV was deleted. Go back and add a resume." />}
+      {record.data?.deleted && <ErrorNotice error={`This ${cv} was deleted. Go back and add a resume.`} />}
       {parsed && !record.data?.deleted && (
         <ResumeEditor key={resumeId} jobId={jobId} resumeId={resumeId} original={parsed} />
       )}

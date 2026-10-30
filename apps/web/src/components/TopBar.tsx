@@ -212,13 +212,22 @@ function UpdateBody({ item, onGo }: { item: UpdateItem; onGo: () => void }) {
   );
 }
 
+/** "Ana Lopez" is AL, as in the mockup's top bar; one name or only an email gives two letters. */
+export function initialsOf(name: string | null, email: string): string {
+  const words = name?.trim().split(/\s+/).filter(Boolean) ?? [];
+  const text = words.length >= 2 ? `${words[0][0]}${words[words.length - 1][0]}` : (words[0] ?? email).slice(0, 2);
+  return text.toUpperCase() || "ME";
+}
+
 const AVATAR_LINKS: { to: string; label: string }[] = [
+  // SV-7: the initials button opens Profile first.
+  { to: "/account/profile", label: "Profile" },
   { to: "/account", label: "Account" },
   { to: "/account#plan", label: "Plan and billing" },
   { to: "/reports", label: "Reports" },
 ];
 
-/** Initials that open Account, Plan and billing, Reports, Help and how it works, and Sign out. */
+/** Initials that open Profile, Account, Plan and billing, Reports, Help and how it works, and Sign out. */
 export function AvatarMenu({
   name,
   email,
@@ -235,7 +244,7 @@ export function AvatarMenu({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useDismiss(open, () => setOpen(false));
-  const initials = (name?.trim() || email).slice(0, 2).toUpperCase() || "ME";
+  const initials = initialsOf(name, email);
   return (
     <div className="topbar__pop" ref={ref}>
       <button
@@ -249,7 +258,6 @@ export function AvatarMenu({
         <span className="account-menu__initials" aria-hidden="true">
           {initials}
         </span>
-        <span aria-hidden="true">▾</span>
       </button>
       {open && (
         <div className="topbar__menu topbar__account">

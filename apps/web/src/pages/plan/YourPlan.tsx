@@ -15,7 +15,7 @@ import { Link } from "react-router";
 import { reportPath } from "../../api/reports";
 import type { ReportItem } from "../../api/types";
 import { ErrorNotice, Loading } from "../../components/ui";
-import { competencyLabel, difficultyLabel, formatDate, interviewTypeLabel, modeLabel } from "../../labels";
+import { competencyLabel, difficultyLabel, formatDate, interviewTypeLabel, modeLabelV2 as modeLabel } from "../../labels";
 import { newCoachPath } from "../coach/paths";
 import type { PlanView } from "./api";
 import { PlanSetup, type SuggestedRehearsal } from "./PlanSetup";
