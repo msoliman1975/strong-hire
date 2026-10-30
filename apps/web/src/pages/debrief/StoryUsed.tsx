@@ -20,12 +20,12 @@ export function StoryUsed({ answer }: { answer: QuestionScore }) {
     return (
       <div className="debrief-story" data-testid="story-used">
         <p>
-          <b>Story used:</b>{" "}
+          Used your story{" "}
           {story ? <Link to={storyPath(story.id)}>{story.title}</Link> : stories.isPending ? "…" : "a story since deleted"}
         </p>
         {answer.story_fix && (
           <p>
-            <b>Story fix:</b> {answer.story_fix} <span className="debrief-story__sent">Sent to story</span>
+            <b>Fix:</b> {answer.story_fix} <span className="debrief-story__sent">Sent to story</span>
           </p>
         )}
       </div>

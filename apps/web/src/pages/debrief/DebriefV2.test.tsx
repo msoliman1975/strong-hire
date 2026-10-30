@@ -13,7 +13,7 @@ import { server } from "../../mocks/node";
 import { setFeatureOverrides } from "../../theme/features";
 import { DebriefPage } from "../DebriefPage";
 import { PRACTICE_NOTICE } from "./DebriefV2";
-import { changeText } from "./SignalCard";
+import { changeText } from "./StrovaVerdict";
 
 afterEach(() => setFeatureOverrides({}));
 
@@ -71,6 +71,32 @@ function renderDebrief(body: Debrief, v2 = true) {
   );
 }
 
+/** The take's interview (U06): a Behavioral interview at Example Corp whose take 2 is this session. */
+function withInterview() {
+  const interview = {
+    id: "iv1",
+    job_target_id: "j1",
+    interview_type: "behavioral",
+    acting_as: { title: "Hiring Manager", company: "Example Corp", text: "Strova is acting as Hiring Manager at Example Corp" },
+  };
+  const readiness = { score: 58, goal: 75 };
+  server.use(
+    http.get("*/api/roles/:jobId/interviews", () =>
+      HttpResponse.json([{ interview, readiness, takes_count: 2, last_signal: "Lean Hire" }]),
+    ),
+    http.get("*/api/interviews/:id", () =>
+      HttpResponse.json({
+        interview,
+        readiness,
+        takes: [
+          { number: 1, session_id: "s1" },
+          { number: 2, session_id: "s2" },
+        ],
+      }),
+    ),
+  );
+}
+
 const PREVIOUS: PreviousSignal = {
   session_id: "s1",
   hire_signal: "Lean No Hire",
@@ -79,44 +105,57 @@ const PREVIOUS: PreviousSignal = {
 };
 
 describe("v2 debrief", () => {
-  it("DB-1: shows the hire signal, the previous signal for the same pair dashed, and the change", async () => {
+  it("DB-1: shows the hire signal in its colour and the change from the previous take", async () => {
     renderDebrief(debrief(PREVIOUS));
-    expect(await screen.findByTestId("hire-signal")).toHaveTextContent("Lean Hire");
-    const scale = screen.getByRole("list", { name: /Hire signal scale: Lean Hire, previous Lean No Hire/ });
-    expect(within(scale).getByText("Lean Hire")).toHaveAttribute("aria-current", "true");
-    expect(within(scale).getByText("Lean No")).toHaveAttribute("data-previous", "true");
-    expect(screen.getByTestId("signal-change")).toHaveTextContent(/^Up from Lean No Hire on .+ \(dashed\)\.$/);
+    const signal = await screen.findByTestId("hire-signal");
+    expect(signal).toHaveTextContent("Lean Hire");
+    expect(signal).toHaveClass("sx-signal-lean");
+    expect(screen.getByTestId("signal-change")).toHaveTextContent("Up from Lean No Hire last take");
   });
 
-  it("DB-1: the change reads down, the same, or first session", () => {
-    expect(changeText({ ...PREVIOUS, hire_signal: "Hire", change: -1, ended_at: null })).toBe("Down from Hire (dashed).");
-    expect(changeText({ ...PREVIOUS, hire_signal: "Lean Hire", change: 0, ended_at: null })).toBe(
-      "The same as your last session.",
-    );
+  it("DB-1: the change reads down, the same, or first take", () => {
+    expect(changeText({ ...PREVIOUS, hire_signal: "Hire", change: -1, ended_at: null })).toBe("Down from Hire last take");
+    expect(changeText({ ...PREVIOUS, hire_signal: "Lean Hire", change: 0, ended_at: null })).toBe("The same as last take");
     expect(changeText(null)).toBe("Your first scored take for this interview.");
   });
 
-  it("DB-1: the first session has no dashed step", async () => {
+  it("DB-1: the first take says so", async () => {
     renderDebrief(debrief(null));
     await screen.findByTestId("hire-signal");
-    expect(document.querySelector("[data-previous]")).toBeNull();
     expect(screen.getByTestId("signal-change")).toHaveTextContent("Your first scored take");
   });
 
-  it("DB-1: the header links back to the plan and to the transcript, as on the canvas", async () => {
+  it("DB-3, TR-1: the header names the take, links back to the interview and to the transcript", async () => {
+    withInterview();
     renderDebrief(debrief());
-    expect(await screen.findByRole("link", { name: "Example Corp plan" })).toHaveAttribute("href", "/jobs/j1/gap");
+    expect(await screen.findByRole("heading", { level: 1, name: "Take 2 with Strova" })).toBeInTheDocument();
+    expect(screen.getByText("Example Corp · Behavioral · debrief")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Back to the interview" })).toHaveAttribute("href", "/interviews/iv1");
     expect(screen.getByRole("link", { name: "Read the transcript" })).toHaveAttribute(
       "href",
       expect.stringMatching(/^\/sessions\/.+\/transcript$/),
     );
   });
 
+  it("DB-3: the debrief opens with Strova's verdict in the interviewer hat", async () => {
+    withInterview();
+    renderDebrief(debrief(PREVIOUS));
+    const verdict = await screen.findByRole("region", { name: "Strova's verdict" });
+    expect(within(verdict).getByRole("img", { name: "Strova is interviewing" })).toHaveAttribute("width", "72");
+    expect(await within(verdict).findByText("Wearing the interviewer hat: Hiring Manager at Example Corp")).toBeInTheDocument();
+    expect(within(verdict).getByTestId("readiness")).toHaveTextContent("58");
+    expect(within(verdict).getByTestId("hire-signal")).toBeInTheDocument();
+    expect(within(verdict).getByTestId("answers-at-bar")).toBeInTheDocument();
+    // The verdict comes before the answers.
+    const answers = screen.getByRole("region", { name: "Answer by answer" });
+    expect(verdict.compareDocumentPosition(answers) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it("DB-2: says how many answers met the bar", async () => {
     renderDebrief(debrief());
     // The fixture: q1 averages 3 (met), q2 averages 2 (not met).
     expect(await screen.findByTestId("answers-at-bar")).toHaveTextContent("1 of 2");
-    expect(screen.getByText("Answers that met the bar")).toBeInTheDocument();
+    expect(screen.getByText("Met the bar")).toBeInTheDocument();
   });
 
   it("FB-2: each answer with its score, a quote from it, and its fix", async () => {
