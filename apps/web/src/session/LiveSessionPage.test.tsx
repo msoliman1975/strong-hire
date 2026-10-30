@@ -3,7 +3,7 @@
  * (IV-9), the interviewer state without the avatar (AV-1) and the answer length (LR-1).
  */
 import { QueryClientProvider } from "@tanstack/react-query";
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { MemoryRouter, Route, Routes, useSearchParams } from "react-router";
@@ -204,6 +204,40 @@ describe("live session page", () => {
     expect(screen.getByTestId("interviewer-state")).toHaveTextContent("Interviewer is thinking");
     act(() => voice.handlers!.onActivity("listening"));
     expect(screen.getByTestId("interviewer-state")).toHaveAttribute("data-activity", "listening");
+  });
+
+  it("SV-6: with v2 on the room shows Strova in the interviewer hat, her state as a chip, and who she is acting as", async () => {
+    setFeatureOverrides({ v2_enabled: true });
+    const record = session();
+    const interview = {
+      id: "iv1",
+      job_target_id: record.job_target_id,
+      resume_id: record.resume_id ?? "",
+      interview_type: record.config.interview_type,
+      custom: null,
+      created_at: "2026-10-30T10:00:00Z",
+      archived_at: null,
+      acting_as: { title: "Hiring Manager", company: "Stripe", text: "Strova is acting as Hiring Manager at Stripe" },
+    };
+    server.use(
+      http.get("*/api/roles/:jobId/interviews", () =>
+        HttpResponse.json([{ interview, readiness: { interview_id: "iv1", kind: "practice_estimate", score: null, goal: 75, competencies: [], change: null, takes_counted: 0 }, takes_count: 0, last_signal: null }]),
+      ),
+    );
+    const { user } = renderLive(record);
+    await joinRoom(user);
+    const room = screen.getByTestId("interviewer-state");
+    expect(within(room).getByRole("img", { name: "Strova is interviewing" })).toHaveAttribute("width", "160");
+    expect(within(room).getByRole("status")).toHaveTextContent("Strova is joining");
+    expect(await within(room).findByText(/Strova is acting as\s+Hiring Manager at Stripe/)).toBeInTheDocument();
+    act(() => voice.handlers!.onAgentJoined());
+    for (const state of ["listening", "thinking", "speaking"] as const) {
+      act(() => voice.handlers!.onActivity(state));
+      expect(within(room).getByRole("img", { name: `Strova is ${state}` })).toBeInTheDocument();
+      expect(within(room).getByRole("status")).toHaveTextContent(`Strova is ${state}`);
+      expect(within(room).getByRole("img").getAttribute("data-hat")).toBe("interviewer");
+    }
+    expect(screen.getByRole("button", { name: "End take" })).toBeInTheDocument();
   });
 
   it("IV-10, AV-1: with VITE_INTERVIEWER_AVATAR=on the avatar shows when the interviewer speaks and listens", async () => {

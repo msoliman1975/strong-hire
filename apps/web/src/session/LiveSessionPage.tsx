@@ -24,7 +24,9 @@ import { useFeature } from "../theme/features";
 import { AnswerLengthBar } from "./AnswerLengthBar";
 import { SUGGESTED_ANSWER_SECONDS, useActivityTiming } from "./answerLength";
 import { InterviewerAvatar } from "./avatar/InterviewerAvatar";
+import "../components/ux/ux.css";
 import { avatarEnabled, InterviewerState } from "./InterviewerState";
+import { StrovaInterviewer } from "./StrovaInterviewer";
 import { micProblem, micProblemText, openMicrophone, type MicCheck, type MicProblem } from "./microphone";
 import {
   isMockVoice,
@@ -277,6 +279,8 @@ function LiveView({ session }: { session: SessionRecord }) {
                   audioTrack={agentAudio}
                   voice={voice}
                 />
+              ) : v2 ? (
+                <StrovaInterviewer activity={stage === "live" ? activity : "idle"} session={session} />
               ) : (
                 <InterviewerState activity={stage === "live" ? activity : "idle"} />
               )}
@@ -364,15 +368,15 @@ function LiveView({ session }: { session: SessionRecord }) {
       {stage !== "joining" && (
         <div className="row section">
           <button type="button" className="btn btn--danger" onClick={() => openDialog(dialog.current)}>
-            End interview
+            {v2 ? "End take" : "End interview"}
           </button>
         </div>
       )}
       {end.isError && <ErrorNotice error={end.error} />}
 
       <dialog ref={dialog} aria-labelledby="end-title" aria-describedby="end-text">
-        <h2 id="end-title">End the interview?</h2>
-        <p id="end-text">Your debrief is ready about a minute after you end the interview.</p>
+        <h2 id="end-title">{v2 ? "End the take?" : "End the interview?"}</h2>
+        <p id="end-text">Your debrief is ready about a minute after you end the {v2 ? "take" : "interview"}.</p>
         <div className="row row--end">
           <button type="button" className="btn btn--quiet" onClick={() => closeDialog(dialog.current)}>
             Keep going
@@ -386,7 +390,7 @@ function LiveView({ session }: { session: SessionRecord }) {
               end.mutate();
             }}
           >
-            End interview
+            {v2 ? "End take" : "End interview"}
           </button>
         </div>
       </dialog>

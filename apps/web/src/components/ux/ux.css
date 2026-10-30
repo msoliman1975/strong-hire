@@ -119,3 +119,9 @@
 .sx-signal-no { color: var(--sh-danger); font-weight: 700; }
 [id="jobtext-count"][data-level="warn"] { color: var(--sh-warn-ink); }
 [id="jobtext-count"][data-level="over"] { color: var(--sh-danger-ink); font-weight: 600; }
+
+/* SV-6: Strova in the dark live room. */
+.strova-room { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+.strova-room__name { font-size: 22px; font-weight: 700; }
+.strova-room__acting { color: var(--sh-room-muted); white-space: pre-line; }
+.strova-room__chip { display: inline-flex; padding: 2px 10px; border-radius: 999px; font-size: 12.5px; background: #11303a; color: var(--sh-teal-light); }
