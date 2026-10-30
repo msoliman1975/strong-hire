@@ -50,6 +50,7 @@ import type {
   Usage,
 } from "../api/types";
 import { newId, type MockGap, type MockStore, type MockTask } from "./db";
+import { addMockInterviews, interviewForTake } from "./interviewHandlers";
 import {
   customDebriefQuestions,
   customProblem,
@@ -573,6 +574,8 @@ export function inputHandlers(store: MockStore) {
         task.result = { outcome: "matched", company: matchCompany(target, posting) };
         job = taskView(task);
       }
+      // TG-2, RH-1: "Create the role" keeps its interviews in the same request.
+      if (body.interview_types?.length) addMockInterviews(store, target, body.interview_types, body.resume_id);
       store.save();
       const accepted: JobTargetAccepted = { job_target: target, job };
       return HttpResponse.json(accepted);
@@ -828,6 +831,14 @@ export function sessionHandlers(store: MockStore) {
       const body = (await request.json()) as CreateSessionRequest;
       const target = findJob(body.job_target_id);
       if (!target || target.deleted) return notFound("Job target");
+      // RH-1: a take of an interview gets the interview's type and resume.
+      if (body.interview_id) {
+        const interview = interviewForTake(store, body.interview_id);
+        if (!interview) return notFound("Interview");
+        if (interview.job_target_id !== target.id) return invalid("The interview is for another role.");
+        body.resume_id = interview.resume_id;
+        body.config = { ...body.config, interview_type: interview.interview_type };
+      }
       const open = body.channel === "text" ? db().siteStatus.text_sessions_open : db().siteStatus.voice_sessions_open;
       if (!open) return paused("sessions_paused");
       const usage = db().usage;

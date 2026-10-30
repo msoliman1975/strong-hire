@@ -11,6 +11,7 @@ import type {
   ExitSurveyIn,
   ExportJob,
   GapAnalysisOut,
+  InterviewOut,
   JobOut,
   JobTargetOut,
   Profile,
@@ -68,6 +69,8 @@ export interface MockDb {
   interviewDates?: Record<string, string | null>;
   /** RM-4: "Not a story" achievements per resume id, normalized (resumeHandlers.ts). */
   storyIdeaDismissed?: Record<string, string[]>;
+  /** RH-1: interviews per role (interviewHandlers.ts). */
+  interviews?: InterviewOut[];
 }
 
 /** GET /status with every ops control at its default. */
