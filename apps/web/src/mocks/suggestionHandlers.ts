@@ -160,9 +160,31 @@ export function sampleSuggestions(ids: {
 
 /** Status changes by suggestion id (accept, dismiss, undo). Tests reset it. */
 const resolved = new Map<string, Pick<Suggestion, "status" | "resolved_at">>();
+/** ST-11: stories with a requested review, and the review parts accepted so far. */
+const reviewed = new Set<string>();
+const reviewParts = new Map<string, Set<string>>();
 
 export function resetMockSuggestions(): void {
   resolved.clear();
+  reviewed.clear();
+  reviewParts.clear();
+}
+
+/** ST-11: POST /stories/{id}/review (storyHandlers.ts) makes the review sample that story's. */
+export function requestMockReview(storyId: string): void {
+  reviewed.add(storyId);
+  resolved.delete(REVIEW_ID);
+  reviewParts.delete(storyId);
+}
+
+const REVIEW_ID = "5a000000-0000-4000-8000-000000000007";
+
+/** The open suggestions shown on one story's page (place `story`). */
+function storySuggestions(storyId: string): Suggestion[] {
+  return sampleSuggestions()
+    .filter((s) => PLACE_KINDS.story.includes(s.kind))
+    .filter((s) => (s.kind === "review" ? reviewed.has(storyId) : s.story_id === storyId))
+    .map((s) => ({ ...s, story_id: storyId }));
 }
 
 function current(s: Suggestion): Suggestion {
@@ -194,11 +216,15 @@ export function suggestionHandlers() {
       const q = new URL(request.url).searchParams;
       const place = q.get("place") as Place | null;
       if (!place || !(place in PLACE_KINDS)) return HttpResponse.json({ detail: "place" }, { status: 422 });
-      const items = sampleSuggestions({
-        sessionId: q.get("session_id"),
-        jobId: q.get("job_target_id"),
-        resumeId: q.get("resume_id"),
-      })
+      const all =
+        place === "story"
+          ? storySuggestions(q.get("story_id") ?? "")
+          : sampleSuggestions({
+              sessionId: q.get("session_id"),
+              jobId: q.get("job_target_id"),
+              resumeId: q.get("resume_id"),
+            });
+      const items = all
         .filter((s) => PLACE_KINDS[place].includes(s.kind))
         .map(current)
         .filter((s) => s.status === "open");
@@ -209,7 +235,17 @@ export function suggestionHandlers() {
       if (!s) return HttpResponse.json({ detail: "Suggestion not found" }, { status: 404 });
       if (s.status !== "open") return notOpen();
       const body = (await request.json().catch(() => ({}))) as SuggestionAcceptIn;
-      resolved.set(s.id, { status: "accepted", resolved_at: new Date().toISOString() });
+      // ST-11: a review stays open until each of its edits is accepted.
+      const p0 = s.payload;
+      let reviewOpen = false;
+      if (p0.kind === "review") {
+        const storyId = [...reviewed].at(-1) ?? s.story_id ?? "";
+        const done = reviewParts.get(storyId) ?? new Set<string>();
+        for (const n of p0.review.notes) if (n.edit && (!body.parts || body.parts.includes(n.part))) done.add(n.part);
+        reviewParts.set(storyId, done);
+        reviewOpen = p0.review.notes.some((n) => n.edit && !done.has(n.part));
+      }
+      if (!reviewOpen) resolved.set(s.id, { status: "accepted", resolved_at: new Date().toISOString() });
       const p = s.payload;
       const out: SuggestionAcceptOut = {
         suggestion: current(s),
@@ -237,9 +273,10 @@ export function suggestionHandlers() {
     http.post(`${API}/suggestions/:id/undo`, ({ params }) => {
       const s = find(String(params.id));
       if (!s) return HttpResponse.json({ detail: "Suggestion not found" }, { status: 404 });
-      if (s.status !== "accepted")
+      if (s.status !== "accepted" && !(s.kind === "review" && [...reviewParts.values()].some((p) => p.size > 0)))
         return HttpResponse.json({ detail: { code: "cannot_undo", message: "There is nothing to undo." } }, { status: 409 });
       resolved.delete(s.id);
+      reviewParts.clear();
       return HttpResponse.json({ ...s, status: "open", resolved_at: null });
     }),
   ];

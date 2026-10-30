@@ -537,3 +537,39 @@
 .studio__teach p {
   margin: 0;
 }
+
+/* ST-9: Career Stories with Strova (mockup #stories). */
+.career-stories__row {
+  gap: 3px;
+}
+
+.career-stories__used {
+  color: var(--sh-ok-ink);
+  font-weight: 600;
+}
+
+.career-stories__ask {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.career-stories__ask label {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.career-stories__ask input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  padding: 8px 12px;
+  border: 1px solid var(--sh-line-strong);
+  border-radius: 999px;
+  background: var(--sh-surface);
+  color: var(--sh-ink);
+}
+
+.career-stories .sx-fold > summary h2 {
+  margin: 0;
+}

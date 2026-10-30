@@ -6,13 +6,14 @@
  */
 import { http, HttpResponse } from "msw/http";
 
-import type { Story, StoryIn, StoryPatch } from "../pages/stories/api";
-import { STORY_PARTS } from "../pages/stories/api";
+import type { Story, StoryAnswer, StoryIn, StoryPatch } from "../pages/stories/api";
+import { displayStatusOf, STORY_PARTS } from "../pages/stories/api";
+import { requestMockReview } from "./suggestionHandlers";
 
 const API = "*/api";
 
 export function mockStory(changes: Partial<Story> & Pick<Story, "id" | "title">): Story {
-  return {
+  const story: Story = {
     context: null,
     stakes: null,
     action: null,
@@ -26,8 +27,15 @@ export function mockStory(changes: Partial<Story> & Pick<Story, "id" | "title">)
     notes: [],
     created_at: "2026-10-20T10:00:00Z",
     updated_at: "2026-10-20T10:00:00Z",
+    display_status: "draft",
     ...changes,
   };
+  return out(story);
+}
+
+/** ST-8: the status to show, as the API computes it on every response. */
+function out(story: Story): Story {
+  return { ...story, display_status: displayStatusOf(story) };
 }
 
 const SEED: Story[] = [
@@ -81,7 +89,7 @@ export function storyHandlers() {
         .filter((s) => !status || s.status === status)
         .filter((s) => !skill || (s.skills as string[]).includes(skill))
         .sort((a, b) => b.created_at.localeCompare(a.created_at));
-      return HttpResponse.json(list);
+      return HttpResponse.json(list.map(out));
     }),
 
     http.post(`${API}/stories`, async ({ request }) => {
@@ -100,12 +108,12 @@ export function storyHandlers() {
         updated_at: now,
       });
       stories.push(story);
-      return HttpResponse.json(story, { status: 201 });
+      return HttpResponse.json(out(story), { status: 201 });
     }),
 
     http.get(`${API}/stories/:id`, ({ params }) => {
       const story = stories.find((s) => s.id === params.id);
-      return story ? HttpResponse.json(story) : notFound();
+      return story ? HttpResponse.json(out(story)) : notFound();
     }),
 
     http.patch(`${API}/stories/:id`, async ({ params, request }) => {
@@ -121,7 +129,34 @@ export function storyHandlers() {
       for (const p of STORY_PARTS) if (p in body) story[p] = clean(body[p]);
       if ("skills" in body) story.skills = body.skills ?? [];
       story.updated_at = new Date().toISOString();
-      return HttpResponse.json(story);
+      return HttpResponse.json(out(story));
+    }),
+
+    // ST-11: the review arrives as an open review suggestion for the story (suggestionHandlers).
+    http.post(`${API}/stories/:id/review`, ({ params }) => {
+      const story = stories.find((s) => s.id === params.id);
+      if (!story) return notFound();
+      requestMockReview(story.id);
+      return HttpResponse.json({ job_id: `review_story:${story.id}` }, { status: 202 });
+    }),
+
+    // ST-13: an answer from the first story with a result, quoting it.
+    http.post(`${API}/stories/ask`, async ({ request }) => {
+      const { question } = (await request.json()) as { question: string };
+      if (!question?.trim()) return HttpResponse.json({ detail: [{ msg: "Ask a question" }] }, { status: 422 });
+      const lead = stories.find((s) => s.result?.trim());
+      const answer: StoryAnswer = lead
+        ? {
+            answer: `Lead with “${lead.title}”. Say the result first: ${lead.result}`,
+            story_ids: [lead.id],
+            quotes: [lead.result as string],
+          }
+        : {
+            answer: "I can't answer that from your stories yet. Add a story that shows it, and ask me again.",
+            story_ids: [],
+            quotes: [],
+          };
+      return HttpResponse.json(answer);
     }),
   ];
 }

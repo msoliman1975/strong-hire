@@ -16,7 +16,10 @@ type DeepRequired<T> = T extends (infer U)[]
     ? { [K in keyof T]-?: DeepRequired<T[K]> }
     : T;
 
-export type Story = DeepRequired<S["Story"]>;
+/** ST-8: every story response carries the status to show (draft, ready or proven). */
+export type Story = DeepRequired<S["StoryOut"]>;
+export type DisplayStatus = Story["display_status"];
+export type StoryAnswer = DeepRequired<S["StoryAnswer"]>;
 export type StoryNote = DeepRequired<S["StoryNote"]>;
 export type StoryStatus = S["StoryStatus"];
 export type StoryIn = S["StoryIn"];
@@ -43,6 +46,14 @@ export const storiesApi = {
   /** Only the fields sent change; a part sent as null or blank is cleared. */
   update: async (id: string, body: StoryPatch) =>
     unwrap(await apiClient.PATCH("/stories/{story_id}", { params: { path: { story_id: id } }, body })) as Story,
+  /** ST-11: queue Strova's review; it arrives as an open `review` suggestion for the story. */
+  review: async (id: string) =>
+    unwrap(await apiClient.POST("/stories/{story_id}/review", { params: { path: { story_id: id } } })) as {
+      job_id: string;
+    },
+  /** ST-13: Strova answers from the user's stories and roles. */
+  ask: async (question: string) =>
+    unwrap(await apiClient.POST("/stories/ask", { body: { question } })) as StoryAnswer,
 };
 
 export const useStories = (filter: StoryFilter = {}) =>
@@ -53,6 +64,15 @@ export const useStory = (id: string) => useQuery({ queryKey: storyKeys.one(id), 
 export const STORY_PARTS = ["context", "stakes", "action", "result", "reflection"] as const;
 
 export const storyStatusLabel: Record<StoryStatus, string> = { draft: "Draft", proven: "Proven" };
+
+/** ST-8: Draft, Ready (all five parts) or Proven. */
+export const displayStatusLabel: Record<DisplayStatus, string> = { draft: "Draft", ready: "Ready", proven: "Proven" };
+
+/** ST-8, as the API computes it: Proven stays; all five parts filled is Ready. */
+export function displayStatusOf(s: Pick<Story, "status" | (typeof STORY_PARTS)[number]>): DisplayStatus {
+  if (s.status === "proven") return "proven";
+  return STORY_PARTS.every((p) => (s[p] ?? "").trim() !== "") ? "ready" : "draft";
+}
 
 /** The parts with text, in order. */
 export const filledParts = (s: Story) => STORY_PARTS.filter((p) => (s[p] ?? "").trim() !== "");
