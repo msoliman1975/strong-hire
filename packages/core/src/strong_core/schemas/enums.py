@@ -535,3 +535,4 @@ class EmailKind(StrEnum):
     AFTER_INTERVIEW = "after_interview"
     MINUTES_LOW = "minutes_low"
     WINBACK = "winback"
+    PLAN_REMINDER = "plan_reminder"  # PS-6: Strova's weekly-plan reminder, at most one a day
