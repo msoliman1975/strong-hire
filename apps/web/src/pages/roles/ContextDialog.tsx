@@ -52,8 +52,8 @@ export function ContextDialog({ job }: { job: JobTargetOut }) {
       <button type="button" className="sx-btn ghost sm" onClick={() => dialog.current?.showModal()}>
         {has ? "Edit what you know" : "Add what you know"}
       </button>
-      <dialog ref={dialog} aria-labelledby="ctx-heading" className="sx-card" style={{ maxWidth: 560, width: "100%" }}>
-        <form className="sx-stack" onSubmit={onSubmit}>
+      <dialog ref={dialog} aria-labelledby="ctx-heading" className="sx-dialog">
+        <form className="sx-card" onSubmit={onSubmit}>
           <h2 id="ctx-heading">What you know about this interview</h2>
           <div className="sx-field">
             <label htmlFor="ctx-stage">Interview stage</label>

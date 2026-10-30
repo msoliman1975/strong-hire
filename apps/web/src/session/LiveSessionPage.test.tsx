@@ -179,12 +179,15 @@ describe("live session page", () => {
     expect(screen.getByRole("button", { name: "Ask for a hint" })).toBeDisabled();
   });
 
-  it("TN-1: with v2 on the room names the session's tone and lays out the canvas room", async () => {
+  it("TN-1, SV-6: with v2 on the room names the session's tone, with Strova beside the question", async () => {
     setFeatureOverrides({ v2_enabled: true });
     const { user } = renderLive(session({ config: { ...session().config, tone: "direct" } }));
     expect(await screen.findByText(/Practice mode, direct tone/)).toBeInTheDocument();
     await joinRoom(user);
-    expect(screen.getByRole("region", { name: "Interview" })).toHaveAttribute("data-v2", "true");
+    const room = screen.getByRole("region", { name: "Interview" });
+    expect(within(room).getByRole("region", { name: "Strova, your interviewer" })).toBeInTheDocument();
+    expect(within(room).getByRole("button", { name: "End take" })).toBeInTheDocument();
+    expect(room).toHaveTextContent("Strova asked");
   });
 
   it("FL-1: with v2 off the room keeps its v1 subtitle", async () => {

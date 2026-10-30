@@ -125,3 +125,5 @@
 .strova-room__name { font-size: 22px; font-weight: 700; }
 .strova-room__acting { color: var(--sh-room-muted); white-space: pre-line; }
 .strova-room__chip { display: inline-flex; padding: 2px 10px; border-radius: 999px; font-size: 12.5px; background: #11303a; color: var(--sh-teal-light); }
+.sx-dialog { border: 0; padding: 0; background: transparent; max-width: 560px; width: calc(100% - 32px); }
+.sx-dialog::backdrop { background: rgb(23 22 31 / 45%); }

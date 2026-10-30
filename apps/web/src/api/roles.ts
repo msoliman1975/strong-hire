@@ -61,7 +61,8 @@ export const roleKeys = {
   rehearsals: ["rehearsals"] as const,
 };
 
-export const useRoles = () => useQuery({ queryKey: roleKeys.roles, queryFn: rolesApi.list });
+export const useRoles = (enabled = true) =>
+  useQuery({ queryKey: roleKeys.roles, queryFn: rolesApi.list, enabled });
 export const useRoleInterviews = (jobId: string) =>
   useQuery({ queryKey: roleKeys.role(jobId), queryFn: () => rolesApi.interviews(jobId), enabled: Boolean(jobId) });
 export const useSuggestedInterviews = (jobId: string | null, enabled = true) =>

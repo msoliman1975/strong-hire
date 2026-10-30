@@ -63,7 +63,9 @@ export function RolePage() {
   const match = jobs.data?.find((j) => j.job_target.id === jobId)?.match_score;
   const kept = new Set(interviews.data?.map((i) => i.interview.interview_type));
   const tested = plan.data?.tested.filter((t) => kept.has(t.interview_type)) ?? [];
-  const skills = [...new Set(tested.flatMap((t) => t.competencies.map((c) => c.competency)))];
+  // The most weighted skills across the kept interviews (each type's list is sorted by weight).
+  const ranked = tested.flatMap((t) => t.competencies).sort((a, b) => b.share - a.share);
+  const skills = [...new Set(ranked.map((c) => c.competency))].slice(0, 6);
   const gap = plan.data?.gap;
   const probes = gap?.status === "ready" ? (gap.analysis?.probe_areas ?? []) : [];
   const mustHave = issues.data?.open.find((i) => i.key.startsWith("job.must-have"));
