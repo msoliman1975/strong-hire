@@ -1542,6 +1542,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/me/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get My Plan
+         * @description PS-1: the user's plan in their style (weekly until chosen), with Home's next step.
+         */
+        get: operations["get_my_plan_me_plan_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/providers": {
         parameters: {
             query?: never;
@@ -7369,6 +7389,27 @@ export interface components {
              */
             quotes?: string[];
         };
+        /**
+         * NextStep
+         * @description HO-1: Strova's next step on Home, from the plan's next item.
+         */
+        NextStep: {
+            /** Headline */
+            headline: string;
+            /** Why */
+            why?: string | null;
+            /** Action Label */
+            action_label: string;
+            /** Action Target */
+            action_target: string;
+            /**
+             * Role Label
+             * @description The ghost link to the role.
+             */
+            role_label?: string | null;
+            /** Role Target */
+            role_target?: string | null;
+        };
         /** OpsErrorDetail */
         OpsErrorDetail: {
             group: components["schemas"]["OpsErrorGroup"];
@@ -7948,6 +7989,36 @@ export interface components {
             closing_style: string;
         };
         /**
+         * PersonalPlan
+         * @description PS-1: the plan (core contract) with the checklist groups and the next step.
+         */
+        PersonalPlan: {
+            plan: components["schemas"]["Plan"];
+            /**
+             * Today
+             * Format: date
+             */
+            today: string;
+            /**
+             * Week End
+             * @description PS-4: the Saturday shown.
+             */
+            week_end?: string | null;
+            /**
+             * Groups
+             * @description PS-3: always all three.
+             */
+            groups?: components["schemas"]["PlanGroup"][];
+            /** Next Key */
+            next_key?: string | null;
+            next_step?: components["schemas"]["NextStep"] | null;
+            /**
+             * Has Roles
+             * @description PS-5: rehearsal items appear once a role is added.
+             */
+            has_roles: boolean;
+        };
+        /**
          * Phase
          * @description Session state machine phases (IV-7). The session controller moves phases, not the LLM.
          * @enum {string}
@@ -7977,11 +8048,28 @@ export interface components {
             /**
              * Week Start
              * @description PS-4: the Monday of the week shown. Weekly style only.
-             * @default null
              */
-            week_start: string | null;
+            week_start?: string | null;
             /** Items */
             items?: components["schemas"]["PlanItem"][];
+        };
+        /**
+         * PlanGroup
+         * @description PS-3: one checklist group.
+         */
+        PlanGroup: {
+            kind: components["schemas"]["PlanItemKind"];
+            /** Title */
+            title: string;
+            /** Done */
+            done: number;
+            /** Total */
+            total: number;
+            /**
+             * Status
+             * @description One line naming the group's next item.
+             */
+            status: string;
         };
         /**
          * PlanItem
@@ -8002,34 +8090,29 @@ export interface components {
             /**
              * Sub
              * @description The sub-line, for example: now 58.
-             * @default null
              */
-            sub: string | null;
+            sub?: string | null;
             status: components["schemas"]["PlanItemStatus"];
             /**
              * Due
              * @description PS-4: the day it is planned for (weekly).
-             * @default null
              */
-            due: string | null;
+            due?: string | null;
             /**
              * Action Label
              * @description The action button's label.
-             * @default null
              */
-            action_label: string | null;
+            action_label?: string | null;
             /**
              * Action Target
              * @description The app path the action opens, for example /interviews/<id>.
-             * @default null
              */
-            action_target: string | null;
+            action_target?: string | null;
             /**
              * Target Id
              * @description The interview, story or resume the item is about.
-             * @default null
              */
-            target_id: string | null;
+            target_id?: string | null;
         };
         /**
          * PlanItemKind
@@ -14129,6 +14212,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_my_plan_me_plan_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonalPlan"];
                 };
             };
         };

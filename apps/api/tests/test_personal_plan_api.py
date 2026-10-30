@@ -216,3 +216,39 @@ async def test_db6_the_debrief_plan_line_names_the_plans_next_item(
         }
     )
     assert plan_line(later) == f"{item.title} on Saturday."
+
+
+async def test_ps6_the_workers_reminder_readiness_matches_the_api(
+    client: httpx.AsyncClient, fake_fixtures: Path, sessionmaker: Maker
+) -> None:
+    """PS-6: the reminder job (worker) reads readiness with the API's RH-2 rule."""
+    import uuid as uuid_
+
+    from strong_core.db.models import TargetInterview
+    from strong_worker.reminders import _readiness
+
+    from .test_interviews_api import take
+
+    job, _ = await role_with_resume(client, fake_fixtures, sessionmaker)
+    (iv,) = await keep(client, job["id"], "case")
+    await take(client, sessionmaker, job["id"], iv["id"], {"structure": 2}, minutes_ago=30)
+    await take(
+        client,
+        sessionmaker,
+        job["id"],
+        iv["id"],
+        {"structure": 4, "estimation_logic": 3},
+        minutes_ago=20,
+    )
+    await take(
+        client, sessionmaker, job["id"], iv["id"], {"structure": 1}, mode="coach", minutes_ago=10
+    )
+    await take(
+        client, sessionmaker, job["id"], iv["id"], {"structure": 1}, profile="fake", minutes_ago=5
+    )
+    api = (await client.get(f"/interviews/{iv['id']}")).json()["readiness"]["score"]
+    async with sessionmaker() as db:
+        row = await db.get(TargetInterview, uuid_.UUID(iv["id"]))
+        assert row is not None
+        assert await _readiness(db, row) == api
+    assert api is not None
