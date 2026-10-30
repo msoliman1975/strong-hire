@@ -377,7 +377,15 @@ async def get_debrief(session_id: uuid.UUID, db: Db, me: Me) -> Debrief:
         previous_signal=None if card is None else await _previous_signal(db, session, card),
         answers_at_bar=None if card is None else answers_at_bar(card),
         suggestions=await debrief_suggestions(db, me.org_id, me.user_id, session.id),
+        next_plan_item=None if card is None else await _plan_line(db, me),
     )
+
+
+async def _plan_line(db: Db, me: Me) -> str | None:
+    """DB-6: the personal plan's next item (U11). Imported here: the plan module reads this one."""
+    from strong_api.plan.personal import plan_for, plan_line
+
+    return plan_line(await plan_for(db, me.user_id, me.org_id))
 
 
 # DB-2: an answer meets the bar when its average rubric score is 3 or more.

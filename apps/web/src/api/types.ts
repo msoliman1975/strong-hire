@@ -148,3 +148,8 @@ export type Suggestion = DeepRequired<S["Suggestion"]>;
 export type SuggestionKind = Suggestion["kind"];
 export type SuggestionAcceptIn = S["AcceptIn"];
 export type SuggestionAcceptOut = DeepRequired<S["AcceptOut"]>;
+
+// The personal plan (U11: PS-1 to PS-5, HO-1).
+export type PersonalPlan = DeepRequired<S["PersonalPlan"]>;
+export type PlanItem = PersonalPlan["plan"]["items"][number];
+export type PlanGroup = PersonalPlan["groups"][number];

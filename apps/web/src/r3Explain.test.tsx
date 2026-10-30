@@ -12,7 +12,6 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { jobTargetsApi, resumesApi } from "./api/inputs";
 import { AppRoutes, createQueryClient } from "./App";
 import { EXPLAIN, Explain } from "./components/Explain";
 import { TOUR_REPLAY_EVENT } from "./components/Tour";
@@ -78,46 +77,6 @@ describe("explainers", () => {
   });
 });
 
-describe("Get started in 3 steps", () => {
-  it("UI-1: shows the steps from the user's own data, with the next one open", async () => {
-    signedIn();
-    const form = new FormData();
-    form.append("text", "Backend engineer, Python and Go.");
-    await resumesApi.upload(form);
-    renderApp("/");
-    const card = await screen.findByTestId("get-started");
-    expect(card).toHaveTextContent("1 of 3 done");
-    expect(within(card).getByRole("link", { name: "Add a job description" })).toHaveAttribute("href", "/jobs/new");
-    expect(within(card).getByText("(done)")).toBeInTheDocument();
-  });
-
-  it("UI-1: Hide this hides it for good", async () => {
-    const user = renderApp("/");
-    await user.click(await screen.findByRole("button", { name: "Hide this" }));
-    expect(screen.queryByTestId("get-started")).toBeNull();
-    cleanup();
-    renderApp("/");
-    await screen.findByRole("region", { name: "Your coach" });
-    expect(screen.queryByTestId("get-started")).toBeNull();
-  });
-
-  it("UI-1: once all three are done it stays done, even if a resume is deleted later", async () => {
-    signedIn();
-    const form = new FormData();
-    form.append("text", "Backend engineer, Python and Go.");
-    const { resume } = await resumesApi.upload(form);
-    const { job_target: job } = await jobTargetsApi.create({ text: "Senior engineer, payments. ".repeat(5) });
-    await jobTargetsApi.get(job.id);
-    await resumesApi.get(resume.id);
-    mockStore.db.sessions.push({ id: "s1", job_target_id: job.id } as (typeof mockStore.db.sessions)[number]);
-    renderApp("/");
-    await screen.findByRole("region", { name: "Your coach" });
-    await new Promise((r) => setTimeout(r, 50));
-    expect(screen.queryByTestId("get-started")).toBeNull();
-    expect(globalThis.localStorage?.getItem(`sh-getstarted-${USER_ID}`)).toBe("done");
-  });
-});
-
 describe("tour", () => {
   it("UI-2: a 3-step tour shows once on the first visit, and Skip ends it for good", async () => {
     globalThis.localStorage?.removeItem(`sh-tour-done-${USER_ID}`);
@@ -130,13 +89,13 @@ describe("tour", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
     cleanup();
     renderApp("/");
-    await screen.findByRole("region", { name: "Your coach" });
+    await screen.findByRole("heading", { level: 1, name: /^Good / });
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
   it("UI-2: Replay the tour starts it again", async () => {
     renderApp("/");
-    await screen.findByRole("region", { name: "Your coach" });
+    await screen.findByRole("heading", { level: 1, name: /^Good / });
     act(() => {
       window.dispatchEvent(new Event(TOUR_REPLAY_EVENT));
     });

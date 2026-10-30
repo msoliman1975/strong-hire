@@ -364,7 +364,7 @@ async def test_db4_the_debrief_lists_the_takes_open_suggestions(
     sclient: httpx.AsyncClient,  # noqa: F811
 ) -> None:
     """DB-4, SG-4: after scoring, the debrief has the take's suggestions (with no stories, every
-    tested skill is missing), and the plan item is null until U11."""
+    tested skill is missing). DB-6: the plan line names the personal plan's next item (U11)."""
     target = await make_target(sessionmaker, gap=True)
     sid = await make_session(sessionmaker, target)
     squeue.replies = [*replies(), "STORY: NONE\nFIX: none"]
@@ -373,6 +373,8 @@ async def test_db4_the_debrief_lists_the_takes_open_suggestions(
     kinds = {s["kind"] for s in debrief["suggestions"]}
     assert "missing_skill" in kinds
     assert all(s["source_session_id"] == str(sid) for s in debrief["suggestions"])
+    # This user has no interviews, stories or read resume: the plan is empty, so no line.
+    assert (await sclient.get("/me/plan")).json()["next_key"] is None
     assert debrief["next_plan_item"] is None
     listed = (
         await sclient.get("/suggestions", params={"place": "debrief", "session_id": str(sid)})

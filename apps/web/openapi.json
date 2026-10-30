@@ -4338,6 +4338,28 @@
         }
       }
     },
+    "/me/plan": {
+      "get": {
+        "tags": [
+          "plan"
+        ],
+        "summary": "Get My Plan",
+        "description": "PS-1: the user's plan in their style (weekly until chosen), with Home's next step.",
+        "operationId": "get_my_plan_me_plan_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonalPlan"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/providers": {
       "get": {
         "tags": [
@@ -19308,6 +19330,64 @@
         "title": "NewStoryPayload",
         "description": "SG-3: a new story from a strong answer that matches no story."
       },
+      "NextStep": {
+        "properties": {
+          "headline": {
+            "type": "string",
+            "title": "Headline"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
+          },
+          "action_label": {
+            "type": "string",
+            "title": "Action Label"
+          },
+          "action_target": {
+            "type": "string",
+            "title": "Action Target"
+          },
+          "role_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role Label",
+            "description": "The ghost link to the role."
+          },
+          "role_target": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role Target"
+          }
+        },
+        "type": "object",
+        "required": [
+          "headline",
+          "action_label",
+          "action_target"
+        ],
+        "title": "NextStep",
+        "description": "HO-1: Strova's next step on Home, from the plan's next item."
+      },
       "OpsErrorDetail": {
         "properties": {
           "group": {
@@ -20831,6 +20911,73 @@
         "title": "PersonaNotes",
         "type": "object"
       },
+      "PersonalPlan": {
+        "properties": {
+          "plan": {
+            "$ref": "#/components/schemas/Plan"
+          },
+          "today": {
+            "type": "string",
+            "format": "date",
+            "title": "Today"
+          },
+          "week_end": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Week End",
+            "description": "PS-4: the Saturday shown."
+          },
+          "groups": {
+            "items": {
+              "$ref": "#/components/schemas/PlanGroup"
+            },
+            "type": "array",
+            "title": "Groups",
+            "description": "PS-3: always all three."
+          },
+          "next_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Key"
+          },
+          "next_step": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NextStep"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "has_roles": {
+            "type": "boolean",
+            "title": "Has Roles",
+            "description": "PS-5: rehearsal items appear once a role is added."
+          }
+        },
+        "type": "object",
+        "required": [
+          "plan",
+          "today",
+          "has_roles"
+        ],
+        "title": "PersonalPlan",
+        "description": "PS-1: the plan (core contract) with the checklist groups and the next step."
+      },
       "Phase": {
         "type": "string",
         "enum": [
@@ -20878,8 +21025,6 @@
         "description": "Where the suggestions are shown (ux-spec section 8)."
       },
       "Plan": {
-        "additionalProperties": false,
-        "description": "PS-1: the user's personal plan in the chosen style.",
         "properties": {
           "style": {
             "$ref": "#/components/schemas/PlanStyle"
@@ -20887,49 +21032,82 @@
           "week_start": {
             "anyOf": [
               {
-                "format": "date",
-                "type": "string"
+                "type": "string",
+                "format": "date"
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "PS-4: the Monday of the week shown. Weekly style only.",
-            "title": "Week Start"
+            "title": "Week Start",
+            "description": "PS-4: the Monday of the week shown. Weekly style only."
           },
           "items": {
             "items": {
               "$ref": "#/components/schemas/PlanItem"
             },
-            "title": "Items",
-            "type": "array"
+            "type": "array",
+            "title": "Items"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "style"
         ],
         "title": "Plan",
-        "type": "object"
+        "description": "PS-1: the user's personal plan in the chosen style."
+      },
+      "PlanGroup": {
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/PlanItemKind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "done": {
+            "type": "integer",
+            "title": "Done"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "One line naming the group's next item."
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "title",
+          "done",
+          "total",
+          "status"
+        ],
+        "title": "PlanGroup",
+        "description": "PS-3: one checklist group."
       },
       "PlanItem": {
-        "additionalProperties": false,
-        "description": "PS-1: one rehearsal, story or resume item. Done is computed, never ticked by hand.",
         "properties": {
           "key": {
-            "description": "Stable id of the item, for example interview:<uuid>.",
+            "type": "string",
             "minLength": 1,
             "title": "Key",
-            "type": "string"
+            "description": "Stable id of the item, for example interview:<uuid>."
           },
           "kind": {
             "$ref": "#/components/schemas/PlanItemKind"
           },
           "title": {
-            "description": "Stripe \u00b7 Behavioral: readiness 75 or more",
+            "type": "string",
             "minLength": 1,
             "title": "Title",
-            "type": "string"
+            "description": "Stripe \u00b7 Behavioral: readiness 75 or more"
           },
           "sub": {
             "anyOf": [
@@ -20940,9 +21118,8 @@
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "The sub-line, for example: now 58.",
-            "title": "Sub"
+            "title": "Sub",
+            "description": "The sub-line, for example: now 58."
           },
           "status": {
             "$ref": "#/components/schemas/PlanItemStatus"
@@ -20950,16 +21127,15 @@
           "due": {
             "anyOf": [
               {
-                "format": "date",
-                "type": "string"
+                "type": "string",
+                "format": "date"
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "PS-4: the day it is planned for (weekly).",
-            "title": "Due"
+            "title": "Due",
+            "description": "PS-4: the day it is planned for (weekly)."
           },
           "action_label": {
             "anyOf": [
@@ -20970,9 +21146,8 @@
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "The action button's label.",
-            "title": "Action Label"
+            "title": "Action Label",
+            "description": "The action button's label."
           },
           "action_target": {
             "anyOf": [
@@ -20983,25 +21158,25 @@
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "The app path the action opens, for example /interviews/<id>.",
-            "title": "Action Target"
+            "title": "Action Target",
+            "description": "The app path the action opens, for example /interviews/<id>."
           },
           "target_id": {
             "anyOf": [
               {
-                "format": "uuid",
-                "type": "string"
+                "type": "string",
+                "format": "uuid"
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "The interview, story or resume the item is about.",
-            "title": "Target Id"
+            "title": "Target Id",
+            "description": "The interview, story or resume the item is about."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "key",
           "kind",
@@ -21009,27 +21184,27 @@
           "status"
         ],
         "title": "PlanItem",
-        "type": "object"
+        "description": "PS-1: one rehearsal, story or resume item. Done is computed, never ticked by hand."
       },
       "PlanItemKind": {
-        "description": "PS-1: the three kinds of personal plan items, each with its own chip.",
+        "type": "string",
         "enum": [
           "rehearsal",
           "story",
           "resume"
         ],
         "title": "PlanItemKind",
-        "type": "string"
+        "description": "PS-1: the three kinds of personal plan items, each with its own chip."
       },
       "PlanItemStatus": {
-        "description": "PS-1: done is computed from the user's data, never ticked by hand.",
+        "type": "string",
         "enum": [
           "done",
           "next",
           "todo"
         ],
         "title": "PlanItemStatus",
-        "type": "string"
+        "description": "PS-1: done is computed from the user's data, never ticked by hand."
       },
       "PlanOut": {
         "properties": {

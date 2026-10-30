@@ -13,7 +13,6 @@ import { jobTargetsApi, resumesApi } from "./api/inputs";
 import { AppRoutes, createQueryClient } from "./App";
 import { mockStore } from "./mocks/node";
 import { mockStory, resetMockStories } from "./mocks/storyHandlers";
-import { latestResume } from "./pages/home/ResumesCard";
 import { workReasons } from "./pages/progress/StoriesToWorkOn";
 import { setFeatureOverrides } from "./theme/features";
 
@@ -100,38 +99,6 @@ describe("Interviews page (v2)", () => {
   it("FL-1: with v2 off, /jobs is still the v1 Job descriptions page", async () => {
     renderApp("/jobs", false);
     expect(await screen.findByRole("heading", { level: 1, name: "Job descriptions" })).toBeInTheDocument();
-  });
-});
-
-describe("Resumes card on Home (v2)", () => {
-  it("LB-1: shows the resumes on file and the latest, with Check a resume when it needs a check", async () => {
-    await addResume("First CV text, Python and Go.");
-    await addResume("Second CV text, Python, Go and Kafka.");
-    renderApp("/");
-    const card = await screen.findByRole("region", { name: "The resume your interviews are measured against." });
-    expect(await within(card).findByText("On file")).toBeInTheDocument();
-    expect(within(card).getByText("2")).toBeInTheDocument();
-    expect(card).toHaveTextContent("Not checked yet");
-    expect(within(card).getByRole("link", { name: "Check a resume" })).toHaveAttribute(
-      "href",
-      expect.stringMatching(/^\/resumes\/.+\/check$/),
-    );
-    expect(within(card).getByRole("link", { name: "Add a resume" })).toHaveAttribute("href", "/resumes");
-  });
-
-  it("LB-1: with no resume, the card offers Add a resume", async () => {
-    renderApp("/");
-    const card = await screen.findByRole("region", { name: "The resume your interviews are measured against." });
-    expect(await within(card).findByText(/Add the resume you will interview with/)).toBeInTheDocument();
-    expect(within(card).getByRole("link", { name: "Add a resume" })).toHaveAttribute("href", "/resumes");
-    expect(within(card).queryByRole("link", { name: "Check a resume" })).toBeNull();
-  });
-
-  it("LB-1: the latest resume is the newest one not deleted", () => {
-    const r = (id: string, at: string, deleted = false) =>
-      ({ id, uploaded_at: at, deleted }) as Parameters<typeof latestResume>[0][number];
-    expect(latestResume([r("a", "2026-10-01"), r("b", "2026-10-03", true), r("c", "2026-10-02")])?.id).toBe("c");
-    expect(latestResume([])).toBeNull();
   });
 });
 
