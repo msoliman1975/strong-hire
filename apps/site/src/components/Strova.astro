@@ -1,0 +1,14 @@
+---
+/** Strova (SV-8): her drawing as inline SVG, with the app's animations (styles/strova.css). */
+import "../styles/strova.css";
+import { ANALYSING_64, COACHING_104, COACHING_64, INTERVIEWING_64 } from "../data/strova";
+
+interface Props {
+  mode: "coaching" | "analysing" | "interviewing";
+  size: 64 | 104;
+}
+const { mode, size } = Astro.props;
+const svg = size === 104 ? COACHING_104 : { coaching: COACHING_64, analysing: ANALYSING_64, interviewing: INTERVIEWING_64 }[mode];
+---
+
+<Fragment set:html={svg} />

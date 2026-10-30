@@ -167,6 +167,14 @@ img {
   color: var(--ink);
 }
 
+/* SV-7: the Strong Hire lockup with "with Strova" in the muted colour. No new logo. */
+.brand__with {
+  margin-left: 2px;
+  font-weight: 400;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
 /* The Approved h logo keeps the official colors of logo.svg, never the action or status tokens. */
 .brand-mark {
   --brand-lamp: #14202b;
@@ -1616,6 +1624,49 @@ select {
   }
 
   .brief__facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* SV-8: Meet Strova, below the hero. */
+.meet-strova {
+  border-bottom: 1px solid var(--line);
+}
+
+.meet-strova__inner {
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.meet-strova__text {
+  flex: 1 1 360px;
+  min-width: 0;
+}
+
+.meet-strova__text h2 {
+  margin-top: 0;
+}
+
+.meet-strova__modes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.meet-strova__modes li {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 0.9375rem;
+}
+
+@media (max-width: 760px) {
+  .meet-strova__modes {
     grid-template-columns: minmax(0, 1fr);
   }
 }
