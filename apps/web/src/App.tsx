@@ -45,6 +45,10 @@ import { LiveSessionPage } from "./session/LiveSessionPage";
 const DevTextInterviewPage = import.meta.env.DEV
   ? lazy(() => import("./dev/DevTextInterviewPage").then((m) => ({ default: m.DevTextInterviewPage })))
   : null;
+// Dev builds only: the Strova avatar in every mode and size (U02 fidelity check).
+const StrovaPreviewPage = import.meta.env.DEV
+  ? lazy(() => import("./dev/StrovaPreviewPage").then((m) => ({ default: m.StrovaPreviewPage })))
+  : null;
 
 export function createQueryClient(): QueryClient {
   return new QueryClient({
@@ -63,6 +67,16 @@ export function AppRoutes() {
     <>
       <SiteBanner />
       <Routes>
+        {StrovaPreviewPage && (
+          <Route
+            path="/dev/strova"
+            element={
+              <Suspense fallback={null}>
+                <StrovaPreviewPage />
+              </Suspense>
+            }
+          />
+        )}
         <Route element={<AuthLayout />}>
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
