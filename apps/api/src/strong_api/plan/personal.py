@@ -196,6 +196,8 @@ async def _rehearsal_items(
             why = None
             if weakest is not None and not done:
                 why = f"Your weakest skill there is {skill_name(weakest.competency).lower()}."
+            elif score is None:
+                why = "Your first take sets your starting readiness."
             items.append(
                 _Item(
                     PlanItem(

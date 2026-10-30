@@ -110,7 +110,11 @@ export function personalPlanHandlers() {
         );
         const weakest = r.readiness.competencies.filter((c) => c.score !== null).sort((a, b) => (a.score ?? 0) - (b.score ?? 0))[0];
         steps[key] = {
-          why: weakest ? `Your weakest skill there is ${skillName(weakest.competency).toLowerCase()}.` : null,
+          why: weakest
+            ? `Your weakest skill there is ${skillName(weakest.competency).toLowerCase()}.`
+            : score === null
+              ? "Your first take sets your starting readiness."
+              : null,
           role_label: `Open ${company}`,
           role_target: `/roles/${r.role.id}`,
         };

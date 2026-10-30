@@ -48,9 +48,17 @@ export function ProfileV2({
   const style: Style = p.plan_style ?? "weekly";
   const items = plan.data?.plan.items ?? [];
   const rehearsal = items.find((i) => i.kind === "rehearsal")?.title.split(":")[0];
-  const story = items.find((i) => i.kind === "story" && i.key.startsWith("story:"))?.title.replace(/^Get /, "").replace(/ to Ready$/, "");
-  const issues = items.filter((i) => i.kind === "resume" && i.status !== "done").length;
-  const ideas = items.filter((i) => i.key.startsWith("idea:")).length;
+  const story = items
+    .find((i) => i.kind === "story" && i.key.startsWith("story:"))
+    ?.title.replace(/^Get /, "")
+    .replace(/ to Ready$/, "");
+  // Counts from the groups: the weekly plan lists only this week's items.
+  const open = (kind: string) => {
+    const g = plan.data?.groups.find((x) => x.kind === kind);
+    return g ? g.total - g.done : 0;
+  };
+  const issues = open("resume");
+  const ideas = open("story");
   const email = auth.data?.user?.email ?? "";
   const summary = [p.full_name, email, p.target_level ? levelLabel[p.target_level] : null, p.years_experience !== null ? `${p.years_experience} years` : null]
     .filter(Boolean)
@@ -68,6 +76,7 @@ export function ProfileV2({
           onChange={(next) => next !== style && settings.mutate({ plan_style: next })}
           examples={{ ideaCount: ideas, issueCount: issues, rehearsal, story }}
         />
+        <p className="sx-small sx-muted">Both styles cover the same work: your stories, your resume and your mock interviews.</p>
       </section>
       <section className="sx-card" aria-labelledby="reminders-heading">
         <h2 id="reminders-heading">Reminders from Strova</h2>

@@ -510,6 +510,10 @@ a.home-resumes__name {
   min-width: 0;
 }
 
+.home-planitem__body > .sx-chip {
+  align-self: flex-start;
+}
+
 .home-planitem__done {
   text-decoration: line-through;
 }
