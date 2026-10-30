@@ -65,6 +65,7 @@ from strong_api.custom.guard import check_custom_spec
 from strong_api.custom.limits import CustomSettings, get_custom_settings
 from strong_api.inputs.deps import CurrentUser, Db, Me, Queue
 from strong_api.inputs.queue import BUILD_INTERVIEWER_BRIEF, JobQueue
+from strong_api.plan.interviews import interview_for_session
 from strong_api.scoring.router import _brief, _config, _owned_session, _owned_target, start_scoring
 from strong_api.sessions.failure import brief_is_stale, failure_reason
 from strong_api.sessions.schemas import (
@@ -89,6 +90,7 @@ from strong_core.db.models import Turn as TurnRow
 from strong_core.db.turns import next_turn_seq
 from strong_core.gateway import Role, get_gateway, usage_context
 from strong_core.schemas import (
+    CustomSessionSpec,
     GapStatus,
     InterviewType,
     JobPosting,
@@ -241,8 +243,27 @@ async def create_session(
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Text sessions are a dev feature.")
     await ensure_sessions_open(db, body.channel)  # OC-2, OC-3
     config = body.config
+    chosen_resume = body.resume_id
+    if body.interview_id is not None:  # RH-1: a take of an interview
+        interview = await interview_for_session(db, me, body.interview_id)
+        if interview.job_target_id != target.id:
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_CONTENT, "The interview is for another role."
+            )
+        chosen_resume = interview.resume_id
+        custom = (
+            CustomSessionSpec.model_validate(interview.custom_json)
+            if interview.custom_json
+            else config.custom
+        )
+        config = config.model_copy(
+            update={
+                "interview_type": interview.interview_type,
+                "custom": custom if interview.interview_type == InterviewType.CUSTOM else None,
+            }
+        )
     await _ensure_may_start(db, me, custom=config.is_custom, duration_min=config.duration_min)
-    resume_id = await _session_resume(db, me, target.id, body.resume_id)
+    resume_id = await _session_resume(db, me, target.id, chosen_resume)
     if config.custom is not None:  # CU-5: unchecked text never reaches a session
         custom = await check_custom_spec(
             request, db, get_gateway(), me.org_id, me.user_id, custom_settings, config.custom
