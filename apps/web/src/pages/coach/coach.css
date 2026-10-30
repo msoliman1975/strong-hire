@@ -110,7 +110,11 @@
   font-size: 0.75rem;
 }
 
-.coach-turn .coach-mark {
+.coach-turn__avatar {
+  display: flex;
+}
+
+.coach-turn .coach-turn__avatar {
   flex: 0 0 32px;
 }
 

@@ -20,7 +20,6 @@ import { useSiteStatus } from "../../api/status";
 
 import { competencyLabel } from "../../labels";
 import {
-  CoachMark,
   ErrorNotice,
   Eyebrow,
   Loading,
@@ -248,7 +247,11 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
             <ol className="plain-list coach__turns">
               {detail.turns.map((t) => (
                 <li key={t.seq} className="coach-turn" data-speaker={t.speaker} data-testid="coach-turn">
-                  {t.speaker === "coach" && <CoachMark size={32} />}
+                  {t.speaker === "coach" && (
+                    <span className="coach-turn__avatar" aria-hidden="true">
+                      <Strova mode="coaching" size={32} />
+                    </span>
+                  )}
                   <div className="coach-turn__body">
                     <p>
                       <span className="visually-hidden">{t.speaker === "coach" ? "Coach: " : "You: "}</span>
@@ -263,7 +266,9 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
               ))}
               {voiceLines.map((line, i) => (
                 <li key={`voice-${i}`} className="coach-turn" data-speaker="coach" data-testid="coach-turn">
-                  <CoachMark size={32} />
+                  <span className="coach-turn__avatar" aria-hidden="true">
+                    <Strova mode="coaching" size={32} />
+                  </span>
                   <p>
                     <span className="visually-hidden">Coach: </span>
                     {line}
