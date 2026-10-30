@@ -16,7 +16,9 @@ from strong_core.library import NAME_MAX_CHARS, clean_name
 from strong_core.schemas import (
     ACCEPTED_ISSUE_KEY_MAX,
     AcceptedIssue,
+    CustomSessionSpec,
     GapStatus,
+    InterviewType,
     JobPosting,
     Level,
     Resume,
@@ -73,6 +75,19 @@ class JobTargetUpdate(_Body):
     posting: JobPosting
     stage: str | None = Field(default=None, max_length=100)
     context: JobContext = Field(default_factory=JobContext)
+    interview_types: list[InterviewType] | None = Field(
+        default=None,
+        description=(
+            "TG-2, RH-1: the add flow's \"Create the role\": keep these types as the role's "
+            "interviews in the same request."
+        ),
+    )
+    resume_id: uuid.UUID | None = Field(
+        default=None, description="The resume for those interviews. Default: the main resume."
+    )
+    custom: CustomSessionSpec | None = Field(
+        default=None, description="CU-1: the Custom setup, when Custom is kept."
+    )
 
 
 class ResumeUpdate(_Body):

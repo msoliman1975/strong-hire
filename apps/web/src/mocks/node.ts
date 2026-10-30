@@ -2,6 +2,7 @@
 import { setupServer } from "msw/node";
 
 import { acceptedIssuesHandlers } from "./acceptedIssuesHandlers";
+import { interviewHandlers } from "./interviewHandlers";
 import { resumeHandlers } from "./resumeHandlers";
 import { coachHandlers } from "./coachHandlers";
 import { coachVoiceHandlers } from "./coachVoiceHandlers";
@@ -21,6 +22,7 @@ export const server = setupServer(
   ...inputHandlers(mockStore),
   ...acceptedIssuesHandlers(mockStore),
   ...resumeHandlers(mockStore),
+  ...interviewHandlers(mockStore),
   ...sessionHandlers(mockStore),
   ...scoringHandlers(mockStore),
   ...authHandlers(mockStore),

@@ -472,6 +472,18 @@ async def update_job_target(
     target.level = posting.level
     target.stage = body.stage
     target.context_notes = _context_notes(body.context)
+    if body.interview_types:
+        # TG-2, RH-1: "Create the role" keeps its interviews in the same request.
+        from strong_api.plan.interviews import InterviewsCreate, create_interviews
+
+        await create_interviews(
+            db,
+            me,
+            target,
+            InterviewsCreate(
+                resume_id=body.resume_id, interview_types=body.interview_types, custom=body.custom
+            ),
+        )
     await db.commit()
 
     job = None
