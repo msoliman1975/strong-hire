@@ -15,7 +15,6 @@ type DeepRequired<T> = T extends (infer U)[]
 
 export type PlanView = DeepRequired<S["PlanView"]>;
 export type TypeWeights = DeepRequired<S["TypeWeights"]>;
-export type PlanSetupDefaults = DeepRequired<S["PlanSetupDefaults"]>;
 export type InterviewDateOut = DeepRequired<S["InterviewDateOut"]>;
 export type Tone = S["Tone"];
 

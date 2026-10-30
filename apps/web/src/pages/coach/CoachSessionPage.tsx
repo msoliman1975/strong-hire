@@ -20,7 +20,6 @@ import { useSiteStatus } from "../../api/status";
 
 import { competencyLabel } from "../../labels";
 import {
-  CoachMark,
   ErrorNotice,
   Eyebrow,
   Loading,
@@ -243,32 +242,41 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
 
       <div className="coach__body">
         <section className="card coach__chat" aria-label="Conversation">
-          <ol className="plain-list coach__turns" role="log" aria-live="polite" aria-label="Conversation with your coach">
-            {detail.turns.map((t) => (
-              <li key={t.seq} className="coach-turn" data-speaker={t.speaker} data-testid="coach-turn">
-                {t.speaker === "coach" && <CoachMark size={32} />}
-                <div className="coach-turn__body">
-                  <p>
-                    <span className="visually-hidden">{t.speaker === "coach" ? "Coach: " : "You: "}</span>
-                    {t.text}
-                  </p>
-                  {t.speaker === "coach" && t.seq === lastCoach && tipOn && (
-                    <p className="coach-turn__tip">Tip: say “I”, not “we”</p>
+          {/* The log wraps the list, so the turns keep their list semantics. */}
+          <div role="log" aria-live="polite" aria-label="Conversation with your coach">
+            <ol className="plain-list coach__turns">
+              {detail.turns.map((t) => (
+                <li key={t.seq} className="coach-turn" data-speaker={t.speaker} data-testid="coach-turn">
+                  {t.speaker === "coach" && (
+                    <span className="coach-turn__avatar" aria-hidden="true">
+                      <Strova mode="coaching" size={32} />
+                    </span>
                   )}
-                  {t.speaker === "candidate" && spoken.has(t.seq) && <p className="coach-turn__meta">Spoken</p>}
-                </div>
-              </li>
-            ))}
-            {voiceLines.map((line, i) => (
-              <li key={`voice-${i}`} className="coach-turn" data-speaker="coach" data-testid="coach-turn">
-                <CoachMark size={32} />
-                <p>
-                  <span className="visually-hidden">Coach: </span>
-                  {line}
-                </p>
-              </li>
-            ))}
-          </ol>
+                  <div className="coach-turn__body">
+                    <p>
+                      <span className="visually-hidden">{t.speaker === "coach" ? "Coach: " : "You: "}</span>
+                      {t.text}
+                    </p>
+                    {t.speaker === "coach" && t.seq === lastCoach && tipOn && (
+                      <p className="coach-turn__tip">Tip: say “I”, not “we”</p>
+                    )}
+                    {t.speaker === "candidate" && spoken.has(t.seq) && <p className="coach-turn__meta">Spoken</p>}
+                  </div>
+                </li>
+              ))}
+              {voiceLines.map((line, i) => (
+                <li key={`voice-${i}`} className="coach-turn" data-speaker="coach" data-testid="coach-turn">
+                  <span className="coach-turn__avatar" aria-hidden="true">
+                    <Strova mode="coaching" size={32} />
+                  </span>
+                  <p>
+                    <span className="visually-hidden">Coach: </span>
+                    {line}
+                  </p>
+                </li>
+              ))}
+            </ol>
+          </div>
           <p role="status" className="muted small coach__pending">
             {turn.isPending ? "The coach is thinking" : ""}
           </p>
@@ -390,6 +398,7 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
                 Still missing: {detail.missing.map((p) => STORY_PART_LABEL[p]).join(", ")}
               </p>
             )}
+            <p className="muted small">Strova uses only your words. Nothing is added that you didn't say.</p>
           </section>
           <section className="card" aria-labelledby="coach-prove-heading">
             <h2 id="coach-prove-heading" className="muted small coach__prove-heading">

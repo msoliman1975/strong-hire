@@ -8,6 +8,7 @@ import { useState, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 
 import { keys, useJob, useProfile, useResumes, useUsage } from "../../api/hooks";
+import { gapApi } from "../../api/gap";
 import { useInterview } from "../../api/roles";
 import { paywallReason, sessionsApi } from "../../api/sessions";
 import type { Difficulty, HireSignal, InterviewDetail, Level, Mode } from "../../api/types";
@@ -16,9 +17,9 @@ import { ErrorNotice, Loading } from "../../components/ui";
 import "../../components/ux/ux.css";
 import { competencyLabel, difficultyLabel, formatDate, modeHintV2, modeLabelV2 } from "../../labels";
 import type { Tone } from "../plan/api";
-import { roleTitle, rolePath, typeName } from "../roles/shared";
+import { DEFAULT_TAKE_MINUTES, roleTitle, rolePath, typeName } from "../roles/shared";
 
-const MINI = 10;
+const MINI = DEFAULT_TAKE_MINUTES;
 const LENGTHS = [10, 30, 45] as const;
 const DIFFICULTIES: Difficulty[] = ["friendly", "realistic", "tough"];
 const MODES: Mode[] = ["realistic", "coach"];
@@ -99,8 +100,10 @@ function InterviewBody({ detail }: { detail: InterviewDetail }) {
   const resume = resumes.data?.find((r) => r.id === detail.interview.resume_id);
 
   const start = useMutation({
-    mutationFn: () =>
-      sessionsApi.create({
+    mutationFn: async () => {
+      // A new role's gap analysis runs in the background; the take needs it ready.
+      if (detail.interview.resume_id) await gapApi.whenReady(detail.interview.job_target_id, detail.interview.resume_id);
+      return sessionsApi.create({
         job_target_id: detail.interview.job_target_id,
         interview_id: detail.interview.id,
         resume_id: detail.interview.resume_id,
@@ -114,7 +117,8 @@ function InterviewBody({ detail }: { detail: InterviewDetail }) {
           tone,
           custom: detail.interview.custom ?? null,
         },
-      }),
+      });
+    },
     onSuccess: (session) => {
       void queryClient.invalidateQueries({ queryKey: keys.usage });
       navigate(`/sessions/${session.id}/live`);
@@ -204,7 +208,7 @@ function InterviewBody({ detail }: { detail: InterviewDetail }) {
         <div className="sub">{actingAs}.</div>
         <div className="sx-row">
           <button type="button" className="sx-btn" onClick={() => start.mutate()} disabled={start.isPending}>
-            {detail.takes.length === 0 ? "Start the first take" : "Retake"}
+            {start.isPending ? "Getting the take ready…" : detail.takes.length === 0 ? "Start the first take" : "Retake"}
           </button>
           <button type="button" className="sx-btn ghost" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
             {open ? "Hide settings" : "Change settings"}

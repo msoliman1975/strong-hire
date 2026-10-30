@@ -8,7 +8,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { resumesApi } from "../../api/inputs";
+import { jobTargetsApi, resumesApi } from "../../api/inputs";
 import { AppRoutes, createQueryClient } from "../../App";
 import { mockStore } from "../../mocks/node";
 import { setFeatureOverrides } from "../../theme/features";
@@ -234,5 +234,28 @@ describe("resume pages", () => {
     await user.click(within(ideas).getAllByRole("button", { name: "Not a story" })[0]);
     await waitFor(() => expect(within(ideas).queryAllByRole("link", { name: "Craft with Strova" })).toHaveLength(before - 1));
     await act(async () => undefined);
+  });
+
+  it("RM-3, SG-6: the resume page says which roles use it, and Strova's resume-line rewrite adds, undoes and dismisses", async () => {
+    const resume = await addResume();
+    const { job_target: created } = await jobTargetsApi.create({ text: "Senior engineer, payments. ".repeat(5) });
+    const job = await jobTargetsApi.get(created.id);
+    await fetch(`${location.origin}/api/roles/${job.id}/interviews`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ interview_types: ["behavioral"] }),
+    });
+    const user = renderApp(`/resumes/${resume.id}`);
+    await screen.findByRole("heading", { level: 1, name: resume.name ?? "" });
+    const usedBy = await screen.findByText(/^Used by/);
+    expect(within(usedBy).getByRole("link")).toHaveAttribute("href", `/roles/${job.id}`);
+    const card = await screen.findByRole("region", { name: "Strova suggests a resume line" });
+    expect(card).toHaveTextContent("Strova suggests · from your stories");
+    expect(card.querySelector("ins")?.textContent).toMatch(/zero failed payments/);
+    await user.click(within(card).getByRole("button", { name: "Add to resume" }));
+    expect(await within(card).findByText("Added to your resume.")).toBeInTheDocument();
+    await user.click(within(card).getByRole("button", { name: "Undo" }));
+    await user.click(await within(card).findByRole("button", { name: "Dismiss" }));
+    await waitFor(() => expect(screen.queryByRole("region", { name: "Strova suggests a resume line" })).toBeNull());
   });
 });

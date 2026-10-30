@@ -4,15 +4,20 @@
  * accept. Resume-line suggestions from stories (SG-6) join this page with U08.
  */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Fragment, useState } from "react";
 import { Link, useParams } from "react-router";
 
 import { resumesApi } from "../../api/inputs";
 import { useResume, useResumeIssues, useStoryIdeas } from "../../api/hooks";
+import { useRoles } from "../../api/roles";
+import { suggestionKeys, suggestionsApi, useSuggestions } from "../../api/suggestions";
+import type { Suggestion } from "../../api/types";
 import { Strova } from "../../components/strova";
 import { ErrorNotice, Loading } from "../../components/ui";
 import "../../components/ux/ux.css";
 import { competencyLabel } from "../../labels";
 import { resumeCheckPath } from "../../paths";
+import { rolePath, roleTitle } from "../roles/shared";
 import { storyPath } from "../stories/paths";
 import { BreakdownSummary } from "../start/ResumeReadyPage";
 import { IssueList } from "./IssueList";
@@ -36,6 +41,7 @@ export function ResumeDetailPage() {
   const record = useResume(resumeId);
   const issues = useResumeIssues(resumeId);
   const ideas = useStoryIdeas(resumeId);
+  const roles = useRoles();
   const refresh = () => {
     void queryClient.invalidateQueries({ queryKey: ["resumes"] });
   };
@@ -49,6 +55,9 @@ export function ResumeDetailPage() {
   if (!record.data) return <Loading label="Loading your resume" />;
   const resume = record.data.resume;
   const open = issues.data?.open ?? [];
+  const usedBy = (roles.data ?? []).filter(
+    (r) => !r.role.archived && r.interviews.some((i) => i.interview.resume_id === resumeId),
+  );
 
   return (
     <div className="sx-page">
@@ -62,6 +71,17 @@ export function ResumeDetailPage() {
               <button type="button" className="sx-btn quiet sm" onClick={() => makeMain.mutate()} disabled={makeMain.isPending}>
                 Make this my main resume
               </button>
+            )}
+            {usedBy.length > 0 && (
+              <span>
+                Used by{" "}
+                {usedBy.map((r, n) => (
+                  <Fragment key={r.role.id}>
+                    {n > 0 && (n === usedBy.length - 1 ? " and " : ", ")}
+                    <Link to={rolePath(r.role.id)}>{roleTitle(r.role)}</Link>
+                  </Fragment>
+                ))}
+              </span>
             )}
           </div>
         </div>
@@ -145,10 +165,91 @@ export function ResumeDetailPage() {
                 {issues.data && open.length === 0 && <p className="sx-muted sx-small">Nothing to fix. Your resume reads well.</p>}
                 <IssueList resumeId={resumeId} issues={open} compactActions />
               </section>
+              <ResumeLineSuggestions resumeId={resumeId} />
             </div>
           </div>
         </>
       )}
     </div>
+  );
+}
+
+/**
+ * SG-6 on the resume page (mockup #cv): Strova's rewrites of a resume line from a story's result,
+ * with Add to resume (then Undo) and Dismiss. Story ideas are shown above, from their own endpoint.
+ */
+function ResumeLineSuggestions({ resumeId }: { resumeId: string }) {
+  const list = useSuggestions("resume", { resume_id: resumeId });
+  const lines = (list.data ?? []).filter((s) => s.kind === "improve_resume_line");
+  if (lines.length === 0) return null;
+  return (
+    <>
+      {lines.map((s) => (
+        <ResumeLineCard key={s.id} suggestion={s} resumeId={resumeId} />
+      ))}
+    </>
+  );
+}
+
+function ResumeLineCard({ suggestion, resumeId }: { suggestion: Suggestion; resumeId: string }) {
+  const client = useQueryClient();
+  const [added, setAdded] = useState(false);
+  const refresh = () => {
+    void client.invalidateQueries({ queryKey: ["resumes"] });
+    void client.invalidateQueries({ queryKey: suggestionKeys.place("resume", resumeId) });
+  };
+  const accept = useMutation({
+    mutationFn: () => suggestionsApi.accept(suggestion.id),
+    onSuccess: () => {
+      setAdded(true);
+      void client.invalidateQueries({ queryKey: ["resumes"] });
+    },
+  });
+  const undo = useMutation({
+    mutationFn: () => suggestionsApi.undo(suggestion.id),
+    onSuccess: () => {
+      setAdded(false);
+      void client.invalidateQueries({ queryKey: ["resumes"] });
+    },
+  });
+  const dismiss = useMutation({ mutationFn: () => suggestionsApi.dismiss(suggestion.id), onSuccess: refresh });
+  const error = accept.error ?? undo.error ?? dismiss.error;
+  const busy = accept.isPending || undo.isPending || dismiss.isPending;
+  const p = suggestion.payload;
+  if (p.kind !== "improve_resume_line") return null;
+  return (
+    <section className="sx-card coach" aria-label="Strova suggests a resume line" data-testid="resume-line-suggestion">
+      <span className="sx-eyebrow">Strova suggests · from your stories</span>
+      {added ? (
+        <div className="sx-notice ok sx-small" role="status">
+          <strong>Added to your resume.</strong>{" "}
+          <button type="button" className="sx-btn quiet sm" disabled={busy} onClick={() => undo.mutate()}>
+            Undo
+          </button>
+        </div>
+      ) : (
+        <>
+          <span className="sx-small">{suggestion.reason}</span>
+          <div className="sx-diff">
+            <del>{p.before}</del>
+            <br />
+            <ins>{p.after}</ins>
+          </div>
+          <div className="sx-row">
+            <button type="button" className="sx-btn sm" disabled={busy} onClick={() => accept.mutate()}>
+              Add to resume
+            </button>
+            <button type="button" className="sx-btn quiet sm" disabled={busy} onClick={() => dismiss.mutate()}>
+              Dismiss
+            </button>
+          </div>
+        </>
+      )}
+      {error && (
+        <span className="sx-small" role="alert">
+          {error.message}
+        </span>
+      )}
+    </section>
   );
 }

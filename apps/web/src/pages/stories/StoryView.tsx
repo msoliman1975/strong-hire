@@ -14,7 +14,8 @@ import { Link } from "react-router";
 
 import { competencyLabel, formatDate } from "../../labels";
 import { EXPLAIN, Explain } from "../../components/Explain";
-import { CoachMark, ErrorNotice, Loading, Segmented, STORY_PART_LABEL } from "../../components/ui";
+import { Strova } from "../../components/strova";
+import { ErrorNotice, Loading, Segmented, STORY_PART_LABEL } from "../../components/ui";
 import { takesApi, useTakes } from "../coach/api";
 import { newCoachPath } from "../coach/paths";
 import { filledParts, STORY_PARTS, useStory, type Story } from "./api";
@@ -165,7 +166,9 @@ export function CoachNotes({ story }: { story: Story }) {
   return (
     <section className="card card--dark story-notes" aria-labelledby="story-notes-heading">
       <h3 id="story-notes-heading">
-        <CoachMark size={20} tone="dark" />
+        <span aria-hidden="true">
+          <Strova mode="coaching" size={20} />
+        </span>
         Coach notes
       </h3>
       {notes.length === 0 ? (

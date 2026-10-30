@@ -187,4 +187,16 @@ describe("rehearsals", () => {
     await user.click(within(mode).getByRole("button", { name: "Practice" }));
     expect(screen.getByRole("region", { name: "Next take" })).toHaveTextContent("Practice, 10 minutes");
   });
+
+  it("RH-5: the mode labels are Realistic and Practice; a Practice take is stored as coach", async () => {
+    const { interviews } = await roleWithInterviews("behavioral");
+    const user = renderApp(`/interviews/${interviews[0].id}`);
+    await user.click(await screen.findByRole("button", { name: "Change settings" }));
+    const mode = within(screen.getByTestId("take-settings")).getByRole("group", { name: "Mode" });
+    expect(within(mode).queryByRole("button", { name: /Coach/ })).toBeNull();
+    await user.click(within(mode).getByRole("button", { name: "Practice" }));
+    await user.click(within(screen.getByRole("region", { name: "Next take" })).getByRole("button", { name: "Start the first take" }));
+    await waitFor(() => expect(screen.getByTestId("where").textContent).toMatch(/^\/sessions\/.+\/live$/));
+    expect((mockStore.db.sessions.at(-1) as SessionRecord).config.mode).toBe("coach");
+  });
 });

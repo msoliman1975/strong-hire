@@ -5,6 +5,8 @@ import { interviewTypeLabel } from "../../labels";
 export const rolesPath = "/roles";
 export const addRolePath = "/roles/new";
 export const rolePath = (jobId: string) => `/roles/${jobId}`;
+/** A take's default length in minutes: the mini interview every plan can run. */
+export const DEFAULT_TAKE_MINUTES = 10;
 export const interviewPath = (interviewId: string) => `/interviews/${interviewId}`;
 
 /** "Stripe · Senior Software Engineer, Payments", or the library name. */
