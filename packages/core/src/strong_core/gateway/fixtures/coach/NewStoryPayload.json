@@ -1,0 +1,20 @@
+{
+  "kind": "new_story",
+  "title": "Checkout migration before Black Friday",
+  "context": "We were moving checkout to a new payments provider.",
+  "stakes": "Black Friday was a month out and checkout could not break.",
+  "action": "I wrote the rollback plan and moved traffic in five percent steps.",
+  "result": "We were done a week before Black Friday and not one payment failed.",
+  "reflection": null,
+  "skills": [
+    "ownership",
+    "impact"
+  ],
+  "quotes": [
+    "we were moving checkout to the new payments provider",
+    "Black Friday was a month out and checkout could not break",
+    "I wrote the rollback plan",
+    "we moved traffic in five percent steps",
+    "we were done a week before Black Friday and not one payment failed"
+  ]
+}

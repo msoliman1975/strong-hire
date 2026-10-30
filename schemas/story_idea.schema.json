@@ -1,0 +1,107 @@
+{
+  "$defs": {
+    "Competency": {
+      "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.",
+      "enum": [
+        "ownership",
+        "impact",
+        "collaboration",
+        "conflict_handling",
+        "learning_from_failure",
+        "communication",
+        "role_fit",
+        "depth_of_experience",
+        "judgment",
+        "motivation",
+        "team_fit",
+        "scope_at_level",
+        "technical_depth",
+        "accuracy",
+        "reasoning",
+        "trade_offs",
+        "clarity_of_explanation",
+        "problem_framing",
+        "structure",
+        "user_and_business_sense",
+        "estimation_logic",
+        "prioritization",
+        "recommendation",
+        "logistics_and_expectations"
+      ],
+      "title": "Competency",
+      "type": "string"
+    },
+    "StoryPart": {
+      "description": "ST-1: the five parts of a story, in the order the workbench and prompts show them.",
+      "enum": [
+        "context",
+        "stakes",
+        "action",
+        "result",
+        "reflection"
+      ],
+      "title": "StoryPart",
+      "type": "string"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/story_idea.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "RM-4: one resume achievement not used by a story, as a seed for crafting.",
+  "properties": {
+    "achievement": {
+      "description": "The resume line, verbatim.",
+      "minLength": 1,
+      "title": "Achievement",
+      "type": "string"
+    },
+    "missing_parts": {
+      "description": "Story parts the line does not give.",
+      "items": {
+        "$ref": "#/$defs/StoryPart"
+      },
+      "title": "Missing Parts",
+      "type": "array"
+    },
+    "resume_line_ref": {
+      "anyOf": [
+        {
+          "pattern": "^roles\\[\\d+\\]\\.achievements\\[\\d+\\]$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Where the line is in schemas.Resume, as roles[<i>].achievements[<j>].",
+      "title": "Resume Line Ref"
+    },
+    "role": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The role it is under: title, company.",
+      "title": "Role"
+    },
+    "skills": {
+      "description": "Likely skills. Empty when the worker call failed.",
+      "items": {
+        "$ref": "#/$defs/Competency"
+      },
+      "title": "Skills",
+      "type": "array"
+    }
+  },
+  "required": [
+    "achievement"
+  ],
+  "title": "StoryIdea",
+  "type": "object"
+}

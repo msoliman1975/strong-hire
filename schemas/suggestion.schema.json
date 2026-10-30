@@ -1,0 +1,665 @@
+{
+  "$defs": {
+    "Competency": {
+      "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.",
+      "enum": [
+        "ownership",
+        "impact",
+        "collaboration",
+        "conflict_handling",
+        "learning_from_failure",
+        "communication",
+        "role_fit",
+        "depth_of_experience",
+        "judgment",
+        "motivation",
+        "team_fit",
+        "scope_at_level",
+        "technical_depth",
+        "accuracy",
+        "reasoning",
+        "trade_offs",
+        "clarity_of_explanation",
+        "problem_framing",
+        "structure",
+        "user_and_business_sense",
+        "estimation_logic",
+        "prioritization",
+        "recommendation",
+        "logistics_and_expectations"
+      ],
+      "title": "Competency",
+      "type": "string"
+    },
+    "ImproveResumeLinePayload": {
+      "additionalProperties": false,
+      "description": "SG-6: the payload of an improve resume line suggestion.",
+      "properties": {
+        "after": {
+          "minLength": 1,
+          "title": "After",
+          "type": "string"
+        },
+        "before": {
+          "minLength": 1,
+          "title": "Before",
+          "type": "string"
+        },
+        "kind": {
+          "const": "improve_resume_line",
+          "default": "improve_resume_line",
+          "title": "Kind",
+          "type": "string"
+        },
+        "quotes": {
+          "description": "The story's words the rewrite came from, verbatim.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Quotes",
+          "type": "array"
+        },
+        "resume_line_ref": {
+          "description": "Where the line is in schemas.Resume, as roles[<i>].achievements[<j>].",
+          "minLength": 1,
+          "pattern": "^roles\\[\\d+\\]\\.achievements\\[\\d+\\]$",
+          "title": "Resume Line Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "resume_line_ref",
+        "before",
+        "after"
+      ],
+      "title": "ImproveResumeLinePayload",
+      "type": "object"
+    },
+    "MissingSkillPayload": {
+      "additionalProperties": false,
+      "description": "SG-4: a tested skill with no story; accepting opens crafting aimed at it.",
+      "properties": {
+        "competency": {
+          "$ref": "#/$defs/Competency",
+          "description": "The target skill for crafting."
+        },
+        "kind": {
+          "const": "missing_skill",
+          "default": "missing_skill",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "competency"
+      ],
+      "title": "MissingSkillPayload",
+      "type": "object"
+    },
+    "NewStoryPayload": {
+      "additionalProperties": false,
+      "description": "SG-3: a new story from a strong answer that matches no story.",
+      "properties": {
+        "action": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Action"
+        },
+        "context": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Context"
+        },
+        "kind": {
+          "const": "new_story",
+          "default": "new_story",
+          "title": "Kind",
+          "type": "string"
+        },
+        "quotes": {
+          "description": "The answer's words the parts came from, verbatim.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Quotes",
+          "type": "array"
+        },
+        "reflection": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reflection"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Result"
+        },
+        "skills": {
+          "items": {
+            "$ref": "#/$defs/Competency"
+          },
+          "title": "Skills",
+          "type": "array"
+        },
+        "stakes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stakes"
+        },
+        "title": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "title"
+      ],
+      "title": "NewStoryPayload",
+      "type": "object"
+    },
+    "ReviewPayload": {
+      "additionalProperties": false,
+      "description": "ST-11: the payload of a review suggestion.",
+      "properties": {
+        "kind": {
+          "const": "review",
+          "default": "review",
+          "title": "Kind",
+          "type": "string"
+        },
+        "review": {
+          "$ref": "#/$defs/StoryReview"
+        }
+      },
+      "required": [
+        "review"
+      ],
+      "title": "ReviewPayload",
+      "type": "object"
+    },
+    "StoryIdeaPayload": {
+      "additionalProperties": false,
+      "description": "RM-4: the payload of a story idea suggestion.",
+      "properties": {
+        "achievement": {
+          "description": "The resume line, verbatim.",
+          "minLength": 1,
+          "title": "Achievement",
+          "type": "string"
+        },
+        "kind": {
+          "const": "story_idea",
+          "default": "story_idea",
+          "title": "Kind",
+          "type": "string"
+        },
+        "missing_parts": {
+          "description": "Story parts the line does not give.",
+          "items": {
+            "$ref": "#/$defs/StoryPart"
+          },
+          "title": "Missing Parts",
+          "type": "array"
+        },
+        "resume_line_ref": {
+          "anyOf": [
+            {
+              "pattern": "^roles\\[\\d+\\]\\.achievements\\[\\d+\\]$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Where the line is in schemas.Resume, as roles[<i>].achievements[<j>].",
+          "title": "Resume Line Ref"
+        },
+        "role": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The role it is under: title, company.",
+          "title": "Role"
+        },
+        "skills": {
+          "description": "Likely skills. Empty when the worker call failed.",
+          "items": {
+            "$ref": "#/$defs/Competency"
+          },
+          "title": "Skills",
+          "type": "array"
+        }
+      },
+      "required": [
+        "achievement"
+      ],
+      "title": "StoryIdeaPayload",
+      "type": "object"
+    },
+    "StoryPart": {
+      "description": "ST-1: the five parts of a story, in the order the workbench and prompts show them.",
+      "enum": [
+        "context",
+        "stakes",
+        "action",
+        "result",
+        "reflection"
+      ],
+      "title": "StoryPart",
+      "type": "string"
+    },
+    "StoryPartEdit": {
+      "additionalProperties": false,
+      "description": "SG-2, ST-11: a before-and-after edit of one story part.",
+      "properties": {
+        "after": {
+          "description": "The proposed text.",
+          "minLength": 1,
+          "title": "After",
+          "type": "string"
+        },
+        "before": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The part as it is now. Null when it is empty.",
+          "title": "Before"
+        },
+        "part": {
+          "$ref": "#/$defs/StoryPart"
+        },
+        "quotes": {
+          "description": "The user's words the new text came from, verbatim.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Quotes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "part",
+        "before",
+        "after"
+      ],
+      "title": "StoryPartEdit",
+      "type": "object"
+    },
+    "StoryReview": {
+      "additionalProperties": false,
+      "description": "ST-11: per-part notes and before-and-after edits for one story.",
+      "properties": {
+        "notes": {
+          "items": {
+            "$ref": "#/$defs/StoryReviewNote"
+          },
+          "title": "Notes",
+          "type": "array"
+        },
+        "summary": {
+          "description": "One or two sentences from Strova.",
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        }
+      },
+      "required": [
+        "summary"
+      ],
+      "title": "StoryReview",
+      "type": "object"
+    },
+    "StoryReviewNote": {
+      "additionalProperties": false,
+      "description": "ST-11: Strova's note on one story part, with an optional edit from the user's words.",
+      "properties": {
+        "edit": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StoryPartEdit"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "note": {
+          "minLength": 1,
+          "title": "Note",
+          "type": "string"
+        },
+        "part": {
+          "$ref": "#/$defs/StoryPart"
+        }
+      },
+      "required": [
+        "part",
+        "note"
+      ],
+      "title": "StoryReviewNote",
+      "type": "object"
+    },
+    "SuggestionKind": {
+      "description": "SG-1: what a suggestion from Strova proposes (ux-spec section 8).",
+      "enum": [
+        "tune_story",
+        "new_story",
+        "missing_skill",
+        "tailor_role",
+        "improve_resume_line",
+        "story_idea",
+        "review"
+      ],
+      "title": "SuggestionKind",
+      "type": "string"
+    },
+    "SuggestionStatus": {
+      "description": "SG-1, SG-8: a suggestion is open until accepted or dismissed. Dismissed ones never return.",
+      "enum": [
+        "open",
+        "accepted",
+        "dismissed"
+      ],
+      "title": "SuggestionStatus",
+      "type": "string"
+    },
+    "TailorRolePayload": {
+      "additionalProperties": false,
+      "description": "SG-5: the lead story for a skill at one company and one detail to bring forward.",
+      "properties": {
+        "company": {
+          "description": "Shown as the note title: For {company}.",
+          "minLength": 1,
+          "title": "Company",
+          "type": "string"
+        },
+        "competency": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Competency"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The skill this story leads for at the company."
+        },
+        "kind": {
+          "const": "tailor_role",
+          "default": "tailor_role",
+          "title": "Kind",
+          "type": "string"
+        },
+        "note": {
+          "description": "The detail to bring forward.",
+          "minLength": 1,
+          "title": "Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "company",
+        "note"
+      ],
+      "title": "TailorRolePayload",
+      "type": "object"
+    },
+    "TuneStoryPayload": {
+      "additionalProperties": false,
+      "description": "SG-2: tune one part of a story from a debrief answer that used it.",
+      "properties": {
+        "edit": {
+          "$ref": "#/$defs/StoryPartEdit"
+        },
+        "kind": {
+          "const": "tune_story",
+          "default": "tune_story",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "edit"
+      ],
+      "title": "TuneStoryPayload",
+      "type": "object"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/suggestion.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "SG-1: one suggestion from Strova. The suggestions table holds org_id and user_id.",
+  "properties": {
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "job_target_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The role it is for.",
+      "title": "Job Target Id"
+    },
+    "kind": {
+      "$ref": "#/$defs/SuggestionKind"
+    },
+    "payload": {
+      "discriminator": {
+        "mapping": {
+          "improve_resume_line": "#/$defs/ImproveResumeLinePayload",
+          "missing_skill": "#/$defs/MissingSkillPayload",
+          "new_story": "#/$defs/NewStoryPayload",
+          "review": "#/$defs/ReviewPayload",
+          "story_idea": "#/$defs/StoryIdeaPayload",
+          "tailor_role": "#/$defs/TailorRolePayload",
+          "tune_story": "#/$defs/TuneStoryPayload"
+        },
+        "propertyName": "kind"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/TuneStoryPayload"
+        },
+        {
+          "$ref": "#/$defs/NewStoryPayload"
+        },
+        {
+          "$ref": "#/$defs/MissingSkillPayload"
+        },
+        {
+          "$ref": "#/$defs/TailorRolePayload"
+        },
+        {
+          "$ref": "#/$defs/ImproveResumeLinePayload"
+        },
+        {
+          "$ref": "#/$defs/StoryIdeaPayload"
+        },
+        {
+          "$ref": "#/$defs/ReviewPayload"
+        }
+      ],
+      "title": "Payload"
+    },
+    "prompt_ref": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The prompt that wrote it. Null for rule-based suggestions.",
+      "title": "Prompt Ref"
+    },
+    "reason": {
+      "description": "Why Strova suggests it, one sentence.",
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "resolved_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "When it was accepted or dismissed.",
+      "title": "Resolved At"
+    },
+    "resume_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The resume it changes.",
+      "title": "Resume Id"
+    },
+    "source_question_ref": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "QuestionScore.question_ref of the answer.",
+      "title": "Source Question Ref"
+    },
+    "source_resume_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The resume it came from.",
+      "title": "Source Resume Id"
+    },
+    "source_session_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The debrief's session.",
+      "title": "Source Session Id"
+    },
+    "status": {
+      "$ref": "#/$defs/SuggestionStatus",
+      "default": "open"
+    },
+    "story_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The story it changes.",
+      "title": "Story Id"
+    }
+  },
+  "required": [
+    "id",
+    "kind",
+    "payload",
+    "reason",
+    "created_at"
+  ],
+  "title": "Suggestion",
+  "type": "object"
+}

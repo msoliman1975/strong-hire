@@ -1,0 +1,40 @@
+{
+  "$id": "https://strong-hire.local/schemas/resume_line_edit.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "SG-6: a rewrite of one resume line from a story's words.",
+  "properties": {
+    "after": {
+      "minLength": 1,
+      "title": "After",
+      "type": "string"
+    },
+    "before": {
+      "minLength": 1,
+      "title": "Before",
+      "type": "string"
+    },
+    "quotes": {
+      "description": "The story's words the rewrite came from, verbatim.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Quotes",
+      "type": "array"
+    },
+    "resume_line_ref": {
+      "description": "Where the line is in schemas.Resume, as roles[<i>].achievements[<j>].",
+      "minLength": 1,
+      "pattern": "^roles\\[\\d+\\]\\.achievements\\[\\d+\\]$",
+      "title": "Resume Line Ref",
+      "type": "string"
+    }
+  },
+  "required": [
+    "resume_line_ref",
+    "before",
+    "after"
+  ],
+  "title": "ResumeLineEdit",
+  "type": "object"
+}
