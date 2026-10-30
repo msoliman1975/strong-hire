@@ -24,7 +24,7 @@ from arq.connections import RedisSettings
 from strong_core.config import get_settings
 from strong_core.ops.logs import configure_logging
 from strong_core.ops.runtime import start_ops
-from strong_worker import retention
+from strong_worker import reminders, retention
 from strong_worker.account import jobs as account_jobs
 from strong_worker.alerts import jobs as alert_jobs
 from strong_worker.gap import jobs as gap_jobs
@@ -53,6 +53,7 @@ async def startup(ctx: dict[str, Any]) -> None:
     await inputs_jobs.startup(ctx)
     await gap_jobs.startup(ctx)
     await scoring_jobs.startup(ctx)
+    await reminders.startup(ctx)
     await account_jobs.startup(ctx)
     await alert_jobs.startup(ctx)
 
@@ -141,6 +142,14 @@ class WorkerSettings:
             run_at_startup=False,
             unique=True,
             timeout=alert_jobs.TICK_TIMEOUT_S,
+        ),
+        # PS-6: plan reminders, hourly; each user's is sent at 08:00 in their time zone.
+        cron(
+            reminders.plan_reminders,
+            minute=5,
+            run_at_startup=False,
+            unique=True,
+            timeout=600,
         ),
         # AL-7: off unless ALERT_DIGEST=true (checked inside the job).
         cron(

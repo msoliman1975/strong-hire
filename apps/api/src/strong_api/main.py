@@ -31,6 +31,7 @@ from strong_api.inputs.queue import ArqJobQueue, JobQueue
 from strong_api.observability import RequestContextMiddleware
 from strong_api.plan.day_plan import router as day_plan_router
 from strong_api.plan.interviews import router as interviews_router
+from strong_api.plan.personal import router as personal_plan_router
 from strong_api.plan.readiness import router as readiness_router
 from strong_api.plan.router import router as plan_router
 from strong_api.plan.story_fit import router as story_fit_router
@@ -143,6 +144,7 @@ def create_app(
     app.include_router(day_plan_router)  # v2 S34: day plan (RD-2)
     app.include_router(interviews_router)  # U06: target roles, interviews, readiness (RH-1, RH-2)
     app.include_router(suggestions_router)  # U08: suggestions from Strova (SG-2 to SG-8)
+    app.include_router(personal_plan_router)  # U11: the personal plan (PS-1 to PS-5)
     install_auth(app)
     install_billing(app)
     install_account(app)

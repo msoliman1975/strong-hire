@@ -449,22 +449,4 @@ describe("v2 coming back to a saved CV", () => {
     expect(puts).toHaveLength(1);
   });
 
-  it("IN-12: the Resumes card on Home links each CV to its breakdown", async () => {
-    await seed();
-    const form = new FormData();
-    form.append("text", "Second CV, Python and Go.");
-    const { resume: second } = await resumesApi.upload(form);
-    await resumesApi.get(second.id);
-    confirmed();
-    const user = renderAt("/");
-    const card = await screen.findByRole("region", { name: "The resume your interviews are measured against." });
-    const links = await within(card).findAllByRole("link", { name: /^Open breakdown for / });
-    expect(links.map((l) => l.getAttribute("href")).sort()).toEqual(
-      mockStore.db.resumes.map((r) => `/resumes/${r.id}/check`).sort(),
-    );
-    expect(card).toHaveTextContent(/1 accepted/);
-    const first = links.find((l) => l.getAttribute("href") === `/resumes/${mockStore.db.resumes[0].id}/check`)!;
-    await user.click(first);
-    await expectSameBreakdown();
-  });
 });

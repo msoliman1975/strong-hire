@@ -6,6 +6,8 @@ import { keys, useProfile } from "../api/hooks";
 import type { AuthState, Profile } from "../api/types";
 import { ProfileForm } from "../components/ProfileForm";
 import { ErrorNotice, Loading, PageHead } from "../components/ui";
+import { useFeature } from "../theme/features";
+import { ProfileV2 } from "./ProfileV2";
 
 /** Save the profile and update the cached sign-in state, so the first sign-in gate opens at once. */
 function useSaveProfile(onSaved: (profile: Profile) => void) {
@@ -57,6 +59,18 @@ export function WelcomePage() {
 export function EditProfilePage() {
   const profile = useProfile();
   const save = useSaveProfile(() => undefined);
+  const v2 = useFeature("v2_enabled");
+
+  // PS-2: with v2 the page is Profile with Strova (plan style, reminders), with the form below.
+  if (v2)
+    return (
+      <ProfileV2
+        saving={save.isPending}
+        saveError={save.error}
+        saved={save.isSuccess}
+        onSave={(body) => save.mutate(body)}
+      />
+    );
 
   return (
     <div className="page--narrow">
