@@ -25838,6 +25838,40 @@
         "title": "Story",
         "description": "ST-1: one story in the user's library. The stories table holds org_id and user_id."
       },
+      "StoryAnswer": {
+        "additionalProperties": false,
+        "description": "ST-13: Strova's answer to a question asked on Career Stories, from the user's own stories\nand roles. The stories it leans on are named, so the screen can link them.",
+        "properties": {
+          "answer": {
+            "description": "Two to four sentences, spoken to the user.",
+            "minLength": 1,
+            "title": "Answer",
+            "type": "string"
+          },
+          "story_ids": {
+            "description": "The user's stories the answer is about, best first.",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Story Ids",
+            "type": "array"
+          },
+          "quotes": {
+            "description": "The user's words the answer's facts came from, verbatim (CO-9).",
+            "items": {
+              "type": "string"
+            },
+            "title": "Quotes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "answer"
+        ],
+        "title": "StoryAnswer",
+        "type": "object"
+      },
       "StoryCounts": {
         "properties": {
           "total": {

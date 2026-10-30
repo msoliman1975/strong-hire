@@ -9976,6 +9976,28 @@ export interface components {
              */
             updated_at: string;
         };
+        /**
+         * StoryAnswer
+         * @description ST-13: Strova's answer to a question asked on Career Stories, from the user's own stories
+         *     and roles. The stories it leans on are named, so the screen can link them.
+         */
+        StoryAnswer: {
+            /**
+             * Answer
+             * @description Two to four sentences, spoken to the user.
+             */
+            answer: string;
+            /**
+             * Story Ids
+             * @description The user's stories the answer is about, best first.
+             */
+            story_ids?: string[];
+            /**
+             * Quotes
+             * @description The user's words the answer's facts came from, verbatim (CO-9).
+             */
+            quotes?: string[];
+        };
         /** StoryCounts */
         StoryCounts: {
             /** Total */

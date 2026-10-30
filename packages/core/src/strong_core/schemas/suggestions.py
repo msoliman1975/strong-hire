@@ -215,3 +215,17 @@ class Suggestion(Contract):
         if (self.status == SuggestionStatus.OPEN) != (self.resolved_at is None):
             raise ValueError("resolved_at is null exactly when status is open")
         return self
+
+
+class StoryAnswer(Contract):
+    """ST-13: Strova's answer to a question asked on Career Stories, from the user's own stories
+    and roles. The stories it leans on are named, so the screen can link them."""
+
+    answer: str = Field(min_length=1, description="Two to four sentences, spoken to the user.")
+    story_ids: list[UUID] = Field(
+        default_factory=list, description="The user's stories the answer is about, best first."
+    )
+    quotes: list[str] = Field(
+        default_factory=list,
+        description="The user's words the answer's facts came from, verbatim (CO-9).",
+    )

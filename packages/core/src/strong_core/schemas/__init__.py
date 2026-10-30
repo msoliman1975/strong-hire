@@ -150,6 +150,7 @@ from strong_core.schemas.suggestions import (
     NewStoryPayload,
     ResumeLineEdit,
     ReviewPayload,
+    StoryAnswer,
     StoryIdea,
     StoryIdeaPayload,
     StoryIdeas,
@@ -197,6 +198,7 @@ EXPORTED_SCHEMAS: dict[str, type[BaseModel]] = {
     "resume_line_edit": ResumeLineEdit,
     "plan": Plan,
     "interview_readiness": InterviewReadiness,
+    "story_answer": StoryAnswer,
 }
 
 __all__ = [
@@ -311,6 +313,7 @@ __all__ = [
     "Speaker",
     "StandardType",
     "Story",
+    "StoryAnswer",
     "StoryFit",
     "StoryFitItem",
     "StoryFitStrength",
