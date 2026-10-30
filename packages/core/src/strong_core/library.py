@@ -76,9 +76,9 @@ def default_job_name(
 
 
 def default_resume_name(filename: str | None, uploaded: datetime | date | None) -> str:
-    """The original file name without its extension, else "CV <date>"."""
+    """The original file name without its extension, else "Resume <date>"."""
     if filename:
         stem = clean_name(PurePath(filename).stem)
         if stem:
             return stem
-    return f"CV {_day(uploaded)}"
+    return f"Resume {_day(uploaded)}"

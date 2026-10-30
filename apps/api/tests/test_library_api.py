@@ -104,7 +104,7 @@ async def test_r1_default_names(client: httpx.AsyncClient, fake_fixtures: Path, 
     assert cv["name"] == "Ana Lopez CV.pdf"
     text, _ = fixture("resumes", "new-grad-swe")
     pasted = (await client.post("/resumes", data={"text": text})).json()["resume"]
-    assert pasted["name"] == f"CV {TODAY}"
+    assert pasted["name"] == f"Resume {TODAY}"
 
     queue.run_jobs = False  # not read yet: the link's host, else a dated name
     by_url = await client.post("/job-targets", json={"url": "https://www.boards.example/jobs/1"})
