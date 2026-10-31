@@ -363,6 +363,25 @@
       "title": "QuestionSource",
       "type": "string"
     },
+    "RoleFamily": {
+      "description": "Role families (RF-1, `docs/role-families-spec.md`). Per-family facts live in\n`strong_core.role_families`; per-family model guidance in `prompts/planner/family_<value>`.",
+      "enum": [
+        "swe",
+        "data_ml",
+        "pm",
+        "design",
+        "tpm",
+        "other",
+        "infra_security",
+        "data_analytics",
+        "eng_management",
+        "finance",
+        "consulting_strategy",
+        "project_program"
+      ],
+      "title": "RoleFamily",
+      "type": "string"
+    },
     "SessionConfig": {
       "additionalProperties": false,
       "description": "What the candidate picks before a session (journey 2, step 1).",
@@ -529,6 +548,11 @@
       "minItems": 3,
       "title": "Questions",
       "type": "array"
+    },
+    "role_family": {
+      "$ref": "#/$defs/RoleFamily",
+      "default": "other",
+      "description": "RF-5: the job's role family, set from the posting, never by the model. Picks the family guidance for the interviewer and the scorer. Briefs stored before RF-5 read as other."
     },
     "seniority_bar": {
       "anyOf": [

@@ -158,13 +158,20 @@
       "type": "object"
     },
     "RoleFamily": {
+      "description": "Role families (RF-1, `docs/role-families-spec.md`). Per-family facts live in\n`strong_core.role_families`; per-family model guidance in `prompts/planner/family_<value>`.",
       "enum": [
         "swe",
         "data_ml",
         "pm",
         "design",
         "tpm",
-        "other"
+        "other",
+        "infra_security",
+        "data_analytics",
+        "eng_management",
+        "finance",
+        "consulting_strategy",
+        "project_program"
       ],
       "title": "RoleFamily",
       "type": "string"
