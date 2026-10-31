@@ -221,6 +221,22 @@ describe("Review with Strova (ST-11)", () => {
 });
 
 describe("story page (ST-14)", () => {
+  it("ST-14: Rename names the story in place; Escape cancels, Enter saves", async () => {
+    resetMockStories([PROVEN, DRAFT]);
+    const user = userEvent.setup();
+    renderAt("/stories/s1");
+    expect(await screen.findByRole("heading", { level: 1, name: "Checkout migration" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Rename" }));
+    const field = screen.getByRole("textbox", { name: "Story name" });
+    expect(field).toHaveValue("Checkout migration");
+    await user.keyboard("{Escape}");
+    expect(screen.getByRole("heading", { level: 1, name: "Checkout migration" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Rename" }));
+    await user.clear(screen.getByRole("textbox", { name: "Story name" }));
+    await user.type(screen.getByRole("textbox", { name: "Story name" }), "Black Friday checkout move{Enter}");
+    expect(await screen.findByRole("heading", { level: 1, name: "Black Friday checkout move" })).toBeInTheDocument();
+  });
+
   it("ST-14, ST-8: status steps, skills, the parts with their versions, used-for notes and the source", async () => {
     resetMockStories([
       { ...PROVEN, notes: [...PROVEN.notes, { text: "For Stripe: bring forward the 40 percent.", at: "2026-10-06T09:00:00Z", session_id: null, question_ref: null }] },
@@ -261,6 +277,20 @@ describe("story page (ST-14)", () => {
       "href",
       "/sessions/5e551011-0000-4000-8000-000000000000/debrief",
     );
+  });
+
+  it("ST-14: the parts are stacked with a filled dot when written and an open dot when empty, under underline tabs", async () => {
+    resetMockStories([DRAFT]);
+    renderAt("/stories/s2");
+    const tabs = await screen.findByRole("group", { name: "Story length" });
+    expect(tabs).toHaveClass("segmented--tabs");
+    expect(within(tabs).getByRole("button", { name: "Story parts" })).toHaveAttribute("aria-pressed", "true");
+    const parts = screen.getByTestId("story-versions").querySelectorAll("li[data-part]");
+    expect(parts).toHaveLength(5);
+    for (const li of parts) {
+      const written = Boolean(li.querySelector("p:not(.muted)"));
+      expect(li.querySelector(".story-view__part-label")?.textContent?.startsWith(written ? "●" : "○")).toBe(true);
+    }
   });
 
   it("ST-14: an open suggestion for the story can be applied, then undone", async () => {

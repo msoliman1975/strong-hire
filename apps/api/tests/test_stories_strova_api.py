@@ -8,6 +8,7 @@ from typing import Any
 
 import httpx
 
+from strong_api.coach.router import title_from_idea
 from strong_api.inputs import queue as queue_names
 from strong_api.stories.ask import FALLBACK
 
@@ -101,7 +102,7 @@ async def test_st12_craft_from_a_resume_idea_seeds_the_context_and_asks_for_the_
     client: httpx.AsyncClient, fake_fixtures: Path
 ) -> None:
     """ST-12: starting from a story idea (RM-4), the achievement seeds the context and Strova's
-    first question asks for the stakes. The user names the story, as for any new one."""
+    first question asks for the stakes. The story is first named after the achievement."""
     await sign_in(client)
     resume = await add_resume(client, fake_fixtures)
     line = resume["resume"]["roles"][0]["achievements"][0]
@@ -112,6 +113,7 @@ async def test_st12_craft_from_a_resume_idea_seeds_the_context_and_asks_for_the_
     assert resp.status_code == 201, resp.text
     detail = resp.json()
     assert detail["story"]["context"] == line
+    assert detail["story"]["title"] == title_from_idea(line)
     first = detail["turns"][0]["text"]
     assert first.startswith(f'Let\'s turn this resume line into a story: "{line}".')
     assert "stake" in first.lower() or "matter" in first.lower()
@@ -122,3 +124,16 @@ async def test_st12_craft_from_a_resume_idea_seeds_the_context_and_asks_for_the_
     assert bad.status_code == 404
     half = await client.post("/coach/sessions", json={"resume_id": resume["id"]})
     assert half.status_code == 422
+
+
+def test_st12_a_story_from_an_idea_is_named_after_the_achievement() -> None:
+    """ST-12: the first name is the achievement in the user's words, cut at a word near 60
+    characters; a short line is used as it is, without its full stop."""
+    assert title_from_idea("Built the refunds API used by 40,000 merchants.") == (
+        "Built the refunds API used by 40,000 merchants"
+    )
+    long = "Led migration of 30 services to PostgreSQL 15 with zero downtime across three regions"
+    title = title_from_idea(long)
+    assert title == "Led migration of 30 services to PostgreSQL 15 with zero…"
+    assert len(title) <= 60
+    assert title_from_idea("   ") == "Untitled story"

@@ -40,8 +40,13 @@
 }
 
 .coach__side {
-  flex: 1 1 340px;
+  flex: 1 1 380px;
   min-width: 0;
+}
+
+/* The builder and the story taking shape use the full main column, like the other wide pages. */
+.shell__main.page > .coach {
+  max-width: 1440px;
 }
 
 .coach__turns {

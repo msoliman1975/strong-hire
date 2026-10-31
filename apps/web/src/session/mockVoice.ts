@@ -31,12 +31,13 @@ export const connectMockVoice: VoiceConnector = async (_join, handlers) => {
   let pausedMs = 0;
   let prepUntil: number | null = null;
   let phase: Phase = "intro";
+  let question: number | null = null;
   let open = true;
   const state = (said: string[]): AgentState => {
     const now = Date.now();
     const elapsedMs = (paused ? pausedAt : now) - started - pausedMs;
     const prepMsLeft = prepUntil === null ? null : Math.max(0, prepUntil - now);
-    return { phase, paused, elapsedMs, prepMsLeft, said, receivedAt: now };
+    return { phase, paused, elapsedMs, prepMsLeft, question, questions: question === null ? null : 3, said, receivedAt: now };
   };
   const hold = () => {
     if (paused) return;
@@ -78,6 +79,7 @@ export const connectMockVoice: VoiceConnector = async (_join, handlers) => {
   }, 200);
   later(() => {
     phase = "core";
+    question = 1;
     say([MOCK_QUESTION]);
   }, 800);
 

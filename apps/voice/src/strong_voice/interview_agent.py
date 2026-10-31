@@ -8,7 +8,8 @@ From the browser, on the data channel (topic "coach"): {"command": "hint" | "red
 "resume" | "end"}. "end" means the candidate clicked End interview. In every mode (IV-11):
 {"command": "prep", "minutes": 1 | 3} starts prep time, {"command": "ready"} ends it.
 To the browser (topic "session"):
-  {"type": "state", "phase", "paused", "elapsed_ms", "prep_ms_left", "said": [lines]}
+  {"type": "state", "phase", "paused", "elapsed_ms", "prep_ms_left", "question", "questions",
+   "said": [lines]}
                                                                         after each interviewer turn
   {"type": "ended"}                                                     when the session is over
 Participant attribute "sh.interviewer.voice": "female" or "male", how the TTS voice sounds. The
@@ -75,6 +76,10 @@ def state_message(interview: VoiceInterview, said: list[str]) -> bytes:
             "paused": controller.paused,
             "elapsed_ms": controller.elapsed_ms,
             "prep_ms_left": interview.prep_ms_left(),
+            # The live room shows "Core questions · 2 of 3": the core question being asked, of
+            # how many are planned. Null outside the core phase.
+            "question": len(controller.asked) if controller.phase.value == "core" else None,
+            "questions": controller.questions_planned if controller.phase.value == "core" else None,
             "said": said,
         }
     ).encode()

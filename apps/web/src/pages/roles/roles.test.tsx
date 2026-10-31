@@ -135,6 +135,8 @@ describe("target roles", () => {
     expect(screen.getByRole("region", { name: "Your stories for this role" })).toBeInTheDocument();
     const ctx = screen.getByRole("region", { name: "Know anything about this interview?" });
     expect(within(ctx).getByRole("button", { name: "Add what you know" })).toBeInTheDocument();
+    const look = screen.getByRole("region", { name: "What they'll look for" });
+    expect(within(look).getByRole("link", { name: "See the full gap report" })).toHaveAttribute("href", `/jobs/${job.id}/gap-report`);
   });
 });
 

@@ -116,12 +116,17 @@ export function StoryRead({ story }: { story: Story }) {
         ]}
         value={length}
         onChange={choose}
+        look="tabs"
       />
       {length === "parts" ? (
         <ol className="plain-list story-view__parts">
           {STORY_PARTS.map((p) => (
             <li key={p} data-part={p}>
-              <span className="story-view__part-label">{STORY_PART_LABEL[p]}</span>
+              <span className="story-view__part-label">
+                {/* ST-14 (mockup #story): a filled dot for a written part, an open one for an empty part. */}
+                <span aria-hidden="true">{story[p]?.trim() ? "●" : "○"} </span>
+                {STORY_PART_LABEL[p]}
+              </span>
               {story[p]?.trim() ? (
                 <p>{story[p]}</p>
               ) : (

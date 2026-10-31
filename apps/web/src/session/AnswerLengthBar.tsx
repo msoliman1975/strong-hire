@@ -5,10 +5,13 @@ import { answerSeconds, minSec, type AnswerTiming } from "./answerLength";
  * it. Before the first answer it says when it starts.
  */
 export function AnswerLengthBar({
+  label = "Answer length",
   timing,
   suggestedSeconds,
   now,
 }: {
+  /** The row's label; the v2 room (mockup #live) says "Your answer". */
+  label?: string;
   timing: AnswerTiming | null;
   suggestedSeconds: number;
   now: number;
@@ -19,7 +22,7 @@ export function AnswerLengthBar({
   return (
     <section className="answer-length" aria-label="Answer length" data-testid="answer-length">
       <div className="answer-length__row">
-        <span>Answer length</span>
+        <span>{label}</span>
         <span className="answer-length__time" data-testid="answer-length-time">
           {timing ? `${minSec(seconds)} of about ${minSec(suggestedSeconds)}` : `About ${minSec(suggestedSeconds)}`}
         </span>

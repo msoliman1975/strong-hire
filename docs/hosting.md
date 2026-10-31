@@ -115,6 +115,12 @@ on `app.` (`infra/compose.server.yaml`). Left, when the pages are approved:
 cd /opt/stronghire/strong-hire && ./scripts/server-deploy.sh
 ```
 
+From PowerShell on the owner's PC (uses the deploy key below):
+
+```powershell
+./scripts/dev.ps1 deploy
+```
+
 ### Shell from the owner's PC
 
 The Hetzner web console turns a typed `_` into `-`. For a normal root shell, the admin key

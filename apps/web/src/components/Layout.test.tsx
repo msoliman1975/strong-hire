@@ -218,3 +218,29 @@ describe("SV-7, NV-3 v2 top bar and old routes", () => {
     expect(within(menu).getAllByRole("link").map((a) => a.textContent)).toEqual(["Account"]);
   });
 });
+
+describe("SV-6 live room frame", () => {
+  function renderApp(path: string) {
+    render(
+      <QueryClientProvider client={createQueryClient()}>
+        <MemoryRouter initialEntries={[path]}>
+          <AppRoutes />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+  }
+
+  it("SV-6: with v2 the live room is full bleed, without the slim app header", async () => {
+    setFeatureOverrides({ v2_enabled: true });
+    signIn("Ana Lopez");
+    renderApp("/sessions/s-missing/live");
+    expect(await screen.findByRole("main")).toBeInTheDocument();
+    expect(screen.queryByText("Live interview")).not.toBeInTheDocument();
+  });
+
+  it("SV-6, FL-1: with v2 off the room keeps the slim header", async () => {
+    signIn("Ana Lopez");
+    renderApp("/sessions/s-missing/live");
+    expect(await screen.findByText("Live interview")).toBeInTheDocument();
+  });
+});

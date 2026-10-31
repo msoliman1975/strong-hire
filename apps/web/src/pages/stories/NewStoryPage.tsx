@@ -61,7 +61,7 @@ export function NewStoryPage() {
   };
 
   return (
-    <div className="sx-page">
+    <div className="sx-page sx-page--narrow">
       <Link to={storiesPath} className="sx-small">
         Career Stories with Strova
       </Link>
