@@ -163,7 +163,20 @@ class PostingFetcher:
         return result
 
     async def _greenhouse(self, token: str, job_id: str) -> FetchResult | None:
-        data = await self._json(f"https://boards-api.greenhouse.io/v1/boards/{token}/jobs/{job_id}")
+        api = f"https://boards-api.greenhouse.io/v1/boards/{token}/jobs"
+        data = await self._json(f"{api}/{job_id}")
+        if data is None or not (data.get("content") or "").strip():
+            # The link can carry the internal job id, or the job endpoint can answer without the
+            # description: look the posting up in the board's list, which has both ids.
+            board = await self._json(f"{api}?content=true")
+            data = next(
+                (
+                    j
+                    for j in (board or {}).get("jobs") or []
+                    if job_id in {str(j.get("id")), str(j.get("internal_job_id"))}
+                ),
+                data,
+            )
         if data is None:
             return None
         departments = ", ".join(d.get("name", "") for d in data.get("departments") or [])

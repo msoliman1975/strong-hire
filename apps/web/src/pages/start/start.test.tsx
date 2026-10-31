@@ -227,7 +227,12 @@ describe("resume pages", () => {
     expect(screen.getByText("Main resume")).toBeInTheDocument();
     const ideas = await screen.findByRole("group", { name: "Story ideas from this resume" });
     const breakdown = screen.getByRole("region", { name: "Breakdown" });
-    expect(screen.getByRole("region", { name: "Resume issues" })).toBeInTheDocument();
+    const issuesCard = screen.getByRole("region", { name: "Resume issues" });
+    // The fix and accept actions are real buttons (filled or outlined), not plain text.
+    const accept = await within(issuesCard).findAllByRole("button", { name: "Accept as it is" });
+    expect(accept[0]).toHaveClass("sx-btn", "ghost");
+    expect(within(issuesCard).getAllByRole("link")[0]).toHaveClass("sx-btn");
+    expect(within(issuesCard).getAllByRole("link")[0]).not.toHaveClass("quiet");
     expect(breakdown.compareDocumentPosition(ideas) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(ideas).not.toHaveAttribute("open");
     expect(ideas).toHaveTextContent(/Strova's findings/);

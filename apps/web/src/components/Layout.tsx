@@ -116,8 +116,8 @@ type NavItem = {
   end?: boolean;
   match?: RegExp;
   badge?: string;
-  /** NV-1: an 18 px interviewing Strova before the label. */
-  strova?: boolean;
+  /** NV-1: an 18 px Strova before the label: interviewing for rehearsals, coaching for stories. */
+  strova?: "interviewing" | "coaching";
   /** The tour step that points at this item. */
   tour?: string;
 };
@@ -153,9 +153,15 @@ function v2Nav(fullName: string | null | undefined): NavItem[] {
       to: "/rehearsals",
       label: "Rehearsals with Strova",
       match: /^\/(rehearsals|interviews|sessions)(\/|$)/,
-      strova: true,
+      strova: "interviewing",
     },
-    { to: "/stories", label: "Career Stories with Strova", match: /^\/(stories|coach)(\/|$)/, tour: "coach" },
+    {
+      to: "/stories",
+      label: "Career Stories with Strova",
+      match: /^\/(stories|coach)(\/|$)/,
+      tour: "coach",
+      strova: "coaching",
+    },
   ];
 }
 
@@ -179,7 +185,7 @@ export function RailNav() {
         {/* Decorative next to its label, so the link reads "Rehearsals with Strova". */}
         {it.strova && (
           <span className="rail-nav__strova" aria-hidden="true">
-            <Strova mode="interviewing" size={18} />
+            <Strova mode={it.strova} size={18} />
           </span>
         )}
         {it.label}

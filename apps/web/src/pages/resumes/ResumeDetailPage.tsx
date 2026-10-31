@@ -117,7 +117,7 @@ export function ResumeDetailPage() {
                 </div>
                 {issues.isError && <ErrorNotice error={issues.error} />}
                 {issues.data && open.length === 0 && <p className="sx-muted sx-small">Nothing to fix. Your resume reads well.</p>}
-                <IssueList resumeId={resumeId} issues={open} compactActions />
+                <IssueList resumeId={resumeId} issues={open} />
               </section>
               <ResumeLineSuggestions resumeId={resumeId} />
             </div>

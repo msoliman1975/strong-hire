@@ -60,12 +60,15 @@ describe("UI-2 left rail nav", () => {
     expect(within(nav).getByRole("link", { name: "Target roles" })).toHaveAttribute("href", "/roles");
     expect(within(nav).getByRole("link", { name: "Rehearsals with Strova" })).toHaveAttribute("href", "/rehearsals");
     expect(within(nav).getByRole("link", { name: "Career Stories with Strova" })).toHaveAttribute("href", "/stories");
-    // The 18 px interviewing Strova sits in the Rehearsals item only.
+    // An 18 px Strova: interviewing in Rehearsals, coaching in Career Stories, nowhere else.
     const rehearsals = within(nav).getByRole("link", { name: "Rehearsals with Strova" });
     const avatar = rehearsals.querySelector("svg");
     expect(avatar).toHaveAttribute("data-mode", "interviewing");
     expect(avatar).toHaveAttribute("width", "18");
-    expect(nav.querySelectorAll("svg")).toHaveLength(1);
+    const stories = within(nav).getByRole("link", { name: "Career Stories with Strova" }).querySelector("svg");
+    expect(stories).toHaveAttribute("data-mode", "coaching");
+    expect(stories).toHaveAttribute("width", "18");
+    expect(nav.querySelectorAll("svg")).toHaveLength(2);
     // No separate coach button, and the dev text interview stays in the account menu.
     expect(screen.queryByRole("link", { name: "Talk to your coach" })).toBeNull();
     expect(within(nav).queryByRole("link", { name: /Text interview/ })).not.toBeInTheDocument();

@@ -7,7 +7,7 @@ import { Link, useParams } from "react-router";
 
 import { useJob, useJobs, useResumeIssues, useResumes } from "../../api/hooks";
 import { useRoleInterviews, useRoles } from "../../api/roles";
-import type { InterviewWithReadiness } from "../../api/types";
+import type { InterviewWithReadiness, JobPosting } from "../../api/types";
 import { Strova } from "../../components/strova";
 import { ErrorNotice, Loading } from "../../components/ui";
 import "../../components/ux/ux.css";
@@ -36,6 +36,72 @@ function InterviewCard({ item, first }: { item: InterviewWithReadiness; first: b
         {item.takes_count === 0 ? "Start a take" : "Retake"}
       </span>
     </Link>
+  );
+}
+
+/** TG-4: what Strova read from the job posting: responsibilities and skills, closed by default. */
+export function PostingCard({ posting, sourceUrl }: { posting: JobPosting; sourceUrl: string | null }) {
+  const n = posting.responsibilities.length;
+  const meta = [posting.level_label, posting.team, posting.location].filter(Boolean).join(" · ");
+  return (
+    <details className="sx-card sx-fold" aria-labelledby="posting-heading" data-testid="posting-card">
+      <summary className="sx-stack" style={{ gap: 4 }}>
+        <div className="sx-between">
+          <h2 id="posting-heading">The job posting</h2>
+          <span className="sx-row sx-small sx-muted">
+            {n} {n === 1 ? "responsibility" : "responsibilities"} · {posting.must_have_skills.length} must-have skills
+            <span className="caret" aria-hidden="true">
+              ▾
+            </span>
+          </span>
+        </div>
+        {meta && <span className="sx-small sx-muted">{meta}</span>}
+      </summary>
+      {n > 0 ? (
+        <div className="sx-stack" style={{ gap: 6 }}>
+          <h3>What you'll do</h3>
+          <ul className="sx-small" style={{ margin: 0, paddingLeft: 18 }}>
+            {posting.responsibilities.map((r) => (
+              <li key={r}>{r}</li>
+            ))}
+          </ul>
+        </div>
+      ) : (
+        <p className="sx-notice warn sx-small">
+          Strova found no responsibilities in this posting. If the link showed only part of it, add the role again and paste
+          the job description instead.
+        </p>
+      )}
+      {posting.must_have_skills.length > 0 && (
+        <div className="sx-stack" style={{ gap: 6 }}>
+          <h3>Must-have skills</h3>
+          <div className="sx-chips">
+            {posting.must_have_skills.map((k) => (
+              <span key={k} className="sx-chip">
+                {k}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+      {posting.nice_to_have_skills.length > 0 && (
+        <div className="sx-stack" style={{ gap: 6 }}>
+          <h3>Nice to have</h3>
+          <div className="sx-chips">
+            {posting.nice_to_have_skills.map((k) => (
+              <span key={k} className="sx-chip">
+                {k}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+      {sourceUrl && (
+        <a className="sx-small" href={sourceUrl} target="_blank" rel="noreferrer">
+          Open the original posting
+        </a>
+      )}
+    </details>
   );
 }
 
@@ -169,6 +235,7 @@ export function RolePage() {
           })}
         </section>
       </div>
+      {posting && <PostingCard posting={posting} sourceUrl={job.data.source_url} />}
       <section className="sx-card dashed" aria-labelledby="ctx-card-heading">
         <h2 id="ctx-card-heading">Know anything about this interview?</h2>
         <p className="sx-small sx-muted">
