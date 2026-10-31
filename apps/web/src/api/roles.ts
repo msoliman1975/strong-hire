@@ -10,6 +10,7 @@ import type {
   InterviewsCreate,
   InterviewWithReadiness,
   Rehearsals,
+  RoleFamily,
   RoleOut,
   SuggestedInterviews,
 } from "./types";
@@ -17,11 +18,11 @@ import type {
 export const rolesApi = {
   /** TG-1: every live role with one readiness per interview, newest first. */
   list: async () => unwrap(await apiClient.GET("/roles")) as RoleOut[],
-  /** TG-3: the company's usual rounds for the role. */
-  suggested: async (jobId: string) =>
+  /** TG-3: the company's usual rounds for the role. `family` previews an unsaved family edit (RF-10). */
+  suggested: async (jobId: string, family?: RoleFamily) =>
     unwrap(
       await apiClient.GET("/roles/{job_target_id}/suggested-interviews", {
-        params: { path: { job_target_id: jobId } },
+        params: { path: { job_target_id: jobId }, query: family ? { role_family: family } : {} },
       }),
     ) as SuggestedInterviews,
   interviews: async (jobId: string) =>
@@ -56,7 +57,7 @@ export const rolesApi = {
 export const roleKeys = {
   roles: ["roles"] as const,
   role: (jobId: string) => ["roles", jobId] as const,
-  suggested: (jobId: string) => ["roles", jobId, "suggested"] as const,
+  suggested: (jobId: string, family?: RoleFamily) => ["roles", jobId, "suggested", family ?? null] as const,
   interview: (id: string) => ["interviews", id] as const,
   rehearsals: ["rehearsals"] as const,
 };
@@ -65,10 +66,10 @@ export const useRoles = (enabled = true) =>
   useQuery({ queryKey: roleKeys.roles, queryFn: rolesApi.list, enabled });
 export const useRoleInterviews = (jobId: string) =>
   useQuery({ queryKey: roleKeys.role(jobId), queryFn: () => rolesApi.interviews(jobId), enabled: Boolean(jobId) });
-export const useSuggestedInterviews = (jobId: string | null, enabled = true) =>
+export const useSuggestedInterviews = (jobId: string | null, enabled = true, family?: RoleFamily) =>
   useQuery({
-    queryKey: roleKeys.suggested(jobId ?? ""),
-    queryFn: () => rolesApi.suggested(jobId ?? ""),
+    queryKey: roleKeys.suggested(jobId ?? "", family),
+    queryFn: () => rolesApi.suggested(jobId ?? "", family),
     enabled: Boolean(jobId) && enabled,
   });
 export const useInterview = (id: string) =>

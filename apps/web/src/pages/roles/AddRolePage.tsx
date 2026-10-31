@@ -1,6 +1,7 @@
 /**
  * TG-2 (mockup #add-role): add a target role in one screen and three steps. 1 the job posting
- * (link or text, IN-1, IN-6), 2 check the role (company, title, level, optional interview date,
+ * (link or text, IN-1, IN-6), 2 check the role (company, title, job category (RF-10), level,
+ * optional interview date,
  * must-have skills), 3 the interviews Strova suggests (TG-3) against the main resume. "Create the
  * role" saves the role with its interviews (RH-1) and opens the role page; the gap analysis runs
  * in the background as before.
@@ -13,11 +14,11 @@ import { gapApi } from "../../api/gap";
 import { useJob, useJobTask, useResumes } from "../../api/hooks";
 import { jobProblem, jobTargetsApi } from "../../api/inputs";
 import { roleKeys, useSuggestedInterviews } from "../../api/roles";
-import type { InterviewOut, JobPosting, Level } from "../../api/types";
+import type { InterviewOut, JobPosting, Level, RoleFamily } from "../../api/types";
 import { Strova } from "../../components/strova";
 import { ErrorNotice, Loading } from "../../components/ui";
 import "../../components/ux/ux.css";
-import { interviewTypeLabel, levelLabel } from "../../labels";
+import { interviewTypeLabel, levelLabel, roleFamilyLabel } from "../../labels";
 import { countWords, fmt, JD_MAX_WORDS, JD_WARN_WORDS } from "../../limits";
 import { planApi } from "../plan/api";
 import { rolePath } from "./shared";
@@ -26,6 +27,7 @@ type Step = 1 | 2 | 3;
 type Kind = InterviewOut["interview_type"];
 const STEPS = ["Job posting", "Check the role", "Interviews"] as const;
 const LEVELS = Object.keys(levelLabel) as Level[];
+const FAMILIES = Object.keys(roleFamilyLabel) as RoleFamily[];
 
 function Steps({ step }: { step: Step }) {
   return (
@@ -231,6 +233,16 @@ function CheckStep({
       </div>
       <div className="sx-grid2">
         <div className="sx-field">
+          <label htmlFor="rf">Job category</label>
+          <select id="rf" value={posting.role_family} onChange={(e) => setEdits({ role_family: e.target.value as RoleFamily })}>
+            {FAMILIES.map((f) => (
+              <option key={f} value={f}>
+                {roleFamilyLabel[f]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="sx-field">
           <label htmlFor="lv">Level</label>
           <select id="lv" value={posting.level ?? ""} onChange={(e) => setEdits({ level: (e.target.value || null) as Level | null })}>
             <option value="">Not stated</option>
@@ -241,6 +253,8 @@ function CheckStep({
             ))}
           </select>
         </div>
+      </div>
+      <div className="sx-grid2">
         <div className="sx-field">
           <label htmlFor="dt">Interview date (optional)</label>
           <input id="dt" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
@@ -273,7 +287,8 @@ function CheckStep({
 function InterviewsStep({ jobId, posting, date, onBack }: { jobId: string; posting: JobPosting; date: string; onBack: () => void }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const suggested = useSuggestedInterviews(jobId);
+  // RF-10: the suggestions follow the job category chosen on the check step, before it is saved.
+  const suggested = useSuggestedInterviews(jobId, true, posting.role_family);
   const resumes = useResumes();
   const live = (resumes.data ?? []).filter((r) => !r.deleted);
   const main = live.find((r) => r.is_main) ?? live[0];

@@ -58,3 +58,16 @@ def test_rf9_unparsed_posting_reads_as_other() -> None:
     assert acting_as(generic_profile(), target(None), InterviewType.RECRUITER_SCREEN).title == (
         "Recruiter"
     )
+
+
+def test_rf10_a_family_edit_previews_its_suggestions_without_saving() -> None:
+    """RF-10: the check step's family choice drives the suggestions; the stored posting is
+    unchanged."""
+    job = target(RoleFamily.SWE)
+    before = dict(job.parsed_json or {})
+    preview = suggested(generic_profile(), job, RoleFamily.CONSULTING_STRATEGY)
+    usual = [i.interview_type for i in preview.items if i.usual]
+    assert usual == list(family_info(RoleFamily.CONSULTING_STRATEGY).generic_loop)
+    case = next(i for i in preview.items if i.interview_type == InterviewType.CASE)
+    assert case.acting_as.title == "Engagement Manager"
+    assert job.parsed_json == before

@@ -110,7 +110,7 @@ function GapAnalysisV1() {
       )}
       {data?.status === "ready" && data.generic_mode && (
         <p className="muted">
-          This company has no curated profile yet, so the analysis uses a general tech interview style and equal
+          This company has no curated profile yet, so the analysis uses a typical bar for this kind of role and equal
           weights for each competency.
         </p>
       )}

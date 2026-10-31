@@ -13,6 +13,7 @@ import type {
   InterviewWithReadiness,
   JobTargetOut,
   RehearsalItem,
+  RoleFamily,
   RoleSummary,
   SessionRecord,
   SuggestedInterviews,
@@ -54,6 +55,15 @@ const DESCRIPTIONS: Record<Kind, string> = {
 };
 
 const STANDARD: Kind[] = ["behavioral", "hiring_manager", "technical_qa"];
+/** RF-9: the generic loop of the families whose loop differs from STANDARD (strong_core.role_families). */
+const FAMILY_LOOPS: Partial<Record<RoleFamily, Kind[]>> = {
+  data_analytics: ["behavioral", "technical_qa", "case"],
+  pm: ["behavioral", "hiring_manager", "case"],
+  design: ["behavioral", "hiring_manager", "case"],
+  finance: ["behavioral", "technical_qa", "case"],
+  consulting_strategy: ["case", "behavioral", "hiring_manager"],
+  project_program: ["behavioral", "hiring_manager", "case"],
+};
 const ALL: Kind[] = ["behavioral", "hiring_manager", "technical_qa", "case", "recruiter_screen"];
 
 function company(job: JobTargetOut): string | null {
@@ -123,15 +133,20 @@ export function interviewHandlers(store: MockStore) {
   const live = (jobId: string) => interviews().filter((i) => i.job_target_id === jobId && !i.archived_at);
 
   return [
-    http.get(`${API}/roles/:jobId/suggested-interviews`, ({ params }) => {
+    http.get(`${API}/roles/:jobId/suggested-interviews`, ({ params, request }) => {
       const j = job(params.jobId);
       if (!j || j.deleted) return HttpResponse.json({ detail: "Job target not found" }, { status: 404 });
+      const family = (new URL(request.url).searchParams.get("role_family") ?? j.posting?.role_family) as
+        | RoleFamily
+        | undefined;
+      const usual = (family && FAMILY_LOOPS[family]) || STANDARD;
+      const order = [...usual, ...ALL.filter((k) => !usual.includes(k))];
       const body: SuggestedInterviews = {
         company_mode: j.generic_mode === false ? "curated" : "generic",
-        items: ALL.map((k) => ({
+        items: order.map((k) => ({
           interview_type: k,
           description: DESCRIPTIONS[k],
-          usual: STANDARD.includes(k),
+          usual: usual.includes(k),
           round_name: null,
           acting_as: actingAs(j, k),
         })),
