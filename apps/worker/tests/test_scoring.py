@@ -8,6 +8,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import pytest
+from pydantic import ValidationError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -27,6 +28,7 @@ from strong_core.schemas import (
     Mode,
     Phase,
     ProfileStatus,
+    ScorerOutput,
     SessionStatus,
     Speaker,
     Turn,
@@ -189,6 +191,54 @@ async def test_fb2_scorer_returns_quote_backed_per_question_scores() -> None:
     assert card.rubric_version == "scorer/rubric.v2"
     assert card.scorer_model == "fake-scorer"
     assert outcome.model_calls == 2
+    assert not outcome.reasked
+
+
+async def test_fb1_fb2_scorer_asks_the_model_for_scorer_output() -> None:
+    """FB-1, FB-2: the scorer's output type requires per-question scores; a valid reply scores
+    every asked question and flags none as missing."""
+    brief, turns = load_scripted("beh-01")
+    backend = ScriptedBackend([scorecard_reply(brief, turns, 3), RATIONALE])
+    outcome = await SessionScorer(gateway(backend)).score(brief, turns, generic_profile())
+    _, output_type = backend.calls[0]
+    assert output_type is ScorerOutput
+    assert outcome.missing_questions == []
+    assert [q.question_ref for q in outcome.scorecard.per_question] == list(first_answers(turns))
+    assert outcome.scorecard.hire_signal == HireSignal.HIRE
+
+
+async def test_fb1_fb2_a_reply_without_per_question_scores_is_rejected() -> None:
+    """FB-1, FB-2: a model reply with only overall scores fails validation."""
+    brief, turns = load_scripted("beh-01")
+    reply = scorecard_reply(brief, turns, 3) | {"per_question": []}
+    backend = ScriptedBackend([reply, RATIONALE])
+    with pytest.raises(ValidationError, match="per_question"):
+        await SessionScorer(gateway(backend)).score(brief, turns, generic_profile())
+
+
+async def test_fb1_fb2_questions_the_model_skipped_are_flagged_and_overall_scores_fill_in(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """FB-1, FB-2: per-question entries for only some asked questions still score. The skipped
+    questions are listed and logged; competencies scored only overall keep that score."""
+    brief, turns = load_scripted("beh-01")
+    reply = scorecard_reply(brief, turns, 3)
+    asked = list(first_answers(turns))
+    kept = reply["per_question"][:1]
+    reply["per_question"] = kept
+    kept_comps = {s["competency"] for s in kept[0]["scores"]}
+    for item in reply["competency_scores"]:
+        if item["competency"] not in kept_comps:
+            item["score"] = 2
+    backend = ScriptedBackend([reply, RATIONALE])
+    with caplog.at_level("WARNING", logger="strong_worker.scoring.scorer"):
+        outcome = await SessionScorer(gateway(backend)).score(brief, turns, generic_profile())
+    assert outcome.missing_questions == asked[1:]
+    assert [q.question_ref for q in outcome.scorecard.per_question] == asked[:1]
+    assert any("no per-question score" in r.getMessage() for r in caplog.records)
+    by_comp = {c.competency.value: c.score for c in outcome.scorecard.competency_scores}
+    assert all(by_comp[c] == 3 for c in kept_comps)
+    assert any(score == 2 for c, score in by_comp.items() if c not in kept_comps)
     assert not outcome.reasked
 
 

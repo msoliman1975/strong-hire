@@ -2,7 +2,9 @@
 
 Steps:
 1. One scorer-role call reads the transcript, the brief and the profile, and returns per-question
-   rubric scores (1 to 4) with justifications and quotes (prompt scorer/rubric).
+   rubric scores (1 to 4) with justifications and quotes (prompt scorer/rubric). The output type
+   is ScorerOutput, which requires at least one per-question entry, so schema-constrained models
+   cannot leave per_question out.
 2. Every quote is checked against the candidate's words (quotes.QuoteChecker). Bad quotes are
    dropped. If a score loses all its quotes, the scorer asks once more (scorer/requote). A score
    that still has no valid quote is dropped.
@@ -11,6 +13,10 @@ Steps:
 4. A second call writes the 3 to 5 sentence rationale for the computed signal
    (scorer/rationale). If it names another signal or has the wrong length after one retry, a
    rationale built in code from the same facts is used.
+
+An asked question can still end up without per-question scores: the model skipped it, or every
+quote for it was invalid. The signal then uses the overall scores, as before, and the question is
+logged and listed in ScoringOutcome.missing_questions.
 
 Recruiter screen (RS-2) has its own rubric prompt (RUBRIC_BY_TYPE), chosen by type; its ref is
 the scorecard's rubric_version.
@@ -39,6 +45,7 @@ from strong_core.schemas import (
     QuestionScore,
     QuestionSource,
     Scorecard,
+    ScorerOutput,
     Speaker,
     Turn,
     ValueScore,
@@ -78,6 +85,8 @@ class ScoringOutcome:
     value_averages: dict[str, float]
     dropped_quotes: list[str] = field(default_factory=list)
     dropped_scores: list[str] = field(default_factory=list)
+    missing_questions: list[str] = field(default_factory=list)
+    """Asked question refs with no per-question score in the scorecard (FB-2)."""
     reasked: bool = False
     rationale_source: str = "model"  # "model" or "code"
     model_calls: int = 0
@@ -151,7 +160,7 @@ class SessionScorer:
             self._input(brief, turns, profile, asked, allowed_values),
         ]
         calls = 1
-        done = await self.gateway.complete(ROLE, messages, output_type=Scorecard)
+        done = await self.gateway.complete(ROLE, messages, output_type=ScorerOutput)
         draft = _clean(done.output, checker, brief, asked, allowed_values)
         dropped_quotes = list(draft.bad_quotes)
         reasked = False
@@ -164,7 +173,7 @@ class SessionScorer:
                 load_prompt(ROLE, "requote").message("user", problems=problems),
             ]
             calls += 1
-            again = await self.gateway.complete(ROLE, retry, output_type=Scorecard)
+            again = await self.gateway.complete(ROLE, retry, output_type=ScorerOutput)
             second = _clean(again.output, checker, brief, asked, allowed_values)
             dropped_quotes += second.bad_quotes
             draft.merge_missing(second)
@@ -178,6 +187,16 @@ class SessionScorer:
         value_scores, value_avgs = _value_scores(draft)
         signal = compute_hire_signal(comp_avgs, profile, value_avgs)
         per_question = _per_question(draft, asked)
+        scored_refs = {q.question_ref for q in per_question}
+        missing = [q.id for q in asked if q.id not in scored_refs]
+        if missing:
+            log.warning(
+                "FB-2: %d of %d asked questions have no per-question score (%s); the signal "
+                "uses the overall scores for them",
+                len(missing),
+                len(asked),
+                ", ".join(missing),
+            )
 
         rationale, source, rationale_calls = await self._rationale(
             brief, signal, comp_avgs, value_avgs, profile, per_question
@@ -199,18 +218,20 @@ class SessionScorer:
             value_averages=value_avgs,
             dropped_quotes=dropped_quotes,
             dropped_scores=list(draft.lost),
+            missing_questions=missing,
             reasked=reasked,
             rationale_source=source,
             model_calls=calls,
             seconds=round(time.perf_counter() - started, 3),
         )
         log.info(
-            "scored: signal=%s average=%.2f dropped_quotes=%d dropped_scores=%d reasked=%s "
-            "calls=%d seconds=%.2f",
+            "scored: signal=%s average=%.2f dropped_quotes=%d dropped_scores=%d "
+            "missing_questions=%d reasked=%s calls=%d seconds=%.2f",
             signal.signal.value,
             signal.average,
             len(dropped_quotes),
             len(draft.lost),
+            len(missing),
             reasked,
             calls,
             outcome.seconds,
@@ -372,7 +393,7 @@ def _values_text(profile: ResolvedProfile, allowed: set[str]) -> str:
 
 
 def _clean(
-    card: Scorecard,
+    card: ScorerOutput,
     checker: QuoteChecker,
     brief: InterviewerBrief,
     asked: list[BriefQuestion],
