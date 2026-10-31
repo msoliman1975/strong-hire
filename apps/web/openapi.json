@@ -17788,6 +17788,11 @@
             "default": null,
             "title": "Profile Version"
           },
+          "role_family": {
+            "$ref": "#/components/schemas/RoleFamily",
+            "default": "other",
+            "description": "RF-5: the job's role family, set from the posting, never by the model. Picks the family guidance for the interviewer and the scorer. Briefs stored before RF-5 read as other."
+          },
           "target_competencies": {
             "description": "4 to 6; a mini interview has 2.",
             "items": {

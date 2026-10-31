@@ -6814,6 +6814,11 @@ export interface components {
              */
             profile_version: number | null;
             /**
+             * @description RF-5: the job's role family, set from the posting, never by the model. Picks the family guidance for the interviewer and the scorer. Briefs stored before RF-5 read as other.
+             * @default other
+             */
+            role_family: components["schemas"]["RoleFamily"];
+            /**
              * Target Competencies
              * @description 4 to 6; a mini interview has 2.
              */

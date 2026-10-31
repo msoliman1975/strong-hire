@@ -24,6 +24,7 @@ from strong_core.schemas.enums import (
     Phase,
     ProbeTrigger,
     QuestionSource,
+    RoleFamily,
     Speaker,
     Tone,
 )
@@ -147,6 +148,12 @@ class InterviewerBrief(Contract):
     company_name: str | None = Field(default=None, description="None in generic mode.")
     generic_mode: bool
     profile_version: int | None = Field(default=None, ge=1)
+    role_family: RoleFamily = Field(
+        default=RoleFamily.OTHER,
+        description="RF-5: the job's role family, set from the posting, never by the model. "
+        "Picks the family guidance for the interviewer and the scorer. Briefs stored before "
+        "RF-5 read as other.",
+    )
     target_competencies: list[Competency] = Field(
         min_length=2, max_length=6, description="4 to 6; a mini interview has 2."
     )

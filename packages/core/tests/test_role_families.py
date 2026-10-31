@@ -101,3 +101,12 @@ def test_rf10_ui_labels_match_the_registry(app: str) -> None:
     assert block is not None
     labels = dict(re.findall(r'^\s*(\w+): "([^"]*)",', block.group(1), re.M))
     assert labels == {f.value: i.label for f, i in ROLE_FAMILIES.items()}
+
+
+def test_rf5_brief_carries_the_role_family_and_old_briefs_read_as_other() -> None:
+    """RF-5: the brief records the job's family; a brief stored before RF-5 reads as other."""
+    from strong_core.schemas import InterviewerBrief
+
+    field = InterviewerBrief.model_fields["role_family"]
+    assert field.default == RoleFamily.OTHER
+    assert not field.is_required()
