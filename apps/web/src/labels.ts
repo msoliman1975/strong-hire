@@ -70,10 +70,16 @@ export const levelLabel: Record<Level, string> = {
 
 export const roleFamilyLabel: Record<RoleFamily, string> = {
   swe: "Software engineering",
-  data_ml: "Data and ML",
+  infra_security: "Infrastructure and security",
+  data_ml: "Data science and ML",
+  data_analytics: "Data analytics",
   pm: "Product management",
   design: "Design",
   tpm: "Technical program management",
+  eng_management: "Engineering management",
+  finance: "Finance",
+  consulting_strategy: "Consulting and strategy",
+  project_program: "Project and program management",
   other: "Other",
 };
 

@@ -9157,9 +9157,11 @@ export interface components {
         };
         /**
          * RoleFamily
+         * @description Role families (RF-1, `docs/role-families-spec.md`). Per-family facts live in
+         *     `strong_core.role_families`; per-family model guidance in `prompts/planner/family_<value>`.
          * @enum {string}
          */
-        RoleFamily: "swe" | "data_ml" | "pm" | "design" | "tpm" | "other";
+        RoleFamily: "swe" | "data_ml" | "pm" | "design" | "tpm" | "other" | "infra_security" | "data_analytics" | "eng_management" | "finance" | "consulting_strategy" | "project_program";
         /** RoleModel */
         RoleModel: {
             /** Role */

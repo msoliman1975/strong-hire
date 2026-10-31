@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import re
+
 import pytest
 
+from strong_core.config import find_repo_root
 from strong_core.role_families import (
     COMMON_COMPETENCIES,
     ROLE_FAMILIES,
@@ -72,8 +75,9 @@ def test_rf2_splits_move_keywords_out_of_the_old_family() -> None:
 
 def test_rf2_family_specific_defaults_from_the_spec() -> None:
     """RF-2 / RF-9: consulting leads with a case; design's technical interviewer is a designer."""
-    assert family_info(RoleFamily.CONSULTING_STRATEGY).generic_loop[0] == InterviewType.CASE
-    assert InterviewType.TECHNICAL_QA not in family_info(RoleFamily.CONSULTING_STRATEGY).generic_loop
+    consulting = family_info(RoleFamily.CONSULTING_STRATEGY).generic_loop
+    assert consulting[0] == InterviewType.CASE
+    assert InterviewType.TECHNICAL_QA not in consulting
     assert family_info(RoleFamily.DESIGN).interviewer_title(InterviewType.TECHNICAL_QA) == (
         "Design Lead"
     )
@@ -87,3 +91,13 @@ def test_rf2_family_specific_defaults_from_the_spec() -> None:
 def test_rf2_family_prompt_name() -> None:
     """D-7: the guidance prompt name for a family."""
     assert family_prompt_name(RoleFamily.FINANCE) == "family_finance"
+
+
+@pytest.mark.parametrize("app", ["web", "admin"])
+def test_rf10_ui_labels_match_the_registry(app: str) -> None:
+    """RF-10: the web and admin role family labels are the registry's labels."""
+    text = (find_repo_root() / "apps" / app / "src" / "labels.ts").read_text(encoding="utf-8")
+    block = re.search(r"roleFamilyLabel: Record<RoleFamily, string> = \{(.*?)\n\};", text, re.S)
+    assert block is not None
+    labels = dict(re.findall(r'^\s*(\w+): "([^"]*)",', block.group(1), re.M))
+    assert labels == {f.value: i.label for f, i in ROLE_FAMILIES.items()}

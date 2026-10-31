@@ -17,6 +17,7 @@ from dataclasses import dataclass, field
 from strong_core.gateway import Message, ModelGateway, Role
 from strong_core.profiles import ResolvedProfile
 from strong_core.prompts import load_prompt
+from strong_core.role_families import ROLE_FAMILIES
 from strong_core.schemas import (
     Competency,
     CompetencyMatch,
@@ -49,21 +50,8 @@ MAX_GAPS = 8
 MAX_PROBE_AREAS = 6
 MAX_PLAN = 4
 
-_COMMON = (
-    Competency.OWNERSHIP,
-    Competency.IMPACT,
-    Competency.COLLABORATION,
-    Competency.COMMUNICATION,
-    Competency.DEPTH_OF_EXPERIENCE,
-    Competency.SCOPE_AT_LEVEL,
-)
 RATED_COMPETENCIES: dict[RoleFamily, tuple[Competency, ...]] = {
-    RoleFamily.SWE: (*_COMMON, Competency.TECHNICAL_DEPTH, Competency.TRADE_OFFS),
-    RoleFamily.DATA_ML: (*_COMMON, Competency.TECHNICAL_DEPTH, Competency.TRADE_OFFS),
-    RoleFamily.PM: (*_COMMON, Competency.USER_AND_BUSINESS_SENSE, Competency.PRIORITIZATION),
-    RoleFamily.DESIGN: (*_COMMON, Competency.USER_AND_BUSINESS_SENSE, Competency.PROBLEM_FRAMING),
-    RoleFamily.TPM: (*_COMMON, Competency.TECHNICAL_DEPTH, Competency.PRIORITIZATION),
-    RoleFamily.OTHER: _COMMON,
+    family: info.rated_competencies for family, info in ROLE_FAMILIES.items()
 }
 """Competencies a resume can show evidence for, by role family. All are rated in every run."""
 
