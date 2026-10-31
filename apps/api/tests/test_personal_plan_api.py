@@ -211,9 +211,7 @@ async def test_db6_the_debrief_plan_line_names_the_plans_next_item(
     due = data.today + timedelta(days=3)
     later = data.model_copy(
         update={
-            "plan": data.plan.model_copy(
-                update={"items": [item.model_copy(update={"due": due})]}
-            )
+            "plan": data.plan.model_copy(update={"items": [item.model_copy(update={"due": due})]})
         }
     )
     # A day that is never today, named by its weekday ("on Saturday").
