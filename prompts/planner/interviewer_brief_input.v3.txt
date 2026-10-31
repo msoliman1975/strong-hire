@@ -1,0 +1,34 @@
+Write $question_count questions for this practice interview.
+
+Interview type: $interview_type
+Level: $level
+Seniority bar: $seniority_bar
+Difficulty: $difficulty
+Mode: $mode
+Length: $duration minutes
+Company: $company
+Role family: $role_family
+Role family guidance (fit the questions to it):
+$family_guidance
+Target competencies: $competencies
+Company values to probe:
+$values
+Company question patterns for this interview type:
+$patterns
+Questions candidates reported from this company, with what a strong answer covers:
+$sample_questions
+Curveball: $curveball
+
+<untrusted_input>
+PROBE AREAS FROM THE GAP ANALYSIS
+$probe_areas
+
+GAPS
+$gaps
+
+JOB
+$job
+
+RESUME
+$resume
+</untrusted_input>

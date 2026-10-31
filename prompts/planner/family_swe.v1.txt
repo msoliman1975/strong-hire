@@ -1,0 +1,5 @@
+Role family: software engineering (application, backend, frontend, mobile, full-stack and platform software).
+Technical Q&A: how the candidate designed and built systems they worked on, data modeling, APIs, performance, testing, debugging, concurrency, and the trade-offs behind their choices, all explained out loud. Never ask for live coding, a written design or a whiteboard; ask the candidate to talk the design through instead.
+Case: a product or system scenario reasoned out loud, for example how to scale a feature or what to build first, ending in a recommendation.
+Levels: new grad builds well-scoped parts with guidance; mid owns features; senior owns a system or a multi-month project; staff or principal sets technical direction across teams.
+Words to use: service, API, latency, on-call, code review, design doc, rollout.

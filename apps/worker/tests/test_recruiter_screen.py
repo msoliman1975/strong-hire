@@ -155,7 +155,7 @@ async def test_rs2_built_brief_records_the_recruiter_prompt(gateway: ModelGatewa
     """RS-2: on the fake model, the planner writes recruiter questions and the brief version
     records the recruiter brief prompt."""
     built = await build_brief(gateway, config(), POSTING, RESUME, generic_profile())
-    assert "planner/interviewer_brief_recruiter_screen.v1" in built.model_version
+    assert "planner/interviewer_brief_recruiter_screen.v2" in built.model_version
     assert built.brief.questions[0].text == recruiter_draft().questions[0].text
     assert {c for q in built.brief.questions for c in q.competencies} == RS_COMPETENCIES
 
@@ -174,7 +174,7 @@ async def test_rs2_scorer_uses_the_recruiter_rubric() -> None:
     backend = ScriptedBackend([scorecard_reply(brief, turns, 3), RATIONALE])
     gateway = ModelGateway(fake_models_config(), fake=backend)
     outcome = await SessionScorer(gateway).score(brief, turns, generic_profile())
-    assert outcome.scorecard.rubric_version == "scorer/rubric_recruiter_screen.v1"
+    assert outcome.scorecard.rubric_version == "scorer/rubric_recruiter_screen.v2"
     assert "recruiter screen" in backend.calls[0][0][0].content
     assert {c.competency for c in outcome.scorecard.competency_scores} <= RS_COMPETENCIES
 
@@ -184,7 +184,8 @@ def test_rs2_every_recruiter_prompt_loads(
     role: str, name: str, tier: CapabilityTier | None
 ) -> None:
     prompt = load_prompt(role, name, tier=tier)
-    assert prompt.version == 1
+    # RF-8 made v2 of the default variants; the small turn prompt needed no change.
+    assert prompt.version == (1 if tier is not None else 2)
     assert ("small" in prompt.ref) == (tier is not None)
 
 

@@ -35,7 +35,7 @@ async def test_in2_extracts_a_job_posting_with_field_confidence(
     assert posting.company_name == "Stripe"
     assert posting.must_have_skills
     assert posting.source_url == "https://stripe.com/jobs/1"  # set by us, never by the model
-    assert result.prompt_refs == ("extractor/job_posting.v1", "extractor/job_posting_input.v1")
+    assert result.prompt_refs == ("extractor/job_posting.v2", "extractor/job_posting_input.v1")
     assert result.attempts == 1
     assert len(backend.calls) == 1
     assert set(result.confidence) == {
