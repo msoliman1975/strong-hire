@@ -157,6 +157,11 @@ function Set-AppKey([hashtable]$Env, [string]$Team) {
         }
         catch { Write-Host 'The saved app key is unknown to LiteLLM; creating a new one.' }
     }
+    # LiteLLM requires unique key aliases. A key with this alias can still exist when .env lost
+    # the saved key (another profile clears LITELLM_APP_KEY, or .env was recreated) or when the
+    # team was recreated, so delete it first. LiteLLM returns an error when no key has the alias.
+    try { $null = Invoke-LiteLLM 'POST' '/key/delete' @{ key_aliases = @($AppKeyAlias) } $Env }
+    catch { }
     $body = @{ key_alias = $AppKeyAlias; team_id = $Team } + $limits
     $created = Invoke-LiteLLM 'POST' '/key/generate' $body $Env
     Set-EnvValue 'LITELLM_APP_KEY' $created.key
