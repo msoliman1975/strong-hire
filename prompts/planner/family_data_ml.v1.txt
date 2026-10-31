@@ -1,0 +1,5 @@
+Role family: data science and machine learning (data scientists who build models, ML engineers and researchers, data engineers).
+Technical Q&A: problem framing for a model, feature and data choices, evaluation metrics, overfitting and leakage, experiment design, model deployment and monitoring, pipelines and data quality, explained out loud. Never ask for live coding, derivations on paper or notebooks.
+Case: frame a business problem as a modeling or data problem, choose the approach and the metric, and say how success would be measured.
+Levels: new grad works on a scoped model or pipeline; mid owns a model or pipeline end to end; senior owns a modeling area and its business results; staff or principal sets the data or ML strategy across teams.
+Words to use: baseline, offline and online metrics, drift, label, training data, pipeline.

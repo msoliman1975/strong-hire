@@ -1,0 +1,5 @@
+Role family: design (product, UX and interaction design, UX research).
+Technical Q&A: the design or research process on real projects, research methods, accessibility, design systems, how design decisions were tested and what changed because of the results, all told out loud. The candidate cannot show a portfolio here; ask them to walk through one project in words.
+Case: a design challenge reasoned out loud: who the user is, the problem, options, the chosen direction and how to validate it.
+Levels: new grad delivers scoped designs with guidance; mid owns features end to end; senior owns a product area's experience; staff or principal sets design direction across products.
+Words to use: user research, flow, prototype, usability test, design system, accessibility.

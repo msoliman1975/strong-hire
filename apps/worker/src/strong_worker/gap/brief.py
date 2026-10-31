@@ -85,6 +85,7 @@ from strong_core.schemas import (
     session_competencies,
 )
 from strong_core.schemas.session import BRIEF_COMPANY_SUMMARY_MAX, FULL_MIN_COMPETENCIES
+from strong_worker.family import family_guidance
 from strong_worker.gap.text import posting_text, resume_text
 from strong_worker.quoting import quote_untrusted as _quote
 
@@ -398,6 +399,8 @@ def build_messages(
             duration=config.duration_min,
             question_count=DRAFT_QUESTIONS_BY_DURATION[config.duration_min],
             company=profile.company_name if not profile.generic else "generic mode (no profile)",
+            role_family=posting.role_family.value,
+            family_guidance=family_guidance(posting.role_family),
             competencies=", ".join(c.value for c in comps),
             values="\n".join(signals) or "(none: generic mode, leave values empty)",
             patterns="\n".join(patterns) or "(none)",
@@ -455,6 +458,7 @@ def assemble(
         company_name=None if profile.generic else profile.company_name,
         generic_mode=profile.generic,
         profile_version=profile.version,
+        role_family=posting.role_family,
         target_competencies=comps,
         target_values=values,
         questions=questions,
@@ -798,6 +802,8 @@ def _custom_messages(
             mode=config.mode.value,
             duration=config.duration_min,
             company=profile.company_name if not profile.generic else "generic mode (no profile)",
+            role_family=posting.role_family.value,
+            family_guidance=family_guidance(posting.role_family),
             values="\n".join(signals) or "(none: generic mode, leave values empty)",
             patterns="\n".join(patterns) or "(none)",
             sample_questions="\n".join(sample_questions(config, profile, comps)) or "(none)",

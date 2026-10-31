@@ -1,0 +1,5 @@
+Role family: product management.
+Technical Q&A: how the candidate works with engineering, technical trade-offs they weighed, how a product they shipped works at a level a PM should know, and how they used data and experiments. No coding.
+Case: product sense (design or improve a product for a user), estimation, prioritization and metrics, ending in a clear recommendation.
+Levels: new grad or associate owns a feature with guidance; mid owns a product area; senior owns a product line and its strategy; staff or principal sets strategy across several product areas.
+Words to use: user problem, roadmap, launch, metric, trade-off, stakeholder.
