@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -208,14 +208,16 @@ async def test_db6_the_debrief_plan_line_names_the_plans_next_item(
         }
     )
     assert plan_line(today) == f"{item.title} today."
+    due = data.today + timedelta(days=3)
     later = data.model_copy(
         update={
             "plan": data.plan.model_copy(
-                update={"items": [item.model_copy(update={"due": date(2026, 10, 31)})]}
+                update={"items": [item.model_copy(update={"due": due})]}
             )
         }
     )
-    assert plan_line(later) == f"{item.title} on Saturday."
+    # A day that is never today, named by its weekday ("on Saturday").
+    assert plan_line(later) == f"{item.title} on {due.strftime('%A')}."
 
 
 async def test_ps6_the_workers_reminder_readiness_matches_the_api(
