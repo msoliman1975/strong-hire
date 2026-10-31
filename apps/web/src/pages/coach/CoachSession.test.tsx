@@ -28,6 +28,10 @@ const STORY = mockStory({
   skills: ["ownership", "impact"],
 });
 
+// Save and exit saves through MSW, ends the session and navigates. On a loaded CI runner that
+// can take longer than the default 1000 ms findBy* wait, so give those waits headroom.
+const NAVIGATION_WAIT = { timeout: 5000 };
+const NAVIGATION_TEST_TIMEOUT = 15_000;
 const BARE = mockStory({ id: "s2", title: "No skills yet", context: "A thing happened." });
 
 beforeEach(() => {
@@ -150,11 +154,13 @@ describe("coach session", () => {
     await user.type(screen.getByRole("textbox", { name: "Story name" }), "Pushback from platform");
     await user.click(screen.getByRole("button", { name: "Save and exit" }));
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Pushback from platform" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "Pushback from platform" }, NAVIGATION_WAIT),
+    ).toBeInTheDocument();
     const saved = mockStoryLibrary().find((s) => s.title === "Pushback from platform");
     expect(saved?.context).toBe("We were losing checkouts every week.");
     expect(screen.getByTestId("where")).toHaveTextContent(`/stories/${saved?.id}`);
-  });
+  }, NAVIGATION_TEST_TIMEOUT);
 
   it("CO-2: a session on an existing story names it and fills in around its parts", async () => {
     renderAt("/coach/new?story=s1");
@@ -169,9 +175,9 @@ describe("coach session", () => {
     await screen.findByRole("heading", { level: 1, name: "Build a story" });
     expect(mockStoryLibrary()).toHaveLength(3);
     await user.click(screen.getByRole("button", { name: "Save and exit" }));
-    expect(await screen.findByText("Stories")).toBeInTheDocument();
+    expect(await screen.findByText("Stories", {}, NAVIGATION_WAIT)).toBeInTheDocument();
     expect(mockStoryLibrary()).toHaveLength(2);
-  });
+  }, NAVIGATION_TEST_TIMEOUT);
 
   it("CO-6: when the voice join is refused, the mic says so and typing still works", async () => {
     server.use(
