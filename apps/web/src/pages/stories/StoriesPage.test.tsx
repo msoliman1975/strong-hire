@@ -88,7 +88,11 @@ function renderAt(path: string) {
 describe("Career Stories (ST-9)", () => {
   it("ST-9: the page has, in order: start a new story, resume ideas, Ask Strova, your stories, Strova suggests", async () => {
     renderAt("/stories");
-    expect(await screen.findByRole("heading", { level: 1, name: "Career Stories with Strova" })).toBeInTheDocument();
+    const title = await screen.findByRole("heading", { level: 1, name: "Career Stories with Strova" });
+    // The header, like Rehearsals: Strova coaching at 72 px, the title and one line.
+    const header = title.closest(".sx-row") as HTMLElement;
+    expect(within(header).getByRole("img", { name: "Strova is coaching" })).toHaveAttribute("width", "72");
+    expect(header).toHaveTextContent("Build the stories you'll tell in interviews with Strova");
     const order = [
       screen.getByRole("heading", { name: "Start a new story" }),
       screen.getByRole("form", { name: "Ask Strova" }),

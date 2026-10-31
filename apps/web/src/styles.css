@@ -3195,11 +3195,6 @@ dialog::backdrop {
   padding: 9px 12px;
 }
 
-.rail-nav__strova {
-  display: inline-flex;
-  margin-right: 10px;
-}
-
 .rail-nav a[aria-current="page"] {
   color: var(--sh-violet-ink);
 }
