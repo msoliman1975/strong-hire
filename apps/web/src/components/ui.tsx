@@ -200,14 +200,17 @@ export function Segmented<T extends string>({
   options,
   value,
   onChange,
+  look = "pills",
 }: {
   label: string;
   options: { value: T; label: string }[];
   value: T;
   onChange: (value: T) => void;
+  /** "tabs": underlined text tabs (the story page in the Strova mockups) instead of pills. */
+  look?: "pills" | "tabs";
 }) {
   return (
-    <div className="segmented" role="group" aria-label={label}>
+    <div className={look === "tabs" ? "segmented segmented--tabs" : "segmented"} role="group" aria-label={label}>
       {options.map((o) => (
         <button key={o.value} type="button" aria-pressed={o.value === value} onClick={() => onChange(o.value)}>
           {o.label}

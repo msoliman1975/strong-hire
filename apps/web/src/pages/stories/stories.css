@@ -329,10 +329,10 @@
 }
 
 .story-view__parts > li {
-  display: grid;
-  grid-template-columns: 128px minmax(0, 1fr);
-  gap: 4px 20px;
-  padding: 18px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 0;
   border-top: 1px solid var(--sh-line);
 }
 
@@ -345,7 +345,6 @@
 }
 
 .story-view__part-label {
-  padding-top: 2px;
   font-family: var(--sh-font-mono);
   font-size: 0.75rem;
   font-weight: 600;
@@ -506,9 +505,6 @@
     padding: 20px;
   }
 
-  .story-view__parts > li {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 
 .story-takes .story-takes__list {
@@ -657,4 +653,39 @@
   .story-page__grid {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+/* ST-14 (mockup #story): the length switch as underlined tabs, which also fit at 390. */
+.segmented--tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 16px;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--sh-line);
+  border-radius: 0;
+  overflow-x: auto;
+}
+
+.segmented--tabs button {
+  flex: none;
+  padding: 0 0 8px;
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--sh-muted);
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: -1px;
+}
+
+.segmented--tabs button[aria-pressed="true"] {
+  background: none;
+  box-shadow: none;
+  border-bottom-color: var(--sh-violet);
+  color: var(--sh-ink);
+  font-weight: 600;
 }

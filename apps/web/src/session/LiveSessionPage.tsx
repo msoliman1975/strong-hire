@@ -285,6 +285,10 @@ function LiveView({ session }: { session: SessionRecord }) {
       {PHASES.map((p) => (
         <li key={p} aria-current={p === phase ? "step" : undefined}>
           {phaseLabel[p]}
+          {/* SV-6 (mockup #live): the current core question, "Core questions · 2 of 3". */}
+          {v2 && p === "core" && p === phase && agent?.question && agent.questions
+            ? ` · ${agent.question} of ${Math.max(agent.question, agent.questions)}`
+            : null}
         </li>
       ))}
     </ol>
@@ -371,6 +375,7 @@ function LiveView({ session }: { session: SessionRecord }) {
               </div>
               {stage === "live" && (
                 <AnswerLengthBar
+                  label="Your answer"
                   timing={timing}
                   suggestedSeconds={SUGGESTED_ANSWER_SECONDS[config.interview_type]}
                   now={now}

@@ -185,6 +185,13 @@ describe("v2 debrief", () => {
     expect(screen.getByTestId("practice-notice")).toHaveTextContent(PRACTICE_NOTICE);
   });
 
+  it("DB-6: when the plan names a next item, the coaching footer replaces the Next in your plan card", async () => {
+    renderDebrief({ ...debrief(), next_plan_item: "the Hiring manager take on Saturday." });
+    expect(await screen.findByTestId("plan-line")).toHaveTextContent("Your plan updated: next is the Hiring manager take on Saturday.");
+    expect(screen.getByRole("link", { name: "Back to Home" })).toHaveAttribute("href", "/");
+    expect(screen.queryByRole("heading", { name: "Next in your plan" })).not.toBeInTheDocument();
+  });
+
   it("FL-1: with the flag off the debrief is the v1 page", async () => {
     renderDebrief(debrief(PREVIOUS), false);
     expect(await screen.findByRole("heading", { name: "Question by question" })).toBeInTheDocument();

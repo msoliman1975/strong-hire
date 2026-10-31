@@ -5,6 +5,13 @@
  */
 .sx-solo { max-width: 860px; margin: 0 auto; padding: 40px 20px 64px; display: flex; flex-direction: column; gap: 22px; font-size: 15px; line-height: 1.5; }
 .sx-page { display: flex; flex-direction: column; gap: 20px; max-width: 1040px; font-size: 15px; line-height: 1.5; }
+/* A form page in the mockups' narrow column (#write): centred, at most 780 px wide. */
+.shell__main .sx-page.sx-page--narrow, .sx-page.sx-page--narrow { max-width: 780px; width: 100%; margin-inline: auto; }
+.sx-page--narrow .sx-field textarea { min-height: 4.5em; }
+/* v2 selects look like the v2 inputs (Profile, at every width). */
+.sx-page select { appearance: none; -webkit-appearance: none; font: inherit; padding: 10px 36px 10px 12px; border: 1px solid var(--sh-line-strong); border-radius: 10px; background: var(--sh-surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%235e5b6b' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 12px center / 12px 8px; color: var(--sh-ink); }
+/* Forms inside v2 cards drop to one column on phones (Profile's details at 390). */
+@media (max-width: 640px) { .sx-page .grid-2 { grid-template-columns: minmax(0, 1fr); } }
 .sx-solo h1, .sx-page h1, .sx-solo h2, .sx-page h2, .sx-solo h3, .sx-page h3 { margin: 0; line-height: 1.2; text-wrap: balance; }
 .sx-solo h1, .sx-page h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
 .sx-solo h2, .sx-page h2 { font-size: 19px; font-weight: 700; }

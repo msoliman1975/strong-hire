@@ -263,6 +263,20 @@ describe("story page (ST-14)", () => {
     );
   });
 
+  it("ST-14: the parts are stacked with a filled dot when written and an open dot when empty, under underline tabs", async () => {
+    resetMockStories([DRAFT]);
+    renderAt("/stories/s2");
+    const tabs = await screen.findByRole("group", { name: "Story length" });
+    expect(tabs).toHaveClass("segmented--tabs");
+    expect(within(tabs).getByRole("button", { name: "Story parts" })).toHaveAttribute("aria-pressed", "true");
+    const parts = screen.getByTestId("story-versions").querySelectorAll("li[data-part]");
+    expect(parts).toHaveLength(5);
+    for (const li of parts) {
+      const written = Boolean(li.querySelector("p:not(.muted)"));
+      expect(li.querySelector(".story-view__part-label")?.textContent?.startsWith(written ? "●" : "○")).toBe(true);
+    }
+  });
+
   it("ST-14: an open suggestion for the story can be applied, then undone", async () => {
     resetMockStories([{ ...PROVEN, id: "11111111-1111-4111-8111-111111111111" }]);
     const user = userEvent.setup();

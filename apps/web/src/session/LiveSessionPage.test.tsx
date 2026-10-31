@@ -243,6 +243,22 @@ describe("live session page", () => {
     expect(screen.getByRole("button", { name: "End take" })).toBeInTheDocument();
   });
 
+  it("SV-6: the v2 room counts the core questions, labels the answer meter \"Your answer\", and reads the counter from the agent", async () => {
+    setFeatureOverrides({ v2_enabled: true });
+    const { user } = renderLive(session());
+    await joinRoom(user);
+    act(() => voice.handlers!.onAgentJoined());
+    act(() =>
+      voice.handlers!.onState({ phase: "core", paused: false, elapsedMs: 60_000, prepMsLeft: null, question: 2, questions: 3, said: ["Tell me about a conflict."], receivedAt: Date.now() }),
+    );
+    const phases = screen.getByRole("list", { name: "Interview phases" });
+    expect(within(phases).getByText("Core questions · 2 of 3")).toHaveAttribute("aria-current", "step");
+    expect(screen.getByTestId("answer-length")).toHaveTextContent("Your answer");
+    const bytes = new TextEncoder().encode(JSON.stringify({ type: "state", phase: "core", question: 1, questions: 4 }));
+    const parsed = parseAgentMessage(bytes, 0);
+    expect(parsed?.type === "state" && [parsed.state.question, parsed.state.questions]).toEqual([1, 4]);
+  });
+
   it("IV-10, AV-1: with VITE_INTERVIEWER_AVATAR=on the avatar shows when the interviewer speaks and listens", async () => {
     vi.stubEnv("VITE_INTERVIEWER_AVATAR", "on");
     const { user } = renderLive(session());
@@ -440,7 +456,7 @@ describe("agent messages", () => {
     );
     expect(state).toEqual({
       type: "state",
-      state: { phase: "core", paused: false, elapsedMs: 1000, prepMsLeft: null, said: ["Hi"], receivedAt: 5 },
+      state: { phase: "core", paused: false, elapsedMs: 1000, prepMsLeft: null, question: null, questions: null, said: ["Hi"], receivedAt: 5 },
     });
     const prep = parseAgentMessage(bytes({ type: "state", phase: "core", paused: true, prep_ms_left: 60_000 }), 5);
     expect(prep?.type === "state" && prep.state.prepMsLeft).toBe(60_000);

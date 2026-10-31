@@ -83,7 +83,9 @@ export function DebriefV2({
       <StrovaCoaching debrief={debrief} scorecard={scorecard} />
 
       <div className="sx-grid2 debrief-v2__more" aria-label="What to do next" role="region">
-        <NextInPlan debrief={debrief} />
+        {/* DB-6 (mockup #debrief): the coaching card ends with "Your plan updated · Back to Home";
+            the older card stays only when the plan has no next item to name. */}
+        {!debrief.next_plan_item && <NextInPlan debrief={debrief} />}
         <StoryUpdates sessionId={session.id} />
         {sideExtra}
         <PracticeQuestions debrief={debrief} />

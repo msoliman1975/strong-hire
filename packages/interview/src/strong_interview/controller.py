@@ -296,6 +296,11 @@ class SessionController:
     def paused(self) -> bool:
         return self._clock.paused_at is not None
 
+    @property
+    def questions_planned(self) -> int:
+        """Core questions asked so far plus the ones still queued (the live room's "2 of 3")."""
+        return len(self.asked) + len(self._queue)
+
     def deadline_ms(self, phase: Phase) -> int:
         """When `phase` should be over, in session time."""
         return self._deadline[phase]

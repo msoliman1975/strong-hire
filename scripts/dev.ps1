@@ -10,11 +10,12 @@
   ./scripts/dev.ps1 test
   ./scripts/dev.ps1 admin               # the admin app dev server on http://localhost:5181
   ./scripts/dev.ps1 down -Volumes       # also delete the database and model volumes
+  ./scripts/dev.ps1 deploy              # update the server to the latest main (docs/hosting.md)
 #>
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('up', 'down', 'logs', 'ps', 'test', 'lint', 'migrate', 'seed', 'schemas', 'admin', 'help')]
+    [ValidateSet('up', 'down', 'logs', 'ps', 'test', 'lint', 'migrate', 'seed', 'schemas', 'admin', 'deploy', 'help')]
     [string]$Command = 'help',
 
     [Alias('Profile')]
@@ -23,7 +24,12 @@ param(
 
     [string]$Service = '',
 
-    [switch]$Volumes
+    [switch]$Volumes,
+
+    # deploy: the server's host name and the private half of the deploy key (docs/hosting.md).
+    [string]$DeployHost = 'getstronghire.com',
+
+    [string]$DeployKey = (Join-Path $HOME '.ssh/stronghire_deploy')
 )
 
 $ErrorActionPreference = 'Stop'
@@ -167,6 +173,20 @@ try {
             Write-Step 'Admin app on http://localhost:5181'
             Invoke-Pnpm @('install') -App 'admin'
             Invoke-Pnpm @('dev') -App 'admin'
+        }
+        'deploy' {
+            # The server's deploy key may run scripts/server-deploy.sh and nothing else, so this
+            # starts the deploy of the latest main and streams its output (docs/hosting.md).
+            if (-not (Test-Path $DeployKey)) {
+                throw "Deploy key not found at $DeployKey. Pass -DeployKey <path> (see docs/hosting.md, 'Deploy from the owner's PC')."
+            }
+            if (-not (Get-Command ssh -ErrorAction SilentlyContinue)) {
+                throw 'ssh is not installed. Add the Windows feature "OpenSSH Client" (Settings > System > Optional features).'
+            }
+            Write-Step "Deploying the latest main to $DeployHost"
+            & ssh -i $DeployKey -o IdentitiesOnly=yes "root@$DeployHost"
+            Assert-LastExit 'Deploy'
+            Write-Step "Deployed. Open https://app.$DeployHost and hard-refresh (Ctrl+Shift+R)."
         }
         default { Get-Help $PSCommandPath -Detailed }
     }

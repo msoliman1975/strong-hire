@@ -36,6 +36,9 @@ export interface AgentState {
   elapsedMs: number;
   /** Prep time left when the message was sent (IV-11), or null when the candidate is not preparing. */
   prepMsLeft: number | null;
+  /** In the core phase: the question being asked and how many are planned ("2 of 3"). */
+  question?: number | null;
+  questions?: number | null;
   said: string[];
   /** Date.now() when the browser got the message; the timer runs on from here. */
   receivedAt: number;
@@ -100,6 +103,8 @@ export function parseAgentMessage(data: Uint8Array, now = Date.now()): AgentMess
       paused: m.paused === true,
       elapsedMs: typeof m.elapsed_ms === "number" ? m.elapsed_ms : 0,
       prepMsLeft: typeof m.prep_ms_left === "number" ? m.prep_ms_left : null,
+      question: typeof m.question === "number" ? m.question : null,
+      questions: typeof m.questions === "number" ? m.questions : null,
       said: Array.isArray(m.said) ? m.said.filter((s): s is string => typeof s === "string") : [],
       receivedAt: now,
     },

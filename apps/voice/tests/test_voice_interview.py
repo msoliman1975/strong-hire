@@ -228,8 +228,26 @@ async def test_state_message_for_the_browser() -> None:
         "paused": True,
         "elapsed_ms": rig.voice.runner.controller.elapsed_ms,
         "prep_ms_left": None,
+        "question": None,
+        "questions": None,
         "said": lines,
     }
+
+
+async def test_sv6_state_message_counts_the_core_questions() -> None:
+    """SV-6: in the core phase the browser gets the question asked and how many are planned."""
+    from strong_voice.interview_agent import state_message
+
+    rig = make_rig(mode=Mode.COACH)
+    await rig.voice.opening()
+    controller = rig.voice.runner.controller
+    queued = len(controller._queue)
+    controller.phase = Phase.CORE
+    controller.asked = ["q1", "q2"]
+    message = json.loads(state_message(rig.voice, []))
+    assert message["question"] == 2
+    assert message["questions"] == 2 + queued
+    assert controller.questions_planned == 2 + queued
 
 
 def test_iv10_agent_tells_the_browser_how_the_voice_sounds() -> None:

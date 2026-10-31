@@ -8,6 +8,7 @@ import type { AuthUser, ModelUsage, Usage } from "../api/types";
 import { hasSlogan, SLOGAN } from "../labels";
 import { useFeature } from "../theme/features";
 import { BrandMark } from "./BrandMark";
+import { avatarEnabled } from "../session/InterviewerState";
 import { ModelUsageBadge } from "./ModelUsageBadge";
 import { useFirstRunRedirect } from "../pages/start/gate";
 import { isStartPath, startStep } from "../pages/start/paths";
@@ -299,6 +300,17 @@ export function AppLayout() {
 
   // During a live interview the menu is hidden, so nothing pulls the candidate away from the session.
   if (live) {
+    // SV-6 (mockup #live): the v2 room is full bleed; its own header shows the take, the
+    // connection and the clock, so the slim app header is left out. The 3D avatar build keeps it.
+    if (v2 && !avatarEnabled()) {
+      return (
+        <div className="room room--bleed">
+          <main id="main" className="page page--room">
+            <Outlet />
+          </main>
+        </div>
+      );
+    }
     return (
       <div className="room">
         <header className="app-header app-header--room">

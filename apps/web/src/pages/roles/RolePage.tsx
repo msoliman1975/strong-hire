@@ -130,6 +130,10 @@ export function RolePage() {
               <Link to={resumePath(resumeId)}>Open your resume</Link>
             </div>
           )}
+          {/* GA-1, GA-2: the full gap report (match score, strengths, gaps) for this role. */}
+          <Link className="sx-small" to={`/jobs/${jobId}/gap-report`}>
+            See the full gap report
+          </Link>
         </section>
         <section className="sx-card coach" aria-labelledby="stories-heading">
           <div className="sx-row">
