@@ -62,8 +62,11 @@ TAKES_COUNTED = 3
 """RH-2: readiness reads the last three Realistic takes."""
 
 
-def _family(target: JobTarget) -> RoleFamily:
-    """The job's role family; OTHER until the posting is parsed."""
+def _family(target: JobTarget, family: RoleFamily | None = None) -> RoleFamily:
+    """The job's role family: `family` when the caller previews an edit (RF-10), else the stored
+    posting's, else OTHER until the posting is parsed."""
+    if family is not None:
+        return family
     posting = _posting(target)
     return posting.role_family if posting is not None else RoleFamily.OTHER
 
@@ -204,15 +207,15 @@ def _company(profile: ResolvedProfile, target: JobTarget) -> str | None:
 
 
 def _loop_rounds(
-    profile: ResolvedProfile, target: JobTarget
+    profile: ResolvedProfile, target: JobTarget, family: RoleFamily | None = None
 ) -> list[tuple[InterviewType, str, str | None]]:
     """(type, round name, interviewer role) for each simulated round of the role's loop."""
-    posting = _posting(target)
-    if profile.profile is None or posting is None:
+    if profile.profile is None or _posting(target) is None:
         return []
+    wanted = _family(target, family)
     rounds: list[tuple[InterviewType, str, str | None]] = []
     for loop in profile.profile.loop_structure:
-        if loop.role_family != posting.role_family:
+        if loop.role_family != wanted:
             continue
         for r in loop.rounds:
             if r.interview_type is not None and all(r.interview_type != x[0] for x in rounds):
@@ -220,10 +223,17 @@ def _loop_rounds(
     return rounds
 
 
-def acting_as(profile: ResolvedProfile, target: JobTarget, kind: InterviewType) -> ActingAs:
-    """ux-spec section 4.1: the profile's interviewer for that round, else by type."""
-    named = next((role for t, _, role in _loop_rounds(profile, target) if t == kind and role), None)
-    title = named or family_info(_family(target)).interviewer_title(kind)
+def acting_as(
+    profile: ResolvedProfile,
+    target: JobTarget,
+    kind: InterviewType,
+    family: RoleFamily | None = None,
+) -> ActingAs:
+    """ux-spec section 4.1: the profile's interviewer for that round, else the family's title for
+    the type (RF-9)."""
+    rounds = _loop_rounds(profile, target, family)
+    named = next((role for t, _, role in rounds if t == kind and role), None)
+    title = named or family_info(_family(target, family)).interviewer_title(kind)
     company = _company(profile, target)
     text = (
         f"Strova is acting as {title} at {company}"
@@ -233,11 +243,14 @@ def acting_as(profile: ResolvedProfile, target: JobTarget, kind: InterviewType) 
     return ActingAs(title=title, company=company, text=text)
 
 
-def suggested(profile: ResolvedProfile, target: JobTarget) -> SuggestedInterviews:
+def suggested(
+    profile: ResolvedProfile, target: JobTarget, family: RoleFamily | None = None
+) -> SuggestedInterviews:
     """TG-3: the loop's rounds (usual), then the other types. Without a loop for the job's
-    family: that family's generic loop (RF-9)."""
-    rounds = _loop_rounds(profile, target)
-    usual = [t for t, _, _ in rounds] if rounds else list(family_info(_family(target)).generic_loop)
+    family: that family's generic loop (RF-9). `family` previews an unsaved edit (RF-10)."""
+    rounds = _loop_rounds(profile, target, family)
+    loop = family_info(_family(target, family)).generic_loop
+    usual = [t for t, _, _ in rounds] if rounds else list(loop)
     names = {t: name for t, name, _ in rounds}
     others = [
         t
@@ -256,7 +269,7 @@ def suggested(profile: ResolvedProfile, target: JobTarget) -> SuggestedInterview
             description=DESCRIPTIONS[t],
             usual=t in usual,
             round_name=names.get(t),
-            acting_as=acting_as(profile, target, t),
+            acting_as=acting_as(profile, target, t, family),
         )
         for t in [*usual, *others]
     ]
@@ -519,12 +532,16 @@ async def interview_for_session(
 
 
 @router.get("/roles/{job_target_id}/suggested-interviews")
-async def suggested_interviews(job_target_id: uuid.UUID, db: Db, me: Me) -> SuggestedInterviews:
-    """TG-3: the company's usual rounds for this role (standard loop in generic mode)."""
+async def suggested_interviews(
+    job_target_id: uuid.UUID, db: Db, me: Me, role_family: RoleFamily | None = None
+) -> SuggestedInterviews:
+    """TG-3: the company's usual rounds for this role (the family's generic loop in generic
+    mode). `role_family` previews the family the user picked on the check step before the role
+    is saved (RF-10); nothing is stored."""
     target = await _owned_job_target(db, me, job_target_id, live=True)
     if target.parsed_json is None:
         raise HTTPException(status.HTTP_409_CONFLICT, "The job posting is still being read.")
-    return suggested(await resolve_profile(db, target.company_id), target)
+    return suggested(await resolve_profile(db, target.company_id), target, role_family)
 
 
 @router.get("/roles/{job_target_id}/interviews")

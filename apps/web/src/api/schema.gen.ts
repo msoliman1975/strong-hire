@@ -1365,7 +1365,9 @@ export interface paths {
         };
         /**
          * Suggested Interviews
-         * @description TG-3: the company's usual rounds for this role (standard loop in generic mode).
+         * @description TG-3: the company's usual rounds for this role (the family's generic loop in generic
+         *     mode). `role_family` previews the family the user picked on the check step before the role
+         *     is saved (RF-10); nothing is stored.
          */
         get: operations["suggested_interviews_roles__job_target_id__suggested_interviews_get"];
         put?: never;
@@ -13896,7 +13898,9 @@ export interface operations {
     };
     suggested_interviews_roles__job_target_id__suggested_interviews_get: {
         parameters: {
-            query?: never;
+            query?: {
+                role_family?: components["schemas"]["RoleFamily"] | null;
+            };
             header?: never;
             path: {
                 job_target_id: string;
