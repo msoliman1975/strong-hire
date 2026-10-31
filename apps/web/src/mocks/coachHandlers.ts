@@ -102,6 +102,14 @@ function addTurn(entry: MockCoachSession, speaker: CoachTurnOut["speaker"], text
   return turn;
 }
 
+/** As the API: a story from a resume idea is first named after the achievement, about 60 characters. */
+function titleFromIdea(line: string): string {
+  const text = line.split(/\s+/).join(" ").trim().replace(/[ .;]+$/, "");
+  if (text.length <= 60) return text || "Untitled story";
+  const cut = text.slice(0, 59).replace(/\s+\S*$/, "").replace(/[ ,;:-]+$/, "");
+  return `${cut}…`;
+}
+
 const notFound = (what: string) => HttpResponse.json({ detail: `${what} not found` }, { status: 404 });
 
 export function coachHandlers(store?: MockStore) {
@@ -118,7 +126,7 @@ export function coachHandlers(store?: MockStore) {
         const now = new Date().toISOString();
         story = mockStory({
           id: crypto.randomUUID(),
-          title: "Untitled story",
+          title: idea ? titleFromIdea(idea) : "Untitled story",
           context: idea,
           source: "coach",
           created_at: now,

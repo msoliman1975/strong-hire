@@ -221,6 +221,22 @@ describe("Review with Strova (ST-11)", () => {
 });
 
 describe("story page (ST-14)", () => {
+  it("ST-14: Rename names the story in place; Escape cancels, Enter saves", async () => {
+    resetMockStories([PROVEN, DRAFT]);
+    const user = userEvent.setup();
+    renderAt("/stories/s1");
+    expect(await screen.findByRole("heading", { level: 1, name: "Checkout migration" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Rename" }));
+    const field = screen.getByRole("textbox", { name: "Story name" });
+    expect(field).toHaveValue("Checkout migration");
+    await user.keyboard("{Escape}");
+    expect(screen.getByRole("heading", { level: 1, name: "Checkout migration" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Rename" }));
+    await user.clear(screen.getByRole("textbox", { name: "Story name" }));
+    await user.type(screen.getByRole("textbox", { name: "Story name" }), "Black Friday checkout move{Enter}");
+    expect(await screen.findByRole("heading", { level: 1, name: "Black Friday checkout move" })).toBeInTheDocument();
+  });
+
   it("ST-14, ST-8: status steps, skills, the parts with their versions, used-for notes and the source", async () => {
     resetMockStories([
       { ...PROVEN, notes: [...PROVEN.notes, { text: "For Stripe: bring forward the 40 percent.", at: "2026-10-06T09:00:00Z", session_id: null, question_ref: null }] },

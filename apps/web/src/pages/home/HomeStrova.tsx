@@ -1,8 +1,8 @@
 /**
  * HO-1 (mockup #home): Home with Strova. The greeting by time of day; Strova's next step (the
- * plan's next item, with the why line, its action and a link to its role); the plan in the chosen
- * style (weekly, PS-4, or the checklist, PS-3); and the four summary cards (resumes, target
- * roles, rehearsals, Career Stories). No suggestion lists here: they live where they act.
+ * plan's next item, with the why line, its action and a link to its role); the four summary cards
+ * (resumes, target roles, rehearsals, Career Stories); and the plan in the chosen style (weekly,
+ * PS-4, or the checklist, PS-3). No suggestion lists here: they live where they act.
  */
 import "../../components/ux/ux.css";
 import "./home.css";
@@ -42,36 +42,58 @@ export function HomeStrova({ now = new Date() }: { now?: Date }) {
   const plan = usePersonalPlan();
   const first = auth.data?.user?.full_name?.trim().split(/\s+/)[0];
   return (
-    <div className="sx-page home-strova">
+    <div className="sx-page sx-page--wide home-strova">
       <h1>
         {greeting(now)}
         {first ? `, ${first}` : ""}
       </h1>
       {plan.isPending && <Loading label="Loading your plan" />}
       {plan.isError && <ErrorNotice error={plan.error} />}
-      {plan.data && (
-        <>
-          <NextStep plan={plan.data} />
-          {plan.data.plan.style === "checklist" ? <Checklist plan={plan.data} /> : <Weekly plan={plan.data} />}
-        </>
-      )}
+      {plan.data && <NextStep plan={plan.data} />}
       <SummaryCards />
+      {plan.data &&
+        (plan.data.plan.style === "checklist" ? <Checklist plan={plan.data} /> : <Weekly plan={plan.data} />)}
     </div>
   );
 }
 
+/** HO-1: one sentence that introduces Strova beside her avatar. */
+export const STROVA_INTRO =
+  "Meet Strova, your interview partner: she reads your resume, helps you build the stories you'll tell, and rehearses the real interview with you.";
+
+/**
+ * HO-1: Strova's next step. Compact: the intro beside her avatar, then the step, its headline
+ * clamped to two lines and the why line to one (the full text stays in the tooltip).
+ */
 function NextStep({ plan }: { plan: PersonalPlan }) {
   const step = plan.next_step;
   return (
-    <section className="sx-hero sx-hero-row" aria-label="Strova's next step">
-      <Strova mode="coaching" size={104} />
-      <div>
-        <span className="sx-eyebrow home-strova__eyebrow">Strova · next step</span>
-        {step ? (
-          <>
-            <div className="big">{step.headline}</div>
-            {step.why && <div className="sub">{step.why}</div>}
-            <div className="sx-row">
+    <section className="sx-hero home-strova__hero" aria-label="Strova's next step">
+      <div className="home-strova__intro">
+        <Strova mode="coaching" size={64} />
+        <p className="sub">{STROVA_INTRO}</p>
+      </div>
+      <div className="home-strova__step">
+        <div className="home-strova__step-text">
+          <span className="sx-eyebrow home-strova__eyebrow">Strova · next step</span>
+          {step ? (
+            <>
+              <div className="home-strova__headline" title={step.headline}>
+                {step.headline}
+              </div>
+              {step.why && (
+                <div className="sub home-strova__why" title={step.why}>
+                  {step.why}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="home-strova__headline">Your plan is clear. Add a target role, and Strova plans your rehearsals.</div>
+          )}
+        </div>
+        <div className="sx-row home-strova__step-actions">
+          {step ? (
+            <>
               <Link className="sx-btn" to={step.action_target}>
                 {step.action_label}
               </Link>
@@ -80,18 +102,13 @@ function NextStep({ plan }: { plan: PersonalPlan }) {
                   {step.role_label}
                 </Link>
               )}
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="big">Your plan is clear. Add a target role, and Strova plans your rehearsals.</div>
-            <div className="sx-row">
-              <Link className="sx-btn" to="/roles/new">
-                Add a target role
-              </Link>
-            </div>
-          </>
-        )}
+            </>
+          ) : (
+            <Link className="sx-btn" to="/roles/new">
+              Add a target role
+            </Link>
+          )}
+        </div>
       </div>
     </section>
   );
@@ -255,13 +272,16 @@ function SummaryCards() {
     .map(([s, n]) => `${n} ${displayStatusLabel[s]}`)
     .join(" · ");
   return (
-    <div className="sx-grid4 home-strova__cards" aria-label="Summary" role="region">
+    <div className="home-strova__cards" aria-label="Summary" role="region">
       <Link className="sx-card tight home-strova__card" to={main ? `/resumes/${main.id}` : "/resumes"}>
         <div className="sx-eyebrow plain">{first ? `${first}'s Resumes` : "Your resumes"}</div>
         {main ? (
           <>
-            <h3>
-              {main.name} {main.is_main && <span className="sx-chip dark">Main</span>}
+            <h3 className="home-strova__name">
+              <span className="home-strova__truncate" title={main.name ?? undefined}>
+                {main.name}
+              </span>
+              {main.is_main && <span className="sx-chip dark">Main</span>}
             </h3>
             <span className="sx-small home-strova__warn">{plural(issues.data?.open.length ?? 0, "issue")} open</span>
             <span className="sx-small home-strova__violet">{plural(ideas.data?.ideas.length ?? 0, "story idea")}</span>

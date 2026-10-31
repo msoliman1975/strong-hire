@@ -17,7 +17,7 @@ import { EMPTY_PROFILE } from "../../mocks/handlers";
 import { mockStore } from "../../mocks/node";
 import { mockStory, resetMockStories } from "../../mocks/storyHandlers";
 import { setFeatureOverrides } from "../../theme/features";
-import { greeting } from "./HomeStrova";
+import { greeting, STROVA_INTRO } from "./HomeStrova";
 
 const USER_ID = "00000000-0000-4000-8000-0000000000a1";
 const EMAIL = "ana@example.com";
@@ -87,8 +87,10 @@ describe("Home with Strova", () => {
     renderHome();
     expect(await screen.findByRole("heading", { level: 1, name: /^Good (morning|afternoon|evening), Ana$/ })).toBeInTheDocument();
     const hero = await screen.findByRole("region", { name: "Strova's next step" });
-    expect(within(hero).getByRole("img", { name: "Strova is coaching" })).toHaveAttribute("width", "104");
+    expect(within(hero).getByRole("img", { name: "Strova is coaching" })).toHaveAttribute("width", "64");
+    expect(hero).toHaveTextContent(STROVA_INTRO);
     expect(hero).toHaveTextContent(/Rehearse .* · Behavioral\./);
+    expect(hero.querySelector(".home-strova__headline")).toHaveAttribute("title", expect.stringMatching(/^Rehearse /));
     expect(within(hero).getByRole("link", { name: "Start the take" })).toHaveAttribute("href", expect.stringMatching(/^\/interviews\//));
     expect(within(hero).getByRole("link", { name: /^Open / })).toHaveAttribute("href", `/roles/${job.id}`);
     expect(screen.getByTestId("weekly-plan")).toBeInTheDocument();
@@ -101,6 +103,21 @@ describe("Home with Strova", () => {
     ]);
     expect(screen.queryByText(/Strova suggests/)).toBeNull();
     expect(screen.queryByRole("button", { name: "Dismiss" })).toBeNull();
+  });
+
+  it("HO-1: the summary cards sit right below Strova's next step, and a long resume name is cut to fit its card", async () => {
+    signIn("weekly");
+    await roleWithBehavioral();
+    const name = "Senior Backend Engineer resume, payments and billing platforms, 2026 edition";
+    const resume = mockStore.db.resumes[0];
+    resume.name = name;
+    renderHome();
+    const hero = await screen.findByRole("region", { name: "Strova's next step" });
+    const cards = screen.getByRole("region", { name: "Summary" });
+    const plan = await screen.findByTestId("weekly-plan");
+    expect(hero.nextElementSibling).toBe(cards);
+    expect(cards.compareDocumentPosition(plan) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(await within(cards).findByTitle(name)).toHaveClass("home-strova__truncate");
   });
 
   it("PS-4: the weekly plan shows the week, a chip legend, one item a day, and today's item highlighted with its action", async () => {

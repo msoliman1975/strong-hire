@@ -219,15 +219,21 @@ describe("resume pages", () => {
     await waitFor(() => expect(screen.getByText("Main").closest(".sx-list-row")).toHaveTextContent(second.name ?? ""));
   });
 
-  it("RM-3: the resume page has story ideas, breakdown and issues", async () => {
+  it("RM-3: the resume page has breakdown and issues first, then Strova's story ideas, closed with their counts", async () => {
     const resume = await addResume();
     mockStore.db.profiles[EMAIL] = { ...(await import("../../mocks/handlers")).EMPTY_PROFILE, plan_style: "weekly" };
     const user = renderApp(`/resumes/${resume.id}`);
     expect(await screen.findByRole("heading", { level: 1, name: resume.name ?? "" })).toBeInTheDocument();
     expect(screen.getByText("Main resume")).toBeInTheDocument();
-    const ideas = await screen.findByRole("region", { name: "Story ideas from this resume" });
-    expect(screen.getByRole("region", { name: "Breakdown" })).toBeInTheDocument();
+    const ideas = await screen.findByRole("group", { name: "Story ideas from this resume" });
+    const breakdown = screen.getByRole("region", { name: "Breakdown" });
     expect(screen.getByRole("region", { name: "Resume issues" })).toBeInTheDocument();
+    expect(breakdown.compareDocumentPosition(ideas) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(ideas).not.toHaveAttribute("open");
+    expect(ideas).toHaveTextContent(/Strova's findings/);
+    await waitFor(() => expect(within(ideas).getByTestId("ideas-counts")).toHaveTextContent(/^\d+ ideas?/));
+    await user.click(within(ideas).getByText("Story ideas from this resume"));
+    expect(ideas).toHaveAttribute("open");
     const craft = await within(ideas).findAllByRole("link", { name: "Craft with Strova" });
     expect(craft[0].getAttribute("href")).toMatch(/^\/coach\/new\?resume=/);
     const before = craft.length;

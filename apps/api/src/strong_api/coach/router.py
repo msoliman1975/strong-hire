@@ -79,6 +79,19 @@ from strong_core.sim import gateway_for_org
 log = logging.getLogger(__name__)
 
 NEW_STORY_TITLE = "Untitled story"
+IDEA_TITLE_MAX_CHARS = 60
+
+
+def title_from_idea(line: str) -> str:
+    """ST-12: a story started from a resume idea is first named after the achievement, in the
+    user's own words, cut at a word to about 60 characters. The user can rename it any time."""
+    text = " ".join(line.split()).rstrip(" .;")
+    if len(text) <= IDEA_TITLE_MAX_CHARS:
+        return text or NEW_STORY_TITLE
+    cut = text[: IDEA_TITLE_MAX_CHARS - 1].rsplit(" ", 1)[0].rstrip(" ,;:-")
+    return f"{cut}…"
+
+
 COACH_ROOM_PREFIX = "coach-"  # the voice agent runs the coach in rooms named like this
 TextSettings = Annotated[TextSessionSettings, Depends(get_text_session_settings)]
 VoiceSettings = Annotated[VoiceSessionSettings, Depends(get_voice_session_settings)]
@@ -238,7 +251,8 @@ async def start_coach_session(body: StartCoachRequest, db: Db, me: Me) -> CoachS
             id=uuid.uuid4(),
             org_id=me.org_id,
             user_id=me.user_id,
-            title=NEW_STORY_TITLE,  # the user names it when ready, as for any new story
+            # The user names it when ready; an idea gives it a first name from the achievement.
+            title=title_from_idea(idea) if idea else NEW_STORY_TITLE,
             # ST-12: the achievement (the user's own words) seeds the context.
             context=idea,
             skills=[],

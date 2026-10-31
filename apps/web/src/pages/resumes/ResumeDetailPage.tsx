@@ -1,7 +1,7 @@
 /**
- * RM-3 (mockup #cv): one resume. Story ideas from it (Craft with Strova, Not a story, and the
- * achievements a story already tells), the breakdown with Edit, and the resume issues with fix and
- * accept. Resume-line suggestions from stories (SG-6) join this page with U08.
+ * RM-3 (mockup #cv): one resume. The breakdown with Edit and the resume issues with fix and accept
+ * come first; then Strova's story ideas from it (Craft with Strova, Not a story, and the
+ * achievements a story already tells), closed by default with their counts in the header. Resume-line suggestions from stories (SG-6) join this page with U08.
  */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Fragment, useState } from "react";
@@ -30,6 +30,12 @@ const PART: Record<string, string> = {
   result: "result",
   reflection: "reflection",
 };
+
+/** RM-3: the closed Story ideas header's summary, such as "3 ideas · 1 already a story". */
+export function ideaCounts(open: number, used: number): string {
+  const ideas = `${open} ${open === 1 ? "idea" : "ideas"}`;
+  return used > 0 ? `${ideas} · ${used} already a story` : ideas;
+}
 
 /** Craft with Strova, seeded with this achievement (U10 reads `idea` and `resume`). */
 export const craftFromIdeaPath = (resumeId: string, ref: string) =>
@@ -60,7 +66,7 @@ export function ResumeDetailPage() {
   );
 
   return (
-    <div className="sx-page">
+    <div className="sx-page sx-page--wide">
       <div className="sx-between">
         <div className="sx-stack" style={{ gap: 6 }}>
           <h1>{record.data.name ?? "Resume"}</h1>
@@ -92,14 +98,51 @@ export function ResumeDetailPage() {
       {!resume && <Loading label="Strova is reading this resume" />}
       {resume && (
         <>
-          <section className="sx-card coach" aria-labelledby="ideas-heading">
-            <div className="sx-between">
-              <div className="sx-row">
-                <Strova mode="coaching" size={28} />
-                <h2 id="ideas-heading">Story ideas from this resume</h2>
+          <div className="sx-grid2">
+            <section className="sx-card" aria-labelledby="breakdown-heading">
+              <div className="sx-between">
+                <h2 id="breakdown-heading">Breakdown</h2>
+                <Link className="sx-btn quiet sm" to={resumeCheckPath(resumeId)}>
+                  Edit
+                </Link>
               </div>
-              <span className="sx-muted sx-small">Strova found these in your achievements</span>
+              {resume.summary && <p className="sx-small sx-muted">{resume.summary}</p>}
+              <BreakdownSummary resume={resume} />
+            </section>
+            <div className="sx-stack" style={{ gap: 16 }}>
+              <section className="sx-card" aria-labelledby="issues-heading">
+                <div className="sx-between">
+                  <h2 id="issues-heading">Resume issues</h2>
+                  <span className="sx-small sx-muted">{issues.data ? `${open.length} open` : ""}</span>
+                </div>
+                {issues.isError && <ErrorNotice error={issues.error} />}
+                {issues.data && open.length === 0 && <p className="sx-muted sx-small">Nothing to fix. Your resume reads well.</p>}
+                <IssueList resumeId={resumeId} issues={open} compactActions />
+              </section>
+              <ResumeLineSuggestions resumeId={resumeId} />
             </div>
+          </div>
+          <details className="sx-card coach sx-fold" data-testid="resume-ideas" aria-labelledby="ideas-heading">
+            <summary className="sx-stack" style={{ gap: 6 }}>
+              <div className="sx-between">
+                <div className="sx-row">
+                  <Strova mode="coaching" size={28} />
+                  <h2 id="ideas-heading">Story ideas from this resume</h2>
+                </div>
+                <div className="sx-row">
+                  <span className="sx-small sx-muted" data-testid="ideas-counts">
+                    {ideaCounts(ideas.data?.ideas.length ?? 0, ideas.data?.used.length ?? 0)}
+                  </span>
+                  <span className="caret" aria-hidden="true">
+                    ▾
+                  </span>
+                </div>
+              </div>
+              <p className="sx-small sx-muted">
+                Strova's findings: she read your achievements and picked the ones that could become stories you tell in
+                interviews.
+              </p>
+            </summary>
             {ideas.isError && <ErrorNotice error={ideas.error} />}
             {dismiss.isError && <ErrorNotice error={dismiss.error} />}
             {ideas.data?.ideas.length === 0 && ideas.data.used.length === 0 && (
@@ -143,31 +186,7 @@ export function ResumeDetailPage() {
                 </Link>
               </div>
             ))}
-          </section>
-          <div className="sx-grid2">
-            <section className="sx-card" aria-labelledby="breakdown-heading">
-              <div className="sx-between">
-                <h2 id="breakdown-heading">Breakdown</h2>
-                <Link className="sx-btn quiet sm" to={resumeCheckPath(resumeId)}>
-                  Edit
-                </Link>
-              </div>
-              {resume.summary && <p className="sx-small sx-muted">{resume.summary}</p>}
-              <BreakdownSummary resume={resume} />
-            </section>
-            <div className="sx-stack" style={{ gap: 16 }}>
-              <section className="sx-card" aria-labelledby="issues-heading">
-                <div className="sx-between">
-                  <h2 id="issues-heading">Resume issues</h2>
-                  <span className="sx-small sx-muted">{issues.data ? `${open.length} open` : ""}</span>
-                </div>
-                {issues.isError && <ErrorNotice error={issues.error} />}
-                {issues.data && open.length === 0 && <p className="sx-muted sx-small">Nothing to fix. Your resume reads well.</p>}
-                <IssueList resumeId={resumeId} issues={open} compactActions />
-              </section>
-              <ResumeLineSuggestions resumeId={resumeId} />
-            </div>
-          </div>
+          </details>
         </>
       )}
     </div>

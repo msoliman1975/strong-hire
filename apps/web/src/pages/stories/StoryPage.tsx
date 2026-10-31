@@ -9,7 +9,7 @@ import "../../components/ux/ux.css";
 import "./stories.css";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router";
 
 import { suggestionKeys, suggestionsApi, useSuggestions } from "../../api/suggestions";
@@ -17,7 +17,7 @@ import type { Suggestion } from "../../api/types";
 import { ErrorNotice, Loading, STORY_PART_LABEL } from "../../components/ui";
 import { competencyLabel } from "../../labels";
 import { useTakes } from "../coach/api";
-import { displayStatusLabel, storyKeys, useStory, type DisplayStatus, type Story } from "./api";
+import { displayStatusLabel, storiesApi, storyKeys, useStory, type DisplayStatus, type Story } from "./api";
 import { reviewPath, storiesPath } from "./paths";
 import { StoryEditor } from "./StoryEditor";
 import { bestTake, StoryTakes, takeAverage } from "./StoryTakes";
@@ -28,6 +28,61 @@ const CHIP: Record<DisplayStatus, string> = { proven: "ok", ready: "v", draft: "
 
 /** SG-5: the tailoring notes ("For {company}: …") accepted on this story. */
 export const usedForNotes = (story: Story) => story.notes.filter((n) => /^For [^:]+: /.test(n.text));
+
+/** ST-14: the story's name, renamed in place: Rename turns it into a field; Enter saves, Escape cancels. */
+export function StoryTitle({ story }: { story: Story }) {
+  const client = useQueryClient();
+  const [draft, setDraft] = useState<string | null>(null);
+  const rename = useMutation({
+    mutationFn: (title: string) => storiesApi.update(story.id, { title }),
+    onSuccess: (saved) => {
+      client.setQueryData(storyKeys.one(story.id), saved);
+      void client.invalidateQueries({ queryKey: storyKeys.all });
+      setDraft(null);
+    },
+  });
+  if (draft === null) {
+    return (
+      <>
+        <h1>{story.title}</h1>
+        <button type="button" className="sx-btn quiet sm" onClick={() => setDraft(story.title)}>
+          Rename
+        </button>
+      </>
+    );
+  }
+  const name = draft.trim();
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!name) return;
+    if (name === story.title) setDraft(null);
+    else rename.mutate(name);
+  };
+  return (
+    <form className="sx-row story-page__rename" onSubmit={submit} aria-label="Rename the story">
+      <label className="visually-hidden" htmlFor="story-rename">
+        Story name
+      </label>
+      <input
+        id="story-rename"
+        value={draft}
+        maxLength={200}
+        autoFocus
+        onChange={(e) => setDraft(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") setDraft(null);
+        }}
+      />
+      <button type="submit" className="sx-btn sm" disabled={!name || rename.isPending}>
+        Save
+      </button>
+      <button type="button" className="sx-btn quiet sm" onClick={() => setDraft(null)}>
+        Cancel
+      </button>
+      {rename.isError && <ErrorNotice error={rename.error} title="The name was not saved" />}
+    </form>
+  );
+}
 
 export function StoryPage() {
   const { storyId = "" } = useParams();
@@ -44,7 +99,7 @@ export function StoryPage() {
       <div className="sx-between">
         <div className="sx-stack story-page__head">
           <div className="sx-row">
-            <h1>{s.title}</h1>
+            <StoryTitle story={s} />
             <span className={`sx-chip ${CHIP[s.display_status]}`} data-testid="story-status">
               {displayStatusLabel[s.display_status]}
             </span>

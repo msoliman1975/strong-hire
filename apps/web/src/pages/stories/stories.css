@@ -689,3 +689,15 @@
   color: var(--sh-ink);
   font-weight: 600;
 }
+
+/* ST-14: renaming the story in place. */
+.story-page__rename input {
+  font: inherit;
+  font-size: 20px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border: 1px solid var(--sh-line-strong);
+  border-radius: 10px;
+  min-width: min(28ch, 100%);
+  flex: 1 1 260px;
+}

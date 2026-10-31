@@ -454,13 +454,113 @@ a.home-resumes__name {
   gap: 6px;
 }
 
+/* Strova's next step: the intro beside her avatar, then the step and its actions on one row. */
+.home-strova__hero {
+  gap: 16px;
+  padding: 20px 24px;
+}
+
+.home-strova__intro {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.home-strova__intro .sub {
+  margin: 0;
+  max-width: 72ch;
+}
+
+.home-strova__step {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  border-top: 1px solid var(--sh-hero-line);
+  padding-top: 14px;
+}
+
+.home-strova__step-text {
+  flex: 1 1 320px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.home-strova__headline {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.home-strova__why {
+  font-size: 13.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.home-strova__step-actions {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 640px) {
+  .home-strova__intro {
+    align-items: flex-start;
+  }
+
+  .home-strova__intro .sub {
+    font-size: 13.5px;
+  }
+
+  .home-strova__headline {
+    font-size: 16px;
+  }
+}
+
+/* The four summary cards: one row when there is room, all the same height. */
+.home-strova__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  align-items: stretch;
+}
+
 .home-strova__card {
   text-decoration: none;
   color: inherit;
+  height: 100%;
+  min-width: 0;
 }
 
 .home-strova__card h3 {
   margin: 0;
+}
+
+.home-strova__card > * {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.home-strova__name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.home-strova__truncate {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .home-strova__warn {
