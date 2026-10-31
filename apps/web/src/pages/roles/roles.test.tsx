@@ -139,7 +139,8 @@ describe("target roles", () => {
     expect(screen.getAllByRole("checkbox")[0]).toHaveAccessibleName(/Case/);
     expect(screen.getByRole("checkbox", { name: /Verbal technical/ })).not.toBeChecked();
     await user.click(screen.getByRole("button", { name: "Create the role" }));
-    await waitFor(() => expect(screen.getByTestId("where").textContent).toMatch(/^\/roles\/[^/]+$/), {
+    // The role page, not the add page: /roles/new also matches /roles/<one segment>.
+    await waitFor(() => expect(screen.getByTestId("where").textContent).toMatch(/^\/roles\/(?!new$)[^/]+$/), {
       timeout: 4000,
     });
     const jobId = (screen.getByTestId("where").textContent ?? "").split("/")[2];
