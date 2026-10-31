@@ -155,7 +155,7 @@ that opens Profile. Left rail, exactly these five items in this order:
 1. **Home**
 2. **{First name}'s Resumes** (from `users.full_name`; "Your resumes" when there is no name)
 3. **Target roles**
-4. **Rehearsals with Strova** (with an 18 px interviewing Strova)
+4. **Rehearsals with Strova** (no icon in the rail; the page header shows Strova)
 5. **Career Stories with Strova**
 
 There is no separate "Ask Strova" nav button: Ask Strova lives on the Career Stories page. The

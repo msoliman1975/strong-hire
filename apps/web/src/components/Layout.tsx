@@ -13,7 +13,6 @@ import { ModelUsageBadge } from "./ModelUsageBadge";
 import { useFirstRunRedirect } from "../pages/start/gate";
 import { isStartPath, startStep } from "../pages/start/paths";
 import { StartSteps } from "../pages/start/StartSteps";
-import { Strova } from "./strova";
 import { AvatarMenu, PlanChip } from "./TopBar";
 import { Tour } from "./Tour";
 import { ErrorNotice, Loading } from "./ui";
@@ -116,8 +115,6 @@ type NavItem = {
   end?: boolean;
   match?: RegExp;
   badge?: string;
-  /** NV-1: an 18 px Strova before the label: interviewing for rehearsals, coaching for stories. */
-  strova?: "interviewing" | "coaching";
   /** The tour step that points at this item. */
   tour?: string;
 };
@@ -149,19 +146,8 @@ function v2Nav(fullName: string | null | undefined): NavItem[] {
     { to: "/", label: "Home", end: true },
     { to: "/resumes", label: resumesLabel(fullName), match: /^\/resumes(\/|$)/ },
     { to: "/roles", label: "Target roles", match: /^\/(roles|jobs)(\/|$)/ },
-    {
-      to: "/rehearsals",
-      label: "Rehearsals with Strova",
-      match: /^\/(rehearsals|interviews|sessions)(\/|$)/,
-      strova: "interviewing",
-    },
-    {
-      to: "/stories",
-      label: "Career Stories with Strova",
-      match: /^\/(stories|coach)(\/|$)/,
-      tour: "coach",
-      strova: "coaching",
-    },
+    { to: "/rehearsals", label: "Rehearsals with Strova", match: /^\/(rehearsals|interviews|sessions)(\/|$)/ },
+    { to: "/stories", label: "Career Stories with Strova", match: /^\/(stories|coach)(\/|$)/, tour: "coach" },
   ];
 }
 
@@ -182,12 +168,6 @@ export function RailNav() {
     const matched = it.match?.test(pathname) ?? false;
     const label = (
       <>
-        {/* Decorative next to its label, so the link reads "Rehearsals with Strova". */}
-        {it.strova && (
-          <span className="rail-nav__strova" aria-hidden="true">
-            <Strova mode={it.strova} size={18} />
-          </span>
-        )}
         {it.label}
         {it.badge && <span className="rail-nav__badge">{it.badge}</span>}
       </>

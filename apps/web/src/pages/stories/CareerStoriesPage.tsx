@@ -67,7 +67,15 @@ export function CareerStoriesPage() {
   const list = stories.data ?? [];
   return (
     <div className="sx-page career-stories">
-      <h1>Career Stories with Strova</h1>
+      <div className="sx-row">
+        <Strova mode="coaching" size={72} />
+        <div>
+          <h1>Career Stories with Strova</h1>
+          <p className="sx-muted sx-small">
+            Build the stories you'll tell in interviews with Strova, who coaches you from your own words.
+          </p>
+        </div>
+      </div>
       <section className="sx-card" aria-labelledby="start-heading">
         <h2 id="start-heading">Start a new story</h2>
         <div className="sx-grid2">
