@@ -9406,6 +9406,48 @@ export interface components {
              */
             rubric_version: string;
         };
+        /**
+         * ScorerOutput
+         * @description FB-1, FB-2: what the scorer model must return. Only for `gateway.complete(output_type=)`.
+         *
+         *     Same shape as Scorecard, but `per_question` is required with at least one entry, so a
+         *     schema-constrained model cannot leave it out. Scorecard stays as it is, because it also reads
+         *     stored scorecards and holds the worker's final card, where `per_question` can be empty (old
+         *     rows, or every per-question score lost its quotes).
+         */
+        ScorerOutput: {
+            hire_signal: components["schemas"]["HireSignal"];
+            /**
+             * Rationale
+             * @description 3 to 5 sentences, like a debrief summary.
+             */
+            rationale: string;
+            /**
+             * Competency Scores
+             * @description Overall score per competency across the session.
+             */
+            competency_scores: components["schemas"]["CompetencyScore"][];
+            /**
+             * Value Scores
+             * @description Overall score per company value. Empty in generic mode.
+             */
+            value_scores?: components["schemas"]["ValueScore"][];
+            /**
+             * Per Question
+             * @description One entry per question that was asked, each with at least one score.
+             */
+            per_question: components["schemas"]["QuestionScore"][];
+            /**
+             * Scorer Model
+             * @description Gateway model alias, never a vendor id.
+             */
+            scorer_model: string;
+            /**
+             * Rubric Version
+             * @description Prompt ref, for example 'scorer/rubric.v1'.
+             */
+            rubric_version: string;
+        };
         /** ScoringAccepted */
         ScoringAccepted: {
             /**

@@ -1,4 +1,4 @@
-"""Scorecard (FB-1, FB-2), delivery metrics (DM-1) and progress snapshots (PR-1)."""
+"""Scorecard and scorer output (FB-1, FB-2), delivery metrics (DM-1), progress (PR-1)."""
 
 from __future__ import annotations
 
@@ -75,6 +75,21 @@ class Scorecard(Contract):
         if len(names) != len(set(names)):
             raise ValueError("value_scores must have one entry per value")
         return self
+
+
+class ScorerOutput(Scorecard):
+    """FB-1, FB-2: what the scorer model must return. Only for `gateway.complete(output_type=)`.
+
+    Same shape as Scorecard, but `per_question` is required with at least one entry, so a
+    schema-constrained model cannot leave it out. Scorecard stays as it is, because it also reads
+    stored scorecards and holds the worker's final card, where `per_question` can be empty (old
+    rows, or every per-question score lost its quotes).
+    """
+
+    per_question: list[QuestionScore] = Field(
+        min_length=1,
+        description="One entry per question that was asked, each with at least one score.",
+    )
 
 
 class ProgressSnapshot(Contract):
