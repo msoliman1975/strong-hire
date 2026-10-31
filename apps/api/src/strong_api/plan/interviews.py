@@ -39,6 +39,7 @@ from strong_core.db.models import InterviewSession, JobTarget, TargetInterview
 from strong_core.db.models import Resume as ResumeRow
 from strong_core.db.models import Scorecard as ScorecardRow
 from strong_core.profiles import ResolvedProfile, resolve_profile
+from strong_core.role_families import family_info
 from strong_core.schemas import (
     COMPETENCIES_BY_TYPE,
     READINESS_GOAL,
@@ -50,6 +51,7 @@ from strong_core.schemas import (
     InterviewType,
     JobPosting,
     Mode,
+    RoleFamily,
     Scorecard,
     SessionStatus,
 )
@@ -59,18 +61,12 @@ router = APIRouter(tags=["target roles and interviews"])
 TAKES_COUNTED = 3
 """RH-2: readiness reads the last three Realistic takes."""
 
-STANDARD_LOOP = (InterviewType.BEHAVIORAL, InterviewType.HIRING_MANAGER, InterviewType.TECHNICAL_QA)
-"""TG-3: the suggestion in generic mode."""
 
-# ux-spec section 4.1: who Strova plays when the profile names no interviewer for the round.
-INTERVIEWER_TITLES: dict[InterviewType, str] = {
-    InterviewType.BEHAVIORAL: "Engineering Manager",
-    InterviewType.HIRING_MANAGER: "Hiring Manager",
-    InterviewType.TECHNICAL_QA: "Senior Engineer",
-    InterviewType.CASE: "Product Lead",
-    InterviewType.RECRUITER_SCREEN: "Recruiter",
-    InterviewType.CUSTOM: "Interviewer",
-}
+def _family(target: JobTarget) -> RoleFamily:
+    """The job's role family; OTHER until the posting is parsed."""
+    posting = _posting(target)
+    return posting.role_family if posting is not None else RoleFamily.OTHER
+
 
 DESCRIPTIONS: dict[InterviewType, str] = {
     InterviewType.BEHAVIORAL: "Past situations: ownership, conflict, impact and what you learned.",
@@ -227,7 +223,7 @@ def _loop_rounds(
 def acting_as(profile: ResolvedProfile, target: JobTarget, kind: InterviewType) -> ActingAs:
     """ux-spec section 4.1: the profile's interviewer for that round, else by type."""
     named = next((role for t, _, role in _loop_rounds(profile, target) if t == kind and role), None)
-    title = named or INTERVIEWER_TITLES[kind]
+    title = named or family_info(_family(target)).interviewer_title(kind)
     company = _company(profile, target)
     text = (
         f"Strova is acting as {title} at {company}"
@@ -238,9 +234,10 @@ def acting_as(profile: ResolvedProfile, target: JobTarget, kind: InterviewType) 
 
 
 def suggested(profile: ResolvedProfile, target: JobTarget) -> SuggestedInterviews:
-    """TG-3: the loop's rounds (usual), then the other types. Generic: the standard loop."""
+    """TG-3: the loop's rounds (usual), then the other types. Without a loop for the job's
+    family: that family's generic loop (RF-9)."""
     rounds = _loop_rounds(profile, target)
-    usual = [t for t, _, _ in rounds] if rounds else list(STANDARD_LOOP)
+    usual = [t for t, _, _ in rounds] if rounds else list(family_info(_family(target)).generic_loop)
     names = {t: name for t, name, _ in rounds}
     others = [
         t

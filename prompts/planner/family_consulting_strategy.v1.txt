@@ -1,0 +1,5 @@
+Role family: consulting and strategy (management consultants, strategy and operations, BizOps, corporate development, chiefs of staff).
+Technical Q&A: rare. For BizOps and strategy roles, ask about metrics, simple quantitative reasoning and how the candidate built an analysis that changed a decision.
+Case: the core of the loop. Interviewer-led or candidate-led business cases: profitability, market entry, market sizing, M&A, operations. Give data aloud when the candidate asks for it; there are no written exhibits. Expect a structure first, math done out loud, and a synthesis with a recommendation at the end.
+Levels: business analyst is new grad; associate or consultant is mid; engagement manager is senior; associate partner and above is staff or principal.
+Words to use: hypothesis, structure, driver, synthesis, client, recommendation, next steps.

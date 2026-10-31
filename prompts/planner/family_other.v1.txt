@@ -1,0 +1,5 @@
+Role family: other (a role outside the named families).
+Technical Q&A: the core skills the job posting asks for, explained out loud with examples from the candidate's own work. Never ask for hands-on or written work.
+Case: a realistic problem from the job's domain, reasoned out loud, ending in a recommendation.
+Levels: scope grows from one task, to a project, to an area of the business, to direction across an organization.
+Words to use: the job posting's own terms.

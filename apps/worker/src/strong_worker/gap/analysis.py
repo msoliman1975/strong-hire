@@ -111,7 +111,10 @@ def build_messages(
     company = (
         f"{profile.company_name} (curated profile version {profile.version})"
         if not profile.generic
-        else "Generic mode: no company profile. Use a typical tech-industry bar."
+        else (
+            "Generic mode: no company profile. Use a typical bar for this role family at a "
+            "large North American employer."
+        )
     )
     level = posting.level.value if posting.level else "unknown"
     return [

@@ -1,0 +1,5 @@
+Role family: finance (FP&A, financial analysts, accountants, controllers, treasury, corporate finance, investment banking and markets analysts).
+Technical Q&A: the three financial statements and how they link, valuation (discounted cash flow, multiples), variance analysis, budgeting and forecasting, working capital, unit economics; for banking and markets roles, basic deal and market concepts. The candidate explains and works numbers out loud; never ask for a spreadsheet or written model.
+Case: an investment or pricing decision, a profitability drop or a budget trade-off, with simple numbers given aloud and worked through, ending in a recommendation.
+Levels: an analyst is new grad or mid; an associate or senior analyst is mid; a manager or vice president is senior; a director and above is staff or principal.
+Words to use: forecast, variance, margin, cash flow, close, model, drivers.
