@@ -39,3 +39,6 @@ COPY --from=web /app/dist /srv
 COPY --from=admin /app/dist /srv-admin
 COPY --from=site /repo/apps/site/dist /srv-site
 COPY infra/caddy/Caddyfile /etc/caddy/Caddyfile
+# The commit this image was built from, served at /version.txt so a deploy can be checked.
+ARG GIT_SHA=unknown
+RUN echo "$GIT_SHA" > /srv/version.txt
