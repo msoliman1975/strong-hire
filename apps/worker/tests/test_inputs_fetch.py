@@ -55,6 +55,44 @@ async def test_in1_greenhouse_uses_board_api() -> None:
     assert "<li>" not in result.text
 
 
+async def test_in1_greenhouse_finds_the_posting_in_the_board_list() -> None:
+    """IN-1: a job-boards link whose job endpoint misses (or has no description) is found in
+    the board's list by its posting id or internal job id, with the full description."""
+    body = html.escape(
+        "<p>Sourcegraph builds code search.</p><h3>What you'll do</h3><ul><li>Own the "
+        "search backend</li><li>Ship weekly</li></ul>" * 3
+    )
+    fetcher = make_fetcher(
+        {
+            "boards-api.greenhouse.io/v1/boards/sourcegraph91/jobs/6132206004": httpx.Response(
+                200, json={"title": "Software Engineer", "content": ""}
+            ),
+            "boards-api.greenhouse.io/v1/boards/sourcegraph91/jobs": httpx.Response(
+                200,
+                json={
+                    "jobs": [
+                        {"id": 1, "internal_job_id": 2, "title": "Other", "content": "x"},
+                        {
+                            "id": 7000,
+                            "internal_job_id": 6132206004,
+                            "title": "Software Engineer",
+                            "company_name": "Sourcegraph",
+                            "content": body,
+                        },
+                    ]
+                },
+            ),
+        }
+    )
+    result = await fetcher.fetch(
+        "https://job-boards.greenhouse.io/sourcegraph91/jobs/6132206004?gh_src=abc"
+    )
+    assert result.board == "greenhouse"
+    assert result.text is not None
+    assert "Company: Sourcegraph" in result.text
+    assert "- Own the search backend" in result.text
+
+
 async def test_in1_lever_uses_board_api() -> None:
     fetcher = make_fetcher(
         {

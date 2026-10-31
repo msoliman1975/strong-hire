@@ -20,7 +20,7 @@ export function issueLine(issue: Issue): string {
   return `${detail}${/[.!?]$/.test(detail) ? "" : "."} ${advice}`;
 }
 
-export function IssueList({ resumeId, issues, compactActions = false }: { resumeId: string; issues: Issue[]; compactActions?: boolean }) {
+export function IssueList({ resumeId, issues }: { resumeId: string; issues: Issue[] }) {
   const queryClient = useQueryClient();
   const accept = useMutation({
     mutationFn: (key: string) => resumesApi.setAcceptedIssue(resumeId, key, true),
@@ -37,14 +37,10 @@ export function IssueList({ resumeId, issues, compactActions = false }: { resume
             <br />
             <span className={`sx-small${strong ? "" : " sx-muted"}`}>{issueLine(issue)}</span>
             <div className="sx-row sx-small" style={{ marginTop: 6 }}>
-              <Link
-                className={compactActions ? "sx-btn quiet sm" : `sx-btn sm${i === 0 && strong ? "" : " ghost"}`}
-                style={compactActions ? { padding: 0 } : undefined}
-                to={resumeCheckPath(resumeId)}
-              >
+              <Link className={`sx-btn sm${i === 0 && strong ? "" : " ghost"}`} to={resumeCheckPath(resumeId)}>
                 {issue.fixLabel}
               </Link>
-              <button type="button" className="sx-btn quiet sm" onClick={() => accept.mutate(issue.key)} disabled={accept.isPending}>
+              <button type="button" className="sx-btn ghost sm" onClick={() => accept.mutate(issue.key)} disabled={accept.isPending}>
                 {issue.acceptLabel}
               </button>
             </div>

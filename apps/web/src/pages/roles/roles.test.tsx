@@ -138,6 +138,19 @@ describe("target roles", () => {
     const look = screen.getByRole("region", { name: "What they'll look for" });
     expect(within(look).getByRole("link", { name: "See the full gap report" })).toHaveAttribute("href", `/jobs/${job.id}/gap-report`);
   });
+
+  it("TG-4: the role page shows the job posting Strova read, closed, with its responsibilities and skills", async () => {
+    const { job } = await roleWithInterviews("behavioral");
+    const user = userEvent.setup();
+    renderApp(`/roles/${job.id}`);
+    const card = await screen.findByRole("group", { name: "The job posting" });
+    expect(card).not.toHaveAttribute("open");
+    expect(card).toHaveTextContent(/\d+ responsibilit(y|ies) · \d+ must-have skills/);
+    await user.click(within(card).getByRole("heading", { name: "The job posting" }));
+    expect(card).toHaveAttribute("open");
+    expect(within(card).getByRole("heading", { name: "What you'll do" })).toBeInTheDocument();
+    expect(within(card).getAllByRole("listitem").length).toBeGreaterThan(0);
+  });
 });
 
 describe("rehearsals", () => {
