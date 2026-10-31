@@ -22,6 +22,7 @@ from strong_core.schemas import (
     InterviewerBrief,
     InterviewType,
     Scorecard,
+    ScorerOutput,
     SessionConfig,
     Turn,
     ValueScore,
@@ -300,6 +301,33 @@ def test_fb2_scorecard_value_scores() -> None:
         ValueScore.model_validate(score | {"quotes": []})
     with pytest.raises(ValidationError):
         ValueScore.model_validate(score | {"score": 5})
+
+
+def test_fb1_fb2_scorer_output_requires_per_question_scores() -> None:
+    """FB-1, FB-2: the scorer model must return per-question scores, at least one entry, each
+    with at least one competency score. Schema-constrained models drop optional fields."""
+    ok = ScorerOutput.model_validate(_scorecard())
+    assert ok.per_question and all(q.scores for q in ok.per_question)
+    with pytest.raises(ValidationError, match="per_question"):
+        ScorerOutput.model_validate(_scorecard() | {"per_question": []})
+    missing = {k: v for k, v in _scorecard().items() if k != "per_question"}
+    with pytest.raises(ValidationError, match="per_question"):
+        ScorerOutput.model_validate(missing)
+    no_scores = _scorecard()
+    no_scores["per_question"] = [no_scores["per_question"][0] | {"scores": []}]
+    with pytest.raises(ValidationError, match="scores"):
+        ScorerOutput.model_validate(no_scores)
+    schema = ScorerOutput.model_json_schema()
+    assert "per_question" in schema["required"]
+    assert schema["properties"]["per_question"]["minItems"] == 1
+
+
+def test_fb1_fb2_stored_scorecards_without_per_question_still_load() -> None:
+    """FB-1, FB-2: Scorecard reads stored rows, and old rows can have no per-question scores."""
+    assert Scorecard.model_validate(_scorecard() | {"per_question": []}).per_question == []
+    missing = {k: v for k, v in _scorecard().items() if k != "per_question"}
+    assert Scorecard.model_validate(missing).per_question == []
+    assert "per_question" not in Scorecard.model_json_schema()["required"]
 
 
 def test_all_contracts_produce_json_schema() -> None:

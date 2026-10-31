@@ -18,10 +18,12 @@ from strong_api.inputs.queue import JobInfo
 from strong_api.main import create_app
 from strong_api.scoring import SCORE_SESSION
 from strong_api.scoring.progress import competency_trends, recommend_next_session
+from strong_api.scoring.router import scorecard_contract
 from strong_core.config import find_repo_root
 from strong_core.db.models import Company, InterviewSession, JobTarget, Org, User
 from strong_core.db.models import CompanyProfile as ProfileRow
 from strong_core.db.models import GapAnalysis as GapRow
+from strong_core.db.models import Scorecard as ScorecardRow
 from strong_core.db.models import Turn as TurnRow
 from strong_core.gateway import ModelGateway
 from strong_core.gateway.registry import fake_models_config
@@ -29,6 +31,7 @@ from strong_core.schemas import (
     AuthProvider,
     Competency,
     Difficulty,
+    HireSignal,
     InterviewType,
     Mode,
     PlannedSession,
@@ -500,3 +503,20 @@ def test_rs1_plan_never_recommends_recruiter_screen() -> None:
     nxt = recommend_next_session(weak, [], [])
     assert nxt is not None and nxt.interview_type == InterviewType.BEHAVIORAL
     assert recommend_next_session({C.LOGISTICS_AND_EXPECTATIONS: 2.0}, [], []) is None
+
+
+def test_fb1_fb2_old_scorecard_rows_without_per_question_still_load() -> None:
+    """FB-1, FB-2: rows stored before per-question scores were required read back unchanged."""
+    score = {"competency": "ownership", "score": 3, "justification": "x", "quotes": ["y"]}
+    row = ScorecardRow(
+        hire_signal=HireSignal.LEAN_HIRE,
+        rationale="Owned the work. Gave numbers. Thin on trade-offs.",
+        competency_scores_json=[score],
+        value_scores_json=None,
+        per_question_json=[],
+        scorer_model="fake-scorer",
+        rubric_version="scorer/rubric.v2",
+    )
+    card = scorecard_contract(row)
+    assert card.per_question == []
+    assert card.competency_scores[0].score == 3

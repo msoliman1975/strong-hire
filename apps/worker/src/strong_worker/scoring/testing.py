@@ -48,7 +48,7 @@ def scorecard_reply(
     hire_signal: str = "Strong Hire",
     quote: str | None = None,
 ) -> dict[str, Any]:
-    """A model reply (Scorecard JSON) that quotes the transcript correctly.
+    """A model reply (ScorerOutput JSON) that quotes the transcript correctly.
 
     `scores` is one score for everything, or competency/value name -> score. `quote` replaces
     every quote, to test bad quotes.

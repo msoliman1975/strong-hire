@@ -173,6 +173,7 @@ async def score_session(ctx: dict[str, Any], session_id: str, org_id: str) -> di
         "snapshots": snapshots,
         "dropped_quotes": len(outcome.dropped_quotes),
         "dropped_scores": len(outcome.dropped_scores),
+        "missing_questions": len(outcome.missing_questions),
         "reasked": outcome.reasked,
         "rationale_source": outcome.rationale_source,
         "model_calls": outcome.model_calls,
