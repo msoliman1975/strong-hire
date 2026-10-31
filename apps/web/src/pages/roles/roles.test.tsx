@@ -121,6 +121,32 @@ describe("target roles", () => {
     expect(kept).toEqual(["behavioral", "technical_qa"]);
   });
 
+  it("RF-10: the job category on the check step drives the suggested interviews and is saved", async () => {
+    const form = new FormData();
+    form.append("text", "Strategy consultant, market entry and profitability cases.");
+    await resumesApi.upload(form);
+    const user = renderApp("/roles/new");
+    await user.click(await screen.findByRole("button", { name: "paste the text" }));
+    await user.click(screen.getByRole("textbox", { name: "Job posting text" }));
+    await user.paste("Senior engineer, payments. ".repeat(10));
+    await user.click(screen.getByRole("button", { name: "Read the posting" }));
+    const category = await screen.findByRole("combobox", { name: "Job category" }, { timeout: 4000 });
+    expect(within(category).getAllByRole("option")).toHaveLength(12);
+    await user.selectOptions(category, "Consulting and strategy");
+    await user.click(screen.getByRole("button", { name: "Looks right" }));
+    // Network steps get the same headroom as "Read the posting" above, for slow CI runners.
+    await waitFor(() => expect(screen.getByRole("checkbox", { name: /Case/ })).toBeChecked(), { timeout: 4000 });
+    expect(screen.getAllByRole("checkbox")[0]).toHaveAccessibleName(/Case/);
+    expect(screen.getByRole("checkbox", { name: /Verbal technical/ })).not.toBeChecked();
+    await user.click(screen.getByRole("button", { name: "Create the role" }));
+    await waitFor(() => expect(screen.getByTestId("where").textContent).toMatch(/^\/roles\/[^/]+$/), {
+      timeout: 4000,
+    });
+    const jobId = (screen.getByTestId("where").textContent ?? "").split("/")[2];
+    const saved = await jobTargetsApi.get(jobId);
+    expect(saved.posting?.role_family).toBe("consulting_strategy");
+  });
+
   it("TG-4, PP-2: the role page has its interviews, what they'll look for, stories and the context card", async () => {
     const { job, interviews } = await roleWithInterviews("behavioral", "technical_qa");
     mockStore.db.interviewDates = { [job.id]: new Date(Date.now() + 6 * 86_400_000).toISOString().slice(0, 10) };
