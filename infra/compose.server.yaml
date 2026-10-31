@@ -10,6 +10,8 @@ services:
     build:
       context: ..
       dockerfile: infra/docker/caddy.Dockerfile
+      args:
+        GIT_SHA: ${GIT_SHA:-unknown}   # set by scripts/server-deploy.sh; served at /version.txt
     profiles: [core, all-in-one]
     environment:
       DOMAIN: ${DOMAIN:?set DOMAIN in .env}

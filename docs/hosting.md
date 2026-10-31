@@ -121,6 +121,12 @@ From PowerShell on the owner's PC (uses the deploy key below):
 ./scripts/dev.ps1 deploy
 ```
 
+The deploy always builds `origin/main`, whatever branch the server checkout was on, and stops if
+the checkout has local changes. It stamps the web build with the commit and ends by checking
+`https://app.getstronghire.com/version.txt`: "Live: … serves <commit>" means the new build is
+being served; anything else exits with an error. To see what is live at any time, open
+`/version.txt` in the browser and compare it with the latest commit on `main`.
+
 ### Shell from the owner's PC
 
 The Hetzner web console turns a typed `_` into `-`. For a normal root shell, the admin key
