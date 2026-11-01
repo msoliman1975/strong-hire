@@ -11,7 +11,7 @@ import type { InterviewWithReadiness, JobPosting } from "../../api/types";
 import { Strova } from "../../components/strova";
 import { ErrorNotice, Loading } from "../../components/ui";
 import "../../components/ux/ux.css";
-import { competencyLabel } from "../../labels";
+import { betaRoleFamilies, competencyLabel, roleFamilyLabel } from "../../labels";
 import { newCoachPath } from "../coach/paths";
 import { usePlan } from "../plan/api";
 import { storyPath, useStoryFit } from "../plan/StoryFitTable";
@@ -150,6 +150,14 @@ export function RolePage() {
         </h1>
         <div className="sx-row sx-small sx-muted">
           <span className={`sx-chip${chip.teal ? " t" : ""}`}>{chip.text}</span>
+          {posting && betaRoleFamilies.has(posting.role_family) && (
+            <span
+              className="sx-chip v"
+              title="Practice for this job category is new. Its questions and scoring are still being calibrated."
+            >
+              Beta: {roleFamilyLabel[posting.role_family]}
+            </span>
+          )}
           {match !== null && match !== undefined && (
             <span className="sx-mono" style={{ color: "var(--sh-ink)" }}>
               Match {match}
