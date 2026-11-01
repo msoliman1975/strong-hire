@@ -3814,7 +3814,7 @@
           "target roles and interviews"
         ],
         "summary": "Suggested Interviews",
-        "description": "TG-3: the company's usual rounds for this role (standard loop in generic mode).",
+        "description": "TG-3: the company's usual rounds for this role (the family's generic loop in generic\nmode). `role_family` previews the family the user picked on the check step before the role\nis saved (RF-10); nothing is stored.",
         "operationId": "suggested_interviews_roles__job_target_id__suggested_interviews_get",
         "parameters": [
           {
@@ -3825,6 +3825,22 @@
               "type": "string",
               "format": "uuid",
               "title": "Job Target Id"
+            }
+          },
+          {
+            "name": "role_family",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/RoleFamily"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Role Family"
             }
           }
         ],

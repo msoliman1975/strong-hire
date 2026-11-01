@@ -124,7 +124,7 @@ function ReportBody({ analysis, generic, plan }: { analysis: GapAnalysis; generi
           <p className="muted">How well your resume shows what this job asks for.</p>
           {generic && (
             <p className="muted small">
-              This company has no curated profile yet, so the analysis uses a general tech interview style.
+              This company has no curated profile yet, so the analysis uses a typical bar for this kind of role.
             </p>
           )}
           <details>

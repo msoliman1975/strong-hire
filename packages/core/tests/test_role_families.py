@@ -110,3 +110,22 @@ def test_rf5_brief_carries_the_role_family_and_old_briefs_read_as_other() -> Non
     field = InterviewerBrief.model_fields["role_family"]
     assert field.default == RoleFamily.OTHER
     assert not field.is_required()
+
+
+def test_rf10_site_waitlist_roles_match_the_registry() -> None:
+    """RF-10: the marketing site's waitlist form lists every family with the registry's labels,
+    in the registry's order."""
+    text = (find_repo_root() / "apps/site/src/components/WaitlistForm.astro").read_text("utf-8")
+    block = re.search(r"const ROLES = \[(.*?)\n\] as const;", text, re.S)
+    assert block is not None
+    roles = re.findall(r'\["(\w+)", "([^"]*)"\]', block.group(1))
+    assert roles == [(f.value, i.label) for f, i in ROLE_FAMILIES.items()]
+
+
+def test_rf10_site_guides_name_every_family_but_other() -> None:
+    """RF-10: a guide page exists only for a family with a noun label; other has no guides."""
+    text = (find_repo_root() / "apps/site/src/data/guides.ts").read_text("utf-8")
+    block = re.search(r"ROLE_LABELS: Record<string, string> = \{(.*?)\n\};", text, re.S)
+    assert block is not None
+    names = set(re.findall(r"^\s*(\w+): \"", block.group(1), re.M))
+    assert names == {f.value for f in RoleFamily} - {"other"}

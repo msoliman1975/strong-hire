@@ -12,10 +12,16 @@ export const GUIDES_PUBLISHED: string[] = [];
 
 export const ROLE_LABELS: Record<string, string> = {
   swe: "software engineer",
-  data_ml: "data and ML",
+  infra_security: "infrastructure and security engineer",
+  data_ml: "data science and ML",
+  data_analytics: "data analyst",
   pm: "product manager",
   design: "designer",
   tpm: "technical program manager",
+  eng_management: "engineering manager",
+  finance: "finance",
+  consulting_strategy: "consulting and strategy",
+  project_program: "project and program manager",
 };
 
 const TYPE_LABELS: Record<string, string> = {
