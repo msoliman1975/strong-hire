@@ -129,3 +129,63 @@ def test_rf10_site_guides_name_every_family_but_other() -> None:
     assert block is not None
     names = set(re.findall(r"^\s*(\w+): \"", block.group(1), re.M))
     assert names == {f.value for f in RoleFamily} - {"other"}
+
+
+def test_rf12_question_bank_covers_every_wave_1_family() -> None:
+    """RF-12: at least 15 general questions per wave 1 family, at least 3 for each standard type
+    (consulting may skip technical Q&A and has at least 6 cases)."""
+    from collections import Counter
+
+    from strong_core.schemas import GeneralQuestionBank
+
+    path = find_repo_root() / "questions" / "general.json"
+    bank = GeneralQuestionBank.model_validate_json(path.read_text(encoding="utf-8"))
+    wave_1 = {
+        RoleFamily.INFRA_SECURITY,
+        RoleFamily.DATA_ANALYTICS,
+        RoleFamily.ENG_MANAGEMENT,
+        RoleFamily.FINANCE,
+        RoleFamily.CONSULTING_STRATEGY,
+        RoleFamily.PROJECT_PROGRAM,
+    }
+    for family in wave_1:
+        own = [q for q in bank.questions if family in q.role_families]
+        by_type = Counter(q.interview_type for q in own)
+        assert len(own) >= 15, (family, len(own))
+        if family == RoleFamily.CONSULTING_STRATEGY:
+            assert by_type[InterviewType.CASE] >= 6
+            needed = (InterviewType.BEHAVIORAL, InterviewType.HIRING_MANAGER)
+        else:
+            needed = (
+                InterviewType.BEHAVIORAL,
+                InterviewType.HIRING_MANAGER,
+                InterviewType.TECHNICAL_QA,
+                InterviewType.CASE,
+            )
+        for kind in needed:
+            assert by_type[kind] >= 3, (family, kind, by_type)
+
+
+def test_rf14_beta_families_are_the_wave_1_families_without_5_gold_transcripts() -> None:
+    """RF-14: a wave 1 family is labeled Beta until evals/transcripts has 5 of its transcripts."""
+    import json
+    from collections import Counter
+
+    root = find_repo_root()
+    counts = Counter(
+        json.loads(p.read_text(encoding="utf-8")).get("role_family")
+        for p in (root / "evals" / "transcripts").glob("*.json")
+    )
+    wave_1 = {
+        "infra_security",
+        "data_analytics",
+        "eng_management",
+        "finance",
+        "consulting_strategy",
+        "project_program",
+    }
+    expected = {f for f in wave_1 if counts[f] < 5}
+    text = (root / "apps/web/src/labels.ts").read_text(encoding="utf-8")
+    block = re.search(r"betaRoleFamilies[^=]*= new Set<RoleFamily>\(\[(.*?)\]\);", text, re.S)
+    assert block is not None
+    assert set(re.findall(r'"(\w+)"', block.group(1))) == expected

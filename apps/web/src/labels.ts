@@ -83,6 +83,19 @@ export const roleFamilyLabel: Record<RoleFamily, string> = {
   other: "Other",
 };
 
+/**
+ * RF-14: wave 1 families with fewer than 5 gold transcripts in evals/transcripts. The target role
+ * page labels them Beta. A test (packages/core/tests/test_role_families.py) keeps this in step.
+ */
+export const betaRoleFamilies: ReadonlySet<RoleFamily> = new Set<RoleFamily>([
+  "infra_security",
+  "data_analytics",
+  "eng_management",
+  "finance",
+  "consulting_strategy",
+  "project_program",
+]);
+
 export const severityLabel: Record<Severity, string> = { low: "Low", medium: "Medium", high: "High" };
 
 export const phaseLabel: Record<Phase, string> = {

@@ -4,7 +4,7 @@
  * chip), PP-4 (the take settings) and RD-3 (readiness is a practice estimate).
  */
 import { QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -146,6 +146,20 @@ describe("target roles", () => {
     const jobId = (screen.getByTestId("where").textContent ?? "").split("/")[2];
     const saved = await jobTargetsApi.get(jobId);
     expect(saved.posting?.role_family).toBe("consulting_strategy");
+  });
+
+  it("RF-14: a role in a new job category is labeled Beta; an established one is not", async () => {
+    const { job } = await roleWithInterviews("behavioral");
+    const stored = mockStore.db.jobs.find((j) => j.id === job.id);
+    expect(stored?.posting).toBeTruthy();
+    renderApp(`/roles/${job.id}`);
+    await screen.findByRole("heading", { level: 1 });
+    expect(screen.queryByText(/^Beta:/)).not.toBeInTheDocument();
+    cleanup();
+
+    if (stored?.posting) stored.posting = { ...stored.posting, role_family: "finance" };
+    renderApp(`/roles/${job.id}`);
+    expect(await screen.findByText("Beta: Finance")).toHaveAttribute("title", expect.stringMatching(/calibrated/));
   });
 
   it("TG-4, PP-2: the role page has its interviews, what they'll look for, stories and the context card", async () => {
