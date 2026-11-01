@@ -1,0 +1,25 @@
+{
+  "company_name": "Arcadia Media",
+  "title": "Senior Manager, Corporate Development",
+  "role_family": "consulting_strategy",
+  "level": "senior",
+  "level_label": "Senior Manager",
+  "team": "Corporate Development",
+  "location": "Los Angeles, CA",
+  "must_have_skills": [
+    "6+ years in investment banking, consulting or corporate development",
+    "Valuation and deal modeling",
+    "Experience leading deals"
+  ],
+  "nice_to_have_skills": [
+    "Media industry experience",
+    "MBA"
+  ],
+  "responsibilities": [
+    "Source and evaluate acquisition targets",
+    "Build valuation models and investment cases",
+    "Lead due diligence with legal and finance",
+    "Plan the integration of acquired companies"
+  ],
+  "source_url": null
+}

@@ -1,0 +1,24 @@
+{
+  "company_name": "Quarry Logistics",
+  "title": "Staff Software Engineer, Tech Lead",
+  "role_family": "swe",
+  "level": "senior",
+  "level_label": "Staff",
+  "team": null,
+  "location": "Remote (US)",
+  "must_have_skills": [
+    "8+ years building backend systems",
+    "Go or Java",
+    "Distributed systems design"
+  ],
+  "nice_to_have_skills": [
+    "Routing or optimization algorithms"
+  ],
+  "responsibilities": [
+    "Lead the design of our routing engine",
+    "Write and review code every day",
+    "Mentor engineers on the team",
+    "Work with product on technical plans"
+  ],
+  "source_url": null
+}

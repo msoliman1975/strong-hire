@@ -1,0 +1,24 @@
+{
+  "company_name": "Saffron Foods",
+  "title": "Software Engineering Manager",
+  "role_family": "eng_management",
+  "level": "mid",
+  "level_label": null,
+  "team": "Mobile",
+  "location": "Austin, TX",
+  "must_have_skills": [
+    "1+ years managing engineers or leading a team with reports",
+    "Mobile development background",
+    "Experience with agile delivery"
+  ],
+  "nice_to_have_skills": [
+    "React Native"
+  ],
+  "responsibilities": [
+    "Build and lead the new mobile team",
+    "Hire 3 engineers this year",
+    "Run one-on-ones and performance reviews",
+    "Ship the new iOS and Android apps with product"
+  ],
+  "source_url": null
+}

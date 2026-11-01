@@ -1,0 +1,19 @@
+Software Engineering Manager
+Saffron Foods
+Austin, TX
+
+Saffron Foods delivers meal kits across Texas. We are hiring a manager for our new mobile team of 5.
+
+What you will do:
+- Build and lead the new mobile team
+- Hire 3 engineers this year
+- Run one-on-ones and performance reviews
+- Ship the new iOS and Android apps with product
+
+What you need:
+- 1+ years managing engineers or leading a team with reports
+- Mobile development background
+- Experience with agile delivery
+
+Nice to have:
+- React Native

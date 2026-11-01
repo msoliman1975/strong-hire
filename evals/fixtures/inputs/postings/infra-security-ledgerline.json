@@ -1,0 +1,26 @@
+{
+  "company_name": "Ledgerline",
+  "title": "Security Engineer, Cloud",
+  "role_family": "infra_security",
+  "level": "mid",
+  "level_label": null,
+  "team": "Security",
+  "location": "Remote (Canada)",
+  "must_have_skills": [
+    "3+ years in security engineering",
+    "AWS security services and IAM",
+    "Threat modeling",
+    "Vulnerability management"
+  ],
+  "nice_to_have_skills": [
+    "SOC 2 audits",
+    "Security certifications such as OSCP or CISSP"
+  ],
+  "responsibilities": [
+    "Threat model new features with product teams",
+    "Run our vulnerability management program",
+    "Harden AWS accounts and IAM policies",
+    "Respond to security incidents"
+  ],
+  "source_url": null
+}

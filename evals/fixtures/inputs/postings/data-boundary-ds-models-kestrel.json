@@ -1,0 +1,26 @@
+{
+  "company_name": "Kestrel Travel",
+  "title": "Senior Data Scientist, Pricing Models",
+  "role_family": "data_ml",
+  "level": "senior",
+  "level_label": "Senior",
+  "team": "Pricing",
+  "location": "Remote (US)",
+  "must_have_skills": [
+    "5+ years building machine learning models in production",
+    "Python and scikit-learn or PyTorch",
+    "Time series forecasting",
+    "Experiment design"
+  ],
+  "nice_to_have_skills": [
+    "Travel or marketplace pricing",
+    "Spark"
+  ],
+  "responsibilities": [
+    "Build and ship demand forecasting and pricing models",
+    "Design features and training data pipelines",
+    "Evaluate models offline and in production experiments",
+    "Monitor models for drift and retrain them"
+  ],
+  "source_url": null
+}

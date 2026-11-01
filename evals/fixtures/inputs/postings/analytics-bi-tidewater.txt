@@ -1,0 +1,21 @@
+Business Intelligence Analyst
+Tidewater Outfitters
+Portland, OR
+
+Tidewater sells outdoor gear online and in 60 stores. The BI team gives every team the numbers it needs.
+
+What you will do:
+- Build and maintain dashboards in Tableau
+- Write SQL to answer questions from merchandising and marketing
+- Define and document core business metrics
+- Find data quality issues and work with engineering to fix them
+
+What you need:
+- 3+ years in BI or analytics
+- Advanced SQL
+- Tableau or Power BI
+- Clear communication with non-technical teams
+
+Nice to have:
+- Retail or e-commerce experience
+- dbt

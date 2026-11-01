@@ -1,0 +1,28 @@
+{
+  "company_name": "Cobalt Freight",
+  "title": "Senior Site Reliability Engineer",
+  "role_family": "infra_security",
+  "level": "senior",
+  "level_label": "Senior",
+  "team": "Reliability",
+  "location": "Chicago, IL (hybrid)",
+  "must_have_skills": [
+    "5+ years in SRE or production operations",
+    "Kubernetes in production",
+    "Linux and networking fundamentals",
+    "Incident management",
+    "Scripting in Python or Go"
+  ],
+  "nice_to_have_skills": [
+    "Terraform",
+    "Prometheus and Grafana",
+    "On-call leadership"
+  ],
+  "responsibilities": [
+    "Own SLOs and error budgets for the booking platform",
+    "Lead incident response and write postmortems",
+    "Automate capacity planning for our Kubernetes clusters",
+    "Improve observability with metrics, logs and traces"
+  ],
+  "source_url": null
+}

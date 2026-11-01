@@ -1,0 +1,24 @@
+{
+  "company_name": "Juniper Learning",
+  "title": "Software Engineer, Platform",
+  "role_family": "swe",
+  "level": "mid",
+  "level_label": null,
+  "team": "Platform",
+  "location": "Remote (US)",
+  "must_have_skills": [
+    "3+ years writing production code",
+    "TypeScript or Python",
+    "API design"
+  ],
+  "nice_to_have_skills": [
+    "GraphQL"
+  ],
+  "responsibilities": [
+    "Build shared APIs for authentication and billing",
+    "Write libraries other teams use",
+    "Improve developer tooling",
+    "Review code and write design docs"
+  ],
+  "source_url": null
+}

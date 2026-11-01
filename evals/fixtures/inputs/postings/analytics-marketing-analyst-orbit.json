@@ -1,0 +1,26 @@
+{
+  "company_name": "Orbit Telecom",
+  "title": "Marketing Analyst",
+  "role_family": "data_analytics",
+  "level": "new_grad",
+  "level_label": null,
+  "team": null,
+  "location": "Atlanta, GA",
+  "must_have_skills": [
+    "Bachelor's degree in a quantitative field",
+    "SQL",
+    "Excel",
+    "Attention to detail"
+  ],
+  "nice_to_have_skills": [
+    "Google Analytics",
+    "Looker"
+  ],
+  "responsibilities": [
+    "Report weekly on campaign performance",
+    "Build attribution reports",
+    "Size audiences for new campaigns",
+    "Present findings to the marketing team"
+  ],
+  "source_url": null
+}

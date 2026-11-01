@@ -1,0 +1,24 @@
+{
+  "company_name": "Bluefin Bank",
+  "title": "Scrum Master",
+  "role_family": "project_program",
+  "level": "mid",
+  "level_label": null,
+  "team": null,
+  "location": "Charlotte, NC",
+  "must_have_skills": [
+    "3+ years as a Scrum Master",
+    "Scrum or SAFe certification",
+    "Jira"
+  ],
+  "nice_to_have_skills": [
+    "Banking experience"
+  ],
+  "responsibilities": [
+    "Run sprint planning, reviews and retrospectives",
+    "Remove blockers for the teams",
+    "Coach teams on agile practices",
+    "Track delivery metrics"
+  ],
+  "source_url": null
+}

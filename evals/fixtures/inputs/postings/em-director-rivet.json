@@ -1,0 +1,24 @@
+{
+  "company_name": "Rivet Robotics",
+  "title": "Director of Engineering",
+  "role_family": "eng_management",
+  "level": "staff_principal",
+  "level_label": "Director",
+  "team": null,
+  "location": "Boston, MA",
+  "must_have_skills": [
+    "10+ years in software, 5+ in engineering leadership",
+    "Experience leading an organization of 40 or more",
+    "Robotics or embedded systems background"
+  ],
+  "nice_to_have_skills": [
+    "Experience in a scale-up"
+  ],
+  "responsibilities": [
+    "Lead the software engineering organization",
+    "Hire and develop engineering managers",
+    "Set engineering standards and the technical roadmap",
+    "Report to the CTO on delivery and quality"
+  ],
+  "source_url": null
+}
