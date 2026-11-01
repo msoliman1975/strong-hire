@@ -24,6 +24,11 @@ arrive as two user messages when the candidate pauses; their metrics are merged.
 Report:
 
     uv run python -m strong_voice.latency report var/latency/local.csv var/latency/hosted.csv
+
+A/B run (for example the story radar, SR-1): one column per file.
+
+    uv run python -m strong_voice.latency report --by-file var/latency/hosted.csv \
+        var/latency/hosted-radar.csv
 """
 
 from __future__ import annotations
@@ -236,6 +241,11 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="cmd", required=True)
     rep = sub.add_parser("report", help="p50 and p95 per profile from latency CSV files")
     rep.add_argument("csv", nargs="+", type=Path)
+    rep.add_argument(
+        "--by-file",
+        action="store_true",
+        help="one column per CSV (its file name) instead of per profile, for A/B runs",
+    )
     args = parser.parse_args(argv)
 
     by_profile: dict[str, list[TurnLatency]] = {}
@@ -244,7 +254,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"missing: {path}")
             continue
         for row in read_rows(path):
-            by_profile.setdefault(row.profile, []).append(row)
+            key = path.stem if args.by_file else row.profile
+            by_profile.setdefault(key, []).append(row)
     if not by_profile:
         print("no latency rows found")
         return 1

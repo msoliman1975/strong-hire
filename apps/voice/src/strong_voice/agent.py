@@ -24,6 +24,7 @@ from strong_voice.coach_agent import coach_entrypoint
 from strong_voice.interview_agent import run_session
 from strong_voice.latency import WARMUP_ROOM_PREFIX, LatencyRecorder
 from strong_voice.plugins import GatewayLLM, GatewaySTT, GatewayTTS
+from strong_voice.radar import PROBE_STORIES, attach_radar, gateway_complete, get_radar_settings
 from strong_voice.session_store import session_id_from_room, session_org
 from strong_voice.settings import get_voice_settings
 
@@ -141,4 +142,11 @@ async def spike_entrypoint(ctx: JobContext) -> None:
             log.info("latency for room %s\n%s", ctx.room.name, recorder.summary())
 
     ctx.add_shutdown_callback(_report)
+    if get_radar_settings().probe:  # SR-1: what the story radar costs the voice loop
+
+        async def _publish(payload: bytes) -> None:
+            await ctx.room.local_participant.publish_data(payload, reliable=True, topic="session")
+
+        radar = attach_radar(session, PROBE_STORIES, gateway_complete(gateway), _publish)
+        ctx.add_shutdown_callback(radar.close)
     await session.start(agent=SpikeInterviewer(), room=ctx.room)
