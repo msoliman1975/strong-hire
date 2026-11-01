@@ -1,0 +1,26 @@
+{
+  "company_name": "Quill Learning",
+  "title": "Senior Product Analyst",
+  "role_family": "data_analytics",
+  "level": "senior",
+  "level_label": "Senior",
+  "team": null,
+  "location": "Remote (US)",
+  "must_have_skills": [
+    "5+ years in product analytics",
+    "SQL",
+    "Experiment design and statistics",
+    "Python or R"
+  ],
+  "nice_to_have_skills": [
+    "Amplitude or Mixpanel",
+    "EdTech experience"
+  ],
+  "responsibilities": [
+    "Own the metrics for the student experience squad",
+    "Design A/B tests and read the results",
+    "Diagnose changes in engagement and retention",
+    "Share recommendations with product leaders"
+  ],
+  "source_url": null
+}

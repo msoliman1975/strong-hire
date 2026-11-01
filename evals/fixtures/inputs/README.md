@@ -3,8 +3,13 @@
 Fixtures for the job posting (IN-2) and resume (IN-3) extractor.
 
 - `postings/<name>.txt` is a real-style job posting. `postings/<name>.json` is the expected
-  `JobPosting`. There are 10 postings, 2 per role family (swe, data_ml, pm, design, tpm).
-  Five are for curated companies and five are for companies that run in generic mode.
+  `JobPosting`. There are 36 postings: at least 2 per original role family (swe, data_ml, pm,
+  design, tpm) and at least 4 per wave 1 family (infra_security, data_analytics, eng_management,
+  finance, consulting_strategy, project_program; RF-4 in `docs/role-families-spec.md`). Boundary
+  cases test the splits: an SRE and a security engineer are infra_security while a platform
+  software engineer stays swe; a product analytics "data scientist" doing SQL, A/B tests and
+  dashboards is data_analytics; a tech lead with no reports is swe while a manager with reports is
+  eng_management; a program manager without engineering depth is project_program, not tpm.
 - `resumes/<name>.txt` is a synthetic resume. `resumes/<name>.json` is the expected `Resume`.
   The people, employers and schools are made up. Contact details use example.com.
 - `resumes/<name>.pdf` and `resumes/<name>.docx` are synthetic CV files with layouts that a

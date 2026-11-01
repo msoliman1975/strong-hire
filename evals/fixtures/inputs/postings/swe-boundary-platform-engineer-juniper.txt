@@ -1,0 +1,19 @@
+Software Engineer, Platform
+Juniper Learning
+Remote (US)
+
+Juniper Learning builds a course platform. The platform team writes the shared services other teams use.
+
+What you will do:
+- Build shared APIs for authentication and billing
+- Write libraries other teams use
+- Improve developer tooling
+- Review code and write design docs
+
+What you need:
+- 3+ years writing production code
+- TypeScript or Python
+- API design
+
+Nice to have:
+- GraphQL

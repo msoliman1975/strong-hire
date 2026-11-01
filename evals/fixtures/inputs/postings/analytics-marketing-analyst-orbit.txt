@@ -1,0 +1,21 @@
+Marketing Analyst
+Orbit Telecom
+Atlanta, GA
+
+Orbit Telecom provides internet service in 12 states. Our marketing team runs campaigns that reach 2 million homes.
+
+What you will do:
+- Report weekly on campaign performance
+- Build attribution reports
+- Size audiences for new campaigns
+- Present findings to the marketing team
+
+What you need:
+- Bachelor's degree in a quantitative field
+- SQL
+- Excel
+- Attention to detail
+
+Nice to have:
+- Google Analytics
+- Looker

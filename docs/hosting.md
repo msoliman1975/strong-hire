@@ -186,3 +186,25 @@ docker exec -it "$(docker ps -qf name=worker)" python -m strong_worker.inputs.re
 Other options: `--org <id>` and `--resume <id>` limit the run to one org or one CV. The command
 prints the number of CVs per outcome: `updated`, `unchanged`, `skipped_confirmed`,
 `unreadable`, `extraction_failed`, `error`.
+
+## Move stored jobs into the new role families
+
+After the role families release (`docs/role-families-spec.md`, RF-11), jobs saved before it keep
+their old family: a finance or consulting job is `other`, an SRE job is `swe`, an analyst job is
+`data_ml`. The command `strong_worker.inputs.reclassify` moves each saved job whose title clearly
+names a new family into it. It makes no model calls and costs nothing.
+
+- Without `--apply` it is a dry run: it prints what it would move and writes nothing.
+- It moves a job only when the new family's title words are more specific than the old family's.
+  "Site Reliability Engineer" moves to `infra_security`; "Software Engineer, Platform" stays `swe`.
+- Each move rewrites the job's family and adds an `audit_logs` row with the action
+  `job_target.reclassify`. Running it twice changes nothing the second time.
+- Waitlist entries are not touched; people chose their own field there.
+
+Run it once, in the worker container, after the deploy:
+
+```bash
+cd /opt/stronghire/strong-hire
+docker exec -it "$(docker ps -qf name=worker)" python -m strong_worker.inputs.reclassify --verbose
+docker exec -it "$(docker ps -qf name=worker)" python -m strong_worker.inputs.reclassify --apply
+```

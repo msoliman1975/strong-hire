@@ -1,0 +1,26 @@
+{
+  "company_name": "Crestline Software",
+  "title": "Senior Financial Analyst, FP&A",
+  "role_family": "finance",
+  "level": "mid",
+  "level_label": "Senior Financial Analyst",
+  "team": "FP&A",
+  "location": "San Francisco, CA",
+  "must_have_skills": [
+    "3+ years in FP&A or corporate finance",
+    "Financial modeling in Excel",
+    "SaaS metrics",
+    "Clear presentation skills"
+  ],
+  "nice_to_have_skills": [
+    "CPA or CFA progress",
+    "Adaptive or Anaplan"
+  ],
+  "responsibilities": [
+    "Build the annual budget and quarterly forecasts",
+    "Run variance analysis against the plan",
+    "Model unit economics for new products",
+    "Present results to department leaders"
+  ],
+  "source_url": null
+}

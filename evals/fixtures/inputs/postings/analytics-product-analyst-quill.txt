@@ -1,0 +1,21 @@
+Senior Product Analyst
+Quill Learning
+Remote (US)
+
+Quill Learning makes a reading app used by 4 million students. Product analysts help each squad decide what to build.
+
+What you will do:
+- Own the metrics for the student experience squad
+- Design A/B tests and read the results
+- Diagnose changes in engagement and retention
+- Share recommendations with product leaders
+
+What you need:
+- 5+ years in product analytics
+- SQL
+- Experiment design and statistics
+- Python or R
+
+Nice to have:
+- Amplitude or Mixpanel
+- EdTech experience

@@ -1,0 +1,20 @@
+Senior Engineering Manager, Platform
+Nimbus Analytics
+Seattle, WA (hybrid)
+
+Nimbus Analytics builds a data platform for retailers. You will lead the managers of our platform teams.
+
+What you will do:
+- Lead three engineering managers and about 25 engineers
+- Set the technical strategy for the platform
+- Own the platform budget and headcount plan
+- Partner with product leaders on the annual plan
+
+What you need:
+- Experience managing managers
+- 8+ years in software engineering
+- Large-scale distributed systems
+- Budget and headcount planning
+
+Nice to have:
+- Data platform experience

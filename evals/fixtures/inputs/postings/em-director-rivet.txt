@@ -1,0 +1,19 @@
+Director of Engineering
+Rivet Robotics
+Boston, MA
+
+Rivet Robotics builds warehouse robots. The Director of Engineering leads all software teams, about 60 people.
+
+What you will do:
+- Lead the software engineering organization
+- Hire and develop engineering managers
+- Set engineering standards and the technical roadmap
+- Report to the CTO on delivery and quality
+
+What you need:
+- 10+ years in software, 5+ in engineering leadership
+- Experience leading an organization of 40 or more
+- Robotics or embedded systems background
+
+Nice to have:
+- Experience in a scale-up

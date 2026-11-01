@@ -1,0 +1,25 @@
+{
+  "company_name": "Birchwood Manufacturing",
+  "title": "Staff Accountant",
+  "role_family": "finance",
+  "level": "new_grad",
+  "level_label": null,
+  "team": null,
+  "location": "Milwaukee, WI",
+  "must_have_skills": [
+    "Bachelor's degree in accounting",
+    "Knowledge of GAAP",
+    "Excel"
+  ],
+  "nice_to_have_skills": [
+    "Progress toward a CPA",
+    "NetSuite"
+  ],
+  "responsibilities": [
+    "Prepare journal entries and reconciliations",
+    "Support the month-end close",
+    "Maintain fixed asset records",
+    "Help with the annual audit"
+  ],
+  "source_url": null
+}

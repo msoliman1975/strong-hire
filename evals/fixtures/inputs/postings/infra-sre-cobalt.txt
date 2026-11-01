@@ -1,0 +1,23 @@
+Senior Site Reliability Engineer
+Cobalt Freight
+Chicago, IL (hybrid)
+
+Cobalt Freight moves 40,000 shipments a day. The Reliability team keeps our booking and tracking services up.
+
+What you will do:
+- Own SLOs and error budgets for the booking platform
+- Lead incident response and write postmortems
+- Automate capacity planning for our Kubernetes clusters
+- Improve observability with metrics, logs and traces
+
+What you need:
+- 5+ years in SRE or production operations
+- Kubernetes in production
+- Linux and networking fundamentals
+- Incident management
+- Scripting in Python or Go
+
+Nice to have:
+- Terraform
+- Prometheus and Grafana
+- On-call leadership

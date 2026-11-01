@@ -1,0 +1,19 @@
+Staff Software Engineer, Tech Lead
+Quarry Logistics
+Remote (US)
+
+Quarry Logistics builds routing software for delivery fleets. This tech lead role has no direct reports.
+
+What you will do:
+- Lead the design of our routing engine
+- Write and review code every day
+- Mentor engineers on the team
+- Work with product on technical plans
+
+What you need:
+- 8+ years building backend systems
+- Go or Java
+- Distributed systems design
+
+Nice to have:
+- Routing or optimization algorithms

@@ -1,0 +1,242 @@
+name: text-role-families
+description: 'RF-15: one 10-minute text session per wave 1 role family, with that family''s fixture posting
+  and a matching CV. Checks extraction, the family guidance in the brief and the scorer end to end.'
+scenarios:
+- id: rf-infra-security
+  interview_type: technical_qa
+  duration_min: 10
+  level: senior
+  quality: average
+  job_text: |-
+    Senior Site Reliability Engineer
+    Cobalt Freight
+    Chicago, IL (hybrid)
+
+    Cobalt Freight moves 40,000 shipments a day. The Reliability team keeps our booking and tracking services up.
+
+    What you will do:
+    - Own SLOs and error budgets for the booking platform
+    - Lead incident response and write postmortems
+    - Automate capacity planning for our Kubernetes clusters
+    - Improve observability with metrics, logs and traces
+
+    What you need:
+    - 5+ years in SRE or production operations
+    - Kubernetes in production
+    - Linux and networking fundamentals
+    - Incident management
+    - Scripting in Python or Go
+
+    Nice to have:
+    - Terraform
+    - Prometheus and Grafana
+    - On-call leadership
+  cv_text: |-
+    Jordan Reyes
+    jordan.reyes@example.com
+
+    Senior Site Reliability Engineer, Lakeshore Payments (2020 to now)
+    - Owned SLOs for the card authorization service; cut monthly downtime from 90 to 12 minutes
+    - Led 30+ incident responses and wrote the postmortem template the company uses
+    - Moved 40 services to Kubernetes with Terraform
+
+    Systems Engineer, Prairie Hosting (2016 to 2020)
+    - Ran Linux fleets of 800 servers; automated patching with Ansible
+
+    Skills: Kubernetes, Terraform, Prometheus, Grafana, Linux, Python, Go
+- id: rf-data-analytics
+  interview_type: case
+  duration_min: 10
+  level: senior
+  quality: average
+  job_text: |-
+    Senior Product Analyst
+    Quill Learning
+    Remote (US)
+
+    Quill Learning makes a reading app used by 4 million students. Product analysts help each squad decide what to build.
+
+    What you will do:
+    - Own the metrics for the student experience squad
+    - Design A/B tests and read the results
+    - Diagnose changes in engagement and retention
+    - Share recommendations with product leaders
+
+    What you need:
+    - 5+ years in product analytics
+    - SQL
+    - Experiment design and statistics
+    - Python or R
+
+    Nice to have:
+    - Amplitude or Mixpanel
+    - EdTech experience
+  cv_text: |-
+    Priya Nair
+    priya.nair@example.com
+
+    Product Analyst, Lumen Kids Apps (2019 to now)
+    - Owned retention metrics for the parent app; found the onboarding step that lost 18% of new users
+    - Designed and read 40 A/B tests with product managers
+    - Built the weekly engagement dashboard in Looker
+
+    Data Analyst, Westfield Retail (2016 to 2019)
+    - Wrote SQL reports for merchandising; cut report time from 2 days to 2 hours
+
+    Skills: SQL, Python, Amplitude, Looker, experiment design
+- id: rf-eng-management
+  interview_type: behavioral
+  duration_min: 10
+  level: mid
+  quality: average
+  job_text: |-
+    Engineering Manager, Payments
+    HarborPay
+    New York, NY
+
+    HarborPay processes card payments for restaurants. The Payments team of 7 engineers owns authorization and settlement.
+
+    What you will do:
+    - Manage and grow a team of 7 engineers
+    - Run hiring for the team
+    - Plan the roadmap with product and design
+    - Keep delivery and on-call healthy
+
+    What you need:
+    - 2+ years managing software engineers
+    - Background as a backend engineer
+    - Experience hiring engineers
+    - Payments or fintech systems
+
+    Nice to have:
+    - Experience with PCI compliance
+  cv_text: |-
+    Sam Okafor
+    sam.okafor@example.com
+
+    Engineering Manager, Billing, Coastline SaaS (2022 to now)
+    - Manage 6 engineers; hired 4 of them
+    - Ran the move from monthly to usage-based billing with zero failed invoices
+    - Brought on-call pages down from 40 to 9 a month
+
+    Senior Backend Engineer, Coastline SaaS (2017 to 2022)
+    - Built the payments retry service in Go
+
+    Skills: people management, hiring, Go, PostgreSQL, payments
+- id: rf-finance
+  interview_type: technical_qa
+  duration_min: 10
+  level: mid
+  quality: average
+  job_text: |-
+    Senior Financial Analyst, FP&A
+    Crestline Software
+    San Francisco, CA
+
+    Crestline Software sells HR software to 5,000 companies. FP&A partners with every department on its budget.
+
+    What you will do:
+    - Build the annual budget and quarterly forecasts
+    - Run variance analysis against the plan
+    - Model unit economics for new products
+    - Present results to department leaders
+
+    What you need:
+    - 3+ years in FP&A or corporate finance
+    - Financial modeling in Excel
+    - SaaS metrics
+    - Clear presentation skills
+
+    Nice to have:
+    - CPA or CFA progress
+    - Adaptive or Anaplan
+  cv_text: |-
+    Elena Petrova
+    elena.petrova@example.com
+
+    Financial Analyst, FP&A, Brightline Cloud (2021 to now)
+    - Built the annual budget model for a 400-person SaaS company
+    - Ran monthly variance analysis for sales and marketing
+    - Modeled unit economics for a new pricing tier that raised gross margin by 3 points
+
+    Audit Associate, Hale & Morgan LLP (2019 to 2021)
+    - Audited revenue for software clients
+
+    Skills: financial modeling, Excel, SaaS metrics, NetSuite; CPA candidate
+- id: rf-consulting-strategy
+  interview_type: case
+  duration_min: 10
+  level: mid
+  quality: average
+  job_text: |-
+    Strategy & Operations Manager
+    Lantern Health
+    Remote (US)
+
+    Lantern Health offers virtual physical therapy. Strategy & Operations helps leaders decide where to grow next.
+
+    What you will do:
+    - Size new markets and build business cases
+    - Run the quarterly business review
+    - Lead cross-team projects
+    - Track company goals and report progress
+
+    What you need:
+    - 4+ years in consulting, strategy or business operations
+    - Financial and market modeling
+    - Structured problem solving
+    - Executive communication
+
+    Nice to have:
+    - Healthcare experience
+    - SQL
+  cv_text: |-
+    Marcus Lee
+    marcus.lee@example.com
+
+    Strategy & Operations Associate, Vela Health (2022 to now)
+    - Sized the market for a new employer channel; the plan won 2 million dollars of budget
+    - Run the quarterly business review for the COO
+
+    Consultant, Ridgeway Partners (2019 to 2022)
+    - Led workstreams on cost cutting and market entry for hospital and retail clients
+
+    Skills: market sizing, financial modeling, SQL, executive presentations
+- id: rf-project-program
+  interview_type: hiring_manager
+  duration_min: 10
+  level: senior
+  quality: average
+  job_text: |-
+    Senior Program Manager, Operations
+    Oakline Insurance
+    Hartford, CT
+
+    Oakline Insurance serves 1 million customers. This program moves our claims teams onto a new process.
+
+    What you will do:
+    - Lead a program of 5 projects across claims and customer service
+    - Build the program plan and track milestones
+    - Manage risks and dependencies across teams
+    - Report to the operations leadership team
+
+    What you need:
+    - 7+ years in program or project management
+    - Experience leading change programs
+    - Stakeholder management
+
+    Nice to have:
+    - Insurance industry experience
+    - PgMP or PMP
+  cv_text: |-
+    Aisha Bello
+    aisha.bello@example.com
+
+    Program Manager, Northgate Mutual (2019 to now)
+    - Led a program of 4 projects that moved 300 claims staff onto a new workflow, on time
+    - Ran the risk log and the steering committee for the program
+
+    Project Manager, Delta Services Group (2014 to 2019)
+    - Managed 12 office moves and system rollouts, each under budget
+
+    Skills: program planning, risk management, stakeholder management, MS Project; PMP

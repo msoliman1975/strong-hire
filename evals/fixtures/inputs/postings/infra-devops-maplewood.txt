@@ -1,0 +1,21 @@
+DevOps Engineer
+Maplewood Health Network
+Toronto, ON
+
+Maplewood runs the systems behind 14 clinics. We are moving our services to the cloud.
+
+What you will do:
+- Build and maintain CI/CD pipelines
+- Manage infrastructure as code
+- Monitor production systems and fix outages
+- Help developers ship safely
+
+What you need:
+- 3+ years in DevOps or infrastructure
+- CI/CD tools such as GitHub Actions or Jenkins
+- Terraform or Ansible
+- Docker
+
+Nice to have:
+- Azure
+- Healthcare compliance

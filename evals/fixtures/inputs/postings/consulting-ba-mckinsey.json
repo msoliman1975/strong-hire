@@ -1,0 +1,25 @@
+{
+  "company_name": "McKinsey & Company",
+  "title": "Business Analyst",
+  "role_family": "consulting_strategy",
+  "level": "new_grad",
+  "level_label": "Business Analyst",
+  "team": null,
+  "location": "Chicago, IL",
+  "must_have_skills": [
+    "Bachelor's degree",
+    "Strong problem solving",
+    "Clear communication",
+    "Leadership in school or work"
+  ],
+  "nice_to_have_skills": [
+    "Experience with data analysis tools"
+  ],
+  "responsibilities": [
+    "Structure problems and form hypotheses",
+    "Gather and analyze data",
+    "Build and present recommendations to clients",
+    "Work in small teams with client leaders"
+  ],
+  "source_url": null
+}

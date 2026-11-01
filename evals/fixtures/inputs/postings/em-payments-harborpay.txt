@@ -1,0 +1,20 @@
+Engineering Manager, Payments
+HarborPay
+New York, NY
+
+HarborPay processes card payments for restaurants. The Payments team of 7 engineers owns authorization and settlement.
+
+What you will do:
+- Manage and grow a team of 7 engineers
+- Run hiring for the team
+- Plan the roadmap with product and design
+- Keep delivery and on-call healthy
+
+What you need:
+- 2+ years managing software engineers
+- Background as a backend engineer
+- Experience hiring engineers
+- Payments or fintech systems
+
+Nice to have:
+- Experience with PCI compliance
