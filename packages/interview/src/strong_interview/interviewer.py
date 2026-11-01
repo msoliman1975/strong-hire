@@ -43,6 +43,7 @@ from strong_core.gateway.prices import cost_usd
 from strong_core.gateway.registry import CapabilityTier
 from strong_core.gateway.types import Completion, Message
 from strong_core.prompts import load_prompt
+from strong_core.role_families import family_info
 from strong_core.schemas import (
     AnswerCheck,
     AnswerConduct,
@@ -52,6 +53,7 @@ from strong_core.schemas import (
     Phase,
     ProbeDecision,
     QuestionSource,
+    RoleFamily,
     Speaker,
     Turn,
 )
@@ -101,6 +103,13 @@ def say_names(names: Sequence[str]) -> str:
     if len(names) <= 1:
         return "".join(names)
     return f"{', '.join(names[:-1])} and {names[-1]}"
+
+
+def _family_text(brief: InterviewerBrief) -> str:
+    """RF-5: the role family in words for the generic-mode line."""
+    if brief.role_family == RoleFamily.OTHER:
+        return "this role"
+    return f"{family_info(brief.role_family).label.lower()} roles"
 
 
 @dataclass(frozen=True)
@@ -235,7 +244,7 @@ class Interviewer:
         company = (
             f"The company is {brief.company_name}."
             if brief.company_name
-            else "No company is named; use a general tech interview style."
+            else f"No company is named; use a general interview style for {_family_text(brief)}."
         )
         name = TURN_BY_TYPE.get(brief.session.interview_type, "turn")
         return load_prompt(Role.INTERVIEWER, name).message(

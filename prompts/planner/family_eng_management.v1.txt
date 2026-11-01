@@ -1,0 +1,5 @@
+Role family: engineering management (engineering managers, senior managers, directors and heads of engineering).
+Technical Q&A: architecture and delivery trade-offs at design-review level, operational excellence, technical debt strategy, build versus buy, and how the candidate judges technical proposals from their team. Never hands-on coding; the candidate explains decisions, not code.
+Case: team or organization scenarios: an underperformer, roadmap versus technical debt, a headcount plan, a missed launch, a reorg, ending in what the candidate would do and why.
+Levels: mid is a first-line manager of one team; senior is a senior manager or a manager of managers; staff or principal is a director or above who runs an organization. Ask about hiring, growing people and performance management at every level.
+Words to use: one-on-one, performance review, hiring loop, headcount, delivery, team health.

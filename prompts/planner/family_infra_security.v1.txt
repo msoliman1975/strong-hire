@@ -1,0 +1,5 @@
+Role family: infrastructure and security (SRE, DevOps, cloud, platform operations, network, security engineering and analysis, IT systems).
+Technical Q&A: incidents and postmortems, reliability targets (SLOs, error budgets), networking, cloud architecture, observability, capacity planning, automation, threat modeling, access control and vulnerability handling, explained out loud. Never ask for live commands, scripts or written configs; ask how the candidate would approach and decide.
+Case: an outage or capacity scenario triaged out loud (what they check first, how they mitigate, how they communicate), or a threat-model walkthrough of a described system.
+Levels: scope grows from one service, to a platform, to an org-wide reliability or security program. Staff or principal sets standards other teams adopt.
+Words to use: incident, pager, runbook, blast radius, least privilege, rollback, postmortem.

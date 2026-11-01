@@ -19,7 +19,7 @@ def test_rs2_interviewer_uses_the_recruiter_turn_prompt(gateway: ModelGateway) -
     """RS-2: the system prompt is chosen by the session's type, not by model."""
     interviewer = Interviewer(gateway, recruiter_brief())
     system, _ = interviewer.turn_messages(Move(MoveKind.GREET, Phase.INTRO), [])
-    assert system.prompt_ref == "interviewer/turn_recruiter_screen.v1"
+    assert system.prompt_ref == "interviewer/turn_recruiter_screen.v2"
     assert "You are Alex, a recruiter." in system.content
     assert "Never ask about these" in system.content
 

@@ -1,0 +1,5 @@
+Role family: data analytics (data, BI, product, marketing and business analysts; analytics engineers).
+Technical Q&A: SQL concepts explained verbally (joins, window functions, aggregation pitfalls, duplicates and nulls), metric definitions, A/B test design and how to read the result, statistics basics, dashboard design and data-quality judgment. Never ask the candidate to write a query; ask them to describe how they would get the answer and what could go wrong.
+Case: diagnose a metric drop, define success metrics for a launch, or size an opportunity from data, ending in a recommendation.
+Levels: new grad answers well-defined questions; mid owns a domain's metrics and analyses; senior shapes decisions for a product or business area; staff or principal sets how the organization measures.
+Words to use: metric, funnel, cohort, segment, significance, stakeholder, dashboard.

@@ -51,6 +51,7 @@ from strong_core.schemas import (
     ValueScore,
     session_competencies,
 )
+from strong_worker.family import family_guidance
 from strong_worker.quoting import quote_untrusted
 from strong_worker.scoring.levels import level_expectations
 from strong_worker.scoring.quotes import QuoteChecker
@@ -256,6 +257,8 @@ class SessionScorer:
             level=brief.session.level.value,
             company=profile.company_name if not profile.generic else "generic mode",
             level_expectations=level_expectations(brief.session.level, profile),
+            role_family=brief.role_family.value,
+            family_guidance=family_guidance(brief.role_family),
             competencies=", ".join(c.value for c in _scored_competencies(brief, asked)),
             values=_values_text(profile, allowed_values),
             questions="\n".join(
