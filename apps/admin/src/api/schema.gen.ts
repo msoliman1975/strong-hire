@@ -3773,6 +3773,17 @@ export interface components {
              */
             reason: string;
         };
+        /**
+         * ActionStep
+         * @description SC-2: one action step. `did` and `why` are core (D-4); the other two are optional.
+         */
+        ActionStep: {
+            did?: components["schemas"]["OutlineSlot"] | null;
+            why?: components["schemas"]["OutlineSlot"] | null;
+            alternatives?: components["schemas"]["OutlineSlot"] | null;
+            /** @description How you brought people along. */
+            people?: components["schemas"]["OutlineSlot"] | null;
+        };
         /** AddAdminIn */
         AddAdminIn: {
             /**
@@ -5945,6 +5956,38 @@ export interface components {
             rows: number;
         };
         /**
+         * CraftReply
+         * @description SC-4 to SC-6: one Strova turn while crafting a styled story. It replaces CoachReply for
+         *     styled stories. The engine names the section and slots; the reply fills only those.
+         */
+        CraftReply: {
+            /**
+             * Message
+             * @description What Strova says: one question at a time.
+             */
+            message: string;
+            /** Slot Updates */
+            slot_updates?: components["schemas"]["SlotUpdate"][];
+            /**
+             * Skips
+             * @description SC-5: slots the candidate asked to skip.
+             */
+            skips?: components["schemas"]["SlotRef"][];
+            /**
+             * Section Done
+             * @description SC-5: the candidate said move on, or the section is complete.
+             * @default false
+             */
+            section_done: boolean;
+            /**
+             * Skills
+             * @description Skills the story shows so far.
+             */
+            skills?: components["schemas"]["Competency"][];
+            /** Hints */
+            hints?: components["schemas"]["SkillHint"][];
+        };
+        /**
          * Crafting
          * @description SG-4, RM-4: what "Craft with Strova" opens with.
          */
@@ -6552,6 +6595,40 @@ export interface components {
             /** Error */
             error?: string | null;
         };
+        /**
+         * FlowCheck
+         * @description SC-9: the result of one flow check. No flags means the story hangs together.
+         */
+        FlowCheck: {
+            /** Flags */
+            flags?: components["schemas"]["FlowFlag"][];
+        };
+        /**
+         * FlowFlag
+         * @description SC-9, D-9: one advisory flow flag. `key` is stable for the same issue, so a dismissed
+         *     flag stays dismissed until the slots it cites change.
+         */
+        FlowFlag: {
+            /** Key */
+            key: string;
+            type: components["schemas"]["FlowFlagType"];
+            /**
+             * Slots
+             * @description The slots the flag is about.
+             */
+            slots: components["schemas"]["SlotRef"][];
+            /**
+             * Question
+             * @description What Strova would ask about it.
+             */
+            question: string;
+        };
+        /**
+         * FlowFlagType
+         * @description SC-9, D-9: the kinds of advisory flags the flow check raises.
+         * @enum {string}
+         */
+        FlowFlagType: "action_vs_problem" | "result_vs_problem" | "number_conflict" | "timeline_conflict" | "loose_end";
         /**
          * FocusSuggestions
          * @description Suggested focus chips per standard category (CU-2).
@@ -8030,6 +8107,56 @@ export interface components {
          * @enum {string}
          */
         OrgType: "personal" | "business";
+        /**
+         * OrganizeResult
+         * @description SC-13, D-11: a classic story sorted into STAR slots from the candidate's words only.
+         */
+        OrganizeResult: {
+            outline: components["schemas"]["StoryOutline"];
+        };
+        /**
+         * OutlineSection
+         * @description SC-2: one section of the outline with its named slots. Missing keys are empty slots.
+         */
+        OutlineSection: {
+            section: components["schemas"]["StorySection"];
+            /** Slots */
+            slots?: {
+                [key: string]: components["schemas"]["OutlineSlot"];
+            };
+            /**
+             * Steps
+             * @description Action only: 1 to 5 steps, in order.
+             */
+            steps?: components["schemas"]["ActionStep"][] | null;
+            /** @description Result only. */
+            metric?: components["schemas"]["ResultMetric"] | null;
+        };
+        /**
+         * OutlineSlot
+         * @description SC-2, D-6: one slot of the outline. A filled slot Strova wrote carries the candidate's
+         *     verbatim `quotes`; a slot the candidate typed is `by_user` and needs none.
+         */
+        OutlineSlot: {
+            /**
+             * Text
+             * @description Markdown. Set only when filled.
+             */
+            text?: string | null;
+            /**
+             * Quotes
+             * @description The candidate's words this slot came from, verbatim.
+             */
+            quotes?: string[];
+            /**
+             * By User
+             * @description True when the candidate typed the text.
+             * @default false
+             */
+            by_user: boolean;
+            /** @default empty */
+            status: components["schemas"]["SlotStatus"];
+        };
         /** OverviewCost */
         OverviewCost: {
             total_usd: components["schemas"]["AdminMetric"];
@@ -9234,6 +9361,37 @@ export interface components {
             evidence: string | null;
         };
         /**
+         * ResultMetric
+         * @description SC-2: the Result section's metric. `text` says it in words; `before`, `after` and `unit`
+         *     hold the numbers when the candidate gave them.
+         */
+        ResultMetric: {
+            /**
+             * Text
+             * @description Markdown. Set only when filled.
+             */
+            text?: string | null;
+            /**
+             * Quotes
+             * @description The candidate's words this slot came from, verbatim.
+             */
+            quotes?: string[];
+            /**
+             * By User
+             * @description True when the candidate typed the text.
+             * @default false
+             */
+            by_user: boolean;
+            /** @default empty */
+            status: components["schemas"]["SlotStatus"];
+            /** Before */
+            before?: string | null;
+            /** After */
+            after?: string | null;
+            /** Unit */
+            unit?: string | null;
+        };
+        /**
          * Resume
          * @description A parsed resume (IN-3). Contact details are deliberately not part of the contract.
          */
@@ -9914,6 +10072,17 @@ export interface components {
             job_id: string;
             status: components["schemas"]["SessionStatus"];
         };
+        /**
+         * SectionImprove
+         * @description SC-11: Improve with Strova for one section. Edits to accept or reject, or questions when
+         *     the facts are missing; never neither.
+         */
+        SectionImprove: {
+            /** Edits */
+            edits?: components["schemas"]["SlotEdit"][];
+            /** Questions */
+            questions?: string[];
+        };
         /** ServiceProfile */
         ServiceProfile: {
             /** Service */
@@ -10481,6 +10650,18 @@ export interface components {
             v2_enabled: boolean;
         };
         /**
+         * SkillHint
+         * @description SC-8, D-8: "This story could also show {skill}", offered once the core slots are filled.
+         */
+        SkillHint: {
+            skill: components["schemas"]["Competency"];
+            /**
+             * Reason
+             * @description One sentence, from the story's own facts.
+             */
+            reason: string;
+        };
+        /**
          * SkillReadiness
          * @description RD-1: readiness for one skill, from Realistic sessions only.
          */
@@ -10526,6 +10707,107 @@ export interface components {
              * @description Realistic sessions that scored the skill
              */
             sessions: number;
+        };
+        /**
+         * SlotEdit
+         * @description SC-11, D-10: one before-and-after edit to a slot from Improve with Strova.
+         */
+        SlotEdit: {
+            section: components["schemas"]["StorySection"];
+            /**
+             * Slot
+             * @description A slot key, `metric`, or a step field.
+             */
+            slot: string;
+            /**
+             * Step
+             * @description Action only: the step index.
+             * @default null
+             */
+            step: number | null;
+            /**
+             * Before
+             * @description The slot's text now; null if empty.
+             * @default null
+             */
+            before: string | null;
+            /** After */
+            after: string;
+            /**
+             * Quotes
+             * @description The candidate's words the new text came from, verbatim.
+             */
+            quotes: string[];
+        };
+        /**
+         * SlotRef
+         * @description Points at one slot: a named slot of a section, or a field of one action step.
+         */
+        SlotRef: {
+            section: components["schemas"]["StorySection"];
+            /**
+             * Slot
+             * @description A slot key, `metric`, or a step field.
+             */
+            slot: string;
+            /**
+             * Step
+             * @description Action only: the step index.
+             * @default null
+             */
+            step: number | null;
+        };
+        /**
+         * SlotStatus
+         * @description SC-2, D-5: one outline slot is filled, still empty, or skipped by the candidate.
+         * @enum {string}
+         */
+        SlotStatus: "filled" | "empty" | "skipped";
+        /**
+         * SlotUpdate
+         * @description SC-6, D-6: new text for one slot from a crafting turn, backed by verbatim quotes.
+         */
+        SlotUpdate: {
+            section: components["schemas"]["StorySection"];
+            /**
+             * Slot
+             * @description A slot key, `metric`, or a step field.
+             */
+            slot: string;
+            /**
+             * Step
+             * @description Action only: the step index.
+             * @default null
+             */
+            step: number | null;
+            /**
+             * Text
+             * @description The slot, reworded from the candidate's words.
+             */
+            text: string;
+            /**
+             * Quotes
+             * @description The candidate's words this slot came from, verbatim.
+             */
+            quotes: string[];
+            /**
+             * Before
+             * @description Metric only.
+             * @default null
+             */
+            before: string | null;
+            /**
+             * After
+             * @description Metric only.
+             * @default null
+             */
+            after: string | null;
+            /**
+             * Unit
+             * @description Metric only.
+             * @default null
+             */
+            unit: string | null;
         };
         /** Source */
         Source: {
@@ -10635,6 +10917,10 @@ export interface components {
             source_question_ref?: string | null;
             /** Notes */
             notes?: components["schemas"]["StoryNote"][];
+            /** @description SC-1: star or carl; null for a classic story (D-11). */
+            style?: components["schemas"]["StoryStyle"] | null;
+            /** @description SC-2: the outline of a styled story; null when classic. */
+            outline?: components["schemas"]["StoryOutline"] | null;
             /**
              * Created At
              * Format: date-time
@@ -10991,6 +11277,10 @@ export interface components {
             source_question_ref?: string | null;
             /** Notes */
             notes?: components["schemas"]["StoryNote"][];
+            /** @description SC-1: star or carl; null for a classic story (D-11). */
+            style?: components["schemas"]["StoryStyle"] | null;
+            /** @description SC-2: the outline of a styled story; null when classic. */
+            outline?: components["schemas"]["StoryOutline"] | null;
             /**
              * Created At
              * Format: date-time
@@ -11007,6 +11297,16 @@ export interface components {
              * @enum {string}
              */
             display_status: "draft" | "ready" | "proven";
+        };
+        /**
+         * StoryOutline
+         * @description SC-2, D-3: the source of truth of a styled story. The five legacy columns are rendered
+         *     from it in code (D-12, SC-14).
+         */
+        StoryOutline: {
+            style: components["schemas"]["StoryStyle"];
+            /** Sections */
+            sections: components["schemas"]["OutlineSection"][];
         };
         /**
          * StoryPart
@@ -11109,6 +11409,12 @@ export interface components {
             edit?: components["schemas"]["StoryPartEdit"] | null;
         };
         /**
+         * StorySection
+         * @description SC-2, D-3: the sections of a story outline. Which ones a story has depends on its style.
+         * @enum {string}
+         */
+        StorySection: "situation" | "challenge" | "task" | "action" | "result" | "learning";
+        /**
          * StorySource
          * @description ST-1: where a story came from.
          * @enum {string}
@@ -11120,6 +11426,12 @@ export interface components {
          * @enum {string}
          */
         StoryStatus: "draft" | "proven";
+        /**
+         * StoryStyle
+         * @description SC-1, D-1: the writing style of a crafted story. A classic story has no style (null).
+         * @enum {string}
+         */
+        StoryStyle: "star" | "carl";
         /**
          * StoryVersion
          * @description CO-8: one telling of the story, built only from the candidate's words.
@@ -11173,6 +11485,13 @@ export interface components {
          */
         StyleRequest: {
             style: components["schemas"]["CoachStyle"];
+        };
+        /**
+         * StyleRewrite
+         * @description SC-12, D-2: the outline in the other style with the wording rewritten, no new facts.
+         */
+        StyleRewrite: {
+            outline: components["schemas"]["StoryOutline"];
         };
         /**
          * SubscriptionStatus

@@ -70,8 +70,10 @@ from strong_core.schemas.enums import (
     SessionStatus,
     SimRunStatus,
     Speaker,
+    StorySection,
     StorySource,
     StoryStatus,
+    StoryStyle,
     SubscriptionStatus,
     SuggestionKind,
     SuggestionStatus,
@@ -1260,6 +1262,18 @@ class Story(Base):
     notes_json: Mapped[list[Any]] = mapped_column(
         server_default="[]", comment="schemas.StoryNote list (ST-6 fix notes)"
     )
+    style: Mapped[StoryStyle | None] = mapped_column(
+        str_enum(StoryStyle, "story_style"), comment="SC-1: star or carl; NULL for a classic story"
+    )
+    outline_json: Mapped[dict[str, Any] | None] = mapped_column(
+        comment="SC-2: schemas.StoryOutline; NULL for a classic story"
+    )
+    flow_json: Mapped[dict[str, Any] | None] = mapped_column(
+        comment="SC-9: the last schemas.FlowCheck and the dismissed flag keys"
+    )
+    hints_json: Mapped[list[Any] | None] = mapped_column(
+        comment="SC-8: skill hints (schemas.SkillHint) with their state"
+    )
     created_at: Mapped[datetime] = _created_at()
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
@@ -1292,6 +1306,9 @@ class CoachSession(Base):
     )
     minutes: Mapped[int] = mapped_column(
         Integer, default=0, server_default="0", comment="Recorded like any session"
+    )
+    section: Mapped[StorySection | None] = mapped_column(
+        str_enum(StorySection, "story_section"), comment="SC-4: the outline section in progress"
     )
     model_profile: Mapped[str | None] = mapped_column(
         String(20), comment="PL-6: MODEL_PROFILE the session ran on"

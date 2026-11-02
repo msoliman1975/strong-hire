@@ -1,0 +1,255 @@
+{
+  "$defs": {
+    "Competency": {
+      "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.",
+      "enum": [
+        "ownership",
+        "impact",
+        "collaboration",
+        "conflict_handling",
+        "learning_from_failure",
+        "communication",
+        "role_fit",
+        "depth_of_experience",
+        "judgment",
+        "motivation",
+        "team_fit",
+        "scope_at_level",
+        "technical_depth",
+        "accuracy",
+        "reasoning",
+        "trade_offs",
+        "clarity_of_explanation",
+        "problem_framing",
+        "structure",
+        "user_and_business_sense",
+        "estimation_logic",
+        "prioritization",
+        "recommendation",
+        "logistics_and_expectations",
+        "discovery",
+        "objection_handling",
+        "value_articulation",
+        "closing"
+      ],
+      "title": "Competency",
+      "type": "string"
+    },
+    "SkillHint": {
+      "additionalProperties": false,
+      "description": "SC-8, D-8: \"This story could also show {skill}\", offered once the core slots are filled.",
+      "properties": {
+        "reason": {
+          "description": "One sentence, from the story's own facts.",
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "skill": {
+          "$ref": "#/$defs/Competency"
+        }
+      },
+      "required": [
+        "skill",
+        "reason"
+      ],
+      "title": "SkillHint",
+      "type": "object"
+    },
+    "SlotRef": {
+      "additionalProperties": false,
+      "description": "Points at one slot: a named slot of a section, or a field of one action step.",
+      "properties": {
+        "section": {
+          "$ref": "#/$defs/StorySection"
+        },
+        "slot": {
+          "description": "A slot key, `metric`, or a step field.",
+          "minLength": 1,
+          "title": "Slot",
+          "type": "string"
+        },
+        "step": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 5,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Action only: the step index.",
+          "title": "Step"
+        }
+      },
+      "required": [
+        "section",
+        "slot"
+      ],
+      "title": "SlotRef",
+      "type": "object"
+    },
+    "SlotUpdate": {
+      "additionalProperties": false,
+      "description": "SC-6, D-6: new text for one slot from a crafting turn, backed by verbatim quotes.",
+      "properties": {
+        "after": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Metric only.",
+          "title": "After"
+        },
+        "before": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Metric only.",
+          "title": "Before"
+        },
+        "quotes": {
+          "description": "The candidate's words this slot came from, verbatim.",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Quotes",
+          "type": "array"
+        },
+        "section": {
+          "$ref": "#/$defs/StorySection"
+        },
+        "slot": {
+          "description": "A slot key, `metric`, or a step field.",
+          "minLength": 1,
+          "title": "Slot",
+          "type": "string"
+        },
+        "step": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 5,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Action only: the step index.",
+          "title": "Step"
+        },
+        "text": {
+          "description": "The slot, reworded from the candidate's words.",
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Metric only.",
+          "title": "Unit"
+        }
+      },
+      "required": [
+        "section",
+        "slot",
+        "text",
+        "quotes"
+      ],
+      "title": "SlotUpdate",
+      "type": "object"
+    },
+    "StorySection": {
+      "description": "SC-2, D-3: the sections of a story outline. Which ones a story has depends on its style.",
+      "enum": [
+        "situation",
+        "challenge",
+        "task",
+        "action",
+        "result",
+        "learning"
+      ],
+      "title": "StorySection",
+      "type": "string"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/craft_reply.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "SC-4 to SC-6: one Strova turn while crafting a styled story. It replaces CoachReply for\nstyled stories. The engine names the section and slots; the reply fills only those.",
+  "properties": {
+    "hints": {
+      "items": {
+        "$ref": "#/$defs/SkillHint"
+      },
+      "maxItems": 3,
+      "title": "Hints",
+      "type": "array"
+    },
+    "message": {
+      "description": "What Strova says: one question at a time.",
+      "minLength": 1,
+      "title": "Message",
+      "type": "string"
+    },
+    "section_done": {
+      "default": false,
+      "description": "SC-5: the candidate said move on, or the section is complete.",
+      "title": "Section Done",
+      "type": "boolean"
+    },
+    "skills": {
+      "description": "Skills the story shows so far.",
+      "items": {
+        "$ref": "#/$defs/Competency"
+      },
+      "title": "Skills",
+      "type": "array"
+    },
+    "skips": {
+      "description": "SC-5: slots the candidate asked to skip.",
+      "items": {
+        "$ref": "#/$defs/SlotRef"
+      },
+      "title": "Skips",
+      "type": "array"
+    },
+    "slot_updates": {
+      "items": {
+        "$ref": "#/$defs/SlotUpdate"
+      },
+      "title": "Slot Updates",
+      "type": "array"
+    }
+  },
+  "required": [
+    "message"
+  ],
+  "title": "CraftReply",
+  "type": "object"
+}

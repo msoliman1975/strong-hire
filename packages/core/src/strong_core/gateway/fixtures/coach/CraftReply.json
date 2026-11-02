@@ -1,0 +1,30 @@
+{
+  "message": "Thanks, that sets the scene. How big was the checkout flow you were moving: how many orders a day went through it?",
+  "slot_updates": [
+    {
+      "section": "situation",
+      "slot": "role",
+      "text": "I was the tech lead for the checkout team.",
+      "quotes": ["I was the tech lead on checkout"]
+    },
+    {
+      "section": "situation",
+      "slot": "problem",
+      "text": "The team was moving checkout to a new payments provider, and the rollout was already two weeks late with Black Friday a month away.",
+      "quotes": [
+        "we were moving checkout to the new payments provider",
+        "the rollout was already two weeks late",
+        "Black Friday was a month out and checkout could not break"
+      ]
+    }
+  ],
+  "skips": [
+    {
+      "section": "situation",
+      "slot": "org"
+    }
+  ],
+  "section_done": false,
+  "skills": ["ownership"],
+  "hints": []
+}
