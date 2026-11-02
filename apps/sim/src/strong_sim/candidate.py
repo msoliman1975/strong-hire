@@ -72,7 +72,7 @@ class Candidate:
 
     def __post_init__(self) -> None:
         s = self.scenario
-        self.system = load_prompt("candidate", "persona").message(
+        self.system = load_prompt("candidate", self.persona_name).message(
             "system",
             name=s.candidate_name,
             level=s.run_level().value,
@@ -84,9 +84,14 @@ class Candidate:
         )
 
     @property
+    def persona_name(self) -> str:
+        """RP-11: in a role-play the AI candidate is the seller."""
+        return "persona_role_play" if self.scenario.role_play is not None else "persona"
+
+    @property
     def prompt_refs(self) -> list[str]:
         return [
-            "candidate/persona",
+            f"candidate/{self.persona_name}",
             f"candidate/quality_{self.scenario.quality.value}",
             f"candidate/behavior_{self.scenario.behavior.value}",
         ]
