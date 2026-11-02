@@ -50,8 +50,8 @@ export function WaitlistPage() {
       <>
         <PageHead title="Check your email">
           <p>
-            We sent a link to <strong>{email.trim()}</strong>. Open it to confirm your place on the waitlist. It
-            works for 7 days.
+            We sent an email to <strong>{email.trim()}</strong>. If you're new to the waitlist, open the link in it
+            to confirm your place. It works for 7 days.
           </p>
         </PageHead>
         <p className="muted">No email after a few minutes? Check your spam folder, or join again to get a new link.</p>

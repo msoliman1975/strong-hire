@@ -80,8 +80,8 @@ async def test_l04_join_again_updates_and_never_reveals_membership(
     sender: RecordingSender,
     sessionmaker: async_sessionmaker[AsyncSession],
 ) -> None:
-    """L04: a second join answers the same, updates the entry, and a confirmed entry gets no
-    new email."""
+    """L04, RMAP-6: a second join answers the same and updates the entry. A confirmed entry is
+    told by email (only its inbox) that it is already on the list, with no confirm link."""
     await anon_client.post("/public/waitlist", json=JOIN)
     await anon_client.post("/public/waitlist/confirm", json={"token": _token(sender)})
     sent = len(sender.mail)
@@ -90,11 +90,66 @@ async def test_l04_join_again_updates_and_never_reveals_membership(
     r = await anon_client.post("/public/waitlist", json=again)
     assert r.status_code == 202
     assert r.json() == {"status": "check_email"}
-    assert len(sender.mail) == sent
+    assert len(sender.mail) == sent + 1
+    to, subject, text = sender.mail[-1]
+    assert to == "ada@example.com"
+    assert subject == "You're already on the Strong Hire waitlist"
+    assert "/waitlist/confirm" not in text and "/signin" not in text
     entry = await _entry(sessionmaker, "ada@example.com")
     assert entry is not None
     assert entry.interview_within.value == "month"
     assert entry.marketing_consent is True
+
+
+async def test_rmap6_an_invited_entry_that_joins_again_gets_the_signin_link(
+    anon_client: httpx.AsyncClient,
+    sender: RecordingSender,
+    sessionmaker: async_sessionmaker[AsyncSession],
+) -> None:
+    """RMAP-6: an entry already invited gets the sign-in link again, not a confirm link."""
+    await anon_client.post("/public/waitlist", json=JOIN)
+    await anon_client.post("/public/waitlist/confirm", json={"token": _token(sender)})
+    async with sessionmaker() as db:
+        entry = await db.scalar(
+            select(WaitlistEntry).where(WaitlistEntry.email == "ada@example.com")
+        )
+        assert entry is not None
+        entry.invited_at = datetime.now(UTC)
+        await db.commit()
+
+    r = await anon_client.post("/public/waitlist", json=JOIN)
+    assert r.status_code == 202
+    to, subject, text = sender.mail[-1]
+    assert (to, subject) == ("ada@example.com", "You're already invited to Strong Hire")
+    assert "https://example.test/signin?utm_source=waitlist" in text
+    assert "/waitlist/confirm" not in text
+
+
+class FailingSender:
+    async def send(self, to: str, subject: str, text: str) -> None:
+        raise OSError("smtp down")
+
+
+async def test_rmap6_a_failed_email_still_answers_check_email_and_logs_an_error(
+    app: FastAPI,
+    anon_client: httpx.AsyncClient,
+    sessionmaker: async_sessionmaker[AsyncSession],
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """RMAP-6: a failed send keeps the entry and logs at ERROR, which error capture (OB-4) turns
+    into an error group and the "New error" alert."""
+    app.state.waitlist = Waitlist(
+        links=MagicLinks("t" * 40, 3600, MemoryUsedTokenStore(), salt=WAITLIST_LINK_SALT),
+        email_sender=FailingSender(),
+        limiter=JoinLimiter(limit=3),
+        web_base_url="https://example.test",
+    )
+    with caplog.at_level("ERROR", logger="strong_api.public"):
+        r = await anon_client.post("/public/waitlist", json=JOIN)
+    assert r.status_code == 202
+    assert await _entry(sessionmaker, "ada@example.com") is not None
+    failures = [rec for rec in caplog.records if "person who joined failed" in rec.getMessage()]
+    assert failures and failures[0].levelname == "ERROR" and failures[0].exc_info
 
 
 async def test_l04_honeypot_is_dropped(

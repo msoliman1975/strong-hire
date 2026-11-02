@@ -6,6 +6,12 @@
 The answer to a join never says whether the email was already on the list. A filled honeypot
 field is accepted and dropped. Joins are limited per client address.
 
+Every join that is not dropped emails the person who joined, so the form's "check your email" is
+always true: a link to confirm while the entry is unconfirmed, else a short note that they are
+already on the list (with the sign-in link again once they were invited). Only that inbox learns
+the email was on the list. A failed send is logged at ERROR, so error capture (OB-4) records it and
+the default "New error" alert reaches the admins.
+
 Each new entry is also emailed to every active admin, one email each so no admin sees the
 others' addresses. That email has no confirmation link: only the person who joined can confirm.
 """
@@ -103,6 +109,24 @@ def _confirmation(link: str) -> tuple[str, str]:
     )
 
 
+def _already_on_list(entry: WaitlistEntry, web_base_url: str) -> tuple[str, str]:
+    """RMAP-6: a confirmed entry joined again. Before, it got no email at all."""
+    if entry.invited_at is not None:
+        signin = f"{web_base_url.rstrip('/')}/signin?utm_source=waitlist"
+        return "You're already invited to Strong Hire", (
+            "You're on the Strong Hire waitlist, and your invitation has gone out: you can "
+            f"create your account now.\n\n{signin}\n\n"
+            "Sign in with the email this message was sent to. If you did not ask for this, ignore "
+            "this email."
+        )
+    return "You're already on the Strong Hire waitlist", (
+        "You're already on the Strong Hire waitlist, and your email is confirmed. There is "
+        "nothing more to do: we'll write to you when sign-ups open.\n\n"
+        "We updated your answers with the ones you just sent. If you did not ask for this, ignore "
+        "this email."
+    )
+
+
 def _admin_notice(entry: WaitlistEntry, admin_base_url: str) -> tuple[str, str]:
     lines = [
         f"{entry.email} joined the Strong Hire waitlist.",
@@ -167,11 +191,14 @@ async def join_waitlist(body: WaitlistIn, request: Request, db: DbSession) -> Wa
         token = waitlist.links.issue(email)
         link = f"{waitlist.web_base_url.rstrip('/')}/waitlist/confirm?token={token}"
         subject, text = _confirmation(link)
-        try:
-            await waitlist.email_sender.send(email, subject, text)
-        except Exception:
-            # The entry is saved; joining again sends a new link.
-            log.exception("waitlist confirmation email failed")
+    else:
+        subject, text = _already_on_list(entry, waitlist.web_base_url)
+    try:
+        await waitlist.email_sender.send(email, subject, text)
+    except Exception:
+        # The entry is saved; joining again sends the email again. ERROR level: error capture
+        # (OB-4) records it and the "New error" alert tells the admins.
+        log.exception("waitlist email to the person who joined failed")
     return WaitlistOut()
 
 
