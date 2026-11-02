@@ -25,11 +25,11 @@ export function dateChip(role: RoleSummary, stage?: string | null): { text: stri
   return { text: `${what} in ${d} ${d === 1 ? "day" : "days"}`, teal: true };
 }
 
-/** "Main resume", or the resume's name. */
+/** "Default resume", or the resume's name. */
 export function resumeLabel(resumes: ResumeOut[] | undefined, resumeId: string | undefined): string {
   const r = resumes?.find((x) => x.id === resumeId);
   if (!r) return "Resume";
-  return r.is_main ? "Main resume" : (r.name ?? "Resume");
+  return r.is_main ? "Default resume" : (r.name ?? "Resume");
 }
 
 export const typeName = (i: InterviewWithReadiness["interview"]) => interviewTypeLabel[i.interview_type];

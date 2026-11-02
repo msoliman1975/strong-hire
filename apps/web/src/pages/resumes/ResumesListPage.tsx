@@ -1,7 +1,7 @@
 /**
  * RM-1 (mockup #cvs): "{First name}'s Resumes". One list, one row per resume, the main one marked.
  * Each row has its roles, open issues, story ideas, date added and check state (IN-12), and every
- * action: Open, Open breakdown, Make main (RM-2), and Rename or Delete in the row's "More" menu (R1).
+ * action: Open, Open breakdown, Make default (RM-2; "default" in the UI, `is_main` in the API), and Rename or Delete in the row's "More" menu (R1).
  * RMAP-2: this replaces the second "Saved resumes" list that the page used to fold below.
  */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -165,7 +165,7 @@ function ResumeRow({ resume, roles }: { resume: ResumeOut; roles: RoleOut[] | un
               <Link className="sx-plain" to={resumePath(resume.id)}>
                 {label}
               </Link>{" "}
-              {resume.is_main && <span className="sx-chip dark">Main</span>}
+              {resume.is_main && <span className="sx-chip dark">Default</span>}
             </strong>
             <span className="sx-small sx-muted">{facts.join(" · ")}</span>
             <span className="sx-small sx-muted">{dates.join(" · ")}</span>
@@ -178,7 +178,7 @@ function ResumeRow({ resume, roles }: { resume: ResumeOut; roles: RoleOut[] | un
                 onClick={() => makeMain.mutate()}
                 disabled={makeMain.isPending}
               >
-                Make main
+                Make default
               </button>
             )}
             {ready && (
@@ -229,7 +229,7 @@ function ResumeRow({ resume, roles }: { resume: ResumeOut; roles: RoleOut[] | un
           <h2 id={`delete-${resume.id}`}>Delete this resume?</h2>
           <p className="sx-small sx-muted">
             We delete {label} and its file. Your reports, interviews and progress are kept.
-            {resume.is_main && " Your newest other resume becomes your main resume."}
+            {resume.is_main && " Your newest other resume becomes your default resume."}
           </p>
           {remove.isError && <ErrorNotice error={remove.error} title="The delete did not work" />}
           <div className="sx-row">
@@ -275,7 +275,7 @@ export function ResumesListPage() {
         )}
       </div>
       <p className="sx-muted">
-        Your main resume feeds your story ideas and is used for new target roles. Use other resumes for roles where you
+        Your default resume feeds your story ideas and is used for new target roles. Use other resumes for roles where you
         sent a different version.
       </p>
       {resumes.data && (

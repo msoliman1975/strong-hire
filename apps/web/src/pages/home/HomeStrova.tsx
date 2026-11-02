@@ -281,7 +281,7 @@ function SummaryCards() {
               <span className="home-strova__truncate" title={main.name ?? undefined}>
                 {main.name}
               </span>
-              {main.is_main && <span className="sx-chip dark">Main</span>}
+              {main.is_main && <span className="sx-chip dark">Default</span>}
             </h3>
             <span className="sx-small home-strova__warn">{plural(issues.data?.open.length ?? 0, "issue")} open</span>
             <span className="sx-small home-strova__violet">{plural(ideas.data?.ideas.length ?? 0, "story idea")}</span>

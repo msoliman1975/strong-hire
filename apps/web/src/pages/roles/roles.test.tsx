@@ -94,7 +94,7 @@ describe("target roles", () => {
     });
     await within(c).findAllByRole("meter");
     expect(within(c).getByText("No date yet")).toBeInTheDocument();
-    expect(c).toHaveTextContent("Main resume");
+    expect(c).toHaveTextContent("Default resume");
     expect(within(c).getAllByRole("meter")).toHaveLength(2);
     expect(within(c).getAllByText("Not started")).toHaveLength(2);
     expect(screen.getByRole("link", { name: "Add a target role" })).toHaveAttribute("href", "/roles/new");
@@ -138,7 +138,7 @@ describe("target roles", () => {
     const behavioral = await screen.findByRole("checkbox", { name: /Behavioral/ });
     expect(behavioral).toBeChecked();
     expect(screen.getByRole("checkbox", { name: /Recruiter screen/ })).not.toBeChecked();
-    expect(screen.getByText(/Measured against:/)).toHaveTextContent("(main)");
+    expect(screen.getByText(/Measured against:/)).toHaveTextContent("(default)");
     await user.click(screen.getByRole("checkbox", { name: /Hiring manager/ }));
     await user.click(screen.getByRole("button", { name: "Create the role" }));
     await waitFor(() => expect(screen.getByTestId("where").textContent).toMatch(/^\/roles\/[^/]+$/));

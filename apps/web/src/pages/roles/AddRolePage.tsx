@@ -389,7 +389,7 @@ function InterviewsStep({ jobId, posting, date, onBack }: { jobId: string; posti
       </div>
       <div className="sx-between sx-small">
         <span>
-          Measured against: <strong>{chosen ? `${chosen.name ?? "Resume"}${chosen.is_main ? " (main)" : ""}` : "no resume yet"}</strong>
+          Measured against: <strong>{chosen ? `${chosen.name ?? "Resume"}${chosen.is_main ? " (default)" : ""}` : "no resume yet"}</strong>
         </span>
         {live.length > 1 && (
           <span className="sx-row">

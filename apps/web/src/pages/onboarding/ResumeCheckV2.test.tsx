@@ -453,7 +453,7 @@ describe("v2 coming back to a saved CV", () => {
     const row = within(list).getAllByRole("listitem")[0];
     await user.click(within(row).getByRole("button", { name: /^Delete / }));
     const dialog = within(row).getByRole("dialog", { name: "Delete this resume?" });
-    expect(dialog).toHaveTextContent("Your newest other resume becomes your main resume.");
+    expect(dialog).toHaveTextContent("Your newest other resume becomes your default resume.");
     await user.click(within(dialog).getByRole("button", { name: "Delete" }));
     expect(await screen.findByText("No resume yet. Add one and Strova reads it.")).toBeInTheDocument();
   });

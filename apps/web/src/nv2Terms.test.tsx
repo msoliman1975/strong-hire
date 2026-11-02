@@ -14,6 +14,8 @@ import { setFeatureOverrides } from "./theme/features";
 
 const USER_ID = "00000000-0000-4000-8000-0000000000a1";
 const CV_WORD = /\bCVs?\b/;
+/** RMAP-4: the resume new roles use is the "default" resume, never the "main" one. */
+const MAIN_WORD = /\b[Mm]ain\b|Make main/;
 
 beforeEach(() => {
   globalThis.localStorage?.clear();
@@ -83,5 +85,14 @@ describe("NV-2 terms", () => {
       expect(text.match(new RegExp(`.{0,60}${CV_WORD.source}.{0,40}`))?.[0] ?? null, path).toBeNull();
       expect(text.length, path).toBeGreaterThan(200);
     }
+  });
+
+  it("RMAP-4: no v2 screen calls a resume main; it is the default resume", async () => {
+    const { resumeId } = await seed();
+    for (const path of ["/", "/resumes", `/resumes/${resumeId}`, "/roles", "/roles/new"]) {
+      const text = await textAt(path);
+      expect(text.match(new RegExp(`.{0,40}(${MAIN_WORD.source}).{0,40}`))?.[0] ?? null, path).toBeNull();
+    }
+    expect(await textAt("/resumes")).toMatch(/Default/);
   });
 });
