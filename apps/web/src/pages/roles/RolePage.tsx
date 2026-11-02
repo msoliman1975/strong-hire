@@ -1,12 +1,14 @@
 /**
  * TG-4 (mockup #role): one target role. The interviews (each opens its interview page), what
  * they'll look for (skills, where they'll probe, must-haves the resume never shows), your stories
- * for this role (story fit, ST-5) and what you know about the interview (IN-4).
+ * for this role (story fit, ST-5) and what you know about the interview (IN-4). With 2 or more
+ * resumes, which resume fits best (RC-1 to RC-8): the saved comparison's summary, opened on demand.
  */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 
+import { useResumeComparison } from "../../api/compare";
 import { useJob, useJobs, useResumeIssues, useResumes } from "../../api/hooks";
 import { jobTargetsApi } from "../../api/inputs";
 import { useRoleInterviews, useRoles } from "../../api/roles";
@@ -20,6 +22,7 @@ import { usePlan } from "../plan/api";
 import { storyPath, useRoleStoryFit } from "../plan/StoryFitTable";
 import { resumePath } from "../resumes/ResumesListPage";
 import { ContextDialog } from "./ContextDialog";
+import { comparisonSummary, ResumeComparison } from "./ResumeComparison";
 import { dateChip, interviewPath, resumeLabel, rolesPath, takesMeta, typeName } from "./shared";
 
 function InterviewCard({ item, first }: { item: InterviewWithReadiness; first: boolean }) {
@@ -176,6 +179,30 @@ export function RemoveRole({ jobId, inUse }: { jobId: string; inUse: boolean }) 
   );
 }
 
+/** RC-1, RC-8: which resume fits this role best. The saved comparison shows as one line until opened. */
+export function CompareResumes({ jobId, resumeId }: { jobId: string; resumeId: string }) {
+  const saved = useResumeComparison(jobId);
+  const [open, setOpen] = useState(false);
+  const c = saved.data;
+  return (
+    <section className="sx-card" aria-labelledby="compare-heading" data-testid="compare-resumes">
+      <div className="sx-between">
+        <div className="sx-stack" style={{ gap: 3 }}>
+          <h2 id="compare-heading">Which resume fits best</h2>
+          <span className="sx-small sx-muted">
+            {c ? comparisonSummary(c) : "Compare your resumes for this role and see the gaps of the best fit."}
+            {c?.out_of_date && <span className="sx-chip warn" style={{ marginLeft: 8 }}>Out of date</span>}
+          </span>
+        </div>
+        <button type="button" className="sx-btn ghost sm" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
+          {open ? "Close" : c ? "Open" : "Compare my resumes"}
+        </button>
+      </div>
+      {open && <ResumeComparison jobId={jobId} pickedId={resumeId || null} />}
+    </section>
+  );
+}
+
 const STRENGTH = { strong: { label: "Strong", cls: "ok" }, thin: { label: "Thin", cls: "warn" }, missing: { label: "Missing", cls: "bad" } } as const;
 
 export function RolePage() {
@@ -207,6 +234,7 @@ export function RolePage() {
   const probes = gap?.status === "ready" ? (gap.analysis?.probe_areas ?? []) : [];
   const mustHave = issues.data?.open.find((i) => i.key.startsWith("job.must-have"));
   const hasContext = Boolean(job.data.stage || Object.values(job.data.context).some(Boolean));
+  const liveResumes = (resumes.data ?? []).filter((r) => !r.deleted);
 
   return (
     <div className="sx-page">
@@ -255,6 +283,7 @@ export function RolePage() {
           />
         </div>
       </div>
+      {liveResumes.length > 1 && <CompareResumes jobId={jobId} resumeId={resumeId} />}
       <section className="sx-card" aria-labelledby="ivs-heading">
         <div className="sx-between">
           <h2 id="ivs-heading">Interviews for this role</h2>
