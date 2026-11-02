@@ -15409,6 +15409,14 @@
               "dismissed"
             ],
             "title": "Status"
+          },
+          "listed_in": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Listed In",
+            "description": "RC-5: names of the compared resumes (the focus first) that name the requirement somewhere, by the IN-12 rule. Empty when none does or there is no requirement."
           }
         },
         "type": "object",
@@ -15418,7 +15426,8 @@
           "severity",
           "related_requirement",
           "source",
-          "status"
+          "status",
+          "listed_in"
         ],
         "title": "ComparisonGap",
         "description": "One gap of the focus resume (RC-4, RC-5)."
@@ -17925,6 +17934,11 @@
             "type": "boolean",
             "title": "Can Add",
             "description": "The line can be copied: a skill the resume lacks, or an achievement at a company the resume also lists."
+          },
+          "in_resume": {
+            "type": "boolean",
+            "title": "In Resume",
+            "description": "The focus resume already has this line, for example after Add to resume."
           }
         },
         "type": "object",
@@ -17934,7 +17948,8 @@
           "line",
           "place",
           "company",
-          "can_add"
+          "can_add",
+          "in_resume"
         ],
         "title": "HintSource",
         "description": "RC-4: the other resume that covers a gap, and its line."

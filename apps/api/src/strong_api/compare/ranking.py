@@ -59,6 +59,7 @@ class Source:
     place: str  # "skills" or "achievement"
     company: str | None
     can_add: bool
+    in_resume: bool = False  # the focus resume already has this line
 
 
 @dataclass(frozen=True)
@@ -68,6 +69,8 @@ class Hint:
     severity: Severity
     related_requirement: str | None
     source: Source | None
+    listed_in: list[str] = field(default_factory=list)
+    """Resumes (the focus first) that name the requirement, by the IN-12 rule."""
 
 
 def words(text: str) -> set[str]:
@@ -204,9 +207,29 @@ def hints(focus: Candidate, others: list[Candidate]) -> list[Hint]:
                 severity=gap.severity,
                 related_requirement=gap.related_requirement,
                 source=_cover(focus.resume, gap.related_requirement, others),
+                listed_in=_listed_in(gap.related_requirement, [focus, *others]),
             )
         )
     return out
+
+
+def _listed_in(requirement: str | None, candidates: list[Candidate]) -> list[str]:
+    """RC-5: the resumes that name the requirement somewhere (skills, titles, lines), so a gap
+    the analysis found is not shown as missing from resumes that list it."""
+    if not requirement:
+        return []
+    return [c.name for c in candidates if c.resume is not None and mentions(c.resume, requirement)]
+
+
+def in_resume(target: Resume, line: str, place: str) -> bool:
+    """RC-4: the target resume already has this line (a skill anywhere, or an achievement in any
+    role)."""
+    wanted = line.strip().lower()
+    if place == "skills":
+        have = [*target.skills, *(s for r in target.roles for s in r.skills)]
+    else:
+        have = [a for r in target.roles for a in r.achievements]
+    return wanted in {h.strip().lower() for h in have}
 
 
 def _cover(target: Resume, requirement: str | None, others: list[Candidate]) -> Source | None:
@@ -228,16 +251,26 @@ def _cover(target: Resume, requirement: str | None, others: list[Candidate]) -> 
     assert other.resume is not None
     located = _source_line(other.resume, evidence)
     if located is None:
-        return Source(other.resume_id, other.name, evidence, "achievement", None, False)
+        return Source(
+            resume_id=other.resume_id,
+            resume_name=other.name,
+            line=evidence,
+            place="achievement",
+            company=None,
+            can_add=False,
+            in_resume=in_resume(target, evidence, "achievement"),
+        )
     line, place, role = located
     company = role.company if role is not None else None
+    present = in_resume(target, line, place)
     return Source(
         resume_id=other.resume_id,
         resume_name=other.name,
         line=line,
         place=place,
         company=company,
-        can_add=can_add(target, line, place, company),
+        can_add=not present and can_add(target, line, place, company),
+        in_resume=present,
     )
 
 

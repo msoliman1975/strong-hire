@@ -62,8 +62,10 @@ function build(store: MockStore, jobId: string, roleResumeId: string | null): Re
           place: "skills",
           company: null,
           can_add: true,
+          in_resume: false,
         },
         status: "open",
+        listed_in: [],
       },
       {
         key: "k-payments",
@@ -72,6 +74,7 @@ function build(store: MockStore, jobId: string, roleResumeId: string | null): Re
         related_requirement: "Payments or financial systems",
         source: null,
         status: "open",
+        listed_in: [],
       },
     ],
     role_resume_id: roleResumeId,
@@ -132,4 +135,10 @@ export function compareHandlers(store: MockStore) {
         : HttpResponse.json({ detail: "Not found" }, { status: 404 });
     }),
   ];
+}
+
+/** Tests: change the saved comparison of a role, for example to shape its gaps. */
+export function patchMockComparison(jobId: string, patch: (c: ResumeComparisonOut) => ResumeComparisonOut) {
+  const c = comparisons.get(jobId);
+  if (c) comparisons.set(jobId, patch(c));
 }

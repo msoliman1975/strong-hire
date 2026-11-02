@@ -88,6 +88,17 @@ function ResumeRow({
   );
 }
 
+function joinNames(items: string[]) {
+  return items.length <= 1 ? items.join("") : `${items.slice(0, -1).join(", ")} and ${items.at(-1)}`;
+}
+
+/** RC-5: what to say about a gap no resume covers. A resume that names the skill is not "missing" it. */
+export function uncovered(gap: ComparisonGap) {
+  if (gap.listed_in.length === 0) return "None of your resumes shows this.";
+  const verb = gap.listed_in.length === 1 ? "lists" : "list";
+  return `${joinNames(gap.listed_in)} ${verb} it, but no line shows it in use. A story or a stronger line helps.`;
+}
+
 function GapRow({
   gap,
   jobId,
@@ -114,9 +125,12 @@ function GapRow({
         </div>
         {source ? (
           <span className="sx-small">
-            Your <strong>{source.resume_name}</strong> resume shows this: “{source.line}”
+            <strong>{source.resume_name}</strong> shows this: “{source.line}”
             {gap.status === "added" && <span className="sx-muted"> · Added to {focusName}</span>}
-            {gap.status === "open" && !source.can_add && (
+            {gap.status === "open" && source.in_resume && (
+              <span className="sx-muted"> · {focusName} already has this line.</span>
+            )}
+            {gap.status === "open" && !source.can_add && !source.in_resume && (
               <span className="sx-muted">
                 {" "}
                 · {source.company ? `${focusName} doesn't list ${source.company}, so add it by hand.` : "Add it by hand."}
@@ -124,7 +138,7 @@ function GapRow({
             )}
           </span>
         ) : (
-          <span className="sx-small sx-muted">None of your resumes shows this.</span>
+          <span className="sx-small sx-muted">{uncovered(gap)}</span>
         )}
       </div>
       <div className="sx-row">

@@ -177,3 +177,35 @@ def test_rc5_a_gap_no_resume_covers_has_no_source() -> None:
     no_evidence = candidate("Other", analysis(55, reqs=[("Payments", 70, None)]))
     [hint] = ranking.hints(focus, [weak, no_evidence])
     assert hint.source is None
+
+
+def test_rc4_a_line_the_focus_resume_already_has_is_marked_not_offered() -> None:
+    """RC-4: after Add to resume and Compare again, the analysis may still list the gap. The
+    line is then already in the focus resume: say so, and do not offer to add it again."""
+    gap = {"summary": "Kafka is not shown", "severity": "medium", "related_requirement": "Kafka"}
+    focus = candidate(
+        "Platform",
+        analysis(78, gaps=[gap], reqs=[("Kafka", 35, None)]),
+        resume(skills=["Go", "Kafka"]),
+    )
+    other = candidate(
+        "Generalist", analysis(61, reqs=[("Kafka", 70, "Kafka")]), resume(skills=["Kafka"])
+    )
+    [hint] = ranking.hints(focus, [other])
+    assert hint.source is not None
+    assert hint.source.in_resume is True and hint.source.can_add is False
+
+
+def test_rc5_an_uncovered_gap_names_the_resumes_that_list_it() -> None:
+    """RC-5: a gap no resume covers is not "missing" from resumes that list the skill: name
+    them, the focus resume first, by the IN-12 rule."""
+    gap = {"summary": "No PostgreSQL depth", "severity": "medium", "related_requirement": "Kafka"}
+    focus = candidate("Platform", analysis(80, gaps=[gap]), resume(skills=["Go", "Kafka"]))
+    other = candidate("Generalist", analysis(60), resume(skills=["Kafka"], roles=[]))
+    none = candidate("Startup", analysis(50), resume(skills=["Rust"], roles=[]))
+    [hint] = ranking.hints(focus, [other, none])
+    assert hint.source is None
+    assert hint.listed_in == ["Platform", "Generalist"]
+    no_req = {"summary": "Leadership", "severity": "high"}
+    [bare] = ranking.hints(candidate("P", analysis(80, gaps=[no_req])), [other])
+    assert bare.listed_in == []
