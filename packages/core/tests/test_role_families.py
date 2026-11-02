@@ -168,7 +168,8 @@ def test_rf12_question_bank_covers_every_wave_1_family() -> None:
 
 
 def test_rf14_beta_families_are_the_wave_1_families_without_5_gold_transcripts() -> None:
-    """RF-14: a wave 1 family is labeled Beta until evals/transcripts has 5 of its transcripts."""
+    """RF-14, D-11: a wave 1 or wave 2 family is labeled Beta until evals/transcripts has 5 of
+    its transcripts."""
     import json
     from collections import Counter
 
@@ -184,6 +185,7 @@ def test_rf14_beta_families_are_the_wave_1_families_without_5_gold_transcripts()
         "finance",
         "consulting_strategy",
         "project_program",
+        "sales",
     }
     expected = {f for f in wave_1 if counts[f] < 5}
     text = (root / "apps/web/src/labels.ts").read_text(encoding="utf-8")

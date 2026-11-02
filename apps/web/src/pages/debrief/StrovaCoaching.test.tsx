@@ -47,6 +47,7 @@ function debrief(changes: Partial<Debrief> = {}, card: Scorecard = scorecardFor(
       ended_at: "2026-10-05T10:30:00Z",
       minutes_billed: 30,
       failure_reason: null,
+      buyer: null,
     },
     status: "ready",
     scorecard: card,

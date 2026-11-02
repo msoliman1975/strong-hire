@@ -299,6 +299,31 @@ describe("rehearsals", () => {
     expect(screen.getByRole("region", { name: "Next take" })).toHaveTextContent("Practice, 10 minutes");
   });
 
+  it("RP-4, RP-8, D-11: a role-play take picks the call, defaulting by level, and is labeled Beta", async () => {
+    const { interviews } = await roleWithInterviews("role_play");
+    const user = renderApp(`/interviews/${interviews[0].id}`);
+    expect(await screen.findByRole("heading", { level: 1 })).toHaveTextContent("Beta");
+    await user.click(await screen.findByRole("button", { name: "Change settings" }));
+    const call = within(screen.getByTestId("take-settings")).getByRole("group", { name: "Call" });
+    // The profile's target level is senior, so the default call is demo and objections.
+    expect(within(call).getByRole("button", { name: "Demo and objections" })).toHaveAttribute("aria-pressed", "true");
+    await user.click(within(call).getByRole("button", { name: "Cold call" }));
+    expect(screen.getByRole("region", { name: "Next take" })).toHaveTextContent("Cold call, Realistic");
+    await user.click(within(screen.getByRole("region", { name: "Next take" })).getByRole("button", { name: "Start the first take" }));
+    await waitFor(() => expect(screen.getByTestId("where").textContent).toMatch(/^\/sessions\/.+\/live$/), { timeout: 4000 });
+    const config = (mockStore.db.sessions.at(-1) as SessionRecord).config;
+    expect(config.interview_type).toBe("role_play");
+    expect(config.role_play).toBe("cold_call");
+  });
+
+  it("RP-4: other takes send no call", async () => {
+    const { interviews } = await roleWithInterviews("behavioral");
+    const user = renderApp(`/interviews/${interviews[0].id}`);
+    expect(await screen.findByRole("heading", { level: 1 })).not.toHaveTextContent("Beta");
+    await user.click(await screen.findByRole("button", { name: "Change settings" }));
+    expect(within(screen.getByTestId("take-settings")).queryByRole("group", { name: "Call" })).toBeNull();
+  });
+
   it("RH-5: the mode labels are Realistic and Practice; a Practice take is stored as coach", async () => {
     const { interviews } = await roleWithInterviews("behavioral");
     const user = renderApp(`/interviews/${interviews[0].id}`);
