@@ -23322,6 +23322,34 @@
         ],
         "title": "ResumeAccepted"
       },
+      "ResumeComparisonEntry": {
+        "additionalProperties": false,
+        "description": "One resume of a resume comparison and the gap analysis it is ranked by (RC-2).",
+        "properties": {
+          "resume_id": {
+            "format": "uuid",
+            "title": "Resume Id",
+            "type": "string"
+          },
+          "gap_analysis_id": {
+            "format": "uuid",
+            "title": "Gap Analysis Id",
+            "type": "string"
+          },
+          "reused": {
+            "description": "True when an analysis of the same job and resume already existed, so this comparison made no model call for it.",
+            "title": "Reused",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "resume_id",
+          "gap_analysis_id",
+          "reused"
+        ],
+        "title": "ResumeComparisonEntry",
+        "type": "object"
+      },
       "ResumeIssue": {
         "properties": {
           "key": {

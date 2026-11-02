@@ -13,6 +13,7 @@ from strong_core.schemas.analysis import (
     RequirementKind,
     RequirementMatch,
     RequirementRating,
+    ResumeComparisonEntry,
     Strength,
 )
 from strong_core.schemas.base import Contract
@@ -39,6 +40,7 @@ from strong_core.schemas.enums import (
     Difficulty,
     DocumentKind,
     EmailKind,
+    GapPurpose,
     GapStatus,
     HireSignal,
     InterviewType,
@@ -201,6 +203,7 @@ EXPORTED_SCHEMAS: dict[str, type[BaseModel]] = {
     "plan": Plan,
     "interview_readiness": InterviewReadiness,
     "story_answer": StoryAnswer,
+    "resume_comparison_entry": ResumeComparisonEntry,
 }
 
 __all__ = [
@@ -252,6 +255,7 @@ __all__ = [
     "Gap",
     "GapAnalysis",
     "GapAssessment",
+    "GapPurpose",
     "GapStatus",
     "GeneralQuestion",
     "GeneralQuestionBank",
@@ -300,6 +304,7 @@ __all__ = [
     "RequirementMatch",
     "RequirementRating",
     "Resume",
+    "ResumeComparisonEntry",
     "ResumeLineEdit",
     "ResumeRole",
     "ReviewPayload",

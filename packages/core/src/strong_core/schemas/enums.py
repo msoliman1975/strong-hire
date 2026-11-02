@@ -329,6 +329,18 @@ class GapStatus(StrEnum):
     FAILED = "failed"
 
 
+class GapPurpose(StrEnum):
+    """Why a gap analysis row exists (RC-7).
+
+    A role row is the role's own analysis: the latest one is what the role page, the plan and
+    the interviewer brief use. A comparison row was made by a resume comparison (RC-2) for a
+    resume the user has not picked; it never becomes the role's analysis by itself.
+    """
+
+    ROLE = "role"
+    COMPARISON = "comparison"
+
+
 class Confidence(StrEnum):
     LOW = "low"
     MEDIUM = "medium"
