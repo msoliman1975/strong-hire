@@ -109,7 +109,9 @@ export function outlineHandlers(find: (id: string) => Story | undefined, out: (s
       const first = candidates.find((c) => c.value.status === "filled" && c.value.text);
       if (!first) return HttpResponse.json({ edits: [], questions: ["What did you do yourself, step by step?"] });
       const before = first.value.text as string;
-      const after = before.replace(/\s+/g, " ").replace(/^(we|our team)\b/i, "I").trim();
+      // A shorter telling in the user's own words: the first clause, or "I" for "we".
+      const head = before.split(/,\s+(?:and|but|so)\s+/)[0].replace(/[.\s]+$/, "");
+      const after = (head.length < before.length - 2 ? `${head}.` : before.replace(/^(we|our team)\b/i, "I")).trim();
       const edit: SlotEdit = {
         section: s.section,
         slot: first.slot,

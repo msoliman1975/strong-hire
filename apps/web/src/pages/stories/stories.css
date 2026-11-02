@@ -729,7 +729,8 @@
   flex-wrap: wrap;
 }
 
-.outline-section__head h3 {
+.outline-section__head h2 {
+  font-size: 1.0625rem;
   margin: 0;
 }
 
@@ -871,4 +872,10 @@
 
 .improve-panel input {
   width: 100%;
+}
+
+/* The side cards' titles are h2 for the heading order (h1 page title); they look like h3. */
+.story-page__card-title {
+  font-size: 1rem;
+  margin: 0;
 }

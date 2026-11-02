@@ -159,7 +159,11 @@ function SlotRow({
   return (
     <li className="outline-slot" data-state={state} data-required={required || undefined} data-testid="outline-slot" data-slot={id}>
       <div className="outline-slot__head">
-        <span className="outline-slot__name">{name}</span>
+        <span className="outline-slot__name">
+          {/* Inside its step card the step number is said, not shown again. */}
+          {view.step !== null && <span className="visually-hidden">Step {view.step + 1}: </span>}
+          {SLOT_LABEL[key] ?? key}
+        </span>
         <span className="outline-slot__state">
           {state === "filled"
             ? slot.by_user
@@ -398,9 +402,9 @@ function SectionCard({ story, outline, section, readOnly }: { story: Story; outl
   const quiet = views.filter((v) => !shown.includes(v));
   const headingId = `outline-${section.section}-${readOnly ? "preview" : "story"}`;
   return (
-    <section className="outline-section" aria-labelledby={headingId} data-testid="outline-section" data-section={section.section}>
+    <div role="group" className="outline-section" aria-labelledby={headingId} data-testid="outline-section" data-section={section.section}>
       <div className="outline-section__head">
-        <h3 id={headingId}>{label}</h3>
+        <h2 id={headingId}>{label}</h2>
         {!readOnly && !improving && (
           <button type="button" className="sx-btn ghost sm" onClick={() => setImproving(true)}>
             Improve with Strova
@@ -420,7 +424,7 @@ function SectionCard({ story, outline, section, readOnly }: { story: Story; outl
           {!readOnly && quiet.length > 0 && <QuietSlots story={story} views={quiet} />}
         </>
       )}
-    </section>
+    </div>
   );
 }
 

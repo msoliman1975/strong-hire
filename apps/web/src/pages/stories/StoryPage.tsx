@@ -177,7 +177,7 @@ function UsedFor({ story }: { story: Story }) {
   const notes = usedForNotes(story);
   return (
     <section className="sx-card" aria-labelledby="used-for-heading">
-      <h3 id="used-for-heading">Used for</h3>
+      <h2 id="used-for-heading" className="story-page__card-title">Used for</h2>
       {notes.length === 0 ? (
         <span className="sx-small sx-muted">Not used by a role yet.</span>
       ) : (
@@ -197,7 +197,7 @@ function CameFrom({ story }: { story: Story }) {
   const count = takes.data?.length ?? 0;
   return (
     <section className="sx-card" aria-labelledby="came-from-heading">
-      <h3 id="came-from-heading">Where it came from</h3>
+      <h2 id="came-from-heading" className="story-page__card-title">Where it came from</h2>
       <span className="sx-small" data-testid="story-source">
         {story.source === "debrief_answer" ? (
           <>
