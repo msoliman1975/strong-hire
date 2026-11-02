@@ -14,6 +14,7 @@ Fields: **Area** (api, worker, voice, web, core, prompts, infra), **Priority** (
 | RMAP-3 | Clearer "Not checked yet" label on resumes | web | Next | Done |
 | RMAP-4 | Call it the "default" resume, not the "main" one | web | Now | Done |
 | RMAP-5 | Deleting a resume that a target role uses | web | Now | Done |
+| RMAP-6 | Waitlist: a confirmed address that joins again gets no email | api | Now | Done |
 
 ## RMAP-1: Filter Rehearsals by target role
 
@@ -186,4 +187,26 @@ resume is **Compare my resumes**, then **Use this one** (RC-6), which needs two 
 
 **Not done:** the API still lets a take start on an interview whose resume is deleted. Only the UI
 stops it. If that matters, `interview_for_session` can return 409 for a deleted resume.
+
+## RMAP-6: Waitlist: a confirmed address that joins again gets no email
+
+**Recorded:** 2026-11-02
+
+**Found:** the owner's test joins got no email. It was not an outage: the address was on the list
+and confirmed since Oct 27. For a confirmed entry, `POST /public/waitlist` sent nothing, while the
+form still said "check your email". The logs had no send failures.
+
+**Done (2026-11-02):** every join that is not dropped now emails the person who joined:
+
+- unconfirmed: the confirm link, as before;
+- confirmed: "You're already on the Strong Hire waitlist", with nothing to do;
+- confirmed and invited: "You're already invited", with the sign-in link again.
+
+The page answer stays the same for everyone, so only that inbox learns the email was on the list.
+The rate limit (5 joins per hour per address) still applies. The success text on the site and on
+the app's `/waitlist` page now reads "We sent you an email. If you're new to the waitlist, open the
+link in it…".
+
+A failed send was already logged at ERROR. Error capture (OB-4) turns it into an error group and
+the default "New error" alert emails `ALERT_EMAIL`. A test now pins that log.
 
