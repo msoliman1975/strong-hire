@@ -15,8 +15,8 @@ Fields: **Area** (api, worker, voice, web, core, prompts, infra), **Priority** (
 | RMAP-4 | Call it the "default" resume, not the "main" one | web | Now | Done |
 | RMAP-5 | Deleting a resume that a target role uses | web | Now | Done |
 | RMAP-6 | Waitlist: a confirmed address that joins again gets no email | api | Now | Done |
-| RMAP-7 | Story crafting with Strova: more room to type, and formatting | web, prompts | Now | Planned (in RMAP-8) |
-| RMAP-8 | Deep story crafting: STAR and CARL, organized slots, depth, flow check, improve | core, api, prompts, web | Now | Planned |
+| RMAP-7 | Story crafting with Strova: more room to type, and formatting | web, prompts | Now | Done (in RMAP-8) |
+| RMAP-8 | Deep story crafting: STAR and CARL, organized slots, depth, flow check, improve | core, api, prompts, web | Now | Done |
 
 ## RMAP-1: Filter Rehearsals by target role
 
@@ -270,4 +270,9 @@ SC-17 and SC-18.
 
 **Delivery:** a loop session builds it unattended, in nine PRs (SC00 to SC08), following
 `docs/story-crafting/execution-plan.md` and `docs/story-crafting/prompts/LOOP.md`.
+
+**Done 2026-11-03:** #242 (spec), #243 (core), #244 (engine and craft turn), #245 (story page API),
+#246 (session UI), #247 (story page UI), #248 (flow check and skill hints), #249 (formatting and
+voice), and SC08 (evals, end-to-end journey, report). RMAP-7 is done with it (SC-17, SC-18).
+Follow-ups are listed in the SC08 pull request.
 

@@ -32,6 +32,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from strong_api.coach import craft, engine
+from strong_api.coach.facts import new_facts
 from strong_api.inputs.deps import Db, Me, Queue
 from strong_api.plan.story_fit import queue_story_fits_for_user
 from strong_api.stories.outline import convert_style, load_outline, save_outline, strip_markdown
@@ -151,9 +152,13 @@ def _unbacked(text: str, quotes: Sequence[str], said: str, *numbers_in: str | No
         if not engine.quote_found(quote, said):
             return f"quote not found: {quote[:80]!r}"
     quoted = " ".join(engine.normal(q) for q in quotes)
-    for number in engine.NUMBER.findall(" ".join(filter(None, (text, *numbers_in)))):
+    claimed = " ".join(filter(None, (text, *numbers_in)))
+    for number in engine.NUMBER.findall(claimed):
         if number not in quoted:
             return f"number not in the quotes: {number}"
+    invented = new_facts(claimed, said)  # SC-15: facts, not wording
+    if invented:
+        return f"new fact: {invented[0]}"
     return None
 
 

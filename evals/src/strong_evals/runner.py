@@ -40,7 +40,7 @@ from strong_core.gateway import ModelGateway, Role, build_gateway
 from strong_core.gateway.fake import DEFAULT_FIXTURES_DIR
 from strong_core.gateway.recorder import RecordingGateway
 from strong_core.schemas import CoachStyle, HireSignal, Scorecard
-from strong_evals import EVALS_DIR
+from strong_evals import EVALS_DIR, crafting
 from strong_evals.candidate import Persona
 from strong_evals.coach import (
     CoachRun,
@@ -180,6 +180,8 @@ class RunReport:
     gap: list[GapResult] = field(default_factory=list)
     coach: list[CoachResult] = field(default_factory=list)
     suggestions: list[SuggestionResult] = field(default_factory=list)
+    crafting: list[crafting.CraftingResult] = field(default_factory=list)
+    crafting_depth: list[str] = field(default_factory=list)
     style_picks: list[StylePick] = field(default_factory=list)
     metrics: list[MetricResult] = field(default_factory=list)
     recorded: int = 0
@@ -197,7 +199,9 @@ class RunReport:
             *self.coach,
             *self.suggestions,
         ]
-        return sum(r.error is not None for r in items)
+        return sum(r.error is not None for r in items) + sum(
+            r.error is not None for r in self.crafting
+        )
 
     @property
     def failed(self) -> list[MetricResult]:
@@ -541,6 +545,32 @@ def compute_metrics(report: RunReport, thresholds: dict[str, dict[str, Any]]) ->
             + (", checked against each case's expected result" if fake else ""),
         )
 
+    if report.crafting:
+        invented = crafting.invented_facts(report.crafting)
+        add(
+            "crafting_invented_facts",
+            "Story crafting: texts with a fact the user never gave (SC-15)",
+            float(invented),
+            str(invented),
+            f"{sum(r.case.kind != 'flow' for r in report.crafting)} cases: crafting turns, "
+            "improve, organize and rewrite",
+        )
+        add(
+            "crafting_depth_violations",
+            "Story crafting: context slots asked, skips kept, move on (SC-4, SC-5)",
+            float(len(report.crafting_depth)),
+            str(len(report.crafting_depth)),
+            "; ".join(report.crafting_depth) or "scripted STAR and CARL sessions",
+        )
+        recall = crafting.flow_recall(report.crafting)
+        add(
+            "crafting_flow_recall",
+            "Flow check: seeded flag types found, none on a coherent story (SC-9)",
+            recall,
+            f"{recall:.0%}",
+            f"{sum(r.case.kind == 'flow' for r in report.crafting)} seeded stories",
+        )
+
     # Reference numbers from the human-written transcripts (not the system under test).
     s_probed = sum(r.follow_ups.probed for r in report.scripted)
     s_eligible = sum(r.follow_ups.eligible for r in report.scripted)
@@ -770,6 +800,12 @@ async def run_suite(
             report.suggestions.append(await run_case(cases[case_id], base))
             done = report.suggestions[-1]
             print(f"  suggestion {case_id}: {done.outcome} {done.error or ''}")
+    if suite.crafting:
+        for case in crafting.load_cases():
+            report.crafting.append(await crafting.run_case(case, base))
+            crafted = report.crafting[-1]
+            print(f"  crafting {case.id}: {crafted.outcome} {crafted.error or ''}")
+        report.crafting_depth = crafting.depth_violations()
     report.prompt_refs = sorted(refs)
     report.recorded = len(recorder.saved) if recorder else 0
     thresholds = yaml.safe_load(THRESHOLDS_FILE.read_text(encoding="utf-8"))
