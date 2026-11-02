@@ -1082,6 +1082,233 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/stories/{story_id}/outline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Edit Outline
+         * @description SC-10: set, clear, skip or reorder slots and steps, as the user typed them.
+         */
+        patch: operations["edit_outline_stories__story_id__outline_patch"];
+        trace?: never;
+    };
+    "/stories/{story_id}/sections/{section}/improve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Improve Section
+         * @description SC-11: Strova's before-and-after edits for one section, from the user's words, or the
+         *     questions to ask when facts are missing. Nothing is written until the user accepts.
+         */
+        post: operations["improve_section_stories__story_id__sections__section__improve_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/sections/{section}/improve/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Accept Improve
+         * @description SC-11: apply the edits the user accepted. Each is checked again against the user's words;
+         *     one that is not is refused (422), so nothing is half applied.
+         */
+        post: operations["accept_improve_stories__story_id__sections__section__improve_accept_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/organize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Organize Story
+         * @description SC-13, D-11: one model call sorts a classic story's words into STAR slots. A preview:
+         *     nothing is written until the user accepts.
+         */
+        post: operations["organize_story_stories__story_id__organize_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/organize/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Accept Organize
+         * @description SC-13: apply the previewed outline. Its slots are checked again against the user's words;
+         *     the story becomes STAR and its five parts are rendered from the outline (SC-14).
+         */
+        post: operations["accept_organize_stories__story_id__organize_accept_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/style": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Switch Style
+         * @description SC-12, D-2: without `rewrite`, rename and move the slots in code and save (no model call,
+         *     no fact lost). With it, one model call rewrites the wording; that is a preview to accept.
+         */
+        post: operations["switch_style_stories__story_id__style_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/style/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Accept Style
+         * @description SC-12: apply a previewed rewrite. Its slots are checked again against the user's words;
+         *     a slot that is not keeps its moved text.
+         */
+        post: operations["accept_style_stories__story_id__style_accept_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/flow-check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Flow Check
+         * @description SC-9: check that the story hangs together. Advisory; the status never depends on it.
+         */
+        post: operations["flow_check_stories__story_id__flow_check_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/flow-flags/{key}/dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Dismiss Flag
+         * @description SC-9: hide a flag until one of the slots it cites changes.
+         */
+        post: operations["dismiss_flag_stories__story_id__flow_flags__key__dismiss_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/hints/{skill}/deepen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deepen Hint
+         * @description SC-8, D-8: Deepen tags the story with the skill; the UI opens a short session with Strova
+         *     on this story for it (POST /coach/sessions with story_id and target_skill).
+         */
+        post: operations["deepen_hint_stories__story_id__hints__skill__deepen_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/hints/{skill}/dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Dismiss Hint
+         * @description SC-8: Not now. The hint does not come back.
+         */
+        post: operations["dismiss_hint_stories__story_id__hints__skill__dismiss_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/coach/sessions": {
         parameters: {
             query?: never;
@@ -1096,6 +1323,27 @@ export interface paths {
          * @description CO-2: start a coach session. The coach greets and asks for the first missing thing.
          */
         post: operations["start_coach_session_coach_sessions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/coach/style-suggestion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Style Suggestion
+         * @description SC-1, D-2: the style the start screen preselects, from the target skill or the question
+         *     the story answers. Code only, no model call.
+         */
+        get: operations["style_suggestion_coach_style_suggestion_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -3773,6 +4021,17 @@ export interface components {
              */
             reason: string;
         };
+        /**
+         * ActionStep
+         * @description SC-2: one action step. `did` and `why` are core (D-4); the other two are optional.
+         */
+        ActionStep: {
+            did?: components["schemas"]["OutlineSlot"] | null;
+            why?: components["schemas"]["OutlineSlot"] | null;
+            alternatives?: components["schemas"]["OutlineSlot"] | null;
+            /** @description How you brought people along. */
+            people?: components["schemas"]["OutlineSlot"] | null;
+        };
         /** AddAdminIn */
         AddAdminIn: {
             /**
@@ -5502,6 +5761,20 @@ export interface components {
             missing: components["schemas"]["StoryPart"][];
             /** @description CO-4: what the coach is asking for now */
             asking_for: components["schemas"]["AskFor"];
+            /** @description SC-4: the section and slots, for a styled story */
+            asking?: components["schemas"]["CraftAsk"] | null;
+            /** @description SC-1, D-2: Strova's suggested style when a new session started without one */
+            suggested_style?: components["schemas"]["StoryStyle"] | null;
+            /**
+             * Flow Flags
+             * @description SC-9: the story's flow flags that show (advisory)
+             */
+            flow_flags?: components["schemas"]["FlowFlag"][];
+            /**
+             * Hints
+             * @description SC-8: up to three open skill hints, gaps first
+             */
+            hints?: components["schemas"]["SkillHint"][];
         };
         /** CoachSessionOut */
         CoachSessionOut: {
@@ -5521,6 +5794,8 @@ export interface components {
             started_at: string | null;
             /** Ended At */
             ended_at: string | null;
+            /** @description SC-4: the outline section in progress; null for a classic session, or once every section of a styled story is done */
+            section?: components["schemas"]["StorySection"] | null;
         };
         /**
          * CoachSessionStatus
@@ -5563,8 +5838,22 @@ export interface components {
          * @description One candidate turn and the coach's reply.
          */
         CoachTurnResult: {
-            /** @description CO-3: only the part updates the candidate's own words back */
+            /** @description CO-3: only the part updates the candidate's own words back. On a styled story the parts are empty and `craft` has the slot updates. */
             reply: components["schemas"]["CoachReply"];
+            /** @description SC-6: on a styled story, the kept slot updates and skips, and whether the section is done */
+            craft?: components["schemas"]["CraftReply"] | null;
+            /** @description SC-4: what Strova asks next */
+            asking?: components["schemas"]["CraftAsk"] | null;
+            /**
+             * Flow Flags
+             * @description SC-9: the story's flow flags that show (advisory)
+             */
+            flow_flags?: components["schemas"]["FlowFlag"][];
+            /**
+             * Hints
+             * @description SC-8: up to three open skill hints, gaps first
+             */
+            hints?: components["schemas"]["SkillHint"][];
             /** @description None when an empty new story was dropped at the end */
             story: components["schemas"]["Story"] | null;
             /**
@@ -5943,6 +6232,51 @@ export interface components {
             cost_usd: number;
             /** Rows */
             rows: number;
+        };
+        /**
+         * CraftAsk
+         * @description SC-4, SC-7: what Strova is asking about on a styled story.
+         */
+        CraftAsk: {
+            /** @description Null once every section is done */
+            section: components["schemas"]["StorySection"] | null;
+            /**
+             * Slots
+             * @description The empty slots of the section, in asking order
+             */
+            slots: components["schemas"]["SlotRef"][];
+        };
+        /**
+         * CraftReply
+         * @description SC-4 to SC-6: one Strova turn while crafting a styled story. It replaces CoachReply for
+         *     styled stories. The engine names the section and slots; the reply fills only those.
+         */
+        CraftReply: {
+            /**
+             * Message
+             * @description What Strova says: one question at a time.
+             */
+            message: string;
+            /** Slot Updates */
+            slot_updates?: components["schemas"]["SlotUpdate"][];
+            /**
+             * Skips
+             * @description SC-5: slots the candidate asked to skip.
+             */
+            skips?: components["schemas"]["SlotRef"][];
+            /**
+             * Section Done
+             * @description SC-5: the candidate said move on, or the section is complete.
+             * @default false
+             */
+            section_done: boolean;
+            /**
+             * Skills
+             * @description Skills the story shows so far.
+             */
+            skills?: components["schemas"]["Competency"][];
+            /** Hints */
+            hints?: components["schemas"]["SkillHint"][];
         };
         /**
          * Crafting
@@ -6553,6 +6887,40 @@ export interface components {
             error?: string | null;
         };
         /**
+         * FlowCheck
+         * @description SC-9: the result of one flow check. No flags means the story hangs together.
+         */
+        FlowCheck: {
+            /** Flags */
+            flags?: components["schemas"]["FlowFlag"][];
+        };
+        /**
+         * FlowFlag
+         * @description SC-9, D-9: one advisory flow flag. `key` is stable for the same issue, so a dismissed
+         *     flag stays dismissed until the slots it cites change.
+         */
+        FlowFlag: {
+            /** Key */
+            key: string;
+            type: components["schemas"]["FlowFlagType"];
+            /**
+             * Slots
+             * @description The slots the flag is about.
+             */
+            slots: components["schemas"]["SlotRef"][];
+            /**
+             * Question
+             * @description What Strova would ask about it.
+             */
+            question: string;
+        };
+        /**
+         * FlowFlagType
+         * @description SC-9, D-9: the kinds of advisory flags the flow check raises.
+         * @enum {string}
+         */
+        FlowFlagType: "action_vs_problem" | "result_vs_problem" | "number_conflict" | "timeline_conflict" | "loose_end";
+        /**
          * FocusSuggestions
          * @description Suggested focus chips per standard category (CU-2).
          */
@@ -6848,6 +7216,27 @@ export interface components {
          * @enum {string}
          */
         HireSignal: "Strong Hire" | "Hire" | "Lean Hire" | "Lean No Hire" | "No Hire";
+        /**
+         * ImproveAccept
+         * @description SC-11: the edits from an improve that the user accepts; the rest are rejected.
+         */
+        ImproveAccept: {
+            /** Edits */
+            edits: components["schemas"]["SlotEdit"][];
+            /**
+             * Note
+             * @description The note the improve was asked with, so its words count as the user's.
+             */
+            note?: string | null;
+        };
+        /**
+         * ImproveIn
+         * @description SC-11: an optional note for Strova ("make it shorter", "add that I led the review").
+         */
+        ImproveIn: {
+            /** Note */
+            note?: string | null;
+        };
         /**
          * ImproveResumeLinePayload
          * @description SG-6: the payload of an improve resume line suggestion.
@@ -8030,6 +8419,68 @@ export interface components {
          * @enum {string}
          */
         OrgType: "personal" | "business";
+        /**
+         * OrganizeResult
+         * @description SC-13, D-11: a classic story sorted into STAR slots from the candidate's words only.
+         */
+        OrganizeResult: {
+            outline: components["schemas"]["StoryOutline"];
+        };
+        /**
+         * OutlinePatch
+         * @description SC-10: inline edits. `slots` are applied first (a step index equal to the number of
+         *     steps adds a step); then `steps`, when sent, is the new order of the action steps by their
+         *     index, and a step left out is removed. 1 to 5 steps must remain.
+         */
+        OutlinePatch: {
+            /** Slots */
+            slots?: components["schemas"]["SlotEditIn"][];
+            /** Steps */
+            steps?: number[] | null;
+        };
+        /**
+         * OutlineSection
+         * @description SC-2: one section of the outline with its named slots. Missing keys are empty slots.
+         */
+        OutlineSection: {
+            section: components["schemas"]["StorySection"];
+            /** Slots */
+            slots?: {
+                [key: string]: components["schemas"]["OutlineSlot"];
+            };
+            /**
+             * Steps
+             * @description Action only: 1 to 5 steps, in order.
+             */
+            steps?: components["schemas"]["ActionStep"][] | null;
+            /** @description Result only. */
+            metric?: components["schemas"]["ResultMetric"] | null;
+        };
+        /**
+         * OutlineSlot
+         * @description SC-2, D-6: one slot of the outline. A filled slot Strova wrote carries the candidate's
+         *     verbatim `quotes`; a slot the candidate typed is `by_user` and needs none.
+         */
+        OutlineSlot: {
+            /**
+             * Text
+             * @description Markdown. Set only when filled.
+             */
+            text?: string | null;
+            /**
+             * Quotes
+             * @description The candidate's words this slot came from, verbatim.
+             */
+            quotes?: string[];
+            /**
+             * By User
+             * @description True when the candidate typed the text.
+             * @default false
+             */
+            by_user: boolean;
+            /** @default empty */
+            status: components["schemas"]["SlotStatus"];
+        };
         /** OverviewCost */
         OverviewCost: {
             total_usd: components["schemas"]["AdminMetric"];
@@ -9234,6 +9685,37 @@ export interface components {
             evidence: string | null;
         };
         /**
+         * ResultMetric
+         * @description SC-2: the Result section's metric. `text` says it in words; `before`, `after` and `unit`
+         *     hold the numbers when the candidate gave them.
+         */
+        ResultMetric: {
+            /**
+             * Text
+             * @description Markdown. Set only when filled.
+             */
+            text?: string | null;
+            /**
+             * Quotes
+             * @description The candidate's words this slot came from, verbatim.
+             */
+            quotes?: string[];
+            /**
+             * By User
+             * @description True when the candidate typed the text.
+             * @default false
+             */
+            by_user: boolean;
+            /** @default empty */
+            status: components["schemas"]["SlotStatus"];
+            /** Before */
+            before?: string | null;
+            /** After */
+            after?: string | null;
+            /** Unit */
+            unit?: string | null;
+        };
+        /**
          * Resume
          * @description A parsed resume (IN-3). Contact details are deliberately not part of the contract.
          */
@@ -9914,6 +10396,17 @@ export interface components {
             job_id: string;
             status: components["schemas"]["SessionStatus"];
         };
+        /**
+         * SectionImprove
+         * @description SC-11: Improve with Strova for one section. Edits to accept or reject, or questions when
+         *     the facts are missing; never neither.
+         */
+        SectionImprove: {
+            /** Edits */
+            edits?: components["schemas"]["SlotEdit"][];
+            /** Questions */
+            questions?: string[];
+        };
         /** ServiceProfile */
         ServiceProfile: {
             /** Service */
@@ -10481,6 +10974,18 @@ export interface components {
             v2_enabled: boolean;
         };
         /**
+         * SkillHint
+         * @description SC-8, D-8: "This story could also show {skill}", offered once the core slots are filled.
+         */
+        SkillHint: {
+            skill: components["schemas"]["Competency"];
+            /**
+             * Reason
+             * @description One sentence, from the story's own facts.
+             */
+            reason: string;
+        };
+        /**
          * SkillReadiness
          * @description RD-1: readiness for one skill, from Realistic sessions only.
          */
@@ -10526,6 +11031,131 @@ export interface components {
              * @description Realistic sessions that scored the skill
              */
             sessions: number;
+        };
+        /**
+         * SlotEdit
+         * @description SC-11, D-10: one before-and-after edit to a slot from Improve with Strova.
+         */
+        SlotEdit: {
+            section: components["schemas"]["StorySection"];
+            /**
+             * Slot
+             * @description A slot key, `metric`, or a step field.
+             */
+            slot: string;
+            /**
+             * Step
+             * @description Action only: the step index.
+             */
+            step?: number | null;
+            /**
+             * Before
+             * @description The slot's text now; null if empty.
+             */
+            before?: string | null;
+            /** After */
+            after: string;
+            /**
+             * Quotes
+             * @description The candidate's words the new text came from, verbatim.
+             */
+            quotes: string[];
+        };
+        /**
+         * SlotEditIn
+         * @description SC-10, D-10: the user's own text for one slot (no quotes). Blank or null text empties the
+         *     slot; `skipped` marks it skipped. The metric may also carry before, after and unit.
+         */
+        SlotEditIn: {
+            section: components["schemas"]["StorySection"];
+            /**
+             * Slot
+             * @description A slot key, `metric`, or a step field.
+             */
+            slot: string;
+            /**
+             * Step
+             * @description Action only: the step index.
+             */
+            step?: number | null;
+            /** Text */
+            text?: string | null;
+            /**
+             * Skipped
+             * @default false
+             */
+            skipped: boolean;
+            /** Before */
+            before?: string | null;
+            /** After */
+            after?: string | null;
+            /** Unit */
+            unit?: string | null;
+        };
+        /**
+         * SlotRef
+         * @description Points at one slot: a named slot of a section, or a field of one action step.
+         */
+        SlotRef: {
+            section: components["schemas"]["StorySection"];
+            /**
+             * Slot
+             * @description A slot key, `metric`, or a step field.
+             */
+            slot: string;
+            /**
+             * Step
+             * @description Action only: the step index.
+             */
+            step?: number | null;
+        };
+        /**
+         * SlotStatus
+         * @description SC-2, D-5: one outline slot is filled, still empty, or skipped by the candidate.
+         * @enum {string}
+         */
+        SlotStatus: "filled" | "empty" | "skipped";
+        /**
+         * SlotUpdate
+         * @description SC-6, D-6: new text for one slot from a crafting turn, backed by verbatim quotes.
+         */
+        SlotUpdate: {
+            section: components["schemas"]["StorySection"];
+            /**
+             * Slot
+             * @description A slot key, `metric`, or a step field.
+             */
+            slot: string;
+            /**
+             * Step
+             * @description Action only: the step index.
+             */
+            step?: number | null;
+            /**
+             * Text
+             * @description The slot, reworded from the candidate's words.
+             */
+            text: string;
+            /**
+             * Quotes
+             * @description The candidate's words this slot came from, verbatim.
+             */
+            quotes: string[];
+            /**
+             * Before
+             * @description Metric only.
+             */
+            before?: string | null;
+            /**
+             * After
+             * @description Metric only.
+             */
+            after?: string | null;
+            /**
+             * Unit
+             * @description Metric only.
+             */
+            unit?: string | null;
         };
         /** Source */
         Source: {
@@ -10592,6 +11222,8 @@ export interface components {
              * @description ST-12: the achievement, as roles[<i>].achievements[<j>]. It seeds the context, and the first question asks for the stakes.
              */
             resume_line_ref?: string | null;
+            /** @description SC-1: STAR or CARL for a new story, crafted section by section. Null keeps the classic five-part session; the response then carries Strova's suggested style. Ignored for an existing story, which keeps its own style. */
+            story_style?: components["schemas"]["StoryStyle"] | null;
         };
         /**
          * Story
@@ -10635,6 +11267,10 @@ export interface components {
             source_question_ref?: string | null;
             /** Notes */
             notes?: components["schemas"]["StoryNote"][];
+            /** @description SC-1: star or carl; null for a classic story (D-11). */
+            style?: components["schemas"]["StoryStyle"] | null;
+            /** @description SC-2: the outline of a styled story; null when classic. */
+            outline?: components["schemas"]["StoryOutline"] | null;
             /**
              * Created At
              * Format: date-time
@@ -10991,6 +11627,10 @@ export interface components {
             source_question_ref?: string | null;
             /** Notes */
             notes?: components["schemas"]["StoryNote"][];
+            /** @description SC-1: star or carl; null for a classic story (D-11). */
+            style?: components["schemas"]["StoryStyle"] | null;
+            /** @description SC-2: the outline of a styled story; null when classic. */
+            outline?: components["schemas"]["StoryOutline"] | null;
             /**
              * Created At
              * Format: date-time
@@ -11007,6 +11647,26 @@ export interface components {
              * @enum {string}
              */
             display_status: "draft" | "ready" | "proven";
+            /**
+             * Flow Flags
+             * @description SC-9: the flow check's flags that show (dismissed ones return when a slot they cite changes). Advisory: the status never depends on them.
+             */
+            flow_flags?: components["schemas"]["FlowFlag"][];
+            /**
+             * Hints
+             * @description SC-8: up to three open skill hints, gap skills of the target roles first.
+             */
+            hints?: components["schemas"]["SkillHint"][];
+        };
+        /**
+         * StoryOutline
+         * @description SC-2, D-3: the source of truth of a styled story. The five legacy columns are rendered
+         *     from it in code (D-12, SC-14).
+         */
+        StoryOutline: {
+            style: components["schemas"]["StoryStyle"];
+            /** Sections */
+            sections: components["schemas"]["OutlineSection"][];
         };
         /**
          * StoryPart
@@ -11109,6 +11769,12 @@ export interface components {
             edit?: components["schemas"]["StoryPartEdit"] | null;
         };
         /**
+         * StorySection
+         * @description SC-2, D-3: the sections of a story outline. Which ones a story has depends on its style.
+         * @enum {string}
+         */
+        StorySection: "situation" | "challenge" | "task" | "action" | "result" | "learning";
+        /**
          * StorySource
          * @description ST-1: where a story came from.
          * @enum {string}
@@ -11120,6 +11786,12 @@ export interface components {
          * @enum {string}
          */
         StoryStatus: "draft" | "proven";
+        /**
+         * StoryStyle
+         * @description SC-1, D-1: the writing style of a crafted story. A classic story has no style (null).
+         * @enum {string}
+         */
+        StoryStyle: "star" | "carl";
         /**
          * StoryVersion
          * @description CO-8: one telling of the story, built only from the candidate's words.
@@ -11168,11 +11840,47 @@ export interface components {
             evidence: string;
         };
         /**
+         * StyleIn
+         * @description SC-12: switch to the other style. Without `rewrite` the slots are renamed and moved in
+         *     code and saved at once; with it, Strova rewrites the wording (one model call) as a preview.
+         */
+        StyleIn: {
+            style: components["schemas"]["StoryStyle"];
+            /**
+             * Rewrite
+             * @default false
+             */
+            rewrite: boolean;
+        };
+        /**
          * StyleRequest
          * @description CO-5: switch the style mid-session; the next reply uses it.
          */
         StyleRequest: {
             style: components["schemas"]["CoachStyle"];
+        };
+        /**
+         * StyleRewrite
+         * @description SC-12, D-2: the outline in the other style with the wording rewritten, no new facts.
+         */
+        StyleRewrite: {
+            outline: components["schemas"]["StoryOutline"];
+        };
+        /**
+         * StyleSuggestion
+         * @description SC-1, D-2: the style the start screen preselects.
+         */
+        StyleSuggestion: {
+            style: components["schemas"]["StoryStyle"];
+        };
+        /**
+         * StyleSwitchOut
+         * @description SC-12: the switched story (no rewrite), or the rewrite to accept or discard.
+         */
+        StyleSwitchOut: {
+            story?: components["schemas"]["StoryOut"] | null;
+            /** @description The rewrite to accept (POST /stories/{id}/style/accept) or discard. Slots the user typed stay theirs; Strova's slots carry quotes. */
+            preview?: components["schemas"]["StoryOutline"] | null;
         };
         /**
          * SubscriptionStatus
@@ -14056,6 +14764,376 @@ export interface operations {
             };
         };
     };
+    edit_outline_stories__story_id__outline_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OutlinePatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    improve_section_stories__story_id__sections__section__improve_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+                section: components["schemas"]["StorySection"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImproveIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SectionImprove"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    accept_improve_stories__story_id__sections__section__improve_accept_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+                section: components["schemas"]["StorySection"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImproveAccept"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    organize_story_stories__story_id__organize_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizeResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    accept_organize_stories__story_id__organize_accept_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrganizeResult"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    switch_style_stories__story_id__style_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StyleIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StyleSwitchOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    accept_style_stories__story_id__style_accept_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoryOutline"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    flow_check_stories__story_id__flow_check_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dismiss_flag_stories__story_id__flow_flags__key__dismiss_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deepen_hint_stories__story_id__hints__skill__deepen_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+                skill: components["schemas"]["Competency"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dismiss_hint_stories__story_id__hints__skill__dismiss_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+                skill: components["schemas"]["Competency"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     start_coach_session_coach_sessions_post: {
         parameters: {
             query?: never;
@@ -14076,6 +15154,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CoachSessionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    style_suggestion_coach_style_suggestion_get: {
+        parameters: {
+            query?: {
+                target_skill?: components["schemas"]["Competency"] | null;
+                question?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StyleSuggestion"];
                 };
             };
             /** @description Validation Error */

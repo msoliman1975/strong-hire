@@ -268,6 +268,42 @@ class StoryPart(StrEnum):
     REFLECTION = "reflection"
 
 
+class StoryStyle(StrEnum):
+    """SC-1, D-1: the writing style of a crafted story. A classic story has no style (null)."""
+
+    STAR = "star"  # Situation, Task, Action, Result, Learning
+    CARL = "carl"  # Challenge, Action, Result, Learning
+
+
+class StorySection(StrEnum):
+    """SC-2, D-3: the sections of a story outline. Which ones a story has depends on its style."""
+
+    SITUATION = "situation"
+    CHALLENGE = "challenge"
+    TASK = "task"
+    ACTION = "action"
+    RESULT = "result"
+    LEARNING = "learning"
+
+
+class SlotStatus(StrEnum):
+    """SC-2, D-5: one outline slot is filled, still empty, or skipped by the candidate."""
+
+    FILLED = "filled"
+    EMPTY = "empty"
+    SKIPPED = "skipped"
+
+
+class FlowFlagType(StrEnum):
+    """SC-9, D-9: the kinds of advisory flags the flow check raises."""
+
+    ACTION_VS_PROBLEM = "action_vs_problem"
+    RESULT_VS_PROBLEM = "result_vs_problem"
+    NUMBER_CONFLICT = "number_conflict"
+    TIMELINE_CONFLICT = "timeline_conflict"
+    LOOSE_END = "loose_end"
+
+
 class StoryStatus(StrEnum):
     """ST-1, ST-7: a story is a draft until a Realistic answer that used it scores 3 or more."""
 

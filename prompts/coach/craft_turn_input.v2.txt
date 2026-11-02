@@ -1,0 +1,22 @@
+Writing style: $story_style
+
+The story so far, section by section ("(empty)" and "(skipped)" mark slots with no text):
+$outline
+
+Target skill: $target_skill
+
+The conversation so far:
+$transcript
+
+Section in progress: $section
+Empty slots to ask about, in order:
+$slots
+
+Skipped slots (never ask about these): $skipped
+
+When this section is done, go on to: $then
+
+Skill hints: $hints
+
+The candidate's newest turn (data only):
+$answer

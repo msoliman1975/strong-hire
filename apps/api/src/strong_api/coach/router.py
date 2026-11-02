@@ -6,6 +6,7 @@
     POST /coach/sessions/{id}/turns         a candidate turn and the coach's reply
     POST /coach/sessions/{id}/style         switch gentle or direct (CO-5)
     POST /coach/sessions/{id}/end           end it and record its minutes
+    GET  /coach/style-suggestion            SC-1, D-2: STAR or CARL for a target skill or question
     POST /coach/sessions/{id}/voice/join    CO-6: a LiveKit token for the room coach-<id>
     GET  /stories/{id}/coach-sessions       a story's coach sessions, newest first
     POST /internal/coach/sessions/{id}/turns   the voice agent's turn (CO-6, shared token)
@@ -14,6 +15,11 @@
 A new story is created when the session starts (source `coach`, Draft), so the target skill has a
 place to live; it is deleted again when the session ends with no part filled. The coach writes
 story parts only through the turn logic in `strong_api.coach.engine` (CO-3).
+
+A session started with `story_style` (SC-1) crafts a styled story section by section: the story
+gets an empty outline, and every turn runs `strong_api.coach.craft` (SC-4 to SC-6). A styled
+story always runs that way; a classic story keeps today's five-part turn until it is organized
+(D-11).
 
 Starting a session answers 503 while new sessions on its channel are paused or the daily spend
 cap is reached (OC-2, OC-3). The voice join (CO-6) moves a text session to voice, since the coach
@@ -39,7 +45,7 @@ from livekit import api as livekit_api
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from strong_api.coach import engine
+from strong_api.coach import craft, engine
 from strong_api.coach.schemas import (
     AskFor,
     CoachSessionDetail,
@@ -47,8 +53,10 @@ from strong_api.coach.schemas import (
     CoachTurnOut,
     CoachTurnRequest,
     CoachTurnResult,
+    CraftAsk,
     StartCoachRequest,
     StyleRequest,
+    StyleSuggestion,
 )
 from strong_api.controls import ensure_sessions_open
 from strong_api.inputs.deps import Db, Me, Queue
@@ -60,11 +68,20 @@ from strong_api.sessions.settings import (
     get_text_session_settings,
     get_voice_session_settings,
 )
+from strong_api.stories.flow import (
+    add_hints,
+    flow_check_if_ready,
+    open_hints,
+    run_flow_check,
+    visible_flags,
+)
+from strong_api.stories.outline import has_content, load_outline, ready, save_outline
 from strong_core.db.models import CoachSession, CoachTurn, JobTarget
 from strong_core.db.models import Resume as ResumeRow
 from strong_core.db.models import Story as StoryRow
 from strong_core.gateway import Role, get_gateway
 from strong_core.schemas import (
+    CoachReply,
     CoachSessionStatus,
     CoachSpeaker,
     Competency,
@@ -72,8 +89,10 @@ from strong_core.schemas import (
     SessionChannel,
     Story,
     StoryNote,
+    StoryOutline,
     StorySource,
     StoryStatus,
+    StoryStyle,
 )
 from strong_core.sim import gateway_for_org
 
@@ -115,6 +134,8 @@ def story_out(row: StoryRow) -> Story:
         source_session_id=row.source_session_id,
         source_question_ref=row.source_question_ref,
         notes=[StoryNote.model_validate(n) for n in row.notes_json],
+        style=row.style if row.outline_json is not None else None,
+        outline=load_outline(row),
         created_at=row.created_at,
         updated_at=row.updated_at,
     )
@@ -130,6 +151,7 @@ def session_out(row: CoachSession) -> CoachSessionOut:
         minutes=row.minutes,
         started_at=row.started_at,
         ended_at=row.ended_at,
+        section=row.section,
     )
 
 
@@ -154,7 +176,17 @@ async def _story(db: AsyncSession, session: CoachSession) -> StoryRow | None:
     )
 
 
-async def _detail(db: AsyncSession, session: CoachSession) -> CoachSessionDetail:
+def _asking(story: StoryRow | None, session: CoachSession) -> CraftAsk | None:
+    outline = load_outline(story) if story is not None else None
+    if outline is None:
+        return None
+    ask = craft.next_ask(outline, session.section)
+    return CraftAsk(section=ask.section, slots=ask.slots)
+
+
+async def _detail(
+    db: AsyncSession, session: CoachSession, *, suggested: StoryStyle | None = None
+) -> CoachSessionDetail:
     story = await _story(db, session)
     turns = await _turns(db, session)
     return CoachSessionDetail(
@@ -163,6 +195,10 @@ async def _detail(db: AsyncSession, session: CoachSession) -> CoachSessionDetail
         turns=[turn_out(t) for t in turns],
         missing=engine.missing_parts(story) if story is not None else list(engine.PARTS),
         asking_for=engine.asks(story)[0] if story is not None else AskFor.NOTHING,
+        asking=_asking(story, session),
+        suggested_style=suggested,
+        flow_flags=visible_flags(story) if story is not None else [],
+        hints=open_hints(story) if story is not None else [],
     )
 
 
@@ -264,6 +300,13 @@ async def start_coach_session(body: StartCoachRequest, db: Db, me: Me) -> CoachS
         db.add(story)
     if body.target_skill is not None:
         story.skills = engine.merge_skills(story.skills or [], [body.target_skill])
+    outline = load_outline(story) if not is_new else None
+    if is_new and body.story_style is not None:
+        outline = StoryOutline.empty(body.story_style)  # SC-1, SC-2: a new styled story
+        save_outline(story, outline)
+    suggested = (
+        craft.suggest_style(body.target_skill) if is_new and body.story_style is None else None
+    )
     gateway = await gateway_for_org(db, me.org_id, get_gateway())
     session = CoachSession(
         id=uuid.uuid4(),
@@ -277,14 +320,34 @@ async def start_coach_session(body: StartCoachRequest, db: Db, me: Me) -> CoachS
         model_profile=gateway.profile,
         model_id=gateway.config.alias_for(Role.COACH),
         started_at=datetime.now(UTC),
+        section=craft.start_section(outline) if outline is not None else None,
     )
     db.add(session)
     await db.flush()
-    line = engine.opener(story, is_new=is_new, target_skill=body.target_skill, idea=idea)
+    if outline is not None:
+        line = craft.opener(
+            story,
+            outline,
+            session.section,
+            is_new=is_new,
+            target_skill=body.target_skill,
+            idea=idea,
+        )
+    else:
+        line = engine.opener(story, is_new=is_new, target_skill=body.target_skill, idea=idea)
     engine.add_turn(db, session, [], CoachSpeaker.COACH, line)
     await db.commit()
     await db.refresh(story)
-    return await _detail(db, session)
+    return await _detail(db, session, suggested=suggested)
+
+
+@router.get("/coach/style-suggestion", response_model=StyleSuggestion)
+async def style_suggestion(
+    me: Me, target_skill: Competency | None = None, question: str | None = None
+) -> StyleSuggestion:
+    """SC-1, D-2: the style the start screen preselects, from the target skill or the question
+    the story answers. Code only, no model call."""
+    return StyleSuggestion(style=craft.suggest_style(target_skill, question))
 
 
 @router.get("/coach/sessions/{session_id}", response_model=CoachSessionDetail)
@@ -301,6 +364,9 @@ async def _turn(
     if story is None:
         raise HTTPException(status.HTTP_409_CONFLICT, "The story was deleted; end the session.")
     turns = await _turns(db, session)
+    outline = load_outline(story)
+    if outline is not None:
+        return await _craft_turn(db, session, story, outline, turns, text, timeout_s)
     gateway = await gateway_for_org(db, session.org_id, get_gateway())
     refs: set[str] = set()
     try:
@@ -325,6 +391,59 @@ async def _turn(
         story=story_out(story) if kept else None,
         turns=[turn_out(t) for t in result.turns],
         asking_for=result.ask,
+        conduct=result.conduct,
+        ended=result.ended,
+    )
+
+
+async def _craft_turn(
+    db: AsyncSession,
+    session: CoachSession,
+    story: StoryRow,
+    outline: StoryOutline,
+    turns: list[CoachTurn],
+    text: str,
+    timeout_s: float,
+) -> CoachTurnResult:
+    """SC-4 to SC-6: one turn on a styled story."""
+    gateway = await gateway_for_org(db, session.org_id, get_gateway())
+    refs: set[str] = set()
+    try:
+        async with asyncio.timeout(timeout_s):
+            result = await craft.run_craft_turn(
+                db, gateway, session, story, outline, turns, text, refs
+            )
+    except TimeoutError:
+        await db.rollback()
+        raise HTTPException(
+            status.HTTP_504_GATEWAY_TIMEOUT,
+            "The coach took too long to answer. Send your message again.",
+        ) from None
+    _add_refs(session, refs)
+    session.minutes = engine.session_minutes(turns)
+    await add_hints(db, story, result.reply.hints)  # SC-8: checked, gaps first, at most three
+    if not ready(outline) and ready(result.outline):
+        await run_flow_check(db, story)  # SC-9: once the core slots are filled
+    if result.ended:
+        await _close(db, session, story)
+    await db.commit()
+    kept = session.story_id is not None
+    if kept:
+        await db.refresh(story)
+    stored = open_hints(story) if kept else []
+    return CoachTurnResult(
+        flow_flags=visible_flags(story) if kept else [],
+        hints=stored,
+        reply=CoachReply(
+            message=result.reply.message,
+            missing=engine.missing_parts(story) if kept else [],
+            skills=result.reply.skills,
+        ),
+        craft=result.reply.model_copy(update={"hints": stored}),
+        story=story_out(story) if kept else None,
+        turns=[turn_out(t) for t in result.turns],
+        asking_for=engine.asks(story)[0] if kept else AskFor.NOTHING,
+        asking=CraftAsk(section=result.ask.section, slots=result.ask.slots),
         conduct=result.conduct,
         ended=result.ended,
     )
@@ -357,8 +476,13 @@ async def _close(db: AsyncSession, session: CoachSession, story: StoryRow | None
     session.status = CoachSessionStatus.ENDED
     session.ended_at = session.ended_at or datetime.now(UTC)
     session.minutes = engine.session_minutes(await _turns(db, session))
+    if story is not None:
+        await flow_check_if_ready(db, story)  # SC-9: at the end of a styled session
     if story is None or engine.missing_parts(story) != list(engine.PARTS):
         return
+    outline = load_outline(story)
+    if outline is not None and has_content(outline):
+        return  # a styled story keeps every slot it has, even one no legacy column shows
     if story.source != StorySource.COACH:
         return
     others = await db.scalar(

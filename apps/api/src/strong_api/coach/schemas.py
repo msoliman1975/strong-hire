@@ -1,4 +1,4 @@
-"""Request and response bodies of the coach API (CO-2 to CO-5)."""
+"""Request and response bodies of the coach API (CO-2 to CO-5, SC-1, SC-4 to SC-7)."""
 
 from __future__ import annotations
 
@@ -15,9 +15,15 @@ from strong_core.schemas import (
     CoachSpeaker,
     CoachStyle,
     Competency,
+    CraftReply,
+    FlowFlag,
     SessionChannel,
+    SkillHint,
+    SlotRef,
     Story,
     StoryPart,
+    StorySection,
+    StoryStyle,
 )
 
 TURN_MAX_CHARS = 4000
@@ -61,6 +67,12 @@ class StartCoachRequest(BaseModel):
         description="ST-12: the achievement, as roles[<i>].achievements[<j>]. It seeds the "
         "context, and the first question asks for the stakes.",
     )
+    story_style: StoryStyle | None = Field(
+        default=None,
+        description="SC-1: STAR or CARL for a new story, crafted section by section. Null keeps "
+        "the classic five-part session; the response then carries Strova's suggested style. "
+        "Ignored for an existing story, which keeps its own style.",
+    )
 
 
 class CoachTurnRequest(BaseModel):
@@ -93,6 +105,18 @@ class CoachSessionOut(BaseModel):
     minutes: int
     started_at: datetime | None
     ended_at: datetime | None
+    section: StorySection | None = Field(
+        default=None,
+        description="SC-4: the outline section in progress; null for a classic session, or once "
+        "every section of a styled story is done",
+    )
+
+
+class CraftAsk(BaseModel):
+    """SC-4, SC-7: what Strova is asking about on a styled story."""
+
+    section: StorySection | None = Field(description="Null once every section is done")
+    slots: list[SlotRef] = Field(description="The empty slots of the section, in asking order")
 
 
 class CoachSessionDetail(BaseModel):
@@ -101,13 +125,45 @@ class CoachSessionDetail(BaseModel):
     turns: list[CoachTurnOut]
     missing: list[StoryPart] = Field(description="CO-3: parts the story does not have yet")
     asking_for: AskFor = Field(description="CO-4: what the coach is asking for now")
+    asking: CraftAsk | None = Field(
+        default=None, description="SC-4: the section and slots, for a styled story"
+    )
+    suggested_style: StoryStyle | None = Field(
+        default=None,
+        description="SC-1, D-2: Strova's suggested style when a new session started without one",
+    )
+    flow_flags: list[FlowFlag] = Field(
+        default_factory=list, description="SC-9: the story's flow flags that show (advisory)"
+    )
+    hints: list[SkillHint] = Field(
+        default_factory=list, description="SC-8: up to three open skill hints, gaps first"
+    )
+
+
+class StyleSuggestion(BaseModel):
+    """SC-1, D-2: the style the start screen preselects."""
+
+    style: StoryStyle
 
 
 class CoachTurnResult(BaseModel):
     """One candidate turn and the coach's reply."""
 
     reply: CoachReply = Field(
-        description="CO-3: only the part updates the candidate's own words back"
+        description="CO-3: only the part updates the candidate's own words back. On a styled "
+        "story the parts are empty and `craft` has the slot updates."
+    )
+    craft: CraftReply | None = Field(
+        default=None,
+        description="SC-6: on a styled story, the kept slot updates and skips, and whether the "
+        "section is done",
+    )
+    asking: CraftAsk | None = Field(default=None, description="SC-4: what Strova asks next")
+    flow_flags: list[FlowFlag] = Field(
+        default_factory=list, description="SC-9: the story's flow flags that show (advisory)"
+    )
+    hints: list[SkillHint] = Field(
+        default_factory=list, description="SC-8: up to three open skill hints, gaps first"
     )
     story: Story | None = Field(description="None when an empty new story was dropped at the end")
     turns: list[CoachTurnOut] = Field(description="The candidate's turn, then the coach's")

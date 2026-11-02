@@ -1,0 +1,65 @@
+{
+  "outline": {
+    "style": "carl",
+    "sections": [
+      {
+        "section": "challenge",
+        "slots": {
+          "role": {
+            "text": "I was the tech lead for the checkout team.",
+            "quotes": ["I was the tech lead on checkout"],
+            "status": "filled"
+          },
+          "problem": {
+            "text": "Our move of checkout to a new payments provider was two weeks late, with Black Friday a month away.",
+            "quotes": [
+              "we were moving checkout to the new payments provider",
+              "the rollout was already two weeks late",
+              "Black Friday was a month out and checkout could not break"
+            ],
+            "status": "filled"
+          },
+          "org": {
+            "status": "skipped"
+          }
+        }
+      },
+      {
+        "section": "action",
+        "steps": [
+          {
+            "did": {
+              "text": "I sent five percent of traffic to the new provider first.",
+              "quotes": ["I split it so five percent of traffic went to the new provider first"],
+              "status": "filled"
+            },
+            "why": {
+              "text": "If it broke, I wanted it to break small.",
+              "quotes": ["if it broke I wanted it to break small"],
+              "status": "filled"
+            }
+          }
+        ]
+      },
+      {
+        "section": "result",
+        "slots": {},
+        "metric": {
+          "text": "We finished a week before Black Friday, and not one payment failed.",
+          "quotes": ["we were done a week before Black Friday and not one payment failed"],
+          "status": "filled"
+        }
+      },
+      {
+        "section": "learning",
+        "slots": {
+          "lesson": {
+            "text": "Small slices turn one risky launch into many small ones.",
+            "quotes": ["small slices made it a bunch of small launches instead of one scary one"],
+            "status": "filled"
+          }
+        }
+      }
+    ]
+  }
+}

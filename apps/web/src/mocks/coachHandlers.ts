@@ -5,6 +5,9 @@
  * stories are written to the story mock's library, so the workbench opens them.
  *
  * `resetMockCoach` clears sessions and takes (tests); `scriptMockCoach` sets the next replies.
+ *
+ * SC-1, SC-4: a start with `story_style` crafts a styled story (craftMock.ts): the story gets an
+ * empty outline, and each turn fills the slot Strova asked about, section by section.
  */
 import { http, HttpResponse } from "msw/http";
 
@@ -22,7 +25,10 @@ import type {
   TakeRequest,
 } from "../pages/coach/api";
 import { STORY_PARTS, type Competency, type Story } from "../pages/stories/api";
+import { askOf, craftTurn, emptyOutline, hasContent, nextSection, renderLegacy, SECTION_OPENER, WRAP_LINE } from "./craftMock";
 import type { MockStore } from "./db";
+import { MOCK_HINTS, mockFlags } from "./outlineMock";
+import { outlineReady } from "../pages/coach/outline";
 import { mockStory, mockStoryLibrary } from "./storyHandlers";
 
 /** ST-12: the resume achievement a story idea (RM-4) starts from, as the API reads it. */
@@ -93,8 +99,21 @@ const asking = (s: Story | null): AskFor => {
 
 function detail(entry: MockCoachSession): CoachSessionDetail {
   const story = findStory(entry.session.story_id);
-  return { session: entry.session, story, turns: entry.turns, missing: missing(story), asking_for: asking(story) };
+  const outline = story?.outline ?? null;
+  return {
+    session: entry.session,
+    story,
+    turns: entry.turns,
+    missing: missing(story),
+    asking_for: asking(story),
+    asking: outline ? askOf(outline, entry.session.section ?? null) : null,
+    flow_flags: story?.flow_flags ?? [],
+    hints: story?.hints ?? [],
+  };
 }
+
+/** D-2, as strong_api.coach.craft.suggest_style. */
+const CARL_SKILLS = new Set(["conflict_handling", "learning_from_failure", "ownership", "judgment", "problem_framing"]);
 
 function addTurn(entry: MockCoachSession, speaker: CoachTurnOut["speaker"], text: string): CoachTurnOut {
   const turn = { seq: entry.turns.length, speaker, text, at_ms: entry.turns.length * 20_000 };
@@ -135,6 +154,13 @@ export function coachHandlers(store?: MockStore) {
         mockStoryLibrary().push(story);
       }
       if (body.target_skill && !story.skills.includes(body.target_skill)) story.skills.push(body.target_skill);
+      if (isNew && body.story_style) {
+        story.style = body.story_style;
+        story.outline = emptyOutline(body.story_style);
+        story.context = null;
+      }
+      const outline = story.outline ?? null;
+      const section = outline ? nextSection(outline, null) : null;
       const id = crypto.randomUUID();
       const entry: MockCoachSession = {
         session: {
@@ -146,6 +172,7 @@ export function coachHandlers(store?: MockStore) {
           minutes: 0,
           started_at: new Date().toISOString(),
           ended_at: null,
+          section,
         },
         turns: [],
       };
@@ -156,9 +183,30 @@ export function coachHandlers(store?: MockStore) {
         : body.target_skill
           ? `Let's build one story that shows ${body.target_skill.replace(/_/g, " ")}, from your own work.`
           : "Let's build one story together, from your own work.";
-      addTurn(entry, "coach", `${lead} ${ASK_LINE[asking(story)]}`);
+      const style = outline?.style.toUpperCase();
+      const craftLead = idea
+        ? `Let's turn this resume line into a story, as ${style}: "${idea}".`
+        : body.target_skill
+          ? `Let's build one story that shows ${body.target_skill.replace(/_/g, " ")}, as ${style}.`
+          : `Let's build one story together, from your own work, as ${style}.`;
+      addTurn(
+        entry,
+        "coach",
+        outline && isNew
+          ? `${craftLead} ${section ? SECTION_OPENER[section] : WRAP_LINE}`
+          : `${lead} ${outline ? (section ? SECTION_OPENER[section] : WRAP_LINE) : ASK_LINE[asking(story)]}`,
+      );
       sessions.set(id, entry);
-      return HttpResponse.json(detail(entry), { status: 201 });
+      const out = detail(entry);
+      if (isNew && !body.story_style) {
+        out.suggested_style = body.target_skill && CARL_SKILLS.has(body.target_skill) ? "carl" : "star";
+      }
+      return HttpResponse.json(out, { status: 201 });
+    }),
+
+    http.get(`${API}/coach/style-suggestion`, ({ request }) => {
+      const skill = new URL(request.url).searchParams.get("target_skill");
+      return HttpResponse.json({ style: skill && CARL_SKILLS.has(skill) ? "carl" : "star" });
     }),
 
     http.get(`${API}/coach/sessions/:id`, ({ params }) => {
@@ -175,6 +223,41 @@ export function coachHandlers(store?: MockStore) {
       const { text } = (await request.json()) as { text: string };
       const story = findStory(entry.session.story_id);
       if (!story) return HttpResponse.json({ detail: "The story was deleted; end the session." }, { status: 409 });
+      if (story.outline) {
+        const wasReady = outlineReady(story.outline);
+        const step = craftTurn(story.outline, entry.session.section ?? null, text);
+        if (!wasReady && outlineReady(story.outline)) {
+          // SC-8, SC-9: once the core slots are filled, the flow check runs and hints arrive.
+          story.flow_flags = mockFlags(story.outline);
+          story.hints = MOCK_HINTS.filter((h) => !story.skills.includes(h.skill));
+        }
+        Object.assign(story, renderLegacy(story.outline)); // SC-14: the five parts follow the outline
+        story.updated_at = new Date().toISOString();
+        entry.session = { ...entry.session, section: step.section };
+        const said = addTurn(entry, "candidate", text);
+        const reply = addTurn(entry, "coach", step.message);
+        const craft = {
+          message: reply.text,
+          slot_updates: step.updates.map((u) => ({ ...u, before: null, after: null, unit: null })),
+          skips: step.skips,
+          section_done: step.sectionDone,
+          skills: story.skills,
+          hints: story.hints,
+        };
+        const result: CoachTurnResult = {
+          flow_flags: story.flow_flags,
+          hints: story.hints,
+          reply: { message: reply.text, parts: [], missing: missing(story), skills: story.skills },
+          craft,
+          story,
+          turns: [said, reply],
+          asking_for: asking(story),
+          asking: askOf(story.outline, step.section),
+          conduct: "ok",
+          ended: false,
+        };
+        return HttpResponse.json(result);
+      }
       const scripted = script.shift();
       const fill = scripted?.parts ?? (missing(story)[0] ? { [missing(story)[0]]: text } : {});
       const parts = Object.entries(fill).map(([part, value]) => {
@@ -212,7 +295,8 @@ export function coachHandlers(store?: MockStore) {
       if (entry.session.status === "active") {
         entry.session = { ...entry.session, status: "ended", ended_at: new Date().toISOString() };
         const story = findStory(entry.session.story_id);
-        if (story && story.source === "coach" && missing(story).length === STORY_PARTS.length) {
+        const empty = story?.outline ? !hasContent(story.outline) : missing(story).length === STORY_PARTS.length;
+        if (story && story.source === "coach" && empty) {
           const library = mockStoryLibrary();
           library.splice(library.indexOf(story), 1);
           entry.session = { ...entry.session, story_id: null };

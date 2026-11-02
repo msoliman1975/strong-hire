@@ -1,5 +1,58 @@
 {
   "$defs": {
+    "ActionStep": {
+      "additionalProperties": false,
+      "description": "SC-2: one action step. `did` and `why` are core (D-4); the other two are optional.",
+      "properties": {
+        "alternatives": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OutlineSlot"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "did": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OutlineSlot"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "people": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OutlineSlot"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "How you brought people along."
+        },
+        "why": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OutlineSlot"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "ActionStep",
+      "type": "object"
+    },
     "Competency": {
       "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.",
       "enum": [
@@ -33,6 +86,179 @@
         "closing"
       ],
       "title": "Competency",
+      "type": "string"
+    },
+    "OutlineSection": {
+      "additionalProperties": false,
+      "description": "SC-2: one section of the outline with its named slots. Missing keys are empty slots.",
+      "properties": {
+        "metric": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResultMetric"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Result only."
+        },
+        "section": {
+          "$ref": "#/$defs/StorySection"
+        },
+        "slots": {
+          "additionalProperties": {
+            "$ref": "#/$defs/OutlineSlot"
+          },
+          "title": "Slots",
+          "type": "object"
+        },
+        "steps": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/ActionStep"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Action only: 1 to 5 steps, in order.",
+          "title": "Steps"
+        }
+      },
+      "required": [
+        "section"
+      ],
+      "title": "OutlineSection",
+      "type": "object"
+    },
+    "OutlineSlot": {
+      "additionalProperties": false,
+      "description": "SC-2, D-6: one slot of the outline. A filled slot Strova wrote carries the candidate's\nverbatim `quotes`; a slot the candidate typed is `by_user` and needs none.",
+      "properties": {
+        "by_user": {
+          "default": false,
+          "description": "True when the candidate typed the text.",
+          "title": "By User",
+          "type": "boolean"
+        },
+        "quotes": {
+          "description": "The candidate's words this slot came from, verbatim.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Quotes",
+          "type": "array"
+        },
+        "status": {
+          "$ref": "#/$defs/SlotStatus",
+          "default": "empty"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Markdown. Set only when filled.",
+          "title": "Text"
+        }
+      },
+      "title": "OutlineSlot",
+      "type": "object"
+    },
+    "ResultMetric": {
+      "additionalProperties": false,
+      "description": "SC-2: the Result section's metric. `text` says it in words; `before`, `after` and `unit`\nhold the numbers when the candidate gave them.",
+      "properties": {
+        "after": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "After"
+        },
+        "before": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Before"
+        },
+        "by_user": {
+          "default": false,
+          "description": "True when the candidate typed the text.",
+          "title": "By User",
+          "type": "boolean"
+        },
+        "quotes": {
+          "description": "The candidate's words this slot came from, verbatim.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Quotes",
+          "type": "array"
+        },
+        "status": {
+          "$ref": "#/$defs/SlotStatus",
+          "default": "empty"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Markdown. Set only when filled.",
+          "title": "Text"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        }
+      },
+      "title": "ResultMetric",
+      "type": "object"
+    },
+    "SlotStatus": {
+      "description": "SC-2, D-5: one outline slot is filled, still empty, or skipped by the candidate.",
+      "enum": [
+        "filled",
+        "empty",
+        "skipped"
+      ],
+      "title": "SlotStatus",
       "type": "string"
     },
     "StoryNote": {
@@ -84,6 +310,41 @@
       "title": "StoryNote",
       "type": "object"
     },
+    "StoryOutline": {
+      "additionalProperties": false,
+      "description": "SC-2, D-3: the source of truth of a styled story. The five legacy columns are rendered\nfrom it in code (D-12, SC-14).",
+      "properties": {
+        "sections": {
+          "items": {
+            "$ref": "#/$defs/OutlineSection"
+          },
+          "title": "Sections",
+          "type": "array"
+        },
+        "style": {
+          "$ref": "#/$defs/StoryStyle"
+        }
+      },
+      "required": [
+        "style",
+        "sections"
+      ],
+      "title": "StoryOutline",
+      "type": "object"
+    },
+    "StorySection": {
+      "description": "SC-2, D-3: the sections of a story outline. Which ones a story has depends on its style.",
+      "enum": [
+        "situation",
+        "challenge",
+        "task",
+        "action",
+        "result",
+        "learning"
+      ],
+      "title": "StorySection",
+      "type": "string"
+    },
     "StorySource": {
       "description": "ST-1: where a story came from.",
       "enum": [
@@ -101,6 +362,15 @@
         "proven"
       ],
       "title": "StoryStatus",
+      "type": "string"
+    },
+    "StoryStyle": {
+      "description": "SC-1, D-1: the writing style of a crafted story. A classic story has no style (null).",
+      "enum": [
+        "star",
+        "carl"
+      ],
+      "title": "StoryStyle",
       "type": "string"
     }
   },
@@ -149,6 +419,18 @@
       },
       "title": "Notes",
       "type": "array"
+    },
+    "outline": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/StoryOutline"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "SC-2: the outline of a styled story; null when classic."
     },
     "reflection": {
       "anyOf": [
@@ -227,6 +509,18 @@
     "status": {
       "$ref": "#/$defs/StoryStatus",
       "default": "draft"
+    },
+    "style": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/StoryStyle"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "SC-1: star or carl; null for a classic story (D-11)."
     },
     "title": {
       "maxLength": 200,

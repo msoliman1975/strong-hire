@@ -1,0 +1,71 @@
+{
+  "outline": {
+    "style": "star",
+    "sections": [
+      {
+        "section": "situation",
+        "slots": {
+          "role": {
+            "text": "I was the tech lead for the checkout team.",
+            "quotes": ["I was the tech lead on checkout"],
+            "status": "filled"
+          },
+          "problem": {
+            "text": "The team was moving checkout to a new payments provider, and the rollout was already two weeks late.",
+            "quotes": [
+              "we were moving checkout to the new payments provider",
+              "the rollout was already two weeks late"
+            ],
+            "status": "filled"
+          }
+        }
+      },
+      {
+        "section": "task",
+        "slots": {
+          "goal": {
+            "text": "Ship the new provider before Black Friday without breaking checkout.",
+            "quotes": ["Black Friday was a month out and checkout could not break"],
+            "status": "filled"
+          }
+        }
+      },
+      {
+        "section": "action",
+        "steps": [
+          {
+            "did": {
+              "text": "I split the rollout so five percent of traffic went to the new provider first.",
+              "quotes": ["I split it so five percent of traffic went to the new provider first"],
+              "status": "filled"
+            },
+            "why": {
+              "text": "A small slice showed failures early, while they were still cheap to fix.",
+              "quotes": ["if it broke I wanted it to break small"],
+              "status": "filled"
+            }
+          }
+        ]
+      },
+      {
+        "section": "result",
+        "slots": {},
+        "metric": {
+          "text": "We finished a week before Black Friday, and not one payment failed.",
+          "quotes": ["we were done a week before Black Friday and not one payment failed"],
+          "status": "filled"
+        }
+      },
+      {
+        "section": "learning",
+        "slots": {
+          "lesson": {
+            "text": "Rolling out in small slices turns a big launch into a series of small, safe ones.",
+            "quotes": ["small slices made it a bunch of small launches instead of one scary one"],
+            "status": "filled"
+          }
+        }
+      }
+    ]
+  }
+}

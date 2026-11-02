@@ -13,6 +13,7 @@
     POST   /stories/ask               ST-13: Strova answers from the user's stories and roles
 
 Every story carries `display_status` (ST-8): draft, ready (all five parts filled) or proven.
+A styled story (SC-1) carries its outline; it is Ready when its core slots are filled (SC-3).
 
 Stories belong to one user: every query filters by both `org_id` and `user_id`, and another
 user's story answers 404. Account export and delete (AC-1) cover stories and their notes through
@@ -39,6 +40,8 @@ from strong_api.inputs.deps import Db, Me, Queue
 from strong_api.inputs.queue import REVIEW_STORY
 from strong_api.plan.story_fit import queue_story_fits_for_user
 from strong_api.stories.ask import ask_strova
+from strong_api.stories.flow import flow_check_if_ready, open_hints, visible_flags
+from strong_api.stories.outline import load_outline, ready
 from strong_api.stories.schemas import (
     DisplayStatus,
     ReviewQueued,
@@ -92,9 +95,13 @@ def _clean(text: str | None) -> str | None:
 
 
 def display_status(row: StoryRow) -> DisplayStatus:
-    """ST-8: Proven stays as stored; a draft with all five parts filled is Ready."""
+    """ST-8: Proven stays as stored; a draft with all five parts filled is Ready. SC-3: a styled
+    story is Ready when every core slot of its outline is filled (D-4)."""
     if row.status == StoryStatus.PROVEN:
         return "proven"
+    outline = load_outline(row)
+    if outline is not None:
+        return "ready" if ready(outline) else "draft"
     return "ready" if all(_clean(getattr(row, p.value)) for p in StoryPart) else "draft"
 
 
@@ -113,9 +120,13 @@ def story_out(row: StoryRow) -> StoryOut:
         source_session_id=row.source_session_id,
         source_question_ref=row.source_question_ref,
         notes=_notes(row),
+        style=row.style if row.outline_json is not None else None,
+        outline=load_outline(row),
         created_at=row.created_at,
         updated_at=row.updated_at,
         display_status=display_status(row),
+        flow_flags=visible_flags(row),
+        hints=open_hints(row),
     )
 
 
@@ -305,6 +316,16 @@ async def edit_story(
     change; a part sent as null or blank is cleared."""
     row = await _owned(db, me, story_id)
     sent = body.model_fields_set
+    if row.outline_json is not None and sent & {p.value for p in StoryPart}:
+        # SC-14: a styled story's five parts are rendered from its outline, so an edit here
+        # would be lost on the next outline save. Its slots are edited in the outline instead.
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            {
+                "code": "styled_story",
+                "message": "This story is organized in sections. Edit its sections instead.",
+            },
+        )
     if "title" in sent:
         title = _clean(body.title)
         if title is None:
@@ -367,6 +388,8 @@ async def review_story(story_id: uuid.UUID, db: Db, me: Me, queue: Queue) -> Rev
     before-and-after edits from the user's words (U08's review prompt), and stores them as an
     open `review` suggestion for the story, replacing an older open one."""
     row = await _owned(db, me, story_id)
+    await flow_check_if_ready(db, row)  # SC-9: a styled story's flow is checked with Review
+    await db.commit()
     job_id = f"review_story:{row.id}:{uuid.uuid4().hex[:8]}"
     await queue.enqueue(REVIEW_STORY, job_id, org_id=str(me.org_id), story_id=str(row.id))
     return ReviewQueued(job_id=job_id)
