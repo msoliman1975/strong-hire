@@ -191,3 +191,24 @@ def test_rp2_sales_family_registry_entry() -> None:
     )
     assert info.interviewer_title(InterviewType.ROLE_PLAY) == "Buyer"
     assert {"account executive", "sdr", "sales engineer"} <= set(info.title_keywords)
+
+
+def test_rp12_question_bank_has_sales_questions_and_scenario_cards() -> None:
+    """RP-12: at least 15 general sales questions (behavioral and hiring manager) and at least
+    8 role-play scenario cards, two or more per call type."""
+    from collections import Counter
+
+    from strong_core.config import find_repo_root
+    from strong_core.schemas import GeneralQuestionBank
+
+    path = find_repo_root() / "questions" / "general.json"
+    bank = GeneralQuestionBank.model_validate_json(path.read_text(encoding="utf-8"))
+    sales = [q for q in bank.questions if RoleFamily.SALES in q.role_families]
+    by_type = Counter(q.interview_type for q in sales)
+    general = by_type[InterviewType.BEHAVIORAL] + by_type[InterviewType.HIRING_MANAGER]
+    assert general >= 15, by_type
+    assert by_type[InterviewType.BEHAVIORAL] >= 3 and by_type[InterviewType.HIRING_MANAGER] >= 3
+    cards = [q for q in bank.questions if q.interview_type == RP]
+    assert len(cards) >= 8
+    calls = Counter(q.question.split(":", 1)[0] for q in cards)
+    assert set(calls) == {"Cold call", "Discovery call", "Demo", "Negotiation", "Close"}
