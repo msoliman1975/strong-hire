@@ -126,14 +126,28 @@ when Ready) · Review result 72 (analysing) · Section headers 24 to 28 · Nav i
 
 ### 4.5 Brand rules
 
-- **Strong Hire stays the product and the only logo.** Keep the existing logo exactly: the
-  `BrandMark` component (`apps/web/src/components/BrandMark.tsx`), the favicon and the site's logo
-  files. The violet square in the mockups is a placeholder for it; never ship the square.
-- **The lockup** is the Strong Hire logo and name followed by "with Strova" in the muted text
-  colour and regular weight, as in the mockups' top bar. It appears in the app top bar, the
-  marketing site header and Strova's emails.
-- **Strova is a character, never a logo.** She is shown only as her avatar, with her name in text.
-  Do not make a Strova wordmark, icon font or favicon.
+- **Strong Hire stays the product name; the logo is Strova's ring, "the Orbit" (SV-10).** Approved
+  on Nov 2, 2026, replacing the lamp logo ("the Approved h"). The ring is Strova's: the same ring
+  that frames her avatar and shows her hat. It is open at the top right, and the green dot in the
+  gap is the candidate, on the way to the offer. Strova and the brand share one shape.
+  - Drawing (48 x 48 box): ring `M41.56 20.03 A18 18 0 1 1 27.97 6.44`, stroke 5, round caps, no
+    fill; dot at (36.73, 11.27), radius 5.5. Source: `BrandMark` in
+    `apps/web/src/components/BrandMark.tsx`; `apps/site/src/components/BrandMark.astro` is a copy.
+  - Colours: ring coach violet `#5332e6`, dot verdict green `#12775a`. On the dark live room and
+    dark browser tabs: ring `#a594ff`, dot `#4fc495`. App icon (`apple-touch-icon.png`, 180 px): a
+    violet `#5332e6` tile, white ring, mint `#7ef0bd` dot.
+  - Rules: never close the ring, never move the dot out of the gap, never colour the dot violet,
+    never put a check or letters inside the ring. The gap is drawn, not painted over, so the mark
+    works on any background. The wordmark "Strong Hire" is text next to the mark, never inside it.
+  - Files: `favicon.svg` (light and dark by `prefers-color-scheme`) and `apple-touch-icon.png` in
+    `apps/web/public` and `apps/site/public`; the 64 px email logo
+    `apps/worker/src/strong_worker/assets/strong-hire-logo-64.png`. The admin console keeps its own
+    favicon so staff can tell it apart.
+- **The lockup** is the Orbit and the name "Strong Hire" followed by "with Strova" in the muted text
+  colour and regular weight, as in the mockups' top bar (the violet square there is a placeholder
+  for the mark). It appears in the app top bar, the marketing site header and Strova's emails.
+- **Strova herself is a character.** She is shown as her avatar, with her name in text. Her ring
+  is the logo, but her face is never the logo: no Strova wordmark, icon font or avatar favicon.
 - **No change** to the v2 visual language: Geist and Geist Mono from `apps/web/src/theme/tokens.css`
   (the mockups load Geist from Google Fonts only because they are a standalone file), the violet
   action colour, teal for interview prep, the story-part colours, the dark live room.
@@ -404,7 +418,8 @@ section "v2.1 UX with Strova".
 - SV-4 Every avatar has an accessible label naming the state.
 - SV-5 Below 64 px the side effects are hidden.
 - SV-6 The live room shows "Strova is acting as {title} at {company}" and a state chip, driven by the interviewer state.
-- SV-7 The app top bar and the site header use the lockup with the existing Strong Hire logo; Strova never appears as a logo.
+- SV-7 The app top bar and the site header use the lockup with the Strong Hire logo (the Orbit, SV-10); Strova's avatar never stands in for the logo.
+- SV-10 The Strong Hire logo is the Orbit: Strova's violet ring, open at the top right, with the candidate's green dot in the gap. The app, the site, the favicons, the app icon and Strova's emails use the same drawing.
 - SV-8 The marketing site has the "Meet Strova" section with the animated avatar and the approved copy.
 - SV-9 Emails Strova sends come from "Strova from Strong Hire" with her 64 px avatar; account emails are unchanged.
 

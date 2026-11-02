@@ -276,9 +276,10 @@ v2.1 redesigns the v2 screens around the resume and Strova, the AI coach and int
 | SV-4 | Every avatar has an accessible label naming the state. | P0 |
 | SV-5 | Below 64 px the side effects are hidden. | P0 |
 | SV-6 | The live room shows "Strova is acting as {title} at {company}" and a state chip, driven by the interviewer state. | P0 |
-| SV-7 | The app top bar and the site header use the lockup with the existing Strong Hire logo; Strova never appears as a logo. | P0 |
+| SV-7 | The app top bar and the site header use the lockup with the Strong Hire logo (the Orbit, SV-10); Strova's avatar never stands in for the logo. | P0 |
 | SV-8 | The marketing site has the "Meet Strova" section with the animated avatar and the approved copy. | P0 |
 | SV-9 | Emails Strova sends come from "Strova from Strong Hire" with her 64 px avatar; account emails are unchanged. | P0 |
+| SV-10 | The Strong Hire logo is the Orbit: Strova's violet ring, open at the top right, with the candidate's green dot in the gap. The app, the site, the favicons, the app icon and Strova's emails use the same drawing. | P0 |
 
 **Onboarding**
 
