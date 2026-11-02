@@ -1,0 +1,30 @@
+{
+  "$id": "https://strong-hire.local/schemas/resume_comparison_entry.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One resume of a resume comparison and the gap analysis it is ranked by (RC-2).",
+  "properties": {
+    "gap_analysis_id": {
+      "format": "uuid",
+      "title": "Gap Analysis Id",
+      "type": "string"
+    },
+    "resume_id": {
+      "format": "uuid",
+      "title": "Resume Id",
+      "type": "string"
+    },
+    "reused": {
+      "description": "True when an analysis of the same job and resume already existed, so this comparison made no model call for it.",
+      "title": "Reused",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "resume_id",
+    "gap_analysis_id",
+    "reused"
+  ],
+  "title": "ResumeComparisonEntry",
+  "type": "object"
+}

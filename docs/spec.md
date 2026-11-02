@@ -315,6 +315,21 @@ v2.1 redesigns the v2 screens around the resume and Strova, the AI coach and int
 | RH-4 | The rehearsals page lists every interview across roles and recommends the next take. | P0 |
 | RH-5 | The mode labels are Realistic and Practice; the stored value is unchanged. | P0 |
 
+**Resume comparison** (added Nov 2, 2026; plan: `docs/resume-comparison-plan.md`)
+
+A user with more than one resume can ask which one fits a target role best. Each resume gets the normal gap analysis (GA-1, GA-2); code ranks them and explains the pick, so the comparison adds no model call of its own. Cost is 0 to 5 gap analysis runs (about 5k input and 1k output tokens each), and $0 when nothing changed since the last comparison.
+
+| ID | Requirement | Priority |
+| --- | --- | --- |
+| RC-1 | A user with 2 or more resumes can compare them for a role from Add a target role (next to "Measured against") and from the role page. It runs only when the user asks. With 1 resume the action is hidden. | P0 |
+| RC-2 | Every live, read resume (up to 5, the resume limit) gets a full gap analysis for the role. A ready analysis of the same job and resume that is not stale is reused, and so is one still running. While analyses run, the screen shows each resume's must-have count from the rule-based check (IN-12), which needs no model. | P0 |
+| RC-3 | Code ranks the resumes by match score, then by fewer must-haves never shown, then by fewer high-severity gaps, and recommends the first, with a reason built from the data (scores and the must-haves only the recommended resume shows). No extra model call. | P0 |
+| RC-4 | The recommended resume's gaps are listed by severity. A gap that another resume covers (rated meets or exceeds, with evidence) names that resume. When the line can be placed (a skill, or an achievement at a company the recommended resume also lists), **Add to resume** copies the line unchanged and the resume check runs again on its next read; **Dismiss** hides the hint. Both persist. No model call. | P0 |
+| RC-5 | A gap that no resume covers offers **Craft a story**, which opens a coach session for the role with the gap as the first message (ST-12). Nothing runs until the user clicks. | P0 |
+| RC-6 | **Use this one** is the user's choice; nothing switches automatically. On Add a target role it sets the resume the role is created with. On the role page it moves the role's interviews to that resume (the old interviews are archived with their takes, RH-1) and copies the resume's analysis into the role's own analysis without a model call. | P0 |
+| RC-7 | A comparison that starts any analysis counts as one run against the gap analysis rate limit (GA-4); one that reuses every pair counts as none. Comparison analyses never become the role's latest analysis, report or match score. | P0 |
+| RC-8 | The comparison is saved on the role. The role page shows when it ran and which resume fit best, and marks it out of date when the job or a compared resume changed, or a resume was added or deleted. Compare again reruns only the changed pairs. | P0 |
+
 **Debrief**
 
 | ID | Requirement | Priority |
@@ -566,7 +581,8 @@ Postgres is the single source of truth, with an `org_id` on every user-owned tab
 | JobTarget | id, user_id, company_id (nullable), source_url, raw_text, parsed_json, level, stage, context_notes, interview_date | Null company_id means generic mode. interview_date (L01) is the candidate's real interview date, if known; L06 times emails to it |
 | Company | id, name, slug, active | The launch companies |
 | CompanyProfile | id, company_id, version, status, profile_json, sources_json, reviewed_by, published_at | Only Published versions are used |
-| GapAnalysis | id, job_target_id, resume_id, match_score, breakdown_json, session_plan_json, model_profile, model_id, prompt_version | Recomputed when resume or job changes |
+| GapAnalysis | id, job_target_id, resume_id, match_score, breakdown_json, session_plan_json, model_profile, model_id, prompt_version, purpose, source_gap_id | Recomputed when resume or job changes. RC-7: purpose is role (the role's own analysis) or comparison; RC-6: source_gap_id marks a role row copied from a comparison row |
+| ResumeComparison | id, user_id, job_target_id, entries_json, new_runs, chosen_resume_id, dismissed_json, applied_json, created_at | RC-8: one row per comparison; each entry points at the gap analysis a resume is ranked by |
 | Session | id, job_target_id, type, difficulty, mode, channel (voice or text), duration_min, profile_version, brief_json, model_profile, interviewer_model_id, prompt_version, status, started_at, ended_at, minutes_billed | Coach and dev-profile sessions excluded from trends |
 | Turn | id, session_id, speaker, phase, text, start_ms, end_ms, question_ref | Transcript only, no audio |
 | Scorecard | id, session_id, hire_signal, rationale, competency_scores_json, value_scores_json, per_question_json, model_profile, model_id, prompt_version, rubric_version | One per Realistic or Coach session. Value scores are empty in generic mode |

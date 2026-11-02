@@ -9030,6 +9030,27 @@ export interface components {
             resume: components["schemas"]["ResumeOut"];
             job: components["schemas"]["JobOut"] | null;
         };
+        /**
+         * ResumeComparisonEntry
+         * @description One resume of a resume comparison and the gap analysis it is ranked by (RC-2).
+         */
+        ResumeComparisonEntry: {
+            /**
+             * Resume Id
+             * Format: uuid
+             */
+            resume_id: string;
+            /**
+             * Gap Analysis Id
+             * Format: uuid
+             */
+            gap_analysis_id: string;
+            /**
+             * Reused
+             * @description True when an analysis of the same job and resume already existed, so this comparison made no model call for it.
+             */
+            reused: boolean;
+        };
         /** ResumeIssue */
         ResumeIssue: {
             /** Key */
