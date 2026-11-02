@@ -34,7 +34,7 @@ v1 is deliberately narrow: tech roles, 20 curated companies plus a generic mode,
 | --- | --- | --- | --- |
 | Platform | Desktop web app | Native iOS and Android | Mobile web as a primary target |
 | Modality | Real-time voice, with an animated 3D interviewer avatar drawn in the browser (IV-10) | Photo-real AI interviewer video avatar (after v2.0) | Candidate video, posture or eye contact analysis |
-| Roles | Tech only: SWE, data/ML, PM, design, TPM | Adjacent corporate roles | Non-tech roles |
+| Roles | Tech only: SWE, data/ML, PM, design, TPM | Wave 1 role families (RF-1 to RF-15, `docs/role-families-spec.md`), then sales role-play and other corporate roles (wave 2) | Roles whose loops are mostly live coding, whiteboard or hands-on tests; licensed clinical and trades roles |
 | Companies | 20 curated profiles researched offline and imported, generic mode for others | Auto-profiles for other companies at job setup, more curated profiles, community interview reports | |
 | Interview types | Behavioral, hiring manager deep dive, verbal technical Q&A, case (product sense, estimation, system thinking) | Recruiter screen, panel with multiple personas | Live coding, whiteboard, written system design |
 | Feedback | Hire signal with rationale, per-question rubric, progress tracking | Transcript view, model answers, delivery metrics (pace, fillers), story bank: the candidate's strongest answers saved as reusable stories, tagged by competency (e.g. conflict management, leadership) | Audio playback (audio is deleted after scoring) |
@@ -59,7 +59,7 @@ The 21 launch companies: Google, Amazon, Microsoft, Meta, Apple, Netflix, Nvidia
 | Planning | One interview plan page per job and resume pair (PP-1 to PP-4), practice readiness and a day-by-day plan (RD-1 to RD-3) | | |
 | Business | B2C, pricing unchanged until a separate pricing decision | Org accounts and seats (B2B) | |
 | Markets | US and Canada, English | Other languages (Arabic is the candidate) | |
-| Roles | Tech only | Adjacent corporate roles | |
+| Roles | Tech, plus the wave 1 role families: infrastructure and security, data analytics, engineering management, finance, consulting and strategy, project and program management (`docs/role-families-spec.md`) | Wave 2: sales with role-play, customer success, marketing, people and HR | |
 
 v2.0 ships once. Until launch, every new screen that replaces a v1 screen sits behind the runtime setting `v2_enabled` (FL-1), so `main` can still ship v1 fixes.
 
@@ -184,7 +184,7 @@ IDs are referenced by the build plan and acceptance tests. Priority: P0 must shi
 | PL-7 | Text-only session mode behind a dev flag, so the interviewer runs as text when local voice is too slow; the simulated-candidate tests reuse it. | P0 |
 | PL-8 | Cloud-portable deployment: only Postgres, Redis and S3-compatible storage (MinIO locally). Hetzner is the default target; only provisioning scripts are provider-specific. | P0 |
 
-Custom interviews (CU-1 to CU-12) are specified in `docs/custom-interview-spec.md`, and the admin app (AA, AO, AU, AT, OB, AL, OC, SM, AI) in `docs/admin-spec.md`.
+Role families (RF-1 to RF-15) are specified in `docs/role-families-spec.md`. Custom interviews (CU-1 to CU-12) are specified in `docs/custom-interview-spec.md`, and the admin app (AA, AO, AU, AT, OB, AL, OC, SM, AI) in `docs/admin-spec.md`.
 
 ### v2.0 requirements
 

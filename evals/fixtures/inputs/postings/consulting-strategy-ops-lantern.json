@@ -1,0 +1,26 @@
+{
+  "company_name": "Lantern Health",
+  "title": "Strategy & Operations Manager",
+  "role_family": "consulting_strategy",
+  "level": "mid",
+  "level_label": null,
+  "team": "Strategy & Operations",
+  "location": "Remote (US)",
+  "must_have_skills": [
+    "4+ years in consulting, strategy or business operations",
+    "Financial and market modeling",
+    "Structured problem solving",
+    "Executive communication"
+  ],
+  "nice_to_have_skills": [
+    "Healthcare experience",
+    "SQL"
+  ],
+  "responsibilities": [
+    "Size new markets and build business cases",
+    "Run the quarterly business review",
+    "Lead cross-team projects",
+    "Track company goals and report progress"
+  ],
+  "source_url": null
+}

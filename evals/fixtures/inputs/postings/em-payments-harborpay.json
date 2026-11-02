@@ -1,0 +1,25 @@
+{
+  "company_name": "HarborPay",
+  "title": "Engineering Manager, Payments",
+  "role_family": "eng_management",
+  "level": "mid",
+  "level_label": null,
+  "team": "Payments",
+  "location": "New York, NY",
+  "must_have_skills": [
+    "2+ years managing software engineers",
+    "Background as a backend engineer",
+    "Experience hiring engineers",
+    "Payments or fintech systems"
+  ],
+  "nice_to_have_skills": [
+    "Experience with PCI compliance"
+  ],
+  "responsibilities": [
+    "Manage and grow a team of 7 engineers",
+    "Run hiring for the team",
+    "Plan the roadmap with product and design",
+    "Keep delivery and on-call healthy"
+  ],
+  "source_url": null
+}

@@ -1,0 +1,5 @@
+Role family: project and program management (project managers, non-technical program managers, PMO, delivery managers, scrum masters).
+Technical Q&A: delivery methods (agile, waterfall, hybrid), planning and the critical path, risk and issue logs, scope, budget and change control, stakeholder mapping, status reporting, explained out loud with real examples. No technical system depth is expected.
+Case: a slipping project, scope creep, a conflict between two sponsors, or a recovery plan, ending in what the candidate would do first and how they would communicate it.
+Levels: new grad or coordinator supports a project; mid runs one project; senior runs a program of projects; staff or principal runs a portfolio or a PMO.
+Words to use: milestone, scope, risk, sponsor, status report, change request, retrospective.

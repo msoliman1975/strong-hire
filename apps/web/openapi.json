@@ -3814,7 +3814,7 @@
           "target roles and interviews"
         ],
         "summary": "Suggested Interviews",
-        "description": "TG-3: the company's usual rounds for this role (standard loop in generic mode).",
+        "description": "TG-3: the company's usual rounds for this role (the family's generic loop in generic\nmode). `role_family` previews the family the user picked on the check step before the role\nis saved (RF-10); nothing is stored.",
         "operationId": "suggested_interviews_roles__job_target_id__suggested_interviews_get",
         "parameters": [
           {
@@ -3825,6 +3825,22 @@
               "type": "string",
               "format": "uuid",
               "title": "Job Target Id"
+            }
+          },
+          {
+            "name": "role_family",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/RoleFamily"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Role Family"
             }
           }
         ],
@@ -17788,6 +17804,11 @@
             "default": null,
             "title": "Profile Version"
           },
+          "role_family": {
+            "$ref": "#/components/schemas/RoleFamily",
+            "default": "other",
+            "description": "RF-5: the job's role family, set from the posting, never by the model. Picks the family guidance for the interviewer and the scorer. Briefs stored before RF-5 read as other."
+          },
           "target_competencies": {
             "description": "4 to 6; a mini interview has 2.",
             "items": {
@@ -23749,9 +23770,16 @@
           "pm",
           "design",
           "tpm",
-          "other"
+          "other",
+          "infra_security",
+          "data_analytics",
+          "eng_management",
+          "finance",
+          "consulting_strategy",
+          "project_program"
         ],
-        "title": "RoleFamily"
+        "title": "RoleFamily",
+        "description": "Role families (RF-1, `docs/role-families-spec.md`). Per-family facts live in\n`strong_core.role_families`; per-family model guidance in `prompts/planner/family_<value>`."
       },
       "RoleModel": {
         "properties": {
@@ -24296,6 +24324,69 @@
           "rubric_version"
         ],
         "title": "Scorecard"
+      },
+      "ScorerOutput": {
+        "additionalProperties": false,
+        "description": "FB-1, FB-2: what the scorer model must return. Only for `gateway.complete(output_type=)`.\n\nSame shape as Scorecard, but `per_question` is required with at least one entry, so a\nschema-constrained model cannot leave it out. Scorecard stays as it is, because it also reads\nstored scorecards and holds the worker's final card, where `per_question` can be empty (old\nrows, or every per-question score lost its quotes).",
+        "properties": {
+          "hire_signal": {
+            "$ref": "#/components/schemas/HireSignal"
+          },
+          "rationale": {
+            "description": "3 to 5 sentences, like a debrief summary.",
+            "minLength": 1,
+            "title": "Rationale",
+            "type": "string"
+          },
+          "competency_scores": {
+            "description": "Overall score per competency across the session.",
+            "items": {
+              "$ref": "#/components/schemas/CompetencyScore"
+            },
+            "minItems": 1,
+            "title": "Competency Scores",
+            "type": "array"
+          },
+          "value_scores": {
+            "description": "Overall score per company value. Empty in generic mode.",
+            "items": {
+              "$ref": "#/components/schemas/ValueScore"
+            },
+            "title": "Value Scores",
+            "type": "array"
+          },
+          "per_question": {
+            "description": "One entry per question that was asked, each with at least one score.",
+            "items": {
+              "$ref": "#/components/schemas/QuestionScore"
+            },
+            "minItems": 1,
+            "title": "Per Question",
+            "type": "array"
+          },
+          "scorer_model": {
+            "description": "Gateway model alias, never a vendor id.",
+            "minLength": 1,
+            "title": "Scorer Model",
+            "type": "string"
+          },
+          "rubric_version": {
+            "description": "Prompt ref, for example 'scorer/rubric.v1'.",
+            "minLength": 1,
+            "title": "Rubric Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "hire_signal",
+          "rationale",
+          "competency_scores",
+          "per_question",
+          "scorer_model",
+          "rubric_version"
+        ],
+        "title": "ScorerOutput",
+        "type": "object"
       },
       "ScoringAccepted": {
         "properties": {

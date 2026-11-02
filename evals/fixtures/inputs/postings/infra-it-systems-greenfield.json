@@ -1,0 +1,25 @@
+{
+  "company_name": "Greenfield Schools",
+  "title": "IT Systems Administrator I",
+  "role_family": "infra_security",
+  "level": "new_grad",
+  "level_label": "I",
+  "team": null,
+  "location": "Denver, CO",
+  "must_have_skills": [
+    "Associate degree or 1 year of IT experience",
+    "Windows and macOS administration",
+    "Networking basics"
+  ],
+  "nice_to_have_skills": [
+    "Google Workspace administration",
+    "CompTIA Network+"
+  ],
+  "responsibilities": [
+    "Manage user accounts and devices",
+    "Maintain the school network and Wi-Fi",
+    "Handle help desk tickets",
+    "Document systems and procedures"
+  ],
+  "source_url": null
+}

@@ -1,6 +1,6 @@
 /** L04 step 1: the public waitlist page and the confirm link, against the MSW mock API. */
 import { QueryClientProvider } from "@tanstack/react-query";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
@@ -57,6 +57,19 @@ describe("waitlist (L04)", () => {
         website: null,
       },
     ]);
+  });
+
+  it("RF-10: every role family can join, for example finance", async () => {
+    const bodies = recordBodies("/api/public/waitlist");
+    const user = renderAt("/waitlist");
+    const field = await screen.findByLabelText("Your field (optional)");
+    expect(within(field).getAllByRole("option")).toHaveLength(13); // "Choose one" and 12 families
+    await user.type(screen.getByLabelText("Email"), "fin@example.com");
+    await user.click(screen.getByLabelText("In the next two weeks"));
+    await user.selectOptions(field, "Finance");
+    await user.click(screen.getByRole("button", { name: "Join the waitlist" }));
+    expect(await screen.findByRole("heading", { name: "Check your email" })).toBeInTheDocument();
+    expect(bodies).toEqual([expect.objectContaining({ email: "fin@example.com", role_family: "finance" })]);
   });
 
   it("L04: marketing email is a separate box that starts unticked", async () => {

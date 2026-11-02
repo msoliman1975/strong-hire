@@ -2,7 +2,7 @@
   "company_name": "McKinsey & Company",
   "company_slug": "mckinsey",
   "meta": {
-    "version": 1,
+    "version": 2,
     "status": "draft",
     "reviewed_by": null,
     "researched_at": "2026-10-28",
@@ -55,7 +55,7 @@
   },
   "loop_structure": [
     {
-      "role_family": "other",
+      "role_family": "consulting_strategy",
       "levels": ["Business Analyst", "Associate", "Engagement Manager"],
       "rounds": [
         {
@@ -330,7 +330,7 @@
         "strong_signals": ["Clear MECE structure", "Tests the largest drivers first", "Top-down recommendation"],
         "watch_outs": ["Generic framework not tailored to the bank", "No final recommendation"]
       },
-      "role_families": ["other"],
+      "role_families": ["consulting_strategy"],
       "levels": []
     },
     {
@@ -345,7 +345,7 @@
         "strong_signals": ["Starts from the business goal", "Checks data before models", "Pilot with a control group"],
         "watch_outs": ["Jumping to deep learning", "No adoption or change plan"]
       },
-      "role_families": ["data_ml", "other"],
+      "role_families": ["data_ml", "consulting_strategy"],
       "levels": []
     },
     {
@@ -360,7 +360,7 @@
         "strong_signals": ["Approach stated first", "Sanity check", "Clear go or no-go"],
         "watch_outs": ["Math with no structure", "Stopping at the number"]
       },
-      "role_families": ["other"],
+      "role_families": ["consulting_strategy"],
       "levels": []
     },
     {
@@ -383,25 +383,25 @@
     {
       "level_name": "Business Analyst",
       "normalized_level": "new_grad",
-      "role_family": "other",
+      "role_family": "consulting_strategy",
       "scope_expectation": "Owns one workstream's analysis on an engagement with guidance from the Engagement Manager; structured problem solving and clear synthesis."
     },
     {
       "level_name": "Associate",
       "normalized_level": "mid",
-      "role_family": "other",
+      "role_family": "consulting_strategy",
       "scope_expectation": "Owns one or two workstreams end to end, works directly with client counterparts and develops recommendations."
     },
     {
       "level_name": "Engagement Manager",
       "normalized_level": "senior",
-      "role_family": "other",
+      "role_family": "consulting_strategy",
       "scope_expectation": "Leads the day-to-day engagement team, manages client relationships and delivery, and shapes the overall answer."
     },
     {
       "level_name": "Associate Partner",
       "normalized_level": "staff_principal",
-      "role_family": "other",
+      "role_family": "consulting_strategy",
       "scope_expectation": "Leads several engagements, builds client relationships and develops expertise and new work."
     },
     {

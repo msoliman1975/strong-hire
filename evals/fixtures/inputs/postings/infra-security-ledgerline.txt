@@ -1,0 +1,21 @@
+Security Engineer, Cloud
+Ledgerline
+Remote (Canada)
+
+Ledgerline builds accounting software for 30,000 small businesses. Our security team protects customer financial data.
+
+What you will do:
+- Threat model new features with product teams
+- Run our vulnerability management program
+- Harden AWS accounts and IAM policies
+- Respond to security incidents
+
+What you need:
+- 3+ years in security engineering
+- AWS security services and IAM
+- Threat modeling
+- Vulnerability management
+
+Nice to have:
+- SOC 2 audits
+- Security certifications such as OSCP or CISSP

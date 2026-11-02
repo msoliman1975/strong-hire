@@ -4,7 +4,7 @@
  * chip), PP-4 (the take settings) and RD-3 (readiness is a practice estimate).
  */
 import { QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -119,6 +119,47 @@ describe("target roles", () => {
     await waitFor(() => expect(screen.getByTestId("where").textContent).toMatch(/^\/roles\/[^/]+$/));
     const kept = (mockStore.db.interviews ?? []).map((i) => i.interview_type);
     expect(kept).toEqual(["behavioral", "technical_qa"]);
+  });
+
+  it("RF-10: the job category on the check step drives the suggested interviews and is saved", async () => {
+    const form = new FormData();
+    form.append("text", "Strategy consultant, market entry and profitability cases.");
+    await resumesApi.upload(form);
+    const user = renderApp("/roles/new");
+    await user.click(await screen.findByRole("button", { name: "paste the text" }));
+    await user.click(screen.getByRole("textbox", { name: "Job posting text" }));
+    await user.paste("Senior engineer, payments. ".repeat(10));
+    await user.click(screen.getByRole("button", { name: "Read the posting" }));
+    const category = await screen.findByRole("combobox", { name: "Job category" }, { timeout: 4000 });
+    expect(within(category).getAllByRole("option")).toHaveLength(12);
+    await user.selectOptions(category, "Consulting and strategy");
+    await user.click(screen.getByRole("button", { name: "Looks right" }));
+    // Network steps get the same headroom as "Read the posting" above, for slow CI runners.
+    await waitFor(() => expect(screen.getByRole("checkbox", { name: /Case/ })).toBeChecked(), { timeout: 4000 });
+    expect(screen.getAllByRole("checkbox")[0]).toHaveAccessibleName(/Case/);
+    expect(screen.getByRole("checkbox", { name: /Verbal technical/ })).not.toBeChecked();
+    await user.click(screen.getByRole("button", { name: "Create the role" }));
+    // The role page, not the add page: /roles/new also matches /roles/<one segment>.
+    await waitFor(() => expect(screen.getByTestId("where").textContent).toMatch(/^\/roles\/(?!new$)[^/]+$/), {
+      timeout: 4000,
+    });
+    const jobId = (screen.getByTestId("where").textContent ?? "").split("/")[2];
+    const saved = await jobTargetsApi.get(jobId);
+    expect(saved.posting?.role_family).toBe("consulting_strategy");
+  });
+
+  it("RF-14: a role in a new job category is labeled Beta; an established one is not", async () => {
+    const { job } = await roleWithInterviews("behavioral");
+    const stored = mockStore.db.jobs.find((j) => j.id === job.id);
+    expect(stored?.posting).toBeTruthy();
+    renderApp(`/roles/${job.id}`);
+    await screen.findByRole("heading", { level: 1 });
+    expect(screen.queryByText(/^Beta:/)).not.toBeInTheDocument();
+    cleanup();
+
+    if (stored?.posting) stored.posting = { ...stored.posting, role_family: "finance" };
+    renderApp(`/roles/${job.id}`);
+    expect(await screen.findByText("Beta: Finance")).toHaveAttribute("title", expect.stringMatching(/calibrated/));
   });
 
   it("TG-4, PP-2: the role page has its interviews, what they'll look for, stories and the context card", async () => {

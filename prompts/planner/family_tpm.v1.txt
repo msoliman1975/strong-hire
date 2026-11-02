@@ -1,0 +1,5 @@
+Role family: technical program management (program roles that need engineering or systems depth).
+Technical Q&A: the architecture of systems their programs delivered, technical risks and dependencies, how they judged engineering trade-offs and estimates, release and launch mechanics, explained out loud. No coding.
+Case: a cross-team technical program scenario: a slipping dependency, a launch at risk, conflicting priorities between teams, ending in a plan.
+Levels: mid drives a program inside one org; senior drives programs across several teams; staff or principal runs company-level programs and sets how programs are run.
+Words to use: milestone, dependency, critical path, launch review, risk, escalation.

@@ -18,12 +18,22 @@ class Level(StrEnum):
 
 
 class RoleFamily(StrEnum):
+    """Role families (RF-1, `docs/role-families-spec.md`). Per-family facts live in
+    `strong_core.role_families`; per-family model guidance in `prompts/planner/family_<value>`."""
+
     SWE = "swe"
     DATA_ML = "data_ml"
     PM = "pm"
     DESIGN = "design"
     TPM = "tpm"
     OTHER = "other"
+    # Wave 1 (D-1 to D-3). swe and data_ml keep their values with a narrower meaning.
+    INFRA_SECURITY = "infra_security"
+    DATA_ANALYTICS = "data_analytics"
+    ENG_MANAGEMENT = "eng_management"
+    FINANCE = "finance"
+    CONSULTING_STRATEGY = "consulting_strategy"
+    PROJECT_PROGRAM = "project_program"
 
 
 class InterviewType(StrEnum):

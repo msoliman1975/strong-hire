@@ -10,17 +10,15 @@ from __future__ import annotations
 import re
 from collections.abc import Iterable
 
+from strong_core.role_families import ROLE_FAMILIES
 from strong_core.schemas import Confidence, JobPosting, Resume, RoleFamily
 
 _NON_WORD = re.compile(r"[^a-z0-9+#]+")
 
 FAMILY_KEYWORDS: dict[RoleFamily, tuple[str, ...]] = {
-    RoleFamily.SWE: ("engineer", "developer", "software", "sre", "reliability", "security"),
-    RoleFamily.DATA_ML: ("data", "machine learning", "ml", "scientist", "analytics", "ai"),
-    RoleFamily.PM: ("product manager", "product lead", "product owner"),
-    RoleFamily.DESIGN: ("designer", "design", "ux", "researcher"),
-    RoleFamily.TPM: ("program manager", "tpm"),
+    family: info.title_keywords for family, info in ROLE_FAMILIES.items()
 }
+"""Title words that back the extracted family (RF-2: from the core registry)."""
 
 
 def normalize(text: str) -> str:

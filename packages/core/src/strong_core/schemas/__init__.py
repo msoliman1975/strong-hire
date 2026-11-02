@@ -118,6 +118,7 @@ from strong_core.schemas.scoring import (
     ProgressSnapshot,
     QuestionScore,
     Scorecard,
+    ScorerOutput,
     ValueScore,
 )
 from strong_core.schemas.session import (
@@ -180,6 +181,7 @@ EXPORTED_SCHEMAS: dict[str, type[BaseModel]] = {
     "custom_session_spec": CustomSessionSpec,
     "custom_question_check": CustomQuestionCheck,
     "scorecard": Scorecard,
+    "scorer_output": ScorerOutput,
     "progress_snapshot": ProgressSnapshot,
     "general_question_bank": GeneralQuestionBank,
     "auto_profile_summary": AutoProfileSummary,
@@ -304,6 +306,7 @@ __all__ = [
     "RoleFamily",
     "SampleQuestion",
     "Scorecard",
+    "ScorerOutput",
     "SessionChannel",
     "SessionConfig",
     "SessionStatus",

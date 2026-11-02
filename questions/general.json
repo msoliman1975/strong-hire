@@ -2031,6 +2031,2436 @@
         "data_ml"
       ],
       "levels": []
+    },
+    {
+      "id": "infra-worst-incident",
+      "interview_type": "behavioral",
+      "question": "Tell me about the worst production incident you were part of. What was your role?",
+      "hints": {
+        "looking_for": [
+          "How you act under pressure",
+          "What you changed afterwards"
+        ],
+        "strong_signals": [
+          "Clear personal role in the response",
+          "A lasting fix, not only a quick patch"
+        ],
+        "watch_outs": [
+          "Blaming another team",
+          "No follow-up after the incident"
+        ]
+      },
+      "competencies": [
+        "ownership",
+        "learning_from_failure"
+      ],
+      "role_families": [
+        "infra_security"
+      ],
+      "levels": []
+    },
+    {
+      "id": "infra-pushed-back-on-risky-change",
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you stopped or delayed a risky change. How did you convince people?",
+      "hints": {
+        "looking_for": [
+          "Whether you weigh risk against speed",
+          "How you persuade without authority"
+        ],
+        "strong_signals": [
+          "Uses data on the risk",
+          "Offers a safer path, not only a no"
+        ],
+        "watch_outs": [
+          "Saying no with no alternative",
+          "A story where nothing was at stake"
+        ]
+      },
+      "competencies": [
+        "conflict_handling",
+        "communication"
+      ],
+      "role_families": [
+        "infra_security"
+      ],
+      "levels": []
+    },
+    {
+      "id": "infra-toil-removed",
+      "interview_type": "behavioral",
+      "question": "Tell me about manual work you automated away. What did it save?",
+      "hints": {
+        "looking_for": [
+          "Whether you look for toil to remove",
+          "How you measure the result"
+        ],
+        "strong_signals": [
+          "Hours or pages saved, with numbers",
+          "Others adopted the tool"
+        ],
+        "watch_outs": [
+          "Automation nobody used",
+          "No measure of the result"
+        ]
+      },
+      "competencies": [
+        "impact",
+        "ownership"
+      ],
+      "role_families": [
+        "infra_security"
+      ],
+      "levels": []
+    },
+    {
+      "id": "infra-why-reliability",
+      "interview_type": "hiring_manager",
+      "question": "Why do you want to work on reliability and infrastructure rather than product features?",
+      "hints": {
+        "looking_for": [
+          "Whether you enjoy operations work",
+          "Whether you understand on-call"
+        ],
+        "strong_signals": [
+          "Specific things you enjoy in the work",
+          "Realistic view of on-call"
+        ],
+        "watch_outs": [
+          "Generic answer about liking tech",
+          "Avoiding any mention of on-call"
+        ]
+      },
+      "competencies": [
+        "motivation",
+        "role_fit"
+      ],
+      "role_families": [
+        "infra_security"
+      ],
+      "levels": []
+    },
+    {
+      "id": "infra-largest-system",
+      "interview_type": "hiring_manager",
+      "question": "What is the largest system you have kept running? Walk me through its shape and your part in it.",
+      "hints": {
+        "looking_for": [
+          "The scale you have handled",
+          "What you owned yourself"
+        ],
+        "strong_signals": [
+          "Numbers for traffic, size or uptime",
+          "Clear line between your work and the team's"
+        ],
+        "watch_outs": [
+          "Vague scale",
+          "Claiming the whole team's work"
+        ]
+      },
+      "competencies": [
+        "depth_of_experience",
+        "scope_at_level"
+      ],
+      "role_families": [
+        "infra_security"
+      ],
+      "levels": []
+    },
+    {
+      "id": "infra-tradeoff-cost-reliability",
+      "interview_type": "hiring_manager",
+      "question": "Tell me about a time you had to trade reliability against cost. What did you decide?",
+      "hints": {
+        "looking_for": [
+          "How you balance cost and risk",
+          "Whether you involve the business"
+        ],
+        "strong_signals": [
+          "States the options and their cost",
+          "Explains how the decision held up"
+        ],
+        "watch_outs": [
+          "Reliability at any cost",
+          "No numbers at all"
+        ]
+      },
+      "competencies": [
+        "judgment",
+        "scope_at_level"
+      ],
+      "role_families": [
+        "infra_security"
+      ],
+      "levels": []
+    },
+    {
+      "id": "infra-slo-design",
+      "interview_type": "technical_qa",
+      "question": "How would you set an SLO and error budget for a new customer-facing API?",
+      "hints": {
+        "looking_for": [
+          "Whether you start from what users feel",
+          "How the budget changes decisions"
+        ],
+        "strong_signals": [
+          "Picks an indicator users care about",
+          "Explains what happens when the budget runs out"
+        ],
+        "watch_outs": [
+          "Picking 100 percent",
+          "Only measuring server uptime"
+        ]
+      },
+      "competencies": [
+        "technical_depth",
+        "reasoning"
+      ],
+      "role_families": [
+        "infra_security"
+      ],
+      "levels": []
+    },
+    {
+      "id": "infra-latency-doubled",
+      "interview_type": "technical_qa",
+      "question": "A service's p99 latency doubled overnight with no deploy. How do you find the cause?",
+      "hints": {
+        "looking_for": [
+          "A calm, ordered way to narrow it down",
+          "Use of metrics, logs and traces"
+        ],
+        "strong_signals": [
+          "Checks what changed outside the code",
+          "Forms and tests hypotheses one by one"
+        ],
+        "watch_outs": [
+          "Guessing a fix first",
+          "Restarting things without learning why"
+        ]
+      },
+      "competencies": [
+        "reasoning",
+        "technical_depth"
+      ],
+      "role_families": [
+        "infra_security"
+      ],
+      "levels": []
+    },
+    {
+      "id": "infra-least-privilege",
+      "interview_type": "technical_qa",
+      "question": "How would you apply least privilege to engineers' access in a cloud account?",
+      "hints": {
+        "looking_for": [
+          "Whether you know access control in practice",
+          "How you keep people productive"
+        ],
+        "strong_signals": [
+          "Roles, short-lived access and audit",
+          "Has a break-glass path"
+        ],
+        "watch_outs": [
+          "Everyone admin",
+          "So locked down nobody can work"
+        ]
+      },
+      "competencies": [
+        "technical_depth",
+        "trade_offs"
+      ],
+      "role_families": [
+        "infra_security"
+      ],
+      "levels": []
+    },
+    {
+      "id": "infra-explain-dns",
+      "interview_type": "technical_qa",
+      "question": "Explain what happens, step by step, when a user types our domain into a browser.",
+      "hints": {
+        "looking_for": [
+          "Accurate networking basics",
+          "Clear explanation"
+        ],
+        "strong_signals": [
+          "Covers DNS, TCP, TLS and HTTP in order",
+          "Mentions where things fail"
+        ],
+        "watch_outs": [
+          "Skipping steps",
+          "Wrong order of steps"
+        ]
+      },
+      "competencies": [
+        "clarity_of_explanation",
+        "accuracy"
+      ],
+      "role_families": [
+        "infra_security"
+      ],
+      "levels": []
+    },
+    {
+      "id": "infra-blast-radius",
+      "interview_type": "technical_qa",
+      "question": "How do you limit the blast radius of a bad config change?",
+      "hints": {
+        "looking_for": [
+          "Whether you design for failure",
+          "Knowledge of safe rollout"
+        ],
+        "strong_signals": [
+          "Staged rollout, health checks and fast rollback",
+          "Separates config from code safely"
+        ],
+        "watch_outs": [
+          "Relying on testing alone",
+          "No rollback plan"
+        ]
+      },
+      "competencies": [
+        "trade_offs",
+        "technical_depth"
+      ],
+      "role_families": [
+        "infra_security"
+      ],
+      "levels": []
+    },
+    {
+      "id": "infra-case-outage-triage",
+      "interview_type": "case",
+      "question": "Checkout is failing for 30 percent of users right now. Walk me through your first 15 minutes.",
+      "hints": {
+        "looking_for": [
+          "Whether you stop the bleeding first",
+          "How you communicate during an incident"
+        ],
+        "strong_signals": [
+          "Mitigates before root-causing",
+          "Sets up roles and updates"
+        ],
+        "watch_outs": [
+          "Debugging alone for an hour",
+          "No customer communication"
+        ]
+      },
+      "competencies": [
+        "problem_framing",
+        "prioritization"
+      ],
+      "role_families": [
+        "infra_security"
+      ],
+      "levels": []
+    },
+    {
+      "id": "infra-case-capacity-launch",
+      "interview_type": "case",
+      "question": "Marketing expects traffic to triple for a launch in four weeks. How do you get ready?",
+      "hints": {
+        "looking_for": [
+          "How you turn a forecast into a plan",
+          "Whether you test, not guess"
+        ],
+        "strong_signals": [
+          "Estimates load from the forecast",
+          "Load tests and has a fallback plan"
+        ],
+        "watch_outs": [
+          "Adding servers with no estimate",
+          "No plan if the forecast is wrong"
+        ]
+      },
+      "competencies": [
+        "structure",
+        "estimation_logic"
+      ],
+      "role_families": [
+        "infra_security"
+      ],
+      "levels": []
+    },
+    {
+      "id": "infra-case-threat-model",
+      "interview_type": "case",
+      "question": "We are adding file uploads to our app. Threat-model the feature with me.",
+      "hints": {
+        "looking_for": [
+          "A structured way to find threats",
+          "Practical fixes"
+        ],
+        "strong_signals": [
+          "Lists assets, entry points and threats",
+          "Ranks risks and proposes controls"
+        ],
+        "watch_outs": [
+          "Only naming one threat",
+          "Controls that block the feature"
+        ]
+      },
+      "competencies": [
+        "problem_framing",
+        "recommendation"
+      ],
+      "role_families": [
+        "infra_security"
+      ],
+      "levels": []
+    },
+    {
+      "id": "infra-case-migrate-cloud",
+      "interview_type": "case",
+      "question": "We run on our own servers and want to move to the cloud. How would you plan the move?",
+      "hints": {
+        "looking_for": [
+          "How you break a big change into steps",
+          "How you manage risk"
+        ],
+        "strong_signals": [
+          "Moves low-risk services first",
+          "Has a way to roll back"
+        ],
+        "watch_outs": [
+          "Moving everything at once",
+          "Ignoring cost after the move"
+        ]
+      },
+      "competencies": [
+        "structure",
+        "prioritization"
+      ],
+      "role_families": [
+        "infra_security"
+      ],
+      "levels": []
+    },
+    {
+      "id": "analytics-changed-a-decision",
+      "interview_type": "behavioral",
+      "question": "Tell me about an analysis that changed a decision. What did the team do differently?",
+      "hints": {
+        "looking_for": [
+          "Whether your work leads to action",
+          "How you present findings"
+        ],
+        "strong_signals": [
+          "Names the decision and the result",
+          "Explains how you made it land"
+        ],
+        "watch_outs": [
+          "Analysis nobody used",
+          "Describing the method only"
+        ]
+      },
+      "competencies": [
+        "impact",
+        "communication"
+      ],
+      "role_families": [
+        "data_analytics"
+      ],
+      "levels": []
+    },
+    {
+      "id": "analytics-unwelcome-finding",
+      "interview_type": "behavioral",
+      "question": "Tell me about a time your data said something a stakeholder did not want to hear.",
+      "hints": {
+        "looking_for": [
+          "Whether you stay honest with data",
+          "How you handle pushback"
+        ],
+        "strong_signals": [
+          "Checks the data before pushing back",
+          "Keeps the relationship"
+        ],
+        "watch_outs": [
+          "Changing the numbers to please",
+          "Being right but unheard"
+        ]
+      },
+      "competencies": [
+        "conflict_handling",
+        "communication"
+      ],
+      "role_families": [
+        "data_analytics"
+      ],
+      "levels": []
+    },
+    {
+      "id": "analytics-data-mistake",
+      "interview_type": "behavioral",
+      "question": "Tell me about a mistake you made in a number you reported. How did you handle it?",
+      "hints": {
+        "looking_for": [
+          "Whether you own errors",
+          "What checks you added"
+        ],
+        "strong_signals": [
+          "Told people quickly",
+          "Added a check so it does not happen again"
+        ],
+        "watch_outs": [
+          "Hiding the error",
+          "Blaming the data source only"
+        ]
+      },
+      "competencies": [
+        "learning_from_failure",
+        "ownership"
+      ],
+      "role_families": [
+        "data_analytics"
+      ],
+      "levels": []
+    },
+    {
+      "id": "analytics-why-analytics",
+      "interview_type": "hiring_manager",
+      "question": "Why analytics, and what kind of questions do you most enjoy answering?",
+      "hints": {
+        "looking_for": [
+          "Real interest in the work",
+          "Fit with this team's questions"
+        ],
+        "strong_signals": [
+          "Gives an example question you loved",
+          "Links it to this role"
+        ],
+        "watch_outs": [
+          "Only talking about tools",
+          "No link to the role"
+        ]
+      },
+      "competencies": [
+        "motivation",
+        "role_fit"
+      ],
+      "role_families": [
+        "data_analytics"
+      ],
+      "levels": []
+    },
+    {
+      "id": "analytics-own-metrics",
+      "interview_type": "hiring_manager",
+      "question": "Walk me through the metrics you have owned. How did you define them?",
+      "hints": {
+        "looking_for": [
+          "The scope of metrics you owned",
+          "Care in definitions"
+        ],
+        "strong_signals": [
+          "Clear definitions and edge cases",
+          "Others relied on the metrics"
+        ],
+        "watch_outs": [
+          "Only reporting numbers others defined",
+          "No definition at all"
+        ]
+      },
+      "competencies": [
+        "depth_of_experience",
+        "scope_at_level"
+      ],
+      "role_families": [
+        "data_analytics"
+      ],
+      "levels": []
+    },
+    {
+      "id": "analytics-say-no-requests",
+      "interview_type": "hiring_manager",
+      "question": "You get ten data requests a week and can do four. How do you decide?",
+      "hints": {
+        "looking_for": [
+          "How you prioritize requests",
+          "How you work with stakeholders"
+        ],
+        "strong_signals": [
+          "Uses impact on decisions to rank",
+          "Offers self-serve options"
+        ],
+        "watch_outs": [
+          "First come, first served",
+          "Saying yes to everything"
+        ]
+      },
+      "competencies": [
+        "judgment",
+        "team_fit"
+      ],
+      "role_families": [
+        "data_analytics"
+      ],
+      "levels": []
+    },
+    {
+      "id": "analytics-sql-duplicates",
+      "interview_type": "technical_qa",
+      "question": "A join doubled your revenue total. What probably went wrong and how do you check?",
+      "hints": {
+        "looking_for": [
+          "Understanding of joins and grain",
+          "A habit of checking results"
+        ],
+        "strong_signals": [
+          "Names a one-to-many join as the likely cause",
+          "Checks row counts before and after"
+        ],
+        "watch_outs": [
+          "Using DISTINCT to hide it",
+          "Not knowing why it happened"
+        ]
+      },
+      "competencies": [
+        "accuracy",
+        "reasoning"
+      ],
+      "role_families": [
+        "data_analytics"
+      ],
+      "levels": []
+    },
+    {
+      "id": "analytics-window-function",
+      "interview_type": "technical_qa",
+      "question": "Explain how you would find each user's first purchase and the time to their second.",
+      "hints": {
+        "looking_for": [
+          "Comfort with window functions",
+          "Clear explanation without writing code"
+        ],
+        "strong_signals": [
+          "Uses ranking or lag over a per-user window",
+          "Handles users with one purchase"
+        ],
+        "watch_outs": [
+          "A slow, convoluted approach",
+          "Ignoring ties or nulls"
+        ]
+      },
+      "competencies": [
+        "technical_depth",
+        "clarity_of_explanation"
+      ],
+      "role_families": [
+        "data_analytics"
+      ],
+      "levels": []
+    },
+    {
+      "id": "analytics-ab-test-read",
+      "interview_type": "technical_qa",
+      "question": "An A/B test shows a 2 percent lift with a p-value of 0.04. What else do you check before you call it?",
+      "hints": {
+        "looking_for": [
+          "Sound statistics",
+          "Healthy scepticism"
+        ],
+        "strong_signals": [
+          "Checks sample ratio, duration and guardrails",
+          "Asks about practical significance"
+        ],
+        "watch_outs": [
+          "Shipping on the p-value alone",
+          "Peeking-based conclusions"
+        ]
+      },
+      "competencies": [
+        "reasoning",
+        "accuracy"
+      ],
+      "role_families": [
+        "data_analytics"
+      ],
+      "levels": []
+    },
+    {
+      "id": "analytics-metric-definition",
+      "interview_type": "technical_qa",
+      "question": "How would you define an 'active user' for a reading app? What are the trade-offs?",
+      "hints": {
+        "looking_for": [
+          "Whether the metric reflects real value",
+          "Awareness of gaming"
+        ],
+        "strong_signals": [
+          "Ties the definition to reading, not opens",
+          "Compares two options and picks one"
+        ],
+        "watch_outs": [
+          "Counting app opens",
+          "No trade-off discussed"
+        ]
+      },
+      "competencies": [
+        "trade_offs",
+        "clarity_of_explanation"
+      ],
+      "role_families": [
+        "data_analytics"
+      ],
+      "levels": []
+    },
+    {
+      "id": "analytics-simpsons-paradox",
+      "interview_type": "technical_qa",
+      "question": "Conversion went up in every region but down overall. How can that happen?",
+      "hints": {
+        "looking_for": [
+          "Understanding of mix effects",
+          "Clear explanation"
+        ],
+        "strong_signals": [
+          "Explains a shift in the region mix",
+          "Gives a simple example"
+        ],
+        "watch_outs": [
+          "Assuming a data bug",
+          "Confused explanation"
+        ]
+      },
+      "competencies": [
+        "reasoning",
+        "clarity_of_explanation"
+      ],
+      "role_families": [
+        "data_analytics"
+      ],
+      "levels": []
+    },
+    {
+      "id": "analytics-case-metric-drop",
+      "interview_type": "case",
+      "question": "Weekly active users dropped 10 percent last week. Walk me through how you would find out why.",
+      "hints": {
+        "looking_for": [
+          "A structured diagnosis",
+          "Whether you rule out data issues first"
+        ],
+        "strong_signals": [
+          "Checks tracking, then segments the drop",
+          "Separates internal and external causes"
+        ],
+        "watch_outs": [
+          "Jumping to one cause",
+          "No check of the data itself"
+        ]
+      },
+      "competencies": [
+        "problem_framing",
+        "structure"
+      ],
+      "role_families": [
+        "data_analytics"
+      ],
+      "levels": []
+    },
+    {
+      "id": "analytics-case-launch-metrics",
+      "interview_type": "case",
+      "question": "We are launching a new reading streaks feature. What would you measure and how would you know it worked?",
+      "hints": {
+        "looking_for": [
+          "Clear success and guardrail metrics",
+          "A plan to measure impact"
+        ],
+        "strong_signals": [
+          "Primary metric, guardrails and a test plan",
+          "Says what result would mean stop"
+        ],
+        "watch_outs": [
+          "Ten metrics with no priority",
+          "No guardrails"
+        ]
+      },
+      "competencies": [
+        "problem_framing",
+        "recommendation"
+      ],
+      "role_families": [
+        "data_analytics"
+      ],
+      "levels": []
+    },
+    {
+      "id": "analytics-case-size-opportunity",
+      "interview_type": "case",
+      "question": "How would you size the revenue from adding a family plan to our subscription?",
+      "hints": {
+        "looking_for": [
+          "A clear estimate from available data",
+          "Business sense"
+        ],
+        "strong_signals": [
+          "Builds from users, take-up and price",
+          "Notes cannibalization of single plans"
+        ],
+        "watch_outs": [
+          "A number with no logic",
+          "Ignoring cannibalization"
+        ]
+      },
+      "competencies": [
+        "estimation_logic",
+        "user_and_business_sense"
+      ],
+      "role_families": [
+        "data_analytics"
+      ],
+      "levels": []
+    },
+    {
+      "id": "analytics-case-dashboard-for-ceo",
+      "interview_type": "case",
+      "question": "The CEO wants one dashboard to run the business. What goes on it?",
+      "hints": {
+        "looking_for": [
+          "Whether you know what matters to a CEO",
+          "Focus"
+        ],
+        "strong_signals": [
+          "Few metrics tied to the company's goals",
+          "Explains how each would be used"
+        ],
+        "watch_outs": [
+          "Forty charts",
+          "Only vanity metrics"
+        ]
+      },
+      "competencies": [
+        "prioritization",
+        "user_and_business_sense"
+      ],
+      "role_families": [
+        "data_analytics"
+      ],
+      "levels": []
+    },
+    {
+      "id": "em-underperformer",
+      "interview_type": "behavioral",
+      "question": "Tell me about an engineer on your team who was underperforming. What did you do?",
+      "hints": {
+        "looking_for": [
+          "How you handle performance problems",
+          "Fairness and directness"
+        ],
+        "strong_signals": [
+          "Clear expectations and support, with a timeline",
+          "A real outcome, good or bad"
+        ],
+        "watch_outs": [
+          "Waiting months to act",
+          "Moving the problem to another team"
+        ]
+      },
+      "competencies": [
+        "ownership",
+        "communication"
+      ],
+      "role_families": [
+        "eng_management"
+      ],
+      "levels": []
+    },
+    {
+      "id": "em-conflict-two-engineers",
+      "interview_type": "behavioral",
+      "question": "Tell me about a conflict between two people on your team. How did you resolve it?",
+      "hints": {
+        "looking_for": [
+          "How you mediate",
+          "Whether you get to the root cause"
+        ],
+        "strong_signals": [
+          "Hears both sides, then decides or helps them agree",
+          "The team worked better after"
+        ],
+        "watch_outs": [
+          "Picking a favourite",
+          "Ignoring it until it blew up"
+        ]
+      },
+      "competencies": [
+        "conflict_handling",
+        "collaboration"
+      ],
+      "role_families": [
+        "eng_management"
+      ],
+      "levels": []
+    },
+    {
+      "id": "em-team-missed-commitment",
+      "interview_type": "behavioral",
+      "question": "Tell me about a time your team missed a commitment. What did you learn as the manager?",
+      "hints": {
+        "looking_for": [
+          "Whether you own the team's misses",
+          "What you changed in how you plan"
+        ],
+        "strong_signals": [
+          "Takes responsibility as the manager",
+          "Changed process or estimates afterwards"
+        ],
+        "watch_outs": [
+          "Blaming the team",
+          "Blaming product for changes"
+        ]
+      },
+      "competencies": [
+        "learning_from_failure",
+        "ownership"
+      ],
+      "role_families": [
+        "eng_management"
+      ],
+      "levels": []
+    },
+    {
+      "id": "em-why-management",
+      "interview_type": "hiring_manager",
+      "question": "Why do you want to manage engineers rather than stay an individual contributor?",
+      "hints": {
+        "looking_for": [
+          "A real reason to manage",
+          "Understanding of the job"
+        ],
+        "strong_signals": [
+          "Talks about growing people and teams",
+          "Knows what you give up"
+        ],
+        "watch_outs": [
+          "Management as the only way up",
+          "Wanting control of technical decisions"
+        ]
+      },
+      "competencies": [
+        "motivation",
+        "role_fit"
+      ],
+      "role_families": [
+        "eng_management"
+      ],
+      "levels": []
+    },
+    {
+      "id": "em-hiring-bar",
+      "interview_type": "hiring_manager",
+      "question": "How do you run hiring for your team, and how do you keep the bar high?",
+      "hints": {
+        "looking_for": [
+          "A clear hiring process",
+          "Judgment on candidates"
+        ],
+        "strong_signals": [
+          "Structured interviews and calibration",
+          "Example of a hard no-hire call"
+        ],
+        "watch_outs": [
+          "Hiring on gut feel",
+          "Lowering the bar to fill seats"
+        ]
+      },
+      "competencies": [
+        "judgment",
+        "scope_at_level"
+      ],
+      "role_families": [
+        "eng_management"
+      ],
+      "levels": []
+    },
+    {
+      "id": "em-team-you-built",
+      "interview_type": "hiring_manager",
+      "question": "Describe the best team you have built or led. What made it work?",
+      "hints": {
+        "looking_for": [
+          "Your style as a manager",
+          "What you value in a team"
+        ],
+        "strong_signals": [
+          "Specific practices you put in place",
+          "Signs the team was healthy"
+        ],
+        "watch_outs": [
+          "Credit only to yourself",
+          "Vague praise"
+        ]
+      },
+      "competencies": [
+        "team_fit",
+        "depth_of_experience"
+      ],
+      "role_families": [
+        "eng_management"
+      ],
+      "levels": []
+    },
+    {
+      "id": "em-tech-debt-vs-roadmap",
+      "interview_type": "technical_qa",
+      "question": "How do you decide how much time your team spends on technical debt versus the roadmap?",
+      "hints": {
+        "looking_for": [
+          "How you weigh debt against features",
+          "How you explain it to product"
+        ],
+        "strong_signals": [
+          "Ties debt to risk or speed with evidence",
+          "Agrees a share with product"
+        ],
+        "watch_outs": [
+          "Never paying debt",
+          "Pausing features for months without a case"
+        ]
+      },
+      "competencies": [
+        "trade_offs",
+        "reasoning"
+      ],
+      "role_families": [
+        "eng_management"
+      ],
+      "levels": []
+    },
+    {
+      "id": "em-design-review",
+      "interview_type": "technical_qa",
+      "question": "One of your engineers proposes a rewrite of a core service. How do you review the proposal?",
+      "hints": {
+        "looking_for": [
+          "Technical judgment without coding",
+          "How you challenge a proposal"
+        ],
+        "strong_signals": [
+          "Asks for the problem, options and migration plan",
+          "Looks for an incremental path"
+        ],
+        "watch_outs": [
+          "Approving because the engineer is senior",
+          "Rejecting without hearing it out"
+        ]
+      },
+      "competencies": [
+        "technical_depth",
+        "reasoning"
+      ],
+      "role_families": [
+        "eng_management"
+      ],
+      "levels": []
+    },
+    {
+      "id": "em-on-call-health",
+      "interview_type": "technical_qa",
+      "question": "Your team gets 40 pages a week. How do you bring that down?",
+      "hints": {
+        "looking_for": [
+          "Operational maturity",
+          "Care for the team"
+        ],
+        "strong_signals": [
+          "Sorts pages by cause and fixes the top sources",
+          "Removes noisy alerts"
+        ],
+        "watch_outs": [
+          "Telling people to cope",
+          "Turning off alerts blindly"
+        ]
+      },
+      "competencies": [
+        "technical_depth",
+        "trade_offs"
+      ],
+      "role_families": [
+        "eng_management"
+      ],
+      "levels": []
+    },
+    {
+      "id": "em-build-vs-buy",
+      "interview_type": "technical_qa",
+      "question": "When would you build a tool in-house instead of buying one? Give an example.",
+      "hints": {
+        "looking_for": [
+          "A clear way to make the call",
+          "Total cost thinking"
+        ],
+        "strong_signals": [
+          "Compares cost, focus and control",
+          "Real example with the outcome"
+        ],
+        "watch_outs": [
+          "Always build",
+          "Ignoring maintenance cost"
+        ]
+      },
+      "competencies": [
+        "trade_offs",
+        "clarity_of_explanation"
+      ],
+      "role_families": [
+        "eng_management"
+      ],
+      "levels": []
+    },
+    {
+      "id": "em-delivery-metrics",
+      "interview_type": "technical_qa",
+      "question": "How do you know if your team is delivering well? What do you measure?",
+      "hints": {
+        "looking_for": [
+          "Whether you measure outcomes, not activity",
+          "Awareness of gaming"
+        ],
+        "strong_signals": [
+          "Mix of delivery and quality measures",
+          "Uses them to help, not to judge people"
+        ],
+        "watch_outs": [
+          "Lines of code or tickets closed",
+          "No measures at all"
+        ]
+      },
+      "competencies": [
+        "reasoning",
+        "clarity_of_explanation"
+      ],
+      "role_families": [
+        "eng_management"
+      ],
+      "levels": []
+    },
+    {
+      "id": "em-case-headcount-plan",
+      "interview_type": "case",
+      "question": "You can hire two people next year. Your team owns three services and a big launch. How do you decide what roles to hire?",
+      "hints": {
+        "looking_for": [
+          "How you plan a team",
+          "Link to business goals"
+        ],
+        "strong_signals": [
+          "Maps work to skills and gaps",
+          "Considers seniority mix"
+        ],
+        "watch_outs": [
+          "Hiring clones of yourself",
+          "No link to the roadmap"
+        ]
+      },
+      "competencies": [
+        "prioritization",
+        "structure"
+      ],
+      "role_families": [
+        "eng_management"
+      ],
+      "levels": []
+    },
+    {
+      "id": "em-case-missed-launch",
+      "interview_type": "case",
+      "question": "A launch your team owns will be four weeks late. It is two weeks before the date. What do you do?",
+      "hints": {
+        "looking_for": [
+          "How you handle bad news",
+          "Options, not only delays"
+        ],
+        "strong_signals": [
+          "Tells stakeholders early with options",
+          "Cuts scope or adds help with care"
+        ],
+        "watch_outs": [
+          "Hiding the delay",
+          "Asking the team to work weekends as the only plan"
+        ]
+      },
+      "competencies": [
+        "problem_framing",
+        "recommendation"
+      ],
+      "role_families": [
+        "eng_management"
+      ],
+      "levels": []
+    },
+    {
+      "id": "em-case-new-team",
+      "interview_type": "case",
+      "question": "You are taking over a team with low morale and high turnover. What are your first 90 days?",
+      "hints": {
+        "looking_for": [
+          "How you diagnose a team",
+          "What you do first"
+        ],
+        "strong_signals": [
+          "Listens first with one-on-ones",
+          "Picks a few early wins"
+        ],
+        "watch_outs": [
+          "Big changes in week one",
+          "No plan to learn the cause"
+        ]
+      },
+      "competencies": [
+        "structure",
+        "prioritization"
+      ],
+      "role_families": [
+        "eng_management"
+      ],
+      "levels": []
+    },
+    {
+      "id": "em-case-reorg",
+      "interview_type": "case",
+      "question": "Two teams keep blocking each other on shared code. Would you change the org, the code or the process?",
+      "hints": {
+        "looking_for": [
+          "Systems thinking about teams and code",
+          "A clear recommendation"
+        ],
+        "strong_signals": [
+          "Finds the root cause of the blocking",
+          "Recommends one change and how to test it"
+        ],
+        "watch_outs": [
+          "Reorg as the first answer",
+          "More meetings as the only fix"
+        ]
+      },
+      "competencies": [
+        "problem_framing",
+        "recommendation"
+      ],
+      "role_families": [
+        "eng_management"
+      ],
+      "levels": []
+    },
+    {
+      "id": "fin-tight-close",
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you had to deliver numbers under a tight deadline. How did you keep them right?",
+      "hints": {
+        "looking_for": [
+          "How you work under deadline pressure",
+          "Your checks for accuracy"
+        ],
+        "strong_signals": [
+          "Clear plan and reviews before sending",
+          "Told people early about risks"
+        ],
+        "watch_outs": [
+          "Sending numbers you had not checked",
+          "Missing the deadline silently"
+        ]
+      },
+      "competencies": [
+        "ownership",
+        "communication"
+      ],
+      "role_families": [
+        "finance"
+      ],
+      "levels": []
+    },
+    {
+      "id": "fin-challenged-a-budget",
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you challenged a leader's budget or forecast.",
+      "hints": {
+        "looking_for": [
+          "Whether you push back with analysis",
+          "How you keep trust"
+        ],
+        "strong_signals": [
+          "Uses drivers and data to challenge",
+          "Agreed a better number together"
+        ],
+        "watch_outs": [
+          "Accepting any number",
+          "Making it personal"
+        ]
+      },
+      "competencies": [
+        "conflict_handling",
+        "communication"
+      ],
+      "role_families": [
+        "finance"
+      ],
+      "levels": []
+    },
+    {
+      "id": "fin-model-error",
+      "interview_type": "behavioral",
+      "question": "Tell me about an error in a model or report you owned. What happened next?",
+      "hints": {
+        "looking_for": [
+          "Whether you own mistakes",
+          "What controls you added"
+        ],
+        "strong_signals": [
+          "Fixed it fast and told the users",
+          "Added a check or review step"
+        ],
+        "watch_outs": [
+          "Hiding the error",
+          "No change afterwards"
+        ]
+      },
+      "competencies": [
+        "learning_from_failure",
+        "ownership"
+      ],
+      "role_families": [
+        "finance"
+      ],
+      "levels": []
+    },
+    {
+      "id": "fin-why-this-finance-role",
+      "interview_type": "hiring_manager",
+      "question": "Why this finance role, and how does it fit where you want to go?",
+      "hints": {
+        "looking_for": [
+          "A clear reason for the role",
+          "Fit with the career path"
+        ],
+        "strong_signals": [
+          "Specific about the work and the company",
+          "Realistic next steps"
+        ],
+        "watch_outs": [
+          "Any finance job will do",
+          "Only talking about pay"
+        ]
+      },
+      "competencies": [
+        "motivation",
+        "role_fit"
+      ],
+      "role_families": [
+        "finance"
+      ],
+      "levels": []
+    },
+    {
+      "id": "fin-walk-through-model",
+      "interview_type": "hiring_manager",
+      "question": "Walk me through the most complex financial model you have built. Who used it?",
+      "hints": {
+        "looking_for": [
+          "Depth of modeling skill",
+          "Impact of the model"
+        ],
+        "strong_signals": [
+          "Explains drivers and structure clearly",
+          "Names the decisions it supported"
+        ],
+        "watch_outs": [
+          "Describing formatting only",
+          "No users"
+        ]
+      },
+      "competencies": [
+        "depth_of_experience",
+        "scope_at_level"
+      ],
+      "role_families": [
+        "finance"
+      ],
+      "levels": []
+    },
+    {
+      "id": "fin-judgment-call",
+      "interview_type": "hiring_manager",
+      "question": "Tell me about a judgment call on an accounting or forecasting question with no clear answer.",
+      "hints": {
+        "looking_for": [
+          "How you reason through grey areas",
+          "Whether you document and escalate"
+        ],
+        "strong_signals": [
+          "Explains the options and the rule you used",
+          "Got sign-off where needed"
+        ],
+        "watch_outs": [
+          "Picking the answer that looks best",
+          "Not knowing the rules"
+        ]
+      },
+      "competencies": [
+        "judgment",
+        "depth_of_experience"
+      ],
+      "role_families": [
+        "finance"
+      ],
+      "levels": []
+    },
+    {
+      "id": "fin-three-statements",
+      "interview_type": "technical_qa",
+      "question": "Depreciation goes up by 10. Walk me through what happens on the three financial statements.",
+      "hints": {
+        "looking_for": [
+          "Command of how the statements link",
+          "Accuracy"
+        ],
+        "strong_signals": [
+          "Net income, cash flow and balance sheet all move correctly",
+          "Mentions the tax effect"
+        ],
+        "watch_outs": [
+          "Forgetting the tax effect",
+          "Saying cash goes down"
+        ]
+      },
+      "competencies": [
+        "technical_depth",
+        "accuracy"
+      ],
+      "role_families": [
+        "finance"
+      ],
+      "levels": []
+    },
+    {
+      "id": "fin-dcf-basics",
+      "interview_type": "technical_qa",
+      "question": "How would you value a company with a discounted cash flow model? What drives the answer most?",
+      "hints": {
+        "looking_for": [
+          "Understanding of valuation",
+          "Clear explanation"
+        ],
+        "strong_signals": [
+          "Free cash flow, discount rate and terminal value",
+          "Knows the terminal value dominates"
+        ],
+        "watch_outs": [
+          "Mixing up equity and enterprise value",
+          "No idea what drives the result"
+        ]
+      },
+      "competencies": [
+        "technical_depth",
+        "clarity_of_explanation"
+      ],
+      "role_families": [
+        "finance"
+      ],
+      "levels": []
+    },
+    {
+      "id": "fin-variance-analysis",
+      "interview_type": "technical_qa",
+      "question": "Revenue came in 5 percent below plan. How do you explain the variance to leadership?",
+      "hints": {
+        "looking_for": [
+          "A clear breakdown of drivers",
+          "Communication to non-finance people"
+        ],
+        "strong_signals": [
+          "Splits price, volume and mix",
+          "Ends with what changes in the forecast"
+        ],
+        "watch_outs": [
+          "Only saying sales were weak",
+          "Too much detail, no message"
+        ]
+      },
+      "competencies": [
+        "reasoning",
+        "clarity_of_explanation"
+      ],
+      "role_families": [
+        "finance"
+      ],
+      "levels": []
+    },
+    {
+      "id": "fin-working-capital",
+      "interview_type": "technical_qa",
+      "question": "Our profit is up but cash is down. What could explain that?",
+      "hints": {
+        "looking_for": [
+          "Understanding of cash versus profit",
+          "Ordered reasoning"
+        ],
+        "strong_signals": [
+          "Names receivables, inventory and capex",
+          "Suggests how to check each"
+        ],
+        "watch_outs": [
+          "Assuming an error",
+          "Only one cause"
+        ]
+      },
+      "competencies": [
+        "reasoning",
+        "accuracy"
+      ],
+      "role_families": [
+        "finance"
+      ],
+      "levels": []
+    },
+    {
+      "id": "fin-unit-economics",
+      "interview_type": "technical_qa",
+      "question": "Explain customer lifetime value and payback period, and when each one misleads.",
+      "hints": {
+        "looking_for": [
+          "Command of unit economics",
+          "Awareness of limits"
+        ],
+        "strong_signals": [
+          "Correct definitions with a simple example",
+          "Says when assumptions break"
+        ],
+        "watch_outs": [
+          "Wrong formula",
+          "Trusting LTV blindly"
+        ]
+      },
+      "competencies": [
+        "technical_depth",
+        "trade_offs"
+      ],
+      "role_families": [
+        "finance"
+      ],
+      "levels": []
+    },
+    {
+      "id": "fin-case-pricing-decision",
+      "interview_type": "case",
+      "question": "We want to raise our price by 10 percent. How would you decide if we should?",
+      "hints": {
+        "looking_for": [
+          "A structured view of price changes",
+          "A clear recommendation"
+        ],
+        "strong_signals": [
+          "Estimates churn and revenue effects with numbers",
+          "Proposes a test before a full rollout"
+        ],
+        "watch_outs": [
+          "Only revenue upside",
+          "No recommendation"
+        ]
+      },
+      "competencies": [
+        "problem_framing",
+        "recommendation"
+      ],
+      "role_families": [
+        "finance"
+      ],
+      "levels": []
+    },
+    {
+      "id": "fin-case-margin-drop",
+      "interview_type": "case",
+      "question": "Gross margin fell from 70 to 64 percent in a year. How do you find out why?",
+      "hints": {
+        "looking_for": [
+          "Structured diagnosis of margins",
+          "Use of data"
+        ],
+        "strong_signals": [
+          "Splits by product, cost line and mix",
+          "Separates one-off and lasting causes"
+        ],
+        "watch_outs": [
+          "Guessing one cause",
+          "No breakdown"
+        ]
+      },
+      "competencies": [
+        "structure",
+        "problem_framing"
+      ],
+      "role_families": [
+        "finance"
+      ],
+      "levels": []
+    },
+    {
+      "id": "fin-case-budget-cut",
+      "interview_type": "case",
+      "question": "Leadership asks you to find 10 percent savings in the operating budget. Where do you start?",
+      "hints": {
+        "looking_for": [
+          "How you find savings without harm",
+          "Business sense"
+        ],
+        "strong_signals": [
+          "Ranks cuts by size and impact on growth",
+          "Talks to budget owners"
+        ],
+        "watch_outs": [
+          "Equal cuts everywhere",
+          "Cutting what drives revenue"
+        ]
+      },
+      "competencies": [
+        "prioritization",
+        "user_and_business_sense"
+      ],
+      "role_families": [
+        "finance"
+      ],
+      "levels": []
+    },
+    {
+      "id": "fin-case-invest-or-not",
+      "interview_type": "case",
+      "question": "A team asks for 2 million dollars for a new product line. How would you evaluate the request?",
+      "hints": {
+        "looking_for": [
+          "Investment thinking",
+          "Clear numbers"
+        ],
+        "strong_signals": [
+          "Builds a simple payback and NPV",
+          "Tests the key assumptions"
+        ],
+        "watch_outs": [
+          "Yes or no with no analysis",
+          "Ignoring risk"
+        ]
+      },
+      "competencies": [
+        "estimation_logic",
+        "recommendation"
+      ],
+      "role_families": [
+        "finance"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-led-a-team",
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you led a group to a result without formal authority.",
+      "hints": {
+        "looking_for": [
+          "Leadership without a title",
+          "How you bring people along"
+        ],
+        "strong_signals": [
+          "Clear goal and how you got buy-in",
+          "A measurable outcome"
+        ],
+        "watch_outs": [
+          "Doing it all yourself",
+          "No real result"
+        ]
+      },
+      "competencies": [
+        "collaboration",
+        "ownership"
+      ],
+      "role_families": [
+        "consulting_strategy"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-difficult-client",
+      "interview_type": "behavioral",
+      "question": "Tell me about a time a client or senior stakeholder disagreed with your recommendation.",
+      "hints": {
+        "looking_for": [
+          "How you handle senior pushback",
+          "Whether you listen and adapt"
+        ],
+        "strong_signals": [
+          "Understood their concern and used facts",
+          "Found a path both accepted"
+        ],
+        "watch_outs": [
+          "Giving in at once",
+          "Arguing until they gave up"
+        ]
+      },
+      "competencies": [
+        "conflict_handling",
+        "communication"
+      ],
+      "role_families": [
+        "consulting_strategy"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-proud-impact",
+      "interview_type": "behavioral",
+      "question": "What is the achievement you are most proud of, and how did you measure it?",
+      "hints": {
+        "looking_for": [
+          "Size of impact",
+          "Clear, structured storytelling"
+        ],
+        "strong_signals": [
+          "Numbers for the result",
+          "Your own role is clear"
+        ],
+        "watch_outs": [
+          "No result",
+          "Team work told as your own"
+        ]
+      },
+      "competencies": [
+        "impact",
+        "communication"
+      ],
+      "role_families": [
+        "consulting_strategy"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-failure",
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you failed. What would you do differently?",
+      "hints": {
+        "looking_for": [
+          "Self-awareness",
+          "Learning that lasted"
+        ],
+        "strong_signals": [
+          "Owns the failure",
+          "Concrete change in behaviour"
+        ],
+        "watch_outs": [
+          "A fake failure",
+          "Blaming others"
+        ]
+      },
+      "competencies": [
+        "learning_from_failure",
+        "ownership"
+      ],
+      "role_families": [
+        "consulting_strategy"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-why-consulting",
+      "interview_type": "hiring_manager",
+      "question": "Why consulting or strategy, and why this firm or team?",
+      "hints": {
+        "looking_for": [
+          "A real reason",
+          "Knowledge of the firm or team"
+        ],
+        "strong_signals": [
+          "Links past work to the role",
+          "Specific about this place"
+        ],
+        "watch_outs": [
+          "Prestige as the main reason",
+          "Could be said about any firm"
+        ]
+      },
+      "competencies": [
+        "motivation",
+        "role_fit"
+      ],
+      "role_families": [
+        "consulting_strategy"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-ambiguous-problem",
+      "interview_type": "hiring_manager",
+      "question": "Walk me through the most ambiguous problem you have solved. How did you get started?",
+      "hints": {
+        "looking_for": [
+          "How you handle ambiguity",
+          "Structured first steps"
+        ],
+        "strong_signals": [
+          "Framed the problem before diving in",
+          "Changed course when facts changed"
+        ],
+        "watch_outs": [
+          "Waiting for someone to define it",
+          "No structure"
+        ]
+      },
+      "competencies": [
+        "judgment",
+        "depth_of_experience"
+      ],
+      "role_families": [
+        "consulting_strategy"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-exec-communication",
+      "interview_type": "hiring_manager",
+      "question": "Tell me about a time you presented to senior executives. How did you prepare?",
+      "hints": {
+        "looking_for": [
+          "Comfort with senior audiences",
+          "Preparation habits"
+        ],
+        "strong_signals": [
+          "Answer first, then support",
+          "Anticipated questions"
+        ],
+        "watch_outs": [
+          "Reading slides aloud",
+          "No preparation story"
+        ]
+      },
+      "competencies": [
+        "scope_at_level",
+        "team_fit"
+      ],
+      "role_families": [
+        "consulting_strategy"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-team-style",
+      "interview_type": "hiring_manager",
+      "question": "What kind of team brings out your best work, and what do you bring to a team?",
+      "hints": {
+        "looking_for": [
+          "Fit with how the team works",
+          "Self-awareness"
+        ],
+        "strong_signals": [
+          "Specific examples",
+          "Knows their own gaps"
+        ],
+        "watch_outs": [
+          "Only easy teams",
+          "Generic adjectives"
+        ]
+      },
+      "competencies": [
+        "team_fit",
+        "role_fit"
+      ],
+      "role_families": [
+        "consulting_strategy"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-case-profitability",
+      "interview_type": "case",
+      "question": "A regional grocery chain's profits fell 20 percent in two years. How would you find out why?",
+      "hints": {
+        "looking_for": [
+          "A clear profitability structure",
+          "Hypothesis-driven work"
+        ],
+        "strong_signals": [
+          "Splits revenue and costs, then drills down",
+          "States a hypothesis and tests it"
+        ],
+        "watch_outs": [
+          "A list of random ideas",
+          "Skipping the structure"
+        ]
+      },
+      "competencies": [
+        "structure",
+        "problem_framing"
+      ],
+      "role_families": [
+        "consulting_strategy"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-case-market-entry",
+      "interview_type": "case",
+      "question": "A US meal-kit company is thinking of entering Canada. Should it?",
+      "hints": {
+        "looking_for": [
+          "A market entry framework",
+          "A clear go or no-go"
+        ],
+        "strong_signals": [
+          "Covers market, competition, ability and economics",
+          "Ends with a recommendation and risks"
+        ],
+        "watch_outs": [
+          "Framework with no answer",
+          "Ignoring the company's own ability"
+        ]
+      },
+      "competencies": [
+        "structure",
+        "recommendation"
+      ],
+      "role_families": [
+        "consulting_strategy"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-case-market-size",
+      "interview_type": "case",
+      "question": "Estimate the yearly market for dog-walking services in a large US city.",
+      "hints": {
+        "looking_for": [
+          "A clear estimate",
+          "Sensible assumptions"
+        ],
+        "strong_signals": [
+          "Builds from households, dog ownership and frequency",
+          "Sanity-checks the result"
+        ],
+        "watch_outs": [
+          "A number with no logic",
+          "Assumptions far off reality"
+        ]
+      },
+      "competencies": [
+        "estimation_logic",
+        "structure"
+      ],
+      "role_families": [
+        "consulting_strategy"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-case-acquisition",
+      "interview_type": "case",
+      "question": "A software company wants to buy a smaller competitor. What would you look at before saying yes?",
+      "hints": {
+        "looking_for": [
+          "M&A thinking",
+          "Business sense"
+        ],
+        "strong_signals": [
+          "Strategic fit, synergies, price and integration risk",
+          "Asks what success looks like"
+        ],
+        "watch_outs": [
+          "Only the price",
+          "Ignoring integration"
+        ]
+      },
+      "competencies": [
+        "problem_framing",
+        "user_and_business_sense"
+      ],
+      "role_families": [
+        "consulting_strategy"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-case-cost-reduction",
+      "interview_type": "case",
+      "question": "A hospital wants to cut operating costs by 10 percent without hurting care. Where do you look?",
+      "hints": {
+        "looking_for": [
+          "Structured cost thinking",
+          "Judgment on what not to cut"
+        ],
+        "strong_signals": [
+          "Maps the cost base and finds the largest levers",
+          "Protects care quality"
+        ],
+        "watch_outs": [
+          "Cutting staff as the only idea",
+          "No structure"
+        ]
+      },
+      "competencies": [
+        "prioritization",
+        "structure"
+      ],
+      "role_families": [
+        "consulting_strategy"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-case-growth",
+      "interview_type": "case",
+      "question": "A fitness app has stopped growing. What are the ways it could grow again, and which would you try first?",
+      "hints": {
+        "looking_for": [
+          "Range of growth levers",
+          "Prioritization"
+        ],
+        "strong_signals": [
+          "New users, retention and pricing as levers",
+          "Picks one with a reason"
+        ],
+        "watch_outs": [
+          "Only advertising",
+          "No priority"
+        ]
+      },
+      "competencies": [
+        "user_and_business_sense",
+        "prioritization"
+      ],
+      "role_families": [
+        "consulting_strategy"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-case-synthesis",
+      "interview_type": "case",
+      "question": "You have five minutes with the CEO at the end of a project. How do you present your findings?",
+      "hints": {
+        "looking_for": [
+          "Ability to synthesize",
+          "Executive communication"
+        ],
+        "strong_signals": [
+          "Answer first with three supporting points",
+          "Clear next steps"
+        ],
+        "watch_outs": [
+          "Telling the story in time order",
+          "No recommendation"
+        ]
+      },
+      "competencies": [
+        "recommendation",
+        "structure"
+      ],
+      "role_families": [
+        "consulting_strategy"
+      ],
+      "levels": []
+    },
+    {
+      "id": "pp-project-recovered",
+      "interview_type": "behavioral",
+      "question": "Tell me about a project that was going off track. How did you bring it back?",
+      "hints": {
+        "looking_for": [
+          "How you recover a project",
+          "Your own actions"
+        ],
+        "strong_signals": [
+          "Found the cause and re-planned",
+          "Delivered with a clear result"
+        ],
+        "watch_outs": [
+          "Luck as the fix",
+          "No change in plan"
+        ]
+      },
+      "competencies": [
+        "ownership",
+        "impact"
+      ],
+      "role_families": [
+        "project_program"
+      ],
+      "levels": []
+    },
+    {
+      "id": "pp-difficult-stakeholder",
+      "interview_type": "behavioral",
+      "question": "Tell me about a difficult stakeholder on one of your projects. How did you manage them?",
+      "hints": {
+        "looking_for": [
+          "Stakeholder management",
+          "Calm under pressure"
+        ],
+        "strong_signals": [
+          "Understood what they needed",
+          "Built a working relationship"
+        ],
+        "watch_outs": [
+          "Avoiding them",
+          "Escalating at once"
+        ]
+      },
+      "competencies": [
+        "conflict_handling",
+        "communication"
+      ],
+      "role_families": [
+        "project_program"
+      ],
+      "levels": []
+    },
+    {
+      "id": "pp-project-failed",
+      "interview_type": "behavioral",
+      "question": "Tell me about a project that failed or was cancelled. What did you learn?",
+      "hints": {
+        "looking_for": [
+          "Honesty about failure",
+          "Lessons you used later"
+        ],
+        "strong_signals": [
+          "Clear cause of failure",
+          "Changed how you run projects"
+        ],
+        "watch_outs": [
+          "Blaming the sponsor",
+          "No lesson"
+        ]
+      },
+      "competencies": [
+        "learning_from_failure",
+        "communication"
+      ],
+      "role_families": [
+        "project_program"
+      ],
+      "levels": []
+    },
+    {
+      "id": "pp-why-program-role",
+      "interview_type": "hiring_manager",
+      "question": "Why project or program management, and what kind of work energizes you?",
+      "hints": {
+        "looking_for": [
+          "Real interest in delivery work",
+          "Fit with this role"
+        ],
+        "strong_signals": [
+          "Specific examples of work you enjoy",
+          "Links to this role"
+        ],
+        "watch_outs": [
+          "Only liking organizing",
+          "No link to the role"
+        ]
+      },
+      "competencies": [
+        "motivation",
+        "role_fit"
+      ],
+      "role_families": [
+        "project_program"
+      ],
+      "levels": []
+    },
+    {
+      "id": "pp-largest-program",
+      "interview_type": "hiring_manager",
+      "question": "What is the largest project or program you have run? Walk me through its scope.",
+      "hints": {
+        "looking_for": [
+          "Scale of past work",
+          "Your part in it"
+        ],
+        "strong_signals": [
+          "Numbers for budget, team and time",
+          "Clear about what you led"
+        ],
+        "watch_outs": [
+          "Vague scope",
+          "Claiming the sponsor's role"
+        ]
+      },
+      "competencies": [
+        "scope_at_level",
+        "depth_of_experience"
+      ],
+      "role_families": [
+        "project_program"
+      ],
+      "levels": []
+    },
+    {
+      "id": "pp-methodology-choice",
+      "interview_type": "hiring_manager",
+      "question": "How do you choose between agile and waterfall for a project? Give an example.",
+      "hints": {
+        "looking_for": [
+          "Judgment in choosing methods",
+          "Practical experience"
+        ],
+        "strong_signals": [
+          "Choice based on certainty and constraints",
+          "Real example and its result"
+        ],
+        "watch_outs": [
+          "One method for everything",
+          "Textbook answer only"
+        ]
+      },
+      "competencies": [
+        "judgment",
+        "depth_of_experience"
+      ],
+      "role_families": [
+        "project_program"
+      ],
+      "levels": []
+    },
+    {
+      "id": "pp-critical-path",
+      "interview_type": "technical_qa",
+      "question": "Explain the critical path of a project and how you use it day to day.",
+      "hints": {
+        "looking_for": [
+          "Command of planning basics",
+          "Practical use"
+        ],
+        "strong_signals": [
+          "Correct definition with an example",
+          "Uses it to focus attention"
+        ],
+        "watch_outs": [
+          "Wrong definition",
+          "Only theory"
+        ]
+      },
+      "competencies": [
+        "technical_depth",
+        "clarity_of_explanation"
+      ],
+      "role_families": [
+        "project_program"
+      ],
+      "levels": []
+    },
+    {
+      "id": "pp-risk-register",
+      "interview_type": "technical_qa",
+      "question": "How do you run a risk log so it actually changes what the team does?",
+      "hints": {
+        "looking_for": [
+          "Risk management in practice",
+          "Turning risks into actions"
+        ],
+        "strong_signals": [
+          "Owners, likelihood, impact and actions",
+          "Reviewed often with the team"
+        ],
+        "watch_outs": [
+          "A list nobody reads",
+          "Only listing risks"
+        ]
+      },
+      "competencies": [
+        "technical_depth",
+        "reasoning"
+      ],
+      "role_families": [
+        "project_program"
+      ],
+      "levels": []
+    },
+    {
+      "id": "pp-scope-creep",
+      "interview_type": "technical_qa",
+      "question": "How do you handle a sponsor who keeps adding scope without changing the date?",
+      "hints": {
+        "looking_for": [
+          "Change control",
+          "Ability to say what it costs"
+        ],
+        "strong_signals": [
+          "Shows the impact on date and cost",
+          "Gets a clear decision"
+        ],
+        "watch_outs": [
+          "Saying yes to everything",
+          "Refusing without options"
+        ]
+      },
+      "competencies": [
+        "trade_offs",
+        "reasoning"
+      ],
+      "role_families": [
+        "project_program"
+      ],
+      "levels": []
+    },
+    {
+      "id": "pp-status-reporting",
+      "interview_type": "technical_qa",
+      "question": "What goes into a good weekly status report for executives?",
+      "hints": {
+        "looking_for": [
+          "Clear, honest reporting",
+          "Knowing the audience"
+        ],
+        "strong_signals": [
+          "Status, risks and decisions needed",
+          "Honest colours, not always green"
+        ],
+        "watch_outs": [
+          "Long activity lists",
+          "Hiding problems"
+        ]
+      },
+      "competencies": [
+        "clarity_of_explanation",
+        "accuracy"
+      ],
+      "role_families": [
+        "project_program"
+      ],
+      "levels": []
+    },
+    {
+      "id": "pp-estimation",
+      "interview_type": "technical_qa",
+      "question": "How do you build and check a schedule estimate for work you have not done before?",
+      "hints": {
+        "looking_for": [
+          "Estimating under uncertainty",
+          "Checking assumptions"
+        ],
+        "strong_signals": [
+          "Breaks work down and uses ranges",
+          "Checks with the people doing the work"
+        ],
+        "watch_outs": [
+          "One number with no basis",
+          "No buffer for risk"
+        ]
+      },
+      "competencies": [
+        "reasoning",
+        "accuracy"
+      ],
+      "role_families": [
+        "project_program"
+      ],
+      "levels": []
+    },
+    {
+      "id": "pp-case-slipping-project",
+      "interview_type": "case",
+      "question": "Your project is three weeks behind with six weeks left. What do you do first?",
+      "hints": {
+        "looking_for": [
+          "Recovery thinking",
+          "Clear first steps"
+        ],
+        "strong_signals": [
+          "Finds the cause and the real critical path",
+          "Gives options to the sponsor"
+        ],
+        "watch_outs": [
+          "Asking for overtime only",
+          "Hoping to catch up"
+        ]
+      },
+      "competencies": [
+        "problem_framing",
+        "prioritization"
+      ],
+      "role_families": [
+        "project_program"
+      ],
+      "levels": []
+    },
+    {
+      "id": "pp-case-two-sponsors",
+      "interview_type": "case",
+      "question": "Two sponsors want opposite things from your program. How do you resolve it?",
+      "hints": {
+        "looking_for": [
+          "Handling conflicting priorities",
+          "Getting a decision made"
+        ],
+        "strong_signals": [
+          "Lays out the trade-off clearly",
+          "Escalates to the right decider with a recommendation"
+        ],
+        "watch_outs": [
+          "Trying to please both",
+          "Picking a side without saying so"
+        ]
+      },
+      "competencies": [
+        "problem_framing",
+        "recommendation"
+      ],
+      "role_families": [
+        "project_program"
+      ],
+      "levels": []
+    },
+    {
+      "id": "pp-case-plan-new-office",
+      "interview_type": "case",
+      "question": "We are opening a new office in four months. Plan the project with me.",
+      "hints": {
+        "looking_for": [
+          "Breaking a project into parts",
+          "Realistic timing"
+        ],
+        "strong_signals": [
+          "Workstreams, owners and milestones",
+          "Finds the longest lead items first"
+        ],
+        "watch_outs": [
+          "Unordered task list",
+          "No dates"
+        ]
+      },
+      "competencies": [
+        "structure",
+        "estimation_logic"
+      ],
+      "role_families": [
+        "project_program"
+      ],
+      "levels": []
+    },
+    {
+      "id": "pp-case-portfolio",
+      "interview_type": "case",
+      "question": "You have 12 projects and budget for 8. How do you choose which ones go ahead?",
+      "hints": {
+        "looking_for": [
+          "Portfolio thinking",
+          "Business sense"
+        ],
+        "strong_signals": [
+          "Scores by value, cost and risk",
+          "Checks fit with company goals"
+        ],
+        "watch_outs": [
+          "Loudest sponsor wins",
+          "No criteria"
+        ]
+      },
+      "competencies": [
+        "prioritization",
+        "user_and_business_sense"
+      ],
+      "role_families": [
+        "project_program"
+      ],
+      "levels": []
     }
   ]
 }

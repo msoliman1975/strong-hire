@@ -1,0 +1,25 @@
+{
+  "company_name": "Nimbus Analytics",
+  "title": "Senior Engineering Manager, Platform",
+  "role_family": "eng_management",
+  "level": "senior",
+  "level_label": "Senior",
+  "team": "Platform",
+  "location": "Seattle, WA (hybrid)",
+  "must_have_skills": [
+    "Experience managing managers",
+    "8+ years in software engineering",
+    "Large-scale distributed systems",
+    "Budget and headcount planning"
+  ],
+  "nice_to_have_skills": [
+    "Data platform experience"
+  ],
+  "responsibilities": [
+    "Lead three engineering managers and about 25 engineers",
+    "Set the technical strategy for the platform",
+    "Own the platform budget and headcount plan",
+    "Partner with product leaders on the annual plan"
+  ],
+  "source_url": null
+}

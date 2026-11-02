@@ -1,0 +1,26 @@
+{
+  "company_name": "Tidewater Outfitters",
+  "title": "Business Intelligence Analyst",
+  "role_family": "data_analytics",
+  "level": "mid",
+  "level_label": null,
+  "team": "Business Intelligence",
+  "location": "Portland, OR",
+  "must_have_skills": [
+    "3+ years in BI or analytics",
+    "Advanced SQL",
+    "Tableau or Power BI",
+    "Clear communication with non-technical teams"
+  ],
+  "nice_to_have_skills": [
+    "Retail or e-commerce experience",
+    "dbt"
+  ],
+  "responsibilities": [
+    "Build and maintain dashboards in Tableau",
+    "Write SQL to answer questions from merchandising and marketing",
+    "Define and document core business metrics",
+    "Find data quality issues and work with engineering to fix them"
+  ],
+  "source_url": null
+}

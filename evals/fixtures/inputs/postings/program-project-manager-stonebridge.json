@@ -1,0 +1,25 @@
+{
+  "company_name": "Stonebridge Construction",
+  "title": "Project Manager",
+  "role_family": "project_program",
+  "level": "mid",
+  "level_label": null,
+  "team": null,
+  "location": "Dallas, TX",
+  "must_have_skills": [
+    "4+ years managing construction projects",
+    "Scheduling with MS Project or Primavera",
+    "Budget control",
+    "Stakeholder communication"
+  ],
+  "nice_to_have_skills": [
+    "PMP certification"
+  ],
+  "responsibilities": [
+    "Plan schedules and budgets for each project",
+    "Manage subcontractors and suppliers",
+    "Track risks, issues and change orders",
+    "Report progress to clients each week"
+  ],
+  "source_url": null
+}

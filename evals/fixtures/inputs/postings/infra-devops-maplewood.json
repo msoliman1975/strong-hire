@@ -1,0 +1,26 @@
+{
+  "company_name": "Maplewood Health Network",
+  "title": "DevOps Engineer",
+  "role_family": "infra_security",
+  "level": "mid",
+  "level_label": null,
+  "team": null,
+  "location": "Toronto, ON",
+  "must_have_skills": [
+    "3+ years in DevOps or infrastructure",
+    "CI/CD tools such as GitHub Actions or Jenkins",
+    "Terraform or Ansible",
+    "Docker"
+  ],
+  "nice_to_have_skills": [
+    "Azure",
+    "Healthcare compliance"
+  ],
+  "responsibilities": [
+    "Build and maintain CI/CD pipelines",
+    "Manage infrastructure as code",
+    "Monitor production systems and fix outages",
+    "Help developers ship safely"
+  ],
+  "source_url": null
+}

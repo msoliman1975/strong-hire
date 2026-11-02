@@ -1,0 +1,25 @@
+{
+  "company_name": "Goldman Sachs",
+  "title": "Investment Banking Analyst",
+  "role_family": "finance",
+  "level": "new_grad",
+  "level_label": "Analyst",
+  "team": "Investment Banking Division",
+  "location": "New York, NY",
+  "must_have_skills": [
+    "Bachelor's degree",
+    "Accounting and corporate finance knowledge",
+    "Financial modeling",
+    "Strong attention to detail"
+  ],
+  "nice_to_have_skills": [
+    "Prior banking internship"
+  ],
+  "responsibilities": [
+    "Build financial models and valuation analyses",
+    "Prepare pitch materials for clients",
+    "Do industry and company research",
+    "Support deal teams through execution"
+  ],
+  "source_url": null
+}
