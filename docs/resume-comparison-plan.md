@@ -42,6 +42,12 @@ order in which the code lands.
   analysis, the job list's match score, the plan, the interviewer brief, Custom setup, sessions,
   reports and the hire-signal history. Reading an analysis by id still works for any purpose.
 
+- A role row copied from a comparison row (Use this one, or creating the role after comparing,
+  when the gap analysis starts with `reuse_ready`) keeps `source_gap_id`. It made no model call
+  and does not count against the rate limit.
+- On Add a target role the posting as checked on step 2 is saved before the comparison starts,
+  so the resumes are compared against what the user confirmed.
+
 ## Token and cost impact
 
 | Case | Model calls | Approximate tokens |

@@ -1210,6 +1210,297 @@
         }
       }
     },
+    "/roles/{job_target_id}/resume-comparison": {
+      "post": {
+        "tags": [
+          "resume comparison"
+        ],
+        "summary": "Start Comparison",
+        "description": "RC-1, RC-2: compare the user's resumes for this role. Reuses unchanged analyses.",
+        "operationId": "start_comparison_roles__job_target_id__resume_comparison_post",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeComparisonOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The role, the comparison, the resume or the hint does not exist."
+          },
+          "409": {
+            "description": "detail.code: too_few_resumes, not_ready or changed."
+          },
+          "429": {
+            "description": "Rate limited. detail.code is 'rate_limited'; see Retry-After."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "resume comparison"
+        ],
+        "summary": "Get Comparison",
+        "description": "RC-8: the role's latest comparison. 404 when none was started.",
+        "operationId": "get_comparison_roles__job_target_id__resume_comparison_get",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeComparisonOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The role, the comparison, the resume or the hint does not exist."
+          },
+          "409": {
+            "description": "detail.code: too_few_resumes, not_ready or changed."
+          },
+          "429": {
+            "description": "Rate limited. detail.code is 'rate_limited'; see Retry-After."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resume-comparisons/{comparison_id}/use": {
+      "post": {
+        "tags": [
+          "resume comparison"
+        ],
+        "summary": "Use Resume",
+        "description": "RC-6: the role uses this resume from now on. Nothing switches without this call.",
+        "operationId": "use_resume_resume_comparisons__comparison_id__use_post",
+        "parameters": [
+          {
+            "name": "comparison_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Comparison Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UseResumeIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeComparisonOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The role, the comparison, the resume or the hint does not exist."
+          },
+          "409": {
+            "description": "detail.code: too_few_resumes, not_ready or changed."
+          },
+          "429": {
+            "description": "Rate limited. detail.code is 'rate_limited'; see Retry-After."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resume-comparisons/{comparison_id}/hints/{key}/add": {
+      "post": {
+        "tags": [
+          "resume comparison"
+        ],
+        "summary": "Add Hint Line",
+        "description": "RC-4: copy the other resume's line into the focus resume, unchanged. No model call; the\nresume check runs again on its next read.",
+        "operationId": "add_hint_line_resume_comparisons__comparison_id__hints__key__add_post",
+        "parameters": [
+          {
+            "name": "comparison_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Comparison Id"
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeComparisonOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The role, the comparison, the resume or the hint does not exist."
+          },
+          "409": {
+            "description": "detail.code: too_few_resumes, not_ready or changed."
+          },
+          "429": {
+            "description": "Rate limited. detail.code is 'rate_limited'; see Retry-After."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resume-comparisons/{comparison_id}/hints/{key}/dismiss": {
+      "post": {
+        "tags": [
+          "resume comparison"
+        ],
+        "summary": "Dismiss Hint",
+        "description": "RC-4: hide the hint. It stays hidden for this comparison.",
+        "operationId": "dismiss_hint_resume_comparisons__comparison_id__hints__key__dismiss_post",
+        "parameters": [
+          {
+            "name": "comparison_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Comparison Id"
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeComparisonOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The role, the comparison, the resume or the hint does not exist."
+          },
+          "409": {
+            "description": "detail.code: too_few_resumes, not_ready or changed."
+          },
+          "429": {
+            "description": "Rate limited. detail.code is 'rate_limited'; see Retry-After."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/sessions/{session_id}/debrief": {
       "get": {
         "tags": [
@@ -14892,6 +15183,198 @@
         ],
         "title": "CompanyRequestGroup"
       },
+      "ComparedResume": {
+        "properties": {
+          "resume_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Resume Id"
+          },
+          "resume_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resume Name",
+            "description": "None when the resume was deleted."
+          },
+          "is_main": {
+            "type": "boolean",
+            "title": "Is Main"
+          },
+          "deleted": {
+            "type": "boolean",
+            "title": "Deleted"
+          },
+          "gap_analysis_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Gap Analysis Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/GapStatus",
+            "description": "The status of the analysis this resume is ranked by."
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error",
+            "description": "A plain reason when status is failed."
+          },
+          "reused": {
+            "type": "boolean",
+            "title": "Reused",
+            "description": "RC-2: an earlier analysis was reused; no model call."
+          },
+          "match_score": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Match Score",
+            "description": "GA-1. None until ready."
+          },
+          "must_haves_total": {
+            "type": "integer",
+            "title": "Must Haves Total",
+            "description": "RC-2: the job's must-have skills."
+          },
+          "must_haves_shown": {
+            "type": "integer",
+            "title": "Must Haves Shown",
+            "description": "RC-2: must-haves the resume mentions (IN-12 rule, no model)."
+          },
+          "must_haves_missing": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Must Haves Missing",
+            "description": "RC-2: must-haves the resume never shows."
+          },
+          "high_gaps": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "High Gaps",
+            "description": "High-severity gaps. None until ready."
+          },
+          "rank": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rank",
+            "description": "RC-3: 1 is the best fit. None until ready."
+          },
+          "stale": {
+            "type": "boolean",
+            "title": "Stale",
+            "description": "RC-8: the job or this resume changed since its analysis was made."
+          }
+        },
+        "type": "object",
+        "required": [
+          "resume_id",
+          "resume_name",
+          "is_main",
+          "deleted",
+          "gap_analysis_id",
+          "status",
+          "error",
+          "reused",
+          "match_score",
+          "must_haves_total",
+          "must_haves_shown",
+          "must_haves_missing",
+          "high_gaps",
+          "rank",
+          "stale"
+        ],
+        "title": "ComparedResume",
+        "description": "One compared resume: its rule-based must-have count (RC-2) and, once ready, its score."
+      },
+      "ComparisonGap": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key",
+            "description": "Stable id of this hint inside the comparison."
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "related_requirement": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Related Requirement"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HintSource"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "RC-4: another resume covers this gap. None: no resume does (RC-5)."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "added",
+              "dismissed"
+            ],
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "summary",
+          "severity",
+          "related_requirement",
+          "source",
+          "status"
+        ],
+        "title": "ComparisonGap",
+        "description": "One gap of the focus resume (RC-4, RC-5)."
+      },
       "Competency": {
         "type": "string",
         "enum": [
@@ -17295,6 +17778,61 @@
           "instance"
         ],
         "title": "Heartbeat"
+      },
+      "HintSource": {
+        "properties": {
+          "resume_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Resume Id"
+          },
+          "resume_name": {
+            "type": "string",
+            "title": "Resume Name"
+          },
+          "line": {
+            "type": "string",
+            "title": "Line",
+            "description": "The line of that resume, unchanged."
+          },
+          "place": {
+            "type": "string",
+            "enum": [
+              "skills",
+              "achievement"
+            ],
+            "title": "Place",
+            "description": "Where the line goes: the resume's skills, or an achievement of a role."
+          },
+          "company": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company",
+            "description": "For an achievement: the company of its role."
+          },
+          "can_add": {
+            "type": "boolean",
+            "title": "Can Add",
+            "description": "The line can be copied: a skill the resume lacks, or an achievement at a company the resume also lists."
+          }
+        },
+        "type": "object",
+        "required": [
+          "resume_id",
+          "resume_name",
+          "line",
+          "place",
+          "company",
+          "can_add"
+        ],
+        "title": "HintSource",
+        "description": "RC-4: the other resume that covers a gap, and its line."
       },
       "HireSignal": {
         "type": "string",
@@ -23350,6 +23888,155 @@
         "title": "ResumeComparisonEntry",
         "type": "object"
       },
+      "ResumeComparisonOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "job_target_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Job Target Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "running",
+              "ready",
+              "failed"
+            ],
+            "title": "Status",
+            "description": "running while any analysis runs; failed when every analysis failed."
+          },
+          "resumes": {
+            "items": {
+              "$ref": "#/components/schemas/ComparedResume"
+            },
+            "type": "array",
+            "title": "Resumes",
+            "description": "Ranked resumes first (rank 1 first), then the others."
+          },
+          "recommended_resume_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recommended Resume Id",
+            "description": "RC-3. None until ready."
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason",
+            "description": "RC-3: why it fits best, built in code."
+          },
+          "focus_resume_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Focus Resume Id",
+            "description": "The resume whose gaps are listed: the chosen one, else the recommended one."
+          },
+          "gaps": {
+            "items": {
+              "$ref": "#/components/schemas/ComparisonGap"
+            },
+            "type": "array",
+            "title": "Gaps",
+            "description": "RC-4, RC-5: gaps of the focus resume."
+          },
+          "role_resume_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role Resume Id",
+            "description": "The resume the role uses now (its interviews, else its analysis)."
+          },
+          "chosen_resume_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chosen Resume Id",
+            "description": "RC-6: picked with Use this one."
+          },
+          "new_runs": {
+            "type": "integer",
+            "title": "New Runs",
+            "description": "RC-7: analyses this comparison started."
+          },
+          "out_of_date": {
+            "type": "boolean",
+            "title": "Out Of Date",
+            "description": "RC-8: compare again to update it."
+          },
+          "out_of_date_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Out Of Date Reason"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "job_target_id",
+          "status",
+          "resumes",
+          "recommended_resume_id",
+          "reason",
+          "focus_resume_id",
+          "gaps",
+          "role_resume_id",
+          "chosen_resume_id",
+          "new_runs",
+          "out_of_date",
+          "out_of_date_reason",
+          "created_at"
+        ],
+        "title": "ResumeComparisonOut",
+        "description": "The latest resume comparison of a role. Poll while status is \"running\"."
+      },
       "ResumeIssue": {
         "properties": {
           "key": {
@@ -28494,6 +29181,21 @@
         ],
         "title": "UsageOut",
         "description": "BL-1 usage meter and BL-2 free interview, as the API counts them."
+      },
+      "UseResumeIn": {
+        "properties": {
+          "resume_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Resume Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "resume_id"
+        ],
+        "title": "UseResumeIn"
       },
       "UsedAchievement": {
         "properties": {

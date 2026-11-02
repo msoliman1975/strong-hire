@@ -214,6 +214,11 @@ def _mentions(resume: Resume, skill: str) -> bool:
     return any(word.search(t) for t in texts)
 
 
+def mentions(resume: Resume, skill: str) -> bool:
+    """Public name of the must-have rule, for the resume comparison pre-screen (RC-2)."""
+    return _mentions(resume, skill)
+
+
 def _truncate(text: str, limit: int) -> str:
     t = text.strip()
     return f"{t[: limit - 1].rstrip()}…" if len(t) > limit else t

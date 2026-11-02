@@ -68,6 +68,7 @@ from strong_core.schemas import (
     Competency,
     CustomSessionSpec,
     GapAnalysis,
+    GapPurpose,
     HireSignal,
     InterviewerBrief,
     InterviewType,
@@ -195,7 +196,11 @@ async def _plan(db: AsyncSession, job_target_id: uuid.UUID) -> list[PlannedSessi
     """The session plan of the newest ready gap analysis (P6), or [] when there is none."""
     row = await db.scalar(
         select(GapRow)
-        .where(GapRow.job_target_id == job_target_id, GapRow.breakdown_json.is_not(None))
+        .where(
+            GapRow.job_target_id == job_target_id,
+            GapRow.breakdown_json.is_not(None),
+            GapRow.purpose == GapPurpose.ROLE,  # RC-7
+        )
         .order_by(GapRow.created_at.desc())
         .limit(1)
     )

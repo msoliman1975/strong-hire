@@ -22,6 +22,7 @@ from strong_core.schemas import (
     STANDARD_INTERVIEW_TYPES,
     Difficulty,
     GapAnalysis,
+    GapPurpose,
     InterviewType,
     JobPosting,
     Level,
@@ -50,7 +51,11 @@ async def latest_pair_gap(
     """The newest gap analysis run of this job with this CV, in any status."""
     return await db.scalar(
         select(GapRow)
-        .where(GapRow.job_target_id == job_target_id, GapRow.resume_id == resume_id)
+        .where(
+            GapRow.job_target_id == job_target_id,
+            GapRow.resume_id == resume_id,
+            GapRow.purpose == GapPurpose.ROLE,  # RC-7
+        )
         .order_by(GapRow.created_at.desc(), GapRow.updated_at.desc().nulls_last())
         .limit(1)
     )

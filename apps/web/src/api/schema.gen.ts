@@ -404,6 +404,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/roles/{job_target_id}/resume-comparison": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Comparison
+         * @description RC-8: the role's latest comparison. 404 when none was started.
+         */
+        get: operations["get_comparison_roles__job_target_id__resume_comparison_get"];
+        put?: never;
+        /**
+         * Start Comparison
+         * @description RC-1, RC-2: compare the user's resumes for this role. Reuses unchanged analyses.
+         */
+        post: operations["start_comparison_roles__job_target_id__resume_comparison_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/resume-comparisons/{comparison_id}/use": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Use Resume
+         * @description RC-6: the role uses this resume from now on. Nothing switches without this call.
+         */
+        post: operations["use_resume_resume_comparisons__comparison_id__use_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/resume-comparisons/{comparison_id}/hints/{key}/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add Hint Line
+         * @description RC-4: copy the other resume's line into the focus resume, unchanged. No model call; the
+         *     resume check runs again on its next read.
+         */
+        post: operations["add_hint_line_resume_comparisons__comparison_id__hints__key__add_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/resume-comparisons/{comparison_id}/hints/{key}/dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Dismiss Hint
+         * @description RC-4: hide the hint. It stays hidden for this comparison.
+         */
+        post: operations["dismiss_hint_resume_comparisons__comparison_id__hints__key__dismiss_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/sessions/{session_id}/debrief": {
         parameters: {
             query?: never;
@@ -5595,6 +5680,101 @@ export interface components {
             triage: components["schemas"]["TriageInfo"];
         };
         /**
+         * ComparedResume
+         * @description One compared resume: its rule-based must-have count (RC-2) and, once ready, its score.
+         */
+        ComparedResume: {
+            /**
+             * Resume Id
+             * Format: uuid
+             */
+            resume_id: string;
+            /**
+             * Resume Name
+             * @description None when the resume was deleted.
+             */
+            resume_name: string | null;
+            /** Is Main */
+            is_main: boolean;
+            /** Deleted */
+            deleted: boolean;
+            /**
+             * Gap Analysis Id
+             * Format: uuid
+             */
+            gap_analysis_id: string;
+            /** @description The status of the analysis this resume is ranked by. */
+            status: components["schemas"]["GapStatus"];
+            /**
+             * Error
+             * @description A plain reason when status is failed.
+             */
+            error: string | null;
+            /**
+             * Reused
+             * @description RC-2: an earlier analysis was reused; no model call.
+             */
+            reused: boolean;
+            /**
+             * Match Score
+             * @description GA-1. None until ready.
+             */
+            match_score: number | null;
+            /**
+             * Must Haves Total
+             * @description RC-2: the job's must-have skills.
+             */
+            must_haves_total: number;
+            /**
+             * Must Haves Shown
+             * @description RC-2: must-haves the resume mentions (IN-12 rule, no model).
+             */
+            must_haves_shown: number;
+            /**
+             * Must Haves Missing
+             * @description RC-2: must-haves the resume never shows.
+             */
+            must_haves_missing: string[];
+            /**
+             * High Gaps
+             * @description High-severity gaps. None until ready.
+             */
+            high_gaps: number | null;
+            /**
+             * Rank
+             * @description RC-3: 1 is the best fit. None until ready.
+             */
+            rank: number | null;
+            /**
+             * Stale
+             * @description RC-8: the job or this resume changed since its analysis was made.
+             */
+            stale: boolean;
+        };
+        /**
+         * ComparisonGap
+         * @description One gap of the focus resume (RC-4, RC-5).
+         */
+        ComparisonGap: {
+            /**
+             * Key
+             * @description Stable id of this hint inside the comparison.
+             */
+            key: string;
+            /** Summary */
+            summary: string;
+            severity: components["schemas"]["Severity"];
+            /** Related Requirement */
+            related_requirement: string | null;
+            /** @description RC-4: another resume covers this gap. None: no resume does (RC-5). */
+            source: components["schemas"]["HintSource"] | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "open" | "added" | "dismissed";
+        };
+        /**
          * Competency
          * @description Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE.
          * @enum {string}
@@ -6575,6 +6755,40 @@ export interface components {
             started_at?: string | null;
             /** At */
             at?: string | null;
+        };
+        /**
+         * HintSource
+         * @description RC-4: the other resume that covers a gap, and its line.
+         */
+        HintSource: {
+            /**
+             * Resume Id
+             * Format: uuid
+             */
+            resume_id: string;
+            /** Resume Name */
+            resume_name: string;
+            /**
+             * Line
+             * @description The line of that resume, unchanged.
+             */
+            line: string;
+            /**
+             * Place
+             * @description Where the line goes: the resume's skills, or an achievement of a role.
+             * @enum {string}
+             */
+            place: "skills" | "achievement";
+            /**
+             * Company
+             * @description For an achievement: the company of its role.
+             */
+            company: string | null;
+            /**
+             * Can Add
+             * @description The line can be copied: a skill the resume lacks, or an achievement at a company the resume also lists.
+             */
+            can_add: boolean;
         };
         /**
          * HireSignal
@@ -9004,6 +9218,80 @@ export interface components {
              */
             reused: boolean;
         };
+        /**
+         * ResumeComparisonOut
+         * @description The latest resume comparison of a role. Poll while status is "running".
+         */
+        ResumeComparisonOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Job Target Id
+             * Format: uuid
+             */
+            job_target_id: string;
+            /**
+             * Status
+             * @description running while any analysis runs; failed when every analysis failed.
+             * @enum {string}
+             */
+            status: "running" | "ready" | "failed";
+            /**
+             * Resumes
+             * @description Ranked resumes first (rank 1 first), then the others.
+             */
+            resumes: components["schemas"]["ComparedResume"][];
+            /**
+             * Recommended Resume Id
+             * @description RC-3. None until ready.
+             */
+            recommended_resume_id: string | null;
+            /**
+             * Reason
+             * @description RC-3: why it fits best, built in code.
+             */
+            reason: string | null;
+            /**
+             * Focus Resume Id
+             * @description The resume whose gaps are listed: the chosen one, else the recommended one.
+             */
+            focus_resume_id: string | null;
+            /**
+             * Gaps
+             * @description RC-4, RC-5: gaps of the focus resume.
+             */
+            gaps: components["schemas"]["ComparisonGap"][];
+            /**
+             * Role Resume Id
+             * @description The resume the role uses now (its interviews, else its analysis).
+             */
+            role_resume_id: string | null;
+            /**
+             * Chosen Resume Id
+             * @description RC-6: picked with Use this one.
+             */
+            chosen_resume_id: string | null;
+            /**
+             * New Runs
+             * @description RC-7: analyses this comparison started.
+             */
+            new_runs: number;
+            /**
+             * Out Of Date
+             * @description RC-8: compare again to update it.
+             */
+            out_of_date: boolean;
+            /** Out Of Date Reason */
+            out_of_date_reason: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /** ResumeIssue */
         ResumeIssue: {
             /** Key */
@@ -11170,6 +11458,14 @@ export interface components {
              */
             has_billing_account: boolean;
         };
+        /** UseResumeIn */
+        UseResumeIn: {
+            /**
+             * Resume Id
+             * Format: uuid
+             */
+            resume_id: string;
+        };
         /** UsedAchievement */
         UsedAchievement: {
             /** Achievement */
@@ -12163,6 +12459,272 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
+            };
+        };
+    };
+    get_comparison_roles__job_target_id__resume_comparison_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumeComparisonOut"];
+                };
+            };
+            /** @description The role, the comparison, the resume or the hint does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description detail.code: too_few_resumes, not_ready or changed. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Rate limited. detail.code is 'rate_limited'; see Retry-After. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    start_comparison_roles__job_target_id__resume_comparison_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumeComparisonOut"];
+                };
+            };
+            /** @description The role, the comparison, the resume or the hint does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description detail.code: too_few_resumes, not_ready or changed. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Rate limited. detail.code is 'rate_limited'; see Retry-After. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    use_resume_resume_comparisons__comparison_id__use_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                comparison_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UseResumeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumeComparisonOut"];
+                };
+            };
+            /** @description The role, the comparison, the resume or the hint does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description detail.code: too_few_resumes, not_ready or changed. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Rate limited. detail.code is 'rate_limited'; see Retry-After. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    add_hint_line_resume_comparisons__comparison_id__hints__key__add_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                comparison_id: string;
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumeComparisonOut"];
+                };
+            };
+            /** @description The role, the comparison, the resume or the hint does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description detail.code: too_few_resumes, not_ready or changed. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Rate limited. detail.code is 'rate_limited'; see Retry-After. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    dismiss_hint_resume_comparisons__comparison_id__hints__key__dismiss_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                comparison_id: string;
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumeComparisonOut"];
+                };
+            };
+            /** @description The role, the comparison, the resume or the hint does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description detail.code: too_few_resumes, not_ready or changed. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Rate limited. detail.code is 'rate_limited'; see Retry-After. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
