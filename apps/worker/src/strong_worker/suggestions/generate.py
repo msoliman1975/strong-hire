@@ -22,6 +22,7 @@ from strong_core.schemas import (
     Competency,
     NewStoryPayload,
     ResumeLineEdit,
+    SlotStatus,
     Story,
     StoryPart,
     StoryPartEdit,
@@ -223,23 +224,45 @@ def check_review(review: StoryReview, said: str) -> list[str]:
     ]
 
 
+def render_sections(story: Story) -> str:
+    """A styled story for the review prompt, section by section (SC-2)."""
+    assert story.outline is not None
+    outline = story.outline
+    lines = [f"Story: {quote_untrusted(story.title)} ({outline.style.value.upper()})"]
+    for section in outline.sections:
+        lines.append(f"{section.section.value}:")
+        for sec, key, step, slot in outline.iter_slots():
+            if sec != section.section:
+                continue
+            name = key if step is None else f"step {step + 1} {key}"
+            if slot.status == SlotStatus.FILLED and slot.text:
+                value = quote_untrusted(_clip(slot.text, 400))
+            else:
+                value = f"({slot.status.value})"
+            lines.append(f"  {name}: {value}")
+    return "\n".join(lines)
+
+
 async def review_story(
     gateway: ModelGateway, story: Story, said_texts: Sequence[str]
 ) -> Written[StoryReview]:
     """ST-11: the review. An edit that is not the user's words is dropped after the second try;
-    its note stays."""
+    its note stays. A styled story (SC-1) is reviewed on its sections with review v2, as notes
+    only: its five parts are rendered from the outline, so a part edit could not be kept, and
+    the user improves a section with Strova instead (SC-11). A classic story keeps review v1."""
     words = [*story_words(story), *said_texts]
     said = said_text(words)
+    styled = story.outline is not None
     messages = [
-        load_prompt(ROLE, "review").message("system"),
+        load_prompt(ROLE, "review", version=2 if styled else 1).message("system"),
         load_prompt(ROLE, "review_input").message(
             "user",
-            story=render_story("Story", story),
+            story=render_sections(story) if styled else render_story("Story", story),
             said="\n\n".join(_clip(t, 2000) for t in words if t) or "(nothing yet)",
         ),
     ]
     written = await _complete_checked(
-        gateway, messages, StoryReview, lambda r: check_review(r, said)
+        gateway, messages, StoryReview, lambda r: [] if styled else check_review(r, said)
     )
     # After two misses, keep the last review's notes without the edits that are not the user's.
     review = written.output or written.last
@@ -247,7 +270,7 @@ async def review_story(
         return written
     notes: list[StoryReviewNote] = []
     for n in review.notes:
-        edit = n.edit
+        edit = None if styled else n.edit
         if edit is not None:
             if unbacked(edit.after, edit.quotes, said):
                 edit = None

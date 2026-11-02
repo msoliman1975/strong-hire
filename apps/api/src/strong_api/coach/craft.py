@@ -301,7 +301,7 @@ def fixed_line(ask: Ask) -> str:
 # --- SC-6: merging a reply -------------------------------------------------------------------
 
 
-def _target(outline: StoryOutline, section: StorySection) -> StorySection | None:
+def target_section(outline: StoryOutline, section: StorySection) -> StorySection | None:
     """The outline's section for a section the model named: Situation and Challenge are the same
     place, and in CARL the Task slots live in Challenge."""
     present = {s.section for s in outline.sections}
@@ -314,7 +314,7 @@ def _target(outline: StoryOutline, section: StorySection) -> StorySection | None
     return None
 
 
-def _allowed(outline: StoryOutline, section: StorySection, slot: str) -> bool:
+def allowed(outline: StoryOutline, section: StorySection, slot: str) -> bool:
     if section == StorySection.ACTION:
         return slot in STEP_FIELDS
     if section == StorySection.RESULT and slot == METRIC_SLOT:
@@ -342,14 +342,14 @@ def _backed(update: SlotUpdate, said: str) -> str | None:
     return None
 
 
-def _get(sec: OutlineSection, slot: str, step: int | None) -> OutlineSlot:
+def get(sec: OutlineSection, slot: str, step: int | None) -> OutlineSlot:
     if step is not None:
         steps = sec.steps or []
         return steps[step].slot(slot) if step < len(steps) else OutlineSlot()
     return sec.slot(slot)
 
 
-def _set(sec: OutlineSection, slot: str, step: int | None, value: OutlineSlot) -> None:
+def put(sec: OutlineSection, slot: str, step: int | None, value: OutlineSlot) -> None:
     if step is not None:
         steps = sec.steps if sec.steps is not None else []
         while len(steps) <= step:
@@ -370,8 +370,8 @@ def apply(outline: StoryOutline, reply: CraftReply, said: str) -> Applied:
     applied = Applied(outline=out)
     for update in reply.slot_updates:
         where = _key(update.section, update.slot, update.step)
-        target = _target(out, update.section)
-        if target is None or not _allowed(out, target, update.slot):
+        target = target_section(out, update.section)
+        if target is None or not allowed(out, target, update.slot):
             applied.dropped.append(f"{where}: not a slot of this {out.style.value} story")
             continue
         sec = out.section(target)
@@ -381,26 +381,22 @@ def apply(outline: StoryOutline, reply: CraftReply, said: str) -> Applied:
         if update.step is not None and update.step >= ACTION_STEPS_MAX:
             applied.dropped.append(f"{where}: at most {ACTION_STEPS_MAX} steps")
             continue
-        if _get(sec, update.slot, update.step).by_user:
+        if get(sec, update.slot, update.step).by_user:
             applied.dropped.append(f"{where}: the candidate typed this slot")
             continue
         why = _backed(update, said)
         if why is not None:
             applied.dropped.append(f"{where}: {why}")
             continue
-        value: OutlineSlot = OutlineSlot(
-            text=update.text, quotes=update.quotes, status=SlotStatus.FILLED
+        value = strova_slot(
+            update.slot,
+            update.text,
+            update.quotes,
+            before=update.before,
+            after=update.after,
+            unit=update.unit,
         )
-        if update.slot == METRIC_SLOT:
-            value = ResultMetric(
-                text=update.text,
-                quotes=update.quotes,
-                status=SlotStatus.FILLED,
-                before=update.before,
-                after=update.after,
-                unit=update.unit,
-            )
-        _set(sec, update.slot, update.step, value)
+        put(sec, update.slot, update.step, value)
         applied.kept.append(update)
     for ref in reply.skips:
         skip(applied, ref)
@@ -408,24 +404,46 @@ def apply(outline: StoryOutline, reply: CraftReply, said: str) -> Applied:
     return applied
 
 
+def strova_slot(
+    slot: str,
+    text: str,
+    quotes: Sequence[str],
+    *,
+    before: str | None = None,
+    after: str | None = None,
+    unit: str | None = None,
+) -> OutlineSlot:
+    """A filled slot Strova wrote, with the user's verbatim quotes (D-6)."""
+    if slot == METRIC_SLOT:
+        return ResultMetric(
+            text=text,
+            quotes=list(quotes),
+            status=SlotStatus.FILLED,
+            before=before,
+            after=after,
+            unit=unit,
+        )
+    return OutlineSlot(text=text, quotes=list(quotes), status=SlotStatus.FILLED)
+
+
 def skip(applied: Applied, ref: SlotRef) -> None:
     """SC-5: mark an empty slot skipped. A filled slot is left as it is."""
-    target = _target(applied.outline, ref.section)
-    if target is None or not _allowed(applied.outline, target, ref.slot):
+    target = target_section(applied.outline, ref.section)
+    if target is None or not allowed(applied.outline, target, ref.slot):
         return
     sec = applied.outline.section(target)
     if ref.step is not None and ref.step >= len(sec.steps or []):
         return
-    if _get(sec, ref.slot, ref.step).status != SlotStatus.EMPTY:
+    if get(sec, ref.slot, ref.step).status != SlotStatus.EMPTY:
         return
-    _set(sec, ref.slot, ref.step, OutlineSlot(status=SlotStatus.SKIPPED))
+    put(sec, ref.slot, ref.step, OutlineSlot(status=SlotStatus.SKIPPED))
     applied.skipped.append(ref)
 
 
 # --- the turn --------------------------------------------------------------------------------
 
 
-def _render_outline(outline: StoryOutline) -> str:
+def render_outline(outline: StoryOutline) -> str:
     lines = [f"Style: {STYLE_NAMES[outline.style]}"]
     for sec in outline.sections:
         lines.append(f"{SECTION_LABELS[sec.section]}:")
@@ -497,7 +515,7 @@ def craft_messages(
         load_prompt(Role.COACH, "craft_turn_input").message(
             "user",
             story_style=STYLE_NAMES[outline.style],
-            outline=_render_outline(outline),
+            outline=render_outline(outline),
             target_skill=target,
             transcript=engine.render_transcript(turns),
             section=section,

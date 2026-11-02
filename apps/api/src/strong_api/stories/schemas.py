@@ -8,7 +8,16 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from strong_core.schemas import Competency, Story, StorySource
+from strong_core.schemas import (
+    ACTION_STEPS_MAX,
+    Competency,
+    SlotEdit,
+    SlotRef,
+    Story,
+    StoryOutline,
+    StorySource,
+    StoryStyle,
+)
 from strong_core.schemas.stories import STORY_TITLE_MAX_CHARS
 
 STORY_PART_MAX_CHARS = 8000
@@ -105,3 +114,64 @@ class ReviewQueued(BaseModel):
     story (GET /suggestions?place=story&story_id=...)."""
 
     job_id: str
+
+
+# --- Deep story crafting: the story page's outline actions (SC-10 to SC-13) ------------------
+
+IMPROVE_NOTE_MAX_CHARS = 1000
+
+
+class SlotEditIn(SlotRef):
+    """SC-10, D-10: the user's own text for one slot (no quotes). Blank or null text empties the
+    slot; `skipped` marks it skipped. The metric may also carry before, after and unit."""
+
+    text: str | None = Field(default=None, max_length=STORY_PART_MAX_CHARS)
+    skipped: bool = False
+    before: str | None = Field(default=None, max_length=100)
+    after: str | None = Field(default=None, max_length=100)
+    unit: str | None = Field(default=None, max_length=100)
+
+
+class OutlinePatch(_In):
+    """SC-10: inline edits. `slots` are applied first (a step index equal to the number of
+    steps adds a step); then `steps`, when sent, is the new order of the action steps by their
+    index, and a step left out is removed. 1 to 5 steps must remain."""
+
+    slots: list[SlotEditIn] = Field(default_factory=list, max_length=60)
+    steps: list[int] | None = Field(default=None, min_length=1, max_length=ACTION_STEPS_MAX)
+
+
+class ImproveIn(_In):
+    """SC-11: an optional note for Strova ("make it shorter", "add that I led the review")."""
+
+    note: str | None = Field(default=None, max_length=IMPROVE_NOTE_MAX_CHARS)
+
+
+class ImproveAccept(_In):
+    """SC-11: the edits from an improve that the user accepts; the rest are rejected."""
+
+    edits: list[SlotEdit] = Field(min_length=1, max_length=30)
+    note: str | None = Field(
+        default=None,
+        max_length=IMPROVE_NOTE_MAX_CHARS,
+        description="The note the improve was asked with, so its words count as the user's.",
+    )
+
+
+class StyleIn(_In):
+    """SC-12: switch to the other style. Without `rewrite` the slots are renamed and moved in
+    code and saved at once; with it, Strova rewrites the wording (one model call) as a preview."""
+
+    style: StoryStyle
+    rewrite: bool = False
+
+
+class StyleSwitchOut(BaseModel):
+    """SC-12: the switched story (no rewrite), or the rewrite to accept or discard."""
+
+    story: StoryOut | None = None
+    preview: StoryOutline | None = Field(
+        default=None,
+        description="The rewrite to accept (POST /stories/{id}/style/accept) or discard. Slots "
+        "the user typed stay theirs; Strova's slots carry quotes.",
+    )

@@ -29,7 +29,7 @@
         "steps": [
           {
             "did": {
-              "text": "I sent 5% of traffic to the new provider first.",
+              "text": "I sent five percent of traffic to the new provider first.",
               "quotes": ["I split it so five percent of traffic went to the new provider first"],
               "status": "filled"
             },

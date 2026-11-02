@@ -35,7 +35,7 @@
         "steps": [
           {
             "did": {
-              "text": "I split the rollout so 5% of traffic went to the new provider first.",
+              "text": "I split the rollout so five percent of traffic went to the new provider first.",
               "quotes": ["I split it so five percent of traffic went to the new provider first"],
               "status": "filled"
             },
