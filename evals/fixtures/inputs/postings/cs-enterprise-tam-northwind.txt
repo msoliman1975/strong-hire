@@ -1,0 +1,20 @@
+Senior Technical Account Manager, Enterprise
+Northwind Cloud
+Seattle, WA
+
+Northwind Cloud runs data infrastructure for large companies. Technical account managers are the technical lead for a small set of enterprise customers.
+
+What you will do:
+- Be the technical advisor for 8 to 10 enterprise accounts
+- Lead incident reviews and recovery plans after outages
+- Plan architecture changes with customer engineering teams
+- Protect and grow renewals worth several million dollars a year
+
+What you need:
+- 6+ years in technical account management, solutions or support engineering
+- Hands-on cloud and database knowledge
+- Experience running executive escalations
+
+Nice to have:
+- AWS or GCP certification
+- Experience with Kubernetes
