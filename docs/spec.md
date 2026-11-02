@@ -1,6 +1,6 @@
 # Strong Hire: Product & Technical Spec v1 and v2.0
 
-Updated Oct 30, 2026 · Mo Soliman
+Updated Nov 2, 2026 · Mo Soliman
 
 v1 launches on December 14, 2026. v2.0 follows as one release, planned for June 2027, built in three parts (Part 1: Journey B reshaped, Part 2: story library, Part 3: AI coach). Text marked "v2" describes v2.0; everything else describes v1 as it ships. The build plan for v2.0 is `docs/v2/execution-plan.md`; its decisions and risks are in the [v2 plan doc](https://claude.ai/artifact/BSjZFLreXzRgqapKdqz87V), and its UX in the [App UX canvas](https://claude.ai/artifact/VspB7PtbLJzFMkrEjaRrKj).
 
@@ -252,6 +252,8 @@ These IDs are the acceptance tests for v2.0. They are grouped by build part; the
 | AD-5 | The admin portal shows coach sessions and minutes, cost per coach session, coach eval results, readiness by skill, and the recruiter screen brief and rubric. | P0 |
 | UI-3 | The marketing site describes v2 and uses the v2 visual language. | P0 |
 
+**CO-9 and story crafting.** From RMAP-8, Strova may reword the candidate's story for clarity, but she still never adds a fact: every number, name, tool and result claim must come from the candidate's words (D-6), and the no-new-facts eval checks it on every crafting change (Deep story crafting, below).
+
 Coach sessions record minutes like any other session; billing rules (BL-1, BL-2) do not change in v2.0 until the pricing decision is made.
 
 ### v2.1 UX with Strova
@@ -375,6 +377,31 @@ A user with more than one resume can ask which one fits a target role best. Each
 | PS-5 | Before any target role the plan has only story and resume items. | P0 |
 | PS-6 | Weekly-style reminders by email respect product_email and the plan email mute. | P0 |
 | HO-1 | Home shows the greeting, Strova's next step, the plan and the four summary cards, and no suggestion lists. | P0 |
+
+### Deep story crafting (RMAP-8)
+
+Strova now crafts stories in a chosen style, STAR (with Learning) or CARL, as an outline of named sections and slots instead of five short free-text parts. She questions section by section to dig into context, checks that the story flows, offers skill hints, and lets the candidate edit any slot inline or ask her to improve a section; the writing surface gets more room and light formatting (RMAP-7). Code still renders the five legacy story columns from the outline, so nothing that reads them changes. The design, decisions D-1 to D-14 and the technical plan are in `docs/story-crafting-spec.md`; the build plan is `docs/story-crafting/execution-plan.md`.
+
+| ID | Requirement | Priority |
+| --- | --- | --- |
+| SC-1 | A story has a style: `star`, `carl`, or none for a classic story. The start screen offers STAR and CARL with Strova's suggestion preselected (D-2). | P0 |
+| SC-2 | A styled story stores an outline: sections with the slots above. Each slot holds `text`, `quotes` (Strova-written) or `by_user: true` (typed by the user), and a status: `filled`, `empty` or `skipped`. | P0 |
+| SC-3 | Status: Ready when every `*` slot is filled (D-4). Draft otherwise. Proven is unchanged (ST-7). | P0 |
+| SC-4 | The session works section by section (D-7). The engine, in code, picks the section and the empty slots to ask about. The prompt gets only those slots, so it never asks out of order. | P0 |
+| SC-5 | Strova presses once on each empty context slot. "skip" or "I can't share that" marks that slot skipped; "move on" ends the section. A skipped slot is not asked again in that session (D-5). | P0 |
+| SC-6 | Each Strova turn returns slot updates with text and verbatim quotes. It may reword, and adds no fact (D-6). | P0 |
+| SC-7 | The session screen shows the outline live, with each slot filled, empty or skipped, and the section in progress. | P0 |
+| SC-8 | When the core slots are filled, Strova offers up to three skill hints, gap skills of the user's target roles first, with **Deepen** and **Not now** (D-8). | P1 |
+| SC-9 | Flow check (D-9). It runs once the core slots are filled, after a session, and with Review. It returns flags of these types: `action_vs_problem` (the actions don't address the stated problem), `result_vs_problem` (the result doesn't answer it), `number_conflict`, `timeline_conflict`, `loose_end` (a stakeholder or constraint named once and never closed). Flags are advisory and can be asked about or dismissed. A dismissed flag does not return until the slots it cites change. | P0 |
+| SC-10 | Every slot is editable inline on the story page and in the session panel (D-10). | P0 |
+| SC-11 | **Improve with Strova** per section, with an optional note. The result is a before-and-after edit with quotes to accept or reject, or questions that open a chat on that section. | P0 |
+| SC-12 | **Switch to STAR/CARL** keeps every fact. It renames and reorders by default; **Rewrite the wording** is optional and costs one model call (D-2). | P1 |
+| SC-13 | Classic stories show **Organize with Strova**: one model call, a preview, then accept or discard (D-11). | P0 |
+| SC-14 | Code renders the legacy five columns from the outline on every save (D-12). The interviewer, scorer, story fit, debrief, suggestions and versions read the same columns as today. A test checks the mapping. | P0 |
+| SC-15 | The no-new-facts eval (CO-9, SG-7) checks facts, not wording, on crafting turns, Improve, Organize and Switch. Every number, proper noun, tool and result claim in Strova's text must appear in the user's words. | P0 |
+| SC-16 | Voice sessions fill the same slots with a lighter flow (D-13). | P1 |
+| SC-17 | The session screen has a wide layout and a reply box that grows with the text, with **Expand** (RMAP-7). | P0 |
+| SC-18 | The reply box and slot editors support bold, italic, bullet and numbered lists (Markdown, toolbar, Ctrl+B and Ctrl+I). Formatting is stripped for voice, scoring, word counts and quotes (RMAP-7). | P1 |
 
 ## Interviewer and scoring design
 
