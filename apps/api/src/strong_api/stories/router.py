@@ -37,6 +37,7 @@ from sqlalchemy import select
 
 from strong_api.inputs.deps import Db, Me, Queue
 from strong_api.inputs.queue import REVIEW_STORY
+from strong_api.plan.story_fit import queue_story_fits_for_user
 from strong_api.stories.ask import ask_strova
 from strong_api.stories.schemas import (
     DisplayStatus,
@@ -163,7 +164,7 @@ async def list_stories(
 
 
 @router.post("/stories", status_code=status.HTTP_201_CREATED)
-async def create_story(body: StoryIn, db: Db, me: Me) -> StoryOut:
+async def create_story(body: StoryIn, db: Db, me: Me, queue: Queue) -> StoryOut:
     """ST-1: create a draft story."""
     row = StoryRow(
         org_id=me.org_id,
@@ -176,7 +177,9 @@ async def create_story(body: StoryIn, db: Db, me: Me) -> StoryOut:
         notes_json=[],
     )
     db.add(row)
-    return await _save(db, row)
+    saved = await _save(db, row)
+    await queue_story_fits_for_user(db, queue, me.org_id, me.user_id)  # ST-5
+    return saved
 
 
 # --- ST-2 ------------------------------------------------------------------------------------
@@ -187,7 +190,7 @@ async def create_story(body: StoryIn, db: Db, me: Me) -> StoryOut:
     status_code=status.HTTP_201_CREATED,
     responses=_FROM_ANSWER_RESPONSES,
 )
-async def story_from_answer(body: StoryFromAnswerIn, db: Db, me: Me) -> StoryOut:
+async def story_from_answer(body: StoryFromAnswerIn, db: Db, me: Me, queue: Queue) -> StoryOut:
     """ST-2: "Save as a story" on a debrief answer. Creates a draft story with the candidate's
     answer to that question, tagged with the competencies it was scored on and linked to the
     session and question. The answer goes into `action` until a split into parts is known."""
@@ -238,7 +241,9 @@ async def story_from_answer(body: StoryFromAnswerIn, db: Db, me: Me) -> StoryOut
         notes_json=[],
     )
     db.add(row)
-    return await _save(db, row)
+    saved = await _save(db, row)
+    await queue_story_fits_for_user(db, queue, me.org_id, me.user_id)  # ST-5
+    return saved
 
 
 async def _scored_question(db: Db, session_id: uuid.UUID, question_ref: str) -> QuestionScore:
@@ -293,7 +298,9 @@ async def get_story(story_id: uuid.UUID, db: Db, me: Me) -> StoryOut:
 
 
 @router.patch("/stories/{story_id}")
-async def edit_story(story_id: uuid.UUID, body: StoryPatch, db: Db, me: Me) -> StoryOut:
+async def edit_story(
+    story_id: uuid.UUID, body: StoryPatch, db: Db, me: Me, queue: Queue
+) -> StoryOut:
     """ST-1: change the title, the skill tags or any of the five parts. Only the fields sent
     change; a part sent as null or blank is cleared."""
     row = await _owned(db, me, story_id)
@@ -311,15 +318,18 @@ async def edit_story(story_id: uuid.UUID, body: StoryPatch, db: Db, me: Me) -> S
             setattr(row, part.value, _clean(getattr(body, part.value)))
     if "skills" in sent:
         row.skills = [s.value for s in body.skills or []]
-    return await _save(db, row)
+    saved = await _save(db, row)
+    await queue_story_fits_for_user(db, queue, me.org_id, me.user_id)  # ST-5
+    return saved
 
 
 @router.delete("/stories/{story_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_story(story_id: uuid.UUID, db: Db, me: Me) -> Response:
+async def delete_story(story_id: uuid.UUID, db: Db, me: Me, queue: Queue) -> Response:
     """ST-1: delete a story and its notes. Debriefs that used it keep their scores."""
     row = await _owned(db, me, story_id)
     await db.delete(row)
     await db.commit()
+    await queue_story_fits_for_user(db, queue, me.org_id, me.user_id)  # ST-5
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 

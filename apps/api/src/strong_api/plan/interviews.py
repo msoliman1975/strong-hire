@@ -30,10 +30,11 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from strong_api.inputs.deps import Db, Me
+from strong_api.inputs.deps import Db, Me, Queue
 from strong_api.inputs.router import _owned_job_target, job_target_name
 from strong_api.plan import service
 from strong_api.plan.readiness import DEV_PROFILES
+from strong_api.plan.story_fit import queue_story_fit
 from strong_api.scoring.router import answers_at_bar
 from strong_core.db.models import InterviewSession, JobTarget, TargetInterview
 from strong_core.db.models import Resume as ResumeRow
@@ -556,12 +557,14 @@ async def list_interviews(job_target_id: uuid.UUID, db: Db, me: Me) -> list[Inte
 
 @router.post("/roles/{job_target_id}/interviews", status_code=status.HTTP_201_CREATED)
 async def add_interviews(
-    job_target_id: uuid.UUID, body: InterviewsCreate, db: Db, me: Me
+    job_target_id: uuid.UUID, body: InterviewsCreate, db: Db, me: Me, queue: Queue
 ) -> list[InterviewOut]:
-    """RH-1, TG-3: keep the chosen types as interviews of the role."""
+    """RH-1, TG-3: keep the chosen types as interviews of the role. The role's story fit
+    (ST-5) starts computing now, so the role page has it when it opens."""
     target = await _owned_job_target(db, me, job_target_id, live=True)
     rows = await create_interviews(db, me, target, body)
     await db.commit()
+    await queue_story_fit(db, queue, target)
     profile = await resolve_profile(db, target.company_id)
     return [_interview_out(r, profile, target) for r in rows]
 

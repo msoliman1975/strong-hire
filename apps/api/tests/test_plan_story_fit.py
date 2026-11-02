@@ -192,3 +192,47 @@ async def test_st5_story_fit_is_owner_only(
     async with other_client(app_with_cache) as other:
         resp = await other.get(f"/plan/{job_id}/{cv_id}/story-fit")
     assert resp.status_code == 404
+
+
+async def test_st5_the_story_fit_is_computed_when_the_role_is_created_and_read_from_the_role(
+    app_with_cache: FastAPI,
+    client: httpx.AsyncClient,
+    queue: InlineQueue,
+    cache: MemoryCache,
+    fake_fixtures: Path,
+) -> None:
+    """ST-5: creating the role's interviews computes its story fit and stores it on the role
+    (role_story_fits), so the role page reads it at once and never waits for the model; a
+    story change refreshes it in the background."""
+    job_id, _ = await _pair(client, fake_fixtures)
+    created = await client.post(
+        f"/roles/{job_id}/interviews", json={"interview_types": ["behavioral"]}
+    )
+    assert created.status_code == 201, created.text
+    runs = [e for e in queue.enqueued if e[0] == "run_story_fit"]
+    assert len(runs) == 1 and runs[0][2]["job_target_id"] == job_id
+    assert queue.results[runs[0][1]]["outcome"] == "computed"
+
+    # The page's read: the stored table, even with the worker stopped and Redis empty.
+    queue.run_jobs = False
+    cache.data.clear()
+    view = (await client.get(f"/roles/{job_id}/story-fit")).json()
+    assert view["status"] == "ready"
+    assert [r["competency"] for r in view["rows"]] == BEHAVIORAL_AND_HM
+    assert view["computed_at"]
+
+    # A new story queues a refresh for each live role.
+    queue.enqueued.clear()
+    made = await client.post("/stories", json={"title": "Payments outage", "skills": ["impact"]})
+    assert made.status_code == 201, made.text
+    assert [e[2]["job_target_id"] for e in queue.enqueued if e[0] == "run_story_fit"] == [job_id]
+
+
+async def test_st5_role_story_fit_is_owner_only(
+    app_with_cache: FastAPI, client: httpx.AsyncClient, fake_fixtures: Path
+) -> None:
+    """ST-5: another user's role answers 404."""
+    job_id, _ = await _pair(client, fake_fixtures)
+    async with other_client(app_with_cache) as other:
+        resp = await other.get(f"/roles/{job_id}/story-fit")
+    assert resp.status_code == 404

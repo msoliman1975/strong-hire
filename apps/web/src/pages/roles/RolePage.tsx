@@ -17,7 +17,7 @@ import "../../components/ux/ux.css";
 import { betaRoleFamilies, competencyLabel, roleFamilyLabel } from "../../labels";
 import { newCoachPath } from "../coach/paths";
 import { usePlan } from "../plan/api";
-import { storyPath, useStoryFit } from "../plan/StoryFitTable";
+import { storyPath, useRoleStoryFit } from "../plan/StoryFitTable";
 import { resumePath } from "../resumes/ResumesListPage";
 import { ContextDialog } from "./ContextDialog";
 import { dateChip, interviewPath, resumeLabel, rolesPath, takesMeta, typeName } from "./shared";
@@ -189,7 +189,7 @@ export function RolePage() {
   const resumeId = interviews.data?.[0]?.interview.resume_id ?? resumes.data?.find((r) => r.is_main)?.id ?? "";
   const plan = usePlan(jobId, resumeId);
   const issues = useResumeIssues(resumeId || null, jobId);
-  const fit = useStoryFit(jobId, resumeId);
+  const fit = useRoleStoryFit(jobId);
 
   if (job.isError) return <ErrorNotice error={job.error} />;
   if (!job.data || !summary) return <Loading label="Loading the role" />;
@@ -301,7 +301,9 @@ export function RolePage() {
             <Strova mode="coaching" size={24} />
             <h2 id="stories-heading">Your stories for this role</h2>
           </div>
-          {fit.isPending && <Loading label="Matching your stories to the skills" />}
+          {(fit.isPending || (fit.data?.status === "computing" && fit.data.rows.length === 0)) && (
+            <Loading label="Matching your stories to the skills" />
+          )}
           {fit.data?.rows.map((row) => {
             const s = STRENGTH[row.strength];
             return (

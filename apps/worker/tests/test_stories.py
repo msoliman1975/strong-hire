@@ -12,7 +12,7 @@ from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from strong_core.db.models import InterviewSession, JobTarget
+from strong_core.db.models import InterviewSession, JobTarget, RoleStoryFit
 from strong_core.db.models import Scorecard as ScorecardRow
 from strong_core.db.models import Story as StoryRow
 from strong_core.db.models import Turn as TurnRow
@@ -259,6 +259,91 @@ async def test_st5_pl6_job_caches_the_table_with_provenance_and_reruns_when_stor
 
     other_org = await run_story_fit(ctx, str(uuid.uuid4()), str(target.id), ["ownership"])
     assert other_org["outcome"] == "failed"
+
+
+async def test_st5_the_table_is_stored_on_the_role_and_reused_without_a_model_call(
+    sessionmaker: async_sessionmaker[AsyncSession], account: tuple[uuid.UUID, uuid.UUID]
+) -> None:
+    """ST-5: the job stores the table on the role (role_story_fits), works without Redis, and
+    reuses a stored table with the same inputs: another role for the same posting, or the Redis
+    copy from before tables were stored, never calls the model again."""
+    org_id, user_id = account
+    story_id = await _add_story(sessionmaker, org_id, user_id, "Checkout", ["ownership"])
+    async with sessionmaker() as db:
+        first_role = JobTarget(org_id=org_id, user_id=user_id, name="Backend role")
+        twin_role = JobTarget(org_id=org_id, user_id=user_id, name="Backend role")
+        legacy_role = JobTarget(org_id=org_id, user_id=user_id, name="Platform role")
+        db.add_all([first_role, twin_role, legacy_role])
+        await db.commit()
+    reply = {
+        "items": [
+            {
+                "competency": "ownership",
+                "story_id": str(story_id),
+                "strength": "strong",
+                "reason": "The checkout story shows you owning the rollout.",
+            }
+        ]
+    }
+    backend = ScriptedBackend([reply])
+    ctx: dict[str, Any] = {
+        gap_jobs.CTX_KEY: gap_jobs.GapContext(sessionmaker=sessionmaker, gateway=_gateway(backend))
+    }
+
+    first = await run_story_fit(ctx, str(org_id), str(first_role.id), ["ownership"])
+    assert first["outcome"] == "computed" and len(backend.calls) == 1
+    async with sessionmaker() as db:
+        stored = await db.scalar(
+            select(RoleStoryFit).where(RoleStoryFit.job_target_id == first_role.id)
+        )
+        assert stored is not None
+        assert stored.input_hash == first["input_hash"]
+        assert stored.fit_json["items"][0]["story_id"] == str(story_id)
+        assert (stored.model_profile, stored.model_id) == ("fake", "fake-planner")
+
+    # The same posting added again: same inputs, so the stored table is copied.
+    twin = await run_story_fit(ctx, str(org_id), str(twin_role.id), ["ownership"])
+    assert twin == {"outcome": "reused", "input_hash": first["input_hash"], "model_calls": 0}
+    assert len(backend.calls) == 1
+
+    # A role whose table is only in Redis (stored before this change) moves to Postgres.
+    cache = _Cache()
+    ctx["redis"] = cache
+    legacy_ctx = {**ctx}
+    probe = await run_story_fit(
+        {
+            gap_jobs.CTX_KEY: gap_jobs.GapContext(
+                sessionmaker=sessionmaker, gateway=_gateway(ScriptedBackend([reply]))
+            )
+        },
+        str(org_id),
+        str(legacy_role.id),
+        ["ownership"],
+    )
+    async with sessionmaker() as db:
+        moved = await db.scalar(
+            select(RoleStoryFit).where(RoleStoryFit.job_target_id == legacy_role.id)
+        )
+        assert moved is not None
+        record = StoryFitRecord(
+            fit=StoryFit.model_validate(moved.fit_json),
+            input_hash=moved.input_hash,
+            model_profile=moved.model_profile,
+            model_id=moved.model_id,
+            prompt_version=moved.prompt_version,
+            computed_at=moved.computed_at,
+        )
+        await db.delete(moved)
+        await db.commit()
+    cache.data[story_fit_key(org_id, legacy_role.id)] = record.model_dump_json()
+    calls = len(backend.calls)
+    again = await run_story_fit(legacy_ctx, str(org_id), str(legacy_role.id), ["ownership"])
+    assert again["outcome"] == "reused" and again["input_hash"] == probe["input_hash"]
+    assert len(backend.calls) == calls
+    async with sessionmaker() as db:
+        assert await db.scalar(
+            select(RoleStoryFit).where(RoleStoryFit.job_target_id == legacy_role.id)
+        )
 
 
 # --- ST-6: the story each answer used --------------------------------------------------------

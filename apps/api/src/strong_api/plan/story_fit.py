@@ -1,12 +1,15 @@
-"""Story fit table on the interview plan page (ST-5).
+"""Story fit of a target role (ST-5): "Your stories for this role".
 
-    GET /plan/{job_target_id}/{resume_id}/story-fit     StoryFitView for the job
+    GET /roles/{job_target_id}/story-fit                StoryFitView for the role
+    GET /plan/{job_target_id}/{resume_id}/story-fit     the same, for the v1 plan page
 
-The worker computes the table (strong_worker.gap.story_fit, Arq job `run_story_fit`) and caches
-it in Redis as a StoryFitRecord. Each read enqueues the job, which skips the model when nothing
-changed, and answers with the cached table, or `computing` while there is none yet. The page
-polls until it is ready. The key and job id functions must match the worker's (a test checks
-this).
+The worker computes the table (strong_worker.gap.story_fit, Arq job `run_story_fit`) and stores
+it on the role in Postgres (`role_story_fits`). It runs when the role's interviews are created
+and when a story changes (`queue_story_fit`, `queue_story_fits_for_user`), so the page reads a
+stored table and never waits for the model. Each read also enqueues the job, which does nothing
+when the inputs are unchanged, to catch roles made another way. A table from before Postgres
+storage is read from Redis. `computing` means there is no table yet; the page polls until there
+is. The key and job id functions must match the worker's (a test checks this).
 
 The tested skills are the competencies of the story rounds (behavioral and hiring manager) that
 are in the company's loop, or both of them when the loop has neither (generic mode). Technical
@@ -30,6 +33,7 @@ from strong_api.inputs.router import _owned_job_target, _owned_resume
 from strong_api.plan import service
 from strong_api.plan.schemas import TypeWeights
 from strong_core.config import get_settings
+from strong_core.db.models import JobTarget, RoleStoryFit
 from strong_core.db.models import Story as StoryRow
 from strong_core.profiles import resolve_profile
 from strong_core.schemas import (
@@ -138,37 +142,68 @@ def _parse(raw: bytes | str | None) -> CachedStoryFit | None:
         return None
 
 
-@router.get(
-    "/plan/{job_target_id}/{resume_id}/story-fit",
-    responses={404: {"description": "The job target or the resume does not exist."}},
-)
-async def get_story_fit(
-    job_target_id: uuid.UUID,
-    resume_id: uuid.UUID,
-    db: Db,
-    me: Me,
-    queue: Queue,
-    request: Request,
-) -> StoryFitView:
-    """ST-5: for each skill the interview will test, the best story and whether it is strong,
-    thin or missing."""
-    target = await _owned_job_target(db, me, job_target_id)
-    await _owned_resume(db, me, resume_id)
+async def role_skills(db: Db, target: JobTarget) -> list[Competency]:
+    """The skills the role's story rounds test (see story_skills)."""
     profile = await resolve_profile(db, target.company_id)
-    skills = story_skills(service.tested(profile, target))
+    return story_skills(service.tested(profile, target))
 
+
+async def queue_story_fit(db: Db, queue: Queue, target: JobTarget) -> None:
+    """Compute the role's story fit in the background. Never fails the caller: a job already
+    queued or a Redis outage only means the next read or change runs it."""
+    if target.parsed_json is None or target.deleted_at is not None:
+        return
     try:
+        skills = await role_skills(db, target)
         await queue.enqueue(
             RUN_STORY_FIT,
-            story_fit_job_id(me.org_id, target.id),
-            org_id=str(me.org_id),
+            story_fit_job_id(target.org_id, target.id),
+            org_id=str(target.org_id),
             job_target_id=str(target.id),
             competencies=[c.value for c in skills],
         )
-    except Exception as exc:  # already queued, or Redis is down: the cached table still shows
+    except Exception as exc:
         log.info("story fit not enqueued for job %s: %s", target.id, exc)
 
-    cached = _parse(await story_fit_cache(request).get(story_fit_key(me.org_id, target.id)))
+
+async def queue_story_fits_for_user(
+    db: Db, queue: Queue, org_id: uuid.UUID, user_id: uuid.UUID
+) -> None:
+    """A story changed: refresh the story fit of each of the user's live roles."""
+    targets = await db.scalars(
+        select(JobTarget).where(
+            JobTarget.org_id == org_id,
+            JobTarget.user_id == user_id,
+            JobTarget.deleted_at.is_(None),
+            JobTarget.archived_at.is_(None),
+        )
+    )
+    for target in list(targets):
+        await queue_story_fit(db, queue, target)
+
+
+async def _stored(db: Db, request: Request, target: JobTarget) -> CachedStoryFit | None:
+    row = await db.scalar(select(RoleStoryFit).where(RoleStoryFit.job_target_id == target.id))
+    if row is not None:
+        try:
+            return CachedStoryFit(
+                fit=StoryFit.model_validate(row.fit_json), computed_at=row.computed_at
+            )
+        except ValidationError:
+            log.warning("stored story fit for job %s does not validate", target.id)
+    # A table stored before role_story_fits existed (the worker moves it on its next run).
+    try:
+        raw = await story_fit_cache(request).get(story_fit_key(target.org_id, target.id))
+    except Exception as exc:
+        log.info("story fit cache not read for job %s: %s", target.id, exc)
+        return None
+    return _parse(raw)
+
+
+async def _view(db: Db, me: Me, queue: Queue, request: Request, target: JobTarget) -> StoryFitView:
+    skills = await role_skills(db, target)
+    await queue_story_fit(db, queue, target)
+    cached = await _stored(db, request, target)
     if cached is None:
         return StoryFitView(status="computing", rows=[], computed_at=None)
 
@@ -207,3 +242,34 @@ async def get_story_fit(
     return StoryFitView(
         status="ready" if done else "computing", rows=rows, computed_at=cached.computed_at
     )
+
+
+@router.get(
+    "/roles/{job_target_id}/story-fit",
+    responses={404: {"description": "The role does not exist."}},
+)
+async def get_role_story_fit(
+    job_target_id: uuid.UUID, db: Db, me: Me, queue: Queue, request: Request
+) -> StoryFitView:
+    """ST-5: for each skill the role's interviews test, the best story and whether it is
+    strong, thin or missing. Read from the role's stored table; never waits for the model."""
+    target = await _owned_job_target(db, me, job_target_id)
+    return await _view(db, me, queue, request, target)
+
+
+@router.get(
+    "/plan/{job_target_id}/{resume_id}/story-fit",
+    responses={404: {"description": "The job target or the resume does not exist."}},
+)
+async def get_story_fit(
+    job_target_id: uuid.UUID,
+    resume_id: uuid.UUID,
+    db: Db,
+    me: Me,
+    queue: Queue,
+    request: Request,
+) -> StoryFitView:
+    """ST-5: the role's story fit, for the v1 plan page (the resume only checks ownership)."""
+    target = await _owned_job_target(db, me, job_target_id)
+    await _owned_resume(db, me, resume_id)
+    return await _view(db, me, queue, request, target)

@@ -3114,7 +3114,7 @@
           "coach"
         ],
         "summary": "End Coach Session",
-        "description": "End the session and record its minutes. Ending twice is harmless.",
+        "description": "End the session and record its minutes. Ending twice is harmless. The story it built\nrefreshes the story fit of the user's roles (ST-5).",
         "operationId": "end_coach_session_coach_sessions__session_id__end_post",
         "parameters": [
           {
@@ -3590,13 +3590,60 @@
         }
       }
     },
+    "/roles/{job_target_id}/story-fit": {
+      "get": {
+        "tags": [
+          "interview plan"
+        ],
+        "summary": "Get Role Story Fit",
+        "description": "ST-5: for each skill the role's interviews test, the best story and whether it is\nstrong, thin or missing. Read from the role's stored table; never waits for the model.",
+        "operationId": "get_role_story_fit_roles__job_target_id__story_fit_get",
+        "parameters": [
+          {
+            "name": "job_target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Target Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryFitView"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The role does not exist."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/plan/{job_target_id}/{resume_id}/story-fit": {
       "get": {
         "tags": [
           "interview plan"
         ],
         "summary": "Get Story Fit",
-        "description": "ST-5: for each skill the interview will test, the best story and whether it is strong,\nthin or missing.",
+        "description": "ST-5: the role's story fit, for the v1 plan page (the resume only checks ownership).",
         "operationId": "get_story_fit_plan__job_target_id___resume_id__story_fit_get",
         "parameters": [
           {
@@ -3919,7 +3966,7 @@
           "target roles and interviews"
         ],
         "summary": "Add Interviews",
-        "description": "RH-1, TG-3: keep the chosen types as interviews of the role.",
+        "description": "RH-1, TG-3: keep the chosen types as interviews of the role. The role's story fit\n(ST-5) starts computing now, so the role page has it when it opens.",
         "operationId": "add_interviews_roles__job_target_id__interviews_post",
         "parameters": [
           {

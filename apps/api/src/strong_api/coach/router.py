@@ -51,7 +51,8 @@ from strong_api.coach.schemas import (
     StyleRequest,
 )
 from strong_api.controls import ensure_sessions_open
-from strong_api.inputs.deps import Db, Me
+from strong_api.inputs.deps import Db, Me, Queue
+from strong_api.plan.story_fit import queue_story_fits_for_user
 from strong_api.sessions.schemas import VoiceJoin
 from strong_api.sessions.settings import (
     TextSessionSettings,
@@ -378,9 +379,14 @@ async def _end(db: AsyncSession, session: CoachSession) -> CoachSessionDetail:
 
 
 @router.post("/coach/sessions/{session_id}/end", response_model=CoachSessionDetail)
-async def end_coach_session(session_id: uuid.UUID, db: Db, me: Me) -> CoachSessionDetail:
-    """End the session and record its minutes. Ending twice is harmless."""
-    return await _end(db, await _owned(db, me, session_id, lock=True))
+async def end_coach_session(
+    session_id: uuid.UUID, db: Db, me: Me, queue: Queue
+) -> CoachSessionDetail:
+    """End the session and record its minutes. Ending twice is harmless. The story it built
+    refreshes the story fit of the user's roles (ST-5)."""
+    detail = await _end(db, await _owned(db, me, session_id, lock=True))
+    await queue_story_fits_for_user(db, queue, me.org_id, me.user_id)
+    return detail
 
 
 @router.post("/coach/sessions/{session_id}/voice/join")
@@ -473,7 +479,11 @@ async def internal_end_coach_session(
     session_id: uuid.UUID,
     db: Db,
     settings: VoiceSettings,
+    queue: Queue,
     x_internal_token: Annotated[str | None, Header()] = None,
 ) -> CoachSessionDetail:
     _check_token(x_internal_token, settings)
-    return await _end(db, await _internal_session(db, session_id))
+    session = await _internal_session(db, session_id)
+    detail = await _end(db, session)
+    await queue_story_fits_for_user(db, queue, session.org_id, session.user_id)  # ST-5
+    return detail
