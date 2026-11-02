@@ -4,6 +4,7 @@
  * is highlighted, and the slots Strova is asking about are marked. Ready shows when the core
  * slots are filled (SC-3).
  */
+import { Markdown } from "../../components/markdown/markdown";
 import { Strova } from "../../components/strova";
 import {
   CONTEXT_SLOTS,
@@ -45,7 +46,7 @@ function SlotChip({ view, asking }: { view: SlotView; asking: boolean }) {
           {core && state !== "filled" ? " · needed for Ready" : ""}
         </span>
       </p>
-      {isFilled(slot) && <p className="craft-slot__text">{slot.text}</p>}
+      {isFilled(slot) && <Markdown className="craft-slot__text" text={slot.text ?? ""} />}
     </li>
   );
 }

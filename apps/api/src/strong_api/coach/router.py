@@ -180,7 +180,7 @@ def _asking(story: StoryRow | None, session: CoachSession) -> CraftAsk | None:
     outline = load_outline(story) if story is not None else None
     if outline is None:
         return None
-    ask = craft.next_ask(outline, session.section)
+    ask = craft.next_ask(outline, session.section, voice=session.channel == SessionChannel.VOICE)
     return CraftAsk(section=ask.section, slots=ask.slots)
 
 
@@ -422,8 +422,9 @@ async def _craft_turn(
     _add_refs(session, refs)
     session.minutes = engine.session_minutes(turns)
     await add_hints(db, story, result.reply.hints)  # SC-8: checked, gaps first, at most three
-    if not ready(outline) and ready(result.outline):
-        await run_flow_check(db, story)  # SC-9: once the core slots are filled
+    if not ready(outline) and ready(result.outline) and session.channel != SessionChannel.VOICE:
+        # SC-9: once the core slots are filled. SC-16: a voice call runs it after the call.
+        await run_flow_check(db, story)
     if result.ended:
         await _close(db, session, story)
     await db.commit()

@@ -358,3 +358,48 @@ async def test_co6_coach_agent_on_the_voice_loop_with_fake_stt_and_tts(
     assert sent[1]["said"] == ["What was at stake?"]
     assert sent[1]["result"]["reply"]["message"] == "What was at stake?"
     assert ended == [True] and api.ends == 1
+
+
+@dataclass
+class StyledApi(FakeApi):
+    """SC-16: the API's reply on a styled story: the spoken line plus the crafting fields."""
+
+    async def turn(self, session_id: uuid.UUID, text: str) -> dict[str, Any]:
+        out = await super().turn(session_id, text)
+        out["craft"] = {
+            "message": out["reply"]["message"],
+            "slot_updates": [
+                {
+                    "section": "situation",
+                    "slot": "role",
+                    "step": None,
+                    "text": "I was the tech lead.",
+                    "quotes": [text],
+                }
+            ],
+            "skips": [],
+            "section_done": False,
+            "skills": [],
+            "hints": [],
+        }
+        out["asking"] = {
+            "section": "situation",
+            "slots": [{"section": "situation", "slot": "problem", "step": None}],
+        }
+        out["flow_flags"] = []
+        out["hints"] = []
+        return out
+
+
+async def test_sc16_a_styled_voice_turn_speaks_strovas_line() -> None:
+    """SC-16: on a styled story the agent speaks the reply's plain line, as for a classic one;
+    the slot updates go to the browser with the result."""
+    api = StyledApi(replies=["What was the problem, and why was it hard?"])
+    coach, _, _ = make_coach(api)
+    turns, said = make_turns(coach)
+    await turns.on_turn("I was the tech lead on checkout at Acme.", 4.0)
+    assert said == ["What was the problem, and why was it hard?"]
+    assert coach.last_result is not None
+    assert coach.last_result["craft"]["slot_updates"][0]["slot"] == "role"
+    sent = json.loads(turn_message(said, coach.last_result))
+    assert sent["result"]["asking"]["section"] == "situation"
