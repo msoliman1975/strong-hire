@@ -144,7 +144,8 @@ export function SessionSetupPage() {
 
   // AC-3: the profile's target level is the default when the posting gives no level.
   const chosenLevel: Level | "" = level || job.data.level || profile.data?.target_level || "";
-  const scenario = pickedScenario ?? defaultRolePlayScenario(chosenLevel || null);
+  // RP-4, CS-7: the default call comes from the job's family, then the level.
+  const scenario = pickedScenario ?? defaultRolePlayScenario(chosenLevel || null, job.data.posting?.role_family);
   const posting = job.data.posting;
   const chosenDuration: Duration = fullAllowed ? (duration ?? 30) : MINI;
   const sessionsClosed = siteStatus.data?.voice_sessions_open === false;

@@ -5133,6 +5133,553 @@
         "senior",
         "staff_principal"
       ]
+    },
+    {
+      "id": "cs-saved-account",
+      "interview_type": "behavioral",
+      "question": "Tell me about an account you saved from churning. What did you do?",
+      "hints": {
+        "looking_for": [
+          "How early you spotted the risk",
+          "What you personally did to turn it around"
+        ],
+        "strong_signals": [
+          "Names the warning signs and the numbers",
+          "Shows a plan with the customer and how it ended"
+        ],
+        "watch_outs": [
+          "Credit for a save the product team made",
+          "No measurable outcome"
+        ]
+      },
+      "competencies": [
+        "impact",
+        "ownership"
+      ],
+      "role_families": [
+        "customer_success"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-lost-account",
+      "interview_type": "behavioral",
+      "question": "Tell me about a customer you lost. What would you do differently?",
+      "hints": {
+        "looking_for": [
+          "Whether you own the loss",
+          "What you changed in how you work"
+        ],
+        "strong_signals": [
+          "Honest about the signals you missed",
+          "A concrete change you still use"
+        ],
+        "watch_outs": [
+          "Blaming the product or the customer only",
+          "No lesson"
+        ]
+      },
+      "competencies": [
+        "learning_from_failure",
+        "ownership"
+      ],
+      "role_families": [
+        "customer_success"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-angry-customer",
+      "interview_type": "behavioral",
+      "question": "Describe the hardest conversation you had with an upset customer.",
+      "hints": {
+        "looking_for": [
+          "How you stay calm under pressure",
+          "Whether you listen before you fix"
+        ],
+        "strong_signals": [
+          "Acknowledges the problem without blaming anyone",
+          "Ends with an agreed plan and follow-up"
+        ],
+        "watch_outs": [
+          "Getting defensive",
+          "Promising what you could not deliver"
+        ]
+      },
+      "competencies": [
+        "conflict_handling",
+        "communication"
+      ],
+      "role_families": [
+        "customer_success"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-internal-advocate",
+      "interview_type": "behavioral",
+      "question": "Tell me about a time you pushed product or engineering to fix something for a customer.",
+      "hints": {
+        "looking_for": [
+          "How you build a case inside the company",
+          "Whether you balance the customer and the team"
+        ],
+        "strong_signals": [
+          "Brings data: revenue at risk, how many customers",
+          "Keeps the customer updated honestly"
+        ],
+        "watch_outs": [
+          "Escalating everything as urgent",
+          "Going around the team"
+        ]
+      },
+      "competencies": [
+        "collaboration",
+        "conflict_handling"
+      ],
+      "role_families": [
+        "customer_success"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-expansion",
+      "interview_type": "behavioral",
+      "question": "Tell me about an account you grew. How did you find the opportunity?",
+      "hints": {
+        "looking_for": [
+          "Whether you grow accounts by solving problems",
+          "How you work with sales on expansion"
+        ],
+        "strong_signals": [
+          "Ties the expansion to a goal the customer had",
+          "Gives the before and after numbers"
+        ],
+        "watch_outs": [
+          "Pushing upgrades the customer did not need",
+          "Leaving sales out"
+        ]
+      },
+      "competencies": [
+        "impact",
+        "collaboration"
+      ],
+      "role_families": [
+        "customer_success"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-onboarding-rescue",
+      "interview_type": "behavioral",
+      "question": "Tell me about an onboarding that went off track. How did you get it back?",
+      "hints": {
+        "looking_for": [
+          "How you manage a project with a customer",
+          "Whether you reset expectations early"
+        ],
+        "strong_signals": [
+          "Finds the real blocker and the owner",
+          "Agrees a new plan with dates"
+        ],
+        "watch_outs": [
+          "Hoping it fixes itself",
+          "Hiding the delay from the customer"
+        ]
+      },
+      "competencies": [
+        "ownership",
+        "communication"
+      ],
+      "role_families": [
+        "customer_success"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-explain-to-exec",
+      "interview_type": "behavioral",
+      "question": "Describe a business review you ran with a senior executive. What did you show them?",
+      "hints": {
+        "looking_for": [
+          "Whether you speak to business outcomes",
+          "How you prepare for executives"
+        ],
+        "strong_signals": [
+          "Leads with the customer's goals and results",
+          "Asks for a decision or next step"
+        ],
+        "watch_outs": [
+          "A tour of product features",
+          "Only usage charts with no meaning"
+        ]
+      },
+      "competencies": [
+        "communication",
+        "impact"
+      ],
+      "role_families": [
+        "customer_success"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-why-cs",
+      "interview_type": "hiring_manager",
+      "question": "Why customer success, and why this kind of customer (size, industry, book) in particular?",
+      "hints": {
+        "looking_for": [
+          "Whether you chose this work on purpose",
+          "What keeps you going after a hard escalation"
+        ],
+        "strong_signals": [
+          "Names what you enjoy and what is hard",
+          "Links it to the customers in the posting"
+        ],
+        "watch_outs": [
+          "A generic answer",
+          "Seeing CS as a step to something else only"
+        ]
+      },
+      "competencies": [
+        "motivation",
+        "role_fit"
+      ],
+      "role_families": [
+        "customer_success"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-book-of-business",
+      "interview_type": "hiring_manager",
+      "question": "Walk me through your current book of business: size, retention and how you split your time.",
+      "hints": {
+        "looking_for": [
+          "Whether your results are real",
+          "How you prioritize many accounts"
+        ],
+        "strong_signals": [
+          "Numbers: accounts, revenue, gross and net retention",
+          "A clear way to tier accounts"
+        ],
+        "watch_outs": [
+          "No numbers",
+          "Treating every account the same"
+        ]
+      },
+      "competencies": [
+        "depth_of_experience",
+        "role_fit"
+      ],
+      "role_families": [
+        "customer_success"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-health-score",
+      "interview_type": "hiring_manager",
+      "question": "How do you know an account is at risk before the customer tells you?",
+      "hints": {
+        "looking_for": [
+          "Whether you watch leading signals",
+          "How you act on them"
+        ],
+        "strong_signals": [
+          "Names signals: usage, tickets, sponsor changes, missed meetings",
+          "Gives an example of acting early"
+        ],
+        "watch_outs": [
+          "Waiting for the renewal date",
+          "Relying on gut feel only"
+        ]
+      },
+      "competencies": [
+        "judgment",
+        "depth_of_experience"
+      ],
+      "role_families": [
+        "customer_success"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-renewal-plan",
+      "interview_type": "hiring_manager",
+      "question": "A large customer renews in 90 days and usage is down 30 percent. What do you do?",
+      "hints": {
+        "looking_for": [
+          "How you plan under a deadline",
+          "Whether you find the cause before acting"
+        ],
+        "strong_signals": [
+          "Talks to the sponsor and the users to find out why",
+          "A plan with owners and dates, and a fallback"
+        ],
+        "watch_outs": [
+          "Offering a discount first",
+          "Waiting until the last month"
+        ]
+      },
+      "competencies": [
+        "judgment",
+        "scope_at_level"
+      ],
+      "role_families": [
+        "customer_success"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-escalation-process",
+      "interview_type": "hiring_manager",
+      "question": "How do you run an escalation that needs support, engineering and leadership?",
+      "hints": {
+        "looking_for": [
+          "Whether you can lead without authority",
+          "How you keep the customer informed"
+        ],
+        "strong_signals": [
+          "One owner, a clear update rhythm and a recovery plan",
+          "Closes with a review of what changed"
+        ],
+        "watch_outs": [
+          "Forwarding emails between teams",
+          "Going silent while waiting on a fix"
+        ]
+      },
+      "competencies": [
+        "scope_at_level",
+        "team_fit"
+      ],
+      "role_families": [
+        "customer_success"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-first-90-days",
+      "interview_type": "hiring_manager",
+      "question": "How would you spend your first 90 days with a new book of accounts?",
+      "hints": {
+        "looking_for": [
+          "Whether you plan before you act",
+          "How quickly you can find the risks"
+        ],
+        "strong_signals": [
+          "Meets the top accounts first and reviews health data",
+          "Sets measurable goals for each month"
+        ],
+        "watch_outs": [
+          "No plan",
+          "Treating it as only learning the product"
+        ]
+      },
+      "competencies": [
+        "scope_at_level",
+        "role_fit"
+      ],
+      "role_families": [
+        "customer_success"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-coaching-csms",
+      "interview_type": "hiring_manager",
+      "question": "How do you coach a customer success manager whose accounts keep churning?",
+      "hints": {
+        "looking_for": [
+          "Whether you diagnose before you coach",
+          "How you use account reviews"
+        ],
+        "strong_signals": [
+          "Finds the pattern behind the losses",
+          "A specific practice plan and a check-in"
+        ],
+        "watch_outs": [
+          "Taking over the accounts",
+          "Telling them to work harder"
+        ]
+      },
+      "competencies": [
+        "team_fit",
+        "judgment"
+      ],
+      "role_families": [
+        "customer_success"
+      ],
+      "levels": [
+        "senior",
+        "staff_principal"
+      ]
+    },
+    {
+      "id": "cs-tools-data",
+      "interview_type": "hiring_manager",
+      "question": "Which tools and data do you use each week, and what decisions do they drive?",
+      "hints": {
+        "looking_for": [
+          "Whether you use data to choose your next action",
+          "How you keep notes others can use"
+        ],
+        "strong_signals": [
+          "Names tools and the decision each one drives",
+          "Keeps the CRM accurate for the team"
+        ],
+        "watch_outs": [
+          "Tools listed with no purpose",
+          "Notes only in your head"
+        ]
+      },
+      "competencies": [
+        "depth_of_experience",
+        "team_fit"
+      ],
+      "role_families": [
+        "customer_success"
+      ],
+      "levels": []
+    },
+    {
+      "id": "cs-team-fit",
+      "interview_type": "hiring_manager",
+      "question": "How do you work with sales, support and product day to day?",
+      "hints": {
+        "looking_for": [
+          "Whether you fit how this team works",
+          "How you share what you learn from customers"
+        ],
+        "strong_signals": [
+          "Examples of handing off cleanly and sharing feedback",
+          "Clear about where each team's job ends"
+        ],
+        "watch_outs": [
+          "Seeing other teams as obstacles",
+          "Answers that fit any team"
+        ]
+      },
+      "competencies": [
+        "team_fit",
+        "motivation"
+      ],
+      "role_families": [
+        "customer_success"
+      ],
+      "levels": []
+    },
+    {
+      "id": "rp-escalation-outage",
+      "interview_type": "role_play",
+      "question": "Escalation call: the head of operations at a retail customer calls after your product was down for two days in their busiest week. They want to know why and are talking about cancelling.",
+      "hints": {
+        "looking_for": [
+          "Whether you acknowledge the impact before explaining",
+          "Whether you find out what it cost them"
+        ],
+        "strong_signals": [
+          "Asks what happened on their side and who was affected",
+          "Agrees a recovery plan with dates and a follow-up"
+        ],
+        "watch_outs": [
+          "Starting with technical excuses",
+          "Promising it will never happen again"
+        ]
+      },
+      "competencies": [
+        "discovery",
+        "objection_handling"
+      ],
+      "role_families": [
+        "customer_success"
+      ],
+      "levels": []
+    },
+    {
+      "id": "rp-escalation-refund",
+      "interview_type": "role_play",
+      "question": "Escalation call: a customer demands a full refund for a rollout that missed its date by six weeks. Keep the relationship and agree a fair next step.",
+      "hints": {
+        "looking_for": [
+          "How you handle a demand you cannot grant on the spot",
+          "Whether you find what they need most"
+        ],
+        "strong_signals": [
+          "Asks what the delay cost them and what would fix it",
+          "Offers a real option and the path to approve it"
+        ],
+        "watch_outs": [
+          "Agreeing to a refund you cannot approve",
+          "Refusing with no alternative"
+        ]
+      },
+      "competencies": [
+        "objection_handling",
+        "closing"
+      ],
+      "role_families": [
+        "customer_success"
+      ],
+      "levels": []
+    },
+    {
+      "id": "rp-escalation-going-to-ceo",
+      "interview_type": "role_play",
+      "question": "Escalation call: an IT director says they will email your CEO unless a recurring data sync bug is fixed this week. Calm the call and agree a plan.",
+      "hints": {
+        "looking_for": [
+          "Whether you stay calm under a threat",
+          "Whether you commit only to what you control"
+        ],
+        "strong_signals": [
+          "Acknowledges the frustration and the history",
+          "Names owners, dates and when they will hear back"
+        ],
+        "watch_outs": [
+          "Getting defensive",
+          "A promise you cannot keep"
+        ]
+      },
+      "competencies": [
+        "objection_handling",
+        "communication"
+      ],
+      "role_families": [
+        "customer_success"
+      ],
+      "levels": []
+    },
+    {
+      "id": "rp-escalation-renewal-risk",
+      "interview_type": "role_play",
+      "question": "Escalation call: two months before renewal, a customer's new VP says the team barely uses the product and they plan to switch to a competitor. Find out why and agree a path to keep them.",
+      "hints": {
+        "looking_for": [
+          "Whether you uncover the real reason",
+          "Whether you reconnect the product to their goals"
+        ],
+        "strong_signals": [
+          "Asks what the new VP needs to show their boss",
+          "Agrees a concrete adoption plan with a check-in"
+        ],
+        "watch_outs": [
+          "Arguing that the product is better",
+          "Discounting before understanding"
+        ]
+      },
+      "competencies": [
+        "discovery",
+        "value_articulation"
+      ],
+      "role_families": [
+        "customer_success"
+      ],
+      "levels": [
+        "mid",
+        "senior",
+        "staff_principal"
+      ]
     }
   ]
 }

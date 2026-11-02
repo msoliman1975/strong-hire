@@ -109,9 +109,9 @@ function InterviewBody({ detail }: { detail: InterviewDetail }) {
   const name = typeName(detail.interview);
   const level: Level | null = job.data?.level ?? profile.data?.target_level ?? null;
   const rolePlay = detail.interview.interview_type === "role_play";
-  // RP-4, D-5: the candidate picks the call; the default comes from the level.
+  // RP-4, CS-7: the candidate picks the call; the default comes from the family, then the level.
   const [picked, setScenario] = useState<RolePlayScenario | null>(null);
-  const scenario = picked ?? defaultRolePlayScenario(level);
+  const scenario = picked ?? defaultRolePlayScenario(level, job.data?.posting?.role_family);
   const resume = resumes.data?.find((r) => r.id === detail.interview.resume_id);
 
   const start = useMutation({

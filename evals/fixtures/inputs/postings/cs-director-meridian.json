@@ -1,0 +1,25 @@
+{
+  "company_name": "Meridian Health Software",
+  "title": "Director of Customer Success",
+  "role_family": "customer_success",
+  "level": "staff_principal",
+  "level_label": null,
+  "team": "Customer Success",
+  "location": "Boston, MA",
+  "must_have_skills": [
+    "8+ years in customer success, with 3+ years managing managers",
+    "A track record of improving net retention",
+    "Experience building customer success processes"
+  ],
+  "nice_to_have_skills": [
+    "Healthcare software experience",
+    "Gainsight"
+  ],
+  "responsibilities": [
+    "Lead and hire a team of 12 customer success managers",
+    "Own gross and net retention targets for the whole customer base",
+    "Build the health score and escalation process",
+    "Report to the board on churn and expansion"
+  ],
+  "source_url": null
+}
