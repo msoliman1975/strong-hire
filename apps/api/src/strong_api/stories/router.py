@@ -40,6 +40,7 @@ from strong_api.inputs.deps import Db, Me, Queue
 from strong_api.inputs.queue import REVIEW_STORY
 from strong_api.plan.story_fit import queue_story_fits_for_user
 from strong_api.stories.ask import ask_strova
+from strong_api.stories.flow import flow_check_if_ready, open_hints, visible_flags
 from strong_api.stories.outline import load_outline, ready
 from strong_api.stories.schemas import (
     DisplayStatus,
@@ -124,6 +125,8 @@ def story_out(row: StoryRow) -> StoryOut:
         created_at=row.created_at,
         updated_at=row.updated_at,
         display_status=display_status(row),
+        flow_flags=visible_flags(row),
+        hints=open_hints(row),
     )
 
 
@@ -385,6 +388,8 @@ async def review_story(story_id: uuid.UUID, db: Db, me: Me, queue: Queue) -> Rev
     before-and-after edits from the user's words (U08's review prompt), and stores them as an
     open `review` suggestion for the story, replacing an older open one."""
     row = await _owned(db, me, story_id)
+    await flow_check_if_ready(db, row)  # SC-9: a styled story's flow is checked with Review
+    await db.commit()
     job_id = f"review_story:{row.id}:{uuid.uuid4().hex[:8]}"
     await queue.enqueue(REVIEW_STORY, job_id, org_id=str(me.org_id), story_id=str(row.id))
     return ReviewQueued(job_id=job_id)

@@ -33,7 +33,7 @@ from datetime import UTC, datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from strong_api.coach import engine
-from strong_api.stories.outline import save_outline, strip_markdown
+from strong_api.stories.outline import ready, save_outline, strip_markdown
 from strong_core.db.models import CoachSession, CoachTurn
 from strong_core.db.models import Story as StoryRow
 from strong_core.gateway import Message, ModelGateway, Role, usage_context
@@ -270,6 +270,9 @@ def opener(
     style = outline.style.value.upper()
     if idea is not None:
         lead = _OPEN_IDEA.format(style=style, line=idea)
+    elif not is_new and target_skill is not None:
+        # SC-8: Deepen opens a short session to show one more skill in this story.
+        lead = f'Let\'s show {engine.skill_label(target_skill)} in "{story.title}".'
     elif not is_new:
         lead = _OPEN_EXISTING.format(title=story.title)
     elif target_skill is not None:
@@ -446,16 +449,17 @@ def skip(applied: Applied, ref: SlotRef) -> None:
 def render_outline(outline: StoryOutline) -> str:
     lines = [f"Style: {STYLE_NAMES[outline.style]}"]
     for sec in outline.sections:
-        lines.append(f"{SECTION_LABELS[sec.section]}:")
+        lines.append(f'{SECTION_LABELS[sec.section]} (section "{sec.section.value}"):')
         for section, key, step, slot in outline.iter_slots():
             if section != sec.section:
                 continue
             label = SLOT_LABELS[key] if step is None else f"Step {step + 1}, {SLOT_LABELS[key]}"
+            ref = f'slot "{key}"' if step is None else f'slot "{key}", step {step}'
             if slot.status == SlotStatus.FILLED and slot.text:
                 value = strip_markdown(slot.text)
             else:
                 value = f"({slot.status.value})"
-            lines.append(f"  {label}: {value}")
+            lines.append(f"  {label} [{ref}]: {value}")
     return "\n".join(lines)
 
 
@@ -522,9 +526,21 @@ def craft_messages(
             slots=_render_slots(ask.slots),
             skipped=_skipped(outline),
             then=then,
+            hints=_hints_line(story, outline),
             answer=answer,
         ),
     ]
+
+
+def _hints_line(story: StoryRow, outline: StoryOutline) -> str:
+    """SC-8, D-8: hints are offered only once the core slots are filled."""
+    if not ready(outline):
+        return "not yet: the core slots are not all filled, so return no hints"
+    shows = ", ".join(engine.skill_label(Competency(s)) for s in story.skills) or "none tagged"
+    return (
+        "the core slots are filled: you may list up to three other skills this story could also "
+        f"show, from its own facts (it is already tagged with: {shows})"
+    )
 
 
 @dataclass
@@ -633,7 +649,8 @@ async def run_craft_turn(
         skips=applied.skipped,
         section_done=advanced,
         skills=[Competency(s) for s in story.skills],
-        hints=[],  # SC-8 arrives with the flow check and hints (SC06)
+        # SC-8: the model's hints as given; the router checks, orders and stores them.
+        hints=raw.hints if raw is not None else [],
     )
     return CraftTurnResult(
         reply=out,

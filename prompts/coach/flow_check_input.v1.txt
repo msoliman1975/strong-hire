@@ -1,0 +1,6 @@
+Writing style: $story_style
+
+The story, section by section ("(empty)" and "(skipped)" mark slots with no text):
+<untrusted_input>
+$outline
+</untrusted_input>

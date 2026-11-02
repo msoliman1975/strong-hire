@@ -46,6 +46,7 @@ import {
   type CoachTurnResult,
   type StoryPart,
 } from "./api";
+import { FlowHints } from "../stories/FlowHints";
 import { CraftPanel } from "./CraftPanel";
 import { outlineReady } from "./outline";
 import { ReplyBox } from "./ReplyBox";
@@ -135,6 +136,8 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
       story: nextStory,
       asking_for: result.asking_for,
       asking: result.asking ?? current.asking,
+      flow_flags: result.flow_flags ?? current.flow_flags,
+      hints: result.hints ?? current.hints,
       missing: STORY_PARTS.filter((p) => !filled(nextStory, p)),
       session: result.ended ? { ...session, status: "ended" } : session,
     });
@@ -419,6 +422,16 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
                 </div>
               )}
               <CraftPanel outline={outline} asking={detail.asking} ended={ended} />
+              {story && (
+                <FlowHints
+                  storyId={story.id}
+                  flags={detail.flow_flags ?? []}
+                  hints={detail.hints ?? []}
+                  ready={status !== "draft"}
+                  showCheck={false}
+                  onStory={(saved) => update({ flow_flags: saved.flow_flags, hints: saved.hints })}
+                />
+              )}
               <p className="muted small">Strova uses only your words. Nothing is added that you didn't say.</p>
             </section>
           ) : (

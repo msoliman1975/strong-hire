@@ -879,3 +879,23 @@
   font-size: 1rem;
   margin: 0;
 }
+
+/* --- SC-8, SC-9: flow flags and skill hints ---------------------------------------------------- */
+
+.flow-hints__title {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.flow-flag,
+.skill-hint {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-left: 3px solid var(--sh-violet-light);
+  padding-left: 10px;
+}
+
+.flow-hints .sx-stack > li + li {
+  margin-top: 0;
+}

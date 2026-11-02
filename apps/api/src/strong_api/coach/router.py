@@ -68,7 +68,14 @@ from strong_api.sessions.settings import (
     get_text_session_settings,
     get_voice_session_settings,
 )
-from strong_api.stories.outline import has_content, load_outline, save_outline
+from strong_api.stories.flow import (
+    add_hints,
+    flow_check_if_ready,
+    open_hints,
+    run_flow_check,
+    visible_flags,
+)
+from strong_api.stories.outline import has_content, load_outline, ready, save_outline
 from strong_core.db.models import CoachSession, CoachTurn, JobTarget
 from strong_core.db.models import Resume as ResumeRow
 from strong_core.db.models import Story as StoryRow
@@ -190,6 +197,8 @@ async def _detail(
         asking_for=engine.asks(story)[0] if story is not None else AskFor.NOTHING,
         asking=_asking(story, session),
         suggested_style=suggested,
+        flow_flags=visible_flags(story) if story is not None else [],
+        hints=open_hints(story) if story is not None else [],
     )
 
 
@@ -412,19 +421,25 @@ async def _craft_turn(
         ) from None
     _add_refs(session, refs)
     session.minutes = engine.session_minutes(turns)
+    await add_hints(db, story, result.reply.hints)  # SC-8: checked, gaps first, at most three
+    if not ready(outline) and ready(result.outline):
+        await run_flow_check(db, story)  # SC-9: once the core slots are filled
     if result.ended:
         await _close(db, session, story)
     await db.commit()
     kept = session.story_id is not None
     if kept:
         await db.refresh(story)
+    stored = open_hints(story) if kept else []
     return CoachTurnResult(
+        flow_flags=visible_flags(story) if kept else [],
+        hints=stored,
         reply=CoachReply(
             message=result.reply.message,
             missing=engine.missing_parts(story) if kept else [],
             skills=result.reply.skills,
         ),
-        craft=result.reply,
+        craft=result.reply.model_copy(update={"hints": stored}),
         story=story_out(story) if kept else None,
         turns=[turn_out(t) for t in result.turns],
         asking_for=engine.asks(story)[0] if kept else AskFor.NOTHING,
@@ -461,6 +476,8 @@ async def _close(db: AsyncSession, session: CoachSession, story: StoryRow | None
     session.status = CoachSessionStatus.ENDED
     session.ended_at = session.ended_at or datetime.now(UTC)
     session.minutes = engine.session_minutes(await _turns(db, session))
+    if story is not None:
+        await flow_check_if_ready(db, story)  # SC-9: at the end of a styled session
     if story is None or engine.missing_parts(story) != list(engine.PARTS):
         return
     outline = load_outline(story)

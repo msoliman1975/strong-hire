@@ -150,6 +150,9 @@ describe("SC-7 (UI): the outline panel", () => {
     expect(await screen.findByText(/Every core slot is filled/)).toBeInTheDocument();
     expect(within(screen.getByTestId("craft-panel")).getByText(/CARL story · Ready/)).toBeInTheDocument();
     expect(screen.queryByRole("group", { name: "Quick replies" })).not.toBeInTheDocument(); // all done
+    // SC-8, SC-9: once Ready, the flow flags and the skill hints show in the panel.
+    expect(screen.getAllByTestId("flow-flag").length).toBeGreaterThan(0);
+    expect(screen.getAllByTestId("skill-hint").length).toBeGreaterThan(0);
   }, 20_000); // ten typed turns
 
   it("SC-3: Ready needs exactly the core slots", () => {
