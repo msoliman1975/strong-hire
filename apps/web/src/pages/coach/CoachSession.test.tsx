@@ -3,7 +3,7 @@
  * MSW (mocks/coachHandlers.ts, the shapes of strong_api.coach and strong_api.takes).
  */
 import { QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router";
@@ -150,6 +150,9 @@ describe("coach session", () => {
     await user.type(screen.getByRole("textbox", { name: "Story name" }), "Pushback from platform");
     await user.click(screen.getByRole("button", { name: "Save and exit" }));
 
+    // Wait for the studio, not the heading: the coach page also shows the story's name as its h1.
+    // Save, end, navigate and load are four requests in a row, slower than 1 s on a busy runner.
+    await waitFor(() => expect(screen.getByTestId("where")).toHaveTextContent(/^\/stories\//), { timeout: 5000 });
     expect(await screen.findByRole("heading", { level: 1, name: "Pushback from platform" })).toBeInTheDocument();
     const saved = mockStoryLibrary().find((s) => s.title === "Pushback from platform");
     expect(saved?.context).toBe("We were losing checkouts every week.");
