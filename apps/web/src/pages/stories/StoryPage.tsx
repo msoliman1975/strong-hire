@@ -4,6 +4,10 @@
  * suggestions for it (U08, place `story`), the parts with the 60-second and full versions (CO-8),
  * Used for (the "For {company}" tailoring notes, SG-5) and Where it came from, then the takes and
  * the coach notes (ST-6). Edit story opens the part-by-part editor (ST-3).
+ *
+ * A styled story (SC-1) reads as its outline, edited in place, with Improve with Strova per
+ * section and Switch to STAR/CARL (SC-10 to SC-12, OutlineStory). A classic story keeps its five
+ * parts and offers Organize with Strova (SC-13).
  */
 import "../../components/ux/ux.css";
 import "./stories.css";
@@ -21,6 +25,7 @@ import { displayStatusLabel, storiesApi, storyKeys, useStory, type DisplayStatus
 import { reviewPath, storiesPath } from "./paths";
 import { StoryEditor } from "./StoryEditor";
 import { bestTake, StoryTakes, takeAverage } from "./StoryTakes";
+import { OrganizeBanner, OutlineStory, StyleSwitch } from "./OutlineStory";
 import { CoachNotes, StoryRead } from "./StoryView";
 
 const STEPS: DisplayStatus[] = ["draft", "ready", "proven"];
@@ -133,9 +138,16 @@ export function StoryPage() {
 
       <StorySuggestions story={s} />
 
+      {!s.outline && !editing && <OrganizeBanner story={s} />}
+
       <div className="sx-grid2 story-page__grid">
-        <section className="sx-card story-page__parts" aria-label="Story parts">
-          {editing ? (
+        <section className="sx-card story-page__parts" aria-label={s.outline ? "Story sections" : "Story parts"}>
+          {s.outline ? (
+            <>
+              <StyleSwitch story={s} outline={s.outline} />
+              <OutlineStory story={s} outline={s.outline} />
+            </>
+          ) : editing ? (
             <StoryEditor story={s} onDone={() => setEditing(false)} />
           ) : (
             <>
@@ -165,7 +177,7 @@ function UsedFor({ story }: { story: Story }) {
   const notes = usedForNotes(story);
   return (
     <section className="sx-card" aria-labelledby="used-for-heading">
-      <h3 id="used-for-heading">Used for</h3>
+      <h2 id="used-for-heading" className="story-page__card-title">Used for</h2>
       {notes.length === 0 ? (
         <span className="sx-small sx-muted">Not used by a role yet.</span>
       ) : (
@@ -185,7 +197,7 @@ function CameFrom({ story }: { story: Story }) {
   const count = takes.data?.length ?? 0;
   return (
     <section className="sx-card" aria-labelledby="came-from-heading">
-      <h3 id="came-from-heading">Where it came from</h3>
+      <h2 id="came-from-heading" className="story-page__card-title">Where it came from</h2>
       <span className="sx-small" data-testid="story-source">
         {story.source === "debrief_answer" ? (
           <>
@@ -220,13 +232,21 @@ function StorySuggestions({ story }: { story: Story }) {
   return (
     <div className="sx-stack" aria-label="Strova suggests" role="region">
       {open.map((s) => (
-        <StorySuggestion key={s.id} suggestion={s} storyId={story.id} />
+        <StorySuggestion key={s.id} suggestion={s} storyId={story.id} styled={!!story.outline} />
       ))}
     </div>
   );
 }
 
-function StorySuggestion({ suggestion, storyId }: { suggestion: Suggestion; storyId: string }) {
+function StorySuggestion({
+  suggestion,
+  storyId,
+  styled,
+}: {
+  suggestion: Suggestion;
+  storyId: string;
+  styled: boolean;
+}) {
   const client = useQueryClient();
   const [applied, setApplied] = useState(false);
   const refresh = () => {
@@ -284,10 +304,17 @@ function StorySuggestion({ suggestion, storyId }: { suggestion: Suggestion; stor
           {error.message}
         </span>
       )}
+      {p.kind === "tune_story" && styled && (
+        <span className="sx-small sx-muted">
+          This story is organized in sections: use Improve with Strova on the section to apply it.
+        </span>
+      )}
       <div className="sx-row">
-        <button type="button" className="sx-btn sm" disabled={busy} onClick={() => accept.mutate()}>
-          {p.kind === "tune_story" ? "Apply" : "Add to story"}
-        </button>
+        {!(p.kind === "tune_story" && styled) && (
+          <button type="button" className="sx-btn sm" disabled={busy} onClick={() => accept.mutate()}>
+            {p.kind === "tune_story" ? "Apply" : "Add to story"}
+          </button>
+        )}
         <button type="button" className="sx-btn quiet sm" disabled={busy} onClick={() => dismiss.mutate()}>
           Dismiss
         </button>

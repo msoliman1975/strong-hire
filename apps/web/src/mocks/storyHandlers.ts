@@ -8,6 +8,7 @@ import { http, HttpResponse } from "msw/http";
 
 import type { Story, StoryAnswer, StoryIn, StoryPatch } from "../pages/stories/api";
 import { displayStatusOf, STORY_PARTS } from "../pages/stories/api";
+import { outlineHandlers } from "./outlineMock";
 import { requestMockReview } from "./suggestionHandlers";
 
 const API = "*/api";
@@ -83,6 +84,8 @@ function notFound() {
 
 export function storyHandlers() {
   return [
+    // SC-10 to SC-13: the outline actions of styled stories (outlineMock.ts).
+    ...outlineHandlers((id) => stories.find((s) => s.id === id), out),
     http.get(`${API}/stories`, ({ request }) => {
       const url = new URL(request.url);
       const status = url.searchParams.get("status");
