@@ -27,8 +27,8 @@ export const STYLE_NAME: Record<StoryStyle, string> = { star: "STAR", carl: "CAR
 
 /** D-1: one line on what each style's sections are. */
 export const STYLE_DESCRIPTION: Record<StoryStyle, string> = {
-  star: "Situation, Task, Action, Result, Learning. A clear arc for most stories.",
-  carl: "Challenge, Action, Result, Learning. Leads with the hard part: conflict, failure, a tough call.",
+  star: "A clear arc from the situation to what you learned. Fits most stories.",
+  carl: "Leads with the hard part: a conflict, a failure or a tough call.",
 };
 
 export const SECTION_LABEL: Record<StorySection, string> = {
