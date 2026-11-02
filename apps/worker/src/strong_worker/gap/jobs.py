@@ -38,6 +38,7 @@ from strong_core.profiles import resolve_profile, use_profile_for_session
 from strong_core.schemas import (
     CustomSessionSpec,
     GapAnalysis,
+    GapPurpose,
     GapStatus,
     InterviewType,
     JobPosting,
@@ -195,7 +196,9 @@ async def latest_ready_gap(
 ) -> GapRow | None:
     """The job's latest ready gap analysis; with resume_id, the latest one for that CV (PR-3)."""
     query = select(GapRow).where(
-        GapRow.job_target_id == job_target_id, GapRow.status == GapStatus.READY
+        GapRow.job_target_id == job_target_id,
+        GapRow.status == GapStatus.READY,
+        GapRow.purpose == GapPurpose.ROLE,  # RC-7: never a comparison row
     )
     if resume_id is not None:
         query = query.where(GapRow.resume_id == resume_id)

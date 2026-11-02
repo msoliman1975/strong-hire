@@ -98,6 +98,7 @@ from strong_core.db.turns import next_turn_seq
 from strong_core.gateway import Role, get_gateway, usage_context
 from strong_core.schemas import (
     CustomSessionSpec,
+    GapPurpose,
     GapStatus,
     InterviewType,
     JobPosting,
@@ -170,6 +171,7 @@ async def _session_resume(
         GapRow.job_target_id == job_target_id,
         GapRow.org_id == me.org_id,
         GapRow.status == GapStatus.READY,
+        GapRow.purpose == GapPurpose.ROLE,  # RC-7
     )
     if resume_id is not None:
         query = query.where(GapRow.resume_id == resume_id)

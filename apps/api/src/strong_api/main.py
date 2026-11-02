@@ -22,6 +22,7 @@ from strong_api.admin import install_admin, seed_admins_on_startup
 from strong_api.auth import install_auth
 from strong_api.billing import install_billing
 from strong_api.coach.router import router as coach_router
+from strong_api.compare.router import router as compare_router
 from strong_api.controls import router as status_router
 from strong_api.custom.router import router as custom_router
 from strong_api.devtools import router as dev_router
@@ -126,6 +127,7 @@ def create_app(
     app.include_router(inputs_router)
     app.include_router(resume_checks_router)  # RM-4, RM-5: resume issues and story ideas
     app.include_router(gap_router)
+    app.include_router(compare_router)  # RC-1 to RC-8: resume comparison per role
     app.include_router(scoring_router)
     app.include_router(sessions_router)
     app.include_router(feedback_router)
