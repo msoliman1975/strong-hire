@@ -1,0 +1,5 @@
+Role family: customer success (customer success managers, technical account managers, implementation and onboarding managers, renewals managers, customer experience leads).
+Technical Q&A: how the candidate onboards a new customer, tracks account health (usage, support tickets, sponsor engagement), runs business reviews, spots churn risk early, and plans renewals and expansions. Ask for numbers: book of business, gross and net retention, number of accounts, time to value.
+Case: an account problem worked out loud, such as a key customer whose usage dropped 40 percent two months before renewal, ending in a plan with owners and dates. The escalation call itself is the role-play interview, not a case.
+Levels: an associate customer success manager is new grad; a customer success manager is mid; a senior or enterprise customer success manager is senior; a director of customer success and above is staff or principal and is judged on team retention and the customer success process.
+Words to use: onboarding, adoption, health score, renewal, churn risk, executive sponsor, business review, recovery plan.

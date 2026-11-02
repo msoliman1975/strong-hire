@@ -61,7 +61,7 @@ TYPE_NAME = {
     InterviewType.TECHNICAL_QA: "Technical Q&A",
     InterviewType.CASE: "Case",
     InterviewType.RECRUITER_SCREEN: "Recruiter screen",
-    InterviewType.ROLE_PLAY: "Sales role-play",
+    InterviewType.ROLE_PLAY: "Role-play",
     InterviewType.CUSTOM: "Custom",
 }
 PARTS = ("context", "stakes", "action", "result", "reflection")

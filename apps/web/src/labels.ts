@@ -19,7 +19,7 @@ export const interviewTypeLabel: Record<InterviewType, string> = {
   case: "Case",
   custom: "Custom",
   recruiter_screen: "Recruiter screen",
-  role_play: "Sales role-play",
+  role_play: "Role-play",
 };
 
 export const interviewTypeHint: Record<InterviewType, string> = {
@@ -29,15 +29,16 @@ export const interviewTypeHint: Record<InterviewType, string> = {
   case: "Product sense, estimation or system thinking.",
   custom: "Mix question types, pick focus topics and add your own questions.",
   recruiter_screen: "Why this role, your background, and pay and timing.",
-  role_play: "A mock sales call: Strova plays the buyer and you lead.",
+  role_play: "A mock sales or customer call: Strova plays the buyer or customer and you lead.",
 };
 
-/** RP-4, D-5: the four sales calls a role-play simulates. */
+/** RP-4, D-5, CS-1: the calls a role-play simulates: four sales calls and the escalation call. */
 export const rolePlayScenarioLabel: Record<RolePlayScenario, string> = {
   cold_call: "Cold call",
   discovery_call: "Discovery call",
   demo_objections: "Demo and objections",
   negotiation_close: "Negotiation and close",
+  escalation_call: "Escalation call",
 };
 
 export const rolePlayScenarioHint: Record<RolePlayScenario, string> = {
@@ -45,6 +46,7 @@ export const rolePlayScenarioHint: Record<RolePlayScenario, string> = {
   discovery_call: "A booked first call. Uncover the buyer's problems and agree a next step.",
   demo_objections: "Show how the product fixes the buyer's problems and handle pushback.",
   negotiation_close: "The buyer likes it. Handle price pushback and get a commitment.",
+  escalation_call: "An upset customer and a renewal at risk. Calm the call, find the cause, agree a plan.",
 };
 
 /** D-5: the default call for a level. */
@@ -109,6 +111,7 @@ export const roleFamilyLabel: Record<RoleFamily, string> = {
   consulting_strategy: "Consulting and strategy",
   project_program: "Project and program management",
   sales: "Sales",
+  customer_success: "Customer success",
   other: "Other",
 };
 
@@ -124,6 +127,7 @@ export const betaRoleFamilies: ReadonlySet<RoleFamily> = new Set<RoleFamily>([
   "consulting_strategy",
   "project_program",
   "sales",
+  "customer_success",
 ]);
 
 export const severityLabel: Record<Severity, string> = { low: "Low", medium: "Medium", high: "High" };

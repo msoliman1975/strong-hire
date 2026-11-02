@@ -36,6 +36,7 @@ class RoleFamily(StrEnum):
     PROJECT_PROGRAM = "project_program"
     # Wave 2 (docs/role-play-spec.md D-10).
     SALES = "sales"
+    CUSTOMER_SUCCESS = "customer_success"
 
 
 class InterviewType(StrEnum):
@@ -81,12 +82,14 @@ class QuestionRefusal(StrEnum):
 
 
 class RolePlayScenario(StrEnum):
-    """RP-4, D-5: the kind of sales call a role-play simulates."""
+    """RP-4, D-5: the kind of call a role-play simulates. The escalation call (CS-1) is a
+    customer success call with an existing, unhappy customer."""
 
     COLD_CALL = "cold_call"
     DISCOVERY_CALL = "discovery_call"
     DEMO_OBJECTIONS = "demo_objections"
     NEGOTIATION_CLOSE = "negotiation_close"
+    ESCALATION_CALL = "escalation_call"
 
 
 class Difficulty(StrEnum):

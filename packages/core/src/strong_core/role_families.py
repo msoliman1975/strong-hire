@@ -36,7 +36,6 @@ FIXED_TITLES: Final[MappingProxyType[InterviewType, str]] = MappingProxyType(
     {
         InterviewType.RECRUITER_SCREEN: "Recruiter",
         InterviewType.CUSTOM: "Interviewer",
-        InterviewType.ROLE_PLAY: "Buyer",  # RP-8: the brief names the persona at session time
     }
 )
 
@@ -53,12 +52,16 @@ class FamilyInfo:
     """Who Strova plays for each of TITLED_TYPES when the profile names no interviewer."""
     generic_loop: tuple[InterviewType, ...]
     """TG-3 suggestion in generic mode, in order (D-9). Any type but Custom."""
+    counterpart: str = "Buyer"
+    """Who Strova plays in a role-play (CS D-5). The brief names the persona at session time."""
 
     @property
     def rated_competencies(self) -> tuple[Competency, ...]:
         return (*COMMON_COMPETENCIES, *self.extra_competencies)
 
     def interviewer_title(self, kind: InterviewType) -> str:
+        if kind == InterviewType.ROLE_PLAY:
+            return self.counterpart
         return FIXED_TITLES.get(kind) or self.titles[kind]
 
 
@@ -69,6 +72,7 @@ def _info(
     extra: tuple[Competency, ...],
     titles: tuple[str, str, str, str],
     loop: tuple[InterviewType, ...],
+    counterpart: str = "Buyer",
 ) -> FamilyInfo:
     return FamilyInfo(
         family=family,
@@ -77,6 +81,7 @@ def _info(
         extra_competencies=extra,
         titles=MappingProxyType(dict(zip(TITLED_TYPES, titles, strict=True))),
         generic_loop=loop,
+        counterpart=counterpart,
     )
 
 
@@ -237,6 +242,29 @@ _REGISTRY: Final[tuple[FamilyInfo, ...]] = (
         (_C.ROLE_FIT, _C.JUDGMENT),
         ("Sales Manager", "Hiring Manager", "Sales Engineer", "Sales Director"),
         (InterviewType.RECRUITER_SCREEN, InterviewType.ROLE_PLAY, _HM),
+    ),
+    _info(
+        RoleFamily.CUSTOMER_SUCCESS,
+        "Customer success",
+        (
+            "customer success",
+            "csm",
+            "client success",
+            "customer experience",
+            "technical account manager",
+            "implementation manager",
+            "onboarding manager",
+            "renewals",
+        ),
+        (_C.ROLE_FIT, _C.JUDGMENT),
+        (
+            "Customer Success Manager",
+            "Hiring Manager",
+            "Senior Customer Success Manager",
+            "Head of Customer Success",
+        ),
+        (InterviewType.RECRUITER_SCREEN, InterviewType.ROLE_PLAY, _HM),
+        counterpart="Customer",
     ),
     _info(
         RoleFamily.OTHER,

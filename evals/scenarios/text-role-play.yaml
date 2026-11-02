@@ -1,6 +1,7 @@
 name: text-role-play
-description: 'RP-11: one 10-minute text role-play per call type (cold call, discovery, demo and objections,
-  negotiation and close), with a sales posting and a seller CV. The AI candidate plays the seller (candidate/persona_role_play).'
+description: 'RP-11, CS-8: one 10-minute text role-play per call type (cold call, discovery, demo and
+  objections, negotiation and close, escalation call), with a posting and a CV for the role. The AI candidate
+  plays the seller, or the customer success manager in the escalation call (candidate/persona_role_play).'
 scenarios:
 - id: rp-cold-call
   interview_type: role_play
@@ -161,3 +162,46 @@ scenarios:
     - 110 percent of quota on average over four years
 
     Skills: enterprise sales, negotiation, Challenger, Salesforce
+- id: rp-escalation-call
+  interview_type: role_play
+  role_play: escalation_call
+  duration_min: 10
+  level: mid
+  quality: average
+  job_text: |-
+    Customer Success Manager
+    Tallyhouse
+    Remote, US
+
+    Tallyhouse sells inventory software to 900 mid-size retailers. Customer success managers own a book of
+    about 40 accounts from onboarding to renewal.
+
+    What you will do:
+    - Onboard new customers and drive adoption across their stores
+    - Run quarterly business reviews with each customer's executive sponsor
+    - Spot churn risk early and lead escalations with support and engineering
+    - Own renewals and find expansion opportunities
+
+    What you need:
+    - 2 or more years in customer success or account management at a SaaS company
+    - Calm, clear communication with upset customers
+    - Comfort with health scores and usage data
+
+    Nice to have:
+    - Gainsight or a similar tool
+    - Retail or supply chain experience
+  cv_text: |-
+    Jordan Okafor
+    jordan.okafor@example.com
+
+    Customer Success Manager, Shelfwise (2023 to now)
+    - Managed 35 mid-market accounts worth 2.1 million dollars a year; gross retention 94 percent
+    - Led 6 escalations after a data sync outage; kept 5 of the 6 accounts through renewal
+    - Ran quarterly business reviews and grew three accounts by adding stores
+
+    Support Specialist, Shelfwise (2021 to 2023)
+    - Resolved 40 tickets a week with a 96 percent satisfaction score
+    - Wrote the onboarding guide used for every new customer
+
+    Education
+    B.A. Communications, University of Georgia, 2021

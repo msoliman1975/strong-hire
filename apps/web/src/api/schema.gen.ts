@@ -9524,7 +9524,7 @@ export interface components {
          *     `strong_core.role_families`; per-family model guidance in `prompts/planner/family_<value>`.
          * @enum {string}
          */
-        RoleFamily: "swe" | "data_ml" | "pm" | "design" | "tpm" | "other" | "infra_security" | "data_analytics" | "eng_management" | "finance" | "consulting_strategy" | "project_program" | "sales";
+        RoleFamily: "swe" | "data_ml" | "pm" | "design" | "tpm" | "other" | "infra_security" | "data_analytics" | "eng_management" | "finance" | "consulting_strategy" | "project_program" | "sales" | "customer_success";
         /** RoleModel */
         RoleModel: {
             /** Role */
@@ -9635,10 +9635,11 @@ export interface components {
         };
         /**
          * RolePlayScenario
-         * @description RP-4, D-5: the kind of sales call a role-play simulates.
+         * @description RP-4, D-5: the kind of call a role-play simulates. The escalation call (CS-1) is a
+         *     customer success call with an existing, unhappy customer.
          * @enum {string}
          */
-        RolePlayScenario: "cold_call" | "discovery_call" | "demo_objections" | "negotiation_close";
+        RolePlayScenario: "cold_call" | "discovery_call" | "demo_objections" | "negotiation_close" | "escalation_call";
         /** RoleSummary */
         RoleSummary: {
             /**
