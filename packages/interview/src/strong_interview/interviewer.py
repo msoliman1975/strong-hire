@@ -71,8 +71,32 @@ _LABEL = re.compile(r"^\s*(interviewer|[a-z]+)\s*:\s*", re.IGNORECASE)
 LEAD_IN_MAX_WORDS = 12  # D-7: the lead-in said before a verbatim question
 VERBATIM_MOVES = (MoveKind.ASK, MoveKind.REDO)
 _FIRST_SENTENCE = re.compile(r"^.*?[.!](?=\s|$)")
-TURN_BY_TYPE = {InterviewType.RECRUITER_SCREEN: "turn_recruiter_screen"}
-"""RS-2: a type with its own turn prompt. The others use prompts/interviewer/turn."""
+TURN_BY_TYPE = {
+    InterviewType.RECRUITER_SCREEN: "turn_recruiter_screen",
+    InterviewType.ROLE_PLAY: "turn_role_play",
+}
+"""RS-2, RP-5: a type with its own turn prompt. The others use prompts/interviewer/turn."""
+DECIDE_BY_TYPE = {InterviewType.ROLE_PLAY: "decide_role_play"}
+"""RP-6: a type with its own follow-up decision prompt. The others use interviewer/decide."""
+
+
+def buyer_text(brief: InterviewerBrief) -> str:
+    """RP-5: the hidden buyer brief as plain lines for the role-play turn prompt."""
+    rp = brief.role_play
+    if rp is None:
+        return "none"
+    product = rp.product + (" (illustrative)" if rp.product_illustrative else "")
+    lines = [
+        f"Name and title: {rp.persona_name}, {rp.persona_title}",
+        f"Company: {rp.company_summary}",
+        f"What the candidate sells: {product}",
+        f"Why this call is happening: {rp.situation}",
+        *(f"Hidden pain (say it only when asked about it): {p}" for p in rp.hidden_pains),
+        f"Budget (only when asked): {rp.budget}",
+        f"Decision process (only when asked): {rp.decision_process}",
+        *(f"Objection ({o.when}): {o.text}" for o in rp.objections),
+    ]
+    return "\n".join(lines)
 
 
 def lead_in(text: str) -> str:
@@ -259,6 +283,8 @@ class Interviewer:
             seniority_bar=brief.seniority_bar or "Use the usual bar for this level.",
             max_words=str(SMALL_MAX_WORDS if self.small else MAX_WORDS),
             facts=self.facts.render(),
+            buyer=buyer_text(brief),
+            success=brief.role_play.success_condition if brief.role_play else "none",
         )
 
     def _move_note(self, move: Move, adapted: bool = False) -> str:
@@ -563,7 +589,9 @@ class Interviewer:
         """Probe or move on after an answer in CORE (IV-3). Moves on if the model fails."""
         brief = self.brief
         messages = [
-            load_prompt(Role.INTERVIEWER, "decide").message("system"),
+            load_prompt(
+                Role.INTERVIEWER, DECIDE_BY_TYPE.get(brief.session.interview_type, "decide")
+            ).message("system"),
             load_prompt(Role.INTERVIEWER, "decide_input").message(
                 "user",
                 interview_type=self.interview_type(question),

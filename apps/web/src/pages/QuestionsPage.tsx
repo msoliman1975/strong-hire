@@ -10,9 +10,11 @@ import { competencyLabel, interviewTypeLabel, levelLabel, roleFamilyLabel } from
 import { useFeature } from "../theme/features";
 
 /** The four question categories; Custom is a session type, not a category (CU-1). */
-const STANDARD_TYPES = (Object.keys(interviewTypeLabel) as InterviewType[]).filter((t): t is StandardType => t !== "custom" && t !== "recruiter_screen");
-/** RS-1: v2 adds Recruiter screen to the type filter. */
-const V2_TYPES: BankType[] = [...STANDARD_TYPES, "recruiter_screen"];
+const STANDARD_TYPES = (Object.keys(interviewTypeLabel) as InterviewType[]).filter(
+  (t): t is StandardType => t !== "custom" && t !== "recruiter_screen" && t !== "role_play",
+);
+/** RS-1, RP-12: v2 adds Recruiter screen and Role-play scenario cards to the type filter. */
+const V2_TYPES: BankType[] = [...STANDARD_TYPES, "recruiter_screen", "role_play"];
 const ROLES = Object.keys(roleFamilyLabel) as RoleFamily[];
 const LEVELS = Object.keys(levelLabel) as Level[];
 const ALL_AREAS = new Set<string>(Object.values(COMPETENCIES_BY_TYPE).flat());

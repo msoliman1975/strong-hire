@@ -13,7 +13,7 @@ from strong_core.db.models import USER_OWNED_TABLES, Base
 from strong_core.schemas import EXPORTED_SCHEMAS, GapPurpose, ResumeComparisonEntry
 
 MIGRATION = next(
-    (Path(__file__).parents[1] / "migrations" / "versions").glob("*_0027_resume_comparisons.py")
+    (Path(__file__).parents[1] / "migrations" / "versions").glob("*_0028_resume_comparisons.py")
 )
 
 
@@ -76,7 +76,7 @@ def test_rc2_comparison_entry_contract() -> None:
 
 def test_rc8_migration_has_a_downgrade() -> None:
     text = MIGRATION.read_text("utf-8")
-    assert "down_revision: str | None = '0026'" in text
+    assert "down_revision: str | None = '0027'" in text
     assert "op.drop_table('resume_comparisons')" in text
     assert "op.drop_column('gap_analyses', 'purpose')" in text
     assert "op.drop_column('gap_analyses', 'source_gap_id')" in text

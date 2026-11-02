@@ -14128,7 +14128,8 @@
               "hiring_manager",
               "technical_qa",
               "case",
-              "recruiter_screen"
+              "recruiter_screen",
+              "role_play"
             ]
           },
           "question": {
@@ -15448,7 +15449,11 @@
           "estimation_logic",
           "prioritization",
           "recommendation",
-          "logistics_and_expectations"
+          "logistics_and_expectations",
+          "discovery",
+          "objection_handling",
+          "value_articulation",
+          "closing"
         ],
         "title": "Competency",
         "description": "Scored competencies from the spec, grouped by interview type in COMPETENCIES_BY_TYPE."
@@ -16641,6 +16646,17 @@
             ],
             "title": "Failure Reason",
             "description": "Plain reason when the session failed before it started."
+          },
+          "buyer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SessionBuyer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "RP-9: the buyer Strova played; role-play sessions only."
           }
         },
         "additionalProperties": false,
@@ -16855,6 +16871,47 @@
         ],
         "title": "DocumentKind",
         "type": "string"
+      },
+      "DraftBeat": {
+        "additionalProperties": false,
+        "description": "One beat of a role-play as the planner writes it (RP-4). The worker turns it into a\nBriefQuestion: `opening` is what the buyer says to open the beat, `goal` stays hidden.",
+        "properties": {
+          "id": {
+            "pattern": "^[a-z0-9_-]+$",
+            "title": "Id",
+            "type": "string"
+          },
+          "opening": {
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Opening",
+            "type": "string"
+          },
+          "goal": {
+            "description": "What the candidate should do.",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Goal",
+            "type": "string"
+          },
+          "competencies": {
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "maxItems": 3,
+            "minItems": 1,
+            "title": "Competencies",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "opening",
+          "goal",
+          "competencies"
+        ],
+        "title": "DraftBeat",
+        "type": "object"
       },
       "DraftQuestion": {
         "additionalProperties": false,
@@ -17625,7 +17682,8 @@
               "hiring_manager",
               "technical_qa",
               "case",
-              "recruiter_screen"
+              "recruiter_screen",
+              "role_play"
             ],
             "type": "string"
           },
@@ -18304,7 +18362,8 @@
           "technical_qa",
           "case",
           "custom",
-          "recruiter_screen"
+          "recruiter_screen",
+          "role_play"
         ],
         "title": "InterviewType",
         "description": "The four v1 interview types (IV-2), plus Custom (CU-1) and Recruiter screen (RS-1).\n\nA Custom session mixes 1 to 3 of the four standard types as question categories\n(`SessionConfig.custom`). Custom is never a question category itself and has no entry in\nCOMPETENCIES_BY_TYPE; use `session_competencies(config)` for a session's competency pool."
@@ -18414,12 +18473,12 @@
             "type": "array"
           },
           "questions": {
-            "description": "6 to 10; a mini interview has 3.",
+            "description": "6 to 10; a mini interview has 3. Role-play: 2 to 4 beats, a mini has 1.",
             "items": {
               "$ref": "#/components/schemas/BriefQuestion"
             },
             "maxItems": 10,
-            "minItems": 3,
+            "minItems": 1,
             "title": "Questions",
             "type": "array"
           },
@@ -18434,11 +18493,23 @@
             "$ref": "#/components/schemas/PersonaBrief"
           },
           "max_probes_per_question": {
-            "description": "IV-3.",
-            "maximum": 3,
+            "description": "IV-3: at most 3. Role-play: the buyer's replies per beat, at most 8 (RP-6).",
+            "maximum": 8,
             "minimum": 0,
             "title": "Max Probes Per Question",
             "type": "integer"
+          },
+          "role_play": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RolePlayBrief"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "RP-3: the hidden buyer brief, for Role-play sessions only. Never shown to the candidate before the debrief."
           },
           "company_summary": {
             "anyOf": [
@@ -22249,7 +22320,11 @@
           "measurable_result",
           "concrete_example",
           "tradeoff_reasoning",
-          "off_topic"
+          "off_topic",
+          "needs_discovery",
+          "objection_unresolved",
+          "no_value_link",
+          "no_next_step"
         ],
         "title": "ProbeTrigger",
         "type": "string"
@@ -24538,7 +24613,8 @@
           "eng_management",
           "finance",
           "consulting_strategy",
-          "project_program"
+          "project_program",
+          "sales"
         ],
         "title": "RoleFamily",
         "description": "Role families (RF-1, `docs/role-families-spec.md`). Per-family facts live in\n`strong_core.role_families`; per-family model guidance in `prompts/planner/family_<value>`."
@@ -24605,6 +24681,181 @@
         ],
         "title": "RoleOut",
         "description": "TG-1: a role with one readiness per interview."
+      },
+      "RolePlayBrief": {
+        "properties": {
+          "scenario": {
+            "$ref": "#/components/schemas/RolePlayScenario"
+          },
+          "persona_name": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Persona Name"
+          },
+          "persona_title": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Persona Title"
+          },
+          "company_summary": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Company Summary",
+            "description": "The buyer's company."
+          },
+          "product": {
+            "type": "string",
+            "maxLength": 240,
+            "minLength": 1,
+            "title": "Product",
+            "description": "What the candidate sells."
+          },
+          "product_illustrative": {
+            "type": "boolean",
+            "title": "Product Illustrative",
+            "description": "D-9: true when the posting named no product and the planner described one.",
+            "default": false
+          },
+          "situation": {
+            "type": "string",
+            "maxLength": 400,
+            "minLength": 1,
+            "title": "Situation",
+            "description": "Why this call is happening."
+          },
+          "hidden_pains": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 4,
+            "minItems": 1,
+            "title": "Hidden Pains",
+            "description": "Said only when good discovery earns them."
+          },
+          "budget": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Budget"
+          },
+          "decision_process": {
+            "type": "string",
+            "maxLength": 240,
+            "minLength": 1,
+            "title": "Decision Process"
+          },
+          "objections": {
+            "items": {
+              "$ref": "#/components/schemas/RolePlayObjection"
+            },
+            "type": "array",
+            "maxItems": 4,
+            "minItems": 1,
+            "title": "Objections"
+          },
+          "curveball": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 240
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Curveball",
+            "description": "Tough only (D-8)."
+          },
+          "success_condition": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Success Condition",
+            "description": "What earns the next step, e.g. a booked demo."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "scenario",
+          "persona_name",
+          "persona_title",
+          "company_summary",
+          "product",
+          "situation",
+          "hidden_pains",
+          "budget",
+          "decision_process",
+          "objections",
+          "success_condition"
+        ],
+        "title": "RolePlayBrief",
+        "description": "RP-3, D-4: the hidden buyer brief. The live interviewer plays this buyer; the scorer\nreads it to judge discovery and closing. Never shown to the candidate before the debrief."
+      },
+      "RolePlayDraft": {
+        "additionalProperties": false,
+        "description": "What the planner model returns for a role-play brief (RP-4). Code adds the scenario, the\npersona, probe limits and the time plan.",
+        "properties": {
+          "buyer": {
+            "$ref": "#/components/schemas/RolePlayBrief"
+          },
+          "beats": {
+            "items": {
+              "$ref": "#/components/schemas/DraftBeat"
+            },
+            "maxItems": 4,
+            "minItems": 1,
+            "title": "Beats",
+            "type": "array"
+          }
+        },
+        "required": [
+          "buyer",
+          "beats"
+        ],
+        "title": "RolePlayDraft",
+        "type": "object"
+      },
+      "RolePlayObjection": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 240,
+            "minLength": 1,
+            "title": "Text",
+            "description": "What the buyer says."
+          },
+          "when": {
+            "type": "string",
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "When",
+            "description": "When to raise it, e.g. \"after the price\"."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text",
+          "when"
+        ],
+        "title": "RolePlayObjection",
+        "description": "One objection the buyer raises in a role-play (RP-3)."
+      },
+      "RolePlayScenario": {
+        "type": "string",
+        "enum": [
+          "cold_call",
+          "discovery_call",
+          "demo_objections",
+          "negotiation_close"
+        ],
+        "title": "RolePlayScenario",
+        "description": "RP-4, D-5: the kind of sales call a role-play simulates."
       },
       "RoleSummary": {
         "properties": {
@@ -25230,6 +25481,46 @@
         ],
         "title": "ServiceProfile"
       },
+      "SessionBuyer": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "company_summary": {
+            "type": "string",
+            "title": "Company Summary"
+          },
+          "product": {
+            "type": "string",
+            "title": "Product"
+          },
+          "reveal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RolePlayBrief"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The full buyer brief, after the session ended (RP-9)."
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "title",
+          "company_summary",
+          "product"
+        ],
+        "title": "SessionBuyer",
+        "description": "RP-8, RP-9: who Strova plays in a role-play. The hidden part (`reveal`) is sent only once\nthe session has ended, for the debrief; never while the call can still run."
+      },
       "SessionChannel": {
         "type": "string",
         "enum": [
@@ -25278,6 +25569,17 @@
             "$ref": "#/components/schemas/Tone",
             "description": "TN-1: the interviewer's tone. as_company uses the profile persona's tone.",
             "default": "as_company"
+          },
+          "role_play": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RolePlayScenario"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "RP-4, D-5: the call to simulate; required for Role-play only."
           }
         },
         "additionalProperties": false,
@@ -25431,6 +25733,17 @@
             ],
             "title": "Failure Reason",
             "description": "Plain reason when the session failed before it started (status failed, never started), for example when the interview plan could not be built. Such a session is not billed and does not use a free interview. Null otherwise."
+          },
+          "buyer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SessionBuyer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "RP-8: the buyer Strova plays; role-play sessions only."
           }
         },
         "type": "object",

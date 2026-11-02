@@ -15,6 +15,7 @@ export const SUGGESTED_ANSWER_SECONDS: Record<InterviewType, number> = {
   case: 180,
   custom: 120,
   recruiter_screen: 60,
+  role_play: 45, // RP-5: a turn in a sales call is short
 };
 
 export interface AnswerTiming {

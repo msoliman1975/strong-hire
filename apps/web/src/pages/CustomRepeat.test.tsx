@@ -35,6 +35,7 @@ const CUSTOM_CONFIG: SessionConfig = {
   duration_min: 30,
   level: "senior",
   tone: "as_company",
+  role_play: null,
   custom: {
     categories: [
       { category: "behavioral", share: 0.5, focus: ["Conflict with a peer"] },
@@ -80,6 +81,7 @@ function session(id: string, jobId: string, resumeId: string, config: SessionCon
     ended_at: `2026-10-0${day}T10:30:00Z`,
     minutes_billed: 30,
     failure_reason: null,
+    buyer: null,
   };
 }
 

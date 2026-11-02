@@ -7,8 +7,9 @@ Filters:
 - company: a company slug, or "general" for general questions only. Without it, every
   company's questions and the general ones.
 - interview_type, competency (repeatable, matches any), role_family, level, q (text search in
-  the question and its hints). interview_type is a standard type or recruiter_screen (RS-1); the
-  bank's questions have only the standard types for now, so recruiter_screen lists none.
+  the question and its hints). interview_type is a standard type, recruiter_screen (RS-1) or
+  role_play (RP-12: scenario cards, one buyer situation each). The bank has no recruiter screen
+  questions yet, so recruiter_screen lists none.
 A question with no role_families or levels fits every job category or level.
 """
 

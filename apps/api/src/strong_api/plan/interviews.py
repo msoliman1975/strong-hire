@@ -78,6 +78,7 @@ DESCRIPTIONS: dict[InterviewType, str] = {
     InterviewType.TECHNICAL_QA: "Talk through technical topics: depth, accuracy and trade-offs.",
     InterviewType.CASE: "Work a business or product problem out loud, with a recommendation.",
     InterviewType.RECRUITER_SCREEN: "Motivation, background and logistics, in a short first call.",
+    InterviewType.ROLE_PLAY: "A mock sales call: Strova plays the buyer and you lead.",
     InterviewType.CUSTOM: "Your own mix of question types and questions.",
 }
 

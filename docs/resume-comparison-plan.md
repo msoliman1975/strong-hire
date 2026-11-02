@@ -68,7 +68,7 @@ them into three PRs if preferred, core first.
 
 | # | Package | Folders | IDs |
 | --- | --- | --- | --- |
-| 1 | Core: `GapPurpose`, `ResumeComparisonEntry`, `gap_analyses.purpose` and `source_gap_id`, `resume_comparisons`, migration 0027, schemas | `packages/core`, `schemas/` | RC-6, RC-7, RC-8 (data) |
+| 1 | Core: `GapPurpose`, `ResumeComparisonEntry`, `gap_analyses.purpose` and `source_gap_id`, `resume_comparisons`, migration 0028, schemas | `packages/core`, `schemas/` | RC-6, RC-7, RC-8 (data) |
 | 2 | API: `strong_api.compare` (start, read, use, add line, dismiss), `purpose = role` filters, rate limit counting; worker: `latest_ready_gap` filter | `apps/api`, `apps/worker` | RC-1 to RC-8 |
 | 3 | Web: the compare panel on Add a target role and the role page, the role page summary, the hint actions | `apps/web` | RC-1 to RC-6, RC-8 |
 
