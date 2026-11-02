@@ -68,11 +68,18 @@ describe("coach session", () => {
     server.events.on("request:start", async ({ request }) => {
       if (request.method === "POST" && request.url.endsWith("/coach/sessions")) started.push(await request.clone().json());
     });
-    renderAt("/coach/new?skill=conflict_handling&job=j1");
+    renderAt("/coach/new?skill=conflict_handling&job=j1&style=classic");
     expect(await screen.findByRole("heading", { level: 1, name: "Build a story" })).toBeInTheDocument();
     expect(screen.getByTestId("where").textContent).toMatch(/^\/coach\/[0-9a-f-]{36}$/);
     expect(started).toEqual([
-      { style: "gentle", channel: "text", story_id: null, target_skill: "conflict_handling", job_target_id: "j1" },
+      {
+        style: "gentle",
+        channel: "text",
+        story_id: null,
+        target_skill: "conflict_handling",
+        job_target_id: "j1",
+        story_style: null,
+      },
     ]);
     const turns = screen.getAllByTestId("coach-turn");
     expect(turns).toHaveLength(1);
@@ -91,7 +98,7 @@ describe("coach session", () => {
     const read = await resumesApi.get(resume.id);
     const line = read.resume?.roles[0]?.achievements[0] ?? "";
     expect(line).not.toBe("");
-    renderAt(`/coach/new?resume=${resume.id}&idea=${encodeURIComponent("roles[0].achievements[0]")}`);
+    renderAt(`/coach/new?style=classic&resume=${resume.id}&idea=${encodeURIComponent("roles[0].achievements[0]")}`);
     const turns = await screen.findAllByTestId("coach-turn");
     expect(turns[0]).toHaveTextContent(`Let's turn this resume line into a story: "${line}".`);
     expect(parts().context).toBe("done");
@@ -109,7 +116,7 @@ describe("coach session", () => {
     scriptMockCoach([
       { parts: { context: "The platform team wanted us to wait a quarter." }, message: "Why did it matter?", skills: ["conflict_handling", "collaboration"] },
     ]);
-    renderAt("/coach/new");
+    renderAt("/coach/new?style=classic");
     await screen.findByRole("heading", { level: 1, name: "Build a story" });
 
     await user.type(screen.getByRole("textbox", { name: "Your reply" }), "The platform team wanted us to wait a quarter.");
@@ -132,7 +139,7 @@ describe("coach session", () => {
     server.events.on("request:start", async ({ request }) => {
       if (request.url.endsWith("/style")) styles.push(await request.clone().json());
     });
-    renderAt("/coach/new");
+    renderAt("/coach/new?style=classic");
     const group = await screen.findByRole("group", { name: "Coaching style" });
     expect(within(group).getByRole("button", { name: "Gentle" })).toHaveAttribute("aria-pressed", "true");
     await user.click(within(group).getByRole("button", { name: "Direct" }));
@@ -142,7 +149,7 @@ describe("coach session", () => {
 
   it("CO-2: Save and exit saves the story's name, ends the session and opens the studio", async () => {
     const user = userEvent.setup();
-    renderAt("/coach/new");
+    renderAt("/coach/new?style=classic");
     await screen.findByRole("heading", { level: 1, name: "Build a story" });
     await user.type(screen.getByRole("textbox", { name: "Your reply" }), "We were losing checkouts every week.");
     await user.click(screen.getByRole("button", { name: "Send" }));
@@ -165,7 +172,7 @@ describe("coach session", () => {
 
   it("CO-2: Save and exit on a new story with nothing in it drops the story and returns to the library", async () => {
     const user = userEvent.setup();
-    renderAt("/coach/new");
+    renderAt("/coach/new?style=classic");
     await screen.findByRole("heading", { level: 1, name: "Build a story" });
     expect(mockStoryLibrary()).toHaveLength(3);
     await user.click(screen.getByRole("button", { name: "Save and exit" }));
@@ -183,7 +190,7 @@ describe("coach session", () => {
       ),
     );
     const user = userEvent.setup();
-    renderAt("/coach/new");
+    renderAt("/coach/new?style=classic");
     await user.click(await screen.findByRole("button", { name: "Talk to the coach" }));
     expect(await screen.findByText(/paused|unavailable/i)).toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: "Your reply" })).toBeEnabled();
@@ -191,7 +198,7 @@ describe("coach session", () => {
 
   it("CO-6: the mic joins the coach's voice room and the coach speaks", async () => {
     const user = userEvent.setup();
-    renderAt("/coach/new");
+    renderAt("/coach/new?style=classic");
     await user.click(await screen.findByRole("button", { name: "Talk to the coach" }));
     expect(await screen.findByText(/Tell me about one time you led a hard change/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Stop talking to the coach" })).toBeEnabled();
@@ -200,7 +207,7 @@ describe("coach session", () => {
   it("CO-2: a session that ended says so and takes no more turns", async () => {
     scriptMockCoach([{ message: "I'm going to end the session here.", parts: {}, ended: true }]);
     const user = userEvent.setup();
-    renderAt("/coach/new");
+    renderAt("/coach/new?style=classic");
     await screen.findByRole("heading", { level: 1, name: "Build a story" });
     await user.type(screen.getByRole("textbox", { name: "Your reply" }), "Something off topic.");
     await user.click(screen.getByRole("button", { name: "Send" }));
@@ -223,7 +230,7 @@ describe("voice-first coach (canvas A1)", () => {
 
   it("CO-6: with voice open and a microphone, the page leads with a big mic and Type instead", async () => {
     const user = userEvent.setup();
-    renderAt("/coach/new");
+    renderAt("/coach/new?style=classic");
     expect(await screen.findByRole("button", { name: "Type instead" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Talk to the coach" })).toBeInTheDocument();
     expect(screen.getByText("Tap to talk")).toBeInTheDocument();
@@ -236,7 +243,7 @@ describe("voice-first coach (canvas A1)", () => {
   });
 
   it("CO-6: the mic on Home (?voice=1) starts talking at once", async () => {
-    renderAt("/coach/new?voice=1");
+    renderAt("/coach/new?style=classic&voice=1");
     expect(await screen.findByRole("button", { name: "Stop talking to the coach" })).toBeInTheDocument();
     expect(await screen.findByText(/Tell me about one time you led a hard change/)).toBeInTheDocument();
   });
@@ -264,7 +271,7 @@ describe("coach session details (canvas A1)", () => {
   });
 
   it("CO-2: a question asked on Home is the first message", async () => {
-    renderAt("/coach/new?ask=Which%20story%20for%20leadership%3F");
+    renderAt("/coach/new?style=classic&ask=Which%20story%20for%20leadership%3F");
     const turns = await screen.findAllByTestId("coach-turn");
     await expect.poll(() => turns[0].ownerDocument.body.textContent).toContain("Which story for leadership?");
   });

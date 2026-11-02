@@ -269,6 +269,8 @@ test("build a story: craft with Strova; write it yourself, review, accept an edi
 
   // Craft with Strova: answer in your own words, then save and open the story.
   await page.getByRole("link", { name: /Craft with Strova/ }).first().click();
+  // SC-1: a new story starts with the STAR or CARL choice; take Strova's suggestion.
+  await page.getByRole("button", { name: "Start crafting" }).click();
   const typeInstead = page.getByRole("button", { name: "Type instead" });
   const reply = page.getByLabel("Your reply");
   await expect(typeInstead.or(reply)).toBeVisible({ timeout: 15_000 });

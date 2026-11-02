@@ -332,3 +332,308 @@
   margin: 0;
   font-size: 1.0625rem;
 }
+
+/* --- SC-1, SC-7, SC-17: crafting a styled story -------------------------------------------- */
+
+/* The start screen: STAR or CARL, with Strova's suggestion preselected. */
+.coach-start {
+  max-width: 760px;
+}
+
+.coach-start__head {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.coach-start__head h1 {
+  margin: 4px 0 8px;
+}
+
+.coach-start__styles {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.coach-start__legend {
+  font-weight: 700;
+  padding: 0;
+}
+
+.coach-start__options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.coach-style {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 10px;
+  align-items: start;
+  border: 1px solid var(--sh-line-strong);
+  border-radius: var(--sh-radius);
+  padding: 14px 16px;
+  cursor: pointer;
+  background: var(--sh-surface);
+}
+
+.coach-style input {
+  grid-row: 1 / span 3;
+  margin-top: 4px;
+  accent-color: var(--sh-violet);
+}
+
+.coach-style[data-checked] {
+  border-color: var(--sh-violet);
+  box-shadow: 0 0 0 1px var(--sh-violet);
+  background: var(--sh-violet-soft);
+}
+
+.coach-style:focus-within {
+  outline: 2px solid var(--sh-violet);
+  outline-offset: 2px;
+}
+
+.coach-style__name {
+  font-weight: 700;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.coach-style__tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--sh-violet-ink);
+  border: 1px solid var(--sh-violet);
+  border-radius: var(--sh-radius-pill);
+  padding: 0 8px;
+}
+
+.coach-style__sections {
+  font-size: 0.875rem;
+}
+
+.coach-start__actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* The session: the conversation gets the wide column; the outline sits beside it, then below. */
+.coach__body--craft .coach__chat {
+  flex: 1.7 1 560px;
+}
+
+.coach__body--craft .coach__side {
+  flex: 1 1 340px;
+}
+
+.craft-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.craft-panel__style {
+  margin: 0;
+}
+
+.craft-panel__sections {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.craft-panel__sections > li + li {
+  margin-top: 0;
+}
+
+.craft-section {
+  border: 1px solid var(--sh-line);
+  border-radius: var(--sh-radius-sm);
+  padding: 10px 12px;
+}
+
+.craft-section[data-current] {
+  border-color: var(--sh-violet);
+  background: var(--sh-violet-soft);
+}
+
+.craft-section__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.9375rem;
+  margin: 0 0 8px;
+}
+
+.craft-section__state {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--sh-muted);
+}
+
+.craft-section[data-current] .craft-section__state {
+  color: var(--sh-violet-ink);
+}
+
+.craft-section__slots {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.craft-section__slots > li + li {
+  margin-top: 0;
+}
+
+.craft-section__more {
+  margin: 8px 0 0;
+}
+
+.craft-slot {
+  border-left: 3px solid var(--sh-line-strong);
+  padding: 2px 0 2px 10px;
+}
+
+.craft-slot[data-state="filled"] {
+  border-left-color: var(--sh-violet);
+}
+
+.craft-slot[data-state="empty"] {
+  border-left-style: dashed;
+}
+
+.craft-slot[data-state="skipped"] {
+  border-left-style: dotted;
+  color: var(--sh-muted);
+}
+
+.craft-slot[data-asking] {
+  border-left: 3px solid var(--sh-violet-ink);
+}
+
+.craft-slot p {
+  margin: 0;
+}
+
+.craft-slot__label {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 8px;
+  font-size: 0.8125rem;
+}
+
+.craft-slot__name {
+  font-weight: 700;
+}
+
+.craft-slot__state {
+  color: var(--sh-muted);
+}
+
+.craft-slot[data-asking] .craft-slot__state {
+  color: var(--sh-violet-ink);
+  font-weight: 700;
+}
+
+.craft-slot__text {
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* The reply box grows with the text (up to half the screen, set in ReplyBox), then scrolls. */
+.craft-reply {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid var(--sh-line);
+  padding-top: 16px;
+}
+
+.craft-reply__quick {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.craft-reply__box {
+  width: 100%;
+  min-height: 84px;
+  resize: vertical;
+  font: inherit;
+  line-height: 1.5;
+}
+
+.craft-reply__bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.craft-reply__bar .coach__mic {
+  margin-right: auto;
+}
+
+/* Expand: a full-width writing view over the page; Esc returns. */
+.craft-expand {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--sh-ground);
+  display: flex;
+  justify-content: center;
+  padding: 24px 16px;
+  overflow: auto;
+}
+
+.craft-expand__inner {
+  width: min(1100px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.craft-expand__title {
+  margin: 0;
+}
+
+.craft-expand__box {
+  flex: 1;
+  min-height: 50vh;
+  width: 100%;
+  font: inherit;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  padding: 16px;
+}
+
+.craft-expand__bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.craft-expand__bar .muted {
+  margin-right: auto;
+}
+
+@media (max-width: 640px) {
+  .coach-start__head {
+    flex-direction: column;
+  }
+}
