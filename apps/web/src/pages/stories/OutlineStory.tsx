@@ -10,9 +10,10 @@
  * - OrganizeBanner (SC-13): a classic story's one click into STAR, previewed first.
  */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router";
 
+import { Markdown, markdownKeys, MarkdownToolbar } from "../../components/markdown/markdown";
 import { Strova } from "../../components/strova";
 import { ErrorNotice } from "../../components/ui";
 import {
@@ -84,6 +85,9 @@ function SlotRow({
       setDraft(null);
     },
   });
+  const area = useRef<HTMLTextAreaElement>(null);
+  const setText = (text: string) => setDraft((d) => (d ? { ...d, text } : d));
+  const keys = markdownKeys(setText);
   const { slot, key } = view;
   const metric = key === "metric";
   const required = CORE_SLOTS.has(key);
@@ -108,14 +112,18 @@ function SlotRow({
           <label htmlFor={id} className="outline-slot__name">
             {name}
           </label>
+          <MarkdownToolbar target={area} onChange={setText} label={`Format ${name}`} />
           <textarea
             id={id}
+            ref={area}
             value={draft.text}
             rows={3}
             maxLength={8000}
             autoFocus
             onChange={(e) => setDraft({ ...draft, text: e.target.value })}
+            onPaste={keys.onPaste}
             onKeyDown={(e) => {
+              if (keys.onKeyDown(e)) return;
               if (e.key === "Escape") setDraft(null);
             }}
           />
@@ -192,7 +200,7 @@ function SlotRow({
           </button>
         )}
       </div>
-      {filled && <p className="outline-slot__text">{slot.text}</p>}
+      {filled && <Markdown className="outline-slot__text" text={slot.text ?? ""} />}
       {filled && metric && <MetricLine slot={slot} />}
     </li>
   );

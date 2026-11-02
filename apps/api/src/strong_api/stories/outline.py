@@ -9,8 +9,8 @@ story fit, debrief notes, suggestions and versions keep reading the same five co
 
 from __future__ import annotations
 
-import re
-
+from strong_api.markdown import SENTENCE_END
+from strong_api.markdown import strip_markdown as strip_markdown  # re-exported for the routers
 from strong_core.db.models import Story as StoryRow
 from strong_core.schemas import (
     METRIC_SLOT,
@@ -49,25 +49,10 @@ LEGACY_MAP: dict[StoryPart, tuple[tuple[tuple[StorySection, ...], str], ...]] = 
     ),
 }
 
-_EMPHASIS = re.compile(r"(\*\*|__)(.+?)\1|(?<![\w*])([*_])(?!\s)(.+?)(?<!\s)\3(?![\w*])")
-_LIST_MARK = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+", re.MULTILINE)
-_END = (".", "!", "?", "…", ":")
-
-
-def strip_markdown(text: str) -> str:
-    """D-14, SC-18: plain text for speech, scoring, word counts and quotes. Bold, italic and list
-    markers go; the line breaks become spaces."""
-    text = _LIST_MARK.sub("", text)
-    previous = None
-    while previous != text:  # nested emphasis, for example ***both***
-        previous = text
-        text = _EMPHASIS.sub(lambda m: m.group(2) or m.group(4), text)
-    return " ".join(text.split())
-
 
 def _sentence(text: str) -> str:
     text = strip_markdown(text)
-    return text if not text or text.endswith(_END) else f"{text}."
+    return text if not text or text.endswith(SENTENCE_END) else f"{text}."
 
 
 def _section(outline: StoryOutline, keys: tuple[StorySection, ...]) -> OutlineSection | None:

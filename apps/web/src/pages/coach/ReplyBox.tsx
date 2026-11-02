@@ -2,8 +2,11 @@
  * SC-17 (UI, RMAP-7): the reply box of a crafting session. It grows with the text up to about
  * half the screen, then scrolls; Expand opens a full-width writing view, and Esc returns. "Skip
  * this" and "Move on" are quick replies (SC-5). Enter sends and Shift+Enter adds a line.
+ * SC-18: a toolbar and Ctrl+B / Ctrl+I format the reply in light Markdown.
  */
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+
+import { markdownKeys, MarkdownToolbar } from "../../components/markdown/markdown";
 
 export const REPLY_MAX_CHARS = 4000;
 export const QUICK_REPLIES = [
@@ -47,8 +50,11 @@ export function ReplyBox({
   const expandButton = useRef<HTMLButtonElement>(null);
   const [expanded, setExpanded] = useState(false);
   useGrow(box, value, halfScreen);
+  const boxKeys = markdownKeys(onChange);
+  const bigKeys = markdownKeys(onChange);
 
   const onKey = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (boxKeys.onKeyDown(e)) return;
     if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
       e.preventDefault();
       if (value.trim() && !busy) onSend();
@@ -82,6 +88,7 @@ export function ReplyBox({
           ))}
         </div>
       )}
+      <MarkdownToolbar target={box} onChange={onChange} />
       <label htmlFor="coach-reply" className="visually-hidden">
         Your reply
       </label>
@@ -95,6 +102,7 @@ export function ReplyBox({
         placeholder="Type your answer. Shift+Enter adds a line."
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={onKey}
+        onPaste={boxKeys.onPaste}
       />
       <div className="craft-reply__bar">
         {children}
@@ -128,6 +136,7 @@ export function ReplyBox({
             <h2 id="craft-expand-title" className="craft-expand__title">
               Write your reply
             </h2>
+            <MarkdownToolbar target={big} onChange={onChange} />
             <label htmlFor="coach-reply-expanded" className="visually-hidden">
               Your reply
             </label>
@@ -138,7 +147,9 @@ export function ReplyBox({
               value={value}
               maxLength={REPLY_MAX_CHARS}
               onChange={(e) => onChange(e.target.value)}
+              onPaste={bigKeys.onPaste}
               onKeyDown={(e) => {
+                if (bigKeys.onKeyDown(e)) return;
                 if (e.key === "Enter" && (e.ctrlKey || e.metaKey) && value.trim() && !busy) {
                   e.preventDefault();
                   close();
