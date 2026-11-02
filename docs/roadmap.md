@@ -15,7 +15,8 @@ Fields: **Area** (api, worker, voice, web, core, prompts, infra), **Priority** (
 | RMAP-4 | Call it the "default" resume, not the "main" one | web | Now | Done |
 | RMAP-5 | Deleting a resume that a target role uses | web | Now | Done |
 | RMAP-6 | Waitlist: a confirmed address that joins again gets no email | api | Now | Done |
-| RMAP-7 | Story crafting with Strova: more room to type, and formatting | web, prompts | Next | Idea |
+| RMAP-7 | Story crafting with Strova: more room to type, and formatting | web, prompts | Now | Planned (in RMAP-8) |
+| RMAP-8 | Deep story crafting: STAR and CARL, organized slots, depth, flow check, improve | core, api, prompts, web | Now | Planned |
 
 ## RMAP-1: Filter Rehearsals by target role
 
@@ -249,4 +250,24 @@ pasting them in.
 - Open questions:
   - Should Strova's own replies use formatting too?
   - Is formatting needed in the coach chat, or only in the story editor?
+
+## RMAP-8: Deep story crafting
+
+**Recorded:** 2026-11-02
+
+**What:** Strova gives stories more depth and an organized shape:
+
+- (A) two writing styles, STAR (with Learning) and CARL;
+- (B) context that goes deeper;
+- a coherent flow;
+- skill hints;
+- a story organized into sections and slots instead of free text;
+- inline editing, plus asking Strova to improve a section.
+
+**Design:** `docs/story-crafting-spec.md`, with decisions D-1 to D-14 and requirements SC-1 to
+SC-18, agreed with the owner on 2026-11-02. RMAP-7 (room to type, formatting) is folded in as
+SC-17 and SC-18.
+
+**Delivery:** six PRs in order: core, API engine, web session, story page, flow check and skill
+hints, then formatting, evals and voice.
 
