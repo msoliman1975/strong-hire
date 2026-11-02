@@ -124,25 +124,28 @@ details[open] summary{margin-bottom:6px}
   <div class="sub">Agents architecture guide</div>
   <div class="grp">Big picture</div>
   <a href="#overview">1. Overview and system map</a>
-  <a href="#roster">2. Agent roster</a>
+  <a href="#roster">2. Roster: agents and non-agents</a>
   <a href="#lifecycle">3. End-to-end lifecycle</a>
   <div class="grp">Foundations</div>
   <a href="#gateway">4. Model gateway and prompts</a>
   <div class="grp">The agents</div>
-  <a href="#interviewer">5. Interviewer agent</a>
-  <a href="#voice">6. Voice pipeline</a>
-  <a href="#planner">7. Extractor and planner</a>
-  <a href="#scorer">8. Scorer agent</a>
-  <a href="#coach">9. Coach agent and suggestions</a>
+  <a href="#extractor">5. A1 Extractor</a>
+  <a href="#planner">6. A2 Planner</a>
+  <a href="#interviewer">7. A3 Interviewer</a>
+  <a href="#scorer">8. A4 Scorer</a>
+  <a href="#coach">9. A5 Coach</a>
+  <a href="#evals">10. A6 AI candidate, A7 Judge</a>
+  <div class="grp">Non-agent components</div>
+  <a href="#nonagents">11. Harness, pipelines, services</a>
+  <a href="#voice">12. Voice pipeline (STT/TTS)</a>
   <div class="grp">Cross-cutting</div>
-  <a href="#memory">10. Memory management</a>
-  <a href="#guardrails">11. Guardrails and safety</a>
-  <a href="#tracing">12. Tracing and monitoring</a>
-  <a href="#evals">13. Evals and the AI candidate</a>
+  <a href="#memory">13. Memory management</a>
+  <a href="#guardrails">14. Guardrails and safety</a>
+  <a href="#tracing">15. Tracing and monitoring</a>
   <div class="grp">Reference</div>
-  <a href="#qa">14. Q&amp;A cheat sheet</a>
-  <a href="#gaps">15. Known gaps</a>
-  <a href="#files">16. File map</a>
+  <a href="#qa">16. Q&amp;A cheat sheet</a>
+  <a href="#gaps">17. Known gaps</a>
+  <a href="#files">18. File map</a>
   <button class="btn theme-toggle" id="themeBtn" type="button">Toggle light/dark</button>
 </nav>
 
@@ -248,23 +251,37 @@ details[open] summary{margin-bottom:6px}
 
 <!-- =============================================================== ROSTER -->
 <section id="roster">
-  <h2>2. Agent roster</h2>
-  <p class="lead">"Agent" here means a <b>gateway role plus the code loop around it</b>. Some important "agents" have no model at all. They are deterministic components that steer the models.</p>
-  <div class="legend"><span style="--c:var(--accent)">LLM role (product)</span><span style="--c:var(--accent2)">Deterministic component</span><span style="--c:var(--violet)">Test-only LLM role</span></div>
+  <h2>2. Roster: agents and non-agent components</h2>
+  <p class="lead">An <b>agent</b> here is one gateway role plus its agent harness (the code loop around the model). The system has <b>7 agents</b>, numbered A1–A7 throughout this guide. Several other important parts are <b>not agents</b>: they make no model decisions of their own, or they are plain model services. Those are listed separately in the second table and covered in section 11.</p>
+  <h3>Agents</h3>
+  <div class="legend"><span style="--c:var(--accent)">Product agent</span><span style="--c:var(--violet)">Test-only agent</span></div>
   <div class="tbl-wrap">
   <table>
-    <thead><tr><th>Agent</th><th>Kind</th><th>Where it runs</th><th>What it does</th><th>Main outputs (contracts)</th></tr></thead>
+    <thead><tr><th>#</th><th>Agent</th><th>Gateway role</th><th>Where it runs</th><th>What it does</th><th>Main outputs (contracts)</th><th>Section</th></tr></thead>
     <tbody>
-      <tr><td><b>Extractor</b></td><td><span class="pill llm">role: extractor</span></td><td>Worker, plus the API for custom checks</td><td>Checks that the input is a job posting or a resume, parses it, builds the auto-profile, finds story-idea skills, checks custom questions</td><td><code>InputCheck</code>, <code>JobPosting</code>, <code>Resume</code>, <code>AutoProfileSummary</code>, <code>StoryIdeas</code>, <code>CustomQuestionCheck</code></td></tr>
-      <tr><td><b>Planner</b></td><td><span class="pill llm">role: planner</span></td><td>Worker</td><td>Gap analysis (resume vs job), the interviewer brief, the role-play buyer brief, story fit</td><td><code>GapAssessment</code>, <code>BriefDraft</code> → <code>InterviewerBrief</code>, <code>RolePlayDraft</code>, <code>StoryFit</code></td></tr>
-      <tr><td><b>Interviewer</b></td><td><span class="pill llm">role: interviewer</span></td><td>Voice agent, or the API text channel</td><td>Says each move (<code>say</code>), decides probe or move on (<code>decide</code>), checks conduct (<code>check_answer</code>)</td><td>Spoken text, <code>ProbeDecision</code>, <code>AnswerCheck</code></td></tr>
-      <tr><td><b>Session controller</b></td><td><span class="pill code">code</span></td><td>Inside the interview runner</td><td>State machine, clock, probe limits, curveball, must-ask questions, conduct strikes</td><td><code>Move</code> with <code>Why</code> reasons</td></tr>
-      <tr><td><b>Output guard</b> and <b>conduct screen</b></td><td><span class="pill code">code</span></td><td>Inside the interview runner</td><td>Removes meta talk and feedback, fixes the stated duration, catches repeats, screens for abuse</td><td><code>GuardResult</code>, fixed lines</td></tr>
-      <tr><td><b>Scorer</b></td><td><span class="pill llm">role: scorer</span></td><td>Worker</td><td>Rubric scores with quotes, re-quote, rationale, story match, take scoring</td><td><code>ScorerOutput</code> → <code>Scorecard</code>, plain-text rationale</td></tr>
-      <tr><td><b>Coach</b> (Strova story coach)</td><td><span class="pill llm">role: coach</span></td><td>API (text), plus voice relaying to the API</td><td>Builds STAR-style stories with the candidate, checks conduct, writes suggestions and story versions</td><td><code>CoachReply</code>, <code>StoryVersions</code>, suggestion payloads</td></tr>
-      <tr><td><b>STT / TTS</b></td><td><span class="pill llm">roles: stt, tts</span></td><td>Voice agent</td><td>Speech in and out through the gateway's OpenAI-compatible audio endpoints</td><td>Text, PCM/WAV</td></tr>
-      <tr><td><b>AI candidate</b></td><td><span class="pill test">role: candidate</span></td><td><code>apps/sim</code>, evals</td><td>Plays a job seeker with a persona, a quality level and a behavior</td><td>Spoken or typed replies</td></tr>
-      <tr><td><b>Judge</b></td><td><span class="pill test">role: judge</span></td><td><code>apps/sim</code>, evals</td><td>Grades the interviewer (or the coach) against fixed rules</td><td><code>JudgeVerdict</code></td></tr>
+      <tr><td><b>A1</b></td><td><b>Extractor</b></td><td><span class="pill llm">extractor</span></td><td>Worker, plus the API for custom checks</td><td>Checks that the input is a job posting or a resume, parses it, builds the auto-profile, finds story-idea skills, checks custom questions</td><td><code>InputCheck</code>, <code>JobPosting</code>, <code>Resume</code>, <code>AutoProfileSummary</code>, <code>StoryIdeas</code>, <code>CustomQuestionCheck</code></td><td><a href="#extractor">5</a></td></tr>
+      <tr><td><b>A2</b></td><td><b>Planner</b></td><td><span class="pill llm">planner</span></td><td>Worker</td><td>Gap analysis (resume vs job), the interviewer brief, the role-play buyer brief, story fit</td><td><code>GapAssessment</code>, <code>BriefDraft</code> → <code>InterviewerBrief</code>, <code>RolePlayDraft</code>, <code>StoryFit</code></td><td><a href="#planner">6</a></td></tr>
+      <tr><td><b>A3</b></td><td><b>Interviewer</b></td><td><span class="pill llm">interviewer</span></td><td>Voice agent, or the API text channel</td><td>Says each move (<code>say</code>), decides probe or move on (<code>decide</code>), checks conduct (<code>check_answer</code>)</td><td>Spoken text, <code>ProbeDecision</code>, <code>AnswerCheck</code></td><td><a href="#interviewer">7</a></td></tr>
+      <tr><td><b>A4</b></td><td><b>Scorer</b></td><td><span class="pill llm">scorer</span></td><td>Worker</td><td>Rubric scores with quotes, re-quote, rationale, story match, take scoring</td><td><code>ScorerOutput</code> → <code>Scorecard</code>, plain-text rationale</td><td><a href="#scorer">8</a></td></tr>
+      <tr><td><b>A5</b></td><td><b>Coach</b> (Strova story coach)</td><td><span class="pill llm">coach</span></td><td>API (text), plus voice relaying to the API; worker for suggestions</td><td>Builds STAR-style stories with the candidate, checks conduct, writes suggestions and story versions</td><td><code>CoachReply</code>, <code>StoryVersions</code>, suggestion payloads</td><td><a href="#coach">9</a></td></tr>
+      <tr><td><b>A6</b></td><td><b>AI candidate</b></td><td><span class="pill test">candidate</span></td><td><code>apps/sim</code>, evals</td><td>Plays a job seeker with a persona, a quality level and a behavior</td><td>Spoken or typed replies</td><td><a href="#evals">10</a></td></tr>
+      <tr><td><b>A7</b></td><td><b>Judge</b></td><td><span class="pill test">judge</span></td><td><code>apps/sim</code>, evals</td><td>Grades the interviewer (or the coach) against fixed rules</td><td><code>JudgeVerdict</code></td><td><a href="#evals">10</a></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <h3>Non-agent components</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Component</th><th>Type</th><th>Why it is not an agent</th><th>Section</th></tr></thead>
+    <tbody>
+      <tr><td><b>Session controller</b></td><td><span class="pill code">harness (A3)</span></td><td>Pure code. It decides phases, the clock and probe limits for A3, but makes no model call.</td><td><a href="#nonagents">11</a>, <a href="#interviewer">7.1–7.3</a></td></tr>
+      <tr><td><b>Output guard</b> and <b>conduct screen</b></td><td><span class="pill code">harness (A3, A5)</span></td><td>Deterministic regex rules and fixed lines around the model's output</td><td><a href="#nonagents">11</a>, <a href="#guardrails">14</a></td></tr>
+      <tr><td><b>Speech services (STT / TTS)</b></td><td><span class="pill code">model service</span></td><td>Gateway roles, but plain conversions (audio to text, text to audio) with no prompt, loop or decision</td><td><a href="#voice">12</a></td></tr>
+      <tr><td><b>Voice pipeline</b></td><td><span class="pill code">transport</span></td><td>LiveKit VAD, turn detection and barge-in. It carries A3 and A5 over audio.</td><td><a href="#voice">12</a></td></tr>
+      <tr><td><b>Background job pipeline</b> (Arq worker)</td><td><span class="pill code">orchestration</span></td><td>Queues and chains the agents' jobs (extract → gap → brief → score → suggestions)</td><td><a href="#nonagents">11</a>, <a href="#lifecycle">3</a></td></tr>
+      <tr><td><b>Model gateway</b></td><td><span class="pill code">infrastructure</span></td><td>Routes every model call by role; no decisions of its own</td><td><a href="#gateway">4</a></td></tr>
+      <tr><td><b>Ops and observability pipeline</b></td><td><span class="pill code">infrastructure</span></td><td>Traces, usage, errors, samples and alerts</td><td><a href="#tracing">15</a></td></tr>
+      <tr><td><b>Eval harness</b></td><td><span class="pill test">test driver</span></td><td>Runs the agents against scripted or simulated candidates and computes gated metrics</td><td><a href="#evals">10</a></td></tr>
     </tbody>
   </table>
   </div>
@@ -349,9 +366,59 @@ details[open] summary{margin-bottom:6px}
   <p>If nothing matches, <code>FakeFixtureMissingError</code> names the file to add. <code>RecordingGateway</code> (<code>gateway/recorder.py</code>) wraps a real gateway and saves every call as a replayable fixture.</p>
 </section>
 
+<!-- =============================================================== EXTRACTOR -->
+<section id="extractor">
+  <h2>5. A1 · The extractor agent</h2>
+  <p class="lead">Runs before the interview, mostly in the Arq worker. Like A2, its harness follows one pattern: <b>sanitize the input → model call (up to 2 attempts) → pure-code assembly that caps, dedupes and verifies → persist</b>.</p>
+
+  <h3>Extractor jobs</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Job</th><th>Prompts</th><th>Contract</th><th>Code around the model</th><th>Persisted</th></tr></thead>
+    <tbody>
+      <tr><td>Input check (IN-6/7)</td><td><code>check_job_posting</code> / <code>check_resume</code> + <code>check_input</code></td><td><code>InputCheck</code></td><td>First 6000 characters. <b>Fails open</b>: a model error accepts the input. The refusal reason is cut to 200 characters and dropped if it looks like instructions.</td><td>Nothing. A refused CV file is never stored.</td></tr>
+      <tr><td><code>extract_job_target</code>, <code>parse_resume</code></td><td><code>job_posting</code> v3, <code>resume</code> v2 + inputs</td><td><code>JobPosting</code>, <code>Resume</code></td><td>2 attempts with semantic checks (no skills, bad dates). Injected items are dropped. Per-field confidence comes from grounding in the source text.</td><td><code>job_targets.parsed_json</code>, <code>resumes.parsed_json</code></td></tr>
+      <tr><td><code>build_auto_profile</code> (AP-1)</td><td><code>auto_profile</code></td><td><code>AutoProfileSummary</code></td><td>Fetches up to 3 pages from the company's own domain. Keeps only sources that were really fetched.</td><td><code>company_auto_profiles</code> (PENDING until an admin approves)</td></tr>
+      <tr><td><code>story_idea_skills</code> (RM-4)</td><td><code>story_idea_skills</code></td><td><code>StoryIdeas</code></td><td><code>missing_parts</code> is computed in code.</td><td><code>suggestions</code> (STORY_IDEA)</td></tr>
+      <tr><td>Custom question check (CU-5)</td><td><code>custom_question_check</code></td><td><code>CustomQuestionCheck</code></td><td>21 injection regexes first, then the model. Rate limited to 20 per minute and 300 per day.</td><td>Only accepted questions</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- =============================================================== PLANNER -->
+<section id="planner">
+  <h2>6. A2 · The planner agent</h2>
+  <p class="lead">Turns A1's parsed documents into a plan. Same harness pattern as A1: sanitize → model call (up to 2 attempts) → pure-code assembly → persist.</p>
+
+  <h3>Planner jobs</h3>
+  <div class="grid g2">
+    <div class="card">
+      <h4>Gap analysis (GA-1..3)</h4>
+      <p><b>In:</b> posting text, requirements <code>r1..rn</code> (up to 12 must-haves and 6 nice-to-haves), family competencies, a compact resume, user notes (1500 characters), company line.</p>
+      <p><b>Model:</b> <code>GapAssessment</code>, with each requirement rated 0–3 plus evidence.</p>
+      <p><b>Code:</b> unrated items count as 0. A rating of 2 or more without resume evidence is capped at 1. Strengths without evidence are dropped. <b>match = 0.7 × requirements + 0.3 × competencies</b>.</p>
+      <p><b>Out:</b> <code>gap_analyses</code> (score, breakdown, session plan, <code>model_version</code>).</p>
+    </div>
+    <div class="card">
+      <h4>Interviewer brief (on session create)</h4>
+      <p><b>In:</b> the latest ready gap analysis, the resume, the company profile version (or an approved auto-profile), family guidance, level bar, difficulty, tone, duration.</p>
+      <p><b>Model:</b> <code>BriefDraft</code> (6–12 questions + curveball), or <code>RolePlayDraft</code>.</p>
+      <p><b>Code:</b> repairs ids, forces every target competency to be covered, drops off-limits recruiter questions (salary history, protected traits), sets probes by difficulty, adds the curveball only on Tough, builds the time plan, trims to 1500 tokens. Tone comes from a parsed prompt file the planner never sees.</p>
+      <p><b>Out:</b> <code>sessions.brief_json</code>. 2 tries, then the session is FAILED.</p>
+    </div>
+    <div class="card">
+      <h4>Story fit (ST-5)</h4>
+      <p>Matches the user's stories (up to 30) to the job's tested skills: strong, thin or missing. Small tier makes one call per skill. The result is cached by an input hash in <code>role_story_fits</code>, and can be reused across roles with the same hash.</p>
+    </div>
+    <div class="card">
+      <h4>Profiles are not built by agents at runtime</h4>
+      <p>Curated company profiles are researched offline, reviewed, versioned and imported. No research runs inside the app or during an interview. Each session records the profile version it used, so scores stay explainable.</p>
+    </div>
+  </div>
+</section>
+
 <!-- =============================================================== INTERVIEWER -->
 <section id="interviewer">
-  <h2>5. The interviewer agent (deep dive)</h2>
+  <h2>7. A3 · The interviewer agent (deep dive)</h2>
   <p class="lead">The package <code>packages/interview</code> (<code>strong_interview</code>) holds three collaborating parts. The voice agent, the text channel and the eval harness all run this same code.</p>
   <div class="grid g3">
     <div class="card"><h4><code>SessionController</code></h4><p class="small">controller.py</p><p>A pure-code state machine. It decides the next <b>Move</b> (greet, ask, probe, curveball, warn, wrap up and so on) and records <b>why</b> (the <code>Why</code> enum) for the traces.</p></div>
@@ -359,7 +426,7 @@ details[open] summary{margin-bottom:6px}
     <div class="card"><h4><code>InterviewRunner</code></h4><p class="small">runner.py</p><p>Keeps the transcript, sequences each candidate turn, runs the checks in parallel, emits trace records, and recovers when a turn fails.</p></div>
   </div>
 
-  <h3>5.1 Conversation state machine</h3>
+  <h3>7.1 Conversation state machine</h3>
   <p>Click a phase for its rules. The dot shows a normal 30-minute session.</p>
   <div class="svgbox">
   <svg id="fsm" viewBox="0 0 1060 230" width="100%" role="img" aria-label="Interview phases">
@@ -384,13 +451,13 @@ details[open] summary{margin-bottom:6px}
   </div>
   <p class="small">The brief's <code>time_plan</code> overrides these defaults. CORE does not start a new question with less than 2 minutes left (<code>MIN_QUESTION_MS</code>). Lower-priority questions are dropped. The candidate may ask at most 3 questions.</p>
 
-  <h3>5.2 One candidate turn, step by step</h3>
+  <h3>7.2 One candidate turn, step by step</h3>
   <p>This sequence is <code>InterviewRunner.respond()</code> for an answer in CORE. Step through it or press Play.</p>
   <div class="controls"><button class="btn primary" data-seq="turn" data-act="play" type="button">▶ Play</button><button class="btn" data-seq="turn" data-act="prev" type="button">◀ Prev</button><button class="btn" data-seq="turn" data-act="next" type="button">Next ▶</button><button class="btn" data-seq="turn" data-act="reset" type="button">Reset</button><span class="small" id="seq-turn-pos"></span></div>
   <div class="svgbox"><svg id="seq-turn" width="100%"></svg></div>
   <div class="explain" id="seq-turn-explain"></div>
 
-  <h3>5.3 Probe-or-move-on: try the controller</h3>
+  <h3>7.3 Probe-or-move-on: try the controller</h3>
   <p>The model only <i>proposes</i> a probe (<code>ProbeDecision{action, missing[]}</code>). The controller decides whether to follow it. Pick settings, then click what the model says after each answer.</p>
   <div class="grid g2">
     <div class="card">
@@ -413,7 +480,7 @@ details[open] summary{margin-bottom:6px}
   </div>
   <p class="small">Rules reproduced from <code>SessionController.after_answer</code>: the limit is <code>min(brief.max_probes_per_question, PROBE_LIMIT[difficulty])</code>, capped at 1 for minis. A later probe must target a gap that has not been probed on this question yet. Otherwise the controller moves on with <code>same_gap_not_filled</code>. If <code>decide</code> fails, the interviewer moves on (<code>ProbeDecision(action="move_on")</code>).</p>
 
-  <h3>5.4 What the interviewer sees (its prompt)</h3>
+  <h3>7.4 What the interviewer sees (its prompt)</h3>
   <div class="grid g2">
     <div class="card">
       <h4>System: <code>interviewer/turn</code> (or a type variant)</h4>
@@ -438,7 +505,7 @@ Extra instruction: note_* or none</pre>
   </div>
   <div class="callout"><b>The brief is the interviewer's compressed knowledge.</b> The interviewer never sees the raw resume or posting. The planner condenses them into an <code>InterviewerBrief</code> of at most about 1500 tokens: 4–6 target competencies, 6–12 ranked questions with probe hints, probe areas, persona, time plan, curveball and seniority bar. This keeps the prompts short and the latency low.</div>
 
-  <h3>5.5 Special modes</h3>
+  <h3>7.5 Special modes</h3>
   <div class="grid g3">
     <div class="card"><h4>Coach mode (IV-8)</h4><p>The candidate can pause, ask for a hint (at most 2 per question) or redo a question. <code>CoachNotAllowedError</code> outside Coach mode.</p></div>
     <div class="card"><h4>Custom sessions (CU-4)</h4><p>Categories run in the candidate's order. Must-ask questions are guaranteed by the controller, never the model, using a time reserve. Verbatim questions: the model writes only a lead-in of 12 words or fewer, and the code appends the exact text.</p></div>
@@ -449,9 +516,131 @@ Extra instruction: note_* or none</pre>
   </div>
 </section>
 
+<!-- =============================================================== SCORER -->
+<section id="scorer">
+  <h2>8. A4 · The scorer agent</h2>
+  <p class="lead">The scorer is deliberately separate from the interviewer: it reads the whole transcript afterwards, like a debrief panel. The live model therefore never softens its judgment mid-conversation, and scoring can use a stronger, slower model.</p>
+  <div class="controls"><button class="btn primary" data-seq="score" data-act="play" type="button">▶ Play</button><button class="btn" data-seq="score" data-act="prev" type="button">◀ Prev</button><button class="btn" data-seq="score" data-act="next" type="button">Next ▶</button><button class="btn" data-seq="score" data-act="reset" type="button">Reset</button><span class="small" id="seq-score-pos"></span></div>
+  <div class="svgbox"><svg id="seq-score" width="100%"></svg></div>
+  <div class="explain" id="seq-score-explain"></div>
+
+  <h3>Hire signal calculator (computed in code, never by the model)</h3>
+  <p>Move the per-competency rubric averages. Weights stand in for a company profile's scoring weights.</p>
+  <div class="grid g2">
+    <div class="card" id="hsSliders"></div>
+    <div class="card">
+      <div class="small">Weighted average</div><div class="result" id="hsAvg">–</div>
+      <div class="small" style="margin-top:8px">Band from the average</div><div id="hsBand">–</div>
+      <div class="small" style="margin-top:8px">Final signal after hard rules</div><div class="result" id="hsSignal">–</div>
+      <div class="small" style="margin-top:8px" id="hsRules"></div>
+      <p class="small">Bands: ≥ 3.5 Strong Hire · ≥ 3.0 Hire · ≥ 2.6 Lean Hire · ≥ 2.0 Lean No Hire · else No Hire. Rules use each average rounded half up to a whole point. In company mode, <code>values_share</code> of the average comes from company-value scores.</p>
+    </div>
+  </div>
+
+  <h3>After the scorecard</h3>
+  <ul>
+    <li><b>Delivery metrics</b> (words per minute, fillers) come from voice timestamps. This is code, not a model.</li>
+    <li><b>Progress snapshots</b> (one per competency) are written only for Realistic sessions that are not minis.</li>
+    <li><b>Story match (ST-6)</b>: for each answer, which library story it used (<code>STORY: S3 | NONE</code>, <code>FIX: …</code>). A Realistic answer that scores 3 or more on a real-model profile makes the story <b>Proven</b> (ST-7).</li>
+    <li><b>Suggestions</b>: the coach role proposes story tunes and new stories (see section 9, A5).</li>
+    <li><b>Takes (CO-7)</b>: one telling of a story is scored by the same scorer with a synthetic one-question brief. The rationale is written in code.</li>
+  </ul>
+</section>
+
+<!-- =============================================================== COACH -->
+<section id="coach">
+  <h2>9. A5 · The coach agent and suggestions</h2>
+  <p class="lead">The coach helps the candidate build interview stories (context, stakes, action, result, reflection). Its defining rule is <b>CO-3: it may only record what the candidate actually said</b>. Every story update must quote the candidate's words.</p>
+  <div class="controls"><button class="btn primary" data-seq="coach" data-act="play" type="button">▶ Play</button><button class="btn" data-seq="coach" data-act="prev" type="button">◀ Prev</button><button class="btn" data-seq="coach" data-act="next" type="button">Next ▶</button><button class="btn" data-seq="coach" data-act="reset" type="button">Reset</button><span class="small" id="seq-coach-pos"></span></div>
+  <div class="svgbox"><svg id="seq-coach" width="100%"></svg></div>
+  <div class="explain" id="seq-coach-explain"></div>
+
+  <div class="grid g2">
+    <div class="card">
+      <h4>What to ask next is chosen in code (CO-4)</h4>
+      <p>In order: concrete example (context) → stakes → own role (asked when the action says "we" but not "I") → measurable result (asked when there is no number) → trade-offs → reflection. The model is told which <b>one</b> thing to ask about.</p>
+    </div>
+    <div class="card">
+      <h4>Styles (CO-5)</h4>
+      <p><code>style_gentle</code> or <code>style_direct</code> is a section of the system prompt. Code also enforces it: a direct reply keeps only the question, and a gentle reply that praises ("a meaningful outcome") becomes "Thank you."</p>
+    </div>
+  </div>
+
+  <h3>Suggestion generators (coach role, worker)</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Kind</th><th>Trigger</th><th>Contract</th><th>Grounding check</th></tr></thead>
+    <tbody>
+      <tr><td>TUNE_STORY (SG-2)</td><td>After scoring, when an answer used a story and has a fix</td><td><code>StoryPartEdit</code></td><td rowspan="5">All use <code>_complete_checked</code>: up to 2 calls. On a problem, the second call adds a <code>suggest_fix</code> message listing the problems. Fact checks: each quote has 3+ words and is found in the user's words, every number appears in the quotes, and 50% or more of each sentence's content words appear in the quotes. A second miss stores nothing. Dismissed suggestions never come back (dedupe).</td></tr>
+      <tr><td>NEW_STORY (SG-3)</td><td>An answer used no story and scored 3 or more</td><td><code>NewStoryPayload</code></td></tr>
+      <tr><td>IMPROVE_RESUME_LINE (SG-6)</td><td>A story's result has a number and a matching resume line does not</td><td><code>ResumeLineEdit</code></td></tr>
+      <tr><td>REVIEW (ST-11)</td><td>The user asks for a story review</td><td><code>StoryReview</code></td></tr>
+      <tr><td>TAILOR_ROLE (SG-5)</td><td>After story fit, for up to 3 lead stories</td><td><code>TailorRolePayload</code></td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">MISSING_SKILL (SG-4) is rule-based and makes no model call. At most 6 model suggestions are made per session.</p>
+</section>
+
+<!-- =============================================================== EVALS -->
+<section id="evals">
+  <h2>10. A6 AI candidate and A7 Judge (test-only agents) and evals</h2>
+  <p class="lead">A6 and A7 never run in the product: they exist to test A3 and A5. They run inside two eval harnesses (non-agent test drivers). Keep the two harnesses apart when you explain them.</p>
+  <div class="grid g2">
+    <div class="card">
+      <h4>In-process eval harness (<code>evals/</code>)</h4>
+      <p><code>python -m strong_evals run --suite … --gate</code>. Calls the interviewer, planner, scorer and coach as library code. Profiles: fake, tiny, local, hosted, claude. <code>--record</code> saves fixtures.</p>
+      <ul>
+        <li><b>Gold set</b>: scripted transcripts with human labels (median of the raters)</li>
+        <li><b>Simulated candidates</b>: strong, average or weak</li>
+        <li>Reports in <code>evals/reports/*.html|json</code>, with the git sha, the role → alias map and the prompt refs</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Live AI-candidate sim (<code>apps/sim</code>, P13)</h4>
+      <p>Drives the <b>deployed</b> app over HTTPS or LiveKit as a real user would. The candidate uses a different provider from the interviewer on purpose. A judge model then grades the interviewer.</p>
+      <ul>
+        <li>Persona × quality × <b>behavior</b>: off_topic, prompt_injection, interrupts, drops_connection, argues, silent…</li>
+        <li>Budget isolated with its own LiteLLM key ($5/day), gated, started from the admin UI</li>
+        <li>Results saved in run folders (transcript, audio, judge, debrief, meta)</li>
+      </ul>
+    </div>
+  </div>
+  <h3>Gated metrics (<code>evals/config/thresholds.yaml</code>)</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Metric</th><th>Gate</th><th>What it protects</th></tr></thead>
+    <tbody>
+      <tr><td>scorer_within_one_band</td><td>≥ 0.85</td><td>Scorer agrees with the human hire signal</td></tr>
+      <tr><td>follow_up_rate</td><td>≥ 0.80</td><td>The interviewer probes vague answers</td></tr>
+      <tr><td>competency_coverage</td><td>≥ 0.80</td><td>The questions cover the target competencies</td></tr>
+      <tr><td>cost_per_session_usd</td><td>≤ 0.80</td><td>Unit economics</td></tr>
+      <tr><td>debrief_ready_s</td><td>≤ 60</td><td>Scoring speed (FB-3)</td></tr>
+      <tr><td>gap_score_spread / gap_fit_order</td><td>≤ 3 / ≥ 1.0</td><td>Gap analysis is stable and ordered sensibly</td></tr>
+      <tr><td>coach_invented_facts, suggestions_invented_facts</td><td>≤ 0</td><td>Grounding (CO-3)</td></tr>
+      <tr><td>coach_one_question / iv3_followup / judge_pass / style_distinct / versions_faithful</td><td>1.0 / 0.8 / 0.9 / 0.75 / 1.0</td><td>Coach behavior</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Judge rules (sim)</h3>
+  <p><code>probe_limit</code>, <code>phases</code>, <code>tone</code>, <code>no_coaching</code>, <code>injection</code>, <code>behavior_handling</code>, <code>no_repetition</code>, <code>stays_in_role</code>. Each rule gets pass, fail or not_applicable, plus a quoted reason. The sim report also checks <b>scorer order</b>: within comparable scenarios, a stronger candidate must not get a worse hire signal.</p>
+</section>
+
+<!-- =============================================================== NONAGENTS -->
+<section id="nonagents">
+  <h2>11. Non-agent components: harness, pipelines and services</h2>
+  <p class="lead">These parts make the agents work but are not agents themselves: they run no prompt-and-decide loop of their own. Most are the <b>agent harness</b>, which is the code around each model call.</p>
+  <div class="grid g2">
+    <div class="card"><h4>Session controller (harness of A3)</h4><p><code>strong_interview/controller.py</code>. A pure-code state machine: phases, the clock, the time plan, probe limits, the same-gap rule, the curveball, must-ask questions, conduct strikes. It turns A3's proposals (<code>ProbeDecision</code>) into <code>Move</code>s with <code>Why</code> reasons. Interactive walk-through in <a href="#interviewer">7.1–7.3</a>.</p></div>
+    <div class="card"><h4>Interview runner (harness of A3)</h4><p><code>strong_interview/runner.py</code>. Sequences each candidate turn, runs <code>decide</code> and <code>check_answer</code> in parallel, saves turns, emits traces, and restores a checkpoint when a turn fails. See <a href="#interviewer">7.2</a>.</p></div>
+    <div class="card"><h4>Output guard and conduct screen (harness of A3, A5)</h4><p><code>guard.py</code>, <code>conduct.py</code>. Regex rules strip meta talk and feedback, fix the stated duration and catch repeats. Abuse is screened with no model call. Warnings and closes are fixed lines. See <a href="#guardrails">14</a>.</p></div>
+    <div class="card"><h4>Grounding checkers (harness of A4, A5)</h4><p><code>QuoteChecker</code> (scorer quotes), <code>engine.backed()</code> (coach story updates) and <code>suggestions/facts.py</code>. They drop any output that is not backed by the candidate's own words. The hire signal is computed by <code>signal.py</code>, not by A4.</p></div>
+    <div class="card"><h4>Background job pipeline</h4><p>Arq on Redis (<code>apps/worker</code>). API routes enqueue jobs; jobs chain the agents: A1 extract → A2 gap analysis → A2 brief → (A3 live) → A4 score → A4 story match → A5 suggestions. It also runs crons with no model: alerts, the metrics sampler, reminders, retention. See <a href="#lifecycle">3</a>.</p></div>
+    <div class="card"><h4>Speech services and voice transport</h4><p>STT and TTS are gateway roles, but only conversions with no prompt or decision. LiveKit handles VAD, end-of-turn detection and barge-in, and carries A3 and A5 over audio. See <a href="#voice">12</a>.</p></div>
+    <div class="card"><h4>Model gateway</h4><p>Routes each call by role, validates structured output, and reports usage. See <a href="#gateway">4</a>.</p></div>
+    <div class="card"><h4>Ops and observability pipeline</h4><p>Trace sink, usage sink, error capture, heartbeats, sampler and alert engine. See <a href="#tracing">15</a>.</p></div>
+  </div>
+</section>
+
 <!-- =============================================================== VOICE -->
 <section id="voice">
-  <h2>6. Voice pipeline</h2>
+  <h2>12. Voice pipeline and speech services (non-agent)</h2>
   <p class="lead">The voice agent (<code>apps/voice</code>, LiveKit Agents) handles audio only. It uses LiveKit for VAD, end-of-turn detection and barge-in, but <b>suppresses LiveKit's own LLM reply</b> (<code>raise StopResponse</code>) and hands the text to the shared <code>InterviewRunner</code>.</p>
   <div class="svgbox">
   <svg viewBox="0 0 1060 210" width="100%" role="img" aria-label="Voice turn pipeline">
@@ -501,117 +690,9 @@ Extra instruction: note_* or none</pre>
   <p class="small">At the end, <code>VoiceInterview.finish</code> flushes the turns, saves <code>prompt_version</code>, flushes the traces (5 s limit), then POSTs <code>/internal/sessions/{id}/end</code>. The API bills the minutes and enqueues scoring.</p>
 </section>
 
-<!-- =============================================================== PLANNER / EXTRACTOR -->
-<section id="planner">
-  <h2>7. Extractor and planner agents</h2>
-  <p class="lead">These run before the interview, in the Arq worker. Each follows the same pattern: <b>sanitize the input → model call (up to 2 attempts) → pure-code assembly that caps, dedupes and verifies → persist</b>.</p>
-
-  <h3>Extractor jobs</h3>
-  <div class="tbl-wrap"><table>
-    <thead><tr><th>Job</th><th>Prompts</th><th>Contract</th><th>Code around the model</th><th>Persisted</th></tr></thead>
-    <tbody>
-      <tr><td>Input check (IN-6/7)</td><td><code>check_job_posting</code> / <code>check_resume</code> + <code>check_input</code></td><td><code>InputCheck</code></td><td>First 6000 characters. <b>Fails open</b>: a model error accepts the input. The refusal reason is cut to 200 characters and dropped if it looks like instructions.</td><td>Nothing. A refused CV file is never stored.</td></tr>
-      <tr><td><code>extract_job_target</code>, <code>parse_resume</code></td><td><code>job_posting</code> v3, <code>resume</code> v2 + inputs</td><td><code>JobPosting</code>, <code>Resume</code></td><td>2 attempts with semantic checks (no skills, bad dates). Injected items are dropped. Per-field confidence comes from grounding in the source text.</td><td><code>job_targets.parsed_json</code>, <code>resumes.parsed_json</code></td></tr>
-      <tr><td><code>build_auto_profile</code> (AP-1)</td><td><code>auto_profile</code></td><td><code>AutoProfileSummary</code></td><td>Fetches up to 3 pages from the company's own domain. Keeps only sources that were really fetched.</td><td><code>company_auto_profiles</code> (PENDING until an admin approves)</td></tr>
-      <tr><td><code>story_idea_skills</code> (RM-4)</td><td><code>story_idea_skills</code></td><td><code>StoryIdeas</code></td><td><code>missing_parts</code> is computed in code.</td><td><code>suggestions</code> (STORY_IDEA)</td></tr>
-      <tr><td>Custom question check (CU-5)</td><td><code>custom_question_check</code></td><td><code>CustomQuestionCheck</code></td><td>21 injection regexes first, then the model. Rate limited to 20 per minute and 300 per day.</td><td>Only accepted questions</td></tr>
-    </tbody>
-  </table></div>
-
-  <h3>Planner jobs</h3>
-  <div class="grid g2">
-    <div class="card">
-      <h4>Gap analysis (GA-1..3)</h4>
-      <p><b>In:</b> posting text, requirements <code>r1..rn</code> (up to 12 must-haves and 6 nice-to-haves), family competencies, a compact resume, user notes (1500 characters), company line.</p>
-      <p><b>Model:</b> <code>GapAssessment</code>, with each requirement rated 0–3 plus evidence.</p>
-      <p><b>Code:</b> unrated items count as 0. A rating of 2 or more without resume evidence is capped at 1. Strengths without evidence are dropped. <b>match = 0.7 × requirements + 0.3 × competencies</b>.</p>
-      <p><b>Out:</b> <code>gap_analyses</code> (score, breakdown, session plan, <code>model_version</code>).</p>
-    </div>
-    <div class="card">
-      <h4>Interviewer brief (on session create)</h4>
-      <p><b>In:</b> the latest ready gap analysis, the resume, the company profile version (or an approved auto-profile), family guidance, level bar, difficulty, tone, duration.</p>
-      <p><b>Model:</b> <code>BriefDraft</code> (6–12 questions + curveball), or <code>RolePlayDraft</code>.</p>
-      <p><b>Code:</b> repairs ids, forces every target competency to be covered, drops off-limits recruiter questions (salary history, protected traits), sets probes by difficulty, adds the curveball only on Tough, builds the time plan, trims to 1500 tokens. Tone comes from a parsed prompt file the planner never sees.</p>
-      <p><b>Out:</b> <code>sessions.brief_json</code>. 2 tries, then the session is FAILED.</p>
-    </div>
-    <div class="card">
-      <h4>Story fit (ST-5)</h4>
-      <p>Matches the user's stories (up to 30) to the job's tested skills: strong, thin or missing. Small tier makes one call per skill. The result is cached by an input hash in <code>role_story_fits</code>, and can be reused across roles with the same hash.</p>
-    </div>
-    <div class="card">
-      <h4>Profiles are not built by agents at runtime</h4>
-      <p>Curated company profiles are researched offline, reviewed, versioned and imported. No research runs inside the app or during an interview. Each session records the profile version it used, so scores stay explainable.</p>
-    </div>
-  </div>
-</section>
-
-<!-- =============================================================== SCORER -->
-<section id="scorer">
-  <h2>8. The scorer agent</h2>
-  <p class="lead">The scorer is deliberately separate from the interviewer: it reads the whole transcript afterwards, like a debrief panel. The live model therefore never softens its judgment mid-conversation, and scoring can use a stronger, slower model.</p>
-  <div class="controls"><button class="btn primary" data-seq="score" data-act="play" type="button">▶ Play</button><button class="btn" data-seq="score" data-act="prev" type="button">◀ Prev</button><button class="btn" data-seq="score" data-act="next" type="button">Next ▶</button><button class="btn" data-seq="score" data-act="reset" type="button">Reset</button><span class="small" id="seq-score-pos"></span></div>
-  <div class="svgbox"><svg id="seq-score" width="100%"></svg></div>
-  <div class="explain" id="seq-score-explain"></div>
-
-  <h3>Hire signal calculator (computed in code, never by the model)</h3>
-  <p>Move the per-competency rubric averages. Weights stand in for a company profile's scoring weights.</p>
-  <div class="grid g2">
-    <div class="card" id="hsSliders"></div>
-    <div class="card">
-      <div class="small">Weighted average</div><div class="result" id="hsAvg">–</div>
-      <div class="small" style="margin-top:8px">Band from the average</div><div id="hsBand">–</div>
-      <div class="small" style="margin-top:8px">Final signal after hard rules</div><div class="result" id="hsSignal">–</div>
-      <div class="small" style="margin-top:8px" id="hsRules"></div>
-      <p class="small">Bands: ≥ 3.5 Strong Hire · ≥ 3.0 Hire · ≥ 2.6 Lean Hire · ≥ 2.0 Lean No Hire · else No Hire. Rules use each average rounded half up to a whole point. In company mode, <code>values_share</code> of the average comes from company-value scores.</p>
-    </div>
-  </div>
-
-  <h3>After the scorecard</h3>
-  <ul>
-    <li><b>Delivery metrics</b> (words per minute, fillers) come from voice timestamps. This is code, not a model.</li>
-    <li><b>Progress snapshots</b> (one per competency) are written only for Realistic sessions that are not minis.</li>
-    <li><b>Story match (ST-6)</b>: for each answer, which library story it used (<code>STORY: S3 | NONE</code>, <code>FIX: …</code>). A Realistic answer that scores 3 or more on a real-model profile makes the story <b>Proven</b> (ST-7).</li>
-    <li><b>Suggestions</b>: the coach role proposes story tunes and new stories (see section 9).</li>
-    <li><b>Takes (CO-7)</b>: one telling of a story is scored by the same scorer with a synthetic one-question brief. The rationale is written in code.</li>
-  </ul>
-</section>
-
-<!-- =============================================================== COACH -->
-<section id="coach">
-  <h2>9. The coach agent and suggestions</h2>
-  <p class="lead">The coach helps the candidate build interview stories (context, stakes, action, result, reflection). Its defining rule is <b>CO-3: it may only record what the candidate actually said</b>. Every story update must quote the candidate's words.</p>
-  <div class="controls"><button class="btn primary" data-seq="coach" data-act="play" type="button">▶ Play</button><button class="btn" data-seq="coach" data-act="prev" type="button">◀ Prev</button><button class="btn" data-seq="coach" data-act="next" type="button">Next ▶</button><button class="btn" data-seq="coach" data-act="reset" type="button">Reset</button><span class="small" id="seq-coach-pos"></span></div>
-  <div class="svgbox"><svg id="seq-coach" width="100%"></svg></div>
-  <div class="explain" id="seq-coach-explain"></div>
-
-  <div class="grid g2">
-    <div class="card">
-      <h4>What to ask next is chosen in code (CO-4)</h4>
-      <p>In order: concrete example (context) → stakes → own role (asked when the action says "we" but not "I") → measurable result (asked when there is no number) → trade-offs → reflection. The model is told which <b>one</b> thing to ask about.</p>
-    </div>
-    <div class="card">
-      <h4>Styles (CO-5)</h4>
-      <p><code>style_gentle</code> or <code>style_direct</code> is a section of the system prompt. Code also enforces it: a direct reply keeps only the question, and a gentle reply that praises ("a meaningful outcome") becomes "Thank you."</p>
-    </div>
-  </div>
-
-  <h3>Suggestion generators (coach role, worker)</h3>
-  <div class="tbl-wrap"><table>
-    <thead><tr><th>Kind</th><th>Trigger</th><th>Contract</th><th>Grounding check</th></tr></thead>
-    <tbody>
-      <tr><td>TUNE_STORY (SG-2)</td><td>After scoring, when an answer used a story and has a fix</td><td><code>StoryPartEdit</code></td><td rowspan="5">All use <code>_complete_checked</code>: up to 2 calls. On a problem, the second call adds a <code>suggest_fix</code> message listing the problems. Fact checks: each quote has 3+ words and is found in the user's words, every number appears in the quotes, and 50% or more of each sentence's content words appear in the quotes. A second miss stores nothing. Dismissed suggestions never come back (dedupe).</td></tr>
-      <tr><td>NEW_STORY (SG-3)</td><td>An answer used no story and scored 3 or more</td><td><code>NewStoryPayload</code></td></tr>
-      <tr><td>IMPROVE_RESUME_LINE (SG-6)</td><td>A story's result has a number and a matching resume line does not</td><td><code>ResumeLineEdit</code></td></tr>
-      <tr><td>REVIEW (ST-11)</td><td>The user asks for a story review</td><td><code>StoryReview</code></td></tr>
-      <tr><td>TAILOR_ROLE (SG-5)</td><td>After story fit, for up to 3 lead stories</td><td><code>TailorRolePayload</code></td></tr>
-    </tbody>
-  </table></div>
-  <p class="small">MISSING_SKILL (SG-4) is rule-based and makes no model call. At most 6 model suggestions are made per session.</p>
-</section>
-
 <!-- =============================================================== MEMORY -->
 <section id="memory">
-  <h2>10. Memory management</h2>
+  <h2>13. Memory management</h2>
   <p class="lead">No agent has hidden or long-lived "chat memory", and there is no vector store or embeddings. <b>Every model call is stateless.</b> Memory is explicit data that code assembles into each prompt from Postgres, in layers.</p>
 
   <div class="svgbox">
@@ -667,7 +748,7 @@ Extra instruction: note_* or none</pre>
 
 <!-- =============================================================== GUARDRAILS -->
 <section id="guardrails">
-  <h2>11. Guardrails and safety layers</h2>
+  <h2>14. Guardrails and safety layers</h2>
   <p class="lead">Defense in depth around every agent. Most layers are deterministic, so a confused model cannot bypass them.</p>
   <h3>Interviewer output guard: animated</h3>
   <div class="controls"><label>Scenario <select id="gdSel" class="btn">
@@ -718,10 +799,10 @@ Extra instruction: note_* or none</pre>
 
 <!-- =============================================================== TRACING -->
 <section id="tracing">
-  <h2>12. Tracing and monitoring</h2>
+  <h2>15. Tracing and monitoring</h2>
   <p class="lead">Observability is <b>built in-app on Postgres and Redis</b>. The admin spec says: "There is no Grafana, Prometheus, Loki or Sentry". No OpenTelemetry, Sentry, Langfuse or LangSmith code is imported anywhere. (The original <code>docs/spec.md</code> still lists Sentry, Prometheus, PostHog and OTel as plans. The admin spec superseded that.)</p>
 
-  <h3>12.1 Interviewer reasoning traces (R2)</h3>
+  <h3>15.1 Interviewer reasoning traces (R2)</h3>
   <p>Every interviewer model call and every fixed line becomes one <code>TraceRecord</code>. This is how you see <b>why</b> the agent did something: the controller's reasons, the model's decision, the exact prompt, the raw reply, the guard result and what was actually spoken.</p>
   <div class="controls"><button class="btn primary" id="trPlay" type="button">▶ Animate a turn's traces</button></div>
   <div class="svgbox">
@@ -770,7 +851,7 @@ Extra instruction: note_* or none</pre>
     </div>
   </div>
 
-  <h3>12.2 Monitoring signals for all agents</h3>
+  <h3>15.2 Monitoring signals for all agents</h3>
   <div class="tbl-wrap"><table>
     <thead><tr><th>Signal</th><th>How it is collected</th><th>Stored in</th><th>Seen in</th></tr></thead>
     <tbody>
@@ -787,58 +868,16 @@ Extra instruction: note_* or none</pre>
     </tbody>
   </table></div>
 
-  <h3>12.3 Default alert rules</h3>
+  <h3>15.3 Default alert rules</h3>
   <p class="small">API down · Worker or voice down · Dependency down · Disk 85%/95% · Memory 90% · Session failures &gt; 5% · Voice p95 &gt; 1500 ms over 30 min · Scoring stuck · Spend ≥ 80% and 100% of the daily cap · New error group · Stripe webhooks silent &gt; 48 h. Critical alerts re-notify every 4 h, warnings every 24 h.</p>
 
-  <h3>12.4 Correlation: following one session across services</h3>
+  <h3>15.4 Correlation: following one session across services</h3>
   <div class="callout">Use <b><code>session_id</code></b> as the join key. It appears on <code>turns</code>, <code>interviewer_traces</code>, <code>usage_events</code>, <code>voice_turn_timings</code>, <code>error_events</code>, every log line (ContextVar, or derived from the LiveKit room name), and the scorecard. <b><code>request_id</code></b> joins an API request or worker job to its logs and errors.</div>
-</section>
-
-<!-- =============================================================== EVALS -->
-<section id="evals">
-  <h2>13. Evals, the AI candidate and the judge</h2>
-  <p class="lead">Two harnesses test the agents. Keep them apart when you explain them.</p>
-  <div class="grid g2">
-    <div class="card">
-      <h4>In-process eval harness (<code>evals/</code>)</h4>
-      <p><code>python -m strong_evals run --suite … --gate</code>. Calls the interviewer, planner, scorer and coach as library code. Profiles: fake, tiny, local, hosted, claude. <code>--record</code> saves fixtures.</p>
-      <ul>
-        <li><b>Gold set</b>: scripted transcripts with human labels (median of the raters)</li>
-        <li><b>Simulated candidates</b>: strong, average or weak</li>
-        <li>Reports in <code>evals/reports/*.html|json</code>, with the git sha, the role → alias map and the prompt refs</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h4>Live AI-candidate sim (<code>apps/sim</code>, P13)</h4>
-      <p>Drives the <b>deployed</b> app over HTTPS or LiveKit as a real user would. The candidate uses a different provider from the interviewer on purpose. A judge model then grades the interviewer.</p>
-      <ul>
-        <li>Persona × quality × <b>behavior</b>: off_topic, prompt_injection, interrupts, drops_connection, argues, silent…</li>
-        <li>Budget isolated with its own LiteLLM key ($5/day), gated, started from the admin UI</li>
-        <li>Results saved in run folders (transcript, audio, judge, debrief, meta)</li>
-      </ul>
-    </div>
-  </div>
-  <h3>Gated metrics (<code>evals/config/thresholds.yaml</code>)</h3>
-  <div class="tbl-wrap"><table>
-    <thead><tr><th>Metric</th><th>Gate</th><th>What it protects</th></tr></thead>
-    <tbody>
-      <tr><td>scorer_within_one_band</td><td>≥ 0.85</td><td>Scorer agrees with the human hire signal</td></tr>
-      <tr><td>follow_up_rate</td><td>≥ 0.80</td><td>The interviewer probes vague answers</td></tr>
-      <tr><td>competency_coverage</td><td>≥ 0.80</td><td>The questions cover the target competencies</td></tr>
-      <tr><td>cost_per_session_usd</td><td>≤ 0.80</td><td>Unit economics</td></tr>
-      <tr><td>debrief_ready_s</td><td>≤ 60</td><td>Scoring speed (FB-3)</td></tr>
-      <tr><td>gap_score_spread / gap_fit_order</td><td>≤ 3 / ≥ 1.0</td><td>Gap analysis is stable and ordered sensibly</td></tr>
-      <tr><td>coach_invented_facts, suggestions_invented_facts</td><td>≤ 0</td><td>Grounding (CO-3)</td></tr>
-      <tr><td>coach_one_question / iv3_followup / judge_pass / style_distinct / versions_faithful</td><td>1.0 / 0.8 / 0.9 / 0.75 / 1.0</td><td>Coach behavior</td></tr>
-    </tbody>
-  </table></div>
-  <h3>Judge rules (sim)</h3>
-  <p><code>probe_limit</code>, <code>phases</code>, <code>tone</code>, <code>no_coaching</code>, <code>injection</code>, <code>behavior_handling</code>, <code>no_repetition</code>, <code>stays_in_role</code>. Each rule gets pass, fail or not_applicable, plus a quoted reason. The sim report also checks <b>scorer order</b>: within comparable scenarios, a stronger candidate must not get a worse hire signal.</p>
 </section>
 
 <!-- =============================================================== QA -->
 <section id="qa">
-  <h2>14. Q&amp;A cheat sheet</h2>
+  <h2>16. Q&amp;A cheat sheet</h2>
   <p class="lead">Short answers to questions you are likely to get.</p>
   <details><summary>Is this a multi-agent system? Do agents talk to each other?</summary><p>Not directly. The agents form a <b>pipeline</b> that hands typed artifacts over through Postgres: extractor → <code>JobPosting</code>/<code>Resume</code> → planner → <code>GapAnalysis</code>, <code>InterviewerBrief</code> → interviewer → <code>turns</code> → scorer → <code>Scorecard</code> → coach suggestions. Arq jobs and API routes do the orchestration. No agent calls another agent, and none chooses tools on its own.</p></details>
   <details><summary>Do the agents use tool calling or autonomous planning?</summary><p>No. "Tool output" is only a way to get structured JSON when a model supports tools. The next action is always chosen in code (controller moves, coach "ask for", job chains).</p></details>
@@ -857,7 +896,7 @@ Extra instruction: note_* or none</pre>
 
 <!-- =============================================================== GAPS -->
 <section id="gaps">
-  <h2>15. Known gaps (as of this writing)</h2>
+  <h2>17. Known gaps (as of this writing)</h2>
   <ul>
     <li><b>Only interviewer calls are traced.</b> Extractor, planner, scorer and coach calls have usage rows but no prompt or reply traces and no latency. Ops Performance shows them as "not measured".</li>
     <li><b>Some provenance is not persisted.</b> Brief <code>model_version</code> and refs, and extraction provenance, live only in Arq results (24 h). Story match persists no prompt ref.</li>
@@ -873,7 +912,7 @@ Extra instruction: note_* or none</pre>
 
 <!-- =============================================================== FILES -->
 <section id="files">
-  <h2>16. File map</h2>
+  <h2>18. File map</h2>
   <div class="tbl-wrap"><table>
     <thead><tr><th>Topic</th><th>Files</th></tr></thead>
     <tbody>
@@ -922,16 +961,16 @@ $$("main section").forEach(s=>obs.observe(s));
 
 /* ---------------- lifecycle ---------------- */
 const LC=[
- {t:"Job posting in",r:"extractor",d:"<b>extract_job_target</b>: fetch the URL (Playwright fallback), or take pasted text. The <b>input check</b> asks the extractor whether this is really a job posting (fails open). Then the posting is extracted into <code>JobPosting</code>, and the company is matched to a curated profile (no LLM)."},
- {t:"Resume in",r:"extractor",d:"<b>parse_resume</b>: check, then extract into <code>Resume</code> with grounding-based confidence per field. The file is stored encrypted. <b>story_idea_skills</b> then turns achievement lines into STORY_IDEA suggestions."},
- {t:"Auto-profile",r:"extractor",d:"Only in generic mode: <b>build_auto_profile</b> reads up to 3 pages from the company's own domain and writes a PENDING <code>company_auto_profiles</code> row. Only admin-approved summaries ever reach a brief."},
- {t:"Gap analysis",r:"planner",d:"<b>run_gap_analysis_job</b>: the planner rates each requirement (0–3) and competency with evidence. Code caps unsupported ratings, computes the match score (0.7 × requirements + 0.3 × competencies) and the session plan."},
- {t:"Brief",r:"planner",d:"On <code>POST /sessions</code>, <b>build_interviewer_brief</b>: the planner drafts 6–12 questions. Code assembles an <code>InterviewerBrief</code> of at most 1500 tokens (competencies, probes, persona and tone, time plan, curveball) into <code>sessions.brief_json</code>."},
- {t:"Live interview",r:"interviewer · stt · tts",d:"Voice (LiveKit) or text. The <b>SessionController</b> drives the phases, and the interviewer model says each move, decides probes and checks conduct. Every call is traced to <code>interviewer_traces</code>, and every turn is saved to <code>turns</code>."},
+ {t:"Job posting in",r:"A1 extractor",d:"<b>extract_job_target</b>: fetch the URL (Playwright fallback), or take pasted text. The <b>input check</b> asks the extractor whether this is really a job posting (fails open). Then the posting is extracted into <code>JobPosting</code>, and the company is matched to a curated profile (no LLM)."},
+ {t:"Resume in",r:"A1 extractor",d:"<b>parse_resume</b>: check, then extract into <code>Resume</code> with grounding-based confidence per field. The file is stored encrypted. <b>story_idea_skills</b> then turns achievement lines into STORY_IDEA suggestions."},
+ {t:"Auto-profile",r:"A1 extractor",d:"Only in generic mode: <b>build_auto_profile</b> reads up to 3 pages from the company's own domain and writes a PENDING <code>company_auto_profiles</code> row. Only admin-approved summaries ever reach a brief."},
+ {t:"Gap analysis",r:"A2 planner",d:"<b>run_gap_analysis_job</b>: the planner rates each requirement (0–3) and competency with evidence. Code caps unsupported ratings, computes the match score (0.7 × requirements + 0.3 × competencies) and the session plan."},
+ {t:"Brief",r:"A2 planner",d:"On <code>POST /sessions</code>, <b>build_interviewer_brief</b>: the planner drafts 6–12 questions. Code assembles an <code>InterviewerBrief</code> of at most 1500 tokens (competencies, probes, persona and tone, time plan, curveball) into <code>sessions.brief_json</code>."},
+ {t:"Live interview",r:"A3 interviewer + STT/TTS",d:"Voice (LiveKit) or text. The <b>SessionController</b> drives the phases, and the interviewer model says each move, decides probes and checks conduct. Every call is traced to <code>interviewer_traces</code>, and every turn is saved to <code>turns</code>."},
  {t:"End and bill",r:"code",d:"<code>/sessions/{id}/end</code> (or the voice agent's internal end) bills the minutes and enqueues <b>score_session</b>."},
- {t:"Scoring",r:"scorer",d:"Rubric call → quote verification → optional re-quote → averages → <b>hire signal in code</b> → rationale call (code fallback). Writes the <code>scorecards</code> row and progress snapshots."},
- {t:"Stories and suggestions",r:"scorer · coach",d:"Story match per answer (ST-6), Proven stories (ST-7), then coach-role suggestions: tune a story, a new story from a good answer, missing skills. All suggestions are fact-checked against the user's own words."},
- {t:"Practice loop",r:"coach · planner",d:"The candidate refines stories with the <b>coach</b> (text or voice). Story changes re-run <b>story fit</b> for each target role, which then queues <b>tailor</b> suggestions. Takes are scored by the scorer."}
+ {t:"Scoring",r:"A4 scorer",d:"Rubric call → quote verification → optional re-quote → averages → <b>hire signal in code</b> → rationale call (code fallback). Writes the <code>scorecards</code> row and progress snapshots."},
+ {t:"Stories and suggestions",r:"A4 scorer · A5 coach",d:"Story match per answer (ST-6), Proven stories (ST-7), then coach-role suggestions: tune a story, a new story from a good answer, missing skills. All suggestions are fact-checked against the user's own words."},
+ {t:"Practice loop",r:"A5 coach · A2 planner",d:"The candidate refines stories with the <b>coach</b> (text or voice). Story changes re-run <b>story fit</b> for each target role, which then queues <b>tailor</b> suggestions. Takes are scored by the scorer."}
 ];
 const lcBox=$("#lcStages");let lcI=0,lcTimer=null;
 LC.forEach((s,i)=>{const d=document.createElement("div");d.className="st";d.innerHTML=`<div class="n">Stage ${i+1}</div><div class="t">${s.t}</div><div class="r"><span class="pill ${s.r==="code"?"code":"llm"}">${s.r}</span></div>`;d.addEventListener("click",()=>{stopLc();lcShow(i);});lcBox.appendChild(d);});
