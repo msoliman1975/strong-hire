@@ -55,7 +55,7 @@ def test_rp5_role_play_turn_prompt_carries_the_buyer(gateway: ModelGateway) -> N
     """RP-5: the system prompt is the role-play one and holds the hidden buyer brief."""
     interviewer = Interviewer(gateway, role_play_brief())
     system, _ = interviewer.turn_messages(Move(MoveKind.GREET, Phase.INTRO), [])
-    assert system.prompt_ref == "interviewer/turn_role_play.v1"
+    assert system.prompt_ref == "interviewer/turn_role_play.v2"
     assert "Dana Ruiz, VP of Operations" in system.content
     assert "Hidden pain (say it only when asked about it): Dispatchers rebuild" in system.content
     assert "A good seller earns: Dana agrees to a demo next week" in system.content
@@ -78,4 +78,19 @@ async def test_rp6_decide_uses_the_role_play_prompt(gateway: ModelGateway) -> No
     interviewer = Interviewer(gateway, brief)
     await interviewer.decide(brief.questions[0], "We have a great tool for you.", [])
     assert interviewer.last_call is not None
-    assert "interviewer/decide_role_play.v1" in interviewer.last_call.prompt_refs
+    assert "interviewer/decide_role_play.v2" in interviewer.last_call.prompt_refs
+
+
+def test_cs4_turn_and_decide_prompts_cover_the_escalation_call(gateway: ModelGateway) -> None:
+    """CS-4, D-8: the customer opens upset, calms when heard, and the decide step reads the
+    triggers for an escalation call."""
+    from strong_core.gateway import Role
+    from strong_core.prompts import load_prompt
+
+    system, _ = Interviewer(gateway, role_play_brief()).turn_messages(
+        Move(MoveKind.GREET, Phase.INTRO), []
+    )
+    assert "In an escalation call: open frustrated" in system.content
+    assert "accept a recovery plan with owners and dates" in system.content
+    decide = load_prompt(Role.INTERVIEWER, "decide_role_play").text
+    assert "no recovery plan with owners and dates yet" in decide

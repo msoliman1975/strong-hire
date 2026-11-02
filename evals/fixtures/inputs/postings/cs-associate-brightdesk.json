@@ -1,0 +1,25 @@
+{
+  "company_name": "Brightdesk",
+  "title": "Associate Customer Success Manager",
+  "role_family": "customer_success",
+  "level": "new_grad",
+  "level_label": null,
+  "team": "Customer Success",
+  "location": "Austin, TX",
+  "must_have_skills": [
+    "A bachelor's degree or 1 year in a customer-facing job",
+    "Clear written and spoken communication",
+    "Comfort with software tools"
+  ],
+  "nice_to_have_skills": [
+    "Zendesk or a similar help desk tool",
+    "Experience at a SaaS company"
+  ],
+  "responsibilities": [
+    "Onboard new customers with group training sessions",
+    "Answer customer questions by email and phone",
+    "Track product usage and reach out when it drops",
+    "Hand renewals to the renewals team"
+  ],
+  "source_url": null
+}

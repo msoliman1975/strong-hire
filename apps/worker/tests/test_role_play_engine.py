@@ -67,7 +67,7 @@ def fake_gateway() -> ModelGateway:
 def test_rp4_planner_prompt_asks_for_the_scenario_and_beat_count() -> None:
     """RP-4: the planner gets the scenario, the beat count and the family guidance."""
     msgs = role_play_messages(config(), POSTING, RESUME, generic_profile())
-    assert msgs[0].prompt_ref == "planner/interviewer_brief_role_play.v1"
+    assert msgs[0].prompt_ref == "planner/interviewer_brief_role_play.v2"
     user = msgs[1].content
     assert user.startswith("Write the buyer brief and 3 beats")
     assert "Scenario: discovery_call" in user
@@ -87,7 +87,7 @@ async def test_rp4_build_brief_makes_a_role_play_brief() -> None:
     assert brief.max_probes_per_question == 8
     assert set(brief.target_competencies) <= set(COMPETENCIES_BY_TYPE[InterviewType.ROLE_PLAY])
     assert brief.role_family == RoleFamily.SALES
-    assert "planner/interviewer_brief_role_play.v1" in built.model_version
+    assert "planner/interviewer_brief_role_play.v2" in built.model_version
 
 
 def test_rp4_mini_and_tough_rules() -> None:
@@ -159,7 +159,7 @@ async def test_rp7_scorer_input_carries_the_buyer_brief() -> None:
     outcome = await SessionScorer(ModelGateway(fake_models_config(), fake=backend)).score(
         brief, turns, generic_profile()
     )
-    assert outcome.scorecard.rubric_version == "scorer/rubric_role_play.v1"
+    assert outcome.scorecard.rubric_version == "scorer/rubric_role_play.v2"
     rubric_input = backend.calls[0][0][1].content
     assert "Buyer brief (role-play only" in rubric_input
     assert "Hidden pain: Dispatchers rebuild" in rubric_input
@@ -170,3 +170,36 @@ def test_rp7_other_types_have_no_buyer_block(kind: str) -> None:
     from strong_interview.testing import make_brief
 
     assert buyer_text(make_brief()) == "(none)"
+
+
+def test_cs3_planner_writes_an_escalation_call() -> None:
+    """CS-3, D-4: the planner prompt explains the escalation call and how the brief fields read."""
+    msgs = role_play_messages(
+        config(role_play="escalation_call"), POSTING, RESUME, generic_profile()
+    )
+    assert "Scenario: escalation_call" in msgs[1].content
+    system = msgs[0].content
+    assert "- escalation_call: an existing customer is upset" in system
+    assert "budget: the contract value and the renewal date" in system
+
+
+def test_cs3_tough_escalation_gets_its_own_default_curveball() -> None:
+    """CS-3, D-8: without a planner curveball, a Tough escalation call gets a customer curveball."""
+    from strong_worker.gap.brief import DEFAULT_ESCALATION_CURVEBALL
+
+    draft = DRAFT.model_copy(update={"buyer": DRAFT.buyer.model_copy(update={"curveball": None})})
+    cfg = config(difficulty="tough", role_play="escalation_call")
+    brief, _ = assemble_role_play(draft, cfg, POSTING, generic_profile(), None)
+    assert brief.curveball == DEFAULT_ESCALATION_CURVEBALL
+    assert brief.role_play is not None
+    assert brief.role_play.scenario == RolePlayScenario.ESCALATION_CALL
+
+
+def test_cs5_rubric_reads_an_escalation_call() -> None:
+    """CS-5, D-3: the rubric gives the escalation reading of each competency."""
+    from strong_core.gateway import Role
+    from strong_core.prompts import load_prompt
+
+    text = load_prompt(Role.SCORER, "rubric_role_play").text
+    assert "What each competency means in an escalation call" in text
+    assert "agreed a recovery plan with owners, dates and a follow-up" in text
