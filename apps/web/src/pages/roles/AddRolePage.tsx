@@ -48,6 +48,10 @@ export function AddRolePage() {
   const [step, setStep] = useState<Step>(1);
   const [jobId, setJobId] = useState<string | null>(null);
   const [taskId, setTaskId] = useState<string | null>(null);
+  // Kept here so Back from step 2 shows the link or text as the user left it.
+  const [input, setInput] = useState<PostingInput>({ link: "", text: "", paste: false });
+  // The posting step moves on by itself once, when its posting is read. After Back it waits.
+  const [advanced, setAdvanced] = useState<string | null>(null);
   return (
     <div className="sx-page" style={{ maxWidth: 780 }}>
       <div className="sx-stack" style={{ gap: 6 }}>
@@ -58,12 +62,20 @@ export function AddRolePage() {
       {step === 1 && (
         <PostingStep
           onRead={(id, task) => {
+            // A posting read again replaces the one from before; that one was never used.
+            if (jobId && jobId !== id) void jobTargetsApi.remove(jobId).catch(() => undefined);
             setJobId(id);
             setTaskId(task);
           }}
           jobId={jobId}
           taskId={taskId}
-          onNext={() => setStep(2)}
+          input={input}
+          setInput={setInput}
+          autoNext={advanced !== jobId}
+          onNext={() => {
+            setAdvanced(jobId);
+            setStep(2);
+          }}
         />
       )}
       {step >= 2 && jobId && <RoleSteps jobId={jobId} step={step} setStep={setStep} />}
@@ -71,20 +83,31 @@ export function AddRolePage() {
   );
 }
 
+type PostingInput = { link: string; text: string; paste: boolean };
+
 function PostingStep({
   jobId,
   taskId,
+  input,
+  setInput,
+  autoNext,
   onRead,
   onNext,
 }: {
   jobId: string | null;
   taskId: string | null;
+  input: PostingInput;
+  setInput: (next: PostingInput) => void;
+  autoNext: boolean;
   onRead: (jobId: string, taskId: string | null) => void;
   onNext: () => void;
 }) {
-  const [link, setLink] = useState("");
-  const [text, setText] = useState("");
-  const [pasteChosen, setPaste] = useState(false);
+  const { link, text, paste: pasteChosen } = input;
+  const setLink = (v: string) => setInput({ ...input, link: v });
+  const setText = (v: string) => setInput({ ...input, text: v });
+  const setPaste = (v: boolean) => setInput({ ...input, paste: v });
+  // The posting read last, still as typed: step 2 can open again without reading it twice.
+  const [readAs, setReadAs] = useState<string | null>(jobId ? JSON.stringify(input) : null);
   const [problem, setProblem] = useState<string | null>(null);
   const job = useJob(jobId ?? "", true);
   const task = useJobTask(jobId ?? "", taskId);
@@ -94,7 +117,10 @@ function PostingStep({
   const read = Boolean(jobId) && job.data?.status === "extracted";
   const create = useMutation({
     mutationFn: () => jobTargetsApi.create(paste ? { text: text.trim() } : { url: link.trim() }),
-    onSuccess: (accepted) => onRead(accepted.job_target.id, accepted.job?.id ?? null),
+    onSuccess: (accepted) => {
+      setReadAs(JSON.stringify(input));
+      onRead(accepted.job_target.id, accepted.job?.id ?? null);
+    },
     onError: (err) => {
       const detail = (err as { detail?: { code?: string } }).detail;
       if (detail?.code === "paste_required") setPaste(true);
@@ -102,12 +128,18 @@ function PostingStep({
   });
 
   useEffect(() => {
-    if (read) onNext();
-  }, [read, onNext]);
+    if (read && autoNext) onNext();
+  }, [read, autoNext, onNext]);
+  // Back from step 2: the same posting can go on without being read again.
+  const unchanged = read && readAs === JSON.stringify(input);
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     setProblem(null);
+    if (unchanged) {
+      onNext();
+      return;
+    }
     if (paste ? !text.trim() : !link.trim()) {
       setProblem(paste ? "Paste the job posting text." : "Paste the link to the job posting.");
       return;
@@ -167,7 +199,7 @@ function PostingStep({
       {create.isError && <ErrorNotice error={create.error} />}
       <div className="sx-row">
         <button type="submit" className="sx-btn" disabled={reading || tooLong}>
-          {reading ? "Reading the posting…" : "Read the posting"}
+          {reading ? "Reading the posting…" : unchanged ? "Continue" : "Read the posting"}
         </button>
       </div>
     </form>

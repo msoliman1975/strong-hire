@@ -95,6 +95,26 @@ describe("target roles", () => {
     expect(screen.getByRole("link", { name: "Add a target role" })).toHaveAttribute("href", "/roles/new");
   });
 
+  it("TG-2: Back from Check the role returns to the posting as typed; Continue goes on without reading it again", async () => {
+    const user = renderApp("/roles/new");
+    await user.click(await screen.findByRole("button", { name: "paste the text" }));
+    const text = "Senior engineer, payments. ".repeat(10);
+    await user.click(screen.getByRole("textbox", { name: "Job posting text" }));
+    await user.paste(text);
+    await user.click(screen.getByRole("button", { name: "Read the posting" }));
+    await screen.findByRole("textbox", { name: "Company" }, { timeout: 4000 });
+    const jobs = mockStore.db.jobs.length;
+    await user.click(screen.getByRole("button", { name: "Back" }));
+    // Step 1 stays open, with the text kept.
+    const box = await screen.findByRole("textbox", { name: "Job posting text" });
+    expect(box).toHaveValue(text);
+    await new Promise((r) => setTimeout(r, 300));
+    expect(screen.queryByRole("textbox", { name: "Company" })).toBeNull();
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    expect(await screen.findByRole("textbox", { name: "Company" })).toBeInTheDocument();
+    expect(mockStore.db.jobs.length).toBe(jobs);
+  });
+
   it("TG-2: add a role in three steps: posting, check, interviews; Create the role opens the role page", async () => {
     const form = new FormData();
     form.append("text", "Backend engineer, Python and Go.");
@@ -178,6 +198,30 @@ describe("target roles", () => {
     expect(within(ctx).getByRole("button", { name: "Add what you know" })).toBeInTheDocument();
     const look = screen.getByRole("region", { name: "What they'll look for" });
     expect(within(look).getByRole("link", { name: "See the full gap report" })).toHaveAttribute("href", `/jobs/${job.id}/gap-report`);
+  });
+
+  it("LB-2: a role nothing uses can be deleted from its page, after a confirm", async () => {
+    const { job_target: created } = await jobTargetsApi.create({ text: "Senior engineer, payments. ".repeat(5) });
+    const job = await jobTargetsApi.get(created.id);
+    const user = renderApp(`/roles/${job.id}`);
+    const card = await screen.findByRole("region", { name: "Remove this role" });
+    expect(card).toHaveTextContent("Nothing uses this role yet");
+    await user.click(within(card).getByRole("button", { name: "Delete role" }));
+    expect(within(card).getByText(/can't be undone/)).toBeInTheDocument();
+    await user.click(within(card).getByRole("button", { name: "Delete role" }));
+    await waitFor(() => expect(screen.getByTestId("where")).toHaveTextContent(/^\/roles$/));
+    expect(mockStore.db.jobs.find((j) => j.id === job.id)?.deleted).toBe(true);
+  });
+
+  it("LB-2: a role with a gap report is archived, not deleted", async () => {
+    const { job } = await roleWithInterviews("behavioral");
+    const user = renderApp(`/roles/${job.id}`);
+    const card = await screen.findByRole("region", { name: "Remove this role" });
+    await waitFor(() => expect(card).toHaveTextContent("can't be deleted"));
+    expect(within(card).queryByRole("button", { name: "Delete role" })).toBeNull();
+    await user.click(within(card).getByRole("button", { name: "Archive role" }));
+    await waitFor(() => expect(screen.getByTestId("where")).toHaveTextContent(/^\/roles$/));
+    expect(mockStore.db.jobs.find((j) => j.id === job.id)?.archived_at).toBeTruthy();
   });
 
   it("TG-4: the role page shows the job posting Strova read, closed, with its responsibilities and skills", async () => {
