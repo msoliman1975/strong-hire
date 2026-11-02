@@ -25,6 +25,7 @@ import { displayStatusLabel, storiesApi, storyKeys, useStory, type DisplayStatus
 import { reviewPath, storiesPath } from "./paths";
 import { StoryEditor } from "./StoryEditor";
 import { bestTake, StoryTakes, takeAverage } from "./StoryTakes";
+import { FlowHints } from "./FlowHints";
 import { OrganizeBanner, OutlineStory, StyleSwitch } from "./OutlineStory";
 import { CoachNotes, StoryRead } from "./StoryView";
 
@@ -139,6 +140,9 @@ export function StoryPage() {
       <StorySuggestions story={s} />
 
       {!s.outline && !editing && <OrganizeBanner story={s} />}
+      {s.outline && (
+        <FlowHints storyId={s.id} flags={s.flow_flags} hints={s.hints} ready={s.display_status !== "draft"} />
+      )}
 
       <div className="sx-grid2 story-page__grid">
         <section className="sx-card story-page__parts" aria-label={s.outline ? "Story sections" : "Story parts"}>

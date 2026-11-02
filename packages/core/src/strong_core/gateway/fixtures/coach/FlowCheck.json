@@ -1,19 +1,46 @@
 {
   "flags": [
     {
+      "key": "action_vs_problem:situation.problem:action.did[0]",
+      "type": "action_vs_problem",
+      "slots": [
+        {"section": "situation", "slot": "problem"},
+        {"section": "action", "slot": "did", "step": 0}
+      ],
+      "question": "The problem was the late rollout. How did splitting the rollout get it back on track?"
+    },
+    {
       "key": "result_vs_problem:situation.problem:result.metric",
       "type": "result_vs_problem",
       "slots": [
-        {
-          "section": "situation",
-          "slot": "problem"
-        },
-        {
-          "section": "result",
-          "slot": "metric"
-        }
+        {"section": "situation", "slot": "problem"},
+        {"section": "result", "slot": "metric"}
       ],
-      "question": "The problem was a rollout two weeks late. Did you make up those two weeks, and how do you know?"
+      "question": "The problem was a late rollout. Did you make up the lost time, and how do you know?"
+    },
+    {
+      "key": "number_conflict:situation.role:result.metric",
+      "type": "number_conflict",
+      "slots": [
+        {"section": "situation", "slot": "role"},
+        {"section": "result", "slot": "metric"}
+      ],
+      "question": "Your role and your result count the team differently. Which count is right?"
+    },
+    {
+      "key": "timeline_conflict:situation.problem:result.metric",
+      "type": "timeline_conflict",
+      "slots": [
+        {"section": "situation", "slot": "problem"},
+        {"section": "result", "slot": "metric"}
+      ],
+      "question": "The rollout was late, yet the result says you finished early. What happened in between?"
+    },
+    {
+      "key": "loose_end:situation.problem",
+      "type": "loose_end",
+      "slots": [{"section": "situation", "slot": "problem"}],
+      "question": "You named Black Friday as the deadline. Did it hold, and what did that mean for you?"
     }
   ]
 }

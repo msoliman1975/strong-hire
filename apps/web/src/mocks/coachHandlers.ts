@@ -27,6 +27,8 @@ import type {
 import { STORY_PARTS, type Competency, type Story } from "../pages/stories/api";
 import { askOf, craftTurn, emptyOutline, hasContent, nextSection, renderLegacy, SECTION_OPENER, WRAP_LINE } from "./craftMock";
 import type { MockStore } from "./db";
+import { MOCK_HINTS, mockFlags } from "./outlineMock";
+import { outlineReady } from "../pages/coach/outline";
 import { mockStory, mockStoryLibrary } from "./storyHandlers";
 
 /** ST-12: the resume achievement a story idea (RM-4) starts from, as the API reads it. */
@@ -105,6 +107,8 @@ function detail(entry: MockCoachSession): CoachSessionDetail {
     missing: missing(story),
     asking_for: asking(story),
     asking: outline ? askOf(outline, entry.session.section ?? null) : null,
+    flow_flags: story?.flow_flags ?? [],
+    hints: story?.hints ?? [],
   };
 }
 
@@ -220,7 +224,13 @@ export function coachHandlers(store?: MockStore) {
       const story = findStory(entry.session.story_id);
       if (!story) return HttpResponse.json({ detail: "The story was deleted; end the session." }, { status: 409 });
       if (story.outline) {
+        const wasReady = outlineReady(story.outline);
         const step = craftTurn(story.outline, entry.session.section ?? null, text);
+        if (!wasReady && outlineReady(story.outline)) {
+          // SC-8, SC-9: once the core slots are filled, the flow check runs and hints arrive.
+          story.flow_flags = mockFlags(story.outline);
+          story.hints = MOCK_HINTS.filter((h) => !story.skills.includes(h.skill));
+        }
         Object.assign(story, renderLegacy(story.outline)); // SC-14: the five parts follow the outline
         story.updated_at = new Date().toISOString();
         entry.session = { ...entry.session, section: step.section };
@@ -232,9 +242,11 @@ export function coachHandlers(store?: MockStore) {
           skips: step.skips,
           section_done: step.sectionDone,
           skills: story.skills,
-          hints: [],
+          hints: story.hints,
         };
         const result: CoachTurnResult = {
+          flow_flags: story.flow_flags,
+          hints: story.hints,
           reply: { message: reply.text, parts: [], missing: missing(story), skills: story.skills },
           craft,
           story,

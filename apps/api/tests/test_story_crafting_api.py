@@ -249,6 +249,7 @@ def test_sc4_the_prompt_gets_only_the_section_and_its_slots() -> None:
         slots=craft._render_slots(ask.slots),
         skipped=craft._skipped(o),
         then="",
+        hints="",
         answer="",
     )
     assert 'slot "role"' in text and 'slot "org"' not in text
@@ -593,7 +594,7 @@ async def test_sc6_a_turn_fills_slots_from_the_candidates_words(
     assert detail["session"]["section"] == "situation"
     async with sessionmaker() as db:
         session = await db.get(CoachSession, uuid.UUID(sid))
-        assert session is not None and "coach/craft_turn.v1" in (session.prompt_version or "")
+        assert session is not None and "coach/craft_turn.v2" in (session.prompt_version or "")
 
 
 async def test_sc5_skip_and_move_on(
@@ -637,11 +638,17 @@ async def test_sc4_the_model_is_told_the_section_and_its_slots(
     sid = (await start(client, story_style="star"))["session"]["id"]
     await turn(client, sid, T1)
     await turn(client, sid, "It was the payments team.")
-    first, second = seen
-    assert 'Section in progress: "situation"' in first
+    first, second = (_asked(m) for m in seen)
+    assert 'Section in progress: "situation"' in seen[0]
     assert 'slot "role"' in first and 'slot "goal"' not in first
     assert 'slot "role"' not in second and 'slot "org"' in second
-    assert 'the "task" section' in first
+    assert 'the "task" section' in seen[0]
+
+
+def _asked(message: str) -> str:
+    """The "Empty slots to ask about" block of the craft prompt's input."""
+    start = message.index("Empty slots to ask about")
+    return message[start : message.index("Skipped slots", start)]
 
 
 async def test_sc6_classic_sessions_are_unchanged(

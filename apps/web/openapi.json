@@ -3597,6 +3597,211 @@
         }
       }
     },
+    "/stories/{story_id}/flow-check": {
+      "post": {
+        "tags": [
+          "stories",
+          "stories"
+        ],
+        "summary": "Flow Check",
+        "description": "SC-9: check that the story hangs together. Advisory; the status never depends on it.",
+        "operationId": "flow_check_stories__story_id__flow_check_post",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{story_id}/flow-flags/{key}/dismiss": {
+      "post": {
+        "tags": [
+          "stories",
+          "stories"
+        ],
+        "summary": "Dismiss Flag",
+        "description": "SC-9: hide a flag until one of the slots it cites changes.",
+        "operationId": "dismiss_flag_stories__story_id__flow_flags__key__dismiss_post",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{story_id}/hints/{skill}/deepen": {
+      "post": {
+        "tags": [
+          "stories",
+          "stories"
+        ],
+        "summary": "Deepen Hint",
+        "description": "SC-8, D-8: Deepen tags the story with the skill; the UI opens a short session with Strova\non this story for it (POST /coach/sessions with story_id and target_skill).",
+        "operationId": "deepen_hint_stories__story_id__hints__skill__deepen_post",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          },
+          {
+            "name": "skill",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Competency"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{story_id}/hints/{skill}/dismiss": {
+      "post": {
+        "tags": [
+          "stories",
+          "stories"
+        ],
+        "summary": "Dismiss Hint",
+        "description": "SC-8: Not now. The hint does not come back.",
+        "operationId": "dismiss_hint_stories__story_id__hints__skill__dismiss_post",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          },
+          {
+            "name": "skill",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Competency"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/coach/sessions": {
       "post": {
         "tags": [
@@ -15292,6 +15497,22 @@
               }
             ],
             "description": "SC-1, D-2: Strova's suggested style when a new session started without one"
+          },
+          "flow_flags": {
+            "items": {
+              "$ref": "#/components/schemas/FlowFlag"
+            },
+            "type": "array",
+            "title": "Flow Flags",
+            "description": "SC-9: the story's flow flags that show (advisory)"
+          },
+          "hints": {
+            "items": {
+              "$ref": "#/components/schemas/SkillHint"
+            },
+            "type": "array",
+            "title": "Hints",
+            "description": "SC-8: up to three open skill hints, gaps first"
           }
         },
         "type": "object",
@@ -15484,6 +15705,22 @@
               }
             ],
             "description": "SC-4: what Strova asks next"
+          },
+          "flow_flags": {
+            "items": {
+              "$ref": "#/components/schemas/FlowFlag"
+            },
+            "type": "array",
+            "title": "Flow Flags",
+            "description": "SC-9: the story's flow flags that show (advisory)"
+          },
+          "hints": {
+            "items": {
+              "$ref": "#/components/schemas/SkillHint"
+            },
+            "type": "array",
+            "title": "Hints",
+            "description": "SC-8: up to three open skill hints, gaps first"
           },
           "story": {
             "anyOf": [
@@ -17926,34 +18163,34 @@
         "type": "object"
       },
       "FlowFlag": {
-        "additionalProperties": false,
-        "description": "SC-9, D-9: one advisory flow flag. `key` is stable for the same issue, so a dismissed\nflag stays dismissed until the slots it cites change.",
         "properties": {
           "key": {
+            "type": "string",
             "maxLength": 100,
             "minLength": 1,
-            "title": "Key",
-            "type": "string"
+            "title": "Key"
           },
           "type": {
             "$ref": "#/components/schemas/FlowFlagType"
           },
           "slots": {
-            "description": "The slots the flag is about.",
             "items": {
               "$ref": "#/components/schemas/SlotRef"
             },
+            "type": "array",
             "minItems": 1,
             "title": "Slots",
-            "type": "array"
+            "description": "The slots the flag is about."
           },
           "question": {
-            "description": "What Strova would ask about it.",
+            "type": "string",
             "minLength": 1,
             "title": "Question",
-            "type": "string"
+            "description": "What Strova would ask about it."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "key",
           "type",
@@ -17961,10 +18198,10 @@
           "question"
         ],
         "title": "FlowFlag",
-        "type": "object"
+        "description": "SC-9, D-9: one advisory flow flag. `key` is stable for the same issue, so a dismissed\nflag stays dismissed until the slots it cites change."
       },
       "FlowFlagType": {
-        "description": "SC-9, D-9: the kinds of advisory flags the flow check raises.",
+        "type": "string",
         "enum": [
           "action_vs_problem",
           "result_vs_problem",
@@ -17973,7 +18210,7 @@
           "loose_end"
         ],
         "title": "FlowFlagType",
-        "type": "string"
+        "description": "SC-9, D-9: the kinds of advisory flags the flow check raises."
       },
       "FocusSuggestions": {
         "properties": {
@@ -29465,6 +29702,22 @@
             ],
             "title": "Display Status",
             "description": "ST-8: draft, ready or proven."
+          },
+          "flow_flags": {
+            "items": {
+              "$ref": "#/components/schemas/FlowFlag"
+            },
+            "type": "array",
+            "title": "Flow Flags",
+            "description": "SC-9: the flow check's flags that show (dismissed ones return when a slot they cite changes). Advisory: the status never depends on them."
+          },
+          "hints": {
+            "items": {
+              "$ref": "#/components/schemas/SkillHint"
+            },
+            "type": "array",
+            "title": "Hints",
+            "description": "SC-8: up to three open skill hints, gap skills of the target roles first."
           }
         },
         "additionalProperties": false,

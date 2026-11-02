@@ -196,3 +196,71 @@ export function mockOutline(style: StoryStyle = "star"): StoryOutline {
   });
   return o;
 }
+
+// --- SC-8, SC-9: flow flags and skill hints ---------------------------------------------------
+
+type FlowFlag = Story["flow_flags"][number];
+type FlagType = FlowFlag["type"];
+type Ref = FlowFlag["slots"][number];
+
+const QUESTIONS: Record<FlagType, string> = {
+  action_vs_problem: "How did what you did address the problem you named?",
+  result_vs_problem: "Did the result solve the problem you started with, and how do you know?",
+  number_conflict: "Two of your numbers seem to disagree. Which one is right?",
+  timeline_conflict: "The timing doesn't line up. What happened in between?",
+  loose_end: "You named someone with a stake in this. What happened with them?",
+};
+
+/** As the API's fake fixture: one flag of each type, citing slots that have text. */
+export function mockFlags(o: StoryOutline): FlowFlag[] {
+  const refs: Ref[] = [];
+  for (const s of o.sections) {
+    for (const [slot, v] of Object.entries(s.slots)) if (v.status === "filled") refs.push({ section: s.section, slot, step: null });
+    if (s.metric?.status === "filled") refs.push({ section: s.section, slot: "metric", step: null });
+    (s.steps ?? []).forEach((st, i) => {
+      if (st.did?.status === "filled") refs.push({ section: s.section, slot: "did", step: i });
+    });
+  }
+  if (!refs.length) return [];
+  const pair = refs.length > 1 ? [refs[0], refs[refs.length - 1]] : [refs[0]];
+  return (Object.keys(QUESTIONS) as FlagType[]).map((type, i) => {
+    const slots = i % 2 ? [pair[0]] : pair;
+    return { key: `${type}:${slots.map((r) => `${r.section}.${r.slot}`).join(":")}`, type, slots, question: QUESTIONS[type] };
+  });
+}
+
+export const MOCK_HINTS = [
+  { skill: "collaboration", reason: "You brought three teams along to the plan." },
+  { skill: "judgment", reason: "You chose a small first step over one big switch." },
+] as Story["hints"];
+
+export function flowHandlers(find: (id: string) => Story | undefined, out: (s: Story) => Story) {
+  const styled = (id: string) => {
+    const story = find(id);
+    return story?.outline ? story : null;
+  };
+  const classic = () => conflict("classic_story", "Organize this story into sections first.");
+  return [
+    http.post(`${API}/stories/:id/flow-check`, ({ params }) => {
+      const story = styled(String(params.id));
+      if (!story?.outline) return classic();
+      story.flow_flags = mockFlags(story.outline);
+      return HttpResponse.json(out(story));
+    }),
+    http.post(`${API}/stories/:id/flow-flags/:key/dismiss`, ({ params }) => {
+      const story = styled(String(params.id));
+      if (!story) return classic();
+      story.flow_flags = story.flow_flags.filter((f) => f.key !== params.key);
+      return HttpResponse.json(out(story));
+    }),
+    http.post(`${API}/stories/:id/hints/:skill/:action`, ({ params }) => {
+      const story = styled(String(params.id));
+      if (!story) return classic();
+      const skill = String(params.skill) as Story["hints"][number]["skill"];
+      if (!story.hints.some((h) => h.skill === skill)) return HttpResponse.json({ detail: "No such hint" }, { status: 404 });
+      story.hints = story.hints.filter((h) => h.skill !== skill);
+      if (params.action === "deepen" && !story.skills.includes(skill)) story.skills.push(skill);
+      return HttpResponse.json(out(story));
+    }),
+  ];
+}

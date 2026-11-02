@@ -16,7 +16,9 @@ from strong_core.schemas import (
     CoachStyle,
     Competency,
     CraftReply,
+    FlowFlag,
     SessionChannel,
+    SkillHint,
     SlotRef,
     Story,
     StoryPart,
@@ -130,6 +132,12 @@ class CoachSessionDetail(BaseModel):
         default=None,
         description="SC-1, D-2: Strova's suggested style when a new session started without one",
     )
+    flow_flags: list[FlowFlag] = Field(
+        default_factory=list, description="SC-9: the story's flow flags that show (advisory)"
+    )
+    hints: list[SkillHint] = Field(
+        default_factory=list, description="SC-8: up to three open skill hints, gaps first"
+    )
 
 
 class StyleSuggestion(BaseModel):
@@ -151,6 +159,12 @@ class CoachTurnResult(BaseModel):
         "section is done",
     )
     asking: CraftAsk | None = Field(default=None, description="SC-4: what Strova asks next")
+    flow_flags: list[FlowFlag] = Field(
+        default_factory=list, description="SC-9: the story's flow flags that show (advisory)"
+    )
+    hints: list[SkillHint] = Field(
+        default_factory=list, description="SC-8: up to three open skill hints, gaps first"
+    )
     story: Story | None = Field(description="None when an empty new story was dropped at the end")
     turns: list[CoachTurnOut] = Field(description="The candidate's turn, then the coach's")
     asking_for: AskFor

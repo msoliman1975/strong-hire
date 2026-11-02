@@ -8,7 +8,7 @@ import { http, HttpResponse } from "msw/http";
 
 import type { Story, StoryAnswer, StoryIn, StoryPatch } from "../pages/stories/api";
 import { displayStatusOf, STORY_PARTS } from "../pages/stories/api";
-import { outlineHandlers } from "./outlineMock";
+import { flowHandlers, outlineHandlers } from "./outlineMock";
 import { requestMockReview } from "./suggestionHandlers";
 
 const API = "*/api";
@@ -28,6 +28,8 @@ export function mockStory(changes: Partial<Story> & Pick<Story, "id" | "title">)
     notes: [],
     style: null,
     outline: null,
+    flow_flags: [],
+    hints: [],
     created_at: "2026-10-20T10:00:00Z",
     updated_at: "2026-10-20T10:00:00Z",
     display_status: "draft",
@@ -86,6 +88,7 @@ export function storyHandlers() {
   return [
     // SC-10 to SC-13: the outline actions of styled stories (outlineMock.ts).
     ...outlineHandlers((id) => stories.find((s) => s.id === id), out),
+    ...flowHandlers((id) => stories.find((s) => s.id === id), out),
     http.get(`${API}/stories`, ({ request }) => {
       const url = new URL(request.url);
       const status = url.searchParams.get("status");

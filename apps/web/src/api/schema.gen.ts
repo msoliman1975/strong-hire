@@ -1228,6 +1228,87 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/stories/{story_id}/flow-check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Flow Check
+         * @description SC-9: check that the story hangs together. Advisory; the status never depends on it.
+         */
+        post: operations["flow_check_stories__story_id__flow_check_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/flow-flags/{key}/dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Dismiss Flag
+         * @description SC-9: hide a flag until one of the slots it cites changes.
+         */
+        post: operations["dismiss_flag_stories__story_id__flow_flags__key__dismiss_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/hints/{skill}/deepen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deepen Hint
+         * @description SC-8, D-8: Deepen tags the story with the skill; the UI opens a short session with Strova
+         *     on this story for it (POST /coach/sessions with story_id and target_skill).
+         */
+        post: operations["deepen_hint_stories__story_id__hints__skill__deepen_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/hints/{skill}/dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Dismiss Hint
+         * @description SC-8: Not now. The hint does not come back.
+         */
+        post: operations["dismiss_hint_stories__story_id__hints__skill__dismiss_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/coach/sessions": {
         parameters: {
             query?: never;
@@ -5684,6 +5765,16 @@ export interface components {
             asking?: components["schemas"]["CraftAsk"] | null;
             /** @description SC-1, D-2: Strova's suggested style when a new session started without one */
             suggested_style?: components["schemas"]["StoryStyle"] | null;
+            /**
+             * Flow Flags
+             * @description SC-9: the story's flow flags that show (advisory)
+             */
+            flow_flags?: components["schemas"]["FlowFlag"][];
+            /**
+             * Hints
+             * @description SC-8: up to three open skill hints, gaps first
+             */
+            hints?: components["schemas"]["SkillHint"][];
         };
         /** CoachSessionOut */
         CoachSessionOut: {
@@ -5753,6 +5844,16 @@ export interface components {
             craft?: components["schemas"]["CraftReply"] | null;
             /** @description SC-4: what Strova asks next */
             asking?: components["schemas"]["CraftAsk"] | null;
+            /**
+             * Flow Flags
+             * @description SC-9: the story's flow flags that show (advisory)
+             */
+            flow_flags?: components["schemas"]["FlowFlag"][];
+            /**
+             * Hints
+             * @description SC-8: up to three open skill hints, gaps first
+             */
+            hints?: components["schemas"]["SkillHint"][];
             /** @description None when an empty new story was dropped at the end */
             story: components["schemas"]["Story"] | null;
             /**
@@ -11546,6 +11647,16 @@ export interface components {
              * @enum {string}
              */
             display_status: "draft" | "ready" | "proven";
+            /**
+             * Flow Flags
+             * @description SC-9: the flow check's flags that show (dismissed ones return when a slot they cite changes). Advisory: the status never depends on them.
+             */
+            flow_flags?: components["schemas"]["FlowFlag"][];
+            /**
+             * Hints
+             * @description SC-8: up to three open skill hints, gap skills of the target roles first.
+             */
+            hints?: components["schemas"]["SkillHint"][];
         };
         /**
          * StoryOutline
@@ -14875,6 +14986,133 @@ export interface operations {
                 "application/json": components["schemas"]["StoryOutline"];
             };
         };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    flow_check_stories__story_id__flow_check_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dismiss_flag_stories__story_id__flow_flags__key__dismiss_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deepen_hint_stories__story_id__hints__skill__deepen_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+                skill: components["schemas"]["Competency"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dismiss_hint_stories__story_id__hints__skill__dismiss_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+                skill: components["schemas"]["Competency"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {

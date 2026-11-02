@@ -11,6 +11,8 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 from strong_core.schemas import (
     ACTION_STEPS_MAX,
     Competency,
+    FlowFlag,
+    SkillHint,
     SlotEdit,
     SlotRef,
     Story,
@@ -101,6 +103,15 @@ class StoryOut(Story):
     with all five parts filled shows as Ready."""
 
     display_status: DisplayStatus = Field(description="ST-8: draft, ready or proven.")
+    flow_flags: list[FlowFlag] = Field(
+        default_factory=list,
+        description="SC-9: the flow check's flags that show (dismissed ones return when a slot "
+        "they cite changes). Advisory: the status never depends on them.",
+    )
+    hints: list[SkillHint] = Field(
+        default_factory=list,
+        description="SC-8: up to three open skill hints, gap skills of the target roles first.",
+    )
 
 
 class StoryAskIn(_In):
