@@ -19,6 +19,7 @@ import { customHandlers } from "./custom";
 import { createStore } from "./db";
 import { accountHandlers, authHandlers, inputHandlers, scoringHandlers, sessionHandlers } from "./handlers";
 import { planHandlers } from "./planHandlers";
+import { compareHandlers } from "./compareHandlers";
 import { storyFitHandlers } from "./storyFitHandlers";
 import { questionHandlers } from "./questionHandlers";
 import { readinessHandlers } from "./readinessHandlers";
@@ -49,6 +50,7 @@ export async function startMocks(mode: MockMode): Promise<void> {
     ...customHandlers(store),
     ...planHandlers(store),
     ...storyFitHandlers(),
+    ...compareHandlers(store),
     ...readinessHandlers(),
     ...questionHandlers(),
     ...storyHandlers(),
