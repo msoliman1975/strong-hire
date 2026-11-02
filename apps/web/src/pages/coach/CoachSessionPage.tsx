@@ -9,6 +9,10 @@
  * POST /coach/sessions/{id}/voice/join (room coach-<id>). When voice is open and the browser has a
  * microphone, the page is voice-first, as on the canvas: a big mic, what the coach is doing now,
  * and "Type instead". `?voice=1` (the mic on Home) starts talking at once.
+ *
+ * A styled story (SC-1) is crafted section by section: the conversation gets the wide column, the
+ * outline fills in live beside it (SC-7, CraftPanel), and the reply box grows, expands and has
+ * "Skip this" and "Move on" (SC-17, ReplyBox). A classic story keeps the five-part view.
  */
 import "./coach.css";
 
@@ -42,6 +46,9 @@ import {
   type CoachTurnResult,
   type StoryPart,
 } from "./api";
+import { CraftPanel } from "./CraftPanel";
+import { outlineReady } from "./outline";
+import { ReplyBox } from "./ReplyBox";
 import { useCoachVoice } from "./useCoachVoice";
 
 /** The title the API gives a new coach story. */
@@ -122,12 +129,14 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
   const apply = (result: CoachTurnResult) => {
     const current = queryClient.getQueryData<CoachSessionDetail>(coachKeys.session(sessionId)) ?? detail;
     const nextStory = result.story ?? current.story;
+    const session = result.asking ? { ...current.session, section: result.asking.section } : current.session;
     update({
       turns: [...current.turns, ...result.turns],
       story: nextStory,
       asking_for: result.asking_for,
+      asking: result.asking ?? current.asking,
       missing: STORY_PARTS.filter((p) => !filled(nextStory, p)),
-      session: result.ended ? { ...current.session, status: "ended" } : current.session,
+      session: result.ended ? { ...session, status: "ended" } : session,
     });
     setShows((result.reply.skills ?? []) as Competency[]);
     if (nextStory) void queryClient.invalidateQueries({ queryKey: storyKeys.one(nextStory.id) });
@@ -191,13 +200,26 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
     const text = draft.trim();
     if (text && !turn.isPending && !ended) turn.mutate(text);
   };
+  const quick = (text: string) => {
+    if (!turn.isPending && !ended) turn.mutate(text);
+  };
+  const outline = story?.outline ?? null;
+  const crafting = outline !== null;
   const onKey = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) send(e);
   };
 
   const heading = story && story.title !== NEW_STORY_TITLE ? story.title : "Build a story";
   // ST-8: the coach's story response has no display status; it is computed the same way.
-  const status = story ? displayStatusOf(story) : "draft";
+  // SC-3: a styled story is Ready from its core slots.
+  const status =
+    story && outline && story.status !== "proven"
+      ? outlineReady(outline)
+        ? "ready"
+        : "draft"
+      : story
+        ? displayStatusOf(story)
+        : "draft";
   const ready = status !== "draft";
   const asked = ASK_PART[detail.asking_for];
   const stateOf = (p: StoryPart): PartState => (p === asked && !ended ? "now" : filled(story, p) ? "done" : "next");
@@ -240,7 +262,7 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
       {done.isError && <ErrorNotice error={done.error} title="The story was not saved" />}
       {style.isError && <ErrorNotice error={style.error} title="The style did not change" />}
 
-      <div className="coach__body">
+      <div className={crafting ? "coach__body coach__body--craft" : "coach__body"}>
         <section className="card coach__chat" aria-label="Conversation">
           {/* The log wraps the list, so the turns keep their list semantics. */}
           <div role="log" aria-live="polite" aria-label="Conversation with your coach">
@@ -311,6 +333,32 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
               </button>
               {voice.error && <p className="field-error">{voice.error}</p>}
             </div>
+          ) : crafting ? (
+            <ReplyBox
+              value={draft}
+              onChange={setDraft}
+              onSend={() => send()}
+              onQuick={quick}
+              busy={turn.isPending}
+              quick={detail.asking?.section != null}
+            >
+              <button
+                type="button"
+                className="coach__mic"
+                data-live={voiceLive || undefined}
+                aria-label={voiceLive ? "Stop talking to the coach" : "Talk to the coach"}
+                disabled={voice.status === "connecting"}
+                onClick={() => void (voiceLive ? voice.end() : voice.start())}
+              >
+                <MicIcon />
+              </button>
+              {voiceAvailable && (
+                <button className="btn btn--quiet" type="button" onClick={() => setTyping(false)}>
+                  Talk instead
+                </button>
+              )}
+              {voice.error && <p className="field-error">{voice.error}</p>}
+            </ReplyBox>
           ) : (
             <form className="coach__input" onSubmit={send} aria-label="Reply to your coach">
               <button
@@ -349,6 +397,31 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
         </section>
 
         <aside className="coach__side stack" aria-label="Story taking shape">
+          {crafting && outline ? (
+            <section className="card" aria-labelledby="coach-shape-heading">
+              <div className="coach__shape-head">
+                <h2 className="coach__shape-title" id="coach-shape-heading">
+                  Your story
+                </h2>
+                {story && <StoryStatusBadge status={status} />}
+              </div>
+              {story && (
+                <div className="field">
+                  <label htmlFor="coach-story-title">Story name</label>
+                  <input
+                    id="coach-story-title"
+                    type="text"
+                    value={title}
+                    maxLength={200}
+                    placeholder="Name it when you're ready"
+                    onChange={(e) => setTitle(e.target.value)}
+                  />
+                </div>
+              )}
+              <CraftPanel outline={outline} asking={detail.asking} ended={ended} />
+              <p className="muted small">Strova uses only your words. Nothing is added that you didn't say.</p>
+            </section>
+          ) : (
           <section className="card" aria-labelledby="coach-shape-heading">
             {/* ST-12: Strova thinks while the story takes shape, and celebrates when it is Ready. */}
             <div className="coach__strova" data-testid="coach-strova">
@@ -400,6 +473,7 @@ function CoachSession({ detail }: { detail: CoachSessionDetail }) {
             )}
             <p className="muted small">Strova uses only your words. Nothing is added that you didn't say.</p>
           </section>
+          )}
           <section className="card" aria-labelledby="coach-prove-heading">
             <h2 id="coach-prove-heading" className="muted small coach__prove-heading">
               This story could prove
