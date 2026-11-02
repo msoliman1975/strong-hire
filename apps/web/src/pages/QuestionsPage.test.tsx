@@ -118,10 +118,10 @@ describe("questions page", () => {
     const openapi = JSON.parse(readFileSync(resolve(__dirname, "../../openapi.json"), "utf8")) as {
       components: { schemas: { Competency: { enum: string[] } } };
     };
-    const { recruiter_screen: recruiter, ...standard } = COMPETENCIES_BY_TYPE;
+    const { recruiter_screen: recruiter, role_play: rolePlay, ...standard } = COMPETENCIES_BY_TYPE;
     const listed = Object.values(standard).flat();
     expect(new Set(listed).size).toBe(listed.length);
-    const all = new Set([...listed, ...recruiter]);
+    const all = new Set([...listed, ...recruiter, ...rolePlay]);
     expect([...all].sort()).toEqual([...openapi.components.schemas.Competency.enum].sort());
   });
 

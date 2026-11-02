@@ -44,6 +44,7 @@ function seed({ consent = false, signedInAs = "admin@example.com" as string | nu
       level: "senior",
       custom: null,
       tone: "as_company",
+      role_play: null,
     },
     channel: "voice",
     brief_ready: true,

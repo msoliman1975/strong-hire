@@ -151,7 +151,7 @@ describe("target roles", () => {
     await user.paste("Senior engineer, payments. ".repeat(10));
     await user.click(screen.getByRole("button", { name: "Read the posting" }));
     const category = await screen.findByRole("combobox", { name: "Job category" }, { timeout: 4000 });
-    expect(within(category).getAllByRole("option")).toHaveLength(12);
+    expect(within(category).getAllByRole("option")).toHaveLength(13);
     await user.selectOptions(category, "Consulting and strategy");
     await user.click(screen.getByRole("button", { name: "Looks right" }));
     // Network steps get the same headroom as "Read the posting" above, for slow CI runners.

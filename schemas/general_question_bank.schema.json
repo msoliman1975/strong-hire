@@ -26,7 +26,11 @@
         "estimation_logic",
         "prioritization",
         "recommendation",
-        "logistics_and_expectations"
+        "logistics_and_expectations",
+        "discovery",
+        "objection_handling",
+        "value_articulation",
+        "closing"
       ],
       "title": "Competency",
       "type": "string"
@@ -60,7 +64,8 @@
             "hiring_manager",
             "technical_qa",
             "case",
-            "recruiter_screen"
+            "recruiter_screen",
+            "role_play"
           ],
           "type": "string"
         },
@@ -171,7 +176,8 @@
         "eng_management",
         "finance",
         "consulting_strategy",
-        "project_program"
+        "project_program",
+        "sales"
       ],
       "title": "RoleFamily",
       "type": "string"

@@ -45,13 +45,14 @@ def test_hire_signal_values_match_spec() -> None:
 
 
 def test_every_interview_type_has_competencies() -> None:
-    """IV-2, RS-1: four interview types and Recruiter screen, each with scored competencies.
-    Custom (CU-1) mixes the four."""
-    rs = InterviewType.RECRUITER_SCREEN
-    assert set(COMPETENCIES_BY_TYPE) == {*STANDARD_INTERVIEW_TYPES, rs}
-    assert set(InterviewType) == {*STANDARD_INTERVIEW_TYPES, InterviewType.CUSTOM, rs}
+    """IV-2, RS-1, RP-1: four interview types, Recruiter screen and Role-play, each with scored
+    competencies. Custom (CU-1) mixes the four."""
+    rs, rp = InterviewType.RECRUITER_SCREEN, InterviewType.ROLE_PLAY
+    assert set(COMPETENCIES_BY_TYPE) == {*STANDARD_INTERVIEW_TYPES, rs, rp}
+    assert set(InterviewType) == {*STANDARD_INTERVIEW_TYPES, InterviewType.CUSTOM, rs, rp}
     assert all(len(COMPETENCIES_BY_TYPE[t]) >= 5 for t in STANDARD_INTERVIEW_TYPES)
     assert len(COMPETENCIES_BY_TYPE[rs]) == 4
+    assert len(COMPETENCIES_BY_TYPE[rp]) == 5
 
 
 @pytest.mark.parametrize("score", [0, 5])

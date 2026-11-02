@@ -40,6 +40,7 @@ function debrief(changes: Partial<Debrief> = {}, card: Scorecard = scorecardFor(
         level: "senior",
         custom: null,
         tone: "as_company",
+        role_play: null,
       },
       status: "completed",
       started_at: "2026-10-05T10:00:00Z",
