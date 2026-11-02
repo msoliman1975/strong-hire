@@ -1102,6 +1102,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/coach/style-suggestion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Style Suggestion
+         * @description SC-1, D-2: the style the start screen preselects, from the target skill or the question
+         *     the story answers. Code only, no model call.
+         */
+        get: operations["style_suggestion_coach_style_suggestion_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/coach/sessions/{session_id}": {
         parameters: {
             query?: never;
@@ -5513,6 +5534,10 @@ export interface components {
             missing: components["schemas"]["StoryPart"][];
             /** @description CO-4: what the coach is asking for now */
             asking_for: components["schemas"]["AskFor"];
+            /** @description SC-4: the section and slots, for a styled story */
+            asking?: components["schemas"]["CraftAsk"] | null;
+            /** @description SC-1, D-2: Strova's suggested style when a new session started without one */
+            suggested_style?: components["schemas"]["StoryStyle"] | null;
         };
         /** CoachSessionOut */
         CoachSessionOut: {
@@ -5532,6 +5557,8 @@ export interface components {
             started_at: string | null;
             /** Ended At */
             ended_at: string | null;
+            /** @description SC-4: the outline section in progress; null for a classic session, or once every section of a styled story is done */
+            section?: components["schemas"]["StorySection"] | null;
         };
         /**
          * CoachSessionStatus
@@ -5574,8 +5601,12 @@ export interface components {
          * @description One candidate turn and the coach's reply.
          */
         CoachTurnResult: {
-            /** @description CO-3: only the part updates the candidate's own words back */
+            /** @description CO-3: only the part updates the candidate's own words back. On a styled story the parts are empty and `craft` has the slot updates. */
             reply: components["schemas"]["CoachReply"];
+            /** @description SC-6: on a styled story, the kept slot updates and skips, and whether the section is done */
+            craft?: components["schemas"]["CraftReply"] | null;
+            /** @description SC-4: what Strova asks next */
+            asking?: components["schemas"]["CraftAsk"] | null;
             /** @description None when an empty new story was dropped at the end */
             story: components["schemas"]["Story"] | null;
             /**
@@ -5954,6 +5985,19 @@ export interface components {
             cost_usd: number;
             /** Rows */
             rows: number;
+        };
+        /**
+         * CraftAsk
+         * @description SC-4, SC-7: what Strova is asking about on a styled story.
+         */
+        CraftAsk: {
+            /** @description Null once every section is done */
+            section: components["schemas"]["StorySection"] | null;
+            /**
+             * Slots
+             * @description The empty slots of the section, in asking order
+             */
+            slots: components["schemas"]["SlotRef"][];
         };
         /**
          * CraftReply
@@ -10753,9 +10797,8 @@ export interface components {
             /**
              * Step
              * @description Action only: the step index.
-             * @default null
              */
-            step: number | null;
+            step?: number | null;
         };
         /**
          * SlotStatus
@@ -10777,9 +10820,8 @@ export interface components {
             /**
              * Step
              * @description Action only: the step index.
-             * @default null
              */
-            step: number | null;
+            step?: number | null;
             /**
              * Text
              * @description The slot, reworded from the candidate's words.
@@ -10793,21 +10835,18 @@ export interface components {
             /**
              * Before
              * @description Metric only.
-             * @default null
              */
-            before: string | null;
+            before?: string | null;
             /**
              * After
              * @description Metric only.
-             * @default null
              */
-            after: string | null;
+            after?: string | null;
             /**
              * Unit
              * @description Metric only.
-             * @default null
              */
-            unit: string | null;
+            unit?: string | null;
         };
         /** Source */
         Source: {
@@ -10874,6 +10913,8 @@ export interface components {
              * @description ST-12: the achievement, as roles[<i>].achievements[<j>]. It seeds the context, and the first question asks for the stakes.
              */
             resume_line_ref?: string | null;
+            /** @description SC-1: STAR or CARL for a new story, crafted section by section. Null keeps the classic five-part session; the response then carries Strova's suggested style. Ignored for an existing story, which keeps its own style. */
+            story_style?: components["schemas"]["StoryStyle"] | null;
         };
         /**
          * Story
@@ -11492,6 +11533,13 @@ export interface components {
          */
         StyleRewrite: {
             outline: components["schemas"]["StoryOutline"];
+        };
+        /**
+         * StyleSuggestion
+         * @description SC-1, D-2: the style the start screen preselects.
+         */
+        StyleSuggestion: {
+            style: components["schemas"]["StoryStyle"];
         };
         /**
          * SubscriptionStatus
@@ -14395,6 +14443,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CoachSessionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    style_suggestion_coach_style_suggestion_get: {
+        parameters: {
+            query?: {
+                target_skill?: components["schemas"]["Competency"] | null;
+                question?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StyleSuggestion"];
                 };
             };
             /** @description Validation Error */

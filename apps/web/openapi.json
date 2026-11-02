@@ -3248,6 +3248,72 @@
         }
       }
     },
+    "/coach/style-suggestion": {
+      "get": {
+        "tags": [
+          "coach"
+        ],
+        "summary": "Style Suggestion",
+        "description": "SC-1, D-2: the style the start screen preselects, from the target skill or the question\nthe story answers. Code only, no model call.",
+        "operationId": "style_suggestion_coach_style_suggestion_get",
+        "parameters": [
+          {
+            "name": "target_skill",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Competency"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Target Skill"
+            }
+          },
+          {
+            "name": "question",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Question"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StyleSuggestion"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/coach/sessions/{session_id}": {
       "get": {
         "tags": [
@@ -14813,6 +14879,28 @@
           "asking_for": {
             "$ref": "#/components/schemas/AskFor",
             "description": "CO-4: what the coach is asking for now"
+          },
+          "asking": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CraftAsk"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "SC-4: the section and slots, for a styled story"
+          },
+          "suggested_style": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoryStyle"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "SC-1, D-2: Strova's suggested style when a new session started without one"
           }
         },
         "type": "object",
@@ -14880,6 +14968,17 @@
               }
             ],
             "title": "Ended At"
+          },
+          "section": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StorySection"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "SC-4: the outline section in progress; null for a classic session, or once every section of a styled story is done"
           }
         },
         "type": "object",
@@ -14971,7 +15070,29 @@
         "properties": {
           "reply": {
             "$ref": "#/components/schemas/CoachReply",
-            "description": "CO-3: only the part updates the candidate's own words back"
+            "description": "CO-3: only the part updates the candidate's own words back. On a styled story the parts are empty and `craft` has the slot updates."
+          },
+          "craft": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CraftReply"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "SC-6: on a styled story, the kept slot updates and skips, and whether the section is done"
+          },
+          "asking": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CraftAsk"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "SC-4: what Strova asks next"
           },
           "story": {
             "anyOf": [
@@ -15849,59 +15970,89 @@
         ],
         "title": "CostSlice"
       },
+      "CraftAsk": {
+        "properties": {
+          "section": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StorySection"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null once every section is done"
+          },
+          "slots": {
+            "items": {
+              "$ref": "#/components/schemas/SlotRef"
+            },
+            "type": "array",
+            "title": "Slots",
+            "description": "The empty slots of the section, in asking order"
+          }
+        },
+        "type": "object",
+        "required": [
+          "section",
+          "slots"
+        ],
+        "title": "CraftAsk",
+        "description": "SC-4, SC-7: what Strova is asking about on a styled story."
+      },
       "CraftReply": {
-        "additionalProperties": false,
-        "description": "SC-4 to SC-6: one Strova turn while crafting a styled story. It replaces CoachReply for\nstyled stories. The engine names the section and slots; the reply fills only those.",
         "properties": {
           "message": {
-            "description": "What Strova says: one question at a time.",
+            "type": "string",
             "minLength": 1,
             "title": "Message",
-            "type": "string"
+            "description": "What Strova says: one question at a time."
           },
           "slot_updates": {
             "items": {
               "$ref": "#/components/schemas/SlotUpdate"
             },
-            "title": "Slot Updates",
-            "type": "array"
+            "type": "array",
+            "title": "Slot Updates"
           },
           "skips": {
-            "description": "SC-5: slots the candidate asked to skip.",
             "items": {
               "$ref": "#/components/schemas/SlotRef"
             },
+            "type": "array",
             "title": "Skips",
-            "type": "array"
+            "description": "SC-5: slots the candidate asked to skip."
           },
           "section_done": {
-            "default": false,
-            "description": "SC-5: the candidate said move on, or the section is complete.",
+            "type": "boolean",
             "title": "Section Done",
-            "type": "boolean"
+            "description": "SC-5: the candidate said move on, or the section is complete.",
+            "default": false
           },
           "skills": {
-            "description": "Skills the story shows so far.",
             "items": {
               "$ref": "#/components/schemas/Competency"
             },
+            "type": "array",
             "title": "Skills",
-            "type": "array"
+            "description": "Skills the story shows so far."
           },
           "hints": {
             "items": {
               "$ref": "#/components/schemas/SkillHint"
             },
+            "type": "array",
             "maxItems": 3,
-            "title": "Hints",
-            "type": "array"
+            "title": "Hints"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "message"
         ],
         "title": "CraftReply",
-        "type": "object"
+        "description": "SC-4 to SC-6: one Strova turn while crafting a styled story. It replaces CoachReply for\nstyled stories. The engine names the section and slots; the reply fills only those."
       },
       "Crafting": {
         "properties": {
@@ -27303,25 +27454,25 @@
         "description": "What the candidate app shows: the site banner and what is paused (OC-1 to OC-4)."
       },
       "SkillHint": {
-        "additionalProperties": false,
-        "description": "SC-8, D-8: \"This story could also show {skill}\", offered once the core slots are filled.",
         "properties": {
           "skill": {
             "$ref": "#/components/schemas/Competency"
           },
           "reason": {
-            "description": "One sentence, from the story's own facts.",
+            "type": "string",
             "minLength": 1,
             "title": "Reason",
-            "type": "string"
+            "description": "One sentence, from the story's own facts."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "skill",
           "reason"
         ],
         "title": "SkillHint",
-        "type": "object"
+        "description": "SC-8, D-8: \"This story could also show {skill}\", offered once the core slots are filled."
       },
       "SkillReadiness": {
         "properties": {
@@ -27478,40 +27629,39 @@
         "type": "object"
       },
       "SlotRef": {
-        "additionalProperties": false,
-        "description": "Points at one slot: a named slot of a section, or a field of one action step.",
         "properties": {
           "section": {
             "$ref": "#/components/schemas/StorySection"
           },
           "slot": {
-            "description": "A slot key, `metric`, or a step field.",
+            "type": "string",
             "minLength": 1,
             "title": "Slot",
-            "type": "string"
+            "description": "A slot key, `metric`, or a step field."
           },
           "step": {
             "anyOf": [
               {
-                "exclusiveMaximum": 5,
-                "minimum": 0,
-                "type": "integer"
+                "type": "integer",
+                "exclusiveMaximum": 5.0,
+                "minimum": 0.0
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "Action only: the step index.",
-            "title": "Step"
+            "title": "Step",
+            "description": "Action only: the step index."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "section",
           "slot"
         ],
         "title": "SlotRef",
-        "type": "object"
+        "description": "Points at one slot: a named slot of a section, or a field of one action step."
       },
       "SlotStatus": {
         "type": "string",
@@ -27524,47 +27674,44 @@
         "description": "SC-2, D-5: one outline slot is filled, still empty, or skipped by the candidate."
       },
       "SlotUpdate": {
-        "additionalProperties": false,
-        "description": "SC-6, D-6: new text for one slot from a crafting turn, backed by verbatim quotes.",
         "properties": {
           "section": {
             "$ref": "#/components/schemas/StorySection"
           },
           "slot": {
-            "description": "A slot key, `metric`, or a step field.",
+            "type": "string",
             "minLength": 1,
             "title": "Slot",
-            "type": "string"
+            "description": "A slot key, `metric`, or a step field."
           },
           "step": {
             "anyOf": [
               {
-                "exclusiveMaximum": 5,
-                "minimum": 0,
-                "type": "integer"
+                "type": "integer",
+                "exclusiveMaximum": 5.0,
+                "minimum": 0.0
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "Action only: the step index.",
-            "title": "Step"
+            "title": "Step",
+            "description": "Action only: the step index."
           },
           "text": {
-            "description": "The slot, reworded from the candidate's words.",
+            "type": "string",
             "minLength": 1,
             "title": "Text",
-            "type": "string"
+            "description": "The slot, reworded from the candidate's words."
           },
           "quotes": {
-            "description": "The candidate's words this slot came from, verbatim.",
             "items": {
               "type": "string"
             },
+            "type": "array",
             "minItems": 1,
             "title": "Quotes",
-            "type": "array"
+            "description": "The candidate's words this slot came from, verbatim."
           },
           "before": {
             "anyOf": [
@@ -27575,9 +27722,8 @@
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "Metric only.",
-            "title": "Before"
+            "title": "Before",
+            "description": "Metric only."
           },
           "after": {
             "anyOf": [
@@ -27588,9 +27734,8 @@
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "Metric only.",
-            "title": "After"
+            "title": "After",
+            "description": "Metric only."
           },
           "unit": {
             "anyOf": [
@@ -27601,11 +27746,12 @@
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "Metric only.",
-            "title": "Unit"
+            "title": "Unit",
+            "description": "Metric only."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "section",
           "slot",
@@ -27613,7 +27759,7 @@
           "quotes"
         ],
         "title": "SlotUpdate",
-        "type": "object"
+        "description": "SC-6, D-6: new text for one slot from a crafting turn, backed by verbatim quotes."
       },
       "Source": {
         "additionalProperties": false,
@@ -27761,6 +27907,17 @@
             ],
             "title": "Resume Line Ref",
             "description": "ST-12: the achievement, as roles[<i>].achievements[<j>]. It seeds the context, and the first question asks for the stakes."
+          },
+          "story_style": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoryStyle"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "SC-1: STAR or CARL for a new story, crafted section by section. Null keeps the classic five-part session; the response then carries Strova's suggested style. Ignored for an existing story, which keeps its own style."
           }
         },
         "additionalProperties": false,
@@ -29197,6 +29354,19 @@
         ],
         "title": "StyleRewrite",
         "type": "object"
+      },
+      "StyleSuggestion": {
+        "properties": {
+          "style": {
+            "$ref": "#/components/schemas/StoryStyle"
+          }
+        },
+        "type": "object",
+        "required": [
+          "style"
+        ],
+        "title": "StyleSuggestion",
+        "description": "SC-1, D-2: the style the start screen preselects."
       },
       "SubscriptionStatus": {
         "type": "string",
