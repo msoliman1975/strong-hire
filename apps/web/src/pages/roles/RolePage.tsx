@@ -4,11 +4,13 @@
  * for this role (story fit, ST-5) and what you know about the interview (IN-4). With 2 or more
  * resumes, which resume fits best (RC-1 to RC-8): the saved comparison's summary, opened on demand.
  */
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 
+import { ApiError } from "../../api/client";
 import { useResumeComparison } from "../../api/compare";
+import { gapApi } from "../../api/gap";
 import { useJob, useJobs, useResumeIssues, useResumes } from "../../api/hooks";
 import { jobTargetsApi } from "../../api/inputs";
 import { useRoleInterviews, useRoles } from "../../api/roles";
@@ -213,7 +215,29 @@ export function RolePage() {
   const jobs = useJobs();
   const resumes = useResumes();
   const summary = roles.data?.find((r) => r.role.id === jobId)?.role;
-  const resumeId = interviews.data?.[0]?.interview.resume_id ?? resumes.data?.find((r) => r.is_main)?.id ?? "";
+  // The role's resume, as the API decides it (RC-6): its first interview's, else its latest
+  // analysis', else the main resume. A role with no interviews yet still uses the resume it was
+  // analysed or compared with.
+  const latestGap = useQuery({
+    queryKey: ["roles", jobId, "latest-gap"],
+    enabled: Boolean(jobId) && interviews.data?.length === 0,
+    queryFn: async () => {
+      try {
+        return await gapApi.get(jobId);
+      } catch (err) {
+        if (err instanceof ApiError && err.status === 404) return null;
+        throw err;
+      }
+    },
+  });
+  const noInterviews = interviews.data?.length === 0;
+  const waiting = interviews.isPending || (noInterviews && latestGap.isPending);
+  const resumeId = waiting
+    ? ""
+    : (interviews.data?.[0]?.interview.resume_id ??
+      latestGap.data?.resume_id ??
+      resumes.data?.find((r) => r.is_main)?.id ??
+      "");
   const plan = usePlan(jobId, resumeId);
   const issues = useResumeIssues(resumeId || null, jobId);
   const fit = useRoleStoryFit(jobId);

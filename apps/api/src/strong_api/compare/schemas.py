@@ -49,6 +49,9 @@ class HintSource(BaseModel):
         description="The line can be copied: a skill the resume lacks, or an achievement at a "
         "company the resume also lists."
     )
+    in_resume: bool = Field(
+        description="The focus resume already has this line, for example after Add to resume."
+    )
 
 
 class ComparisonGap(BaseModel):
@@ -62,6 +65,11 @@ class ComparisonGap(BaseModel):
         description="RC-4: another resume covers this gap. None: no resume does (RC-5)."
     )
     status: Literal["open", "added", "dismissed"]
+    listed_in: list[str] = Field(
+        description="RC-5: names of the compared resumes (the focus first) that name the "
+        "requirement somewhere, by the IN-12 rule. Empty when none does or there is no "
+        "requirement."
+    )
 
 
 class ResumeComparisonOut(BaseModel):

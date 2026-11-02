@@ -5795,6 +5795,11 @@ export interface components {
              * @enum {string}
              */
             status: "open" | "added" | "dismissed";
+            /**
+             * Listed In
+             * @description RC-5: names of the compared resumes (the focus first) that name the requirement somewhere, by the IN-12 rule. Empty when none does or there is no requirement.
+             */
+            listed_in: string[];
         };
         /**
          * Competency
@@ -6831,6 +6836,11 @@ export interface components {
              * @description The line can be copied: a skill the resume lacks, or an achievement at a company the resume also lists.
              */
             can_add: boolean;
+            /**
+             * In Resume
+             * @description The focus resume already has this line, for example after Add to resume.
+             */
+            in_resume: boolean;
         };
         /**
          * HireSignal

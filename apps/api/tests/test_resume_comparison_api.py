@@ -318,6 +318,7 @@ async def test_rc4_add_to_resume_copies_the_line_and_dismiss_hides_it(
         "place": "skills",
         "company": None,
         "can_add": True,
+        "in_resume": False,
     }
     comparison = body["id"]
     gap_runs = len([j for j in queue.enqueued if j[0] == queue_names.RUN_GAP_ANALYSIS])

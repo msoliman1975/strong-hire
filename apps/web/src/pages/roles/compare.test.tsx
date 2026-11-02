@@ -11,6 +11,9 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { jobTargetsApi, resumesApi } from "../../api/inputs";
 import { AppRoutes, createQueryClient } from "../../App";
 import { EMPTY_PROFILE } from "../../mocks/handlers";
+import { gapApi } from "../../api/gap";
+import { compareApi } from "../../api/compare";
+import { patchMockComparison } from "../../mocks/compareHandlers";
 import { mockStore } from "../../mocks/node";
 import { setFeatureOverrides } from "../../theme/features";
 
@@ -130,7 +133,8 @@ describe("resume comparison", () => {
     // RC-4: the gap the main resume covers names it and its line; Add to resume copies it.
     const gaps = within(card).getAllByTestId("comparison-gap");
     const covered = gaps.find((g) => g.textContent?.includes("Kafka is not shown")) as HTMLElement;
-    expect(covered).toHaveTextContent(`Your ${main.name} resume shows this: “Kafka”`);
+    expect(covered).toHaveTextContent(`${main.name} shows this: “Kafka”`);
+    expect(covered).not.toHaveTextContent("Your ");
     await user.click(within(covered).getByRole("button", { name: "Add to resume" }));
     await waitFor(() => expect(covered).toHaveTextContent(`Added to ${other.name}`));
     expect(within(covered).queryByRole("button", { name: "Add to resume" })).toBeNull();
@@ -162,5 +166,42 @@ describe("resume comparison", () => {
     expect(within(card).getAllByTestId("comparison-gap")).toHaveLength(2);
     await user.click(within(card).getByRole("button", { name: "Dismiss" }));
     await waitFor(() => expect(within(card).getAllByTestId("comparison-gap")).toHaveLength(1));
+  });
+
+  it("RC-4, RC-5: a line the resume already has is not offered again; a listed skill is not called missing", async () => {
+    await addResume("Backend engineer, Python and Go.");
+    await addResume("Platform engineer, Kafka and Go.");
+    const { job_target: created } = await jobTargetsApi.create({ text: "Senior engineer, payments. ".repeat(5) });
+    await compareApi.start(created.id);
+    patchMockComparison(created.id, (c) => ({
+      ...c,
+      gaps: [
+        { ...c.gaps[0], source: c.gaps[0].source && { ...c.gaps[0].source, can_add: false, in_resume: true } },
+        { ...c.gaps[1], listed_in: ["Platform resume", "Payments resume"] },
+      ],
+    }));
+    const user = renderApp(`/roles/${created.id}`);
+    const card = await screen.findByTestId("compare-resumes");
+    await user.click(await within(card).findByRole("button", { name: "Open" }));
+    const [present, listed] = await within(card).findAllByTestId("comparison-gap");
+    expect(present).toHaveTextContent("already has this line.");
+    expect(within(present).queryByRole("button", { name: "Add to resume" })).toBeNull();
+    expect(present).not.toHaveTextContent("Add it by hand");
+    expect(within(present).getByRole("button", { name: "Dismiss" })).toBeInTheDocument();
+    expect(listed).toHaveTextContent("Platform resume and Payments resume list it, but no line shows it in use.");
+    expect(listed).not.toHaveTextContent("None of your resumes");
+    expect(within(listed).getByRole("link", { name: "Craft a story" })).toBeInTheDocument();
+  });
+
+  it("RC-6: a role with no interviews yet shows the resume of its latest analysis, not the main one", async () => {
+    await addResume("Backend engineer, Python and Go.");
+    const other = await addResume("Platform engineer, Kafka and Go.");
+    const { job_target: created } = await jobTargetsApi.create({ text: "Senior engineer, payments. ".repeat(5) });
+    await jobTargetsApi.get(created.id);
+    await gapApi.start(created.id, { resume_id: other.id });
+    renderApp(`/roles/${created.id}`);
+    expect(await screen.findByRole("heading", { level: 1 })).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText(`${other.name} ·`, { exact: false })).toBeInTheDocument());
+    expect(screen.queryByText(/Main resume ·/)).toBeNull();
   });
 });

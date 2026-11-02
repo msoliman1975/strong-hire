@@ -307,6 +307,7 @@ async def to_out(
             related_requirement=h.related_requirement,
             source=HintSource(**vars(h.source)) if h.source else None,
             status="added" if h.key in applied else "dismissed" if h.key in dismissed else "open",
+            listed_in=h.listed_in,
         )
         for h in hints
     ]
