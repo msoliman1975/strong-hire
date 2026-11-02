@@ -6,7 +6,7 @@ import { keys, useJobs, useResumes } from "../api/hooks";
 import { jobTargetsApi, resumesApi } from "../api/inputs";
 import { formatDate } from "../labels";
 import { resumeCheckPath } from "../paths";
-import { checkedLabel, issueSummary, resumeIssueCounts } from "../pages/onboarding/resumeSummary";
+import { editedLabel, issueSummary, resumeIssueCounts } from "../pages/onboarding/resumeSummary";
 import { useFeature } from "../theme/features";
 import { ErrorNotice, Loading } from "./ui";
 
@@ -38,7 +38,7 @@ interface Item {
   detail?: string;
   /** IN-12 (v2 CVs): the breakdown page. The row opens it, and "Open breakdown" is its main action. */
   to?: string;
-  /** IN-12: a second line, for example "Checked Oct 28 · 3 to fix · 1 accepted · 0 high". */
+  /** IN-12: a second line, for example "Edited Oct 28 · 3 to fix · 1 accepted · 0 high". */
   summary?: string;
 }
 
@@ -344,7 +344,7 @@ export function CvLibrary() {
           name: r.name,
           addedAt: r.uploaded_at,
           to: resumeCheckPath(r.id),
-          summary: [checkedLabel(r), counts && issueSummary(counts)].filter(Boolean).join(" · "),
+          summary: [editedLabel(r), counts && issueSummary(counts)].filter(Boolean).join(" · "),
         };
       })}
       loading={resumes.isPending}

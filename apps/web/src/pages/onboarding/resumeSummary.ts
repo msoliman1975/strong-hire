@@ -50,6 +50,10 @@ export function shortDate(iso: string, now = new Date()): string {
   });
 }
 
-/** "Checked Oct 28" from confirmed_at, else "Not checked yet". */
-export const checkedLabel = (record: Pick<ResumeOut, "confirmed_at">) =>
-  record.confirmed_at ? `Checked ${shortDate(record.confirmed_at)}` : "Not checked yet";
+/**
+ * RMAP-3: "Edited Oct 28" from confirmed_at, else null. confirmed_at is set when the user saves the
+ * resume from the editor; the issues are found on every read, saved or not. So a resume never
+ * saved says nothing here, instead of a "Not checked yet" next to its issue counts.
+ */
+export const editedLabel = (record: Pick<ResumeOut, "confirmed_at">): string | null =>
+  record.confirmed_at ? `Edited ${shortDate(record.confirmed_at)}` : null;

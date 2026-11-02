@@ -19,7 +19,7 @@ import "../../components/ux/ux.css";
 import { formatDate } from "../../labels";
 import { MAX_RESUME_MB, MAX_RESUMES, RESUMES_FULL } from "../../limits";
 import { resumeCheckPath } from "../../paths";
-import { checkedLabel, issuesOpen, resumeIssueCounts } from "../onboarding/resumeSummary";
+import { editedLabel, issuesOpen, resumeIssueCounts } from "../onboarding/resumeSummary";
 import { START } from "../start/paths";
 
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
@@ -128,7 +128,7 @@ function ResumeRow({ resume, roles }: { resume: ResumeOut; roles: RoleOut[] | un
     : [usedBy(roles, resume.id), issueFacts(resume), ideas.data ? plural(ideas.data.ideas.length, "story idea") : null].filter(
         Boolean,
       );
-  const dates = [`Added ${formatDate(resume.uploaded_at)}`, ready ? checkedLabel(resume) : null].filter(Boolean);
+  const dates = [`Added ${formatDate(resume.uploaded_at)}`, ready ? editedLabel(resume) : null].filter(Boolean);
 
   return (
     <li className="sx-list-row" data-testid="resume-row">

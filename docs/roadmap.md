@@ -11,7 +11,7 @@ Fields: **Area** (api, worker, voice, web, core, prompts, infra), **Priority** (
 | --- | --- | --- | --- | --- |
 | RMAP-1 | Filter Rehearsals by target role | web | Next | Idea |
 | RMAP-2 | One resume list on the Resumes page | web | Next | Done |
-| RMAP-3 | Clearer "Not checked yet" label on resumes | web | Next | Idea |
+| RMAP-3 | Clearer "Not checked yet" label on resumes | web | Next | Done |
 
 ## RMAP-1: Filter Rehearsals by target role
 
@@ -98,4 +98,15 @@ reviewed yet", or "Review the breakdown" as a link to it.
 - Decide too whether **Continue** on the breakdown should count as reviewed (set `confirmed_at`)
   even with no edit. That is an API change in `apps/api/src/strong_api/inputs/router.py`.
 - Update the IN-12 tests that match "Checked Oct 28" and "Not checked yet".
+
+**Done (2026-11-02):** the label now says what `confirmed_at` records: **"Edited Oct 28"** after the
+user saves the resume from the editor, and nothing before that. "Checked" and "Not checked yet" are
+gone from the v2 Resumes page. Open issues and **Open breakdown** already prompt a review.
+`checkedLabel()` became `editedLabel()` in `resumeSummary.ts`. The v1 "Saved CVs" detail
+("not checked yet") is unchanged, because v1 has a real confirm step.
+
+**Not done:** **Continue** on the first-use breakdown does not mark the resume reviewed. The only way
+to set `confirmed_at` is `PUT /resumes/{id}`, which also re-runs the story-idea skills job (a model
+call) and every gap analysis that used the resume. That is too much for a click-through. If a
+reviewed state is wanted later, add a light endpoint that only sets a `reviewed_at`.
 

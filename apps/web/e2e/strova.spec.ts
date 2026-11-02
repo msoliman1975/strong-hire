@@ -152,7 +152,9 @@ test("RMAP-2: Resumes is one list; each row opens its breakdown and has Rename a
   const row = list.getByRole("listitem").first();
   await expect(row).toContainText("Main");
   await expect(row).toContainText(/\d+ issues? open/);
-  await expect(row).toContainText(/Added .* · (Checked|Not checked yet)/);
+  await expect(row).toContainText(/Added [A-Z][a-z]{2} \d+, \d{4}/);
+  // RMAP-3: first use goes through the breakdown without the editor, so nothing says "Not checked yet".
+  await expect(row).not.toContainText(/checked/i);
   await shot(page, "07-resumes");
   await row.getByText("More ▾").click();
   await expect(row.getByRole("button", { name: /^Rename / })).toBeVisible();

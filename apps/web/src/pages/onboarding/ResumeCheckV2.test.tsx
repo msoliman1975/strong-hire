@@ -411,7 +411,7 @@ describe("v2 coming back to a saved CV", () => {
     const list = await screen.findByRole("list", { name: "Your resumes" });
     const row = within(list).getAllByRole("listitem")[0];
     expect(row).toHaveTextContent(/\d+ issues? open( · \d+ high)? · 1 accepted/);
-    expect(row).toHaveTextContent(/Added [A-Z][a-z]{2} \d+, \d{4} · Checked Oct 28/);
+    expect(row).toHaveTextContent(/Added [A-Z][a-z]{2} \d+, \d{4} · Edited Oct 28/);
     const open = within(row).getByRole("link", { name: /^Open breakdown for / });
     expect(open).toHaveAttribute("href", `/resumes/${mockStore.db.resumes[0].id}/check`);
     await user.click(open);
@@ -425,7 +425,9 @@ describe("v2 coming back to a saved CV", () => {
     expect(screen.queryByRole("list", { name: "Saved resumes" })).not.toBeInTheDocument();
     expect(screen.queryByText("Rename or delete resumes")).not.toBeInTheDocument();
     const row = within(list).getAllByRole("listitem")[0];
-    expect(row).toHaveTextContent("Not checked yet");
+    // RMAP-3: a resume never saved from the editor has no "Not checked yet" next to its issues.
+    expect(row).not.toHaveTextContent(/checked/i);
+    expect(row).not.toHaveTextContent(/Edited/);
     expect(within(row).getByRole("link", { name: /^Open breakdown for / })).toBeInTheDocument();
     expect(within(row).getByRole("link", { name: /^Open (?!breakdown)/ })).toHaveAttribute(
       "href",
