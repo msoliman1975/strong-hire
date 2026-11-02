@@ -1085,7 +1085,8 @@ export interface paths {
         put?: never;
         /**
          * End Coach Session
-         * @description End the session and record its minutes. Ending twice is harmless.
+         * @description End the session and record its minutes. Ending twice is harmless. The story it built
+         *     refreshes the story fit of the user's roles (ST-5).
          */
         post: operations["end_coach_session_coach_sessions__session_id__end_post"];
         delete?: never;
@@ -1274,6 +1275,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/roles/{job_target_id}/story-fit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Role Story Fit
+         * @description ST-5: for each skill the role's interviews test, the best story and whether it is
+         *     strong, thin or missing. Read from the role's stored table; never waits for the model.
+         */
+        get: operations["get_role_story_fit_roles__job_target_id__story_fit_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/plan/{job_target_id}/{resume_id}/story-fit": {
         parameters: {
             query?: never;
@@ -1283,8 +1305,7 @@ export interface paths {
         };
         /**
          * Get Story Fit
-         * @description ST-5: for each skill the interview will test, the best story and whether it is strong,
-         *     thin or missing.
+         * @description ST-5: the role's story fit, for the v1 plan page (the resume only checks ownership).
          */
         get: operations["get_story_fit_plan__job_target_id___resume_id__story_fit_get"];
         put?: never;
@@ -1390,7 +1411,8 @@ export interface paths {
         put?: never;
         /**
          * Add Interviews
-         * @description RH-1, TG-3: keep the chosen types as interviews of the role.
+         * @description RH-1, TG-3: keep the chosen types as interviews of the role. The role's story fit
+         *     (ST-5) starts computing now, so the role page has it when it opens.
          */
         post: operations["add_interviews_roles__job_target_id__interviews_post"];
         delete?: never;
@@ -13780,6 +13802,44 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    get_role_story_fit_roles__job_target_id__story_fit_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryFitView"];
+                };
+            };
+            /** @description The role does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
             };
         };
     };

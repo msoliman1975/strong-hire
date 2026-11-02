@@ -7,10 +7,12 @@ is strong, thin or missing (schemas.StoryFit).
   skills, or, for a small-tier model (PL-5), one call per skill. Code then checks the reply:
   only the asked skills, only the user's own story ids, one item per skill. A skill the reply
   leaves out, or gives an unknown story, becomes "missing". With no stories there is no call.
-- `run_story_fit` is the Arq job the plan API enqueues when the plan page asks. It reads the
-  stories and the job, and skips the model when the cached result has the same input hash
-  (same stories, skills, job, prompt and model). The result is cached in Redis under
-  `story_fit_key` as a `StoryFitRecord`, with PL-6 provenance.
+- `run_story_fit` is the Arq job the API enqueues when a role's interviews are created, when a
+  story changes, and when the role page asks (to catch anything else). It reads the stories and
+  the job, and skips the model when a stored table has the same input hash (same stories,
+  skills, job, prompt and model). The result is stored on the role in Postgres
+  (`role_story_fits`, read by the role page) and copied to Redis under `story_fit_key` as a
+  `StoryFitRecord` (read by the day plan), with PL-6 provenance.
 
 How the plan API uses it (S23, in strong_api/plan/):
     await queue.enqueue_job(
@@ -35,7 +37,7 @@ from typing import Any, Protocol
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from sqlalchemy import select
 
-from strong_core.db.models import JobTarget
+from strong_core.db.models import JobTarget, RoleStoryFit
 from strong_core.gateway import ModelGateway, Role
 from strong_core.gateway.registry import CapabilityTier
 from strong_core.prompts import load_prompt
@@ -206,12 +208,52 @@ def _cached(raw: bytes | str | None) -> StoryFitRecord | None:
         return None
 
 
+def _record(row: RoleStoryFit) -> StoryFitRecord:
+    return StoryFitRecord(
+        fit=StoryFit.model_validate(row.fit_json),
+        input_hash=row.input_hash,
+        model_profile=row.model_profile,
+        model_id=row.model_id,
+        prompt_version=row.prompt_version,
+        computed_at=row.computed_at,
+    )
+
+
+async def _store(
+    gap: Any, target: JobTarget, record: StoryFitRecord, cache: StoryFitCache | None
+) -> None:
+    """Save the table on the role (Postgres, what the role page reads) and in Redis (the day
+    plan's copy). One row per role: a newer table replaces the older one."""
+    async with gap.sessionmaker() as db:
+        row = await db.scalar(select(RoleStoryFit).where(RoleStoryFit.job_target_id == target.id))
+        if row is None:
+            row = RoleStoryFit(
+                org_id=target.org_id, user_id=target.user_id, job_target_id=target.id
+            )
+            db.add(row)
+        row.input_hash = record.input_hash
+        row.fit_json = record.fit.model_dump(mode="json")
+        row.model_profile = record.model_profile
+        row.model_id = record.model_id
+        row.prompt_version = record.prompt_version
+        row.computed_at = record.computed_at
+        await db.commit()
+    if cache is not None:
+        key = story_fit_key(target.org_id, target.id)
+        await cache.set(key, record.model_dump_json(), ex=CACHE_TTL_S)
+
+
 async def run_story_fit(
     ctx: dict[str, Any], org_id: str, job_target_id: str, competencies: list[str]
 ) -> dict[str, Any]:
-    """Arq job: compute (or reuse) the story fit for one job and cache it."""
+    """Arq job: compute (or reuse) the story fit for one role and store it.
+
+    The model runs only when nothing stored has the same input hash: not this role's table,
+    not another of the user's roles with the same inputs (the same posting added twice), and
+    not the Redis copy from before tables were stored in Postgres.
+    """
     gap = _gap(ctx)
-    cache: StoryFitCache = ctx["redis"]
+    cache: StoryFitCache | None = ctx.get("redis")
     org = uuid.UUID(org_id)
     wanted = [Competency(c) for c in competencies]
     async with gap.sessionmaker() as db:
@@ -224,18 +266,34 @@ async def run_story_fit(
             return {"outcome": "failed", "reason": "job not found"}
         stories = [story_from_row(r) for r in await load_user_stories(db, org, target.user_id)]
         gateway = await gateway_for_org(db, org, gap.gateway)
-    job = _job_text(target)
-    prompt_version = _prompt_ref(gateway)
-    input_hash = story_fit_input_hash(
-        stories, wanted, job, prompt_version, gateway.config.roles[ROLE]
-    )
-    key = story_fit_key(org_id, job_target_id)
-    previous = _cached(await cache.get(key))
-    if previous is not None and previous.input_hash == input_hash:
-        return {"outcome": "cached", "input_hash": input_hash, "model_calls": 0}
+        job = _job_text(target)
+        prompt_version = _prompt_ref(gateway)
+        input_hash = story_fit_input_hash(
+            stories, wanted, job, prompt_version, gateway.config.roles[ROLE]
+        )
+        own = await db.scalar(select(RoleStoryFit).where(RoleStoryFit.job_target_id == target.id))
+        if own is not None and own.input_hash == input_hash:
+            return {"outcome": "cached", "input_hash": input_hash, "model_calls": 0}
+        twin = await db.scalar(
+            select(RoleStoryFit)
+            .where(
+                RoleStoryFit.org_id == org,
+                RoleStoryFit.user_id == target.user_id,
+                RoleStoryFit.input_hash == input_hash,
+            )
+            .limit(1)
+        )
+        reused = _record(twin) if twin is not None else None
+    if reused is None and cache is not None:
+        legacy = _cached(await cache.get(story_fit_key(org_id, job_target_id)))
+        if legacy is not None and legacy.input_hash == input_hash:
+            reused = legacy
+    if reused is not None:
+        await _store(gap, target, reused, cache)
+        return {"outcome": "reused", "input_hash": input_hash, "model_calls": 0}
     try:
         result = await compute_story_fit(gateway, stories, wanted, job)
-    except Exception as exc:  # the plan page keeps the last good table, or shows none
+    except Exception as exc:  # the role page keeps the last good table, or shows none
         log.warning("story fit failed for job %s: %s", job_target_id, exc)
         return {"outcome": "failed", "reason": f"Story fit failed: {type(exc).__name__}"}
     record = StoryFitRecord(
@@ -246,7 +304,7 @@ async def run_story_fit(
         prompt_version=result.prompt_version,
         computed_at=datetime.now(UTC),
     )
-    await cache.set(key, record.model_dump_json(), ex=CACHE_TTL_S)
+    await _store(gap, target, record, cache)
     # SG-5: a new table gives each lead story a "For {company}" suggestion. Never fails the job.
     try:
         async with gap.sessionmaker() as db:

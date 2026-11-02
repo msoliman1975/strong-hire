@@ -37,6 +37,26 @@ export const useStoryFit = (jobId: string, resumeId: string) =>
     refetchInterval: (query) => (query.state.data?.status === "computing" ? POLL_MS : false),
   });
 
+export const roleStoryFitKey = (jobId: string) => ["roles", jobId, "story-fit"] as const;
+
+/**
+ * ST-5 on the role page: the role's stored story fit. It is computed when the role is created
+ * and when a story changes, so it is there when the page opens; it polls only while the API
+ * says `computing` (a role with no table yet).
+ */
+export const useRoleStoryFit = (jobId: string) =>
+  useQuery({
+    queryKey: roleStoryFitKey(jobId),
+    enabled: Boolean(jobId),
+    queryFn: async () =>
+      unwrap(
+        await apiClient.GET("/roles/{job_target_id}/story-fit", {
+          params: { path: { job_target_id: jobId } },
+        }),
+      ),
+    refetchInterval: (query) => (query.state.data?.status === "computing" ? POLL_MS : false),
+  });
+
 const STRENGTH_LABEL: Record<Strength, string> = { strong: "Strong", thin: "Thin", missing: "Missing" };
 const PILL_STATE: Record<Strength, "strong" | "thin" | "gap"> = { strong: "strong", thin: "thin", missing: "gap" };
 

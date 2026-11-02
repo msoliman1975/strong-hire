@@ -1,4 +1,5 @@
-/** MSW for the plan page's story fit table (ST-5, S23): GET /plan/{job}/{resume}/story-fit. */
+/** MSW for the story fit table (ST-5, S23): GET /roles/{job}/story-fit (the role page) and
+ * GET /plan/{job}/{resume}/story-fit (the v1 plan page). */
 import { http, HttpResponse } from "msw";
 
 import type { StoryFitView } from "../pages/plan/StoryFitTable";
@@ -30,4 +31,5 @@ export const mockStoryFit: StoryFitView = {
 
 export const storyFitHandlers = () => [
   http.get("*/api/plan/:jobId/:resumeId/story-fit", () => HttpResponse.json(mockStoryFit)),
+  http.get("*/api/roles/:jobId/story-fit", () => HttpResponse.json(mockStoryFit)),
 ];
