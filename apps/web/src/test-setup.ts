@@ -17,3 +17,13 @@ afterEach(() => {
   resetMockSuggestions();
 });
 afterAll(() => server.close());
+
+// jsdom has <dialog> but not showModal() and close(): open and close it by its attribute.
+if (typeof HTMLDialogElement !== "undefined" && !HTMLDialogElement.prototype.showModal) {
+  HTMLDialogElement.prototype.showModal = function showModal(this: HTMLDialogElement) {
+    this.setAttribute("open", "");
+  };
+  HTMLDialogElement.prototype.close = function close(this: HTMLDialogElement) {
+    this.removeAttribute("open");
+  };
+}
