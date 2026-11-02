@@ -196,17 +196,19 @@ when crafting starts from a "tell me about a challenge" question. Otherwise it s
 
 ## Delivery plan
 
-Each step is one PR, merged in order. Tests stay green at every step.
+The plan is `docs/story-crafting/execution-plan.md`: nine tasks, SC00 to SC08, each one PR into
+`main`, built unattended by one loop session (`docs/story-crafting/prompts/LOOP.md`). The order
+is:
 
-1. **Core:** enums, contracts, migration, schemas. Small and separate, as CLAUDE.md requires.
-2. **API engine:** outline, renderer, readiness, `next_ask`, the craft turn, and the start and
-   turn endpoints for styled stories. Prompts and fixtures.
-3. **Web session:** style picker, wide session screen, live outline panel, the growing reply box
-   with Expand.
-4. **Story page:** inline slot editing, Improve per section, Switch style, Organize for classic
-   stories.
-5. **Flow check and skill hints:** API and UI.
-6. **Formatting (SC-18), evals (SC-15 and the depth and flow suites), voice light flow (SC-16).**
+1. spec on `main`;
+2. core;
+3. the engine and craft turn;
+4. the story APIs;
+5. the session UI;
+6. the story page UI;
+7. the flow check and skill hints;
+8. formatting and voice;
+9. evals, end-to-end and the report.
 
 ## Open items
 

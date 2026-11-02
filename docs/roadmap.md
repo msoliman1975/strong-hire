@@ -268,6 +268,6 @@ pasting them in.
 SC-18, agreed with the owner on 2026-11-02. RMAP-7 (room to type, formatting) is folded in as
 SC-17 and SC-18.
 
-**Delivery:** six PRs in order: core, API engine, web session, story page, flow check and skill
-hints, then formatting, evals and voice.
+**Delivery:** a loop session builds it unattended, in nine PRs (SC00 to SC08), following
+`docs/story-crafting/execution-plan.md` and `docs/story-crafting/prompts/LOOP.md`.
 
