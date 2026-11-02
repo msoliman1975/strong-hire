@@ -49,6 +49,7 @@ SPEC_TABLES = {
     "takes",  # CO-7
     # v2.1 UX with Strova
     "target_interviews",  # RH-1
+    "role_story_fits",  # ST-5: the stored story fit per role
     "suggestions",  # SG-1
 }
 
