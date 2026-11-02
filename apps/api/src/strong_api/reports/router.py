@@ -24,7 +24,7 @@ from strong_core.db.models import GapAnalysis as GapRow
 from strong_core.db.models import InterviewSession, JobTarget
 from strong_core.db.models import Resume as ResumeRow
 from strong_core.db.models import Scorecard as ScorecardRow
-from strong_core.schemas import GapStatus, HireSignal, SessionStatus
+from strong_core.schemas import GapPurpose, GapStatus, HireSignal, SessionStatus
 
 router = APIRouter(tags=["reports"])
 
@@ -58,6 +58,7 @@ async def list_reports(
             GapRow.job_target_id.in_(ids),
             GapRow.org_id == me.org_id,
             GapRow.status == GapStatus.READY,
+            GapRow.purpose == GapPurpose.ROLE,  # RC-7: comparisons are not reports
         )
         if resume_id is not None:
             gap_query = gap_query.where(GapRow.resume_id == resume_id)
