@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import type { ResumeOut } from "../../api/types";
 import { resume as fixtureResume } from "../../mocks/fixtures";
 import { checkResume } from "./resumeChecks";
-import { checkedLabel, countIssues, issueSummary, issuesOpen, resumeIssueCounts, shortDate } from "./resumeSummary";
+import { countIssues, issueSummary, issuesOpen, resumeIssueCounts, shortDate, editedLabel } from "./resumeSummary";
 
 const record = (over: Partial<ResumeOut> = {}): ResumeOut => ({
   id: "r1",
@@ -50,11 +50,11 @@ describe("resume summary", () => {
     expect(resumeIssueCounts(record({ status: "pending", resume: null }))).toBeNull();
   });
 
-  it("IN-12: says when the CV was checked", () => {
+  it("IN-12, RMAP-3: says when the CV was last edited, and nothing when it never was", () => {
     const now = new Date("2026-11-02T10:00:00Z");
     expect(shortDate("2026-10-28T10:00:00Z", now)).toBe("Oct 28");
     expect(shortDate("2025-10-28T10:00:00Z", now)).toBe("Oct 28, 2025");
-    expect(checkedLabel({ confirmed_at: null })).toBe("Not checked yet");
-    expect(checkedLabel({ confirmed_at: `${new Date().getFullYear()}-10-28T10:00:00Z` })).toBe("Checked Oct 28");
+    expect(editedLabel({ confirmed_at: null })).toBeNull();
+    expect(editedLabel({ confirmed_at: `${new Date().getFullYear()}-10-28T10:00:00Z` })).toBe("Edited Oct 28");
   });
 });

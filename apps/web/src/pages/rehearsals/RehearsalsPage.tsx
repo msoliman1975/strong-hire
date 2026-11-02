@@ -1,8 +1,10 @@
 /**
  * RH-4 (mockup #rehearse): Strova as the interviewer, the recommended next take, then every
  * interview across the target roles with its readiness and Retake or Start.
+ * RMAP-1: a "Target role" filter (All by default) narrows the list and the recommendation to one
+ * role. It lives in the URL (?role=<id>), so Back and a shared link keep it.
  */
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 
 import { useRehearsals } from "../../api/roles";
 import type { RehearsalItem } from "../../api/types";
@@ -28,9 +30,67 @@ function why(item: RehearsalItem): string {
   return `${text.charAt(0).toUpperCase()}${text.slice(1)}.`;
 }
 
+/** "Rubrik · Staff Engineer": the company, and the title when there is one. */
+function roleLabel(item: RehearsalItem): string {
+  const title = item.role.title;
+  return title && title !== company(item) ? `${company(item)} · ${title}` : company(item);
+}
+
+/**
+ * RMAP-1: the recommended take among some interviews, with the API's rule (RH-4, `recommend` in
+ * strong_api/plan/interviews.py): below the goal only, the closest interview date first, then the
+ * lowest readiness (no score yet counts lowest), then the oldest interview.
+ */
+export function recommendNext(items: readonly RehearsalItem[]): RehearsalItem | null {
+  const below = items.filter((i) => i.readiness.score === null || i.readiness.score < GOAL);
+  const sorted = [...below].sort(
+    (a, b) =>
+      Number(a.role.interview_date === null) - Number(b.role.interview_date === null) ||
+      (a.role.interview_date ?? "").localeCompare(b.role.interview_date ?? "") ||
+      (a.readiness.score ?? -1) - (b.readiness.score ?? -1) ||
+      a.interview.created_at.localeCompare(b.interview.created_at),
+  );
+  return sorted[0] ?? null;
+}
+
+/** The roles the interviews belong to, in the list's order, each with its interview count. */
+function rolesOf(items: readonly RehearsalItem[]) {
+  const roles = new Map<string, { id: string; label: string; company: string; count: number }>();
+  for (const item of items) {
+    const found = roles.get(item.role.id);
+    if (found) found.count += 1;
+    else roles.set(item.role.id, { id: item.role.id, label: roleLabel(item), company: company(item), count: 1 });
+  }
+  return [...roles.values()];
+}
+
 export function RehearsalsPage() {
   const data = useRehearsals();
-  const next = data.data?.items.find((i) => i.interview.id === data.data?.next_interview_id) ?? null;
+  const [params, setParams] = useSearchParams();
+  const all = data.data?.items ?? [];
+  const roles = rolesOf(all);
+  // A role that is gone (archived, deleted) or a bad link shows everything.
+  const roleId = roles.some((r) => r.id === params.get("role")) ? params.get("role") : null;
+  const items = roleId ? all.filter((i) => i.role.id === roleId) : all;
+  // RMAP-1: two roles at one company would give identical rows ("Rubrik · Behavioral"), so their
+  // rows name the role title too.
+  const companyRoles = new Map<string, number>();
+  for (const r of roles) companyRoles.set(r.company, (companyRoles.get(r.company) ?? 0) + 1);
+  const rowTitle = (item: RehearsalItem) =>
+    (companyRoles.get(company(item)) ?? 0) > 1 ? roleLabel(item) : company(item);
+  const next = roleId
+    ? recommendNext(items)
+    : (all.find((i) => i.interview.id === data.data?.next_interview_id) ?? null);
+  const pick = (id: string) =>
+    setParams(
+      (p) => {
+        const out = new URLSearchParams(p);
+        if (id) out.set("role", id);
+        else out.delete("role");
+        return out;
+      },
+      { replace: true },
+    );
   return (
     <div className="sx-page">
       <div className="sx-row">
@@ -42,6 +102,26 @@ export function RehearsalsPage() {
           </p>
         </div>
       </div>
+      {roles.length > 1 && (
+        <div className="sx-row" style={{ gap: 8 }}>
+          <label htmlFor="rehearsals-role" className="sx-small" style={{ fontWeight: 600 }}>
+            Target role
+          </label>
+          <select
+            id="rehearsals-role"
+            value={roleId ?? ""}
+            onChange={(e) => pick(e.target.value)}
+            style={{ width: "auto", maxWidth: "100%" }}
+          >
+            <option value="">All target roles ({all.length})</option>
+            {roles.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.label} ({r.count})
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       {data.isPending && <Loading label="Loading your rehearsals" />}
       {data.isError && <ErrorNotice error={data.error} />}
       {next && (
@@ -50,7 +130,7 @@ export function RehearsalsPage() {
             Recommended next take
           </span>
           <div className="big">
-            {company(next)} · {typeName(next.interview)}, Realistic, {DEFAULT_TAKE_MINUTES} minutes
+            {rowTitle(next)} · {typeName(next.interview)}, Realistic, {DEFAULT_TAKE_MINUTES} minutes
           </div>
           <div className="sub">{why(next)}</div>
           <div className="sx-row">
@@ -71,15 +151,20 @@ export function RehearsalsPage() {
           </div>
         </div>
       )}
-      {data.data && data.data.items.length > 0 && (
-        <div className="sx-card">
-          {data.data.items.map((item) => {
+      {roleId && !next && items.length > 0 && (
+        <p className="sx-notice ground" role="status">
+          Every interview for this role is at your readiness goal. Retake any of them to stay sharp.
+        </p>
+      )}
+      {items.length > 0 && (
+        <div className="sx-card" data-testid="rehearsal-list">
+          {items.map((item) => {
             const score = item.readiness.score;
             return (
               <Link key={item.interview.id} className="sx-list-row" to={interviewPath(item.interview.id)}>
                 <div className="sx-stack" style={{ gap: 4, flex: "1 1 300px" }}>
                   <strong>
-                    {company(item)} · {typeName(item.interview)}
+                    {rowTitle(item)} · {typeName(item.interview)}
                   </strong>
                   <span className="sx-small sx-muted">{takesMeta(item)}</span>
                 </div>

@@ -211,7 +211,10 @@ describe("resume pages", () => {
     const user = renderApp("/resumes");
     expect(await screen.findByRole("heading", { level: 1, name: "Ana's Resumes" })).toBeInTheDocument();
     const card = (await screen.findByText("Main")).closest(".sx-card") as HTMLElement;
-    expect(within(card).getAllByRole("link", { name: /^Open / })).toHaveLength(2);
+    expect(within(card).getAllByRole("link", { name: /^Open (?!breakdown)/ })).toHaveLength(2);
+    // RMAP-2: one list only, each row with its breakdown.
+    expect(within(card).getAllByRole("link", { name: /^Open breakdown for / })).toHaveLength(2);
+    expect(screen.queryByRole("list", { name: "Saved resumes" })).not.toBeInTheDocument();
     const main = screen.getByText("Main");
     expect(main.closest(".sx-list-row")).toHaveTextContent(first.name ?? "");
     expect(await within(main.closest(".sx-list-row") as HTMLElement).findByText(/Not used by a role/)).toBeInTheDocument();
