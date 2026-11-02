@@ -13,7 +13,7 @@ Fields: **Area** (api, worker, voice, web, core, prompts, infra), **Priority** (
 | RMAP-2 | One resume list on the Resumes page | web | Next | Done |
 | RMAP-3 | Clearer "Not checked yet" label on resumes | web | Next | Done |
 | RMAP-4 | Call it the "default" resume, not the "main" one | web | Now | Done |
-| RMAP-5 | Deleting a resume that a target role uses | web, api | Next | Idea |
+| RMAP-5 | Deleting a resume that a target role uses | web | Now | Done |
 
 ## RMAP-1: Filter Rehearsals by target role
 
@@ -166,5 +166,24 @@ resume is **Compare my resumes**, then **Use this one** (RC-6), which needs two 
    - (c) delete, then flag the roles ("Pick a resume for this role").
 3. Decide whether a take may start on an interview whose resume is deleted.
 
-**Open question:** which of (a), (b) and (c). (a) keeps the user moving and fits "default".
+**Decision (2026-11-02):** (c). Delete stays allowed. The roles flag it and ask for another resume.
+
+**Done (2026-11-02):** web only, with the existing endpoints:
+
+- **Delete dialog** (Resumes): names the roles that use the resume, for example "Rubrik (2 roles)
+  and Sourcegraph use this resume. They keep their takes and reports, and each asks you to pick
+  another resume."
+- **Target roles:** the card says "Resume deleted" with a **Pick a resume for this role** chip.
+- **Role page:** a **Pick a resume for this role** card, with the live resumes (default first) and
+  **Use this resume**. That button:
+  - starts the role's analysis with that resume (`reuse_ready`, so a ready analysis is reused;
+    otherwise one run counts against GA-4);
+  - keeps the same interview types (and Custom setup) on the new resume;
+  - archives the old interviews with their takes (RH-1).
+  It is the same end state as RC-6. With no resume left, the card offers **Add a resume**.
+- **Interview page:** "Resume deleted" in the Role × Resume × Type line. In place of Start, a link
+  to the role says "Pick a resume for this role".
+
+**Not done:** the API still lets a take start on an interview whose resume is deleted. Only the UI
+stops it. If that matters, `interview_for_session` can return 409 for a deleted resume.
 

@@ -204,6 +204,36 @@ test("RMAP-1: Rehearsals filters by target role and keeps the filter in the URL"
   await expect(filter).toHaveValue(value ?? "");
 });
 
+test("RMAP-5: deleting a role's resume flags the role; Use this resume moves it", async ({ page }) => {
+  await firstUse(page, "deleted@example.com");
+  await addRole(page);
+  const roleUrl = page.url();
+  // A second resume, then delete the first one, which the role uses.
+  await page.goto("/start");
+  await page.getByLabel("Or paste your resume text").fill(RESUME.replace("Ana Lopez", "Ana Lopez (platform)"));
+  await page.getByRole("button", { name: "Read my resume" }).click();
+  await expect(page.getByRole("heading", { name: "Here is what your resume shows" })).toBeVisible({ timeout: 15_000 });
+  await page.goto("/resumes");
+  const list = page.getByRole("list", { name: "Your resumes" });
+  await expect(list.getByRole("listitem")).toHaveCount(2);
+  const used = list.getByRole("listitem").filter({ hasText: /Used by Stripe/ });
+  await used.getByText("More ▾").click();
+  await used.getByRole("button", { name: /^Delete / }).click();
+  const dialog = used.getByRole("dialog", { name: "Delete this resume?" });
+  await expect(dialog.getByTestId("delete-roles-note")).toContainText("uses this resume");
+  await shot(page, "26-delete-used-resume");
+  await dialog.getByRole("button", { name: "Delete" }).click();
+  await expect(list.getByRole("listitem")).toHaveCount(1);
+
+  await page.goto(roleUrl);
+  const card = page.getByTestId("pick-resume");
+  await expect(card).toBeVisible();
+  await shot(page, "27-pick-resume");
+  await card.getByRole("button", { name: "Use this resume" }).click();
+  await expect(card).toBeHidden({ timeout: 15_000 });
+  await expect(page.getByText("Resume deleted")).toHaveCount(0);
+});
+
 test("rehearse: interview page, take, live room, debrief, apply a suggestion, undo", async ({ page }) => {
   await firstUse(page, "rehearse@example.com");
   await addRole(page);

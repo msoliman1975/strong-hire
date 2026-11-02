@@ -2,7 +2,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { RoleOut } from "../../api/types";
-import { usedBy } from "./ResumesListPage";
+import { deleteRolesNote, usedBy } from "./ResumesListPage";
 
 const role = (company: string, resumeId: string) =>
   ({ role: { company_name: company, name: null }, interviews: [{ interview: { resume_id: resumeId } }] }) as unknown as RoleOut;
@@ -19,3 +19,17 @@ describe("usedBy", () => {
     expect(usedBy(undefined, "a")).toBeNull();
   });
 });
+
+describe("deleteRolesNote", () => {
+  it("RMAP-5: names the roles that use the resume, one or many, and nothing when none do", () => {
+    expect(deleteRolesNote([role("Stripe", "a")], "a")).toBe(
+      "Stripe uses this resume. It keeps its takes and report, and asks you to pick another resume.",
+    );
+    expect(deleteRolesNote([role("Rubrik", "a"), role("Rubrik", "a"), role("Sourcegraph", "a")], "a")).toBe(
+      "Rubrik (2 roles) and Sourcegraph use this resume. They keep their takes and reports, and each asks you to pick another resume.",
+    );
+    expect(deleteRolesNote([role("Stripe", "b")], "a")).toBeNull();
+    expect(deleteRolesNote(undefined, "a")).toBeNull();
+  });
+});
+

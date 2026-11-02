@@ -25,8 +25,18 @@ export function dateChip(role: RoleSummary, stage?: string | null): { text: stri
   return { text: `${what} in ${d} ${d === 1 ? "day" : "days"}`, teal: true };
 }
 
-/** "Default resume", or the resume's name. */
+/**
+ * RMAP-5: the role's resume was deleted (or is missing from the user's resumes). False while the
+ * resumes load or when there is no resume id, so nothing flashes.
+ */
+export function resumeGone(resumes: ResumeOut[] | undefined, resumeId: string | null | undefined): boolean {
+  if (!resumes || !resumeId) return false;
+  return !resumes.some((r) => r.id === resumeId && !r.deleted);
+}
+
+/** "Default resume", the resume's name, or "Resume deleted" (RMAP-5). */
 export function resumeLabel(resumes: ResumeOut[] | undefined, resumeId: string | undefined): string {
+  if (resumeGone(resumes, resumeId)) return "Resume deleted";
   const r = resumes?.find((x) => x.id === resumeId);
   if (!r) return "Resume";
   return r.is_main ? "Default resume" : (r.name ?? "Resume");
