@@ -10331,6 +10331,55 @@
         "title": "ActionIn",
         "description": "Base for admin write bodies: the reason is required and saved in the audit log."
       },
+      "ActionStep": {
+        "properties": {
+          "did": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OutlineSlot"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "why": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OutlineSlot"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "alternatives": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OutlineSlot"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "people": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OutlineSlot"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How you brought people along."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ActionStep",
+        "description": "SC-2: one action step. `did` and `why` are core (D-4); the other two are optional."
+      },
       "AddAdminIn": {
         "properties": {
           "reason": {
@@ -15800,6 +15849,60 @@
         ],
         "title": "CostSlice"
       },
+      "CraftReply": {
+        "additionalProperties": false,
+        "description": "SC-4 to SC-6: one Strova turn while crafting a styled story. It replaces CoachReply for\nstyled stories. The engine names the section and slots; the reply fills only those.",
+        "properties": {
+          "message": {
+            "description": "What Strova says: one question at a time.",
+            "minLength": 1,
+            "title": "Message",
+            "type": "string"
+          },
+          "slot_updates": {
+            "items": {
+              "$ref": "#/components/schemas/SlotUpdate"
+            },
+            "title": "Slot Updates",
+            "type": "array"
+          },
+          "skips": {
+            "description": "SC-5: slots the candidate asked to skip.",
+            "items": {
+              "$ref": "#/components/schemas/SlotRef"
+            },
+            "title": "Skips",
+            "type": "array"
+          },
+          "section_done": {
+            "default": false,
+            "description": "SC-5: the candidate said move on, or the section is complete.",
+            "title": "Section Done",
+            "type": "boolean"
+          },
+          "skills": {
+            "description": "Skills the story shows so far.",
+            "items": {
+              "$ref": "#/components/schemas/Competency"
+            },
+            "title": "Skills",
+            "type": "array"
+          },
+          "hints": {
+            "items": {
+              "$ref": "#/components/schemas/SkillHint"
+            },
+            "maxItems": 3,
+            "title": "Hints",
+            "type": "array"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "CraftReply",
+        "type": "object"
+      },
       "Crafting": {
         "properties": {
           "competency": {
@@ -17264,6 +17367,71 @@
         ],
         "title": "ExportOut",
         "description": "AC-1 data export. The bundle is a zip: data.json plus the original resume files."
+      },
+      "FlowCheck": {
+        "additionalProperties": false,
+        "description": "SC-9: the result of one flow check. No flags means the story hangs together.",
+        "properties": {
+          "flags": {
+            "items": {
+              "$ref": "#/components/schemas/FlowFlag"
+            },
+            "title": "Flags",
+            "type": "array"
+          }
+        },
+        "title": "FlowCheck",
+        "type": "object"
+      },
+      "FlowFlag": {
+        "additionalProperties": false,
+        "description": "SC-9, D-9: one advisory flow flag. `key` is stable for the same issue, so a dismissed\nflag stays dismissed until the slots it cites change.",
+        "properties": {
+          "key": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/FlowFlagType"
+          },
+          "slots": {
+            "description": "The slots the flag is about.",
+            "items": {
+              "$ref": "#/components/schemas/SlotRef"
+            },
+            "minItems": 1,
+            "title": "Slots",
+            "type": "array"
+          },
+          "question": {
+            "description": "What Strova would ask about it.",
+            "minLength": 1,
+            "title": "Question",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "type",
+          "slots",
+          "question"
+        ],
+        "title": "FlowFlag",
+        "type": "object"
+      },
+      "FlowFlagType": {
+        "description": "SC-9, D-9: the kinds of advisory flags the flow check raises.",
+        "enum": [
+          "action_vs_problem",
+          "result_vs_problem",
+          "number_conflict",
+          "timeline_conflict",
+          "loose_end"
+        ],
+        "title": "FlowFlagType",
+        "type": "string"
       },
       "FocusSuggestions": {
         "properties": {
@@ -21046,6 +21214,105 @@
         ],
         "title": "OrgType"
       },
+      "OrganizeResult": {
+        "additionalProperties": false,
+        "description": "SC-13, D-11: a classic story sorted into STAR slots from the candidate's words only.",
+        "properties": {
+          "outline": {
+            "$ref": "#/components/schemas/StoryOutline"
+          }
+        },
+        "required": [
+          "outline"
+        ],
+        "title": "OrganizeResult",
+        "type": "object"
+      },
+      "OutlineSection": {
+        "properties": {
+          "section": {
+            "$ref": "#/components/schemas/StorySection"
+          },
+          "slots": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/OutlineSlot"
+            },
+            "type": "object",
+            "title": "Slots"
+          },
+          "steps": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ActionStep"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Steps",
+            "description": "Action only: 1 to 5 steps, in order."
+          },
+          "metric": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ResultMetric"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Result only."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "section"
+        ],
+        "title": "OutlineSection",
+        "description": "SC-2: one section of the outline with its named slots. Missing keys are empty slots."
+      },
+      "OutlineSlot": {
+        "properties": {
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text",
+            "description": "Markdown. Set only when filled."
+          },
+          "quotes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Quotes",
+            "description": "The candidate's words this slot came from, verbatim."
+          },
+          "by_user": {
+            "type": "boolean",
+            "title": "By User",
+            "description": "True when the candidate typed the text.",
+            "default": false
+          },
+          "status": {
+            "$ref": "#/components/schemas/SlotStatus",
+            "default": "empty"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "OutlineSlot",
+        "description": "SC-2, D-6: one slot of the outline. A filled slot Strova wrote carries the candidate's\nverbatim `quotes`; a slot the candidate typed is `by_user` and needs none."
+      },
       "OverviewCost": {
         "properties": {
           "total_usd": {
@@ -23927,6 +24194,77 @@
         "title": "RequirementRating",
         "type": "object"
       },
+      "ResultMetric": {
+        "properties": {
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text",
+            "description": "Markdown. Set only when filled."
+          },
+          "quotes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Quotes",
+            "description": "The candidate's words this slot came from, verbatim."
+          },
+          "by_user": {
+            "type": "boolean",
+            "title": "By User",
+            "description": "True when the candidate typed the text.",
+            "default": false
+          },
+          "status": {
+            "$ref": "#/components/schemas/SlotStatus",
+            "default": "empty"
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Before"
+          },
+          "after": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "After"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ResultMetric",
+        "description": "SC-2: the Result section's metric. `text` says it in words; `before`, `after` and `unit`\nhold the numbers when the candidate gave them."
+      },
       "Resume": {
         "properties": {
           "summary": {
@@ -25442,6 +25780,28 @@
         ],
         "title": "ScoringAccepted"
       },
+      "SectionImprove": {
+        "additionalProperties": false,
+        "description": "SC-11: Improve with Strova for one section. Edits to accept or reject, or questions when\nthe facts are missing; never neither.",
+        "properties": {
+          "edits": {
+            "items": {
+              "$ref": "#/components/schemas/SlotEdit"
+            },
+            "title": "Edits",
+            "type": "array"
+          },
+          "questions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Questions",
+            "type": "array"
+          }
+        },
+        "title": "SectionImprove",
+        "type": "object"
+      },
       "ServiceProfile": {
         "properties": {
           "service": {
@@ -26942,6 +27302,27 @@
         "title": "SiteStatus",
         "description": "What the candidate app shows: the site banner and what is paused (OC-1 to OC-4)."
       },
+      "SkillHint": {
+        "additionalProperties": false,
+        "description": "SC-8, D-8: \"This story could also show {skill}\", offered once the core slots are filled.",
+        "properties": {
+          "skill": {
+            "$ref": "#/components/schemas/Competency"
+          },
+          "reason": {
+            "description": "One sentence, from the story's own facts.",
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "skill",
+          "reason"
+        ],
+        "title": "SkillHint",
+        "type": "object"
+      },
       "SkillReadiness": {
         "properties": {
           "competency": {
@@ -27030,6 +27411,209 @@
           "sessions"
         ],
         "title": "SkillReadinessRow"
+      },
+      "SlotEdit": {
+        "additionalProperties": false,
+        "description": "SC-11, D-10: one before-and-after edit to a slot from Improve with Strova.",
+        "properties": {
+          "section": {
+            "$ref": "#/components/schemas/StorySection"
+          },
+          "slot": {
+            "description": "A slot key, `metric`, or a step field.",
+            "minLength": 1,
+            "title": "Slot",
+            "type": "string"
+          },
+          "step": {
+            "anyOf": [
+              {
+                "exclusiveMaximum": 5,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Action only: the step index.",
+            "title": "Step"
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The slot's text now; null if empty.",
+            "title": "Before"
+          },
+          "after": {
+            "minLength": 1,
+            "title": "After",
+            "type": "string"
+          },
+          "quotes": {
+            "description": "The candidate's words the new text came from, verbatim.",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Quotes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "section",
+          "slot",
+          "after",
+          "quotes"
+        ],
+        "title": "SlotEdit",
+        "type": "object"
+      },
+      "SlotRef": {
+        "additionalProperties": false,
+        "description": "Points at one slot: a named slot of a section, or a field of one action step.",
+        "properties": {
+          "section": {
+            "$ref": "#/components/schemas/StorySection"
+          },
+          "slot": {
+            "description": "A slot key, `metric`, or a step field.",
+            "minLength": 1,
+            "title": "Slot",
+            "type": "string"
+          },
+          "step": {
+            "anyOf": [
+              {
+                "exclusiveMaximum": 5,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Action only: the step index.",
+            "title": "Step"
+          }
+        },
+        "required": [
+          "section",
+          "slot"
+        ],
+        "title": "SlotRef",
+        "type": "object"
+      },
+      "SlotStatus": {
+        "type": "string",
+        "enum": [
+          "filled",
+          "empty",
+          "skipped"
+        ],
+        "title": "SlotStatus",
+        "description": "SC-2, D-5: one outline slot is filled, still empty, or skipped by the candidate."
+      },
+      "SlotUpdate": {
+        "additionalProperties": false,
+        "description": "SC-6, D-6: new text for one slot from a crafting turn, backed by verbatim quotes.",
+        "properties": {
+          "section": {
+            "$ref": "#/components/schemas/StorySection"
+          },
+          "slot": {
+            "description": "A slot key, `metric`, or a step field.",
+            "minLength": 1,
+            "title": "Slot",
+            "type": "string"
+          },
+          "step": {
+            "anyOf": [
+              {
+                "exclusiveMaximum": 5,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Action only: the step index.",
+            "title": "Step"
+          },
+          "text": {
+            "description": "The slot, reworded from the candidate's words.",
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          },
+          "quotes": {
+            "description": "The candidate's words this slot came from, verbatim.",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Quotes",
+            "type": "array"
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Metric only.",
+            "title": "Before"
+          },
+          "after": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Metric only.",
+            "title": "After"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Metric only.",
+            "title": "Unit"
+          }
+        },
+        "required": [
+          "section",
+          "slot",
+          "text",
+          "quotes"
+        ],
+        "title": "SlotUpdate",
+        "type": "object"
       },
       "Source": {
         "additionalProperties": false,
@@ -27298,6 +27882,28 @@
             },
             "type": "array",
             "title": "Notes"
+          },
+          "style": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoryStyle"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "SC-1: star or carl; null for a classic story (D-11)."
+          },
+          "outline": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoryOutline"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "SC-2: the outline of a styled story; null when classic."
           },
           "created_at": {
             "type": "string",
@@ -28099,6 +28705,28 @@
             "type": "array",
             "title": "Notes"
           },
+          "style": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoryStyle"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "SC-1: star or carl; null for a classic story (D-11)."
+          },
+          "outline": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoryOutline"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "SC-2: the outline of a styled story; null when classic."
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
@@ -28132,6 +28760,28 @@
         ],
         "title": "StoryOut",
         "description": "ST-1 and ST-8: a story with the status to show. Proven stays as stored (ST-7); a draft\nwith all five parts filled shows as Ready."
+      },
+      "StoryOutline": {
+        "properties": {
+          "style": {
+            "$ref": "#/components/schemas/StoryStyle"
+          },
+          "sections": {
+            "items": {
+              "$ref": "#/components/schemas/OutlineSection"
+            },
+            "type": "array",
+            "title": "Sections"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "style",
+          "sections"
+        ],
+        "title": "StoryOutline",
+        "description": "SC-2, D-3: the source of truth of a styled story. The five legacy columns are rendered\nfrom it in code (D-12, SC-14)."
       },
       "StoryPart": {
         "type": "string",
@@ -28390,6 +29040,19 @@
         "title": "StoryReviewNote",
         "description": "ST-11: Strova's note on one story part, with an optional edit from the user's words."
       },
+      "StorySection": {
+        "type": "string",
+        "enum": [
+          "situation",
+          "challenge",
+          "task",
+          "action",
+          "result",
+          "learning"
+        ],
+        "title": "StorySection",
+        "description": "SC-2, D-3: the sections of a story outline. Which ones a story has depends on its style."
+      },
       "StorySource": {
         "type": "string",
         "enum": [
@@ -28408,6 +29071,15 @@
         ],
         "title": "StoryStatus",
         "description": "ST-1, ST-7: a story is a draft until a Realistic answer that used it scores 3 or more."
+      },
+      "StoryStyle": {
+        "type": "string",
+        "enum": [
+          "star",
+          "carl"
+        ],
+        "title": "StoryStyle",
+        "description": "SC-1, D-1: the writing style of a crafted story. A classic story has no style (null)."
       },
       "StoryVersion": {
         "properties": {
@@ -28511,6 +29183,20 @@
         ],
         "title": "StyleRequest",
         "description": "CO-5: switch the style mid-session; the next reply uses it."
+      },
+      "StyleRewrite": {
+        "additionalProperties": false,
+        "description": "SC-12, D-2: the outline in the other style with the wording rewritten, no new facts.",
+        "properties": {
+          "outline": {
+            "$ref": "#/components/schemas/StoryOutline"
+          }
+        },
+        "required": [
+          "outline"
+        ],
+        "title": "StyleRewrite",
+        "type": "object"
       },
       "SubscriptionStatus": {
         "type": "string",

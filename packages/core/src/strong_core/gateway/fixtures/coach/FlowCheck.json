@@ -1,0 +1,19 @@
+{
+  "flags": [
+    {
+      "key": "result_vs_problem:situation.problem:result.metric",
+      "type": "result_vs_problem",
+      "slots": [
+        {
+          "section": "situation",
+          "slot": "problem"
+        },
+        {
+          "section": "result",
+          "slot": "metric"
+        }
+      ],
+      "question": "The problem was a rollout two weeks late. Did you make up those two weeks, and how do you know?"
+    }
+  ]
+}

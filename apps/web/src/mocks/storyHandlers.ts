@@ -25,6 +25,8 @@ export function mockStory(changes: Partial<Story> & Pick<Story, "id" | "title">)
     source_session_id: null,
     source_question_ref: null,
     notes: [],
+    style: null,
+    outline: null,
     created_at: "2026-10-20T10:00:00Z",
     updated_at: "2026-10-20T10:00:00Z",
     display_status: "draft",

@@ -1,0 +1,104 @@
+{
+  "$defs": {
+    "SlotEdit": {
+      "additionalProperties": false,
+      "description": "SC-11, D-10: one before-and-after edit to a slot from Improve with Strova.",
+      "properties": {
+        "after": {
+          "minLength": 1,
+          "title": "After",
+          "type": "string"
+        },
+        "before": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The slot's text now; null if empty.",
+          "title": "Before"
+        },
+        "quotes": {
+          "description": "The candidate's words the new text came from, verbatim.",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Quotes",
+          "type": "array"
+        },
+        "section": {
+          "$ref": "#/$defs/StorySection"
+        },
+        "slot": {
+          "description": "A slot key, `metric`, or a step field.",
+          "minLength": 1,
+          "title": "Slot",
+          "type": "string"
+        },
+        "step": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 5,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Action only: the step index.",
+          "title": "Step"
+        }
+      },
+      "required": [
+        "section",
+        "slot",
+        "after",
+        "quotes"
+      ],
+      "title": "SlotEdit",
+      "type": "object"
+    },
+    "StorySection": {
+      "description": "SC-2, D-3: the sections of a story outline. Which ones a story has depends on its style.",
+      "enum": [
+        "situation",
+        "challenge",
+        "task",
+        "action",
+        "result",
+        "learning"
+      ],
+      "title": "StorySection",
+      "type": "string"
+    }
+  },
+  "$id": "https://strong-hire.local/schemas/section_improve.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "SC-11: Improve with Strova for one section. Edits to accept or reject, or questions when\nthe facts are missing; never neither.",
+  "properties": {
+    "edits": {
+      "items": {
+        "$ref": "#/$defs/SlotEdit"
+      },
+      "title": "Edits",
+      "type": "array"
+    },
+    "questions": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Questions",
+      "type": "array"
+    }
+  },
+  "title": "SectionImprove",
+  "type": "object"
+}
