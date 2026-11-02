@@ -144,6 +144,7 @@ USER_OWNED_TABLES = (
     "takes",
     "target_interviews",
     "suggestions",
+    "role_story_fits",
 )
 
 # Platform tables: no org_id, not owned by one user. A test checks that every table is in
@@ -1343,6 +1344,32 @@ class TargetInterview(Base):
     archived_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), comment="TG-3: removed by the user. NULL: kept"
     )
+
+
+class RoleStoryFit(Base):
+    """ST-5: the stored story fit of one target role: for each tested skill, the best story and
+    how well it fits (schemas.StoryFit). The worker computes it when the role is created and when
+    a story changes; the role page only reads it. `input_hash` covers the stories, the skills,
+    the job, the prompt and the model, so unchanged inputs are never sent to the model again."""
+
+    __tablename__ = "role_story_fits"
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    org_id: Mapped[uuid.UUID] = _org_fk()
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    job_target_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("job_targets.id", ondelete="CASCADE"), unique=True
+    )
+    input_hash: Mapped[str] = mapped_column(String(64), index=True)
+    fit_json: Mapped[dict[str, Any]] = mapped_column(comment="schemas.StoryFit")
+    model_profile: Mapped[str] = mapped_column(String(50))
+    model_id: Mapped[str | None] = mapped_column(
+        String(200), comment="Gateway alias; NULL when no model call was needed"
+    )
+    prompt_version: Mapped[str] = mapped_column(String(200))
+    computed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
 class Suggestion(Base):
