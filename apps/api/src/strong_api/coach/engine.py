@@ -108,6 +108,7 @@ _CLOSE: dict[AnswerConduct, str] = {
     ),
 }
 _STRIKE_PREFIXES = (*_FIRST.values(), *_CLOSE.values())
+CLOSE_LINES = _CLOSE  # the crafting turn (strong_api.coach.craft) ends a session the same way
 
 _WE = re.compile(r"\b(we|our|us|the team)\b", re.IGNORECASE)
 _I = re.compile(r"\b(i|i'm|i'd|i've|me|my|myself)\b", re.IGNORECASE)
@@ -213,6 +214,10 @@ def _clean_quote(quote: str) -> str:
     return _normal(quote).strip(" .,'-\"")
 
 
+normal = _normal  # quote matching, shared with the crafting turn (SC-6)
+NUMBER = _NUMBER
+
+
 def quote_found(quote: str, said: str) -> bool:
     """The quote is the candidate's words: at least MIN_QUOTE_WORDS words, found in `said`
     (case, spacing and punctuation between words are ignored)."""
@@ -267,10 +272,16 @@ def strikes(turns: Sequence[CoachTurn]) -> int:
 
 
 def warning(conduct: AnswerConduct, *, last: bool, ask: AskFor) -> str:
+    return warning_line(conduct, last=last, back_to=ASK_LINES[ask])
+
+
+def warning_line(conduct: AnswerConduct, *, last: bool, back_to: str) -> str:
+    """IV-12: the fixed warning, then the question to go back to (a classic ask or a crafting
+    slot, SC-4)."""
     parts = [_FIRST[conduct]]
     if last:
         parts.append(_LAST)
-    parts.append(f"Back to your story: {ASK_LINES[ask]}")
+    parts.append(f"Back to your story: {back_to}")
     return " ".join(parts)
 
 
@@ -299,6 +310,9 @@ def _render_transcript(turns: Sequence[CoachTurn]) -> str:
     if not recent:
         return "(nothing yet)"
     return "\n".join(f"{t.speaker.value}: {t.text}" for t in recent)
+
+
+render_transcript = _render_transcript
 
 
 def turn_messages(
