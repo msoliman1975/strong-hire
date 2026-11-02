@@ -65,12 +65,33 @@ MAX_QUOTES = 3
 TRANSCRIPT_SHARE = 0.55
 CHARS_PER_TOKEN = 4
 _SENTENCE_END = re.compile(r"(?<=[.!?])\s+(?=[A-Z0-9\"'])")
-RUBRIC_BY_TYPE = {InterviewType.RECRUITER_SCREEN: "rubric_recruiter_screen"}
+RUBRIC_BY_TYPE = {
+    InterviewType.RECRUITER_SCREEN: "rubric_recruiter_screen",
+    InterviewType.ROLE_PLAY: "rubric_role_play",
+}
 _SIGNAL_NAMES = sorted((s.value for s in HireSignal), key=len, reverse=True)
 
 
+def buyer_text(brief: InterviewerBrief) -> str:
+    """RP-7: the buyer brief the scorer judges discovery and closing against, or "(none)"."""
+    rp = brief.role_play
+    if rp is None:
+        return "(none)"
+    lines = [
+        f"Scenario: {rp.scenario.value}",
+        f"Buyer: {rp.persona_name}, {rp.persona_title}. {rp.company_summary}",
+        f"Product sold: {rp.product}",
+        *(f"Hidden pain: {p}" for p in rp.hidden_pains),
+        f"Budget: {rp.budget}",
+        f"Decision process: {rp.decision_process}",
+        *(f"Objection: {o.text}" for o in rp.objections),
+        f"Success condition: {rp.success_condition}",
+    ]
+    return "\n".join(lines)
+
+
 def rubric_prompt(brief: InterviewerBrief) -> str:
-    """The scorer's rubric prompt for the session's type (RS-2)."""
+    """The scorer's rubric prompt for the session's type (RS-2, RP-7)."""
     return RUBRIC_BY_TYPE.get(brief.session.interview_type, "rubric")
 
 
@@ -259,6 +280,7 @@ class SessionScorer:
             level_expectations=level_expectations(brief.session.level, profile),
             role_family=brief.role_family.value,
             family_guidance=family_guidance(brief.role_family),
+            buyer=buyer_text(brief),
             competencies=", ".join(c.value for c in _scored_competencies(brief, asked)),
             values=_values_text(profile, allowed_values),
             questions="\n".join(

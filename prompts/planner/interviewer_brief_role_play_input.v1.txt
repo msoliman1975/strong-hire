@@ -1,0 +1,20 @@
+Write the buyer brief and $beats beats for this practice sales role-play.
+
+Scenario: $scenario
+Level: $level
+Seniority bar: $seniority_bar
+Difficulty: $difficulty
+Mode: $mode
+Length: $duration minutes
+Hiring company: $company
+Role family guidance:
+$family_guidance
+Curveball: $curveball
+
+<untrusted_input>
+JOB
+$job
+
+RESUME
+$resume
+</untrusted_input>

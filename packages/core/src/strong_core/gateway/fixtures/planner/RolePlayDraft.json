@@ -1,0 +1,28 @@
+{
+  "buyer": {
+    "scenario": "discovery_call",
+    "persona_name": "Dana Ruiz",
+    "persona_title": "VP of Operations",
+    "company_summary": "Harbor Freight Partners, a freight broker with 300 staff in three US offices.",
+    "product": "A dispatch scheduling tool that plans drivers and loads automatically",
+    "product_illustrative": true,
+    "situation": "Dana booked this call after a webinar about late shipments.",
+    "hidden_pains": [
+      "Dispatchers rebuild the day's schedule by hand every morning, about two hours each",
+      "Late deliveries rose to 9 percent last quarter and a large customer complained"
+    ],
+    "budget": "About 40,000 dollars a year; not approved yet",
+    "decision_process": "Dana decides with the CFO; IT must approve security",
+    "objections": [
+      {"text": "We tried a scheduling tool two years ago and nobody used it.", "when": "when the seller describes the product"},
+      {"text": "That sounds expensive for a company our size.", "when": "after the price is mentioned"}
+    ],
+    "curveball": null,
+    "success_condition": "Dana agrees to a 30-minute demo with her dispatch lead next week"
+  },
+  "beats": [
+    {"id": "b1", "opening": "Hi, thanks for calling. I have about twenty minutes. Where do you want to start?", "goal": "Set an agenda and ask about the buyer's current process", "competencies": ["discovery", "communication"]},
+    {"id": "b2", "opening": "Okay. So how would your tool actually help us?", "goal": "Tie the product to the pains the buyer named", "competencies": ["value_articulation", "objection_handling"]},
+    {"id": "b3", "opening": "This is interesting, but I'm not sure we're ready. What happens next?", "goal": "Agree a concrete next step with a date", "competencies": ["closing"]}
+  ]
+}
