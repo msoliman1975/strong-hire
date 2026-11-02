@@ -15,6 +15,7 @@ Fields: **Area** (api, worker, voice, web, core, prompts, infra), **Priority** (
 | RMAP-4 | Call it the "default" resume, not the "main" one | web | Now | Done |
 | RMAP-5 | Deleting a resume that a target role uses | web | Now | Done |
 | RMAP-6 | Waitlist: a confirmed address that joins again gets no email | api | Now | Done |
+| RMAP-7 | Story crafting with Strova: more room to type, and formatting | web, prompts | Next | Idea |
 
 ## RMAP-1: Filter Rehearsals by target role
 
@@ -209,4 +210,43 @@ link in it…".
 
 A failed send was already logged at ERROR. Error capture (OB-4) turns it into an error group and
 the default "New error" alert emails `ALERT_EMAIL`. A test now pins that log.
+
+## RMAP-7: Story crafting with Strova: more room to type, and formatting
+
+**Recorded:** 2026-11-02
+
+**What:** Writing a story with Strova should feel like writing, not like a chat box.
+
+1. **More room.** The reply box in the coach session (`CoachSessionPage.tsx`, `.coach__input`
+   in `coach.css`) is a two-row textarea that shares its row with the mic and Send buttons, and the
+   conversation column sits beside the story panel. Long answers are cramped. Options:
+   - a taller box that grows with the text (auto-resize, up to about half the screen);
+   - an **Expand** button that opens a full-width writing view;
+   - more width for the conversation while the user types.
+2. **Formatting.** Today everything is plain text: the coach reply, the story editor's five parts
+   (`StoryEditor.tsx`, `NewStoryPage.tsx`) and story takes (`StoryTakes.tsx`). Users want at least
+   **bold**, *italic*, bullet and numbered lists, and line breaks that are kept.
+
+**Why:** Stories are long, structured answers (context, stakes, action, result, reflection).
+Users draft them here, and a small plain box makes that harder than writing them elsewhere and
+pasting them in.
+
+**Notes:**
+
+- Suggested storage: lightweight Markdown in the existing text fields (`StoryOut.context` and the
+  others, coach turn text). No migration, and the models read Markdown well. Render it in the story
+  view, the workbench and the review page, and accept pasted rich text by converting it to Markdown.
+- A small toolbar (B, I, bullets, numbers) and the usual shortcuts (Ctrl+B, Ctrl+I) over a
+  Markdown textarea is the lightest option. A full rich-text editor (TipTap or Lexical) is heavier
+  and needs a bundle-size check.
+- Places that must get plain text: the voice interviewer and TTS (strip the Markdown first), the
+  word counts and limits (count words, not symbols), and resume-line suggestions (SG-6, quoted
+  verbatim).
+- Check the coach prompts (`prompts/coach/`) and the story scorer with Markdown input. Their fake
+  fixtures may need a formatted example.
+- Requirements to keep: the story's five parts, word limits (R3), and quotes taken verbatim from
+  the story (SG-6).
+- Open questions:
+  - Should Strova's own replies use formatting too?
+  - Is formatting needed in the coach chat, or only in the story editor?
 
