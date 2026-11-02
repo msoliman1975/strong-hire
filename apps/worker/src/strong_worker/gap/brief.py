@@ -80,6 +80,7 @@ from strong_core.schemas import (
     QuestionSource,
     Resume,
     RolePlayDraft,
+    RolePlayScenario,
     SessionConfig,
     Severity,
     Tone,
@@ -152,6 +153,11 @@ DEFAULT_ROLE_PLAY_CURVEBALL = (
     "Midway, the buyer says they just heard a competitor will offer the same thing for less, and "
     "asks why they should not wait."
 )
+DEFAULT_ESCALATION_CURVEBALL = (
+    "Midway, the customer says a competitor already sent them a proposal and they are reviewing it "
+    "this week."
+)
+"""CS D-8: the Tough curveball for an escalation call when the planner gave none."""
 DEFAULT_CURVEBALL = (
     "Midway, change one key constraint of the candidate's last answer and ask how their "
     "decision changes."
@@ -562,7 +568,11 @@ def assemble_role_play(
     tough = config.difficulty == Difficulty.TOUGH and not config.is_mini
     curveball = ((draft.buyer.curveball or "").strip()[:MAX_TEXT] or None) if tough else None
     if tough and curveball is None:
-        curveball = DEFAULT_ROLE_PLAY_CURVEBALL
+        curveball = (
+            DEFAULT_ESCALATION_CURVEBALL
+            if config.role_play == RolePlayScenario.ESCALATION_CALL
+            else DEFAULT_ROLE_PLAY_CURVEBALL
+        )
     buyer = draft.buyer.model_copy(update={"scenario": config.role_play, "curveball": curveball})
     turns = ROLE_PLAY_TURNS_BY_DIFFICULTY[config.difficulty]
     if config.is_mini:

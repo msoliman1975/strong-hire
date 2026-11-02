@@ -45,3 +45,22 @@ def test_cs2_other_families_play_the_buyer() -> None:
     for family in RoleFamily:
         title = family_info(family).interviewer_title(InterviewType.ROLE_PLAY)
         assert title == ("Customer" if family == RoleFamily.CUSTOMER_SUCCESS else "Buyer")
+
+
+def test_cs9_question_bank_has_customer_success_questions_and_escalation_cards() -> None:
+    """CS-9: at least 15 general customer success questions (behavioral and hiring manager) and
+    at least 4 escalation call scenario cards."""
+    from collections import Counter
+
+    from strong_core.config import find_repo_root
+    from strong_core.schemas import GeneralQuestionBank
+
+    path = find_repo_root() / "questions" / "general.json"
+    bank = GeneralQuestionBank.model_validate_json(path.read_text(encoding="utf-8"))
+    own = [q for q in bank.questions if RoleFamily.CUSTOMER_SUCCESS in q.role_families]
+    by_type = Counter(q.interview_type for q in own)
+    assert by_type[InterviewType.BEHAVIORAL] >= 3 and by_type[InterviewType.HIRING_MANAGER] >= 3
+    assert by_type[InterviewType.BEHAVIORAL] + by_type[InterviewType.HIRING_MANAGER] >= 15
+    cards = [q for q in own if q.interview_type == InterviewType.ROLE_PLAY]
+    assert len(cards) >= 4
+    assert all(q.question.startswith("Escalation call:") for q in cards)

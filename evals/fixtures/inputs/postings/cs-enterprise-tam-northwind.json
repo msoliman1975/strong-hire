@@ -1,0 +1,25 @@
+{
+  "company_name": "Northwind Cloud",
+  "title": "Senior Technical Account Manager, Enterprise",
+  "role_family": "customer_success",
+  "level": "senior",
+  "level_label": "Senior",
+  "team": "Enterprise Success",
+  "location": "Seattle, WA",
+  "must_have_skills": [
+    "6+ years in technical account management, solutions or support engineering",
+    "Hands-on cloud and database knowledge",
+    "Experience running executive escalations"
+  ],
+  "nice_to_have_skills": [
+    "AWS or GCP certification",
+    "Experience with Kubernetes"
+  ],
+  "responsibilities": [
+    "Be the technical advisor for 8 to 10 enterprise accounts",
+    "Lead incident reviews and recovery plans after outages",
+    "Plan architecture changes with customer engineering teams",
+    "Protect and grow renewals worth several million dollars a year"
+  ],
+  "source_url": null
+}

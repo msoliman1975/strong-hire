@@ -1,0 +1,25 @@
+{
+  "company_name": "Tallyhouse",
+  "title": "Customer Success Manager",
+  "role_family": "customer_success",
+  "level": "mid",
+  "level_label": null,
+  "team": null,
+  "location": "Remote, US",
+  "must_have_skills": [
+    "2+ years in customer success or account management at a SaaS company",
+    "Calm, clear communication with upset customers",
+    "Comfort with health scores and usage data"
+  ],
+  "nice_to_have_skills": [
+    "Gainsight or a similar tool",
+    "Retail or supply chain experience"
+  ],
+  "responsibilities": [
+    "Onboard new customers and drive adoption across their stores",
+    "Run quarterly business reviews with executive sponsors",
+    "Lead escalations with support and engineering",
+    "Own renewals and find expansion opportunities"
+  ],
+  "source_url": null
+}

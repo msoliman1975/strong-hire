@@ -49,11 +49,23 @@ export const rolePlayScenarioHint: Record<RolePlayScenario, string> = {
   escalation_call: "An upset customer and a renewal at risk. Calm the call, find the cause, agree a plan.",
 };
 
-/** D-5: the default call for a level. */
-export function defaultRolePlayScenario(level: Level | null | undefined): RolePlayScenario {
+/**
+ * RP D-5, CS D-6: the default call. Customer success gets the escalation call at every level;
+ * other families get a sales call by level.
+ */
+export function defaultRolePlayScenario(
+  level: Level | null | undefined,
+  family?: RoleFamily | null,
+): RolePlayScenario {
+  if (family === "customer_success") return "escalation_call";
   if (level === "new_grad") return "cold_call";
   if (level === "senior" || level === "staff_principal") return "demo_objections";
   return "discovery_call";
+}
+
+/** RP-8, CS D-7: who the candidate plays in the live room. */
+export function rolePlayPart(scenario: RolePlayScenario | null | undefined): string {
+  return scenario === "escalation_call" ? "the customer success manager" : "the seller";
 }
 
 /** D-11: the interview types still labeled Beta (fewer than 5 gold transcripts). */

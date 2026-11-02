@@ -42,18 +42,19 @@ from strong_worker.inputs.testing import RecordingBackend
 
 
 def test_fixtures_cover_every_role_family_and_validate() -> None:
-    """RF-4: at least 4 postings per wave 1 family and 2 per original family."""
+    """RF-4, RP-11, CS-8: at least 4 postings per wave 1 family, sales and customer success, and 2
+    per original family."""
     postings = load_cases(fixtures_dir() / "postings")
     resumes = load_cases(fixtures_dir() / "resumes")
-    assert len(postings) == 40
+    assert len(postings) == 44
     assert len(resumes) == 15
     families = Counter(
         JobPosting.model_validate_json(expected).role_family.value for _, _, expected in postings
     )
     wave_1 = {f.value for f in WAVE_1}
     original = {"swe", "data_ml", "pm", "design", "tpm"}
-    assert set(families) == wave_1 | original | {"sales"}
-    assert all(families[f] >= 4 for f in [*wave_1, "sales"]), families  # RF-4, RP-11
+    assert set(families) == wave_1 | original | {"sales", "customer_success"}
+    assert all(families[f] >= 4 for f in [*wave_1, "sales", "customer_success"]), families  # CS-8
     assert all(families[f] >= 2 for f in original), families
     for _, _, expected in resumes:
         Resume.model_validate_json(expected)
@@ -161,7 +162,7 @@ async def test_report_with_recorded_outputs(tmp_path: Path) -> None:
     report = await run_inputs_eval(gateway)
 
     assert report.profile == "fake"
-    assert len(report.cases) == 55
+    assert len(report.cases) == 59
     assert not [c for c in report.cases if c.get("error")]
     assert set(report.postings.values()) == {1.0}
     assert set(report.resumes.values()) == {1.0}
@@ -185,4 +186,4 @@ async def test_extraction_accuracy_on_real_models() -> None:
         await asyncio.to_thread(
             Path(out).write_text, json.dumps(report.to_dict(), indent=2), encoding="utf-8"
         )
-    assert len(report.cases) == 55
+    assert len(report.cases) == 59
