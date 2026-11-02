@@ -211,4 +211,11 @@ def test_rp12_question_bank_has_sales_questions_and_scenario_cards() -> None:
     cards = [q for q in bank.questions if q.interview_type == RP]
     assert len(cards) >= 8
     calls = Counter(q.question.split(":", 1)[0] for q in cards)
-    assert set(calls) == {"Cold call", "Discovery call", "Demo", "Negotiation", "Close"}
+    assert set(calls) == {
+        "Cold call",
+        "Discovery call",
+        "Demo",
+        "Negotiation",
+        "Close",
+        "Escalation call",
+    }
