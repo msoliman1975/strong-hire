@@ -5,8 +5,8 @@ A resume comparison ranks the user's resumes against one target role. It is save
 purpose: a comparison row is never the role's latest analysis (RC-7), and a role row copied from
 a comparison row (source_gap_id) made no model call (RC-6). Existing rows are role rows.
 
-Revision ID: 0027
-Revises: 0026
+Revision ID: 0028
+Revises: 0027
 Create Date: 2026-11-02
 """
 
@@ -16,8 +16,8 @@ import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
 
-revision: str = '0027'
-down_revision: str | None = '0026'
+revision: str = '0028'
+down_revision: str | None = '0027'
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
