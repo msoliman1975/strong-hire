@@ -3206,6 +3206,397 @@
         }
       }
     },
+    "/stories/{story_id}/outline": {
+      "patch": {
+        "tags": [
+          "stories",
+          "stories"
+        ],
+        "summary": "Edit Outline",
+        "description": "SC-10: set, clear, skip or reorder slots and steps, as the user typed them.",
+        "operationId": "edit_outline_stories__story_id__outline_patch",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OutlinePatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{story_id}/sections/{section}/improve": {
+      "post": {
+        "tags": [
+          "stories",
+          "stories"
+        ],
+        "summary": "Improve Section",
+        "description": "SC-11: Strova's before-and-after edits for one section, from the user's words, or the\nquestions to ask when facts are missing. Nothing is written until the user accepts.",
+        "operationId": "improve_section_stories__story_id__sections__section__improve_post",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          },
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/StorySection"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImproveIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SectionImprove"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{story_id}/sections/{section}/improve/accept": {
+      "post": {
+        "tags": [
+          "stories",
+          "stories"
+        ],
+        "summary": "Accept Improve",
+        "description": "SC-11: apply the edits the user accepted. Each is checked again against the user's words;\none that is not is refused (422), so nothing is half applied.",
+        "operationId": "accept_improve_stories__story_id__sections__section__improve_accept_post",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          },
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/StorySection"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImproveAccept"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{story_id}/organize": {
+      "post": {
+        "tags": [
+          "stories",
+          "stories"
+        ],
+        "summary": "Organize Story",
+        "description": "SC-13, D-11: one model call sorts a classic story's words into STAR slots. A preview:\nnothing is written until the user accepts.",
+        "operationId": "organize_story_stories__story_id__organize_post",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizeResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{story_id}/organize/accept": {
+      "post": {
+        "tags": [
+          "stories",
+          "stories"
+        ],
+        "summary": "Accept Organize",
+        "description": "SC-13: apply the previewed outline. Its slots are checked again against the user's words;\nthe story becomes STAR and its five parts are rendered from the outline (SC-14).",
+        "operationId": "accept_organize_stories__story_id__organize_accept_post",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganizeResult"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{story_id}/style": {
+      "post": {
+        "tags": [
+          "stories",
+          "stories"
+        ],
+        "summary": "Switch Style",
+        "description": "SC-12, D-2: without `rewrite`, rename and move the slots in code and save (no model call,\nno fact lost). With it, one model call rewrites the wording; that is a preview to accept.",
+        "operationId": "switch_style_stories__story_id__style_post",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StyleIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StyleSwitchOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{story_id}/style/accept": {
+      "post": {
+        "tags": [
+          "stories",
+          "stories"
+        ],
+        "summary": "Accept Style",
+        "description": "SC-12: apply a previewed rewrite. Its slots are checked again against the user's words;\na slot that is not keeps its moved text.",
+        "operationId": "accept_style_stories__story_id__style_accept_post",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoryOutline"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/coach/sessions": {
       "post": {
         "tags": [
@@ -18285,6 +18676,59 @@
         "title": "HireSignal",
         "description": "FB-1. Ordered from strongest to weakest."
       },
+      "ImproveAccept": {
+        "properties": {
+          "edits": {
+            "items": {
+              "$ref": "#/components/schemas/SlotEdit"
+            },
+            "type": "array",
+            "maxItems": 30,
+            "minItems": 1,
+            "title": "Edits"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note",
+            "description": "The note the improve was asked with, so its words count as the user's."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "edits"
+        ],
+        "title": "ImproveAccept",
+        "description": "SC-11: the edits from an improve that the user accepts; the rest are rejected."
+      },
+      "ImproveIn": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ImproveIn",
+        "description": "SC-11: an optional note for Strova (\"make it shorter\", \"add that I led the review\")."
+      },
       "ImproveResumeLinePayload": {
         "properties": {
           "resume_line_ref": {
@@ -21366,18 +21810,50 @@
         "title": "OrgType"
       },
       "OrganizeResult": {
-        "additionalProperties": false,
-        "description": "SC-13, D-11: a classic story sorted into STAR slots from the candidate's words only.",
         "properties": {
           "outline": {
             "$ref": "#/components/schemas/StoryOutline"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "outline"
         ],
         "title": "OrganizeResult",
-        "type": "object"
+        "description": "SC-13, D-11: a classic story sorted into STAR slots from the candidate's words only."
+      },
+      "OutlinePatch": {
+        "properties": {
+          "slots": {
+            "items": {
+              "$ref": "#/components/schemas/SlotEditIn"
+            },
+            "type": "array",
+            "maxItems": 60,
+            "title": "Slots"
+          },
+          "steps": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array",
+                "maxItems": 5,
+                "minItems": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Steps"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "OutlinePatch",
+        "description": "SC-10: inline edits. `slots` are applied first (a step index equal to the number of\nsteps adds a step); then `steps`, when sent, is the new order of the action steps by their\nindex, and a step left out is removed. 1 to 5 steps must remain."
       },
       "OutlineSection": {
         "properties": {
@@ -25932,26 +26408,26 @@
         "title": "ScoringAccepted"
       },
       "SectionImprove": {
-        "additionalProperties": false,
-        "description": "SC-11: Improve with Strova for one section. Edits to accept or reject, or questions when\nthe facts are missing; never neither.",
         "properties": {
           "edits": {
             "items": {
               "$ref": "#/components/schemas/SlotEdit"
             },
-            "title": "Edits",
-            "type": "array"
+            "type": "array",
+            "title": "Edits"
           },
           "questions": {
             "items": {
               "type": "string"
             },
-            "title": "Questions",
-            "type": "array"
+            "type": "array",
+            "title": "Questions"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "title": "SectionImprove",
-        "type": "object"
+        "description": "SC-11: Improve with Strova for one section. Edits to accept or reject, or questions when\nthe facts are missing; never neither."
       },
       "ServiceProfile": {
         "properties": {
@@ -27564,32 +28040,29 @@
         "title": "SkillReadinessRow"
       },
       "SlotEdit": {
-        "additionalProperties": false,
-        "description": "SC-11, D-10: one before-and-after edit to a slot from Improve with Strova.",
         "properties": {
           "section": {
             "$ref": "#/components/schemas/StorySection"
           },
           "slot": {
-            "description": "A slot key, `metric`, or a step field.",
+            "type": "string",
             "minLength": 1,
             "title": "Slot",
-            "type": "string"
+            "description": "A slot key, `metric`, or a step field."
           },
           "step": {
             "anyOf": [
               {
-                "exclusiveMaximum": 5,
-                "minimum": 0,
-                "type": "integer"
+                "type": "integer",
+                "exclusiveMaximum": 5.0,
+                "minimum": 0.0
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "Action only: the step index.",
-            "title": "Step"
+            "title": "Step",
+            "description": "Action only: the step index."
           },
           "before": {
             "anyOf": [
@@ -27600,25 +28073,26 @@
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "The slot's text now; null if empty.",
-            "title": "Before"
+            "title": "Before",
+            "description": "The slot's text now; null if empty."
           },
           "after": {
+            "type": "string",
             "minLength": 1,
-            "title": "After",
-            "type": "string"
+            "title": "After"
           },
           "quotes": {
-            "description": "The candidate's words the new text came from, verbatim.",
             "items": {
               "type": "string"
             },
+            "type": "array",
             "minItems": 1,
             "title": "Quotes",
-            "type": "array"
+            "description": "The candidate's words the new text came from, verbatim."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "section",
           "slot",
@@ -27626,7 +28100,95 @@
           "quotes"
         ],
         "title": "SlotEdit",
-        "type": "object"
+        "description": "SC-11, D-10: one before-and-after edit to a slot from Improve with Strova."
+      },
+      "SlotEditIn": {
+        "properties": {
+          "section": {
+            "$ref": "#/components/schemas/StorySection"
+          },
+          "slot": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Slot",
+            "description": "A slot key, `metric`, or a step field."
+          },
+          "step": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMaximum": 5.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Step",
+            "description": "Action only: the step index."
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "skipped": {
+            "type": "boolean",
+            "title": "Skipped",
+            "default": false
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Before"
+          },
+          "after": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "After"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "section",
+          "slot"
+        ],
+        "title": "SlotEditIn",
+        "description": "SC-10, D-10: the user's own text for one slot (no quotes). Blank or null text empties the\nslot; `skipped` marks it skipped. The metric may also carry before, after and unit."
       },
       "SlotRef": {
         "properties": {
@@ -29327,6 +29889,25 @@
         ],
         "title": "Strength"
       },
+      "StyleIn": {
+        "properties": {
+          "style": {
+            "$ref": "#/components/schemas/StoryStyle"
+          },
+          "rewrite": {
+            "type": "boolean",
+            "title": "Rewrite",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "style"
+        ],
+        "title": "StyleIn",
+        "description": "SC-12: switch to the other style. Without `rewrite` the slots are renamed and moved in\ncode and saved at once; with it, Strova rewrites the wording (one model call) as a preview."
+      },
       "StyleRequest": {
         "properties": {
           "style": {
@@ -29367,6 +29948,34 @@
         ],
         "title": "StyleSuggestion",
         "description": "SC-1, D-2: the style the start screen preselects."
+      },
+      "StyleSwitchOut": {
+        "properties": {
+          "story": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoryOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "preview": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoryOutline"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The rewrite to accept (POST /stories/{id}/style/accept) or discard. Slots the user typed stay theirs; Strova's slots carry quotes."
+          }
+        },
+        "type": "object",
+        "title": "StyleSwitchOut",
+        "description": "SC-12: the switched story (no rewrite), or the rewrite to accept or discard."
       },
       "SubscriptionStatus": {
         "type": "string",

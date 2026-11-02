@@ -1082,6 +1082,152 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/stories/{story_id}/outline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Edit Outline
+         * @description SC-10: set, clear, skip or reorder slots and steps, as the user typed them.
+         */
+        patch: operations["edit_outline_stories__story_id__outline_patch"];
+        trace?: never;
+    };
+    "/stories/{story_id}/sections/{section}/improve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Improve Section
+         * @description SC-11: Strova's before-and-after edits for one section, from the user's words, or the
+         *     questions to ask when facts are missing. Nothing is written until the user accepts.
+         */
+        post: operations["improve_section_stories__story_id__sections__section__improve_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/sections/{section}/improve/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Accept Improve
+         * @description SC-11: apply the edits the user accepted. Each is checked again against the user's words;
+         *     one that is not is refused (422), so nothing is half applied.
+         */
+        post: operations["accept_improve_stories__story_id__sections__section__improve_accept_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/organize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Organize Story
+         * @description SC-13, D-11: one model call sorts a classic story's words into STAR slots. A preview:
+         *     nothing is written until the user accepts.
+         */
+        post: operations["organize_story_stories__story_id__organize_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/organize/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Accept Organize
+         * @description SC-13: apply the previewed outline. Its slots are checked again against the user's words;
+         *     the story becomes STAR and its five parts are rendered from the outline (SC-14).
+         */
+        post: operations["accept_organize_stories__story_id__organize_accept_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/style": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Switch Style
+         * @description SC-12, D-2: without `rewrite`, rename and move the slots in code and save (no model call,
+         *     no fact lost). With it, one model call rewrites the wording; that is a preview to accept.
+         */
+        post: operations["switch_style_stories__story_id__style_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stories/{story_id}/style/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Accept Style
+         * @description SC-12: apply a previewed rewrite. Its slots are checked again against the user's words;
+         *     a slot that is not keeps its moved text.
+         */
+        post: operations["accept_style_stories__story_id__style_accept_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/coach/sessions": {
         parameters: {
             query?: never;
@@ -6970,6 +7116,27 @@ export interface components {
          */
         HireSignal: "Strong Hire" | "Hire" | "Lean Hire" | "Lean No Hire" | "No Hire";
         /**
+         * ImproveAccept
+         * @description SC-11: the edits from an improve that the user accepts; the rest are rejected.
+         */
+        ImproveAccept: {
+            /** Edits */
+            edits: components["schemas"]["SlotEdit"][];
+            /**
+             * Note
+             * @description The note the improve was asked with, so its words count as the user's.
+             */
+            note?: string | null;
+        };
+        /**
+         * ImproveIn
+         * @description SC-11: an optional note for Strova ("make it shorter", "add that I led the review").
+         */
+        ImproveIn: {
+            /** Note */
+            note?: string | null;
+        };
+        /**
          * ImproveResumeLinePayload
          * @description SG-6: the payload of an improve resume line suggestion.
          */
@@ -8157,6 +8324,18 @@ export interface components {
          */
         OrganizeResult: {
             outline: components["schemas"]["StoryOutline"];
+        };
+        /**
+         * OutlinePatch
+         * @description SC-10: inline edits. `slots` are applied first (a step index equal to the number of
+         *     steps adds a step); then `steps`, when sent, is the new order of the action steps by their
+         *     index, and a step left out is removed. 1 to 5 steps must remain.
+         */
+        OutlinePatch: {
+            /** Slots */
+            slots?: components["schemas"]["SlotEditIn"][];
+            /** Steps */
+            steps?: number[] | null;
         };
         /**
          * OutlineSection
@@ -10766,15 +10945,13 @@ export interface components {
             /**
              * Step
              * @description Action only: the step index.
-             * @default null
              */
-            step: number | null;
+            step?: number | null;
             /**
              * Before
              * @description The slot's text now; null if empty.
-             * @default null
              */
-            before: string | null;
+            before?: string | null;
             /** After */
             after: string;
             /**
@@ -10782,6 +10959,37 @@ export interface components {
              * @description The candidate's words the new text came from, verbatim.
              */
             quotes: string[];
+        };
+        /**
+         * SlotEditIn
+         * @description SC-10, D-10: the user's own text for one slot (no quotes). Blank or null text empties the
+         *     slot; `skipped` marks it skipped. The metric may also carry before, after and unit.
+         */
+        SlotEditIn: {
+            section: components["schemas"]["StorySection"];
+            /**
+             * Slot
+             * @description A slot key, `metric`, or a step field.
+             */
+            slot: string;
+            /**
+             * Step
+             * @description Action only: the step index.
+             */
+            step?: number | null;
+            /** Text */
+            text?: string | null;
+            /**
+             * Skipped
+             * @default false
+             */
+            skipped: boolean;
+            /** Before */
+            before?: string | null;
+            /** After */
+            after?: string | null;
+            /** Unit */
+            unit?: string | null;
         };
         /**
          * SlotRef
@@ -11521,6 +11729,19 @@ export interface components {
             evidence: string;
         };
         /**
+         * StyleIn
+         * @description SC-12: switch to the other style. Without `rewrite` the slots are renamed and moved in
+         *     code and saved at once; with it, Strova rewrites the wording (one model call) as a preview.
+         */
+        StyleIn: {
+            style: components["schemas"]["StoryStyle"];
+            /**
+             * Rewrite
+             * @default false
+             */
+            rewrite: boolean;
+        };
+        /**
          * StyleRequest
          * @description CO-5: switch the style mid-session; the next reply uses it.
          */
@@ -11540,6 +11761,15 @@ export interface components {
          */
         StyleSuggestion: {
             style: components["schemas"]["StoryStyle"];
+        };
+        /**
+         * StyleSwitchOut
+         * @description SC-12: the switched story (no rewrite), or the rewrite to accept or discard.
+         */
+        StyleSwitchOut: {
+            story?: components["schemas"]["StoryOut"] | null;
+            /** @description The rewrite to accept (POST /stories/{id}/style/accept) or discard. Slots the user typed stay theirs; Strova's slots carry quotes. */
+            preview?: components["schemas"]["StoryOutline"] | null;
         };
         /**
          * SubscriptionStatus
@@ -14410,6 +14640,249 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StoryAnswer"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_outline_stories__story_id__outline_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OutlinePatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    improve_section_stories__story_id__sections__section__improve_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+                section: components["schemas"]["StorySection"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImproveIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SectionImprove"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    accept_improve_stories__story_id__sections__section__improve_accept_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+                section: components["schemas"]["StorySection"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImproveAccept"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    organize_story_stories__story_id__organize_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizeResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    accept_organize_stories__story_id__organize_accept_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrganizeResult"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    switch_style_stories__story_id__style_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StyleIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StyleSwitchOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    accept_style_stories__story_id__style_accept_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoryOutline"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryOut"];
                 };
             };
             /** @description Validation Error */

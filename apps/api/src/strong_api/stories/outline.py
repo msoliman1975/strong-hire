@@ -14,12 +14,15 @@ import re
 from strong_core.db.models import Story as StoryRow
 from strong_core.schemas import (
     METRIC_SLOT,
+    SECTION_SLOT_KEYS,
+    STYLE_SECTIONS,
     OutlineSection,
     OutlineSlot,
     SlotStatus,
     StoryOutline,
     StoryPart,
     StorySection,
+    StoryStyle,
 )
 
 # SC-14: which slots each legacy column is rendered from, in order. The first section that
@@ -198,3 +201,34 @@ def save_outline(row: StoryRow, outline: StoryOutline) -> None:
     row.outline_json = outline.model_dump(mode="json", exclude_none=True)
     for part, text in render_legacy(outline).items():
         setattr(row, part.value, text)
+
+
+# --- SC-12: switching style in code ------------------------------------------------------------
+
+_TASK_KEYS = SECTION_SLOT_KEYS[StoryStyle.STAR][StorySection.TASK]
+
+
+def convert_style(outline: StoryOutline, style: StoryStyle) -> StoryOutline:
+    """SC-12, D-2: the same slots in the other style, with no model call. Sections are renamed
+    and the Task slots move into Challenge (CARL) or out of it (STAR); every slot keeps its text,
+    quotes and status, so STAR to CARL to STAR gives back the same outline."""
+    if outline.style == style:
+        return outline.model_copy(deep=True)
+    by_section = {s.section: s for s in outline.model_copy(deep=True).sections}
+    if style == StoryStyle.CARL:
+        situation, task = by_section[StorySection.SITUATION], by_section[StorySection.TASK]
+        challenge = OutlineSection(
+            section=StorySection.CHALLENGE, slots={**situation.slots, **task.slots}
+        )
+        by_section[StorySection.CHALLENGE] = challenge
+    else:
+        challenge = by_section[StorySection.CHALLENGE]
+        by_section[StorySection.SITUATION] = OutlineSection(
+            section=StorySection.SITUATION,
+            slots={k: v for k, v in challenge.slots.items() if k not in _TASK_KEYS},
+        )
+        by_section[StorySection.TASK] = OutlineSection(
+            section=StorySection.TASK,
+            slots={k: v for k, v in challenge.slots.items() if k in _TASK_KEYS},
+        )
+    return StoryOutline(style=style, sections=[by_section[s] for s in STYLE_SECTIONS[style]])

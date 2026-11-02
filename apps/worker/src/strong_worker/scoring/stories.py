@@ -84,6 +84,10 @@ def story_from_row(row: StoryRow) -> Story:
             "source_session_id": row.source_session_id,
             "source_question_ref": row.source_question_ref,
             "notes": row.notes_json or [],
+            # SC-1, SC-2: a styled story carries its outline; the five parts above are rendered
+            # from it (SC-14), so every reader of them is unchanged.
+            "style": row.style if row.outline_json is not None else None,
+            "outline": row.outline_json if row.style is not None else None,
             "created_at": row.created_at,
             "updated_at": row.updated_at or row.created_at,
         }
