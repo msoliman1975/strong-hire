@@ -206,6 +206,10 @@ function LiveView({ session }: { session: SessionRecord }) {
   const preparing = prepLeft !== null;
   const inRoom = stage === "waiting" || stage === "live";
 
+  // RP-8: in a role-play the candidate leads the call and Strova plays the buyer.
+  const buyerLine = session.buyer
+    ? `Role-play: you are the seller. Strova plays ${session.buyer.name}, ${session.buyer.title}.`
+    : null;
   const settings = (
     <>
       {interviewTypeLabel[config.interview_type]} interview, {difficultyLabel[config.difficulty]} difficulty,{" "}
@@ -307,6 +311,7 @@ function LiveView({ session }: { session: SessionRecord }) {
               {difficultyLabel[config.difficulty]} difficulty · {modeLabels(v2).label[config.mode]} mode
               {config.tone && ` · ${ROOM_TONE_LABEL[config.tone]} tone`}
             </p>
+            {buyerLine && <p data-testid="role-play-line">{buyerLine}</p>}
           </div>
           <div className="row">
             <span className="muted" role="status">
@@ -320,6 +325,7 @@ function LiveView({ session }: { session: SessionRecord }) {
       ) : (
         <PageHead title="Interview in progress">
           <p>{settings}</p>
+          {buyerLine && <p data-testid="role-play-line">{buyerLine}</p>}
         </PageHead>
       )}
 

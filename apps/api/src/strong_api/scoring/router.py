@@ -55,6 +55,7 @@ from strong_api.scoring.schemas import (
     JobProgress,
     PreviousSignal,
     ScoringAccepted,
+    SessionBuyer,
 )
 from strong_api.sessions.failure import failed_before_start, failure_reason
 from strong_api.suggestions.router import debrief_suggestions
@@ -130,6 +131,25 @@ def snapshot_contract(row: SnapshotRow) -> ProgressSnapshot:
         competency=row.competency,
         score=float(row.score),
         at=row.at,
+    )
+
+
+ENDED = {SessionStatus.SCORING, SessionStatus.COMPLETED, SessionStatus.FAILED}
+"""RP-9: once a session is here the call cannot run again, so the buyer brief may be shown."""
+
+
+def _buyer(session: InterviewSession) -> SessionBuyer | None:
+    """RP-8: the buyer's public part during a role-play; the full brief only once it ended."""
+    brief = _brief(session)
+    if brief is None or brief.role_play is None:
+        return None
+    rp = brief.role_play
+    return SessionBuyer(
+        name=rp.persona_name,
+        title=rp.persona_title,
+        company_summary=rp.company_summary,
+        product=rp.product,
+        reveal=rp if session.status in ENDED else None,
     )
 
 
@@ -364,6 +384,7 @@ async def get_debrief(session_id: uuid.UUID, db: Db, me: Me) -> Debrief:
             ended_at=session.ended_at,
             minutes_billed=session.minutes_billed,
             failure_reason=failure_reason(session),
+            buyer=_buyer(session),
         ),
         status=state,
         scorecard=card,

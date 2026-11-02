@@ -8,6 +8,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from strong_api.scoring.schemas import SessionBuyer
 from strong_core.schemas import SessionChannel, SessionConfig, SessionStatus, Turn
 
 
@@ -68,6 +69,9 @@ class SessionRecord(BaseModel):
             "started), for example when the interview plan could not be built. Such a session "
             "is not billed and does not use a free interview. Null otherwise."
         ),
+    )
+    buyer: SessionBuyer | None = Field(
+        default=None, description="RP-8: the buyer Strova plays; role-play sessions only."
     )
 
 

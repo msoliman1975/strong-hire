@@ -3,9 +3,9 @@
 Fixtures for the job posting (IN-2) and resume (IN-3) extractor.
 
 - `postings/<name>.txt` is a real-style job posting. `postings/<name>.json` is the expected
-  `JobPosting`. There are 36 postings: at least 2 per original role family (swe, data_ml, pm,
+  `JobPosting`. There are 40 postings: at least 2 per original role family (swe, data_ml, pm,
   design, tpm) and at least 4 per wave 1 family (infra_security, data_analytics, eng_management,
-  finance, consulting_strategy, project_program; RF-4 in `docs/role-families-spec.md`). Boundary
+  finance, consulting_strategy, project_program; RF-4 in `docs/role-families-spec.md`) and 4 for sales (RP-11 in `docs/role-play-spec.md`). Boundary
   cases test the splits: an SRE and a security engineer are infra_security while a platform
   software engineer stays swe; a product analytics "data scientist" doing SQL, A/B tests and
   dashboards is data_analytics; a tech lead with no reports is swe while a manager with reports is

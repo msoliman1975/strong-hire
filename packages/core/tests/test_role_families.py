@@ -25,11 +25,12 @@ WAVE_1 = {
     "project_program",
 }
 ORIGINAL = {"swe", "data_ml", "pm", "design", "tpm", "other"}
+WAVE_2 = {"sales"}
 
 
 def test_rf1_enum_keeps_original_values_and_adds_wave_1() -> None:
     """RF-1 / D-4: splits narrow a value's meaning; no value is renamed or removed."""
-    assert {f.value for f in RoleFamily} == ORIGINAL | WAVE_1
+    assert {f.value for f in RoleFamily} == ORIGINAL | WAVE_1 | WAVE_2
 
 
 def test_rf2_every_family_has_exactly_one_registry_entry() -> None:
@@ -53,7 +54,7 @@ def test_rf2_entry_is_complete(family: RoleFamily) -> None:
     assert info.interviewer_title(InterviewType.CUSTOM) == "Interviewer"
     assert 2 <= len(info.generic_loop) <= 4
     assert len(set(info.generic_loop)) == len(info.generic_loop)
-    assert set(info.generic_loop) <= set(TITLED_TYPES)
+    assert InterviewType.CUSTOM not in info.generic_loop
     for kw in info.title_keywords:
         assert kw == kw.lower().strip() and kw
 
@@ -167,7 +168,8 @@ def test_rf12_question_bank_covers_every_wave_1_family() -> None:
 
 
 def test_rf14_beta_families_are_the_wave_1_families_without_5_gold_transcripts() -> None:
-    """RF-14: a wave 1 family is labeled Beta until evals/transcripts has 5 of its transcripts."""
+    """RF-14, D-11: a wave 1 or wave 2 family is labeled Beta until evals/transcripts has 5 of
+    its transcripts."""
     import json
     from collections import Counter
 
@@ -183,6 +185,7 @@ def test_rf14_beta_families_are_the_wave_1_families_without_5_gold_transcripts()
         "finance",
         "consulting_strategy",
         "project_program",
+        "sales",
     }
     expected = {f for f in wave_1 if counts[f] < 5}
     text = (root / "apps/web/src/labels.ts").read_text(encoding="utf-8")

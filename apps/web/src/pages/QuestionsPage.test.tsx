@@ -118,10 +118,10 @@ describe("questions page", () => {
     const openapi = JSON.parse(readFileSync(resolve(__dirname, "../../openapi.json"), "utf8")) as {
       components: { schemas: { Competency: { enum: string[] } } };
     };
-    const { recruiter_screen: recruiter, ...standard } = COMPETENCIES_BY_TYPE;
+    const { recruiter_screen: recruiter, role_play: rolePlay, ...standard } = COMPETENCIES_BY_TYPE;
     const listed = Object.values(standard).flat();
     expect(new Set(listed).size).toBe(listed.length);
-    const all = new Set([...listed, ...recruiter]);
+    const all = new Set([...listed, ...recruiter, ...rolePlay]);
     expect([...all].sort()).toEqual([...openapi.components.schemas.Competency.enum].sort());
   });
 
@@ -140,6 +140,16 @@ describe("questions page", () => {
     ]);
     // The bank holds no recruiter screen questions yet.
     expect((await screen.findAllByText("No questions match these filters.")).length).toBeGreaterThan(0);
+  });
+
+  it("RP-12: with v2 on, Role-play scenario cards are a type with the call areas", async () => {
+    setFeatureOverrides({ v2_enabled: true });
+    const user = renderAt("/questions");
+    await section(/^General questions/);
+    await user.selectOptions(screen.getByLabelText("Interview type"), "role_play");
+    expect(lastSearch).toContain("type=role_play");
+    const areas = within(screen.getByRole("group", { name: "Question area" }));
+    expect(areas.getAllByRole("checkbox")).toHaveLength(5);
   });
 
   it("RS-1: with v2 off, Recruiter screen is not offered", async () => {

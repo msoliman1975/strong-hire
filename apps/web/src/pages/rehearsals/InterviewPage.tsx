@@ -11,11 +11,21 @@ import { keys, useJob, useProfile, useResumes, useUsage } from "../../api/hooks"
 import { gapApi } from "../../api/gap";
 import { useInterview } from "../../api/roles";
 import { paywallReason, sessionsApi } from "../../api/sessions";
-import type { Difficulty, HireSignal, InterviewDetail, Level, Mode } from "../../api/types";
+import type { Difficulty, HireSignal, InterviewDetail, Level, Mode, RolePlayScenario } from "../../api/types";
 import { Strova } from "../../components/strova";
 import { ErrorNotice, Loading } from "../../components/ui";
 import "../../components/ux/ux.css";
-import { competencyLabel, difficultyLabel, formatDate, modeHintV2, modeLabelV2 } from "../../labels";
+import {
+  betaInterviewTypes,
+  competencyLabel,
+  defaultRolePlayScenario,
+  difficultyLabel,
+  formatDate,
+  modeHintV2,
+  modeLabelV2,
+  rolePlayScenarioHint,
+  rolePlayScenarioLabel,
+} from "../../labels";
 import type { Tone } from "../plan/api";
 import { DEFAULT_TAKE_MINUTES, roleTitle, rolePath, typeName } from "../roles/shared";
 
@@ -24,6 +34,7 @@ const LENGTHS = [10, 30, 45] as const;
 const DIFFICULTIES: Difficulty[] = ["friendly", "realistic", "tough"];
 const MODES: Mode[] = ["realistic", "coach"];
 const TONES: Tone[] = ["as_company", "warm", "neutral", "direct"];
+const SCENARIOS = Object.keys(rolePlayScenarioLabel) as RolePlayScenario[];
 
 const toneWord = (tone: Tone, company: string | null) =>
   tone === "as_company" ? `As ${company ?? "the company"}` : { warm: "Warm", neutral: "Neutral", direct: "Direct" }[tone];
@@ -97,6 +108,10 @@ function InterviewBody({ detail }: { detail: InterviewDetail }) {
   const score = ready.score;
   const name = typeName(detail.interview);
   const level: Level | null = job.data?.level ?? profile.data?.target_level ?? null;
+  const rolePlay = detail.interview.interview_type === "role_play";
+  // RP-4, D-5: the candidate picks the call; the default comes from the level.
+  const [picked, setScenario] = useState<RolePlayScenario | null>(null);
+  const scenario = picked ?? defaultRolePlayScenario(level);
   const resume = resumes.data?.find((r) => r.id === detail.interview.resume_id);
 
   const start = useMutation({
@@ -116,6 +131,7 @@ function InterviewBody({ detail }: { detail: InterviewDetail }) {
           level: level ?? "mid",
           tone,
           custom: detail.interview.custom ?? null,
+          role_play: rolePlay ? scenario : null,
         },
       });
     },
@@ -130,7 +146,7 @@ function InterviewBody({ detail }: { detail: InterviewDetail }) {
   });
 
   const takeNo = detail.takes.length + 1;
-  const setup = `${modeLabelV2[mode]}, ${length} minutes, ${toneWord(tone, company).replace(/^As /, "")} tone.`;
+  const setup = `${rolePlay ? `${rolePlayScenarioLabel[scenario]}, ` : ""}${modeLabelV2[mode]}, ${length} minutes, ${toneWord(tone, company).replace(/^As /, "")} tone.`;
   const actingAs = detail.interview.acting_as.text.replace(/^Strova is acting as /, "Strova will act as ");
   const coverage: ReactNode =
     ready.takes_counted === 0 ? (
@@ -151,7 +167,14 @@ function InterviewBody({ detail }: { detail: InterviewDetail }) {
         <Link className="sx-small" to={rolePath(detail.role.id)}>
           {roleTitle(detail.role)}
         </Link>
-        <h1>{name} interview</h1>
+        <h1>
+          {name} interview
+          {betaInterviewTypes.has(detail.interview.interview_type) && (
+            <span className="sx-chip v" style={{ marginLeft: 8, verticalAlign: "middle" }} title="New: questions and scoring are still being calibrated.">
+              Beta
+            </span>
+          )}
+        </h1>
         <p className="sx-muted sx-small">
           Role × Resume × Type: {company ?? detail.role.name ?? "Role"} · {detail.resume_name ?? resume?.name ?? "Resume"} · {name}
         </p>
@@ -217,6 +240,12 @@ function InterviewBody({ detail }: { detail: InterviewDetail }) {
         {start.isError && paywallReason(start.error, false) === null && <ErrorNotice error={start.error} />}
         {open && (
           <div className="sx-drawer" data-testid="take-settings">
+            {rolePlay && (
+              <div className="sx-stack" style={{ gap: 6 }}>
+                <Seg label="Call" value={scenario} options={SCENARIOS} name={(s) => rolePlayScenarioLabel[s]} onChange={setScenario} />
+                <span className="sx-small sx-muted">{rolePlayScenarioHint[scenario]}</span>
+              </div>
+            )}
             <Seg label="Difficulty" value={difficulty} options={DIFFICULTIES} name={(d) => difficultyLabel[d]} onChange={setDifficulty} />
             <div className="sx-stack" style={{ gap: 6 }}>
               <Seg label="Mode" value={mode} options={MODES} name={(m) => modeLabelV2[m]} onChange={setMode} />

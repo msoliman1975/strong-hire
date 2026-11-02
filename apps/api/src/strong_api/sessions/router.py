@@ -66,7 +66,14 @@ from strong_api.custom.limits import CustomSettings, get_custom_settings
 from strong_api.inputs.deps import CurrentUser, Db, Me, Queue
 from strong_api.inputs.queue import BUILD_INTERVIEWER_BRIEF, JobQueue
 from strong_api.plan.interviews import interview_for_session
-from strong_api.scoring.router import _brief, _config, _owned_session, _owned_target, start_scoring
+from strong_api.scoring.router import (
+    _brief,
+    _buyer,
+    _config,
+    _owned_session,
+    _owned_target,
+    start_scoring,
+)
 from strong_api.sessions.failure import brief_is_stale, failure_reason
 from strong_api.sessions.schemas import (
     CoachRequest,
@@ -133,6 +140,7 @@ def _record(session: InterviewSession, target: JobTarget | None) -> SessionRecor
         ended_at=session.ended_at,
         minutes_billed=session.minutes_billed or 0,
         failure_reason=failure_reason(session),
+        buyer=_buyer(session),
     )
 
 

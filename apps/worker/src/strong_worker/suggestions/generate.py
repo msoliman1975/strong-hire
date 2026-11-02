@@ -18,6 +18,7 @@ from pydantic import BaseModel
 from strong_core.gateway import Message, ModelGateway, Role
 from strong_core.prompts import load_prompt
 from strong_core.schemas import (
+    STORY_SKILLS,
     Competency,
     NewStoryPayload,
     ResumeLineEdit,
@@ -140,7 +141,7 @@ async def new_story(
     said = said_text([answer])
     messages = [
         load_prompt(ROLE, "suggest_new_story").message(
-            "system", skills=", ".join(c.value for c in Competency)
+            "system", skills=", ".join(c.value for c in STORY_SKILLS)
         ),
         load_prompt(ROLE, "suggest_new_story_input").message(
             "user", question=quote_untrusted(question), answer=_clip(answer)
