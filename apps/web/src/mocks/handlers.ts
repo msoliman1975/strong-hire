@@ -906,6 +906,7 @@ export function sessionHandlers(store: MockStore) {
         ended_at: null,
         minutes_billed: 0,
         failure_reason: null,
+        buyer: null,
       };
       db().sessions.push(session);
       store.save();
@@ -1073,6 +1074,7 @@ export function scoringHandlers(store: MockStore) {
           ended_at: s.ended_at,
           minutes_billed: s.minutes_billed,
           failure_reason: s.failure_reason ?? null,
+          buyer: s.buyer ?? null,
         },
         status: ready
           ? "ready"

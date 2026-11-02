@@ -20,6 +20,7 @@ from strong_core.schemas import (
     PlannedSession,
     ProgressSnapshot,
     QuestionSource,
+    RolePlayBrief,
     Scorecard,
     SessionConfig,
     SessionStatus,
@@ -39,6 +40,19 @@ class _Out(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
+class SessionBuyer(BaseModel):
+    """RP-8, RP-9: who Strova plays in a role-play. The hidden part (`reveal`) is sent only once
+    the session has ended, for the debrief; never while the call can still run."""
+
+    name: str
+    title: str
+    company_summary: str
+    product: str
+    reveal: RolePlayBrief | None = Field(
+        default=None, description="The full buyer brief, after the session ended (RP-9)."
+    )
+
+
 class DebriefSession(_Out):
     """The session a debrief belongs to. Same shape as the web app's SessionRecord."""
 
@@ -51,6 +65,9 @@ class DebriefSession(_Out):
     minutes_billed: int
     failure_reason: str | None = Field(
         default=None, description="Plain reason when the session failed before it started."
+    )
+    buyer: SessionBuyer | None = Field(
+        default=None, description="RP-9: the buyer Strova played; role-play sessions only."
     )
 
 

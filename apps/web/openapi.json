@@ -16163,6 +16163,17 @@
             ],
             "title": "Failure Reason",
             "description": "Plain reason when the session failed before it started."
+          },
+          "buyer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SessionBuyer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "RP-9: the buyer Strova played; role-play sessions only."
           }
         },
         "additionalProperties": false,
@@ -23957,104 +23968,103 @@
         "description": "TG-1: a role with one readiness per interview."
       },
       "RolePlayBrief": {
-        "additionalProperties": false,
-        "description": "RP-3, D-4: the hidden buyer brief. The live interviewer plays this buyer; the scorer\nreads it to judge discovery and closing. Never shown to the candidate before the debrief.",
         "properties": {
           "scenario": {
             "$ref": "#/components/schemas/RolePlayScenario"
           },
           "persona_name": {
+            "type": "string",
             "maxLength": 60,
             "minLength": 1,
-            "title": "Persona Name",
-            "type": "string"
+            "title": "Persona Name"
           },
           "persona_title": {
+            "type": "string",
             "maxLength": 80,
             "minLength": 1,
-            "title": "Persona Title",
-            "type": "string"
+            "title": "Persona Title"
           },
           "company_summary": {
-            "description": "The buyer's company.",
+            "type": "string",
             "maxLength": 300,
             "minLength": 1,
             "title": "Company Summary",
-            "type": "string"
+            "description": "The buyer's company."
           },
           "product": {
-            "description": "What the candidate sells.",
+            "type": "string",
             "maxLength": 240,
             "minLength": 1,
             "title": "Product",
-            "type": "string"
+            "description": "What the candidate sells."
           },
           "product_illustrative": {
-            "default": false,
-            "description": "D-9: true when the posting named no product and the planner described one.",
+            "type": "boolean",
             "title": "Product Illustrative",
-            "type": "boolean"
+            "description": "D-9: true when the posting named no product and the planner described one.",
+            "default": false
           },
           "situation": {
-            "description": "Why this call is happening.",
+            "type": "string",
             "maxLength": 400,
             "minLength": 1,
             "title": "Situation",
-            "type": "string"
+            "description": "Why this call is happening."
           },
           "hidden_pains": {
-            "description": "Said only when good discovery earns them.",
             "items": {
               "type": "string"
             },
+            "type": "array",
             "maxItems": 4,
             "minItems": 1,
             "title": "Hidden Pains",
-            "type": "array"
+            "description": "Said only when good discovery earns them."
           },
           "budget": {
+            "type": "string",
             "maxLength": 200,
             "minLength": 1,
-            "title": "Budget",
-            "type": "string"
+            "title": "Budget"
           },
           "decision_process": {
+            "type": "string",
             "maxLength": 240,
             "minLength": 1,
-            "title": "Decision Process",
-            "type": "string"
+            "title": "Decision Process"
           },
           "objections": {
             "items": {
               "$ref": "#/components/schemas/RolePlayObjection"
             },
+            "type": "array",
             "maxItems": 4,
             "minItems": 1,
-            "title": "Objections",
-            "type": "array"
+            "title": "Objections"
           },
           "curveball": {
             "anyOf": [
               {
-                "maxLength": 240,
-                "type": "string"
+                "type": "string",
+                "maxLength": 240
               },
               {
                 "type": "null"
               }
             ],
-            "default": null,
-            "description": "Tough only (D-8).",
-            "title": "Curveball"
+            "title": "Curveball",
+            "description": "Tough only (D-8)."
           },
           "success_condition": {
-            "description": "What earns the next step, e.g. a booked demo.",
+            "type": "string",
             "maxLength": 200,
             "minLength": 1,
             "title": "Success Condition",
-            "type": "string"
+            "description": "What earns the next step, e.g. a booked demo."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "scenario",
           "persona_name",
@@ -24069,7 +24079,7 @@
           "success_condition"
         ],
         "title": "RolePlayBrief",
-        "type": "object"
+        "description": "RP-3, D-4: the hidden buyer brief. The live interviewer plays this buyer; the scorer\nreads it to judge discovery and closing. Never shown to the candidate before the debrief."
       },
       "RolePlayDraft": {
         "additionalProperties": false,
@@ -24096,30 +24106,30 @@
         "type": "object"
       },
       "RolePlayObjection": {
-        "additionalProperties": false,
-        "description": "One objection the buyer raises in a role-play (RP-3).",
         "properties": {
           "text": {
-            "description": "What the buyer says.",
+            "type": "string",
             "maxLength": 240,
             "minLength": 1,
             "title": "Text",
-            "type": "string"
+            "description": "What the buyer says."
           },
           "when": {
-            "description": "When to raise it, e.g. \"after the price\".",
+            "type": "string",
             "maxLength": 160,
             "minLength": 1,
             "title": "When",
-            "type": "string"
+            "description": "When to raise it, e.g. \"after the price\"."
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "text",
           "when"
         ],
         "title": "RolePlayObjection",
-        "type": "object"
+        "description": "One objection the buyer raises in a role-play (RP-3)."
       },
       "RolePlayScenario": {
         "type": "string",
@@ -24756,6 +24766,46 @@
         ],
         "title": "ServiceProfile"
       },
+      "SessionBuyer": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "company_summary": {
+            "type": "string",
+            "title": "Company Summary"
+          },
+          "product": {
+            "type": "string",
+            "title": "Product"
+          },
+          "reveal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RolePlayBrief"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The full buyer brief, after the session ended (RP-9)."
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "title",
+          "company_summary",
+          "product"
+        ],
+        "title": "SessionBuyer",
+        "description": "RP-8, RP-9: who Strova plays in a role-play. The hidden part (`reveal`) is sent only once\nthe session has ended, for the debrief; never while the call can still run."
+      },
       "SessionChannel": {
         "type": "string",
         "enum": [
@@ -24968,6 +25018,17 @@
             ],
             "title": "Failure Reason",
             "description": "Plain reason when the session failed before it started (status failed, never started), for example when the interview plan could not be built. Such a session is not billed and does not use a free interview. Null otherwise."
+          },
+          "buyer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SessionBuyer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "RP-8: the buyer Strova plays; role-play sessions only."
           }
         },
         "type": "object",

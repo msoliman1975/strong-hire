@@ -100,6 +100,7 @@ export type Turn = DeepRequired<S["Turn"]>;
 export type Phase = S["Phase"];
 export type Level = S["Level"];
 export type RoleFamily = S["RoleFamily"];
+export type RolePlayScenario = S["RolePlayScenario"];
 export type InterviewType = S["InterviewType"];
 export type Difficulty = S["Difficulty"];
 export type Mode = S["Mode"];

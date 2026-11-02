@@ -90,6 +90,7 @@ describe("admin mocks match openapi.json", () => {
       ended_at: "2026-10-07T09:30:00Z",
       minutes_billed: 30,
       failure_reason: null,
+      buyer: null,
     });
     expectApiShape("AdminUserPage", await adminApi.users());
     expectApiShape("AdminSessionList", await adminApi.sessions({ interview_type: "case" }));
@@ -162,6 +163,7 @@ describe("admin mocks match openapi.json", () => {
       ended_at: "2026-10-07T09:30:00Z",
       minutes_billed: 30,
       failure_reason: null,
+      buyer: null,
     });
     expectApiShape("AdminSessionList", await adminApi.sessions({ status: "failed" }));
     expectApiShape("AdminSessionDetail", await adminApi.session("00000000-0000-4000-8000-0000000000c2"));

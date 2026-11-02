@@ -6128,6 +6128,8 @@ export interface components {
              * @description Plain reason when the session failed before it started.
              */
             failure_reason?: string | null;
+            /** @description RP-9: the buyer Strova played; role-play sessions only. */
+            buyer?: components["schemas"]["SessionBuyer"] | null;
         };
         /**
          * DeliveryMetrics
@@ -9288,9 +9290,8 @@ export interface components {
             /**
              * Curveball
              * @description Tough only (D-8).
-             * @default null
              */
-            curveball: string | null;
+            curveball?: string | null;
             /**
              * Success Condition
              * @description What earns the next step, e.g. a booked demo.
@@ -9610,6 +9611,23 @@ export interface components {
             at: string | null;
         };
         /**
+         * SessionBuyer
+         * @description RP-8, RP-9: who Strova plays in a role-play. The hidden part (`reveal`) is sent only once
+         *     the session has ended, for the debrief; never while the call can still run.
+         */
+        SessionBuyer: {
+            /** Name */
+            name: string;
+            /** Title */
+            title: string;
+            /** Company Summary */
+            company_summary: string;
+            /** Product */
+            product: string;
+            /** @description The full buyer brief, after the session ended (RP-9). */
+            reveal?: components["schemas"]["RolePlayBrief"] | null;
+        };
+        /**
          * SessionChannel
          * @description PL-7. How the candidate and the interviewer talk. Text runs the same controller and
          *     interviewer logic with typed input. It is a dev flag; the simulated-candidate tests use it.
@@ -9700,6 +9718,8 @@ export interface components {
              * @description Plain reason when the session failed before it started (status failed, never started), for example when the interview plan could not be built. Such a session is not billed and does not use a free interview. Null otherwise.
              */
             failure_reason?: string | null;
+            /** @description RP-8: the buyer Strova plays; role-play sessions only. */
+            buyer?: components["schemas"]["SessionBuyer"] | null;
         };
         /** SessionReplay */
         SessionReplay: {

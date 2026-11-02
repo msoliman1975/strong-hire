@@ -11,6 +11,7 @@ import type {
   InterviewType,
   Level,
   Mode,
+  RolePlayScenario,
   SessionConfig,
   SessionSetup,
 } from "../api/types";
@@ -22,6 +23,7 @@ import type { SetupState } from "../custom/repeat";
 import { useCustomSetup } from "../custom/useCustomSetup";
 import { useFeature } from "../theme/features";
 import {
+  defaultRolePlayScenario,
   difficultyHint,
   difficultyLabel,
   interviewTypeHint,
@@ -29,12 +31,15 @@ import {
   levelLabel,
   modeHint,
   modeLabel,
+  rolePlayScenarioHint,
+  rolePlayScenarioLabel,
 } from "../labels";
 
 // The four standard types, then Custom (D-1), which opens its own setup below the type choice.
 // Recruiter screen (RS-1) is a v2 type: it shows only when v2_enabled is on (FL-1).
 const ALL_TYPES = Object.keys(interviewTypeLabel) as InterviewType[];
-const V1_TYPES = ALL_TYPES.filter((t) => t !== "recruiter_screen");
+const SCENARIOS = Object.keys(rolePlayScenarioLabel) as RolePlayScenario[];
+const V1_TYPES = ALL_TYPES.filter((t) => t !== "recruiter_screen" && t !== "role_play");
 const DIFFICULTIES = Object.keys(difficultyLabel) as Difficulty[];
 const MODES = Object.keys(modeLabel) as Mode[];
 const LEVELS = Object.keys(levelLabel) as Level[];
@@ -88,6 +93,7 @@ export function SessionSetupPage() {
   // Coach first: the controls (pause, hint, redo) help a new candidate; Realistic is one click away.
   const [mode, setMode] = useState<Mode>(prefill?.config.mode ?? pick(params.get("mode"), MODES, "coach"));
   const [level, setLevel] = useState<Level | "">(prefill?.config.level ?? "");
+  const [pickedScenario, setScenario] = useState<RolePlayScenario | null>(prefill?.config.role_play ?? null);
   // CU-5: the server refused a question or chip; it is shown next to it, not as a page error.
   const [refusedInline, setRefusedInline] = useState(false);
 
@@ -138,6 +144,7 @@ export function SessionSetupPage() {
 
   // AC-3: the profile's target level is the default when the posting gives no level.
   const chosenLevel: Level | "" = level || job.data.level || profile.data?.target_level || "";
+  const scenario = pickedScenario ?? defaultRolePlayScenario(chosenLevel || null);
   const posting = job.data.posting;
   const chosenDuration: Duration = fullAllowed ? (duration ?? 30) : MINI;
   const sessionsClosed = siteStatus.data?.voice_sessions_open === false;
@@ -157,7 +164,7 @@ export function SessionSetupPage() {
       level: chosenLevel,
       custom: isCustom ? custom.spec() : null,
       tone: "as_company", // TN-1: S11 adds the tone picker
-      role_play: null, // RP-8: the scenario picker comes with the role-play UI
+      role_play: type === "role_play" ? scenario : null, // RP-4, D-5
     });
   };
 
@@ -189,6 +196,17 @@ export function SessionSetupPage() {
           </p>
         )}
         {isCustom && <CustomFields setup={custom} longAllowed={fullAllowed} />}
+        {type === "role_play" && (
+          <Choices
+            legend="Call"
+            name="role_play"
+            options={SCENARIOS}
+            value={scenario}
+            onChange={setScenario}
+            label={(v) => rolePlayScenarioLabel[v]}
+            hint={(v) => rolePlayScenarioHint[v]}
+          />
+        )}
         <Choices
           legend="Difficulty"
           name="difficulty"

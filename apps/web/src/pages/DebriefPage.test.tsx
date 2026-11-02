@@ -25,6 +25,7 @@ function debrief(generic: boolean, duration_min: 10 | 30 | 45 = 30): Debrief {
       ended_at: "2026-10-01T10:30:00Z",
       minutes_billed: 30,
       failure_reason: null,
+      buyer: null,
     },
     status: "ready",
     scorecard: scorecardFor("behavioral", generic),

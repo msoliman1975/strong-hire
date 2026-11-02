@@ -81,6 +81,7 @@ function session(id: string, jobId: string, resumeId: string, config: SessionCon
     ended_at: `2026-10-0${day}T10:30:00Z`,
     minutes_billed: 30,
     failure_reason: null,
+    buyer: null,
   };
 }
 
